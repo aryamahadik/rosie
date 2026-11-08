@@ -10,5 +10,6 @@
   "door": "ai",
   "flow": "A",
   "booker": { "kind": "new", "name": null },
-  "safetyOutcomeId": null
+  "safetyOutcomeId": null,
+  "entered": null
 }

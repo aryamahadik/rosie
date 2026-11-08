@@ -1,11 +1,11 @@
 {
   "call": "confirmBusinessBooking",
   "given": {
-    "seeds": ["business-setup/seed-company-two-kinds.json"],
-    "after": ["j3-open-request-business-desk.json"],
+    "seeds": ["business-setup/seed-company-two-kinds.json", "services-prices/seed-service-money-paths.json"],
+    "after": ["j3-open-request-business-desk.json", "j3-read-back-page.json"],
     "now": "2026-10-20T14:12:02Z",
     "stated": { "step": "B3-08", "gives": ["who_for", "reach_by", "times", "customer"] },
-    "note": "B3-08 then B3-24: the Today page reads Sam's entry back once and Sam taps '2 Not yet': Tessa did not agree to messages from Rosie. The answer still gives who_for (Tessa, 18 or older, as person served and payer), reach_by (texts, the way her mobile on file implies: K-28 customers_way_fits_contact), times (an arrival window, arriving 12-2pm with Casey, the reserved 12 to 3pm holding the job's length as K-30's flow B seed does) and customer (her new row, with her mobile as a new K-04 handle and phone row and her customer role, in one commit). No consent is written, so Rosie texts Tessa nothing; Sam is told to tell her the details himself (B3-24's row). Her mobile gets its contacts/add effect when saved (Q-03; CQ-04). res-casey stands for Casey's worker resource, which no frozen seed holds yet."
+    "note": "B3-08 then B3-24: the Today page showed the read-back readBackBusinessBooking answered its server, and Sam taps '2 Not yet': Tessa did not agree to messages from Rosie. The page server sends the words and versions it kept with Sam's session, never the browser; the call fills the read-back again from those versions, finds the same words, and compares every version (limit 4). '2 Not yet' books it as entered, as '1 Yes' does (A3-30: 'The reply books it, as entered'; A3-40, B3-24: 'The booking is made'): the held reservation, arriving 12-2pm with Casey on Thu Oct 22 (the reserved 12 to 3pm), confirmed booked with the booking, and the head's stage booked, inside the 10-minute hold, so the sweep never lets the time go. It still gives who_for (Tessa, 18 or older as the read-back said, as person served and payer), reach_by (texts, the way her mobile implies: K-28 customers_way_fits_contact), times (booking_details.times window, Lee Home Services's flow B default) and customer (her new K-28 row naming the mobile handle the BOOK linked, with her customer role, in one commit). No consent is written, so Rosie texts Tessa nothing; the page tells Sam it is booked with no texts to her, and he tells her the details himself (B3-24's row). The contacts/add effect went with her mobile at the BOOK (Q-03). A page's commit has no turn: CQ-44's commit with no turn (README open gap 3)."
   },
   "request": {
     "caller": {
@@ -18,43 +18,40 @@
     },
     "bookingId": "booking-tessa-desk",
     "expectVersion": 1,
-    "customerVersion": null,
     "answer": "notYet",
     "readBack": {
+      "kind": "page",
       "exactWords": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+      "versionsRead": [
+        { "table": "bookings", "rowId": "booking-tessa-desk", "version": 1 },
+        { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 1 },
+        { "table": "booking_lines", "rowId": "line-tessa-desk-1", "version": 1 },
+        { "table": "reservations", "rowId": "rsv-tessa-desk-casey", "version": 1 },
+        { "table": "persons", "rowId": "person-tessa-desk", "version": 1 },
+        { "table": "phones", "rowId": "handle-tessa-desk", "version": 1 }
+      ],
       "yesEventId": "evt-page-sam-0402"
     },
-    "customer": {
-      "name": "Tessa",
-      "mobile": "+15555550142",
-      "email": null,
-      "way": "texts",
-      "ageBand": "18_or_older"
-    },
-    "time": {
-      "resourceId": "res-casey",
-      "during": { "start": "2026-10-22T16:00:00Z", "end": "2026-10-22T19:00:00Z" },
-      "timesRead": "window",
-      "zone": "America/New_York"
-    }
+    "changed": null
   },
   "outcome": {
     "bookingId": "booking-tessa-desk",
     "customerId": "customer-tessa-desk",
     "gives": ["who_for", "reach_by", "times", "customer"],
     "answer": "notYet",
+    "stage": "booked",
     "consentId": null,
-    "reservationId": "rsv-tessa-desk-casey",
-    "effects": [{ "effectId": "effect-contact-add-tessa-desk", "kind": "linq_contact_add" }],
+    "reservation": { "reservationId": "rsv-tessa-desk-casey", "state": "booked", "version": 2 },
+    "textsOff": null,
+    "effects": [],
     "written": [
-      { "table": "phones", "rowId": "handle-tessa-desk", "version": 1 },
       { "table": "person_roles", "rowId": "role-tessa-desk-home-services", "version": 1 },
       { "table": "customers", "rowId": "customer-tessa-desk", "version": 1 },
       { "table": "bookings", "rowId": "booking-tessa-desk", "version": 2 },
       { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 2 },
-      { "table": "reservations", "rowId": "rsv-tessa-desk-casey", "version": 1 }
+      { "table": "reservations", "rowId": "rsv-tessa-desk-casey", "version": 2 }
     ],
-    "outboxRowIds": ["out-sam-tessa-no-texts"],
+    "outboxRowIds": [],
     "repeated": false
   }
 }

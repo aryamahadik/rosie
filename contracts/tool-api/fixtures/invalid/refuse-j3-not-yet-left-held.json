@@ -1,0 +1,19 @@
+{
+  "bookingId": "booking-tessa-desk",
+  "customerId": "customer-tessa-desk",
+  "gives": ["who_for", "reach_by", "times", "customer"],
+  "answer": "notYet",
+  "stage": "booked",
+  "consentId": null,
+  "reservation": { "reservationId": "rsv-tessa-desk-casey", "state": "held", "version": 1 },
+  "textsOff": null,
+  "effects": [],
+  "written": [
+    { "table": "person_roles", "rowId": "role-tessa-desk-home-services", "version": 1 },
+    { "table": "customers", "rowId": "customer-tessa-desk", "version": 1 },
+    { "table": "bookings", "rowId": "booking-tessa-desk", "version": 2 },
+    { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 2 }
+  ],
+  "outboxRowIds": [],
+  "repeated": false
+}

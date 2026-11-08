@@ -5,19 +5,19 @@
     "after": [],
     "now": "2026-10-23T14:20:03Z",
     "stated": { "step": "A3-22", "gives": ["safe"] },
-    "note": "A3-24: Alex texts 'my lips are swelling after the beard color and I can't breathe well' (contracts/model/fixtures/safety-emergency-now.json, word for word). The read on arrival says An emergency, so before any batch closes the handle actor records it in the text's own arrival turn (caller.kind actorOnArrival; turn-arrival-alex-0202 stands for the hash of evt-alex-0202, CQ-09): the outcome row, its after-safe hold written at version 1, the 911 line as an outbox row of send class safety, at any hour and past any opt-out, and Sam told through a hand-off, then Rosie's team after 5 minutes (arch 06 line 329). The call gives safe. The same text later joins its batch's turn, whose recordSafetyOutcome for it answers repeated and whose routine parts the hold answers held until a clear 'we're safe' (A3-24)."
+    "note": "A3-24: Alex texts 'my lips are swelling after the beard color and I can't breathe well' (contracts/model/fixtures/safety-emergency-now.json, word for word). The read on arrival says An emergency, so before any batch closes the handle actor records it in the text's own arrival turn (caller.kind actorOnArrival; its id is arrivalTurnId('evt-alex-0202'), the SHA-256 of 'arrival:evt-alex-0202', README default 36, so it never equals the id of the batch turn the text joins next, the hash of its sorted event ids, CQ-09): the outcome row, its after-safe hold written at version 1, the 911 line as an outbox row of send class safety, at any hour and past any opt-out, and Sam told through a hand-off, then Rosie's team after 5 minutes (arch 06 line 329). The call gives safe. The same text then joins its batch's turn, under that turn's own id (j3-safety-arrival-batch-turn.json), whose recordSafetyOutcome for it answers repeated and whose routine parts the hold answers held until a clear 'we're safe' (A3-24)."
   },
   "request": {
     "caller": {
       "kind": "actorOnArrival",
-      "turnId": "turn-arrival-alex-0202",
-      "requestId": "turn-arrival-alex-0202",
+      "turnId": "bbf088c8c89cea1fde8ac199403e49cb5d7312eeadcc2ec7e4b305e6d1c8b3c1",
+      "requestId": "bbf088c8c89cea1fde8ac199403e49cb5d7312eeadcc2ec7e4b305e6d1c8b3c1",
       "businessId": "biz-lees-barbershop",
       "personId": "person-alex",
       "traceId": "trace-alex-0202"
     },
     "turn": {
-      "id": "turn-arrival-alex-0202",
+      "id": "bbf088c8c89cea1fde8ac199403e49cb5d7312eeadcc2ec7e4b305e6d1c8b3c1",
       "handleId": "handle-alex",
       "eventIds": ["evt-alex-0202"],
       "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },

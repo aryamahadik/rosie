@@ -9,23 +9,12 @@
   },
   "bookingId": "booking-alex-sam-book",
   "expectVersion": 1,
-  "customerVersion": 1,
   "answer": "yesSendLink",
   "readBack": {
+    "kind": "page",
     "exactWords": "Book this for Alex M.? Did Alex agree to messages from Rosie? / Haircut · Sat Oct 24 / 11:00am · Riley / For Alex, 18 or older / Alex M. · mobile on file / No Rosie $2: Lee's Barbershop added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-sam-book", "version": 1 }],
     "yesEventId": "req-agent-alex-0004"
   },
-  "customer": {
-    "name": "Alex M.",
-    "mobile": "+15555550101",
-    "email": "alex@example.com",
-    "way": "texts",
-    "ageBand": "18_or_older"
-  },
-  "time": {
-    "resourceId": "res-riley",
-    "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
-    "timesRead": "setstart",
-    "zone": "America/New_York"
-  }
+  "changed": null
 }

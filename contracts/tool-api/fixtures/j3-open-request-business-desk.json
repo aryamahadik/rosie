@@ -1,11 +1,11 @@
 {
   "call": "openRequest",
   "given": {
-    "seeds": ["business-setup/seed-company-two-kinds.json"],
+    "seeds": ["business-setup/seed-company-two-kinds.json", "services-prices/seed-service-money-paths.json"],
     "after": [],
     "now": "2026-10-20T14:10:02Z",
     "stated": { "step": "B3-01", "gives": ["request"] },
-    "note": "B3-08's what-if on the portal: Tessa calls the office, and Sam enters 'Tessa, drain clearing, Thu 12-2, Casey' on the Today page at 10:10am Tue Oct 20 (A3-19: 'On the portal, the desk types it on the Today page'). Tessa is not on Lee Home Services's list, so the request opens at door business, flow B, made_by shop, for a new person named as typed; her customer row, mobile and role come with the read-back's answer (j3-confirm-business-booking-not-yet.json). The business's own entry is not free text from a customer, so no safety read names it (safetyOutcomeId null). In flow B the request is B3-01's to give."
+    "note": "B3-08's what-if on the portal: Tessa calls the office, and Sam enters 'Tessa, drain clearing, Thu 12-2, Casey' with her mobile on the Today page at 10:10am Tue Oct 20 (A3-19: 'On the portal, the desk types it on the Today page'). Tessa is not on Lee Home Services's list, so the request opens at door business, flow B, made_by shop, for a new person named as typed, and the values typed are stored here (README default 43): the service as the K-30 line (svc-lee-plumbing-drain-clearing with its home way, the $179 rule copied), her mobile as her own new K-04 handle with its phone row and contacts/add effect (Q-03), and Thu Oct 22 arriving 12-2pm with Casey held for the booking, the reserved 12 to 3pm holding the job's length as K-30's flow B seed does. Her K-28 customer row and role come with the read-back's answer (j3-confirm-business-booking-not-yet.json). The business's own entry is not free text from a customer, so no safety read names it (safetyOutcomeId null). In flow B the request is B3-01's to give. res-casey stands for Casey's worker resource, which no frozen seed holds yet (README default 48)."
   },
   "request": {
     "caller": {
@@ -19,7 +19,20 @@
     "door": "business",
     "flow": "B",
     "booker": { "kind": "new", "name": "Tessa" },
-    "safetyOutcomeId": null
+    "safetyOutcomeId": null,
+    "entered": {
+      "time": {
+        "resourceId": "res-casey",
+        "during": { "start": "2026-10-22T16:00:00Z", "end": "2026-10-22T19:00:00Z" },
+        "zone": "America/New_York"
+      },
+      "service": {
+        "asTyped": "drain clearing",
+        "serviceId": "svc-lee-plumbing-drain-clearing",
+        "serviceMoneyId": "way-lee-plumbing-drain-home"
+      },
+      "newCustomer": { "mobile": "+15555550142", "email": null }
+    }
   },
   "outcome": {
     "bookingId": "booking-tessa-desk",
@@ -28,9 +41,17 @@
     "gives": ["request"],
     "written": [
       { "table": "persons", "rowId": "person-tessa-desk", "version": 1 },
+      { "table": "phones", "rowId": "handle-tessa-desk", "version": 1 },
       { "table": "bookings", "rowId": "booking-tessa-desk", "version": 1 },
-      { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 1 }
+      { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-tessa-desk-1", "version": 1 }
     ],
+    "held": {
+      "reservationId": "rsv-tessa-desk-casey",
+      "version": 1,
+      "heldUntil": "2026-10-20T14:20:02Z"
+    },
+    "effects": [{ "effectId": "effect-contact-add-tessa-desk", "kind": "linq_contact_add" }],
     "repeated": false
   }
 }

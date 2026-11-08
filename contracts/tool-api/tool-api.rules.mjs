@@ -1,5 +1,7 @@
 // K-09's named rules (T-018; v1.1's givesJourneyKeys and arrivalTurn added by T-050): what an exchange states that
 // one JSON Schema cannot check across its parts.
+
+import { createHash } from "node:crypto";
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
 // passed its schema (contracts/scripts/check-fixtures.mjs). QA's contract test (T-088) and the Tool API mock (C-186)
 // read the same statements. README "Named rules". Rules are only ever added: a later minor version adds a rule under a
@@ -301,25 +303,84 @@ const dangerOrTimeout = (safety) =>
   safety?.timedOut === true || (safety?.outcomes ?? []).some((outcome) => outcome !== "No");
 
 /**
+ * The marker an arrival turn's hash input starts with (README default 36). A batch turn's id is the hash of its sorted
+ * event ids alone (CQ-09; T-248), so an arrival turn's input, the marker and then the event id, is never a batch's, as
+ * a clock turn's input is its clock row's id (K-05 v1 default 9).
+ */
+export const ARRIVAL_MARK = "arrival:";
+
+/**
+ * The arrival turn's id for a text's event id: the SHA-256 of the UTF-8 bytes of ARRIVAL_MARK followed by the event
+ * id, in lowercase hex (README default 36). The handle actor (C-047) and QA (T-117) compute it with this function.
+ */
+export function arrivalTurnId(eventId) {
+  return createHash("sha256").update(`${ARRIVAL_MARK}${eventId}`, "utf8").digest("hex");
+}
+
+/** A batch turn of texts that had an arrival record: its id is never one of its texts' arrival turn ids. */
+function batchAfterArrival(exchange) {
+  const request = exchange.request ?? {};
+  const { caller = {}, turn } = request;
+  const problems = [];
+  if (caller.kind !== "turn" || turn === null || turn === undefined) {
+    return ["a batch turn after an arrival record is called with caller.kind turn and its turn"];
+  }
+  if (caller.turnId !== turn.id || caller.requestId !== turn.id) {
+    problems.push("a batch turn is called with caller.turnId and requestId its id");
+  }
+  for (const eventId of turn.eventIds ?? []) {
+    if (turn.id === arrivalTurnId(eventId)) {
+      problems.push(
+        `the batch turn's id is ${eventId}'s arrival turn id: the two turns must never share one`,
+      );
+    }
+  }
+  const records = (request.core ?? []).filter((action) => action.call === "recordSafetyOutcome");
+  if (records.length === 0) problems.push("the batch carries its texts' safety records as core actions");
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result !== "committed" || outcome.repeated !== false || outcome.turnId !== turn.id) {
+    problems.push("the batch commits under its own id, never as a repeat of the arrival turn");
+  }
+  for (const result of outcome.core ?? []) {
+    if (result.call === "recordSafetyOutcome" && result.response?.repeated !== true) {
+      problems.push(
+        "a text recorded on arrival answers repeated in its batch turn (the event id is the key)",
+      );
+    }
+  }
+  return problems;
+}
+
+/**
  * arrivalTurn: the handle actor's record on arrival (recordSafetyOutcome, caller.kind actorOnArrival) commits under
- * the text's own arrival turn: caller.turnId and requestId the turn's id, its one event id the text's, its handle the
- * text's, its trace id the caller's (CQ-06, CQ-09; K-34 v1 safety_outcomes_text_has_handle_and_turn); only a text
- * whose read holds danger or timed out has one (a No rides in the turn its text joins: README default 5); a first
- * record gives safe and writes its hold at version 1 (K-34 v1 rule 2). An at-once release on arrival
- * (releaseSafetyHold, caller.kind actorOnArrival) runs under the same arrival turn's id.
+ * the text's own arrival turn: its id arrivalTurnId(the text's event id), never a batch turn's; caller.turnId and
+ * requestId that id; its one event id the text's, its handle the text's, its trace id the caller's (CQ-06, CQ-09;
+ * K-34 v1 safety_outcomes_text_has_handle_and_turn); only a text whose read holds danger or timed out has one (a No
+ * rides in the turn its text joins: README default 5); a first record gives safe and writes its hold at version 1
+ * (K-34 v1 rule 2). An at-once release on arrival (releaseSafetyHold, caller.kind actorOnArrival) runs under the same
+ * arrival turn's id. The batch turn the same text joins (gateAndCommit) has an id of its own, never an arrival turn's,
+ * so it commits, its record answering repeated (README "The safety record on arrival").
  */
 export function arrivalTurn(exchange) {
   const request = exchange.request ?? {};
   const caller = request.caller ?? {};
+  if (exchange.call === "gateAndCommit") return batchAfterArrival(exchange);
   if (caller.kind !== "actorOnArrival")
-    return ["arrivalTurn needs a call made by caller.kind actorOnArrival"];
+    return ["arrivalTurn needs a call made by caller.kind actorOnArrival, or the batch turn after it"];
   const problems = [];
   if (caller.requestId !== caller.turnId) problems.push("caller.requestId is the arrival turn's id");
+  if (!/^[0-9a-f]{64}$/.test(caller.turnId ?? "")) {
+    problems.push("the arrival turn's id is a SHA-256 in lowercase hex (arrivalTurnId)");
+  }
   if (exchange.call === "releaseSafetyHold") return problems;
   if (exchange.call !== "recordSafetyOutcome")
-    return ["arrivalTurn applies to recordSafetyOutcome and releaseSafetyHold"];
+    return ["arrivalTurn applies to recordSafetyOutcome, releaseSafetyHold and the batch turn after them"];
   const { turn, safety } = request;
   if (turn?.id !== caller.turnId) problems.push("caller.turnId is the arrival turn's id");
+  const expectedId = arrivalTurnId(safety?.eventId);
+  if (turn?.id !== expectedId) {
+    problems.push(`the arrival turn's id is arrivalTurnId(${safety?.eventId}), ${expectedId}`);
+  }
   if (JSON.stringify(turn?.eventIds) !== JSON.stringify([safety?.eventId])) {
     problems.push("the arrival turn's one event id is the text's own");
   }

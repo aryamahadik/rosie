@@ -1,0 +1,49 @@
+{
+  "call": "recordStopOrStart",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "core/seed-phone-chat-open.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-business-text.json", "j3-confirm-business-booking-yes.json"],
+    "now": "2026-10-22T16:40:02Z",
+    "stated": null,
+    "note": "S13-32 and A3-12: two hours after Sam booked Alex's Saturday haircut and Alex's yes to texts was written, Alex texts only STOP from his mobile. As stop-recorded.json, his own core-only turn records it at once for every business (RULES 7.2; MC C1), with the stop reply as a quick_reply row; this exchange shows the core action as it rides there. v1.1 adds what v1's open gap 18 left out: Lee's Barbershop, which has an open booking for that phone (booking-alex-sam-book, booked), is told in the same commit with the one fixed line 'Texts to this customer are off. Reach them their way.', a row to Sam held for his text hours, never saying where the stop came from (RULES 7.5; S13-32; README default 50). The visit stays booked: alone, a stop never cancels it (S13-32). phoneVersion 5 is an example."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-stop-0220",
+      "requestId": "turn-alex-stop-0220",
+      "businessId": null,
+      "personId": "person-alex",
+      "traceId": "trace-alex-0220"
+    },
+    "kind": "stop",
+    "phoneNumber": "+15555550101",
+    "inboundEventId": "evt-alex-0220",
+    "words": "STOP",
+    "alsoCancelVisit": false,
+    "workPhoneBusinessIds": null,
+    "sentByActor": null
+  },
+  "outcome": {
+    "consentRowIds": ["consent-alex-stop-0220"],
+    "stopped": true,
+    "chatOpen": false,
+    "phoneVersion": 5,
+    "reply": { "fixedLineId": "stopReply", "outboxRowId": "out-alex-stop-reply-0220" },
+    "askedWhichTexts": null,
+    "flaggedBookingIds": [],
+    "repeated": false,
+    "businessesTold": [
+      {
+        "businessId": "biz-lees-barbershop",
+        "fixedLineId": "textsOffReachTheirWay",
+        "outboxRowId": "out-sam-alex-texts-off-0220"
+      }
+    ]
+  }
+}

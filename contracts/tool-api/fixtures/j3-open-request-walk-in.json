@@ -19,7 +19,8 @@
     "door": "walk_in",
     "flow": "A",
     "booker": { "kind": "caller" },
-    "safetyOutcomeId": null
+    "safetyOutcomeId": null,
+    "entered": null
   },
   "outcome": {
     "bookingId": "booking-omar-walk-in",
@@ -30,6 +31,8 @@
       { "table": "bookings", "rowId": "booking-omar-walk-in", "version": 1 },
       { "table": "booking_details", "rowId": "booking-omar-walk-in", "version": 1 }
     ],
+    "held": null,
+    "effects": [],
     "repeated": false
   }
 }

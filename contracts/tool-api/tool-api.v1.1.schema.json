@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.1.schema.json",
   "title": "ToolApiV1dot1",
-  "description": "K-09 Tool API v1.1, a minor version for journey 3 (T-050; 02-contracts K-09 version table, row v1.1; section 9 F15). It only adds to v1 (tool-api.v1.schema.json, frozen by T-018 and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference; the changed ones (given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, recordSafetyOutcome.request, recordSafetyOutcome.response, recordSafetyOutcome.exchange, releaseSafetyHold.request, releaseSafetyHold.exchange, callName) take only new optional fields, new enum values or new request variants, so every v1 exchange is a v1.1 exchange. Added: the calls of journey 3 (A3-01 to A3-51 and B3-01 to B3-42, the call-only steps out: C-231, C-232; S11-62 with journey 3): openRequest (gives request), confirmBusinessBooking (gives who_for, reach_by, times and customer), findCustomer, checkBookingFirst and setCustomerBlock; recordSafetyOutcome gives safe and takes the handle actor's record on arrival (arrivalCaller), and releaseSafetyHold its at-once release. Each key journey 3 writes is written by exactly one call, named in that call's description with its step id (02-contracts section 8; README 'v1.1'). K-28 v1 (customers) and K-30 v1 (bookings and changes) are frozen on main: the calls name their tables and columns, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-09 Tool API v1.1, a minor version for journey 3 (T-050; 02-contracts K-09 version table, row v1.1; section 9 F15). It only adds to v1 (tool-api.v1.schema.json, frozen by T-018 and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference; the changed ones (given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, recordSafetyOutcome.request, recordSafetyOutcome.response, recordSafetyOutcome.exchange, releaseSafetyHold.request, releaseSafetyHold.exchange, callName) take only new optional fields, new enum values or new request variants, so every v1 exchange is a v1.1 exchange. Added: the calls of journey 3 (A3-01 to A3-51 and B3-01 to B3-42, the call-only steps out: C-231, C-232; S11-62 with journey 3): openRequest (gives request, and at the business's door stores the values its BOOK words name), confirmBusinessBooking (gives who_for, reach_by, times and customer, and books it), readBackBusinessBooking (the Today page's read-back words), findCustomer, checkBookingFirst and setCustomerBlock; recordSafetyOutcome gives safe and takes the handle actor's record on arrival (arrivalCaller), and releaseSafetyHold its at-once release. Each key journey 3 writes is written by exactly one call, named in that call's description with its step id (02-contracts section 8; README 'v1.1'). K-28 v1 (customers) and K-30 v1 (bookings and changes) are frozen on main: the calls name their tables and columns, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     { "$ref": "#/$defs/buildFrontier.exchange" },
     { "$ref": "#/$defs/closestEntries.exchange" },
@@ -34,6 +34,7 @@
     { "$ref": "#/$defs/readSetup.exchange" },
     { "$ref": "#/$defs/openRequest.exchange" },
     { "$ref": "#/$defs/confirmBusinessBooking.exchange" },
+    { "$ref": "#/$defs/readBackBusinessBooking.exchange" },
     { "$ref": "#/$defs/findCustomer.exchange" },
     { "$ref": "#/$defs/checkBookingFirst.exchange" },
     { "$ref": "#/$defs/setCustomerBlock.exchange" }
@@ -78,7 +79,42 @@
     "plannerVerbs.response": { "$ref": "tool-api.v1.schema.json#/$defs/plannerVerbs.response" },
     "plannerVerbs.errors": { "$ref": "tool-api.v1.schema.json#/$defs/plannerVerbs.errors" },
     "coreAction": { "$ref": "tool-api.v1.schema.json#/$defs/coreAction" },
-    "coreResult": { "$ref": "tool-api.v1.schema.json#/$defs/coreResult" },
+    "coreResult": {
+      "title": "CoreResult",
+      "description": "One core action's result inside gateAndCommit.response.core, in the order of the request, as v1, with one change: a STOP's response may name the businesses told (recordStopOrStart.response, v1.1; README default 50). Every v1 core result is a v1.1 core result.",
+      "anyOf": [
+        {
+          "description": "Every v1 core result but a STOP's or a START's.",
+          "allOf": [
+            { "$ref": "tool-api.v1.schema.json#/$defs/coreResult" },
+            {
+              "not": {
+                "type": "object",
+                "properties": { "call": { "const": "recordStopOrStart" } },
+                "required": ["call"]
+              }
+            }
+          ]
+        },
+        {
+          "title": "CoreResult_recordStopOrStart",
+          "type": "object",
+          "properties": {
+            "call": { "const": "recordStopOrStart" },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [{ "$ref": "#/$defs/recordStopOrStart.response" }, { "type": "null" }]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [{ "$ref": "#/$defs/recordStopOrStart.errors" }, { "type": "null" }]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        }
+      ]
+    },
     "partResult": {
       "title": "PartResult",
       "description": "What the gate did with one part, as v1 (arch 02 line 121; arch 06 lines 295 to 309), with one change: gives may also name the keys journey 3 gives (journeyThreeKey; v1.1), so a turn that commits a journey 3 step's write (the BOOK words' request, A3-19, B3-08; the read-back's yes, A3-30, B3-08) names the keys it wrote. Every v1 part result is a v1.1 part result.",
@@ -205,12 +241,12 @@
     },
     "recordSafetyOutcome.arrival": {
       "title": "RecordSafetyOutcomeOnArrival",
-      "description": "The handle actor's record of one raw text's safety outcome on arrival, before batching (arch 02 line 111: 'Any danger: the outcome step's checked message goes first, at any hour, past any opt-out'; C-047; T-246's open point). It commits through K-05 v1 commitTurn under the text's arrival turn (turn): a turn of that one text, so K-34 v1's safety_outcomes_text_has_handle_and_turn and K-04's outbox_rows.turn_id (not null) hold for the outcome row and the checked line's row of send class safety, written with the hold, who is told and the event log in one transaction (arch 10 line 508). Only for a read whose outcomes hold danger (anything but No) or that timed out (no verdict in 4 s: the safety line for a danger word, else the outage line; routine held): a read of No has no arrival record and rides in the turn its text joins (README default 5). The same text joins its batch's turn too, whose recordSafetyOutcome core action for it answers repeated (the event id is the key), and whose routine parts the hold answers held. The named rule arrivalTurn checks the turn, the caller and the read (README 'Named rules').",
+      "description": "The handle actor's record of one raw text's safety outcome on arrival, before batching (arch 02 line 111: 'Any danger: the outcome step's checked message goes first, at any hour, past any opt-out'; C-047; T-246's open point). It commits through K-05 v1 commitTurn under the text's arrival turn (turn): a turn of that one text, so K-34 v1's safety_outcomes_text_has_handle_and_turn and K-04's outbox_rows.turn_id (not null) hold for the outcome row and the checked line's row of send class safety, written with the hold, who is told and the event log in one transaction (arch 10 line 508). Only for a read whose outcomes hold danger (anything but No) or that timed out (no verdict in 4 s: the safety line for a danger word, else the outage line; routine held): a read of No has no arrival record and rides in the turn its text joins (README default 5). The same text joins its batch's turn too, under that turn's own id (never the arrival turn's: README default 36), whose recordSafetyOutcome core action for it answers repeated (the event id is the key), whose routine parts the hold answers held, and whose STOP in any words or protecting change commits at once (RULES 7.2; MASTER-FLOW-A line 7208). Only a read with danger or a timeout has one: a read that timed out with a danger word gets that word's safety line (send class safety), and one with none the outage line (send class quick_reply, as T-246 sends it; safetyLine names its row). The named rule arrivalTurn checks the turn, the caller, the read and the batch turn after it (README 'Named rules').",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/arrivalCaller" },
         "turn": {
-          "description": "The arrival turn (K-05 v1 turn): one event id, the text's own (safety.eventId); its id the hash of that one event id (CQ-09), as a clock turn's is the hash of its clock row's id (K-05 v1 default 9); its trace id the text's own (CQ-06); its handle the text's; its bundle the one pinned at arrival (arch 10 line 548). K-05 v1 commitTurn writes it once, as committed.",
+          "description": "The arrival turn (K-05 v1 turn): one event id, the text's own (safety.eventId); its id the hash of a marked input, the SHA-256 of 'arrival:' followed by that event id in lowercase hex (arrivalTurnId in tool-api.rules.mjs; README default 36), as a clock turn's input is its clock row's id (K-05 v1 default 9), so it never equals the id of the batch turn the text joins, the hash of the batch's sorted event ids (CQ-09), even when that batch is the text alone; its trace id the text's own (CQ-06); its handle the text's; its bundle the one pinned at arrival (arch 10 line 548). K-05 v1 commitTurn writes it once, as committed, and then writes the batch turn too.",
           "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
         },
         "safety": {
@@ -232,7 +268,7 @@
     },
     "arrivalCaller": {
       "title": "ArrivalCaller",
-      "description": "The handle actor on arrival (v1.1; README default 36): it records a raw text's safety outcome before batching and releases an at-once hold once the checked line is handed on (arch 02 line 111; C-047). Only recordSafetyOutcome.arrival and releaseSafetyHold.arrival take it, alone and never inside gateAndCommit, so no other call accepts it. Its turnId and requestId are the text's arrival turn's id (the hash of its one event id, CQ-09): the key a repeat is known by, as a turn's is; T-246's job caller with turnId null and requestId safety:<eventId> cannot carry a text's outcome, which K-34 v1 holds to a turn (safety_outcomes_text_has_handle_and_turn).",
+      "description": "The handle actor on arrival (v1.1; README default 36): it records a raw text's safety outcome before batching and releases an at-once hold once the checked line is handed on (arch 02 line 111; C-047). Only recordSafetyOutcome.arrival and releaseSafetyHold.arrival take it, alone and never inside gateAndCommit, so no other call accepts it. Its turnId and requestId are the text's arrival turn's id (arrivalTurnId: the SHA-256 of 'arrival:' and its event id, never a batch turn's id; README default 36): the key a repeat is known by, as a turn's is; T-246's job caller with turnId null and requestId safety:<eventId> cannot carry a text's outcome, which K-34 v1 holds to a turn (safety_outcomes_text_has_handle_and_turn).",
       "type": "object",
       "properties": {
         "kind": {
@@ -240,7 +276,7 @@
           "const": "actorOnArrival"
         },
         "turnId": {
-          "description": "The text's arrival turn: the hash of its one event id (CQ-09). Never null: K-34 v1 holds a text's outcome to a turn.",
+          "description": "The text's arrival turn: arrivalTurnId(its event id), the SHA-256 of 'arrival:' and the event id in lowercase hex (README default 36), never the id of a batch turn (the hash of its sorted event ids, CQ-09). Never null: K-34 v1 holds a text's outcome to a turn.",
           "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
         },
         "requestId": {
@@ -401,7 +437,103 @@
     "releaseSafetyHold.response": { "$ref": "tool-api.v1.schema.json#/$defs/releaseSafetyHold.response" },
     "releaseSafetyHold.errors": { "$ref": "tool-api.v1.schema.json#/$defs/releaseSafetyHold.errors" },
     "recordStopOrStart.request": { "$ref": "tool-api.v1.schema.json#/$defs/recordStopOrStart.request" },
-    "recordStopOrStart.response": { "$ref": "tool-api.v1.schema.json#/$defs/recordStopOrStart.response" },
+    "recordStopOrStart.response": {
+      "title": "RecordStopOrStartResponse",
+      "description": "Recorded, as v1, with one optional field a v1.1 call always returns: businessesTold, v1's open gap 18 closed (README default 50).",
+      "type": "object",
+      "properties": {
+        "consentRowIds": {
+          "description": "The consent rows added, never edited (K-29 v1 consents).",
+          "type": "array",
+          "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+        },
+        "stopped": {
+          "description": "The phone's stopped flag after the call (K-04 v1 phones.stopped).",
+          "type": "boolean"
+        },
+        "chatOpen": {
+          "description": "The phone's chat-open flag after the call (RULES 4.1b).",
+          "type": "boolean"
+        },
+        "phoneVersion": { "$ref": "#/$defs/version" },
+        "reply": {
+          "description": "The stop or start reply, or null for a work phone's STOP, which asks instead.",
+          "anyOf": [
+            {
+              "title": "StopReply",
+              "type": "object",
+              "properties": {
+                "fixedLineId": { "$ref": "#/$defs/fixedLineId" },
+                "outboxRowId": {
+                  "description": "Its outbox row (send class quick_reply, a reply in the same turn: Q-15; README default 6), or null when the actor sent it.",
+                  "$ref": "#/$defs/nullableId"
+                }
+              },
+              "required": ["fixedLineId", "outboxRowId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "askedWhichTexts": {
+          "description": "For a work phone's STOP, the 'which texts?' question; null otherwise.",
+          "anyOf": [
+            {
+              "title": "WhichTextsQuestion",
+              "type": "object",
+              "properties": {
+                "openQuestionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "clockRowId": {
+                  "description": "Due at the end of the work phone's next text hour (RULES 7.7; CQ-05).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["openQuestionId", "clockRowId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "flaggedBookingIds": {
+          "description": "Visits flagged by CANCEL or CANCELAR (RULES 7.4).",
+          "type": "array",
+          "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+        },
+        "repeated": {
+          "description": "true when this request was recorded before.",
+          "type": "boolean"
+        },
+        "businessesTold": {
+          "description": "v1.1 (README default 50; v1's open gap 18): for a STOP, each business with an open booking for that phone (K-04 v1 bookings at stage entry or booked whose booker, person served or payer has that phone as their own handle), told once, in the same commit, by an outbox row to its owner with the fixed line 'Texts to this customer are off. Reach them their way.' and nothing more: never where the stop came from, never the words (RULES 7.5; MC C1; S13-32, MASTER-FLOW-A line 7229; A3-12). A STOP with no open booking, a START and a work phone's answer tell no one (empty). On a repeat, the rows first written. Left out only by a v1 call.",
+          "type": "array",
+          "items": {
+            "title": "BusinessToldTextsOff",
+            "type": "object",
+            "properties": {
+              "businessId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+              "fixedLineId": { "const": "textsOffReachTheirWay" },
+              "outboxRowId": {
+                "description": "The row to the business's owner (send class routine, held for the owner's text hours as any owner row is), or null when the actor sent the STOP's reply itself while PostgreSQL was down and the notice is written on return.",
+                "$ref": "#/$defs/nullableId"
+              }
+            },
+            "required": ["businessId", "fixedLineId", "outboxRowId"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "consentRowIds",
+        "stopped",
+        "chatOpen",
+        "phoneVersion",
+        "reply",
+        "askedWhichTexts",
+        "flaggedBookingIds",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
     "recordStopOrStart.errors": { "$ref": "tool-api.v1.schema.json#/$defs/recordStopOrStart.errors" },
     "setRecordFlag.request": { "$ref": "tool-api.v1.schema.json#/$defs/setRecordFlag.request" },
     "setRecordFlag.response": { "$ref": "tool-api.v1.schema.json#/$defs/setRecordFlag.response" },
@@ -619,9 +751,96 @@
       "required": ["error"],
       "additionalProperties": false
     },
+    "timeEntered": {
+      "title": "TimeEntered",
+      "description": "The time and the person entered ('Sat 11am Riley', A3-19; 'Thu 12-2 Casey', B3-08), as decide's part fields in the BOOK turn, each re-parsed there from the BOOK words with that text's send time under limit 6 before any write (arch 03 line 185; arch 06 line 309: valueFailsWords, then limit 6's one question), or as typed on the Today page. It is held for the booking by K-05 v1 reserve in the same turn (README default 43), and the read-back reads the held reservation as a fact with its version.",
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "description": "The worker, room or vehicle named (K-04 v1 resources.id, one of this business's: row-level security), matched by code from the name typed ('Riley'); a name that fits none or several is limit 6's one question.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "during": {
+          "description": "The time to hold (K-04 v1 reservations.during; K-05 v1 during): a set start with the service's length, or for an arrival window ('12-2') the reserved time from the window's start that also holds the job's length (K-30 README 'Times'). Whether it reads as a set start or a window is the business's flow default (K-23 v1 flow_defaults.arrive), which the reply writes as K-30 booking_details.times.",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/during"
+        },
+        "zone": {
+          "description": "The IANA zone the words were read in: the visit's, else the business's (CQ-05; K-30 README 'Times').",
+          "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+        }
+      },
+      "required": ["resourceId", "during", "zone"],
+      "additionalProperties": false
+    },
+    "serviceEntered": {
+      "title": "ServiceEntered",
+      "description": "The service as typed ('haircut', 'drain'), matched by code to one of this business's own K-25 v1 services and its way for the request's flow (services, service_money), and copied into the K-30 v1 booking_lines row written on the owner's BOOK (K-30 README 'How the tables are written and read': 'on the owner's BOOK'; the price rule in force and the way's path, fee and currency copied as K-30 rule 10 says). Words that fit no service or several are limit 6's one question, never a guess (A4-81's service match for a customer's own request is K-09 v1.2's).",
+      "type": "object",
+      "properties": {
+        "asTyped": {
+          "description": "The words as the business typed them, re-parsed under limit 6 (the read-back's svc.intext comes from the line's service, never from these words).",
+          "type": "string",
+          "minLength": 1
+        },
+        "serviceId": {
+          "description": "K-25 v1 services.id, this business's.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "serviceMoneyId": {
+          "description": "K-25 v1 service_money.id: the service's way for the request's flow (A: the shop's; B: at the customer's place).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["asTyped", "serviceId", "serviceMoneyId"],
+      "additionalProperties": false
+    },
+    "newCustomerEntered": {
+      "title": "NewCustomerEntered",
+      "description": "For a customer not yet on the business's list only (booker kind new), the contacts entered with the BOOK words or on the Today page: written in the BOOK turn as the new person's own K-04 v1 handles (handles, person_handles, and a phones row for a mobile, with its contacts/add effect: Q-03; CQ-04), the handles K-28 v1's row names when the reply adds it (customers_mobile_own_fk, customers_email_own_fk). A typed number or address Rosie already holds is linked as this person's own handle too, so the answer is the same whether or not Rosie knew it (RULES 4.9, 6.5; security review of T-050 round 1, note e). A customer already on the list is never sent here: the reply takes their contacts from their row (README default 49). Both null is a customer with no contact, booked and sent nothing (A3-19). The age band and the way are not taken here (README open gap 41).",
+      "type": "object",
+      "properties": {
+        "mobile": {
+          "description": "The mobile entered, or null.",
+          "anyOf": [{ "$ref": "#/$defs/phoneNumber" }, { "type": "null" }]
+        },
+        "email": {
+          "description": "The email entered, or null (MC C2: optional).",
+          "anyOf": [{ "$ref": "#/$defs/emailAddress" }, { "type": "null" }]
+        }
+      },
+      "required": ["mobile", "email"],
+      "additionalProperties": false
+    },
+    "enteredBooking": {
+      "title": "EnteredBooking",
+      "description": "The values a booking the business adds names in its BOOK words (A3-19 'BOOK Alex M. haircut Sat 11am Riley'; B3-08 'BOOK Tessa drain Thu 12-2 Casey') or its Today page entry (A3-19: 'the desk types it on the Today page'), taken in the turn or the page call that holds them, never later from a read-back's words (arch 03 line 185; arch 06 line 309: limit 6 re-parses from source words, and from a read-back only for a photo). Stored there, each where A3-30's read-back and its reply read it as a fact with its version (README default 43): the time held by K-05 v1 reserve, the service in the K-30 line, a new customer's contacts as their own K-04 handles; the name is the booker's (openRequest.booker). So the read-back's slots have facts with versions when C-118 composes it (K-03 v1 slots.json: svc.intext from the line, day, visit.time and change.when from the held reservation, pro.name from its resource).",
+      "type": "object",
+      "properties": {
+        "time": { "$ref": "#/$defs/timeEntered" },
+        "service": { "$ref": "#/$defs/serviceEntered" },
+        "newCustomer": {
+          "description": "For booker kind new, the contacts entered (newCustomerEntered); null for a customer on the list.",
+          "anyOf": [{ "$ref": "#/$defs/newCustomerEntered" }, { "type": "null" }]
+        }
+      },
+      "required": ["time", "service", "newCustomer"],
+      "additionalProperties": false
+    },
+    "heldTime": {
+      "title": "HeldTime",
+      "description": "The reservation that holds the time entered for the booking (K-05 v1 reserve.response: held, for the booking, door standard, 10 minutes: Q-12; its saved-time clock row the sweep's), as the read-back reads it.",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "heldUntil": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" }
+      },
+      "required": ["reservationId", "version", "heldUntil"],
+      "additionalProperties": false
+    },
     "openRequest.request": {
       "title": "OpenRequestRequest",
-      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker); at door business, and for the desk's walk_in on the Today page, caller.personId is the owner, an admin or staff of the business (K-04 v1 person_roles: 'Sam, a barber or the desk can book for a customer'), else notAllowed (wrongRole). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, both rows at version 1 (K-04 v1 rule 2; K-30 v1 rule 4). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
+      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number). At door business it also takes and stores the values the BOOK words or the Today page entry name (entered; README default 43), each where A3-30's read-back and its reply read it as a fact with its version: the service as the K-30 v1 booking_lines row written on the owner's BOOK (K-30 README: 'on the owner's BOOK'), a new customer's contacts as their own K-04 handles (with a phones row and a contacts/add effect for a mobile: Q-03), both in the same commit; and the time entered held for the booking by K-05 v1 reserve (for the booking, door standard: 10 minutes, Q-12), right after that commit in the same turn or call, since K-04 reservations.booking_id names the head, and before the read-back is composed. A time already held or booked for someone else (K-05 v1 reserve: overlap) leaves held null, and the read-back offers the next open times instead (limit 5's nextOpenTimes, arch 06 line 307; on the page, the times shown again); the request stays open, and '3 Change it' takes the new time (confirmBusinessBooking, changeIt). These values give no key: who_for, reach_by, times and customer are the reply's (confirmBusinessBooking, A3-30, B3-08). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker); at door business, and for the desk's walk_in on the Today page, caller.personId is the owner, an admin or staff of the business (K-04 v1 person_roles: 'Sam, a barber or the desk can book for a customer'), else notAllowed (wrongRole). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, both rows at version 1 (K-04 v1 rule 2; K-30 v1 rule 4). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -675,9 +894,13 @@
         "safetyOutcomeId": {
           "description": "The safety read of the request's own free text (K-34 v1 safety_outcomes.id, recordSafetyOutcome alone, source page or agent): required for door ai and door page, since free text from pages and AIs gets the safety read first (arch 02 line 129; B3-17: 'This check ran on every message and call above too'); null in a turn, whose texts' reads ride in its own commit (README default 5), and for the business's own Today page entry.",
           "$ref": "#/$defs/nullableId"
+        },
+        "entered": {
+          "description": "For door business, the values its BOOK words or Today page entry name (enteredBooking: the time and person, the service, a new customer's contacts), taken and stored in this call (README default 43); null for every other door, whose values come by their own steps (A4-14, A4-80, A4-81, A4-82: K-09 v1.2).",
+          "anyOf": [{ "$ref": "#/$defs/enteredBooking" }, { "type": "null" }]
         }
       },
-      "required": ["caller", "door", "flow", "booker", "safetyOutcomeId"],
+      "required": ["caller", "door", "flow", "booker", "safetyOutcomeId", "entered"],
       "additionalProperties": false,
       "dependentSchemas": {
         "door": {
@@ -690,7 +913,8 @@
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "const": "agent" } } },
                   "booker": { "type": "object", "properties": { "kind": { "enum": ["caller", "new"] } } },
-                  "safetyOutcomeId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                  "safetyOutcomeId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                  "entered": { "type": "null" }
                 }
               }
             },
@@ -701,7 +925,8 @@
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "const": "page" } } },
                   "booker": { "type": "object", "properties": { "kind": { "enum": ["caller", "new"] } } },
-                  "safetyOutcomeId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                  "safetyOutcomeId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                  "entered": { "type": "null" }
                 }
               }
             },
@@ -711,17 +936,39 @@
               "then": {
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "const": "turn" } } },
-                  "booker": { "type": "object", "properties": { "kind": { "const": "caller" } } }
+                  "booker": { "type": "object", "properties": { "kind": { "const": "caller" } } },
+                  "entered": { "type": "null" }
                 }
               }
             },
             {
-              "description": "door business: the owner, a barber or the desk, by text (a turn) or on the Today page (a page), for a customer on the list or a new one; never an AI (A3-03).",
+              "description": "door business: the owner, a barber or the desk, by text (a turn) or on the Today page (a page), for a customer on the list or a new one, with the values entered; never an AI (A3-03). A customer on the list sends no contacts (their row's are used); a new one sends theirs, or none.",
               "if": { "properties": { "door": { "const": "business" } }, "required": ["door"] },
               "then": {
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } },
-                  "booker": { "type": "object", "properties": { "kind": { "enum": ["customer", "new"] } } }
+                  "booker": { "type": "object", "properties": { "kind": { "enum": ["customer", "new"] } } },
+                  "entered": { "$ref": "#/$defs/enteredBooking" }
+                },
+                "if": {
+                  "properties": {
+                    "booker": {
+                      "type": "object",
+                      "properties": { "kind": { "const": "customer" } },
+                      "required": ["kind"]
+                    }
+                  },
+                  "required": ["booker"]
+                },
+                "then": {
+                  "properties": {
+                    "entered": { "type": "object", "properties": { "newCustomer": { "type": "null" } } }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "entered": { "type": "object", "properties": { "newCustomer": { "type": "object" } } }
+                  }
                 }
               }
             },
@@ -731,7 +978,8 @@
               "then": {
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } },
-                  "flow": { "const": "A" }
+                  "flow": { "const": "A" },
+                  "entered": { "type": "null" }
                 },
                 "if": {
                   "properties": {
@@ -785,16 +1033,34 @@
           "maxItems": 1
         },
         "written": {
-          "description": "Each row written, with its version after the commit (K-05 v1 rowRef): the booking head, the details row, and a new person when booker is new.",
+          "description": "Each row written, with its version after the commit (K-05 v1 rowRef): the booking head, the details row, a new person when booker is new, and for door business the K-30 line copied from the service entered and a new customer's phone row (named by its handle id: K-08 v1 default 3).",
           "type": "array",
           "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "held": {
+          "description": "For door business, the time entered held for the booking (K-05 v1 reserve, for the booking, door standard; README default 43), which the read-back reads as a fact and the reply books; null for every other door.",
+          "anyOf": [{ "$ref": "#/$defs/heldTime" }, { "type": "null" }]
+        },
+        "effects": {
+          "description": "Effect rows written (K-07 v1; K-05 v1.1): contacts/add for a new customer's mobile not yet a Linq contact (Q-03; CQ-04).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/effectWritten" }
         },
         "repeated": {
           "description": "true when this request id (or turn) opened it before: nothing was written and the first request comes back.",
           "type": "boolean"
         }
       },
-      "required": ["bookingId", "number", "bookerPersonId", "gives", "written", "repeated"],
+      "required": [
+        "bookingId",
+        "number",
+        "bookerPersonId",
+        "gives",
+        "written",
+        "held",
+        "effects",
+        "repeated"
+      ],
       "additionalProperties": false
     },
     "openRequest.errors": {
@@ -829,7 +1095,7 @@
     },
     "confirmBusinessBooking.request": {
       "title": "ConfirmBusinessBookingRequest",
-      "description": "The answer to Rosie's read-back of a booking the business adds; gives who_for, reach_by, times and customer (A3-30, B3-08; 02-contracts section 8: who_for the K-04 head's booker, person served and payer with K-30; reach_by K-28 v1 customers.way; times K-30 booking_details.times with the time chosen; customer the K-28 v1 customers row), the one call that writes them; its '2 Not yet' is A3-40 and B3-24. The read-back carries what, when, who it's for, the age and how they're reached (A3-30: 'Book this for Alex M.? Did Alex agree to messages from Rosie?'), and the reply books it as entered (A4-98: not a request). In a turn (the owner's, a barber's or the desk's reply in their own chat, 'owner → san: 1') the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, limit 3 above all (the exact yes, bound to the read-back's own words and versions: arch 06 line 303), and partResult.gives names the four keys; alone it is the portal's Today page (FS section 6.2; K-21), whose confirm tap is the exact yes. '3 Change it' writes nothing here: the booking is changed and read back again, a new question. Primary, uncached. Business: caller.businessId, the booking's; row-level security scopes every row (K-28 v1, K-30 v1 rule 5). Person: caller.personId is the owner, an admin or staff of this business who answered (K-04 v1 person_roles: 'Sam, a barber or the desk'), else notAllowed (wrongRole); never the customer and never an AI ('Never: take an AI's yes as Alex's', A3-03). The customer is the head's booker, which openRequest named; no person id comes in this request. Repeat: caller.requestId is the key (the turn's id); a repeat writes nothing and answers the first result with repeated true. Version: the head's version is compared and set (expectVersion, limit 4); a customer already on the list is compared at the version the read-back read (customerVersion) and raised only when the call fills an age band the row lacked (K-28 v1 rule 2); a new customer row is inserted at version 1. A customer already on the list keeps the contacts and the way on file, which the read-back shows ('Alex M. · mobile on file'): another phone or email is a contact change, which waits for the person's own code typed back (S13-45 row 3; D75, D77, D100; K-28 v1 README 'The contact on file and the way'), and a way changes on the person's own word in their own chat (A7-98), so a read-back that differs from the row is refused (notAllowed, notDecider) and nothing is written. Writes, in one commit: customer, the K-28 row found by (business, booker) or added (K-28 customers_business_person_key) with the name, the contacts as K-04 handles of the booker's own (a new mobile gets its K-04 handle and phone row and a contacts/add effect, Q-03; CQ-04) and the K-04 person_roles customer row in the same commit (K-28 v1 rule 7); reach_by, customers.way (a new customer's, or the one on file); who_for, the head's served_person_id and payer_person_id (the customer it is for) and customers.age_band (a new customer's, or one the row lacked); times, K-30 booking_details.times (set once) and the time entered held for the booking (K-05 v1 reserve, a K-04 reservation held with booking_id, as K-30 keeps every booked time on K-04's reservations) until the same walk's booking write books it (A6-10, K-09 v1.4); and, for '1 Yes, send the link', the yes to messages for this booking as a K-29 v1 consents row of kind texts naming the customer, the business, the contact, the booking and the read-back's exact words with their sha256 (RULES 2.5; K-28 v1 default 5), whose chat link the owner passes on (issueChatLink, purpose booking, given_via owner, once contacts/add has worked: MC C9; Q-03; C-254). '2 Not yet' writes no consent: Rosie texts the customer nothing ('Never: message the customer on a guess').",
+      "description": "The answer to Rosie's read-back of a booking the business adds; gives who_for, reach_by, times and customer (A3-30, B3-08; 02-contracts section 8: who_for the K-04 head's booker, person served and payer with K-30; reach_by K-28 v1 customers.way; times K-30 booking_details.times with the time chosen; customer the K-28 v1 customers row), the one call that writes them; its '2 Not yet' is A3-40 and B3-24. The read-back carries what, when, who it's for, the age and how they're reached (A3-30: 'Book this for Alex M.? Did Alex agree to messages from Rosie?'), and the reply books it as entered (A4-98: not a request). In a turn (the owner's, a barber's or the desk's reply in their own chat, 'owner → san: 1') the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, limit 3 above all (the exact yes, bound to the read-back's own words and versions: arch 06 line 303), and partResult.gives names the four keys; alone it is the portal's Today page (FS section 6.2; K-21), whose confirm tap is the exact yes. It never takes a value from the read-back's words: the time, the person, the service and a new customer's contacts were taken from the BOOK words in their own turn and stored (openRequest, entered; README default 43), the read-back was built from those rows and their versions, and this call confirms what is stored, comparing those versions (limit 4); the read-back's words and versions come from its open question in a turn, or from readBackBusinessBooking through the page server on the Today page, never from the browser. '3 Change it' (changeIt) takes the changed values in the turn or page call that holds them, each re-parsed there under limit 6, stores them as the BOOK's were, gives no key, and the booking is read back again. Primary, uncached. Business: caller.businessId, the booking's; row-level security scopes every row (K-28 v1, K-30 v1 rule 5). Person: caller.personId is the owner, an admin or staff of this business who answered (K-04 v1 person_roles: 'Sam, a barber or the desk'), else notAllowed (wrongRole); never the customer and never an AI ('Never: take an AI's yes as Alex's', A3-03). The customer is the head's booker, which openRequest named; no person id comes in this request. Repeat: caller.requestId is the key (the turn's id); a repeat writes nothing and answers the first result with repeated true. Version: the head's version is compared and set (expectVersion, limit 4), and every row the read-back was built from (its versionsRead: the details, the line, the held reservation, a listed customer's K-28 row or a new customer's K-04 person and handles) is compared before any write; the held reservation is confirmed at its version (K-05 v1 commitTurn reservations.confirm), and a hold that lapsed answers limit 5's nextOpenTimes in a turn and timeTaken on the page; a listed customer's row is raised only when the call fills an age band it lacked (K-28 v1 rule 2); a new customer row is inserted at version 1. A customer already on the list keeps the contacts and the way on file, which the call takes from their row (README default 49): another phone or email is a contact change, which waits for the person's own code typed back (S13-45 row 3; D75, D77, D100; K-28 v1 README 'The contact on file and the way'), and a way changes on the person's own word in their own chat (A7-98), so the request carries no contact at all. Writes, for '1 Yes' and '2 Not yet' alike, in one commit: customer, the K-28 row found by (business, booker), or added (K-28 customers_business_person_key) with the booker's name and the contacts the BOOK stored as their own K-04 handles, and the K-04 person_roles customer row in the same commit (K-28 v1 rule 7); reach_by, customers.way (the one on file, or for a new customer the way their contacts imply: texts with a mobile, else email, else none; K-28 customers_way_fits_contact; README open gap 41); who_for, the head's served_person_id and payer_person_id (the customer it is for) and customers.age_band (the one on file, or 18 or older as the read-back said it: README open gap 41); times, K-30 booking_details.times (set once, from how the business's flow reads a time: K-23 v1 flow_defaults.arrive) and the booking itself: the held reservation confirmed booked with this booking (its saved-time clock row cancelled) and the head's stage set to booked (A3-30: 'The reply books it, as entered', MASTER-FLOW-A line 1956, MASTER-FLOW-B line 1746; A4-98; A4-14's and A5-31's vary; K-30 README: the commit that writes the booking includes A3-30), so the sweep never lets the time go (K-05 item 8); and, for '1 Yes, send the link', the yes to messages for this booking as a K-29 v1 consents row of kind texts naming the customer, the business, the contact, the booking and the read-back's exact words with their sha256 (RULES 2.5; K-28 v1 default 5), whose chat link the owner passes on (issueChatLink, purpose booking, given_via owner, once contacts/add has worked: MC C9; Q-03; C-254), unless that mobile is stopped (K-04 phones.stopped: MC C1): then no consent and no link, and the one who answered hears only 'Texts to this customer are off. Reach them their way.' (textsOff; RULES 7.5; S13-32; README default 50). '2 Not yet' writes no consent: Rosie texts the customer nothing ('Never: message the customer on a guess'), and the one who answered is told it is booked with no texts (A3-40, B3-24). The booking's visit row and terms snapshot (K-30 booking_visits, booking_terms) are README open gap 42.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -841,105 +1107,104 @@
           "description": "The head's version the read-back was built from (limit 4: arch 06 line 305).",
           "$ref": "#/$defs/version"
         },
-        "customerVersion": {
-          "description": "For a customer already on the list, the version of their K-28 row the read-back was built from (findCustomer, or the frontier's fact), compared and set (limit 4); null for a customer the call adds.",
-          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
-        },
         "answer": {
-          "description": "yesSendLink: '1 Yes, send the link', the customer agreed to messages from Rosie for this booking; notYet: '2 Not yet', no messages, the business tells the customer the details (A3-40, B3-24).",
+          "description": "yesSendLink: '1 Yes, send the link', the customer agreed to messages from Rosie for this booking; notYet: '2 Not yet', no messages, the business tells the customer the details (A3-40, B3-24); changeIt: '3 Change it', the values changed in the turn or page call that holds them (changed), held and stored as the BOOK's were, then read back again (A3-30). '1 Yes' and '2 Not yet' alike book it as entered (A3-30: 'The reply books it, as entered'; A4-98).",
           "type": "string",
-          "enum": ["yesSendLink", "notYet"]
+          "enum": ["yesSendLink", "notYet", "changeIt"]
         },
         "readBack": {
-          "title": "ReadBackAnswered",
-          "description": "The read-back as sent and the exact yes that answered it (arch 01 line 89; arch 06 line 303).",
-          "type": "object",
-          "properties": {
-            "exactWords": {
-              "description": "The read-back word for word as sent, its {{two.count}} slot filled (A3-30, B3-08): the consent's exact words for '1 Yes' (K-29 v1 consents.exact_words, with its sha256).",
-              "type": "string",
-              "minLength": 1
+          "description": "The read-back answered and the exact yes (arch 01 line 89; arch 06 line 303). Its words and the versions they were built from never come from the request's sender: in a turn they are the read-back's open question's (K-04 v1 open_questions.readback and versions_read, its outbox row's final parts as sent); on the Today page they are what readBackBusinessBooking answered the page server, kept with its session (K-21), never the browser's (security review of T-050 round 1, note c).",
+          "oneOf": [
+            {
+              "title": "ReadBackInTurn",
+              "description": "In a turn: the open question the reply answers (the read-back the BOOK turn sent, with its options 1, 2 and 3); the call reads its words and versions.",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "openQuestion" },
+                "openQuestionId": {
+                  "description": "K-04 v1 open_questions.id of the read-back, step A3-30 (B3-08), in the answerer's own chat.",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "yesEventId": {
+                  "description": "The event of the reply text that answered it (K-06).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "openQuestionId", "yesEventId"],
+              "additionalProperties": false
             },
-            "yesEventId": {
-              "description": "The event of the reply that answered it (K-06): the reply text in a turn, or the Today page's confirm tap (how a page names its event: K-21; README open gap 20).",
-              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            {
+              "title": "ReadBackOnPage",
+              "description": "On the Today page: the words and versions readBackBusinessBooking answered, sent back by the page server from its session (K-21), never by the browser. The call fills the read-back again from these versions and refuses words that differ (notAllowed, notDecider) or versions that moved (versionChanged, limit 4).",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "page" },
+                "exactWords": {
+                  "description": "The read-back word for word as shown (readBackBusinessBooking.response.exactWords): the consent's exact words for '1 Yes' (K-29 v1 consents.exact_words, with its sha256).",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "versionsRead": {
+                  "description": "The rows and versions the words were built from (readBackBusinessBooking.response.versionsRead), compared and set (limit 4).",
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/rowRef" },
+                  "minItems": 1
+                },
+                "yesEventId": {
+                  "description": "The Today page's confirm tap (how a page names its event: K-21; README open gap 29).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "exactWords", "versionsRead", "yesEventId"],
+              "additionalProperties": false
             }
-          },
-          "required": ["exactWords", "yesEventId"],
-          "additionalProperties": false
+          ]
         },
-        "customer": {
-          "title": "CustomerAsReadBack",
-          "description": "The customer as the read-back shows them (K-28 v1 customers): the name on file, the contacts on file, the way and the age band.",
-          "type": "object",
-          "properties": {
-            "name": {
-              "description": "The name the business has on file (K-28 v1 customers.name; A3-30 'Alex M.').",
-              "type": "string",
-              "minLength": 1
+        "changed": {
+          "description": "For changeIt only, the values the change names, taken in the turn or page call that holds them, as the BOOK's are (enteredBooking: decide's part fields, each re-parsed from those words under limit 6; or as typed on the page): a new time or person (timeEntered: the old hold released, the new one held), another service (serviceEntered: the line entered is set removed and a new one copied), or, for a customer the BOOK added, a corrected name or contacts (their K-04 person and handles). Null for yesSendLink and notYet, which confirm what is stored.",
+          "anyOf": [
+            {
+              "title": "ChangedEntry",
+              "type": "object",
+              "properties": {
+                "time": { "anyOf": [{ "$ref": "#/$defs/timeEntered" }, { "type": "null" }] },
+                "service": { "anyOf": [{ "$ref": "#/$defs/serviceEntered" }, { "type": "null" }] },
+                "newCustomer": {
+                  "description": "Only for a booker the BOOK added (openRequest booker kind new): the name and the contacts corrected; null otherwise, since a listed customer's name and contacts change on their own word or code (A7-98; S13-45 row 3).",
+                  "anyOf": [
+                    {
+                      "title": "NewCustomerChanged",
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string", "minLength": 1 },
+                        "contacts": { "$ref": "#/$defs/newCustomerEntered" }
+                      },
+                      "required": ["name", "contacts"],
+                      "additionalProperties": false
+                    },
+                    { "type": "null" }
+                  ]
+                }
+              },
+              "required": ["time", "service", "newCustomer"],
+              "additionalProperties": false,
+              "not": {
+                "properties": {
+                  "time": { "type": "null" },
+                  "service": { "type": "null" },
+                  "newCustomer": { "type": "null" }
+                }
+              }
             },
-            "mobile": {
-              "description": "The mobile on file (K-28 customers.mobile_handle_id, a K-04 phones row of the booker's own), or null: a customer with no mobile can be booked too (A3-19), and is sent nothing.",
-              "anyOf": [{ "$ref": "#/$defs/phoneNumber" }, { "type": "null" }]
-            },
-            "email": {
-              "description": "The email on file (K-28 customers.email_handle_id), or null (MC C2: optional).",
-              "anyOf": [{ "$ref": "#/$defs/emailAddress" }, { "type": "null" }]
-            },
-            "way": {
-              "description": "reach_by: K-28 v1 customers.way, spelt as K-01 v1 bookingValues.reach (texts, textsonly, email); null only with no contact on file (customers_way_fits_contact).",
-              "anyOf": [{ "type": "string", "enum": ["texts", "textsonly", "email"] }, { "type": "null" }]
-            },
-            "ageBand": {
-              "description": "who_for's age: K-28 v1 customers.age_band, the read-back's 'For Alex, 18 or older' (A3-30); never an exact age (A4-80).",
-              "type": "string",
-              "enum": ["18_or_older", "under_18"]
-            }
-          },
-          "required": ["name", "mobile", "email", "way", "ageBand"],
-          "additionalProperties": false
-        },
-        "time": {
-          "title": "TimeAsEntered",
-          "description": "times: the time and person entered (A3-19 'Sat 11am Riley'; B3-08 'Thu 12-2 Casey') as the read-back showed them.",
-          "type": "object",
-          "properties": {
-            "resourceId": {
-              "description": "The worker, room or vehicle entered (K-04 v1 resources.id).",
-              "$ref": "../common/formats.v1.schema.json#/$defs/id"
-            },
-            "during": {
-              "description": "The time held (K-04 v1 reservations.during, K-05 v1 during): for an arrival window, the reserved time that also holds the job's length (K-30 README 'Times').",
-              "$ref": "../data-access/data-access.v1.schema.json#/$defs/during"
-            },
-            "timesRead": {
-              "description": "K-30 v1 booking_details.times, set once: setstart ('11:00am'), window ('arriving 12–2pm'), stay or seat.",
-              "type": "string",
-              "enum": ["setstart", "window", "stay", "seat"]
-            },
-            "zone": {
-              "description": "The IANA zone the time was read in: the visit's, else the business's (CQ-05; K-30 README 'Times').",
-              "$ref": "../common/formats.v1.schema.json#/$defs/zone"
-            }
-          },
-          "required": ["resourceId", "during", "timesRead", "zone"],
-          "additionalProperties": false
+            { "type": "null" }
+          ]
         }
       },
-      "required": [
-        "caller",
-        "bookingId",
-        "expectVersion",
-        "customerVersion",
-        "answer",
-        "readBack",
-        "customer",
-        "time"
-      ],
+      "required": ["caller", "bookingId", "expectVersion", "answer", "readBack", "changed"],
       "additionalProperties": false,
       "dependentSchemas": {
         "answer": {
-          "description": "Who may answer, and what '1 Yes' needs (A3-30; RULES 2.5; MC C9).",
+          "description": "Who may answer, how the read-back reaches the call, and what each answer carries (A3-30; RULES 2.5; MC C9).",
           "allOf": [
             {
               "description": "Only the business answers its own read-back: by its reply in a turn or on the Today page; never an AI, a job or the console (A3-03).",
@@ -948,16 +1213,33 @@
               }
             },
             {
-              "description": "'1 Yes, send the link' needs a way to reach the customer: the link is for a mobile, or goes in the confirmation email (MC C9).",
-              "if": { "properties": { "answer": { "const": "yesSendLink" } }, "required": ["answer"] },
+              "description": "A turn names the open question it answers; a page sends what readBackBusinessBooking answered its server.",
+              "if": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "turn" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              },
               "then": {
                 "properties": {
-                  "customer": {
-                    "type": "object",
-                    "properties": { "way": { "type": "string", "enum": ["texts", "textsonly", "email"] } }
-                  }
+                  "readBack": { "type": "object", "properties": { "kind": { "const": "openQuestion" } } }
+                }
+              },
+              "else": {
+                "properties": {
+                  "readBack": { "type": "object", "properties": { "kind": { "const": "page" } } }
                 }
               }
+            },
+            {
+              "description": "'3 Change it' carries the changed values; '1 Yes' and '2 Not yet' carry none, since they confirm what is stored.",
+              "if": { "properties": { "answer": { "const": "changeIt" } }, "required": ["answer"] },
+              "then": { "properties": { "changed": { "type": "object" } } },
+              "else": { "properties": { "changed": { "type": "null" } } }
             }
           ]
         }
@@ -965,16 +1247,16 @@
     },
     "confirmBusinessBooking.response": {
       "title": "ConfirmBusinessBookingResponse",
-      "description": "The read-back answered: the keys it gave and what it wrote.",
+      "description": "The read-back answered: the keys it gave, the booking's stage, the reservation and what it wrote.",
       "type": "object",
       "properties": {
         "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
         "customerId": {
-          "description": "The customer row found or added (K-28 v1 customers.id).",
-          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          "description": "The customer row found or added (K-28 v1 customers.id); null for changeIt with a customer the BOOK added, whose row the confirming answer writes.",
+          "$ref": "#/$defs/nullableId"
         },
         "gives": {
-          "description": "The keys the call wrote: who_for, reach_by, times and customer (A3-30, B3-08; A-keys.md, B-keys.md), on either answer.",
+          "description": "The keys the call wrote: who_for, reach_by, times and customer (A3-30, B3-08; A-keys.md, B-keys.md) for yesSendLink and notYet alike; none for changeIt.",
           "type": "array",
           "items": { "$ref": "#/$defs/journeyThreeKey" },
           "uniqueItems": true
@@ -982,15 +1264,43 @@
         "answer": {
           "description": "The answer taken (the request's).",
           "type": "string",
-          "enum": ["yesSendLink", "notYet"]
+          "enum": ["yesSendLink", "notYet", "changeIt"]
+        },
+        "stage": {
+          "description": "The K-04 v1 head's stage after the call: booked for yesSendLink and notYet ('The reply books it, as entered': MASTER-FLOW-A line 1956, MASTER-FLOW-B line 1746; A4-98; A3-40 'The booking is made'); entry for changeIt.",
+          "type": "string",
+          "enum": ["booked", "entry"]
         },
         "consentId": {
-          "description": "For yesSendLink, the K-29 v1 consents row of kind texts; null for notYet.",
+          "description": "For yesSendLink, the K-29 v1 consents row of kind texts; null for notYet and changeIt, and null when the customer's phone is stopped (textsOff).",
           "$ref": "#/$defs/nullableId"
         },
-        "reservationId": {
-          "description": "The time held for the booking (K-04 v1 reservations.id, held, booking_id this booking).",
-          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        "reservation": {
+          "description": "The reservation the call left: for yesSendLink and notYet the time entered, booked (K-05 v1 commitTurn reservations.confirm: booked, booking_id this booking, its saved-time clock row cancelled); for changeIt the new time held (K-05 v1 reserve), or the one already held when the time did not change.",
+          "type": "object",
+          "properties": {
+            "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "state": { "type": "string", "enum": ["booked", "held"] },
+            "version": { "$ref": "#/$defs/version" }
+          },
+          "required": ["reservationId", "state", "version"],
+          "additionalProperties": false
+        },
+        "textsOff": {
+          "description": "For yesSendLink when the customer's mobile is stopped (K-04 v1 phones.stopped, MC C1): no consent and no link are written, since only START or a fresh yes sent from that number turns texts back on (S13-32), and the one who answered hears only 'Texts to this customer are off. Reach them their way.' (RULES 7.5; MC C1; S13-32; A3-12), a fixed line never saying where the stop came from; null otherwise (README default 50; v1's open gap 18).",
+          "anyOf": [
+            {
+              "title": "TextsOffNotice",
+              "type": "object",
+              "properties": {
+                "fixedLineId": { "const": "textsOffReachTheirWay" },
+                "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["fixedLineId", "outboxRowId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
         },
         "effects": {
           "description": "Effect rows written (K-07 v1; K-05 v1.1): contacts/add for a mobile not yet a Linq contact (Q-03; CQ-04), after which issueChatLink gives the owner the link (C-254).",
@@ -1003,7 +1313,7 @@
           "items": { "$ref": "#/$defs/rowRef" }
         },
         "outboxRowIds": {
-          "description": "The rows the commit wrote to the one who answered (A3-40's 'Booked, with no texts to Alex M.' for notYet).",
+          "description": "The rows the commit wrote to the one who answered (A3-40's 'Booked, with no texts to Alex M.' for notYet; the textsOff line; for changeIt, in a turn, the new read-back).",
           "type": "array",
           "items": { "$ref": "#/$defs/id" }
         },
@@ -1017,14 +1327,53 @@
         "customerId",
         "gives",
         "answer",
+        "stage",
         "consentId",
-        "reservationId",
+        "reservation",
+        "textsOff",
         "effects",
         "written",
         "outboxRowIds",
         "repeated"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "answer": {
+          "description": "What each answer leaves (A3-30; A3-40; MC C9).",
+          "allOf": [
+            {
+              "description": "'1 Yes, send the link' either writes the customer's yes to messages for a way to reach them (consentId), or, for a stopped mobile, tells the business only that texts are off (textsOff); it never ends with neither. A customer with no contact on file has no way to be sent the link (MC C9), so '1 Yes' for them is refused before any write (notAllowed), and Sam's 'no texts' books it ('2 Not yet': A3-19, A3-40). The other answers write no consent.",
+              "if": { "properties": { "answer": { "const": "yesSendLink" } }, "required": ["answer"] },
+              "then": {
+                "anyOf": [
+                  { "properties": { "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } } },
+                  { "properties": { "textsOff": { "type": "object" } } }
+                ]
+              },
+              "else": { "properties": { "consentId": { "type": "null" }, "textsOff": { "type": "null" } } }
+            },
+            {
+              "description": "'1 Yes' and '2 Not yet' alike book it as entered (A3-30: 'The reply books it, as entered'; A3-40: 'The booking is made'): the stage booked and the reservation booked, never left held for the sweep to let go (K-05 README item 8); '3 Change it' books nothing and leaves the stage at entry.",
+              "if": {
+                "properties": { "answer": { "enum": ["yesSendLink", "notYet"] } },
+                "required": ["answer"]
+              },
+              "then": {
+                "properties": {
+                  "stage": { "const": "booked" },
+                  "reservation": { "type": "object", "properties": { "state": { "const": "booked" } } }
+                }
+              },
+              "else": {
+                "properties": {
+                  "stage": { "const": "entry" },
+                  "reservation": { "type": "object", "properties": { "state": { "const": "held" } } }
+                }
+              }
+            }
+          ]
+        }
+      }
     },
     "wrongDoorError": {
       "title": "WrongDoorError",
@@ -1051,7 +1400,7 @@
     },
     "confirmBusinessBooking.errors": {
       "title": "ConfirmBusinessBookingErrors",
-      "description": "Refused, nothing written: confirmBusinessBooking's errors. A mobile or email that is another person's own handle is refused by K-28 v1 (customers_mobile_own_fk, customers_email_own_fk: constraint), never linked to this customer.",
+      "description": "Refused, nothing written: confirmBusinessBooking's errors. The contacts are always the booker's own handles (a listed customer's row's, or those the BOOK linked as the new person's own: newCustomerEntered), so K-28 v1's customers_mobile_own_fk and customers_email_own_fk never refuse here, and no answer tells the business whether Rosie knew a number (RULES 4.9, 6.5; security review of T-050 round 1, note e). timeTaken: the held time lapsed and another took it (in a turn, limit 5's nextOpenTimes instead); versionChanged: a row the read-back was built from moved (limit 4); notAllowed: not the business's owner, admin or staff (wrongRole), or page words that differ from the read-back the versions give (notDecider).",
       "oneOf": [
         { "$ref": "#/$defs/notAllowedError" },
         { "$ref": "#/$defs/wrongDoorError" },
@@ -1076,6 +1425,87 @@
           "anyOf": [
             { "$ref": "#/$defs/confirmBusinessBooking.response" },
             { "$ref": "#/$defs/confirmBusinessBooking.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readBackBusinessBooking.request": {
+      "title": "ReadBackBusinessBookingRequest",
+      "description": "The read-back of a booking the business adds, for the portal's Today page (A3-30, B3-08; A3-19: 'On the portal, the desk types it on the Today page'; FS section 6.2): the exact words the page shows and the rows and versions they were built from, which the page server keeps with its session and sends back with the confirm tap (confirmBusinessBooking, readBack kind page), so the words a consent is bound to never come from the browser (RULES 2.5; frontend review of T-050 round 1, FAIL 2; security review, note c). The words are code's: A3-30's read-back line (its master text, K-01 v1) with its slots filled from the stored facts, no model (K-03 v1 slots: svc.intext from the line's service; day, visit.time and change.when from the held reservation in the visit's zone, else the business's; pro.name from its resource; the customer's name, age band and 'mobile on file' from their K-28 row, or from the K-04 person and handles the BOOK stored; two.count from the shop's row), so the same versions always give the same words. Gives no key. In a turn the read-back is the BOOK turn's own reply row, composed by C-118 from the same facts and kept with its open question; this call is the page's. Primary, uncached. Callers: page only (the Today page's server side, K-21; schema-held). Business: caller.businessId, the booking's; row-level security scopes every row it reads (arch 10 line 546). Person: caller.personId, set by the page server from its session, is the owner, an admin or staff of this business (K-04 v1 person_roles), else notAllowed (wrongRole). Repeat: a read, safe; the same versions give the same words. Version: returns the version of every row the words were built from (versionsRead), which the confirm compares and sets (limit 4).",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": {
+          "description": "The request openRequest opened at door business with its values entered.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["caller", "bookingId"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "bookingId": {
+          "description": "Only the page's server side asks: a turn's read-back is its own reply row.",
+          "properties": {
+            "caller": { "type": "object", "properties": { "kind": { "const": "page" } } }
+          }
+        }
+      }
+    },
+    "readBackBusinessBooking.response": {
+      "title": "ReadBackBusinessBookingResponse",
+      "description": "The read-back's exact words, their hash and the rows and versions they were built from.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "exactWords": {
+          "description": "The read-back word for word as the page shows it (A3-30, B3-08), its two.count slot filled: what a '1 Yes' binds the consent to (K-29 v1 consents.exact_words).",
+          "type": "string",
+          "minLength": 1
+        },
+        "wordsSha256": {
+          "description": "The SHA-256 of the words' UTF-8 bytes in lowercase hex, as K-29 v1 consents.words_sha256 keeps it.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "versionsRead": {
+          "description": "Every row the words were built from, with its version (K-05 v1 rowRef): the head, the details, the line, the held reservation, and the customer's K-28 row or the new person's K-04 rows.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" },
+          "minItems": 1
+        },
+        "heldUntil": {
+          "description": "When the held time lapses (K-04 v1 reservations.held_until), or null when it is not held (taken or lapsed: the page offers other times, '3 Change it').",
+          "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/utc" }, { "type": "null" }]
+        }
+      },
+      "required": ["bookingId", "exactWords", "wordsSha256", "versionsRead", "heldUntil"],
+      "additionalProperties": false
+    },
+    "readBackBusinessBooking.errors": {
+      "title": "ReadBackBusinessBookingErrors",
+      "description": "Refused, nothing read: readBackBusinessBooking's errors. wrongDoor: not a booking the business added (A3-29).",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/wrongDoorError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readBackBusinessBooking.exchange": {
+      "title": "ReadBackBusinessBookingExchange",
+      "description": "One readBackBusinessBooking request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readBackBusinessBooking" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readBackBusinessBooking.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readBackBusinessBooking.response" },
+            { "$ref": "#/$defs/readBackBusinessBooking.errors" }
           ]
         }
       },
@@ -1183,7 +1613,7 @@
     },
     "checkBookingFirst.request": {
       "title": "CheckBookingFirstRequest",
-      "description": "A booking already made, checked first (A3-43, B3-35; S13-45's one rule): in a text or chat the reply gives the page and sends nothing yet (the turn's reply row, no call); only the page's tap sends a code, and this is that tap. With the name and the day typed, if one booking at this business matches, a code goes to its contact on file, their way: the email on file, or a text into that mobile's open chat (RULES 4.1b; MC C9: never a first text, never back to the page), as a K-22 v1 proof_codes row of purpose link_record (README 'Proof codes in K-22 v1'). The answer is the same whether or not one matched, and says nothing about a visit ('Never: say anything about a visit, or that one exists, before the check passes'); 'Nothing changes until you type the code'. The code typed back is proveCode's (v1), by the code id the server keeps with the attempt (K-22 v1 rule 4), and the booking then goes on as before the visit (journeys 7 and on). Primary, uncached. Business: caller.businessId, the business whose page it is. Person: caller.personId is null: the tap acts for no one until the code is right (K-22 v1 rule 4). Only a page (schema). Repeat: caller.requestId is the key; a repeat sends no second code and answers the same attempt (a code lives 10 minutes; 5 wrong give a 15-minute pause, RULES 6.2, which proveCode counts).",
+      "description": "A booking already made, checked first (A3-43, B3-35; S13-45's one rule): in a text or chat the reply gives the page and sends nothing yet (the turn's reply row, no call); only the page's tap sends a code, and this is that tap. With the name and the day typed, if one booking at this business matches, a code goes to its contact on file, their way: the email on file, or a text into that mobile's open chat (RULES 4.1b; MC C9: never a first text, never back to the page), as a K-22 v1 proof_codes row of purpose link_record (README 'Proof codes in K-22 v1'). The answer is the same whether or not one matched, and says nothing about a visit ('Never: say anything about a visit, or that one exists, before the check passes'); 'Nothing changes until you type the code'. The code typed back is proveCode's (v1), by the code id the server keeps with the attempt (K-22 v1 rule 4), and the booking then goes on as before the visit (journeys 7 and on). Primary, uncached. Business: caller.businessId, the business whose page it is. Person: caller.personId is null: the tap acts for no one until the code is right (K-22 v1 rule 4). Only a page (schema). Repeat: caller.requestId is the key; a repeat sends no second code and answers the same attempt (a code lives 10 minutes; 5 wrong give a 15-minute pause, RULES 6.2, which proveCode counts). Limit per contact (README default 51): a contact on file gets at most one live code from this tap: while a code sent to it lives (10 minutes), or while its 15-minute pause holds, a new tap's requestId sends nothing and answers the same sentIfMatched with a new attempt id, so taps on new requests never flood a customer with codes, and the answer still never tells whether a booking exists. Errors: bookingPaused, transient (none tells whether a booking exists).",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1470,7 +1900,24 @@
       "required": ["call", "given", "request", "outcome"],
       "additionalProperties": false
     },
-    "recordStopOrStart.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/recordStopOrStart.exchange" },
+    "recordStopOrStart.exchange": {
+      "title": "RecordStopOrStartExchange",
+      "description": "One recordStopOrStart request with its outcome, as v1, its response able to name the businesses told (v1.1).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "recordStopOrStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/recordStopOrStart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/recordStopOrStart.response" },
+            { "$ref": "#/$defs/recordStopOrStart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
     "setRecordFlag.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/setRecordFlag.exchange" },
     "handOff.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/handOff.exchange" },
     "answerHandOff.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/answerHandOff.exchange" },
@@ -1492,7 +1939,7 @@
     "saveSetupStep.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/saveSetupStep.exchange" },
     "readSetup.exchange": { "$ref": "tool-api.v1.schema.json#/$defs/readSetup.exchange" },
     "callName": {
-      "description": "Every call v1.1 holds: v1's (the turn face, the shared core, the setup calls of journeys 1 and 2) and journey 3's (openRequest, confirmBusinessBooking, findCustomer, checkBookingFirst, setCustomerBlock). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
+      "description": "Every call v1.1 holds: v1's (the turn face, the shared core, the setup calls of journeys 1 and 2) and journey 3's (openRequest, confirmBusinessBooking, readBackBusinessBooking, findCustomer, checkBookingFirst, setCustomerBlock). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
       "type": "string",
       "enum": [
         "buildFrontier",
@@ -1526,6 +1973,7 @@
         "readSetup",
         "openRequest",
         "confirmBusinessBooking",
+        "readBackBusinessBooking",
         "findCustomer",
         "checkBookingFirst",
         "setCustomerBlock"

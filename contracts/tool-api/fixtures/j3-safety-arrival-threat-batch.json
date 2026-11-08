@@ -1,0 +1,126 @@
+{
+  "call": "gateAndCommit",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": ["j3-safety-arrival-threat.json"],
+    "now": "2026-10-23T14:42:04Z",
+    "stated": null,
+    "note": "A3-48, the batch after the threat's arrival record: danger closed Alex's batch at once, so it holds his one text, evt-alex-0204. Its turn id is the hash of its sorted event ids (CQ-09; turn-alex-0204 stands for it), never the arrival turn's arrivalTurnId('evt-alex-0204') (README default 36), so K-05 commitTurn writes this turn instead of answering repeated with nothing written. Its safety record answers repeated (the event id is the key), and the protecting change the danger text calls for commits here at once, past the hold that is never released: 'visits with that person or at their place pause until Sam decides' (A3-48; MASTER-FLOW-A line 7208: 'stopping or protecting is done at once on anyone's word'), v1's setRecordFlag paused as a core action, with the call-off clock for his Nov 14 visit (as flag-paused.json writes it from Sam's portal). With the old id this commit answered repeated, and the pause was never written. Sam then decides: keep them paused, or block them (j3-block-after-threat.json)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-0204",
+      "requestId": "turn-alex-0204",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0204"
+    },
+    "turn": {
+      "id": "turn-alex-0204",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0204"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0204",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "input": { "kind": "coreOnly" },
+    "core": [
+      {
+        "call": "recordSafetyOutcome",
+        "request": {
+          "caller": {
+            "kind": "turn",
+            "turnId": "turn-alex-0204",
+            "requestId": "turn-alex-0204",
+            "businessId": "biz-lees-barbershop",
+            "personId": "person-alex",
+            "traceId": "trace-alex-0204"
+          },
+          "safety": {
+            "eventId": "evt-alex-0204",
+            "source": "text",
+            "tries": [{ "model": "haiku", "result": "verdict" }],
+            "read": {
+              "labels": [
+                {
+                  "outcome": "A threat to staff or others",
+                  "tense": "now",
+                  "evidence": "if Riley messes up my hair again I'll hurt him",
+                  "atRisk": "Riley, staff",
+                  "writer": "the person at the handle"
+                }
+              ]
+            },
+            "timedOut": false,
+            "dangerWords": [],
+            "outcomes": ["A threat to staff or others"],
+            "liftedToUnsure": false
+          },
+          "handleId": "handle-alex",
+          "bookingId": "booking-alex-riley-nov14",
+          "sentByActor": null
+        }
+      },
+      {
+        "call": "setRecordFlag",
+        "request": {
+          "caller": {
+            "kind": "turn",
+            "turnId": "turn-alex-0204",
+            "requestId": "turn-alex-0204",
+            "businessId": "biz-lees-barbershop",
+            "personId": "person-alex",
+            "traceId": "trace-alex-0204"
+          },
+          "flag": "paused",
+          "action": "set",
+          "target": { "personId": "person-alex" },
+          "expectVersion": null
+        }
+      }
+    ],
+    "now": "2026-10-23T14:42:04Z"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-0204",
+    "committedAt": "2026-10-23T14:42:04Z",
+    "repeated": false,
+    "parts": [],
+    "planner": null,
+    "core": [
+      {
+        "call": "recordSafetyOutcome",
+        "response": {
+          "outcomeId": "safety-outcome-alex-0204",
+          "outcomes": ["A threat to staff or others"],
+          "hold": { "holdId": "hold-alex-0204", "releaseRule": "never", "blocksBooking": false },
+          "safetyLine": { "fixedLineId": "threatSafetyLine", "outboxRowId": "out-alex-threat-line" },
+          "told": [{ "who": "owner", "via": "handOff", "id": "handoff-alex-threat" }],
+          "nothingBooks": true,
+          "repeated": true
+        },
+        "error": null
+      },
+      {
+        "call": "setRecordFlag",
+        "response": {
+          "rowId": "pause-alex-lees",
+          "version": 1,
+          "callOffClockRowIds": ["clock-call-off-alex-nov14"],
+          "repeated": false
+        },
+        "error": null
+      }
+    ],
+    "written": {
+      "written": [{ "table": "pauses", "rowId": "pause-alex-lees", "version": 1 }],
+      "outboxRows": [],
+      "promoted": []
+    },
+    "effects": [],
+    "openQuestions": { "opened": [], "closed": [] }
+  }
+}

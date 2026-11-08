@@ -1,0 +1,54 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-business-text.json"],
+    "now": "2026-10-22T14:01:32Z",
+    "stated": null,
+    "note": "A3-30's '3 Change it': Sam answers the read-back '3, make it 11:30' at 10:01am. The changed value is decide's part field in that turn, re-parsed from Sam's own words with his text's send time under limit 6 (arch 06 line 309), never taken from the read-back: Sat Oct 24 11:30am to 12:00pm with Riley, the same service. The call releases the old hold and holds the new time for the booking (K-05 v1 release, then reserve, door standard, 10 minutes), leaves the line and Alex's row as they are, gives no key and books nothing (stage entry), and the turn's reply reads the booking back again with a new open question, built from the new hold's version. Its '1' then books it as j3-confirm-business-booking-yes.json does."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-book-alex-change",
+      "requestId": "turn-sam-book-alex-change",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0304"
+    },
+    "bookingId": "booking-alex-sam-book",
+    "expectVersion": 1,
+    "answer": "changeIt",
+    "readBack": { "kind": "openQuestion", "openQuestionId": "oq-a3-30-alex-sam-book", "yesEventId": "evt-sam-0304" },
+    "changed": {
+      "time": {
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T15:30:00Z", "end": "2026-10-24T16:00:00Z" },
+        "zone": "America/New_York"
+      },
+      "service": null,
+      "newCustomer": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-sam-book",
+    "customerId": "customer-alex-barbershop",
+    "gives": [],
+    "answer": "changeIt",
+    "stage": "entry",
+    "consentId": null,
+    "reservation": { "reservationId": "rsv-alex-sam-book-riley-2", "state": "held", "version": 1 },
+    "textsOff": null,
+    "effects": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-sam-book-riley", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-alex-sam-book-riley-2", "version": 1 }
+    ],
+    "outboxRowIds": ["out-sam-alex-read-back-2"],
+    "repeated": false
+  }
+}

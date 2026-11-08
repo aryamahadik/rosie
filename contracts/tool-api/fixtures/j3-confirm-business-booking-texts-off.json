@@ -1,0 +1,47 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-business-text.json"],
+    "now": "2026-10-22T14:03:02Z",
+    "stated": { "step": "A3-30", "gives": ["who_for", "reach_by", "times", "customer"] },
+    "note": "A3-30 with a stopped phone: as j3-confirm-business-booking-yes.json, except that Alex texted STOP from his mobile earlier that morning, so his K-04 phones row is stopped (MC C1; as core/seed-phone-stopped.json shows for Ben). Sam replies '1' to the read-back. The reply books it as entered and gives the four keys, but the business's yes is not Alex's: only START, or a fresh yes on a new booking sent from that number, turns texts back on (S13-32), so no texts consent and no chat link are written. Sam hears only the fixed line 'Texts to this customer are off. Reach them their way.' (RULES 7.5; MC C1; S13-32; A3-12), never where the stop came from, as a quick reply in his own chat (README default 50; v1's open gap 18). textsOffReachTheirWay is a K-01 fixed line id whose words wait on Q-01 (open gap 8)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-0303",
+      "requestId": "turn-sam-0303",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0303"
+    },
+    "bookingId": "booking-alex-sam-book",
+    "expectVersion": 1,
+    "answer": "yesSendLink",
+    "readBack": { "kind": "openQuestion", "openQuestionId": "oq-a3-30-alex-sam-book", "yesEventId": "evt-sam-0303" },
+    "changed": null
+  },
+  "outcome": {
+    "bookingId": "booking-alex-sam-book",
+    "customerId": "customer-alex-barbershop",
+    "gives": ["who_for", "reach_by", "times", "customer"],
+    "answer": "yesSendLink",
+    "stage": "booked",
+    "consentId": null,
+    "reservation": { "reservationId": "rsv-alex-sam-book-riley", "state": "booked", "version": 2 },
+    "textsOff": { "fixedLineId": "textsOffReachTheirWay", "outboxRowId": "out-sam-alex-texts-off" },
+    "effects": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-alex-sam-book-riley", "version": 2 }
+    ],
+    "outboxRowIds": ["out-sam-alex-texts-off"],
+    "repeated": false
+  }
+}

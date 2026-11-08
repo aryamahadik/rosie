@@ -1,0 +1,62 @@
+{
+  "call": "recordSafetyOutcome",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-10-23T14:42:02Z",
+    "stated": { "step": "A3-22", "gives": ["safe"] },
+    "note": "A3-48 on arrival: Alex texts 'if Riley messes up my hair again I'll hurt him' (contracts/model/fixtures/safety-threat.json, word for word; v1's safety-outcome-hold.json records the same read inside a turn). The read says A threat to staff or others, so the handle actor records it at once in the text's own arrival turn (its id arrivalTurnId('evt-alex-0204'): README default 36): the outcome row, a hold never released, written at version 1, the checked line as a send class safety row, and Sam told at once through a hand-off (arch 06 lines 325, 329). The text then joins its own batch turn, whose commit writes the pause (j3-safety-arrival-threat-batch.json)."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "requestId": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0204"
+    },
+    "turn": {
+      "id": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0204"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0204",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "safety": {
+      "eventId": "evt-alex-0204",
+      "source": "text",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "read": {
+        "labels": [
+          {
+            "outcome": "A threat to staff or others",
+            "tense": "now",
+            "evidence": "if Riley messes up my hair again I'll hurt him",
+            "atRisk": "Riley, staff",
+            "writer": "the person at the handle"
+          }
+        ]
+      },
+      "timedOut": false,
+      "dangerWords": [],
+      "outcomes": ["A threat to staff or others"],
+      "liftedToUnsure": false
+    },
+    "handleId": "handle-alex",
+    "bookingId": "booking-alex-riley-nov14",
+    "sentByActor": null
+  },
+  "outcome": {
+    "outcomeId": "safety-outcome-alex-0204",
+    "outcomes": ["A threat to staff or others"],
+    "hold": { "holdId": "hold-alex-0204", "releaseRule": "never", "blocksBooking": false, "version": 1 },
+    "safetyLine": { "fixedLineId": "threatSafetyLine", "outboxRowId": "out-alex-threat-line" },
+    "told": [{ "who": "owner", "via": "handOff", "id": "handoff-alex-threat" }],
+    "nothingBooks": true,
+    "repeated": false,
+    "gives": ["safe"]
+  }
+}

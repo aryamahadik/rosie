@@ -2,13 +2,13 @@
   "caller": {
     "kind": "actorOnArrival",
     "turnId": null,
-    "requestId": "turn-arrival-alex-0202",
+    "requestId": "bbf088c8c89cea1fde8ac199403e49cb5d7312eeadcc2ec7e4b305e6d1c8b3c1",
     "businessId": "biz-lees-barbershop",
     "personId": "person-alex",
     "traceId": "trace-alex-0202"
   },
   "turn": {
-    "id": "turn-arrival-alex-0202",
+    "id": "bbf088c8c89cea1fde8ac199403e49cb5d7312eeadcc2ec7e4b305e6d1c8b3c1",
     "handleId": "handle-alex",
     "eventIds": ["evt-alex-0202"],
     "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },

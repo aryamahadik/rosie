@@ -10,14 +10,14 @@
   "request": {
     "caller": {
       "kind": "actorOnArrival",
-      "turnId": "turn-arrival-alex-0201",
-      "requestId": "turn-arrival-alex-0201",
+      "turnId": "50886074cc97ae2453033beb3136a7a384f6caabb0276ecef5ad5b7264fb3b5d",
+      "requestId": "50886074cc97ae2453033beb3136a7a384f6caabb0276ecef5ad5b7264fb3b5d",
       "businessId": "biz-lees-barbershop",
       "personId": "person-alex",
       "traceId": "trace-alex-0201"
     },
     "turn": {
-      "id": "turn-arrival-alex-0201",
+      "id": "50886074cc97ae2453033beb3136a7a384f6caabb0276ecef5ad5b7264fb3b5d",
       "handleId": "handle-alex",
       "eventIds": ["evt-alex-0201"],
       "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
