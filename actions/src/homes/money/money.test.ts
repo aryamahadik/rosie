@@ -29,6 +29,7 @@ import {
   approvedMoneyLines,
   checkMoneyLine,
   checkMoneyText,
+  claimHolds,
   gateMoneyText,
   readApprovedLines,
   sentencesOf,
@@ -1033,7 +1034,8 @@ describe("round 3 (DL-182): a money sentence passes only as an approved line, an
     // Round 2, notes 2 to 5.
     ["Your card has now been charged $55.", "moneyNotFromRecord"],
     ["We've now charged your card.", "moneyNotFromRecord"],
-    ["The $55 you paid is confirmed.", "moneyNotFromRecord"],
+    // Round 4 (DL-187 4): a line that names a confirmation fails with neverChargeOnSilence (round 3: moneyNotFromRecord).
+    ["The $55 you paid is confirmed.", "neverChargeOnSilence"],
     ["We'll hold onto $40 on your card.", "neverHold"],
     ["We'll hold the money until the visit.", "neverHold"],
   ];
@@ -1212,10 +1214,8 @@ describe("round 3 (DL-182): a money sentence passes only as an approved line, an
     expect(gateMoneyText(note, gate()).refused).toEqual([SILENCE]);
   }, 120_000);
 
-  it("a money action word with no money object passes: 'We'll hold your 10am'", () => {
+  it("a round 3 money action word that is no round 4 money word passes with no money object; 'We'll hold your 10am' now falls back", () => {
     const passing = [
-      "We'll hold your 10am.",
-      "We’ll hold your 10am.",
       "We'll keep your spot until Fri 11am.",
       "Riley will block off Sat morning for you.",
       "Take a seat when you get here.",
@@ -1225,6 +1225,13 @@ describe("round 3 (DL-182): a money sentence passes only as an approved line, an
       expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
       for (const reading of gateReadings())
         expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+    }
+    // Round 4 (DL-187 1): "hold" is a money word alone, so a time the model says it is holding falls back to the
+    // approved wording (Rosie's word for a time is "saved"). Round 3 passed these two.
+    for (const text of ["We'll hold your 10am.", "We’ll hold your 10am."]) {
+      expect(gateMoneyText(text, gate()), text).toEqual({ ok: false, refused: [HOLD] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()).refused, text).toEqual([HOLD]);
     }
   });
 
@@ -1238,8 +1245,9 @@ describe("round 3 (DL-182): a money sentence passes only as an approved line, an
     ])
       expect(gateMoneyText(text, gate()).refused, text).toEqual([HOLD]);
     expect(gateMoneyText("If you don't reply by 7pm; we'll charge it.", gate()).refused).toEqual([SILENCE]);
-    // A line break ends a sentence: the card with an amount is still a money sentence of its own.
-    expect(gateMoneyText("We'll hold it.\nYour card, $40.", gate()).refused).toEqual([NOT_FROM_RECORD]);
+    // A line break ends a sentence: the card with an amount is still a money sentence of its own. Round 4 (DL-187 2):
+    // "We'll hold it." is one too, by "hold" (round 3 refused only the second sentence, [NOT_FROM_RECORD]).
+    expect(gateMoneyText("We'll hold it.\nYour card, $40.", gate()).refused).toEqual([HOLD, NOT_FROM_RECORD]);
   });
 });
 
@@ -1314,5 +1322,358 @@ describe("round 3 (DL-182, 2): 'deposit paid', 'paid in full' and 'refunded' sai
       row: 8,
       text: "{{deposit}} deposit paid, toward the {{price}}",
     });
+  });
+});
+
+// Round 4 (DL-187): one money word, sign or slot is enough. A sentence that holds one passes only as an approved line,
+// each sentence judged alone; a sentence with none is the recorded residual (gate.ts header; CQ-120).
+
+/** Every line the security reviewer gave in rounds 1 to 3 (card T-593), with the label it fails with (DL-187 4). */
+const REVIEWER_ROUNDS_1_TO_3: readonly (readonly [string, GateWhy])[] = [
+  // Round 1, (a) to (e).
+  ["Your card will be held for $40 until the visit.", "neverHold"],
+  ["Your saved card is held for {{deposit}} until Sat 11:00am.", "neverHold"],
+  ["If you don't reply by Fri 11am, we'll charge the $20 fee to your card.", "neverChargeOnSilence"],
+  [
+    "If you haven't answered within 24 hours, the late-cancel fee is charged to the saved card.",
+    "neverChargeOnSilence",
+  ],
+  ["If we don't get a reply by 7pm, we'll charge your card.", "neverChargeOnSilence"],
+  // Round 2, items 1 to 3.
+  ["We'll place a $40 hold on your card but won't charge it unless you cancel late.", "neverHold"],
+  ["We'll place a temporary $40 hold on your card that won't be charged.", "neverHold"],
+  ["If you don't reply by 7pm, we'll charge the fee with no further notice.", "neverChargeOnSilence"],
+  ["No reply by 7pm means we charge the fee and can't refund it.", "neverChargeOnSilence"],
+  ["A hold (not a charge) goes on your card for $40.", "neverHold"],
+  ["Not replying by 7pm means we'll charge your card.", "neverChargeOnSilence"],
+  ["Without hearing from you by 7pm, we'll charge the fee.", "neverChargeOnSilence"],
+  // Round 2, notes 2 to 5.
+  ["Your card has now been charged $55.", "moneyNotFromRecord"],
+  ["We've now charged your card.", "moneyNotFromRecord"],
+  ["The $55 you paid is confirmed.", "neverChargeOnSilence"],
+  ["We'll hold onto $40 on your card.", "neverHold"],
+  ["We'll hold the money until the visit.", "neverHold"],
+  // Round 3, group 1: forms round 3's word lists missed.
+  ["If you don't reply by 7pm, the visit becomes chargeable.", "neverChargeOnSilence"],
+  ["If you don't reply by 7pm, the visit becomes billable.", "neverChargeOnSilence"],
+  ["If you're unresponsive by 7pm, we'll charge you.", "neverChargeOnSilence"],
+  ["We'll hold 40 € until your visit.", "neverHold"],
+  ["We'll place a hold on your Mastercard until the visit.", "neverHold"],
+  // Round 3, group 2: one money word and no pair.
+  ["We'll run a pre-authorization when you book.", "neverHold"],
+  ["If you don't confirm by 7pm, you'll be charged.", "neverChargeOnSilence"],
+  ["If you don't reply by 7pm, the cancellation will cost you the full price.", "neverChargeOnSilence"],
+  // Round 3, note 1: a hold split from its card by a sentence end or an abbreviation point.
+  ["We'll place a hold. It goes on your card.", "neverHold"],
+  ["We'll hold approx. $40 until your visit.", "neverHold"],
+  // Round 3, note 3: statements the claim check alone passed before the money step.
+  ["Your deposit was paid at booking.", "moneyNotFromRecord"],
+  ["The business refunded your $40.", "moneyNotFromRecord"],
+];
+
+/** DL-187 4's label: neverHold with hold, held or authori; neverChargeOnSilence with a reply, an answer, a confirmation, a response or silence (and round 3's hearing); else moneyNotFromRecord. */
+function labelOf(line: string): GateWhy {
+  if (/hold|held|authori/i.test(line)) return "neverHold";
+  if (/repl|answer|confirm|respon|silen|hear/i.test(line)) return "neverChargeOnSilence";
+  return "moneyNotFromRecord";
+}
+
+describe("round 4 (DL-187): one money word, sign or slot makes a money sentence, each sentence judged alone", () => {
+  it("every line the security reviewer gave in rounds 1 to 3 fails with its label, in all three apostrophe forms, on every booking", () => {
+    let checked = 0;
+    for (const [line, why] of REVIEWER_ROUNDS_1_TO_3) {
+      expect(labelOf(line), line).toBe(why);
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, text).toContainEqual(BY_WHY[why]);
+        for (const reading of gateReadings()) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, text).toBe(false);
+          expect(check.refused, text).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          if (why !== "moneyNotFromRecord")
+            expect(checkMoneyLine(text, reading).refused, text).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+      }
+    }
+    expect(REVIEWER_ROUNDS_1_TO_3.length).toBe(29);
+    expect(checked).toBe(29 * 3 * 6);
+  });
+
+  it("one money word, sign or slot alone makes a money sentence: neverHold with hold, held or authori, neverChargeOnSilence with a reply, else moneyNotFromRecord", () => {
+    const words = [
+      "charge",
+      "surcharge",
+      "chargeable",
+      "bill",
+      "billing",
+      "pay",
+      "prepaid",
+      "paid",
+      "unpaid",
+      "cost",
+      "price",
+      "pricing",
+      "refund",
+      "deposit",
+      "debit",
+      "owe",
+      "owed",
+      "deduct",
+      "invoice",
+      "withdraw",
+      "withdrew",
+      "fund",
+      "funds",
+      "dollar",
+      "dollars",
+      "buck",
+      "bucks",
+      "money",
+      "amount",
+      "fee",
+      "fees",
+      "cent",
+      "cents",
+      "card",
+      "cards",
+      "Mastercard",
+      "postcard",
+    ];
+    for (const word of words)
+      expect(gateMoneyText(`That is the ${word} we spoke of.`, NOTHING_APPROVED).refused, word).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+    for (const word of [
+      "hold",
+      "holding",
+      "held",
+      "withheld",
+      "authorize",
+      "authorise",
+      "pre-authorization",
+      "unauthorized",
+      "pre-auth",
+    ])
+      expect(gateMoneyText(`That is the ${word} we spoke of.`, NOTHING_APPROVED).refused, word).toEqual([
+        HOLD,
+      ]);
+    for (const text of [
+      "That is $40.",
+      "That is 40 €.",
+      "That is £40.",
+      "That is {{keep}}.",
+      "That is {{due}}.",
+      "That is {{pay.took}}.",
+      "THAT’S THE FEE.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([NOT_FROM_RECORD]);
+    for (const text of [
+      "If you don't reply, that is the fee.",
+      "No answer means a fee.",
+      "Unless you confirm, a fee.",
+      "If you don't respond, the fee.",
+      "Silence means a fee.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([SILENCE]);
+  });
+
+  it("'feel', 'coffee', 'recently' and 'percent' make no money sentence: a stem counts only at the start of a word", () => {
+    const pairs = [
+      ["We hope you feel at home.", "We hope the fee is fine."],
+      ["Coffee is on us while you wait.", "The fee is on us while you wait."],
+      ["We recently moved next door.", "One cent is on us."],
+      ["Ninety percent of visits start on time.", "Ninety cents of each visit is ours."],
+    ] as const;
+    for (const [none, money] of pairs) {
+      expect(gateMoneyText(none, NOTHING_APPROVED), none).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(none, reading, gate()), none).toEqual({ ok: true, claims: [], refused: [] });
+      expect(gateMoneyText(money, NOTHING_APPROVED).refused, money).toEqual([NOT_FROM_RECORD]);
+    }
+  });
+
+  it("each sentence is judged alone: a hold is never split from its card, and a time said to be held falls back", () => {
+    expect(gateMoneyText("We'll place a hold.", gate()).refused).toEqual([HOLD]);
+    expect(gateMoneyText("It goes on your card.", gate()).refused).toEqual([NOT_FROM_RECORD]);
+    expect(gateMoneyText("We'll place a hold. It goes on your card.", gate()).refused).toEqual([
+      HOLD,
+      NOT_FROM_RECORD,
+    ]);
+    expect(gateMoneyText("We'll hold approx. $40 until your visit.", gate()).refused).toEqual([
+      HOLD,
+      NOT_FROM_RECORD,
+    ]);
+    expect(gateMoneyText("Your 10am is held for you.", gate()).refused).toEqual([HOLD]);
+    expect(gateMoneyText("Your 10am is saved.", NOTHING_APPROVED)).toEqual({ ok: true, refused: [] });
+  });
+
+  it("approved lines are never re-split after filling, and a slot value that holds a sentence end is refused", () => {
+    // The reviewer's round 3 note 2: a {{biz.name}} value holding a sentence approves no sentence (who.ok's row).
+    const value = "X. We'll hold $40 on your card";
+    const biz = [{ slot: "biz.name", value }];
+    expect(approved().sentences.has("{{biz.name}} booked this for you")).toBe(true);
+    expect(gateMoneyText(`${value} booked this for you.`, gate(biz)).refused).toEqual([HOLD]);
+    expect(gateMoneyText("We'll hold $40 on your card booked this for you.", gate(biz)).refused).toEqual([
+      HOLD,
+    ]);
+    // A value that holds a sentence end stands for no slot, even where the rest of the line fits (pay.took's row).
+    expect(record("A").rows["pay.took"]?.map((row) => row.text)).toContain(
+      "Paid now: {{paidnow}}, in one payment",
+    );
+    expect(
+      gateMoneyText("Paid now: $40, in one payment.", gate([{ slot: "paidnow", value: "$40" }])),
+    ).toEqual({
+      ok: true,
+      refused: [],
+    });
+    for (const dirty of ["$40.", "$40!", "$40?", "$40\nfor now", "$40. For now"])
+      expect(
+        gateMoneyText(`Paid now: ${dirty}, in one payment.`, gate([{ slot: "paidnow", value: dirty }]))
+          .refused,
+        dirty,
+      ).toEqual([NOT_FROM_RECORD]);
+  });
+
+  it("money words are found as a person reads them: a fullwidth sign, an invisible character or a look-alike letter hides none (default 8)", () => {
+    const hidden: readonly (readonly [string, GateWhy])[] = [
+      // A soft hyphen and a zero-width space inside "charge".
+      ["If you don't reply, we'll ch­arge it.", "neverChargeOnSilence"],
+      ["If you don't reply, we'll ch​arge it.", "neverChargeOnSilence"],
+      // A fullwidth dollar sign, fullwidth letters, a combining mark.
+      ["That is ＄40.", "moneyNotFromRecord"],
+      ["That is the ｆｅｅ.", "moneyNotFromRecord"],
+      ["That is the ćard.", "moneyNotFromRecord"],
+      // Cyrillic and Greek letters that look like Latin ones, inside a Latin word or making up the whole word.
+      ["If you don't reply, we'll сharge it.", "neverChargeOnSilence"],
+      ["We'll place a hоld.", "neverHold"],
+      ["That is the fее.", "moneyNotFromRecord"],
+      ["That is the сагԁ.", "moneyNotFromRecord"],
+      ["That is the ρay.", "moneyNotFromRecord"],
+      // A word that mixes Latin letters with another script's letter (an Armenian o) counts as a money word.
+      ["We'll place a hօld.", "moneyNotFromRecord"],
+    ];
+    for (const [text, why] of hidden)
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([BY_WHY[why]]);
+    // A word all in one script is none: a Russian thank-you passes.
+    expect(gateMoneyText("Спасибо, see you soon.", NOTHING_APPROVED)).toEqual({
+      ok: true,
+      refused: [],
+    });
+    // The claim check reads its claims in the same form: "charged" with a Cyrillic c, before the money step.
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine("You were сharged $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+
+  it("the residual: a sentence with no money word, sign or slot is not this check's to catch (gate.ts header; CQ-120)", () => {
+    for (const text of [
+      "We'll put a temporary stop on your plastic until the visit.",
+      "If we don't hear back by 7pm, it goes through anyway.",
+      "We'll put a h0ld on it until the visit.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+    }
+  });
+});
+
+describe("round 4 (DL-187, 3): a past statement is a statement; 'refunded' in any form and the registry's taken points need money taken", () => {
+  function deposits(): { asked: MoneyReading; unwritten: MoneyReading; taken: MoneyReading } {
+    return {
+      asked: readMoney(oneService("A", "list|deposit|counter", false), record("A")),
+      unwritten: readMoney({ ...oneService("A", "list|deposit|counter"), written: false }, record("A")),
+      taken: readMoney(oneService("A", "list|deposit|counter"), record("A")),
+    };
+  }
+
+  function fulls(): { asked: MoneyReading; unwritten: MoneyReading; taken: MoneyReading } {
+    return {
+      asked: readMoney(oneService("A", "list|full|none", false), record("A")),
+      unwritten: readMoney({ ...oneService("A", "list|full|none"), written: false }, record("A")),
+      taken: readMoney(oneService("A", "list|full|none"), record("A")),
+    };
+  }
+
+  it("a past statement is no term: 'Your deposit was paid at booking.' fails before the money step and passes once taken", () => {
+    const deposit = deposits();
+    for (const text of [
+      "Your deposit was paid at booking.",
+      "Your $40 deposit has been paid at booking.",
+      "Your deposit's been paid when you booked.",
+      "You paid the deposit at booking.",
+    ]) {
+      for (const reading of [deposit.asked, deposit.unwritten])
+        expect(checkMoneyLine(text, reading).refused, text).toEqual([
+          { claim: "depositPaid", why: "notTaken" },
+        ]);
+      expect(checkMoneyLine(text, deposit.taken).ok, text).toBe(true);
+    }
+    const full = fulls();
+    for (const text of [
+      "Your visit was paid in full at booking.",
+      "It was paid in full when you book.",
+      "You paid in full when you booked.",
+    ]) {
+      for (const reading of [full.asked, full.unwritten])
+        expect(checkMoneyLine(text, reading).refused, text).toEqual([
+          { claim: "paidInFull", why: "notTaken" },
+        ]);
+      expect(checkMoneyLine(text, full.taken).ok, text).toBe(true);
+    }
+    // A term opens its sentence or a part of it and says what the booking asks "when you book": it stays a term.
+    for (const text of [
+      "Paid in full when you book: $55",
+      "A $55 cut, paid in full when you book.",
+      "Haircut · paid in full when booking",
+    ])
+      expect(checkMoneyLine(text, full.asked), text).toEqual({
+        ok: true,
+        claims: ["paidInFull"],
+        refused: [],
+      });
+  });
+
+  it("'refunded' in any form needs money taken: 'The business refunded your $40.' fails before the money step and passes once taken", () => {
+    const deposit = deposits();
+    for (const text of [
+      "The business refunded your $40.",
+      "Sam refunded the deposit.",
+      "Your $40 is refunded.",
+      "It's refunded.",
+      "They've refunded it in full.",
+      "A refunded deposit is yours again.",
+    ]) {
+      for (const reading of [deposit.asked, deposit.unwritten])
+        expect(checkMoneyLine(text, reading).refused, text).toEqual([
+          { claim: "backToCard", why: "notTaken" },
+        ]);
+      expect(checkMoneyLine(text, deposit.taken).ok, text).toBe(true);
+    }
+    // pay.back's row refunds a supposed payment, as a term: it says no money was taken (claims.ts default 2).
+    const row = "Nothing was taken through Rosie. Anything you paid the business is refunded its own way.";
+    expect(record("A").rows["pay.back"]?.map((line) => line.text)).toContain(row);
+    expect(checkMoneyLine(row, deposit.asked).claims).not.toContain("backToCard");
+    expect(checkMoneyLine("Anything you paid was refunded.", deposit.asked).refused).toEqual([
+      { claim: "backToCard", why: "notTaken" },
+    ]);
+  });
+
+  it("the registry points depositPaid, paidInFull and backToCard rule 'yes' only on money taken", () => {
+    const home = moneyHome();
+    const deposit = deposits();
+    const full = fulls();
+    // Before the money step the record holds what is asked, so the claim of a term holds; the point says "no".
+    expect(claimHolds("depositPaid", deposit.asked)).toBe(true);
+    for (const point of ["depositPaid", "backToCard"])
+      expect(
+        [deposit.asked, deposit.unwritten, deposit.taken].map((money) => home.rule(point, { money })),
+        point,
+      ).toEqual(["no", "no", "yes"]);
+    expect(
+      [full.asked, full.unwritten, full.taken].map((money) => home.rule("paidInFull", { money })),
+    ).toEqual(["no", "no", "yes"]);
   });
 });
