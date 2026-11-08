@@ -170,6 +170,12 @@ async function run(args: string[], io: CliIo): Promise<number> {
   const total = trades.reduce((sum, file) => sum + file.bytes, 0);
   const most = largest === null ? "" : `; the largest ${largest.path}, ${String(largest.bytes)} bytes`;
   io.out(`wrote ${String(trades.length)} trade overlays in trade/ (${String(total)} bytes${most})`);
+  const lint = built.bundle.manifest.lint as { rules: { rule: string; failures: number }[] };
+  io.out(
+    `lint marks K-01 v1's step checks ask for (the full lint is T-153 to T-160's): ${lint.rules
+      .map((entry) => `${entry.rule} ${String(entry.failures)}`)
+      .join(", ")}`,
+  );
   io.out(
     `validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and ${String(trades.length)} trade overlays`,
   );

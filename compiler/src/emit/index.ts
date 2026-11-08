@@ -59,6 +59,7 @@ export {
   toBundleMessage,
   toBundleMessages,
   toBundleVary,
+  toScreenRows,
   type BundleStep,
   type CompiledSteps,
 } from "./steps";

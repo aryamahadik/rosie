@@ -9,11 +9,20 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import { beforeAll, describe, expect, it } from "vitest";
+import { S13_32_LINES } from "../corrections/c1";
 import { buildKeyMap } from "../keymap";
+import { loadMaster } from "../load/flow";
 import { loadTrade } from "../load/trade";
 import { buildKeywords } from "../msgtext";
-import { S13_32_LINES } from "../corrections/c1";
-import { buildBundle, byteLength, markedRules, treeSha256, type BuiltBundle } from "./index";
+import {
+  buildBundle,
+  byteLength,
+  markedRules,
+  settingsFor,
+  toScreenRows,
+  treeSha256,
+  type BuiltBundle,
+} from "./index";
 
 const GIVEN_ID = { hash: "ab".repeat(32), build: 7 };
 const BUILT_AT = "2026-11-08T00:00:00Z";
@@ -410,5 +419,42 @@ describe("one compiled overlay per trade", () => {
       ).toBe(true);
       expect(settings.cutoff === null || typeof settings.cutoff === "string").toBe(true);
     }
+  });
+});
+
+describe("the values K-01 v1 writes otherwise than the sources", () => {
+  it("settings: a value per flow ({ A, B }) is split; none starts at arrive window and an empty cutoff (MC C5)", () => {
+    const perFlow = { arrive: { A: "setstart" as const, B: { window: 3 } }, cutoff: "24 hours before" };
+    expect(settingsFor(perFlow, "A")).toEqual({ arrive: "setstart", cutoff: "24 hours before" });
+    expect(settingsFor(perFlow, "B")).toEqual({ arrive: { window: 3 }, cutoff: "24 hours before" });
+    expect(settingsFor({ arrive: { window: 2 } }, "B")).toEqual({ arrive: { window: 2 }, cutoff: null });
+    expect(settingsFor({ cutoff: { A: "7am the day of" } }, "B")).toEqual({ arrive: "window", cutoff: null });
+    expect(settingsFor(null, "A")).toEqual({ arrive: "window", cutoff: null });
+  });
+
+  it("a screen row written as its label alone is that label with an empty value (K-01 pair)", () => {
+    expect(toScreenRows([["Card"], ["Name", "Alex"]], "test")).toEqual([
+      ["Card", ""],
+      ["Name", "Alex"],
+    ]);
+    expect(() => toScreenRows([["a", "b", "c"]], "test")).toThrow(/a form row is/);
+    expect(() => toScreenRows("Card", "test")).toThrow(/a list of rows/);
+  });
+
+  it("timing: false (lib.js line 594) is a step with no timing stamp; a stamp is kept", () => {
+    const master = loadMaster();
+    const unstamped = Object.values(master.B.steps).filter((step) => step.timing === false);
+    const stamped = Object.values(master.B.steps).filter((step) => step.timing === "B");
+    expect(unstamped.length).toBeGreaterThan(0);
+    expect(stamped.length).toBeGreaterThan(0);
+    for (const step of unstamped) expect(flows.B.steps[step.id], step.id).not.toHaveProperty("timing");
+    for (const step of stamped) expect(flows.B.steps[step.id], step.id).toHaveProperty("timing", "B");
+  });
+
+  it("a flow B step the master types `step` is a plain step, with no type", () => {
+    const master = loadMaster();
+    const typed = Object.values(master.B.steps).filter((step) => step.type === "step");
+    expect(typed.length).toBeGreaterThan(0);
+    for (const step of typed) expect(flows.B.steps[step.id], step.id).not.toHaveProperty("type");
   });
 });
