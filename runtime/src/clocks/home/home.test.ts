@@ -1,9 +1,10 @@
 // The clock home (T-591; C-055; S13-35, S13-02, S13-03), run by `npm run test:unit -- runtime/src/clocks/home`. The card's
 // checks first: a deadline that would pass the visit is cut to end before it; free cancel ending at noon the day before
 // gives a 6pm reminder two evenings before; never two reminders for one booked time; a job sent now gets the urgent clock
-// at 2am. Then text hours (9am to 8pm, the owner's and team's from 8am, 8pm the last minute), a deadline shown in another
-// zone, and the registry's module. Every expected time is worked out by hand from the zone facts below, across the
-// daylight-saving change of Sun Nov 1, 2026.
+// at 2am. Then text hours (9am to 8pm, the owner's and team's from 8am, ending before 8pm as limit 8 reads them: 8:00pm
+// itself is outside and 7:59pm the last minute, DL-180), a deadline shown in another zone, and the registry's module.
+// Every expected time is worked out by hand from the zone facts below, across the daylight-saving change of Sun Nov 1,
+// 2026. Limit 8's own text-hours check (../../dispatch/limit8/text-hours.ts) is imported read-only to hold the home to it.
 //
 // Zone facts (IANA): America/New_York is UTC-4 (EDT) until 2026-11-01T06:00Z and UTC-5 (EST) after; America/Los_Angeles
 // is UTC-7 (PDT) until 2026-11-01T09:00Z and UTC-8 (PST) after; America/Detroit keeps New York's clock. Sat Oct 24, 2026
@@ -12,6 +13,8 @@
 import { describe, expect, it } from "vitest";
 
 import armClock from "../../../../contracts/data-access/fixtures/arm-clock.json";
+import { CUSTOMER_OPENS, STAFF_OPENS } from "../../dispatch/limit8/limit8";
+import { checkTextHours, minutesOf, type TextWindow } from "../../dispatch/limit8/text-hours";
 import { isLabel } from "../../trace";
 import { dueOf, DueError } from "../due";
 import { instantAtLocal, localDateOf } from "../zone";
@@ -44,6 +47,31 @@ const MINUTE = 60_000;
 
 const ms = (iso: string): number => Date.parse(iso);
 const iso = (instant: number): string => new Date(instant).toISOString().replace(".000Z", "Z");
+
+/** H04's default text hours, 8am to 8pm (K-04 businesses.text_hours_start and text_hours_end), as limit 8 reads them. */
+const H04_HOURS = { start: "08:00", end: "20:00" };
+
+function minutesOfTime(time: string): number {
+  const minutes = minutesOf(time);
+  if (minutes === null) throw new Error(`${time} is not a time`);
+  return minutes;
+}
+
+/**
+ * The window limit 8 checks a routine send against (limit8.ts windowFor): the business's H04 hours, opened no earlier
+ * than the audience's hour (9am for a customer, 8am for the owner and team), ending at H04's "20:00", exclusive.
+ */
+function limit8Window(audience: Audience): TextWindow {
+  const floor = minutesOfTime(audience === "customer" ? CUSTOMER_OPENS : STAFF_OPENS);
+  return {
+    startMinutes: Math.max(minutesOfTime(H04_HOURS.start), floor),
+    endMinutes: minutesOfTime(H04_HOURS.end),
+  };
+}
+
+/** Limit 8's own text-hours check at send, in New York: true when it would let a routine text go at the instant. */
+const limit8Sends = (at: number, audience: Audience): boolean =>
+  checkTextHours(at, NY, limit8Window(audience)).inside;
 
 /** A question's clock as the arming would ask the home for it: a customer's set-time question in New York. */
 function question(over: Partial<HomeDueInput>): HomeDueInput {
@@ -89,8 +117,9 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
     });
   });
 
-  it("cuts a deadline past a 7am visit back to 8pm the evening before, inside text hours and before the visit", () => {
-    // Fri Oct 23 10am to Sat 10am passes Sat's 7am visit; 7am is before a customer's 9am, so 8pm Fri EDT = 00:00Z Sat.
+  it("cuts a deadline past a 7am visit back to 7:59pm the evening before, inside text hours and before the visit", () => {
+    // Fri Oct 23 10am to Sat 10am passes Sat's 7am visit; 7am is before a customer's 9am, and 8:00pm itself is outside
+    // text hours, so 7:59pm Fri EDT = 23:59Z Fri.
     const held = fitDeadline({
       dueAt: "2026-10-24T14:00:00Z",
       from: "2026-10-23T14:00:00Z",
@@ -99,19 +128,20 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
       audience: "customer",
     });
     expect(held).toEqual({
-      dueAt: "2026-10-24T00:00:00Z",
+      dueAt: "2026-10-23T23:59:00Z",
       dueZone: NY,
       fit: "earlier",
       cutByVisit: true,
       inTextHours: true,
     });
     expect(ms(held.dueAt)).toBeLessThan(ms("2026-10-24T11:00:00Z"));
+    expect(limit8Sends(ms(held.dueAt), "customer")).toBe(true);
   });
 
-  it("holds step 9's own visit-start cap to text hours: a 24 h Clock line for a 7am visit ends 8pm the evening before", () => {
+  it("holds step 9's own visit-start cap to text hours: a 24 h Clock line for a 7am visit ends 7:59pm the evening before", () => {
     const due = homeDueOf(question({ clockLine: "24 h", visitStartsAt: "2026-10-24T11:00:00Z" }));
     expect(due).toEqual({
-      dueAt: "2026-10-24T00:00:00Z",
+      dueAt: "2026-10-23T23:59:00Z",
       dueZone: NY,
       fit: "earlier",
       cutByVisit: true,
@@ -121,8 +151,9 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
     });
   });
 
-  it("across the daylight-saving change: a 48 h Clock line for Mon Nov 2's 7am EST visit ends Sun Nov 1 at 8pm EST", () => {
-    // Delivered Sat Oct 31 10am EDT (14:00Z); 48 h passes Mon 7am EST (12:00Z). 8pm EST Sun = 01:00Z Mon, not EDT's 00:00Z.
+  it("across the daylight-saving change: a 48 h Clock line for Mon Nov 2's 7am EST visit ends Sun Nov 1 at 7:59pm EST", () => {
+    // Delivered Sat Oct 31 10am EDT (14:00Z); 48 h passes Mon 7am EST (12:00Z). 7:59pm EST Sun = 00:59Z Mon, not EDT's
+    // 23:59Z Sun.
     const due = homeDueOf(
       question({
         deliveredAt: "2026-10-31T14:00:00Z",
@@ -130,9 +161,10 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
         visitStartsAt: "2026-11-02T12:00:00Z",
       }),
     );
-    expect(due.dueAt).toBe("2026-11-02T01:00:00Z");
+    expect(due.dueAt).toBe("2026-11-02T00:59:00Z");
     expect(due.fit).toBe("earlier");
     expect(due.cutByVisit).toBe(true);
+    expect(limit8Sends(ms(due.dueAt), "customer")).toBe(true);
   });
 
   it("keeps the audience's own hours: an 8am visit holds an owner's deadline, but a customer's ends the evening before", () => {
@@ -144,7 +176,7 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
     };
     expect(fitDeadline({ ...input, audience: "owner" }).dueAt).toBe("2026-10-24T12:00:00Z");
     expect(fitDeadline({ ...input, audience: "team" }).dueAt).toBe("2026-10-24T12:00:00Z");
-    expect(fitDeadline({ ...input, audience: "customer" }).dueAt).toBe("2026-10-24T00:00:00Z");
+    expect(fitDeadline({ ...input, audience: "customer" }).dueAt).toBe("2026-10-23T23:59:00Z");
   });
 
   it("moves a night deadline to 9am when that is still before the visit (the earliest safe moment in text hours)", () => {
@@ -186,17 +218,22 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
     });
   });
 
-  it("keeps step 9's 8pm with no visit: 8pm is the last minute of text hours", () => {
-    const due = homeDueOf(question({ deliveredAt: "2026-10-23T18:00:00Z", visitStartsAt: null }));
+  it("moves step 9's 8pm with no visit back a minute to 7:59pm: 8:00pm itself is outside text hours", () => {
+    // Delivered Fri 2pm EDT: step 9 gives Sat 8pm EDT (00:00Z Sun), which limit 8 holds to Sun 9am; 7:59pm Sat goes.
+    const input = question({ deliveredAt: "2026-10-23T18:00:00Z", visitStartsAt: null });
+    expect(dueOf(input).dueAt).toBe("2026-10-25T00:00:00Z");
+    expect(limit8Sends(ms("2026-10-25T00:00:00Z"), "customer")).toBe(false);
+    const due = homeDueOf(input);
     expect(due).toMatchObject({
-      dueAt: "2026-10-25T00:00:00Z",
-      fit: "asGiven",
+      dueAt: "2026-10-24T23:59:00Z",
+      fit: "earlier",
       branch: "noVisit",
       inTextHours: true,
     });
+    expect(limit8Sends(ms(due.dueAt), "customer")).toBe(true);
   });
 
-  it("holds the never-delivered path to the visit and the owner's text hours: a 7am visit's applies 8pm the evening before", () => {
+  it("holds the never-delivered path to the visit and the owner's text hours: a 7am visit's applies 7:59pm the evening before", () => {
     const visit = homeNeverDeliveredDueOf({
       sentAt: "2026-10-23T19:00:00Z",
       visitStartsAt: "2026-10-24T11:00:00Z",
@@ -205,7 +242,7 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
       urgentClockMs: null,
     });
     expect(visit).toEqual({
-      dueAt: "2026-10-24T00:00:00Z",
+      dueAt: "2026-10-23T23:59:00Z",
       dueZone: NY,
       fit: "earlier",
       cutByVisit: true,
@@ -219,10 +256,64 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
       audience: "owner",
       urgentClockMs: null,
     });
-    expect(noVisit).toMatchObject({ dueAt: "2026-10-25T00:00:00Z", fit: "asGiven", branch: "dayAfterSend" });
+    expect(noVisit).toMatchObject({ dueAt: "2026-10-24T23:59:00Z", fit: "earlier", branch: "dayAfterSend" });
   });
 
-  it("over every delivery for two days across Nov 1: never past the visit, inside text hours whenever any moment allows", () => {
+  it("moves any due time that would land at 8:00pm itself to 7:59pm: a Clock line, and a visit at 8pm", () => {
+    // Delivered Thu Oct 22 8pm EDT, a 24 h Clock line lands on Fri 8pm EDT (00:00Z Sat): 7:59pm Fri, not Sat's 9am.
+    const clockLine = homeDueOf(
+      question({
+        deliveredAt: "2026-10-23T00:00:00Z",
+        clockLine: "24 h",
+        visitStartsAt: "2026-10-24T15:00:00Z",
+      }),
+    );
+    expect(clockLine).toMatchObject({
+      dueAt: "2026-10-23T23:59:00Z",
+      fit: "earlier",
+      cutByVisit: false,
+      inTextHours: true,
+      branch: "clockLine",
+    });
+    // A deadline past Sat's 8pm visit is cut to 8pm, then back a minute: still before the visit.
+    for (const audience of ["customer", "owner", "team"] as const) {
+      const visit = fitDeadline({
+        dueAt: "2026-10-25T14:00:00Z",
+        from: "2026-10-23T14:00:00Z",
+        visitStartsAt: "2026-10-25T00:00:00Z",
+        zone: NY,
+        audience,
+      });
+      expect(visit).toEqual({
+        dueAt: "2026-10-24T23:59:00Z",
+        dueZone: NY,
+        fit: "earlier",
+        cutByVisit: true,
+        inTextHours: true,
+      });
+      expect(limit8Sends(ms(visit.dueAt), audience)).toBe(true);
+    }
+  });
+
+  it("keeps the hour to act at 8:00pm: when 7:59pm would leave under an hour, 9am if still by the visit, else flagged", () => {
+    // Delivered Fri 7pm EDT (23:00Z): step 9's floor is Fri 8pm itself, and 7:59pm is under the hour after delivery.
+    const byTwo = question({ deliveredAt: "2026-10-23T23:00:00Z", visitStartsAt: "2026-10-24T18:00:00Z" });
+    expect(dueOf(byTwo)).toMatchObject({ dueAt: "2026-10-24T00:00:00Z", branch: "deliveryFloor" });
+    expect(homeDueOf(byTwo)).toMatchObject({
+      dueAt: "2026-10-24T13:00:00Z",
+      fit: "later",
+      inTextHours: true,
+    });
+    // For Sat's 7am visit no moment inside text hours both leaves the hour and comes by the visit: kept, flagged.
+    const bySeven = question({ deliveredAt: "2026-10-23T23:00:00Z", visitStartsAt: "2026-10-24T11:00:00Z" });
+    expect(homeDueOf(bySeven)).toMatchObject({
+      dueAt: "2026-10-24T00:00:00Z",
+      fit: "asGiven",
+      inTextHours: false,
+    });
+  });
+
+  it("over every delivery for two days across Nov 1: never past the visit, inside text hours whenever any moment allows, as limit 8 reads them", () => {
     const visits = [
       "2026-11-01T11:00:00Z", // Sun 6am EST
       "2026-11-01T15:00:00Z", // Sun 10am EST
@@ -249,6 +340,9 @@ describe("a deadline that would pass the visit is cut to end before it (S13-35; 
           expect(due.inTextHours).toBe(inTextHours(at, NY, audience));
           // Outside text hours only when no moment inside them lies between the hour after delivery and the visit.
           if (!due.inTextHours) expect(lastInTextHours(visit, NY, audience)).toBeLessThan(floor);
+          // Limit 8's own check at send agrees (DL-180): every due time marked inside text hours passes it, never at or
+          // after 8:00pm, and one marked outside would be held.
+          expect(limit8Sends(at, audience)).toBe(due.inTextHours);
           checked += 1;
         }
     expect(checked).toBeGreaterThan(1000);
@@ -458,26 +552,49 @@ describe("a job sent now gets the urgent clock at 2am (S13-35; RULES 5.5)", () =
 });
 
 describe("text hours: 9am to 8pm in the person's zone, the owner's and team's from 8am (RULES 4.3)", () => {
-  it("opens at 9am for a customer and 8am for the owner and team, and 8pm is the last minute", () => {
+  it("opens at 9am for a customer and 8am for the owner and team, and 7:59pm is the last minute: 8:00pm is outside", () => {
     expect(inTextHours(ms("2026-10-23T13:00:00Z"), NY, "customer")).toBe(true); // 9:00am EDT
     expect(inTextHours(ms("2026-10-23T12:59:59Z"), NY, "customer")).toBe(false);
     expect(inTextHours(ms("2026-10-23T12:00:00Z"), NY, "owner")).toBe(true); // 8:00am EDT
     expect(inTextHours(ms("2026-10-23T11:59:59Z"), NY, "team")).toBe(false);
-    expect(inTextHours(ms("2026-10-24T00:00:00Z"), NY, "customer")).toBe(true); // 8:00pm EDT
+    expect(inTextHours(ms("2026-10-23T23:59:00Z"), NY, "customer")).toBe(true); // 7:59pm EDT
+    expect(inTextHours(ms("2026-10-23T23:59:59Z"), NY, "team")).toBe(true);
+    expect(inTextHours(ms("2026-10-24T00:00:00Z"), NY, "customer")).toBe(false); // 8:00pm EDT
+    expect(inTextHours(ms("2026-10-24T00:00:00Z"), NY, "owner")).toBe(false);
     expect(inTextHours(ms("2026-10-24T00:00:01Z"), NY, "owner")).toBe(false);
+    // At 8:00pm itself: back to 7:59pm, or on to Sat's opening.
+    expect(iso(lastInTextHours(ms("2026-10-24T00:00:00Z"), NY, "customer"))).toBe("2026-10-23T23:59:00Z");
+    expect(iso(nextInTextHours(ms("2026-10-24T00:00:00Z"), NY, "customer"))).toBe("2026-10-24T13:00:00Z");
   });
 
   it("reads each day's hours on the zone's own calendar across the change of Sun Nov 1", () => {
     expect(inTextHours(ms("2026-11-01T14:00:00Z"), NY, "customer")).toBe(true); // 9am EST
     expect(inTextHours(ms("2026-11-01T13:59:59Z"), NY, "customer")).toBe(false);
-    expect(inTextHours(ms("2026-11-02T01:00:00Z"), NY, "customer")).toBe(true); // 8pm EST
+    expect(inTextHours(ms("2026-11-02T00:59:00Z"), NY, "customer")).toBe(true); // 7:59pm EST
+    expect(inTextHours(ms("2026-11-02T01:00:00Z"), NY, "customer")).toBe(false); // 8pm EST
     expect(inTextHours(ms("2026-11-02T01:00:01Z"), NY, "customer")).toBe(false);
-    // Sat Oct 31 9pm EDT: next opening Sun 9am EST, last closing Sat 8pm EDT.
+    // Sat Oct 31 9pm EDT: next opening Sun 9am EST, the last minute before closing Sat 7:59pm EDT.
     expect(iso(nextInTextHours(ms("2026-11-01T01:00:00Z"), NY, "customer"))).toBe("2026-11-01T14:00:00Z");
-    expect(iso(lastInTextHours(ms("2026-11-01T01:00:00Z"), NY, "customer"))).toBe("2026-11-01T00:00:00Z");
-    // Sun Nov 1 1:30am EST (the second 1:30am), before opening: last closing Sat 8pm EDT, next opening Sun 9am EST.
-    expect(iso(lastInTextHours(ms("2026-11-01T06:30:00Z"), NY, "team"))).toBe("2026-11-01T00:00:00Z");
+    expect(iso(lastInTextHours(ms("2026-11-01T01:00:00Z"), NY, "customer"))).toBe("2026-10-31T23:59:00Z");
+    // Sun Nov 1 1:30am EST (the second 1:30am), before opening: back to Sat 7:59pm EDT, on to the team's 8am EST.
+    expect(iso(lastInTextHours(ms("2026-11-01T06:30:00Z"), NY, "team"))).toBe("2026-10-31T23:59:00Z");
     expect(iso(nextInTextHours(ms("2026-11-01T06:30:00Z"), NY, "team"))).toBe("2026-11-01T13:00:00Z");
+    // Sun Nov 1 8pm EST: back to 7:59pm EST (00:59Z Mon), not EDT's.
+    expect(iso(lastInTextHours(ms("2026-11-02T01:00:00Z"), NY, "customer"))).toBe("2026-11-02T00:59:00Z");
+  });
+
+  it("reads text hours as limit 8 does at send: every half minute of a day, and of Sun Nov 1, for every audience", () => {
+    const disagree: string[] = [];
+    const days = [
+      ["2026-10-23T04:00:00Z", "2026-10-24T04:00:00Z"], // Fri Oct 23, EDT
+      ["2026-11-01T04:00:00Z", "2026-11-02T05:00:00Z"], // Sun Nov 1, 25 hours
+    ] as const;
+    for (const audience of ["customer", "owner", "team"] as const)
+      for (const [from, to] of days)
+        for (let at = ms(from); at < ms(to); at += MINUTE / 2)
+          if (inTextHours(at, NY, audience) !== limit8Sends(at, audience))
+            disagree.push(`${audience} ${iso(at)}`);
+    expect(disagree).toEqual([]);
   });
 
   it("adds N text hours, counting only time inside them: 2 of their text hours", () => {
@@ -504,6 +621,26 @@ describe("text hours: 9am to 8pm in the person's zone, the owner's and team's fr
     );
     expect(() => textHoursAfter(ms("2026-10-23T13:00:00Z"), -HOUR, NY, "customer")).toThrow(DueError);
     expect(() => textHoursAfter(Number.NaN, HOUR, NY, "customer")).toThrow(DueError);
+  });
+
+  it("a count that runs out at 8:00pm itself gives 7:59pm, never a moment before the count began", () => {
+    // 11 text hours from Fri 9am EDT, 2 from 6pm and the team's 12 from 8am all run out at Fri 8pm EDT itself.
+    const counts = [
+      ["2026-10-23T13:00:00Z", 11 * HOUR, "customer"],
+      ["2026-10-23T22:00:00Z", 2 * HOUR, "customer"],
+      ["2026-10-23T12:00:00Z", 12 * HOUR, "team"],
+    ] as const;
+    for (const [from, span, audience] of counts) {
+      const at = textHoursAfter(ms(from), span, NY, audience);
+      expect(iso(at)).toBe("2026-10-23T23:59:00Z");
+      expect(limit8Sends(at, audience)).toBe(true);
+    }
+    // From inside the last minute, 7:59pm would come before the count began: on to Sat 9am EDT.
+    expect(iso(textHoursAfter(ms("2026-10-23T23:59:30Z"), MINUTE / 2, NY, "customer"))).toBe(
+      "2026-10-24T13:00:00Z",
+    );
+    // From 8:00pm itself the count starts at Sat's opening, so a zero span gives Sat 9am.
+    expect(iso(textHoursAfter(ms("2026-10-24T00:00:00Z"), 0, NY, "customer"))).toBe("2026-10-24T13:00:00Z");
   });
 });
 

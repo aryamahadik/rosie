@@ -7,13 +7,16 @@
 // Every due time the home gives, in the zone it is set in (CQ-05: the visit's, else the business's; ../due.ts zoneFor):
 //
 //   1. Ends by the visit: a deadline that would pass the visit's start is cut to it, as step 9 caps its own (../due.ts).
-//   2. Sits inside the person's text hours (./text-hours.ts: 9am to 8pm, the owner's and team's from 8am). Outside them it
-//      moves to when they next open, if that is still by the visit: "the earliest safe moment in text hours" (RULES 5.8;
-//      S13-28 rule 48), and a later deadline only leaves more time to act. Else, with no opening left before the visit,
-//      it moves back to when they last closed, if that still leaves time to act: at least 1 hour after the clock started,
-//      step 9's own floor (../due.ts DELIVERY_FLOOR_MS; RULES 5.1's "time left to act"). Else no moment inside text hours
-//      both leaves time to act and comes by the visit, and it stays where it is: by the visit, outside text hours,
-//      flagged (`inTextHours` false), since the visit and the time to act come first in S13-35's rule.
+//   2. Sits inside the person's text hours (./text-hours.ts: 9am to 8pm, the owner's and team's from 8am, ending before
+//      8pm as limit 8 reads them at send, so 7:59pm is the last minute; DL-180). A due time at 8:00pm itself moves back a
+//      minute to 7:59pm, if that still leaves time to act (below). Any other time outside them, and 8:00pm when 7:59pm
+//      would not leave that time, moves to when they next open, if that is still by the visit: "the earliest safe moment
+//      in text hours" (RULES 5.8; S13-28 rule 48), and a later deadline only leaves more time to act. Else, with no
+//      opening left before the visit, it moves back to 7:59pm, the last minute before they last closed, if that still
+//      leaves time to act: at least 1 hour after the clock started, step 9's own floor (../due.ts DELIVERY_FLOOR_MS;
+//      RULES 5.1's "time left to act"). Else no moment inside text hours both leaves time to act and comes by the visit,
+//      and it stays where it is: by the visit, outside text hours, flagged (`inTextHours` false), since the visit and
+//      the time to act come first in S13-35's rule.
 //   3. On a job sent now: the plug-in's urgent clock from the clock's start, any hour, never past the arrival estimate.
 //
 // `homeDueOf` is step 9's due rule (../due.ts dueOf, T-255) held to the home, `homeNeverDeliveredDueOf` the same for the
@@ -36,7 +39,14 @@ import {
   type NeverDeliveredInput,
 } from "../due";
 import { ceilSecond, floorSecond, instantOf, utcOf } from "./instants";
-import { checkZone, inTextHours, lastInTextHours, nextInTextHours, type Audience } from "./text-hours";
+import {
+  checkZone,
+  inTextHours,
+  isClosingTime,
+  lastInTextHours,
+  nextInTextHours,
+  type Audience,
+} from "./text-hours";
 
 /**
  * Where the home put a deadline:
@@ -44,7 +54,8 @@ import { checkZone, inTextHours, lastInTextHours, nextInTextHours, type Audience
  *   visitStart  cut to the visit's start, which is inside text hours (or, with `inTextHours` false, no moment inside them
  *               leaves time to act before it);
  *   later       moved to when text hours next open, still by the visit;
- *   earlier     moved back to when text hours last closed (no opening was left before the visit), still leaving time to act;
+ *   earlier     moved back to 7:59pm, the last minute before text hours last closed (8:00pm itself is outside: a due time
+ *               at 8:00pm, or one with no opening left before the visit), still leaving time to act;
  *   urgent      a job sent now: the plug-in's urgent clock, any hour.
  */
 export type HomeFit = "asGiven" | "visitStart" | "later" | "earlier" | "urgent";
@@ -133,16 +144,17 @@ function fit(
     cutByVisit = true;
   }
   if (!inTextHours(due, zone, audience)) {
+    const earlier = lastInTextHours(due, zone, audience);
     const later = nextInTextHours(due, zone, audience);
-    if (visit === null || later <= visit) {
+    const mayGoBack = earlier >= floor;
+    const mayGoLater = visit === null || later <= visit;
+    // 8:00pm itself goes back a minute to 7:59pm (DL-180); any other time outside goes later first.
+    if (mayGoBack && (isClosingTime(due, zone) || !mayGoLater)) {
+      due = earlier;
+      placed = "earlier";
+    } else if (mayGoLater) {
       due = later;
       placed = "later";
-    } else {
-      const earlier = lastInTextHours(due, zone, audience);
-      if (earlier >= floor) {
-        due = earlier;
-        placed = "earlier";
-      }
     }
   }
   return {
@@ -156,7 +168,8 @@ function fit(
 
 /**
  * Holds a deadline to the clock home (S13-35; RULES 5.1): cut to end by the visit, then into the audience's text hours,
- * later if that is still by the visit, else earlier if that still leaves time to act (1 hour after `from`).
+ * later if that is still by the visit, else earlier if that still leaves time to act (1 hour after `from`); 8:00pm itself
+ * goes back a minute to 7:59pm first, when that leaves the time (DL-180).
  */
 export function fitDeadline(input: DeadlineInput): HomeDeadline {
   const zone = checkZone(input.zone);
@@ -230,8 +243,8 @@ export function homeDueOf(input: HomeDueInput): HomeDue {
 /**
  * When a question never delivered takes step 9's never-delivered path (../due.ts neverDeliveredDueOf: by the visit, or
  * with none 8pm the day after the send), held to the home: inside the text hours of whoever is told, and by the visit, so
- * a 7am visit's path applies at 8pm the evening before, while the owner can still act. On a job sent now, the plug-in's
- * urgent clock from the send.
+ * a 7am visit's path applies at 7:59pm the evening before, while the owner can still act, and the 8pm with no visit at
+ * 7:59pm. On a job sent now, the plug-in's urgent clock from the send.
  */
 export function homeNeverDeliveredDueOf(input: HomeNeverDeliveredInput): HomeNeverDeliveredDue {
   if (input.urgentClockMs !== null) {

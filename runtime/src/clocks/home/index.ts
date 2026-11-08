@@ -7,8 +7,9 @@
 //     urgent clock, any hour. `homeDueOf` holds step 9's due rule (../due.ts dueOf, T-255) to the home and
 //     `homeNeverDeliveredDueOf` its never-delivered path; `fitDeadline` holds any other deadline; `urgentDue` is the
 //     urgent clock.
-//   - Text hours (./text-hours.ts): 9am to 8pm, the owner's and team's from 8am, 8pm the last minute; `textHoursAfter`
-//     adds N text hours ("2 of their text hours").
+//   - Text hours (./text-hours.ts): 9am to 8pm, the owner's and team's from 8am, ending before 8pm as limit 8 reads them
+//     (8:00pm itself is outside, 7:59pm the last minute; DL-180); `textHoursAfter` adds N text hours ("2 of their text
+//     hours").
 //   - Reminders (./reminder.ts): one per booked time, keyed by the booking and the start, at least 3 hours before free
 //     cancel ends: usually 10am the day before, 6pm the evening before that when free cancel ends before 1pm the day
 //     before; none for a job sent now or a booking made after the reminder's time.
