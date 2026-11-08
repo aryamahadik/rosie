@@ -1135,9 +1135,20 @@ describe("the default one rule (contactsOnFileOver)", () => {
 });
 
 describe("the shipped limit 1", () => {
-  it("is slot 1 of the gate's registry, in place of the fail-closed stub", () => {
-    expect(LIMITS[0]).toBe(limit1);
+  it("is slot 1 of the gate's registry, whole behind the record flags check, in place of the fail-closed stub", async () => {
+    const slot = LIMITS[0];
+    expect(slot.limit).toBe(1);
     expect(limit1.limit).toBe(1);
+    // The slot keeps limit 1's own decide, with limit 1's type (compared with ===: the lint forbids handing an unbound
+    // method to expect).
+    const decide: typeof limit1.decide = slot.decide;
+    expect(decide === limit1.decide).toBe(true);
+    expect(typeof slot.flags).toBe("function");
+    // A protect-only part (no flag can hold it, nothing to read): the slot's verdict is limit 1's own, a pass.
+    const request = ask(ALEX_PARTNER, stopRow(), "stop");
+    const verdict = await slot.check(partOf(request), turnOf(request, TEST_REPO));
+    expect(verdict).toEqual(await limit1.check(partOf(request), turnOf(request, TEST_REPO)));
+    expect(verdict).toEqual({ result: "pass" });
   });
 
   it("passes a protect-only change with nothing read: stop texts from Alex's phone", async () => {
