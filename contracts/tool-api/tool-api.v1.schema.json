@@ -2,7 +2,37 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.schema.json",
   "title": "ToolApiV1",
-  "description": "K-09 Tool API v1, DRAFT (T-009; not frozen: T-018 freezes it with journeys 1 and 2). The calls that own every read and write (arch 02 line 139): the turn face (called by the handle actor and the AI layer) and the shared core (M3b: the any-time rows every chat needs from its first text). The same calls serve texts, secure pages and outside AIs under the same limits; free text from pages and AIs gets the safety read first (arch 02 line 129); row-level security per business on every call (arch 10 line 546). There is no root payload: each payload is one definition under $defs, named <call>.request, <call>.response and <call>.errors. contracts/tool-api/README.md states each call's read, repeat safety and time budget.",
+  "description": "K-09 Tool API v1, frozen by T-018 (T-009 drafted the turn face and the shared core; T-018 added the setup calls journeys 1 and 2 use, the exchanges and the fixtures). The calls that own every read and write (arch 02 line 139; arch 12 line 590: generated from the master's needs and gives keys): the turn face (called by the handle actor and the AI layer), the shared core (M3b: the any-time rows every chat needs from its first text) and the setup calls of journeys 1 and 2 (S1-01 to S1-84, S2-02 to S2-31). The same calls serve texts, secure pages and outside AIs under the same limits; free text from pages and AIs gets the safety read first (arch 02 line 129); row-level security per business on every call (arch 10 line 546). Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every fixture is and what the Tool API mock answers from (C-186). The root is any one exchange, so the type generator writes a type for every call (ADR-005). contracts/tool-api/README.md states each call's read, repeat safety and time budget.",
+  "anyOf": [
+    { "$ref": "#/$defs/buildFrontier.exchange" },
+    { "$ref": "#/$defs/closestEntries.exchange" },
+    { "$ref": "#/$defs/gateAndCommit.exchange" },
+    { "$ref": "#/$defs/composeInput.exchange" },
+    { "$ref": "#/$defs/finalizeMessage.exchange" },
+    { "$ref": "#/$defs/recordSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/releaseSafetyHold.exchange" },
+    { "$ref": "#/$defs/recordStopOrStart.exchange" },
+    { "$ref": "#/$defs/setRecordFlag.exchange" },
+    { "$ref": "#/$defs/handOff.exchange" },
+    { "$ref": "#/$defs/answerHandOff.exchange" },
+    { "$ref": "#/$defs/pageTeam.exchange" },
+    { "$ref": "#/$defs/acknowledgePage.exchange" },
+    { "$ref": "#/$defs/openReviewItem.exchange" },
+    { "$ref": "#/$defs/decideReviewItem.exchange" },
+    { "$ref": "#/$defs/enterDoor.exchange" },
+    { "$ref": "#/$defs/sendFixedLine.exchange" },
+    { "$ref": "#/$defs/sendsFailing.exchange" },
+    { "$ref": "#/$defs/textingBack.exchange" },
+    { "$ref": "#/$defs/calendarLinkDropped.exchange" },
+    { "$ref": "#/$defs/calendarLinkBack.exchange" },
+    { "$ref": "#/$defs/sendProofCode.exchange" },
+    { "$ref": "#/$defs/proveCode.exchange" },
+    { "$ref": "#/$defs/issueChatLink.exchange" },
+    { "$ref": "#/$defs/matchKinds.exchange" },
+    { "$ref": "#/$defs/lookupListing.exchange" },
+    { "$ref": "#/$defs/saveSetupStep.exchange" },
+    { "$ref": "#/$defs/readSetup.exchange" }
+  ],
   "$defs": {
     "id": {
       "$ref": "../common/formats.v1.schema.json#/$defs/id"
@@ -64,12 +94,12 @@
       "type": "object",
       "properties": {
         "kind": {
-          "description": "Who calls: turn (the handle actor's turn, through gateAndCommit; arch 02 line 121), page (a secure page or the portal, through K-21), agent (an outside AI through the Agent API, K-20), console (the team console, C-194), job (an offline or queue job, such as the dispatcher or a calendar renewal), clockFiring (a clock row's firing with no handle, the minute sweep's: arch 10 line 540) or actorOnReturn (a line the handle actor sent while PostgreSQL was down, written on return: arch 11 line 566). The same calls serve texts, secure pages and outside AIs under the same limits (arch 02 line 129).",
+          "description": "Who calls: turn (the handle actor's turn, through gateAndCommit; arch 02 line 121), a clock turn on the clock row's handle included (QUESTIONS.md NQ-RT-4), page (a secure page or the portal, through K-21), agent (an outside AI through the Agent API, K-20), console (the team console, C-194), job (an offline or queue job, such as the dispatcher or a calendar renewal), clockFiring (a clock row's firing that carries no turn: a row no handle owns, the minute sweep's (arch 10 line 540), or a firing whose writes hold no outbox row (K-05 v1 fireClock.request.turn)) or actorOnReturn (a line the handle actor sent while PostgreSQL was down, written on return: arch 11 line 566). The same calls serve texts, secure pages and outside AIs under the same limits (arch 02 line 129).",
           "type": "string",
           "enum": ["turn", "page", "agent", "console", "job", "clockFiring", "actorOnReturn"]
         },
         "turnId": {
-          "description": "For kind turn, the turn whose one commit carries the call (arch 02 line 121; arch 10 line 508); null otherwise.",
+          "description": "For kind turn, the turn whose one commit carries the call (arch 02 line 121; arch 10 line 508), a clock turn's id for a firing on the handle's actor (NQ-RT-4); null otherwise.",
           "anyOf": [
             {
               "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
@@ -95,7 +125,7 @@
           ]
         },
         "personId": {
-          "description": "The person the caller acts for, when known: the sender of the turn's texts, the signed-in person on a page, the customer an agent token is bound to, or the team member at the console (limit 1: arch 06 line 299).",
+          "description": "The person the caller acts for, when known: the sender of the turn's texts, the signed-in person on a page, the customer an agent token is bound to, or the team member at the console (limit 1: arch 06 line 299). The action layer states it per call as the session's rosie.person_id, which K-22 v1's row predicates read (K-22 v1 README rule 4). Null while the call acts for no one, as a sign-in call, S1-10's owner email included, does until its code is right (K-22 v1 rule 4); sendProofCode.request.forPersonId then names whom the code is for.",
           "anyOf": [
             {
               "$ref": "../common/formats.v1.schema.json#/$defs/id"
@@ -232,9 +262,17 @@
               "description": "Unproven sender: a code to the contact on file, in words that never confirm a booking exists (arch 06 line 299; RULES 6.2); the choice waits for the code typed back within 10 minutes (proveCode).",
               "type": "string",
               "enum": ["proofCodeSent"]
+            },
+            "proofCodeId": {
+              "description": "The code this commit sent (purpose unprovenSender; where codes are kept is K-22's, named in words), which proveCode takes when it comes back (RULES 6.2; S13-45). The code itself never comes back to the caller.",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "openQuestionId": {
+              "description": "The open question in the sender's own conversation that takes the code typed back there (S13-45: typed back in the same conversation; FS line 701), opened in this commit (openQuestions.opened). Its answer goes to proveCode, whose redecideTurnId names this turn, so the waiting choice is decided again once the code is proven (gateOutcome wait).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
             }
           },
-          "required": ["limit", "outcome", "action"],
+          "required": ["limit", "outcome", "action", "proofCodeId", "openQuestionId"],
           "additionalProperties": false
         },
         {
@@ -463,14 +501,14 @@
     },
     "limit6Outcome": {
       "title": "Limit6Outcome",
-      "description": "Limit 6's outcome when it fails (arch 06 line 309). Each action has one kind of outcome (gateOutcome): oneQuestion is ask; nothingChanged is refuse.",
+      "description": "Limit 6's outcome when it fails (arch 06 line 309), only after decide's one Sonnet re-read (K-02 v1 decideResult.reread true). With reread false a value that fails its words commits nothing: the gate refuses before any write (gateAndCommit.errors valueFailsWords), C-116 runs the turn's one re-read, and the turn loop sends the turn to the gate again (arch 02 line 119; arch 06 lines 289, 309; Q-41). Each action has one kind of outcome (gateOutcome): oneQuestion is ask; nothingChanged is refuse.",
       "oneOf": [
         {
           "title": "Limit6Outcome_oneQuestion",
           "type": "object",
           "properties": {
             "limit": {
-              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "description": "Limit 6: Values (arch 06 line 309), failing after decide's one Sonnet re-read ran (K-02 v1 decideResult.reread true; arch 02 line 119; Q-41). The named rule rereadBeforeQuestion refuses this outcome on a decide result with reread false.",
               "const": 6
             },
             "outcome": {
@@ -479,7 +517,7 @@
               "enum": ["ask"]
             },
             "action": {
-              "description": "After the re-read, one question (arch 06 line 309).",
+              "description": "Still failing after the one Sonnet re-read: one question, and nothing changes for that part (arch 06 lines 289, 309).",
               "type": "string",
               "enum": ["oneQuestion"]
             }
@@ -492,7 +530,7 @@
           "type": "object",
           "properties": {
             "limit": {
-              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "description": "Limit 6: Values (arch 06 line 309), failing after decide's one Sonnet re-read ran (K-02 v1 decideResult.reread true), as for oneQuestion.",
               "const": 6
             },
             "outcome": {
@@ -622,7 +660,7 @@
       "type": "object",
       "properties": {
         "context": {
-          "description": "K-02 v1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's).",
+          "description": "K-02 v1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's). writer.handle is the writer's own number, the turn's own data: C-114 leaves it out of the prompt.",
           "$ref": "../model/model.v1.schema.json#/$defs/context"
         },
         "flagged": {
@@ -849,11 +887,11 @@
     },
     "plannerVerbs.errors": {
       "title": "PlannerVerbsErrors",
-      "description": "Refused, nothing written for the planner's part: plannerVerbs' errors.",
+      "description": "Refused: code commits none of the planner's verb; its parts take the passed-on path instead, which the turn's commit writes ('I've passed this on.': arch 02 line 123). plannerVerbs' errors.",
       "oneOf": [
         {
           "title": "PlannerRefusedError",
-          "description": "Code refused the planner's output: an answer naming a fact the context does not hold, or an ask with more than one question (K-02 v1 README: code checks; C-092). The part takes the passed-on path: 'I've passed this on.' (arch 02 line 123).",
+          "description": "Code refused the planner's output: an answer naming a fact the context does not hold, or an ask with more than one question (K-02 v1 README: code checks; C-092). The verb is not committed and the part takes the passed-on path: 'I've passed this on.' (arch 02 line 123). gateAndCommit.response.planner is then null; v1 returns no reason (README open gaps).",
           "type": "object",
           "properties": {
             "error": {
@@ -1065,6 +1103,21 @@
             },
             "request": {
               "$ref": "#/$defs/issueChatLink.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_saveSetupStep",
+          "description": "The one setup step the actor names in a turn: a staff member's ready text matched by its join link's short code (S2-05; MC C9), so its request takes only S2-05's variant (saveSetupStepInTurn). Every other setup write in a turn is the effect of the choice decide picked, which limits 1 to 6 check at the gate (partResult.gives; arch 02 line 121; arch 06 lines 295 to 309).",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "saveSetupStep"
+            },
+            "request": {
+              "$ref": "#/$defs/saveSetupStepInTurn"
             }
           },
           "required": ["call", "request"],
@@ -1537,6 +1590,39 @@
           },
           "required": ["call", "response", "error"],
           "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_saveSetupStep",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "saveSetupStep"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/saveSetupStep.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/saveSetupStep.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
         }
       ]
     },
@@ -1577,6 +1663,14 @@
             }
           ]
         },
+        "gives": {
+          "description": "For committed, the keys the part's step gives that this commit wrote (A-keys.md, B-keys.md; arch 12 line 590), such as kinds for S1-02 or thread for a handle's first commit (S1-01); empty otherwise. The setup steps' writes are saveSetupStep's (README 'Journeys 1 and 2').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/setupKey"
+          },
+          "uniqueItems": true
+        },
         "dependsOnPart": {
           "description": "For dependsOnStopped, the part it depends on; null otherwise.",
           "anyOf": [
@@ -1591,20 +1685,27 @@
           ]
         }
       },
-      "required": ["part", "choiceId", "result", "limits", "stoppedBy", "dependsOnPart"],
+      "required": ["part", "choiceId", "result", "limits", "stoppedBy", "gives", "dependsOnPart"],
       "additionalProperties": false
     },
     "gateAndCommit.request": {
       "title": "GateAndCommitRequest",
-      "description": "Gate and commit a turn: the gate checks limits 1 to 6 on the agreed parts with their quotes; code adds each choice's effects; one transaction writes state, one outbox row per message (no plan yet), clock rows, effect rows and the event log under the turn id (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508). It commits through K-05 v1 commitTurn, or for a clock's firing through K-05 v1 fireClock (QUESTIONS.md NQ-RT-4); effect rows and the waiting rows' moves (K-07 v1 waiting_chat to superseded or withdrawn) are K-05 v1.1's (T-071). A limit 4 or 5 refusal from the commit reloads once and gates again (arch 06 line 305). Reads: the primary, uncached (arch 02 line 117; arch 10 lines 504, 508). Repeat: safe: the turn id is the key; a repeat writes nothing and returns the first commit with repeated true (K-05 v1 commitTurn; tour line 418). Time budget: at most 300 ms (arch 04 line 223: 'Gate and commit').",
+      "description": "Gate and commit a turn: the gate checks limits 1 to 6 on the agreed parts with their quotes; code adds each choice's effects; one transaction writes state, one outbox row per message (no plan yet), clock rows, effect rows and the event log under the turn id (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508). It commits through K-05 v1 commitTurn, or for a clock's firing through K-05 v1 fireClock (QUESTIONS.md NQ-RT-4: a turn on the handle's actor, or a sweep job for a row with no handle, with the clock branch, no decide reads and the firing's own trace id, CQ-06); effect rows and the waiting rows' moves (K-07 v1 waiting_chat to superseded or withdrawn) are K-05 v1.1's (T-071). A limit 4 or 5 refusal from the commit reloads once and gates again (arch 06 line 305). Reads: the primary, uncached (arch 02 line 117; arch 10 lines 504, 508). Repeat: safe: the turn id is the key, or for a firing with no turn the clock row; a repeat writes nothing and returns the first commit or firing with repeated true (K-05 v1 commitTurn and fireClock; tour line 418). Time budget: at most 300 ms (arch 04 line 223: 'Gate and commit').",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "turn": {
-          "description": "The turn row the commit writes (K-05 v1 turn). For a clock's firing, the firing's turn (K-05 v1 fireClock.request.turn).",
-          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+          "description": "The turn row the commit writes (K-05 v1 turn); every input but a clock's needs one. For a clock's firing (input.kind clock), the clock turn on the clock row's handle, or null when the firing's writes hold no outbox row (K-05 v1 fireClock.request.turn), as for any row no handle owns (K-04 turns.handle_id is not null). A clock turn has no texts: its one event id is the clock row's id (K-05 v1 default 9), its id is that event id's hash, as every turn's is (CQ-09), so one row's firing has one turn id and a repeat finds the first firing, and its trace id is the firing's own (CQ-06); its caller.kind is turn, with caller.turnId and caller.requestId its id. A firing with no turn is called with caller.kind clockFiring, caller.turnId null and caller.requestId the clock row's id. The named rule clockTurn checks these.",
+          "anyOf": [
+            {
+              "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "input": {
           "description": "What the turn acts on: decided texts, a clock's firing, or only core actions (the guard's keyword-only texts: arch 02 line 115).",
@@ -1637,7 +1738,7 @@
             },
             {
               "title": "ClockInput",
-              "description": "A clock's firing runs its branch with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127).",
+              "description": "A clock's firing runs its step's clock branch, the safe default and who is told, with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127), and answers fired (gateAndCommit.response), or notArmed, notDue or the clock row's versionChanged (gateAndCommit.errors). A version change on a row the branch read reloads once and runs the branch again, as limit 4 does (arch 06 line 305).",
               "type": "object",
               "properties": {
                 "kind": {
@@ -1693,10 +1794,158 @@
         }
       },
       "required": ["caller", "turn", "input", "core", "now"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "input": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "clock"
+              }
+            },
+            "required": ["kind"]
+          }
+        },
+        "required": ["input"]
+      },
+      "then": {
+        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule."
+      },
+      "else": {
+        "description": "Decided texts or core actions only: the turn is required (K-05 v1 commitTurn).",
+        "properties": {
+          "turn": {
+            "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+          }
+        }
+      }
     },
     "gateAndCommit.response": {
       "title": "GateAndCommitResponse",
+      "description": "committed for a turn's decided texts or core actions (gateAndCommit.committed); fired for a clock's firing (gateAndCommit.fired; K-05 v1 fireClock.response).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/gateAndCommit.committed"
+        },
+        {
+          "$ref": "#/$defs/gateAndCommit.fired"
+        }
+      ]
+    },
+    "effectWritten": {
+      "title": "EffectWritten",
+      "description": "An effect row a commit or a firing wrote, to run after it (K-07 v1 effect rows; K-05 v1.1, T-071).",
+      "type": "object",
+      "properties": {
+        "effectId": {
+          "description": "The effect id reconciliation matches by (arch 10 line 550).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "kind": {
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind"
+        }
+      },
+      "required": ["effectId", "kind"],
+      "additionalProperties": false
+    },
+    "openQuestionsWritten": {
+      "title": "OpenQuestionsWritten",
+      "description": "The open questions a commit or a firing opened and closed (K-05 v1 writes.openQuestions).",
+      "type": "object",
+      "properties": {
+        "opened": {
+          "description": "Open questions opened (K-05 v1 writes.openQuestions.open).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "closed": {
+          "description": "Open questions closed (answered, defaulted or withdrawn).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      },
+      "required": ["opened", "closed"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.fired": {
+      "title": "GateAndCommitFired",
+      "description": "A clock's firing, once (K-05 v1 fireClock.response): the row moved to fired and its step's clock branch committed with it in one transaction (arch 02 line 127; arch 10 lines 508, 540). A repeat, such as the minute sweep after the actor's alarm (they race by design: arch 10 line 540), writes nothing and returns the first firing with repeated true: a row already fired is never an error.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "fired"
+        },
+        "clockRowId": {
+          "description": "The clock row fired (input.clockRowId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "version": {
+          "description": "The clock row's version after the firing (K-05 v1 fireClock.response.version).",
+          "$ref": "#/$defs/version"
+        },
+        "firedAt": {
+          "description": "When it fired: the first firing's time on a repeat.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "turnId": {
+          "description": "The clock turn's id, or null for a firing with no turn (K-05 v1 fireClock.response.turnId).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "repeated": {
+          "description": "true when the row had fired before: nothing was written and the first firing comes back (K-05 v1 fireClock).",
+          "type": "boolean"
+        },
+        "core": {
+          "description": "One result per core action the firing carried, in the request's order; empty for most firings.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coreResult"
+          }
+        },
+        "written": {
+          "description": "What the firing's branch wrote: rows with their versions (a phone row named by its handle id: K-08 v1 default 3), outbox rows in commit order, promotions (K-05 v1 commitResult).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
+        },
+        "effects": {
+          "description": "Effect rows written with the firing (K-05 v1.1 fireClock writes.effects; with no turn, under the firing's job id).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effectWritten"
+          }
+        },
+        "openQuestions": {
+          "description": "The questions the branch opened and closed: a question's own clock closes it as defaulted (K-05 v1 fire-once).",
+          "$ref": "#/$defs/openQuestionsWritten"
+        }
+      },
+      "required": [
+        "result",
+        "clockRowId",
+        "version",
+        "firedAt",
+        "turnId",
+        "repeated",
+        "core",
+        "written",
+        "effects",
+        "openQuestions"
+      ],
+      "additionalProperties": false
+    },
+    "gateAndCommit.committed": {
+      "title": "GateAndCommitCommitted",
       "description": "Committed: per part either committed or the failed limit and its outcome, and what the one commit wrote.",
       "type": "object",
       "properties": {
@@ -1714,14 +1963,14 @@
           "type": "boolean"
         },
         "parts": {
-          "description": "One result per decide part, in order; empty for a clock's or a core-only turn.",
+          "description": "One result per decide part, in order; empty for a core-only turn.",
           "type": "array",
           "items": {
             "$ref": "#/$defs/partResult"
           }
         },
         "planner": {
-          "description": "The planner's verb as committed, or null.",
+          "description": "The planner's verb as committed; null when no planner ran, or when code refused its output (plannerVerbs.errors), whose parts then take the passed-on path.",
           "anyOf": [
             {
               "$ref": "#/$defs/plannerVerbs.response"
@@ -1739,49 +1988,18 @@
           }
         },
         "written": {
-          "description": "What the commit wrote: rows with their versions, outbox rows in commit order, promotions (K-05 v1).",
+          "description": "What the commit wrote: rows with their versions (a phone row named by its handle id: K-08 v1 default 3), outbox rows in commit order, promotions (K-05 v1).",
           "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
         },
         "effects": {
-          "description": "Effect rows written in the commit, to run after it (K-07 v1 effect rows; written through K-05 v1.1's commit, T-071). Empty until K-05 v1.1 freezes.",
+          "description": "Effect rows written in the commit, to run after it (K-07 v1 effect rows; written through K-05 v1.1's commitTurn, T-071, frozen): a calendar write, a charge, or contacts/add for a mobile saved (CQ-04; Q-03).",
           "type": "array",
           "items": {
-            "title": "EffectWritten",
-            "type": "object",
-            "properties": {
-              "effectId": {
-                "description": "The effect id reconciliation matches by (arch 10 line 550).",
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              },
-              "kind": {
-                "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind"
-              }
-            },
-            "required": ["effectId", "kind"],
-            "additionalProperties": false
+            "$ref": "#/$defs/effectWritten"
           }
         },
         "openQuestions": {
-          "title": "OpenQuestionsWritten",
-          "type": "object",
-          "properties": {
-            "opened": {
-              "description": "Open questions opened (K-05 v1 writes.openQuestions.open).",
-              "type": "array",
-              "items": {
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              }
-            },
-            "closed": {
-              "description": "Open questions closed (answered, defaulted or withdrawn).",
-              "type": "array",
-              "items": {
-                "$ref": "../common/formats.v1.schema.json#/$defs/id"
-              }
-            }
-          },
-          "required": ["opened", "closed"],
-          "additionalProperties": false
+          "$ref": "#/$defs/openQuestionsWritten"
         }
       },
       "required": [
@@ -1849,6 +2067,88 @@
           },
           "required": ["error", "rule", "parts"],
           "additionalProperties": false
+        },
+        {
+          "title": "ValueFailsWordsError",
+          "description": "Limit 6 failed and decide has not re-read (K-02 v1 decideResult.reread false): a value does not re-parse from its source words (arch 06 line 309). Refused before any write, the turn's core actions included: the AI layer runs the turn's one Sonnet re-read (C-116; arch 02 line 119: 'a value that fails its words: one Sonnet re-read per turn'; arch 06 line 289; Q-41) and the turn loop sends the turn here again with the re-read in decide (reread true); only then does a value that still fails take limit 6's outcome (limit6Outcome). Never answered when reread is true (the named rule rereadBeforeQuestion). Only parts the gate checks are named: parts a safety outcome holds are held, not gated (partResult held), so a danger text's checked line never waits for the re-read (README default 25). A bare STOP never waits for it either: the handle actor runs a text that is only an opt-out word in its own core-only turn (input.kind coreOnly), never joined to a turn of decided texts (README default 35).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "valueFailsWords"
+            },
+            "parts": {
+              "description": "Each part with a value that fails its words, in decide's order.",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "PartValuesFailed",
+                "type": "object",
+                "properties": {
+                  "part": {
+                    "description": "The part's index in decide.parts (K-02 v1 decideResult.parts).",
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "fields": {
+                    "description": "The part's fields whose values fail their words, by name (K-02 v1 field.name).",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "required": ["part", "fields"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["error", "parts"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockNotArmedError",
+          "description": "A clock's firing only: the row is still waiting (never armed) or was cancelled, so nothing fires and nothing was written (K-05 v1 fireClock notArmed). A row already fired answers fired with repeated true, never this error.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notArmed"
+            },
+            "clockRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "state": {
+              "description": "K-04 clock_rows.state.",
+              "type": "string",
+              "enum": ["waiting", "cancelled"]
+            }
+          },
+          "required": ["error", "clockRowId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockNotDueError",
+          "description": "A clock's firing only: firedAt is before the row's due time and the firing is not staging's Fire now (input.by fireNow: BP 9.4), so nothing was written (K-05 v1 fireClock notDue).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notDue"
+            },
+            "clockRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "dueAt": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            }
+          },
+          "required": ["error", "clockRowId", "dueAt"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ClockRowChangedError",
+          "description": "A clock's firing only: the clock row's own version is not input.expectVersion (it was armed again or moved after it was read), so nothing was written; changed names the clock row (K-05 v1 fireClock versionChanged; arch 10 line 506). A turn's rows that changed are never this error: limit 4's outcome stops their parts.",
+          "$ref": "#/$defs/versionChangedError"
         },
         {
           "$ref": "#/$defs/constraintError"
@@ -1993,7 +2293,7 @@
           "enum": ["send", "sendAndLog", "rewrite", "passedOn"]
         },
         "checks": {
-          "description": "Each attempt's check result, in order: the attempt sent, then the fallback when code ran it (K-03 v1 checkResult).",
+          "description": "Each attempt's check result, in order: the attempt sent, then the fallback when code ran it (K-03 v1 checkResult). Its checked final parts hold filled values (slot values, codes, links) the composer never got: for the one rewrite, C-118 sends the model only each failed check and its detail, and C-092's details name slots, never filled values.",
           "type": "array",
           "items": {
             "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/checkResult"
@@ -2256,7 +2556,7 @@
           "enum": ["outcome_message_sent", "booking_private", "safe_readback"]
         },
         "releasedByOutcomeId": {
-          "description": "For safe_readback, the safety read of the 'we're safe' text itself (K-34 v1 released_by_outcome_id); null otherwise.",
+          "description": "For safe_readback, the safety read of the 'we're safe' text itself (K-34 v1 released_by_outcome_id), which must be a text from the held handle's own chat (A3-24, A3-25; security review of T-018): another handle's text is refused (notAllowed). Null otherwise.",
           "$ref": "#/$defs/nullableId"
         }
       },
@@ -2345,6 +2645,9 @@
           "additionalProperties": false
         },
         {
+          "$ref": "#/$defs/notAllowedError"
+        },
+        {
           "$ref": "#/$defs/notFoundError"
         },
         {
@@ -2357,7 +2660,7 @@
     },
     "recordStopOrStart.request": {
       "title": "RecordStopOrStartRequest",
-      "description": "Record STOP, START and a work phone's answer to 'which texts?' (RULES 7.2, 7.5, 7.7; MC C1): a STOP (any of msgtext.js's 16 opt-out words, the text only that word: arch 02 line 115) sets the phone's stopped flag and clears chat open, across every business since one number serves them all, and adds a consent row that withdraws texts (K-29 v1 consents; K-04 v1 phones); CANCEL or CANCELAR also flags the visit (RULES 7.4; S13-28 rule 46); START clears it and adds a texts row; a work phone's STOP asks which texts, and no answer by the end of its next text hour means all (RULES 7.7). The stop reply is C1's every-business reply (Q-01's words). Written on return when PostgreSQL was down: the actor sent the reply and keeps the stopped flag (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: the text's turn (or the clock row for workPhoneNoAnswer) is the key; a repeat answers repeated. Time budget: none in the sources.",
+      "description": "Record STOP, START and a work phone's answer to 'which texts?' (RULES 7.2, 7.5, 7.7; MC C1): a STOP (any of msgtext.js's 16 opt-out words, the text only that word: arch 02 line 115) sets the phone's stopped flag and clears chat open, across every business since one number serves them all, and adds a consent row that withdraws texts (K-29 v1 consents; K-04 v1 phones); CANCEL or CANCELAR also flags the visit (RULES 7.4; S13-28 rule 46); START clears it and adds a texts row; a work phone's STOP asks which texts, and no answer by the end of its next text hour means all (RULES 7.7). Each binds to the number it came from: START counts only from that phone's own START text, in the turn of that text or written on return by its actor (RULES 7.5: 'Only START ... turns texts back on'; MC C1), so a page, an agent, the console or a job can never turn texts back on; a stop for another number changes nothing (RULES 7.2: 'To stop texts to a number, reply STOP from it'); either answers notFromThatPhone. The stop reply is C1's every-business reply (Q-01's words). Written on return when PostgreSQL was down: the actor sent the reply and keeps the stopped flag (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: the text's turn (or the clock row for workPhoneNoAnswer) is the key; a repeat answers repeated. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "caller": {
@@ -2369,7 +2672,12 @@
           "enum": ["stop", "start", "workPhoneAnswer", "workPhoneNoAnswer"]
         },
         "phoneNumber": {
+          "description": "The number the STOP, START or answer is for: the number it came from, never another (RULES 7.2, 7.5).",
           "$ref": "#/$defs/phoneNumber"
+        },
+        "inboundEventId": {
+          "description": "The inbound event the STOP, START or answer came in (K-06), from phoneNumber's own handle: for start it is required, with caller.kind turn (the turn of that text) or actorOnReturn (its actor writing on return), and the schema refuses any other caller (RULES 7.5; MC C1); for stop or workPhoneAnswer the text's event, or null for a stop made on a page, by email or by a call, which stops only the caller's own number (RULES 7.2); null for workPhoneNoAnswer, whose key is its clock row.",
+          "$ref": "#/$defs/nullableId"
         },
         "words": {
           "description": "The person's own words, kept as the consent row's exact words (K-29 v1 consents.exact_words).",
@@ -2403,12 +2711,37 @@
         "caller",
         "kind",
         "phoneNumber",
+        "inboundEventId",
         "words",
         "alsoCancelVisit",
         "workPhoneBusinessIds",
         "sentByActor"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "start"
+          }
+        },
+        "required": ["kind"]
+      },
+      "then": {
+        "description": "START only from the phone's own START text (RULES 7.5; MC C1): the turn of that text or its actor writing on return, with the text's event.",
+        "properties": {
+          "caller": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": ["turn", "actorOnReturn"]
+              }
+            }
+          },
+          "inboundEventId": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      }
     },
     "recordStopOrStart.response": {
       "title": "RecordStopOrStartResponse",
@@ -2507,6 +2840,21 @@
       "title": "RecordStopOrStartErrors",
       "description": "Refused, nothing written: recordStopOrStart's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
       "oneOf": [
+        {
+          "title": "NotFromThatPhoneError",
+          "description": "It did not come from phoneNumber itself, so nothing changes: a START that is not that phone's own START text (inboundEventId from another handle, or a caller other than that text's turn or its actor on return: RULES 7.5; MC C1), or a STOP for another number (from a turn, the number must be the turn's handle; on a page, by email or by a call, the caller's own mobile: RULES 7.2, 'A stop for another number changes nothing').",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notFromThatPhone"
+            },
+            "phoneNumber": {
+              "$ref": "#/$defs/phoneNumber"
+            }
+          },
+          "required": ["error", "phoneNumber"],
+          "additionalProperties": false
+        },
         {
           "title": "NotAWorkPhoneError",
           "description": "A work-phone kind for a phone with no owner, admin or staff role (RULES 7.7).",
@@ -3151,7 +3499,7 @@
     },
     "decideReviewItem.request": {
       "title": "DecideReviewItemRequest",
-      "description": "Decide a team review item, or set it waiting on someone else until a time (S11-52: the account owner has 3 business days to send their own papers). Only a person on Rosie's team decides (Q-18). What the decision changes is written by the journey call it names (journeys 1 and 11). Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision; a wait compares the version. Time budget: none in the sources.",
+      "description": "Decide a team review item, or set it waiting on someone else until a time (S11-52: the account owner has 3 business days to send their own papers). Only a person on Rosie's team decides (Q-18). A done decision writes what it changes to the row under review, in its own part, in the same commit (K-37 v1 README: 'What the decision changes ... is written to the row under review in its own part'): for journey 1, control proven by the team (S1-75, S1-76: K-23 business_setup) and a new-work draft approved or kept offline (S1-03: K-24 new_work_drafts); the kinds of later journeys write back through the K-09 minor version of their journey (README open gaps). Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision; a wait compares the version. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "caller": {
@@ -3174,12 +3522,52 @@
                   "const": "done"
                 },
                 "outcome": {
-                  "description": "The decision in plain words, without private values.",
+                  "description": "The decision in plain words, without private values (K-37 v1 review_items.outcome).",
                   "type": "string",
                   "minLength": 1
+                },
+                "writeBack": {
+                  "description": "What the decision writes to the row under review (the item's subject_table and subject_row_id), in the same commit; the action layer never reads outcome's words for it (arch 02 line 139). Null for a kind whose write-back is a later journey's (owner_claim, booking_cap, harm_report, missed_deadline). A write-back that does not fit the item's kind or subject is refused (writeBackNotForKind).",
+                  "anyOf": [
+                    {
+                      "title": "ReviewControlWriteBack",
+                      "description": "An item of kind control (S1-75 'Rosie's team checks') or listing_match (S1-76: the team checks a listing that does not match, or one already on Rosie; K-23 v1 business_setup.control_proven_at cites both): controlProven true writes K-23 business_setup.control_proven_at (the decision's time) and control_proven_via team_check (K-23 v1 business_setup_control_way_known), so the go-live check (S1-32) finds control proven; false writes nothing there, and that company stays offline with its setup saved (S1-75 safe default).",
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "const": "business_setup"
+                        },
+                        "controlProven": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["table", "controlProven"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "title": "ReviewNewWorkWriteBack",
+                      "description": "An item of kind new_work (S1-03: 'A person checks every service against the official rules for that work, within 1 business day'): writes K-24 v1 new_work_drafts.state, approved (it can go live) or kept_offline (it stays offline, saved; S11-58). Telling Sam the result (S1-03: 'Sam hears the result within 1 business day') is a message from a call made alone, which waits for K-05's commit with no turn (CQ-44; README open gaps).",
+                      "type": "object",
+                      "properties": {
+                        "table": {
+                          "const": "new_work_drafts"
+                        },
+                        "state": {
+                          "description": "K-24 v1 new_work_drafts.state after the decision.",
+                          "type": "string",
+                          "enum": ["approved", "kept_offline"]
+                        }
+                      },
+                      "required": ["table", "state"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
-              "required": ["state", "outcome"],
+              "required": ["state", "outcome", "writeBack"],
               "additionalProperties": false
             },
             {
@@ -3215,18 +3603,50 @@
         "decidedAt": {
           "$ref": "#/$defs/nullableUtc"
         },
+        "written": {
+          "description": "Each row written, with its version after the commit (K-05 v1 rowRef): the review item, and for a done decision with a write-back the row under review (K-23 business_setup, keyed by its business; K-24 new_work_drafts). Empty on a repeat.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
         "repeated": {
           "description": "true when already decided.",
           "type": "boolean"
         }
       },
-      "required": ["state", "decidedAt", "repeated"],
+      "required": ["state", "decidedAt", "written", "repeated"],
       "additionalProperties": false
     },
     "decideReviewItem.errors": {
       "title": "DecideReviewItemErrors",
       "description": "Refused, nothing written: decideReviewItem's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
       "oneOf": [
+        {
+          "title": "WriteBackNotForKindError",
+          "description": "The write-back does not fit the item: business_setup is control's and listing_match's, new_work_drafts is new_work's, and any other kind takes none in v1; or the item's subject row is another (K-37 v1 subject_table, subject_row_id).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "writeBackNotForKind"
+            },
+            "kind": {
+              "description": "The item's kind (K-37 v1 review_items.kind).",
+              "type": "string",
+              "enum": [
+                "new_work",
+                "control",
+                "listing_match",
+                "owner_claim",
+                "booking_cap",
+                "harm_report",
+                "missed_deadline"
+              ]
+            }
+          },
+          "required": ["error", "kind"],
+          "additionalProperties": false
+        },
         {
           "title": "NotTeamError",
           "description": "The person is not on Rosie's team (Q-18).",
@@ -3642,29 +4062,129 @@
     },
     "sendProofCode.request": {
       "title": "SendProofCodeRequest",
-      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller for the email route. Where codes are kept is K-22's (not yet frozen). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
+      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller on an email route, and never reaches the event log: the email row's final parts hold it, so that row's event-log entry leaves the final parts out (K-08 v1.1 proof_code.sent; T-1077's action-layer review). S1-75's control code goes to the listing's email (route listingEmail, purpose control; Q-02), never to a person's handle. The owner's email at sign-up (FS row B13) is typed on S1-10's secure page: route typedEmail writes its handle and sends the code there (purpose emailCheck). The code is kept as a K-22 v1 proof_codes row, only its keyed hash, never the code: its purpose, person, business, recipient handle and channel come from this request as README 'Proof codes in K-22 v1' maps them, and its person is forPersonId, whoever the call acts for (K-22 v1 rules 4 and 5). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "purpose": {
-          "description": "unprovenSender: limit 1 (arch 06 line 299); newContact: a new phone or email, limit 3 (arch 06 line 303); signIn: a page sign-in (S13-45).",
+          "description": "Each is one K-22 v1 proof_codes.purpose (README 'Proof codes in K-22 v1'). unprovenSender: limit 1 (arch 06 line 299), a code to the contact on file typed back in the sender's own conversation (RULES 6.1), which proves the sender's handle as that person's: K-22 v1 link_record (RULES 6.5; S13-45: 'Before a phone links to an old record'); newContact: a new phone or email, limit 3 (arch 06 line 303): K-22 v1 contact_change (D75); signIn: a page sign-in (S13-45; S11-52): K-22 v1 sign_in; emailCheck: the owner's email at sign-up (FS row B13, required: S1-10, S1-77), typed on the secure page and proven by its code typed on the page before it is used (route typedEmail): K-22 v1 owner_email; control: S1-75's proof that the business is theirs, a code to the listing's email, else Rosie's team (Q-02): K-22 v1 listing_control. K-22 v1's new_device, closing_or_export and hand_over have no purpose here (README open gap 24).",
           "type": "string",
-          "enum": ["unprovenSender", "newContact", "signIn"]
+          "enum": ["unprovenSender", "newContact", "signIn", "emailCheck", "control"]
         },
         "route": {
-          "description": "emailOnFile: an email to the address on file; textFromMobile: the person texts the code from that mobile (MC C9).",
+          "description": "emailOnFile: an email to the address on file; textFromMobile: the person texts the code from that mobile (MC C9); listingEmail: for control only, an email to the listing's email (K-23 business_setup.listing_email; S1-75; Q-02); typedEmail: for emailCheck only, an email to the address typed on the page (typedEmail).",
           "type": "string",
-          "enum": ["emailOnFile", "textFromMobile"]
+          "enum": ["emailOnFile", "textFromMobile", "listingEmail", "typedEmail"]
         },
         "contactHandleId": {
-          "description": "The email address or mobile the code proves (K-04 v1 handles).",
-          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          "description": "The email address or mobile the code proves (K-04 v1 handles); null for control, which proves the business, not a contact, and for typedEmail, whose handle this call writes. For those two the call writes the email's K-04 v1 handle when it is new (the listing's email, K-23 v1 business_setup.listing_email, or the typed address), since the code row names where it went (K-22 v1 proof_codes.sent_to_handle_id, not null) and the email row its recipient (K-04 v1 outbox_rows.recipient_handle_id).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "typedEmail": {
+          "description": "For route typedEmail (purpose emailCheck), the owner's email as typed on the secure page (FS row B13; S1-10 lines 172 to 173: 'The secure page also asks one owner email ... The email is proven with a code sent to it, typed on the page. Until then it isn't used.'): this call writes its K-04 v1 handle (kind email, the address in lower case) when the address is new, so the code's email row has its recipient (K-04 outbox_rows.recipient_handle_id), keeps it as the owner email of forPersonId's account, not yet proven (K-22 v1 accounts.email, written on the runtime side: K-22 v1 README 'Every path that binds a person', S1-10), and sends the code there. The call acts for no person until the code is right (K-22 v1 rule 4), so caller.personId is null; whose account it is comes from forPersonId, which the page's server side sets from the secure page's own link, never from the browser. proveCode, once the code is right, marks the email proven (K-22 v1 accounts.email_proven_at) and links the handle to that person (K-04 v1 person_handles); it is used for nothing before. Null for every other route.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/emailAddress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forPersonId": {
+          "description": "The person the code is for (K-22 v1 proof_codes.person_id): the person it proves, and for emailCheck the person whose account the typed email goes on (K-22 v1 accounts, keyed by person_id; K-22 v1 README, S1-10 path: 'the typed email goes on the account'). The server sets it, never the browser: for emailCheck the page's server side (K-21) takes it from the secure page's own signed link, which Rosie made for one person (S1-10's link for the owner, or on the helper path for the helper, whose own sign-in it sets; S1-77's link for the owner the helper named: MASTER-FLOW-A lines 141 to 143, 182), so a helper's request and the owner's for one business differ here; for signIn, the account the typed mobile or email finds on the runtime side (K-22 v1 README, 'Every path that binds a person', S11-52); for unprovenSender, the decider whose contact on file the gate sends the code to (limit 1: arch 06 line 299); for newContact, the person whose new contact it proves. It names whom the code is for, not whom the call acts for: on signIn and emailCheck caller.personId is null, and rosie.person_id stays unset until proveCode finds the code right (K-22 v1 rule 4: 'a sign-in call (S11-52, and S1-10's owner email): no person until its code is right'). Null only for control, whose code proves a business, not a person (K-22 v1 proof_codes.person_id and proof_codes_who).",
+          "$ref": "#/$defs/nullableId"
         }
       },
-      "required": ["caller", "purpose", "route", "contactHandleId"],
-      "additionalProperties": false
+      "required": ["caller", "purpose", "route", "contactHandleId", "typedEmail", "forPersonId"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "purpose": {
+          "description": "What the purpose, which every request carries, asks of whom the code is for and whom the call acts for (K-22 v1 proof_codes_who and rule 4). Keyed on purpose rather than written as an allOf beside properties, so the generated type keeps the request's fields.",
+          "allOf": [
+            {
+              "description": "Whom the code is for (K-22 v1 proof_codes_who): a control code proves a business and names no person; every other code names the person it proves.",
+              "if": {
+                "properties": {
+                  "purpose": {
+                    "const": "control"
+                  }
+                },
+                "required": ["purpose"]
+              },
+              "then": {
+                "properties": {
+                  "forPersonId": {
+                    "type": "null"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "forPersonId": {
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  }
+                }
+              }
+            },
+            {
+              "description": "A sign-in's send and the owner email's send act for no person until the code is right (K-22 v1 rule 4): caller.personId is null, and forPersonId names whom the code is for.",
+              "if": {
+                "properties": {
+                  "purpose": {
+                    "enum": ["signIn", "emailCheck"]
+                  }
+                },
+                "required": ["purpose"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": {
+                      "personId": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "if": {
+        "properties": {
+          "route": {
+            "const": "typedEmail"
+          }
+        },
+        "required": ["route"]
+      },
+      "then": {
+        "description": "The owner's email typed on the page (FS row B13): the purpose is emailCheck, the address is given, and no handle exists yet.",
+        "properties": {
+          "purpose": {
+            "const": "emailCheck"
+          },
+          "contactHandleId": {
+            "type": "null"
+          },
+          "typedEmail": {
+            "$ref": "#/$defs/emailAddress"
+          }
+        }
+      },
+      "else": {
+        "description": "Every other route sends to a contact or listing already on file.",
+        "properties": {
+          "typedEmail": {
+            "type": "null"
+          }
+        }
+      }
     },
     "sendProofCode.response": {
       "title": "SendProofCodeResponse",
@@ -3679,11 +4199,11 @@
           "$ref": "../common/formats.v1.schema.json#/$defs/utc"
         },
         "outboxRowId": {
-          "description": "For emailOnFile, the email row; null otherwise.",
+          "description": "For an email route (emailOnFile, listingEmail, typedEmail), the email row, whose final parts hold the code; null for textFromMobile.",
           "$ref": "#/$defs/nullableId"
         },
         "readyText": {
-          "description": "For textFromMobile, the ready text shown to the person; null otherwise.",
+          "description": "For textFromMobile, the ready text shown to the person; null otherwise. It holds the code, so like the email row's final parts it never enters a span, a trace or the event log (K-08 v1.1 proof_code.sent).",
           "anyOf": [
             {
               "description": "The words to text from that mobile, with the code in them.",
@@ -3747,7 +4267,7 @@
     },
     "proveCode.request": {
       "title": "ProveCodeRequest",
-      "description": "Check a proof code typed back, or texted from the mobile it proves (RULES 6.2; S13-45): within 10 minutes and from the right contact, the contact is proven; a wrong code counts one of 5 tries, and the fifth gives a 15-minute pause. Reads: the primary, uncached. Repeat: keyed: the inbound event or page request id is the key, and a repeat answers its first result; every new event counts a try. Time budget: the code lives 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "description": "Check a proof code typed back, or texted from the mobile it proves (RULES 6.2; S13-45): within 10 minutes and from the right contact, the contact is proven; a wrong code counts one of 5 tries, and the fifth gives a 15-minute pause. The code's person is the one its send named (sendProofCode.request.forPersonId; K-22 v1 proof_codes.person_id), which the server keeps with the code id and never takes from this request; on a sign-in's or the owner email's code caller.personId is null, and the call acts for no one until the code is right (K-22 v1 rule 4). Reads: the primary, uncached. Repeat: keyed: the inbound event or page request id is the key, and a repeat answers its first result; every new event counts a try. Time budget: the code lives 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
       "type": "object",
       "properties": {
         "caller": {
@@ -3762,7 +4282,7 @@
           "minLength": 1
         },
         "fromHandleId": {
-          "description": "For textFromMobile, the handle it came from, which must be the mobile; null on a page.",
+          "description": "The handle the code came from: for textFromMobile it must be the mobile it proves; for a code typed back in a chat, that chat's handle (S13-45: the same conversation; limit 1's question, limit1Outcome.openQuestionId); null on a page.",
           "$ref": "#/$defs/nullableId"
         },
         "at": {
@@ -3784,14 +4304,30 @@
               "const": "proven"
             },
             "handleId": {
-              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              "description": "The contact proven (K-04 v1 handles): for unprovenSender the sender's own handle; for emailCheck the email handle sendProofCode wrote, now linked to the code's person (sendProofCode.request.forPersonId; K-04 v1 person_handles), marked proven on that person's account (K-22 v1 accounts.email_proven_at) and usable; null for a control code.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "controlBusinessId": {
+              "description": "For a control code, the business whose control is proven (K-23 business_setup.control_proven_at, control_proven_via listing_code; S1-75); null otherwise.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "redecideTurnId": {
+              "description": "For a code limit 1 sent (purpose unprovenSender), the turn whose part waits for it (limit1Outcome proofCodeSent): its choice is decided again from today's record, as releaseSafetyHold's redecideTurnId (arch 06 line 299; gateOutcome wait); null otherwise.",
+              "anyOf": [
+                {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "repeated": {
               "description": "true when checked before.",
               "type": "boolean"
             }
           },
-          "required": ["result", "handleId", "repeated"],
+          "required": ["result", "handleId", "controlBusinessId", "redecideTurnId", "repeated"],
           "additionalProperties": false
         },
         {
@@ -3933,12 +4469,25 @@
               "type": "string",
               "minLength": 1
             },
+            "ownerRetoldClockRowId": {
+              "description": "For a staff invite, the clock row due 48 hours after the link is given: with no ready text by then, the owner is told once and given the link again (S2-05, S2-07; K-29 chat_links.owner_retold_at); null for a booking link.",
+              "$ref": "#/$defs/nullableId"
+            },
             "repeated": {
               "description": "true when this link was issued before.",
               "type": "boolean"
             }
           },
-          "required": ["result", "chatLinkId", "shortCode", "readyText", "link", "qrText", "repeated"],
+          "required": [
+            "result",
+            "chatLinkId",
+            "shortCode",
+            "readyText",
+            "link",
+            "qrText",
+            "ownerRetoldClockRowId",
+            "repeated"
+          ],
           "additionalProperties": false
         },
         {
@@ -3997,8 +4546,1723 @@
         }
       ]
     },
+    "setupKey": {
+      "title": "SetupKey",
+      "description": "A needs and gives key of journeys 1 and 2, as the step index prints it (A-keys.md and B-keys.md, sections 1 and 2; 02-contracts section 8 names each key's home). voice is left out: the phone-line row is out (C-236; 02-contracts section 8).",
+      "type": "string",
+      "enum": [
+        "thread",
+        "kinds",
+        "pf.license",
+        "pf.services",
+        "pf.questions",
+        "pf.safety",
+        "pf.first_steps",
+        "pf.visit",
+        "pf.money",
+        "pf.messages",
+        "pf.staff",
+        "pf.rules",
+        "pf.edges",
+        "companies",
+        "business",
+        "id_checked",
+        "mobile",
+        "license",
+        "services",
+        "ways",
+        "stripe",
+        "spaces",
+        "booking_rules",
+        "price_oks",
+        "profile",
+        "calendar",
+        "terms",
+        "bill_card",
+        "live",
+        "added",
+        "license_checked",
+        "team",
+        "on_call",
+        "staff_live"
+      ]
+    },
+    "kindId": {
+      "title": "KindId",
+      "description": "A kind of work's id (K-24 v1 kinds.id, kinds_id_form: lowercase words joined by hyphens; a drafted new kind starts new-).",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "objectKey": {
+      "title": "ObjectKey",
+      "description": "An R2 object key a secure page's upload gave (02-contracts K-13, the files port, not frozen: an opaque key). ID uploads, photos and documents stay private in R2 (Q-31).",
+      "type": "string",
+      "minLength": 1
+    },
+    "emailAddress": {
+      "title": "EmailAddress",
+      "description": "An email address in lowercase (K-23 v1 business_setup_listing_email_form).",
+      "type": "string",
+      "pattern": "^[^@A-Z\\s]+@[^@A-Z\\s]+$"
+    },
+    "localDate": {
+      "title": "LocalDate",
+      "description": "A calendar date, YYYY-MM-DD, such as a document's end date (FS document row).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "money": {
+      "$ref": "../common/formats.v1.schema.json#/$defs/money"
+    },
+    "licenseAsGiven": {
+      "title": "LicenseAsGiven",
+      "description": "A license or registration kept as given, with no check and no checked column (MC C4, C7; FS document row; 02-contracts K-35, not frozen: named in words).",
+      "type": "object",
+      "properties": {
+        "nameOrNumber": {
+          "description": "The name or number as given (FS document row).",
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer": {
+          "description": "Who issued it, as given, or null.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "endsOn": {
+          "description": "Its end date as given, or null.",
+          "anyOf": [{ "$ref": "#/$defs/localDate" }, { "type": "null" }]
+        },
+        "objectKey": {
+          "description": "The uploaded file, or null.",
+          "anyOf": [{ "$ref": "#/$defs/objectKey" }, { "type": "null" }]
+        },
+        "showOnListing": { "description": "Shown on the listing (FS document row).", "type": "boolean" }
+      },
+      "required": ["nameOrNumber", "issuer", "endsOn", "objectKey", "showOnListing"],
+      "additionalProperties": false
+    },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, so the Tool API mock (C-186) and QA's contract test (T-088) can set it up: the seed fixtures of the frozen table parts, the fixtures of this folder whose requests run first, the clock, and what the fixture states (the named rules statedOutcome and givesStepKeys in tool-api.rules.mjs check it).",
+      "type": "object",
+      "properties": {
+        "seeds": {
+          "description": "Seed fixtures of the frozen table parts, as <folder under contracts/db-schema>/<file>.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z-]+/seed-[a-z0-9-]+[.]json$" }
+        },
+        "after": {
+          "description": "Fixtures of this folder whose requests run first, in order.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+[.]json$" }
+        },
+        "now": {
+          "description": "The time the call reads 'now' at (the fake clock on staging: BP 9.4).",
+          "$ref": "#/$defs/utc"
+        },
+        "stated": {
+          "description": "What the fixture states: for a limit fixture, the limit that fails, the kind of its outcome and its action (README 'Limits 1 to 6 at the gate'); for a setup fixture, the step and the keys it gives (A-keys.md, B-keys.md); null otherwise.",
+          "anyOf": [
+            {
+              "title": "StatedOutcome",
+              "type": "object",
+              "properties": {
+                "limit": { "type": "integer", "minimum": 1, "maximum": 6 },
+                "outcome": { "$ref": "#/$defs/gateOutcome" },
+                "action": { "type": "string", "minLength": 1 }
+              },
+              "required": ["limit", "outcome", "action"],
+              "additionalProperties": false
+            },
+            {
+              "title": "StatedGives",
+              "type": "object",
+              "properties": {
+                "step": { "$ref": "#/$defs/stepId" },
+                "gives": { "type": "array", "items": { "$ref": "#/$defs/setupKey" }, "uniqueItems": true }
+              },
+              "required": ["step", "gives"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": { "description": "Anything else the exchange assumes, in plain words.", "type": "string" }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "matchKinds.request": {
+      "title": "MatchKindsRequest",
+      "description": "Match the owner's words to kinds of work (S1-02; arch 05 line 237: 'an owner's words at sign-up are matched by meaning to the closest of the 243 kinds, and the owner picks'): each part of the words gets the closest kinds of K-24 v1 kinds, for the owner to pick; words that fit two get one 'which?'; none fits: new work (S1-03), or a service Rosie never books (S1-74; RULES 1.4). The model or index is Q-42's (a spike picks it). Called by the frontier builder for S1-02's facts, and by registration screen 1 through K-21. Reads: the primary, uncached, and the meaning-match index (Q-42). Repeat: safe: a read. Time budget: none in the sources; proposed at most 200 ms, as closestEntries (README default 3).",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "words": {
+          "description": "The owner's words as typed (S1-02: 'Just type them').",
+          "type": "string",
+          "minLength": 1
+        },
+        "flow": {
+          "description": "The flow the kinds are read for (K-24 v1 kind_flows.flow).",
+          "type": "string",
+          "enum": ["A", "B"]
+        }
+      },
+      "required": ["caller", "words", "flow"],
+      "additionalProperties": false
+    },
+    "matchKinds.response": {
+      "title": "MatchKindsResponse",
+      "description": "Each part of the words, in order, with its closest kinds.",
+      "type": "object",
+      "properties": {
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "title": "KindMatch",
+            "type": "object",
+            "properties": {
+              "words": {
+                "description": "The part of the owner's words, quoted exactly.",
+                "type": "string",
+                "minLength": 1
+              },
+              "outcome": {
+                "description": "listed: one kind fits; which: two fit, so one 'which?' first; new_work: a service with a visit that has no plug-in yet (S1-02 'One isn't on the list yet'); not_booked: not a service Rosie books (S1-02 'Not a service we book'; RULES 1.4). K-24 picked_kinds.outcome takes listed, new_work or not_booked once the owner picks.",
+                "type": "string",
+                "enum": ["listed", "which", "new_work", "not_booked"]
+              },
+              "kinds": {
+                "description": "The closest kinds, closest first: one for listed, two for which, none otherwise.",
+                "type": "array",
+                "maxItems": 2,
+                "items": {
+                  "title": "KindFound",
+                  "type": "object",
+                  "properties": {
+                    "kindId": { "$ref": "#/$defs/kindId" },
+                    "name": { "description": "K-24 kinds.name.", "type": "string", "minLength": 1 }
+                  },
+                  "required": ["kindId", "name"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["words", "outcome", "kinds"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["parts"],
+      "additionalProperties": false
+    },
+    "matchKinds.errors": {
+      "title": "MatchKindsErrors",
+      "description": "Refused, nothing written: matchKinds' errors.",
+      "oneOf": [
+        {
+          "title": "KindIndexUnavailableError",
+          "description": "The meaning-match index cannot be read (Q-42): S1-02 asks the owner again later; nothing is picked.",
+          "type": "object",
+          "properties": { "error": { "const": "indexUnavailable" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "lookupListing.request": {
+      "title": "LookupListingRequest",
+      "description": "Look up the business's listing (S1-09 'Reads the card or listing'; FS section 10): by name and town through the Places port (02-contracts K-15, not frozen: named in words), or from a photo of a card (C-120 photo reading, K-02 v1.1 at F14). Banned words in a listing are never shown (S13-11). Called by the frontier builder for S1-09's facts and by registration screen 2 through K-21. Reads: the Places port and the business's own setup row on the primary, uncached. Repeat: safe: a read. Time budget: none in the sources; the port's own.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "query": {
+          "oneOf": [
+            {
+              "title": "ListingByName",
+              "type": "object",
+              "properties": {
+                "by": { "const": "nameAndTown" },
+                "name": { "type": "string", "minLength": 1 },
+                "town": { "type": "string", "minLength": 1 }
+              },
+              "required": ["by", "name", "town"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ListingByCardPhoto",
+              "type": "object",
+              "properties": {
+                "by": { "const": "cardPhoto" },
+                "objectKey": { "$ref": "#/$defs/objectKey" }
+              },
+              "required": ["by", "objectKey"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "query"],
+      "additionalProperties": false
+    },
+    "lookupListing.response": {
+      "title": "LookupListingResponse",
+      "description": "The listings found, for the owner to confirm (S1-09); none found takes 'No match, or already listed' (S1-76).",
+      "type": "object",
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "title": "ListingCandidate",
+            "type": "object",
+            "properties": {
+              "listingRef": {
+                "description": "The Places port's reference (K-15, not frozen: opaque).",
+                "type": "string",
+                "minLength": 1
+              },
+              "name": { "description": "FS B01.", "type": "string", "minLength": 1 },
+              "address": { "type": "string", "minLength": 1 },
+              "listingPhone": {
+                "description": "FS B04, or null.",
+                "anyOf": [{ "$ref": "#/$defs/phoneNumber" }, { "type": "null" }]
+              },
+              "website": {
+                "description": "FS B05, or null.",
+                "anyOf": [{ "type": "string", "pattern": "^https?://\\S+$" }, { "type": "null" }]
+              },
+              "alreadyOnRosie": {
+                "description": "true when a business already holds this listing: S1-76's review (S1-09 'No match, or already listed').",
+                "type": "boolean"
+              }
+            },
+            "required": ["listingRef", "name", "address", "listingPhone", "website", "alreadyOnRosie"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["candidates"],
+      "additionalProperties": false
+    },
+    "lookupListing.errors": {
+      "title": "LookupListingErrors",
+      "description": "Refused, nothing written: lookupListing's errors.",
+      "oneOf": [
+        {
+          "title": "PlacesUnavailableError",
+          "description": "The Places port did not answer (K-15): the owner types the details instead (S1-09).",
+          "type": "object",
+          "properties": { "error": { "const": "placesUnavailable" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "saveSetupStep.request": {
+      "title": "SaveSetupStepRequest",
+      "description": "Save one setup step of journeys 1 and 2 and write the keys it gives (arch 12 line 590: the Tool API generated from the master's needs and gives keys; 02-contracts K-09 'Journey 1', 'Journey 2'; README 'Journeys 1 and 2'). In a turn, a step's write is the effect code adds for the choice decide picked, inside gateAndCommit's one commit after limits 1 to 6 pass, and the part's result names the keys it gave (partResult.gives); only S2-05's ready text rides as a core action (saveSetupStepInTurn); from a page (registration screens, the staff page, the pay page: K-21) or the console it is called alone and commits under caller.requestId, which waits for K-05's commit with no turn (CQ-44). The step must be one the record has reached with its needs given (needsMissing otherwise). Reads: the primary, uncached. Repeat: safe: the turn or request id is the key; a repeat writes nothing and answers repeated. Time budget: in a turn, inside gateAndCommit's 300 ms (arch 04 line 223); alone, none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "expectVersion": {
+          "description": "The version of the row the read-back or page showed (limit 4: arch 06 line 305), or null for a first write.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "step": {
+          "description": "The step and what it saves, one variant per step (A-S1.md, A-S2.md; B-S1.md and B-S2.md hold the same steps).",
+          "oneOf": [
+            {
+              "title": "SetupS1_02",
+              "description": "S1-02, 'Asks what work Sam does, and checks each one': each kind the owner named, in order, with the outcome the owner picked after matchKinds (arch 05 line 237): listed, new work (S1-03 drafts it) or not a service Rosie books (S1-74 says so plainly). Writes K-24 v1 picked_kinds, one row each. Gives kinds.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-02" },
+                "picks": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "KindPick",
+                    "type": "object",
+                    "properties": {
+                      "position": {
+                        "description": "Its place in the owner's list, from 1 (K-24 picked_kinds.position).",
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "words": {
+                        "description": "The owner's own words for it (K-24 picked_kinds.words).",
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "outcome": {
+                        "description": "K-24 picked_kinds.outcome.",
+                        "type": "string",
+                        "enum": ["listed", "new_work", "not_booked"]
+                      },
+                      "kindId": {
+                        "description": "The kind picked, a new- id for new work, or null for not_booked (K-24 picked_kinds_kind_unless_not_booked).",
+                        "anyOf": [{ "$ref": "#/$defs/kindId" }, { "type": "null" }]
+                      }
+                    },
+                    "required": ["position", "words", "outcome", "kindId"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "picks"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_03",
+              "description": "S1-03, 'Drafts a plug-in for new work': the owner's answers to the draft's blocks (K-24 v1 new_work_drafts, state in_review, and new_work_draft_blocks) and a team review item of kind new_work, due in 1 business day (K-37 v1 review_items; Q-18). The kind stays offline until Rosie's team approves it. Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-03" },
+                "pickedKindId": {
+                  "description": "The new-work pick (K-24 new_work_drafts.picked_kind_id).",
+                  "$ref": "#/$defs/id"
+                },
+                "blocks": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "DraftBlock",
+                    "type": "object",
+                    "properties": {
+                      "block": {
+                        "description": "K-24 new_work_draft_blocks.block, 1 to 15.",
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 15
+                      },
+                      "outcome": {
+                        "description": "answered, or no: a no sets no fact and no switch (K-24).",
+                        "type": "string",
+                        "enum": ["answered", "no"]
+                      },
+                      "answer": {
+                        "description": "The owner's answer as given.",
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": ["block", "outcome", "answer"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "pickedKindId", "blocks"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_11",
+              "description": "S1-11, 'Plug-in: each kind of work' (automatic): each listed kind's eleven plug-in text blocks, stored whole (K-24 v1 picked_kind_texts, one row per pf key; MC R3). Gives pf.license, pf.services, pf.questions, pf.safety, pf.first_steps, pf.visit, pf.money, pf.messages, pf.staff, pf.rules and pf.edges.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-11" },
+                "pickedKindIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+              },
+              "required": ["step", "pickedKindIds"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_04",
+              "description": "S1-04, 'Asks which kinds of work share a company': each company and its kinds (K-23 v1 companies and company_kinds; K-24 picked_kinds.company_id; FS B10). Gives companies.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-04" },
+                "companies": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "CompanyKinds",
+                    "type": "object",
+                    "properties": {
+                      "name": { "description": "K-23 companies.name.", "type": "string", "minLength": 1 },
+                      "pickedKindIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+                    },
+                    "required": ["name", "pickedKindIds"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "companies"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_09",
+              "description": "S1-09, 'Reads the card or listing; asks: an owner?': the listing fields the owner confirmed (K-04 v1 businesses; K-23 v1 business_setup listing_phone, listing_email and website; FS section 10, B01 to B05), banned words never shown (S13-11), and the owner's answer. A helper takes S1-77; no match or already listed takes S1-76, a team review item of kind listing_match. Gives business.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-09" },
+                "companyId": {
+                  "description": "The company the listing is for (K-23 companies.id).",
+                  "$ref": "#/$defs/id"
+                },
+                "listingRef": {
+                  "description": "The listing lookupListing gave, or null for a card photo or typed details.",
+                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                },
+                "name": { "description": "FS B01.", "type": "string", "minLength": 1 },
+                "listingPhone": {
+                  "description": "FS B04, or null.",
+                  "anyOf": [{ "$ref": "#/$defs/phoneNumber" }, { "type": "null" }]
+                },
+                "listingEmail": {
+                  "description": "Where S1-75's control code goes (Q-02), or null.",
+                  "anyOf": [{ "$ref": "#/$defs/emailAddress" }, { "type": "null" }]
+                },
+                "website": {
+                  "description": "FS B05, or null.",
+                  "anyOf": [{ "type": "string", "pattern": "^https?://\\S+$" }, { "type": "null" }]
+                },
+                "answer": {
+                  "description": "owner ('An owner; the listing matches'), helper ('Helps run it; not an owner': S1-77) or noMatch ('No match, or already listed': S1-76).",
+                  "type": "string",
+                  "enum": ["owner", "helper", "noMatch"]
+                }
+              },
+              "required": [
+                "step",
+                "companyId",
+                "listingRef",
+                "name",
+                "listingPhone",
+                "listingEmail",
+                "website",
+                "answer"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_10",
+              "description": "S1-10, 'Checks the owner's mobile and ID, once': the owner's mobile, proven by their own text (MC C9), and the ID uploaded on the secure page, which counts as the ID confirmed, with no face match and no ID-check service (MC C10). Writes the K-04 v1 phone row and K-22's owner mobile and ID upload record (K-22 not frozen: named in words). The owner's email on the same page (FS row B13) is proven by its own code first: sendProofCode purpose emailCheck, route typedEmail, then proveCode (S1-10: 'Until then it isn't used'). Gives id_checked and mobile.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-10" },
+                "mobile": { "$ref": "#/$defs/phoneNumber" },
+                "provenByEventId": {
+                  "description": "The owner's own text from that mobile (MC C9; K-06).",
+                  "$ref": "#/$defs/id"
+                },
+                "idUpload": {
+                  "title": "IdUpload",
+                  "type": "object",
+                  "properties": {
+                    "objectKey": { "$ref": "#/$defs/objectKey" },
+                    "uploadedAt": { "$ref": "#/$defs/utc" }
+                  },
+                  "required": ["objectKey", "uploadedAt"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["step", "mobile", "provenByEventId", "idUpload"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_72",
+              "description": "S1-72, 'Signs the agreement now' (a page, after S1-71 finds the work needs one): the signed agreement, kept as a document (K-35, not frozen: named in words). Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-72" },
+                "pickedKindId": { "$ref": "#/$defs/id" },
+                "documentObjectKey": { "$ref": "#/$defs/objectKey" },
+                "signedAt": { "$ref": "#/$defs/utc" }
+              },
+              "required": ["step", "pickedKindId", "documentObjectKey", "signedAt"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_23",
+              "description": "S1-23, 'Adds a license, if the business wants (optional)', kept as given (MC C4, C7). Gives license.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-23" },
+                "pickedKindId": { "$ref": "#/$defs/id" },
+                "license": { "$ref": "#/$defs/licenseAsGiven" }
+              },
+              "required": ["step", "pickedKindId", "license"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_61",
+              "description": "S1-61, 'Gives the business registration only', kept as given (MC C4). Gives license.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-61" },
+                "pickedKindId": { "$ref": "#/$defs/id" },
+                "registration": { "$ref": "#/$defs/licenseAsGiven" }
+              },
+              "required": ["step", "pickedKindId", "registration"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_12",
+              "description": "S1-12, 'Sends the price list as a photo': the services read from the owner's own list (a photo read by C-120, K-02 v1.1 at F14; or the form, typed or said), never a made-up price; a line that cannot be read is left out until Sam says (S1-12 safe default). No read-back here: the money card (S1-13) shows the prices with the money (MASTER-FLOW-A line 290), and a photo's values take the owner's yes there, where limit 6 re-parses them from the read-back (arch 06 line 309). Services are K-25's (not frozen: named in words). Gives services.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-12" },
+                "companyId": { "$ref": "#/$defs/id" },
+                "photoObjectKey": {
+                  "description": "The price-list photo, or null when typed.",
+                  "anyOf": [{ "$ref": "#/$defs/objectKey" }, { "type": "null" }]
+                },
+                "services": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "ServiceAsRead",
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string", "minLength": 1 },
+                      "price": {
+                        "description": "The listed price, or null when priced from photos or at the visit.",
+                        "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+                      },
+                      "minutes": {
+                        "description": "How long it takes, or null.",
+                        "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+                      }
+                    },
+                    "required": ["name", "price", "minutes"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "companyId", "photoObjectKey", "services"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_43",
+              "description": "S1-43, 'Checks where each service may be done' (automatic): the business's locations and, in flow B, the travel area from its shop or office (K-23 v1 locations; the geo port K-17 v1 geocodes each address). Where each service is done is K-25's (not frozen: named in words). Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-43" },
+                "locations": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "LocationGiven",
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "description": "K-23 locations.kind.",
+                        "type": "string",
+                        "enum": ["shop", "office", "meeting_spot"]
+                      },
+                      "name": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+                      "address": { "type": "string", "minLength": 1 },
+                      "travelMiles": {
+                        "description": "Flow B: K-23 locations.travel_miles, or null.",
+                        "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+                      },
+                      "travelFee": {
+                        "description": "K-23 locations.travel_fee_cents and travel_fee_currency, or null.",
+                        "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+                      }
+                    },
+                    "required": ["kind", "name", "address", "travelMiles", "travelFee"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "locations"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_13",
+              "description": "S1-13, 'One money card: where, when they book, and after': each service's way, as K-24 v1 kind_flows' combo form (price way list|photos|visit, taken when they book none|card|deposit|full, the rest none|counter|bill|card|own; never a hold), and whether nothing is taken through Rosie (K-23 v1 business_setup.no_money, FS M02), which says whether Stripe is needed. Service money per path is K-25's (not frozen: named in words). Gives ways and stripe.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-13" },
+                "ways": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "ServiceWay",
+                    "type": "object",
+                    "properties": {
+                      "serviceName": { "type": "string", "minLength": 1 },
+                      "combo": {
+                        "type": "string",
+                        "pattern": "^(list|photos|visit)\\|(none|card|deposit|full)\\|(none|counter|bill|card|own)$"
+                      }
+                    },
+                    "required": ["serviceName", "combo"],
+                    "additionalProperties": false
+                  }
+                },
+                "noMoney": { "type": "boolean" }
+              },
+              "required": ["step", "ways", "noMoney"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_81",
+              "description": "S1-81, 'Lists each space or thing, and its papers' (K-23 v1 places_or_things; FS place_or_thing row). Gives spaces.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-81" },
+                "spaces": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "SpaceOrThing",
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string", "minLength": 1 },
+                      "kind": { "type": "string", "enum": ["space", "thing"] },
+                      "fits": { "type": "integer", "minimum": 1 },
+                      "bookableCount": { "type": "integer", "minimum": 0 },
+                      "bookablePer": { "type": "string", "enum": ["slot", "day"] },
+                      "turnaroundMinutes": {
+                        "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+                      }
+                    },
+                    "required": ["name", "kind", "fits", "bookableCount", "bookablePer", "turnaroundMinutes"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "spaces"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_83",
+              "description": "S1-83, 'Sets the class timetable from a photo': the sessions read from the photo and read back, saved on the owner's yes (limit 6; C-120). Sessions with seats are K-27's (not frozen: named in words). Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-83" },
+                "photoObjectKey": { "$ref": "#/$defs/objectKey" },
+                "sessions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "ClassSession",
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "string",
+                        "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+                      },
+                      "startsAt": {
+                        "description": "Local time, HH:MM, in the business's zone (S13-03).",
+                        "type": "string",
+                        "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                      },
+                      "minutes": { "type": "integer", "minimum": 1 },
+                      "seats": { "type": "integer", "minimum": 1 },
+                      "teacher": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+                    },
+                    "required": ["weekday", "startsAt", "minutes", "seats", "teacher"],
+                    "additionalProperties": false
+                  }
+                },
+                "yesEventId": { "$ref": "#/$defs/id" }
+              },
+              "required": ["step", "photoObjectKey", "sessions", "yesEventId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_21",
+              "description": "S1-21, 'Suggested rules, as one tap list': the typed rules the owner kept and the owner's price OK limit (K-26 v1 rules and price_ok_limits; MC C5). The phone-line row and its voice key are out (C-236). Gives booking_rules and price_oks.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-21" },
+                "rules": {
+                  "type": "array",
+                  "items": {
+                    "title": "RuleKept",
+                    "type": "object",
+                    "properties": {
+                      "ruleKind": { "description": "K-26 rule_kinds.id.", "type": "string", "minLength": 1 },
+                      "flow": { "type": "string", "enum": ["A", "B"] },
+                      "kindId": { "anyOf": [{ "$ref": "#/$defs/kindId" }, { "type": "null" }] },
+                      "value": {
+                        "description": "K-26's typed value: value_on, value_cents with value_currency, value_span, value_count, or a note's words.",
+                        "oneOf": [
+                          {
+                            "title": "RuleOn",
+                            "type": "object",
+                            "properties": { "on": { "type": "boolean" } },
+                            "required": ["on"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "title": "RuleMoney",
+                            "type": "object",
+                            "properties": { "money": { "$ref": "#/$defs/money" } },
+                            "required": ["money"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "title": "RuleMinutes",
+                            "type": "object",
+                            "properties": { "minutes": { "type": "integer", "minimum": 0 } },
+                            "required": ["minutes"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "title": "RuleCount",
+                            "type": "object",
+                            "properties": { "count": { "type": "integer", "minimum": 0 } },
+                            "required": ["count"],
+                            "additionalProperties": false
+                          },
+                          {
+                            "title": "RuleNote",
+                            "type": "object",
+                            "properties": { "words": { "type": "string", "minLength": 1 } },
+                            "required": ["words"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": ["ruleKind", "flow", "kindId", "value"],
+                    "additionalProperties": false
+                  }
+                },
+                "priceOk": {
+                  "description": "K-26 price_ok_limits: the owner OKs quotes or bills over this amount, or null.",
+                  "anyOf": [
+                    {
+                      "title": "PriceOkLimit",
+                      "type": "object",
+                      "properties": {
+                        "quotes": { "type": "boolean" },
+                        "bills": { "type": "boolean" },
+                        "over": { "$ref": "#/$defs/money" }
+                      },
+                      "required": ["quotes", "bills", "over"],
+                      "additionalProperties": false
+                    },
+                    { "type": "null" }
+                  ]
+                }
+              },
+              "required": ["step", "rules", "priceOk"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_84",
+              "description": "S1-84, 'Confirms About us and photos' (K-23 v1 business_setup.about and profile_confirmed_at, business_photos; FS B06 to B08). Gives profile.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-84" },
+                "about": { "type": "string", "minLength": 1 },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "title": "PhotoKept",
+                    "type": "object",
+                    "properties": {
+                      "objectKey": { "$ref": "#/$defs/objectKey" },
+                      "shows": { "type": "string", "enum": ["place", "work", "team", "logo"] },
+                      "cameFrom": { "type": "string", "enum": ["listing", "website", "owner"] }
+                    },
+                    "required": ["objectKey", "shows", "cameFrom"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "about", "photos"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_24",
+              "description": "S1-24, 'Links a calendar with jobs already booked', on a page already open (Q-10): a Google or Microsoft calendar linked (the calendar double until J-13: Q-56), a schedule photo whose times block on the owner's yes (arch 05 line 263), or none. Calendar links and busy blocks are K-27's (not frozen: named in words). Gives calendar.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-24" },
+                "personId": { "$ref": "#/$defs/id" },
+                "calendar": { "type": "string", "enum": ["google", "microsoft", "schedulePhoto", "none"] },
+                "calendarLinkId": {
+                  "description": "The link K-27 will hold (opaque until it freezes), or null.",
+                  "$ref": "#/$defs/nullableId"
+                }
+              },
+              "required": ["step", "personId", "calendar", "calendarLinkId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_78",
+              "description": "S1-78, 'Names an emergency contact (a solo owner)': kept with their own yes by texting Rosie, without which no safety timer runs (Q-06; K-22, not frozen: named in words). Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-78" },
+                "name": { "type": "string", "minLength": 1 },
+                "mobile": { "$ref": "#/$defs/phoneNumber" }
+              },
+              "required": ["step", "name", "mobile"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_25",
+              "description": "S1-25, 'Explains what Rosfield costs' (S1-62: this work pays Rosfield's $2): the owner's yes, kept as a K-29 v1 consent row of kind fee_ok with the exact words shown, never edited. S1-26 is out (C-251). Gives nothing.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-25" },
+                "words": {
+                  "description": "The exact words shown (K-29 consents.exact_words).",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "yesEventId": { "$ref": "#/$defs/id" },
+                "channel": {
+                  "description": "K-29 consents.channel.",
+                  "type": "string",
+                  "enum": ["text", "email", "page", "ai"]
+                }
+              },
+              "required": ["step", "words", "yesEventId", "channel"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_27",
+              "description": "S1-27, 'Connects Stripe in the business's own name' (a pay page; the Stripe port K-14, not frozen): the connected account (K-23 v1 business_setup.stripe_account_id, FS M01). Gives stripe.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-27" },
+                "stripeAccountId": { "type": "string", "pattern": "^acct_[A-Za-z0-9]+$" }
+              },
+              "required": ["step", "stripeAccountId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_29",
+              "description": "S1-29, 'Shows the preview, the terms and Go live' (a page): the terms accepted (K-23 v1 business_setup.terms_accepted_at and terms_accepted_by_person_id, FS M05) and the bill card saved (K-33 v1 bill_cards, FS M04; never a card number). A kind left unsigned stays offline (S1-31). Gives terms and bill_card.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-29" },
+                "termsAcceptedAt": { "$ref": "#/$defs/utc" },
+                "billCard": {
+                  "title": "BillCardSaved",
+                  "type": "object",
+                  "properties": {
+                    "stripeCustomerId": { "type": "string", "pattern": "^cus_[A-Za-z0-9]+$" },
+                    "stripePaymentMethodId": { "type": "string", "pattern": "^pm_[A-Za-z0-9]+$" }
+                  },
+                  "required": ["stripeCustomerId", "stripePaymentMethodId"],
+                  "additionalProperties": false
+                },
+                "leftUnsignedPickedKindIds": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+              },
+              "required": ["step", "termsAcceptedAt", "billCard", "leftUnsignedPickedKindIds"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_32",
+              "description": "S1-32, 'The ID and control checks come back' (automatic): code reads the ID upload, which counts as confirmed (MC C10), and control (K-23 v1 business_setup.control_proven_at and control_proven_via; S1-75). The response's branch is the master's: 'Confirmed in minutes', 'The ID doesn't match' (S1-52) or 'The number isn't found' (S1-33). Gives nothing.",
+              "type": "object",
+              "properties": { "step": { "const": "S1-32" } },
+              "required": ["step"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS1_35",
+              "description": "S1-35, 'Goes live, tells its listing, offers the next': the business goes live (K-04 v1 businesses.status live; FS line 721); the notice goes by email to the listing's email only, and nothing when it has none (Q-02); S1-36's next-day reminder clock arms. Gives live.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S1-35" },
+                "companyIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+              },
+              "required": ["step", "companyIds"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_02",
+              "description": "S2-02, 'Sam sends the team, with who does what': each person, their mobile, their role, and the owner's tick that each agreed to texts, which stays (FS rows T02, T03; Q-08). Writes K-04 v1 persons, person_roles and phone rows, a contacts/add effect row per mobile (CQ-04; Q-03), and K-22's staff rows, status invited (not frozen: named in words). Gives added.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-02" },
+                "people": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "TeamMemberAdded",
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string", "minLength": 1 },
+                      "mobile": { "$ref": "#/$defs/phoneNumber" },
+                      "role": {
+                        "description": "K-04 person_roles.role.",
+                        "type": "string",
+                        "enum": ["admin", "staff"]
+                      },
+                      "agreedToTexts": {
+                        "description": "The owner's tick (FS row T03; Q-08).",
+                        "const": true
+                      }
+                    },
+                    "required": ["name", "mobile", "role", "agreedToTexts"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "people"],
+              "additionalProperties": false
+            },
+            { "$ref": "#/$defs/setupStepS2_05" },
+            {
+              "title": "SetupS2_06",
+              "description": "S2-06, 'Joins and fills in the secure page': the staff page (K-22, not frozen: named in words). Gives profile.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-06" },
+                "personId": { "$ref": "#/$defs/id" },
+                "displayName": { "type": "string", "minLength": 1 },
+                "languages": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "../model/model.v1.schema.json#/$defs/language" }
+                }
+              },
+              "required": ["step", "personId", "displayName", "languages"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_11",
+              "description": "S2-11, 'Keeps each license as added (checks off)': the person's license kept as given, with no check (MC C4; K-35, not frozen: named in words). Gives license_checked.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-11" },
+                "personId": { "$ref": "#/$defs/id" },
+                "license": { "$ref": "#/$defs/licenseAsGiven" }
+              },
+              "required": ["step", "personId", "license"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_29",
+              "description": "S2-29, 'No person license: keeps what the person adds', kept as given, or nothing (MC C4). Gives license_checked.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-29" },
+                "personId": { "$ref": "#/$defs/id" },
+                "license": { "anyOf": [{ "$ref": "#/$defs/licenseAsGiven" }, { "type": "null" }] }
+              },
+              "required": ["step", "personId", "license"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_15",
+              "description": "S2-15, 'Sets skills, who OKs what, supervision, prices' (automatic, from S2-02's answers): each person's kinds of work, supervisor and price (FS row T06). Skills, who OKs what and supervision are K-22's, staff prices K-25's (not frozen: named in words). Gives team.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-15" },
+                "people": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "title": "TeamMemberSet",
+                    "type": "object",
+                    "properties": {
+                      "personId": { "$ref": "#/$defs/id" },
+                      "kindIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/kindId" } },
+                      "supervisorPersonId": { "$ref": "#/$defs/nullableId" },
+                      "price": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+                    },
+                    "required": ["personId", "kindIds", "supervisorPersonId", "price"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["step", "people"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_27",
+              "description": "S2-27, 'Sam sets who's on call' (S2-30: some work is sent now): K-22's on call (FS staff.on_call; not frozen: named in words). Gives on_call.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-27" },
+                "onCallPersonIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+              },
+              "required": ["step", "onCallPersonIds"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_31",
+              "description": "S2-31, 'Sets nobody on call: no jobs sent now'. Gives nothing.",
+              "type": "object",
+              "properties": { "step": { "const": "S2-31" } },
+              "required": ["step"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SetupS2_24",
+              "description": "S2-24, 'Tells each person they can be booked', on the owner's yes to S2-22 ('1 Yes, all of them'; S2-23 asks again in the owner's morning list): K-22's staff status can be booked (not frozen: named in words), and one message to each person. Gives staff_live.",
+              "type": "object",
+              "properties": {
+                "step": { "const": "S2-24" },
+                "personIds": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+                "yesEventId": { "$ref": "#/$defs/id" }
+              },
+              "required": ["step", "personIds", "yesEventId"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "expectVersion", "step"],
+      "additionalProperties": false
+    },
+    "setupStepS2_05": {
+      "title": "SetupS2_05",
+      "description": "S2-05, 'Texts each person one invite', under MC C9: the person joins by texting the join link's ready text from the mobile the owner entered ('Says yes': K-29 v1 chat_links.used_at and a consent row of kind texts with its chat_link_id; K-22's status joined, named in words). A ready text from another mobile takes S2-09's wrong-number path and never joins (Q-08: 'Never: join someone on another person's word'); STOP is recordStopOrStart's (S2-08); no reply is the 48-hour clock's (S2-07). Gives nothing (S2-06 gives profile). The one setup step that rides as a core action of a turn (saveSetupStepInTurn).",
+      "type": "object",
+      "properties": {
+        "step": { "const": "S2-05" },
+        "chatLinkId": { "$ref": "#/$defs/id" },
+        "fromPhoneNumber": { "$ref": "#/$defs/phoneNumber" },
+        "eventId": {
+          "description": "The inbound text carrying the ready text (K-06).",
+          "$ref": "#/$defs/id"
+        },
+        "words": {
+          "description": "The text as received; it carries the link's short code.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["step", "chatLinkId", "fromPhoneNumber", "eventId", "words"],
+      "additionalProperties": false
+    },
+    "saveSetupStepInTurn": {
+      "title": "SaveSetupStepInTurn",
+      "description": "saveSetupStep as a core action of a turn (coreAction, gateAndCommit.request.core): only S2-05's ready text, which the actor matches by its join link's short code (S2-05; MC C9) and which is itself the person's own yes from the mobile the owner entered. Every other setup step's write in a turn is the effect code adds for the choice decide picked, so limits 1 to 6 check it at the gate (partResult; arch 02 line 121; arch 06 lines 295 to 309): a consent such as S1-25's fee_ok, S1-27's Stripe account, S1-29's terms and bill card, S2-02's team and S2-24's staff going live never ride in a turn's core (security review of T-018). The response and errors are saveSetupStep's.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "expectVersion": {
+          "description": "The chat link's version as read (limit 4: arch 06 line 305), or null.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "step": { "$ref": "#/$defs/setupStepS2_05" }
+      },
+      "required": ["caller", "expectVersion", "step"],
+      "additionalProperties": false
+    },
+    "saveSetupStep.response": {
+      "title": "SaveSetupStepResponse",
+      "description": "The step saved: the keys it gave and what it wrote.",
+      "type": "object",
+      "properties": {
+        "step": { "$ref": "#/$defs/stepId" },
+        "gives": {
+          "description": "The keys this step gives that the call wrote (A-keys.md, B-keys.md; 02-contracts section 8 names each key's home); empty for a step that gives none.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/setupKey" },
+          "uniqueItems": true
+        },
+        "branch": {
+          "description": "The branch the step took, by its label in the master, such as 'Confirmed in minutes' (S1-32) or 'A wrong number' (S2-05); null for a step with no branches.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "written": {
+          "description": "Each row written, with its version after the commit (K-05 v1 rowRef); a phone row is named by its handle id, never its number (K-08 v1 default 3).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "openQuestionId": {
+          "description": "The question the walk asks next, or null (arch 03 line 191).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "outboxRowIds": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "clockRowIds": {
+          "description": "Clock rows armed, such as S1-36's next-day reminder.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "effects": {
+          "description": "Effect rows written (K-07 v1; K-05 v1.1), such as contacts/add for each mobile saved (CQ-04).",
+          "type": "array",
+          "items": {
+            "title": "SetupEffect",
+            "type": "object",
+            "properties": {
+              "effectId": { "$ref": "#/$defs/id" },
+              "kind": { "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind" }
+            },
+            "required": ["effectId", "kind"],
+            "additionalProperties": false
+          }
+        },
+        "reviewItemId": {
+          "description": "A team review item opened (S1-03 new_work, S1-76 listing_match), or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": { "description": "true when this turn or request was saved before.", "type": "boolean" }
+      },
+      "required": [
+        "step",
+        "gives",
+        "branch",
+        "written",
+        "openQuestionId",
+        "outboxRowIds",
+        "clockRowIds",
+        "effects",
+        "reviewItemId",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "saveSetupStep.errors": {
+      "title": "SaveSetupStepErrors",
+      "description": "Refused, nothing written: saveSetupStep's errors.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        {
+          "title": "NeedsMissingError",
+          "description": "A key the step needs is not given yet (A-S1.md and A-S2.md, the needs column; FS section 6.1: each screen asks only what is missing).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "needsMissing" },
+            "step": { "$ref": "#/$defs/stepId" },
+            "missing": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/setupKey" } }
+          },
+          "required": ["error", "step", "missing"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readSetup.request": {
+      "title": "ReadSetupRequest",
+      "description": "Read where a business's setup stands: which keys of journeys 1 and 2 are given, so each screen asks only what is missing (FS section 6.1); what is live (S1-50); the one-page summary (S1-79); who can be booked where (S2-21, the portal). Served to the pages through K-21. Reads: the primary, uncached (a screen acts on it at once; arch 10 line 538). Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/caller" },
+        "businessId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["caller", "businessId"],
+      "additionalProperties": false
+    },
+    "readSetup.response": {
+      "title": "ReadSetupResponse",
+      "description": "Where the setup stands.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "K-04 v1 businesses.status (FS line 721).",
+          "type": "string",
+          "enum": ["offline", "saved", "live"]
+        },
+        "keys": {
+          "description": "Each key of journeys 1 and 2 and whether it is given (A-keys.md, B-keys.md).",
+          "type": "array",
+          "items": {
+            "title": "KeyGiven",
+            "type": "object",
+            "properties": { "key": { "$ref": "#/$defs/setupKey" }, "given": { "type": "boolean" } },
+            "required": ["key", "given"],
+            "additionalProperties": false
+          }
+        },
+        "kinds": {
+          "description": "Each kind picked, its company and whether it is live (K-24 picked_kinds; K-23 company_kinds; S1-50).",
+          "type": "array",
+          "items": {
+            "title": "KindStanding",
+            "type": "object",
+            "properties": {
+              "pickedKindId": { "$ref": "#/$defs/id" },
+              "kindId": { "anyOf": [{ "$ref": "#/$defs/kindId" }, { "type": "null" }] },
+              "companyId": { "$ref": "#/$defs/nullableId" },
+              "live": { "type": "boolean" }
+            },
+            "required": ["pickedKindId", "kindId", "companyId", "live"],
+            "additionalProperties": false
+          }
+        },
+        "team": {
+          "description": "Each person on the team, their status and whether they can be booked (S2-21; K-22's staff status, not frozen: named in words).",
+          "type": "array",
+          "items": {
+            "title": "TeamStanding",
+            "type": "object",
+            "properties": {
+              "personId": { "$ref": "#/$defs/id" },
+              "status": { "type": "string", "enum": ["invited", "joined", "stopped", "removed", "bookable"] },
+              "onCall": { "type": "boolean" }
+            },
+            "required": ["personId", "status", "onCall"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["status", "keys", "kinds", "team"],
+      "additionalProperties": false
+    },
+    "readSetup.errors": {
+      "title": "ReadSetupErrors",
+      "description": "Refused: readSetup's errors.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "buildFrontier.exchange": {
+      "title": "BuildFrontierExchange",
+      "description": "One buildFrontier request with its outcome (fixtures; the mock, C-186).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "buildFrontier" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/buildFrontier.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/buildFrontier.response" }, { "$ref": "#/$defs/buildFrontier.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "closestEntries.exchange": {
+      "title": "ClosestEntriesExchange",
+      "description": "One closestEntries request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "closestEntries" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/closestEntries.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/closestEntries.response" },
+            { "$ref": "#/$defs/closestEntries.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.exchange": {
+      "title": "GateAndCommitExchange",
+      "description": "One gateAndCommit request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "gateAndCommit" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/gateAndCommit.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "composeInput.exchange": {
+      "title": "ComposeInputExchange",
+      "description": "One composeInput request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "composeInput" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/composeInput.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/composeInput.response" }, { "$ref": "#/$defs/composeInput.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "finalizeMessage.exchange": {
+      "title": "FinalizeMessageExchange",
+      "description": "One finalizeMessage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "finalizeMessage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/finalizeMessage.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/finalizeMessage.response" },
+            { "$ref": "#/$defs/finalizeMessage.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "recordSafetyOutcome.exchange": {
+      "title": "RecordSafetyOutcomeExchange",
+      "description": "One recordSafetyOutcome request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "recordSafetyOutcome" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/recordSafetyOutcome.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/recordSafetyOutcome.response" },
+            { "$ref": "#/$defs/recordSafetyOutcome.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "releaseSafetyHold.exchange": {
+      "title": "ReleaseSafetyHoldExchange",
+      "description": "One releaseSafetyHold request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "releaseSafetyHold" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/releaseSafetyHold.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/releaseSafetyHold.response" },
+            { "$ref": "#/$defs/releaseSafetyHold.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "recordStopOrStart.exchange": {
+      "title": "RecordStopOrStartExchange",
+      "description": "One recordStopOrStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "recordStopOrStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/recordStopOrStart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/recordStopOrStart.response" },
+            { "$ref": "#/$defs/recordStopOrStart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "setRecordFlag.exchange": {
+      "title": "SetRecordFlagExchange",
+      "description": "One setRecordFlag request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "setRecordFlag" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/setRecordFlag.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/setRecordFlag.response" }, { "$ref": "#/$defs/setRecordFlag.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "handOff.exchange": {
+      "title": "HandOffExchange",
+      "description": "One handOff request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "handOff" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/handOff.request" },
+        "outcome": { "anyOf": [{ "$ref": "#/$defs/handOff.response" }, { "$ref": "#/$defs/handOff.errors" }] }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "answerHandOff.exchange": {
+      "title": "AnswerHandOffExchange",
+      "description": "One answerHandOff request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "answerHandOff" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/answerHandOff.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/answerHandOff.response" }, { "$ref": "#/$defs/answerHandOff.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "pageTeam.exchange": {
+      "title": "PageTeamExchange",
+      "description": "One pageTeam request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "pageTeam" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/pageTeam.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/pageTeam.response" }, { "$ref": "#/$defs/pageTeam.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "acknowledgePage.exchange": {
+      "title": "AcknowledgePageExchange",
+      "description": "One acknowledgePage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "acknowledgePage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/acknowledgePage.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/acknowledgePage.response" },
+            { "$ref": "#/$defs/acknowledgePage.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "openReviewItem.exchange": {
+      "title": "OpenReviewItemExchange",
+      "description": "One openReviewItem request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "openReviewItem" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/openReviewItem.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/openReviewItem.response" },
+            { "$ref": "#/$defs/openReviewItem.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "decideReviewItem.exchange": {
+      "title": "DecideReviewItemExchange",
+      "description": "One decideReviewItem request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "decideReviewItem" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/decideReviewItem.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/decideReviewItem.response" },
+            { "$ref": "#/$defs/decideReviewItem.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "enterDoor.exchange": {
+      "title": "EnterDoorExchange",
+      "description": "One enterDoor request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "enterDoor" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/enterDoor.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/enterDoor.response" }, { "$ref": "#/$defs/enterDoor.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendFixedLine.exchange": {
+      "title": "SendFixedLineExchange",
+      "description": "One sendFixedLine request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendFixedLine" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendFixedLine.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendFixedLine.response" }, { "$ref": "#/$defs/sendFixedLine.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendsFailing.exchange": {
+      "title": "SendsFailingExchange",
+      "description": "One sendsFailing request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendsFailing" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendsFailing.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendsFailing.response" }, { "$ref": "#/$defs/sendsFailing.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "textingBack.exchange": {
+      "title": "TextingBackExchange",
+      "description": "One textingBack request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "textingBack" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/textingBack.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/textingBack.response" }, { "$ref": "#/$defs/textingBack.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "calendarLinkDropped.exchange": {
+      "title": "CalendarLinkDroppedExchange",
+      "description": "One calendarLinkDropped request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarLinkDropped" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarLinkDropped.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarLinkDropped.response" },
+            { "$ref": "#/$defs/calendarLinkDropped.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "calendarLinkBack.exchange": {
+      "title": "CalendarLinkBackExchange",
+      "description": "One calendarLinkBack request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarLinkBack" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarLinkBack.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarLinkBack.response" },
+            { "$ref": "#/$defs/calendarLinkBack.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendProofCode.exchange": {
+      "title": "SendProofCodeExchange",
+      "description": "One sendProofCode request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendProofCode" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendProofCode.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendProofCode.response" }, { "$ref": "#/$defs/sendProofCode.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "proveCode.exchange": {
+      "title": "ProveCodeExchange",
+      "description": "One proveCode request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "proveCode" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/proveCode.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/proveCode.response" }, { "$ref": "#/$defs/proveCode.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "issueChatLink.exchange": {
+      "title": "IssueChatLinkExchange",
+      "description": "One issueChatLink request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "issueChatLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/issueChatLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/issueChatLink.response" }, { "$ref": "#/$defs/issueChatLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "matchKinds.exchange": {
+      "title": "MatchKindsExchange",
+      "description": "One matchKinds request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "matchKinds" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/matchKinds.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/matchKinds.response" }, { "$ref": "#/$defs/matchKinds.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "lookupListing.exchange": {
+      "title": "LookupListingExchange",
+      "description": "One lookupListing request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "lookupListing" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/lookupListing.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/lookupListing.response" }, { "$ref": "#/$defs/lookupListing.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "saveSetupStep.exchange": {
+      "title": "SaveSetupStepExchange",
+      "description": "One saveSetupStep request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "saveSetupStep" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/saveSetupStep.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/saveSetupStep.response" }, { "$ref": "#/$defs/saveSetupStep.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readSetup.exchange": {
+      "title": "ReadSetupExchange",
+      "description": "One readSetup request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readSetup" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readSetup.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readSetup.response" }, { "$ref": "#/$defs/readSetup.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
     "callName": {
-      "description": "Every call this version holds: the turn face (buildFrontier, closestEntries, gateAndCommit with plannerVerbs inside it, composeInput, finalizeMessage) and the shared core (the rest). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2).",
+      "description": "Every call v1 holds: the turn face (buildFrontier, closestEntries, gateAndCommit with plannerVerbs inside it, composeInput, finalizeMessage), the shared core, and the setup calls of journeys 1 and 2 (matchKinds, lookupListing, saveSetupStep, readSetup). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
       "type": "string",
       "enum": [
         "buildFrontier",
@@ -4025,7 +6289,11 @@
         "sendProofCode",
         "proveCode",
         "issueChatLink",
-        "plannerVerbs"
+        "plannerVerbs",
+        "matchKinds",
+        "lookupListing",
+        "saveSetupStep",
+        "readSetup"
       ]
     }
   }
