@@ -3,6 +3,7 @@
 export {
   MONEY_CLAIMS,
   checkMoneyLine,
+  checkMoneyText,
   claimHolds,
   moneyClaims,
   refusedClaims,
@@ -11,6 +12,17 @@ export {
   type MoneyLineCheck,
   type RefusalWhy,
 } from "./claims";
+export {
+  approvedMoneyLines,
+  gateMoneyText,
+  readApprovedLines,
+  recordGate,
+  sentencesOf,
+  type ApprovedMoneyLines,
+  type GateCheck,
+  type GivenSlotValue,
+  type MoneyGate,
+} from "./gate";
 export { MONEY_POINTS, moneyHome, moneyRule, type MoneyHomeContext } from "./home";
 export {
   firstFit,
