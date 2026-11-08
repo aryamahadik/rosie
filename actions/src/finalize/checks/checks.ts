@@ -12,7 +12,6 @@ import {
   filledOf,
   fixedLineWords,
   insertedWords,
-  markOut,
   optionsOf,
   ownWords,
   quotesOf,
@@ -24,11 +23,15 @@ import {
 import {
   cutInto,
   faultOr,
+  markOutIn,
   plainWordsOf,
   quoted,
   quotingOf,
+  readingOf,
+  replaceIn,
   statedBy,
   unstatedValues,
+  withoutInsertedIn,
   withoutPieces,
   type Quoting,
 } from "./values";
@@ -101,14 +104,15 @@ const UNFILLED = /\{\{[^{}]*\}\}|\{\{[^{}\s]*/g;
 
 /**
  * Every value a code-supplied fact, every slot filled, every link a link slot's value; no detail quotes a piece of a
- * filled value, and one that would still hold such a piece is the check's name alone (T-1105).
+ * filled value, and one that would still hold such a piece is the check's name alone (T-1105). Where each value stands
+ * is read in the send text before anything is taken out of it (DL-176).
  */
 export const valuesFaults: Check = (parts, context) => {
   const faults: string[] = [];
   const pieces: string[] = [];
-  const texts = sendTexts(parts);
-  for (const text of texts) {
-    const quoting = quotingOf("values", text, parts.slotValues, pieces);
+  const quotings = sendTexts(parts).map((text) => quotingOf("values", text, parts.slotValues, pieces));
+  for (const quoting of quotings) {
+    const { text } = quoting;
     for (const match of text.matchAll(/\{\{\s*([^{}:|\s]*)/g)) {
       const name = match[1] ?? "";
       const end = match.index + match[0].length;
@@ -140,11 +144,12 @@ export const valuesFaults: Check = (parts, context) => {
   const plain = plainWordsOf(context);
   const inserted = insertedWords(parts, context);
   const filled = filledOf(parts);
-  for (const text of texts) {
+  for (const quoting of quotings) {
     // Fixed lines and typed options out, each unfilled slot (its fault is named above), then every slot value, a quote
-    // at its own place only: what is left is the model's.
-    const own = markOut(withoutInserted(text, inserted).replace(UNFILLED, " "), filled, " ");
-    faults.push(...unstatedValues(own, parts, stated, plain, pieces));
+    // at its own place only: what is left is the model's, each character read where it stood in the send text, so a
+    // scan cuts into a glued value at the place the quoting found for it there.
+    const taken = replaceIn(withoutInsertedIn(readingOf(quoting.text), inserted), UNFILLED, () => " ");
+    faults.push(...unstatedValues(markOutIn(taken, filled, " "), quoting, parts, stated, plain));
   }
   return withoutPieces("values", unique(faults), pieces);
 };
