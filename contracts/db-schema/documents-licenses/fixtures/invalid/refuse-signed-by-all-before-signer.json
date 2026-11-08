@@ -1,0 +1,64 @@
+{
+  "after": ["../../services-prices/fixtures/seed-services-price-list.json"],
+  "rows": [
+    {
+      "table": "documents",
+      "values": {
+        "id": "doc-lees-wedding-party-agreement",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "business",
+        "person_id": "person-sam",
+        "kind": "agreement",
+        "title": "Standard agreement",
+        "shown_on_listing": false,
+        "origin": "built",
+        "added_at": "2026-10-19T18:20:00Z",
+        "version": 1,
+        "service_id": "svc-lees-wedding-party"
+      }
+    },
+    {
+      "table": "document_texts",
+      "values": {
+        "id": "doctext-lees-wedding-party-agreement-en",
+        "document_id": "doc-lees-wedding-party-agreement",
+        "business_id": "biz-lees-barbershop",
+        "language": "en",
+        "words": "Standard agreement: Wedding party grooming / Signed once by the business, so a customer's signature completes it / Turns on the contract step for this service",
+        "words_sha256": "c87c938e29904aa6288be132d41244a3c74e166525de939da6c7536a4fde8e17",
+        "text_version": "Lee's Barbershop standard agreement v1",
+        "made_at": "2026-10-19T18:20:00Z"
+      }
+    },
+    {
+      "table": "document_signers",
+      "values": {
+        "id": "docsigner-lees-wedding-party-sam",
+        "document_id": "doc-lees-wedding-party-agreement",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-sam",
+        "signs_as": "Owner",
+        "asked_at": "2026-10-19T18:20:00Z"
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "documents",
+    "set": {
+      "signed_by_all_at": "2026-10-19T18:22:00Z",
+      "version": 2
+    },
+    "where": {
+      "id": "doc-lees-wedding-party-agreement"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["documents_signed_by_all_once"]
+    }
+  }
+}

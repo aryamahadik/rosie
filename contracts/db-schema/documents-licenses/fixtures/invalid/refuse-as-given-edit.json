@@ -1,0 +1,22 @@
+{
+  "after": ["seed-license-as-given.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "documents",
+    "set": {
+      "number": "\\x6b33352d7365616c65642d6e756d6265722d6f74686572",
+      "version": 2
+    },
+    "where": {
+      "id": "doc-barbershop-license"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

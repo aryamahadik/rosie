@@ -1,0 +1,23 @@
+{
+  "after": ["seed-agreement-signed.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-nutrition-clinic"
+    },
+    "action": "update",
+    "table": "documents",
+    "set": {
+      "signed_by_all_at": "2026-10-20T15:30:00Z",
+      "version": 3
+    },
+    "where": {
+      "id": "doc-health-privacy-nutrition"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["documents_signed_by_all_once"]
+    }
+  }
+}

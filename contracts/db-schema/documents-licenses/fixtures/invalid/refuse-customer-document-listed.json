@@ -1,0 +1,30 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "documents",
+    "values": {
+      "id": "doc-alex-court-order",
+      "business_id": "biz-lees-barbershop",
+      "owner_kind": "customer",
+      "customer_person_id": "person-alex",
+      "person_id": "person-alex",
+      "kind": "court_order",
+      "title": "Court order",
+      "shown_on_listing": true,
+      "origin": "given",
+      "given_by_person_id": "person-alex",
+      "given_via": "secure_page",
+      "added_at": "2026-10-21T16:40:00Z"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["documents_listing_only_own_papers"]
+    }
+  }
+}
