@@ -905,7 +905,49 @@ describe("per write scope (K-05 README 'Scope'; T-191: rosie_job with the scope 
       businessId: "biz-yoga-studio",
     });
     request.writes.events.push({ ...entry, id: "log-runtime-side", businessId: null });
-    const outcome = await commitTurn(runtime, request, { now: new Date("2026-11-08T01:30:00Z") });
+    // A rosie_job client that records each statement it sends, in order, with its parameters.
+    const statements: { text: string; parameters: unknown[] }[] = [];
+    const watched = postgres(resolvePrimaryUrl(), {
+      max: 1,
+      onnotice: () => undefined,
+      debug: (_connection: number, text: string, parameters: unknown[]) => {
+        statements.push({ text, parameters });
+      },
+      connection: {
+        application_name: "rosie-t195-scope",
+        search_path: `${db.schema}, public`,
+        role: RUNTIME_ROLE,
+      },
+    });
+    let outcome: CommitTurnOutcome;
+    try {
+      outcome = await commitTurn(watched, request, { now: new Date("2026-11-08T01:30:00Z") });
+    } finally {
+      await watched.end({ timeout: 5 });
+    }
+    // The scope in force at each insert and update: the row's own business, '' (the runtime side) for none.
+    let scope = "";
+    const writes: [string, string][] = [];
+    for (const { text, parameters } of statements) {
+      if (text.includes("select set_config($1, '', true)")) {
+        scope = "";
+      } else if (text.includes("select set_config($1, $2, true)")) {
+        scope = String(parameters[1]);
+      }
+      const write = /^\s*(?:insert into|update)\s+"?([a-z_]+)"?/.exec(text);
+      if (write?.[1] !== undefined) {
+        writes.push([write[1], scope]);
+      }
+    }
+    expect(writes).toEqual([
+      ["turns", ""],
+      ["bookings", "biz-yoga-studio"],
+      ["outbox_rows", "biz-lees-barbershop"],
+      ["outbox_rows", "biz-yoga-studio"],
+      ["event_log", "biz-lees-barbershop"],
+      ["event_log", "biz-yoga-studio"],
+      ["event_log", ""],
+    ]);
     expect(committed(outcome).committed).toEqual({
       written: [{ table: "bookings", rowId: "booking-alex-workshop", version: 3 }],
       outboxRows: [
