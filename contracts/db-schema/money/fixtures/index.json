@@ -49,6 +49,14 @@
       "source": "S11-22 to S11-26; S13-55 ('With nothing paid now, it may be charged to the saved card, only with the owner's yes'; 'A charge made twice by mistake is refunded at once, without waiting for Sam'); S12-26; arch 10 line 550; RULES 3.3, 3.10; FS lines 732, 733; fixtures/v1/test-kit/shops/barber.json (Beard trim $20, the $20 fee); K-14 v1 fixtures/list-double-charge.json, refund-double-charge.json; K-07 v1 fixtures/effect-reconciliation-refund.json; K-30 v1 seed-terms-snapshot (Dee)"
     },
     {
+      "file": "seed-pay-link.json",
+      "version": "v1",
+      "table": "pay_links",
+      "expect": "accept",
+      "shows": "Rosie sends the bill, and it is paid by the link: Alex's $179 home grooming visit at his home (list|card|bill) is marked done; the bill matches the booking's price, so it goes at once (A9-04): one K-07 stripe_pay_link effect makes the payment Rosie's own pay page takes (purpose rest, pending), and one pay link to it is texted and emailed to Alex, kept only as its code's hash, with no deadline. Alex pays that evening: the payment is paid, the link ended paid, its item puts the $179 against the line, and the charge line is written from Stripe's paymentSucceeded event",
+      "source": "A9-04 ('A bill that matches the booking's price ... goes out at once with no OK'); A9-05 ('The bill goes the way the customer picked. They pay by the link'; 'Pay $125 for Visit with Riley: rosfield.com/p/a2'); A9-06; S13-55; RULES 3.2, 3.14; fixtures/v1/test-kit/shops/barber.json (flow B: home grooming visit $179, a card saved for the $89 fee, Rosie texts the bill); K-25 v1 seed-service-money-paths (way-lees-home-grooming-home); K-14 v1 payLink, pageIntent, paymentSucceeded"
+    },
+    {
       "file": "invalid/refuse-ledger-update.json",
       "version": "v1",
       "table": "ledger_lines",
@@ -111,6 +119,14 @@
       "expect": "refuse",
       "shows": "Setting Ben T.'s counted $2 to $0, after Sam questioned its bill line, is refused (no update privilege on rosfield_fees: SQLSTATE 42501); a wrong line comes off on the bill instead, as K-33's answer to the question",
       "source": "S11-66 ('Sam can question a line in the portal before the charge. A person on Rosie's team answers, and a wrong line comes off'); FEES-TERMS-DRAFT 2.12; K-33 v1 monthly_bill_lines (outcome removed); Q-22"
+    },
+    {
+      "file": "invalid/refuse-pay-link-code-read.json",
+      "version": "v1",
+      "table": "pay_links",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading the whole row of Alex's pay link is refused (its code's hash is outside the Tool API's select grant: SQLSTATE 42501); the same read of its other columns passes, and only the runtime side finds a link by its code's hash",
+      "source": "BP rule 7; K-30 v1 refuse-link-code-read.json (the same rule for secure links); K-14 v1 README 'Pay links' (the page reads the payment from Rosie's own record, never from the link)"
     }
   ]
 }

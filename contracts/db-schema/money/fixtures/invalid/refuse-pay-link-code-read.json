@@ -1,0 +1,18 @@
+{
+  "after": ["seed-pay-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "select",
+    "table": "pay_links",
+    "where": {
+      "id": "link-alex-home-grooming-bill"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

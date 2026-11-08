@@ -870,7 +870,7 @@
           "type": "bigint",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "This part, in integer minor units; a payment's items add up to its amount, which code checks (README rule 9).",
+          "description": "This part, in integer minor units; a payment's items add up to its amount, which code checks (README rule 10).",
           "source": "RULES 3.2; CQ-09"
         },
         {
@@ -1246,7 +1246,7 @@
           "type": "bigint",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "How much goes back, in integer minor units: never more than what is left of the payment, which code checks (README rule 9). For a refund through Stripe, the K-07 effect row's amount.",
+          "description": "How much goes back, in integer minor units: never more than what is left of the payment, which code checks (README rule 10). For a refund through Stripe, the K-07 effect row's amount.",
           "source": "FS line 732 (amount); A10-12; CQ-09; K-07 v1 effects.amount_cents"
         },
         {
@@ -1515,6 +1515,170 @@
           "columns": ["asked_at"],
           "where": "state = 'pending'",
           "why": "Refunds not yet back: an own-way refund the owner has not marked done, a Stripe refund still pending."
+        }
+      ],
+      "rowLevelSecurity": { "scope": "business", "column": "business_id" },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "pay_links",
+      "description": "Each pay link sent: the link to Rosie's own pay page (A6-32's rosfield.com/p/f4; A9-05's rosfield.com/p/a2) for one payment a K-07 stripe_pay_link effect made: whom it is for, where it was given, the deadline the page refuses after, and when it ended. Only a hash of its code is kept, and the page server finds the link by it on the runtime side; the payment's client secret is read from Stripe by the payment's effect (K-14 pageIntent), never from the link or the browser. One live link per payment ('one pay link, with no chasing'); one more only at the owner's word (A9-10).",
+      "source": "A6-32 ('one link to pay, with one deadline'); A9-05; A9-09; A9-10 ('Send one more link'); A9-11; A9-14; S11-26; S13-55 ('The person paying gets a pay link only for the rest ... It goes by email when their email is given, else to the customer to forward'); MC C3 (the 15-minute pay link to the AI, email and any open chat); S12-17; K-14 v1 payLink, closePayLink, pageIntent (README 'Pay links'); K-30 v1 secure_links (only a code's hash)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pay link's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the payment is for. Row-level security scopes by it.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "payment_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The payment the link pays (payments.id), held to the same business: a payment its stripe_pay_link effect made, pending until paid, closed at its deadline or replaced.",
+          "source": "K-14 v1 payLink ('the payment Rosie's own pay page takes'); A6-32"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whom it is for (persons.id): the person paying, such as the customer, or the payer for the rest, who approves nothing (RULES 3.13). Anyone with a forwarded link can pay (A9-11).",
+          "source": "RULES 3.13; S13-55; A9-11 ('Named only now: the customer forwards the link, and anyone with it can pay')"
+        },
+        {
+          "name": "given_via",
+          "type": "text[]",
+          "null": false,
+          "audience": "never",
+          "description": "Where it was given: text, email, ai (to the customer's own AI) and page; a new place is added, none removed. The texts and emails that carried it are K-04 outbox rows, with their recipients.",
+          "source": "MC C3 ('the pay link to the AI, email and any open chat'); S13-55; A6-32; K-29 v1 chat_links.given_via (the same pattern)"
+        },
+        {
+          "name": "code_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the link's code, in lowercase hex: the code itself is never kept, and this column is outside the Tool API's select grant (README rule 6).",
+          "source": "BP rule 7; K-30 v1 secure_links.code_sha256"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The deadline the page shows and refuses after: after an OK, the request's latest answer time (A6-32's clock.pay); 15 minutes for the customer's own AI's door (MC C3). Its clock row fires at it and closes the payment (K-14 closePayLink). Null: no deadline, such as a bill (A9-05).",
+          "source": "A6-32 ('It's due by the request's latest answer time'); MC C3; RULES 3.11; K-14 v1 README 'Pay links'; A9-05"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": ["customer", "owner"],
+          "description": "When it was first given.",
+          "source": "A6-32; A9-05"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it stopped working; null while it works. Set once.",
+          "source": "A6-32; A9-10"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "paid, closed (not paid by its deadline: the payment is closed, K-14 closePayLink), replaced (one more link at the owner's word: A9-10) or booking_ended. Set once, with ended_at.",
+          "source": "A6-32 ('Not paid in time'); A9-10; K-14 v1 closePayLink"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: raised when a place is added or it ends, compared and set by a commit (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "pay_links_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pay_links_payment_fk",
+          "columns": ["payment_id", "business_id"],
+          "references": { "table": "payments", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pay_links_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "pay_links_code_key",
+          "columns": ["code_sha256"],
+          "source": "A6-32 (a code finds one link)"
+        },
+        {
+          "name": "pay_links_one_live",
+          "columns": ["payment_id"],
+          "where": "ended_at is null",
+          "source": "S11-68 ('one pay link, with no chasing'); A6-32; A9-10"
+        }
+      ],
+      "checks": [
+        {
+          "name": "pay_links_given_via",
+          "expression": "cardinality(given_via) >= 1 and given_via <@ array['text', 'email', 'ai', 'page']::text[]",
+          "source": "MC C3; S13-55"
+        },
+        {
+          "name": "pay_links_code_hash_form",
+          "expression": "code_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7; K-30 v1 secure_links_code_hash_form"
+        },
+        {
+          "name": "pay_links_ended",
+          "expression": "(ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('paid', 'closed', 'replaced', 'booking_ended')) and (ended_at is null or ended_at >= sent_at)",
+          "source": "A6-32; A9-10"
+        },
+        {
+          "name": "pay_links_due_after_sent",
+          "expression": "due_at is null or due_at > sent_at",
+          "source": "A6-32; MC C3"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pay_links_payment_idx",
+          "columns": ["payment_id"],
+          "why": "A payment's links: the live one the page and the clock row read, and those it replaced (A9-10)."
         }
       ],
       "rowLevelSecurity": { "scope": "business", "column": "business_id" },
@@ -1949,7 +2113,7 @@
           "type": "bigint",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "The fee the customer agreed to, in integer minor units: the booking's one fee, the largest of its open lines' fees, or a deposit service's deposit when it has none (K-30 booking_lines.fee_cents); out of what was paid now, never more than that (README rule 9).",
+          "description": "The fee the customer agreed to, in integer minor units: the booking's one fee, the largest of its open lines' fees, or a deposit service's deposit when it has none (K-30 booking_lines.fee_cents); out of what was paid now, never more than that (README rule 10).",
           "source": "FS line 733 (amount); S13-55 ('One late-cancel and no-show fee per booking ... the largest counts'; 'its deposit is the fee'; 'never more than what was paid now'); RULES 3.3; CQ-09"
         },
         {
