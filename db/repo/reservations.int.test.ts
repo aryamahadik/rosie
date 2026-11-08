@@ -1,8 +1,10 @@
 // T-187: reservations and class seats against local PostgreSQL
 // (`npm run db:up`; `npm run test:integration -- db/repo/reservations`). The schema comes from migrating a fresh test schema.
 import { readFileSync } from "node:fs";
+import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createResource } from "./bookings-head";
+import { createClient, resolvePrimaryUrl } from "./client";
 import {
   createClassSeats,
   getClassSeats,
@@ -831,7 +833,7 @@ describe("release", () => {
       heldUntil: "2026-11-07T15:15:00Z",
     });
     expect(
-      await release(db.sql, { ...base, reservationId: "nope", expectVersion: null, why: "let_go" }),
+      await release(db.sql, { ...base, reservationId: "nope", expectVersion: 1, why: "let_go" }),
     ).toEqual({
       error: "notFound",
       table: "reservations",
@@ -1027,4 +1029,188 @@ describe("release", () => {
     });
     expect(scope).toBe("biz-lees-barbershop");
   });
+
+  it("a let go or a cancel with no version is refused before any write; null is only for the clock's expiry", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    const held = await reserve(db.sql, request({ reservationId: "needs-version" }));
+    expect(held).toMatchObject({ result: "held", version: 1 });
+    for (const why of ["let_go", "cancelled"] as const) {
+      await expect(
+        release(db.sql, {
+          reservationId: "needs-version",
+          businessId: "biz-lees-barbershop",
+          expectVersion: null,
+          why,
+          at: "2026-11-07T15:06:00Z",
+        }),
+      ).rejects.toThrow(TypeError);
+    }
+    expect(await getReservation(db.sql, "needs-version")).toMatchObject({ state: "held", version: 1 });
+    // The clock's expiry still takes null.
+    expect(
+      await release(db.sql, {
+        reservationId: "needs-version",
+        businessId: "biz-lees-barbershop",
+        expectVersion: null,
+        why: "expired",
+        at: "2026-11-07T15:15:00Z",
+      }),
+    ).toMatchObject({ result: "released", why: "expired", repeated: false });
+  });
+});
+
+describe("a repeat answers before the resource is looked at", () => {
+  it("the same reserve again answers repeated after its resource went inactive; another request is idConflict", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    const first = request({ reservationId: "repeat-first" });
+    expect(await reserve(db.sql, first)).toMatchObject({ result: "held", repeated: false });
+    await db.sql`update resources set active = false, version = version + 1 where id = 'res-riley'`;
+    expect(await reserve(db.sql, first)).toMatchObject({ result: "held", repeated: true });
+    expect(
+      await reserve(db.sql, {
+        ...first,
+        during: { start: "2026-12-02T16:00:00Z", end: "2026-12-02T16:30:00Z" },
+      }),
+    ).toEqual({ error: "idConflict", reservationId: "repeat-first" });
+    expect(await reserve(db.sql, request({ reservationId: "repeat-other" }))).toEqual({
+      error: "notBookable",
+      resourceId: "res-riley",
+    });
+    await db.sql`update resources set active = true, version = version + 1 where id = 'res-riley'`;
+  });
+});
+
+describe("a lost connection answers transient, writes nothing, and the same request then succeeds (K-05 README line 46)", () => {
+  const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+  interface Killed<T> {
+    answer: T;
+    victim: ReturnType<typeof createClient>;
+  }
+
+  /**
+   * Runs `call` on its own one-connection client while another connection holds the slot's advisory lock (the one
+   * lockSlot takes), waits until the call's backend waits on that lock, cuts it with pg_terminate_backend from a third
+   * connection, and returns the call's answer with the killed client for the resend.
+   */
+  async function killWhileWaitingOnSlot<T>(call: (sql: Sql) => Promise<T>): Promise<Killed<T>> {
+    const url = resolvePrimaryUrl();
+    const holder = postgres(url, { max: 1, onnotice: () => undefined });
+    const killer = postgres(url, { max: 1, onnotice: () => undefined });
+    const victim = createClient({ primaryUrl: url, schema: db.schema, max: 1 });
+    try {
+      let letGo: () => void = () => undefined;
+      const hold = new Promise<void>((resolve) => {
+        letGo = resolve;
+      });
+      let locked: () => void = () => undefined;
+      const isLocked = new Promise<void>((resolve) => {
+        locked = resolve;
+      });
+      const holding = holder.begin(async (tx) => {
+        await tx`select pg_advisory_xact_lock(hashtextextended(${"resource:res-riley"}, 0))`;
+        locked();
+        await hold;
+      });
+      await isLocked;
+
+      const [backend] = await victim.primary<{ pid: number }[]>`select pg_backend_pid() as pid`;
+      const pid = backend?.pid ?? 0;
+      const answering = call(victim.primary);
+      let waiting = false;
+      for (let attempt = 0; attempt < 100 && !waiting; attempt += 1) {
+        const [state] = await killer<{ waiting: boolean }[]>`
+          select (wait_event_type = 'Lock') as waiting from pg_stat_activity where pid = ${pid}
+        `;
+        waiting = state?.waiting === true;
+        if (!waiting) {
+          await sleep(50);
+        }
+      }
+      expect(waiting).toBe(true);
+      await killer`select pg_terminate_backend(${pid})`;
+      const answer = await answering;
+      letGo();
+      await holding;
+      return { answer, victim };
+    } catch (error) {
+      await victim.close();
+      throw error;
+    } finally {
+      await killer.end({ timeout: 5 });
+      await holder.end({ timeout: 5 });
+    }
+  }
+
+  /** The same request again on the killed client: at most one stale transient (postgres.js keeps the killed query's FATAL). */
+  async function resend<T>(call: (sql: Sql) => Promise<T>, victim: Killed<T>["victim"]): Promise<T[]> {
+    const answers: T[] = [];
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const again = await call(victim.primary);
+      answers.push(again);
+      if ((again as { error?: string }).error !== "transient") {
+        break;
+      }
+    }
+    return answers;
+  }
+
+  const lostConnection = /^(08[0-9A-Z]{3}|57P0[123])$/;
+
+  it("reserve() waiting on the slot lock, its backend terminated, answers transient and writes nothing; the same request then holds the time", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    const asked = request({ reservationId: "killed-reserve" });
+    const { answer, victim } = await killWhileWaitingOnSlot((sql) => reserve(sql, asked));
+    try {
+      expect(answer).toMatchObject({ error: "transient" });
+      expect((answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+      expect(await getReservation(db.sql, "killed-reserve")).toBeNull();
+      const answers = await resend((sql) => reserve(sql, asked), victim);
+      expect(answers.length).toBeLessThanOrEqual(2);
+      for (const stale of answers.slice(0, -1)) {
+        expect(stale).toMatchObject({ error: "transient" });
+      }
+      expect(answers.at(-1)).toMatchObject({
+        result: "held",
+        reservationId: "killed-reserve",
+        repeated: false,
+      });
+      expect(await getReservation(db.sql, "killed-reserve")).toMatchObject({ state: "held", version: 1 });
+    } finally {
+      await victim.close();
+    }
+  }, 30_000);
+
+  it("release() waiting on the slot lock, its backend terminated, answers transient and writes nothing; the same request then releases", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    expect(await reserve(db.sql, request({ reservationId: "killed-release" }))).toMatchObject({
+      result: "held",
+    });
+    const asked = {
+      reservationId: "killed-release",
+      businessId: "biz-lees-barbershop",
+      expectVersion: 1,
+      why: "let_go" as const,
+      at: "2026-11-07T15:06:00Z",
+    };
+    const { answer, victim } = await killWhileWaitingOnSlot((sql) => release(sql, asked));
+    try {
+      expect(answer).toMatchObject({ error: "transient" });
+      expect((answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+      expect(await getReservation(db.sql, "killed-release")).toMatchObject({ state: "held", version: 1 });
+      const answers = await resend((sql) => release(sql, asked), victim);
+      expect(answers.length).toBeLessThanOrEqual(2);
+      for (const stale of answers.slice(0, -1)) {
+        expect(stale).toMatchObject({ error: "transient" });
+      }
+      expect(answers.at(-1)).toMatchObject({ result: "released", version: 2, repeated: false });
+      expect(await getReservation(db.sql, "killed-release")).toMatchObject({ state: "released", version: 2 });
+    } finally {
+      await victim.close();
+    }
+  }, 30_000);
 });

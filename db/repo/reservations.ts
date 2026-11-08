@@ -4,16 +4,20 @@
 // (EXCLUDE, 23P01), and a class session's seat counter cannot pass its capacity (CHECK, 23514). reserve() writes the row
 // and reads the refusal; it never checks for a free slot first, so two parallel calls cannot both pass.
 //
-// Both calls run under the reservation's business (withBusiness; row-level security itself is T-191's). Every row update
-// raises the version by one (trigger from 0002).
+// Both calls run under the reservation's business (the scope set inside their own transaction; row-level security itself
+// is T-191's). Their transaction is lost-connection safe (inScopedTransaction): a lost connection answers transient with
+// no rollback written to the dead connection. Every row update raises the version by one (trigger from 0002).
 //
 // Left to later tasks, as the card says: the saved-time clock row (no clock_rows table exists yet, so the answer names
 // its id, `<reservation id>/saved-time`, and writes nothing), the cap lookup through an unscoped database function (T-191,
 // when row-level security would hide other businesses' rows), the one extension (extend) and the commit's confirm.
-import { withBusiness } from "./scope";
+import { isLostConnection } from "./bundles";
+import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
 
 type Db = Sql | Tx;
+/** A transaction's connection: postgres.js's own Tx, or the reserved connection inScopedTransaction runs on. */
+type Conn = Db;
 
 export type ReservationState = "held" | "waiting" | "booked" | "released";
 export type ReleaseWhy = "expired" | "let_go" | "cancelled";
@@ -235,10 +239,91 @@ function savedForColumns(who: SavedFor): {
 }
 
 const transientCodes = new Set(["40001", "40P01"]);
+const LOST_CONNECTION_SQLSTATE = "08006";
 
 function sqlstateOf(error: unknown): { code: string | undefined; constraint: string | undefined } {
   const failure = error as { code?: string; constraint_name?: string };
   return { code: failure.code, constraint: failure.constraint_name };
+}
+
+/**
+ * The transient answer for a serialization failure, a deadlock or a lost connection (K-05 README: nothing was written,
+ * the same request may be sent again); any other error is thrown. The answer carries only a SQLSTATE: a lost connection
+ * with no SQLSTATE of its own (postgres.js CONNECTION_*, ECONNRESET, EPIPE, ETIMEDOUT) is 08006.
+ */
+function transientOrThrow(error: unknown): { error: "transient"; sqlstate: string } {
+  const { code } = sqlstateOf(error);
+  if (code !== undefined && transientCodes.has(code)) {
+    return { error: "transient", sqlstate: code };
+  }
+  if (isLostConnection(error)) {
+    const own = code !== undefined && /^(08[0-9A-Z]{3}|57P0[123])$/.test(code);
+    return { error: "transient", sqlstate: own ? code : LOST_CONNECTION_SQLSTATE };
+  }
+  throw error;
+}
+
+let savepointCount = 0;
+
+/**
+ * Runs `fn` inside a savepoint of the open transaction (the reserved connection has no `savepoint` method of its own):
+ * on a failure the savepoint is rolled back, so the transaction can go on; on a lost connection nothing is written to
+ * the dead connection.
+ */
+async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
+  savepointCount += 1;
+  const name = `rosie_sp_${String(savepointCount)}`;
+  await tx.unsafe(`savepoint ${name}`);
+  try {
+    const result = await fn();
+    await tx.unsafe(`release savepoint ${name}`);
+    return result;
+  } catch (error) {
+    if (!isLostConnection(error)) {
+      await tx.unsafe(`rollback to savepoint ${name}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * One transaction on one reserved connection, scoped to `businessId` (set_config inside it, is_local), read committed
+ * like sql.begin. postgres.js's own `begin` writes a `rollback` to a connection that is gone, from a timer outside any
+ * promise (T-185), so a lost connection is rethrown here without a rollback (the server rolled the transaction back when
+ * the backend went) and is never released (postgres.js 3.4.9 would put it back in the open queue). The same pre-probe as
+ * bundles.ts takes the stale error a killed connection keeps, by an ordinary query, before a connection is reserved.
+ */
+async function inScopedTransaction<T>(
+  sql: Sql,
+  businessId: string,
+  fn: (tx: Conn) => Promise<T>,
+): Promise<T> {
+  assertBusinessId(businessId);
+  await sql`select 1`;
+  const reserved = await sql.reserve();
+  let lost = false;
+  try {
+    await reserved`begin`;
+    let result: T;
+    try {
+      await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
+      result = await fn(reserved);
+    } catch (error) {
+      if (!isLostConnection(error)) {
+        await reserved`rollback`;
+      }
+      throw error;
+    }
+    await reserved`commit`;
+    return result;
+  } catch (error) {
+    lost = isLostConnection(error);
+    throw error;
+  } finally {
+    if (!lost) {
+      reserved.release();
+    }
+  }
 }
 
 // ---- reads and set-up ---------------------------------------------------------------------------------------------
@@ -303,7 +388,7 @@ interface SavedRow {
  * deadlock by failing one of them (40P01) after a second. Every call that writes a held row takes it first, before any
  * phones or token lock, so the order is the same everywhere.
  */
-async function lockSlot(tx: Tx, resourceId: string, personId: string | null): Promise<void> {
+async function lockSlot(tx: Conn, resourceId: string, personId: string | null): Promise<void> {
   const keys = [`resource:${resourceId}`, ...(personId === null ? [] : [`person:${personId}`])].sort();
   for (const key of keys) {
     await tx`select pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
@@ -316,7 +401,12 @@ async function lockSlot(tx: Tx, resourceId: string, personId: string | null): Pr
  * business. An agent token (it has no row): a transaction-level advisory lock on the business and the token, counted at
  * that business. A booking: no cap. Waiting rows never count (A4-18).
  */
-async function lockAndListSaved(tx: Tx, who: SavedFor, businessId: string, at: string): Promise<SavedRow[]> {
+async function lockAndListSaved(
+  tx: Conn,
+  who: SavedFor,
+  businessId: string,
+  at: string,
+): Promise<SavedRow[]> {
   const columns = savedForColumns(who);
   if (columns.phone !== null) {
     await tx`select 1 from phones where number = ${columns.phone} for update`;
@@ -398,7 +488,7 @@ class Refused extends Error {
 }
 
 async function insertReservation(
-  tx: Tx,
+  tx: Conn,
   request: ReserveRequest,
   resource: ResourceRow,
   state: "held" | "waiting",
@@ -426,7 +516,7 @@ async function insertReservation(
 }
 
 /** Whether a booked time already covers the asked one, for the resource or, for a worker, the person at any business. */
-async function bookedOverlap(tx: Tx, request: ReserveRequest, resource: ResourceRow): Promise<boolean> {
+async function bookedOverlap(tx: Conn, request: ReserveRequest, resource: ResourceRow): Promise<boolean> {
   const rows = await tx`
     select 1 from reservations
     where state = 'booked'
@@ -441,8 +531,15 @@ async function bookedOverlap(tx: Tx, request: ReserveRequest, resource: Resource
  * Saves a resource's time inside the transaction `tx`, which the caller scoped to the request's business.
  * Prefer reserve(); this is for a caller that already holds a transaction.
  */
-export async function reserveIn(tx: Tx, request: ReserveRequest): Promise<ReserveOutcome> {
+export async function reserveIn(tx: Conn, request: ReserveRequest): Promise<ReserveOutcome> {
   const minutes = validateReserve(request);
+
+  // The same reservation id with the same request answers its outcome again, whatever has changed about the resource
+  // since (K-05 README item 8, and the table of repeats: "Safe").
+  const known = await getReservation(tx, request.reservationId);
+  if (known !== null) {
+    return repeatOutcome(known, request);
+  }
 
   const [resource] = await tx<ResourceRow[]>`
     select id, business_id, kind, person_id, active from resources where id = ${request.resourceId}
@@ -478,9 +575,9 @@ export async function reserveIn(tx: Tx, request: ReserveRequest): Promise<Reserv
 
   try {
     if (resource.kind === "class_session") {
-      return await tx.savepoint(async (sp) => {
-        const row = await insertReservation(sp, request, resource, "held", minutes);
-        const bumped = await sp`
+      return await inSavepoint(tx, async () => {
+        const row = await insertReservation(tx, request, resource, "held", minutes);
+        const bumped = await tx`
           update class_seats set taken = taken + ${request.seats}, version = version + 1
           where resource_id = ${resource.id} and business_id = ${request.businessId}
           returning resource_id
@@ -491,8 +588,8 @@ export async function reserveIn(tx: Tx, request: ReserveRequest): Promise<Reserv
         return heldOutcome(row, false);
       });
     }
-    return await tx.savepoint(async (sp) =>
-      heldOutcome(await insertReservation(sp, request, resource, "held", minutes), false),
+    return await inSavepoint(tx, async () =>
+      heldOutcome(await insertReservation(tx, request, resource, "held", minutes), false),
     );
   } catch (error) {
     if (error instanceof Refused) {
@@ -520,7 +617,7 @@ export async function reserveIn(tx: Tx, request: ReserveRequest): Promise<Reserv
         return { error: "overlap", resourceId: request.resourceId };
       }
       // Someone has saved the time: wait next in line (A4-18), place in line is `at`.
-      const waiting = await tx.savepoint((sp) => insertReservation(sp, request, resource, "waiting", 0));
+      const waiting = await inSavepoint(tx, () => insertReservation(tx, request, resource, "waiting", 0));
       return {
         result: "waiting",
         reservationId: waiting.id,
@@ -539,13 +636,9 @@ export async function reserveIn(tx: Tx, request: ReserveRequest): Promise<Reserv
 export async function reserve(sql: Sql, request: ReserveRequest): Promise<ReserveOutcome> {
   validateReserve(request);
   try {
-    return await withBusiness(sql, request.businessId, (tx) => reserveIn(tx, request));
+    return await inScopedTransaction(sql, request.businessId, (tx) => reserveIn(tx, request));
   } catch (error) {
-    const { code } = sqlstateOf(error);
-    if (code !== undefined && transientCodes.has(code)) {
-      return { error: "transient", sqlstate: code };
-    }
-    throw error;
+    return transientOrThrow(error);
   }
 }
 
@@ -557,12 +650,16 @@ export async function reserve(sql: Sql, request: ReserveRequest): Promise<Reserv
  * line (K-05 README item 9): the waiting rows of the same resource whose time overlaps, earliest queued_at first, a tie to
  * the lower id; the first one that can be held is promoted, and the ones passed over are named.
  */
-export async function releaseIn(tx: Tx, request: ReleaseRequest): Promise<ReleaseOutcome> {
+export async function releaseIn(tx: Conn, request: ReleaseRequest): Promise<ReleaseOutcome> {
   assertUtc(request.at, "at");
-  if (
-    request.expectVersion !== null &&
-    (!Number.isSafeInteger(request.expectVersion) || request.expectVersion < 1)
-  ) {
+  if (request.expectVersion === null) {
+    // null is only for the clock's expiry (K-05 README item 9); a let go or a cancel always compares the version.
+    if (request.why !== "expired") {
+      throw new TypeError(
+        `a ${request.why} release needs the version read (null is only for the clock's expiry)`,
+      );
+    }
+  } else if (!Number.isSafeInteger(request.expectVersion) || request.expectVersion < 1) {
     throw new TypeError("expectVersion is a positive integer or null");
   }
   // The slot's lock first (as reserve takes it), then the row's: see lockSlot.
@@ -658,13 +755,13 @@ export async function releaseIn(tx: Tx, request: ReleaseRequest): Promise<Releas
         continue;
       }
       try {
-        const held = await tx.savepoint(async (sp) => {
-          const [row] = await sp<ReservationRow[]>`
+        const held = await inSavepoint(tx, async () => {
+          const [row] = await tx<ReservationRow[]>`
             update reservations
             set state = 'held', version = ${waiting.version + 1},
                 held_until = ${request.at}::timestamptz + make_interval(mins => ${STANDARD_HOLD_MINUTES})
             where id = ${waiting.id}
-            returning ${sp.unsafe(RESERVATION_COLUMNS)}
+            returning ${tx.unsafe(RESERVATION_COLUMNS)}
           `;
           if (row === undefined) {
             throw new Error("update of reservations returned no row");
@@ -705,12 +802,8 @@ export async function releaseIn(tx: Tx, request: ReleaseRequest): Promise<Releas
 /** Releases a reservation in one transaction under the request's business, promoting the next in line. */
 export async function release(sql: Sql, request: ReleaseRequest): Promise<ReleaseOutcome> {
   try {
-    return await withBusiness(sql, request.businessId, (tx) => releaseIn(tx, request));
+    return await inScopedTransaction(sql, request.businessId, (tx) => releaseIn(tx, request));
   } catch (error) {
-    const { code } = sqlstateOf(error);
-    if (code !== undefined && transientCodes.has(code)) {
-      return { error: "transient", sqlstate: code };
-    }
-    throw error;
+    return transientOrThrow(error);
   }
 }
