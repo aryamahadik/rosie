@@ -1,0 +1,411 @@
+// The turn loop inside the real actor (T-251), run inside the Workers runtime: each text goes through the gateway's door,
+// the real safety read on arrival (its double answers the K-02 safety fixtures), the real batch window, the real turn
+// lease (T-248, with the holds and unread texts of T-1088) and the real bundle pin (T-249, bundle v0 active), whose
+// `runTurn` and commit hook are the turn loop's own (`turnHooks`). Doubles: the turn's ports (./test-support.ts) answering
+// the K-09 and K-02 fixtures with the running turn's own ids (the lease hashes the turn id from the event ids, CQ-09; the
+// trace id is the text's), the safety read's doubles (src/safety/test-support.ts), K-05's bundle reads
+// (src/bundle/test-support.ts), K-05 v1.2's targets for the guard, and T-267's shared-core double for a STOP. Spans are
+// read from the log lines (one JSON line each, ADR-009). Test method: T-1128's. Test values only (rule 9).
+import { reset, runDurableObjectAlarm } from "cloudflare:test";
+import { exports } from "cloudflare:workers";
+import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
+
+import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
+import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
+import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
+import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
+import {
+  setBatchHooks,
+  setBundleDeps,
+  setLeaseHooks,
+  setSafetyDeps,
+  turnIdOf,
+  type HandleActor,
+  type HoldEntry,
+  type TurnEntry,
+} from "../actor";
+import { BUNDLE_A, fakeBundles } from "../bundle/test-support";
+import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../gateway";
+import { fakeKeyStore } from "../gateway/test-support";
+import { setGuardDeps, setReplyDeps } from "../guard";
+import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../guard/replies/test-support";
+import { fakeTargets } from "../guard/test-support";
+import { harness, type Harness } from "../safety/test-support";
+import type { SafetyResult } from "../safety/types";
+import { spanProblems } from "../trace";
+import { setTurnDeps, turnHooks, turnReplyCore } from "./index";
+import {
+  BEN,
+  SAM,
+  SAM_S1_02_TARGETS,
+  decided,
+  fakeDecide,
+  fakeFacts,
+  fakeTurnFace,
+  retarget,
+  safetyNoFor,
+  storedText,
+  targetsAnswer,
+  turnDeps,
+  until,
+  type FakeDecide,
+  type FakeTurnFace,
+} from "./test-support";
+import type { BuildFrontierRequest, DecideContext, GateAndCommitRequest, TurnParty } from "./types";
+
+type Json = Record<string, unknown>;
+
+const TRACE = "11111111-2222-4333-8444-555555555555";
+const keys = fakeKeyStore();
+
+type Namespace = DurableObjectNamespace<HandleActor>;
+
+function namespace(): Namespace {
+  return (exports as unknown as { HandleActor: Namespace }).HandleActor;
+}
+
+function door(): ReturnType<typeof durableObjectActor> {
+  const ns = namespace();
+  const adapter: ActorNamespace<DurableObjectId> = {
+    idFromName: (name) => ns.idFromName(name),
+    get: (id): HandleActorRpc => ns.get(id),
+  };
+  return durableObjectActor(adapter);
+}
+
+interface Party {
+  handle: (typeof SAM)["handle"];
+  party: TurnParty;
+}
+
+/** The actor's reads over RPC, typed here. */
+interface ActorRpc {
+  readTurns(): Promise<TurnEntry[]>;
+  readWaitingBatches(): Promise<number[]>;
+  readHolds(): Promise<HoldEntry[]>;
+  safetyIdle(): Promise<void>;
+  batchIdle(): Promise<void>;
+}
+
+function stubOf(who: Party): DurableObjectStub<HandleActor> {
+  return namespace().get(namespace().idFromName(actorNameOf(who.handle)));
+}
+
+const actorOf = (who: Party): ActorRpc => stubOf(who);
+
+/** A text arrives through the gateway's door: K-06's text, sealed under the handle's key, as the gateway hands it. */
+async function arrive(who: Party, eventId: string, body: string, sentAt: string): Promise<void> {
+  const entry = await storedText({ eventId, body, sentAt, traceId: TRACE }, who.handle, keys, BUNDLE_A, 0);
+  const handoff = {
+    event: entry.event,
+    partKey: null,
+    traceId: TRACE,
+    bundleId: { hash: "a".repeat(64), build: 1 },
+    actorName: actorNameOf(who.handle),
+  };
+  expect(await door().accept(handoff)).toBe("written");
+}
+
+interface Run {
+  h: Harness;
+  face: FakeTurnFace;
+  ai: FakeDecide;
+  /** The fake clock moves, then the alarm runs, as the platform would at the stored time. */
+  tick(ms: number): Promise<void>;
+  /** Settles the safety work, the batch work and the turns' work. */
+  settle(): Promise<void>;
+  actor: ActorRpc;
+}
+
+async function withTurnLoop(
+  who: Party,
+  answers: Record<string, SafetyResult>,
+  times: string[],
+  body: (run: Run) => Promise<void>,
+): Promise<void> {
+  const h = harness(keys, answers);
+  const face = fakeTurnFace();
+  const ai = fakeDecide(face.log);
+  const facts = fakeFacts(who.party, times);
+  for (const [eventId, result] of Object.entries(answers)) facts.safety.set(eventId, result);
+  const targets = fakeTargets();
+  targets.answers.set(who.party.handleId, targetsAnswer(who.party.handleId, SAM_S1_02_TARGETS));
+  const restores = [
+    setSafetyDeps(h.deps),
+    setBatchHooks({ clock: h.clock }),
+    setLeaseHooks(turnHooks),
+    setBundleDeps(fakeBundles().deps),
+    setTurnDeps(turnDeps(facts, face, ai, keys)),
+    setGuardDeps({ targets: targets.port }),
+  ];
+  const run: Run = {
+    h,
+    face,
+    ai,
+    actor: actorOf(who),
+    async tick(ms) {
+      await h.clock.advance(ms);
+      await runDurableObjectAlarm(stubOf(who));
+    },
+    async settle() {
+      await actorOf(who).safetyIdle();
+      await actorOf(who).batchIdle();
+    },
+  };
+  try {
+    await body(run);
+  } finally {
+    restores.reverse().forEach((restore) => {
+      restore();
+    });
+  }
+}
+
+/** A fixture with the running turn's own turn id in place of the fixture's. */
+const forTurn = <T>(value: T, from: string, to: string): T =>
+  retarget(value, { turnId: [from, to], traceId: [TRACE, TRACE] });
+
+const S1_02 = "turn-s1-02-sam-kinds";
+
+/** The S1-02 fixtures, answering for whichever turn asks: the frontier, decide and the gate. */
+function answerS102(run: Run): void {
+  run.face.frontier = (request: BuildFrontierRequest) =>
+    forTurn(buildFrontierS102.outcome, S1_02, request.turn.id);
+  run.ai.decide = (context: DecideContext) => decided(forTurn(decideS102, S1_02, context.turnId));
+  run.face.gate = (request: GateAndCommitRequest) =>
+    forTurn(commitS102.outcome, S1_02, request.turn.id) as never;
+}
+
+const LINE_FIELDS = new Set(["level", "msg", "environment", "version"]);
+
+/** The spans logged so far: each log line whose msg is "span", as K-08's span (ADR-009's line fields left out). */
+function spansOf(log: MockInstance): Json[] {
+  return log.mock.calls
+    .map((call) => JSON.parse(String(call[0])) as Json)
+    .filter((line) => line.msg === "span")
+    .map((line) => Object.fromEntries(Object.entries(line).filter(([key]) => !LINE_FIELDS.has(key))));
+}
+
+afterEach(async () => {
+  vi.restoreAllMocks();
+  await reset();
+});
+
+describe("the turn loop as the lease's turn", () => {
+  it("inside the lease, Sam's answer to S1-02 commits commit-s1-02.json's request under the turn's own id, with the lease's CommitContext", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    await withTurnLoop(
+      SAM,
+      { "evt-sam-0001": safetyNoFor("evt-sam-0001") },
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        answerS102(run);
+        await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+        await run.tick(3000);
+        await run.settle();
+
+        const turnId = await turnIdOf(["evt-sam-0001"]);
+        const ids = {
+          turnId: [S1_02, turnId] as [string, string],
+          traceId: ["trace-sam-0001", TRACE] as [string, string],
+        };
+        expect(run.face.frontierCalls).toEqual([retarget(buildFrontierS102.request, ids)]);
+        expect(run.face.gateCalls.map((call) => call.request)).toEqual([retarget(commitS102.request, ids)]);
+        // The lease's own CommitContext, read at commit time: no hold open, no text unread.
+        expect(run.face.gateCalls[0]?.at).toEqual({ holds: [], unread: [] });
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ["evt-sam-0001"],
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+
+        // Every span of the turn carries its turn id and the pinned bundle id, passes K-08, and no line holds the words.
+        const spans = spansOf(log).filter((span) => span.turn_id === turnId);
+        expect(spans.map((span) => span.hop)).toEqual([
+          "lease",
+          "guard",
+          "frontier",
+          "decideReads",
+          "gate",
+          "commit",
+        ]);
+        for (const span of spans) {
+          expect(spanProblems(span)).toEqual([]);
+          expect(span.bundle_id).toEqual(BUNDLE_A);
+          expect(span.trace_id).toBe(TRACE);
+        }
+        const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
+        for (const words of ["Barbershop, plumbing, electrical", "+15555550100", "Sam Lee"]) {
+          expect(lines).not.toContain(words);
+        }
+      },
+    );
+  });
+
+  it("one turn at a time: a second batch for the handle waits until this turn commits, then opens the next turn", async () => {
+    await withTurnLoop(
+      SAM,
+      { "evt-sam-0001": safetyNoFor("evt-sam-0001"), "evt-sam-0002": safetyNoFor("evt-sam-0002") },
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        answerS102(run);
+        run.face.gateHold.closed = true;
+        await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+        await run.tick(3000);
+        await until(() => run.face.gateCalls.length === 1, "the first turn's commit");
+        const first = await turnIdOf(["evt-sam-0001"]);
+        expect(await run.actor.readTurns()).toMatchObject([{ turnId: first, state: "committing" }]);
+
+        // A second batch closes while the first turn's commit is out: it waits, and no second turn runs.
+        await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:03Z");
+        await run.tick(3000);
+        expect(await run.actor.readWaitingBatches()).toHaveLength(1);
+        expect(await run.actor.readTurns()).toMatchObject([{ turnId: first, state: "committing" }]);
+        expect(run.face.frontierCalls).toHaveLength(1);
+        expect(run.face.log).toEqual(["frontier", "decide", "gate"]);
+
+        // The commit answers: the lease is released, and the waiting batch opens the next turn, which commits in turn.
+        run.face.gateHold.closed = false;
+        await until(() => run.face.gateCalls.length === 2, "the second turn's commit");
+        await run.settle();
+        const second = await turnIdOf(["evt-sam-0002"]);
+        expect(run.face.log).toEqual([
+          "frontier",
+          "decide",
+          "gate",
+          "gate:answered",
+          "frontier",
+          "decide",
+          "gate",
+          "gate:answered",
+        ]);
+        expect(run.face.frontierCalls[1]?.turn.eventIds).toEqual(["evt-sam-0002"]);
+        expect(await run.actor.readTurns()).toMatchObject([
+          { turnId: first, state: "committed" },
+          { turnId: second, eventIds: ["evt-sam-0002"], state: "committed", restart: false },
+        ]);
+        expect(await run.actor.readWaitingBatches()).toEqual([]);
+      },
+    );
+  });
+
+  it("a text before the commit restarts the turn once through the lease: the replaced run never reaches the gate, and the restart commits both texts once", async () => {
+    await withTurnLoop(
+      SAM,
+      { "evt-sam-0001": safetyNoFor("evt-sam-0001"), "evt-sam-0002": safetyNoFor("evt-sam-0002") },
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        answerS102(run);
+        run.ai.decideHold.closed = true;
+        await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+        await run.tick(3000);
+        await until(() => run.ai.decideCalls.length === 1, "the first run's decide");
+
+        await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:03Z");
+        await run.tick(3000);
+        await until(() => run.ai.decideCalls.length === 2, "the restart's decide");
+        run.ai.decideHold.closed = false;
+        await until(() => run.face.gateCalls.length === 1, "the restart's commit");
+        await run.settle();
+
+        const first = await turnIdOf(["evt-sam-0001"]);
+        const restart = await turnIdOf(["evt-sam-0001", "evt-sam-0002"]);
+        expect(run.face.gateCalls.map((call) => call.request.turn.id)).toEqual([restart]);
+        expect(run.face.gateCalls[0]?.request.turn.eventIds).toEqual(["evt-sam-0001", "evt-sam-0002"]);
+        expect(run.face.frontierCalls.map((request) => request.turn.id)).toEqual([first, restart]);
+        expect(await run.actor.readTurns()).toMatchObject([
+          { turnId: first, state: "replaced" },
+          { turnId: restart, state: "committed", restart: true },
+        ]);
+      },
+    );
+  });
+
+  it("the lease's CommitContext reaches the gate unchanged: a danger text's open hold binds the commit of its own turn", async () => {
+    const emergency = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: "evt-sam-0001" };
+    await withTurnLoop(SAM, { "evt-sam-0001": emergency }, [commitS102.request.now], async (run) => {
+      answerS102(run);
+      await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+      await run.settle();
+      await run.tick(3000);
+      await run.settle();
+
+      expect(run.face.gateCalls).toHaveLength(1);
+      const holds = await run.actor.readHolds();
+      expect(holds).toMatchObject([
+        { eventId: "evt-sam-0001", holdId: "hold-evt-sam-0001", rule: "after_safe" },
+      ]);
+      expect(run.face.gateCalls[0]?.at).toEqual({
+        holds: [
+          {
+            eventId: "evt-sam-0001",
+            holdId: "hold-evt-sam-0001",
+            rule: "after_safe",
+            outcomes: emergency.outcomes,
+            blocksBooking: holds[0]?.blocksBooking,
+          },
+        ],
+        unread: [],
+      });
+      // The text's own safety record rides in the commit too, as the read gave it.
+      expect(run.face.gateCalls[0]?.request.core).toMatchObject([
+        { call: "recordSafetyOutcome", request: { safety: emergency, handleId: "handle-sam" } },
+      ]);
+    });
+  });
+
+  it("a bare STOP commits through the lease as its own core-only turn, stop-recorded.json's request under the turn's own id", async () => {
+    await withTurnLoop(
+      BEN,
+      { "evt-ben-0007": safetyNoFor("evt-ben-0007") },
+      [stopRecorded.request.now],
+      async (run) => {
+        const turnId = await turnIdOf(["evt-ben-0007"]);
+        const core = fakeReplyCore(stopRecorded.request.now, [
+          phone("+15555550131", "handle-ben", "person-ben", 3),
+        ]);
+        core.ids.set(turnId, { consent: "consent-ben-stop", reply: "out-ben-stop-reply" });
+        run.face.gate = async (request) => {
+          const answer = await core.core.commitCore({
+            caller: request.caller as never,
+            actions: request.core.slice(1) as never,
+          });
+          if ("error" in answer) return answer;
+          return {
+            ...forTurn(stopRecorded.outcome, "turn-ben-stop", turnId),
+            core: [stopRecorded.outcome.core[0], ...answer.core],
+          } as never;
+        };
+        const restoreReplies = setReplyDeps({
+          core: turnReplyCore,
+          rows: core.rows,
+          rosieNumber: ROSIE_NUMBER,
+        });
+        try {
+          await arrive(BEN, "evt-ben-0007", "STOP", "2026-10-21T19:30:00Z");
+          await run.tick(3000);
+          await run.settle();
+        } finally {
+          restoreReplies();
+        }
+
+        const ids = {
+          turnId: ["turn-ben-stop", turnId] as [string, string],
+          traceId: ["trace-ben-0007", TRACE] as [string, string],
+        };
+        expect(run.face.gateCalls.map((call) => call.request)).toEqual([retarget(stopRecorded.request, ids)]);
+        expect(run.face.frontierCalls).toEqual([]);
+        expect(run.ai.decideCalls).toEqual([]);
+        expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
+        expect(await run.actor.readTurns()).toMatchObject([{ turnId, state: "committed" }]);
+      },
+    );
+  });
+});
