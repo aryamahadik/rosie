@@ -52,6 +52,10 @@ export default defineConfig({
           name: "parity",
           include: [PARITY_GLOB],
           exclude: ["**/node_modules/**"],
+          // The unit project's resource guard, not part of any test's claim (T-1073; T-1114, DL-200): routing parity
+          // tests took 6 to 14 s each, past Vitest's 5 s default, while builders ran vitest on the build Mac.
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
         },
       },
       {
