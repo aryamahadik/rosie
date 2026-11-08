@@ -1,9 +1,13 @@
-// Doubles for the turn loop's tests (T-251). Not imported by the Worker. Each answers as the frozen contracts state:
+// Doubles for the turn loop's tests (T-251, T-252). Not imported by the Worker. Each answers as the frozen contracts state:
 //
 //   - K-09 v1's turn face (`fakeTurnFace`): buildFrontier, closestEntries and gateAndCommit answer what the test gives
 //     them, from the fixtures (build-frontier-s1-02.json, closest-entries.json, commit-s1-02.json, the limit fixtures,
-//     stop-recorded.json), with the running turn's own ids where a test runs through the real lease (`retarget`);
+//     stop-recorded.json), with the running turn's own ids where a test runs through the real lease (`retarget`); after
+//     the commit, composeInput and finalizeMessage answer what the test gives them (finalize-rewrite.json,
+//     finalize-passed-on.json);
 //   - K-02 v1's decide and re-read (`fakeDecide`): the decide-*.json results, with the model calls a stage reports;
+//   - the second half's ports (`fakeReply`, T-252): the composer (K-03 plans, with its model calls), K-05 v1's
+//     unplannedRows and writePlan, and the dispatcher's wake;
 //   - the handle's directory, the safety results (safety-no.json under each text's event id) and a clock of the fixtures'
 //     `now` values;
 //   - K-05 v1.2 handleTargets for the guard (`targetsAnswer`), so the guard's targets are the fixtures' `targets`;
@@ -29,14 +33,27 @@ import type {
   BuildFrontierRequest,
   ClosestEntriesAnswer,
   ClosestEntriesRequest,
+  ComposeInput,
+  ComposeInputAnswer,
+  ComposeInputRequest,
+  ComposerAnswer,
   DecideAnswer,
   DecideContext,
   DecideResult,
+  DispatchWake,
+  FinalizeMessageAnswer,
+  FinalizeMessageRequest,
   GateAndCommitAnswer,
   GateAndCommitRequest,
+  MessagePlan,
   RereadRequest,
+  RewriteRequest,
+  RowsAnswer,
   TurnDeps,
   TurnParty,
+  UnplannedOutboxRow,
+  WriteRowPlanAnswer,
+  WriteRowPlanRequest,
 } from "./types";
 
 type Json = Record<string, unknown>;
@@ -255,6 +272,10 @@ export interface FakeTurnFace {
   readonly frontierCalls: BuildFrontierRequest[];
   readonly searchCalls: ClosestEntriesRequest[];
   readonly gateCalls: GateCall[];
+  /** Each compose input request (T-252), in order. */
+  readonly composeInputCalls: ComposeInputRequest[];
+  /** Each finalizeMessage request (T-252), in order. */
+  readonly finalizeCalls: FinalizeMessageRequest[];
   /** Each call by name, in the order it was made, then `<name>:answered` once it answered. */
   readonly log: string[];
   frontier: (request: BuildFrontierRequest) => BuildFrontierAnswer;
@@ -267,6 +288,10 @@ export interface FakeTurnFace {
   gateHold: Hold;
   /** Throw instead of answering (the answer lost on its way) for these gate calls, by place from 0. */
   readonly loseGate: Set<number>;
+  /** What compose input answers for a row (a throw: the answer lost on its way). */
+  composeInput: (request: ComposeInputRequest) => ComposeInputAnswer;
+  /** What finalizeMessage answers (a throw: the answer lost on its way). */
+  finalize: (request: FinalizeMessageRequest) => FinalizeMessageAnswer;
 }
 
 export function fakeTurnFace(): FakeTurnFace {
@@ -274,12 +299,16 @@ export function fakeTurnFace(): FakeTurnFace {
     frontierCalls: [],
     searchCalls: [],
     gateCalls: [],
+    composeInputCalls: [],
+    finalizeCalls: [],
     log: [],
     frontier: () => ({ error: "notFound", table: "handles", rowId: "none" }),
     search: () => ({ error: "indexUnavailable" }),
     gate: null,
     gateHold: hold(false),
     loseGate: new Set(),
+    composeInput: (request) => ({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId }),
+    finalize: (request) => ({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId }),
   };
   return fake;
 }
@@ -307,6 +336,18 @@ export function turnFaceOf(fake: FakeTurnFace): TurnDeps["toolApi"] {
       if (gate === null) return { error: "unwired" };
       fake.log.push("gate:answered");
       return gate(request, index);
+    },
+    async composeInput(request) {
+      fake.composeInputCalls.push(structuredClone(request));
+      fake.log.push(`composeInput:${request.outboxRowId}`);
+      await flush(1);
+      return structuredClone(fake.composeInput(request));
+    },
+    async finalizeMessage(request) {
+      fake.finalizeCalls.push(structuredClone(request));
+      fake.log.push(`finalize:${request.attempt}:${request.outboxRowId}`);
+      await flush(1);
+      return structuredClone(fake.finalize(request));
     },
   };
 }
@@ -382,6 +423,146 @@ export function decided(result: unknown, modelCalls: readonly ModelCall[] = TWO_
   return { result: "decided", decide: structuredClone(result) as DecideResult, modelCalls: [...modelCalls] };
 }
 
+// ---- after the commit (T-252): the composer, K-05's plan calls and the dispatcher ----------------------------------
+
+/** The model call of one Haiku composer call, and of the one rewrite (K-08 v1 model calls; test values). */
+export const ONE_COMPOSE: readonly ModelCall[] = [call("haiku", "compose")];
+export const ONE_REWRITE: readonly ModelCall[] = [call("haiku", "rewrite")];
+
+export interface FakeComposer {
+  /** Each input the composer was given, in order. */
+  readonly composeCalls: ComposeInput[];
+  /** Each rewrite request, in order. */
+  readonly rewriteCalls: RewriteRequest[];
+  /** What the composer answers for an input (a throw: no answer). It may wait: a test's hold. */
+  compose: (input: ComposeInput) => ComposerAnswer | Promise<ComposerAnswer>;
+  /** What the one rewrite answers. */
+  rewrite: (request: RewriteRequest) => ComposerAnswer | Promise<ComposerAnswer>;
+  readonly log: string[];
+}
+
+/** A composer double: each call is logged as `compose:<row>` when it starts and `compose:<row>:answered` when it ends. */
+export function fakeComposer(log: string[] = []): FakeComposer {
+  return {
+    composeCalls: [],
+    rewriteCalls: [],
+    compose: () => ({ error: "unwired" }),
+    rewrite: () => ({ error: "unwired" }),
+    log,
+  };
+}
+
+export function composerOf(fake: FakeComposer): TurnDeps["composer"] {
+  return {
+    async compose(input) {
+      fake.composeCalls.push(structuredClone(input));
+      fake.log.push(`compose:${input.row}`);
+      const answer = await fake.compose(input);
+      fake.log.push(`compose:${input.row}:answered`);
+      return structuredClone(answer);
+    },
+    async rewrite(request) {
+      fake.rewriteCalls.push(structuredClone(request));
+      fake.log.push(`rewrite:${request.input.row}`);
+      const answer = await fake.rewrite(request);
+      fake.log.push(`rewrite:${request.input.row}:answered`);
+      return structuredClone(answer);
+    },
+  };
+}
+
+/** The composer's answer: K-03's plan (a copy) with its model calls. */
+export function planned(plan: unknown, modelCalls: readonly ModelCall[] = ONE_COMPOSE): ComposerAnswer {
+  return { result: "planned", plan: structuredClone(plan) as MessagePlan, modelCalls: [...modelCalls] };
+}
+
+export interface FakeRows {
+  /** Each unplannedRows request's turn id, in order. */
+  readonly unplannedReads: string[];
+  /** Each writePlan request, in order. */
+  readonly writes: WriteRowPlanRequest[];
+  /** What unplannedRows answers for a turn id (a throw: no answer). Unset by a test: none of the turn's rows. */
+  unplanned: (turnId: string) => RowsAnswer;
+  /** What writePlan answers (a throw: no answer). Unset by a test: written, at the next version. */
+  write: (request: WriteRowPlanRequest) => WriteRowPlanAnswer;
+  readonly log: string[];
+}
+
+export function fakeRows(log: string[] = []): FakeRows {
+  return {
+    unplannedReads: [],
+    writes: [],
+    unplanned: () => ({ result: "rows", rows: [] }),
+    write: (request) => ({
+      result: "written",
+      outboxRowId: request.outboxRowId,
+      version: request.expectVersion + 1,
+    }),
+    log,
+  };
+}
+
+export function rowsOf(fake: FakeRows): TurnDeps["rows"] {
+  return {
+    async unplannedRows({ turnId }) {
+      fake.unplannedReads.push(turnId);
+      fake.log.push("unplannedRows");
+      await flush(1);
+      return structuredClone(fake.unplanned(turnId));
+    },
+    async writePlan(request) {
+      fake.writes.push(structuredClone(request));
+      fake.log.push(`writePlan:${request.outboxRowId}`);
+      await flush(1);
+      return structuredClone(fake.write(request));
+    },
+  };
+}
+
+/** K-05 v1 `unplannedRows`' row for a row the commit wrote: version 1, as a commit inserts it (K-04 v1 rule 2). */
+export function unplannedRow(
+  outboxRowId: string,
+  commitSeq: number,
+  recipientHandleId: string,
+  channel: UnplannedOutboxRow["channel"] = "imessage",
+  copyOfRowId: string | null = null,
+): UnplannedOutboxRow {
+  return { outboxRowId, version: 1, commitSeq, recipientHandleId, channel, copyOfRowId };
+}
+
+export interface FakeDispatcher {
+  /** Each wake, in order. */
+  readonly wakes: DispatchWake[];
+  /** While true the wake throws, as a dispatcher that cannot be reached. */
+  down: boolean;
+  readonly log: string[];
+}
+
+export function fakeDispatcher(log: string[] = []): FakeDispatcher {
+  return { wakes: [], down: false, log };
+}
+
+export function dispatcherOf(fake: FakeDispatcher): TurnDeps["dispatcher"] {
+  return {
+    wake(request) {
+      fake.wakes.push(structuredClone(request));
+      fake.log.push("wake");
+      return fake.down ? Promise.reject(new Error("the dispatcher is not reached")) : Promise.resolve();
+    },
+  };
+}
+
+/** The second half's doubles, all logging into one list (pass a turn face's `log` to see the whole order). */
+export interface FakeReply {
+  readonly composer: FakeComposer;
+  readonly rows: FakeRows;
+  readonly dispatcher: FakeDispatcher;
+}
+
+export function fakeReply(log: string[] = []): FakeReply {
+  return { composer: fakeComposer(log), rows: fakeRows(log), dispatcher: fakeDispatcher(log) };
+}
+
 // ---- the turn's own facts ---------------------------------------------------------------------------------------
 
 /** The safety read's result for each text: safety-no.json under the text's own event id (what the read on arrival gave). */
@@ -403,15 +584,22 @@ export function fakeFacts(party: TurnParty | null, times: string[]): FakeFacts {
   return { party, safety: new Map(), times, asked: [] };
 }
 
-/** Every port the turn reaches, over these doubles. */
+/**
+ * Every port the turn reaches, over these doubles. The second half's (T-252) are `reply`'s; left out, a fresh set whose
+ * rows fake lists none of the turn's rows, so nothing is composed and only the dispatcher's wake shows, in its own log.
+ */
 export function turnDeps(
   facts: FakeFacts,
   face: FakeTurnFace,
   ai: FakeDecide,
   keys: SealingKeyStore,
+  reply: FakeReply = fakeReply(),
 ): TurnDeps {
   let next = 0;
   return {
+    composer: composerOf(reply.composer),
+    rows: rowsOf(reply.rows),
+    dispatcher: dispatcherOf(reply.dispatcher),
     directory: {
       partyOf: () => Promise.resolve(facts.party),
     },

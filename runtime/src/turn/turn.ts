@@ -21,12 +21,18 @@
 //      `valueFailsWords` refusal before the re-read (K-09 README default 25) sends the turn to the re-read, then to the
 //      gate again; an answer lost on the way (`noAnswer`) or a `transient` one is sent again once, as the same request.
 //
-// Fails closed: a run that cannot finish one of these steps commits nothing and ends; the lease reruns the turn from its
-// sealed texts when its 60 s lapse (a third lapse waits for T-253's park). Never logged or put in a span: a text's words,
-// a number, a key (K-08 README line 79); the spans hold counts, labels and ids only.
+//   7. Reply (T-252, ./compose.ts; arch 02 step 7, line 123): once the turn has committed, each row the commit wrote is
+//      composed, the rows in parallel (compose input, the composer, finalize with at most one rewrite, the fallback and
+//      the passed-on line inside finalize), an email copy takes its text row's plan with no composer call, a fixed
+//      line's row is never composed, and the dispatcher is woken once. A run no longer the turn's composes nothing: the
+//      run that has the turn now does it.
 //
-// Not here: composing the committed rows (T-252); the planner after meaning search (C-117: `planner` is null); the safety
-// read (T-246); wiring the real Tool API and AI calls into the ports (D-017, T-552 onward).
+// Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends; the lease reruns the turn from its
+// sealed texts when its 60 s lapse (a third lapse waits for T-253's park). Never logged or put in a span: a text's words,
+// a plan's words, a number, a key (K-08 README line 79); the spans hold counts, labels and ids only.
+//
+// Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); the crash path after
+// the commit (T-253); wiring the real Tool API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
 
 import type {
   CommitAnswer,
@@ -54,6 +60,7 @@ import { isReadableEvent } from "../safety";
 import type { SafetyResult } from "../safety/types";
 import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../trace";
 import type { LimitResult, ModelCall, RowRef } from "../trace/types";
+import { composeCommitted, type ComposeReport } from "./compose";
 import { withKeywordCommit } from "./keywords";
 import type {
   BuildFrontierRequest,
@@ -108,6 +115,11 @@ export interface TurnCommitted {
   readonly gateCalls: number;
   /** The keyword texts' replies, when the turn had keyword texts. */
   readonly replies: RepliesResult<OpenedText> | null;
+  /**
+   * What the second half did after the commit (T-252): each row composed, copied, found planned or left, the fixed
+   * lines' rows never composed, and the dispatcher woken once. Null when the run was no longer the turn's by then.
+   */
+  readonly composed: ComposeReport | null;
 }
 
 /** Nothing committed on this run (the lease reruns the turn when its lease lapses); `why` is a label. */
@@ -219,6 +231,8 @@ interface Run {
   keywordCommits: number;
   /** The last committed answer, once the turn has committed. */
   committed: GateCommitted | null;
+  /** The caller that commit went under (a turn of keyword texts alone covers every business): the second half's too. */
+  committedCaller: TurnCaller | null;
 }
 
 /**
@@ -317,6 +331,7 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
     rereadRan: false,
     keywordCommits: 0,
     committed: null,
+    committedCaller: null,
   };
 
   const { keywords, onward } = guarded;
@@ -511,7 +526,7 @@ async function keywordTurn(
         : await commitDecided(run, decided, []);
     return outcomeOf(run, sent, replies);
   }
-  if (run.committed !== null) return committedOutcome(run, run.committed, replies);
+  if (run.committed !== null) return finishCommitted(run, run.committed, replies);
   return notCommitted(run, "notRecorded", replies);
 }
 
@@ -872,6 +887,7 @@ async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent
   const committed = "result" in answer ? committedOf(answer.committed) : null;
   if (committed !== null) {
     run.committed = committed;
+    run.committedCaller = request.caller;
     recordGate(run, gateSpan, got, committed);
     finish(commitSpan, {
       outcome: "ok",
@@ -966,17 +982,33 @@ const businessOf = (run: Run): { businessId?: string } =>
 
 // ---- outcomes and spans -------------------------------------------------------------------------------------------
 
-function committedOutcome(
+/**
+ * The turn has committed (first or repeated): step 7, the second half (./compose.ts), composes the rows the commit wrote
+ * and wakes the dispatcher once, then the run ends committed. A run no longer the turn's by then (a lapse's rerun took
+ * it) composes nothing and wakes no one: the run that has the turn now commits as a repeat and does both.
+ */
+async function finishCommitted(
   run: Run,
   answer: GateCommitted,
   replies: RepliesResult<OpenedText> | null,
-): TurnCommitted {
-  return { result: "committed", answer, reread: run.rereadRan, gateCalls: run.gateCalls, replies };
+): Promise<TurnCommitted> {
+  const composed = replaced(run.turn)
+    ? null
+    : await composeCommitted({
+        set: run.set,
+        turnId: run.turn.turnId,
+        handleId: run.party.handleId,
+        caller: { ...(run.committedCaller ?? run.caller) },
+        trace: run.trace,
+        answer,
+        wordsWritten: replies?.replies.flatMap((reply) => reply.rowsWritten) ?? [],
+      });
+  return { result: "committed", answer, reread: run.rereadRan, gateCalls: run.gateCalls, replies, composed };
 }
 
-function outcomeOf(run: Run, sent: Sent, replies: RepliesResult<OpenedText> | null): TurnOutcome {
-  if (sent.kind === "committed") return committedOutcome(run, sent.answer, replies);
-  return notCommitted(run, sent.error, replies);
+function outcomeOf(run: Run, sent: Sent, replies: RepliesResult<OpenedText> | null): Promise<TurnOutcome> {
+  if (sent.kind === "committed") return finishCommitted(run, sent.answer, replies);
+  return Promise.resolve(notCommitted(run, sent.error, replies));
 }
 
 /** An error code as a span may carry it: the code when it is a label, else badAnswer. */

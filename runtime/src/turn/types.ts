@@ -1,18 +1,23 @@
-// The turn loop's shapes (T-251; C-046), written by hand from the frozen contracts, because the generated types are
-// git-ignored (ADR-005) and the Worker must not depend on them. Only what the turn builds or reads is typed; every other
-// field of a context, a decide result or an answer rides through untouched, as the far side gave it:
+// The turn loop's shapes (T-251, T-252; C-046), written by hand from the frozen contracts, because the generated types
+// are git-ignored (ADR-005) and the Worker must not depend on them. Only what the turn builds or reads is typed; every
+// other field of a context, a decide result, a composer input or an answer rides through untouched, as the far side gave it:
 //
 //   - K-09 v1 (contracts/tool-api), the turn face: `buildFrontier`, `closestEntries` and `gateAndCommit` (the `caller`,
 //     the K-05 `turn`, the decided and core-only inputs, `recordSafetyOutcome` as a core action of the turn's one commit:
-//     README defaults 5, 10 and 35);
+//     README defaults 5, 10 and 35), and after the commit `composeInput` and `finalizeMessage` (T-252);
 //   - K-02 v1 (contracts/model): the turn's texts (`text`), the context decide is given, and decide's result with its
 //     reads and its re-read flag (`decideResult`);
-//   - K-08 v1: the model calls a decide stage reports for its span.
+//   - K-03 v1 (contracts/message-plan): the composer's input, the plan, the plan a row stores (`rowPlan`), the final
+//     parts and the check result (T-252);
+//   - K-05 v1 item 2 (contracts/data-access, "write a plan"): `unplannedRows` and `writePlan` (T-252);
+//   - K-08 v1: the model calls a decide stage or the composer reports for its span.
 //
 // Every outside call is a port (`TurnDeps`), set once per Worker isolate and joined at D-017 (T-552 onward): the Tool
-// API's turn face (C-074: the frontier is C-075's, the gate C-080's, the commit C-087's), the AI layer's decide and its
-// one Sonnet re-read (C-115, C-116: T-369, T-370), the handle's directory and sealing key, and each text's safety result.
-// Never logged or put in a span: a text's words, a number, a key. The ids, kinds and codes here are labels.
+// API's turn face (C-074: the frontier is C-075's, the gate C-080's, the commit C-087's, the finalize call C-093's), the AI
+// layer's decide and its one Sonnet re-read (C-115, C-116: T-369, T-370) and its composer (C-118: T-373 to T-375), K-05's
+// plan calls (C-152: T-196), the outbox dispatcher (C-124), the handle's directory and sealing key, and each text's safety
+// result. Never logged or put in a span: a text's words, a plan's words, a number, a key. The ids, kinds and codes here
+// are labels.
 
 import type { CommitContext, CommitTurnRef } from "../actor";
 import type { HandleRef, SealingKeyStore } from "../gateway/seal";
@@ -231,10 +236,141 @@ export interface GateCommitted {
 
 export type GateAndCommitAnswer = GateCommitted | ToolApiError;
 
+// ---- K-03 v1: the composer's input, the plan, the plan a row stores, the final parts and the check result ----------
+
+/**
+ * K-03 v1 `channel`: the channel an outbox row goes on: imessage, rcs or sms through Linq, or email, its own row with its
+ * text row's plan (arch 07 line 371).
+ */
+export type OutboxChannel = "imessage" | "rcs" | "sms" | "email";
+
+/**
+ * K-03 v1 `composeInput`, one per outbox row (arch 07 line 397), as far as the turn reads it: the row and the turn it is
+ * for. The rest (the conversation, the master text, the facts limit 7 lets the reader see, the audience, the language, the
+ * channel, the situation, the allowed formats and links, the options, page types and open questions, the inbound text)
+ * rides through to the composer untouched. It never carries the frontier. Never logged: it holds a person's words.
+ */
+export interface ComposeInput {
+  readonly row: string;
+  readonly turn: string;
+  readonly [field: string]: unknown;
+}
+
+/** K-03 v1 `line`: one line of the plan, in the order it is sent (first, fact or action), its words with slots. */
+export interface PlanLine {
+  readonly role: string;
+  readonly text: string;
+}
+
+/**
+ * K-03 v1 `plan`: the composer's structured output for one row (arch 01 line 97; arch 07 line 397): the formats, the
+ * lines with slots, at most one question with option ids, one page type or none, a threaded-reply target. Never logged.
+ */
+export interface MessagePlan {
+  readonly formats: readonly string[];
+  readonly lines: readonly PlanLine[];
+  readonly question: { readonly text: string; readonly optionIds: readonly string[] } | null;
+  readonly pageType: string | null;
+  readonly threadReplyTo: string | null;
+}
+
+/**
+ * K-03 v1 `rowPlan`: the plan as the outbox row stores it (arch 07 line 347). An email copy names the text row whose plan
+ * it reuses in `copyOf` (arch 07 lines 371, 397; plan-email-copy.json); null for a row the composer planned itself.
+ */
+export interface RowPlan {
+  row: string;
+  channel: OutboxChannel;
+  copyOf: string | null;
+  plan: MessagePlan;
+}
+
+/**
+ * K-03 v1 `finalParts`: the message after code (options inserted, fixed lines added, slots filled), at most two sends
+ * (arch 07 lines 361, 367). Its sends and slot values hold filled words and values: never logged, never given to the
+ * composer (K-09 v1 finalizeMessage.response.checks).
+ */
+export interface FinalParts {
+  readonly row: string;
+  readonly channel: OutboxChannel;
+  readonly sends: readonly unknown[];
+  /** The fixed lines code added, by K-01 id (such as `opener` or `passedOn`): labels. */
+  readonly fixedLines: readonly string[];
+  readonly slotValues: readonly unknown[];
+  readonly threadReplyTo: string | null;
+}
+
+/** K-03 v1 `checkOutcome`: one check's result; `detail` is what failed, in the words the rewrite is told (never logged). */
+export interface CheckOutcome {
+  readonly check: string;
+  readonly passed: boolean;
+  readonly detail: string | null;
+}
+
+/** K-03 v1 `checkResult`: the checks on one attempt (composed, rewrite or the fallback) and what happens next. */
+export interface CheckResult {
+  readonly row: string;
+  readonly attempt: "composed" | "rewrite" | "fallback";
+  readonly checked: unknown;
+  readonly checks: readonly CheckOutcome[];
+  readonly outcome: string;
+  readonly questionWithdrawn: boolean;
+  readonly teamPaged: boolean;
+}
+
+// ---- K-09 v1: compose input and finalize a message (the turn face after the commit) ------------------------------
+
+/** K-09 v1 `composeInput.request`: one committed outbox row. */
+export interface ComposeInputRequest {
+  caller: TurnCaller;
+  outboxRowId: string;
+}
+
+/** K-09 v1 `composeInput.response`: the composer's input, or the text row an email copy takes its plan from. */
+export type ComposeInputResponse =
+  | { readonly result: "compose"; readonly input: ComposeInput }
+  | { readonly result: "emailCopy"; readonly textRowId: string };
+
+/** Or a K-09 error: notFound, alreadyPlanned (the row holds a plan), rowClosed (no longer to be sent) or transient. */
+export type ComposeInputAnswer = ComposeInputResponse | ToolApiError;
+
+/**
+ * K-09 v1 `finalizeMessage.request`: an outbox row and its plan. `expectVersion` is the row's version when its input was
+ * composed (limit 4 at the write: K-05 v1 writePlan); `attempt` is composed (the composer's plan) or rewrite (the one
+ * rewrite); the fallback is code's, run inside the call.
+ */
+export interface FinalizeMessageRequest {
+  caller: TurnCaller;
+  outboxRowId: string;
+  expectVersion: number;
+  attempt: "composed" | "rewrite";
+  plan: RowPlan;
+}
+
+/**
+ * K-09 v1 `finalizeMessage.response`: send or sendAndLog (the final parts written with the plan), rewrite (nothing
+ * written: the composer gets one rewrite, told what failed) or passedOn (the rewrite and the fallback both failed: the
+ * passed-on line written, the question withdrawn so no clock arms, the team paged). `checks` holds each attempt's check
+ * result in order (the attempt sent, then the fallback when code ran it).
+ */
+export interface FinalizeMessageResponse {
+  readonly outcome: "send" | "sendAndLog" | "rewrite" | "passedOn";
+  readonly checks: readonly CheckResult[];
+  readonly finalParts: FinalParts | null;
+  readonly questionWithdrawn: boolean;
+  readonly teamPageId: string | null;
+}
+
+/**
+ * Or a K-09 error, nothing written: notFound, alreadyPlanned (with the stored final parts), rewriteUsed, rowClosed,
+ * versionChanged or transient.
+ */
+export type FinalizeMessageAnswer = FinalizeMessageResponse | ToolApiError;
+
 /**
  * K-09 v1's turn face, as the turn reaches it (C-074, the Tool API; joined at D-017). Each call is handed the turn's trace;
- * the turn records the call's own span (frontier, search, gate and commit), so a joined port records only what runs
- * beneath it, never the same hop again.
+ * the turn records the call's own span (frontier, search, gate and commit; after the commit fillAndChecks and
+ * rewriteOrFallback), so a joined port records only what runs beneath it, never the same hop again.
  */
 export interface TurnFace {
   buildFrontier(request: BuildFrontierRequest, trace: TraceContext): Promise<BuildFrontierAnswer>;
@@ -249,6 +385,18 @@ export interface TurnFace {
     at: CommitContext,
     trace: TraceContext,
   ): Promise<GateAndCommitAnswer>;
+  /**
+   * Compose input (arch 07 line 397): a committed row's K-03 composer input, with its committed choices and only what
+   * limit 7 lets its recipient see, never the frontier; for an email copy, the text row whose plan it takes. A read.
+   */
+  composeInput(request: ComposeInputRequest, trace: TraceContext): Promise<ComposeInputAnswer>;
+  /**
+   * Finalize a message (arch 02 line 123; arch 07 lines 405 to 417; T-313, C-093): options, fixed lines, slots, the claim
+   * check and the message checks on the plan. It writes the final parts with the plan itself (K-05 v1 writePlan), or
+   * answers the failed checks for the one rewrite; after a failed rewrite it runs the step's fallback, then the passed-on
+   * line, inside the same call (K-09 README default 11).
+   */
+  finalizeMessage(request: FinalizeMessageRequest, trace: TraceContext): Promise<FinalizeMessageAnswer>;
 }
 
 // ---- the AI layer: decide and its one re-read -------------------------------------------------------------------
@@ -289,6 +437,98 @@ export interface TurnDecide {
   reread(request: RereadRequest, trace: TraceContext): Promise<DecideAnswer>;
 }
 
+// ---- the AI layer: the composer (T-252) ---------------------------------------------------------------------------
+
+/** What the composer (C-118, T-373) answers: K-03's plan for the row, and the model calls it made (K-08). */
+export interface Composed {
+  readonly result: "planned";
+  readonly plan: MessagePlan;
+  /** The model calls the composer made, for the span (K-08 v1 requires at least one on the compose hop). */
+  readonly modelCalls: readonly ModelCall[];
+}
+
+/** The composer could not give a plan (models down, an input refused): a label, never words; any calls it made. */
+export interface ComposeFailed {
+  readonly error: string;
+  readonly modelCalls?: readonly ModelCall[];
+}
+
+export type ComposerAnswer = Composed | ComposeFailed;
+
+/**
+ * What the one rewrite is given (arch 02 line 123: "One rewrite, told what failed"): the row's input, the plan that
+ * failed, and each failed check with its detail, never the filled final parts, whose slot values the composer never got
+ * (K-09 v1 finalizeMessage.response.checks; README default 32).
+ */
+export interface RewriteRequest {
+  readonly input: ComposeInput;
+  readonly plan: MessagePlan;
+  readonly failed: readonly { readonly check: string; readonly detail: string | null }[];
+}
+
+/** The composer (C-118: T-373 to T-375): one call per outbox row, in parallel (arch 07 line 397), and the one rewrite. */
+export interface TurnComposer {
+  compose(input: ComposeInput, trace: TraceContext): Promise<ComposerAnswer>;
+  rewrite(request: RewriteRequest, trace: TraceContext): Promise<ComposerAnswer>;
+}
+
+// ---- K-05 v1 item 2, "write a plan" (T-252) ------------------------------------------------------------------------
+
+/**
+ * One row of K-05 v1 `unplannedRows.response`: a row of the turn that holds no plan yet (K-04 outbox_rows_unplanned_idx),
+ * with its version (finalizeMessage's and writePlan's expectVersion) and, for an email copy, its text row.
+ */
+export interface UnplannedOutboxRow {
+  readonly outboxRowId: string;
+  readonly version: number;
+  readonly commitSeq: number;
+  readonly recipientHandleId: string;
+  readonly channel: OutboxChannel;
+  readonly copyOfRowId: string | null;
+}
+
+/** K-05 v1 `unplannedRows.response`, or a K-05 error (transient: nothing read; the same call may be sent again). */
+export type RowsAnswer =
+  { readonly result: "rows"; readonly rows: readonly UnplannedOutboxRow[] } | ToolApiError;
+
+/** K-05 v1 `writePlan.request`: the plan and the final parts, written together into one row (K-03 rowPlan, finalParts). */
+export interface WriteRowPlanRequest {
+  outboxRowId: string;
+  expectVersion: number;
+  plan: RowPlan;
+  finalParts: FinalParts;
+}
+
+/** K-05 v1 `writePlan.response`, or one of its errors (alreadyPlanned: the row holds a plan, which stays; versionChanged). */
+export type WriteRowPlanAnswer =
+  { readonly result: "written"; readonly outboxRowId: string; readonly version: number } | ToolApiError;
+
+/**
+ * K-05 v1's plan calls as the turn reaches them (the database engineer's C-152, T-196; joined at D-017). The finalize call
+ * writes a composed row's plan itself; the turn writes only an email copy's, which takes its text row's plan.
+ */
+export interface TurnRows {
+  unplannedRows(request: { turnId: string }): Promise<RowsAnswer>;
+  writePlan(request: WriteRowPlanRequest): Promise<WriteRowPlanAnswer>;
+}
+
+// ---- the outbox dispatcher (T-252) ----------------------------------------------------------------------------------
+
+/** What the dispatcher is told when a turn has committed and its rows are composed: once per committed turn. */
+export interface DispatchWake {
+  /** The committed turn (K-04 turns.id). */
+  readonly turnId: string;
+  /** The turn's own handle (K-04 handles.id): the actor's recipient (runtime/src/dispatch DispatchOptions). */
+  readonly handleId: string;
+  /** Every row the commit wrote, in commit order (fixed lines' rows included), whatever its compose ended with. */
+  readonly outboxRowIds: readonly string[];
+}
+
+/** The outbox dispatcher (C-124, runtime/src/dispatch), as the turn wakes it (joined at D-017). */
+export interface TurnDispatcher {
+  wake(request: DispatchWake, trace: TraceContext): Promise<void>;
+}
+
 // ---- the turn's own facts ------------------------------------------------------------------------------------------
 
 /** Who the handle is, as K-04 names it, and the zone its texts' dates resolve in. */
@@ -324,6 +564,12 @@ export interface TurnDeps {
   readonly safety: TurnSafety;
   readonly toolApi: TurnFace;
   readonly ai: TurnDecide;
+  /** The composer, after the commit (T-252). */
+  readonly composer: TurnComposer;
+  /** K-05 v1's plan calls, after the commit (T-252). */
+  readonly rows: TurnRows;
+  /** The outbox dispatcher, woken once per committed turn (T-252). */
+  readonly dispatcher: TurnDispatcher;
   /** The time a K-09 request names as now, in UTC (the fake clock on staging: BP 9.4). */
   now(): string;
 }
