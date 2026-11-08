@@ -1,11 +1,30 @@
-// The gateway (T-241; C-044): the Linq webhook entry. See linq-webhook.ts.
+// The gateway (C-044): the Linq webhook entry (T-241, linq-webhook.ts) and the Stripe and calendar webhook doors (T-275,
+// providers/), with the answer rules they share (answer.ts).
 
-import { DEFAULT_BUNDLE_ID } from "./linq-webhook";
+import { DEFAULT_BUNDLE_ID } from "./answer";
+import { unconfiguredProviders, type ProviderDeps } from "./providers";
 import type { GatewayDeps } from "./types";
 
-export { DEFAULT_BUNDLE_ID, handleLinqWebhook, type WebhookEnvironment } from "./linq-webhook";
+export { DEFAULT_BUNDLE_ID, type WebhookEnvironment } from "./answer";
+export { handleLinqWebhook } from "./linq-webhook";
 export { durableObjectActor, type ActorNamespace, type HandleActorRpc } from "./actor-door";
 export { ACTOR_KINDS, HandoffError, RECEIPT_KINDS, prepareHandoff, type Prepared } from "./hand-off";
+export {
+  CALENDAR_WEBHOOK_PATHS,
+  STRIPE_WEBHOOK_PATHS,
+  handleProviderWebhook,
+  providerRouteOf,
+  unconfiguredProviders,
+  type CalendarPort,
+  type CalendarSource,
+  type ProviderDeps,
+  type ProviderDoors,
+  type ProviderEvent,
+  type ProviderEventStore,
+  type ProviderRoute,
+  type StripeBusinessLookup,
+  type StripePort,
+} from "./providers";
 export {
   actorNameOf,
   openWords,
@@ -35,6 +54,7 @@ export const LINQ_WEBHOOK_PATH = "/webhooks/linq";
 /**
  * The gateway's doors until the Linq adapter (T-413) and the actor (T-243) exist: each answers by failing, so the
  * route answers 503 and accepts nothing. A webhook is never accepted unverified, and Linq's retries cover the gap.
+ * The provider doors are unconfigured the same way (T-275).
  */
 export function unconfiguredGateway(): GatewayDeps {
   const notYet = (door: string): Promise<never> =>
@@ -45,5 +65,15 @@ export function unconfiguredGateway(): GatewayDeps {
     receipts: { accept: () => notYet("dispatcher") },
     keys: { getOrCreateKey: () => notYet("sealing key store") },
     bundleId: () => DEFAULT_BUNDLE_ID,
+    providers: unconfiguredProviders(),
+  };
+}
+
+/** The provider doors' dependencies from the gateway's: its doors (unconfigured when left out), bundle id and clock. */
+export function providerDepsOf(deps: GatewayDeps): ProviderDeps {
+  return {
+    ...(deps.providers ?? unconfiguredProviders()),
+    bundleId: deps.bundleId,
+    ...(deps.now === undefined ? {} : { now: deps.now }),
   };
 }

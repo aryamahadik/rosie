@@ -1,11 +1,21 @@
-// Rosie's Worker. Routes (factory spec 6; T-241): GET {BASE_PATH}/health and POST {BASE_PATH}/webhooks/linq (the gateway).
+// Rosie's Worker. Routes (factory spec 6; T-241; T-275): GET {BASE_PATH}/health, and the gateway's webhooks, each a POST
+// under BASE_PATH: /webhooks/linq; Stripe's /webhooks/stripe/rosfield and /webhooks/stripe/businesses; the calendars'
+// /webhooks/calendar/google and /webhooks/calendar/microsoft.
 // Every request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
-// The Linq webhook opens its own id at receipt (runtime/src/gateway).
+// Each webhook opens its own id at receipt (runtime/src/gateway).
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
-import { handleLinqWebhook, LINQ_WEBHOOK_PATH, unconfiguredGateway, type GatewayDeps } from "./gateway";
+import {
+  handleLinqWebhook,
+  handleProviderWebhook,
+  LINQ_WEBHOOK_PATH,
+  providerDepsOf,
+  providerRouteOf,
+  unconfiguredGateway,
+  type GatewayDeps,
+} from "./gateway";
 
 // The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
 export { HandleActor } from "./actor";
@@ -44,8 +54,8 @@ function jsonResponse(status: number, body: Record<string, unknown>, traceId: st
 }
 
 /**
- * The health and 404 answers are synchronous (the health tests read them without waiting); the Linq webhook answers
- * later. The Workers runtime always passes the execution context, so its call is the second form.
+ * The health and 404 answers are synchronous (the health tests read them without waiting); the webhooks answer later.
+ * The Workers runtime always passes the execution context, so its call is the second form.
  */
 export interface RosieWorker {
   fetch(request: Request, env: Cloudflare.Env): Response;
@@ -55,8 +65,9 @@ export interface RosieWorker {
 }
 
 /**
- * The Worker with the gateway's doors (the Linq adapter, the handle actor) supplied by `gatewayDeps`, and the sweep's
- * HandleActor namespace by `clockActors` (the HANDLE_ACTOR binding by default).
+ * The Worker with the gateway's doors (the Linq adapter, the handle actor, and the Stripe and calendar doors' ports and
+ * store) supplied by `gatewayDeps`, and the sweep's HandleActor namespace by `clockActors` (the HANDLE_ACTOR binding by
+ * default).
  */
 export function createWorker(
   gatewayDeps: (env: Cloudflare.Env) => GatewayDeps,
@@ -94,6 +105,17 @@ export function createWorker(
       return handleLinqWebhook(request, gatewayDeps(env), { environment, version });
     }
 
+    const route = pathname.startsWith(basePath) ? providerRouteOf(pathname.slice(basePath.length)) : null;
+    if (route !== null) {
+      if (request.method !== "POST") {
+        return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
+      }
+      return handleProviderWebhook(request, route, providerDepsOf(gatewayDeps(env)), {
+        environment,
+        version,
+      });
+    }
+
     if (request.method === "GET" && pathname === `${basePath}/health`) {
       console.log(JSON.stringify({ level: "info", msg: "health", trace_id: traceId, environment, version }));
       return jsonResponse(
@@ -109,5 +131,6 @@ export function createWorker(
   return { fetch: fetch as RosieWorker["fetch"], scheduled };
 }
 
-// Until the Linq adapter (T-413) and the handle actor (T-243) exist, the gateway's doors fail and the route answers 503.
+// Until the Linq adapter (T-413), the handle actor (T-243) and the provider doors' ports and store (T-275) are joined, the
+// gateway's doors fail and each webhook route answers 503 (a Stripe request with an unreadable signature header, 401).
 export default createWorker(() => unconfiguredGateway());
