@@ -25,7 +25,7 @@
 //
 // No words, number or key is logged: spans carry ids, counts and labels only (runtime/src/trace; K-08 v1).
 
-import { decideLimit8, isSafety, isSmsPort, isStopReply } from "./limit8";
+import { decideLimit8, isSafety, isSmsPort, isStopReply, type YesRefused } from "./limit8";
 import type { Outcome, SpanFields, TraceContext } from "../trace";
 import type {
   CalendarFileBuilder,
@@ -223,6 +223,8 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
   /** The row's version as the store last said it (markPart answers raise it); a markRow compares it. */
   let version = row.version;
   let limit8: LimitResult | null = null;
+  /** Why a stopped phone's newest texts yes did not lift the stop (T-1099): a label on the span. */
+  let textsYes: YesRefused | null = null;
 
   const end = (outcome: RowOutcome): RowReport => {
     const spanOutcome: Outcome =
@@ -238,7 +240,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
         ? {}
         : { provider: "linq" as const, call: "sendPart", attempt: attempted.tryNo }),
       got: { parts: row.parts.length, partsSent },
-      decided: { result: outcome, claimNo: row.claim.claimNo },
+      decided: { result: outcome, claimNo: row.claim.claimNo, ...(textsYes === null ? {} : { textsYes }) },
       rows: [{ table: "outbox_rows", id: row.outboxRowId }],
       errorCode,
     });
@@ -262,6 +264,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
     limit8 = gate.limit;
     if (!gate.go) {
       errorCode = gate.errorCode;
+      textsYes = gate.yesRefused ?? null;
       return end(gate.outcome);
     }
     const { overrideOptout } = gate;
@@ -351,7 +354,14 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
 
 type Limit8Gate =
   | { go: true; overrideOptout: boolean; limit: LimitResult }
-  | { go: false; outcome: RowOutcome; errorCode: string | null; limit: LimitResult | null };
+  | {
+      go: false;
+      outcome: RowOutcome;
+      errorCode: string | null;
+      limit: LimitResult | null;
+      /** Set when a stopped phone's newest texts row was a yes that did not lift the stop (T-1099). */
+      yesRefused?: YesRefused;
+    };
 
 const limit8Failed = (outcome: string): LimitResult => ({ limit: 8, result: "fail", outcome });
 
@@ -408,8 +418,11 @@ async function checkLimit8(
         }),
       );
       const limit = limit8Failed(decision.outcome);
-      if ("error" in marked) return { go: false, outcome: "storeError", errorCode: marked.error, limit };
-      return { go: false, outcome: decision.outcome, errorCode: null, limit };
+      const refused = decision.yesRefused === undefined ? {} : { yesRefused: decision.yesRefused };
+      if ("error" in marked) {
+        return { go: false, outcome: "storeError", errorCode: marked.error, limit, ...refused };
+      }
+      return { go: false, outcome: decision.outcome, errorCode: null, limit, ...refused };
     }
   }
 }
@@ -421,6 +434,10 @@ type StoppedRecheck =
 /**
  * Reads the stopped flag once more just before a send. Stopped: only a safety line and a stop reply still go (with the
  * opt-out override); any other row is dropped as limit 8 drops it. A read that stays transient sends nothing.
+ *
+ * No texts yes counts here (T-1099): a row the person's own yes lifted past limit 8 waits for the chat, since a stopped
+ * phone's chat is closed (K-04 phones_stop_closes_chat), so with the flag set it never reaches this read but by a part
+ * already out; should one reach it, it is dropped, which fails closed.
  */
 async function checkStoppedAgain(
   deps: DispatchDeps,

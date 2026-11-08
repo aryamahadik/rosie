@@ -291,14 +291,54 @@ export interface RecipientDirectory {
 }
 
 /**
+ * K-05 v1.2 `sendState.textsConsent` (item 28; default 35): the newest texts consent row for the recipient's contact that
+ * covers the row's business, its business's or every business's (a STOP or a START), by `at`, a tie to the lower id
+ * (K-29: "the newest row decides"). Limit 8 reads it beside the stopped flag (T-1099): after a STOP only the person's own
+ * yes from that number turns texts back on (RULES 7.1, 7.5; S13-32, MASTER-FLOW-A lines 7213 to 7215 and 7242).
+ */
+export interface TextsConsentRead {
+  consentId: string;
+  /** Null for a STOP or a START, which covers every business (one number: D102; K-29). */
+  businessId: string | null;
+  /** True when the row withdraws texts: a STOP, or a switch away from this contact (K-29: a withdrawal is a new row). */
+  revoked: boolean;
+  /** When the yes was given or the stop came. */
+  at: Utc;
+  /**
+   * Whether the yes is the person's own word sent from the contact the row covers: a START, a fresh yes on a new booking
+   * or a chat link's ready text, sent from that number (K-29 `consents.channel` text, written by a turn on that same
+   * handle: `consents.turn_id`, K-04 `turns.handle_id`; or recorded on return from that number's own text, as K-09's
+   * start-recorded.json). False for a yes the business entered ('1 Yes' by the owner's text or on the Today page: A3-30;
+   * S13-32 line 7215), a page's, an AI's or an email's. Not in K-05 v1.2's `textsConsent`: the field the record needs (a
+   * K-05 minor version). Left out: not known, so no yes lifts a stop.
+   */
+  fromContact?: boolean;
+  /**
+   * The booking the yes was given for (K-29 `consents.booking_id`; null when it names none): a fresh yes turns that
+   * booking's texts back on (S13-32 line 7242). Not in K-05 v1.2's `textsConsent` either. Left out: not known.
+   */
+  bookingId?: string | null;
+}
+
+/**
  * What limit 8 reads about a claimed row's recipient just before a send (NQ-RT-2's default: K-05 v1.2's "recipient send
  * state", one primary, uncached read; T-072 builds it, T-220 serves it, joined at D-017; a fake answers until then).
  * Its fields are NQ-RT-2's list (stopped, chat open, zone, text hours, the current versions of the rows the row read)
  * and what CQ-05 and RULES 4.3 need from them: who the recipient is (8am for owner and team) and the test-phone override.
  */
 export interface SendState {
-  /** K-04 phones: the stopped flag. */
+  /** K-04 phones: the stopped flag. STOP sets it for every business and START clears it (K-04 0004; K-09 v1). */
   stopped: boolean;
+  /**
+   * K-04 phones.stop_at, K-05 v1.2 `phone.stopAt`: when the stop came (a stopped phone always has it:
+   * phones_stopped_has_time). Left out or null: not known, so no yes lifts the stop.
+   */
+  stopAt?: Utc | null;
+  /**
+   * K-05 v1.2 `textsConsent`: the newest texts row covering the contact for the row's business, or null when there is
+   * none (T-1099). Left out by a reader that does not give it: the stopped flag alone decides, as before.
+   */
+  textsConsent?: TextsConsentRead | null;
   /** K-04 phones: whether the mobile has an open chat (it has texted Rosie). */
   chatOpen: boolean;
   /** Who the recipient is: a customer's text hours start at 9am, the owner's and team's at 8am (RULES 4.3). */
