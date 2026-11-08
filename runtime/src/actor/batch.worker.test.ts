@@ -3,12 +3,13 @@
 // the same fake clock is the batch's clock. The alarm is fired with `runDurableObjectAlarm` (it runs `alarm()` whatever
 // its real time), so "not yet due" is tested through the stored schedule against the fake clock. Test method: T-1128's.
 // Test values only (rule 9).
-import { evictDurableObject, reset, runDurableObjectAlarm } from "cloudflare:test";
+import { evictDurableObject, reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
+import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
 import safetyThreat from "../../../contracts/model/fixtures/safety-threat.json";
 import {
@@ -17,6 +18,7 @@ import {
   type ActorNamespace,
   type HandleActorRpc,
   type InboundEvent,
+  type SealedHandoff,
 } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
 import { harness, type Harness } from "../safety/test-support";
@@ -28,6 +30,7 @@ import {
   type ClosedBatch,
   type HandleActor,
   type HoldEntry,
+  type SafetyEntry,
 } from "./index";
 
 type Json = Record<string, unknown>;
@@ -55,7 +58,8 @@ function door(): ReturnType<typeof durableObjectActor> {
 interface BatchRpc {
   readBatches(): Promise<BatchEntry[]>;
   readHolds(): Promise<HoldEntry[]>;
-  markHoldReleased(eventId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
+  readSafety(): Promise<SafetyEntry[]>;
+  markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
 }
@@ -68,7 +72,7 @@ function actorOf(): BatchRpc {
   return stub();
 }
 
-async function arrive(eventId: string, body = "Can I get a haircut on Thursday afternoon?"): Promise<void> {
+async function handoffOf(eventId: string, body: string): Promise<SealedHandoff> {
   const overrides: Json = { eventId, body };
   const prepared = await prepareHandoff(
     {
@@ -80,7 +84,24 @@ async function arrive(eventId: string, body = "Can I get a haircut on Thursday a
     keys,
   );
   if (prepared.door !== "actor") throw new Error("not an actor event");
-  expect(await door().accept(prepared.handoff)).toBe("written");
+  return prepared.handoff;
+}
+
+async function arrive(eventId: string, body = "Can I get a haircut on Thursday afternoon?"): Promise<void> {
+  expect(await door().accept(await handoffOf(eventId, body))).toBe("written");
+}
+
+/** The actor's stored schedule, earliest first. */
+function scheduleOf(): Promise<{ kind: string; due_ms: number }[]> {
+  return runInDurableObject(stub(), (_, state) =>
+    state.storage.sql
+      .exec<{ kind: string; due_ms: number }>("SELECT kind, due_ms FROM batch_schedule ORDER BY due_ms, kind")
+      .toArray(),
+  );
+}
+
+function alarmOf(): Promise<number | null> {
+  return runInDurableObject(stub(), (_, state) => state.storage.getAlarm());
 }
 
 const asResult = (fixture: unknown): SafetyResult => fixture as SafetyResult;
@@ -88,6 +109,14 @@ const asResult = (fixture: unknown): SafetyResult => fixture as SafetyResult;
 interface Run {
   h: Harness;
   handed: ClosedBatch[];
+  /** How many times the lease was handed a batch, refused or not. */
+  calls(): number;
+  /**
+   * Makes the actor crash the next time a hand-off reaches the lease, in "refusesThenCrashes": the hand-off's writes so far
+   * are persisted first (a real hand-off does I/O before it could crash: the lease hashes and sets the alarm), then the
+   * actor's state is reset.
+   */
+  armCrash(): Promise<void>;
   /** The fake clock moves, then the alarm runs, as the platform would at the stored time. */
   tick(ms: number): Promise<void>;
   /** Settles the safety work and the batch work of what has arrived. */
@@ -97,12 +126,14 @@ interface Run {
 async function withBatch(
   answers: Record<string, SafetyResult>,
   body: (run: Run) => Promise<void>,
-  lease: "wired" | "unwired" | "failsOnce" = "wired",
-  options: { restarts?: boolean } = {},
+  lease: "wired" | "unwired" | "failsOnce" | "refusesThenCrashes" = "wired",
+  options: { restarts?: boolean; delayMs?: number } = {},
 ): Promise<void> {
-  const h = harness(keys, answers);
+  const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
   const handed: ClosedBatch[] = [];
   let failed = false;
+  let calls = 0;
+  let crash: (() => Promise<void>) | null = null;
   // A fake-clock timer that is still waiting keeps `evictDurableObject` from finishing. A test that restarts the actor
   // gives the safety read's 4 s deadline a promise with no timer: every read in it answers at once, so it never fires.
   const deps = options.restarts
@@ -115,17 +146,35 @@ async function withBatch(
       ? {}
       : {
           toLease: (batch: ClosedBatch) => {
-            if (lease === "failsOnce" && !failed) {
+            calls += 1;
+            if ((lease === "failsOnce" || lease === "refusesThenCrashes") && !failed) {
               failed = true;
               throw new Error("lease refused");
             }
+            const crashNow = crash;
+            if (crashNow !== null) {
+              crash = null;
+              // The actor dies in the middle of the hand-off: the hand-off never answers.
+              return crashNow();
+            }
             handed.push(batch);
+            return undefined;
           },
         }),
   });
   const run: Run = {
     h,
     handed,
+    calls: () => calls,
+    async armCrash() {
+      await runInDurableObject(stub(), (_, state) => {
+        crash = async () => {
+          await state.storage.sync();
+          state.abort("a crash in the hand-off");
+          await new Promise<void>(() => undefined);
+        };
+      });
+    },
     async tick(ms) {
       await h.clock.advance(ms);
       await runDurableObjectAlarm(stub());
@@ -147,6 +196,13 @@ const NO = (ids: string[]): Record<string, SafetyResult> =>
   Object.fromEntries(ids.map((id) => [id, asResult(safetyNo)]));
 
 const idsOf = (batch: ClosedBatch): string[] => batch.entries.map((entry) => entry.event.eventId);
+
+/** The id the shared core gave the hold of this text, as the actor recorded it (what K-09 releaseSafetyHold names). */
+async function holdIdOf(eventId: string): Promise<string> {
+  const hold = (await actorOf().readHolds()).find((entry) => entry.eventId === eventId);
+  if (hold?.holdId === undefined || hold.holdId === null) throw new Error("no recorded hold");
+  return hold.holdId;
+}
 
 afterEach(async () => {
   vi.restoreAllMocks();
@@ -269,8 +325,8 @@ describe("a hold from the safety read", () => {
       ]);
       expect(run.handed).toHaveLength(0);
 
-      // The hold lifts (after a clear "we're safe"): both go on, in order.
-      expect(await actorOf().markHoldReleased("evt-1")).toBe("released");
+      // The hold lifts (after a clear "we're safe"): both go on, in order. The core's hold id names it (note a).
+      expect(await actorOf().markHoldReleased(await holdIdOf("evt-1"))).toBe("released");
       await run.settle();
       expect(run.handed.map(idsOf)).toEqual([["evt-1"], ["evt-2"]]);
     });
@@ -284,7 +340,7 @@ describe("a hold from the safety read", () => {
       await run.tick(3000);
       await run.tick(3000);
       await run.settle();
-      expect(await actorOf().markHoldReleased("evt-1")).toBe("neverReleased");
+      expect(await actorOf().markHoldReleased(await holdIdOf("evt-1"))).toBe("neverReleased");
       await run.tick(3000);
       await run.settle();
       expect(run.handed).toHaveLength(0);
@@ -389,5 +445,166 @@ describe("the lease seam and restarts", () => {
       await run.settle();
     });
     expect(JSON.stringify(spy.mock.calls)).not.toContain("SECRETWORD");
+  });
+});
+
+describe("T-247's security notes, before the lease is wired (DL-110)", () => {
+  it("note c: a crash in the middle of a hand-off leaves the release entry, so the restarted actor hands the batch again", async () => {
+    await withBatch(
+      NO(["evt-1"]),
+      async (run) => {
+        await arrive("evt-1");
+        await run.settle();
+        // Closed at 3 s; the lease refuses it, so it is handed again 1 s later, from a release entry already due.
+        await run.tick(3000);
+        await run.settle();
+        expect(run.calls()).toBe(1);
+        expect(await scheduleOf()).toContainEqual({ kind: "batchRelease", due_ms: 4000 });
+
+        // That second hand-off is cut off: the actor crashes while the lease has the batch.
+        await run.armCrash();
+        await run.h.clock.advance(1000);
+        const crashed = await runDurableObjectAlarm(stub()).then(
+          () => "finished",
+          () => "crashed",
+        );
+        expect(crashed).toBe("crashed");
+        expect(run.calls()).toBe(2);
+        expect(run.handed).toHaveLength(0);
+
+        // The restarted actor finds the entry and sets its alarm from it; the alarm (no new text) hands the same batch.
+        expect(await actorOf().readBatches()).toMatchObject([{ batchId: 1, handed: false }]);
+        expect(await scheduleOf()).toContainEqual(expect.objectContaining({ kind: "batchRelease" }));
+        expect(await alarmOf()).not.toBeNull();
+        await run.h.clock.advance(1000);
+        // Fires the alarm now (the platform may already have fired it at its real time).
+        await runDurableObjectAlarm(stub());
+        await vi.waitFor(() => {
+          expect(run.handed.map((batch) => batch.batchId)).toEqual([1]);
+        });
+        expect(await actorOf().readBatches()).toMatchObject([{ batchId: 1, handed: true }]);
+      },
+      "refusesThenCrashes",
+      { restarts: true },
+    );
+  });
+
+  it("note d: a batched text whose safety read never started counts as held", async () => {
+    await withBatch(NO(["evt-1", "evt-2"]), async (run) => {
+      // The read's start fails once the text is stored (the safety clock throws), so the text is in the batch window
+      // with no safety row; the gateway's retry is a duplicate and starts nothing.
+      let broken = true;
+      const restore = setSafetyDeps({
+        ...run.h.deps,
+        clock: {
+          now: () => {
+            if (broken) {
+              broken = false;
+              throw new Error("the clock broke");
+            }
+            return run.h.clock.now();
+          },
+          after: (ms) => run.h.clock.after(ms),
+        },
+      });
+      const first = await handoffOf("evt-1", "Can I get a haircut on Thursday afternoon?");
+      try {
+        await expect(door().accept(first)).rejects.toThrow();
+        expect(await door().accept(first)).toBe("duplicate");
+      } finally {
+        restore();
+      }
+      await arrive("evt-2");
+      await run.settle();
+      expect((await actorOf().readSafety()).map((entry) => entry.eventId)).toEqual(["evt-2"]);
+
+      await run.tick(3000);
+      await run.settle();
+      expect(await actorOf().readBatches()).toMatchObject([
+        { batchId: 1, reason: "quiet", handed: false, eventIds: ["evt-1", "evt-2"] },
+      ]);
+      expect(run.handed).toHaveLength(0);
+    });
+  });
+
+  it("note e: a late danger verdict after a no-match timeout closes the open batch at once, as an on-time one does", async () => {
+    const late = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    await withBatch(
+      { "evt-1": late, ...NO(["evt-2"]) },
+      async (run) => {
+        // Every read answers 5 s after its text: past the 4 s deadline. (Nothing here waits for the reads to settle: the
+        // fake clock never reaches evt-2's.)
+        await arrive("evt-1");
+        await run.tick(2900);
+        await arrive("evt-2");
+        // 4 s: evt-1 has no verdict and no danger word, so the outage line goes and its batch stays open (it would close
+        // at 5.9 s, 3 s after evt-2).
+        await run.tick(1100);
+        await vi.waitFor(() => {
+          expect(run.h.core.fixed.map((call) => call.request.caller.requestId)).toEqual(["safety:evt-1"]);
+        });
+        expect(await actorOf().readBatches()).toEqual([
+          { batchId: 0, reason: null, handed: false, eventIds: ["evt-1", "evt-2"] },
+        ]);
+
+        // 5 s: the late verdict finds danger, and the open batch closes then.
+        await run.h.clock.advance(1000);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readBatches()).toMatchObject([
+            { batchId: 1, reason: "danger", eventIds: ["evt-1", "evt-2"] },
+          ]);
+        });
+        expect(run.h.core.recorded.map((call) => call.request.safety.eventId)).toEqual(["evt-1"]);
+        expect(run.handed).toHaveLength(0);
+      },
+      "wired",
+      { delayMs: 5000 },
+    );
+  });
+
+  it("note e: one threat text sets no alarm that fires every second; nothing is handed on", async () => {
+    await withBatch({ "evt-1": asResult(safetyThreat) }, async (run) => {
+      await arrive("evt-1", "if Riley messes up my hair again I'll hurt him");
+      await run.settle();
+      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: false }]);
+      expect(await scheduleOf()).toEqual([]);
+      expect(await alarmOf()).toBeNull();
+
+      await run.h.clock.advance(5000);
+      expect(await runDurableObjectAlarm(stub())).toBe(false);
+      expect(run.handed).toHaveLength(0);
+    });
+  });
+
+  it("note e: a held batch polls nothing until its hold is released, and the release hands it on", async () => {
+    await withBatch({ "evt-1": asResult(safetyCrisisWords) }, async (run) => {
+      await arrive("evt-1", "I don't want to be alive anymore");
+      await run.settle();
+      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: false }]);
+      expect(await scheduleOf()).toEqual([]);
+      expect(await alarmOf()).toBeNull();
+
+      expect(await actorOf().markHoldReleased(await holdIdOf("evt-1"))).toBe("released");
+      await run.settle();
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+      expect(await scheduleOf()).toEqual([]);
+    });
+  });
+
+  it("note e: with no safety read wired, a text is held and nothing polls", async () => {
+    await withBatch({}, async (run) => {
+      const restore = setSafetyDeps(null);
+      try {
+        await arrive("evt-1");
+        await run.tick(3000);
+        await run.settle();
+        expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
+        expect(await scheduleOf()).toEqual([]);
+        expect(await alarmOf()).toBeNull();
+        expect(run.handed).toHaveLength(0);
+      } finally {
+        restore();
+      }
+    });
   });
 });

@@ -93,6 +93,17 @@ export function unmarkReceipt(storage: DurableObjectStorage, eventId: string): v
   storage.sql.exec("DELETE FROM seen_receipts WHERE event_id = ?", eventId);
 }
 
+function entryOf(row: InboxRow): InboxEntry {
+  return {
+    seq: row.seq,
+    event: JSON.parse(row.event_json) as SealedEvent,
+    partKey: row.part_key,
+    traceId: row.trace_id,
+    bundleId: { hash: row.bundle_hash, build: row.bundle_build },
+    startsTurn: row.starts_turn === 1,
+  };
+}
+
 /** The inbox in arrival order. */
 export function readInbox(sql: SqlStorage): InboxEntry[] {
   return sql
@@ -101,12 +112,18 @@ export function readInbox(sql: SqlStorage): InboxEntry[] {
        FROM inbox ORDER BY seq`,
     )
     .toArray()
-    .map((row) => ({
-      seq: row.seq,
-      event: JSON.parse(row.event_json) as SealedEvent,
-      partKey: row.part_key,
-      traceId: row.trace_id,
-      bundleId: { hash: row.bundle_hash, build: row.bundle_build },
-      startsTurn: row.starts_turn === 1,
-    }));
+    .map(entryOf);
+}
+
+/** The stored events with these event ids, in arrival order (an id the inbox does not hold is left out). */
+export function readInboxEvents(sql: SqlStorage, eventIds: readonly string[]): InboxEntry[] {
+  if (eventIds.length === 0) return [];
+  return sql
+    .exec<InboxRow>(
+      `SELECT seq, event_json, part_key, trace_id, bundle_hash, bundle_build, starts_turn
+       FROM inbox WHERE event_id IN (SELECT value FROM json_each(?)) ORDER BY seq`,
+      JSON.stringify(eventIds),
+    )
+    .toArray()
+    .map(entryOf);
 }

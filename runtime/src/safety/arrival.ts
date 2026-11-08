@@ -15,7 +15,7 @@
 // (`routineHeld`, `readSafety`); it does not batch. Never logged or put in a span: a word, an evidence quote, a number.
 
 import { openWords, sealWords, type SealedWords } from "../gateway/seal";
-import type { SealedHandoff } from "../gateway/types";
+import type { SealedEvent, SealedHandoff } from "../gateway/types";
 import { isLabel, openTrace, type SpanSink } from "../trace";
 import type { ModelCall } from "../trace/types";
 import {
@@ -157,14 +157,23 @@ export function createSafetyTables(sql: SqlStorage): void {
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
 const READ_KINDS: readonly string[] = ["text", "photo", "pollVote", "edit"];
 
-export function isReadable(handoff: SealedHandoff): boolean {
-  const { event } = handoff;
+/** True when the safety read reads this stored event's words. */
+export function isReadableEvent(event: SealedEvent): boolean {
   return READ_KINDS.includes(event.kind) && event.sealed !== null && event.fromRosie !== true;
+}
+
+export function isReadable(handoff: SealedHandoff): boolean {
+  return isReadableEvent(handoff.event);
 }
 
 export interface SafetyHost {
   storage: DurableObjectStorage;
   spanSink: () => SpanSink;
+  /**
+   * Called after a verdict that came late (after the 4 s timeout) has been applied: it may have found danger (the open
+   * batch closes at once, as on time) or lifted the unread hold (the batches it kept back go on).
+   */
+  afterLate?: (eventId: string) => void;
 }
 
 export class SafetyOnArrival {
@@ -266,14 +275,38 @@ export class SafetyOnArrival {
   /**
    * Notes that the shared core released a hold (the turn's gate, or the console, calls `releaseSafetyHold`: after a
    * clear "we're safe" with a fresh read-back, once the booking is private, or at once after the line). The actor keeps
-   * only its mirror of it. A threat's hold is never released (A3-48).
+   * only its mirror of it, found by the core's hold id: only a hold the core recorded, named by its id, is released
+   * (T-246 and T-247 security note a). An unread hold (no read said it is safe: only the read's late verdict lifts it) and
+   * a hold the core has not recorded yet (no hold id while PostgreSQL was down) have no id to name, so they stay held. A
+   * threat's hold is never released (A3-48).
    */
-  markHoldReleased(eventId: string): "released" | "neverReleased" | "noSuchHold" {
-    const hold = this.readHolds().find((entry) => entry.eventId === eventId);
+  markHoldReleased(holdId: string): "released" | "neverReleased" | "noSuchHold" {
+    const hold = this.readHolds().find(
+      (entry) => entry.holdId !== null && entry.holdId === holdId && entry.rule !== "unread",
+    );
     if (hold === undefined) return "noSuchHold";
     if (hold.rule === "never") return "neverReleased";
-    this.host.storage.sql.exec("UPDATE safety_holds SET released = 1 WHERE event_id = ?", eventId);
+    this.host.storage.sql.exec(
+      "UPDATE safety_holds SET released = 1 WHERE event_id = ? AND hold_id = ?",
+      hold.eventId,
+      holdId,
+    );
     return "released";
+  }
+
+  /** The event ids among these that have no safety row: their read never started. */
+  withoutSafetyRow(eventIds: readonly string[]): string[] {
+    if (eventIds.length === 0) return [];
+    const known = new Set(
+      this.host.storage.sql
+        .exec<{ event_id: string }>(
+          "SELECT event_id FROM safety_events WHERE event_id IN (SELECT value FROM json_each(?))",
+          JSON.stringify(eventIds),
+        )
+        .toArray()
+        .map((row) => row.event_id),
+    );
+    return eventIds.filter((eventId) => !known.has(eventId));
   }
 
   /**
@@ -400,7 +433,8 @@ export class SafetyOnArrival {
     await this.applyResult(set, handoff, arrivedAt, stand, timeoutCalls(), first);
 
     // A verdict that arrives late changes a timeout that found no danger word: it is applied then, and the unread hold lifts.
-    // It is not waited for: a read that never answers must not keep the text's work open.
+    // It is not waited for: a read that never answers must not keep the text's work open. The actor is told once it is
+    // applied, so danger closes the open batch at once and a lifted hold lets the waiting batches go on (note e).
     if (
       first === "deadline" &&
       matches.length === 0 &&
@@ -411,6 +445,7 @@ export class SafetyOnArrival {
         .then(async (late) => {
           if (late !== "failed" && !late.result.timedOut) {
             await this.applyResult(set, handoff, arrivedAt, late.result, late.modelCalls, "late");
+            this.host.afterLate?.(eventId);
           }
         })
         .catch(() => undefined);

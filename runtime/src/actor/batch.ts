@@ -12,12 +12,18 @@
 // 317 to 327), and in order: a held batch keeps the later ones behind it.
 //
 // The Durable Object has one alarm. What is due is kept in a small stored schedule (`batch_schedule`: one row per kind of
-// entry; the resume of a cut-off safety read, T-1088, adds its own kind), the alarm is set to the earliest row, and each
-// entry's handler is idempotent: a restart inside the window still closes the batch from stored state.
+// entry; the turn lease adds its own kind, and the resume of a cut-off safety read, T-1088, will add one), the alarm is set
+// to the earliest row, and each entry's handler is idempotent: a restart inside the window still closes the batch from
+// stored state.
 //
-// Not here: the lease and its restart rule (T-248). The seam is `BatchHooks.toLease`: it is handed each closed, released
-// batch once, in order; a hook that throws is tried again later with the same batch id, so the lease must take a batch id
-// it has seen as already handed. Never logged or put in a span: a text's words (K-08 README line 75). Nothing here logs.
+// The hand-off (T-247's security notes c and e): the release entry stays stored while a batch is being handed, so a crash
+// in the middle of a hand-off still hands the batch again after the restart; and nothing polls while a hold keeps a batch
+// back, because every way a hold lifts (the read's end, a late verdict, a released hold) hands the waiting batches on
+// itself, so one threat text cannot keep an alarm firing every second.
+//
+// The lease (T-248, lease.ts) takes each closed, released batch once, in order. A hand-off is at least once: one that
+// throws is tried again later with the same batch id, and the lease takes a batch id it has seen as already handed. Never
+// logged or put in a span: a text's words (K-08 README line 75). Nothing here logs.
 
 import { readInbox, type InboxEntry } from "./inbox";
 
@@ -27,7 +33,7 @@ export const QUIET_MS = 3000;
 export const MAX_MS = 6000;
 /** The third text closes the batch. */
 export const MAX_TEXTS = 3;
-/** While a closed batch waits for a hold, or the lease refused it, how often it is looked at again. */
+/** While a batch is being handed on, or after the lease refused it, when it is looked at again. */
 export const RELEASE_RETRY_MS = 1000;
 
 export type CloseReason = "quiet" | "third" | "max" | "danger";
@@ -48,7 +54,11 @@ export interface BatchClock {
   now(): number;
 }
 
-/** Joined at D-017 (the lease, T-248); a test sets a fake clock. Unwired, a closed batch stays stored and nothing is handed on. */
+/**
+ * The clock of the actor's stored schedule (a test sets a fake one; the turn lease reads the same clock, so every entry of
+ * the schedule is on one clock). `toLease` stands in for the actor's own turn lease, for the batch window's own tests:
+ * unset, each closed batch goes to the actor's lease (T-248), which keeps it stored while no turn can run (D-017).
+ */
 export interface BatchHooks {
   clock: BatchClock;
   toLease?: (batch: ClosedBatch) => void | Promise<void>;
@@ -66,6 +76,11 @@ export function setBatchHooks(next: BatchHooks): () => void {
   };
 }
 
+/** The clock the actor's stored schedule runs on. */
+export function actorClock(): BatchClock {
+  return hooks.clock;
+}
+
 /** One stored batch as a reader sees it. */
 export interface BatchEntry {
   batchId: number;
@@ -79,12 +94,32 @@ export interface BatchEntry {
 export const SCHEDULE_BATCH_CLOSE = "batchClose";
 export const SCHEDULE_RELEASE = "batchRelease";
 
+/** The actor's one stored schedule: one entry per kind, each due at a time on the actor's clock. */
+export function createScheduleTable(sql: SqlStorage): void {
+  sql.exec("CREATE TABLE IF NOT EXISTS batch_schedule (kind TEXT PRIMARY KEY, due_ms INTEGER NOT NULL)");
+}
+
+/** Sets the entry of this kind to fall due at `dueMs` (one entry per kind). */
+export function scheduleEntry(sql: SqlStorage, kind: string, dueMs: number): void {
+  sql.exec("INSERT OR REPLACE INTO batch_schedule (kind, due_ms) VALUES (?, ?)", kind, dueMs);
+}
+
+/** Removes the entry of this kind, if there is one. */
+export function unscheduleEntry(sql: SqlStorage, kind: string): void {
+  sql.exec("DELETE FROM batch_schedule WHERE kind = ?", kind);
+}
+
 export interface BatchHost {
   storage: DurableObjectStorage;
   /** True while routine work must wait (the safety hold). */
   held(): boolean;
   /** True when this text found danger. */
   isDanger(eventId: string): boolean;
+  /**
+   * The actor's turn lease (T-248): "taken" once the batch is the lease's (now or before: a batch id it has seen), or
+   * "unwired" when no turn can run yet, so the batch stays stored here and nothing polls. A throw: tried again later.
+   */
+  lease(batch: ClosedBatch): Promise<"taken" | "unwired">;
 }
 
 interface ItemRow extends Record<string, SqlStorageValue> {
@@ -121,7 +156,7 @@ export function createBatchTables(sql: SqlStorage): void {
        handed INTEGER NOT NULL DEFAULT 0
      )`,
   );
-  sql.exec("CREATE TABLE IF NOT EXISTS batch_schedule (kind TEXT PRIMARY KEY, due_ms INTEGER NOT NULL)");
+  createScheduleTable(sql);
 }
 
 export class BatchWindow {
@@ -201,7 +236,7 @@ export class BatchWindow {
   // ---- the schedule and the alarm --------------------------------------------------------------------------------
 
   private scheduleAt(kind: string, dueMs: number): void {
-    this.sql.exec("INSERT OR REPLACE INTO batch_schedule (kind, due_ms) VALUES (?, ?)", kind, dueMs);
+    scheduleEntry(this.sql, kind, dueMs);
   }
 
   /** Sets the one alarm to the earliest stored entry, or clears it when nothing is due. */
@@ -217,7 +252,10 @@ export class BatchWindow {
     await this.host.storage.setAlarm(Date.now() + Math.max(0, due - hooks.clock.now()));
   }
 
-  /** The alarm: runs each due entry's handler (each one idempotent), hands on what is ready, and sets the alarm again. */
+  /**
+   * The alarm: runs each due entry's handler (each one idempotent), hands on what is ready, and sets the alarm again. The
+   * release entry is not cleared here: the hand-off clears it once nothing is left to hand (note c).
+   */
   async onAlarm(): Promise<void> {
     const now = hooks.clock.now();
     const due = this.sql
@@ -225,8 +263,6 @@ export class BatchWindow {
       .toArray()
       .map((row) => row.kind);
     if (due.includes(SCHEDULE_BATCH_CLOSE)) this.closeIfDue(now);
-    if (due.includes(SCHEDULE_RELEASE))
-      this.sql.exec("DELETE FROM batch_schedule WHERE kind = ?", SCHEDULE_RELEASE);
     await this.release();
     await this.arm();
   }
@@ -258,7 +294,6 @@ export class BatchWindow {
   }
 
   private async releaseNow(): Promise<void> {
-    const toLease = hooks.toLease;
     for (;;) {
       const next = this.sql
         .exec<BatchRow>(
@@ -266,35 +301,62 @@ export class BatchWindow {
         )
         .toArray()[0];
       if (next === undefined) {
-        this.sql.exec("DELETE FROM batch_schedule WHERE kind = ?", SCHEDULE_RELEASE);
+        unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;
       }
-      // Unwired: nothing is handed on and nothing polls; the batch stays stored.
-      if (toLease === undefined) return;
+      // Held: nothing polls (note e). The hold lifts only through a call that hands the waiting batches on itself: the
+      // read's end or a late verdict (the actor's safety callbacks), or a released hold (`markHoldReleased`).
       if (this.host.held()) {
-        this.scheduleAt(SCHEDULE_RELEASE, hooks.clock.now() + RELEASE_RETRY_MS);
+        unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;
       }
       const eventSeqs = this.sql
         .exec<{ seq: number }>("SELECT seq FROM batch_items WHERE batch_id = ? ORDER BY seq", next.batch_id)
         .toArray()
         .map((row) => row.seq);
-      const entries = readInbox(this.sql).filter((entry) => eventSeqs.includes(entry.seq));
+      const batch: ClosedBatch = {
+        batchId: next.batch_id,
+        reason: next.reason as CloseReason,
+        firstAt: next.first_ms,
+        lastAt: next.last_ms,
+        closedAt: next.closed_ms,
+        entries: readInbox(this.sql).filter((entry) => eventSeqs.includes(entry.seq)),
+      };
+      // The release entry stays stored while the batch is handed, and the alarm is set for it (note c): a crash in the
+      // middle of the hand-off leaves the entry, so the alarm wakes the actor and the batch is handed again (same id).
+      this.scheduleAt(SCHEDULE_RELEASE, hooks.clock.now() + RELEASE_RETRY_MS);
+      await this.arm();
+      let answer: "taken" | "unwired";
       try {
-        await toLease({
-          batchId: next.batch_id,
-          reason: next.reason as CloseReason,
-          firstAt: next.first_ms,
-          lastAt: next.last_ms,
-          closedAt: next.closed_ms,
-          entries,
-        });
+        const stand = hooks.toLease;
+        if (stand === undefined) {
+          answer = await this.host.lease(batch);
+        } else {
+          await stand(batch);
+          answer = "taken";
+        }
       } catch {
-        this.scheduleAt(SCHEDULE_RELEASE, hooks.clock.now() + RELEASE_RETRY_MS);
+        // Refused: the entry stays, so the same batch is handed again in RELEASE_RETRY_MS.
+        return;
+      }
+      // No turn can run yet: nothing is handed on and nothing polls; the batch stays stored.
+      if (answer === "unwired") {
+        unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;
       }
       this.sql.exec("UPDATE batches SET handed = 1 WHERE batch_id = ?", next.batch_id);
     }
+  }
+
+  /** The event ids of the texts not handed on yet: those of the open batch and of the closed batches still waiting. */
+  pendingEventIds(): string[] {
+    return this.sql
+      .exec<{ event_id: string }>(
+        `SELECT i.event_id FROM batch_items i LEFT JOIN batches b ON b.batch_id = i.batch_id
+         WHERE i.batch_id IS NULL OR b.handed = 0 ORDER BY i.seq`,
+      )
+      .toArray()
+      .map((row) => row.event_id);
   }
 
   /** Every stored batch, in order, with the texts of the open one last (batch id 0, reason null). */
