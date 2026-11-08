@@ -1,0 +1,63 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": [
+      "customers/seed-customer-mobile-email.json",
+      "core/seed-resources.json",
+      "core/seed-phone-chat-open.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": [
+      "j3-open-request-business-text.json",
+      "j3-confirm-business-booking-yes.json",
+      "j3-stop-tells-businesses.json"
+    ],
+    "now": "2026-10-23T14:12:02Z",
+    "stated": { "step": "A3-30", "gives": ["who_for", "reach_by", "times", "customer"] },
+    "note": "A3-30 on the Today page with a stopped mobile: the day after Alex texted STOP (j3-stop-tells-businesses.json), Sam enters Alex's next haircut, Sat Oct 31 11:00am with Riley, at the desk on the Today page (openRequest door business, caller page, booker Alex on the list, as j3-open-request-business-desk.json does for Tessa; its insert wrote taken 'nothing': README default 55), and the page server got the read-back's words and versions from readBackBusinessBooking (as j3-read-back-page.json does) and kept them with his session. Sam taps '1 Yes, send the link'. The page server sends the words and versions, never the browser; the call fills the read-back again from those versions, finds the same words, and compares every version (limit 4). It books it as entered and gives the four keys, but Alex's mobile is stopped (K-04 phones.stopped, MC C1), and the business's yes is not Alex's: only START, or a fresh yes on a new booking sent from that number, turns texts back on (S13-32), so no texts consent and no chat link are written. The page's commit has no turn and writes no outbox row (K-04 outbox_rows.turn_id is not null; README open gap 43), so textsOff names the fixed line with no row and the Today page shows Sam only 'Texts to this customer are off. Reach them their way.' itself, never where the stop came from (README default 50), as safetyLine.outboxRowId is null for a page. The booking ids, the line and the reservation are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0502",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0501"
+    },
+    "bookingId": "booking-alex-desk",
+    "expectVersion": 1,
+    "answer": "yesSendLink",
+    "readBack": {
+      "kind": "page",
+      "exactWords": "Book this for Alex M.? Did Alex agree to messages from Rosie? / Haircut · Sat Oct 31 / 11:00am · Riley / For Alex, 18 or older / Alex M. · mobile on file / No Rosie $2: Lee's Barbershop added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+      "versionsRead": [
+        { "table": "bookings", "rowId": "booking-alex-desk", "version": 1 },
+        { "table": "booking_details", "rowId": "booking-alex-desk", "version": 1 },
+        { "table": "booking_lines", "rowId": "line-alex-desk-1", "version": 1 },
+        { "table": "reservations", "rowId": "rsv-alex-desk-riley", "version": 1 },
+        { "table": "customers", "rowId": "customer-alex-barbershop", "version": 1 }
+      ],
+      "yesEventId": "evt-page-sam-0502"
+    },
+    "changed": null
+  },
+  "outcome": {
+    "bookingId": "booking-alex-desk",
+    "customerId": "customer-alex-barbershop",
+    "gives": ["who_for", "reach_by", "times", "customer"],
+    "answer": "yesSendLink",
+    "stage": "booked",
+    "consentId": null,
+    "reservation": { "reservationId": "rsv-alex-desk-riley", "state": "booked", "version": 2 },
+    "textsOff": { "fixedLineId": "textsOffReachTheirWay", "outboxRowId": null },
+    "effects": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-desk", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-alex-desk", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-alex-desk-riley", "version": 2 }
+    ],
+    "outboxRowIds": [],
+    "repeated": false
+  }
+}

@@ -504,7 +504,7 @@
           "type": "boolean"
         },
         "businessesTold": {
-          "description": "v1.1 (README default 50; v1's open gap 18): for a STOP, each business with an open booking for that phone (K-04 v1 bookings at stage entry or booked whose booker, person served or payer has that phone as their own handle), told once, in the same commit, by an outbox row to its owner with the fixed line 'Texts to this customer are off. Reach them their way.' and nothing more: never where the stop came from, never the words (RULES 7.5; MC C1; S13-32, MASTER-FLOW-A line 7229; A3-12). A STOP with no open booking, a START and a work phone's answer tell no one (empty). On a repeat, the rows first written. Left out only by a v1 call.",
+          "description": "v1.1 (README default 50; v1's open gap 18): for a STOP, each business with an open booking for that phone (K-04 v1 bookings at stage entry or booked whose booker, person served or payer has that phone as their own handle), told once, in the same commit, by an outbox row to its owner with the fixed line 'Texts to this customer are off. Reach them their way.' and nothing more: never where the stop came from, never the words (RULES 7.5; MC C1; S13-32, MASTER-FLOW-A line 7229; A3-12). A STOP made with no turn (a page's or an email's STOP for the caller's own number, inboundEventId null; or a STOP text its actor writes on return, caller.kind actorOnReturn) cannot write an outbox row (K-04 v1 outbox_rows.turn_id is not null), so its commit writes, for each such business, one K-04 v1 clock_rows row of kind step (S13-32) owned by that business's owner's handle and due at once, whose firing, a clock turn on that handle (README default 24), writes the same row to the owner within the minute and never texts the stopped phone (README default 56; open gap 43). A STOP with no open booking, a START and a work phone's answer tell no one (empty). On a repeat, the rows first written. Left out only by a v1 call.",
           "type": "array",
           "items": {
             "title": "BusinessToldTextsOff",
@@ -513,7 +513,7 @@
               "businessId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
               "fixedLineId": { "const": "textsOffReachTheirWay" },
               "outboxRowId": {
-                "description": "The row to the business's owner (send class routine, held for the owner's text hours as any owner row is), or null when the actor sent the STOP's reply itself while PostgreSQL was down and the notice is written on return.",
+                "description": "The row to the business's owner (send class routine, held for the owner's text hours as any owner row is), written in the STOP's own turn; or null for a STOP made with no turn (a page's, an email's, or one its actor writes on return), whose notice row the clock turn of README default 56 writes instead, within the minute (README open gap 43).",
                 "$ref": "#/$defs/nullableId"
               }
             },
@@ -840,7 +840,7 @@
     },
     "openRequest.request": {
       "title": "OpenRequestRequest",
-      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number). At door business it also takes and stores the values the BOOK words or the Today page entry name (entered; README default 43), each where A3-30's read-back and its reply read it as a fact with its version: the service as the K-30 v1 booking_lines row written on the owner's BOOK (K-30 README: 'on the owner's BOOK'), a new customer's contacts as their own K-04 handles (with a phones row and a contacts/add effect for a mobile: Q-03), both in the same commit; and the time entered held for the booking by K-05 v1 reserve (for the booking, door standard: 10 minutes, Q-12), right after that commit in the same turn or call, since K-04 reservations.booking_id names the head, and before the read-back is composed. A time already held or booked for someone else (K-05 v1 reserve: overlap) leaves held null, and the read-back offers the next open times instead (limit 5's nextOpenTimes, arch 06 line 307; on the page, the times shown again); the request stays open, and '3 Change it' takes the new time (confirmBusinessBooking, changeIt). These values give no key: who_for, reach_by, times and customer are the reply's (confirmBusinessBooking, A3-30, B3-08). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker); at door business, and for the desk's walk_in on the Today page, caller.personId is the owner, an admin or staff of the business (K-04 v1 person_roles: 'Sam, a barber or the desk can book for a customer'), else notAllowed (wrongRole). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, each row at version 1: the head and the details row, and at door business the line, a new customer's handles and phone row, and the hold (K-04 v1 rule 2; K-30 v1 rule 4; K-05 v1 reserve). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
+      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number; at door business also taken 'nothing', set once in this insert, since a booking the business adds takes nothing (K-30 v1 booking_details.taken: 'nothing (... a booking the business adds)'; SPEC-master 5e: 'a shop-added booking'; A3-30: 'It's booked as entered: nothing is taken unless the customer adds a card on the link'), so A3-30's and B3-08's '2 Not yet', whose gate shows only when taken is 'nothing', is on the reply's frontier (arch 03 line 161); at every other door taken stays null until the money step, A5-04 and A5-08: README default 55). At door business it also takes and stores the values the BOOK words or the Today page entry name (entered; README default 43), each where A3-30's read-back and its reply read it as a fact with its version: the service as the K-30 v1 booking_lines row written on the owner's BOOK (K-30 README: 'on the owner's BOOK'), a new customer's contacts as their own K-04 handles (with a phones row and a contacts/add effect for a mobile: Q-03), both in the same commit; and the time entered held for the booking by K-05 v1 reserve (for the booking, door standard: 10 minutes, Q-12), right after that commit in the same turn or call, since K-04 reservations.booking_id names the head, and before the read-back is composed. A time already held or booked for someone else (K-05 v1 reserve: overlap) leaves held null, and the read-back offers the next open times instead (limit 5's nextOpenTimes, arch 06 line 307; on the page, the times shown again); the request stays open, and '3 Change it' takes the new time (confirmBusinessBooking, changeIt). These values give no key: who_for, reach_by, times and customer are the reply's (confirmBusinessBooking, A3-30, B3-08). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker); at door business, and for the desk's walk_in on the Today page, caller.personId is the owner, an admin or staff of the business (K-04 v1 person_roles: 'Sam, a barber or the desk can book for a customer'), else notAllowed (wrongRole). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, each row at version 1: the head and the details row, and at door business the line, a new customer's handles and phone row, and the hold (K-04 v1 rule 2; K-30 v1 rule 4; K-05 v1 reserve). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1287,14 +1287,17 @@
           "additionalProperties": false
         },
         "textsOff": {
-          "description": "For yesSendLink when the customer's mobile is stopped (K-04 v1 phones.stopped, MC C1): no consent and no link are written, since only START or a fresh yes sent from that number turns texts back on (S13-32), and the one who answered hears only 'Texts to this customer are off. Reach them their way.' (RULES 7.5; MC C1; S13-32; A3-12), a fixed line never saying where the stop came from; null otherwise (README default 50; v1's open gap 18).",
+          "description": "For yesSendLink when the customer's mobile is stopped (K-04 v1 phones.stopped, MC C1): no consent and no link are written, since only START or a fresh yes sent from that number turns texts back on (S13-32), and the one who answered hears only 'Texts to this customer are off. Reach them their way.' (RULES 7.5; MC C1; S13-32; A3-12), a fixed line never saying where the stop came from: in a turn as an outbox row in their own chat, on the Today page shown by the page itself (outboxRowId null); null otherwise (README default 50; v1's open gap 18).",
           "anyOf": [
             {
               "title": "TextsOffNotice",
               "type": "object",
               "properties": {
                 "fixedLineId": { "const": "textsOffReachTheirWay" },
-                "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                "outboxRowId": {
+                  "description": "The outbox row to the one who answered, in their own chat, when the reply came in a turn; null for a page caller (the Today page), whose commit writes no outbox row (K-04 v1 outbox_rows.turn_id is not null; README open gap 43) and which shows the line itself, as safetyLine.outboxRowId is null for a page or an agent. The exchange holds it to the caller (confirmBusinessBooking.exchange).",
+                  "$ref": "#/$defs/nullableId"
+                }
               },
               "required": ["fixedLineId", "outboxRowId"],
               "additionalProperties": false
@@ -1429,7 +1432,58 @@
         }
       },
       "required": ["call", "given", "request", "outcome"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "page" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "description": "The Today page's commit writes no outbox row (K-04 v1 outbox_rows.turn_id is not null; README open gap 43): a stopped mobile's texts-off line has no row, and the page shows it itself (README default 50).",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "textsOff": {
+                "anyOf": [
+                  { "type": "null" },
+                  { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "description": "In a turn the texts-off line is an outbox row in the answerer's own chat (README default 50).",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "textsOff": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": { "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     "readBackBusinessBooking.request": {
       "title": "ReadBackBusinessBookingRequest",
