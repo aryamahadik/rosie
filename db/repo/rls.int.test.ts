@@ -52,8 +52,8 @@ const readCore = (relative: string): unknown => JSON.parse(readFileSync(new URL(
 
 const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).tables;
 /**
- * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), and K-37 v1 platform and
- * review (T-193).
+ * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
+ * review (T-193), and K-07 v1's schema addition: effects, provider events and outbox claims (T-194).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -72,6 +72,14 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/platform-review/platform-review.v1.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/outbox-effects/outbox-effects.v1.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -639,7 +647,8 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         "SELECT",
         "INSERT",
         ...(table.versioned ? ["UPDATE"] : []),
-        ...(role === RUNTIME && table.name === "person_handles" ? ["DELETE"] : []),
+        // K-05 item 29 removes a person's handle link; K-07 deletes a claim at a row's move to waiting_chat.
+        ...(role === RUNTIME && ["person_handles", "outbox_claims"].includes(table.name) ? ["DELETE"] : []),
       ].sort();
     };
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
