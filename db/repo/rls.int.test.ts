@@ -66,7 +66,7 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
 /**
  * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
- * incidents (T-580), and K-36 v1 notifications (T-581).
+ * incidents (T-580), K-36 v1 notifications (T-581), and K-23 v1 business setup (T-203).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -112,6 +112,14 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/notifications/notifications.v1.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/business-setup/business-setup.v1.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
