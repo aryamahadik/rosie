@@ -30,7 +30,10 @@ const isList = (value: unknown): value is readonly unknown[] => Array.isArray(va
 const ENDS = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu;
 const INNER_SPACES = /\s+/gu;
 
-/** Words as the guard compares them: NFKC, cut at both ends to the first and last letter or digit, inner spaces as one, upper case. */
+/**
+ * Words as the guard compares them: NFKC, cut at both ends to the first and last letter or digit, each run of inner spaces
+ * as one space, in upper case.
+ */
 export function keyOf(words: string): string {
   return words.normalize("NFKC").replace(ENDS, "").replace(INNER_SPACES, " ").toUpperCase();
 }
