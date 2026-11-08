@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } fr
 import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
 import {
   checkUnits,
+  questionClock,
   type CommitTurnContext,
   type CommitUnit,
   type Committed,
@@ -74,11 +75,14 @@ import {
   k09Fixture,
   messagesReaderOn,
   phoneRow,
+  questionsAsked,
   stringsIn,
   withHandleAddress,
   withMore,
   withPhones,
+  withQuestions,
   worldOf,
+  type FakeAloneCommit,
   type FlagsRecord,
   type World,
 } from "./test-support";
@@ -88,6 +92,9 @@ const validator: ToolApiValidator = createToolApiValidator();
 /** Ben's mobile as K-09 v1's fixtures name it (stop-recorded.json, start-recorded.json), in the 555-01xx range. */
 const BEN_K09 = "+15555550131";
 const ALEX = "+15555550101";
+/** Sam's and Avery's mobiles as K-04 v1's seed-person-roles.json names them (the barbershop's owner and staff). */
+const SAM = "+15555550100";
+const AVERY = "+15555550103";
 
 interface Exchange<Request, Outcome> {
   readonly given: { readonly now: string };
@@ -169,7 +176,8 @@ function stopTurn(input: {
   handleId: string;
   eventId: string;
   number: string;
-  personId: string;
+  /** The sender of the turn's texts; null for a clock turn, which has none. */
+  personId: string | null;
   kind?: StopOrStartRequest["kind"];
   words?: string;
   now: string;
@@ -866,7 +874,8 @@ describe("a replayed STOP written on return keeps its original time and is writt
       now: () => RETURN,
     });
     await recordStopOrStartAlone(replayedStop(), null, deps);
-    // A START sent before that STOP, queued and written after it (T-269's queue keeps order; this holds regardless).
+    // A START sent before that STOP, written after it: the newest word decides whatever order the writes arrive in
+    // (DL-193), with no help from T-269's queue order.
     const olderStart: StopOrStartRequest = {
       ...replayedStop("evt-ben-0005"),
       kind: "start",
@@ -879,10 +888,14 @@ describe("a replayed STOP written on return keeps its original time and is writt
       },
     };
     const answer = await recordStopOrStartAlone(olderStart, null, deps);
-    expect(answer).toMatchObject({ stopped: true, chatOpen: false, phoneVersion: 4, repeated: false });
+    // Every START moves start_at (DL-193), so its row is written (version 5); the newer STOP keeps the phone stopped.
+    expect(answer).toMatchObject({ stopped: true, chatOpen: false, phoneVersion: 5, repeated: false });
     expect(world.record.phones.find((each) => each.handleId === "handle-ben")).toMatchObject({
       stopped: true,
-      version: 4,
+      chatOpen: false,
+      stopAt: new Date("2026-10-21T19:30:02Z"),
+      startAt: new Date("2026-10-21T19:10:00Z"),
+      version: 5,
     });
     const rows = await messagesReaderOn(world, null).consentsOfPersons(["person-ben"]);
     expect(textsStanding(rows, "person-ben", BARBERSHOP, "handle-ben")).toMatchObject({ revoked: true });
@@ -900,6 +913,288 @@ describe("a replayed STOP written on return keeps its original time and is writt
       expect(answer).toEqual({ error: "notFromThatPhone", phoneNumber: BEN_K09 });
     }
     expect(commit.requests).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+
+/** When Ben's actor writes its outage record on return (arch 11 line 566). */
+const RETURN_AT = "2026-10-22T14:30:00Z";
+
+/** A word Ben's actor writes on return: its text's event, and when the actor sent its reply (null: it sent none). */
+function benOnReturn(kind: "stop" | "start", eventId: string, sentAt: string | null): StopOrStartRequest {
+  return {
+    caller: {
+      kind: "actorOnReturn",
+      turnId: null,
+      requestId: eventId,
+      businessId: null,
+      personId: "person-ben",
+      traceId: `trace-${eventId}`,
+    },
+    kind,
+    phoneNumber: BEN_K09,
+    inboundEventId: eventId,
+    words: kind === "stop" ? "STOP" : "START",
+    alsoCancelVisit: false,
+    workPhoneBusinessIds: null,
+    sentByActor:
+      sentAt === null
+        ? null
+        : {
+            at: sentAt,
+            fixedLineId: kind === "stop" ? "stopReply" : "startReply",
+            linqMessageId: `linq-msg-${eventId}`,
+          },
+  };
+}
+
+interface OnReturn {
+  readonly world: World;
+  readonly commit: FakeAloneCommit;
+  readonly deps: FlagsDeps<unknown>;
+}
+
+/** Ben's world, stopped at T0 by stop-recorded.json's STOP in his turn (2026-10-21T19:30:02Z) or not, and his actor. */
+async function benOnReturnWorld(stoppedAtT0: boolean): Promise<OnReturn> {
+  const world = benWorld();
+  if (stoppedAtT0) {
+    const exchange = stopRecorded();
+    const stop = await stopOrStartCore(
+      stopActionOf(exchange.request),
+      turnContext(exchange.request),
+      depsOn(world),
+    );
+    world.record = applied(world.record, stop.writes.state);
+  }
+  const commit = fakeAloneCommit(world);
+  const events = eventSourcesOf(
+    Object.fromEntries(
+      ["evt-ben-0011", "evt-ben-0012", "evt-ben-0013", "evt-ben-0014"].map((id) => [id, "handle-ben"]),
+    ),
+  );
+  return { world, commit, deps: depsOn(world, { events, commitAlone: commit, now: () => RETURN_AT }) };
+}
+
+const benPhone = (world: World): FlagsRecord["phones"][number] | undefined =>
+  world.record.phones.find((each) => each.handleId === "handle-ben");
+
+/** The row that decides Ben's texts at a business, on the runtime side: K-29's newest (K-29 README). */
+async function benStanding(world: World, businessId: string): Promise<ReturnType<typeof textsStanding>> {
+  const rows = await messagesReaderOn(world, null).consentsOfPersons(["person-ben"]);
+  return textsStanding(rows, "person-ben", businessId, "handle-ben");
+}
+
+const responseOf = (answer: unknown): K09.RecordStopOrStartResponse =>
+  answer as K09.RecordStopOrStartResponse;
+
+describe("a START written on return with no known time never beats a STOP (DL-193; the security reviewer's GAP 1)", () => {
+  it("stopped at T0; START at 14:05 with no actor send, then STOP at 14:10, both written at 14:30 in order: stopped, K-29's newest the STOP", async () => {
+    // The STOP's time: the actor's send at 14:10, or with none the call's now, 14:30 (fail closed: default 1).
+    for (const stopSentAt of ["2026-10-22T14:10:00Z", null]) {
+      const { world, commit, deps } = await benOnReturnWorld(true);
+      // start-recorded.json's START (Ben's own evt-ben-0011, at 14:05), for which the actor sent no reply.
+      const start: StopOrStartRequest = { ...startRecorded().request, sentByActor: null };
+      const startAnswer = await recordStopOrStartAlone(start, null, deps);
+      // It cannot be ordered against any STOP from that phone: it lifts nothing and writes nothing (default 8).
+      expect(startAnswer).toEqual({
+        consentRowIds: [],
+        stopped: true,
+        chatOpen: false,
+        phoneVersion: 4,
+        reply: null,
+        askedWhichTexts: null,
+        flaggedBookingIds: [],
+        repeated: false,
+      });
+      expect(validator.check("recordStopOrStart", "response", startAnswer)).toEqual([]);
+      expect(commit.requests).toEqual([]);
+
+      const stopAnswer = await recordStopOrStartAlone(
+        benOnReturn("stop", "evt-ben-0012", stopSentAt),
+        null,
+        deps,
+      );
+      const stopAt = new Date(stopSentAt ?? RETURN_AT);
+      // The phone was already stopped; the STOP still moves stop_at to its own time (DL-193), so version 5.
+      expect(stopAnswer).toMatchObject({ stopped: true, chatOpen: false, phoneVersion: 5, repeated: false });
+      expect(benPhone(world)).toMatchObject({
+        stopped: true,
+        chatOpen: false,
+        stopAt,
+        startAt: null,
+        version: 5,
+      });
+      expect(commit.keys).toEqual(["evt-ben-0012"]);
+      // K-29's newest row is that STOP at both businesses, and no START row was written.
+      const [stopRowId] = responseOf(stopAnswer).consentRowIds;
+      for (const business of [BARBERSHOP, YOGA_STUDIO]) {
+        expect(await benStanding(world, business)).toMatchObject({
+          id: stopRowId,
+          revoked: true,
+          at: stopAt,
+        });
+      }
+      expect(world.record.consents.filter((row) => row.businessId === null && !row.revoked)).toEqual([]);
+    }
+  });
+
+  it("on a phone not stopped it moves nothing either, so the STOP at 14:10 written after it still stops the phone", async () => {
+    const { world, deps } = await benOnReturnWorld(false);
+    const start: StopOrStartRequest = { ...startRecorded().request, sentByActor: null };
+    expect(await recordStopOrStartAlone(start, null, deps)).toMatchObject({
+      consentRowIds: [],
+      stopped: false,
+      chatOpen: true,
+      phoneVersion: 3,
+      reply: null,
+    });
+    expect(benPhone(world)).toMatchObject({ startAt: null, version: 3 });
+    const stop = await recordStopOrStartAlone(
+      benOnReturn("stop", "evt-ben-0012", "2026-10-22T14:10:00Z"),
+      null,
+      deps,
+    );
+    expect(stop).toMatchObject({ stopped: true, chatOpen: false, phoneVersion: 4 });
+    expect(await benStanding(world, BARBERSHOP)).toMatchObject({
+      revoked: true,
+      at: new Date("2026-10-22T14:10:00Z"),
+    });
+  });
+
+  it("a START with a known time after the last STOP still lifts it; one at the STOP's own time does not (a tie fails closed)", async () => {
+    const { world, deps } = await benOnReturnWorld(true);
+    await recordStopOrStartAlone({ ...startRecorded().request, sentByActor: null }, null, deps);
+    await recordStopOrStartAlone(benOnReturn("stop", "evt-ben-0012", "2026-10-22T14:10:00Z"), null, deps);
+    const tie = await recordStopOrStartAlone(
+      benOnReturn("start", "evt-ben-0013", "2026-10-22T14:10:00Z"),
+      null,
+      deps,
+    );
+    expect(tie).toMatchObject({ stopped: true, chatOpen: false });
+    const later = await recordStopOrStartAlone(
+      benOnReturn("start", "evt-ben-0014", "2026-10-22T14:20:00Z"),
+      null,
+      deps,
+    );
+    expect(later).toMatchObject({
+      stopped: false,
+      chatOpen: true,
+      reply: { fixedLineId: "startReply", outboxRowId: null },
+      repeated: false,
+    });
+    expect(benPhone(world)).toMatchObject({
+      stopped: false,
+      chatOpen: true,
+      stopAt: new Date("2026-10-22T14:10:00Z"),
+      startAt: new Date("2026-10-22T14:20:00Z"),
+    });
+    const [startRowId] = responseOf(later).consentRowIds;
+    expect(await benStanding(world, BARBERSHOP)).toMatchObject({ id: startRowId, revoked: false });
+  });
+});
+
+/** Every order of the items (the writes on return may arrive in any of them). */
+function orders<T>(items: readonly T[]): T[][] {
+  if (items.length <= 1) return [[...items]];
+  return items.flatMap((item, index) =>
+    orders([...items.slice(0, index), ...items.slice(index + 1)]).map((rest) => [item, ...rest]),
+  );
+}
+
+describe("the newest word decides whatever order the writes arrive in (DL-193; the security reviewer's note a)", () => {
+  it("a newer STOP on a phone already stopped moves stop_at, so an older START written after it never lifts it", async () => {
+    const { world, deps } = await benOnReturnWorld(true);
+    // In an outage: start-recorded.json's START at 14:05:11 (its reply sent), then a STOP at 14:10; the STOP written first.
+    const stop = await recordStopOrStartAlone(
+      benOnReturn("stop", "evt-ben-0012", "2026-10-22T14:10:00Z"),
+      null,
+      deps,
+    );
+    expect(stop).toMatchObject({ stopped: true, phoneVersion: 5 });
+    expect(benPhone(world)).toMatchObject({ stopAt: new Date("2026-10-22T14:10:00Z"), version: 5 });
+    const start = await recordStopOrStartAlone(startRecorded().request, null, deps);
+    expect(start).toMatchObject({ stopped: true, chatOpen: false, phoneVersion: 6, repeated: false });
+    expect(benPhone(world)).toMatchObject({
+      stopped: true,
+      chatOpen: false,
+      stopAt: new Date("2026-10-22T14:10:00Z"),
+      startAt: new Date("2026-10-22T14:05:11Z"),
+      version: 6,
+    });
+    expect(await benStanding(world, BARBERSHOP)).toMatchObject({
+      revoked: true,
+      at: new Date("2026-10-22T14:10:00Z"),
+    });
+  });
+
+  it("every START moves start_at, so an older STOP written after a newer START never stops the phone", async () => {
+    const { world, deps } = await benOnReturnWorld(true);
+    // start-recorded.json lifts the stop (14:05:11); in an outage, a STOP at 14:10 then a START at 14:20, START written first.
+    await recordStopOrStartAlone(startRecorded().request, null, deps);
+    const start = await recordStopOrStartAlone(
+      benOnReturn("start", "evt-ben-0013", "2026-10-22T14:20:00Z"),
+      null,
+      deps,
+    );
+    expect(start).toMatchObject({ stopped: false, chatOpen: true, phoneVersion: 6 });
+    const stop = await recordStopOrStartAlone(
+      benOnReturn("stop", "evt-ben-0012", "2026-10-22T14:10:00Z"),
+      null,
+      deps,
+    );
+    expect(stop).toMatchObject({ stopped: false, chatOpen: true, phoneVersion: 7 });
+    expect(benPhone(world)).toMatchObject({
+      stopped: false,
+      chatOpen: true,
+      stopAt: new Date("2026-10-22T14:10:00Z"),
+      startAt: new Date("2026-10-22T14:20:00Z"),
+      version: 7,
+    });
+    expect(await benStanding(world, BARBERSHOP)).toMatchObject({
+      revoked: false,
+      at: new Date("2026-10-22T14:20:00Z"),
+    });
+  });
+
+  it("written in every order, the flag is the newest word's, and stop_at and start_at end at the newest of each kind", async () => {
+    type Word = readonly ["stop" | "start", string, string];
+    const sets: readonly (readonly Word[])[] = [
+      [
+        ["start", "evt-ben-0011", "2026-10-22T14:05:11Z"],
+        ["stop", "evt-ben-0012", "2026-10-22T14:10:00Z"],
+        ["start", "evt-ben-0013", "2026-10-22T14:20:00Z"],
+      ],
+      [
+        ["start", "evt-ben-0011", "2026-10-22T14:05:11Z"],
+        ["start", "evt-ben-0013", "2026-10-22T14:20:00Z"],
+        ["stop", "evt-ben-0012", "2026-10-22T14:25:00Z"],
+      ],
+    ];
+    for (const words of sets) {
+      const newestAt = (kind: "stop" | "start" | null): Date => {
+        const times = words
+          .filter(([each]) => kind === null || each === kind)
+          .map(([, , at]) => Date.parse(at));
+        return new Date(Math.max(...times));
+      };
+      const newestKind = words.find(([, , at]) => Date.parse(at) === newestAt(null).getTime())?.[0];
+      expect(orders(words)).toHaveLength(6);
+      for (const order of orders(words)) {
+        const { world, deps } = await benOnReturnWorld(true);
+        for (const [kind, eventId, at] of order) {
+          await recordStopOrStartAlone(benOnReturn(kind, eventId, at), null, deps);
+        }
+        const stopped = newestKind === "stop";
+        expect(benPhone(world)).toMatchObject({
+          stopped,
+          chatOpen: !stopped,
+          stopAt: newestAt("stop"),
+          startAt: newestAt("start"),
+        });
+        expect(await benStanding(world, BARBERSHOP)).toMatchObject({ revoked: stopped, at: newestAt(null) });
+      }
+    }
   });
 });
 
@@ -935,6 +1230,41 @@ describe("a work phone's STOP asks which texts, and its answer is a consent row 
       now: "2026-10-24T09:00:00Z",
       workPhoneBusinessIds: ids,
     });
+
+  /** Her STOP in her turn, with the "which texts?" question its commit opens put in the world: its id and clock row. */
+  async function averyAsks(world: World): Promise<{ questionId: string; clockRowId: string }> {
+    const request = averyTurn("stop");
+    const run = await stopOrStartCore(stopActionOf(request), turnContext(request), depsOn(world));
+    const [ask] = run.writes.asks;
+    if (ask === undefined) throw new Error("her STOP asks which texts");
+    world.record = withQuestions(
+      applied(world.record, run.writes.state),
+      questionsAsked(run.writes.asks, "turn-avery-stop"),
+    );
+    // The clock row as the commit makes it for the question (commit/build.ts questionClock).
+    const clockRowId = questionClock(ask.question, ask.safeDefault).id;
+    expect(run.result.response?.askedWhichTexts?.clockRowId).toBe(clockRowId);
+    return { questionId: ask.question.id, clockRowId };
+  }
+
+  /** No answer as a clock turn on her handle: its one event id is the clock row (K-05 v1 default 9; README default 24). */
+  function clockTurn(
+    clockRowId: string,
+    eventIds: [string, ...string[]] = [clockRowId],
+  ): GateAndCommitRequest {
+    const request = stopTurn({
+      turnId: `turn-clock-${clockRowId}`,
+      handleId: "handle-avery",
+      eventId: clockRowId,
+      number: AVERY,
+      personId: null,
+      kind: "workPhoneNoAnswer",
+      now: "2026-10-24T10:00:00Z",
+    });
+    if (request.turn === null) throw new Error("a clock turn");
+    request.turn = { ...request.turn, eventIds };
+    return request;
+  }
 
   it("STOP: her customer texts stop at once, the work texts wait for her answer, and the question goes back to her", async () => {
     const world = averyWorld();
@@ -991,7 +1321,9 @@ describe("a work phone's STOP asks which texts, and its answer is a consent row 
   it("her answer naming none means every text: the STOP for every business and the flag; no answer does the same", async () => {
     for (const kind of ["workPhoneAnswer", "workPhoneNoAnswer"] as const) {
       const world = averyWorld();
-      const request = averyTurn(kind);
+      // No answer comes as the clock turn of the question her STOP asked (default 10); her answer, in her text's turn.
+      const request =
+        kind === "workPhoneNoAnswer" ? clockTurn((await averyAsks(world)).clockRowId) : averyTurn(kind);
       const run = await stopOrStartCore(stopActionOf(request), turnContext(request), depsOn(world));
       expect(run.result.response).toMatchObject({ stopped: true, chatOpen: false, askedWhichTexts: null });
       expect(run.result.response?.reply === null).toBe(kind === "workPhoneNoAnswer");
@@ -1031,6 +1363,110 @@ describe("a work phone's STOP asks which texts, and its answer is a consent row 
       depsOn(worldOf(flagsSeedRecord())),
     );
     expect(refused.result.error).toEqual({ error: "notAWorkPhone", phoneNumber: ALEX });
+  });
+
+  it("no answer counts only from the clock row her own STOP armed, never from another clock turn (DL-193; note c)", async () => {
+    const world = averyWorld();
+    const refused = async (request: GateAndCommitRequest, on: World = world): Promise<void> => {
+      const run = await stopOrStartCore(stopActionOf(request), turnContext(request), depsOn(on));
+      expect(run.result.error).toEqual({ error: "notFromThatPhone", phoneNumber: AVERY });
+      expect(run.writes.state).toEqual([]);
+      expect(run.writes.messages).toEqual([]);
+    };
+    // Before her STOP asks, no clock row counts.
+    await refused(clockTurn("clock-oq-which-texts-unasked"));
+    const { clockRowId } = await averyAsks(world);
+    // Another clock row on her handle, her own text's turn, and a turn with another event beside the clock row.
+    await refused(clockTurn("clock-call-off-avery-nov20"));
+    await refused(averyTurn("workPhoneNoAnswer"));
+    await refused(clockTurn(clockRowId, [clockRowId, "evt-avery-text"]));
+    // A question at the stop home on her handle that no STOP of hers asked: its clock row counts for nothing.
+    world.record = withQuestions(world.record, [
+      {
+        id: "oq-avery-stop-home-other",
+        turnId: "turn-avery-other",
+        handleId: "handle-avery",
+        businessId: null,
+        step: "S13-32",
+        status: "waiting",
+      },
+    ]);
+    await refused(clockTurn("clock-oq-avery-stop-home-other"));
+    expect(world.record.phones.find((each) => each.handleId === "handle-avery")?.stopped).toBe(false);
+    // Once her question is answered, its clock row counts for nothing either.
+    const answered = worldOf({
+      ...world.record,
+      questions: world.record.questions.map((question) => ({ ...question, status: "answered" as const })),
+    });
+    await refused(clockTurn(clockRowId), answered);
+
+    // Her own question's clock row: every text stops.
+    const request = clockTurn(clockRowId);
+    const run = await stopOrStartCore(stopActionOf(request), turnContext(request), depsOn(world));
+    expect(run.result.response).toMatchObject({
+      stopped: true,
+      chatOpen: false,
+      reply: null,
+      askedWhichTexts: null,
+      repeated: false,
+    });
+    expect(run.writes.state[0]).toMatchObject({ values: { business_id: null, revoked: true } });
+  });
+
+  it("a firing with no turn names its clock row by its request id: hers counts, keyed by it; Sam's does not", async () => {
+    const world = averyWorld();
+    const { clockRowId } = await averyAsks(world);
+    // Sam, the barbershop's owner, stops too: his question's clock row is armed for his phone, never hers.
+    const samStop = stopTurn({
+      turnId: "turn-sam-stop",
+      handleId: "handle-sam",
+      eventId: "evt-sam-stop",
+      number: SAM,
+      personId: "person-sam",
+      now: "2026-10-24T09:05:00Z",
+    });
+    const samRun = await stopOrStartCore(stopActionOf(samStop), turnContext(samStop), depsOn(world));
+    const [samAsk] = samRun.writes.asks;
+    if (samAsk === undefined) throw new Error("Sam's STOP asks which texts");
+    world.record = withQuestions(world.record, questionsAsked(samRun.writes.asks, "turn-sam-stop"));
+    const samClock = questionClock(samAsk.question, samAsk.safeDefault).id;
+
+    const firing = (requestId: string): StopOrStartRequest => ({
+      caller: {
+        kind: "clockFiring",
+        turnId: null,
+        requestId,
+        businessId: null,
+        personId: null,
+        traceId: `trace-${requestId}`,
+      },
+      kind: "workPhoneNoAnswer",
+      phoneNumber: AVERY,
+      inboundEventId: null,
+      words: "STOP",
+      alsoCancelVisit: false,
+      workPhoneBusinessIds: null,
+      sentByActor: null,
+    });
+    const commit = fakeAloneCommit(world);
+    const deps = depsOn(world, { commitAlone: commit, now: () => "2026-10-24T10:00:00Z" });
+    for (const other of [samClock, "clock-nobody-armed"]) {
+      expect(await recordStopOrStartAlone(firing(other), null, deps)).toEqual({
+        error: "notFromThatPhone",
+        phoneNumber: AVERY,
+      });
+    }
+    expect(commit.requests).toEqual([]);
+    const answer = await recordStopOrStartAlone(firing(clockRowId), null, deps);
+    expect(answer).toMatchObject({ stopped: true, chatOpen: false, reply: null, repeated: false });
+    expect(validator.check("recordStopOrStart", "response", answer)).toEqual([]);
+    // Keyed by its clock row (K-09 v1: "the clock row for workPhoneNoAnswer is the key"): fired again, written once.
+    expect(commit.keys).toEqual([clockRowId]);
+    expect(await recordStopOrStartAlone(firing(clockRowId), null, deps)).toMatchObject({
+      stopped: true,
+      repeated: true,
+    });
+    expect(commit.keys).toEqual([clockRowId]);
   });
 });
 

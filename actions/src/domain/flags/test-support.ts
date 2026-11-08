@@ -11,7 +11,7 @@ import path from "node:path";
 import type { BookingFlow, BookingHead, BookingStage } from "../../../../db/repo/bookings-head";
 import type { PersonRole, PersonRoleName } from "../../../../db/repo/people";
 import type { Pause, PauseTarget, Phone } from "../../../../db/repo/phones";
-import type { StateWrite } from "../../commit";
+import type { Ask, StateWrite } from "../../commit";
 import { CONTRACTS_DIR } from "../../tool-api";
 import type { MessagesReader } from "../messages-consent";
 import {
@@ -32,11 +32,23 @@ export { BARBERSHOP, YOGA_STUDIO, phoneRow, stringsIn, k05Problems } from "../me
 /** T-307's seeds with K-04's booking heads. */
 export const FLAG_SEEDS = [...SEEDS, "db-schema/core/fixtures/seed-booking-head.json"] as const;
 
-/** The record the flags doubles read: T-307's, with roles, booking heads and pauses. */
+/** An open question as K-04 open_questions holds it, with the columns the flags reads use. */
+export interface QuestionRow {
+  readonly id: string;
+  /** The turn that asked it (open_questions.turn_id: the commit's turn). */
+  readonly turnId: string;
+  readonly handleId: string;
+  readonly businessId: string | null;
+  readonly step: string;
+  readonly status: "waiting" | "open" | "answered" | "defaulted" | "withdrawn";
+}
+
+/** The record the flags doubles read: T-307's, with roles, booking heads, pauses and open questions. */
 export interface FlagsRecord extends TestRecord {
   readonly roles: readonly PersonRole[];
   readonly bookings: readonly BookingHead[];
   readonly pauses: readonly Pause[];
+  readonly questions: readonly QuestionRow[];
 }
 
 type Values = Readonly<Record<string, unknown>>;
@@ -93,7 +105,7 @@ export function flagsRecordOf(files: readonly string[]): FlagsRecord {
       pauses.push(pauseOf(values));
     }
   }
-  return { ...base, roles, bookings, pauses };
+  return { ...base, roles, bookings, pauses, questions: [] };
 }
 
 function pauseOf(values: Values): Pause {
@@ -177,6 +189,23 @@ export function withMore(
   };
 }
 
+/** The record with these open questions added. */
+export function withQuestions(record: FlagsRecord, questions: readonly QuestionRow[]): FlagsRecord {
+  return { ...record, questions: [...record.questions, ...questions] };
+}
+
+/** The questions a turn's commit opens for its asks (waiting, under that turn's id), as K-05's commit writes them. */
+export function questionsAsked(asks: readonly Ask[], turnId: string): QuestionRow[] {
+  return asks.map(({ question }) => ({
+    id: question.id,
+    turnId,
+    handleId: question.handleId,
+    businessId: question.businessId,
+    step: question.step,
+    status: "waiting",
+  }));
+}
+
 /** Whether a row is seen under a scope: on the runtime side (null) every row, else that business's only (K-04 rule 4). */
 const seen = (scope: string | null, businessId: string | null): boolean =>
   scope === null || businessId === scope;
@@ -240,6 +269,19 @@ export function flagsReaderOn(world: World, scope: string | null): FlagsReader {
           (pause) =>
             pause.phoneNumber === number && pause.clearedAt === null && seen(scope, pause.businessId),
         ),
+      ),
+    // As db/repo/targets.ts liveOpenQuestionsOfHandle: the handle's waiting or open questions, in id order.
+    openQuestionsOfHandle: (handleId) =>
+      Promise.resolve(
+        record()
+          .questions.filter(
+            (question) =>
+              question.handleId === handleId &&
+              (question.status === "waiting" || question.status === "open") &&
+              (scope === null || question.businessId === scope),
+          )
+          .sort((a, b) => byId(a.id, b.id))
+          .map(({ id, turnId, step }) => ({ id, turnId, step })),
       ),
   };
 }

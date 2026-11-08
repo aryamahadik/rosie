@@ -1,7 +1,8 @@
-// What the flags service reads (T-317; C-078): K-04 v1's handles, phones, people, roles, booking heads and pauses, and
-// K-29 v1's consent rows, each through one data-access call (db/repo). A STOP or a START covers every business, so it is
-// read and written on the runtime side, with no business scope (db/repo/scope.ts; T-307's security note N4): only there
-// does a consent row with no business show (K-29 rule 4). setRecordFlag runs under the call's business scope.
+// What the flags service reads (T-317; C-078): K-04 v1's handles, phones, people, roles, booking heads, pauses and live
+// open questions, and K-29 v1's consent rows, each through one data-access call (db/repo). A STOP or a START covers every
+// business, so it is read and written on the runtime side, with no business scope (db/repo/scope.ts; T-307's security
+// note N4): only there does a consent row with no business show (K-29 rule 4), nor a "which texts?" question a STOP with
+// no business asked. setRecordFlag runs under the call's business scope.
 //
 // The reads hand back rows as db/repo gives them, a phone's number and a handle's address included, so the service is the
 // one place that keeps them in: what it answers, writes to a log or throws carries ids, flags and closed lists only.
@@ -27,8 +28,12 @@ import {
   type Phone,
 } from "../../../../db/repo/phones";
 import type { Sql, Tx } from "../../../../db/repo/scope";
+import { liveOpenQuestionsOfHandle, type OpenQuestionRead } from "../../../../db/repo/targets";
 
 export type { BookingHead, ConsentRead, Handle, Pause, PersonRole, Phone };
+
+/** A live open question as the flags service reads it (K-05 v1.2 openQuestionRead): its id, its asking turn and its step. */
+export type AskedQuestion = Pick<OpenQuestionRead, "id" | "turnId" | "step">;
 
 /** The K-04 v1 and K-29 v1 reads the flags service makes, each one data-access call. */
 export interface FlagsReader {
@@ -60,6 +65,8 @@ export interface FlagsReader {
   openPausesOfPerson(personId: string): Promise<readonly Pause[]>;
   /** K-04 pauses that still hold on a phone, at every business the scope shows. */
   openPausesOfPhone(number: string): Promise<readonly Pause[]>;
+  /** K-04 open_questions: the live questions (waiting or open) sent to a handle, each with the turn that asked it. */
+  openQuestionsOfHandle(handleId: string): Promise<readonly AskedQuestion[]>;
 }
 
 /** The reader over the data-access calls, on the call's own transaction (the runtime side's, or the call's scoped one). */
@@ -79,6 +86,7 @@ export function flagsReaderOf(db: Sql | Tx): FlagsReader {
     pause: (pauseId) => getPause(db, pauseId),
     openPausesOfPerson: (personId) => listOpenPausesOfPerson(db, personId),
     openPausesOfPhone: (number) => listOpenPausesOfPhone(db, number),
+    openQuestionsOfHandle: (handleId) => liveOpenQuestionsOfHandle(db, handleId),
   };
 }
 
