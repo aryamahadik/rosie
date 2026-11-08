@@ -46,8 +46,10 @@ const EARLIER_TABLES = [
 ];
 // bookings (0007) comes in through the fixtures' `after` chain: seed-booking-head.json loads before the threads.
 const LOADABLE_TABLES: readonly string[] = [...EARLIER_TABLES, "bookings", ...OWN_TABLES];
-// Foreign keys of the table list whose target table a later migration makes. The key is added there.
-const WAITING_FOREIGN_KEYS = ["openers_sent_outbox_fk", "messages_outbox_fk"];
+// Foreign keys of the table list whose target table a later migration makes. The key is added there. None waits now:
+// openers_sent_outbox_fk and messages_outbox_fk came with outbox_rows (T-189).
+const WAITING_FOREIGN_KEYS: string[] = [];
+const BUNDLE_HASH = "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037";
 
 interface FixtureFile {
   after: string[];
@@ -92,6 +94,10 @@ async function loadFixture(
       skipped.add(row.table);
       continue;
     }
+    const named = row.values.outbox_row_id;
+    if (typeof named === "string") {
+      await makeOutboxRow(sql, named);
+    }
     if (row.table === "messages" && sealWords !== undefined) {
       await sealWords(row.values);
     } else {
@@ -105,7 +111,32 @@ async function loadFixture(
 // Later migrations add tables that reference these, so the truncate cascades to them. Each test file runs in its
 // own schema (createTestDatabase), so nothing else is touched.
 async function emptyTables(sql: Sql): Promise<void> {
-  await sql`truncate messages, openers_sent, threads, bookings, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
+  await sql`truncate messages, openers_sent, outbox_rows, threads, bookings, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
+}
+
+/**
+ * A minimal outbox row for an opener mark or a message to name (openers_sent_outbox_fk, messages_outbox_fk): one
+ * delivered row to handle-alex, on a turn and a registered bundle made here if they are not there. Safe to call twice.
+ */
+async function makeOutboxRow(sql: Sql, id: string): Promise<void> {
+  await sql`
+    insert into bundles (hash, build, manifest_key, built_at)
+    values (${BUNDLE_HASH}, 1, ${`bundle/${BUNDLE_HASH}/1/manifest`}, '2026-10-01T00:00:00Z')
+    on conflict do nothing
+  `;
+  await sql`
+    insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+    values ('turn-outbox-helper', 'handle-alex', array['evt-outbox-helper'], 'committed', ${BUNDLE_HASH}, 1,
+            'trace-outbox-helper', '2026-10-01T00:00:00Z')
+    on conflict do nothing
+  `;
+  await sql`
+    insert into outbox_rows (id, turn_id, recipient_handle_id, channel, versions_read, state, bundle_hash,
+                             bundle_build, trace_id)
+    values (${id}, 'turn-outbox-helper', 'handle-alex', 'imessage', '[]'::jsonb, 'delivered', ${BUNDLE_HASH}, 1,
+            'trace-outbox-helper')
+    on conflict do nothing
+  `;
 }
 
 /** A booking head row for a thread or message to name (threads_booking_fk, messages_booking_fk). */
@@ -483,6 +514,8 @@ describe("the opener-sent mark per business", () => {
     expect(await hasOpenerBeenSent(db.sql, "handle-alex", otherId)).toBe(false);
     expect(await getOpenerSent(db.sql, "handle-alex", otherId)).toBeNull();
 
+    await makeOutboxRow(db.sql, "out-other-1");
+    await makeOutboxRow(db.sql, "out-other-2");
     const marked = await markOpenerSent(db.sql, {
       handleId: "handle-alex",
       businessId: otherId,
@@ -508,6 +541,9 @@ describe("the opener-sent mark per business", () => {
   });
 
   it("30 parallel marks give exactly one created", async () => {
+    for (let index = 0; index < 30; index += 1) {
+      await makeOutboxRow(db.sql, `out-par-${String(index)}`);
+    }
     const results = await Promise.all(
       Array.from({ length: 30 }, (_, index) =>
         markOpenerSent(db.sql, {
@@ -522,6 +558,7 @@ describe("the opener-sent mark per business", () => {
   });
 
   it("keys: the handle and the business must exist and cannot be deleted under a mark", async () => {
+    await makeOutboxRow(db.sql, "o");
     expect(
       await refusal(
         markOpenerSent(db.sql, {
@@ -694,6 +731,7 @@ describe("the message log: words sealed, last 6 with one business up to 30 days 
       bookingId: "b-erase",
       replyAddress: "b-erase@reply.example.com",
     });
+    await makeOutboxRow(db.sql, "out-erase-2");
     const words = "Please move my appointment to Friday.";
     for (const [n, from, to, direction] of [
       [1, "customer", "rosie", "in"],
@@ -770,6 +808,7 @@ describe("the message log: words sealed, last 6 with one business up to 30 days 
   });
 
   it("markMessageDelivered is a compare-and-set and keeps the first delivery time", async () => {
+    await makeOutboxRow(db.sql, "out-deliver");
     const written = await writeMessage(db.sql, keys, {
       id: "msg-deliver",
       threadId: "thread-alex-chat",
