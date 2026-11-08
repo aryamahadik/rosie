@@ -4,8 +4,8 @@
   "tables": [
     {
       "name": "documents",
-      "description": "One document of a business, a team member, a space or thing, a booking or a customer (FS document row): a license, insurance, registration, background check or certificate a person gave as their own word (S1-23, S1-61, S1-81, S2-06), kept exactly as given and never checked, or an agreement, contract, estimate, proposal, design or form Rosie built for its signers to sign or OK on the secure page (S1-72, A4-43, A5-19, A5-20). There is no column that says Rosie checked, verified or approved it (FS line 736: 'No checked column'; D96; MC C4, C7). What a person gave (number, issuer, end) is sealed under the key of the person it is about. Its files are document_files rows, its words to sign document_texts rows, who must sign document_signers rows and each signature a document_signatures row. No row is ever deleted: a document taken off, replaced or not signed in time keeps its row with withdrawn_at.",
-      "source": "FS line 736 (document); FS line 741 (place_or_thing papers); S1-23, S1-60, S1-61, S1-72, S1-81, S2-06, S2-11, S2-28, S2-29, A4-43, A5-19, A5-20; MC C4, C7; D96; RULES 10.1 to 10.5; arch 09 line 472; 02-contracts section 7 row K-35 and section 8 (license, license_checked)",
+      "description": "One document of a business, a team member, a space or thing, a booking or a customer (FS document row): a license, insurance, bond, registration, background check, certificate or other paper a person gave as their own word (S1-23, S1-61, S1-81, S2-06), or a family's legal papers or court order on file (A4-24, A4-25), kept exactly as given and never checked; or an agreement, contract, estimate, proposal, design or form Rosie built for its signers to sign or OK on the secure page (S1-72, A4-43, A5-19, A5-20), the business's own standard agreement for one service among them (S1-29). There is no column that says Rosie checked, verified or approved it (FS line 736: 'No checked column'; D96; MC C4, C7). What a person gave (number, issuer, end) is sealed under the key of the person it is about. Its files are document_files rows, its words to sign document_texts rows, who must sign document_signers rows and each signature a document_signatures row. No row is ever deleted: a document taken off, replaced or not signed in time keeps its row with withdrawn_at.",
+      "source": "FS line 736 (document); FS line 741 (place_or_thing papers); FS rows Q02, Q10; S1-23, S1-29, S1-60, S1-61, S1-72, S1-81, S2-06, S2-11, S2-28, S2-29, A4-24, A4-25, A4-43, A5-19, A5-20, S13-11; MC C4, C7; D96; RULES 10.1 to 10.5; arch 09 line 472; 02-contracts section 7 row K-35 and section 8 (license, license_checked)",
       "columns": [
         {
           "name": "id",
@@ -76,15 +76,15 @@
           "type": "text",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "license, insurance, registration, background_check, certificate, contract, estimate, proposal, design, form or agreement (FS line 736). An ID document is never one: the owner's ID upload is K-22's id_uploads (MC C10).",
-          "source": "FS line 736 (kind); S1-23 ('any license, insurance or document'); S1-61 (registration); S2-28, S2-29 (background check, certificate); A5-19 ('A document is a contract, a written estimate, a proposal or a design'); A4-43 (form); S1-72 (agreement); MC C10"
+          "description": "license, insurance, registration, background_check, certificate, contract, estimate, proposal, design, form or agreement (FS line 736), or one of four more a person gives as their own word: bond, its own kind, so a bond never reads as insurance ('bonded' shows only as the business's own word, S13-11); legal_papers, a family's legal papers for an adult, like a guardian's or a health care agent's (A4-24), and court_order, a court order on file (A4-25), each a customer's or a booking's only (documents_legal_papers_for_customer) and, with its title, shown only on the secure page (RULES 4.5: legal status, a child's details); and other, any other document the owner adds (S1-23: 'any license, insurance or document'; FS row Q10: 'upload anything'). An ID document is never one: the owner's ID upload is K-22's id_uploads (MC C10).",
+          "source": "FS line 736 (kind); FS row Q10 ('Licenses, insurance and other documents: OPTIONAL, upload anything'); S1-23 ('any license, insurance or document'; 'Insurance or a bond may be added here too'); S1-61 (registration; 'Insured or bonded shows only if the owner adds it'); S13-11 ('\"Licensed\", \"insured\" or \"bonded\" shows only as the business's own word'); S2-28, S2-29 (background check, certificate); A4-24 ('legal papers for an adult, like a guardian or a health care agent'); A4-25 ('Papers on file, like a court order, win'); RULES 4.5; A5-19 ('A document is a contract, a written estimate, a proposal or a design'); A4-43 (form); S1-72 (agreement); MC C10"
         },
         {
           "name": "kind_id",
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The kind of work it is for: the profession file's id, as K-23's company_kinds.kind_id and K-22's staff_skills.kind_id (never the document's own kind, which is kind). Set for a license the plug-in names for that work (S1-60, S2-28) and for an agreement that work needs (S1-71, S1-72), so Go live keeps that kind of work offline while its agreement is unsigned (S1-29, S1-31). Null: not for one kind of work (insurance, a registration, a booking's document).",
+          "description": "The kind of work it is for: the profession file's id, as K-23's company_kinds.kind_id and K-22's staff_skills.kind_id (never the document's own kind, which is kind). Set for a license the plug-in names for that work (S1-60, S2-28) and for an agreement that work needs (S1-71, S1-72), so Go live keeps that kind of work offline while its agreement is unsigned (S1-29, S1-31). Rosie's health privacy agreement, signed once per business, names the kind it was first signed for, and Go live reads it for every health kind, one added later too (README, default 17). Null: not for one kind of work (insurance, a registration, a booking's document, and the business's own standard agreement, which names its service in service_id).",
           "source": "S1-60 ('The plug-in names the licenses'); S1-71 ('the plug-in says if the work needs an agreement'); S1-72 ('Not signed now: setup goes on, but that work stays offline, saved'); S1-29; S1-31 ('Keeps that kind of work offline'); S2-28; K-23 v1 company_kinds.kind_id; K-22 v1 rule 3"
         },
         {
@@ -92,8 +92,8 @@
           "type": "text",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "What the document is called: the plug-in's name for the paper (S1-60: the plug-in names the licenses) or the kind's own name, such as Barber license or Health privacy agreement. Never words the person typed: those are sealed in number, issuer and ends. It is shown as the business's own word, never as checked (S13-11).",
-          "source": "FS line 736 (name or number); S1-60 ('The plug-in names the licenses and who issues them'); S2-06 ('Barber license: as you gave it, not checked'); S13-11"
+          "description": "What the document is called: the plug-in's name for the paper (S1-60: the plug-in names the licenses) or the kind's own name, such as Barber license or Health privacy agreement. Never words the person typed: those are sealed in number, issuer and ends. It is shown as the business's own word, never as checked (S13-11). A legal paper's or a court order's title is shown only on the secure page, as its kind is (RULES 4.5).",
+          "source": "FS line 736 (name or number); S1-60 ('The plug-in names the licenses and who issues them'); S2-06 ('Barber license: as you gave it, not checked'); S13-11; RULES 4.5"
         },
         {
           "name": "number",
@@ -101,8 +101,8 @@
           "null": true,
           "audience": ["customer", "staff", "owner"],
           "sealedBy": "person_id",
-          "description": "The paper's number exactly as the person gave it (the quoted words of their text, or the page's field), never parsed or corrected, sealed under person_id's key: a license number is personal data. Customers see it only as the business's own word, where shown_on_listing is true or the plug-in's rules want it on the job (S13-13); a team member's read-back says 'as you gave it', never the number (S2-06). Null: none given, or a document Rosie built.",
-          "source": "FS line 736 (name or number); S1-23 ('BS20981'; 'It shows as you gave it; Rosie doesn't check it'); S1-61 ('Registration 2020-1187'); S2-06; S13-11; S13-13; RULES 10.1; arch 01 line 93"
+          "description": "The paper's number exactly as the person gave it (the quoted words of their text, or the page's field), never parsed or corrected, sealed under person_id's key: a license number is personal data. Customers see it only as the business's own word, where shown_on_listing is true or the plug-in's rules want it on the job (S13-13); a team member's read-back says 'as you gave it', never the number (S2-06). Its audience is the business's, a team member's and a space's papers': for a customer's own document or a booking's given document it is secure-page-only, never in a text, an email, a call summary or a customer's AI (README, documents' readers; RULES 4.5: 'ID numbers'). Null: none given, or a document Rosie built.",
+          "source": "FS line 736 (name or number); S1-23 ('BS20981'; 'It shows as you gave it; Rosie doesn't check it'); S1-61 ('Registration 2020-1187'); S2-06; S13-11; S13-13; RULES 4.5, 10.1; arch 01 line 93"
         },
         {
           "name": "issuer",
@@ -110,8 +110,8 @@
           "null": true,
           "audience": ["customer", "staff", "owner"],
           "sealedBy": "person_id",
-          "description": "Who issued it (a state, a city or the federal government, or for insurance its carrier), exactly as given, sealed under person_id's key. Shown as number is. Null: not given, or a document Rosie built.",
-          "source": "FS line 736 (issuer); S1-60 ('who issues them: a state, a city or the federal government'); RULES 10.4; S1-23 ('Insurance or a bond may be added here too')"
+          "description": "Who issued it (a state, a city or the federal government, or for insurance its carrier), exactly as given, sealed under person_id's key. Shown as number is: for a customer's own document or a booking's given document, secure-page-only (README, documents' readers). Null: not given, or a document Rosie built.",
+          "source": "FS line 736 (issuer); S1-60 ('who issues them: a state, a city or the federal government'); RULES 4.5, 10.4; S1-23 ('Insurance or a bond may be added here too')"
         },
         {
           "name": "ends",
@@ -119,8 +119,8 @@
           "null": true,
           "audience": ["customer", "staff", "owner"],
           "sealedBy": "person_id",
-          "description": "Its end date exactly as the person gave it (their words, such as 06/2027), sealed under person_id's key. Rosie never reads it as a date, since no lapse is checked while switch verify is off (MC C4: S2-11's Expired branch is hidden), so it holds no instant and no zone. Shown as number is. Null: not given, or a document Rosie built.",
-          "source": "FS line 736 (end_date); MC C4; RULES 10.5; S2-11 ('With checks on, Rosie checks the name, kind, status, places and end date')"
+          "description": "Its end date exactly as the person gave it (their words, such as 06/2027), sealed under person_id's key. Rosie never reads it as a date, since no lapse is checked while switch verify is off (MC C4: S2-11's Expired branch is hidden), so it holds no instant and no zone. Shown as number is: for a customer's own document or a booking's given document, secure-page-only (README, documents' readers). Null: not given, or a document Rosie built.",
+          "source": "FS line 736 (end_date); MC C4; RULES 4.5, 10.5; S2-11 ('With checks on, Rosie checks the name, kind, status, places and end date')"
         },
         {
           "name": "shown_on_listing",
@@ -128,8 +128,8 @@
           "null": false,
           "default": "false",
           "audience": ["staff", "owner"],
-          "description": "Whether customers see it on the listing and with the work it is for, always as the business's own word, never as checked (S1-23: 'to show customers'; S2-06: 'Any license you want shown'; S13-11). Set by the person it is about or the owner.",
-          "source": "FS line 736 (shown_on_listing); S1-23; S2-06; S13-11; RULES 10.1; 01-inventory C-196 ('documents only as added by the business')"
+          "description": "Whether customers see it on the listing and with the work it is for, always as the business's own word, never as checked (S1-23: 'to show customers'; S2-06: 'Any license you want shown'; S13-11). Only the business's own papers may be shown: the business's, a team member's or a space's (documents_listing_only_own_papers); a customer's own document or a booking's never is, so the listing never says whether someone is a customer (RULES 4.9, 4.10). Set by the person it is about or the owner.",
+          "source": "FS line 736 (shown_on_listing); S1-23; S2-06; S13-11; RULES 10.1; RULES 4.9 (S13-27 rules 35, 36), 4.10; 01-inventory C-196 ('documents only as added by the business')"
         },
         {
           "name": "origin",
@@ -168,8 +168,8 @@
           "type": "timestamptz",
           "null": true,
           "audience": ["customer", "staff", "owner"],
-          "description": "For a document Rosie built: when the last signer it asks signed (A5-20's 'All signed'; S1-72's 'Signed'), set in the commit that writes that signature; null until then, and always for a given document. The money step waits for it (A5-20), and Go live reads a business's agreement with none as left unsigned (S1-29). Shown in the zone added_at is.",
-          "source": "FS line 736 (signers and signed_at); A5-20 ('The money step comes only once everyone has signed'); S1-72; S1-29 ('2 Left unsigned')"
+          "description": "For a document Rosie built: when the last signer it asks signed (A5-20's 'All signed'; S1-72's 'Signed'), set in the commit that writes that signature and never changed after: the trigger documents_signed_by_all_once refuses an update that moves or clears it, or sets it while the document has no signer or a signer with no signature (README rule 11). Null until then, and always for a given document. The money step waits for it (A5-20); Go live reads an agreement its kind of work needs (kind_id) with none as left unsigned (S1-29), and the business's own standard agreement (service_id) turns its service's contract step on only once it is set. Shown in the zone added_at is.",
+          "source": "FS line 736 (signers and signed_at); A5-20 ('The money step comes only once everyone has signed'); S1-72; S1-29 ('2 Left unsigned'; 'The business's own standard agreement can be signed once here'); A5-19"
         },
         {
           "name": "withdrawn_at",
@@ -201,8 +201,16 @@
           "null": false,
           "default": "1",
           "audience": "never",
-          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4). Each signature's commit raises its document's version too, so two last signers cannot both leave signed_by_all_at unset (README rule 9).",
           "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For the business's own standard agreement (S1-29: 'The business's own standard agreement can be signed once here, so a customer's signature completes it. That turns on its contract step for that service'): the one service of this business (K-25 services.id, held by documents_service_fk) whose contract step it turns on once the owner has signed it (A5-19: 'no document, unless Sam set one for this service'). Such a document is the business's, built and of kind agreement, with no kind_id (documents_standard_agreement_for_service), so Go live never reads it as left unsigned; at most one stands per service (documents_one_standard_agreement_per_service). Null for every other document.",
+          "source": "S1-29; FS row Q02 ('the business's own standard agreement can be added once'; 'O per service'); A5-19; A5-20; K-25 v1 services and services_id_business_key"
         }
       ],
       "primaryKey": ["id"],
@@ -278,6 +286,15 @@
             "columns": ["id"]
           },
           "onDelete": "restrict"
+        },
+        {
+          "name": "documents_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
         }
       ],
       "unique": [
@@ -290,6 +307,12 @@
           "name": "documents_id_business_person_key",
           "columns": ["id", "business_id", "person_id"],
           "source": "Each file is sealed under its document's person's key (arch 01 line 93)"
+        },
+        {
+          "name": "documents_one_standard_agreement_per_service",
+          "columns": ["service_id"],
+          "where": "service_id is not null and withdrawn_at is null",
+          "source": "FS row Q02 ('the business's own standard agreement can be added once'); S1-29; A5-19 ('unless Sam set one for this service'): one standing agreement per service, the one A5-19 reads; a new one replaces it"
         }
       ],
       "checks": [
@@ -310,8 +333,8 @@
         },
         {
           "name": "documents_kind_known",
-          "expression": "kind in ('license', 'insurance', 'registration', 'background_check', 'certificate', 'contract', 'estimate', 'proposal', 'design', 'form', 'agreement')",
-          "source": "FS line 736 (kind)"
+          "expression": "kind in ('license', 'insurance', 'registration', 'background_check', 'certificate', 'contract', 'estimate', 'proposal', 'design', 'form', 'agreement', 'bond', 'legal_papers', 'court_order', 'other')",
+          "source": "FS line 736 (kind); S1-23, S1-61, S13-11 (bond); A4-24 (legal papers); A4-25 (court order); S1-23, FS row Q10 (other)"
         },
         {
           "name": "documents_title_given",
@@ -372,6 +395,21 @@
           "name": "documents_not_signed_only_built",
           "expression": "withdrawn_why is distinct from 'not_signed_in_time' or (origin = 'built' and signed_by_all_at is null)",
           "source": "A5-20; A5-23"
+        },
+        {
+          "name": "documents_listing_only_own_papers",
+          "expression": "not shown_on_listing or owner_kind in ('business', 'staff', 'place_or_thing')",
+          "source": "S13-11 (claims show as the business's own word); 01-inventory C-196 ('documents only as added by the business'); RULES 4.9 (S13-27 rules 35, 36: never say whether a person is a customer); RULES 4.10"
+        },
+        {
+          "name": "documents_legal_papers_for_customer",
+          "expression": "kind not in ('legal_papers', 'court_order') or owner_kind in ('customer', 'booking')",
+          "source": "A4-24 ('legal papers for an adult'); A4-25 ('The family's record on the secure page decides who may book and hear. Papers on file, like a court order, win'); RULES 4.5, 4.7"
+        },
+        {
+          "name": "documents_standard_agreement_for_service",
+          "expression": "service_id is null or (owner_kind = 'business' and origin = 'built' and kind = 'agreement' and kind_id is null)",
+          "source": "S1-29 ('The business's own standard agreement can be signed once here ... That turns on its contract step for that service'); FS row Q02; A5-19"
         }
       ],
       "indexes": [
@@ -481,8 +519,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The file's media type: a photo (image/...) or a file such as a PDF (application/...).",
-          "source": "FS line 736 (file); K-22 v1 id_uploads.content_type"
+          "description": "The file's media type: a photo (image/...) or a file such as a PDF (application/...), never image/svg+xml or application/xhtml+xml, which a browser can run as a page with script in it.",
+          "source": "FS line 736 (file); K-22 v1 id_uploads.content_type; RULES 4.5"
         },
         {
           "name": "uploaded_at",
@@ -533,8 +571,8 @@
       "checks": [
         {
           "name": "document_files_content_type_form",
-          "expression": "content_type ~ '^(image|application)/[a-z0-9.+-]+$'",
-          "source": "FS line 736 (file); K-22 v1 id_uploads_content_type_form"
+          "expression": "content_type ~ '^(image|application)/[a-z0-9.+-]+$' and content_type not in ('image/svg+xml', 'application/xhtml+xml')",
+          "source": "FS line 736 (file); K-22 v1 id_uploads_content_type_form; RULES 4.5 (no file a browser runs as a page)"
         },
         {
           "name": "document_files_via_page_or_portal",

@@ -55,6 +55,30 @@
       "expect": "refuse",
       "shows": "A photo of Lee's Barbershop's license kept from the chat is refused (CHECK document_files_via_page_or_portal, SQLSTATE 23514): a document's file is taken only on the secure page or in the portal. The same file uploaded on the secure page passes",
       "source": "S13-43 ('A license photo goes only on the secure page'); MC C10 ('on the secure page, never in the chat'); RULES 4.5 ('These stay on the secure page, each view logged')"
+    },
+    {
+      "file": "invalid/refuse-customer-document-listed.json",
+      "version": "v1",
+      "table": "documents",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop putting a customer's own document on the listing is refused (CHECK documents_listing_only_own_papers, SQLSTATE 23514): the court order Alex keeps on file for his son, given on his secure page, can never be shown to customers or their AI, so the listing never says who is a customer; only the business's, a team member's or a space's papers may be shown. The same row with shown_on_listing false passes",
+      "source": "S13-11 ('shows only as the business's own word'); 01-inventory C-196 ('documents only as added by the business'); RULES 4.9 (S13-27 rules 35, 36: never confirm or deny that a person is a customer); RULES 4.5, 4.10; A4-25 ('Papers on file, like a court order, win')"
+    },
+    {
+      "file": "invalid/refuse-signed-by-all-moved.json",
+      "version": "v1",
+      "table": "documents",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Nutrition Clinic moving the time Sam's health privacy agreement was signed by all, with the version raised, is refused by the trigger documents_signed_by_all_once (SQLSTATE 23514): once set, signed_by_all_at never changes, so A5-20's 'All signed' and S1-29's Go live read stay true. The same update that leaves signed_by_all_at as it is passes",
+      "source": "A5-20 ('The money step comes only once everyone has signed'); S1-29 ('Never: let that work go live without its agreement'); S1-72; RULES 4.10 ('the proof of every yes stay'); S13-08"
+    },
+    {
+      "file": "invalid/refuse-signed-by-all-before-signer.json",
+      "version": "v1",
+      "table": "documents",
+      "expect": "refuse",
+      "shows": "Sam's own standard agreement for Lee's Barbershop's wedding party grooming (S1-29), built and sent to him to sign once at Go live, is not marked signed by all before he signs: the trigger documents_signed_by_all_once refuses the update (SQLSTATE 23514) while a signer row has no signature. Once his signature is written, the same update passes, which turns on that service's contract step (A5-19)",
+      "source": "S1-29 ('The business's own standard agreement can be signed once here, so a customer's signature completes it. That turns on its contract step for that service'); FS row Q02; A5-19 ('no document, unless Sam set one for this service'); A5-20 ('Everyone the plug-in says must sign does'); K-25 v1 seed-services-price-list (the wedding party grooming)"
     }
   ]
 }
