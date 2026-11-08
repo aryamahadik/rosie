@@ -40,8 +40,9 @@
 // The danger's hold is written in that same step, before the core is called (T-1088 round 4, DL-144; the architect's
 // round 3 gap A): from every outcome kept for the text, the strictest rule of them all (arch 06 line 327), in place of an
 // unread hold; the core's hold then takes its place, never looser, and an eviction before the core answers leaves the text
-// among the holds (a resume or a re-read writes it again if it is missing). So a danger text is always read: its batch
-// goes on, and its hold binds the commit, where a STOP or a protecting change still commits (holds bind commits, not
+// among the holds (a resume or a re-read writes it again if it is missing). Its row says danger from that step too (round
+// 5, DL-146), even where the timeout rule's outage line had failed. So a danger text is always read: its batch goes on,
+// and its hold binds the commit, where a STOP or a protecting change still commits (holds bind commits, not
 // hand-offs: CQ-65, DL-119; T-305's hold rule). On return, only a text that no longer waits makes the others due at once,
 // and only those still waiting for a verdict: a text whose danger's line or record is not done keeps its own 30 s re-read
 // and makes nothing due (round 3 gap B), so two such texts never trigger each other's reads.
@@ -558,7 +559,8 @@ export class SafetyOnArrival {
    * its read is running or was never wired; no verdict came (its unread hold is open: only a verdict lifts it, T-247 note
    * a); or the outage path failed with no verdict. A text the read found danger in has been read, whether or not its line
    * has gone and its record is kept (round 4, DL-144): its hold, written from its kept outcomes before the core is called,
-   * does not keep the batch back, it binds the turn's commit, so a STOP in that batch or a later one still commits. A
+   * does not keep the batch back, it binds the turn's commit, so a STOP in that batch or a later one still commits. Its row
+   * says danger from that same step (round 5, `markDanger`), so a late danger after a failed outage line is read too. A
    * danger text whose hold could not be written is among the texts not read at commit time (`unreadTexts`). A text with no
    * safety row at all is the actor's to find (note d).
    */
@@ -984,6 +986,21 @@ export class SafetyOnArrival {
   }
 
   /**
+   * Notes on the text's row, in the step its hold is written, that its read found danger (T-1088 round 5, DL-146; the
+   * architect's round 4 gap): from here on the text counts as read, so its batch goes on and its hold binds the commit
+   * (CQ-65 as DL-119). On the late path the row may say lineFailed already (the timeout rule's outage line failed), and an
+   * eviction during the line's send leaves it so, as `finish` comes only after the send. A storage that fails here must
+   * not keep the line from going: `finish` notes it once the send ends.
+   */
+  private markDanger(eventId: string): void {
+    try {
+      this.host.storage.sql.exec("UPDATE safety_events SET danger = 1 WHERE event_id = ?", eventId);
+    } catch {
+      // Not noted: `finish` notes it after the send; a row left lineFailed until then keeps its batch back (fails closed).
+    }
+  }
+
+  /**
    * The danger outcome is complete (the core answered, or the direct line went or none is needed, and its record is kept):
    * its re-reads stop, unless the unread hold still waits for a verdict.
    */
@@ -1102,6 +1119,7 @@ export class SafetyOnArrival {
           outcomes,
           result.dangerWords.some((match) => match.list === "plugin"),
         );
+        this.markDanger(eventId);
         const sent = await this.sendDanger(set, handoff, arrivedAt, result);
         path = sent.path;
         lineId = sent.lineId;

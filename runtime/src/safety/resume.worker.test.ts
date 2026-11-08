@@ -1805,4 +1805,154 @@ describe("a danger cut off before the core answers (round 4)", () => {
       restoreSafety();
     }
   });
+
+  // Round 5 (DL-146; the architect's round 4 FAIL on 965c5a0): on the late path, the row said lineFailed with no danger
+  // (the timeout rule's outage line had failed) while a late danger verdict's line was being sent, as `finish` comes only
+  // after the send. A cut during that send left it so for good, and the batch's held() kept that batch, and every later
+  // one, a STOP's included, back while the re-reads said No, though the text's hold was open. Now the row says danger in
+  // the step that writes the hold.
+  describe("on the late path, after the timeout rule's outage line failed (round 5)", () => {
+    it("a late danger cut off during its core call counts as read once its hold is written: the batch goes on with the after-safe hold while the re-reads say No, a later STOP's batch reaches its turn and commits, and routine work stays held", async () => {
+      const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+      const lease: Lease = { turns: [], contexts: [] };
+      const attempts: RecordSafetyOutcomeRequest[] = [];
+      let stopChecks = 0;
+      await withEviction(
+        { "evt-1": danger },
+        {
+          lease,
+          before: (h) => ({
+            ...h.deps,
+            // The read sent on arrival answers An emergency at 6 s, past the deadline. The stopped flag cannot be read at
+            // 4 s, so the timeout rule's outage line fails. The core takes the record and never answers.
+            read: {
+              async read() {
+                await h.clock.after(6000);
+                return verdict(danger);
+              },
+            },
+            core: hangingCore(h, attempts),
+            isStopped: () => {
+              stopChecks += 1;
+              throw new Error("the stopped flag could not be read");
+            },
+          }),
+        },
+        async (run) => {
+          await arrive("evt-1", SMOKE_TEXT);
+          // 4 s: no verdict and no danger word: the unread hold and its re-read at 34 s, then the outage line, which
+          // fails (the stopped flag throws): no line went, and the row says lineFailed with no danger. The batch, closed
+          // at 3 s by the alarm, waits: its text has no verdict yet.
+          await run.h.clock.advance(4000);
+          await vi.waitFor(async () => {
+            expect(await actorOf().readSafety()).toMatchObject([
+              { eventId: "evt-1", state: "lineFailed", danger: false, path: "none" },
+            ]);
+          });
+          await run.wake();
+          await vi.waitFor(async () => {
+            expect(await actorOf().readBatches()).toMatchObject([
+              { reason: "quiet", handed: false, eventIds: ["evt-1"] },
+            ]);
+          });
+          expect(stopChecks).toBe(1);
+          expect(await actorOf().readHolds()).toMatchObject([
+            { eventId: "evt-1", rule: "unread", released: false },
+          ]);
+          expect(run.h.core.fixed).toEqual([]);
+          expect(run.h.direct.sent).toEqual([]);
+
+          // 6 s: the late verdict, An emergency. In one step the danger is noted, its hold is written in place of the
+          // unread hold, and the row says danger; then the core is called, and never answers.
+          await run.h.clock.advance(2000);
+          await vi.waitFor(() => {
+            expect(attempts.map((request) => request.caller.requestId)).toEqual(["safety:evt-1"]);
+          });
+          expect(await actorOf().readHolds()).toEqual([
+            { eventId: "evt-1", holdId: null, rule: "after_safe", blocksBooking: true, released: false },
+          ]);
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "lineFailed", danger: true },
+          ]);
+
+          // 7 s: the cut, during the core's call. Every read after it says No.
+          await run.h.clock.advance(1000);
+          const reads: SafetyReadRequest[] = [];
+          await run.evict({
+            ...run.h.deps,
+            read: {
+              read(request) {
+                reads.push(request);
+                return Promise.resolve(verdict({ ...asResult(safetyNo), eventId: request.eventId }));
+              },
+            },
+          });
+
+          // 34 s: the stored re-read wakes a new instance. It says No: the first verdict stands, nothing is sent, and the
+          // text is read again 30 s on. The batch goes on all the same, with the after-safe hold open for its commit.
+          await run.h.clock.advance(27_000);
+          await run.wake();
+          await vi.waitFor(() => {
+            expect(lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+          });
+          const hold: OpenHold = {
+            eventId: "evt-1",
+            holdId: null,
+            rule: "after_safe",
+            outcomes: ["An emergency"],
+            blocksBooking: true,
+          };
+          expect(present(lease.turns[0], "the turn").holds).toEqual([hold]);
+          await vi.waitFor(async () => {
+            expect(reads.map((request) => request.eventId)).toEqual(["evt-1"]);
+            expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 64_000 });
+          });
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "lineFailed", danger: true },
+          ]);
+          expect(await actorOf().routineHeld()).toBe(true);
+          expect(await commitOf(present(lease.turns[0], "the turn"))).toMatchObject({ result: "committed" });
+
+          // 40 s: a STOP arrives; its batch closes at 43 s and reaches its own turn, and its commit is handed the danger's
+          // hold and no unread text. T-305's hold rule (actions/src/commit/hold.ts isHeld, on main) then commits the STOP
+          // (a protective change passes every hold) and holds every routine part (an after-safe hold lets none through);
+          // the lease refuses nothing itself.
+          await run.h.clock.advance(6000);
+          await arrive("evt-2", STOP_TEXT);
+          await run.settle();
+          await run.h.clock.advance(3000);
+          await run.wake();
+          await vi.waitFor(() => {
+            expect(lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"], ["evt-2"]]);
+          });
+          const stopTurn = present(lease.turns[1], "the STOP's turn");
+          expect(stopTurn.holds).toEqual([hold]);
+          expect(await commitOf(stopTurn)).toMatchObject({ result: "committed" });
+          expect(lease.contexts).toEqual([
+            { holds: [hold], unread: [] },
+            { holds: [hold], unread: [] },
+          ]);
+          expect(await actorOf().routineHeld()).toBe(true);
+
+          // 64 s: read again, No again: still nothing is sent and the hold stays, and no batch was kept back meanwhile.
+          await run.h.clock.advance(21_000);
+          await run.wake();
+          await vi.waitFor(async () => {
+            expect(reads.map((request) => request.eventId)).toEqual(["evt-1", "evt-2", "evt-1"]);
+            expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 94_000 });
+          });
+          expect(await actorOf().readHolds()).toEqual([
+            { eventId: "evt-1", holdId: null, rule: "after_safe", blocksBooking: true, released: false },
+          ]);
+          expect(await actorOf().readBatches()).toMatchObject([
+            { handed: true, eventIds: ["evt-1"] },
+            { handed: true, eventIds: ["evt-2"] },
+          ]);
+          expect(run.h.core.recorded).toEqual([]);
+          expect(run.h.core.fixed).toEqual([]);
+          expect(run.h.direct.sent).toEqual([]);
+        },
+      );
+    });
+  });
 });
