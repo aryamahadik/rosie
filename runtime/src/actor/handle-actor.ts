@@ -14,12 +14,18 @@
 // whose unread hold is open (no verdict in 4 s, the outage line sent) for its re-read every 30 s until a verdict lands
 // (DL-127), so a late answer lost with an evicted instance cannot leave a text unread and held for good.
 //
+// The same one alarm keeps the handle's clock rows (T-254, ../clocks): the stored schedule gains a clock entry at the
+// handle's earliest armed row, and the alarm then fires the due rows through the clocks' one fire path, each a clock
+// turn whose commit reads the holds open and the texts not read yet, as a turn's does. The minute sweep and staging's
+// Fire now hand a row in through `fireClockRow`; the clock arming (T-255) names the handle through `syncClocks`.
+//
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
 // a sealed box. Never logged: a word, a phone number, a key, a sealed body.
 
 import { DurableObject } from "cloudflare:workers";
 
 import { BundlePins, bundleKvOf, type PinEntry } from "../bundle";
+import { ActorClocks, type DueClock, type FireBy, type FireReport } from "../clocks";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import {
@@ -112,6 +118,7 @@ export class HandleActor extends DurableObject {
   private readonly batch: BatchWindow;
   private readonly lease: TurnLease;
   private readonly pins: BundlePins;
+  private readonly clocks: ActorClocks;
   private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
@@ -156,6 +163,16 @@ export class HandleActor extends DurableObject {
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
     });
+    // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
+    // armed row; a clock turn's commit is handed the holds open and the texts not read yet, read at commit time.
+    this.clocks = new ActorClocks({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      arm: () => this.batch.arm(),
+      context: () => ({ holds: this.safety.openHolds(), unread: this.unreadTexts() }),
+      logContext: () => ({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+      staging: () => this.env.ENVIRONMENT === "staging",
+    });
     // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read,
     // and reads again every text whose re-read is due (DL-127). A failure here must not keep the actor from starting.
     this.resumeSafetyGuarded();
@@ -166,13 +183,29 @@ export class HandleActor extends DurableObject {
 
   /**
    * The Durable Object alarm: the stored schedule's due entries (the safety work first, so a line waits for nothing: a
-   * cut-off read, a re-read; then a lapsed lease; the batch close; a batch's hand-off). A throw in the safety part never
-   * keeps the lease and batch handlers from running.
+   * cut-off read, a re-read; then a lapsed lease; the batch close; a batch's hand-off; then the clock rows, T-254). A
+   * throw in the safety part never keeps the lease and batch handlers from running; the clock part never throws, and it
+   * sets the alarm again from the whole schedule.
    */
   override async alarm(): Promise<void> {
     this.resumeSafetyGuarded();
     await this.lease.onAlarm();
     await this.batch.onAlarm();
+    await this.clocks.onAlarm();
+  }
+
+  /**
+   * The clock arming's call (T-255) once it arms a row of this handle, named by K-04 handles.id: fires the handle's due
+   * rows through the clocks' fire path, then keeps the alarm's clock entry at its earliest armed row (T-254). A handle id
+   * other than the one this actor already names is refused, with nothing read.
+   */
+  syncClocks(handleId: string): Promise<FireReport[]> {
+    return this.clocks.sync(handleId);
+  }
+
+  /** One clock row of this handle, handed by the minute sweep (a missed row) or staging's Fire now: the alarm's own path. */
+  fireClockRow(request: { row: DueClock; by: FireBy }): Promise<FireReport> {
+    return this.clocks.fireRow(request.row, request.by);
   }
 
   /**
