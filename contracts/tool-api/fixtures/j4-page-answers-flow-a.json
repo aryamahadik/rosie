@@ -33,6 +33,11 @@
     "bookingId": "booking-agent-alex-oct21",
     "answerIds": ["answer-agent-alex-1"],
     "meetsPro": null,
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
     "gives": ["answers"],
     "written": [],
     "repeated": false

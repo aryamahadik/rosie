@@ -1,0 +1,54 @@
+{
+  "call": "quoteFromPhotos",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json", "rules/seed-price-ok-limit.json"],
+    "after": ["j4-quote-price-page.json", "j4-quote-change-turn.json"],
+    "now": "2026-11-03T00:37:40Z",
+    "stated": null,
+    "note": "B4-11's read-back answered: Sam replies '1' ('Reply 1 Send it, 2 Type another price'), the exact yes to the read-back's open question (arch 06 line 303). The pending $600 comes from that open question, never from the reply's words. In one commit: the quote's option changes to $600 in place (K-30 quote_options, version 2: 'changed only by the owner's read-back change before it is sent'), the quote's version rises to 3, the owner's ask is answered change with Sam, owner, the read-back's question, the option and the event (K-30 owner_oks.open_question_id: 'for a change typed and read back, the read-back's question'), and the open question is answered. The walk goes on to B4-13 in the same commit (setPrice photos at version 3, as j4-quote-send-turn.json sends at $640), so this answer gives no key of its own (round 2: DL-162 ruling 1; README default 80). The option id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-heater-change-yes",
+      "requestId": "turn-sam-heater-change-yes",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-sam-heater-change"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "stage": "changeReadBack",
+      "step": "B4-11",
+      "quoteId": "quote-alex-heater",
+      "ownerOkId": "ok-alex-heater",
+      "expectVersion": 2,
+      "answer": "send",
+      "newOptions": null,
+      "pendingOptions": null,
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-sam-heater-change", "yesEventId": "evt-sam-heater-0003" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "quoteId": "quote-alex-heater",
+    "state": "with_owner",
+    "version": 3,
+    "ownerOkId": "ok-alex-heater",
+    "ownerAskClockRowId": null,
+    "link": null,
+    "pricingClockRowId": null,
+    "pendingChange": null,
+    "customerClockRowId": null,
+    "requestEnded": false,
+    "gives": [],
+    "outboxRowIds": [],
+    "written": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 3 },
+      { "table": "quote_options", "rowId": "qopt-alex-heater-1", "version": 2 },
+      { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-sam-heater-change", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

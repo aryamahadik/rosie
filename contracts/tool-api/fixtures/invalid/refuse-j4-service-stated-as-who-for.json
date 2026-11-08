@@ -1,7 +1,11 @@
 {
   "call": "matchService",
   "given": {
-    "seeds": ["core/seed-business-head.json", "services-prices/seed-service-money-paths.json"],
+    "seeds": [
+      "core/seed-business-head.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
     "after": ["j3-open-request-agent.json"],
     "now": "2026-10-21T23:15:20Z",
     "stated": { "step": "A4-80", "gives": ["who_for"] },
@@ -24,7 +28,24 @@
     "serviceId": "svc-lees-haircut",
     "serviceVersion": 1,
     "ways": [
-      { "serviceMoneyId": "way-lees-haircut-shop", "place": "business", "path": "list|card|counter", "version": 1 }
+      {
+        "serviceMoneyId": "way-lees-haircut-shop",
+        "flow": "A",
+        "place": "business",
+        "path": "list|card|counter",
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      },
+      {
+        "serviceMoneyId": "way-lees-haircut-home",
+        "flow": "B",
+        "place": "customer",
+        "path": "list|full|none",
+        "price": { "cents": 7500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      }
     ],
     "openQuestionId": null,
     "gives": ["service"],

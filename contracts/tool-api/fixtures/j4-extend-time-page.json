@@ -1,0 +1,37 @@
+{
+  "call": "extendTime",
+  "given": {
+    "seeds": ["core/seed-resources.json"],
+    "after": ["j4-save-time-agent.json", "j4-secure-link-agent.json"],
+    "now": "2026-10-21T23:25:00Z",
+    "stated": null,
+    "note": "A4-21's 'The page warns before the saved time ends, and offers more time at least once': Alex is on his secure page with Sat 11:00am held on the standard door (a request Sam OKs: j4-save-time-agent.json), and taps for more time before 23:26:40. Through K-05 v1 extend: held_until rises 10 minutes to 23:36:40, reservations.extended is set (version 2) and the saved-time clock row moves with it (version 2), in one commit (round 2: DL-162 ruling 4; Q-12). No extension is left; no key. The clock row's id follows K-05's '<reservation id>/saved-time'."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-agent-alex-0013",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-agent-alex-0013"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "reservationId": "rsv-agent-alex-riley-sat",
+    "expectVersion": 1
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "reservationId": "rsv-agent-alex-riley-sat",
+    "version": 2,
+    "heldUntil": "2026-10-21T23:36:40Z",
+    "door": "standard",
+    "extendable": false,
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-agent-alex-riley-sat", "version": 2 },
+      { "table": "clock_rows", "rowId": "rsv-agent-alex-riley-sat/saved-time", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

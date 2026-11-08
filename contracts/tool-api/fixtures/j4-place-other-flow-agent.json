@@ -1,0 +1,46 @@
+{
+  "call": "matchService",
+  "given": {
+    "seeds": [
+      "core/seed-business-head.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json"],
+    "now": "2026-10-21T23:15:26Z",
+    "stated": null,
+    "note": "A4-01 then A4-02, a what-if beside the haircut at the shop: Alex's AI showed both places with their prices (j4-match-service-agent.json: $35 at the shop, $75 at home) and he picks '2 At my home'. The way picked, way-lees-haircut-home, is checked against today's list and is flow B's, so the request moves to flow B in the same commit: K-04 bookings.flow set to B at stage entry, the head compared and set (version 2), and the walk goes on in flow B's step graph (A4-02: 'From here it's the other flow'), closing v1.1 open gap 27 (round 2: DL-162 ruling 6; README default 75). The way is kept with the token (README default 57). No key."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0003b",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "place": { "step": "A4-01", "serviceMoneyId": "way-lees-haircut-home", "expectVersion": 1 }
+  },
+  "outcome": {
+    "result": "placePicked",
+    "serviceId": "svc-lees-haircut",
+    "way": {
+      "serviceMoneyId": "way-lees-haircut-home",
+      "flow": "B",
+      "place": "customer",
+      "path": "list|full|none",
+      "price": { "cents": 7500, "currency": "USD" },
+      "fromPrice": null,
+      "version": 1
+    },
+    "flow": "B",
+    "flowChanged": true,
+    "headVersion": 2,
+    "openQuestionId": null,
+    "gives": [],
+    "written": [{ "table": "bookings", "rowId": "booking-agent-alex-oct21", "version": 2 }],
+    "repeated": false
+  }
+}

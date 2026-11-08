@@ -1,0 +1,23 @@
+{
+  "bookingId": "booking-agent-teen-oct21",
+  "outcome": "teenParentLink",
+  "servedPersonId": "person-agent-teen-0001",
+  "payerPersonId": null,
+  "private": false,
+  "servedAgeBand": null,
+  "ageBandKept": "nothingKept",
+  "parentLink": {
+    "kind": "bookingPage",
+    "secureLinkId": null,
+    "url": "rosfield.com/c/placeholder-parent-link",
+    "outboxRowId": null,
+    "clockRowId": null
+  },
+  "headVersion": 2,
+  "gives": [],
+  "written": [
+    { "table": "bookings", "rowId": "booking-agent-teen-oct21", "version": 2 },
+    { "table": "booking_details", "rowId": "booking-agent-teen-oct21", "version": 2 }
+  ],
+  "repeated": false
+}

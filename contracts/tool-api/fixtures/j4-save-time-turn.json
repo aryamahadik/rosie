@@ -4,7 +4,8 @@
     "seeds": [
       "people-access/seed-staff-joined.json",
       "services-prices/seed-service-money-paths.json",
-      "business-setup/seed-location-flow-b.json"
+      "business-setup/seed-location-flow-b.json",
+      "bookings-changes/seed-booking-flow-b.json"
     ],
     "after": ["j4-check-place-area-turn.json", "j4-show-times-turn.json"],
     "now": "2026-11-02T14:03:10Z",
@@ -30,6 +31,7 @@
       "reservationId": "rsv-alex-drain2",
       "version": 1,
       "heldUntil": "2026-11-02T14:13:10Z",
+      "door": "standard",
       "minutes": 10,
       "extendable": true
     },

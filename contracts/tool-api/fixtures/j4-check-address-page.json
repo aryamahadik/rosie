@@ -29,6 +29,7 @@
     "result": "inside",
     "addressRowId": "addr-alex-drain2-1",
     "zone": "America/New_York",
+    "matchPrecision": "exact",
     "requestEnded": false,
     "gives": ["address"],
     "written": [{ "table": "booking_addresses", "rowId": "addr-alex-drain2-1", "version": 2 }],

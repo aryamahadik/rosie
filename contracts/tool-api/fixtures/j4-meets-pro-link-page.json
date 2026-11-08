@@ -1,0 +1,37 @@
+{
+  "call": "sendSecureLink",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j4-secure-link-turn.json", "j4-meets-pro-someone-else-page.json"],
+    "now": "2026-11-02T14:07:35Z",
+    "stated": null,
+    "note": "B4-27: the adult who meets the pro gets their own link (round 2: DL-162 ruling 3; K-30 secure_links purpose secure_page: 'each person served or who meets the pro gets their own'), for that adult's person, given on Alex's own secure page for Alex to forward ('Alex forwards a link'): given_via page, no contact (that adult has none on file, and Alex's handle is not theirs), the link returned to the page once in url, only its code's hash kept. Rosie texts nobody ('Rosie never texts the parent on Alex's word'). It gives no key, and no form or approval rides it (README default 83). Its K-03 slot is link.secure. The link id and code are placeholders (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-drain2-0012",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-drain2-0008"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "for": "meetsPro",
+    "via": "page"
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "secureLinkId": "link-alex-drain2-meets-pro",
+    "for": "meetsPro",
+    "givenVia": "page",
+    "url": "rosfield.com/c/placeholder-meets-pro-code-0027",
+    "outboxRowId": null,
+    "approval": null,
+    "formsOnPage": false,
+    "notListed": false,
+    "gives": [],
+    "written": [{ "table": "secure_links", "rowId": "link-alex-drain2-meets-pro", "version": 1 }],
+    "repeated": false
+  }
+}

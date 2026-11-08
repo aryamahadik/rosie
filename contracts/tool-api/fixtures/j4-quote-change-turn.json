@@ -1,0 +1,52 @@
+{
+  "call": "quoteFromPhotos",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json", "rules/seed-price-ok-limit.json"],
+    "after": ["j4-quote-price-page.json"],
+    "now": "2026-11-03T00:36:12Z",
+    "stated": null,
+    "note": "B4-11 in Sam's own chat: he replies '2' to B4-10's 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline' and types '600'. In this turn decide gives the answer change with the money field $600, re-parsed from Sam's own words under limit 6 (round 2: DL-162 ruling 1; AI FAIL 1). Code stores it, with its version, as the pending change before the read-back: on the read-back's K-04 open question, written in this commit at version 1, whose read-back words carry $600 and whose versions_read name the quote (version 2), its option and the owner's ask (README default 80). Nothing changes on the quote, the owner's ask stays waiting, and nothing goes to Alex ('the new price stays unsent until Sam confirms'). The reply row in Sam's chat is the read-back, 'Send Alex M. $600 for the water heater replacement, not $640? / Reply 1 Send it, 2 Type another price.', whose {{change.price}} the slot filler fills from the stored pending price. The open question, row and event ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-heater-change",
+      "requestId": "turn-sam-heater-change",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-sam-heater-change"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "stage": "ownerAnswer",
+      "step": "B4-11",
+      "quoteId": "quote-alex-heater",
+      "ownerOkId": "ok-alex-heater",
+      "expectVersion": 2,
+      "answer": "change",
+      "newOptions": [{ "label": null, "price": { "cents": 60000, "currency": "USD" }, "upTo": null }],
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-ok-alex-heater", "yesEventId": "evt-sam-heater-0002" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "quoteId": "quote-alex-heater",
+    "state": "with_owner",
+    "version": 2,
+    "ownerOkId": "ok-alex-heater",
+    "ownerAskClockRowId": null,
+    "link": null,
+    "pricingClockRowId": null,
+    "pendingChange": {
+      "options": [{ "label": null, "price": { "cents": 60000, "currency": "USD" }, "upTo": null }],
+      "openQuestionId": "oq-sam-heater-change",
+      "version": 1
+    },
+    "customerClockRowId": null,
+    "requestEnded": false,
+    "gives": [],
+    "outboxRowIds": ["row-sam-heater-readback"],
+    "written": [{ "table": "open_questions", "rowId": "oq-sam-heater-change", "version": 1 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "call": "setPrice",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "rules/seed-price-ok-limit.json",
+      "core/seed-phone-chat-open.json"
+    ],
+    "after": ["j4-quote-price-page.json"],
+    "now": "2026-11-03T00:41:15Z",
+    "stated": { "step": "B4-13", "gives": ["price_known"] },
+    "note": "B4-10's '1 Send it' on the portal's Needs you page (a what-if beside j4-quote-send-turn.json, where Sam answers by text), then B4-13 from the same page: the quote goes sent (version 3), good for 7 days, with the quote link (K-30 secure_links purpose quote, only its code's hash kept). A page's commit writes no outbox row (v1.1 open gap 43), so it arms a K-04 clock row due at once on Alex's mobile's handle, whose chat is open, and that clock turn writes the price row with the link filled at finalize (round 2: DL-162 ruling 2e; README defaults 71, 72, as v1.1 default 56 and default 66 do): B4-13's price reaches Alex within the minute. The link never comes back to the page (url null). Gives price_known. Link and clock ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-heater-0002",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-portal-sam-heater-0001"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "price": { "path": "photos", "step": "B4-13", "quoteId": "quote-alex-heater", "expectVersion": 2 }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "path": "photos",
+    "price": null,
+    "fromPrice": null,
+    "quote": {
+      "quoteId": "quote-alex-heater",
+      "state": "sent",
+      "sentAt": "2026-11-03T00:41:15Z",
+      "goodUntil": "2026-11-10T00:41:15Z",
+      "version": 3,
+      "options": [
+        {
+          "quoteOptionId": "qopt-alex-heater-1",
+          "label": null,
+          "price": { "cents": 64000, "currency": "USD" },
+          "upTo": null
+        }
+      ],
+      "link": {
+        "kind": "quote",
+        "secureLinkId": "link-alex-heater-quote-page",
+        "url": null,
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-heater-price-message"
+      }
+    },
+    "outboxRowIds": [],
+    "gives": ["price_known"],
+    "written": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 3 },
+      { "table": "secure_links", "rowId": "link-alex-heater-quote-page", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-heater-price-message", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

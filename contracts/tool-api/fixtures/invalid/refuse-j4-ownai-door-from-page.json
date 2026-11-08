@@ -1,0 +1,63 @@
+{
+  "call": "saveTime",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json",
+      "business-setup/seed-location-flow-b.json",
+      "bookings-changes/seed-booking-flow-b.json"
+    ],
+    "after": [],
+    "now": "2026-11-02T15:10:00Z",
+    "stated": { "step": "B4-16", "gives": ["choice", "time_saved"] },
+    "note": "j4-save-time-agent-instant.json with one fault: the same save made from the booking page (caller page) answered on MC C3's ownAi door, 15 minutes. Only the customer's own AI's save can be on that door; a page's is always standard, 10 minutes with Q-12's extension. With caller.kind agent it is accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-agent-alex-drain3-0009",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-drain3-0001"
+    },
+    "bookingId": "booking-agent-alex-drain3",
+    "pick": {
+      "kind": "offered",
+      "time": {
+        "optionId": "opt-agent-alex-drain3-thu-1000",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-05T15:00:00Z", "end": "2026-11-05T18:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-05T15:00:00Z", "end": "2026-11-05T17:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      "serviceId": "svc-lee-plumbing-drain-clearing",
+      "serviceMoneyId": "way-lee-plumbing-drain-home",
+      "quoteOptionId": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-drain3",
+    "timing": "settime",
+    "reservation": {
+      "reservationId": "rsv-agent-alex-drain3",
+      "version": 1,
+      "heldUntil": "2026-11-02T15:25:00Z",
+      "door": "ownAi",
+      "minutes": 15,
+      "extendable": false
+    },
+    "lineId": "line-agent-alex-drain3-1",
+    "linePrice": { "cents": 17900, "currency": "USD" },
+    "gives": ["choice", "time_saved"],
+    "written": [
+      { "table": "booking_details", "rowId": "booking-agent-alex-drain3", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-agent-alex-drain3", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-agent-alex-drain3-1", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -30,6 +30,11 @@
     "bookingId": "booking-alex-chat-drain2",
     "answerIds": ["answer-alex-drain2-1", "answer-alex-drain2-2"],
     "meetsPro": null,
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
     "gives": ["access", "answers"],
     "written": [],
     "repeated": false

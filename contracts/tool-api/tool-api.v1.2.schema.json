@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.2.schema.json",
   "title": "ToolApiV1dot2",
-  "description": "K-09 Tool API v1.2, a minor version for journey 4 (T-051; 02-contracts K-09 version table, row v1.2; section 9 F16). It only adds to v1.1 (tool-api.v1.1.schema.json, frozen by T-050 and unchanged, referred to here, which refers to v1): every v1 and v1.1 definition is here under its own name, the unchanged ones by reference; the changed ones (stepKey, given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, callName) take only new enum values, so every v1 and v1.1 exchange is a v1.2 exchange. Added: the calls of journey 4 (A4-01 to A4-99, B4-01 to B4-115; S12-01 to S12-05 and S12-28 with journey 4): matchService (gives service), setWhoFor (who_for), setReachWay (reach_by), addCustomer (customer), setPrice (price_known, visit_fee), quoteFromPhotos (quote), showTimes (times), saveTime (choice, time_saved), joinWaitlist, sendSecureLink (contact, link), checkPlace (place, address) and saveSecurePage (access, answers). Each key journey 4 writes is written by exactly one call, named in that call's request description with its step ids (02-contracts section 8; README 'v1.2', 'Each key's one call'). K-16 v1, K-17 v1, K-27 v1 and K-30 v1 are frozen on main: the calls name their tables, columns and calls, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-09 Tool API v1.2, a minor version for journey 4 (T-051; 02-contracts K-09 version table, row v1.2; section 9 F16). It only adds to v1.1 (tool-api.v1.1.schema.json, frozen by T-050 and unchanged, referred to here, which refers to v1): every v1 and v1.1 definition is here under its own name, the unchanged ones by reference; the changed ones (stepKey, given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, callName) take only new enum values, so every v1 and v1.1 exchange is a v1.2 exchange. Added: the calls of journey 4 (A4-01 to A4-99, B4-01 to B4-115; S12-01 to S12-05 and S12-28 with journey 4): matchService (gives service), setWhoFor (who_for), setReachWay (reach_by), addCustomer (customer), setPrice (price_known, visit_fee), quoteFromPhotos (quote), showTimes (times), saveTime (choice, time_saved), extendTime (Q-12's one extension, round 2), joinWaitlist, sendSecureLink (contact, link), checkPlace (place, address) and saveSecurePage (access, answers). Each key journey 4 writes is written by exactly one call, named in that call's request description with its step ids (02-contracts section 8; README 'v1.2', 'Each key's one call'). Round 2 (the lead's rulings DL-162, on ops/cards/T-051.md) adds, still only to v1.2's own definitions: the owner's changed price stored before its read-back (quoteFromPhotos change and changeReadBack), the links the master gives (linkIssued: a teen's parent link, a quote's times link, the photos link and its page, the pricing page's quote message), the adult who meets the pro (sendSecureLink for meetsPro, saveSecurePage meetsProYes), C3's 15 minutes only for the customer's own AI's instant money booking (saveTime's door, extendTime), screen 2's categories at A4-80, both flows' ways and the place pick, checkPlace naming its way, addCustomer's way and age band, a bounded waitlist with a texts-off answer, and an AI's place kept only as a matched town or ZIP (README 'v1.2', 'Round 2'). K-16 v1, K-17 v1, K-27 v1 and K-30 v1 are frozen on main: the calls name their tables, columns and calls, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     { "$ref": "#/$defs/buildFrontier.exchange" },
     { "$ref": "#/$defs/closestEntries.exchange" },
@@ -46,6 +46,7 @@
     { "$ref": "#/$defs/quoteFromPhotos.exchange" },
     { "$ref": "#/$defs/showTimes.exchange" },
     { "$ref": "#/$defs/saveTime.exchange" },
+    { "$ref": "#/$defs/extendTime.exchange" },
     { "$ref": "#/$defs/joinWaitlist.exchange" },
     { "$ref": "#/$defs/sendSecureLink.exchange" },
     { "$ref": "#/$defs/checkPlace.exchange" },
@@ -444,26 +445,117 @@
     },
     "wayOffered": {
       "title": "WayOffered",
-      "description": "One of a service's ways for the request's flow (K-25 v1 service_money: the place it is done and its money path), with its version, as matchService answers it and A4-01 or B4-01 and B4-02 pick from.",
+      "description": "One of a service's ways (K-25 v1 service_money: the place it is done, its flow and its money path), with its version and its price now, as matchService answers it and A4-01, B4-01 and B4-02 pick from. Round 2 (DL-162 ruling 6; action-layer FAIL 6): every active way of the service, in both flows, each with its own price, since 'Both' is two rows and the customer 'sees both prices first' (K-25 v1 service_money.place; A4-01; B4-02: 'at the shop for $35, or at your home for $75').",
       "type": "object",
       "properties": {
         "serviceMoneyId": {
           "description": "K-25 v1 service_money.id, of the matched service.",
           "$ref": "../common/formats.v1.schema.json#/$defs/id"
         },
-        "place": {
-          "description": "K-25 v1 service_money.place, as stored: where the service is done (at the business, at the customer's place, by video or phone: A4-01, B4-01).",
+        "flow": {
+          "description": "K-25 v1 service_money.flow: A, the customer comes to the business (a shop or office, a meeting spot, or video or phone); B, the business goes to the customer. A way of the other flow than the request's is picked with matchService's place pick, which moves the request to that flow (README default 75).",
           "type": "string",
-          "minLength": 1
+          "enum": ["A", "B"]
+        },
+        "place": {
+          "description": "K-25 v1 service_money.place, as stored: business, customer, meeting_spot or video (A4-01, B4-01).",
+          "type": "string",
+          "enum": ["business", "customer", "meeting_spot", "video"]
         },
         "path": {
           "description": "K-25 v1 service_money.path, price|before|after (one of the master's 28 for the flow; K-30 booking_lines_path_form).",
           "type": "string",
           "pattern": "^(list|photos|visit)[|](none|card|deposit|full)[|](none|counter|bill|card|own)$"
         },
+        "price": {
+          "description": "The price resolver's set price for this way now (K-25 v1 price rules, the rule whose place names this way, else the service's: README default 65's resolver, for no named time or person), in integer minor units; on a visit path the visit's own promised price; null on a photos path (priced from photos: A4-07) or a visit path that promises none. Shown before any yes (B4-02; A4-05).",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "fromPrice": {
+          "description": "On a visit path, a 'from' price, only as 'from' (K-25 v1 price_rules.from_cents; A4-05); null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
         "version": { "$ref": "#/$defs/version" }
       },
-      "required": ["serviceMoneyId", "place", "path", "version"],
+      "required": ["serviceMoneyId", "flow", "place", "path", "price", "fromPrice", "version"],
+      "additionalProperties": false
+    },
+    "optionPrice": {
+      "title": "OptionPrice",
+      "description": "One price of a quote as the pro or the owner sets it (K-30 v1 quote_options): what it is (null for a quote with one option), a set price or a range's low end, and a range's high end (null for a set price), in integer minor units (A4-08, B4-09: 'a range, like $80 to $100, set at the visit inside it'; 'One quote can hold options').",
+      "type": "object",
+      "properties": {
+        "label": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+        "price": { "$ref": "#/$defs/money" },
+        "upTo": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+      },
+      "required": ["label", "price", "upTo"],
+      "additionalProperties": false
+    },
+    "linkIssued": {
+      "title": "LinkIssued",
+      "description": "A link the call issued (round 2: DL-162 ruling 2, the links the master gives that round 1 issued no call for), and how it reaches its reader (README default 62, restated in default 71): in a turn, inside an outbox row whose final parts hold it (url null); to the customer's own AI or on a page, in url, once, never logged (FS line 679); from a page's commit, which writes no outbox row (v1.1 open gap 43), through a K-04 clock row due at once on the reader's handle whose clock turn writes the row (README default 72: v1.1 default 56's and v1.2 default 66's way). A secure link keeps only its code's sha256 (K-30 v1 secure_links.code_sha256; BP rule 7); its code is derived from the link's id under a Workers secret, so the slot filler fills it at finalize in the same turn or a later clock turn, and it never enters a span, a trace or the event log (README default 71; v1 default 30). Each link names its K-03 link slot (K-03 v1 slots.json); where K-03 has none that fits, README open gap 70 names the one it lacks, and the composer cannot state that link until a K-03 minor version adds it.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "secure_page (K-30 secure_links purpose secure_page: K-03 slot link.secure), photos (purpose photos, A4-07 'Add photos: rosfield.com/q/a7': no K-03 slot, open gap 70 proposes link.photos), quote (purpose quote, A4-12 'Pick a time: rosfield.com/q/r3' and A4-94 'See times: rosfield.com/q/r3e': no K-03 slot, open gap 70 proposes link.quote) or bookingPage (the business's booking page for a parent, A4-96 'Forward to a parent: rosfield.com/c/teen': no row, since nothing about the teen is kept; no K-03 slot, open gap 70 proposes link.book).",
+          "type": "string",
+          "enum": ["secure_page", "photos", "quote", "bookingPage"]
+        },
+        "secureLinkId": {
+          "description": "The K-30 v1 secure_links row for a secure_page, photos or quote link; null for bookingPage, which names the business and its service only and keeps no row (README default 73).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "url": {
+          "description": "For a page or an AI caller, the link itself, given once (rosfield.com/ then a short code; the host a config value, Q-51); null in a turn, from a page whose link goes by a clock row, and on a repeat. Never logged, never in a span (v1 default 30).",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "outboxRowId": {
+          "description": "In a turn, the row carrying the link, into that reader's open chat or to their email (RULES 4.1b; MC C9); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "clockRowId": {
+          "description": "From a page's commit: the K-04 clock row due at once on the reader's handle whose clock turn writes the row carrying the link (README default 72); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["kind", "secureLinkId", "url", "outboxRowId", "clockRowId"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "bookingPage" } }, "required": ["kind"] },
+          "then": { "properties": { "secureLinkId": { "type": "null" }, "clockRowId": { "type": "null" } } },
+          "else": {
+            "properties": { "secureLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+          }
+        }
+      ]
+    },
+    "textsOffNotice": {
+      "title": "TextsOffNotice",
+      "description": "A yes to texts that a stopped mobile cannot give (RULES 7.5: 'Only START, or a fresh yes on a new booking from that number, turns texts back on'; MC C1; S13-32, MASTER-FLOW-A line 7242), so no K-29 consent is written and the person hears only that texts to that number are off and how START turns them back on: K-01's fixed line stopLaterReply (Q-01: 'Texts are off. Reply START, or call the business.'; its words wait on Jay). In a turn as an outbox row in that person's own chat; on a page, whose commit writes no outbox row (v1.1 open gap 43), shown by the page itself, outboxRowId null (v1.1 default 50's rule; STATE note 9: no answer holds textsOff with a consentId).",
+      "type": "object",
+      "properties": {
+        "fixedLineId": { "$ref": "#/$defs/fixedLineId" },
+        "outboxRowId": { "$ref": "#/$defs/nullableId" }
+      },
+      "required": ["fixedLineId", "outboxRowId"],
+      "additionalProperties": false
+    },
+    "savedTimeCapError": {
+      "title": "SavedTimeCapError",
+      "description": "K-05 v1 reserve's savedTimeCap (arch 05 line 247; CQ-13 '(2 per business)'): a third saved time for one mobile (across businesses) or for one agent token at one business, so nothing was held (round 2: security note c). The caller hears only when its own two saved times end, never their reservation ids or their businesses (K-05 lists them; the Tool API keeps them back: RULES 4.10).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "savedTimeCap" },
+        "endsAt": {
+          "type": "array",
+          "items": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": ["error", "endsAt"],
       "additionalProperties": false
     },
     "timeOffered": {
@@ -623,13 +715,28 @@
     },
     "matchService.request": {
       "title": "MatchServiceRequest",
-      "description": "Is it a service the business offers? Gives service (A4-81, B4-114; 02-contracts section 8: K-30 the booking line's service), the one call that writes it in journey 4. The request's words for the service, as typed (in a turn decide's part field, re-parsed from that text under limit 6 before any write: arch 03 line 185; arch 06 line 309; from a page or an AI their field, read first: openRequest.safetyOutcomeId, arch 02 line 129), are matched by code to this business's own listed K-25 v1 services and their ways for the request's flow: one fits (matched, gives service), several fit (whichOne: one 'which?' and nothing written; in a turn limit 6's one question, whose answered option, K-04 v1 open_questions.answered_option_id, names the service picked), none fits (notOnList: A4-85, B4-03 'Says plainly the business doesn't do it'), or it is listed but can't be booked (cantBeBooked: A4-99, B4-117 'Declines plainly; tells the owner', v1's handOff, kind other, in the same commit). How code matches the words (the names on the list, or Q-42's meaning index) is C-099's (v1.1 open gap 39); never a guess. The matched service's own home is K-30 booking_lines.service_id, which saveTime writes when the time is saved (K-30 README writer table: A4-21, B4-23); until then it is kept as README default 57 says (open gap 54). Primary, uncached. Business: caller.businessId, the request's; row-level security scopes every row (arch 10 line 546). Person: set on the server (K-22 v1 rule 4). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: reads each service's and way's version, which saveTime compares (limit 4).",
+      "description": "Is it a service the business offers? Gives service (A4-81, B4-114; 02-contracts section 8: K-30 the booking line's service), the one call that writes it in journey 4. The request's words for the service, as typed (in a turn decide's part field, re-parsed from that text under limit 6 before any write: arch 03 line 185; arch 06 line 309; from a page or an AI their field, read first: openRequest.safetyOutcomeId, arch 02 line 129), are matched by code to this business's own listed K-25 v1 services and their ways in both flows (round 2, DL-162 ruling 6: a service offered in both places answers both ways, each with its price, A4-01, B4-02): one fits (matched, gives service), several fit (whichOne: one 'which?' and nothing written; in a turn limit 6's one question, whose answered option, K-04 v1 open_questions.answered_option_id, names the service picked), none fits (notOnList: A4-85, B4-03 'Says plainly the business doesn't do it'), or it is listed but can't be booked (cantBeBooked: A4-99, B4-117 'Declines plainly; tells the owner', v1's handOff, kind other, in the same commit). How code matches the words (the names on the list, or Q-42's meaning index) is C-099's (v1.1 open gap 39); never a guess. The matched service's own home is K-30 booking_lines.service_id, which saveTime writes when the time is saved (K-30 README writer table: A4-21, B4-23); until then it is kept as README default 57 says (open gap 54). The place pick (place, round 2: A4-01 '1 At the shop, 2 At my home', B4-02 '1 At my home, 2 At the shop', A4-15 'Wants the other place') takes one of the ways this call answered, checked again against today's list (wrongDetails otherwise: S12-05), keeps it as README default 57 says, and gives no key (A4-01 and B4-02 give none); when the way picked is the other flow's, it moves the request to that flow in the same commit, K-04 v1 bookings.flow compared and set on the head's version (expectVersion, limit 4) while the head is at stage entry, and the walk goes on in that flow's step graph (A4-02 'From here it's the other flow'; B4-02 '2 At the shop: the other flow goes on from there'), which closes v1.1 open gap 27 (README default 75). Primary, uncached. Business: caller.businessId, the request's; row-level security scopes every row (arch 10 line 546). Person: set on the server (K-22 v1 rule 4). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: reads each service's and way's version, which saveTime compares (limit 4); the place pick compares and sets the head's.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
         "bookingId": {
           "description": "The request openRequest opened at its door (K-04 v1 bookings.id, stage entry).",
           "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "place": {
+          "title": "PlacePick",
+          "description": "The place picked from the ways this call answered (round 2, DL-162 ruling 6): in a turn the answered option of the 'where?' question (decide's pick, its option id naming the way: README default 57), from a page or an AI the way's id, checked against today's list again.",
+          "type": "object",
+          "properties": {
+            "step": { "type": "string", "enum": ["A4-01", "A4-02", "A4-15", "B4-01", "B4-02"] },
+            "serviceMoneyId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "expectVersion": {
+              "description": "The head's version the question was asked on (limit 4).",
+              "$ref": "#/$defs/version"
+            }
+          },
+          "required": ["step", "serviceMoneyId", "expectVersion"],
+          "additionalProperties": false
         },
         "words": {
           "description": "The service as typed, or, after a 'which?', the service picked from the candidates this call answered (in a turn the answered option of its question; from a page or an AI the candidate's id, checked against the list again).",
@@ -651,8 +758,12 @@
           ]
         }
       },
-      "required": ["caller", "bookingId", "words"],
+      "required": ["caller", "bookingId"],
       "additionalProperties": false,
+      "oneOf": [
+        { "title": "MatchByWords", "required": ["words"], "not": { "required": ["place"] } },
+        { "title": "PickAPlace", "required": ["place"], "not": { "required": ["words"] } }
+      ],
       "dependentSchemas": {
         "bookingId": {
           "description": "The customer's side only: a turn, the booking page or the customer's own AI.",
@@ -664,7 +775,7 @@
     },
     "matchService.response": {
       "title": "MatchServiceResponse",
-      "description": "Matched (gives service), which one, not on the list, or can't be booked.",
+      "description": "Matched (gives service), which one, not on the list, can't be booked, or the place picked (round 2; gives none).",
       "oneOf": [
         {
           "title": "ServiceMatched",
@@ -674,7 +785,7 @@
             "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
             "serviceVersion": { "$ref": "#/$defs/version" },
             "ways": {
-              "description": "Its ways for the request's flow (A4-01, B4-01, B4-02 pick the place from them).",
+              "description": "Its active ways in both flows, each with its flow and its price now (round 2: A4-01, B4-01, B4-02 pick the place from them; K-25 v1 service_money.place 'Both is two rows ... sees both prices first').",
               "type": "array",
               "items": { "$ref": "#/$defs/wayOffered" },
               "minItems": 1
@@ -757,13 +868,52 @@
           },
           "required": ["result", "serviceId", "handOffId", "gives", "written", "repeated"],
           "additionalProperties": false
+        },
+        {
+          "title": "PlacePicked",
+          "description": "Round 2 (DL-162 ruling 6): the way picked, kept as README default 57 says; flowChanged when it was the other flow's way, the head's flow then set to it at stage entry (K-04 v1 bookings.flow, the head's version raised: README default 75). Gives no key.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "placePicked" },
+            "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "way": { "$ref": "#/$defs/wayOffered" },
+            "flow": {
+              "description": "The request's flow after the pick (K-04 v1 bookings.flow).",
+              "type": "string",
+              "enum": ["A", "B"]
+            },
+            "flowChanged": { "type": "boolean" },
+            "headVersion": { "$ref": "#/$defs/version" },
+            "openQuestionId": {
+              "description": "In a turn, the open question the walk's next asking step opened in the same commit, in the request's flow after the pick, whose options and versions_read carry the way (README default 57); null for a page or an AI.",
+              "$ref": "#/$defs/nullableId"
+            },
+            "gives": { "type": "array", "maxItems": 0 },
+            "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+            "repeated": { "type": "boolean" }
+          },
+          "required": [
+            "result",
+            "serviceId",
+            "way",
+            "flow",
+            "flowChanged",
+            "headVersion",
+            "openQuestionId",
+            "gives",
+            "written",
+            "repeated"
+          ],
+          "additionalProperties": false
         }
       ]
     },
     "matchService.errors": {
       "title": "MatchServiceErrors",
-      "description": "Refused, nothing written.",
+      "description": "Refused, nothing written. wrongDetails: a place picked that is not one of the service's active ways now (S12-05).",
       "oneOf": [
+        { "$ref": "#/$defs/wrongDetailsError" },
+        { "$ref": "#/$defs/versionChangedError" },
         { "$ref": "#/$defs/notAllowedError" },
         { "$ref": "#/$defs/notFoundError" },
         { "$ref": "#/$defs/safetyHeldError" },
@@ -790,7 +940,7 @@
     },
     "setWhoFor.request": {
       "title": "SetWhoForRequest",
-      "description": "Who it's for, and if they're 18 or older; gives who_for (A4-80, B4-92; 02-contracts section 8: the K-04 v1 booking head's booker, person served and payer with K-30), the one call that writes it in journey 4; and who's who on the booking after the save (A4-24, B4-32, with A4-25, A4-26, A4-55, A4-64, A4-89, B4-74, B4-107, B4-110, B4-112, B4-113), which gives no key. Writes the head's served_person_id and payer_person_id (the booker for themself; a new K-04 person, named as typed, for someone else; never a person id the browser or the AI sends: K-22 v1 rule 4), compare-and-set on the head's version (expectVersion, limit 4); a teen who may agree alone gets a private booking (A4-90, B4-106: K-04 bookings.private, as v1's setRecordFlag sets it). The age band (never an exact age: A4-80) goes to K-28 v1 customers.age_band of the person served when they have a row at this business (compare-and-set); else it is kept as README default 57 says until addCustomer writes the row (open gap 54). An unclear or refused age counts as under 18, so a parent books (A4-80; CQ-71's default). Under 13 and alone (A4-86, B4-98), a teen booking alone (A4-96, B4-108), adults only for a child (B4-99) and a booker not allowed (B4-100) give no key and keep nothing about the child (RULES 4.7): the request ends (K-30 booking_details.request_ended_why dropped; README default 60). Primary, uncached. Business: caller.businessId. Person: the booker is the head's, named by openRequest. Repeat: caller.requestId is the key. Version: the head's version compared and set; a new person inserted at version 1.",
+      "description": "Who it's for, and if they're 18 or older; gives who_for (A4-80, B4-92; 02-contracts section 8: the K-04 v1 booking head's booker, person served and payer with K-30), the one call that writes it in journey 4; and who's who on the booking after the save (A4-24, B4-32, with A4-25, A4-26, A4-55, A4-64, A4-89, B4-74, B4-107, B4-110, B4-112, B4-113), which gives no key. A4-80's answer (round 2, DL-162 ruling 5; frontend FAIL 5) carries screen 2's categories (FS line 652: you, a child, another adult, an adult you act for, an organization's people), the booker's own answer to 'are you 18 or older?', and for a child the once-asked 'Are you the parent or guardian?' (A4-80 lines 2113 to 2114; B4-92 lines 1881 to 1882), so the checks that can end the booking run here, before any name, number, photo or address (A4-80 line 2129): an adult you act for only where the plug-in lets someone book for that adult (A4-80 line 2127), only the person served or someone with legal papers for them where the plug-in says so (B4-100 line 1956), a child only by a parent or guardian unless the plug-in lets another adult book (README default 74). Writes the head's served_person_id and payer_person_id (the booker for themself; a new K-04 person, named as typed, for a child, another adult or an adult acted for; for an organization the booker as payer and nobody served yet, README open gap 58; never a person id the browser or the AI sends: K-22 v1 rule 4), compare-and-set on the head's version (expectVersion, limit 4); a teen who may agree alone gets a private booking (A4-90, B4-106: K-04 bookings.private, as v1's setRecordFlag sets it). The person served's age band (servedAgeBand: never an exact age, A4-80; their own answer for themself, under_18 for a child, 18_or_older for another adult or an adult acted for) goes to K-28 v1 customers.age_band of the person served, as that column stores each person's own band, when they have a row at this business (compare-and-set); else it is kept as README default 57 says until addCustomer writes the row (open gap 54). An unclear or refused age counts as under 18, so a parent books (A4-80; CQ-71's default). Under 13 and alone (A4-86, B4-98), a teen booking alone (A4-96, B4-108), adults only for a child (B4-99) and a booker not allowed (B4-100; an act-for or a child's booking the plug-in does not allow) give no key and keep nothing about the child or the person named (RULES 4.7): no person is written, and the request ends (K-30 booking_details.request_ended_why dropped; README default 60). A teen booking alone gets the parent link at once (A4-96, B4-108, round 2: DL-162 ruling 2a): parentLink, the business's booking page for a parent to book as their own booking, keeping no row (README default 73); to the teen's own AI or on the page in url, and in a turn as a message in the teen's own text thread only ('It's sent as a message only if the teen wrote by text, in that thread'); Rosie never texts the parent. Primary, uncached. Business: caller.businessId. Person: the booker is the head's, named by openRequest. Repeat: caller.requestId is the key. Version: the head's version compared and set; a new person inserted at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -803,23 +953,60 @@
           "oneOf": [
             {
               "title": "WhoForAnswer",
-              "description": "A4-80, B4-92: for themself or someone else, and the age band.",
+              "description": "A4-80, B4-92 (round 2, DL-162 ruling 5): who the visit is for, by screen 2's categories, the booker's own age answer, a young teen's band, and a child's 'Are you the parent or guardian?'. In a turn decide's part fields, re-parsed from that text under limit 6 (README default 76); from a page or an AI their fields.",
               "type": "object",
               "properties": {
                 "step": { "type": "string", "enum": ["A4-80", "B4-92"] },
-                "for": { "type": "string", "enum": ["self", "someoneElse"] },
-                "name": {
-                  "description": "For someoneElse, their name as typed, or null; null for self.",
-                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                "for": {
+                  "description": "self ('Book me'), child, otherAdult (another adult), actsFor (an adult the booker acts for, with legal papers that come on the page: A4-64) or organization (an organization's people: A4-89) (FS line 652; A4-80 line 2113).",
+                  "type": "string",
+                  "enum": ["self", "child", "otherAdult", "actsFor", "organization"]
                 },
-                "ageBand": {
-                  "description": "The person served's answer to 'are you 18 or older?': 18_or_older, under_18, or unclear (counts as under 18: A4-80).",
+                "bookerAgeBand": {
+                  "description": "The booker's own answer to 'are you 18 or older?': 18_or_older, under_18, or unclear, which counts as under 18 ('Almost 18' is under 18: A4-80). For self it is also the person served's band.",
                   "type": "string",
                   "enum": ["18_or_older", "under_18", "unclear"]
+                },
+                "under13": {
+                  "description": "For self under 18 (or unclear): true when the booker is under 13 ('Under 13 and alone': A4-86, B4-98), as decide reads it from their words, never by asking an exact age (A4-80: 'Never ask a child's exact age'); false for a teen of 13 to 17; null for any other answer (README default 74).",
+                  "anyOf": [{ "type": "boolean" }, { "type": "null" }]
+                },
+                "parentOrGuardian": {
+                  "description": "For a child: the booker's answer to 'Are you the parent or guardian?', asked once (A4-80 line 2114; B4-92 line 1882); null otherwise.",
+                  "anyOf": [{ "type": "boolean" }, { "type": "null" }]
+                },
+                "name": {
+                  "description": "For a child, another adult or an adult acted for: their name as typed, if the answer gives one, kept only when the booking goes on (a new K-04 person); never asked before this answer (A4-80 line 2129), and kept by no ending branch (RULES 4.7). Null for self and an organization.",
+                  "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
                 }
               },
-              "required": ["step", "for", "name", "ageBand"],
-              "additionalProperties": false
+              "required": ["step", "for", "bookerAgeBand", "under13", "parentOrGuardian", "name"],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": { "properties": { "for": { "const": "child" } }, "required": ["for"] },
+                  "then": { "properties": { "parentOrGuardian": { "type": "boolean" } } },
+                  "else": { "properties": { "parentOrGuardian": { "type": "null" } } }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "for": { "const": "self" },
+                      "bookerAgeBand": { "enum": ["under_18", "unclear"] }
+                    },
+                    "required": ["for", "bookerAgeBand"]
+                  },
+                  "then": { "properties": { "under13": { "type": "boolean" } } },
+                  "else": { "properties": { "under13": { "type": "null" } } }
+                },
+                {
+                  "if": {
+                    "properties": { "for": { "enum": ["self", "organization"] } },
+                    "required": ["for"]
+                  },
+                  "then": { "properties": { "name": { "type": "null" } } }
+                }
+              ]
             },
             {
               "title": "WhoIsWhoAnswer",
@@ -899,10 +1086,26 @@
         "servedPersonId": { "$ref": "#/$defs/nullableId" },
         "payerPersonId": { "$ref": "#/$defs/nullableId" },
         "private": { "type": "boolean" },
+        "servedAgeBand": {
+          "description": "The person served's band as K-28 customers.age_band stores it (round 2, DL-162 ruling 5): 18_or_older or under_18 (an unclear answer counts as under 18); null for an organization and every ending branch, which keep nothing.",
+          "anyOf": [{ "type": "string", "enum": ["18_or_older", "under_18"] }, { "type": "null" }]
+        },
         "ageBandKept": {
-          "description": "customerRow (K-28 customers.age_band written), pending (README default 57, until addCustomer), or nothingKept (a child under 13 or a teen alone, RULES 4.7; who's who).",
+          "description": "customerRow (K-28 customers.age_band written), pending (README default 57, until addCustomer), or nothingKept (an ending branch, RULES 4.7; an organization; who's who).",
           "type": "string",
           "enum": ["customerRow", "pending", "nothingKept"]
+        },
+        "parentLink": {
+          "description": "For teenParentLink (A4-96, B4-108), the parent's link, the business's booking page with no row (round 2, DL-162 ruling 2a; README default 73); null otherwise.",
+          "anyOf": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/linkIssued" },
+                { "type": "object", "properties": { "kind": { "const": "bookingPage" } } }
+              ]
+            },
+            { "type": "null" }
+          ]
         },
         "headVersion": { "$ref": "#/$defs/version" },
         "gives": {
@@ -919,7 +1122,9 @@
         "servedPersonId",
         "payerPersonId",
         "private",
+        "servedAgeBand",
         "ageBandKept",
+        "parentLink",
         "headVersion",
         "gives",
         "written",
@@ -928,10 +1133,40 @@
       "additionalProperties": false,
       "dependentSchemas": {
         "outcome": {
-          "description": "Only A4-80's two going-on branches give who_for (A-J4.md: the step's gives); the ending branches and who's who give none.",
-          "if": { "properties": { "outcome": { "enum": ["goOn", "teenPrivate"] } }, "required": ["outcome"] },
-          "then": { "properties": { "gives": { "type": "array", "minItems": 1 } } },
-          "else": { "properties": { "gives": { "type": "array", "maxItems": 0 } } }
+          "description": "Only A4-80's two going-on branches give who_for (A-J4.md: the step's gives); the ending branches and who's who give none. An ending branch keeps nothing about the child or the person named (RULES 4.7): no person served or payer, no band. Only teenParentLink carries the parent link.",
+          "allOf": [
+            {
+              "if": {
+                "properties": { "outcome": { "enum": ["goOn", "teenPrivate"] } },
+                "required": ["outcome"]
+              },
+              "then": { "properties": { "gives": { "type": "array", "minItems": 1 } } },
+              "else": { "properties": { "gives": { "type": "array", "maxItems": 0 } } }
+            },
+            {
+              "if": {
+                "properties": {
+                  "outcome": {
+                    "enum": ["childGetsParent", "teenParentLink", "adultsOnly", "bookerNotAllowed"]
+                  }
+                },
+                "required": ["outcome"]
+              },
+              "then": {
+                "properties": {
+                  "servedPersonId": { "type": "null" },
+                  "payerPersonId": { "type": "null" },
+                  "servedAgeBand": { "type": "null" },
+                  "ageBandKept": { "const": "nothingKept" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "outcome": { "const": "teenParentLink" } }, "required": ["outcome"] },
+              "then": { "properties": { "parentLink": { "type": "object" } } },
+              "else": { "properties": { "parentLink": { "type": "null" } } }
+            }
+          ]
         }
       }
     },
@@ -949,7 +1184,7 @@
     },
     "setWhoFor.exchange": {
       "title": "SetWhoForExchange",
-      "description": "One setWhoFor request with its outcome.",
+      "description": "One setWhoFor request with its outcome. A teen's parent link goes in a turn only inside the reply row in the teen's own thread (url null), and to the teen's AI or on the page only in url (no row): round 2, DL-162 ruling 2a.",
       "type": "object",
       "properties": {
         "call": { "const": "setWhoFor" },
@@ -960,7 +1195,62 @@
         }
       },
       "required": ["call", "given", "request", "outcome"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "turn" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "parentLink": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "url": { "type": "null" },
+                      "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "parentLink": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": { "url": { "type": "string" }, "outboxRowId": { "type": "null" } }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     "setReachWay.request": {
       "title": "SetReachWayRequest",
@@ -1043,9 +1333,14 @@
           }
         },
         "effects": {
-          "description": "contacts/add for a new mobile not yet a Linq contact (Q-03; CQ-04).",
+          "description": "contacts/add for a new mobile not yet a Linq contact (Q-03; CQ-04), and only that: the one K-07 effect kind the card may write, linq_contact_add (round 2: security note b; never a charge or any other kind; a page's or an AI's commit with no turn writes it only through K-05's commit with no turn, CQ-44, open gap 69). The handles, the effects and written differ when Rosie already knew a number, so K-20 (T-029) and K-21's journey 4 version (T-061) never pass handles, effects or written to the AI or the browser (RULES 4.9, 6.5; v1.1 default 49; round 2: security note a).",
           "type": "array",
-          "items": { "$ref": "#/$defs/effectWritten" }
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/effectWritten" },
+              { "type": "object", "properties": { "kind": { "const": "linq_contact_add" } } }
+            ]
+          }
         },
         "gives": {
           "type": "array",
@@ -1089,7 +1384,7 @@
     },
     "addCustomer.request": {
       "title": "AddCustomerRequest",
-      "description": "The AI sends the customer's name; gives customer (A4-23, B4-25; 02-contracts section 8: the K-28 v1 customers row), the one call that writes it in journey 4. In one commit: the K-28 row for the head's booker at this business (customers_business_person_key), with the name as the AI or the page sent it or as typed in the person's own chat (in a turn decide's field, re-parsed under limit 6), the booker's handles setReachWay linked (customers_mobile_own_fk, customers_email_own_fk), the way the reach card gave and the age band A4-80 gave when the booker is the person served (README default 57), else the way their contacts imply (customers_way_fits_contact); and the K-04 v1 person_roles customer row (K-28 v1 rule 7); and K-04 persons.name when it is still null. A customer already on the list keeps their row and the name on file (a different name is not changed here: S13-45; RULES 4.10), and the call still gives customer. A blocked person or number hears only that the business can't take it, with no reason (customerBlocked: S11-62). K-28 says a new customer is added 'once booked' (A4-23); the row is written here, in A4-23's commit, so the key's home holds it when given (arch 03 line 161), and a request that ends unbooked keeps it (README open gap 57). Primary, uncached. Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; the row found by (business, person) answers added false. Version: a new row at version 1.",
+      "description": "The AI sends the customer's name; gives customer (A4-23, B4-25; 02-contracts section 8: the K-28 v1 customers row), the one call that writes it in journey 4. In one commit: the K-28 row for the head's booker at this business (customers_business_person_key), with the name as the AI or the page sent it or as typed in the person's own chat (in a turn decide's field, re-parsed under limit 6), the booker's handles setReachWay linked (customers_mobile_own_fk, customers_email_own_fk), the way the reach card gave (way) and the booker's own age band A4-80 gave (ageBand), both carried by this request (round 2, DL-162 ruling 7; action-layer FAIL 2), never a way their contacts imply and never a band left out: the server side that builds the request takes both where README default 57 kept them (in a turn the answered options of A4-80's and A4-82's open questions, which the action layer reads; on the booking page the page server's session, K-21; for an AI the Agent API's token session, K-20), never from the browser's or the AI's words, and checks them against what setWhoFor and setReachWay answered (README default 77); and the K-04 v1 person_roles customer row (K-28 v1 rule 7); and K-04 persons.name when it is still null. A customer already on the list keeps their row and the name on file (a different name is not changed here: S13-45; RULES 4.10), and the call still gives customer. A blocked person or number hears only that the business can't take it, with no reason (customerBlocked: S11-62). K-28 says a new customer is added 'once booked' (A4-23); the row is written here, in A4-23's commit, so the key's home holds it when given (arch 03 line 161), and a request that ends unbooked keeps it (README open gap 57). Primary, uncached. Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; the row found by (business, person) answers added false. Version: a new row at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1098,9 +1393,19 @@
           "description": "The name for the business's list (K-28 v1 customers.name), as sent or typed.",
           "type": "string",
           "minLength": 1
+        },
+        "way": {
+          "description": "The reach card's way (A4-82, B4-93) as setReachWay took it, for K-28 v1 customers.way: texts, textsonly or email (Q-07); never another way their contacts imply (round 2, DL-162 ruling 7).",
+          "type": "string",
+          "enum": ["texts", "textsonly", "email"]
+        },
+        "ageBand": {
+          "description": "The booker's own band from A4-80 (setWhoFor's bookerAgeBand, an unclear answer counting as under 18), for K-28 v1 customers.age_band of the booker's row, as that column stores each person's own answer (round 2, DL-162 rulings 5 and 7).",
+          "type": "string",
+          "enum": ["18_or_older", "under_18"]
         }
       },
-      "required": ["caller", "bookingId", "name"],
+      "required": ["caller", "bookingId", "name", "way", "ageBand"],
       "additionalProperties": false,
       "dependentSchemas": {
         "name": {
@@ -1190,7 +1495,7 @@
     },
     "setPrice.request": {
       "title": "SetPriceRequest",
-      "description": "How the price is set (A4-05, B4-06); gives price_known (A4-06 and B4-07 from the list; A4-12 and B4-13 the price texted from a quote) or visit_fee (A4-13, B4-14: the visit promised, priced there), the one call that writes each in journey 4 (02-contracts section 8: K-30 the booking line's price copied in, or the visit fee). list: the price resolver's price for the service's way now (K-25 v1 price rules; a per-unit or per-hour price with its unit), shown before any time; visit: the visit's own price that is promised and any 'from' price, never shown as a set price (A4-05; A4-13 'Promises the $25 consult'); photos: the quote sent (K-30 v1 quotes.state sent, sent_at, good_until 168 hours later: quotes_sent_good_7_days) with its options, and a secure link of purpose quote to pick a time (K-30 secure_links; the customer OKs the price by picking a time: A4-12). The list and visit prices are copied into K-30 booking_lines when the time is saved (saveTime; K-30 README writer table; S11-54: the price on the customer's screen holds through the saved time); until then they are kept as README default 57 says (open gap 54); a quote is its own home. The quote's text to the customer goes into their open chat in a turn (RULES 4.1b; MC C9), else to the email on file in a turn, else waits for their own AI or page to read it (README open gap 59). Primary, uncached. Business: caller.businessId. Person: list and visit on the customer's side; photos only from the owner's answer turn or the pro's or owner's pricing page (caller.personId the owner, an admin or staff: K-04 person_roles). Repeat: caller.requestId is the key. Version: a quote compared and set (expectVersion).",
+      "description": "How the price is set (A4-05, B4-06); gives price_known (A4-06 and B4-07 from the list; A4-12 and B4-13 the price texted from a quote) or visit_fee (A4-13, B4-14: the visit promised, priced there), the one call that writes each in journey 4 (02-contracts section 8: K-30 the booking line's price copied in, or the visit fee). list: the price resolver's price for the service's way now (K-25 v1 price rules; a per-unit or per-hour price with its unit), shown before any time; visit: the visit's own price that is promised and any 'from' price, never shown as a set price (A4-05; A4-13 'Promises the $25 consult'); photos: the quote sent (K-30 v1 quotes.state sent, sent_at, good_until 168 hours later: quotes_sent_good_7_days) with its options, and a secure link of purpose quote to pick a time (K-30 secure_links; the customer OKs the price by picking a time: A4-12). The list and visit prices are copied into K-30 booking_lines when the time is saved (saveTime; K-30 README writer table; S11-54: the price on the customer's screen holds through the saved time); until then they are kept as README default 57 says (open gap 54); a quote is its own home. The quote's text to the customer (A4-12, B4-13: the price 'with a link to pick a time', the quote link, K-30 secure_links purpose quote) goes into their open chat in a turn (RULES 4.1b; MC C9), else to the email on file in a turn; from the pro's or the owner's pricing page, whose commit writes no outbox row (v1.1 open gap 43), the commit arms a K-04 clock row due at once on the customer's handle (their mobile's when its chat is open, else their email's) whose clock turn writes that row, the quote link filled at finalize (round 2, DL-162 ruling 2e: README defaults 71, 72, as v1.1 default 56 and v1.2 default 66 do); a customer with neither waits for their own AI or page to read it (README open gap 59). Primary, uncached. Business: caller.businessId. Person: list and visit on the customer's side; photos only from the owner's answer turn or the pro's or owner's pricing page (caller.personId the owner, an admin or staff: K-04 person_roles). Repeat: caller.requestId is the key. Version: a quote compared and set (expectVersion).",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1313,19 +1618,25 @@
                   },
                   "minItems": 1
                 },
-                "secureLinkId": {
-                  "description": "The quote link (K-30 secure_links purpose quote): only its code's hash is kept.",
-                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                "link": {
+                  "description": "The quote link (K-30 secure_links purpose quote; only its code's hash is kept), with the row or the clock row that carries it to the customer (linkIssued; round 2, DL-162 ruling 2e). Never given to the pricing page or the owner: url is null.",
+                  "allOf": [
+                    { "$ref": "#/$defs/linkIssued" },
+                    {
+                      "type": "object",
+                      "properties": { "kind": { "const": "quote" }, "url": { "type": "null" } }
+                    }
+                  ]
                 }
               },
-              "required": ["quoteId", "state", "sentAt", "goodUntil", "version", "options", "secureLinkId"],
+              "required": ["quoteId", "state", "sentAt", "goodUntil", "version", "options", "link"],
               "additionalProperties": false
             },
             { "type": "null" }
           ]
         },
         "outboxRowIds": {
-          "description": "In a turn, the row that tells the customer the price (A4-12, B4-13), into their open chat or to their email; empty for a page's commit (v1.1 open gap 43).",
+          "description": "In a turn, the row that tells the customer the price (A4-12, B4-13), into their open chat or to their email; empty for a page's commit (v1.1 open gap 43), whose clock row writes it (quote.link.clockRowId).",
           "type": "array",
           "items": { "$ref": "#/$defs/id" }
         },
@@ -1384,7 +1695,7 @@
     },
     "setPrice.exchange": {
       "title": "SetPriceExchange",
-      "description": "One setPrice request with its outcome.",
+      "description": "One setPrice request with its outcome. A quote sent from the pricing page writes no outbox row (v1.1 open gap 43) and carries its message through a clock row (quote.link.clockRowId); in a turn the row is in outboxRowIds and the link's outboxRowId, and no clock row is armed (round 2, DL-162 ruling 2e; README default 72).",
       "type": "object",
       "properties": {
         "call": { "const": "setPrice" },
@@ -1395,11 +1706,68 @@
         }
       },
       "required": ["call", "given", "request", "outcome"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "page" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "outboxRowIds": { "type": "array", "maxItems": 0 },
+              "quote": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "link": { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "quote": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "link": { "type": "object", "properties": { "clockRowId": { "type": "null" } } }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     "quoteFromPhotos.request": {
       "title": "QuoteFromPhotosRequest",
-      "description": "A price made for one customer from photos or answers (A4-07 to A4-11, A4-51, A4-94, A4-95; B4-08 to B4-12, B4-80, B4-101, B4-102); gives quote (B4-09: the pro prices it from the photos; 02-contracts section 8: K-30 v1 quotes), the one call that writes it in journey 4 (flow A's A4-08 gives no key). Three stages. askPhotos (A4-07, B4-08: no time is saved while it's priced): the K-30 quotes row (state pricing, basis photos or answers, the service, its currency) and a secure link of purpose photos for the customer to add them (K-30 secure_links: only its code's hash), and a K-04 clock row 4 hours on (A4-08: 'If nobody prices it in 4 hours, Sam is asked to'). price (A4-08, B4-09; the pro's or the owner's signed-in pricing page, K-21, caller.personId set by the page server): the K-30 quote_options (one, or options; each a set price or a range set at the visit inside it) and priced_by_person_id, priced_at; when a K-26 v1 price OK limit asks (every quote, or one over its amount: S1-21 price_oks; quotes.price_ok_limit_id) the state with_owner and a K-30 owner_oks row (about quote, answer_by 4 of the owner's text hours, one reminder after 30 minutes), and, since a page's commit writes no outbox row (v1.1 open gap 43), a K-04 clock row due at once on the owner's handle whose clock turn writes the owner's question (A4-09, B4-10: 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline'), as v1.1 default 56 does; else the quote stays pricing, priced, for setPrice to send. ownerAnswer (A4-09, A4-10, B4-10, B4-11; the owner's or an admin's reply in their own chat, or Needs you on the portal, K-21): the K-30 owner_oks answer with who gave it (K-08 approvalOwnerYes: person, role, question, option, event) and send (the walk goes on to setPrice photos in the same commit: A4-12), change (the new price read back first and, on its exact yes, the options changed: only before it is sent; A4-10, B4-11), seeFirst (A4-94, B4-101: state see_first, a visit to be priced there offered) or decline (A4-95, B4-102: state declined, the request ended declined). No answer in 30 minutes tells the customer it's with the shop (A4-11, B4-12) and none by the deadline is not_priced (A4-51, B4-80): clock firings (v1's gateAndCommit clock branch), not this call. Primary, uncached. Business: caller.businessId; quotes_service_fk holds the service to it. Person: askPhotos on the customer's side; price and ownerAnswer only by the owner, an admin or staff who may (K-04 person_roles; K-22 who OKs what), else notAllowed. Repeat: caller.requestId is the key. Version: the quote compared and set (expectVersion); options inserted at version 1.",
+      "description": "A price made for one customer from photos or answers (A4-07 to A4-11, A4-51, A4-94, A4-95; B4-08 to B4-12, B4-80, B4-101, B4-102); gives quote (B4-09: the pro prices it from the photos; 02-contracts section 8: K-30 v1 quotes), the one call that writes it in journey 4 (flow A's A4-08 gives no key). Four stages. askPhotos (A4-07, B4-08: no time is saved while it's priced): the K-30 quotes row (state pricing, basis photos or answers, the service, its currency) and a secure link of purpose photos for the customer to add them (K-30 secure_links: only its code's hash), which goes by via (round 2, DL-162 ruling 2c: in a turn by text into the customer's open chat or to their email, as A4-07's own first text 'Add photos: rosfield.com/q/a7'; to the customer's own AI as ai and on the booking page as page, in url, once: README default 62), its page saving the photos and answers (saveSecurePage photos, ruling 2d); and the 4-hour pricing clock (A4-08: 'If nobody prices it in 4 hours, Sam is asked to. The customer hears it's with the business'), a K-04 clock row of kind step on the owner's handle, due 4 hours on, whose clock turn writes the owner's ask and the customer's notice, cancelled by the price stage (pricingClockRowId; round 2: runtime note c; README default 78). price (A4-08, B4-09; the pro's or the owner's signed-in pricing page, K-21, caller.personId set by the page server): the K-30 quote_options (one, or options; each a set price or a range set at the visit inside it) and priced_by_person_id, priced_at; when a K-26 v1 price OK limit asks (every quote, or one over its amount: S1-21 price_oks; quotes.price_ok_limit_id) the state with_owner and a K-30 owner_oks row (about quote, answer_by 4 of the owner's text hours, one reminder after 30 minutes), and, since a page's commit writes no outbox row (v1.1 open gap 43), a K-04 clock row due at once on the owner's handle whose clock turn writes the owner's question (A4-09, B4-10: 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline'), as v1.1 default 56 does; else the quote stays pricing, priced, for setPrice to send. ownerAnswer (A4-09, A4-10, B4-10, B4-11; the owner's or an admin's reply in their own chat, or Needs you on the portal, K-21): the K-30 owner_oks answer with who gave it (K-08 approvalOwnerYes: person, role, question, option, event) and send (the walk goes on to setPrice photos in the same commit: A4-12), seeFirst (A4-94, B4-101: state see_first, and a visit to be priced there offered to the customer with its times link, a K-30 secure_links row of purpose quote whose page offers that visit and its times: 'See times: rosfield.com/q/r3e', round 2, DL-162 ruling 2b, README default 79) or decline (A4-95, B4-102: state declined, the request ended declined, the customer told politely); the customer's row is in the owner's turn (outboxRowIds, into their open chat or to their email), and from the portal, whose commit writes no outbox row, a K-04 clock row due at once on the customer's handle writes it (link.clockRowId, customerClockRowId: README default 72). change (A4-10, B4-11, round 2, DL-162 ruling 1; AI FAIL 1, frontend FAIL 3): '2 Change it' carries the new price or options (newOptions: in a turn decide's money field, re-parsed from the owner's own words under limit 6, such as '600'; on the portal the page's field); code stores it, with its version, as the pending change before the read-back, and nothing changes on the quote and nothing goes to the customer (A4-10: 'the new price stays unsent until Sam confirms'): in a turn on the read-back's K-04 open question, written in the same commit at version 1 (its read-back words carry the pending price; its versions_read the quote, its options and the owner's ask at their versions), from the portal with the page server's session (K-21), never the browser's (v1.1 default 52's rule); the response returns it (pendingChange), and K-03's {{change.price}} in the read-back ('Send Alex M. $600 for the water heater replacement, not $640?') reads that stored pending price (README default 80). changeReadBack (A4-10, B4-11): the exact yes to that read-back (arch 06 line 303; arch 01 line 89): '1 Send it' changes the quote's options to the pending ones in place (K-30 quote_options, versions raised: 'changed only by the owner's read-back change before it is sent'), writes the owner_oks answer change with the read-back's question, option and event (K-30 owner_oks.open_question_id: 'for a change typed and read back (A4-10, A6-04), the read-back's question') and goes on to setPrice photos in the same commit, as '1 Send it' does; '2 Type another price' stores a new pending change the same way and reads it back again; a stale read-back (the pending change or the quote moved) is limit 4's, nothing changed, as v1.1 did for '3 Change it' (its defaults 43 and 53). No answer in 30 minutes tells the customer it's with the shop (A4-11, B4-12) and none by the deadline is not_priced (A4-51, B4-80): clock firings (v1's gateAndCommit clock branch), not this call. Primary, uncached. Business: caller.businessId; quotes_service_fk holds the service to it. Person: askPhotos on the customer's side; price and ownerAnswer only by the owner, an admin or staff who may (K-04 person_roles; K-22 who OKs what), else notAllowed. Repeat: caller.requestId is the key. Version: the quote compared and set (expectVersion); options inserted at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1413,9 +1781,14 @@
                 "stage": { "const": "askPhotos" },
                 "step": { "type": "string", "enum": ["A4-07", "B4-08"] },
                 "serviceId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
-                "basis": { "type": "string", "enum": ["photos", "answers"] }
+                "basis": { "type": "string", "enum": ["photos", "answers"] },
+                "via": {
+                  "description": "How the photos link goes (round 2, DL-162 ruling 2c; K-30 secure_links.given_via): text or email in a turn, ai for the customer's own AI, page on the booking page.",
+                  "type": "string",
+                  "enum": ["text", "email", "ai", "page"]
+                }
               },
-              "required": ["stage", "step", "serviceId", "basis"],
+              "required": ["stage", "step", "serviceId", "basis", "via"],
               "additionalProperties": false
             },
             {
@@ -1428,16 +1801,7 @@
                 "expectVersion": { "$ref": "#/$defs/version" },
                 "options": {
                   "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "label": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
-                      "price": { "$ref": "#/$defs/money" },
-                      "upTo": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
-                    },
-                    "required": ["label", "price", "upTo"],
-                    "additionalProperties": false
-                  },
+                  "items": { "$ref": "#/$defs/optionPrice" },
                   "minItems": 1
                 }
               },
@@ -1454,10 +1818,79 @@
                 "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
                 "expectVersion": { "$ref": "#/$defs/version" },
                 "answer": { "type": "string", "enum": ["send", "change", "seeFirst", "decline"] },
+                "newOptions": {
+                  "description": "For change, the owner's new price or options (A4-10 '85'; B4-11 '600'), stored as the pending change before its read-back (round 2, DL-162 ruling 1); null for any other answer.",
+                  "anyOf": [
+                    { "type": "array", "items": { "$ref": "#/$defs/optionPrice" }, "minItems": 1 },
+                    { "type": "null" }
+                  ]
+                },
                 "yes": { "$ref": "#/$defs/readBackYes" }
               },
-              "required": ["stage", "step", "quoteId", "ownerOkId", "expectVersion", "answer", "yes"],
-              "additionalProperties": false
+              "required": [
+                "stage",
+                "step",
+                "quoteId",
+                "ownerOkId",
+                "expectVersion",
+                "answer",
+                "newOptions",
+                "yes"
+              ],
+              "additionalProperties": false,
+              "if": { "properties": { "answer": { "const": "change" } }, "required": ["answer"] },
+              "then": { "properties": { "newOptions": { "type": "array" } } },
+              "else": { "properties": { "newOptions": { "type": "null" } } }
+            },
+            {
+              "title": "QuoteChangeReadBack",
+              "description": "The owner's exact yes to the read-back of a changed price (A4-10, B4-11: 'Reply 1 Send it, 2 Type another price'), round 2, DL-162 ruling 1.",
+              "type": "object",
+              "properties": {
+                "stage": { "const": "changeReadBack" },
+                "step": { "type": "string", "enum": ["A4-10", "B4-11"] },
+                "quoteId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "expectVersion": {
+                  "description": "The quote's version the read-back was built on (limit 4).",
+                  "$ref": "#/$defs/version"
+                },
+                "answer": {
+                  "description": "send ('1 Send it': the pending change applied and sent) or typeAnother ('2 Type another price': a new pending change, read back again).",
+                  "type": "string",
+                  "enum": ["send", "typeAnother"]
+                },
+                "newOptions": {
+                  "description": "For typeAnother, the new price or options, stored as the next pending change; null for send.",
+                  "anyOf": [
+                    { "type": "array", "items": { "$ref": "#/$defs/optionPrice" }, "minItems": 1 },
+                    { "type": "null" }
+                  ]
+                },
+                "pendingOptions": {
+                  "description": "From the portal, the pending change the page server kept with its session (K-21) from quoteFromPhotos' answer, never the browser's: the call refills the read-back from it and the quote's versions and refuses words that differ (v1.1 default 52's rule). Null in a turn, where the pending change is the read-back's open question's, named by yes.",
+                  "anyOf": [
+                    { "type": "array", "items": { "$ref": "#/$defs/optionPrice" }, "minItems": 1 },
+                    { "type": "null" }
+                  ]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": [
+                "stage",
+                "step",
+                "quoteId",
+                "ownerOkId",
+                "expectVersion",
+                "answer",
+                "newOptions",
+                "pendingOptions",
+                "yes"
+              ],
+              "additionalProperties": false,
+              "if": { "properties": { "answer": { "const": "typeAnother" } }, "required": ["answer"] },
+              "then": { "properties": { "newOptions": { "type": "array" } } },
+              "else": { "properties": { "newOptions": { "type": "null" } } }
             }
           ]
         }
@@ -1498,7 +1931,7 @@
                 "properties": {
                   "stage": {
                     "type": "object",
-                    "properties": { "stage": { "const": "ownerAnswer" } },
+                    "properties": { "stage": { "enum": ["ownerAnswer", "changeReadBack"] } },
                     "required": ["stage"]
                   }
                 },
@@ -1508,6 +1941,133 @@
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } }
                 }
+              }
+            },
+            {
+              "description": "The read-back's pending change: the open question's in a turn, the page server's from the portal.",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "changeReadBack" } },
+                    "required": ["stage"]
+                  },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "turn" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage", "caller"]
+              },
+              "then": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": {
+                      "pendingOptions": { "type": "null" },
+                      "yes": { "type": "object", "properties": { "kind": { "const": "openQuestion" } } }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "changeReadBack" } },
+                    "required": ["stage"]
+                  },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "page" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage", "caller"]
+              },
+              "then": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": {
+                      "pendingOptions": { "type": "array" },
+                      "yes": { "type": "object", "properties": { "kind": { "const": "page" } } }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "The photos link goes each caller's own way: a turn by text or email, the AI as ai, the booking page as page (README default 62).",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "askPhotos" } },
+                    "required": ["stage"]
+                  },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "turn" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage", "caller"]
+              },
+              "then": {
+                "properties": {
+                  "stage": { "type": "object", "properties": { "via": { "enum": ["text", "email"] } } }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "askPhotos" } },
+                    "required": ["stage"]
+                  },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage", "caller"]
+              },
+              "then": {
+                "description": "An AI's token must be bound to the person before a link for them is made (README default 70; round 2: security note d).",
+                "properties": {
+                  "stage": { "type": "object", "properties": { "via": { "const": "ai" } } },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "stage": { "const": "askPhotos" } },
+                    "required": ["stage"]
+                  },
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "page" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage", "caller"]
+              },
+              "then": {
+                "properties": { "stage": { "type": "object", "properties": { "via": { "const": "page" } } } }
               }
             }
           ]
@@ -1535,8 +2095,33 @@
           "description": "For a price made on a page that asks the owner: the K-04 clock row due at once on the owner's handle whose clock turn writes the question (v1.1 default 56's way); null otherwise.",
           "$ref": "#/$defs/nullableId"
         },
-        "photosLinkId": {
-          "description": "For askPhotos, the photos link (K-30 secure_links purpose photos); null otherwise.",
+        "link": {
+          "description": "The link the stage issued (round 2, DL-162 ruling 2; linkIssued): askPhotos' photos link (kind photos, A4-07, B4-08) or seeFirst's times link (kind quote, A4-94, B4-101); null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/linkIssued" }, { "type": "null" }]
+        },
+        "pricingClockRowId": {
+          "description": "For askPhotos, the 4-hour pricing clock (K-04 clock_rows, kind step, on the owner's handle; README default 78); null otherwise. The price stage cancels it.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "pendingChange": {
+          "description": "For change and changeReadBack's typeAnother, the pending change stored before its read-back (round 2, DL-162 ruling 1; README default 80): its options, the read-back's open question in a turn (null from the portal, whose page server keeps it), and the version a yes compares (the open question's in a turn; the quote's from the portal). Null otherwise; once a read-back's '1 Send it' applies it, the quote's options are the change.",
+          "anyOf": [
+            {
+              "title": "PendingChange",
+              "type": "object",
+              "properties": {
+                "options": { "type": "array", "items": { "$ref": "#/$defs/optionPrice" }, "minItems": 1 },
+                "openQuestionId": { "$ref": "#/$defs/nullableId" },
+                "version": { "$ref": "#/$defs/version" }
+              },
+              "required": ["options", "openQuestionId", "version"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "customerClockRowId": {
+          "description": "From the portal, for a decline whose polite note to the customer has no link (A4-95, B4-102): the K-04 clock row due at once on the customer's handle whose clock turn writes it (README default 72); null otherwise (a linked message carries its own in link.clockRowId).",
           "$ref": "#/$defs/nullableId"
         },
         "requestEnded": {
@@ -1548,7 +2133,11 @@
           "items": { "const": "quote" },
           "maxItems": 1
         },
-        "outboxRowIds": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "outboxRowIds": {
+          "description": "In a turn, the rows written: the photos link's first text (askPhotos), the owner's ask, the customer's see-first or decline note (A4-94, A4-95); empty for a page's commit (v1.1 open gap 43).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
         "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
         "repeated": { "type": "boolean" }
       },
@@ -1559,7 +2148,10 @@
         "version",
         "ownerOkId",
         "ownerAskClockRowId",
-        "photosLinkId",
+        "link",
+        "pricingClockRowId",
+        "pendingChange",
+        "customerClockRowId",
         "requestEnded",
         "gives",
         "outboxRowIds",
@@ -1583,7 +2175,7 @@
     },
     "quoteFromPhotos.exchange": {
       "title": "QuoteFromPhotosExchange",
-      "description": "One quoteFromPhotos request with its outcome. A price made on the pricing page writes no outbox row (v1.1 open gap 43).",
+      "description": "One quoteFromPhotos request with its outcome. A page's commit writes no outbox row (v1.1 open gap 43): a link it issues reaches its reader in url (the booking page's photos link) or through a clock row (the portal's see-first link). In a turn a link goes only in its row (url null, no clock row); to the customer's own AI only in url (round 2, DL-162 ruling 2; README defaults 62, 72).",
       "type": "object",
       "properties": {
         "call": { "const": "quoteFromPhotos" },
@@ -1598,30 +2190,119 @@
       },
       "required": ["call", "given", "request", "outcome"],
       "additionalProperties": false,
-      "if": {
-        "properties": {
-          "request": {
-            "type": "object",
+      "allOf": [
+        {
+          "if": {
             "properties": {
-              "caller": {
+              "request": {
                 "type": "object",
-                "properties": { "kind": { "const": "page" } },
-                "required": ["kind"]
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "page" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
               }
             },
-            "required": ["caller"]
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "type": "object",
+                "properties": {
+                  "outboxRowIds": { "type": "array", "maxItems": 0 },
+                  "link": {
+                    "anyOf": [
+                      { "type": "null" },
+                      { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+                    ]
+                  }
+                }
+              }
+            }
           }
         },
-        "required": ["request"]
-      },
-      "then": {
-        "properties": {
-          "outcome": {
-            "type": "object",
-            "properties": { "outboxRowIds": { "type": "array", "maxItems": 0 } }
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "turn" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "type": "object",
+                "properties": {
+                  "customerClockRowId": { "type": "null" },
+                  "link": {
+                    "anyOf": [
+                      { "type": "null" },
+                      {
+                        "type": "object",
+                        "properties": { "url": { "type": "null" }, "clockRowId": { "type": "null" } }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "type": "object",
+                "properties": {
+                  "link": {
+                    "anyOf": [
+                      { "type": "null" },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "outboxRowId": { "type": "null" },
+                          "clockRowId": { "type": "null" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
-      }
+      ]
     },
     "showTimes.request": {
       "title": "ShowTimesRequest",
@@ -1760,7 +2441,7 @@
     },
     "saveTime.request": {
       "title": "SaveTimeRequest",
-      "description": "The pick and the saved time; gives choice (B4-16: the pick, K-30 v1 booking_details.timing) and time_saved (A4-21, B4-23: K-04 reservations, the saved time; 02-contracts section 8), the one call that writes each in journey 4 (flow A's pick, A4-15, gives no key; in a turn the walk passes the automatic save, arch 03 line 191, so the part gives both). In one commit: K-30 booking_details.timing, set once (settime, or sentnow for 'Send someone now' where the plug-in lists it: B4-91); the time held for the booking by K-05 v1 reserve (held_until 10 minutes on, with one 10-minute extension offered once, K-05 extend, Q-12; for the customer's own AI's door 15 minutes, never extended: MC C3; Q-12); and the K-30 booking_lines row, written when the time is saved (K-30 README writer table), copying the service, the way, its price rule or the quote option picked, the path, price kind, units, price, deposit, fee and currency as shown on the card (S11-54; RULES 3.7; K-30 rule 10). In a turn the pick names the times card's option, and the action layer rebuilds the card from its open question's versions_read (the same versions give the same times); a row that moved fails limit 4 (fresh times) and a time taken limit 5 (nextOpenTimes). From a page or an AI the time comes back as the card answered it and is checked again: a service, way or price that is not today's is wrongDetails (S12-05) and nothing is held; a time another customer took first is timeTaken, and the caller shows the next times or a place in line (S12-01, S12-02). Over the plug-in's limit of open bookings for a phone or an address: overBookingLimit, and Rosie's team gets an S12-28 review item (README default 64). The AI going quiet lets the time go at held_until (S12-03, S12-04: K-05's sweep and the saved-time clock row; its one text to the customer only into an open chat: MC C9). Primary, uncached. Business: caller.businessId; reserve counts saved times across businesses (K-05 item 8). Person: the head's booker; reservations.for_phone_number is their mobile on file. Repeat: caller.requestId is the key; the reservation id is the caller's (K-05 reserve: repeated). Version: booking_details compared and set; the reservation and line at version 1.",
+      "description": "The pick and the saved time; gives choice (B4-16: the pick, K-30 v1 booking_details.timing) and time_saved (A4-21, B4-23: K-04 reservations, the saved time; 02-contracts section 8), the one call that writes each in journey 4 (flow A's pick, A4-15, gives no key; in a turn the walk passes the automatic save, arch 03 line 191, so the part gives both). In one commit: K-30 booking_details.timing, set once (settime, or sentnow for 'Send someone now' where the plug-in lists it: B4-91); the time held for the booking by K-05 v1 reserve on one of two doors (round 2, DL-162 ruling 4; action-layer FAIL 3, frontend FAIL 1; README default 61): ownAi, 15 minutes, never extended, only for the customer's own AI booking a service that books at once with money due now or a card to save (MC C3; K-05 v1 door ownAi: caller agent, the K-26 v1 OK rules A4-98 reads saying it books on the yes, and the way's path taking a card, a deposit or the full price before), and standard for every other save, every caller's request the owner OKs included ('A request the owner OKs keeps the master's own rules'): held_until 10 minutes on, with one 10-minute extension offered once (extendTime, K-05 extend; Q-12; A4-21 'offers more time at least once'); and the K-30 booking_lines row, written when the time is saved (K-30 README writer table), copying the service, the way, its price rule or the quote option picked, the path, price kind, units, price, deposit, fee and currency as shown on the card (S11-54; RULES 3.7; K-30 rule 10). In a turn the pick names the times card's option, and the action layer rebuilds the card from its open question's versions_read (the same versions give the same times); a row that moved fails limit 4 (fresh times) and a time taken limit 5 (nextOpenTimes). From a page or an AI the time comes back as the card answered it and is checked again: a service, way or price that is not today's is wrongDetails (S12-05) and nothing is held; a time another customer took first is timeTaken, and the caller shows the next times or a place in line (S12-01, S12-02). Over the plug-in's limit of open bookings for a phone or an address: overBookingLimit, and Rosie's team gets an S12-28 review item (README default 64). A third saved time for one mobile, or for one agent token at one business, is savedTimeCap, with only when the caller's own two end (K-05 reserve; arch 05 line 247; round 2: security note c). The time lapses at held_until (K-05's sweep and the saved-time clock row): on the ownAi door nothing is booked or charged and nobody is chased, so S12-04's text is not sent (MC C3); on the standard door S12-03 and S12-04 hold as the master says, its one text to the customer only into an open chat (MC C9; round 2: runtime note a, security note e). Primary, uncached. Business: caller.businessId; reserve counts saved times across businesses (K-05 item 8). Person: the head's booker; reservations.for_phone_number is their mobile on file. Repeat: caller.requestId is the key; the reservation id is the caller's (K-05 reserve: repeated). Version: booking_details compared and set; the reservation and line at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1877,20 +2558,34 @@
                 "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
                 "version": { "$ref": "#/$defs/version" },
                 "heldUntil": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "door": {
+                  "description": "K-05 v1 reserve's door (round 2, DL-162 ruling 4): ownAi (MC C3: the customer's own AI, a service that books at once, money due now or a card to save) or standard (every other save, a request the owner OKs included).",
+                  "type": "string",
+                  "enum": ["standard", "ownAi"]
+                },
                 "minutes": {
-                  "description": "10 (Q-12), or 15 for the customer's own AI's door (MC C3).",
+                  "description": "10 on the standard door (Q-12), 15 on the ownAi door (MC C3).",
                   "type": "integer",
                   "enum": [10, 15]
                 },
                 "extendable": {
-                  "description": "Whether the one 10-minute extension may still be offered (Q-12); never for the 15 minutes of MC C3.",
+                  "description": "Whether the one 10-minute extension may still be offered (Q-12; extendTime); never on the ownAi door (MC C3: 'the 15 minutes are never extended').",
                   "type": "boolean"
                 }
               },
-              "required": ["reservationId", "version", "heldUntil", "minutes", "extendable"],
+              "required": ["reservationId", "version", "heldUntil", "door", "minutes", "extendable"],
               "additionalProperties": false,
-              "if": { "properties": { "minutes": { "const": 15 } }, "required": ["minutes"] },
-              "then": { "properties": { "extendable": { "const": false } } }
+              "allOf": [
+                {
+                  "if": { "properties": { "minutes": { "const": 15 } }, "required": ["minutes"] },
+                  "then": { "properties": { "extendable": { "const": false } } }
+                },
+                {
+                  "if": { "properties": { "door": { "const": "ownAi" } }, "required": ["door"] },
+                  "then": { "properties": { "minutes": { "const": 15 }, "extendable": { "const": false } } },
+                  "else": { "properties": { "minutes": { "const": 10 } } }
+                }
+              ]
             },
             { "type": "null" }
           ]
@@ -1932,6 +2627,7 @@
         { "$ref": "#/$defs/timeTakenError" },
         { "$ref": "#/$defs/wrongDetailsError" },
         { "$ref": "#/$defs/overBookingLimitError" },
+        { "$ref": "#/$defs/savedTimeCapError" },
         { "$ref": "#/$defs/customerBlockedError" },
         { "$ref": "#/$defs/safetyHeldError" },
         { "$ref": "#/$defs/waitsForOwnerError" },
@@ -1945,7 +2641,7 @@
     },
     "saveTime.exchange": {
       "title": "SaveTimeExchange",
-      "description": "One saveTime request with its outcome. The customer's own AI's door holds 15 minutes, never extended (MC C3); every other door 10 (Q-12).",
+      "description": "One saveTime request with its outcome. Only the customer's own AI's save can be on the ownAi door, 15 minutes, never extended (MC C3); a turn's and a page's save is always on the standard door, 10 minutes with Q-12's extension; an AI's save is standard too for a request the owner OKs or a service with nothing to pay or save before the visit (round 2, DL-162 ruling 4; README default 61).",
       "type": "object",
       "properties": {
         "call": { "const": "saveTime" },
@@ -1973,21 +2669,6 @@
         },
         "required": ["request"]
       },
-      "then": {
-        "properties": {
-          "outcome": {
-            "type": "object",
-            "properties": {
-              "reservation": {
-                "anyOf": [
-                  { "type": "null" },
-                  { "type": "object", "properties": { "minutes": { "const": 15 } } }
-                ]
-              }
-            }
-          }
-        }
-      },
       "else": {
         "properties": {
           "outcome": {
@@ -1996,7 +2677,10 @@
               "reservation": {
                 "anyOf": [
                   { "type": "null" },
-                  { "type": "object", "properties": { "minutes": { "const": 10 } } }
+                  {
+                    "type": "object",
+                    "properties": { "door": { "const": "standard" }, "minutes": { "const": 10 } }
+                  }
                 ]
               }
             }
@@ -2004,9 +2688,88 @@
         }
       }
     },
+    "extendTime.request": {
+      "title": "ExtendTimeRequest",
+      "description": "More time for a saved time (round 2, DL-162 ruling 4; frontend FAIL 1): the one 10-minute extension Q-12 offers once before the hold ends (A4-21: 'The page warns before the saved time ends, and offers more time at least once'; B4-29: 'The time stays saved while they fill it in, with more time offered before it ends'; arch 05 line 247), through K-05 v1 extend, which raises held_until by 10 minutes, sets reservations.extended and moves the saved-time clock row with it, in one commit. Gives no key. Never for C3's 15 minutes: a time saved on the ownAi door answers neverExtended and nothing changes (MC C3: 'the 15 minutes are never extended'; K-05 v1 extend.errors). K-05 extend takes the door from its caller, since K-04 keeps none on the row; the action layer names it by the rule saveTime used, from stored facts: ownAi only for a time saved for an agent token whose booking books on the yes (K-30 booking_details.approval now, or before A4-98 decides it the K-26 v1 OK rules A4-98 reads) on a way whose path takes money now or a card (README default 61). Callers: the booking page and the secure page (caller page), the customer in their own chat (a turn) and the customer's own AI (agent), for their own booking. A longer saved time from the start (A4-21: a plan check up to 1 hour, a document up to 24 hours) is K-05's planCheck and document doors, not this call (README open gap 72). Primary, uncached. Business: caller.businessId; reservations are scoped by it. Person: the head's booker, set on the server. Repeat: caller.requestId is the key; the one extension already given answers alreadyExtended (K-05 extend: a repeat changes nothing). Version: the reservation compared and set (expectVersion, limit 4).",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "reservationId": {
+          "description": "The time saveTime held (K-04 v1 reservations.id), this booking's.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "description": "The reservation's version saveTime answered (limit 4).",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["caller", "bookingId", "reservationId", "expectVersion"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "reservationId": {
+          "description": "The customer's side only: a turn, a page or the customer's own AI.",
+          "properties": {
+            "caller": { "type": "object", "properties": { "kind": { "$ref": "#/$defs/customerSideCaller" } } }
+          }
+        }
+      }
+    },
+    "extendTime.response": {
+      "title": "ExtendTimeResponse",
+      "description": "Extended: the new end (the old end plus 10 minutes), the reservation's version, and no extension left (K-05 v1 extend.response).",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "heldUntil": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+        "door": { "const": "standard" },
+        "extendable": { "const": false },
+        "gives": { "type": "array", "maxItems": 0 },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "reservationId",
+        "version",
+        "heldUntil",
+        "door",
+        "extendable",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "extendTime.errors": {
+      "title": "ExtendTimeErrors",
+      "description": "Refused, nothing changed: K-05 v1 extend's neverExtended (C3's 15 minutes), alreadyExtended (the one extension was given) and notHeld (waiting, booked, released, or its end has passed), as K-05 gives them; and the Tool API's own.",
+      "oneOf": [
+        { "$ref": "../data-access/data-access.v1.schema.json#/$defs/extend.errors" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+    "extendTime.exchange": {
+      "title": "ExtendTimeExchange",
+      "description": "One extendTime request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "extendTime" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/extendTime.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/extendTime.response" }, { "$ref": "#/$defs/extendTime.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
     "joinWaitlist.request": {
       "title": "JoinWaitlistRequest",
-      "description": "Joins the waitlist, or next in line for a time that's taken (A4-60, B4-64; A4-15, B4-16 'Joins the waitlist'; A4-18, B4-18 'Puts Alex next in line'; A4-33 a full class); gives no key. In one commit, with the customer's own yes to messages about it (K-29 v1 consents, kind texts, bound to the words shown and their sha256: RULES 2.5): a K-30 waitlist_entries row (the service, the session or the one person asked for, the times wanted; one open entry per person and service), and the request ends there (K-30 booking_details.request_ended_why waitlist). Nothing is taken or saved; when a spot opens everyone on it hears at once and the first to book gets it, as a new booking (A4-60), whose notices are journey 7's. Primary, uncached. Callers: a turn or the booking page; never an AI, whose call is never the customer's own yes (A3-03). Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; an open entry for the same person and service answers repeated. Version: inserts at version 1; booking_details compared and set.",
+      "description": "Joins the waitlist, or next in line for a time that's taken (A4-60, B4-64; A4-15, B4-16 'Joins the waitlist'; A4-18, B4-18 'Puts Alex next in line'; A4-33 a full class); gives no key. In one commit, with the customer's own yes to messages about it (K-29 v1 consents, kind texts, bound to the words shown and their sha256: RULES 2.5): a K-30 waitlist_entries row (the service, the session or the one person asked for, the times wanted; one open entry per person and service), and the request ends there (K-30 booking_details.request_ended_why waitlist). The times wanted are never open-ended (round 2, DL-162 ruling 8; K-30 waitlist_entries.wanted not null and waitlist_entries_wanted_bounded: 'When the time passes, they hear once'): 'any time' is sent as the stated bounded range README default 81 names, from now to the end of the seventh day in the visit's zone, else the business's (A4-19: 'the waitlist for this week'). A stopped mobile gives no yes (RULES 7.5: only START, or a fresh yes on a new booking from that number, turns texts back on; MC C1; a tap on the page or a yes in a turn to a list is neither), so the answer is textsOff: no K-29 consent (consentId null: STATE note 9, no answer holds textsOff with a consentId), K-01's stopLaterReply shown or sent, and, since K-30 v1 waitlist_entries.consent_id is not null ('nothing about the list is sent without it'), no entry can be written without that yes: the entry the ruling keeps waits for a K-30 minor version (README default 82, open gap 71), so the request stays open (request_ended_why not set) and nothing is written. Nothing is taken or saved; when a spot opens everyone on it hears at once and the first to book gets it, as a new booking (A4-60), whose notices are journey 7's. Primary, uncached. Callers: a turn or the booking page; never an AI, whose call is never the customer's own yes (A3-03). Business: caller.businessId. Person: the head's booker. Repeat: caller.requestId is the key; an open entry for the same person and service answers repeated. Version: inserts at version 1; booking_details compared and set.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -2017,8 +2780,8 @@
           "$ref": "#/$defs/nullableId"
         },
         "wanted": {
-          "description": "The times they want (K-30 waitlist_entries), or null for any.",
-          "anyOf": [{ "$ref": "../data-access/data-access.v1.schema.json#/$defs/during" }, { "type": "null" }]
+          "description": "The times they want (K-30 waitlist_entries.wanted, bounded at both ends: waitlist_entries_wanted_bounded), never null: 'any time' is the bounded range README default 81 states (round 2, DL-162 ruling 8; action-layer FAIL 7).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/during"
         },
         "yes": { "$ref": "#/$defs/readBackYes" }
       },
@@ -2035,18 +2798,59 @@
     },
     "joinWaitlist.response": {
       "title": "JoinWaitlistResponse",
-      "description": "The entry, the yes and the request ended.",
-      "type": "object",
-      "properties": {
-        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
-        "waitlistEntryId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
-        "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
-        "requestEnded": { "const": true },
-        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
-        "repeated": { "type": "boolean" }
-      },
-      "required": ["bookingId", "waitlistEntryId", "consentId", "requestEnded", "written", "repeated"],
-      "additionalProperties": false
+      "description": "Joined (the entry, the yes, the request ended), or textsOff for a stopped mobile (round 2, DL-162 ruling 8; security GAP 2): no yes, no entry, the request still open, the texts-off line.",
+      "oneOf": [
+        {
+          "title": "WaitlistJoined",
+          "type": "object",
+          "properties": {
+            "result": { "const": "joined" },
+            "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "waitlistEntryId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "textsOff": { "type": "null" },
+            "requestEnded": { "const": true },
+            "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+            "repeated": { "type": "boolean" }
+          },
+          "required": [
+            "result",
+            "bookingId",
+            "waitlistEntryId",
+            "consentId",
+            "textsOff",
+            "requestEnded",
+            "written",
+            "repeated"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "WaitlistTextsOff",
+          "type": "object",
+          "properties": {
+            "result": { "const": "textsOff" },
+            "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "waitlistEntryId": { "type": "null" },
+            "consentId": { "type": "null" },
+            "textsOff": { "$ref": "#/$defs/textsOffNotice" },
+            "requestEnded": { "const": false },
+            "written": { "type": "array", "maxItems": 0 },
+            "repeated": { "type": "boolean" }
+          },
+          "required": [
+            "result",
+            "bookingId",
+            "waitlistEntryId",
+            "consentId",
+            "textsOff",
+            "requestEnded",
+            "written",
+            "repeated"
+          ],
+          "additionalProperties": false
+        }
+      ]
     },
     "joinWaitlist.errors": {
       "title": "JoinWaitlistErrors",
@@ -2062,7 +2866,7 @@
     },
     "joinWaitlist.exchange": {
       "title": "JoinWaitlistExchange",
-      "description": "One joinWaitlist request with its outcome.",
+      "description": "One joinWaitlist request with its outcome. The texts-off line has no row on the page, which shows it itself, and is a row in a turn (v1.1 default 50's rule; round 2, DL-162 ruling 8).",
       "type": "object",
       "properties": {
         "call": { "const": "joinWaitlist" },
@@ -2073,22 +2877,71 @@
         }
       },
       "required": ["call", "given", "request", "outcome"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "caller": {
+                "type": "object",
+                "properties": { "kind": { "const": "page" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["caller"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "textsOff": {
+                "anyOf": [
+                  { "type": "null" },
+                  { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "textsOff": {
+                "anyOf": [
+                  { "type": "null" },
+                  {
+                    "type": "object",
+                    "properties": { "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     "sendSecureLink.request": {
       "title": "SendSecureLinkRequest",
-      "description": "The secure link; gives contact (A4-42, flow A) or link (B4-29, flow B) (02-contracts section 8: K-30 the secure link issued; K-28 the contact it went to), the one call that writes each in journey 4. Writes a K-30 v1 secure_links row of purpose secure_page for the person (the head's booker, or the person served when it is someone else, who gets their own link for their private answers and their own yes: A4-24, A4-42), its given_via and, for text or email, the contact on file it went to (K-28 customers.mobile_handle_id or email_handle_id: one of that person's own handles, secure_links_handle_own_fk); only the sha256 of its short code is kept (secure_links.code_sha256; BP rule 7). How it goes: in a turn by text into that mobile's open chat (RULES 4.1b; MC C9: Rosie never texts first; notReachable chatNotOpen otherwise) or to the email on file, as an outbox row whose final parts hold the link, which never enters a span, a trace or the event log (v1 default 30); to the customer's own AI as given_via ai and on the booking page as given_via page, the link returned to that caller once in url (FS line 679: 'It must give an AI exactly ... the secure link'), never logged, and never by text from a call made alone, whose commit writes no outbox row (v1.1 open gap 43). The walk's automatic steps after it ride the same commit: A4-43, B4-38 the plug-in's forms go on the secure page ('Not on the business's own list': the request ends not_listed), and A4-98, B4-115 decide once whether it books on the yes or asks the owner first (K-30 booking_details.approval now or ownerok, from K-26 v1 ok_same_day, ok_new_customer, ok_dates: set once). Primary, uncached. Business: caller.businessId. Person: the link's person is named by the server from the head, never sent by the browser or the AI. Repeat: caller.requestId is the key; a repeat makes no second link and answers the first without its url, since the code is not kept (a later message that needs a link gets a new one: K-30 default 12). Version: the link at version 1; booking_details compared and set.",
+      "description": "The secure link; gives contact (A4-42, flow A) or link (B4-29, flow B) (02-contracts section 8: K-30 the secure link issued; K-28 the contact it went to), the one call that writes each in journey 4. Writes a K-30 v1 secure_links row of purpose secure_page for the person (the head's booker, or the person served when it is someone else, who gets their own link for their private answers and their own yes: A4-24, A4-42), its given_via and, for text or email, the contact on file it went to (K-28 customers.mobile_handle_id or email_handle_id: one of that person's own handles, secure_links_handle_own_fk); only the sha256 of its short code is kept (secure_links.code_sha256; BP rule 7). How it goes: in a turn by text into that mobile's open chat (RULES 4.1b; MC C9: Rosie never texts first; notReachable chatNotOpen otherwise) or to the email on file, as an outbox row whose final parts hold the link, which never enters a span, a trace or the event log (v1 default 30); to the customer's own AI as given_via ai and on the booking page as given_via page, the link returned to that caller once in url (FS line 679: 'It must give an AI exactly ... the secure link'), never logged, and never by text from a call made alone, whose commit writes no outbox row (v1.1 open gap 43). The walk's automatic steps after it ride the same commit: A4-43, B4-38 the plug-in's forms go on the secure page ('Not on the business's own list': the request ends not_listed), and A4-98, B4-115 decide once whether it books on the yes or asks the owner first (K-30 booking_details.approval now or ownerok, from K-26 v1 ok_same_day, ok_new_customer, ok_dates: set once). for meetsPro (round 2, DL-162 ruling 3; B4-26, B4-27; action-layer FAIL 4, frontend FAIL 4): the adult who meets the pro, once saveSecurePage's meetsPro save named them (booking_details.meets_pro someone_else, a new K-04 person named as typed), gets their own link (K-30 secure_links purpose secure_page: 'each person served or who meets the pro gets their own', B4-27), for their mobile and their own yes to texts on it (saveSecurePage meetsProYes); it is given to the booker to forward ('Alex forwards a link'), on the booker's secure page (via page) or to the booker's own AI (via ai), with no contact (secure_links.handle_id null: that adult has no contact on file, and the booker's handle is not theirs, secure_links_handle_own_fk), never texted by Rosie ('Rosie never texts the parent on Alex's word'); it gives no key (B4-27 gives none), and no form or approval rides it (README default 83). Primary, uncached. Business: caller.businessId. Person: the link's person is named by the server from the head, never sent by the browser or the AI. Repeat: caller.requestId is the key; a repeat makes no second link and answers the first without its url, since the code is not kept (a later message that needs a link gets a new one: K-30 default 12). Version: the link at version 1; booking_details compared and set.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
         "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
         "for": {
-          "description": "booker (the head's booker) or served (the head's person served, when it is someone else).",
+          "description": "booker (the head's booker), served (the head's person served, when it is someone else) or meetsPro (the adult who meets the pro, K-30 booking_details.meets_pro someone_else: round 2, DL-162 ruling 3).",
           "type": "string",
-          "enum": ["booker", "served"]
+          "enum": ["booker", "served", "meetsPro"]
         },
         "via": {
-          "description": "K-30 secure_links.given_via: text or email in a turn, ai for the customer's own AI, page on the booking page.",
+          "description": "K-30 secure_links.given_via: text or email in a turn, ai for the customer's own AI, page on the booking page or the secure page. A meetsPro link goes only via page or ai, to the booker to forward.",
           "type": "string",
           "enum": ["text", "email", "ai", "page"]
         }
@@ -2097,8 +2950,15 @@
       "additionalProperties": false,
       "dependentSchemas": {
         "via": {
-          "description": "Each caller its own way: a turn by text or email; the AI as ai; the booking page as page.",
+          "description": "Each caller its own way: a turn by text or email; the AI as ai; the booking page as page. A meetsPro link is never texted or emailed by Rosie: the booker forwards it (B4-27).",
           "allOf": [
+            {
+              "if": {
+                "properties": { "for": { "const": "meetsPro" } },
+                "required": ["for"]
+              },
+              "then": { "properties": { "via": { "enum": ["ai", "page"] } } }
+            },
             {
               "properties": {
                 "caller": {
@@ -2160,11 +3020,16 @@
     },
     "sendSecureLink.response": {
       "title": "SendSecureLinkResponse",
-      "description": "The link issued, how it went, what the walk after it decided, and the key it gave.",
+      "description": "The link issued, how it went, what the walk after it decided, and the key it gave. The link's K-03 slot is link.secure (this reader's secure page link: K-03 v1 slots.json).",
       "type": "object",
       "properties": {
         "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
         "secureLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "for": {
+          "description": "Whose link it is, as asked (round 2).",
+          "type": "string",
+          "enum": ["booker", "served", "meetsPro"]
+        },
         "givenVia": { "type": "string", "enum": ["text", "email", "ai", "page"] },
         "url": {
           "description": "For given_via ai or page, the link itself (rosfield.com/ then a short code: A4-42; the host a config value, Q-51), given to that caller once; null in a turn (the outbox row carries it) and on a repeat. Never logged, never in a span (v1 default 30).",
@@ -2189,7 +3054,6 @@
         "gives": {
           "type": "array",
           "items": { "enum": ["contact", "link"] },
-          "minItems": 1,
           "maxItems": 1
         },
         "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
@@ -2198,6 +3062,7 @@
       "required": [
         "bookingId",
         "secureLinkId",
+        "for",
         "givenVia",
         "url",
         "outboxRowId",
@@ -2208,7 +3073,23 @@
         "written",
         "repeated"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "for": {
+          "description": "The booker's or the person served's link gives contact (A4-42) or link (B4-29) and carries the walk's A4-43 and A4-98; the meetsPro link gives none and carries no form, approval or ending (B4-27; README default 83).",
+          "if": { "properties": { "for": { "const": "meetsPro" } }, "required": ["for"] },
+          "then": {
+            "properties": {
+              "givenVia": { "enum": ["ai", "page"] },
+              "gives": { "type": "array", "maxItems": 0 },
+              "approval": { "type": "null" },
+              "formsOnPage": { "const": false },
+              "notListed": { "const": false }
+            }
+          },
+          "else": { "properties": { "gives": { "type": "array", "minItems": 1 } } }
+        }
+      }
     },
     "sendSecureLink.errors": {
       "title": "SendSecureLinkErrors",
@@ -2276,7 +3157,7 @@
     },
     "checkPlace.request": {
       "title": "CheckPlaceRequest",
-      "description": "Where the job is, flow B; gives place (B4-77: the town or ZIP checked against the travel area before any times) and address (B4-30: the street address checked on the secure page) (02-contracts section 8: K-30 booking_addresses), the one call that writes each in journey 4. area: the town or ZIP as given, geocoded (K-17 v1 geocode, kind town or zip) and checked by distance in PostGIS against the travel area of the way's location (K-23 v1 locations: travel centre and miles; K-25 service_money.location_id) and against the states whose form the business filled in (B4-31): inside, a K-30 booking_addresses row at position 1 with the area and the location (address null), gives place; outside, the reply says the business can't go there (B4-31) and the request ends outside_area; several matches (a town two states share), not found, or a null state: askZip, nothing written (B4-77's safe default; K-17 v1 default 8). street (page only: an address never passes through an AI, A6-14; 'An address an AI puts in a message is never saved', B4-30): geocoded (kind streetAddress) and checked again; inside and in a filled-in state, the row's address sealed under the key of the person who typed it on their own link (sealed_for_person_id; K-04 v1 rule 6), its zone and state_code from the match and checked_at, gives address; a partial match (a coarser precision than asked: K-17 v1) is askAgain, nothing checked (B4-30's safe default); outside after all, the request ends outside_area. Two addresses (a move, a ride, a tow) are positions 1 and 2, each with its own check. The address and the normalized address are never returned, logged or in a span (K-17 v1 'No address in a span or log'). Primary, uncached, and the geo port. Business: caller.businessId. Person: for street, caller.personId is the secure link's person, set by the page server from the link it found by its code's hash (K-30 rule 5). Repeat: caller.requestId is the key. Version: a new row at version 1; a street check compares and sets the area row's version.",
+      "description": "Where the job is, flow B; gives place (B4-77: the town or ZIP checked against the travel area before any times) and address (B4-30: the street address checked on the secure page) (02-contracts section 8: K-30 booking_addresses), the one call that writes each in journey 4. area: the town or ZIP as given, geocoded (K-17 v1 geocode, kind town or zip) and checked by distance in PostGIS against the travel area of the way it names (round 2, DL-162 ruling 6; action-layer FAIL 1: serviceMoneyId, a flow B way of the matched service, whose K-25 v1 service_money.location_id is the location whose travel area it is, K-23 v1 locations: travel centre and miles, and K-30 booking_addresses.location_id, which is not null) and against the states whose form the business filled in (B4-31): inside, a K-30 booking_addresses row at position 1 with the area and that location (address null), gives place; outside, the reply says the business can't go there (B4-31) and the request ends outside_area; several matches (a town two states share), not found, or a null state: askZip, nothing written (B4-77's safe default; K-17 v1 default 8). What is kept is only the geo match's town or ZIP, never the words given (round 2, DL-162 ruling 9; security GAP 1; README default 84): booking_addresses.area is the match's own normalized town or ZIP, and a text that matches finer than a town or ZIP (K-17 v1 precision street, interpolated or exact: a street address an AI or a page put in the words) is askZip with nothing kept, so an address that passes through an AI is never saved (B4-30: 'An address an AI puts in a message is never saved'; A6-14; K-30 booking_addresses.address, sealed and secure-page-only; README default 67); matchPrecision says which. street (page only: an address never passes through an AI, A6-14; 'An address an AI puts in a message is never saved', B4-30): geocoded (kind streetAddress) and checked again; inside and in a filled-in state, the row's address sealed under the key of the person who typed it on their own link (sealed_for_person_id; K-04 v1 rule 6), its zone and state_code from the match and checked_at, gives address; a partial match (a coarser precision than asked: K-17 v1) is askAgain, nothing checked (B4-30's safe default); outside after all, the request ends outside_area. Two addresses (a move, a ride, a tow) are positions 1 and 2, each with its own check. The address and the normalized address are never returned, logged or in a span (K-17 v1 'No address in a span or log'). Primary, uncached, and the geo port. Business: caller.businessId. Person: for street, caller.personId is the secure link's person, set by the page server from the link it found by its code's hash (K-30 rule 5). Repeat: caller.requestId is the key. Version: a new row at version 1; a street check compares and sets the area row's version.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -2288,14 +3169,18 @@
               "type": "object",
               "properties": {
                 "kind": { "const": "area" },
+                "serviceMoneyId": {
+                  "description": "The flow B way checked (K-25 v1 service_money.id of the matched service, picked as README default 57 keeps it): its location_id is the travel area's and the row's location (round 2, DL-162 ruling 6).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
                 "typed": { "type": "string", "enum": ["town", "zip"] },
                 "text": {
-                  "description": "The town or ZIP as given (K-17 v1 geocode.request text); kept as K-30 booking_addresses.area once inside.",
+                  "description": "The words given for the town or ZIP (K-17 v1 geocode.request text): geocoded, then dropped; never kept, returned, logged or in a span. Only the geo match's own town or ZIP is kept, as K-30 booking_addresses.area (round 2, DL-162 ruling 9).",
                   "type": "string",
                   "minLength": 1
                 }
               },
-              "required": ["kind", "typed", "text"],
+              "required": ["kind", "serviceMoneyId", "typed", "text"],
               "additionalProperties": false
             },
             {
@@ -2377,6 +3262,13 @@
           "description": "For a street checked inside, its IANA zone (the visit's: S13-03; CQ-05); null otherwise.",
           "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/zone" }, { "type": "null" }]
         },
+        "matchPrecision": {
+          "description": "The best geo match's precision (K-17 v1 precision: exact, interpolated, street, zip, town); null when nothing matched, several did, or the port failed. For an area check only a town or zip match is kept (round 2, DL-162 ruling 9).",
+          "anyOf": [
+            { "type": "string", "enum": ["exact", "interpolated", "street", "zip", "town"] },
+            { "type": "null" }
+          ]
+        },
         "requestEnded": { "type": "boolean" },
         "gives": {
           "type": "array",
@@ -2392,6 +3284,7 @@
         "result",
         "addressRowId",
         "zone",
+        "matchPrecision",
         "requestEnded",
         "gives",
         "written",
@@ -2400,8 +3293,31 @@
       "additionalProperties": false,
       "dependentSchemas": {
         "result": {
-          "description": "Only inside gives a key: place for the area, address for the street.",
+          "description": "Only inside gives a key: place for the area, address for the street. An area check keeps only a town or ZIP match: a finer match (a street address in the words) is askZip with nothing written (round 2, DL-162 ruling 9; B4-30; A6-14).",
           "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "check": { "const": "area" },
+                  "matchPrecision": { "enum": ["exact", "interpolated", "street"] }
+                },
+                "required": ["check", "matchPrecision"]
+              },
+              "then": {
+                "properties": {
+                  "result": { "const": "askZip" },
+                  "addressRowId": { "type": "null" },
+                  "written": { "type": "array", "maxItems": 0 }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": { "check": { "const": "area" }, "result": { "const": "inside" } },
+                "required": ["check", "result"]
+              },
+              "then": { "properties": { "matchPrecision": { "enum": ["town", "zip"] } } }
+            },
             {
               "if": { "properties": { "result": { "const": "inside" } }, "required": ["result"] },
               "then": { "properties": { "gives": { "type": "array", "minItems": 1 } } },
@@ -2446,7 +3362,7 @@
     },
     "saveSecurePage.request": {
       "title": "SaveSecurePageRequest",
-      "description": "What a person types on the booking's secure page; gives answers (A4-65: the page's questions) and access with answers (B4-34: access, door and job notes) (02-contracts section 8: K-30 page answers, access and job notes, secure page only), the one call that writes each in journey 4; and who meets the pro (B4-26, with B4-27 and B4-105), which gives no key. answers: one K-30 v1 page_answers row per answer (kind question, note, access, entry_code, safety_need, emergency_contact, child_details, authority or photo; a question's words are the plug-in's), each sealed under the key of the person who typed it (page_answers.answer, sealedBy person_id; K-04 v1 rule 6), never edited (a resubmission is a new row and the newest wins); B4-34 carries at least one access or entry_code answer, which gives access. An entry code shows to the pro only on the visit's day (B4-34), an emergency contact is called by the business and never texted by Rosie, and none goes in a text, an email or to an AI (S13-05; RULES 4.5; B6-14). meetsPro: K-30 booking_details.meets_pro (served, someone_else or nobody_home, only where the plug-in marks the work so: B4-105), compare-and-set; for someone_else, that adult is a new K-04 person named as typed, and meets_pro_person_id is set only once their own yes on their own forwarded link is in (B4-27: 'Rosie never texts the parent on Alex's word'), so their link is sendSecureLink's for that person. Primary, uncached. Only the secure page's server side (K-21; a page's commit writes no outbox row, v1.1 open gap 43; CQ-44). Business: caller.businessId. Person: caller.personId, the secure link's person, set by the page server from the link it found by its code's hash, never by the browser (K-30 rule 5). Repeat: caller.requestId is the key. Version: answers are inserted and carry no version (K-30 rule 4); booking_details compared and set.",
+      "description": "What a person types on the booking's secure page; gives answers (A4-65: the page's questions) and access with answers (B4-34: access, door and job notes) (02-contracts section 8: K-30 page answers, access and job notes, secure page only), the one call that writes each in journey 4; and who meets the pro (B4-26, with B4-27 and B4-105), which gives no key. answers: one K-30 v1 page_answers row per answer (kind question, note, access, entry_code, safety_need, emergency_contact, child_details, authority or photo; a question's words are the plug-in's), each sealed under the key of the person who typed it (page_answers.answer, sealedBy person_id; K-04 v1 rule 6), never edited (a resubmission is a new row and the newest wins); B4-34 carries at least one access or entry_code answer, which gives access. An entry code shows to the pro only on the visit's day (B4-34), an emergency contact is called by the business and never texted by Rosie, and none goes in a text, an email or to an AI (S13-05; RULES 4.5; B6-14). meetsPro: K-30 booking_details.meets_pro (served, someone_else or nobody_home, only where the plug-in marks the work so: B4-105), compare-and-set; for someone_else, that adult is a new K-04 person named as typed, and meets_pro_person_id is set only once their own yes on their own forwarded link is in (B4-27: 'Rosie never texts the parent on Alex's word'), so their link is sendSecureLink's for meetsPro, given to the booker to forward. meetsProYes (round 2, DL-162 ruling 3; B4-27: 'On it the parent adds a mobile and says yes to texts'): on that adult's own link, the caller's person is that adult (set by the page server from their link), and one commit writes their mobile as their own K-04 handle (a phones row and its contacts/add effect, Q-03; a number Rosie already holds is linked as theirs too, and no answer tells whether Rosie knew it: README default 68), their yes on their link as a K-29 v1 consents row of kind texts for that mobile (channel page, the booking, the exact words shown and their sha256: RULES 2.5, 7.1; bound to that link by its person and booking, since K-29 v1 names no secure link: README open gap 73), and booking_details.meets_pro_person_id, that adult, compare-and-set (K-30: 'once their own yes on their link is in'). A stopped mobile gets no yes without START, or a fresh yes on a new booking from that number (RULES 7.5; MC C1): a tap on the page is neither, so no consent is written and they see only that texts are off (textsOff, K-01's stopLaterReply, no row: the page shows it), while their mobile and meets_pro_person_id are still written, since the yes the step needs is theirs on their own link, and texts wait (B4-27: 'No yes from the parent: no texts. The business calls them, or they say yes at the door'; README default 85). photos (round 2, DL-162 ruling 2d; A4-07, A4-08, B4-08, B4-09; FS line 661): on the photos link's page (K-30 secure_links purpose photos), the customer's photos and answers for the quote, each a K-30 page_answers row (kind photo with its file reference as K-13 names it, or question or note), sealed under their key, never in a text and never through an AI ('Photos of a person or a body go only on the secure page'); gives no key (the price is B4-09's); the quote stays pricing for the pro's price (who is asked to price it, and A4-08's 'Price needed' row with the pricing page's link, is README open gap 74). Primary, uncached. Only the secure page's server side (K-21; a page's commit writes no outbox row, v1.1 open gap 43; CQ-44). Business: caller.businessId. Person: caller.personId, the secure link's person, set by the page server from the link it found by its code's hash, never by the browser (K-30 rule 5). Repeat: caller.requestId is the key. Version: answers are inserted and carry no version (K-30 rule 4); booking_details compared and set.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -2516,6 +3432,72 @@
               },
               "required": ["kind", "step", "expectVersion", "who", "otherName"],
               "additionalProperties": false
+            },
+            {
+              "title": "SaveMeetsProYes",
+              "description": "B4-27, on the adult's own forwarded link (round 2, DL-162 ruling 3): their mobile and their own yes to texts, on the page, with the words the page server showed (K-21), never the browser's.",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "meetsProYes" },
+                "step": { "const": "B4-27" },
+                "expectVersion": {
+                  "description": "K-30 booking_details.version the page showed (limit 4).",
+                  "$ref": "#/$defs/version"
+                },
+                "mobile": {
+                  "description": "Their mobile, as typed on their link (K-05 v1 phoneNumber).",
+                  "$ref": "#/$defs/phoneNumber"
+                },
+                "yes": {
+                  "description": "Their yes to texts on their own link: the page's confirm, its exact words as the page server showed them (RULES 2.5).",
+                  "allOf": [
+                    { "$ref": "#/$defs/readBackYes" },
+                    { "type": "object", "properties": { "kind": { "const": "page" } } }
+                  ]
+                }
+              },
+              "required": ["kind", "step", "expectVersion", "mobile", "yes"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SavePhotos",
+              "description": "A4-07, B4-08: the customer's photos and answers on the photos link's page, for the quote (round 2, DL-162 ruling 2d).",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "photos" },
+                "step": { "type": "string", "enum": ["A4-07", "B4-08"] },
+                "quoteId": {
+                  "description": "The quote the photos link was made for (K-30 quotes, state pricing).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "answers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "description": "K-30 v1 page_answers.kind: photo (its file reference), question (the plug-in's) or note.",
+                        "type": "string",
+                        "enum": ["photo", "question", "note"]
+                      },
+                      "question": {
+                        "description": "For kind question, the plug-in's question as shown; null otherwise (page_answers_kind_known).",
+                        "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+                      },
+                      "answer": {
+                        "description": "As typed, or for a photo its file reference as K-13 names it; sealed on write, never returned.",
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": ["kind", "question", "answer"],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["kind", "step", "quoteId", "answers"],
+              "additionalProperties": false
             }
           ]
         }
@@ -2549,14 +3531,49 @@
           "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
         },
         "meetsPro": {
-          "description": "K-30 booking_details.meets_pro after a meetsPro save; null for answers.",
+          "description": "K-30 booking_details.meets_pro after a meetsPro or meetsProYes save; null for answers and photos.",
           "anyOf": [
             { "type": "string", "enum": ["served", "someone_else", "nobody_home"] },
             { "type": "null" }
           ]
         },
+        "meetsProPersonId": {
+          "description": "For meetsProYes, K-30 booking_details.meets_pro_person_id as set: the link's own person (round 2, DL-162 ruling 3); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "handles": {
+          "description": "For meetsProYes, the adult's mobile handle linked (K-04 v1 handles.id), never the number; empty otherwise.",
+          "type": "array",
+          "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+        },
+        "effects": {
+          "description": "For meetsProYes, contacts/add for a mobile not yet a Linq contact (Q-03; CQ-04), and only that kind (linq_contact_add); empty otherwise.",
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/effectWritten" },
+              { "type": "object", "properties": { "kind": { "const": "linq_contact_add" } } }
+            ]
+          }
+        },
+        "consentId": {
+          "description": "For meetsProYes, their K-29 texts yes, bound to their own link (README open gap 73); null for a stopped mobile (textsOff) and for every other save.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "textsOff": {
+          "description": "For meetsProYes on a stopped mobile, the texts-off line the page shows itself (no row: a page's commit writes none); null otherwise (round 2, DL-162 ruling 3; RULES 7.5).",
+          "anyOf": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/textsOffNotice" },
+                { "type": "object", "properties": { "outboxRowId": { "type": "null" } } }
+              ]
+            },
+            { "type": "null" }
+          ]
+        },
         "gives": {
-          "description": "answers (A4-65); access and answers (B4-34); none for who meets the pro.",
+          "description": "answers (A4-65); access and answers (B4-34); none for who meets the pro, the adult's yes or the photos.",
           "type": "array",
           "items": { "enum": ["access", "answers"] },
           "uniqueItems": true,
@@ -2565,8 +3582,27 @@
         "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
         "repeated": { "type": "boolean" }
       },
-      "required": ["bookingId", "answerIds", "meetsPro", "gives", "written", "repeated"],
-      "additionalProperties": false
+      "required": [
+        "bookingId",
+        "answerIds",
+        "meetsPro",
+        "meetsProPersonId",
+        "handles",
+        "effects",
+        "consentId",
+        "textsOff",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "consentId": {
+          "description": "No answer holds the texts-off line and a consent together (STATE note 9; v1.1 default 50).",
+          "if": { "properties": { "textsOff": { "type": "object" } }, "required": ["textsOff"] },
+          "then": { "properties": { "consentId": { "type": "null" } } }
+        }
+      }
     },
     "saveSecurePage.errors": {
       "title": "SaveSecurePageErrors",
@@ -2645,7 +3681,7 @@
     "saveSetupStep.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/saveSetupStep.exchange" },
     "readSetup.exchange": { "$ref": "tool-api.v1.1.schema.json#/$defs/readSetup.exchange" },
     "callName": {
-      "description": "Every call v1.2 holds: v1.1's and journey 4's (matchService, setWhoFor, setReachWay, addCustomer, setPrice, quoteFromPhotos, showTimes, saveTime, joinWaitlist, sendSecureLink, checkPlace, saveSecurePage). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
+      "description": "Every call v1.2 holds: v1.1's and journey 4's (matchService, setWhoFor, setReachWay, addCustomer, setPrice, quoteFromPhotos, showTimes, saveTime, extendTime, joinWaitlist, sendSecureLink, checkPlace, saveSecurePage). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
       "type": "string",
       "enum": [
         "buildFrontier",
@@ -2691,6 +3727,7 @@
         "quoteFromPhotos",
         "showTimes",
         "saveTime",
+        "extendTime",
         "joinWaitlist",
         "sendSecureLink",
         "checkPlace",

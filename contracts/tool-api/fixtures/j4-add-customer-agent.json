@@ -10,7 +10,7 @@
     ],
     "now": "2026-10-21T23:16:09Z",
     "stated": { "step": "A4-23", "gives": ["customer"] },
-    "note": "A4-23: the AI sends Alex's name, 'Alex M.'. In one commit the K-28 row for the booker at Lee's Barbershop is added with that name, his mobile handle, the way texts from the reach card and the age band 18_or_older from A4-80 (both kept until now: README default 57), with the K-04 customer role (K-28 v1 rule 7); his K-04 persons.name was null and is set (version 2). The token is bound (README default 70)."
+    "note": "A4-23: the AI sends Alex's name, 'Alex M.'. The Agent API builds the request from its token session (README default 57), never from the AI's words: the way texts the reach card gave (j4-reach-card-agent.json) and his own band 18_or_older from A4-80 (j4-who-for-agent.json) ride the request (round 2: README default 77; action-layer FAIL 2), checked against what setReachWay and setWhoFor answered. In one commit the K-28 row for the booker at Lee's Barbershop is added with that name, his mobile handle, way texts and age_band 18_or_older, with the K-04 customer role (K-28 v1 rule 7); his K-04 persons.name was null and is set (version 2). The token is bound (README default 70)."
   },
   "request": {
     "caller": {
@@ -22,7 +22,9 @@
       "traceId": "trace-agent-alex-0001"
     },
     "bookingId": "booking-agent-alex-oct21",
-    "name": "Alex M."
+    "name": "Alex M.",
+    "way": "texts",
+    "ageBand": "18_or_older"
   },
   "outcome": {
     "bookingId": "booking-agent-alex-oct21",

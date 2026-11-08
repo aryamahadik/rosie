@@ -23,6 +23,7 @@
   "outcome": {
     "bookingId": "booking-alex-chat-drain2",
     "secureLinkId": "link-alex-drain2-secure",
+    "for": "booker",
     "givenVia": "text",
     "url": "rosfield.com/s/placeholder-link-code-0029",
     "outboxRowId": "row-alex-drain2-link",

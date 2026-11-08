@@ -4,7 +4,8 @@
     "seeds": [
       "people-access/seed-staff-joined.json",
       "services-prices/seed-service-money-paths.json",
-      "business-setup/seed-location-flow-b.json"
+      "business-setup/seed-location-flow-b.json",
+      "bookings-changes/seed-booking-flow-b.json"
     ],
     "after": ["j4-check-place-area-turn.json"],
     "now": "2026-11-02T14:02:40Z",

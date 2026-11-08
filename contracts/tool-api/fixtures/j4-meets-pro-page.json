@@ -23,6 +23,11 @@
     "bookingId": "booking-alex-chat-drain2",
     "answerIds": [],
     "meetsPro": "served",
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
     "gives": [],
     "written": [{ "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 5 }],
     "repeated": false

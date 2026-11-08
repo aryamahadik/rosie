@@ -1,7 +1,11 @@
 {
   "call": "sendSecureLink",
   "given": {
-    "seeds": ["core/seed-phone-chat-open.json", "rules/seed-rules-tap-list.json"],
+    "seeds": [
+      "core/seed-phone-chat-open.json",
+      "rules/seed-rules-tap-list.json",
+      "bookings-changes/seed-booking-flow-b.json"
+    ],
     "after": ["j4-check-place-area-turn.json", "j4-save-time-turn.json"],
     "now": "2026-11-02T14:03:10Z",
     "stated": { "step": "B4-29", "gives": ["link"] },
@@ -23,6 +27,7 @@
   "outcome": {
     "bookingId": "booking-alex-chat-drain2",
     "secureLinkId": "link-alex-drain2-secure",
+    "for": "booker",
     "givenVia": "text",
     "url": null,
     "outboxRowId": "row-alex-drain2-link",

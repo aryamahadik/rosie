@@ -1,0 +1,53 @@
+{
+  "call": "setWhoFor",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-21T22:40:05Z",
+    "stated": null,
+    "note": "A4-96: a teen's own AI asks Lee's Barbershop to book a haircut for the teen (door ai, a new nameless person for the token, as j3-open-request-agent.json opens it), and A4-80's answer is '3 I'm under 18', for themselves, a teen of 13 to 17 (under13 false). The barbershop's plug-in has no private teen booking (A4-90: 'A barbershop's plug-in has none'), so a parent must book: teenParentLink. It keeps nothing about the teen, no person served, no payer and no band, and the request ends dropped (README default 60; the head cancelled, version 2). The parent's link comes at once (round 2: DL-162 ruling 2a): the business's booking page, where a parent books as their own booking, with no row, since nothing about the teen is kept (README default 73); it goes to the teen's AI in url, once, never logged, and Rosie never texts the parent. Its K-03 slot does not exist yet (README open gap 70: link.book). The booking id, the person, the request and the link code are placeholders (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-teen-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-teen-0001"
+    },
+    "bookingId": "booking-agent-teen-oct21",
+    "expectVersion": 1,
+    "answer": {
+      "step": "A4-80",
+      "for": "self",
+      "bookerAgeBand": "under_18",
+      "under13": false,
+      "parentOrGuardian": null,
+      "name": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-teen-oct21",
+    "outcome": "teenParentLink",
+    "servedPersonId": null,
+    "payerPersonId": null,
+    "private": false,
+    "servedAgeBand": null,
+    "ageBandKept": "nothingKept",
+    "parentLink": {
+      "kind": "bookingPage",
+      "secureLinkId": null,
+      "url": "rosfield.com/c/placeholder-parent-link",
+      "outboxRowId": null,
+      "clockRowId": null
+    },
+    "headVersion": 2,
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-agent-teen-oct21", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-agent-teen-oct21", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

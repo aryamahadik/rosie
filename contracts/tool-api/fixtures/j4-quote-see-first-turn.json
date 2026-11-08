@@ -1,0 +1,62 @@
+{
+  "call": "quoteFromPhotos",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "rules/seed-price-ok-limit.json",
+      "core/seed-phone-chat-open.json"
+    ],
+    "after": ["j4-quote-price-page.json"],
+    "now": "2026-11-03T00:39:30Z",
+    "stated": null,
+    "note": "B4-10's '3 See it first' then B4-101, in Sam's turn (a what-if beside j4-quote-send-turn.json): the quote goes see_first (version 3), the owner's ask is answered see_first, and Alex is offered an estimate visit with its times link in the same commit (round 2: DL-162 ruling 2b; README default 79): a K-30 secure_links row of purpose quote, whose page offers the visit to be priced there and its times ('See times: rosfield.com/q/r3e'), only its code's hash kept. It goes in a row into Alex's open chat ('Lee Home Services would like to see the job before pricing it ... Reply 1 Book a visit, 2 No thanks.'), url null; its K-03 slot does not exist yet (README open gap 70: link.quote). Nothing else is saved or taken; gives no key. Row and link ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-heater-see-first",
+      "requestId": "turn-sam-heater-see-first",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-sam-heater-see-first"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "stage": "ownerAnswer",
+      "step": "B4-10",
+      "quoteId": "quote-alex-heater",
+      "ownerOkId": "ok-alex-heater",
+      "expectVersion": 2,
+      "answer": "seeFirst",
+      "newOptions": null,
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-ok-alex-heater", "yesEventId": "evt-sam-heater-0004" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "quoteId": "quote-alex-heater",
+    "state": "see_first",
+    "version": 3,
+    "ownerOkId": "ok-alex-heater",
+    "ownerAskClockRowId": null,
+    "link": {
+      "kind": "quote",
+      "secureLinkId": "link-alex-heater-see-first",
+      "url": null,
+      "outboxRowId": "row-alex-heater-see-first",
+      "clockRowId": null
+    },
+    "pricingClockRowId": null,
+    "pendingChange": null,
+    "customerClockRowId": null,
+    "requestEnded": false,
+    "gives": [],
+    "outboxRowIds": ["row-alex-heater-see-first"],
+    "written": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 3 },
+      { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 2 },
+      { "table": "secure_links", "rowId": "link-alex-heater-see-first", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

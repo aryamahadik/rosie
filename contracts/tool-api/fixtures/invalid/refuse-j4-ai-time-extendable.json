@@ -5,6 +5,7 @@
     "reservationId": "rsv-agent-alex-riley-sat",
     "version": 1,
     "heldUntil": "2026-10-21T23:31:40Z",
+    "door": "ownAi",
     "minutes": 15,
     "extendable": true
   },

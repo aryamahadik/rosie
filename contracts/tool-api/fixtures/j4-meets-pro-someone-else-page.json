@@ -1,0 +1,38 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j4-secure-link-turn.json", "j4-check-address-page.json"],
+    "now": "2026-11-02T14:07:20Z",
+    "stated": null,
+    "note": "B4-26's '2 Someone else meets the pro', a what-if beside j4-meets-pro-page.json (B4-27: 'Say Alex books for a parent's home'): booking_details.meets_pro is someone_else, compared and set (version 5), and that adult is a new K-04 person named as Alex typed it ('My mother', words, not a name). meets_pro_person_id waits for their own yes on their own link (B4-27; K-30), which sendSecureLink for meetsPro gives Alex to forward (j4-meets-pro-link-page.json). No key. The person id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-drain2-0011",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-drain2-0008"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "save": { "kind": "meetsPro", "step": "B4-26", "expectVersion": 4, "who": "someone_else", "otherName": "My mother" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "answerIds": [],
+    "meetsPro": "someone_else",
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
+    "gives": [],
+    "written": [
+      { "table": "persons", "rowId": "person-alex-drain2-meets-pro", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 5 }
+    ],
+    "repeated": false
+  }
+}

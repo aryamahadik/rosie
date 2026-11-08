@@ -1,0 +1,39 @@
+{
+  "call": "joinWaitlist",
+  "given": {
+    "seeds": [
+      "core/seed-phone-stopped.json",
+      "conversations-consent/seed-consent-stop-row.json",
+      "services-prices/seed-services-price-list.json"
+    ],
+    "after": [],
+    "now": "2026-10-22T16:30:00Z",
+    "stated": null,
+    "note": "A4-60 on Lee's Barbershop's booking page for Ben T., whose mobile sent STOP on Oct 20 (K-04 phones.stopped; K-29's stop row): no skin fade fits and he taps yes to 'Want a text if a spot opens?' for any time, which the page sends as README default 81's bounded range, now to the end of Thu Oct 29 in New York (round 2: DL-162 ruling 8). A tap on the page is neither START nor a fresh yes sent from that number (RULES 7.5; MC C1), so no K-29 yes is written (consentId null: STATE note 9), and since K-30 v1 waitlist_entries.consent_id is not null no entry can be written without one: textsOff, nothing written, the request still open (README default 82, open gap 71). The page shows K-01's stopLaterReply itself (no row: a page's commit writes none). The booking id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-ben-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-ben",
+      "traceId": "trace-page-ben-0001"
+    },
+    "bookingId": "booking-page-ben-skin-fade",
+    "serviceId": "svc-lees-skin-fade",
+    "resourceId": null,
+    "wanted": { "start": "2026-10-22T16:30:00Z", "end": "2026-10-30T04:00:00Z" },
+    "yes": { "kind": "page", "exactWords": "Want a text if a spot opens?", "yesEventId": "evt-page-ben-0004" }
+  },
+  "outcome": {
+    "result": "textsOff",
+    "bookingId": "booking-page-ben-skin-fade",
+    "waitlistEntryId": null,
+    "consentId": null,
+    "textsOff": { "fixedLineId": "stopLaterReply", "outboxRowId": null },
+    "requestEnded": false,
+    "written": [],
+    "repeated": false
+  }
+}

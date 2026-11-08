@@ -23,9 +23,11 @@
     "yes": { "kind": "openQuestion", "openQuestionId": "oq-dee-waitlist", "yesEventId": "evt-dee-0102" }
   },
   "outcome": {
+    "result": "joined",
     "bookingId": "booking-dee-skin-fade-wait",
     "waitlistEntryId": "wait-dee-skin-fade",
     "consentId": "consent-dee-waitlist",
+    "textsOff": null,
     "requestEnded": true,
     "written": [
       { "table": "waitlist_entries", "rowId": "wait-dee-skin-fade", "version": 1 },

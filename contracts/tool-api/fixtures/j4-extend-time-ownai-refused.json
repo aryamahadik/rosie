@@ -1,0 +1,24 @@
+{
+  "call": "extendTime",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json"],
+    "after": ["j4-save-time-agent-instant.json"],
+    "now": "2026-11-02T15:22:00Z",
+    "stated": null,
+    "note": "Alex's AI asks for more time on the drain clearing saved on MC C3's ownAi door (j4-save-time-agent-instant.json). The action layer names the door by saveTime's rule, from stored facts (README default 61), and K-05 v1 extend answers neverExtended: C3's 15 minutes are never extended, and nothing changes (round 2: DL-162 ruling 4)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-drain3-0010",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-drain3-0001"
+    },
+    "bookingId": "booking-agent-alex-drain3",
+    "reservationId": "rsv-agent-alex-drain3",
+    "expectVersion": 1
+  },
+  "outcome": { "error": "neverExtended", "reservationId": "rsv-agent-alex-drain3", "door": "ownAi" }
+}

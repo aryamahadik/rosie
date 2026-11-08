@@ -1,0 +1,43 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-sealing-key.json"],
+    "after": [],
+    "now": "2026-11-03T00:12:40Z",
+    "stated": null,
+    "note": "B4-08's photos link opened (the water heater's quote, quote-alex-heater, pricing, as K-30's seed-quote-owner-ok keeps it): Alex adds a photo of the heater and a note on the photos link's page, whose server found the link by its code's hash and names his person (K-30 rule 5). Two K-30 page_answers rows, a photo by its file reference and a note, each sealed under his key, insert only, never in a text and never through an AI (round 2: DL-162 ruling 2d; FS line 661; 'Photos of a person or a body go only on the secure page'). The quote stays pricing for Jordan's price (j4-quote-price-page.json follows); no key. The file reference, the note's words and the ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-heater-0003",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-heater-0003"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "save": {
+      "kind": "photos",
+      "step": "B4-08",
+      "quoteId": "quote-alex-heater",
+      "answers": [
+        { "kind": "photo", "question": null, "answer": "uploads/placeholder-heater-photo-1.jpg" },
+        { "kind": "note", "question": null, "answer": "It's a 40-gallon gas heater in the basement" }
+      ]
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "answerIds": ["answer-alex-heater-photo-1", "answer-alex-heater-note-1"],
+    "meetsPro": null,
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
+    "gives": [],
+    "written": [],
+    "repeated": false
+  }
+}

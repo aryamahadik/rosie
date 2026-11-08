@@ -28,6 +28,7 @@
   "outcome": {
     "bookingId": "booking-agent-alex-oct21",
     "secureLinkId": "link-agent-alex-secure",
+    "for": "booker",
     "givenVia": "ai",
     "url": "rosfield.com/s/placeholder-link-code-0042",
     "outboxRowId": null,

@@ -1,0 +1,15 @@
+{
+  "caller": {
+    "kind": "turn",
+    "turnId": "turn-dee-waitlist",
+    "requestId": "turn-dee-waitlist",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-dee",
+    "traceId": "trace-dee-0101"
+  },
+  "bookingId": "booking-dee-skin-fade-wait",
+  "serviceId": "svc-lees-skin-fade",
+  "resourceId": null,
+  "wanted": null,
+  "yes": { "kind": "openQuestion", "openQuestionId": "oq-dee-waitlist", "yesEventId": "evt-dee-0102" }
+}

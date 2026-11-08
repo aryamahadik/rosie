@@ -38,7 +38,13 @@
           "upTo": null
         }
       ],
-      "secureLinkId": "link-alex-heater-quote"
+      "link": {
+        "kind": "quote",
+        "secureLinkId": "link-alex-heater-quote",
+        "url": null,
+        "outboxRowId": "row-alex-heater-price",
+        "clockRowId": null
+      }
     },
     "outboxRowIds": ["row-alex-heater-price"],
     "gives": ["price_known"],

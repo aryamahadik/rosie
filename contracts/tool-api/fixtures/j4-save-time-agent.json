@@ -5,12 +5,13 @@
       "core/seed-resources.json",
       "availability/seed-hours.json",
       "services-prices/seed-service-money-paths.json",
-      "services-prices/seed-price-rule-dates.json"
+      "services-prices/seed-price-rule-dates.json",
+      "rules/seed-rules-tap-list.json"
     ],
     "after": ["j3-open-request-agent.json", "j4-match-service-agent.json", "j4-show-times-agent.json"],
     "now": "2026-10-21T23:16:40Z",
     "stated": { "step": "A4-21", "gives": ["time_saved"] },
-    "note": "A4-15 then A4-21: Alex picks Sat 11:00am with Riley, and his AI sends the time as the card answered it, with the service and the way; each is checked again against today's list and the $35. In one commit: booking_details.timing settime (set once; version 3), Sat Oct 24 11:00 to 11:30am held for the booking by K-05 reserve for 15 minutes, never extended (the customer's own AI's door: MC C3; Q-12), and the K-30 line copied as shown: the haircut, the shop's way list|card|counter, the $35 rule's price and the way's $20 fee (S11-54). Flow A's pick gives no key; the save gives time_saved."
+    "note": "A4-15 then A4-21: Alex picks Sat 11:00am with Riley, and his AI sends the time as the card answered it, with the service and the way; each is checked again against today's list and the $35. In one commit: booking_details.timing settime (set once; version 3), Sat Oct 24 11:00 to 11:30am held for the booking by K-05 reserve, and the K-30 line copied as shown: the haircut, the shop's way list|card|counter, the $35 rule's price and the way's $20 fee (S11-54). The door is standard, 10 minutes with Q-12's one extension still on offer, not C3's 15: Alex is new at the barbershop, so K-26's new-customer OK rule (the rows A4-98 reads, rules/seed-rules-tap-list.json) makes this a request Sam OKs first, and 'A request the owner OKs keeps the master's own rules' (MC C3; round 2: README default 61; action-layer FAIL 3, as j4-secure-link-agent.json then writes approval ownerok). Flow A's pick gives no key; the save gives time_saved."
   },
   "request": {
     "caller": {
@@ -45,9 +46,10 @@
     "reservation": {
       "reservationId": "rsv-agent-alex-riley-sat",
       "version": 1,
-      "heldUntil": "2026-10-21T23:31:40Z",
-      "minutes": 15,
-      "extendable": false
+      "heldUntil": "2026-10-21T23:26:40Z",
+      "door": "standard",
+      "minutes": 10,
+      "extendable": true
     },
     "lineId": "line-agent-alex-1",
     "linePrice": { "cents": 3500, "currency": "USD" },
