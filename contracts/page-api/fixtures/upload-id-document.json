@@ -1,0 +1,27 @@
+{
+  "call": "signedUpload",
+  "given": {
+    "now": "2026-10-19T14:30:30Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "Registration screen 6 on S1-10's page (MC C10): signed in as the link's own person, Sam picks a photo of his ID. The server binds the upload to Sam, Lee's Barbershop and the purpose idDocument, and gives a short-lived signed address for that one file, straight to private storage (MC 8 'Files'; Q-31); the page never names an object key. The address is a placeholder (K-13 not frozen); 10 MiB is an example limit (README open gaps). No selfie, face match or video step exists (MC C10)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0006-upload",
+      "traceId": "trace-page-sam-0006",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "purpose": "idDocument",
+    "mediaType": "image/jpeg",
+    "bytes": 2400000
+  },
+  "outcome": {
+    "result": "ready",
+    "uploadId": "upload-sam-id-1",
+    "uploadUrl": "https://files.example.com/upload/placeholder-signed-sam-id-1",
+    "expiresAt": "2026-10-19T14:45:30Z",
+    "maxBytes": 10485760
+  }
+}

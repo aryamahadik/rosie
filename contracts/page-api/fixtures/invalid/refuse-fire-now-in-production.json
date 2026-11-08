@@ -1,0 +1,35 @@
+{
+  "call": "fireNow",
+  "given": {
+    "now": "2026-10-23T15:00:30Z",
+    "environment": "production",
+    "after": [],
+    "note": "Refused: fire-now.json's exchange with its one fault, run in production. Fire now is staging's only (BP 9.4: 'Never in production'), so a production answer that fired the clock row is refused; in production the only answer is stagingOnly (fire-now-in-production.json). Run on staging, the same exchange is accepted (fire-now.json)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-firenow-0001",
+      "traceId": "trace-page-tester-0005",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "clockRowId": "clock-oq-a7-03-alex",
+    "expectVersion": 2
+  },
+  "outcome": {
+    "result": "fired",
+    "clockRowId": "clock-oq-a7-03-alex",
+    "version": 3,
+    "firedAt": "2026-10-23T15:00:30Z",
+    "turnId": "turn-clock-oq-a7-03-alex",
+    "repeated": false,
+    "core": [],
+    "written": {
+      "written": [{ "table": "open_questions", "rowId": "oq-a7-03-alex", "version": 3 }],
+      "outboxRows": [{ "id": "out-sam-a7-03-defaulted", "commitSeq": 2 }],
+      "promoted": []
+    },
+    "effects": [],
+    "openQuestions": { "opened": [], "closed": ["oq-a7-03-alex"] }
+  }
+}

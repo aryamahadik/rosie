@@ -1,0 +1,26 @@
+{
+  "call": "codeCheck",
+  "given": {
+    "now": "2026-10-19T14:30:50Z",
+    "environment": "staging",
+    "after": ["email-check-on-page.json"],
+    "note": "Sam types the code from his email on the same page within 10 minutes. Served by K-09 v1 email-check-proven.json: proveCode by the code id the server kept with the attempt, caller.personId null, fromHandleId null; the email is now proven on Sam's account and its handle linked to him. The typed code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0005-code",
+      "traceId": "trace-page-sam-0005",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "attemptId": "attempt-sam-email-1",
+    "code": "000000"
+  },
+  "outcome": {
+    "result": "proven",
+    "handleId": "handle-sam-email",
+    "controlBusinessId": null,
+    "redecideTurnId": null,
+    "repeated": false
+  }
+}

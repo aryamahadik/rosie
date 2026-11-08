@@ -1,0 +1,20 @@
+{
+  "call": "openLink",
+  "given": {
+    "now": "2026-10-27T09:00:00Z",
+    "environment": "staging",
+    "after": ["open-link-secure-page.json", "upload-id-finished.json"],
+    "note": "Sam opens S1-10's link again a week later. Its step gave id_checked and mobile on Oct 19 (S1-10: 'Checks the owner's mobile and ID, once'), so the link has ended: a new owner email now needs a signed-in session plus the ID re-check (S13-45 row 8; security note N10 on K-09). The page shows a plain expired page with no field of the old page, the same answer an unknown or lapsed code gets."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-link-sam-s01-2",
+      "traceId": "trace-page-sam-0300",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    }
+  },
+  "outcome": {
+    "error": "linkExpired"
+  }
+}

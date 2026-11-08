@@ -1,0 +1,97 @@
+{
+  "call": "testRoster",
+  "given": {
+    "now": "2026-10-23T13:00:00Z",
+    "environment": "production",
+    "after": [],
+    "note": "Refused: test-roster.json's exchange with its one fault, run in production. The listing of seeded test businesses and test phones is staging's only (BP 9.4; merger question w1-qa-web 6), refused in production as Fire now is (refuse-fire-now-in-production.json): a production answer that lists anything is refused, and the only answer there is stagingOnly. Run on staging, the same exchange is accepted (test-roster.json)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-testphone-0001",
+      "traceId": "trace-page-tester-0001",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "testRoster",
+    "businesses": [
+      {
+        "businessId": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "flow": "A",
+        "kindIds": ["barber"],
+        "signedUp": true,
+        "live": true,
+        "zone": "America/New_York"
+      },
+      {
+        "businessId": "biz-lee-home-services",
+        "name": "Lee Home Services",
+        "flow": "B",
+        "kindIds": ["plumber", "electrician"],
+        "signedUp": true,
+        "live": true,
+        "zone": "America/New_York"
+      }
+    ],
+    "phones": [
+      {
+        "testPhoneId": "tp-01",
+        "last4": "0100",
+        "role": "owner",
+        "label": "Test owner 1",
+        "businessId": "biz-lees-barbershop",
+        "personId": "person-sam",
+        "seededCustomer": null,
+        "linqContact": true,
+        "stopped": false
+      },
+      {
+        "testPhoneId": "tp-02",
+        "last4": "0102",
+        "role": "staff",
+        "label": "Test staff 1",
+        "businessId": "biz-lees-barbershop",
+        "personId": "person-riley",
+        "seededCustomer": null,
+        "linqContact": true,
+        "stopped": false
+      },
+      {
+        "testPhoneId": "tp-03",
+        "last4": "0101",
+        "role": "customer",
+        "label": "Test customer 1",
+        "businessId": "biz-lees-barbershop",
+        "personId": null,
+        "seededCustomer": { "customerId": "customer-alex-barbershop", "name": "Alex M." },
+        "linqContact": true,
+        "stopped": false
+      },
+      {
+        "testPhoneId": "tp-04",
+        "last4": "0104",
+        "role": "secondCustomer",
+        "label": "Test customer 2",
+        "businessId": "biz-lees-barbershop",
+        "personId": null,
+        "seededCustomer": null,
+        "linqContact": true,
+        "stopped": false
+      },
+      {
+        "testPhoneId": "tp-05",
+        "last4": "0105",
+        "role": "stop",
+        "label": "STOP test phone",
+        "businessId": null,
+        "personId": null,
+        "seededCustomer": null,
+        "linqContact": true,
+        "stopped": false
+      }
+    ]
+  }
+}

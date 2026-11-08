@@ -1,0 +1,28 @@
+{
+  "call": "signInStart",
+  "given": {
+    "now": "2026-10-26T13:00:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "S11-52: Sam signs in on the owner portal by the email way and types his email. The server finds his account on the runtime side (K-09 v1 proof-code-email.json: forPersonId person-sam, caller.personId null), and the code goes to his proven email on file, never back to the page. The answer would be the same if no account matched (S13-45), and the page names the way the code went: email. The address is on the reserved .example domain."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-signin-1",
+      "traceId": "trace-page-sam-0200",
+      "sessionToken": null,
+      "linkCode": null
+    },
+    "account": { "from": "typed", "kind": "email", "typed": "sam@lees-barbershop.example" },
+    "way": "email",
+    "deviceToken": "placeholder-device-token-sam-laptop"
+  },
+  "outcome": {
+    "result": "started",
+    "attemptId": "attempt-sam-signin-1",
+    "way": "email",
+    "expiresAt": "2026-10-26T13:10:00Z",
+    "readyText": null,
+    "textLink": null
+  }
+}

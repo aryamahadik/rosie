@@ -1,0 +1,12 @@
+{
+  "page": {
+    "requestId": "req-portal-sam-signin-1",
+    "traceId": "trace-page-sam-0200",
+    "sessionToken": null,
+    "linkCode": null
+  },
+  "account": { "from": "typed", "kind": "email", "typed": "sam@lees-barbershop.example" },
+  "way": "email",
+  "deviceToken": "placeholder-device-token-sam-laptop",
+  "forPersonId": "person-sam"
+}

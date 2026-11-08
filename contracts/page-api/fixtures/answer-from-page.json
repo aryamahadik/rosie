@@ -1,0 +1,35 @@
+{
+  "call": "answerOnPage",
+  "given": {
+    "now": "2026-10-21T13:01:00Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/staff-join-ready-text.json"],
+    "note": "Registration screen 23 (Team): S2-22 asked Sam in his chat whether Riley and Avery may take bookings (the open question K-09 v1's commit-limit fixtures answer by text; its card and labels are the master's: MASTER-FLOW-A lines 1433 to 1440). Sam, signed in on the portal that morning, answers on the page instead, the same way as in the chat: the question, the option '1 Yes, all of them', no fields. Nothing is written: the answer comes back as its read-back, the card's question and the option's label, with the two staff rows and the versions it shows (limit 4); only the yes on it (confirmOnPage) commits, as S2-24 through K-09 v1 saveSetupStep. The read-back's id and the staff rows' ids and versions are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-team-sam-0022",
+      "traceId": "trace-page-sam-0122",
+      "sessionToken": "placeholder-session-token-sam-0003",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "stepId": "S2-22",
+    "questionId": "oq-s2-22-sam",
+    "choiceId": "c-01",
+    "fields": [],
+    "uploadIds": []
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-sam-s2-22-1",
+    "stepId": "S2-22",
+    "questionId": "oq-s2-22-sam",
+    "words": "Let them take bookings now? 1 Yes, all of them",
+    "shown": [
+      { "table": "staff", "rowId": "staff-riley-barbershop", "version": 4 },
+      { "table": "staff", "rowId": "staff-avery-barbershop", "version": 4 }
+    ],
+    "signature": "none",
+    "expiresAt": "2026-10-21T13:11:00Z"
+  }
+}

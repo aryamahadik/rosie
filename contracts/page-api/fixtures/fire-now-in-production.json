@@ -1,0 +1,22 @@
+{
+  "call": "fireNow",
+  "given": {
+    "now": "2026-10-23T15:00:30Z",
+    "environment": "production",
+    "after": [],
+    "note": "The same request as fire-now.json reaches production: Fire now is staging's only (BP 9.4: 'Never in production'), so it does nothing, reads nothing and answers stagingOnly; the web app shows no such control there either (T-522). Every staging-only call answers the same in production."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-firenow-0001",
+      "traceId": "trace-page-tester-0005",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "clockRowId": "clock-oq-a7-03-alex",
+    "expectVersion": 2
+  },
+  "outcome": {
+    "error": "stagingOnly"
+  }
+}

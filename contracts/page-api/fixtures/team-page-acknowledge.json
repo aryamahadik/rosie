@@ -1,0 +1,24 @@
+{
+  "call": "teamAcknowledgePage",
+  "given": {
+    "now": "2026-10-26T21:52:30Z",
+    "environment": "staging",
+    "after": ["team-console-pages.json"],
+    "note": "A member of Rosie's team, who was paged, taps acknowledge on the threat page at the version the console read (2). Served by K-09 v1 acknowledgePage with caller.kind console, that person and via console_tap (K-36 v1 acknowledged_via): paging stops and the next page's clock row (K-36 v1 seed-page-open's clock-page-alex-0204-3) is cancelled. A double tap answers repeated (T-519). The team member is a placeholder id."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-console-team-0101",
+      "traceId": "trace-console-0101",
+      "sessionToken": "placeholder-session-token-team-0001",
+      "linkCode": null
+    },
+    "pageId": "page-alex-0204",
+    "expectVersion": 2
+  },
+  "outcome": {
+    "acknowledgedAt": "2026-10-26T21:52:30Z",
+    "cancelledClockRowId": "clock-page-alex-0204-3",
+    "repeated": false
+  }
+}

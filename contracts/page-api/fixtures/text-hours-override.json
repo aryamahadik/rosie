@@ -1,0 +1,27 @@
+{
+  "call": "textHoursOverride",
+  "given": {
+    "now": "2026-10-23T23:10:00Z",
+    "environment": "staging",
+    "after": ["test-roster.json"],
+    "note": "Staging only (BP 9.4: 'a text-hours override for test phones. Never in production'): at 7:10pm a tester sets the override for the first customer's test phone (tp-03, 555-0101), which has none yet, so reminders, visit checks and hand-offs can be tried at any hour without changing Lee's Barbershop's hours (01-inventory C-204). It is stored as the staging-only K-04 v1 release_flags row staging.text-hours-override, scope phone:+15555550101 (K-04 v1 seed-flag.json, which this writes), and limit 8 reads it at send (T-617). Setting it again answers repeated."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-texthours-0001",
+      "traceId": "trace-page-tester-0006",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "testPhoneId": "tp-03",
+    "on": true,
+    "expectVersion": null
+  },
+  "outcome": {
+    "result": "set",
+    "testPhoneId": "tp-03",
+    "on": true,
+    "version": 1,
+    "repeated": false
+  }
+}

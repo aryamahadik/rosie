@@ -1,0 +1,31 @@
+{
+  "call": "signInCheck",
+  "given": {
+    "now": "2026-10-19T14:22:10Z",
+    "environment": "staging",
+    "after": ["sign-in-from-link-by-text.json"],
+    "note": "Sam texted the ready text from his own mobile at 14:22:04; the turn that carried it checked the code by the id the server kept, from the mobile the code proves (K-09 v1 proveCode, fromHandleId his mobile), and the page now asks with code null. The code is right and came from the account's own mobile, so the call acts for Sam from here on (K-22 v1 rule 4). Sam has had no session, live or ended, so there is no known device to compare: his first session starts on the code alone (README default 4; S13-45 row 8's new device presumes an earlier one). The token and the session's 30-day end are placeholders (K-22 v1 open gaps)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-signin-sam-s01-2",
+      "traceId": "trace-page-sam-0003",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    },
+    "attemptId": "attempt-sam-s01-1",
+    "code": null,
+    "deviceToken": "placeholder-device-token-sam-phone"
+  },
+  "outcome": {
+    "result": "signedIn",
+    "sessionToken": "placeholder-session-token-sam-0001",
+    "sessionExpiresAt": "2026-11-18T14:22:10Z",
+    "person": {
+      "personId": "person-sam",
+      "roles": [{ "role": "owner", "businessId": "biz-lees-barbershop" }],
+      "team": false,
+      "tester": false
+    }
+  }
+}

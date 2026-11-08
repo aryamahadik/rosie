@@ -1,0 +1,26 @@
+{
+  "call": "testPhoneSend",
+  "given": {
+    "now": "2026-10-20T13:00:01Z",
+    "environment": "staging",
+    "after": ["test-roster.json"],
+    "note": "Staging only (BP 9.4 'The test-phone page'): a signed-in tester picks the second customer's test phone (tp-04, 555-0104) and types a text as a threaded reply. The server builds the K-06 v1 event for the roster's number (the page names only the roster id), asks the Linq double for a signed webhook (K-11 v1 doubleWebhook) and posts it to the gateway, which answers 200: the event is K-06 v1 test-phone-page.json, byte for byte, as K-11 v1 double-signed-webhook.json carries it. The page never holds a webhook secret, and shows the trace id."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-testphone-0002",
+      "traceId": "trace-page-tester-0002",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "testPhoneId": "tp-04",
+    "words": "Is there a spot in Saturday's class?",
+    "threadedReplyTo": "linq-msg-double-0104-0000"
+  },
+  "outcome": {
+    "result": "sent",
+    "eventId": "evt-double-0104-0001",
+    "traceId": "trace-double-0104-0001",
+    "gatewayStatus": 200
+  }
+}

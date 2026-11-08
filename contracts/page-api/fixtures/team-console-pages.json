@@ -1,0 +1,145 @@
+{
+  "call": "teamConsole",
+  "given": {
+    "now": "2026-10-26T21:52:00Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/notifications/fixtures/seed-page-open.json",
+      "db-schema/platform-review/fixtures/seed-review-item.json",
+      "db-schema/platform-review/fixtures/seed-gap-case.json",
+      "db-schema/platform-review/fixtures/seed-dead-letter.json",
+      "db-schema/platform-review/fixtures/seed-parked-turn.json"
+    ],
+    "note": "Rosie's team opens the team console (C-194), signed in as a person with a live K-36 v1 team_page_recipients row (Q-18: Jay and the CTO until launch; on staging the test console, BP 9.4; the person is a placeholder id, since the sample cast names no one on the team). It lists, oldest first, what is open at 5:52pm on Oct 26 in the frozen seeds (K-36 v1 seed-page-open; K-37 v1 seed-review-item, seed-gap-case, seed-dead-letter, seed-parked-turn): the threat page paged twice and repeating every 5 minutes (the emergency page acknowledged by reply on Oct 24, K-36 v1 seed-page-acknowledged, is older than 24 hours, so it is not listed); four review items not yet decided (the missed-deadline item opens later, on Nov 3), soonest due first; Alex's gift-card gap case with its frontier, never its sealed summary; the calendar poll's dead letter (the reconciliation one comes later, on Nov 3), never its message as enqueued; and Riley's parked turn. Each row carries its id and current version, which teamAcknowledgePage and teamDecideReviewItem send back."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-console-team-0100",
+      "traceId": "trace-console-0100",
+      "sessionToken": "placeholder-session-token-team-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "teamConsole",
+    "pages": [
+      {
+        "pageId": "page-alex-0204",
+        "version": 2,
+        "reason": "hand_off",
+        "businessId": "biz-lees-barbershop",
+        "summary": "Hand-off handoff-alex-0204 at Lee's Barbershop (biz-lees-barbershop): a threat to staff or others, read from safety-alex-0204; no reply or console tap from the owner in 5 minutes.",
+        "repeating": true,
+        "timesPaged": 2,
+        "openedAt": "2026-10-26T21:45:03Z",
+        "lastPagedAt": "2026-10-26T21:50:03Z",
+        "state": "open",
+        "acknowledgedAt": null,
+        "acknowledgedVia": null
+      }
+    ],
+    "reviewItems": [
+      {
+        "reviewItemId": "review-new-work-barbershop",
+        "version": 1,
+        "kind": "new_work",
+        "businessId": "biz-lees-barbershop",
+        "subject": null,
+        "summary": "A new kind of work drafted from Sam's own words and price list: review the plug-in and check every service against the official rules for that work. It stays a draft, offline, until reviewed.",
+        "state": "open",
+        "dueAt": "2026-10-20T18:20:00Z",
+        "waitUntil": null
+      },
+      {
+        "reviewItemId": "review-control-movers",
+        "version": 1,
+        "kind": "control",
+        "businessId": "biz-movers",
+        "subject": { "table": "businesses", "rowId": "biz-movers" },
+        "summary": "Control of Movers: no code came back from the listing's own phone or email. Check it; the company stays offline until then.",
+        "state": "open",
+        "dueAt": "2026-10-20T19:30:00Z",
+        "waitUntil": null
+      },
+      {
+        "reviewItemId": "review-harm-report-barbershop",
+        "version": 1,
+        "kind": "harm_report",
+        "businessId": "biz-lees-barbershop",
+        "subject": null,
+        "summary": "Harm to a child, an older adult or someone in care was told of, not urgent now; a hotline from the safety list was given. Follow up today.",
+        "state": "open",
+        "dueAt": "2026-10-23T04:00:00Z",
+        "waitUntil": null
+      },
+      {
+        "reviewItemId": "review-booking-cap-barbershop",
+        "version": 1,
+        "kind": "booking_cap",
+        "businessId": "biz-lees-barbershop",
+        "subject": null,
+        "summary": "Flag: one phone tried to book more visits today than the plug-in allows. Nothing was booked.",
+        "state": "open",
+        "dueAt": "2026-10-26T16:10:00Z",
+        "waitUntil": null
+      }
+    ],
+    "gapCases": [
+      {
+        "turnId": "turn-alex-gift-card",
+        "version": 1,
+        "businessId": "biz-lees-barbershop",
+        "outcome": "log_gap",
+        "openQuestionIds": [],
+        "versionsRead": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+        "frontier": [
+          {
+            "question": null,
+            "branch": null,
+            "anytimeRow": "danger-or-crisis",
+            "door": null,
+            "hub": null,
+            "fields": [],
+            "stakes": "low",
+            "stakesFrom": [],
+            "choiceId": "c-05",
+            "kind": "anytime",
+            "label": "Danger or crisis",
+            "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+            "step": "A3-22",
+            "target": {
+              "businessId": "biz-lees-barbershop",
+              "businessName": "Lee's Barbershop",
+              "bookingId": null,
+              "visitAt": null
+            }
+          }
+        ],
+        "loggedAt": "2026-10-22T14:20:04Z"
+      }
+    ],
+    "deadLetters": [
+      {
+        "deadLetterId": "dl-calendar-poll-riley-2026-10-23",
+        "version": 1,
+        "queue": "jobs",
+        "jobKind": "calendar_poll",
+        "jobId": "job-calendar-poll-riley-2026-10-23T14:30Z",
+        "tries": 5,
+        "lastError": "Calendar provider answered 503",
+        "businessId": "biz-lees-barbershop",
+        "traceId": "trace-calendar-poll-0042",
+        "deadAt": "2026-10-23T14:38:05Z"
+      }
+    ],
+    "parkedTurns": [
+      {
+        "turnId": "turn-riley-done-1",
+        "version": 2,
+        "errorSummary": "Exceeded CPU time limit before the commit, on try 3 of 3",
+        "personToldAt": "2026-10-24T15:36:11Z",
+        "replyDueAt": "2026-10-26T15:36:10Z"
+      }
+    ]
+  }
+}

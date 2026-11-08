@@ -1,0 +1,28 @@
+{
+  "call": "signInStart",
+  "given": {
+    "now": "2026-10-19T14:21:00Z",
+    "environment": "staging",
+    "after": ["open-link-secure-page.json"],
+    "note": "On S1-10's page Sam picks the text way for the link's own account. The server takes whose account from the link, which Rosie made for Sam (K-09 v1 forPersonId person-sam), never from the browser; the call acts for no one (caller.personId null). His account's mobile is the one his own text to Rosie proved (MC C9), so the code goes back to the page as a ready text he sends from that mobile (K-09 v1 textFromMobile). Rosie's number in the link is a fictional placeholder (Q-51); the code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-signin-sam-s01-1",
+      "traceId": "trace-page-sam-0002",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    },
+    "account": { "from": "link" },
+    "way": "text",
+    "deviceToken": "placeholder-device-token-sam-phone"
+  },
+  "outcome": {
+    "result": "started",
+    "attemptId": "attempt-sam-s01-1",
+    "way": "text",
+    "expiresAt": "2026-10-19T14:31:00Z",
+    "readyText": "My Rosie sign-in code is 000000",
+    "textLink": "sms:+15555550188&body=My%20Rosie%20sign-in%20code%20is%20000000"
+  }
+}

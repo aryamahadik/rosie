@@ -1,0 +1,29 @@
+{
+  "call": "openLink",
+  "given": {
+    "now": "2026-10-19T14:20:05Z",
+    "environment": "staging",
+    "after": [],
+    "note": "Refused: S1-10's link opened with no session, answered as if opening it proved the browser was Sam's (proof session, acting for Sam, secure-page-only sections shown). Opening a link never counts as proof of who someone is (FS line 701; S13-45: 'Opening a link never counts'), so the call acts for no one until a session of the link's own person comes with it. Its one fault is the missing session: with Sam's session in the request, as open-link-signed-in.json has Riley's, the same answer is accepted; with no session, the answer is open-link-secure-page.json's."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-link-sam-s01-1",
+      "traceId": "trace-page-sam-0001",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    }
+  },
+  "outcome": {
+    "result": "open",
+    "pageKind": "setupIdCheck",
+    "stepId": "S1-10",
+    "businessName": "Lee's Barbershop",
+    "proof": "session",
+    "acting": { "personId": "person-sam" },
+    "securePageOnly": true,
+    "sections": ["idUpload", "ownerEmail"],
+    "signIn": null,
+    "expiresAt": "2026-10-26T14:20:00Z"
+  }
+}

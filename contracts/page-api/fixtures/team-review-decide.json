@@ -1,0 +1,33 @@
+{
+  "call": "teamDecideReviewItem",
+  "given": {
+    "now": "2026-10-20T15:00:00Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/control-team-review.json"],
+    "note": "Within its 1 business day, a member of Rosie's team decides the control review of Lee Home Services, whose listing has no email for a code (S1-75 'Rosie's team checks'; Q-02; Q-18). The console read the decision back before sending it (T-519). Served by K-09 v1 decideReviewItem with caller.kind console and the session's person: the typed write-back sets K-23 v1 business_setup.control_proven_at with control_proven_via team_check in the same commit, never read from the outcome's words (arch 02 line 139). The answer is K-09 v1 control-team-decided.json's. The team member is a placeholder id: the sample cast names no one on Rosie's team."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-console-team-0001",
+      "traceId": "trace-console-0001",
+      "sessionToken": "placeholder-session-token-team-0001",
+      "linkCode": null
+    },
+    "reviewItemId": "review-lee-home-control",
+    "expectVersion": 1,
+    "decision": {
+      "state": "done",
+      "outcome": "Control of Lee Home Services checked by Rosie's team: proven (S1-75).",
+      "writeBack": { "table": "business_setup", "controlProven": true }
+    }
+  },
+  "outcome": {
+    "state": "done",
+    "decidedAt": "2026-10-20T15:00:00Z",
+    "written": [
+      { "table": "review_items", "rowId": "review-lee-home-control", "version": 2 },
+      { "table": "business_setup", "rowId": "biz-lee-home-services", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

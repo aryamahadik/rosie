@@ -1,0 +1,25 @@
+{
+  "call": "codeStart",
+  "given": {
+    "now": "2026-10-19T14:30:20Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "Registration screen 6 on S1-10's page: signed in as the link's own person, Sam types the one owner email (FS row B13; S1-10: 'The email is proven with a code sent to it, typed on the page. Until then it isn't used'). Served by K-09 v1 email-check-typed.json: purpose emailCheck, route typedEmail, forPersonId person-sam taken from the link, caller.personId null. The code goes to the typed address and never comes back to the page, which holds only the attempt id. The address is on the reserved .example domain."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0005",
+      "traceId": "trace-page-sam-0005",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "purpose": "ownerEmail",
+    "typedEmail": "sam@lees-barbershop.example"
+  },
+  "outcome": {
+    "result": "sent",
+    "attemptId": "attempt-sam-email-1",
+    "purpose": "ownerEmail",
+    "expiresAt": "2026-10-19T14:40:20Z"
+  }
+}

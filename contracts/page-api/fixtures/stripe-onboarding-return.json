@@ -1,0 +1,36 @@
+{
+  "call": "stripeOnboardingReturn",
+  "given": {
+    "now": "2026-10-19T15:00:00Z",
+    "environment": "staging",
+    "after": ["stripe-onboarding-link.json"],
+    "note": "Stripe sends Sam's browser back to the return address. The server reads the account's status (K-14 v1 accountStatus) on the id Rosie's own record holds, never one from the redirect; onboarding is finished, so it writes S1-27 through K-09 v1 saveSetupStep, called alone for Sam with that id (gives stripe). The answer is K-09 v1 setup-s1-27-stripe.json's."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-pay-sam-0001",
+      "traceId": "trace-page-sam-0027",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "returned": "return"
+  },
+  "outcome": {
+    "result": "connected",
+    "served": {
+      "call": "saveSetupStep",
+      "response": {
+        "step": "S1-27",
+        "gives": ["stripe"],
+        "branch": null,
+        "written": [{ "table": "business_setup", "rowId": "biz-lees-barbershop", "version": 4 }],
+        "openQuestionId": null,
+        "outboxRowIds": [],
+        "clockRowIds": [],
+        "effects": [],
+        "reviewItemId": null,
+        "repeated": false
+      }
+    }
+  }
+}

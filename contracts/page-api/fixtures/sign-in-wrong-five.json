@@ -1,0 +1,24 @@
+{
+  "call": "signInCheck",
+  "given": {
+    "now": "2026-10-28T15:07:10Z",
+    "environment": "staging",
+    "after": [],
+    "note": "Someone typed Sam's email on the portal at 15:05 (attempt-sam-signin-3) and is guessing codes: four wrong codes answered wrong, with 4, 3, 2 and 1 tries left. The fifth wrong code pauses sign-in for 15 minutes (RULES 6.2; FS section 8: 'Five wrong codes pause sign-in for 15 minutes'; K-22 v1 proof_codes_pause_after_five), and the page shows the pause and sends no further check until it ends. Nothing about Sam is shown. The typed code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-signin-3-try5",
+      "traceId": "trace-page-0303",
+      "sessionToken": null,
+      "linkCode": null
+    },
+    "attemptId": "attempt-sam-signin-3",
+    "code": "111111",
+    "deviceToken": "placeholder-device-token-unknown-1"
+  },
+  "outcome": {
+    "result": "paused",
+    "until": "2026-10-28T15:22:10Z"
+  }
+}

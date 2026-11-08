@@ -1,0 +1,98 @@
+{
+  "call": "testPhoneParts",
+  "given": {
+    "now": "2026-10-23T14:06:00Z",
+    "environment": "staging",
+    "after": ["test-roster.json"],
+    "note": "Staging only (BP 9.4: the test-phone page shows, in order, each part the Linq double would have sent): a signed-in tester views the first customer's test phone (tp-03, 555-0101, seeded as Alex M.). The Linq double recorded A7-03's two parts to it, in order: the words with the question, then the poll with the step's three times, word for word (K-11 v1 send-text.json and send-poll.json, request and outcome). The email double's copy goes to that phone's own person, since a customer who gave an email gets a copy of every message (RULES 4.1); its address, subject and words are placeholders (K-12 not frozen). The phone's chat is open and not stopped, and its chat link with the ready text is shown through the chat-link component (MC C9); the short code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-testphone-0003",
+      "traceId": "trace-page-tester-0003",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "testPhoneId": "tp-03",
+    "since": null
+  },
+  "outcome": {
+    "result": "parts",
+    "phone": {
+      "testPhoneId": "tp-03",
+      "last4": "0101",
+      "chatOpen": true,
+      "stopped": false,
+      "stoppedAt": null
+    },
+    "chatLink": {
+      "link": "sms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20ALX24Q",
+      "readyText": "Hey, send me further updates about my booking ALX24Q",
+      "shortCode": "ALX24Q"
+    },
+    "parts": [
+      {
+        "at": "2026-10-23T14:05:03Z",
+        "sent": {
+          "idempotencyKey": "out-a7-03-alex/1/1",
+          "to": "+15555550101",
+          "chatId": "linq-chat-demo-alex",
+          "service": "imessage",
+          "kind": "words",
+          "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+          "calendarFile": null,
+          "options": [],
+          "link": null,
+          "photo": null,
+          "tapback": null,
+          "threadedReplyTo": null,
+          "typing": null,
+          "overrideOptout": false
+        },
+        "outcome": {
+          "result": "accepted",
+          "providerMessageId": "linq-msg-demo-0001",
+          "providerOptionIds": null,
+          "chatId": "linq-chat-demo-alex",
+          "service": "imessage",
+          "acceptedAt": "2026-10-23T14:05:03Z"
+        }
+      },
+      {
+        "at": "2026-10-23T14:05:05Z",
+        "sent": {
+          "idempotencyKey": "out-a7-03-alex/2/1",
+          "to": "+15555550101",
+          "chatId": "linq-chat-demo-alex",
+          "service": "imessage",
+          "kind": "poll",
+          "text": null,
+          "calendarFile": null,
+          "options": ["Sat 12:00pm", "Sat 2:00pm", "Sat 3:30pm"],
+          "link": null,
+          "photo": null,
+          "tapback": null,
+          "threadedReplyTo": null,
+          "typing": null,
+          "overrideOptout": false
+        },
+        "outcome": {
+          "result": "accepted",
+          "providerMessageId": "linq-msg-demo-0002",
+          "providerOptionIds": ["linq-opt-demo-1", "linq-opt-demo-2", "linq-opt-demo-3"],
+          "chatId": "linq-chat-demo-alex",
+          "service": "imessage",
+          "acceptedAt": "2026-10-23T14:05:05Z"
+        }
+      }
+    ],
+    "emails": [
+      {
+        "at": "2026-10-23T14:05:06Z",
+        "to": "alex.m@example.com",
+        "subject": "Your haircut at Lee's Barbershop",
+        "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?\nSat 12:00pm\nSat 2:00pm\nSat 3:30pm"
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "call": "openLink",
+  "given": {
+    "now": "2026-10-19T14:20:05Z",
+    "environment": "staging",
+    "after": [],
+    "note": "S1-10: Rosie sent Sam the secure ID check link in his own chat ('Open secure page: rosfield.com/v/s01'; the code here is a placeholder). He opens it in a browser with no session. Opening a link proves nothing about who is at the browser (FS line 701; S13-45), so the page acts for no one: it shows what it is for and the business's public name, never Sam's name or anything on file, and offers the sign-in for the link's own account, both ways, so it hints at nothing on file. The link's 7-day life is an example (README open gaps)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-link-sam-s01-1",
+      "traceId": "trace-page-sam-0001",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    }
+  },
+  "outcome": {
+    "result": "open",
+    "pageKind": "setupIdCheck",
+    "stepId": "S1-10",
+    "businessName": "Lee's Barbershop",
+    "proof": "none",
+    "acting": null,
+    "securePageOnly": false,
+    "sections": ["idUpload", "ownerEmail"],
+    "signIn": { "ways": ["text", "email"] },
+    "expiresAt": "2026-10-26T14:20:00Z"
+  }
+}
