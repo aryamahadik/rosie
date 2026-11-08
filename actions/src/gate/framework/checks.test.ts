@@ -221,6 +221,48 @@ describe("every value has its source words", () => {
   });
 });
 
+describe("the quote and the words stand whole in a text, at word edges (T-304 round 2, DL-184)", () => {
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function bareTwoSaying(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'yes' cut out of 'yesterday'", "2, like yesterday", "yes", "yesterday"],
+    ["'no' cut out of 'know'", "2, you know", "no", "know"],
+  ])("a quote %s is refused (quoteNotInText); the whole word is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = bareTwoSaying(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(bareTwoSaying(words, whole))).toBeNull();
+    expect(checkDecideOutput(bareTwoSaying(words, words))).toBeNull();
+  });
+
+  it("a value's words cut out of a longer number are refused (valueNotInText): '$1' out of Sam's '$12'", () => {
+    const decided = samsSecondPart((part) => {
+      const [, price] = asChoose(part).fields;
+      if (price !== undefined) price.words = "$1";
+    });
+    expect(checkDecideOutput(decided)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+    expect(onlyProblem(decided, 1)).toEqual({ check: "valueWords", why: "valueNotInText" });
+  });
+
+  it("pass_on's and redact's words cut out of a longer number are refused (wordsNotInText)", () => {
+    for (const verb of ["pass_on", "redact"] as const) {
+      const refused = changePart(twoRequests(), 1, (part) => {
+        becomes(part, { verb, quote: "tile is $12 a foot from now on", words: "tile is $1" });
+      });
+      expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+      expect(onlyProblem(refused, 1)).toEqual({ check: "quote", why: "wordsNotInText" });
+    }
+  });
+});
+
 describe("the order of the checks and what is refused", () => {
   it("a part takes its verb, quote, option and value words in that order: its first failing check is its problem", () => {
     const quoteAndOption = samsSecondPart((part) => {

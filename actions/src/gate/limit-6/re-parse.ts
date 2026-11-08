@@ -11,7 +11,10 @@
 //   2. a value read from a photo (the photo port, C-120's) passes only with the read-back of it the owner said yes to,
 //      re-parsed from that read-back's words: never from a caption, never before the yes;
 //   3. any other value re-parses from its words (actions/src/values reparse) as each text that carries them sent them:
-//      a value no text carries fails;
+//      a value no text carries fails. A text carries the words only where they stand in it whole, starting and ending
+//      at a word edge (values foundAtWordEdges; DL-184): "40" cut out of "raise haircut to 140", "tomorrow at 1" out of
+//      "tomorrow at 10", "$1" out of "$1,200", "Oct 2" out of "Oct 24", "2" out of "12 people" and "1" out of "10am" are
+//      carried by no text, so they fail (noText) and never re-parse as a value the person did not say;
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -23,7 +26,10 @@
 // Defaults used (for ops/QUESTIONS.md):
 //   1. "One question, then nothing changes": the one question is the part's question asked again (K-04 ask_count one
 //      more, as limit 3's fresh read-back is: T-301 default 4), so a value that fails on a question asked twice or more
-//      gives nothingChanged; any other failure gives oneQuestion.
+//      gives nothingChanged; any other failure gives oneQuestion. An option's question is the open question it answers;
+//      a door's, an any-time row's, a hub case's (and a which-booking or entry step choice's) is the open question its
+//      step asked about its target (K-02 v1 openQuestion: the same step, business and booking), the most asked when
+//      several are, so a value failing on one of them is not asked again every turn either (DL-184 item 3).
 //   2. A value re-parses when its words name exactly one value of its type and it is the model's (values/reparse.ts):
 //      words naming two ("$40 deposit, $100 after", "3 or 4pm") fail, and so do words naming none (a price the model
 //      gave with no amount in its words). An hour with no am or pm may be either; a time with no day is the next time
@@ -41,6 +47,7 @@
 //      decide gave none.
 
 import {
+  foundAtWordEdges,
   isZone,
   languagesOf,
   reparse,
@@ -70,7 +77,7 @@ export const ASKS_BEFORE_NOTHING_CHANGES = 2;
 
 /**
  * Why one value fails, as a label: a re-parse fault (values/reparse.ts), or
- *   noText            no text of the turn carries its words;
+ *   noText            no text of the turn carries its words whole (at word edges: values foundAtWordEdges);
  *   photoNotReadBack  read from a photo, and no read-back of it has gone out;
  *   photoNotApproved  read from a photo, and the owner has not said yes to its read-back.
  */
@@ -198,7 +205,7 @@ async function reparsed(
 /** Why one value fails, or null when it re-parses. */
 async function faultOf(field: Field, run: FieldRun): Promise<ValueFault | null> {
   const type = typeOf(run.choice, field);
-  const texts: Text[] = run.turn.context.texts.filter((text) => text.words.includes(field.words));
+  const texts: Text[] = run.turn.context.texts.filter((text) => foundAtWordEdges(text.words, field.words));
   const source: ValueSource = await run.ports.photos.sourceOf(
     {
       part: run.part.index,
@@ -222,11 +229,33 @@ async function faultOf(field: Field, run: FieldRun): Promise<ValueFault | null> 
   );
 }
 
+type OpenQuestion = Context["openQuestions"][number];
+
+/**
+ * Whether an open question is the part's own (default 1): an option's is the open question it answers; any other
+ * choice's (a door, an any-time row, a hub case) is the one its step asked about its target, the same business and booking.
+ */
+function isPartQuestion(choice: Choice, question: OpenQuestion): boolean {
+  if (choice.kind === "option") return question.openQuestionId === choice.question;
+  return (
+    question.step === choice.step &&
+    question.target.businessId === choice.target.businessId &&
+    question.target.bookingId === choice.target.bookingId
+  );
+}
+
+/** How many times the part's question has been asked: the most of its open questions, 1 when none is open. */
+export function askCountOf(choice: Choice, context: Context): number {
+  let asked = 1;
+  for (const question of context.openQuestions) {
+    if (isPartQuestion(choice, question)) asked = Math.max(asked, question.askCount);
+  }
+  return asked;
+}
+
 /** The outcome of a failure: one question, or nothing changes once the part's question was asked again (default 1). */
 function outcomeFor(choice: Choice, context: Context): Limit6Outcome {
-  if (choice.kind !== "option") return oneQuestionOutcome();
-  const asked = context.openQuestions.find((question) => question.openQuestionId === choice.question);
-  return (asked?.askCount ?? 1) >= ASKS_BEFORE_NOTHING_CHANGES
+  return askCountOf(choice, context) >= ASKS_BEFORE_NOTHING_CHANGES
     ? nothingChangedOutcome()
     : oneQuestionOutcome();
 }

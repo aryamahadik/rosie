@@ -7,7 +7,9 @@
 //   - a photo value passes only with the owner's approved read-back.
 // Also: every other K-09 gate fixture comes out as it states; video or phone visits take either side's zone; limit 6
 // checks only parts that carry values; what it returns holds no person's words; the shipped limit sits in slot 6 and
-// reads only through the call's database.
+// reads only through the call's database. Round 2 (DL-184): words cut out of a longer word or number are carried by no
+// text (the security review's six cases fail, their whole forms pass), and a value failing on a door, an any-time row or
+// a hub case changes nothing once its question was asked again.
 
 import { describe, expect, it } from "vitest";
 
@@ -45,17 +47,23 @@ import {
   type VisitRef,
 } from "./index";
 import {
+  ALEX_VISIT,
+  ALEX_VISIT_AT,
   BARBERSHOP,
   CHICAGO,
+  HAIRCUT,
   HAIRCUT_LINE,
   HOME_SERVICES,
   LOS_ANGELES,
+  MONDAY_OCT_19,
   MONEY_CARD_SENT,
   NEW_YORK,
   PRICE_BOARD,
   afterReread,
+  askedAbout,
   decidedIn,
   exchangeRequest,
+  groupRequest,
   haircutMoveRequest,
   limitIn,
   moveRequest,
@@ -63,13 +71,17 @@ import {
   photosOf,
   placesOf,
   priceBoardRequest,
+  priceChangeRequest,
   raisePriceRequest,
   registryWith,
   seedBusinessZones,
+  targetAt,
+  timePickRequest,
   turnOf,
   typed,
   visitKey,
   withoutLimit6,
+  type Target,
   type World,
 } from "./test-support";
 
@@ -478,6 +490,165 @@ describe("limit 6 checks only parts that carry values", () => {
         ["service", "noText"],
         ["price", "noText"],
       ]),
+    );
+  });
+});
+
+/** The words a request's part 0 cites for its field `name`. */
+function citedIn(request: GateRequest, name: string): string {
+  const { part } = partOf(request);
+  if (part.verb !== "choose" && part.verb !== "enter") throw new Error("part 0 chooses or enters");
+  const cited = part.fields.find((each) => each.name === name);
+  if (cited === undefined) throw new Error(`part 0 has no field ${name}`);
+  return cited.words;
+}
+
+describe("words cut out of a longer word or number are carried by no text (DL-184 item 1)", () => {
+  const LATER = "can you move me to tomorrow at 10";
+  const OCT_24 = "can I come in Oct 24 at 11am";
+  const PEOPLE = "can you fit 12 people tomorrow";
+  const newOn19 = { bookingId: null, sentAt: MONDAY_OCT_19 } as const;
+  // [case, the field, the request citing words cut out of the person's text, the same text cited whole]
+  const cases: [string, string, () => GateRequest, () => GateRequest][] = [
+    [
+      "money: '40' out of 'raise haircut to 140' (the whole '140' is $140)",
+      "price",
+      () => priceChangeRequest("raise haircut to 140", usd(4000), "40"),
+      () => priceChangeRequest("raise haircut to 140", usd(14000), "140"),
+    ],
+    [
+      "time: 'tomorrow at 1' out of 'tomorrow at 10' (the whole is Sun Nov 1 at 10am)",
+      "time_saved",
+      () => haircutMoveRequest(at("2026-11-01T18:00:00Z", NEW_YORK), "tomorrow at 1", LATER),
+      () => haircutMoveRequest(at("2026-11-01T15:00:00Z", NEW_YORK), "tomorrow at 10", LATER),
+    ],
+    [
+      "money: '$1' out of '$1,200' (the whole is $1,200)",
+      "price",
+      () => priceChangeRequest("raise haircut to $1,200", usd(100), "$1"),
+      () => priceChangeRequest("raise haircut to $1,200", usd(120000), "$1,200"),
+    ],
+    [
+      "date: 'Oct 2' out of 'Oct 24' (the whole is Sat Oct 24, at 11am)",
+      "time_saved",
+      () => haircutMoveRequest(at("2027-10-02T04:00:00Z", NEW_YORK), "Oct 2", OCT_24, newOn19),
+      () => haircutMoveRequest(at("2026-10-24T15:00:00Z", NEW_YORK), "Oct 24 at 11am", OCT_24, newOn19),
+    ],
+    [
+      "count: 2 out of '12 people' (the whole is 12)",
+      "people",
+      () => groupRequest(2, "2 people", PEOPLE),
+      () => groupRequest(12, "12 people", PEOPLE),
+    ],
+    [
+      "option: 1 out of '10am' (the whole '10am' names the first option)",
+      "time_pick",
+      () => timePickRequest("c-01", "1", "10am works"),
+      () => timePickRequest("c-01", "10am", "10am works"),
+    ],
+  ];
+
+  it.each(cases)("%s: the cut fails (noText), the whole passes", async (_case, name, cut, whole) => {
+    const request = cut();
+    const cited = citedIn(request, name);
+    const texts = decidedIn(request).context.texts;
+    // The cut words are in the text as a plain substring, inside a longer word or number.
+    expect(texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [[name, "noText"]]));
+    expect(await decision({}, whole())).toEqual({ result: "pass" });
+    // Said whole in a text of the turn, the same words re-parse as that value: only the cut refused it.
+    const said = cut();
+    const [first] = decidedIn(said).context.texts;
+    decidedIn(said).context.texts.push(typed("evt-whole-0001", cited, first.sentAt.utc));
+    expect(await decision({}, said)).toEqual({ result: "pass" });
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check refuses the cut before any limit; the whole passes limit 6",
+    async (_case, _name, cut, whole) => {
+      expect(await runGate(cut(), callContext(BARBERSHOP), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "decideRefused", rule: "quoteInText", parts: [0] },
+      });
+      const [part] = gatedParts(await runGate(whole(), callContext(BARBERSHOP), registryWith(limitIn())));
+      expect(part?.result).toBe("passed");
+      expect(part?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+    },
+  );
+});
+
+describe("a value failing on a door, an any-time row or a hub case changes nothing once its question was asked again (DL-184 item 3)", () => {
+  const ALEX_VISIT_TARGET = targetAt(HOME_SERVICES, ALEX_VISIT, ALEX_VISIT_AT);
+  // [kind, the failing request, its step, its target, the field, why it fails]
+  const kinds: [string, () => GateRequest, string, Target, string, ValueFault][] = [
+    [
+      "a door (A3-51's new booking): 13 from '12 people'",
+      () => groupRequest(13, "12 people", "can you fit 12 people tomorrow"),
+      "A3-51",
+      targetAt(BARBERSHOP),
+      "people",
+      "differs",
+    ],
+    [
+      "an any-time row (B7-07's move): 'tomorrow at 3' read in New York",
+      () => moveRequest(at("2026-10-26T19:00:00Z", NEW_YORK)),
+      "B7-07",
+      ALEX_VISIT_TARGET,
+      "time_saved",
+      "wrongZone",
+    ],
+    [
+      "a hub case (S11-12's settings change): a price from 'raise haircut'",
+      () => raisePriceRequest(usd(4000), "raise haircut"),
+      "S11-12",
+      targetAt(BARBERSHOP),
+      "price",
+      "noValue",
+    ],
+  ];
+
+  it.each(kinds)(
+    "%s: one question until its step's question about its target was asked twice, then nothingChanged",
+    async (_kind, request, step, target, name, why) => {
+      const ask = failed(oneQuestionOutcome(), [[name, why]]);
+      const nothing = failed(nothingChangedOutcome(), [[name, why]]);
+      expect(await decision({}, request())).toEqual(ask);
+      expect(await decision({}, askedAbout(request(), step, target, 1))).toEqual(ask);
+      expect(await decision({}, askedAbout(request(), step, target, 2))).toEqual(nothing);
+      expect(await decision({}, askedAbout(request(), step, target, 3))).toEqual(nothing);
+      // Another booking's question, or another step's, is not the part's own.
+      const elsewhere = { ...target, bookingId: target.bookingId === null ? HAIRCUT : null };
+      expect(await decision({}, askedAbout(request(), step, elsewhere, 2))).toEqual(ask);
+      expect(await decision({}, askedAbout(request(), "A7-17", target, 2))).toEqual(ask);
+    },
+  );
+
+  it("at the gate: before the re-read it is still refused naming the field; after it, the part stops with nothingChanged", async () => {
+    const asked = askedAbout(
+      moveRequest(at("2026-10-26T19:00:00Z", NEW_YORK)),
+      "B7-07",
+      ALEX_VISIT_TARGET,
+      2,
+    );
+    expect(await runGate(asked, callContext(HOME_SERVICES), registryWith(limitIn()))).toEqual({
+      verdict: "refused",
+      error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+    });
+    const [part] = gatedParts(
+      await runGate(afterReread(asked), callContext(HOME_SERVICES), registryWith(limitIn())),
+    );
+    expect(part?.result).toBe("stopped");
+    expect(part?.stoppedBy).toEqual(nothingChangedOutcome());
+  });
+
+  it("an option's question is still the open question it answers, by its id, never another of its step's", async () => {
+    const wrong = () => timePickRequest("c-02", "10am", "10am works");
+    expect(await decision({}, wrong())).toEqual(failed(oneQuestionOutcome(), [["time_pick", "differs"]]));
+    expect(await decision({}, timePickRequest("c-02", "10am", "10am works", 2))).toEqual(
+      failed(nothingChangedOutcome(), [["time_pick", "differs"]]),
+    );
+    expect(await decision({}, askedAbout(wrong(), "A4-14", targetAt(BARBERSHOP), 2))).toEqual(
+      failed(oneQuestionOutcome(), [["time_pick", "differs"]]),
     );
   });
 });
