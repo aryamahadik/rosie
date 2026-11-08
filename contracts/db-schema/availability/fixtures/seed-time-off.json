@@ -1,0 +1,89 @@
+{
+  "after": ["../../core/fixtures/seed-resources.json", "../../business-setup/fixtures/seed-place-or-thing.json"],
+  "rows": [
+    {
+      "table": "time_off",
+      "values": {
+        "id": "off-riley-mon-nov-2",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": null,
+        "resource_id": "res-riley",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "kind": "off",
+        "during": "[2026-11-02T05:00:00Z,2026-11-03T05:00:00Z)",
+        "time_zone": "America/New_York",
+        "status": "lapsed",
+        "asked_by_person_id": "person-riley",
+        "asked_at": "2026-10-28T22:30:00Z",
+        "status_at": "2026-11-01T13:00:00Z",
+        "status_by_person_id": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "time_off",
+      "values": {
+        "id": "block-lees-barbershop-thu-oct-29",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "business",
+        "location_id": null,
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "kind": "blocked",
+        "during": "[2026-10-29T18:00:00Z,2026-10-29T21:00:00Z)",
+        "time_zone": "America/New_York",
+        "status": "ok",
+        "asked_by_person_id": "person-sam",
+        "asked_at": "2026-10-26T15:32:00Z",
+        "status_at": "2026-10-26T15:32:00Z",
+        "status_by_person_id": "person-sam",
+        "version": 1
+      }
+    },
+    {
+      "table": "time_off",
+      "values": {
+        "id": "off-avery-fri-nov-13",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": null,
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "kind": "off",
+        "during": "[2026-11-13T05:00:00Z,2026-11-14T05:00:00Z)",
+        "time_zone": "America/New_York",
+        "status": "asked",
+        "asked_by_person_id": "person-avery",
+        "asked_at": "2026-11-06T23:00:00Z",
+        "status_at": "2026-11-06T23:00:00Z",
+        "status_by_person_id": "person-avery",
+        "version": 1
+      }
+    },
+    {
+      "table": "time_off",
+      "values": {
+        "id": "closed-pet-boarding-suite-nov-26",
+        "business_id": "biz-pet-boarding",
+        "owner_kind": "place",
+        "location_id": null,
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": "place-pet-boarding-suite",
+        "kind": "closed",
+        "during": "[2026-11-26T05:00:00Z,2026-11-27T05:00:00Z)",
+        "time_zone": "America/New_York",
+        "status": "ok",
+        "asked_by_person_id": "person-sam",
+        "asked_at": "2026-10-21T14:00:00Z",
+        "status_at": "2026-10-21T14:00:00Z",
+        "status_by_person_id": "person-sam",
+        "version": 1
+      }
+    }
+  ]
+}

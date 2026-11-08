@@ -1,0 +1,77 @@
+{
+  "after": [
+    "../../people-access/fixtures/seed-owner-id-upload.json",
+    "../../people-access/fixtures/seed-emergency-contact.json"
+  ],
+  "rows": [
+    {
+      "table": "calendar_links",
+      "values": {
+        "id": "callink-sam-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-sam",
+        "provider": "google",
+        "state": "dropped",
+        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d73616d2d62617262657273686f702d6e6f742d7265616c",
+        "linked_at": "2026-10-19T18:16:00Z",
+        "sync_cursor": "sync-token-demo-sam-barbershop-41",
+        "synced_at": "2026-11-09T21:00:00Z",
+        "subscription_id": "channel-demo-sam-barbershop-3",
+        "subscription_resource_id": "resource-demo-sam-primary",
+        "subscribed_at": "2026-11-06T09:20:00Z",
+        "subscription_expires_at": "2026-11-13T09:20:00Z",
+        "dropped_at": "2026-11-09T21:30:00Z",
+        "dropped_why": "renewal_failed",
+        "drop_reminded_at": "2026-11-10T21:30:00Z",
+        "unlinked_at": null,
+        "version": 9
+      }
+    },
+    {
+      "table": "calendar_links",
+      "values": {
+        "id": "callink-sam-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-sam",
+        "provider": "google",
+        "state": "linked",
+        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d73616d2d686f6d652d73657276696365732d6e6f742d7265616c",
+        "linked_at": "2026-10-20T14:44:00Z",
+        "sync_cursor": "sync-token-demo-sam-home-services-12",
+        "synced_at": "2026-11-07T13:30:00Z",
+        "subscription_id": "channel-demo-sam-home-services-2",
+        "subscription_resource_id": "resource-demo-sam-primary",
+        "subscribed_at": "2026-11-04T13:30:00Z",
+        "subscription_expires_at": "2026-11-11T13:30:00Z",
+        "dropped_at": null,
+        "dropped_why": null,
+        "drop_reminded_at": null,
+        "unlinked_at": null,
+        "version": 5
+      }
+    },
+    {
+      "table": "calendar_links",
+      "values": {
+        "id": "callink-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-riley",
+        "provider": "microsoft",
+        "state": "linked",
+        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d72696c65792d62617262657273686f702d6e6f742d7265616c",
+        "linked_at": "2026-10-19T15:04:00Z",
+        "sync_cursor": "delta-link-demo-riley-7",
+        "synced_at": "2026-11-07T19:05:00Z",
+        "subscription_id": "subscription-demo-riley-5",
+        "subscription_resource_id": null,
+        "subscribed_at": "2026-11-06T15:00:00Z",
+        "subscription_expires_at": "2026-11-09T09:00:00Z",
+        "dropped_at": null,
+        "dropped_why": null,
+        "drop_reminded_at": null,
+        "unlinked_at": null,
+        "version": 7
+      }
+    }
+  ]
+}

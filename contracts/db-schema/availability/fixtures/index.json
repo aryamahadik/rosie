@@ -1,0 +1,92 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-hours.json",
+      "version": "v1",
+      "table": "weekly_hours",
+      "expect": "accept",
+      "shows": "Weekly hours as local times with their zone named: Lee's Barbershop's shop open Mon to Fri 9:00am to 5:00pm and Sat 10:00am to 2:00pm (H01, from the Google listing, confirmed at S1-21); Avery's own hours, Mon to Fri at the shop, since Riley works Saturday mornings alone; and the yoga studio's shop (a K-23 locations row, 123 Demo St) with the same demo hours, where its classes meet",
+      "source": "FS row H01 ('Opening hours', weekly hours, [G] prefill the owner confirms each one); FS line 726 (schedule owner location, staff; kind hours); S1-21 ('Hours · From your Google listing'); S1-13 ('On Saturday mornings, Riley works alone, with no front desk'); fixtures/v1/test-kit/shops/barber.json and yoga.json (google_prefill hours 'Mon-Fri 9am-5pm, Sat 10am-2pm (demo)'; address '123 Demo St, Anytown'); CQ-05; CQ-09"
+    },
+    {
+      "file": "seed-time-off.json",
+      "version": "v1",
+      "table": "time_off",
+      "expect": "accept",
+      "shows": "Riley's day off asked by text for all of Mon Nov 2 (Wed Oct 28, 6:30pm), lapsed at 8:00am Sun Nov 1 with no answer from Sam, so the day stays as booked (status lapsed, set by no person); Sam's BLOCK of Lee's Barbershop on Thu Oct 29, 2 to 5pm (the whole business, ok on his own yes); Avery's day off for Fri Nov 13, still asked, so new bookings with Avery that day pause; the pet boarding Suite closed for one day (a space closed, like a person's time off)",
+      "source": "S11-43 ('OFF Mon Nov 2'; 'pauses new ones for Riley that day'); S11-44 ('No answer by 8:00am the day before: the day stays as booked'); S11-78, S11-79, S11-89 ('The pause lifts'); S11-13 ('Block Thu Oct 29, 2-5pm at Lee's Barbershop?'); S1-81 ('can be closed for a day, like a person's time off'); FS row H02; SPEC-master 6 (Sam, Riley, Avery, Lee's Barbershop)"
+    },
+    {
+      "file": "seed-session-seats.json",
+      "version": "v1",
+      "table": "class_sessions",
+      "expect": "accept",
+      "shows": "The yoga studio's timetable class Hot Flow, Saturdays 10:00 to 11:00am with Maya in the Studio room, 12 seats Rosie can book and a minimum of 3; its Sat Nov 14 session (a K-04 class_session resource with its class_seats counter at capacity 12) and its Sat Nov 7 session, counted 24 hours before with too few and cancelled by Sam; and K-04's one-off Handstand workshop, Sat Nov 14 11:00am to 1:00pm with Maya in the same room (10 seats in its K-04 counter, 2 taken), as a session with no class",
+      "source": "S1-83 ('Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run'; 'At the plug-in's cutoff, Rosie counts the bookings. Too few: the owner decides to run it or cancel'); A4-33 ('Each shows its teacher, room and seats left'); FS rows K01, K02; FS line 726; K-04 v1 seed-resources, seed-class-seats; fixtures/v1/test-kit/shops/yoga.json (the Handstand workshop with Maya, Sat 11:00am, 10 spots; the Hot Flow class; 'Maya teaches Saturday mornings alone'; cutoff '24 hours before')"
+    },
+    {
+      "file": "seed-calendar-link.json",
+      "version": "v1",
+      "table": "calendar_links",
+      "expect": "accept",
+      "shows": "Sam's Google calendar linked for Lee's Barbershop at S1-24 (Mon Oct 19, 2:16pm), dropped at 4:30pm Mon Nov 9 when its subscription's renewal kept failing, with the one reminder 24 hours later; the same calendar carried over to Lee Home Services at S1-38 (Tue Oct 20, 10:44am) and still linked, one row per business; Riley's Microsoft calendar linked on his staff page (S2-06); each row with its tokens sealed under the person's K-22 seed key, its sync cursor and its change subscription",
+      "source": "S1-24 ('Connected'; 'One person has one calendar across every kind of work and company'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-06; S12-13 ('Mon Nov 9, 4:30pm'; 'His open times come off until it's back'); S12-14; arch 05 lines 261, 271; arch 11 line 580; FS row H03; K-22 v1 seed-owner-id-upload and seed-emergency-contact (Sam's and Riley's sealing keys)"
+    },
+    {
+      "file": "seed-busy-block.json",
+      "version": "v1",
+      "table": "busy_blocks",
+      "expect": "accept",
+      "shows": "Times only, never what: Riley's personal event over Ben T.'s visit on Sat Nov 7 at 2:00pm, read from his linked calendar with its zone; a job already on Sam's calendar blocking Thu Nov 12 at Lee Home Services; and, for the movers, a time read from a photo of Sam's schedule that blocks only from his yes to the read-back",
+      "source": "S12-33 ('Riley adds a personal event to the phone calendar, over Ben T.'s booked visit'; 'The event's title is never shown'); S1-24 ('jobs already booked block those times'; 'Or Sam sends a photo of the schedule'; 'Rosie sees only when Sam is busy, never what'); arch 05 lines 261, 263, 265; limit 6"
+    },
+    {
+      "file": "invalid/refuse-busy-block-title.json",
+      "version": "v1",
+      "table": "busy_blocks",
+      "expect": "refuse",
+      "shows": "A busy block written with the event's title is refused, since the table has no title column (SQLSTATE 42703); the same row without the title passes",
+      "source": "arch 05 line 261 ('Rosie keeps each busy block's start, end and source, never its title'); S1-24; S12-33; 02-contracts row K-27 (refuse-busy-block-title)"
+    },
+    {
+      "file": "invalid/refuse-busy-block-other-business-read.json",
+      "version": "v1",
+      "table": "busy_blocks",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio reading Riley's busy block at Lee's Barbershop gets no row (row-level security per business); the same read in the barbershop's own scope gets it",
+      "source": "arch 10 line 546 ('Row-level security per business on every Tool API call'); S11-43 ('Each business sees only busy times from the other'); RULES 4.5"
+    },
+    {
+      "file": "invalid/refuse-calendar-tokens-read.json",
+      "version": "v1",
+      "table": "calendar_links",
+      "expect": "refuse",
+      "shows": "A Tool API read of Riley's link naming its sealed tokens is refused (SQLSTATE 42501: no Tool API grant reaches tokens); the same read of its id, provider and state passes",
+      "source": "arch 05 line 271 ('Links keep their tokens sealed under the person's key'); BP rule 7; README rule 5"
+    },
+    {
+      "file": "invalid/refuse-photo-block-without-yes.json",
+      "version": "v1",
+      "table": "busy_blocks",
+      "expect": "refuse",
+      "shows": "A busy block from a photo of the movers' schedule with no owner's yes is refused (CHECK busy_blocks_source_fields, SQLSTATE 23514); the same row with Sam's yes and its time passes",
+      "source": "arch 05 line 263 ('its times block on the owner's yes (S1-24; limit 6)'); S1-24"
+    },
+    {
+      "file": "invalid/refuse-two-sessions-one-room.json",
+      "version": "v1",
+      "table": "class_sessions",
+      "expect": "refuse",
+      "shows": "A yin session in the Studio room at 11:30am Sat Nov 14, while the Handstand workshop meets there, is refused (EXCLUDE class_sessions_one_per_room, SQLSTATE 23P01); the same session at 1:00pm passes",
+      "source": "arch 05 line 255 ('Double booking is blocked ... per worker, room or vehicle'); S1-83 ('who teaches and the room'); fixtures/v1/test-kit/shops/yoga.json (staff_skills: yin)"
+    },
+    {
+      "file": "invalid/refuse-icloud-link.json",
+      "version": "v1",
+      "table": "calendar_links",
+      "expect": "refuse",
+      "shows": "Avery linking an Apple iCloud calendar is refused (CHECK calendar_links_provider_known, SQLSTATE 23514); the same link as Google passes",
+      "source": "Q-11 ('Apple iCloud calendars: Not linked'); MC 8 'Calendars' ('Google and Microsoft'); 02-contracts K-16 (refuse-icloud)"
+    }
+  ]
+}

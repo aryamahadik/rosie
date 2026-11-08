@@ -1,0 +1,312 @@
+{
+  "after": ["../../business-setup/fixtures/seed-business-demo-shop.json", "../../core/fixtures/seed-resources.json"],
+  "rows": [
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-yoga-studio-shop",
+        "business_id": "biz-yoga-studio",
+        "kind": "shop",
+        "name": null,
+        "address": "123 Demo St, Anytown",
+        "map_point": null,
+        "end_address": null,
+        "travel_miles": null,
+        "travel_centre": null,
+        "travel_centre_address": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-mon",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 1,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-tue",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 2,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-wed",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 3,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-thu",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 4,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-fri",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 5,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-lees-barbershop-shop-sat",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "location",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 6,
+        "opens_at": "10:00",
+        "closes_at": "14:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-avery-mon",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "weekday": 1,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-avery-tue",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "weekday": 2,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-avery-wed",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "weekday": 3,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-avery-thu",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "weekday": 4,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-avery-fri",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "resource",
+        "location_id": "loc-lees-barbershop-shop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "place_or_thing_id": null,
+        "weekday": 5,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-mon",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 1,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-tue",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 2,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-wed",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 3,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-thu",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 4,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-fri",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 5,
+        "opens_at": "09:00",
+        "closes_at": "17:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    },
+    {
+      "table": "weekly_hours",
+      "values": {
+        "id": "hours-yoga-studio-shop-sat",
+        "business_id": "biz-yoga-studio",
+        "owner_kind": "location",
+        "location_id": "loc-yoga-studio-shop",
+        "resource_id": null,
+        "resource_kind": null,
+        "place_or_thing_id": null,
+        "weekday": 6,
+        "opens_at": "10:00",
+        "closes_at": "14:00",
+        "time_zone": "America/New_York",
+        "version": 1
+      }
+    }
+  ]
+}
