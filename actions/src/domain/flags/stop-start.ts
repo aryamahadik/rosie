@@ -14,19 +14,23 @@
 //   - START is a new texts row for every business (T-307's start()) and clears the flag, opening the chat (RULES 4.1b).
 //   - A phone that also gets work texts (an owner, admin or staff role anywhere) asks which texts a STOP in its turn meant
 //     (RULES 7.7; S13-32 lines 7248 to 7250); its answer names the businesses whose texts stop, all of them when it names
-//     none, and no answer by its clock means all.
+//     none, and no answer by its clock means all. No answer counts only from the clock row that STOP armed (default 10).
 //   - A STOP or START the handle actor writes on return keeps the time it came, not the time it is written, and is keyed by
 //     its text's event id, so the same text written twice is written once (arch 11 line 566; T-269's security note c).
-//     A replayed word older than the phone's newest opposite word leaves the flag as that newer word set it: the newest
-//     word decides, as the newest consent row does (K-29 README), so a replay can never lift a later STOP.
+//   - The newest word decides, as the newest consent row does (K-29 README), whatever order the words are written in
+//     (DL-193): every STOP moves the phone's stop_at to its own time and every START its start_at, each the newest of its
+//     kind (default 9), and the phone is stopped while the newest STOP is at or after the newest START. So a word written
+//     late, older than the newest opposite word, leaves the flag as that newer word set it: a replay never lifts a later
+//     STOP. A START whose time is not known never beats a STOP (default 8).
 //
 // Nothing here logs; what it answers or throws carries ids, flags and labels, never the number (except K-09's own
 // notFromThatPhone and notAWorkPhone answers, which name the request's own number back), an address or anyone's words.
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   1. The time a STOP or START written on return keeps is `sentByActor.at`: K-09 v1 carries no other time for it, and the
-//      actor answers a stop word at once (arch 02 line 115). Written on return with no such send, it is the call's now
-//      (later, so a STOP so written never loses to a START it may have come before: fail closed).
+//      actor answers a stop word at once (arch 02 line 115). A STOP written on return with no such send is dated at the
+//      call's now (later, so it never loses to a START it may have come before: fail closed); a START so written has no
+//      known time (default 8).
 //   2. Whose STOP it is: the caller's person when they are behind the phone, else every person behind it, one row each.
 //   3. A work phone's STOP in a turn stops at once the texts of every business where the phone's people hold no work role
 //      ("their own appointment texts": a stop stops at once, RULES 7.2), one revoked texts row each at that business, and
@@ -43,6 +47,18 @@
 //      booking.flagged entry (K-08 v1), the visit itself unchanged (RULES 7.4: "flags the visit").
 //   7. A STOP with no business (every business: K-09 caller.businessId null) has its reply row name no business (Rosie's
 //      own line: K-04 outbox_rows.business_id); T-307's service, bound to one business, builds it under EVERY_BUSINESS.
+//   8. A START written on return with no known time (`sentByActor` null) never beats a STOP (DL-193; the security
+//      reviewer's GAP 1): it cannot be ordered against any STOP from that phone, so it lifts no stop, moves no start time
+//      and writes no consent row, since a row dated when it is written would be K-29's newest over a STOP the person sent
+//      after it but the actor writes later. It answers the phone as it is, with no reply; the person can text START again.
+//   9. stop_at and start_at only move forward: a word older than the newest of its kind leaves that time as it is, since
+//      moving it back would let an older word decide (DL-193: "the newest word always decides"). A START that leaves the
+//      phone started opens its chat, as START does (RULES 4.1b; db/repo/phones.ts startPhone).
+//  10. A work phone's no answer counts only from the clock row its own STOP armed (DL-193; the security reviewer's note
+//      c): the clock turn's one event id (K-05 v1 default 9), or with no turn the firing's request id, must be the clock
+//      row (commit/build.ts questionClock) of a "which texts?" question still live on that phone's handle and asked by a
+//      STOP in the question's own turn (the id this call gives the question it asks, keyed by that turn). Any other clock
+//      row, turn or caller changes nothing (notFromThatPhone).
 
 import type { ErrorsOf, RequestOf, ResponseOf } from "../../tool-api";
 import {
@@ -139,11 +155,15 @@ export function keyOf(call: StopOrStartCall): string {
   return caller.requestId;
 }
 
-/** The time the word came (default 1): written on return, when the actor sent its reply; else the call's now. */
-export function timeOf(call: StopOrStartCall): string {
-  const { caller, sentByActor } = call.request;
-  if (caller.kind === "actorOnReturn" && sentByActor !== null) return sentByActor.at;
-  return call.now;
+/**
+ * The time the word came (default 1): written on return, when the actor sent its reply, else for a START no known time
+ * (null: default 8) and for a STOP or an answer the call's now (fail closed); otherwise the call's now.
+ */
+export function timeOf(call: StopOrStartCall): string | null {
+  const { caller, kind, sentByActor } = call.request;
+  if (caller.kind !== "actorOnReturn") return call.now;
+  if (sentByActor !== null) return sentByActor.at;
+  return kind === "start" ? null : call.now;
 }
 
 const byId = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
@@ -161,6 +181,42 @@ function channelOf(call: StopOrStartCall, turnHandle: Handle | null): ConsentCha
     default:
       return "text";
   }
+}
+
+/** The clock row the commit makes for an asked question (commit/build.ts questionClock), compared, never parsed. */
+function clockOfQuestion(questionId: string): string {
+  return `clock-${questionId}`;
+}
+
+/**
+ * The clock row a work phone's no answer fires from (default 10): a clock turn's one event id (K-05 v1 default 9; K-09
+ * README default 24), or the request id of a firing that carries no turn (K-09 v1 caller clockFiring); else null.
+ */
+function firingClockRow(call: StopOrStartCall): string | null {
+  const { caller } = call.request;
+  if (caller.kind === "clockFiring") return call.turn === null ? caller.requestId : null;
+  if (caller.kind !== "turn" || call.turn === null) return null;
+  const [only, ...more] = call.turn.eventIds;
+  return only !== undefined && more.length === 0 ? only : null;
+}
+
+/**
+ * Whether a work phone's no answer fires from the clock row its own STOP armed (default 10): the clock of a "which
+ * texts?" question still live on that phone's handle, asked by a STOP in the question's own turn.
+ */
+async function armedByItsStop(
+  call: StopOrStartCall,
+  handle: Handle,
+  ports: StopOrStartPorts,
+): Promise<boolean> {
+  const clockRowId = firingClockRow(call);
+  if (clockRowId === null) return false;
+  for (const question of await ports.reader.openQuestionsOfHandle(handle.id)) {
+    if (question.step !== STOP_STEP || clockOfQuestion(question.id) !== clockRowId) continue;
+    // The id planStopOrStart gives the question a work phone's STOP asks, keyed by that STOP's turn.
+    if (question.id === (await ports.ids.rowId("whichTexts", question.turnId))) return true;
+  }
+  return false;
 }
 
 /** Whether the word came from the number itself (K-09 v1 README default 29). */
@@ -182,7 +238,8 @@ async function fromThatPhone(
         return kind === "stop" && inboundEventId === null && (await callersOwn());
       }
       if (turn.handleId !== handle.id) return false;
-      if (kind === "workPhoneNoAnswer") return true;
+      // No answer comes as a clock turn on the phone's handle, from the clock row its own STOP armed (default 10).
+      if (kind === "workPhoneNoAnswer") return armedByItsStop(call, handle, ports);
       return inboundEventId !== null && turn.eventIds.includes(inboundEventId);
     }
     case "actorOnReturn":
@@ -196,8 +253,8 @@ async function fromThatPhone(
     case "console":
       return kind === "stop" && inboundEventId === null && (await callersOwn());
     case "clockFiring":
-      // workPhoneNoAnswer's clock row is the key; the row was armed for that phone by its STOP's turn.
-      return kind === "workPhoneNoAnswer";
+      // A firing with no turn names its clock row by its request id: the row its own STOP armed (default 10).
+      return kind === "workPhoneNoAnswer" && (await armedByItsStop(call, handle, ports));
     default:
       return false;
   }
@@ -264,36 +321,59 @@ function consentEntry(write: ConsentWrite, why: FlagWrites["why"]): FlagWrites["
   });
 }
 
-/** The phone's flag as the newest word leaves it (the module note): a replayed word older than the opposite one changes nothing. */
-function flagMoves(phone: Phone, stop: boolean, at: string): boolean {
-  const when = Date.parse(at);
-  if (stop) {
-    if (phone.stopped) return false;
-    // A START that came after this STOP decides: the person's last word turned texts back on.
-    return !(phone.startAt !== null && phone.startAt.getTime() > when);
-  }
-  if (!phone.stopped) return false;
-  // A STOP at or after this START decides (fail closed on a tie): a replay never lifts a later STOP.
-  return !(phone.stopAt !== null && phone.stopAt.getTime() >= when);
+/** A STOP or a START as the phone's one row takes it (K-04 phones): what it sets, and the flags it leaves. */
+interface PhoneMove {
+  /** The columns it sets, compared and set on the version read; empty when the row stays as it is. */
+  readonly set: Readonly<Record<string, unknown>>;
+  readonly stopped: boolean;
+  readonly chatOpen: boolean;
 }
 
-/** The phone's state write and entry for a STOP or a START, compared and set on the version read (K-04 phones). */
+/** Whether a word at `when` (ms) is newer than the time recorded for its kind (null: none recorded). */
+const newerThan = (recorded: Date | null, when: number): boolean =>
+  recorded === null || recorded.getTime() < when;
+
+/**
+ * Where a word with a known time leaves the phone (the module note; default 9): a STOP moves stop_at, and a START
+ * start_at, to its own time when it is the newest of its kind, and the phone is stopped while the newest STOP is at or
+ * after the newest START (a tie fails closed). A STOP never lifts a stop; a START lifts it only when it is newer than
+ * the newest STOP.
+ */
+function phoneMove(phone: Phone, stop: boolean, at: string): PhoneMove {
+  const when = Date.parse(at);
+  const set: Record<string, unknown> = {};
+  if (stop) {
+    const moves = newerThan(phone.stopAt, when);
+    const newestStop = moves || phone.stopAt === null ? when : phone.stopAt.getTime();
+    // A START after every STOP decides: the person's last word turned texts back on.
+    const stopped = phone.stopped || !(phone.startAt !== null && phone.startAt.getTime() > newestStop);
+    if (stopped && !phone.stopped) Object.assign(set, { stopped: true, chat_open: false });
+    if (moves) set.stop_at = at;
+    return { set, stopped, chatOpen: stopped ? false : phone.chatOpen };
+  }
+  const moves = newerThan(phone.startAt, when);
+  // A STOP at or after this START decides (fail closed on a tie): a START older than the newest STOP lifts nothing.
+  const stopped = phone.stopped && phone.stopAt !== null && phone.stopAt.getTime() >= when;
+  if (!stopped) {
+    if (phone.stopped) set.stopped = false;
+    if (!phone.chatOpen) set.chat_open = true;
+    if (phone.chatOpenAt === null) set.chat_open_at = at;
+  }
+  if (moves) set.start_at = at;
+  return { set, stopped, chatOpen: stopped ? phone.chatOpen : true };
+}
+
+/** The phone's state write and entry for a STOP or a START that moves it, compared and set on the version read. */
 function phoneWrite(
   phone: Phone,
   stop: boolean,
-  at: string,
+  move: PhoneMove,
   actorPersonId: string | null,
   why: FlagWrites["why"],
   logId: string,
 ): Pick<FlagWrites, "state" | "stateEvents"> {
-  const set: Record<string, unknown> = stop
-    ? { stopped: true, chat_open: false, stop_at: at }
-    : {
-        stopped: false,
-        chat_open: true,
-        start_at: at,
-        ...(phone.chatOpenAt === null ? { chat_open_at: at } : {}),
-      };
+  if (Object.keys(move.set).length === 0) return { state: [], stateEvents: [] };
+  const set = { ...move.set };
   return {
     state: [
       { op: "update", table: "phones", key: { number: phone.number }, expectVersion: phone.version, set },
@@ -309,7 +389,7 @@ function phoneWrite(
         table: "phones",
         rowId: phone.handleId,
         old: { stopped: phone.stopped, chat_open: phone.chatOpen },
-        new: { ...set, chat_open: !stop },
+        new: { ...set, stopped: move.stopped, chat_open: move.chatOpen },
         why,
       }),
     ],
@@ -478,6 +558,20 @@ export async function planStopOrStart(
     });
   }
 
+  if (at === null) {
+    // A START written on return with no known time never beats a STOP (default 8): nothing is written.
+    return answerOnly({
+      consentRowIds: [],
+      stopped: phone.stopped,
+      chatOpen: phone.chatOpen,
+      phoneVersion: phone.version,
+      reply: null,
+      askedWhichTexts: null,
+      flaggedBookingIds: [],
+      repeated: false,
+    });
+  }
+
   if (asksWhich || namesSome) {
     const businesses = asksWhich
       ? [...roles.other].sort(byId)
@@ -535,7 +629,7 @@ export async function planStopOrStart(
       const row = await replyRow(await ids.rowId("stopReply", key), questionId);
       if (row !== null) rows.push(row);
       // The commit names an asked question's clock row `clock-<question id>` (commit/build.ts questionClock).
-      asked = { openQuestionId: questionId, clockRowId: `clock-${questionId}` };
+      asked = { openQuestionId: questionId, clockRowId: clockOfQuestion(questionId) };
     }
     return {
       key,
@@ -571,29 +665,26 @@ export async function planStopOrStart(
     const word = { id, personId, handleId: handle.id, words: request.words, at, channel, turnId };
     consents.push(stop ? await messages.stop(word) : await messages.start(word));
   }
-  const moves = flagMoves(phone, stop, at);
-  const phoneWrites = moves
-    ? phoneWrite(
-        phone,
-        stop,
-        at,
-        whose.length === 1 ? (whose[0] ?? null) : null,
-        why,
-        `log-${firstConsent ?? key}-phone`,
-      )
-    : { state: [], stateEvents: [] };
+  const move = phoneMove(phone, stop, at);
+  const phoneWrites = phoneWrite(
+    phone,
+    stop,
+    move,
+    whose.length === 1 ? (whose[0] ?? null) : null,
+    why,
+    `log-${firstConsent ?? key}-phone`,
+  );
   const replied =
     request.kind === "workPhoneNoAnswer"
       ? { answer: null, row: null }
       : await reply(stop ? STOP_REPLY : START_REPLY);
-  const stoppedAfter = moves ? stop : phone.stopped;
   return {
     key,
     answer: {
       consentRowIds: consents.map((write) => write.values.id),
-      stopped: stoppedAfter,
-      chatOpen: moves ? !stop : phone.chatOpen,
-      phoneVersion: moves ? phone.version + 1 : phone.version,
+      stopped: move.stopped,
+      chatOpen: move.chatOpen,
+      phoneVersion: phoneWrites.state.length > 0 ? phone.version + 1 : phone.version,
       reply: replied.answer,
       askedWhichTexts: null,
       flaggedBookingIds: flagged,
