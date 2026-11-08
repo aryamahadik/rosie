@@ -16,6 +16,7 @@
   "outcome": {
     "result": "turnState",
     "handleId": "handle-ben",
+    "handle": { "kind": "phone", "address": "+15555550106" },
     "businessId": "biz-lees-barbershop",
     "readAt": "2026-10-22T15:00:00Z",
     "persons": [{ "personId": "person-ben", "language": "en", "version": 1 }],

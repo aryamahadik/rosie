@@ -937,7 +937,7 @@
     },
     "claimEvent": {
       "title": "ClaimEvent",
-      "description": "The event-log entry a claim of an effect row appends (K-08 v1.1 kind effect.claimed: 'claimEffects ... and serviceBack ...: one entry per row'; CQ-43; arch 09 lines 457, 492: every write appends who, what, old and new, when and why). The call writes it itself, since it picks its rows (SKIP LOCKED) and the caller cannot name them: id '<effect id>/claimed/<the effect's version after the claim>', so each claim of a row has its own; actor job (the effects runner: K-05 v1.1 default 24); table effects and the effect id; old and new values as K-08 v1.1 names them (state always; claimed_by and claim_lapses_at; first_try_at for a run that starts; tries and runs for a run after an outage); why the state it was claimed from; nothing sealed. It is appended with the effect's turn id, or its job id when it has none, its trace id and the turn's bundle (null for a job), as a result's entry is (v1.1 item 21; K-08 default 20), and its zone is the effect's business's (K-04 businesses.time_zone), or null (UTC) for an effect with no business. New in v1.2.",
+      "description": "The event-log entry a claim of an effect row appends (K-08 v1.1 kind effect.claimed: 'claimEffects ... and serviceBack ...: one entry per row'; CQ-43; arch 09 lines 457, 492: every write appends who, what, old and new, when and why). The call writes it itself, since it picks its rows (SKIP LOCKED) and the caller cannot name them: id '<effect id>/claimed/<the effect's version after the claim>', so each claim of a row has its own; actor job (the effects runner: K-05 v1.1 default 24); table effects and the effect id; old and new values as K-08 v1.1 names them (state always; claimed_by and claim_lapses_at; first_try_at for a run that starts; tries and runs for a run after an outage), so old_values.state names the state it was claimed from; why null, since K-08 v1's why (event-trace.v1.schema.json /$defs/why: a step, a choice, a limit, a safe default, an outage path or a provider event, nothing else) has nothing a claim could name, and K-08 v1.1's event-effect-claimed-* rows carry none; nothing sealed. It is appended with the effect's turn id, or its job id when it has none, its trace id and the turn's bundle (null for a job), as a result's entry is (v1.1 item 21; K-08 default 20), and its zone is the effect's business's (K-04 businesses.time_zone), or null (UTC) for an effect with no business. New in v1.2.",
       "allOf": [
         {
           "$ref": "#/$defs/eventEntry"
@@ -958,6 +958,10 @@
               "const": "effects"
             },
             "sealed": {
+              "type": "null"
+            },
+            "why": {
+              "description": "Null: old_values.state names the state it was claimed from, and K-08 v1's why has no field for it (README item 33, default 37).",
               "type": "null"
             }
           }
@@ -1163,6 +1167,21 @@
       "type": "string",
       "pattern": "^[a-z_][a-z0-9_]*$"
     },
+    "factTable": {
+      "title": "FactTable",
+      "description": "A fact's home table: a table name as a frozen table list spells it, never sealing_keys. No column of a person's sealing key is a fact (rule 7; arch 01 line 93: deleting the key erases the data, so no copy of it may outlive the row): a request that names one is refused, readTurnState answers unknownFact for one and never returns one, wrapped or not (README item 26, default 30; refuse-read-turn-state-sealing-key-fact, refuse-read-turn-state-returns-sealing-key). New in v1.2.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/tableName"
+        },
+        {
+          "not": {
+            "description": "K-04 v1 sealing_keys: person_id, wrapped_key, wrapping_key_name, created_at, erased_at and version are never facts.",
+            "const": "sealing_keys"
+          }
+        }
+      ]
+    },
     "role": {
       "title": "Role",
       "description": "A person's role at a business, as K-04 person_roles names it (FS line 723): owner, admin, staff, own_business (someone with their own business on the staff list: FS T01) or customer. New in v1.2.",
@@ -1253,7 +1272,7 @@
     },
     "openQuestionRead": {
       "title": "OpenQuestionRead",
-      "description": "A live open question sent to a handle (K-04 open_questions with status waiting or open: arch 01 line 63; arch 09 line 490; tour lines 423 to 427), as the guard lists it and the frontier builds its options from it (arch 03 line 159: 'every one sent to this handle'; questions about other bookings add only their options, labeled by business, date and time). New in v1.2.",
+      "description": "A live open question sent to a handle (K-04 open_questions with status waiting or open: arch 01 line 63; arch 09 line 490; tour lines 423 to 427), as the guard lists it and the frontier builds its options from it (arch 03 line 159: 'every one sent to this handle'; questions about other bookings add only their options, labeled by business, date and time), with the send time and poll id K-02 v1's openQuestion carries (model.v1.schema.json /$defs/openQuestion: sentAt, pollId), read from K-04 v1's outbox rows that ask it (outbox_rows.open_question_id) and their parts (outbox_parts.sent_at; the poll part's linq_message_id). New in v1.2.",
       "type": "object",
       "properties": {
         "id": {
@@ -1319,6 +1338,14 @@
             }
           ]
         },
+        "sentAt": {
+          "description": "When it went out (K-02 v1 openQuestion.sentAt; arch 01 line 63; arch 02 line 127): the latest outbox_parts.sent_at among the parts of the outbox rows that ask it (outbox_rows.open_question_id; K-04 v1), so a question asked again gives its newest send (README default 41); null until a part has gone. New in v1.2.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "pollId": {
+          "description": "The poll it went out as, so a vote answers its own poll (K-02 v1 openQuestion.pollId; arch 03 line 187): the linq_message_id of the latest sent part of kind poll among those rows' parts, which a vote names as K-06 v1 poll.pollId (K-04 seed-outbox-row: linq-msg-demo-0002); null for a question that went out as text only, by email, or whose poll has not gone yet (README default 41). New in v1.2.",
+          "$ref": "#/$defs/nullableId"
+        },
         "askCount": {
           "description": "open_questions.ask_count.",
           "type": "integer",
@@ -1344,6 +1371,8 @@
         "readback",
         "versionsRead",
         "clock",
+        "sentAt",
+        "pollId",
         "askCount",
         "bundleId",
         "version"
@@ -1405,7 +1434,7 @@
     },
     "factRef": {
       "title": "FactRef",
-      "description": "A fact the frontier needs, named by its key and its one home: the table, the row's primary key as text and the column (arch 02 line 117: 'each fact once, from its one home'; S13-30; K-02 v1 fact row ids). Which home a key has is the frontier's and the bundle's (C-075), never this call's; that the request names each key once is the frontier's check (a second value for one key is refused there). New in v1.2.",
+      "description": "A fact the frontier needs, named by its key and its one home: the table, the row's primary key as text and the column (arch 02 line 117: 'each fact once, from its one home'; S13-30; K-02 v1 fact row ids). Which home a key has is the frontier's and the bundle's (C-075), never this call's; that the request names each key once is the frontier's check (a second value for one key is refused there). Never a column of sealing_keys (factTable). New in v1.2.",
       "type": "object",
       "properties": {
         "key": {
@@ -1414,7 +1443,7 @@
           "minLength": 1
         },
         "table": {
-          "$ref": "#/$defs/tableName"
+          "$ref": "#/$defs/factTable"
         },
         "rowId": {
           "description": "The home row's primary key as text (K-02 v1 fact rowId; K-04 versions_read).",
@@ -1429,7 +1458,7 @@
     },
     "factValue": {
       "title": "FactValue",
-      "description": "A fact read from its home row on the primary: its key and home, the column's value and the row's version, which a commit compares and sets (limit 4: arch 06 line 305). The value is written as K-04's seed fixtures write values: JSON for jsonb, JSON booleans and numbers, and PostgreSQL text input for the rest (a timestamptz in UTC ending in Z, a time as HH:MM). New in v1.2.",
+      "description": "A fact read from its home row on the primary: its key and home, the column's value and the row's version, which a commit compares and sets (limit 4: arch 06 line 305). The value is written as K-04's seed fixtures write values: JSON for jsonb, JSON booleans and numbers, and PostgreSQL text input for the rest (a timestamptz in UTC ending in Z, a time as HH:MM). Never a column of sealing_keys, so no key, wrapped or not, reaches the Tool API, the frontier or the model's context (factTable). New in v1.2.",
       "type": "object",
       "properties": {
         "key": {
@@ -1437,7 +1466,7 @@
           "minLength": 1
         },
         "table": {
-          "$ref": "#/$defs/tableName"
+          "$ref": "#/$defs/factTable"
         },
         "rowId": {
           "$ref": "#/$defs/id"
@@ -1574,7 +1603,7 @@
     },
     "unknownFactError": {
       "title": "UnknownFactError",
-      "description": "A fact names a table or column that no frozen database part lists, or a table whose rows carry no version (a fact is compared and set by its row's version: limit 4). The call builds its reads from the names a frozen table list gives, never from the request's words alone. Nothing was read. New in v1.2.",
+      "description": "A fact names a table or column that no frozen database part lists, a table whose rows carry no version (a fact is compared and set by its row's version: limit 4), or any column of sealing_keys, which is never a fact (factTable; rule 7). The call builds its reads from the names a frozen table list gives, never from the request's words alone. Nothing was read. New in v1.2.",
       "type": "object",
       "properties": {
         "error": {
@@ -1616,7 +1645,7 @@
           "uniqueItems": true
         },
         "facts": {
-          "description": "The facts the frontier's steps need, each by its key and its home (factRef). Each home row must be found under the scope (notFound otherwise).",
+          "description": "The facts the frontier's steps need, each by its key and its home (factRef), never a column of sealing_keys (unknownFact). Each home row must be found under the scope (notFound otherwise).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/factRef"
@@ -1628,7 +1657,7 @@
     },
     "readTurnState.response": {
       "title": "ReadTurnStateResponse",
-      "description": "The turn's stored state, as one read of the primary saw it (one transaction, so every row and version is from one moment): the handle's persons and their roles at this business; its phone; every live open question sent to the handle at this business (or with no business); the target booking heads with their versions and the booking record flags (private, deceased); the open pauses on the handle's persons and phone at this business (paused); the phone's stopped flag (stopped); the consent rows of the handle's persons at this business; and each fact with its row and version. Every list is present, empty when there is none. New in v1.2.",
+      "description": "The turn's stored state, as one read of the primary saw it (one transaction, so every row and version is from one moment): the handle's kind and address; the handle's persons and their roles at this business; its phone; every live open question sent to the handle at this business (or with no business), with its send time and poll id; the target booking heads with their versions and the booking record flags (private, deceased); the open pauses on the handle's persons and phone at this business (paused); the phone's stopped flag (stopped); the consent rows of the handle's persons at this business; and each fact with its row and version. Every list is present, empty when there is none. New in v1.2.",
       "type": "object",
       "properties": {
         "result": {
@@ -1636,6 +1665,10 @@
         },
         "handleId": {
           "$ref": "#/$defs/id"
+        },
+        "handle": {
+          "description": "The turn's handle as K-04 handles holds it, its kind and address (K-02 v1 context writer.handle: 'The phone number or email address that wrote'; arch 01 line 55), read for every handle: an email handle and a first text, which have no phone row (phone null), included. handles is scoped none (K-04 v1 rule 4), so every business scope reads it. Never logged or traced (K-08). New in v1.2.",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json#/$defs/handle"
         },
         "businessId": {
           "$ref": "#/$defs/nullableId"
@@ -1708,7 +1741,7 @@
           ]
         },
         "openQuestions": {
-          "description": "Every live open question sent to this handle at this business (with no business: those with none), in id order (compared, never parsed: CQ-09; K-04 open_questions has no time column).",
+          "description": "Every live open question sent to this handle at this business (with no business: those with none), in id order (compared, never parsed: CQ-09; K-04 open_questions has no time column), each with its send time and poll id, read from the outbox rows that ask it under the same scope (README item 26).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/openQuestionRead"
@@ -1746,6 +1779,7 @@
       "required": [
         "result",
         "handleId",
+        "handle",
         "businessId",
         "readAt",
         "persons",
@@ -1761,7 +1795,7 @@
     },
     "readTurnState.errors": {
       "title": "ReadTurnStateErrors",
-      "description": "notFound: the handle, a requested booking or a fact's home row does not exist, or the business scope hides it (another business's row: K-04 v1 rule 4), named by the first one missing; unknownFact; transient. Nothing is returned.",
+      "description": "notFound: the handle, a requested booking or a fact's home row does not exist, or the business scope hides it (another business's row: K-04 v1 rule 4), named by the first one missing; unknownFact (a column no frozen table list gives, a table with no version, or any column of sealing_keys); transient. Nothing is returned.",
       "oneOf": [
         {
           "$ref": "#/$defs/notFoundError"
@@ -1946,7 +1980,7 @@
     },
     "sendState.response": {
       "title": "SendStateResponse",
-      "description": "What limit 8 reads about a row's recipient, all from one read of the primary (one transaction): the row's state and version; the recipient's handle and person; the phone's stopped flag, open chat and Linq contact, with the chat Linq knows; the newest texts consent row that covers this contact here; the audience text hours follow; the zone (the visit's, else the business's: CQ-05); the business's H04 text hours; the staging test phone's override (BP 9.4); each row the message read at its version now; and whether its booking or question has closed. Limit 8's rules on it are C-125's. New in v1.2.",
+      "description": "What limit 8 reads about a row's recipient, all from one read of the primary (one transaction): the row's state and version; the recipient's handle and person; the phone's stopped flag, open chat and Linq contact, with the chat Linq knows; the newest texts consent row that covers this contact here; the audience text hours follow; the zone (the visit's, else the business's: CQ-05); the business's H04 text hours; the staging test phone's override (BP 9.4); each row the message read at its version now; whether its booking or question has closed; and the record flags the dispatcher checks (arch 03 line 175): the booking's private and deceased flags with the person served, and the open pauses at the row's business on its recipient. Limit 8's rules on it, and what each flag holds back, are C-125's. New in v1.2.",
       "type": "object",
       "properties": {
         "result": {
@@ -2123,7 +2157,7 @@
           }
         },
         "booking": {
-          "description": "The row's booking head now (stage and version), or null when the row has none.",
+          "description": "The row's booking head now (stage, the person served, the record flags private and deceased, and version), or null when the row has none. The flags are the ones arch 03 line 175 says the dispatcher checks: deceased (A7-81: reminders and sales texts stop) and private (A3-50: only the person served, those they added and the business are reached), with the person served to check private against (README item 28, default 42).",
           "anyOf": [
             {
               "type": "object",
@@ -2134,17 +2168,36 @@
                 "stage": {
                   "enum": ["entry", "booked", "checked_in", "done", "cancelled"]
                 },
+                "servedPersonId": {
+                  "description": "bookings.served_person_id: the person served, or null until known. New in v1.2.",
+                  "$ref": "#/$defs/nullableId"
+                },
+                "private": {
+                  "description": "bookings.private (A3-50). New in v1.2.",
+                  "type": "boolean"
+                },
+                "deceased": {
+                  "description": "bookings.deceased (A7-81). New in v1.2.",
+                  "type": "boolean"
+                },
                 "version": {
                   "$ref": "#/$defs/version"
                 }
               },
-              "required": ["id", "stage", "version"],
+              "required": ["id", "stage", "servedPersonId", "private", "deceased", "version"],
               "additionalProperties": false
             },
             {
               "type": "null"
             }
           ]
+        },
+        "pauses": {
+          "description": "The paused flag the dispatcher checks (arch 03 line 175: 'visits and requests wait for the owner', A3-48): the open pauses (K-04 pauses, cleared_at null) at the row's business on its recipient person or on the recipient's phone (K-04 pauses_open_person_idx, pauses_open_phone_idx: 'The gate and the dispatcher check a person's pause'), in id order; empty when there is none, and for a row with no business, since every pause names its business (README default 42). Address pauses are not read (open gap 17). New in v1.2.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pauseRead"
+          }
         },
         "openQuestion": {
           "description": "The row's open question now (status and version), or null when the row asks none.",
@@ -2203,6 +2256,7 @@
         "textHoursOverride",
         "currentVersions",
         "booking",
+        "pauses",
         "openQuestion",
         "closed"
       ],
@@ -2249,7 +2303,7 @@
     },
     "handleSealingKey.request": {
       "title": "HandleSealingKeyRequest",
-      "description": "Get or create a handle's sealing key (QUESTIONS.md NQ-RT-1's default: the handle's key, created on first sight of the handle and linked to the person once known; arch 02 line 109: the gateway 'writes the sealed event to the handle's actor'; arch 01 line 93). On K-04 v1 as frozen a key is a person's (sealing_keys by person_id), so the handle's key is a key of one of its people: at first sight the call writes the handle, a person with no name yet and their link, and that person's key. The key never appears in the exchange (rule 7): the call hands the caller the data key, unwrapped under the named Workers secret as a key object for AES-256-GCM that cannot be exported (db/repo/sealing.ts's form, T-182), beside the response. Scope: the runtime side; every table it touches is scoped none in K-04 (handles, persons, person_handles, sealing_keys). Reads and writes the primary, uncached. Repeat: safe: a second call finds what the first wrote. Time budget: inside the gateway's 1 s answer (arch 02 line 109). New in v1.2.",
+      "description": "Get or create a handle's sealing key (QUESTIONS.md NQ-RT-1's default: the handle's key, created on first sight of the handle and linked to the person once known; arch 02 line 109: the gateway 'writes the sealed event to the handle's actor'; arch 01 line 93). On K-04 v1 as frozen a key is a person's (sealing_keys by person_id), so the handle's key is a key of one of its people: at first sight the call writes the handle, a person with no name yet and their link, and that person's key; and when every person on the handle has had their key erased (RULES 4.10), it writes the same way a fresh person with no name, linked to the handle, and that person's key, so the number's next text, a stop in other words, START, HELP or a danger text included, is still sealed and reaches a turn (README item 29; open gap 18, closed). The key never appears in the exchange (rule 7): the call hands the caller the data key, unwrapped under the named Workers secret as a key object for AES-256-GCM that cannot be exported (db/repo/sealing.ts's form, T-182), beside the response. Scope: the runtime side; every table it touches is scoped none in K-04 (handles, persons, person_handles, sealing_keys). Reads and writes the primary, uncached. Repeat: safe: a second call finds what the first wrote. Time budget: inside the gateway's 1 s answer (arch 02 line 109). New in v1.2.",
       "type": "object",
       "properties": {
         "handle": {
@@ -2261,7 +2315,7 @@
           "$ref": "#/$defs/id"
         },
         "newPersonId": {
-          "description": "The id the person row takes if this call writes it at first sight; unused otherwise.",
+          "description": "The id the person row takes if this call writes it: at first sight, or when every person on the handle has had their key erased; unused otherwise.",
           "$ref": "#/$defs/id"
         },
         "wrappingKeyName": {
@@ -2285,7 +2339,7 @@
           "$ref": "#/$defs/id"
         },
         "personId": {
-          "description": "The person whose key it is: the oldest held key among the handle's people (sealing_keys.created_at, a tie to the lower person id), else a key made now for the first of its people with none (the lower person id), else, with no person yet, the person made now.",
+          "description": "The person whose key it is: the oldest held key among the handle's people (sealing_keys.created_at, a tie to the lower person id), else a key made now for the first of its people with none (the lower person id), else, with no person yet or with every person's key erased, the person made now with no name.",
           "$ref": "#/$defs/id"
         },
         "created": {
@@ -2329,28 +2383,8 @@
     },
     "handleSealingKey.errors": {
       "title": "HandleSealingKeyErrors",
-      "description": "keyErased: every person on the handle has had their key erased (RULES 4.10; arch 09 line 492), so nothing can be sealed for them and nothing is written (README open gap 18); constraint: a new id already taken (23505); transient. The gateway answers 503 on any of them and stores nothing (arch 02 line 109).",
+      "description": "constraint: a new id already taken (23505); transient. The gateway answers 503 on either and stores nothing (arch 02 line 109), and the provider retries. A handle whose every person's key was erased is no error: the call writes a fresh person and key (README item 29).",
       "oneOf": [
-        {
-          "title": "KeyErasedError",
-          "type": "object",
-          "properties": {
-            "error": {
-              "const": "keyErased"
-            },
-            "handleId": {
-              "$ref": "#/$defs/id"
-            },
-            "personId": {
-              "$ref": "#/$defs/id"
-            },
-            "erasedAt": {
-              "$ref": "#/$defs/utc"
-            }
-          },
-          "required": ["error", "handleId", "personId", "erasedAt"],
-          "additionalProperties": false
-        },
         {
           "$ref": "#/$defs/constraintError"
         },

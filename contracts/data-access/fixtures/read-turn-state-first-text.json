@@ -4,7 +4,7 @@
     "k04Seeds": ["seed-sealing-key.json"],
     "after": ["handle-key-first-sight.json"],
     "now": "2026-11-08T14:00:05Z",
-    "note": "S1-01: the frontier of a new owner's first text, before there is a business. With no business the call reads on the runtime side and returns only rows with no business: the person made at first sight, no language yet, and nothing else (no phone row until this turn commits)."
+    "note": "S1-01: the frontier of a new owner's first text, before there is a business. With no business the call reads on the runtime side and returns only rows with no business: the handle's kind and address, the person made at first sight, no language yet, and nothing else (no phone row until this turn commits)."
   },
   "request": {
     "handleId": "handle-gw-0108",
@@ -15,6 +15,7 @@
   "outcome": {
     "result": "turnState",
     "handleId": "handle-gw-0108",
+    "handle": { "kind": "phone", "address": "+15555550108" },
     "businessId": null,
     "readAt": "2026-11-08T14:00:05Z",
     "persons": [{ "personId": "person-gw-0108", "language": null, "version": 1 }],

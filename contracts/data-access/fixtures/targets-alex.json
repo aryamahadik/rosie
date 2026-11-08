@@ -1,10 +1,10 @@
 {
   "call": "handleTargets",
   "given": {
-    "k04Seeds": ["seed-open-question.json", "seed-phone-chat-open.json"],
+    "k04Seeds": ["seed-open-question.json", "seed-outbox-row.json", "seed-phone-chat-open.json"],
     "after": [],
     "now": "2026-10-23T14:06:12Z",
-    "note": "Alex's poll answer 'A' (evt-alex-0008) is not a keyword, so the guard lists his targets across every business: his customer roles at the barbershop and the yoga studio, A7-03's open question about his haircut, and both his bookings."
+    "note": "Alex's poll answer 'A' (evt-alex-0008) is not a keyword, so the guard lists his targets across every business: his customer roles at the barbershop and the yoga studio, A7-03's open question about his haircut with the time it went out and its poll (K-04 seed-outbox-row: the poll part, linq-msg-demo-0002, sent at 14:05:05), and both his bookings."
   },
   "request": {
     "handleId": "handle-alex"
@@ -39,6 +39,8 @@
         "readback": null,
         "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
         "clock": "24 h",
+        "sentAt": "2026-10-23T14:05:05Z",
+        "pollId": "linq-msg-demo-0002",
         "askCount": 1,
         "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
         "version": 2

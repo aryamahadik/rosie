@@ -781,16 +781,16 @@
       "version": "v1.2",
       "def": "handleSealingKey.exchange",
       "expect": "accept",
-      "shows": "Ben T. texts after his key was erased: no person on the handle holds a key, so the call is refused with keyErased and writes nothing",
-      "source": "RULES 4.10 (45-day delete); arch 09 line 492; K-04 v1 sealing_keys_erased_or_held, seed-sealing-key (Ben erased 2026-11-02)"
+      "shows": "Ben T.'s number texts after his key was erased: no person on the handle holds a key, so, as at first sight, the call writes a person with no name linked to the handle and that person's key, and a stop in other words, START, HELP or a danger text from the number is still sealed and reaches a turn; his erased key stays erased",
+      "source": "RULES 4.10 (45-day delete), 7.2 (a stop in any words), 4.12; arch 02 lines 109, 111; arch 09 line 492; K-04 v1 sealing_keys_erased_or_held, person_handles, seed-sealing-key (Ben erased 2026-11-02); security review of T-072 round 1 (gap 2)"
     },
     {
       "file": "targets-alex.json",
       "version": "v1.2",
       "def": "handleTargets.exchange",
       "expect": "accept",
-      "shows": "The guard's targets for Alex across every business: his two customer roles, A7-03's open question with its options, and his bookings at the barbershop and the yoga studio, with versions",
-      "source": "QUESTIONS.md NQ-RT-2 default ('a handle's targets'); arch 02 line 115; arch 03 line 159; K-04 v1 person_roles, open_questions, bookings_booker_idx, bookings_served_idx"
+      "shows": "The guard's targets for Alex across every business: his two customer roles, A7-03's open question with its options, the time it went out and its poll's id, and his bookings at the barbershop and the yoga studio, with versions",
+      "source": "QUESTIONS.md NQ-RT-2 default ('a handle's targets'); arch 02 line 115; arch 03 lines 159, 187; K-04 v1 person_roles, open_questions, outbox_rows.open_question_id, outbox_parts, seed-outbox-row, bookings_booker_idx, bookings_served_idx; K-02 v1 openQuestion"
     },
     {
       "file": "targets-sam-owner.json",
@@ -813,8 +813,8 @@
       "version": "v1.2",
       "def": "readTurnState.exchange",
       "expect": "accept",
-      "shows": "The frontier's read of Alex's state under the barbershop's scope: his person and role, his phone, A7-03's open question, the haircut's head at v7 with its flags, no pause, no consent row, and two facts each from its one home row with that row's version",
-      "source": "QUESTIONS.md M2-action-adapters.1 default ('read turn state', primary and uncached, under the business scope); arch 02 line 117; arch 03 lines 159, 163, 175; arch 10 lines 504, 538, 546"
+      "shows": "The frontier's read of Alex's state under the barbershop's scope: his handle's kind and address, his person and role, his phone, A7-03's open question with the time it went out and its poll's id, the haircut's head at v7 with its flags, no pause, no consent row, and two facts each from its one home row with that row's version",
+      "source": "QUESTIONS.md M2-action-adapters.1 default ('read turn state', primary and uncached, under the business scope); arch 02 line 117; arch 03 lines 159, 163, 175, 187; arch 10 lines 504, 538, 546; K-02 v1 writer.handle, openQuestion; K-04 v1 seed-outbox-row"
     },
     {
       "file": "read-turn-state-ben-stopped.json",
@@ -885,8 +885,8 @@
       "version": "v1.2",
       "def": "sendState.exchange",
       "expect": "accept",
-      "shows": "Limit 8's read for Alex's confirmation: not stopped, chat open with Linq's chat id and a Linq contact, a customer in the business's zone (no visit zone before K-30) and H04 hours, the staging override on for his test number, the booking it read unchanged",
-      "source": "QUESTIONS.md NQ-RT-2 default ('a recipient's send state'); arch 06 line 313; RULES 4.3; CQ-05; BP 9.4; QUESTIONS.md M3-M3b.4; K-04 v1 phones, threads, businesses, release_flags, seed-flag"
+      "shows": "Limit 8's read for Alex's confirmation: not stopped, chat open with Linq's chat id and a Linq contact, a customer in the business's zone (no visit zone before K-30) and H04 hours, the staging override on for his test number, the booking it read unchanged, served to Alex, neither private nor deceased, and no pause",
+      "source": "QUESTIONS.md NQ-RT-2 default ('a recipient's send state'); arch 06 line 313; arch 03 line 175 (the record flags the dispatcher checks); RULES 4.3; CQ-05; BP 9.4; QUESTIONS.md M3-M3b.4; K-04 v1 phones, threads, businesses, bookings, pauses, release_flags, seed-flag"
     },
     {
       "file": "send-state-owner.json",
@@ -917,8 +917,8 @@
       "version": "v1.2",
       "def": "commitTurn.exchange",
       "expect": "accept",
-      "shows": "Alex calls the Nov 14 haircut off while its confirmation is claimed and unsent: the booking cancelled (v2), the time with Riley released, the reply written",
-      "source": "02-contracts K-05 item 1; arch 06 line 313; K-04 v1 bookings.stage"
+      "shows": "Alex calls the Nov 14 haircut off while its confirmation is claimed and unsent: the booking cancelled (v2), the time with Riley released, the reply written, its entry in K-08's shapes (approved by nothing: no question was asked)",
+      "source": "02-contracts K-05 item 1; arch 06 line 313; K-04 v1 bookings.stage; K-08 v1 approval, eventLogRow.approved_by"
     },
     {
       "file": "send-state-booking-cancelled.json",
@@ -1015,6 +1015,22 @@
       "expect": "refuse",
       "shows": "A fact named with no home row: each fact is read once from its one home row, with that row's version",
       "source": "arch 02 line 117 ('each fact once, from its one home'); S13-30; K-02 v1 fact rowId"
+    },
+    {
+      "file": "invalid/refuse-read-turn-state-sealing-key-fact.json",
+      "version": "v1.2",
+      "def": "readTurnState.request",
+      "expect": "refuse",
+      "shows": "A read that names a person's wrapped sealing key as a fact: no column of sealing_keys is ever a fact, so the request is refused (the call answers unknownFact for one)",
+      "source": "BP rule 7; arch 01 line 93 (deleting the key erases the data); K-04 v1 sealing_keys; security review of T-072 round 1 (gap 1)"
+    },
+    {
+      "file": "invalid/refuse-read-turn-state-returns-sealing-key.json",
+      "version": "v1.2",
+      "def": "readTurnState.response",
+      "expect": "refuse",
+      "shows": "A turn state that carries Alex's wrapped key (K-04's seed stand-in bytes) as a fact: readTurnState never returns a sealing key's column, wrapped or not, to the Tool API, the frontier or the model's context",
+      "source": "BP rule 7; arch 01 lines 93, 95 (a gap case is logged with its state and frontier); K-02 v1 context facts; K-04 v1 sealing_keys, seed-sealing-key; security review of T-072 round 1 (gap 1)"
     }
   ]
 }

@@ -4,7 +4,7 @@
     "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
     "after": ["claim-in-order.json"],
     "now": "2026-11-07T15:06:36Z",
-    "note": "A second after the dispatcher claimed his confirmation, and before any part went, Alex calls off the Nov 14 haircut: the commit cancels the booking (version 1 to 2), releases the time with Riley and writes the one reply in the same turn."
+    "note": "A second after the dispatcher claimed his confirmation, and before any part went, Alex calls off the Nov 14 haircut: the commit cancels the booking (version 1 to 2), releases the time with Riley and writes the one reply in the same turn. The entry is in K-08 v1's shapes: his text answers no question in this chain, and K-08's approved_by is only an answer to a question, a consent row or the owner's yes, so it is null."
   },
   "request": {
     "turn": {
@@ -62,7 +62,7 @@
           "newValues": { "stage": "cancelled" },
           "sealed": null,
           "why": { "choice": "cancel" },
-          "approvedBy": { "exactYes": "evt-alex-0015" },
+          "approvedBy": null,
           "proofs": null
         }
       ]

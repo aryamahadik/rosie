@@ -36,7 +36,15 @@
     "textHours": { "start": "08:00", "end": "20:00" },
     "textHoursOverride": false,
     "currentVersions": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
-    "booking": { "id": "booking-alex-riley-nov14", "stage": "booked", "version": 1 },
+    "booking": {
+      "id": "booking-alex-riley-nov14",
+      "stage": "booked",
+      "servedPersonId": "person-alex",
+      "private": false,
+      "deceased": false,
+      "version": 1
+    },
+    "pauses": [],
     "openQuestion": null,
     "closed": { "booking": false, "question": false }
   }

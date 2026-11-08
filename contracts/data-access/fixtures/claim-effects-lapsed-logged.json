@@ -70,7 +70,7 @@
             "claim_lapses_at": "2026-11-07T15:09:10Z"
           },
           "sealed": null,
-          "why": { "claimedFrom": "running" },
+          "why": null,
           "approvedBy": null,
           "proofs": null
         }

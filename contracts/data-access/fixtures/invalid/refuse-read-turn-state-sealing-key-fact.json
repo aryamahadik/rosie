@@ -1,0 +1,6 @@
+{
+  "handleId": "handle-alex",
+  "businessId": "biz-lees-barbershop",
+  "bookingIds": [],
+  "facts": [{ "key": "person.key", "table": "sealing_keys", "rowId": "person-alex", "column": "wrapped_key" }]
+}
