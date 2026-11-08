@@ -219,12 +219,25 @@ describe("dates and times, from the send time in a zone", () => {
     expect(readings("in 3 days at 4pm", "2026-10-19T14:05:00Z", NEW_YORK)).toEqual(["2026-10-22T20:00:00Z"]);
   });
 
-  it.each(["BLOCK Thu 2-5", "3 or 4pm", "tomorrow or Friday at 3pm", "in 2 hours or tomorrow"])(
-    "'%s' names several times, never one",
-    (words) => {
-      expect(readTimeWords(words).kind).toBe("several");
-    },
-  );
+  it.each([
+    "BLOCK Thu 2-5",
+    "3 or 4pm",
+    "tomorrow or Friday at 3pm",
+    "in 2 hours or tomorrow",
+    "Thu 2pm-5pm",
+  ])("'%s' names several times, never one", (words) => {
+    expect(readTimeWords(words).kind).toBe("several");
+  });
+
+  it("a bare number is an hour only right beside its day: 'BLOCK Thu 2', never 'tomorrow, party of 6'", () => {
+    const monday = "2026-10-26T15:30:00Z";
+    expect(readings("BLOCK Thu 2", monday, NEW_YORK)).toEqual([
+      "2026-10-29T06:00:00Z",
+      "2026-10-29T18:00:00Z",
+    ]);
+    expect(readings("tomorrow, party of 6", monday, NEW_YORK)).toEqual(["2026-10-27T04:00:00Z"]);
+    expect(readTimeWords("party of 6").kind).toBe("none");
+  });
 
   it.each(["the usual", "barbering and some other stuff", "1"])("'%s' names no time", (words) => {
     expect(readTimeWords(words).kind).toBe("none");
