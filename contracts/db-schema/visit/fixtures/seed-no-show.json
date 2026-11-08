@@ -1,0 +1,83 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-line-price-copied.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-avery-no-show-dee",
+        "handle_id": "handle-avery",
+        "event_ids": ["evt-avery-0041"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-avery-0041",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T16:15:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a8-14-dee-haircut",
+        "turn_id": "turn-avery-no-show-dee",
+        "handle_id": "handle-dee",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-haircut",
+        "step": "A8-14",
+        "options": [
+          {
+            "id": "A8-14/3",
+            "label": "I'm here"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-dee-haircut",
+            "version": 5
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-dee-haircut-1",
+            "version": 2
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "30 min",
+        "ask_count": 1,
+        "status": "defaulted",
+        "answered_option_id": null,
+        "closed_at": "2026-11-07T16:45:02Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "no_shows",
+      "values": {
+        "visit_id": "visit-dee-haircut-1",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "marked_at": "2026-11-07T16:15:00Z",
+        "marked_by_person_id": "person-avery",
+        "marked_via": "staff_text",
+        "welfare_first": false,
+        "found_safe_at": null,
+        "owner_told_at": null,
+        "asked_at": "2026-11-07T16:15:02Z",
+        "reply_by": "2026-11-07T16:45:02Z",
+        "open_question_id": "oq-a8-14-dee-haircut",
+        "replied_at": null,
+        "reply": null,
+        "outcome": "no_visit",
+        "outcome_at": "2026-11-07T16:45:02Z",
+        "version": 2
+      }
+    }
+  ]
+}

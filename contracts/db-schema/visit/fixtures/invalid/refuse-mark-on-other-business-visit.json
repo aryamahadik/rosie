@@ -1,0 +1,40 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-flow-a.json", "../../bookings-changes/fixtures/seed-booking-flow-b.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "visit_marks",
+    "values": {
+      "visit_id": "visit-alex-drain-1",
+      "booking_id": "booking-alex-drain",
+      "business_id": "biz-lees-barbershop",
+      "checked_in_at": "2026-10-22T12:20:00Z",
+      "checked_in_how": "code",
+      "checked_in_by_person_id": "person-riley",
+      "checked_in_via": "staff_text",
+      "wrong_try_1_at": null,
+      "wrong_try_2_at": null,
+      "wrong_try_3_at": null,
+      "tries_told_at": null,
+      "no_code_at": null,
+      "left_at": null,
+      "ended_at": null,
+      "ended_how": null,
+      "done_by_person_id": null,
+      "done_via": null,
+      "side": null,
+      "stopped_why": null,
+      "done_price_id": null,
+      "photo_key": null,
+      "report_by": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

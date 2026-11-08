@@ -1,0 +1,49 @@
+{
+  "after": ["seed-late-fan-out.json"],
+  "rows": [
+    {
+      "table": "late_reports",
+      "values": {
+        "id": "late-jordan-home-services-oct22-ran-long",
+        "business_id": "biz-lee-home-services",
+        "worker_person_id": "person-jordan",
+        "minutes": 15,
+        "cause": "ran_long",
+        "from_visit_id": "visit-alex-drain-1",
+        "reported_at": "2026-10-22T13:00:00Z",
+        "day": "2026-10-22",
+        "zone": "America/New_York",
+        "turn_id": null
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "visit_events",
+    "values": {
+      "id": "vev-drew-heater-flush-ran-long",
+      "visit_id": "visit-drew-heater-flush-1",
+      "booking_id": "booking-drew-heater-flush",
+      "business_id": "biz-lee-home-services",
+      "kind": "late",
+      "at": "2026-10-22T13:00:02Z",
+      "by_person_id": null,
+      "turn_id": null,
+      "minutes": null,
+      "arrives_about": null,
+      "late_report_id": "late-jordan-home-services-oct22-ran-long",
+      "new_start": null,
+      "new_window": "[2026-10-22T16:35:00Z,2026-10-22T18:35:00Z)",
+      "open_question_id": null,
+      "wait_until": null
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_events_late"]
+    }
+  }
+}

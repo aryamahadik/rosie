@@ -1,0 +1,50 @@
+{
+  "after": ["seed-late-fan-out.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "visit_prices",
+    "values": {
+      "id": "price-drew-extra-shown-early",
+      "visit_id": "visit-drew-heater-flush-1",
+      "booking_id": "booking-drew-heater-flush",
+      "business_id": "biz-lee-home-services",
+      "kind": "extra",
+      "replaces_price_id": null,
+      "priced_by_person_id": "person-jordan",
+      "priced_at": "2026-10-22T16:50:00Z",
+      "total_cents": 62000,
+      "currency": "USD",
+      "included_cents": null,
+      "price_ok_limit_id": "pok-lee-home-services",
+      "rule_id": null,
+      "owner_asked_at": "2026-10-22T16:50:02Z",
+      "owner_answer_by": "2026-10-22T17:20:02Z",
+      "owner_reminded_at": null,
+      "owner_answer": null,
+      "owner_answered_at": null,
+      "owner_answered_by_person_id": null,
+      "owner_answered_by_role": null,
+      "owner_open_question_id": null,
+      "owner_option_id": null,
+      "owner_event_id": null,
+      "shown_at": "2026-10-22T16:50:05Z",
+      "customer_open_question_id": null,
+      "customer_reminded_at": null,
+      "customer_answer": null,
+      "customer_answered_at": null,
+      "yes_where": null,
+      "yes_on_phone_of_person_id": null,
+      "good_until": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_prices_shown_after_ok"]
+    }
+  }
+}

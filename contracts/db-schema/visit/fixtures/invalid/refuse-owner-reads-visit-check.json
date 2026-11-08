@@ -1,0 +1,18 @@
+{
+  "after": ["seed-visit-check.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "select",
+    "table": "visit_checks",
+    "where": {
+      "id": "vcheck-dee-skin-fade"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

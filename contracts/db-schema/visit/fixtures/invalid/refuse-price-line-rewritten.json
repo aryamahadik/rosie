@@ -1,0 +1,22 @@
+{
+  "after": ["seed-done.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "update",
+    "table": "visit_price_lines",
+    "set": {
+      "amount_cents": 15900,
+      "version": 2
+    },
+    "where": {
+      "id": "pline-alex-drain-done-1"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

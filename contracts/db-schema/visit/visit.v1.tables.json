@@ -1,0 +1,2052 @@
+{
+  "part": "visit",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "visit_marks",
+      "description": "One row per visit for what happens at it: FS line 729's checked_in_at, done_at and done_by, which K-30 leaves to this part. It holds how the visit was checked in (the code from the pro's own phone or the desk's Today page, a roster tick, a drop-off or a mail-in, or a self check-in), the wrong code tries in a row (their times only, never the digits typed) and when the owner was told after the third, a visit with no code, a self check-in's 'I've left', and how the visit ended: done (the pro's DONE, the desk, the owner's yes when nothing was entered by night, or the code when nothing is billed after), part (PART: stopped partway, priced for what was done), not started (whose side), stopped (safety, a finding, conduct or a first step), the door kept shut, or it did not happen. Written at the visit's first mark; each value is set once and never changed (README rule 7, trigger visit_marks_set_once). A no-show mark is its own row (no_shows).",
+      "source": "02-contracts section 7 row K-31 ('Check-ins (the code entered, wrong tries), DONE (when and by whom)'); FS line 729 (checked_in_at, done_at, done_by); A8-03 to A8-10, A8-70, A8-87; B8-03 to B8-08, B8-40, B8-41; K-30 v1 README ('K-31 the visit (F17) will name booking_visits.id for check-ins, DONE and no-shows and owns FS line 729's checked_in_at, done_at and done_by')",
+      "columns": [
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit (K-30 booking_visits.id), held to its booking by visit_marks_visit_fk: one row per visit, written at its first mark.",
+          "source": "K-30 v1 booking_visits.id ('The visit part (K-31) names it for check-ins, DONE and no-shows'); A7-01 ('Each later day ... gets its own reminder, with a new code')"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's booking (K-04 bookings.id).",
+          "source": "FS line 729; K-04 v1 bookings"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5 holds it), so row-level security can scope the row.",
+          "source": "arch 10 line 546; K-04 v1 rule 4"
+        },
+        {
+          "name": "checked_in_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the visit was checked in: the right code entered, a roster tick, a drop-off's code, a mail-in's arrival or a self check-in. It confirms the visit (A8-03: 'The code confirms the visit'), and the first check-in code is when K-32 counts the $2 (Q-22). The pro is told ('Checked in: Alex M., Sat 11:00am'), and in flow B the customer too. Null until then; set once.",
+          "source": "FS line 729 (checked_in_at); A8-03, A8-04, A8-06; B8-04 ('Jordan from Lee Home Services is checked in for your 8–10am visit'); FS line 618 (Today); K-32 v1 rosfield_fees (counted at the first check-in code); Q-22"
+        },
+        {
+          "name": "checked_in_how",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "code (the visit's check-in code, K-30 booking_visits.check_in_code, checked by code against the sealed value: A8-04, A8-06, B8-04), roster (the desk ticks names on the Today page at a class: A8-09), drop_off (the code given when the item is left: A8-10), mail_in (no code: it counts when the item arrives, A8-10) or self (no staff there: ID checked on the secure page, A8-70).",
+          "source": "A8-03 (its branches); A8-04; A8-06; A8-09; A8-10; A8-70; B8-03; B8-04"
+        },
+        {
+          "name": "checked_in_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who entered it (persons.id): the pro, from their own phone, so 'checked in' shows who came (B8-04), or the desk on the Today page (A8-04; FS line 618). Null for a self check-in.",
+          "source": "B8-04 ('Only the pro's own phone can enter the code, so checked in shows who came'); A8-04 ('From Riley's phone, or the portal's Today page at the desk'); FS line 618"
+        },
+        {
+          "name": "checked_in_via",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "staff_text (a text from the pro's or the desk's own phone), today_page (the owner console's Today page) or secure_page (a self check-in).",
+          "source": "A8-04; FS line 618; A8-70"
+        },
+        {
+          "name": "wrong_try_1_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the first wrong code in a row was entered ('That isn't Alex M.'s code. Check it with them and send it again'). Only the time is kept, never the digits typed: a code is checked once more and never guessed. Set once.",
+          "source": "A8-03 ('A code typed with a typo is checked once more, never guessed'); A8-05; B8-05; FS line 668 (screen 18)"
+        },
+        {
+          "name": "wrong_try_2_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the second wrong code in a row was entered; only the time. Set once.",
+          "source": "A8-05 ('3 wrong tries: three wrong in a row'); B8-05"
+        },
+        {
+          "name": "wrong_try_3_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the third wrong code in a row was entered; only the time. After it no code is taken: the owner is told, the visit goes on, and DONE at the end counts it. Set once.",
+          "source": "A8-05; A8-07 ('After 3 wrong tries, Sam is told ... The visit goes on, and Riley's DONE at the end counts it'); B8-06; FS line 668 ('after 3 wrong tries the owner is told')"
+        },
+        {
+          "name": "tries_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "owner"],
+          "description": "When the owner was told after the third wrong try, and in flow B the customer as well ('If the person at your door isn't Jordan, don't let them in').",
+          "source": "A8-07; B8-06; FS line 668"
+        },
+        {
+          "name": "no_code_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the pro noted that there is no code (the customer's phone is away: 'NO CODE Alex M. Phone is away.'), so DONE at the end confirms the visit instead.",
+          "source": "A8-08; B8-08"
+        },
+        {
+          "name": "left_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A self check-in's 'I've left', which closes the visit. None by the end gets one text; no answer in 15 minutes, the owner is told and a safety check follows (never an overtime fee on silence).",
+          "source": "A8-70 ('Kai taps I've left to close the visit')"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the visit was marked to end, once: DONE's or PART's time, the owner's answer, or when it could not start or stopped (A8-87: 'One event, one moment: the visit is marked done once, here').",
+          "source": "A8-87; B8-40 ('One DONE per visit'); B8-41"
+        },
+        {
+          "name": "ended_how",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "done (the work is done: the pro's DONE, the desk's mark, the owner's 1 Yes, mark it done after nothing was entered by night, or the code when nothing is billed after and no date was promised); part (PART: it stopped partway, and only what was done is charged); not_started (something required is missing or a conflict is found: whose side says what is charged); stopped (stopped for safety, a finding, conduct or a first step that is not OK); door_shut (the customer said the person at the door is not the pro, and the door stayed shut: no fee); didnt_happen (the owner's 2 It didn't happen: nothing more is charged).",
+          "source": "A8-87; B8-40; B8-41; A8-37; B8-80; A8-51; B8-54; A8-40; A8-35; A8-80; A8-72; B8-29; B8-30; B8-88; B8-90; B8-07; A8-47; B8-47; Q-13"
+        },
+        {
+          "name": "done_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who marked it done or part (persons.id): the pro who texted DONE or PART, the desk, or the owner who answered 1 Yes, mark it done; null when the code confirmed it (done_via code).",
+          "source": "FS line 729 (done_by); A8-87; B8-41; A8-47; B8-47; FS line 618"
+        },
+        {
+          "name": "done_via",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "staff_text (DONE or PART from the pro's or the desk's own phone), today_page (the desk marks it done on the Today page), owner_yes (the owner's answer when nothing was entered by night) or code (checked in with the code, nothing billed after and no ready date promised: nothing more is needed).",
+          "source": "A8-87 ('Checked in with the code'; 'The pro texts DONE'); B8-41; FS line 618; A8-47; B8-47; Q-13"
+        },
+        {
+          "name": "side",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "Whose side a visit that could not start, or stopped, is on: customer (theirs to bring: any fee is the owner's question), business (nothing is charged) or customer_state (they arrived impaired, refused a safety rule or gave an answer that was not true: money follows the signed terms). Required when it did not start. A stop takes it where the plug-in or the step says (a first step that is not OK, or a safety stop where the plug-in sets no rule of its own, is the business's side).",
+          "source": "A8-51 ('Whose side is it on?'; 'Safe default: the business's side'); A8-56; A8-61; A8-81; B8-54; A8-72 ('That's the business's side'); A8-40 ('the part not given is the business's side')"
+        },
+        {
+          "name": "stopped_why",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "Why it stopped: safety (it isn't safe to go on, or the pro feels unsafe and leaves), finding (a finding stops the work, with a written note), conduct (ended for conduct) or first_step (the first step shows it can't go ahead safely today). The details go only on the secure page, never here.",
+          "source": "A8-40; B8-29; A8-35; B8-30; A8-80; B8-88; A8-72; B8-90; A8-86 ('Details go only on the secure page')"
+        },
+        {
+          "name": "done_price_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The DONE's or PART's total and lines (visit_prices of kind done or part, of this visit): every money message after the visit reads these lines. Null when the owner's yes lets the bill go as booked, or the code confirmed the visit.",
+          "source": "B8-41 ('Every money message after the visit reads these lines'); A8-37 ('texts PART with the price of what was done'); A8-87; A8-47 ('the bill goes as booked')"
+        },
+        {
+          "name": "photo_key",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "DONE's photo when nobody needs to be home: the object key of the photo in the private file store (K-13), never the photo. It rides on the first message after the visit, the bill or the receipt.",
+          "source": "B8-17 ('DONE needs a photo'; 'The DONE photo rides on the first message after the visit, the bill or the receipt'); B8-41; B9-06; 02-contracts row K-13"
+        },
+        {
+          "name": "report_by",
+          "type": "date",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "A report promised by a date: DONE says that date, a day in the visit's zone (README rule 9).",
+          "source": "A8-87 ('A report promised by a date: DONE says that date'); B8-41"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["visit_id"],
+      "foreignKeys": [
+        {
+          "name": "visit_marks_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_marks_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_marks_checked_in_by_fk",
+          "columns": ["checked_in_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_marks_done_by_fk",
+          "columns": ["done_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_marks_done_price_fk",
+          "columns": ["done_price_id", "visit_id"],
+          "references": {
+            "table": "visit_prices",
+            "columns": ["id", "visit_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "visit_marks_done_price_key",
+          "columns": ["done_price_id"],
+          "source": "B8-41 (one DONE per visit: a DONE's lines bill one visit)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "visit_marks_check_in_how_known",
+          "expression": "checked_in_how is null or checked_in_how in ('code', 'roster', 'drop_off', 'mail_in', 'self')",
+          "source": "A8-03; A8-09; A8-10; A8-70"
+        },
+        {
+          "name": "visit_marks_check_in_via_known",
+          "expression": "checked_in_via is null or checked_in_via in ('staff_text', 'today_page', 'secure_page')",
+          "source": "A8-04; FS line 618; A8-70"
+        },
+        {
+          "name": "visit_marks_checked_in_together",
+          "expression": "(checked_in_at is null) = (checked_in_how is null) and (checked_in_at is null) = (checked_in_via is null) and (checked_in_at is not null or checked_in_by_person_id is null)",
+          "source": "FS line 729; B8-04"
+        },
+        {
+          "name": "visit_marks_who_checked_in",
+          "expression": "checked_in_at is null or (checked_in_how = 'self' and checked_in_via = 'secure_page' and checked_in_by_person_id is null) or (checked_in_how <> 'self' and checked_in_via in ('staff_text', 'today_page') and checked_in_by_person_id is not null)",
+          "source": "B8-04 ('checked in shows who came'); A8-04; A8-70"
+        },
+        {
+          "name": "visit_marks_wrong_tries_in_order",
+          "expression": "(wrong_try_2_at is null or (wrong_try_1_at is not null and wrong_try_2_at >= wrong_try_1_at)) and (wrong_try_3_at is null or (wrong_try_2_at is not null and wrong_try_3_at >= wrong_try_2_at))",
+          "source": "A8-05 ('three wrong in a row')"
+        },
+        {
+          "name": "visit_marks_told_after_third",
+          "expression": "tries_told_at is null or (wrong_try_3_at is not null and tries_told_at >= wrong_try_3_at)",
+          "source": "A8-07; B8-06"
+        },
+        {
+          "name": "visit_marks_code_before_third",
+          "expression": "checked_in_how is distinct from 'code' or (wrong_try_3_at is null and checked_in_at >= coalesce(wrong_try_2_at, wrong_try_1_at, checked_in_at))",
+          "source": "A8-05; A8-06 ('The next try matches, so it's a normal check-in'); A8-07 (after 3 wrong tries, DONE counts it)"
+        },
+        {
+          "name": "visit_marks_left_after_self_check_in",
+          "expression": "left_at is null or (coalesce(checked_in_how = 'self', false) and left_at >= checked_in_at)",
+          "source": "A8-70"
+        },
+        {
+          "name": "visit_marks_ended_how_known",
+          "expression": "ended_how is null or ended_how in ('done', 'part', 'not_started', 'stopped', 'door_shut', 'didnt_happen')",
+          "source": "A8-87; A8-37; A8-51; A8-86; B8-07; A8-47"
+        },
+        {
+          "name": "visit_marks_ended_together",
+          "expression": "(ended_at is null) = (ended_how is null) and (ended_at is null or checked_in_at is null or ended_at >= checked_in_at)",
+          "source": "A8-87"
+        },
+        {
+          "name": "visit_marks_done_via_known",
+          "expression": "done_via is null or done_via in ('staff_text', 'today_page', 'owner_yes', 'code')",
+          "source": "A8-87; FS line 618; A8-47"
+        },
+        {
+          "name": "visit_marks_done_with_how",
+          "expression": "coalesce(ended_how in ('done', 'part'), false) = (done_via is not null)",
+          "source": "FS line 729 (done_at, done_by)"
+        },
+        {
+          "name": "visit_marks_done_by",
+          "expression": "(done_via is not null and done_via <> 'code') = (done_by_person_id is not null)",
+          "source": "FS line 729 (done_by); A8-87"
+        },
+        {
+          "name": "visit_marks_done_by_code",
+          "expression": "done_via is distinct from 'code' or (ended_how = 'done' and coalesce(checked_in_how = 'code', false) and done_price_id is null)",
+          "source": "A8-87 ('Checked in with the code: the code came in, nothing is billed after, and no ready date was promised')"
+        },
+        {
+          "name": "visit_marks_part_priced",
+          "expression": "ended_how is distinct from 'part' or (coalesce(done_via in ('staff_text', 'today_page'), false) and done_price_id is not null)",
+          "source": "A8-37 ('texts PART with the price of what was done. It's read back like a bill'); B8-80"
+        },
+        {
+          "name": "visit_marks_owner_yes_as_booked",
+          "expression": "done_via is distinct from 'owner_yes' or (ended_how = 'done' and done_price_id is null)",
+          "source": "A8-47 ('Sam marks it done, and the bill goes as booked'); B8-47; Q-13"
+        },
+        {
+          "name": "visit_marks_done_text_has_lines",
+          "expression": "done_via is distinct from 'staff_text' or done_price_id is not null",
+          "source": "B8-41 ('Jordan texts DONE with the total and its lines'); A8-87 ('DONE 35 haircut')"
+        },
+        {
+          "name": "visit_marks_done_price_when_done",
+          "expression": "done_price_id is null or coalesce(ended_how in ('done', 'part'), false)",
+          "source": "B8-41; A8-37"
+        },
+        {
+          "name": "visit_marks_never_met",
+          "expression": "ended_how is null or ended_how not in ('door_shut', 'didnt_happen') or checked_in_at is null",
+          "source": "B8-07 ('Nothing counts until Jordan checks in'); A8-47 (no code and no DONE)"
+        },
+        {
+          "name": "visit_marks_side_known",
+          "expression": "side is null or side in ('customer', 'business', 'customer_state')",
+          "source": "A8-51"
+        },
+        {
+          "name": "visit_marks_side_when",
+          "expression": "(ended_how is distinct from 'not_started' or side is not null) and (side is null or coalesce(ended_how in ('not_started', 'stopped'), false))",
+          "source": "A8-51; A8-72; A8-40"
+        },
+        {
+          "name": "visit_marks_stopped_why_known",
+          "expression": "stopped_why is null or stopped_why in ('safety', 'finding', 'conduct', 'first_step')",
+          "source": "A8-86; B8-97; A8-72"
+        },
+        {
+          "name": "visit_marks_stopped_with_why",
+          "expression": "coalesce(ended_how = 'stopped', false) = (stopped_why is not null)",
+          "source": "A8-86"
+        },
+        {
+          "name": "visit_marks_photo_report_with_done",
+          "expression": "(photo_key is null and report_by is null) or done_via is not null",
+          "source": "B8-17; B8-41; A8-87"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "visit_marks_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking's visits' marks: the record and journey 9's visit_done (A9-01 needs visit_done)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "visit_prices",
+      "description": "Each price set at a visit, with its lines in visit_price_lines: a price made at the visit for a service priced at the visit (only the consult or service call was promised), an extra (more work, more time or another way, priced first), and the DONE's or PART's total and lines that every money message after the visit reads. A price over the owner's limit, or made where the owner's rule asks for an OK, goes to the owner first (the answer in K-08's ownerYes shape); then the customer sees it and says yes to all, not today or some lines, asks for a change, or does not answer. A price is never edited: the owner's change or the customer's asked change is a new row naming the one it replaces. Each answer is set once (README rule 7, trigger visit_prices_set_once).",
+      "source": "02-contracts section 7 row K-31 ('prices and extras set at the visit'); A8-24 to A8-31, A8-33, A8-37, A8-48, A8-49, A8-87, A8-88; B8-19 to B8-26, B8-41, B8-48, B8-49, B8-77, B8-80, B8-92, B8-93; K-08 v1 approvalOwnerYes; K-32 v1 README open gaps ('Extras set at the visit (K-31, F17)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The price's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit it was set at (K-30 booking_visits.id), held to its booking by visit_prices_visit_fk.",
+          "source": "A8-25; B8-20; A8-33; B8-23; B8-41"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's booking (K-04 bookings.id).",
+          "source": "FS line 729; K-04 v1 bookings"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "at_visit (a service priced at the visit: only the consult or service call was promised, and nothing more is done until the customer says yes), extra (extra work, more time or another way during the visit: priced first, and the customer's own yes), done (the DONE's total and lines: the booked work, extras with their yes, parts at cost) or part (PART: the price of what was done when the work stops partway).",
+          "source": "A8-24, A8-25; B8-19, B8-20; A8-85, A8-33; B8-96, B8-23; A8-87; B8-41; A8-37; B8-80"
+        },
+        {
+          "name": "replaces_price_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The price this one replaces (visit_prices.id, of the same visit): after the owner's 2 Change it (the owner types a new price, read back first) or the customer's asked change (priced again, shown again). A price is replaced at most once.",
+          "source": "A8-26 ('Sam types a new price, read back to Sam before it goes'); A8-88; B8-92; B8-77"
+        },
+        {
+          "name": "priced_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who set it (persons.id): the pro who texted it (a price, an extra, DONE or PART), or the owner who changed it.",
+          "source": "A8-25; B8-20; A8-33; B8-23; A8-87; B8-41; A8-26"
+        },
+        {
+          "name": "priced_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it was set.",
+          "source": "A8-25; B8-20; B8-41"
+        },
+        {
+          "name": "total_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The total in integer minor units (cents for USD), never a decimal: the price shown, or DONE's total ($0 for a free estimate declined).",
+          "source": "A8-25 ('$125 in all'); B8-92 ('$620'); B8-41 ('DONE 179 drain'); B9-01 ('DONE's total is $0'); CQ-09; K-30 v1 README 'Money'"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The three-letter currency code (USD in the demo shops).",
+          "source": "CQ-09; K-32 v1 README 'Money'"
+        },
+        {
+          "name": "included_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a price made at the visit: the consult or service call its total includes ('The $25 consult included'; 'The $89 service call is included'). Null otherwise.",
+          "source": "A8-25; A8-26; B8-20 ('The visit or consult fee is part of the quote'); B8-92; B8-93"
+        },
+        {
+          "name": "price_ok_limit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The owner's price OK limit that sends it to the owner first (K-26 price_ok_limits.id), when it is over that limit.",
+          "source": "B8-20 ('Over Sam's limit: Sam first'); B8-92 ('over your $500 limit'); A8-33 ('A price over Sam's limit goes to Sam first'); B8-23; A8-37; K-26 v1 price_ok_limits"
+        },
+        {
+          "name": "rule_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The owner's rule that asks for an OK of every price made at the visit (K-26 rules.id), as at the barbershop ('At the shop, only Sam OKs prices made at the chair').",
+          "source": "A8-26 ('A price made for one customer goes to Sam first, as Sam set it'); K-26 v1 rules"
+        },
+        {
+          "name": "owner_asked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner was asked to OK it, at once, whenever a limit or a rule asks: nothing goes out until someone OKs it.",
+          "source": "A8-26 ('Never: send a price made at the chair without Sam's OK, where Sam's rule asks for one'); B8-92"
+        },
+        {
+          "name": "owner_answer_by",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "owner"],
+          "description": "30 minutes after the owner was asked: with no answer by then, the customer hears it is with the owner (a DONE's or PART's total waits).",
+          "source": "A8-26 ('No answer in 30 minutes, by 11:35am here: nothing goes out, and the customer hears it's with Sam'); A8-28; B8-92 ('No answer in 30 minutes: Alex is told it's with the owner'); A8-37 ('No OK in 30 minutes: the bill or charge waits')"
+        },
+        {
+          "name": "owner_reminded_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner got the one reminder.",
+          "source": "A8-28 ('Nothing goes out until someone OKs it, and Sam gets one reminder')"
+        },
+        {
+          "name": "owner_answer",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "send (1 Send it) or change (2 Change it: the owner's new price, read back to the owner first, is a new row naming this one).",
+          "source": "A8-26 ('Means 1: send it. Means 2: Sam types a new price'); B8-92"
+        },
+        {
+          "name": "owner_answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner answered.",
+          "source": "A8-26; K-08 v1 approvalOwnerYes"
+        },
+        {
+          "name": "owner_answered_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who answered (persons.id): the owner, or an admin the owner lets OK prices (K-08 ownerYes person).",
+          "source": "K-08 v1 approvalOwnerYes; S13-45 row 8 (admins act only for what the owner lets them)"
+        },
+        {
+          "name": "owner_answered_by_role",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "owner or admin (K-08 ownerYes role).",
+          "source": "K-08 v1 approvalOwnerYes"
+        },
+        {
+          "name": "owner_open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The question the owner answered (K-04 open_questions.id; K-08 ownerYes question).",
+          "source": "K-08 v1 approvalOwnerYes; K-04 v1 open_questions"
+        },
+        {
+          "name": "owner_option_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The option chosen, as sent (K-08 ownerYes option).",
+          "source": "K-08 v1 approvalOwnerYes"
+        },
+        {
+          "name": "owner_event_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The inbound event that carried the answer (K-08 ownerYes event).",
+          "source": "K-08 v1 approvalOwnerYes"
+        },
+        {
+          "name": "shown_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the customer was shown it, before any work ('Nothing is done until you say yes'), after the owner's OK where one is asked. Prices made at the visit and extras only.",
+          "source": "A8-29 ('Once Sam OKs it, the customer sees the price before any work'); B8-93; A8-33; B8-23"
+        },
+        {
+          "name": "customer_open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The question the customer answered (K-04 open_questions.id).",
+          "source": "A8-29; B8-93; K-04 v1 open_questions"
+        },
+        {
+          "name": "customer_reminded_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "owner"],
+          "description": "When the customer got the one reminder (a drop-off after 2 hours; at a home after 15 minutes); still no answer, the owner picks whether to reach them.",
+          "source": "A8-49 ('No reply in 2 hours: one reminder'); B8-49 ('one reminder after 15 minutes'); B8-23"
+        },
+        {
+          "name": "customer_answer",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "yes (1 Yes, do it: all of it), not_today (2 Not today, or 2 No, just the booked work: only what was promised; a price still waiting for the owner's OK goes as not today), some_lines (3 OK some lines: only the lines marked yes are done and billed today), changes (asks for a change: priced again as a new row) or none (no answer after the one reminder and the owner's pick: nothing priced is done). Prices made at the visit and extras only.",
+          "source": "A8-29; A8-30; A8-48; A8-88; A8-49; A8-28 ('No reply: the consult only'); B8-93; B8-21; B8-48; B8-77; B8-49; B8-92 ('A quote still waiting then is treated as Not today'); A8-33; B8-23; B8-25"
+        },
+        {
+          "name": "customer_answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the customer answered.",
+          "source": "A8-29; B8-93"
+        },
+        {
+          "name": "yes_where",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "Where the customer's own yes was given: own_chat (in their own chat), page (on their secure page), pro_phone (on the pro's or the shop's phone, their page opened there: saved with the time and the pro's name, and a copy goes to their own mobile) or owner_call (the owner reached them their way: saved with the time and where it came from).",
+          "source": "A8-29 ('their own yes, in their own chat, or on the shop's phone'); A8-31; B8-26; A8-48 ('ticks them on the secure page'); B8-49 ('a yes is saved with the time and where it came from')"
+        },
+        {
+          "name": "yes_on_phone_of_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a yes on the pro's or the shop's phone: whose phone (persons.id), named on the copy the customer gets ('at 8:52am on Jordan's phone').",
+          "source": "A8-31 ('saved with the time and Riley's name'); B8-26"
+        },
+        {
+          "name": "good_until",
+          "type": "date",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a price not done today, or the lines left: the last day it stays good, 7 days on, a day in the visit's zone (README rule 9), to be booked as its own visit ('Good until Sat Oct 31').",
+          "source": "A8-30 ('good for 7 days'; 'Good until Sat Oct 31'); A8-48; A8-28; B8-21 ('Good until Thu Oct 29'); B8-25; B8-48"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "visit_prices_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_replaces_fk",
+          "columns": ["replaces_price_id", "visit_id"],
+          "references": {
+            "table": "visit_prices",
+            "columns": ["id", "visit_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_priced_by_fk",
+          "columns": ["priced_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_limit_fk",
+          "columns": ["price_ok_limit_id"],
+          "references": {
+            "table": "price_ok_limits",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_rule_fk",
+          "columns": ["rule_id"],
+          "references": {
+            "table": "rules",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_owner_by_fk",
+          "columns": ["owner_answered_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_owner_question_fk",
+          "columns": ["owner_open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_customer_question_fk",
+          "columns": ["customer_open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_prices_yes_phone_fk",
+          "columns": ["yes_on_phone_of_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "visit_prices_id_visit_key",
+          "columns": ["id", "visit_id"],
+          "source": "A replacing price and a DONE name a price of their own visit (visit_prices_replaces_fk, visit_marks_done_price_fk)"
+        },
+        {
+          "name": "visit_prices_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "A line names a price of its own business (visit_price_lines_price_fk)"
+        },
+        {
+          "name": "visit_prices_replaced_once",
+          "columns": ["replaces_price_id"],
+          "where": "replaces_price_id is not null",
+          "source": "A8-26; A8-88 (one new price for each change)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "visit_prices_kind_known",
+          "expression": "kind in ('at_visit', 'extra', 'done', 'part')",
+          "source": "A8-24; A8-85; A8-87; A8-37"
+        },
+        {
+          "name": "visit_prices_money",
+          "expression": "total_cents >= 0 and currency ~ '^[A-Z]{3}$' and (included_cents is null or (kind = 'at_visit' and included_cents > 0 and included_cents <= total_cents))",
+          "source": "CQ-09; B9-01 (a $0 DONE); A8-25 ('The $25 consult included')"
+        },
+        {
+          "name": "visit_prices_not_itself",
+          "expression": "replaces_price_id is null or replaces_price_id <> id",
+          "source": "A8-26"
+        },
+        {
+          "name": "visit_prices_one_reason_to_ask",
+          "expression": "price_ok_limit_id is null or rule_id is null",
+          "source": "A8-26; B8-92"
+        },
+        {
+          "name": "visit_prices_owner_asked_when_needed",
+          "expression": "(owner_asked_at is not null) = (price_ok_limit_id is not null or rule_id is not null)",
+          "source": "A8-26 ('A price made for one customer goes to Sam first, as Sam set it'); B8-20 ('Who must OK it first is settled before Alex is asked')"
+        },
+        {
+          "name": "visit_prices_owner_thirty_minutes",
+          "expression": "(owner_asked_at is null) = (owner_answer_by is null) and (owner_answer_by is null or owner_answer_by = owner_asked_at + interval '30 minutes')",
+          "source": "A8-26; B8-92; A8-37"
+        },
+        {
+          "name": "visit_prices_owner_reminded_after",
+          "expression": "owner_reminded_at is null or (owner_asked_at is not null and owner_reminded_at > owner_asked_at)",
+          "source": "A8-28"
+        },
+        {
+          "name": "visit_prices_owner_answered_by",
+          "expression": "(owner_answer is null) = (owner_answered_at is null) and (owner_answer is null) = (owner_answered_by_person_id is null) and (owner_answer is null) = (owner_answered_by_role is null) and (owner_answer is null) = (owner_open_question_id is null) and (owner_answer is null) = (owner_option_id is null) and (owner_answer is null) = (owner_event_id is null)",
+          "source": "K-08 v1 approvalOwnerYes (person, role, question, option, event); S13-26 (silence never says yes)"
+        },
+        {
+          "name": "visit_prices_owner_answer_fits",
+          "expression": "owner_answer is null or (owner_asked_at is not null and owner_answer in ('send', 'change') and owner_answered_by_role in ('owner', 'admin') and owner_answered_at >= owner_asked_at)",
+          "source": "A8-26; B8-92; K-08 v1 approvalOwnerYes"
+        },
+        {
+          "name": "visit_prices_customer_only_when_asked",
+          "expression": "kind in ('at_visit', 'extra') or (shown_at is null and customer_open_question_id is null and customer_reminded_at is null and customer_answer is null and good_until is null)",
+          "source": "A8-29; B8-93; B8-41 (DONE is read back to the pro, not asked of the customer)"
+        },
+        {
+          "name": "visit_prices_shown_after_ok",
+          "expression": "shown_at is null or (shown_at >= priced_at and (owner_asked_at is null or (coalesce(owner_answer = 'send', false) and shown_at >= owner_answered_at)))",
+          "source": "A8-26 ('Never: send a price made at the chair without Sam's OK'); A8-29; B8-92; B8-93 ('once anyone who must OK it first has')"
+        },
+        {
+          "name": "visit_prices_customer_answer_known",
+          "expression": "customer_answer is null or customer_answer in ('yes', 'not_today', 'some_lines', 'changes', 'none')",
+          "source": "A8-29; B8-93"
+        },
+        {
+          "name": "visit_prices_customer_answered",
+          "expression": "(customer_answer is null) = (customer_answered_at is null) and (customer_answer is null or customer_answered_at >= priced_at) and (customer_answer is null or customer_answer in ('not_today', 'none') or shown_at is not null)",
+          "source": "A8-29 ('Nothing is done until they say yes'); A8-28; B8-92"
+        },
+        {
+          "name": "visit_prices_customer_reminded_after",
+          "expression": "customer_reminded_at is null or (shown_at is not null and customer_reminded_at > shown_at)",
+          "source": "A8-49; B8-49"
+        },
+        {
+          "name": "visit_prices_yes_where_known",
+          "expression": "yes_where is null or yes_where in ('own_chat', 'page', 'pro_phone', 'owner_call')",
+          "source": "A8-29; A8-31; A8-48; B8-26; B8-49"
+        },
+        {
+          "name": "visit_prices_yes_where_with_yes",
+          "expression": "(yes_where is not null) = coalesce(customer_answer in ('yes', 'some_lines'), false) and coalesce(yes_where = 'pro_phone', false) = (yes_on_phone_of_person_id is not null)",
+          "source": "A8-31 ('saved with the time and Riley's name'); B8-26; B8-49"
+        },
+        {
+          "name": "visit_prices_good_until_when_left",
+          "expression": "good_until is null or coalesce(customer_answer in ('not_today', 'some_lines'), false)",
+          "source": "A8-30; A8-48; B8-21; B8-25"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "visit_prices_visit_idx",
+          "columns": ["visit_id"],
+          "why": "A visit's prices: the read-backs, the bill (DONE's lines) and the record."
+        },
+        {
+          "name": "visit_prices_waiting_owner_idx",
+          "columns": ["business_id"],
+          "where": "owner_asked_at is not null and owner_answer is null",
+          "why": "Prices waiting for the owner's OK, for Needs you (FS line 619) and the 30-minute clock."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "visit_price_lines",
+      "description": "The lines of a price set at a visit: each line of work priced at the visit or as an extra, which the customer OKs one by one for 3 OK some lines; and the DONE's or PART's lines (the booked work, naming its booking line; work OK'd at the visit, naming that line; parts at cost, with the store's receipt; the visit fee). A line's words and amount are never changed; only the customer's OK of a line of work is set, once.",
+      "source": "A8-25 ('quote 110 color correction + 15 gloss'); A8-48; B8-20 ('QUOTE 245 valve 165 supply line 80'); B8-48; A8-33; B8-23; B8-41 ('DONE with the total and its lines: what Alex said yes to'; 'parts at cost where the price said so, with the store's receipt'); B8-21 ('DONE carries only the visit fee'); B9-05",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The line's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "price_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The price it belongs to (visit_prices.id), held to its business by visit_price_lines_price_fk.",
+          "source": "A8-25; B8-20; B8-41"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The price's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The line's place in the price, from 1, as read back.",
+          "source": "A8-29 (the lines in order); B8-93"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "work (a line of work priced at the visit or as an extra), booked (DONE's or PART's line for the booked work, naming its booking line), agreed (DONE's or PART's line for work OK'd at the visit, naming that line), parts (parts at cost, with the store's receipt) or visit_fee (the visit fee or consult: after Not today, DONE carries only that).",
+          "source": "A8-25; B8-20; A8-33; B8-23; B8-41 ('The lines: the booked work, extras with their yes, and parts at cost'); B8-21 ('DONE carries only the visit fee')"
+        },
+        {
+          "name": "words",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The line as priced or texted ('Color correction', 'Shutoff valve and wall pipe', 'drain'): the work or the parts, never anything about the person; a note about the person goes on the signed-in page (README open gaps).",
+          "source": "A8-25; A8-29; B8-20; B8-92; B8-41; A8-23 ('Notes and photos of a person's body go only on the signed-in page')"
+        },
+        {
+          "name": "amount_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The line's amount in integer minor units (cents for USD), never a decimal.",
+          "source": "CQ-09; A8-25; B8-20"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The three-letter currency code, the same as its price's.",
+          "source": "CQ-09"
+        },
+        {
+          "name": "booking_line_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a booked line: the booking's line it bills (K-30 booking_lines.id), whose price was copied in at booking.",
+          "source": "B8-41 ('the booked work'); K-30 v1 booking_lines; RULES 3.7"
+        },
+        {
+          "name": "from_line_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For an agreed line: the line of work OK'd at the visit that it bills (visit_price_lines.id).",
+          "source": "B8-41 ('extras with their yes'); B8-48 ('Jordan's DONE has only the lines Alex OK'd')"
+        },
+        {
+          "name": "receipt_key",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For parts at cost: the object key of the store's receipt in the private file store (K-13), shown on the bill ('receipts shown').",
+          "source": "B8-41 ('parts at cost where the price said so, with the store's receipt'); B9-05 ('Costs passed on at cost: receipts shown')"
+        },
+        {
+          "name": "customer_ok",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a line of work: yes or no, once the customer answered (every line yes for 1 Yes, do it; no for 2 Not today; each line for 3 OK some lines, by telling the AI, like '1 and 3', or ticking them on the secure page). Set once.",
+          "source": "A8-48 ('Only those are done and billed today. The rest stays good for 7 days'); B8-48; A8-29"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it (limit 4).",
+          "source": "arch 01 line 85; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "visit_price_lines_price_fk",
+          "columns": ["price_id", "business_id"],
+          "references": {
+            "table": "visit_prices",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_price_lines_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_price_lines_booking_line_fk",
+          "columns": ["booking_line_id"],
+          "references": {
+            "table": "booking_lines",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_price_lines_from_line_fk",
+          "columns": ["from_line_id", "business_id"],
+          "references": {
+            "table": "visit_price_lines",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "visit_price_lines_position_key",
+          "columns": ["price_id", "position"],
+          "source": "A8-29 (the lines in order)"
+        },
+        {
+          "name": "visit_price_lines_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "An agreed line names a line of its own business (visit_price_lines_from_line_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "visit_price_lines_kind_known",
+          "expression": "kind in ('work', 'booked', 'agreed', 'parts', 'visit_fee')",
+          "source": "B8-41; A8-25; B8-21"
+        },
+        {
+          "name": "visit_price_lines_position_from_one",
+          "expression": "position >= 1",
+          "source": "A8-29"
+        },
+        {
+          "name": "visit_price_lines_money",
+          "expression": "amount_cents >= 0 and currency ~ '^[A-Z]{3}$'",
+          "source": "CQ-09"
+        },
+        {
+          "name": "visit_price_lines_words",
+          "expression": "length(btrim(words)) > 0",
+          "source": "A8-29 (each line read back)"
+        },
+        {
+          "name": "visit_price_lines_booked_names_line",
+          "expression": "(kind = 'booked') = (booking_line_id is not null)",
+          "source": "B8-41; K-30 v1 booking_lines"
+        },
+        {
+          "name": "visit_price_lines_agreed_names_line",
+          "expression": "(kind = 'agreed') = (from_line_id is not null) and (from_line_id is null or from_line_id <> id)",
+          "source": "B8-41; B8-48"
+        },
+        {
+          "name": "visit_price_lines_parts_receipt",
+          "expression": "(kind = 'parts') = (receipt_key is not null)",
+          "source": "B8-41 ('with the store's receipt')"
+        },
+        {
+          "name": "visit_price_lines_ok_only_work",
+          "expression": "customer_ok is null or (kind = 'work' and customer_ok in ('yes', 'no'))",
+          "source": "A8-48; B8-48"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "no_shows",
+      "description": "A no-show mark on a visit and what follows it: 15 minutes after the start (10 for a video or phone session nobody joined) the pro or the desk marks the customer as not there; where they may be unable to answer, a safety check comes first and no fee or no-show words go until they are found safe (alerts per Q-06); then the customer is asked to reply within 30 minutes; their reply, and how the mark ended. No fee is asked here: any fee is the owner's question (K-32 booking_fees), only after the customer is heard. One per visit; each value set once (README rule 7, trigger no_shows_set_once).",
+      "source": "02-contracts section 7 row K-31 ('no-show marks'); A8-14, A8-15, A8-16; B8-10, B8-11, B8-12; FS line 623 (No-shows: 'A missed visit is marked 15 minutes after the start; safety first where the welfare switch applies; then the customer is asked; no fee until the owner decides'); S11-22; Q-06",
+      "columns": [
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit marked (K-30 booking_visits.id), held to its booking by no_shows_visit_fk: one mark per visit.",
+          "source": "A8-14; B8-10; K-30 v1 booking_visits ('The visit part (K-31) names it for ... no-shows')"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's booking (K-04 bookings.id).",
+          "source": "FS line 729"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "marked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the no-show was marked ('NO SHOW Alex M.'): 15 minutes after the start, 10 for a video or phone session nobody joined (code holds it to the visit's start: README rule 10).",
+          "source": "A8-14 ('15 minutes after the start, Riley marks a no-show'; 'A video or phone session nobody joined: after 10 minutes'); B8-10; FS line 623"
+        },
+        {
+          "name": "marked_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who marked it (persons.id): the pro or the desk.",
+          "source": "A8-14; B8-10; FS line 623"
+        },
+        {
+          "name": "marked_via",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "staff_text (from their own phone) or today_page (the owner console).",
+          "source": "A8-14; FS lines 618, 623"
+        },
+        {
+          "name": "welfare_first",
+          "type": "boolean",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "Whether a safety check comes first: the plug-in's welfare switch is on, someone on the booking is marked in care, or the booker said they may be unable to answer.",
+          "source": "A8-14 ('Where the welfare switch is on, or someone on the booking is in care: a safety check comes first'); B8-10 ('May be unable to answer: ... or a booker who said so'); RULES 4.12"
+        },
+        {
+          "name": "found_safe_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "With a safety check: when they were found safe, by a reply or the business's own calls; no fee or no-show words go to anyone before it.",
+          "source": "A8-14 ('No fee words until they're found safe'); B8-10 ('No fee or no-show words go to anyone until they're found safe')"
+        },
+        {
+          "name": "owner_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "With a safety check: when the owner was told they were not reached in 30 minutes, and the plug-in's welfare plan runs. Rosie's own messages go by text to open chats and by email; Rosie places no call (Q-06).",
+          "source": "A8-14 ('Not reached in 30 minutes: Sam is told, and the plug-in's welfare plan runs'); B8-10; Q-06"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the customer was asked to reply within 30 minutes ('If you're here, please reply within 30 minutes'), after any safety check found them safe.",
+          "source": "A8-14; B8-10 ('Found safe and simply out, or no welfare need: ... This message then goes')"
+        },
+        {
+          "name": "reply_by",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "30 minutes after asked_at: the customer is heard before the owner decides anything.",
+          "source": "A8-15 ('Does Alex reply in 30 minutes?'; 'The customer is heard before Sam decides anything'); B8-11"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The question sent (K-04 open_questions.id): 'Reply 3 I'm here'.",
+          "source": "A8-14; K-04 v1 open_questions"
+        },
+        {
+          "name": "replied_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the customer replied.",
+          "source": "A8-15; B8-11"
+        },
+        {
+          "name": "reply",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "here (3 I'm here, or home: they or another adult on the booking is there), on_way ('On my way', 'I'm outside', 'Be there in 2 minutes': held to the grace time), cancelled ('I cancelled': the record is checked) or emergency (an emergency reason, which goes to the owner with any fee question, in their words only if nothing private).",
+          "source": "A8-14 ('On my way or I'm outside: Riley is told, and the time is held to the grace time'; 'I cancelled: the record is checked'); A8-15; B8-11 ('Means I'm home: any reply saying Alex or another adult on the booking is there'; 'An emergency reason goes to Sam with the fee question')"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "checked_in (they came after all: checked in with the code, a normal visit, no fee), not_met (they said they were there but still could not be met: nothing is charged now, and any fee is the owner's question with the facts), no_visit (no reply in the 30 minutes: no visit; any fee is the owner's call, and silence charges nothing) or cancelled_before (the record shows they cancelled first: no no-show). Set once.",
+          "source": "A8-16; B8-12 ('Still can't meet after they said they're there: nothing is charged now'); A8-15 ('No reply ... No visit. Any fee is Sam's call; silence charges nothing'); B8-11; A8-14 ('I cancelled: the record is checked')"
+        },
+        {
+          "name": "outcome_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the mark ended.",
+          "source": "A8-15; A8-16"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it (limit 4).",
+          "source": "arch 01 line 85; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["visit_id"],
+      "foreignKeys": [
+        {
+          "name": "no_shows_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "no_shows_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "no_shows_marked_by_fk",
+          "columns": ["marked_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "no_shows_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "no_shows_marked_via_known",
+          "expression": "marked_via in ('staff_text', 'today_page')",
+          "source": "A8-14; FS line 623"
+        },
+        {
+          "name": "no_shows_safety_check_with_welfare",
+          "expression": "(found_safe_at is null and owner_told_at is null) or welfare_first",
+          "source": "A8-14; B8-10"
+        },
+        {
+          "name": "no_shows_after_the_mark",
+          "expression": "(found_safe_at is null or found_safe_at >= marked_at) and (owner_told_at is null or owner_told_at >= marked_at)",
+          "source": "A8-14"
+        },
+        {
+          "name": "no_shows_asked_after_safe",
+          "expression": "asked_at is null or (asked_at >= marked_at and (not welfare_first or (found_safe_at is not null and asked_at >= found_safe_at)))",
+          "source": "A8-14 ('No fee words until they're found safe'); B8-10; RULES 4.12; S11-22"
+        },
+        {
+          "name": "no_shows_thirty_minutes",
+          "expression": "(asked_at is null) = (reply_by is null) and (reply_by is null or reply_by = asked_at + interval '30 minutes')",
+          "source": "A8-15; B8-11"
+        },
+        {
+          "name": "no_shows_reply_known",
+          "expression": "reply is null or reply in ('here', 'on_way', 'cancelled', 'emergency')",
+          "source": "A8-14; A8-15; B8-11"
+        },
+        {
+          "name": "no_shows_replied_together",
+          "expression": "(reply is null) = (replied_at is null) and (replied_at is null or replied_at >= marked_at)",
+          "source": "A8-15"
+        },
+        {
+          "name": "no_shows_outcome_known",
+          "expression": "outcome is null or outcome in ('checked_in', 'not_met', 'no_visit', 'cancelled_before')",
+          "source": "A8-15; A8-16; B8-11; B8-12"
+        },
+        {
+          "name": "no_shows_outcome_together",
+          "expression": "(outcome is null) = (outcome_at is null) and (outcome_at is null or outcome_at >= marked_at)",
+          "source": "A8-15"
+        },
+        {
+          "name": "no_shows_no_visit_after_silence",
+          "expression": "outcome is distinct from 'no_visit' or (reply is null and reply_by is not null and outcome_at >= reply_by)",
+          "source": "A8-15 ('Never: a fee before the customer is heard'); B8-11"
+        },
+        {
+          "name": "no_shows_not_met_after_reply",
+          "expression": "outcome is distinct from 'not_met' or coalesce(reply in ('here', 'on_way'), false)",
+          "source": "A8-16 ('Still can't meet after they said they're there'); B8-12"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "no_shows_open_idx",
+          "columns": ["business_id"],
+          "where": "outcome is null",
+          "why": "Open no-show marks, for the No-shows page (FS line 623) and the 30-minute clock."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "visit_events",
+      "description": "Events on the way to a visit and at its door, appended and never edited: the pro's on-my-way text with the arrival time (flow B); a LATE fanned out to this visit, with the new start or window and the visit's own question (both flows); and flow B's door events: the customer says the person at the door isn't the pro (and then that it was after all), only a child answers, and the agreed way in fails (and a new one comes on the secure page).",
+      "source": "02-contracts section 7 row K-31 ('on-my-way and door events (flow B)'; 'the late row fanned out to that worker's later visits (arch 09 line 484)'); arch 09 line 484; B8-02; B8-91; A7-14; B7-18; B8-03; B8-07; B8-09; B8-52",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The event's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit (K-30 booking_visits.id), held to its booking by visit_events_visit_fk.",
+          "source": "B8-02; A7-14; B8-03"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's booking (K-04 bookings.id).",
+          "source": "FS line 729"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business (README rule 5), so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "on_my_way (OMW: the person who meets the pro gets the pro's name and photo, the arrival time and the code to give at the door), late (this visit's share of a late report: its new start or window and its own question), not_the_pro (2 It isn't Jordan, by a reply, a call to the business line or any words: the door stays shut and the owner reaches them at once), was_the_pro (1 It was Jordan after all: the visit goes on), only_child_home (only a child answers where an adult must be there: the pro waits up to 30 minutes), way_in_failed (the agreed way in fails: a new one is asked on the secure page within 15 minutes) or way_in_fixed (a new way in came, by the page or by text).",
+          "source": "B8-02 ('Must carry: the business, the pro's name and photo, the arrival time, and the code and where to give it'); B8-91; A7-14; B7-18; B8-07; B8-09; B8-52"
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When it happened.",
+          "source": "B8-02; B7-18; B8-07"
+        },
+        {
+          "name": "by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Whose word it is (persons.id): the pro (on_my_way, only_child_home, way_in_failed) or the customer (not_the_pro, was_the_pro, way_in_fixed). Null for late, whose word the late report carries.",
+          "source": "B8-02; B8-07; B8-09; B8-52"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that committed it (K-04 turns.id); null for a page call with no turn (QUESTIONS.md CQ-44).",
+          "source": "K-04 v1 turns; arch 10 line 508; CQ-44"
+        },
+        {
+          "name": "minutes",
+          "type": "integer",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For on_my_way: the minutes the pro texted ('OMW 70 min'), when given.",
+          "source": "B8-91 ('OMW 70 min'; 'Rosie turns Jordan's minutes into a clock time')"
+        },
+        {
+          "name": "arrives_about",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For on_my_way: the arrival time told ('about 15 minutes'; 'arriving about 8:03pm'); a job sent now gets an arrival time instead of a window.",
+          "source": "B8-02; B8-91 ('an arrival time instead of a window')"
+        },
+        {
+          "name": "late_report_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For late: the late report it fans out from (late_reports.id, of the same business).",
+          "source": "arch 09 line 484"
+        },
+        {
+          "name": "new_start",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For late, at a set start: the new start told ('your 11:00am starts about 11:20am'). The booked time itself does not move: a later start that stands changes nothing in K-04 or K-30.",
+          "source": "A7-14 ('No reply: the later start stands, and nothing else changes'); S13-35 (a set start)"
+        },
+        {
+          "name": "new_window",
+          "type": "tstzrange",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For late, with a window or a sent-now estimate: the new window told ('New time: arriving 8:20–10:20am'), instants in UTC shown in the visit's zone (README rule 9).",
+          "source": "B7-18 ('New time: arriving 8:20–10:20am'; 'On a job sent now ... the new arrival estimate'); S13-03"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The visit's own question (K-04 open_questions.id): each visit a late report fans out to has its own (arch 09 line 484). A door event may carry one too (not_the_pro's 1 It was Jordan after all; only_child_home's 1 I'll be there soon, 2 Another time).",
+          "source": "arch 09 line 484 ('each with its own question'); A7-14; B7-18; B8-07; B8-09"
+        },
+        {
+          "name": "wait_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "How long the pro waits: 30 minutes for an adult when only a child answers; 15 minutes for a new way in.",
+          "source": "B8-09 ('Jordan waits up to 30 minutes'); B8-52 ('within 15 minutes'; 'Clock: a new code ... by 15 minutes after Jordan's text')"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "visit_events_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_events_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_events_by_fk",
+          "columns": ["by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_events_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_events_late_report_fk",
+          "columns": ["late_report_id", "business_id"],
+          "references": {
+            "table": "late_reports",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_events_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "visit_events_one_per_late_report",
+          "columns": ["late_report_id", "visit_id"],
+          "where": "late_report_id is not null",
+          "source": "arch 09 line 484 (one late report fans out once to each later visit)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "visit_events_kind_known",
+          "expression": "kind in ('on_my_way', 'late', 'not_the_pro', 'was_the_pro', 'only_child_home', 'way_in_failed', 'way_in_fixed')",
+          "source": "B8-02; A7-14; B8-07; B8-09; B8-52"
+        },
+        {
+          "name": "visit_events_whose_word",
+          "expression": "(kind = 'late') = (by_person_id is null)",
+          "source": "B8-02; B8-07; arch 09 line 484"
+        },
+        {
+          "name": "visit_events_on_my_way",
+          "expression": "(kind = 'on_my_way') = (arrives_about is not null) and (minutes is null or (kind = 'on_my_way' and minutes > 0)) and (arrives_about is null or arrives_about > at)",
+          "source": "B8-02 ('the arrival time'); B8-91"
+        },
+        {
+          "name": "visit_events_late",
+          "expression": "(kind = 'late') = (late_report_id is not null) and (kind <> 'late' or (open_question_id is not null and (new_start is null) <> (new_window is null))) and (kind = 'late' or (new_start is null and new_window is null))",
+          "source": "arch 09 line 484 ('each with its own question'); A7-14; B7-18"
+        },
+        {
+          "name": "visit_events_window_bounded",
+          "expression": "new_window is null or (not isempty(new_window) and not lower_inf(new_window) and not upper_inf(new_window))",
+          "source": "B7-18; S13-03"
+        },
+        {
+          "name": "visit_events_question_where_asked",
+          "expression": "open_question_id is null or kind in ('late', 'not_the_pro', 'only_child_home')",
+          "source": "A7-14; B8-07; B8-09"
+        },
+        {
+          "name": "visit_events_waits",
+          "expression": "(kind in ('only_child_home', 'way_in_failed')) = (wait_until is not null) and (kind <> 'only_child_home' or wait_until = at + interval '30 minutes') and (kind <> 'way_in_failed' or wait_until = at + interval '15 minutes')",
+          "source": "B8-09; B8-52"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "visit_events_visit_idx",
+          "columns": ["visit_id", "at"],
+          "why": "A visit's events in order: the job page, the door check and the record."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "late_reports",
+      "description": "A worker running late is one row (arch 09 line 484): the pro's LATE with its minutes, or a visit running long so that the next customer will start late. Code fans it out to that worker's later visits that day, each as its own visit_events row of kind late with its own question. Appended and never edited.",
+      "source": "arch 09 line 484 ('One event, many bookings. A worker running late is one row that code fans out to their later visits that day, each with its own question'); 02-contracts section 7 row K-31; A7-14; B7-18; A8-33 ('The next booking is told if it will start late'); 01-inventory any-time table row 16",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The late report's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose later visits it fans out to; a pro who works at several is asked which one (S11-43), so row-level security scopes the row.",
+          "source": "arch 10 line 546; S11-43 ('When the person texts OFF, LATE or DONE, Rosie asks Which business?'); FS line 743"
+        },
+        {
+          "name": "worker_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pro running late (persons.id); the visits it fans out to are that worker's reservations that day (K-04 reservations.worker_person_id).",
+          "source": "arch 09 line 484 ('their later visits that day'); A7-14; B7-18; K-04 v1 reservations"
+        },
+        {
+          "name": "minutes",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "How late, in minutes ('LATE 20').",
+          "source": "A7-14 ('LATE 20'); B7-18"
+        },
+        {
+          "name": "cause",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "late (the pro texts LATE: from the road, or by voice, never typing while driving) or ran_long (a visit runs long, as extra work can, and the next customer will start late: they are told the same way).",
+          "source": "A7-14 ('Also when a visit runs long and the next customer will start late: they're told the same way'); B7-18 ('from the road, or because an earlier job runs long'; 'LATE can come by voice'); A8-33"
+        },
+        {
+          "name": "from_visit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The visit running long (K-30 booking_visits.id): required for ran_long, and named for a LATE because an earlier job runs long.",
+          "source": "A7-14; B7-18; A8-33"
+        },
+        {
+          "name": "reported_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it came in.",
+          "source": "A7-14 (30 minutes before A8-03); B7-18 ('Thu Oct 22, 7:55am')"
+        },
+        {
+          "name": "day",
+          "type": "date",
+          "null": false,
+          "audience": "never",
+          "description": "The day whose later visits it fans out to: reported_at's day in zone.",
+          "source": "arch 09 line 484 ('that day'); A7-14 ('On the visit day')"
+        },
+        {
+          "name": "zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone the day is read in: the business's (K-04 businesses.time_zone; CQ-05).",
+          "source": "CQ-05; K-04 v1 businesses.time_zone; S13-03"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that read it (K-04 turns.id): the pro's LATE, or the commit whose extra work made the visit run long.",
+          "source": "K-04 v1 turns; arch 10 line 508"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "late_reports_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "late_reports_worker_fk",
+          "columns": ["worker_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "late_reports_from_visit_fk",
+          "columns": ["from_visit_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "late_reports_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "late_reports_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "A fanned-out event names a late report of its own business (visit_events_late_report_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "late_reports_minutes_positive",
+          "expression": "minutes > 0",
+          "source": "A7-14; B7-18"
+        },
+        {
+          "name": "late_reports_cause_known",
+          "expression": "cause in ('late', 'ran_long')",
+          "source": "A7-14; B7-18; A8-33"
+        },
+        {
+          "name": "late_reports_long_names_visit",
+          "expression": "cause <> 'ran_long' or from_visit_id is not null",
+          "source": "A7-14; A8-33"
+        },
+        {
+          "name": "late_reports_day_in_zone",
+          "expression": "day = (reported_at at time zone zone)::date",
+          "source": "arch 09 line 484 ('that day'); CQ-05"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "late_reports_worker_day_idx",
+          "columns": ["worker_person_id", "day"],
+          "why": "A worker's late reports that day, for the fan-out to their later visits."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "day_lists",
+      "description": "Each day list sent to a staff member: the day's bookings at one business, each linking to the customer's answers and the notes from last time on the signed-in page, sent at the staff member's own day-list time or the staff text hour. A visit before the list's hour goes on the evening before's list, and a booking added after it goes at once in its own text. One per staff member, business and day; appended and never edited.",
+      "source": "02-contracts section 7 row K-31 ('day lists'); A8-01; B8-01; K-22 v1 staff.day_list_time; FS line 723 (staff day_list_time)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The day list's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose bookings it lists ('Your Sat Oct 24 at Lee's Barbershop'), so row-level security can scope the row.",
+          "source": "A8-01; arch 10 line 546; FS line 743 (each booking belongs to exactly one business)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The staff member it went to (persons.id; their K-22 staff row at this business).",
+          "source": "A8-01; B8-01; K-22 v1 staff"
+        },
+        {
+          "name": "day",
+          "type": "date",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "The day whose bookings it lists, in zone.",
+          "source": "A8-01 ('Riley gets the day's bookings'); B8-01"
+        },
+        {
+          "name": "zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone the day is read in: the business's (K-04 businesses.time_zone; CQ-05).",
+          "source": "CQ-05; K-04 v1 businesses.time_zone"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it went: at the staff member's day-list time (K-22), else the staff text hour; the evening before for a visit before that hour.",
+          "source": "A8-01 ('It goes at the staff text hour, or the hour Riley picked'; 'A visit before the list's hour goes on the evening before's list'); B8-01 ('Rosie's rule: staff pick their own day-list hour')"
+        },
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The list's text (K-04 outbox_rows.id), written in the same commit and linked by code (README rule 10).",
+          "source": "K-04 v1 outbox_rows; arch 01 line 65"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "day_lists_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "day_lists_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "day_lists_outbox_row_fk",
+          "columns": ["outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "day_lists_one_per_day",
+          "columns": ["business_id", "person_id", "day"],
+          "source": "A8-01 (the day's list, once; a booking added after it goes at once in its own text)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "day_lists_sent_that_day_or_the_evening_before",
+          "expression": "(sent_at at time zone zone)::date between day - 1 and day",
+          "source": "A8-01 ('A visit before the list's hour goes on the evening before's list'); B8-01"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "visit_checks",
+      "description": "The visit check (D98): the day after a booking Rosie brought in that has no check-in code and no DONE, Rosie asks the customer once, their way and in text hours, 'Did your visit with <business> happen?'. The answer is recorded only, for Rosie's team: no charge, refund, fee or other action follows, and the business never sees it (README rule 6: no Tool API grant). Not for sensitive work, a private booking or a number that sent STOP. One per visit; the answer is set once.",
+      "source": "FS line 740 (visit_check: 'id, booking_id, asked_at, answer (yes, no, none), answered_at, channel. For Rosie's team; no action follows'); FS line 624; FS line 670 (screen 20); A8-47; B8-47; D98; 02-contracts section 7 row K-31 ('the visit check (asked, answer, channel; for Rosie's team only, with no action: FS visit_check row, D98)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit check's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 740 (id); CQ-09"
+        },
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit asked about (K-30 booking_visits.id), held to its booking by visit_checks_visit_fk: asked once.",
+          "source": "A8-47 ('the customer is asked once'); FS line 624"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The visit's booking (K-04 bookings.id).",
+          "source": "FS line 740 (booking_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's business, kept so Rosie's team can read checks by business; it scopes nothing, since no business reads this table (README rule 6).",
+          "source": "FS line 624 ('The business does not see it')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The customer asked (persons.id): the person served, or whoever the visit's messages go to.",
+          "source": "A8-47 ('the customer is asked once, their way'); S13-31"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where it went, their way (K-04 handles.id).",
+          "source": "A8-47 ('their way'); RULES 4.8"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "text (their own chat) or email.",
+          "source": "FS line 740 (channel); RULES 4.8; MC C9"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was asked: the day after the visit, in text hours.",
+          "source": "FS line 740 (asked_at); A8-47 ('the next day in text hours'); FS line 670"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Its question (K-04 open_questions.id), which carries no business, so no business reads it either (QUESTIONS.md CQ-56's default for the rows beside a team-only row).",
+          "source": "K-04 v1 open_questions (business_id null: seen by no business scope); CQ-56"
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "yes (1 Yes), no (2 No) or none (no answer while the question was open). Set once.",
+          "source": "FS line 740 (answer (yes, no, none)); A8-47 ('Reply 1 Yes, 2 No')"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was answered, or closed with none. Set once.",
+          "source": "FS line 740 (answered_at)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one (limit 4).",
+          "source": "arch 01 line 85; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "visit_checks_visit_fk",
+          "columns": ["visit_id", "booking_id"],
+          "references": {
+            "table": "booking_visits",
+            "columns": ["id", "booking_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_checks_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_checks_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_checks_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "visit_checks_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "visit_checks_once_per_visit",
+          "columns": ["visit_id"],
+          "source": "A8-47; B8-47 ('the customer is asked once')"
+        }
+      ],
+      "checks": [
+        {
+          "name": "visit_checks_channel_known",
+          "expression": "channel in ('text', 'email')",
+          "source": "FS line 740; RULES 4.8"
+        },
+        {
+          "name": "visit_checks_answer_known",
+          "expression": "answer is null or answer in ('yes', 'no', 'none')",
+          "source": "FS line 740"
+        },
+        {
+          "name": "visit_checks_answered_together",
+          "expression": "(answer is null) = (answered_at is null) and (answered_at is null or answered_at >= asked_at)",
+          "source": "FS line 740"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "visit_checks_answered_idx",
+          "columns": ["answered_at"],
+          "where": "answer is not null",
+          "why": "The team console's visit-check answers (FS line 624)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's: no business reads or writes a visit check, its own included (FS line 624: 'The business does not see it'); the Tool API role has no grant on it, and only the runtime side writes and reads it (README rule 6)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-flow-b.json", "../../core/fixtures/seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-drew",
+        "name": "Drew",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-drew",
+        "kind": "phone",
+        "address": "+15555550163"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-drew",
+        "handle_id": "handle-drew"
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-drew-home-services",
+        "person_id": "person-drew",
+        "business_id": "biz-lee-home-services",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "stage": "booked",
+        "booker_person_id": "person-drew",
+        "served_person_id": "person-drew",
+        "payer_person_id": "person-drew",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "resource_id": "res-jordan",
+        "resource_kind": "worker",
+        "worker_person_id": "person-jordan",
+        "during": "[2026-10-22T16:00:00Z,2026-10-22T19:00:00Z)",
+        "state": "booked",
+        "queued_at": "2026-10-20T15:02:00Z",
+        "seats": 1,
+        "held_until": null,
+        "extended": false,
+        "for_phone_number": null,
+        "booking_id": "booking-drew-heater-flush",
+        "version": 2
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-drew-heater-flush-1",
+        "booking_id": "booking-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "reservation_id": "rsv-drew-heater-flush",
+        "arrival_window": "[2026-10-22T16:00:00Z,2026-10-22T18:00:00Z)",
+        "cutoff_at": "2026-10-22T11:00:00Z",
+        "check_in_code": "\\x6b33312d7365616c2d636f64652d31",
+        "code_for_person_id": "person-drew",
+        "version": 1
+      }
+    },
+    {
+      "table": "day_lists",
+      "values": {
+        "id": "daylist-jordan-home-services-oct22",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-jordan",
+        "day": "2026-10-22",
+        "zone": "America/New_York",
+        "sent_at": "2026-10-22T11:00:00Z",
+        "outbox_row_id": null
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-jordan-late-oct22",
+        "handle_id": "handle-jordan",
+        "event_ids": ["evt-jordan-0071"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-jordan-0071",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-22T11:55:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "late_reports",
+      "values": {
+        "id": "late-jordan-home-services-oct22",
+        "business_id": "biz-lee-home-services",
+        "worker_person_id": "person-jordan",
+        "minutes": 20,
+        "cause": "late",
+        "from_visit_id": null,
+        "reported_at": "2026-10-22T11:55:00Z",
+        "day": "2026-10-22",
+        "zone": "America/New_York",
+        "turn_id": "turn-jordan-late-oct22"
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-b7-18-alex-drain",
+        "turn_id": "turn-jordan-late-oct22",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lee-home-services",
+        "booking_id": "booking-alex-drain",
+        "step": "B7-18",
+        "options": [
+          {
+            "id": "B7-18/1",
+            "label": "That works"
+          },
+          {
+            "id": "B7-18/2",
+            "label": "Move my visit"
+          },
+          {
+            "id": "B7-18/3",
+            "label": "Call off, no fee"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-alex-drain",
+            "version": 5
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-alex-drain-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": null,
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "B7-18/1",
+        "closed_at": "2026-10-22T11:58:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-b7-18-drew-heater-flush",
+        "turn_id": "turn-jordan-late-oct22",
+        "handle_id": "handle-drew",
+        "person_id": "person-drew",
+        "business_id": "biz-lee-home-services",
+        "booking_id": "booking-drew-heater-flush",
+        "step": "B7-18",
+        "options": [
+          {
+            "id": "B7-18/1",
+            "label": "That works"
+          },
+          {
+            "id": "B7-18/2",
+            "label": "Move my visit"
+          },
+          {
+            "id": "B7-18/3",
+            "label": "Call off, no fee"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-drew-heater-flush",
+            "version": 2
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-drew-heater-flush-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": null,
+        "ask_count": 1,
+        "status": "open",
+        "answered_option_id": null,
+        "closed_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "visit_events",
+      "values": {
+        "id": "vev-alex-drain-late",
+        "visit_id": "visit-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "kind": "late",
+        "at": "2026-10-22T11:55:02Z",
+        "by_person_id": null,
+        "turn_id": "turn-jordan-late-oct22",
+        "minutes": null,
+        "arrives_about": null,
+        "late_report_id": "late-jordan-home-services-oct22",
+        "new_start": null,
+        "new_window": "[2026-10-22T12:20:00Z,2026-10-22T14:20:00Z)",
+        "open_question_id": "oq-b7-18-alex-drain",
+        "wait_until": null
+      }
+    },
+    {
+      "table": "visit_events",
+      "values": {
+        "id": "vev-drew-heater-flush-late",
+        "visit_id": "visit-drew-heater-flush-1",
+        "booking_id": "booking-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "kind": "late",
+        "at": "2026-10-22T11:55:02Z",
+        "by_person_id": null,
+        "turn_id": "turn-jordan-late-oct22",
+        "minutes": null,
+        "arrives_about": null,
+        "late_report_id": "late-jordan-home-services-oct22",
+        "new_start": null,
+        "new_window": "[2026-10-22T16:20:00Z,2026-10-22T18:20:00Z)",
+        "open_question_id": "oq-b7-18-drew-heater-flush",
+        "wait_until": null
+      }
+    }
+  ]
+}
