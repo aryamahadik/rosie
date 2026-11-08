@@ -11,12 +11,19 @@
 //      the safety line (988 and 911 for self-harm words, else 911); otherwise the outage line, never to a stopped number;
 //   4. keeps routine work held per the outcome (arch 06 lines 317 to 327) until a hold's rule releases it.
 //
-// The routine work this holds is the batch's (T-247) and the turn's. This file keeps the hold's state and says so
-// (`routineHeld`, `readSafety`); it does not batch. Never logged or put in a span: a word, an evidence quote, a number.
+// The routine work this holds is the batch's (T-247) and the turn's. Holds bind commits, not hand-offs, once every text
+// has been read (QUESTIONS.md CQ-65 as DL-119 replaced it): a text not read yet keeps its batch back (`unreadAmong`), and
+// an outcome hold rides with the turn to its commit (`openHolds`), so a STOP inside a danger text still reaches its turn.
+//
+// A read cut off by the actor's eviction (a deploy or a reset mid-read: the 4 s deadline lived only in memory) is resumed
+// by the next instance (T-1088, `resumeCutOff`): read again with the time left, or, past 4 s, given the timeout rule at
+// once and read again for a late verdict, in arrival order. The actor's stored alarm makes sure that next instance comes.
+// This file keeps the hold's state and says so (`routineHeld`, `readSafety`); it does not batch. Never logged or put in a
+// span: a word, an evidence quote, a number.
 
 import { openWords, sealWords, type SealedWords } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
-import { isLabel, openTrace, type SpanSink } from "../trace";
+import { isLabel, openTrace, type BundleId, type SpanSink } from "../trace";
 import type { ModelCall } from "../trace/types";
 import {
   checkedLineFor,
@@ -36,6 +43,7 @@ import {
   type RecordSafetyOutcomeRequest,
   type ReleaseRule,
   type SafetyDeps,
+  type SafetyOutcome,
   type SafetyReadAnswer,
   type SafetyResult,
   type SendFixedLineRequest,
@@ -70,6 +78,34 @@ export interface HoldEntry {
   released: boolean;
 }
 
+/**
+ * A hold still open, as a turn and its commit see it (CQ-65 as DL-119 replaced it: holds bind commits, not hand-offs).
+ * `rule` is the hold's release rule (K-34 `safety_holds.release_rule`), or `unread` while no verdict has come;
+ * `outcomes` are what the read (or its timeout stand-in) found in the text that made the hold.
+ */
+export interface OpenHold {
+  eventId: string;
+  /** The core's hold id (what K-09 releaseSafetyHold names), or null while PostgreSQL has not recorded it. */
+  holdId: string | null;
+  rule: HoldRule;
+  outcomes: SafetyOutcome[];
+  blocksBooking: boolean;
+}
+
+/** A stored text as the actor's inbox keeps it, sealed: what a resumed read reads again. */
+export interface StoredText {
+  event: SealedEvent;
+  partKey: string | null;
+  traceId: string;
+  bundleId: BundleId;
+}
+
+/** A read resumed after an eviction: its text and the work the actor lends and settles. */
+export interface ResumedRead {
+  eventId: string;
+  work: Promise<void>;
+}
+
 interface EventRow extends Record<string, SqlStorageValue> {
   event_id: string;
   state: string;
@@ -85,6 +121,10 @@ interface HoldRow extends Record<string, SqlStorageValue> {
   rule: string;
   blocks_booking: number;
   released: number;
+}
+
+interface OpenHoldRow extends HoldRow {
+  outcomes: string | null;
 }
 
 /** What opening the words gave: nothing to read, or the words and the read in flight. */
@@ -152,6 +192,9 @@ export function createSafetyTables(sql: SqlStorage): void {
   sql.exec(
     "CREATE TABLE IF NOT EXISTS safety_return (event_id TEXT PRIMARY KEY, kind TEXT NOT NULL, box TEXT NOT NULL)",
   );
+  // What the read (or its timeout stand-in) found in each text, as K-02 outcome labels (a JSON list): a turn is handed
+  // each open hold with the outcomes that made it (DL-119). Labels only, never the read's evidence words.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_outcomes (event_id TEXT PRIMARY KEY, outcomes TEXT NOT NULL)");
 }
 
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
@@ -174,11 +217,24 @@ export interface SafetyHost {
    * batch closes at once, as on time) or lifted the unread hold (the batches it kept back go on).
    */
   afterLate?: (eventId: string) => void;
+  /** The stored texts with these event ids, sealed, in arrival order (the actor's inbox): a resumed read reads them again. */
+  storedTexts(eventIds: readonly string[]): StoredText[];
+}
+
+/** A text whose read is resumed after an eviction, with the time its arrival was noted (on the safety clock). */
+interface CutOffRow extends Record<string, SqlStorageValue> {
+  event_id: string;
+  arrived_ms: number;
 }
 
 export class SafetyOnArrival {
   private launch: Promise<unknown> = Promise.resolve();
   private readonly pending = new Set<Promise<void>>();
+  /**
+   * The texts whose safety work runs in this instance now. A row still 'reading' that is not here was cut off: the
+   * instance that read it is gone (an eviction, a deploy, a reset), and with it the 4 s deadline it kept in memory.
+   */
+  private readonly inFlight = new Set<string>();
 
   /** The handle's actor name, from the first hand-off; kept in storage for a restart. */
   private actorName = "";
@@ -220,15 +276,143 @@ export class SafetyOnArrival {
     );
     const deadline = set.clock.after(VERDICT_DEADLINE_MS);
     const started = this.queueRead(set, handoff);
-    const work = this.settle(set, handoff, arrivedAt, deadline, started).catch(() => undefined);
+    return this.track(eventId, this.settle(set, handoff, arrivedAt, deadline, started));
+  }
+
+  /** Notes a text's safety work as running in this instance until it ends; a failure is swallowed (the row says what is left). */
+  private track(eventId: string, settling: Promise<void>): Promise<void> {
+    this.inFlight.add(eventId);
+    const work = settling
+      .catch(() => undefined)
+      .finally(() => {
+        this.inFlight.delete(eventId);
+      });
     this.pending.add(work);
     void work.finally(() => this.pending.delete(work));
     return work;
   }
 
+  /**
+   * Resumes each read an eviction cut off (T-1088): every text still 'reading' whose work is not running in this instance,
+   * in arrival order. Before its 4 s deadline it is read again with the time left; past it, the timeout rule applies at
+   * once (a danger word's line, else the outage line and the unread hold) and the read is sent again so that its late
+   * verdict can lift the unread hold, as on arrival (routine work is never held forever). The deadline still counts from
+   * the text's arrival, so a danger text gets its line no later than the timeout rule allows. A resumed read whose work
+   * fails is left unresolved (`lineFailed`), so routine work stays held and no alarm keeps trying it. Nothing is resumed
+   * while nothing is wired.
+   */
+  resumeCutOff(): ResumedRead[] {
+    const set = deps;
+    if (set === null) return [];
+    const { sql } = this.host.storage;
+    const rows = sql
+      .exec<CutOffRow>(
+        "SELECT event_id, arrived_ms FROM safety_events WHERE state = 'reading' ORDER BY rowid",
+      )
+      .toArray()
+      .filter((row) => !this.inFlight.has(row.event_id));
+    if (rows.length === 0) return [];
+    const texts = new Map(
+      this.host.storedTexts(rows.map((row) => row.event_id)).map((text) => [text.event.eventId, text]),
+    );
+    const resumed: ResumedRead[] = [];
+    for (const row of rows) {
+      const eventId = row.event_id;
+      const text = texts.get(eventId);
+      if (text === undefined) {
+        // No stored words to read again: the text stays unresolved, so routine work stays held (fails closed).
+        this.giveUp(eventId);
+        continue;
+      }
+      const handoff: SealedHandoff = { ...text, actorName: this.actorName };
+      let settling: Promise<void>;
+      try {
+        const left = row.arrived_ms + VERDICT_DEADLINE_MS - set.clock.now();
+        const deadline = left > 0 ? set.clock.after(left) : Promise.resolve();
+        const started = this.queueRead(set, handoff);
+        settling = this.settle(set, handoff, row.arrived_ms, deadline, started).finally(() => {
+          this.giveUp(eventId);
+        });
+      } catch {
+        // Its read could not even start again (the clock or the key store threw): unresolved and held, as above.
+        this.giveUp(eventId);
+        continue;
+      }
+      resumed.push({ eventId, work: this.track(eventId, settling) });
+    }
+    return resumed;
+  }
+
+  /** Marks a text whose safety work could not end as unresolved: it is no longer read, and routine work for it waits. */
+  private giveUp(eventId: string): void {
+    this.host.storage.sql.exec(
+      "UPDATE safety_events SET state = 'lineFailed' WHERE event_id = ? AND state = 'reading'",
+      eventId,
+    );
+  }
+
+  /**
+   * Milliseconds, on the safety clock, until the earliest 4 s deadline of a text still being read (zero or less: passed),
+   * or null when no text is being read, or nothing is wired to read it. The actor keeps an alarm for it, so an instance
+   * comes back to resume a read cut off by an eviction.
+   */
+  nextDeadlineIn(): number | null {
+    const set = deps;
+    if (set === null) return null;
+    const row = this.host.storage.sql
+      .exec<{ at: number | null }>("SELECT MIN(arrived_ms) AS at FROM safety_events WHERE state = 'reading'")
+      .one();
+    return row.at === null ? null : row.at + VERDICT_DEADLINE_MS - set.clock.now();
+  }
+
   /** Resolves when every text that has arrived so far has been dealt with (tests; a shutdown). */
   async idle(): Promise<void> {
     while (this.pending.size > 0) await Promise.all([...this.pending]);
+  }
+
+  /**
+   * True when one of these texts has not been read yet, so the batch that holds it waits (CQ-65 as DL-119 replaced it):
+   * its read is running or was never wired; no verdict came (its unread hold is open: only a verdict lifts it, T-247 note
+   * a); or the outage path failed with no verdict. A text the read found danger in has been read: its outcome hold does
+   * not keep the batch back, it binds the turn's commit. A text with no safety row at all is the actor's to find (note d).
+   */
+  unreadAmong(eventIds: readonly string[]): boolean {
+    if (eventIds.length === 0) return false;
+    return (
+      this.host.storage.sql
+        .exec(
+          `SELECT 1 FROM safety_events e
+           WHERE e.event_id IN (SELECT value FROM json_each(?))
+             AND (e.state IN ('reading', 'unwired')
+                  OR (e.state = 'lineFailed' AND e.danger = 0)
+                  OR EXISTS (SELECT 1 FROM safety_holds h
+                             WHERE h.event_id = e.event_id AND h.rule = 'unread' AND h.released = 0))
+           LIMIT 1`,
+          JSON.stringify(eventIds),
+        )
+        .toArray().length > 0
+    );
+  }
+
+  /**
+   * The holds not released, in the order they were made, each with the outcomes of the text that made it: what a turn
+   * carries from its start and what its commit is handed again at commit time (DL-119).
+   */
+  openHolds(): OpenHold[] {
+    return this.host.storage.sql
+      .exec<OpenHoldRow>(
+        `SELECT h.event_id, h.hold_id, h.rule, h.blocks_booking, h.released, o.outcomes
+         FROM safety_holds h LEFT JOIN safety_outcomes o ON o.event_id = h.event_id
+         WHERE h.released = 0 ORDER BY h.rowid`,
+      )
+      .toArray()
+      .map((row) => ({
+        eventId: row.event_id,
+        holdId: row.hold_id,
+        rule: row.rule as HoldRule,
+        outcomes: row.outcomes === null ? [] : (JSON.parse(row.outcomes) as SafetyOutcome[]),
+        blocksBooking: row.blocks_booking === 1,
+      }));
   }
 
   /** True while routine work must wait: a text is unread, or a hold is not released. */
@@ -419,17 +603,26 @@ export class SafetyOnArrival {
       this.finish(eventId, "done", false, "none", null, null);
       return;
     }
-    if (first !== "failed" && first !== "deadline") {
+    // The read's own timeout marker (`timedOut`: no model gave a verdict) is no verdict, even when it beats the actor's
+    // deadline: it takes the deadline's rule below, never the place of a verdict with no outcome (DL-112; T-365 note a).
+    const gaveUp = first !== "failed" && first !== "deadline" && first.result.timedOut;
+    if (first !== "failed" && first !== "deadline" && !gaveUp) {
       await this.applyResult(set, handoff, arrivedAt, first.result, first.modelCalls, "verdict");
       return;
     }
 
-    // No verdict: the 4 s deadline passed, or the read failed. A danger word from the bundle's list counts as Unsure.
+    // No verdict: the 4 s deadline passed, the read failed, or the read gave up. A danger word from the bundle's list
+    // counts as Unsure (988 and 911 for self-harm words, else 911); with none, the outage line goes.
     const opened = await started.catch(() => "unreadable" as const);
     const words = opened === "unreadable" || opened.kind === "nothing" ? null : opened.words;
     const matches =
       words === null ? [] : matchDangerWords([words.body, words.subject], set.bundle.dangerWords());
     const stand = timeoutResult(eventId, matches);
+    if (first !== "failed" && first !== "deadline") {
+      // The read is over: its own model calls go in the span, and no late verdict can follow.
+      await this.applyResult(set, handoff, arrivedAt, stand, first.modelCalls, "readTimedOut");
+      return;
+    }
     await this.applyResult(set, handoff, arrivedAt, stand, timeoutCalls(), first);
 
     // A verdict that arrives late changes a timeout that found no danger word: it is applied then, and the unread hold lifts.
@@ -458,7 +651,7 @@ export class SafetyOnArrival {
     arrivedAt: number,
     result: SafetyResult,
     modelCalls: ModelCall[],
-    via: "verdict" | "deadline" | "failed" | "late",
+    via: "verdict" | "deadline" | "failed" | "readTimedOut" | "late",
   ): Promise<void> {
     const { sql } = this.host.storage;
     const eventId = handoff.event.eventId;
@@ -469,6 +662,12 @@ export class SafetyOnArrival {
     let state: EventState = "done";
     let failure = false;
 
+    // The outcome labels the hold (if any) is handed on with; a late verdict's replace its stand-in's.
+    sql.exec(
+      "INSERT OR REPLACE INTO safety_outcomes (event_id, outcomes) VALUES (?, ?)",
+      eventId,
+      JSON.stringify(result.outcomes),
+    );
     try {
       if (dangers.length > 0) {
         const sent = await this.sendDanger(set, handoff, arrivedAt, result);
@@ -480,15 +679,16 @@ export class SafetyOnArrival {
           failure = true;
         }
       } else if (result.timedOut) {
-        const sent = await this.sendOutage(set, handoff, arrivedAt);
-        path = sent.path;
-        lineId = sent.lineId;
-        handedAfter = sent.handedAfterMs;
-        // Routine work stays held: no read said it is safe.
+        // Routine work stays held: no read said it is safe. The hold is made before the outage line is tried, so a send
+        // that throws still leaves the text unread, never read (T-1088: an unread text keeps its batch back).
         sql.exec(
           "INSERT OR IGNORE INTO safety_holds (event_id, hold_id, rule, blocks_booking, released) VALUES (?, NULL, 'unread', 0, 0)",
           eventId,
         );
+        const sent = await this.sendOutage(set, handoff, arrivedAt);
+        path = sent.path;
+        lineId = sent.lineId;
+        handedAfter = sent.handedAfterMs;
       } else if (via === "late") {
         sql.exec("UPDATE safety_holds SET released = 1 WHERE event_id = ? AND rule = 'unread'", eventId);
       }

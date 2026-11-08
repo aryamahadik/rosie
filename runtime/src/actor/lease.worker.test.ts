@@ -15,15 +15,19 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import commitFirst from "../../../contracts/data-access/fixtures/commit-first.json";
 import commitRepeat from "../../../contracts/data-access/fixtures/commit-repeat-same-turn.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
+import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
+import safetyThreat from "../../../contracts/model/fixtures/safety-threat.json";
 import {
+  actorNameOf,
   durableObjectActor,
+  openWords,
   prepareHandoff,
   type ActorNamespace,
   type HandleActorRpc,
   type InboundEvent,
 } from "../gateway";
-import { fakeKeyStore } from "../gateway/test-support";
+import { fakeKeyStore, present } from "../gateway/test-support";
 import { fakeBundles } from "../bundle/test-support";
 import { harness, type Harness } from "../safety/test-support";
 import type { SafetyResult } from "../safety/types";
@@ -37,10 +41,13 @@ import {
   type BatchEntry,
   type ClosedBatch,
   type CommitAnswer,
+  type CommitContext,
   type CommitTurnAnswer,
   type CommitTurnRequest,
   type HandleActor,
+  type HoldEntry,
   type LeasedTurn,
+  type OpenHold,
   type TurnEntry,
 } from "./index";
 
@@ -71,6 +78,8 @@ interface LeaseRpc {
   readTurns(): Promise<TurnEntry[]>;
   readWaitingBatches(): Promise<number[]>;
   readBatches(): Promise<BatchEntry[]>;
+  readHolds(): Promise<HoldEntry[]>;
+  markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
 }
@@ -112,11 +121,13 @@ async function arrive(eventId: string, options: { body?: string; trace?: string 
 interface FakeCommits {
   /** Every request, in order. */
   readonly calls: CommitTurnRequest[];
+  /** What the lease handed the commit hook beside each request (the safety holds open at commit time), in order. */
+  readonly contexts: CommitContext[];
   /** Each turn id committed, once, with its first answer. */
   readonly committed: Map<string, CommitTurnAnswer>;
   /** True: the next commit goes through, but its answer is lost on the way back (the call throws). */
   loseNextAnswer: boolean;
-  commitTurn(request: CommitTurnRequest): Promise<CommitTurnAnswer>;
+  commitTurn(request: CommitTurnRequest, at?: CommitContext): Promise<CommitTurnAnswer>;
 }
 
 const FIRST = commitFirst.outcome as unknown as CommitTurnAnswer;
@@ -125,10 +136,12 @@ const REPEAT = commitRepeat.outcome as unknown as CommitTurnAnswer;
 function fakeCommits(): FakeCommits {
   const k05: FakeCommits = {
     calls: [],
+    contexts: [],
     committed: new Map(),
     loseNextAnswer: false,
-    commitTurn(request) {
+    commitTurn(request, at) {
       k05.calls.push(request);
+      if (at !== undefined) k05.contexts.push(at);
       if (k05.committed.has(request.turn.id)) {
         // commit-repeat-same-turn.json: the same turn id again writes nothing and returns the first commit, repeated.
         return Promise.resolve({ ...REPEAT, turnId: request.turn.id });
@@ -182,9 +195,15 @@ const ALL_NO: Record<string, SafetyResult> = Object.fromEntries(
 
 async function withLease(
   body: (run: Run) => Promise<void>,
-  options: { turnWired?: boolean; capture?: ClosedBatch[]; restarts?: boolean } = {},
+  options: {
+    turnWired?: boolean;
+    capture?: ClosedBatch[];
+    restarts?: boolean;
+    /** What the safety read says for each event id (default: No for every text). */
+    answers?: Record<string, SafetyResult>;
+  } = {},
 ): Promise<void> {
-  const h = harness(keys, ALL_NO);
+  const h = harness(keys, options.answers ?? ALL_NO);
   const k05 = fakeCommits();
   const turns: LeasedTurn[] = [];
   // A fake-clock timer still waiting keeps `evictDurableObject` from finishing: a test that restarts the actor gives the
@@ -211,7 +230,7 @@ async function withLease(
           runTurn: (turn) => {
             turns.push(turn);
           },
-          commit: (request) => k05.commitTurn(request),
+          commit: (request, at) => k05.commitTurn(request, at),
         },
   );
   const restoreBundles = setBundleDeps(fakeBundles().deps);
@@ -251,6 +270,15 @@ function leaseRows(): Promise<number> {
 
 function alarmOf(): Promise<number | null> {
   return runInDurableObject(stub(), (_, state) => state.storage.getAlarm());
+}
+
+/** The actor's stored schedule, earliest first. */
+function scheduleOf(): Promise<{ kind: string; due_ms: number }[]> {
+  return runInDurableObject(stub(), (_, state) =>
+    state.storage.sql
+      .exec<{ kind: string; due_ms: number }>("SELECT kind, due_ms FROM batch_schedule ORDER BY due_ms, kind")
+      .toArray(),
+  );
 }
 
 afterEach(async () => {
@@ -640,6 +668,32 @@ describe("a lapsed lease", () => {
     );
   });
 
+  it("an alarm with no lease held puts the lease's entry in step: an entry due now that a wired runTurn left cannot re-arm the alarm in a loop once runTurn is unwired (T-248 security note c)", async () => {
+    await withLease(
+      async (run) => {
+        // What a wired runTurn left behind: a batch the lease took waits, no lease is held, and the lease's entry is due
+        // now (a crash came before the next turn opened; then a back-only rollback unwired runTurn).
+        await runInDurableObject(stub(), async (_, state) => {
+          state.storage.sql.exec(
+            "INSERT INTO lease_batches (batch_id, items, turn_id, seen_ms) VALUES (1, '[]', NULL, 0)",
+          );
+          state.storage.sql.exec(
+            "INSERT OR REPLACE INTO batch_schedule (kind, due_ms) VALUES ('turnLease', ?)",
+            run.h.clock.now(),
+          );
+          await state.storage.setAlarm(Date.now());
+        });
+
+        expect(await runDurableObjectAlarm(stub())).toBe(true);
+        expect(await scheduleOf()).toEqual([]);
+        expect(await alarmOf()).toBeNull();
+        expect(await runDurableObjectAlarm(stub())).toBe(false);
+        expect(await actorOf().readWaitingBatches()).toEqual([1]);
+      },
+      { turnWired: false },
+    );
+  });
+
   it("a third lapse is left for the park (T-253): no fourth try, nothing polls, and a later text waits", async () => {
     await withLease(async (run) => {
       await arrive("evt-1");
@@ -707,5 +761,148 @@ describe("the seam to the turn's work", () => {
       await run.settle();
     });
     expect(JSON.stringify(spy.mock.calls)).not.toContain("SECRETWORD");
+  });
+});
+
+// QUESTIONS.md CQ-65 as DL-119 replaced it (T-1088): once its texts have been read, a batch reaches its turn while a safety
+// hold is open; each run of a turn carries the holds open at its start, and the commit hook is handed the holds open at
+// commit time. The lease refuses no commit for a hold: T-252's gate will (here the K-05 double commits whatever it is
+// sent, so these tests show what the gate is handed, not a gate).
+describe("safety holds bind commits, not hand-offs", () => {
+  const CRISIS = "I don't want to be alive anymore";
+  const STOP_AND_THREAT = "STOP. If Riley messes up my hair again I'll hurt him";
+  const crisis = (eventId: string): SafetyResult => ({
+    ...(safetyCrisisWords as unknown as SafetyResult),
+    eventId,
+  });
+  const threat = (eventId: string): SafetyResult => ({
+    ...(safetyThreat as unknown as SafetyResult),
+    eventId,
+  });
+  /** The open hold the shared core's double records for a crisis-words text (K-09: the hold id it gives, after_safe). */
+  const crisisHold = (eventId: string): OpenHold => ({
+    eventId,
+    holdId: `hold-${eventId}`,
+    rule: "after_safe",
+    outcomes: ["Crisis words"],
+    blocksBooking: false,
+  });
+
+  it("a danger text's batch reaches its turn with the hold open: the turn carries the hold, and the commit hook is handed it", async () => {
+    await withLease(
+      async (run) => {
+        await arrive("evt-1", { body: CRISIS });
+        await run.settle();
+
+        // Danger closed the batch at once; its text was read, so it went to the lease though the hold is open.
+        expect(run.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+        const turn = present(run.turns[0], "the turn");
+        expect(turn.holds).toEqual([crisisHold("evt-1")]);
+        expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", released: false }]);
+
+        expect(await run.commit(turn)).toMatchObject({ result: "committed" });
+        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-1")] }]);
+      },
+      { answers: { "evt-1": crisis("evt-1") } },
+    );
+  });
+
+  it("a STOP inside a threat text reaches its turn, with the threat's hold, which is never released, beside it", async () => {
+    await withLease(
+      async (run) => {
+        await arrive("evt-1", { body: STOP_AND_THREAT });
+        await run.settle();
+
+        const turn = present(run.turns[0], "the turn");
+        expect(turn.eventIds).toEqual(["evt-1"]);
+        // The turn's text is the one with the STOP in it, sealed as the inbox keeps it (the guard reads it: T-251).
+        const entry = present(turn.entries[0], "the turn's text");
+        const words = await openWords(
+          present(entry.event.sealed, "the sealed words"),
+          keys.keyOf(entry.event.handle),
+          actorNameOf(entry.event.handle),
+          entry.event.eventId,
+        );
+        expect(words.body).toBe(STOP_AND_THREAT);
+        const threatHold: OpenHold = {
+          eventId: "evt-1",
+          holdId: "hold-evt-1",
+          rule: "never",
+          outcomes: ["A threat to staff or others"],
+          blocksBooking: false,
+        };
+        expect(turn.holds).toEqual([threatHold]);
+        expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("neverReleased");
+
+        await run.commit(turn);
+        expect(run.k05.contexts).toEqual([{ holds: [threatHold] }]);
+      },
+      { answers: { "evt-1": threat("evt-1") } },
+    );
+  });
+
+  it("a hold that opens mid-turn binds that commit, and the next turn after the commit carries it", async () => {
+    await withLease(
+      async (run) => {
+        // A turn restarted once (evt-1, then evt-2), with no hold open at its start.
+        await arrive("evt-1");
+        await run.tick(3000);
+        await arrive("evt-2");
+        await run.tick(3000);
+        await run.settle();
+        const restarted = present(run.turns[1], "the restarted turn");
+        expect(restarted).toMatchObject({ eventIds: ["evt-1", "evt-2"], restart: true, holds: [] });
+
+        // Mid-turn, evt-3 brings crisis words: its batch closes at once and waits for the next turn (the restart is used).
+        await arrive("evt-3", { body: CRISIS });
+        await run.settle();
+        expect(await actorOf().readWaitingBatches()).toEqual([3]);
+        expect(run.turns).toHaveLength(2);
+
+        // The commit is handed the hold open now, not the turn's empty list from its start.
+        expect(await run.commit(restarted)).toMatchObject({ result: "committed" });
+        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-3")] }]);
+
+        // The waiting batch opens the next turn, which carries the hold open then.
+        await run.settle();
+        expect(run.turns).toHaveLength(3);
+        expect(run.turns[2]).toMatchObject({
+          eventIds: ["evt-3"],
+          restart: false,
+          holds: [crisisHold("evt-3")],
+        });
+      },
+      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") } },
+    );
+  });
+
+  it("a lapsed turn's rerun carries the holds open at the rerun, not those of its first run", async () => {
+    await withLease(
+      async (run) => {
+        await arrive("evt-1");
+        await run.tick(3000);
+        await arrive("evt-2");
+        await run.tick(3000);
+        await run.settle();
+        const restarted = present(run.turns[1], "the restarted turn");
+        expect(restarted.holds).toEqual([]);
+
+        await arrive("evt-3", { body: CRISIS });
+        await run.settle();
+        expect(await actorOf().readWaitingBatches()).toEqual([3]);
+
+        // No commit within 60 s: the restarted turn reruns under the same id, with the hold now open.
+        await run.tick(LEASE_MS);
+        await run.settle();
+        const rerun = present(run.turns[2], "the rerun");
+        expect(rerun).toMatchObject({ turnId: restarted.turnId, tries: 2, holds: [crisisHold("evt-3")] });
+
+        // Released before the commit (after a clear "we're safe"): the commit is handed no open hold.
+        expect(await actorOf().markHoldReleased("hold-evt-3")).toBe("released");
+        expect(await run.commit(rerun)).toMatchObject({ result: "committed" });
+        expect(run.k05.contexts).toEqual([{ holds: [] }]);
+      },
+      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") } },
+    );
   });
 });

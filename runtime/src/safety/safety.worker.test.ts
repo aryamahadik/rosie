@@ -395,6 +395,59 @@ describe("a read that never answers", () => {
     });
   });
 
+  // DL-112 (T-365's security note a): the read's own no-verdict answer (no read, timedOut, no outcome) can beat the actor's
+  // deadline when arrival and the call share a millisecond. It is no verdict: the deadline's rule applies at once.
+  it("an answer marked timedOut that comes at 3999 ms takes the deadline's rule: a danger word gets 911 then, never a verdict with no outcome (DL-112)", async () => {
+    const eventId = safetyTimeoutDangerWord.eventId;
+    const gaveUp = timeoutResult(eventId, []);
+    await withSafety({ [eventId]: gaveUp }, { delayMs: 3999 }, async (h) => {
+      await arrive(eventId, "Riley's cut won't stop bleeding, please help");
+      await h.clock.advance(3999);
+      await actorOf().safetyIdle();
+
+      expect(h.core.recorded).toHaveLength(1);
+      const call = h.core.recorded[0];
+      expect(call?.at).toBe(3999);
+      expect(call?.request.safety).toEqual(asResult(safetyTimeoutDangerWord));
+      expect(call?.response).toMatchObject({ safetyLine: { fixedLineId: "safetyEmergency" } });
+      // Not the outage line a verdict with no outcome would have had.
+      expect(h.core.fixed).toEqual([]);
+      expect(await actorOf().readSafety()).toMatchObject([
+        { state: "done", danger: true, path: "outbox", lineId: "safetyEmergency", handedAfterMs: 3999 },
+      ]);
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "after_safe", released: false }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("an answer marked timedOut before the deadline gives a self-harm word 988 and 911 (DL-112)", async () => {
+    const eventId = safetyTimeoutSelfHarm.eventId;
+    await withSafety({ [eventId]: timeoutResult(eventId, []) }, { delayMs: 3999 }, async (h) => {
+      await arrive(eventId, "I don’t want to be alive anymore");
+      await h.clock.advance(3999);
+      await actorOf().safetyIdle();
+
+      expect(h.core.recorded.map((call) => call.at)).toEqual([3999]);
+      expect(h.core.recorded[0]?.request.safety).toEqual(asResult(safetyTimeoutSelfHarm));
+      expect(h.core.recorded[0]?.response).toMatchObject({ safetyLine: { fixedLineId: "safetyCrisis" } });
+      expect(h.core.fixed).toEqual([]);
+    });
+  });
+
+  it("an answer marked timedOut before the deadline, with no danger word, gets the outage line and the unread hold, as the deadline does (DL-112)", async () => {
+    const eventId = "evt-gave-up-1";
+    await withSafety({ [eventId]: timeoutResult(eventId, []) }, { delayMs: 3999 }, async (h) => {
+      await arrive(eventId, PLAIN_TEXT);
+      await h.clock.advance(3999);
+      await actorOf().safetyIdle();
+
+      expect(h.core.recorded).toEqual([]);
+      expect(h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[3999, "outage"]]);
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
   it("a read that fails counts as no verdict at once", async () => {
     await withSafety({}, {}, async (h) => {
       h.deps.read.read = () => Promise.reject(new Error("model down"));

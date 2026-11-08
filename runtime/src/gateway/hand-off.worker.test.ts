@@ -312,7 +312,12 @@ describe("the sealed body", () => {
 
     const key = d.keys.keyOf(refuseCard.handle);
     const text = logLines() + (await response.text()) + (await failing.text());
-    expect(text).not.toContain("4242");
+    // The whole test card number, spaced as the text and the key store's error hold it, and run together: the log holds
+    // random trace ids, whose hex digits can hold "4242" by chance (about one run in two thousand; DL-116).
+    const card = "4242 4242 4242 4242";
+    expect(refuseCard.body).toContain(card);
+    expect(text).not.toContain(card);
+    expect(text).not.toContain(card.replaceAll(" ", ""));
     expect(text).not.toContain(refuseCard.handle.address);
     expect(text).not.toContain(toBase64(key));
     expect(text).not.toContain(JSON.stringify([...key]));

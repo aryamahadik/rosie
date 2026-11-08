@@ -3,7 +3,14 @@
 // sealed events in its own storage (inbox.ts), drops a known event id, starts no turn for Rosie's own reaction, and
 // sends a receipt that reaches it to the receipt hooks, never to the inbox. Each raw text goes to the safety read on
 // arrival (T-246, ../safety), then into the batch window (T-247, batch.ts), whose closed batches go to the turn lease
-// (T-248, lease.ts) once no safety hold keeps them back. Each run of a turn pins its bundle first (T-249, ../bundle).
+// (T-248, lease.ts) once each of their texts has been read; the open safety holds go with the turn to its commit
+// (QUESTIONS.md CQ-65 as DL-119 replaced it: holds bind commits, not hand-offs). Each run of a turn pins its bundle first
+// (T-249, ../bundle).
+//
+// A safety read lives in memory, so the actor keeps a stored alarm at each read's 4 s deadline (T-1088): if the actor is
+// evicted mid-read (a deploy, a reset), the alarm brings a new instance, which resumes every read cut off, in arrival
+// order, the moment it starts (any request or alarm starts it); a resumed read ends through the same settle path as one
+// on arrival, so its batch is handed on and its danger closes the open batch.
 //
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
 // a sealed box. Never logged: a word, a phone number, a key, a sealed body.
@@ -15,7 +22,14 @@ import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import { SafetyOnArrival, isReadable, isReadableEvent, type HoldEntry, type SafetyEntry } from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
-import { actorClock, BatchWindow, type BatchEntry } from "./batch";
+import {
+  actorClock,
+  BatchWindow,
+  scheduleEntry,
+  SCHEDULE_SAFETY,
+  unscheduleEntry,
+  type BatchEntry,
+} from "./batch";
 import {
   createInboxTables,
   markReceiptSeen,
@@ -62,6 +76,12 @@ export function setReceiptHooks(hooks: ReceiptHooks): () => void {
   };
 }
 
+/**
+ * While a safety read's work runs past its 4 s deadline (its line is being handed on), how often the alarm comes back, in
+ * case the actor is evicted before it ends (T-1088). The safety line's budget is 5 s from arrival (arch 04).
+ */
+export const SAFETY_RETRY_MS = 1000;
+
 /** A hand-off the actor cannot read; `code` is a label, and the message never holds words. */
 export class ActorRefusal extends Error {
   readonly code: string;
@@ -97,7 +117,7 @@ export class HandleActor extends DurableObject {
     this.safety = new SafetyOnArrival({
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
-      // A late verdict: danger closes the open batch at once, and a lifted hold lets the waiting batches go on.
+      // A late verdict: danger closes the open batch at once, and a lifted unread hold lets the waiting batches go on.
       afterLate: (eventId) => {
         this.lend(
           Promise.resolve()
@@ -107,10 +127,11 @@ export class HandleActor extends DurableObject {
             .then(() => this.settleBatch()),
         );
       },
+      storedTexts: (eventIds) => readInboxEvents(ctx.storage.sql, eventIds),
     });
     this.batch = new BatchWindow({
       storage: ctx.storage,
-      held: () => this.safety.routineHeld() || this.unreadInBatch(),
+      held: (eventIds) => this.unreadAmong(eventIds),
       isDanger: (eventId) =>
         this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
       lease: (batch) => this.lease.take(batch),
@@ -128,14 +149,26 @@ export class HandleActor extends DurableObject {
         this.lend(work);
       },
       pin: (request, signal) => this.pins.pin(request, signal),
+      holds: () => this.safety.openHolds(),
     });
-    // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes and a
-    // lease that lapsed while the actor was gone still reruns its turn.
+    // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read.
+    // A failure here must not keep the actor from starting: the safety entry stays stored, so its alarm tries again.
+    try {
+      this.resumeSafety();
+    } catch {
+      // Nothing resumed now; the alarm's own call does it.
+    }
+    // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes, a
+    // lease that lapsed while the actor was gone still reruns its turn, and a read still unresolved is looked at again.
     ctx.waitUntil(this.batch.arm());
   }
 
-  /** The Durable Object alarm: the stored schedule's due entries (a lapsed lease, the batch close, a batch's hand-off). */
+  /**
+   * The Durable Object alarm: the stored schedule's due entries (a cut-off safety read first, so its line waits for
+   * nothing; a lapsed lease; the batch close; a batch's hand-off).
+   */
   override async alarm(): Promise<void> {
+    this.resumeSafety();
     await this.lease.onAlarm();
     await this.batch.onAlarm();
   }
@@ -159,19 +192,13 @@ export class HandleActor extends DurableObject {
         return written;
       });
       // The safety read starts in the same step as the write, before any batch (arch 02 step S): the 4 s deadline
-      // begins now and the read is queued in arrival order. It runs on; the gateway is answered at once.
+      // begins now and the read is queued in arrival order. It runs on; the gateway is answered at once. The stored alarm
+      // is set for its deadline, so an eviction mid-read cannot leave it unread (T-1088).
       if (answer === "written" && isReadable(handoff)) {
         const eventId = handoff.event.eventId;
         const safe = this.safety.arrive(handoff);
-        // Danger closes the batch at once; each safety result may also let a held batch go to the lease.
-        this.lend(
-          safe
-            .then(() => {
-              this.batch.afterSafety(eventId);
-            })
-            .then(() => this.settleBatch()),
-        );
-        this.ctx.waitUntil(safe);
+        this.settleAfter(eventId, safe);
+        this.syncSafetySchedule();
       }
       if (answer === "written") await this.batch.arm();
     } else {
@@ -196,21 +223,22 @@ export class HandleActor extends DurableObject {
     return this.safety.readHolds();
   }
 
-  /** True while routine work must wait: a text is unread, or a safety hold is not released. */
+  /**
+   * True while routine work must wait: a text is unread, or a safety hold is not released. A text not handed on yet whose
+   * read never started (no safety row) counts as unread, as it does for the batch (T-248 security note d).
+   */
   routineHeld(): boolean {
-    return this.safety.routineHeld();
+    return this.safety.routineHeld() || this.withoutSafetyRow(this.batch.pendingEventIds());
   }
 
   /**
    * Notes that the shared core released the hold with this id (K-09 releaseSafetyHold's holdId). Only a hold the core
    * recorded, named by its id, is released: an unread hold, or one the core has no id for yet, answers "noSuchHold". A
-   * threat's is never released (A3-48) and answers "neverReleased".
+   * threat's is never released (A3-48) and answers "neverReleased". A released hold no longer binds a commit; it never kept
+   * a batch back (holds bind commits, not hand-offs: DL-119), so nothing is handed on here.
    */
   markHoldReleased(holdId: string): "released" | "neverReleased" | "noSuchHold" {
-    const answer = this.safety.markHoldReleased(holdId);
-    // A lifted hold lets the batches that waited for it go to the lease (nothing polls while they wait).
-    if (answer === "released") this.lend(this.settleBatch());
-    return answer;
+    return this.safety.markHoldReleased(holdId);
   }
 
   /** Every batch the actor holds, in order: closed ones with how they closed and whether the lease has them, and the open one last. */
@@ -234,11 +262,21 @@ export class HandleActor extends DurableObject {
   }
 
   /**
-   * True when a batched text the safety read reads has no safety row: its read never started (the read's start failed after
-   * the text was stored). Routine work waits, as for a text still unread (T-247 security note d: fail closed).
+   * True when one of these texts has not been read yet, so the batch that holds it waits (CQ-65 as DL-119 replaced it:
+   * holds bind commits, not hand-offs): its read is running, was never wired, or gave no verdict yet (the safety read's
+   * `unreadAmong`), or it never started (no safety row: T-247 security note d, fail closed). An outcome hold keeps nothing
+   * back: the turn carries it to its commit (lease.ts).
    */
-  private unreadInBatch(): boolean {
-    const missing = this.safety.withoutSafetyRow(this.batch.pendingEventIds());
+  private unreadAmong(eventIds: readonly string[]): boolean {
+    return this.safety.unreadAmong(eventIds) || this.withoutSafetyRow(eventIds);
+  }
+
+  /**
+   * True when one of these texts is one the safety read reads but has no safety row: its read never started (the read's
+   * start failed after the text was stored). Routine work waits, as for a text still unread (T-247 security note d).
+   */
+  private withoutSafetyRow(eventIds: readonly string[]): boolean {
+    const missing = this.safety.withoutSafetyRow(eventIds);
     if (missing.length === 0) return false;
     return readInboxEvents(this.ctx.storage.sql, missing).some((entry) => isReadableEvent(entry.event));
   }
@@ -248,10 +286,52 @@ export class HandleActor extends DurableObject {
     while (this.batchWork.size > 0) await Promise.all([...this.batchWork]);
   }
 
-  /** Hands what is ready to the lease and sets the alarm for what is still waiting. */
+  /**
+   * The settle path of a text's safety work, on arrival or resumed after an eviction (T-248's handoff): danger closes the
+   * open batch at once, and the end of the read may let a waiting batch go to the lease.
+   */
+  private settleAfter(eventId: string, safe: Promise<void>): void {
+    this.lend(
+      safe
+        .then(() => {
+          this.batch.afterSafety(eventId);
+        })
+        .then(() => this.settleBatch()),
+    );
+    this.ctx.waitUntil(safe);
+  }
+
+  /** Hands what is ready to the lease and sets the alarm for what is still waiting (a read still running included). */
   private async settleBatch(): Promise<void> {
+    this.syncSafetySchedule();
     await this.batch.release();
     await this.batch.arm();
+  }
+
+  /**
+   * Resumes every safety read an eviction cut off (T-1088), in arrival order, each through the settle path, and sets the
+   * safety alarm for what is still being read. Nothing is resumed while the safety read is not wired.
+   */
+  private resumeSafety(): void {
+    for (const resumed of this.safety.resumeCutOff()) this.settleAfter(resumed.eventId, resumed.work);
+    this.syncSafetySchedule();
+  }
+
+  /**
+   * Keeps the safety entry of the stored schedule in step (T-1088): due at the earliest 4 s deadline of a text still being
+   * read, so that an actor evicted mid-read is woken to resume it; once that deadline has passed and the read's work still
+   * runs, due again in SAFETY_RETRY_MS; none when no text is being read, or when nothing is wired to read it (then nothing
+   * could resume it, and no alarm keeps firing for it). The time left is counted on the safety read's clock and set on
+   * the schedule's.
+   */
+  private syncSafetySchedule(): void {
+    const sql = this.ctx.storage.sql;
+    const left = this.safety.nextDeadlineIn();
+    if (left === null) {
+      unscheduleEntry(sql, SCHEDULE_SAFETY);
+      return;
+    }
+    scheduleEntry(sql, SCHEDULE_SAFETY, actorClock().now() + (left > 0 ? left : SAFETY_RETRY_MS));
   }
 
   private lend(work: Promise<void>): void {
