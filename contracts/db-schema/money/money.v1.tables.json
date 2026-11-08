@@ -4,7 +4,7 @@
   "tables": [
     {
       "name": "memberships",
-      "description": "A membership or a repeat plan a customer has with one business (FS membership row): its service, its price for each charge in integer minor units, how often it charges or recurs, how it is paid (charged each period through Rosie, paid with each visit, or paid outside Rosie), its own yes to its terms (a K-29 consent row of kind plan_terms), when it started and when it renews, and whether it is active, paused or ended. The price is written once: a new price needs a new yes, which starts a new row (A7-55; S13-39). Each charge is a plan_charges row; a card saved for its charges is a saved_cards row.",
+      "description": "A membership or a repeat plan a customer has with one business (FS membership row): its service, its price for each charge in integer minor units, how often it charges or recurs, how it is paid (charged each period through Rosie, paid with each visit, or paid outside Rosie), its own yes to its terms (a K-29 consent row of kind plan_terms), when it started and when it renews, and whether it is active, paused or ended. The price is written once: a new price needs a new yes, which starts a new row (A7-55; S13-39). Each charge is a plan_charges row, its first too when it is bought on the page while booking (A5-22: 'charged when bought'): that one is made then, with the customer present (plan_charges.customer_present), and pays its first period. A purchase on the page that no card pays ends it unpaid (ended_why not_paid), so a declined purchase leaves no active membership whose credit pays the visit. A card saved for its charges is a saved_cards row.",
       "source": "FS line 737 (membership); A5-21; A5-22; A7-32; A7-54; A7-55; A7-91; S13-39; RULES 3.9; FEES-TERMS-DRAFT 3.1 to 3.5; 02-contracts section 7 row K-32 ('memberships, packs, credits (FS rows)')",
       "columns": [
         {
@@ -157,8 +157,8 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "stopped (the customer's one reply: 'Don't renew', or end it), price_not_agreed (a price rise with no yes: it ends after its last visit at the old price), business_closed (S11-75), new_terms (the customer said yes to a new price, which is a new row). Set once, with ended_at.",
-          "source": "A7-91 ('Reply 1 Keep the plan, 2 Don't renew'); A7-55 ('With no yes by then ... the plan ends after your last $35 visit'); S13-39; S11-75"
+          "description": "stopped (the customer's one reply: 'Don't renew', or end it), price_not_agreed (a price rise with no yes: it ends after its last visit at the old price), business_closed (S11-75), new_terms (the customer said yes to a new price, which is a new row), not_paid (bought on the page, its first charge was never paid: declined or let go, and no other card on the page paid it, so it never started and the credit it gave the visit goes back). Set once, with ended_at.",
+          "source": "A7-91 ('Reply 1 Keep the plan, 2 Don't renew'); A7-55 ('With no yes by then ... the plan ends after your last $35 visit'); S13-39; S11-75; A5-22; RULES 3.11 ('A declined card at booking shows \"Try another card\"'; 'Not paid: not booked, nothing taken')"
         },
         {
           "name": "version",
@@ -247,8 +247,8 @@
         },
         {
           "name": "memberships_status",
-          "expression": "status in ('active', 'paused', 'ended') and (status = 'paused') = (paused_at is not null) and (status = 'ended') = (ended_at is not null) and (ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('stopped', 'price_not_agreed', 'business_closed', 'new_terms'))",
-          "source": "FS line 737 (status); A7-32; A7-55; A7-91; S11-75"
+          "expression": "status in ('active', 'paused', 'ended') and (status = 'paused') = (paused_at is not null) and (status = 'ended') = (ended_at is not null) and (ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('stopped', 'price_not_agreed', 'business_closed', 'new_terms', 'not_paid'))",
+          "source": "FS line 737 (status); A7-32; A7-55; A7-91; S11-75; A5-22; RULES 3.11"
         },
         {
           "name": "memberships_dates",
@@ -563,7 +563,7 @@
           "type": "text",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "What it is for, as every charge says (RULES 3.14), K-14's purpose: deposit (with several services, part paid now and part left); full_price (all of it paid now); rest (the agreed price, or what is left, after the visit, with any extras said yes to); extra (an added service or extra paid apart); fee (the one late-cancel or no-show fee, with the owner's yes); tip (a tip by the receipt's tip link); pack (a pack, membership or intro offer, charged when bought); plan_charge (one charge of a plan, after its own yes and its reminder). No hold.",
+          "description": "What it is for, as every charge says (RULES 3.14), K-14's purpose: deposit (with several services, part paid now and part left); full_price (all of it paid now); rest (the agreed price, or what is left, after the visit, with any extras said yes to); extra (an added service or extra paid apart); fee (the one late-cancel or no-show fee, with the owner's yes); tip (a tip by the receipt's tip link); pack (a pack or an intro offer, charged when bought, named by its packs row; a membership bought the same way is its first plan_charge); plan_charge (one charge of a membership or plan, after its own yes: each after its reminder, or its first, made with the customer present as it is bought on the page, A5-22, which K-14 v1 runs with its purpose pack: README default 28). No hold.",
           "source": "FS line 731 (kind: due now, deposit, full, rest, bill, card at DONE, pack, membership, extra); A5-04 ('With several services, part paid now and part left is A deposit. All of it paid now is The full price'); K-14 v1 purpose; RULES 3.2, 3.3, 3.9, 3.14; A9-12; A9-15 (tip line); A5-22; A7-54"
         },
         {
@@ -628,7 +628,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For a plan's charge: the plan charge it pays (plan_charges.id), held to the same business. The charge's own payment, written with its effect while the plan charge is due, and, after a decline, the one pay link's payment both name it (A7-54: 'A declined plan charge gets one pay link'), and only one of them is ever pending or paid (payments_one_live_per_plan_charge). So the effect's result or paymentSucceeded finds the plan charge it moves to charged or failed, and C-107 the charge its 1% names (A9-21). Null otherwise.",
+          "description": "For a plan's charge: the plan charge it pays (plan_charges.id), held to the same business. The charge's own payment, written with its effect while the plan charge is due, and, after a decline, the one pay link's payment both name it (A7-54: 'A declined plan charge gets one pay link'), or, for a membership's first charge made on the page, each card tried there (RULES 3.11: 'Try another card'), and only one of them is ever pending or paid (payments_one_live_per_plan_charge). So the effect's result or paymentSucceeded finds the plan charge it moves to charged or failed, and C-107 the charge its 1% names (A9-21). Null otherwise.",
           "source": "A7-54; A9-21 ('A plan charged monthly through Rosie ... pays 1% of each charge'); RULES 3.9, 3.15; S13-39; K-14 v1 purpose planCharge"
         },
         {
@@ -1469,6 +1469,12 @@
           "name": "refunds_effect_key",
           "columns": ["effect_id"],
           "source": "arch 10 lines 508, 542 (one refund per effect, so nothing is refunded twice); S12-16"
+        },
+        {
+          "name": "refunds_one_at_once_per_payment",
+          "columns": ["payment_id"],
+          "where": "decided_by = 'at_once' and state <> 'failed'",
+          "source": "RULES 3.10 ('refunded at once'); S12-26 ('a customer pays only what they agreed to, once'): a refund at once gives back the whole payment, so a payment has one that has not failed; a repeated event, a later C-018 check or C-016's job never writes a second (a double charge names no payment, so its refunds are held by their effects instead)"
         }
       ],
       "checks": [
@@ -2432,8 +2438,8 @@
     },
     {
       "name": "plan_charges",
-      "description": "One charge of a membership or plan: the period or the visit it pays, its amount in integer minor units, its day, the reminder that had to reach the customer first (S13-39: 'No reminder that reached them: no charge'), and how it ended. Its payments name it (payments.plan_charge_id): the charge's own, written with its effect while it is due, and after a decline its one pay link's; only one is ever pending or paid. One row per plan and period, so a retried charge job never charges twice; a charge skipped (no reminder reached them, paused, a visit not given) keeps its row with no payment. Each end is a set-once time, so a charge once charged or skipped never changes, and one that failed can only go on to charged, by its one pay link (README rule 7).",
-      "source": "S13-39; A7-54 ('Each charge is told the day before, with the amount and the visits it covers'; 'For a plan paid by the visit, only for visits that happened'; 'A declined plan charge gets one pay link'); A7-91; RULES 3.9; FEES-TERMS-DRAFT 3.1; K-14 v1 purpose planCharge",
+      "description": "One charge of a membership or plan: the period or the visit it pays, its amount in integer minor units, its day, the reminder that had to reach the customer first (S13-39: 'No reminder that reached them: no charge'), and how it ended. Its payments name it (payments.plan_charge_id): the charge's own, written with its effect while it is due, and after a decline its one pay link's; only one is ever pending or paid. A membership bought on the page while booking (A5-22) has its first charge made then, with the customer present (customer_present), which needs no reminder because the customer is buying it now; a decline there shows 'Try another card' (RULES 3.11). One row per plan and period, so a retried charge job never charges twice; a charge skipped (no reminder reached them, paused, a visit not given) keeps its row with no payment. Each end is a set-once time, so a charge once charged or skipped never changes, and one that failed can only go on to charged, by its one pay link or, for the one made with the customer present, another card on the page (README rule 7).",
+      "source": "S13-39; A7-54 ('Each charge is told the day before, with the amount and the visits it covers'; 'For a plan paid by the visit, only for visits that happened'; 'A declined plan charge gets one pay link'); A7-91; RULES 3.9, 3.11; A5-22; FEES-TERMS-DRAFT 3.1; K-14 v1 purpose planCharge",
       "columns": [
         {
           "name": "id",
@@ -2512,8 +2518,17 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The text that told the customer of this charge the day before (K-04 outbox_rows.id), or the visit's reminder it rode on as one line; it must have reached them before the charge, which code checks by the row's delivered state. Null until sent; set once.",
+          "description": "The text that told the customer of this charge the day before (K-04 outbox_rows.id), or the visit's reminder it rode on as one line; it must have reached them before the charge, which code checks by the row's delivered state. None for the one charge made with the customer present (customer_present). Null until sent; set once.",
           "source": "S13-39 ('Every charge is texted the day before'; 'No reminder that reached them: no charge'); A7-54 ('When a visit's reminder goes the same or the day before, the charge rides on it as one line'); RULES 3.9"
+        },
+        {
+          "name": "customer_present",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "True only for a membership's first charge, made as it is bought on the page while booking, with the customer there typing the card (A5-22: 'A pack, membership or intro offer bought here is charged when bought'; 'The card is typed on the page'), which K-14 runs as a charge with customerPresent true and purpose pack. It needs no reminder, since the customer is buying it now (plan_charges_reminded_first), and a decline shows 'Try another card' instead of a pay link (RULES 3.11). False for every other charge, made without them only after its reminder reached them (S13-39; K-14 v1 README: 'a plan's charges are Rosie's own off-session charges'). Written at insert and never changed (no role may update it: README rule 6); at most one per membership (plan_charges_one_customer_present), and never a visit's charge (plan_charges_customer_present).",
+          "source": "A5-22; RULES 3.9 ('A pack, membership or intro offer bought while booking is charged when bought'), 3.11; S13-39; K-14 v1 charge.portRequest customerPresent ('a pack is bought on the page (A5-22)'), purpose pack ('a pack, membership or intro offer, charged when bought'); K-14 v1 README spike row 15"
         },
         {
           "name": "state",
@@ -2521,7 +2536,7 @@
           "null": false,
           "default": "'due'",
           "audience": ["customer", "owner"],
-          "description": "due (not yet charged, or its charge's payment is running), charged (a payment naming it was taken), skipped (not charged: see skipped_why) or failed (its charge declined, never retried; one pay link follows as a payment of its own naming it, A7-54, and once that is paid the charge moves on to charged, keeping failed_at). Held by the set-once times below.",
+          "description": "due (not yet charged, or its charge's payment is running), charged (a payment naming it was taken), skipped (not charged: see skipped_why) or failed (its charge declined, never retried; one pay link follows as a payment of its own naming it, A7-54, or, for the charge made with the customer present, each card tried again on the page is a payment of its own naming it, RULES 3.11; once one is paid the charge moves on to charged, keeping failed_at). Held by the set-once times below.",
           "source": "A7-54 ('A declined plan charge gets one pay link. Then Sam decides'); S13-39; RULES 3.11"
         },
         {
@@ -2545,7 +2560,7 @@
           "type": "timestamptz",
           "null": true,
           "audience": "never",
-          "description": "When its charge was declined: from then it is failed, or charged once its one pay link is paid. Set once.",
+          "description": "When its charge was declined: from then it is failed, or charged once its one pay link (or, for the charge made with the customer present, another card on the page) is paid. Set once.",
           "source": "A7-54 ('A declined plan charge gets one pay link'); RULES 3.11"
         },
         {
@@ -2603,6 +2618,12 @@
           "name": "plan_charges_one_per_period",
           "columns": ["membership_id", "period_start"],
           "source": "S13-39 (a plan charges once for each period or visit: a retry never charges twice); arch 10 line 508"
+        },
+        {
+          "name": "plan_charges_one_customer_present",
+          "columns": ["membership_id"],
+          "where": "customer_present",
+          "source": "A5-22 (a membership is bought once, so only its first charge is made with the customer present); S13-39 (every later charge waits for its reminder)"
         }
       ],
       "checks": [
@@ -2623,8 +2644,13 @@
         },
         {
           "name": "plan_charges_reminded_first",
-          "expression": "state not in ('charged', 'failed') or reminder_outbox_row_id is not null",
-          "source": "S13-39 ('No reminder that reached them: no charge'); A7-91 ('No reminder sent: no charge'); RULES 3.9"
+          "expression": "state not in ('charged', 'failed') or reminder_outbox_row_id is not null or customer_present",
+          "source": "S13-39 ('No reminder that reached them: no charge'); A7-91 ('No reminder sent: no charge'); RULES 3.9; A5-22 (a membership bought on the page is charged when bought, with the customer present)"
+        },
+        {
+          "name": "plan_charges_customer_present",
+          "expression": "not customer_present or booking_id is null",
+          "source": "A5-22 ('This visit then uses a credit from it': the purchase pays the membership's first period, never a visit, so a charge for a visit of a plan paid by the visit always waits for its reminder, S13-39)"
         },
         {
           "name": "plan_charges_outcome",
@@ -2705,7 +2731,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For rosfield_1pct: the plan charge it is 1% of (plan_charges.id), held to the same business: a monthly plan's charge once charged, found from its paid payment's plan_charge_id. Null for rosfield_2.",
+          "description": "For rosfield_1pct: the plan charge it is 1% of (plan_charges.id), held to the same business: a monthly plan's charge once charged, its first too when the membership was bought on the page (customer_present), found from its paid payment's plan_charge_id. Null for rosfield_2.",
           "source": "S1-25 ('pays 1% of each charge'); A9-21; FEES-TERMS-DRAFT 3.1"
         },
         {
