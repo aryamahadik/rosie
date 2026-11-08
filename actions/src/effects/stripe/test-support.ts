@@ -15,7 +15,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 
 import { createStripeDouble, type StripeDouble } from "../../../../adapters/src/stripe/double";
 import type { Account } from "../../../../adapters/src/stripe/double";
-import type { Span } from "../../../../runtime/src/trace";
+import { openTrace, type Span } from "../../../../runtime/src/trace";
 import { CONTRACTS_DIR, formatProblems, loadToolApiSchemas } from "../../tool-api/validator";
 import type { EffectRow, KindPorts } from "../kinds";
 import {
@@ -24,7 +24,7 @@ import {
   type EffectsRunnerDeps,
   type SpanRefusedReport,
 } from "../runner";
-import { FakeClock, FakeEffectRepo, fixtureEffect, spanRecorder } from "../runner/test-support";
+import { FakeClock, FakeEffectRepo, TEST_BUNDLE, fixtureEffect } from "../runner/test-support";
 import { createStripeKinds } from "./stripe-kinds";
 import type { StripeEffectPort, StripeKind } from "./port";
 
@@ -189,6 +189,34 @@ export function must<T>(value: T | undefined | null): T {
 
 // ---- the harness ----------------------------------------------------------------------------------------------------
 
+/**
+ * Opens one trace per effect run on the fake clock and keeps every span, as the runner's spanRecorder does, but under a
+ * fixed, readable trace id (K-08 v1's fixtures write placeholders such as trace-alex-0008), never crypto.randomUUID()
+ * (T-1110). expectCleanRun scans every span for card digits ("4242", and "4000" where a test names it); a random UUID
+ * holds one of them about once in a thousand traces, so section 6's ten traces failed about one run in a hundred.
+ */
+function traceRecorder(clock: FakeClock): { spans: Span[]; traceOf: EffectsRunnerDeps["traceOf"] } {
+  const spans: Span[] = [];
+  let traces = 0;
+  return {
+    spans,
+    traceOf: () => {
+      traces += 1;
+      const jobId = `effects-run-${String(traces)}`;
+      return openTrace({
+        openedBy: "sweep",
+        jobId,
+        bundleId: TEST_BUNDLE,
+        now: () => clock.now(),
+        newId: () => `trace-${jobId}`,
+        sink: (span) => {
+          spans.push(span);
+        },
+      });
+    },
+  };
+}
+
 export interface StripeHarness {
   readonly clock: FakeClock;
   readonly repo: FakeEffectRepo;
@@ -209,7 +237,7 @@ export function stripeHarness(start: string): StripeHarness {
   const clock = new FakeClock(start);
   const repo = new FakeEffectRepo();
   const double = stripeDouble(clock);
-  const { spans, traceOf } = spanRecorder(clock);
+  const { spans, traceOf } = traceRecorder(clock);
   const refusedSpans: SpanRefusedReport[] = [];
   const written = new Map<string, string>();
   const kinds: KindPorts = createStripeKinds({

@@ -74,13 +74,16 @@ async function expectLifeAccepted(repo: FakeEffectRepo, effectId: string): Promi
   expect(lifeChain(life)).toEqual([]);
 }
 
+/** What expectCleanRun scans for private values: every span, result and event-log entry the run recorded. */
+const recordedText = (h: StripeHarness): string => JSON.stringify([h.spans, h.repo.results, h.repo.entries]);
+
 /** Every request the double took passes K-14 v1's schema, and every span K-08 v1's, holding no private value. */
 function expectCleanRun(h: StripeHarness, privateValues: readonly string[] = []): void {
   for (const { call, request } of h.double.requests()) expect(k14(`${call}.request`, request)).toEqual([]);
   expect(h.double.rejectedRequests()).toEqual([]);
   expect(h.refusedSpans).toEqual([]);
   for (const span of h.spans) expect(contractChecks().span(span)).toEqual([]);
-  const recorded = JSON.stringify([h.spans, h.repo.results, h.repo.entries]);
+  const recorded = recordedText(h);
   for (const value of ["demo-client-secret", "4242", "visa", ...privateValues])
     expect(recorded).not.toContain(value);
 }
@@ -1035,5 +1038,19 @@ describe("a try the runner has stopped waiting for sends nothing more", () => {
       ["ok", null],
     ]);
     expect(listed(h, SHOP, DEPOSIT_COMMITTED, "2026-11-07T16:00:00Z")).toHaveLength(1);
+  });
+});
+
+// ---- what the scan for private values reads -------------------------------------------------------------------------
+
+describe("what expectCleanRun scans for private values is the same on every run of the same rows", () => {
+  it("records the same spans, results and entries twice over: no random id reaches the scan (T-1110)", async () => {
+    const scanned = async (): Promise<string> => {
+      const h = stripeHarness(DEPOSIT_CLAIMED);
+      h.commit(depositRow(), DEPOSIT_COMMITTED);
+      await h.clock.drive(h.runner().runDue());
+      return recordedText(h);
+    };
+    expect(await scanned()).toBe(await scanned());
   });
 });
