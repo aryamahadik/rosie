@@ -254,8 +254,9 @@ export function buildStripeRequest(effect: EffectRow): BuildResult {
   if (!isStripeKey(effect.idempotencyKey)) faults.push("effect.idempotencyKey");
   const amount: unknown = effect.amount;
   if (AMOUNT_CALLS.includes(call) ? !isStripeAmount(amount) : amount !== null) faults.push("amount");
-  faults.push(...portFaults(call, effect.portRequest));
-  const purpose = effect.portRequest.purpose;
+  const portRequest: unknown = effect.portRequest;
+  faults.push(...portFaults(call, portRequest));
+  const purpose = isObject(portRequest) ? portRequest.purpose : undefined;
   if (call === "charge" && (kind === "rosfield_monthly_charge") !== (purpose === "rosfieldMonthlyBill"))
     faults.push("port.purpose");
   if (faults.length > 0) return { ok: false, faults: [...new Set(faults)] };

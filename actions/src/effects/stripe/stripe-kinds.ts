@@ -43,6 +43,9 @@ export const ABORTED = "aborted";
 
 const STOPPED: unique symbol = Symbol("stopped");
 
+/** True once the runner has stopped waiting for the try: read afresh each time, as it changes while the try waits. */
+const hasStopped = (signal: AbortSignal): boolean => signal.aborted;
+
 /**
  * The answer `work` gives, or STOPPED as soon as the try's signal aborts: the runner aborts it at answerBy, so the kind
  * answers by then even when a call never comes back (T-323's handoff). A call that ends later is not waited for; the
@@ -97,13 +100,14 @@ async function runTry(
   const options: StripeCallOptions = { signal };
 
   if (built.call === "charge" || built.call === "refund") {
+    if (hasStopped(signal)) return networkError(ABORTED);
     const writtenAt = await untilAborted(deps.writtenAtOf(effect), signal);
     if (writtenAt === STOPPED) return networkError(ABORTED);
     const at = now();
     const plan = lookUpPlan(effect, writtenAt, at);
     if (plan.kind === "unknown") return networkError(WRITTEN_AT_UNKNOWN);
     if (plan.kind === "lookUp") {
-      if (signal.aborted) return networkError(ABORTED);
+      if (hasStopped(signal)) return networkError(ABORTED);
       const listed = await untilAborted<unknown>(
         deps.port.listMoney(
           {
@@ -122,7 +126,7 @@ async function runTry(
     }
   }
 
-  if (signal.aborted) return networkError(ABORTED);
+  if (hasStopped(signal)) return networkError(ABORTED);
   const outcome = await untilAborted<unknown>(send(deps.port, built, options), signal);
   if (outcome === STOPPED) return networkError(ABORTED);
   return answerOf(built, outcome);

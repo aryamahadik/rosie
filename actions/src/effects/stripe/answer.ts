@@ -102,7 +102,9 @@ export function answerOf(built: StripeCallRequest, outcome: unknown): KindAnswer
   if (!isObject(outcome)) return networkError(ANSWER_INVALID);
   if (outcome.result === "failed") return failureAnswer(built.call, outcome) ?? networkError(ANSWER_INVALID);
   const result = outcome.result;
-  const idField = typeof result === "string" ? SUCCESS[built.call][result] : undefined;
+  const successes = SUCCESS[built.call];
+  const idField =
+    typeof result === "string" && Object.hasOwn(successes, result) ? successes[result] : undefined;
   if (idField === undefined) return networkError(ANSWER_INVALID);
   // Off-session, the bank's ask comes back as a decline (authentication_required), never as needsAuthentication.
   if (result === "needsAuthentication" && !(built.call === "charge" && built.request.port.customerPresent))

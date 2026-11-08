@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import { EFFECT_KINDS, kindsOf, type EffectRow } from "../kinds";
 import { calendarWrite } from "../runner/test-support";
 import { CALL_OF, STRIPE_KINDS, type StripeEffectCall } from "./port";
 import {
@@ -16,7 +17,6 @@ import {
   refusedCode,
 } from "./request";
 import { ROSFIELD, SHOP, STRIPE_INDEX, depositRow, k14, readExchange, rowFromExchange } from "./test-support";
-import { EFFECT_KINDS, kindsOf } from "../kinds";
 
 const EFFECT_CALLS: readonly StripeEffectCall[] = [
   "saveCard",
@@ -159,6 +159,13 @@ describe("the request is the committed row's, and nothing else", () => {
       ok: false,
       faults: ["turnId"],
     });
+  });
+
+  it("refuses a row whose port request is not an object, without throwing", () => {
+    for (const portRequest of [null, [], "deposit", 4000]) {
+      const row = { ...depositRow(), portRequest: portRequest as unknown as EffectRow["portRequest"] };
+      expect(buildStripeRequest(row)).toEqual({ ok: false, faults: ["port"] });
+    }
   });
 
   it("refuses a row of another port", () => {

@@ -185,6 +185,8 @@ describe("an answer off the contract is a network error, never a charge or a dec
       { result: "charged", paymentId: "4242424242424242" },
       { result: "charged", paymentId: 5 },
       { result: "held", paymentId: "stripe-payment-demo-0001" },
+      { result: "constructor", paymentId: "stripe-payment-demo-0001" },
+      { result: "toString", paymentId: "stripe-payment-demo-0001" },
       { result: "refunded", refundId: "stripe-refund-demo-0001" },
       { result: "failed", kind: "declined", httpStatus: 402, code: "card declined", declineCode: null },
       { result: "failed", kind: "unknown", httpStatus: 400, code: null },
