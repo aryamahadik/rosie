@@ -11,7 +11,10 @@
 //     the send date (today's both this week's and next week's); "next Friday" the coming one or the one after; a month and
 //     day the next one on or after the send date; a day with no time of day is its start, 00:00;
 //   - a wall time a daylight-saving change skips has no instant, and one it repeats has two.
-// Words that name two days or two times ("3 or 4pm", "Thu 2-5") are several, never one. Nothing here keeps or logs words.
+// Words that name two days or two times ("3 or 4pm", "Thu 2-5") are several, never one. The readers' own phrase words
+// are read (T-304 round 3, DL-189): "quarter past 3" is 3:15, "quarter to 3pm" 2:45pm, "half past three" 3:30, "las 3 y
+// media" 3:30, "las 3 y cuarto" 3:15, "las 4 menos cuarto" 3:45. timeReadingOf also gives every span of the folded words
+// a reading read, so a reader of the whole value phrase sees what was left unread. Nothing here keeps or logs words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
@@ -278,9 +281,105 @@ const meridiemOf = (word: string | undefined, letter: string | undefined): "am" 
   return null;
 };
 
+/** An hour phrase read: where it stands and the time of day it names. */
+interface HourPhrase extends Span {
+  readonly clock: ClockWords;
+}
+
+/**
+ * The hour phrases in folded words (T-304 round 3, DL-189 item 2: the readers' own phrase words): "quarter past 3", "a
+ * quarter to 4pm", "half past three", "las 3 y media", "las tres y cuarto", "las 4 menos cuarto". A "to" phrase is that many
+ * minutes before the hour: "quarter to 3pm" is 2:45pm; with no am or pm, "quarter to 3" is 2:45, morning or afternoon.
+ */
+function hourPhrasesIn(
+  folded: string,
+  hourWords: ReadonlyMap<string, number>,
+  hourNames: string,
+): HourPhrase[] {
+  const hour = hourNames === "" ? String.raw`(\d{1,2})` : String.raw`(\d{1,2}|${hourNames})`;
+  const meridiem = String.raw`(?: ?(am|pm)\b)?`;
+  // The hour ends there: am or pm may follow it, never another digit, letter or a colon's minutes.
+  const after = String.raw`(?= ?(?:am|pm)\b|[^\w:]|$)`;
+  const patterns: readonly [RegExp, number, boolean][] = [
+    [new RegExp(String.raw`\b(?:a )?quarter (?:past|after) ${hour}${after}${meridiem}`, "g"), 15, false],
+    [
+      new RegExp(String.raw`\b(?:a )?quarter (?:to|till|til|of|before) ${hour}${after}${meridiem}`, "g"),
+      45,
+      true,
+    ],
+    [new RegExp(String.raw`\bhalf past ${hour}${after}${meridiem}`, "g"), 30, false],
+    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} y media\b`, "g"), 30, false],
+    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} y cuarto\b`, "g"), 15, false],
+    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} menos cuarto\b`, "g"), 45, true],
+  ];
+  const phrases: HourPhrase[] = [];
+  for (const [pattern, minute, before] of patterns) {
+    for (const found of findAll(folded, pattern)) {
+      const said = found.groups[0] ?? "";
+      const named = /^\d+$/.test(said) ? Number(said) : hourWords.get(said);
+      if (named === undefined || named < 1 || named > 12) continue;
+      const meridiemSaid = found.groups[1] === "am" || found.groups[1] === "pm" ? found.groups[1] : null;
+      phrases.push({
+        at: found.at,
+        end: found.end,
+        clock: hourPhraseClock(named, minute, before, meridiemSaid),
+      });
+    }
+  }
+  return phrases;
+}
+
+/** The time of day an hour phrase names: `minute` past `hour`, or for a "to" phrase that many minutes before it. */
+function hourPhraseClock(
+  hour: number,
+  minute: number,
+  before: boolean,
+  meridiem: "am" | "pm" | null,
+): ClockWords {
+  if (meridiem === null) {
+    const shown = before ? (hour === 1 ? 12 : hour - 1) : hour;
+    return { kind: "clock", hour: shown, minute, meridiem: null };
+  }
+  const day = 24 * 60;
+  const hour24 = (hour % 12) + (meridiem === "pm" ? 12 : 0);
+  const at = (hour24 * 60 + (before ? minute - 60 : minute) + day) % day;
+  const atHour = Math.floor(at / 60);
+  return {
+    kind: "clock",
+    hour: atHour % 12 === 0 ? 12 : atHour % 12,
+    minute: at % 60,
+    meridiem: atHour < 12 ? "am" : "pm",
+  };
+}
+
+/** What the words say about one time, and every span of the folded words the reading read. */
+export interface TimeReading {
+  readonly read: TimeRead;
+  /** Each run of the folded words read: a day, a time of day, an elapsed time, a morning or afternoon word. */
+  readonly spans: readonly Span[];
+}
+
 /** Reads what the words say about one time, in the languages given. */
 export function readTimeWords(words: string, languages: readonly ValueLanguage[] = BOTH_LANGUAGES): TimeRead {
+  return timeReadingOf(words, languages).read;
+}
+
+/** Reads what the words say about one time, with the spans of their folded form it read. */
+export function timeReadingOf(
+  words: string,
+  languages: readonly ValueLanguage[] = BOTH_LANGUAGES,
+): TimeReading {
   const folded = foldWords(words);
+  const hints: Span[] = [
+    ...findAll(folded, AM_HINTS).map(({ at, end }) => ({ at, end })),
+    ...findAll(folded, PM_HINTS).map(({ at, end }) => ({ at, end })),
+  ];
+  const read = readFolded(folded, languages);
+  return { read: read.read, spans: [...read.spans, ...hints] };
+}
+
+/** Reads one time from folded words: the reading and the spans it took. */
+function readFolded(folded: string, languages: readonly ValueLanguage[]): TimeReading {
   const counted = countedIn(folded, languages);
   const taken: Span[] = [];
   const daySpans: Span[] = [];
@@ -334,7 +433,12 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
     weekdays.push({ weekday, next });
   }
 
+  const hourWords = hourWordsOf(languages);
+  const hourNames = [...hourWords.keys()].sort((a, b) => b.length - a.length).join("|");
   const clocks: ClockWords[] = [];
+  for (const phrase of hourPhrasesIn(folded, hourWords, hourNames)) {
+    if (takeClock(phrase)) clocks.push(phrase.clock);
+  }
   for (const found of findAll(folded, NOON)) if (takeClock(found)) clocks.push({ kind: "noon" });
   for (const found of findAll(folded, MIDNIGHT)) if (takeClock(found)) clocks.push({ kind: "midnight" });
   for (const found of findAll(folded, COLON_TIME)) {
@@ -355,8 +459,6 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
     if (takeClock(found))
       clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
   }
-  const hourWords = hourWordsOf(languages);
-  const hourNames = [...hourWords.keys()].sort((a, b) => b.length - a.length).join("|");
   if (hourNames !== "") {
     const worded = new RegExp(String.raw`\b(?:${CUE} (${hourNames})\b|(${hourNames}) ?(am|pm)\b)`, "g");
     for (const found of findAll(folded, worded)) {
@@ -382,7 +484,8 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
     const next = ordered[index + 1];
     return next !== undefined && EITHER.test(folded.slice(span.end, next.at));
   });
-  if (joined || either) return { kind: "several" };
+  const spans: readonly Span[] = taken;
+  if (joined || either) return { read: { kind: "several" }, spans };
 
   const am = AM_HINTS.test(folded);
   const pm = pmFromDay || PM_HINTS.test(folded);
@@ -393,19 +496,22 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
   const [firstElapsed, ...moreElapsed] = elapsed;
   if (firstElapsed !== undefined) {
     const alone = moreElapsed.length === 0 && day.length === 0 && weekday.length === 0 && clock.length === 0;
-    return alone
-      ? {
-          kind: "time",
-          time: { elapsedMs: firstElapsed.value, day: null, weekday: null, clock: null, hint: null },
-        }
-      : { kind: "several" };
+    const time: TimeWords = {
+      elapsedMs: firstElapsed.value,
+      day: null,
+      weekday: null,
+      clock: null,
+      hint: null,
+    };
+    return { read: alone ? { kind: "time", time } : { kind: "several" }, spans };
   }
-  if (day.length > 1 || weekday.length > 1 || clock.length > 1) return { kind: "several" };
+  if (day.length > 1 || weekday.length > 1 || clock.length > 1) return { read: { kind: "several" }, spans };
   const [oneDay = null] = day;
   const [oneWeekday = null] = weekday;
   const [oneClock = null] = clock;
-  if (oneDay === null && oneWeekday === null && oneClock === null) return { kind: "none" };
-  return { kind: "time", time: { elapsedMs: null, day: oneDay, weekday: oneWeekday, clock: oneClock, hint } };
+  if (oneDay === null && oneWeekday === null && oneClock === null) return { read: { kind: "none" }, spans };
+  const time: TimeWords = { elapsedMs: null, day: oneDay, weekday: oneWeekday, clock: oneClock, hint };
+  return { read: { kind: "time", time }, spans };
 }
 
 /**

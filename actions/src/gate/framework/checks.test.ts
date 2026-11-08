@@ -263,6 +263,58 @@ describe("the quote and the words stand whole in a text, at word edges (T-304 ro
   });
 });
 
+describe("the edges are judged on the folded text the readers read (T-304 round 3, DL-189)", () => {
+  const ZERO_WIDTH_SPACE = "​";
+
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function saying(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'I can' out of 'I can´t make it'", "2, I can´t make it", "I can", "I can´t make it"],
+    ["'no' out of 'no.reply@example.com'", "2, no.reply@example.com", "no", "no.reply@example.com"],
+    [
+      "'40' out of '1​40' (a zero-width space inside)",
+      `2, raise it to 1${ZERO_WIDTH_SPACE}40`,
+      "40",
+      `1${ZERO_WIDTH_SPACE}40`,
+    ],
+    ["'$1' out of '$1，200'", "2, raise it to $1，200", "$1", "$1，200"],
+    [
+      "'tomorrow at 10' out of 'tomorrow at 10：30'",
+      "2, tomorrow at 10：30",
+      "tomorrow at 10",
+      "tomorrow at 10：30",
+    ],
+    ["'$12' out of '$12．50'", "2, $12．50 a foot", "$12", "$12．50"],
+    ["'9' out of 'table for 9：30 tomorrow'", "2, table for 9：30 tomorrow", "9", "table for 9：30"],
+  ])("a quote %s is refused (quoteNotInText); the whole is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = saying(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(saying(words, whole))).toBeNull();
+    expect(checkDecideOutput(saying(words, words))).toBeNull();
+  });
+
+  it("a value's words cut out of a number behind a fullwidth mark are refused (valueNotInText): '$12' of '$12．50'", () => {
+    const text = "block thursday afternoon and also tile is $12．50 a foot from now on";
+    const decided = samsSecondPart((part) => {
+      part.quote = "tile is $12．50 a foot from now on";
+      const [, price] = asChoose(part).fields;
+      if (price !== undefined) price.words = "$12";
+    });
+    decided.context.texts[0].words = text;
+    expect(checkDecideOutput(decided)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+    expect(onlyProblem(decided, 1)).toEqual({ check: "valueWords", why: "valueNotInText" });
+  });
+});
+
 describe("the order of the checks and what is refused", () => {
   it("a part takes its verb, quote, option and value words in that order: its first failing check is its problem", () => {
     const quoteAndOption = samsSecondPart((part) => {
