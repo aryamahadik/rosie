@@ -3,8 +3,8 @@
 // limit 1. Values come only from the contracts' fixtures and the master's sample cast: K-04 v1's seeds (Sam, Alex, Riley,
 // Lee's Barbershop, Alex's haircut), K-22 v1's team at Lee Home Services (Pat, the office manager; Jordan), K-09 v1's
 // exchanges (Sam's new mobile, Alex's Nov 14 visit), T-308's examples (A4-26's gift, A4-55's employer) and the master's
-// steps (S2-22, S11-42, S11-53, S11-22, S11-61, A7-66, A7-02, A7-11, A7-81, A3-48, A3-50, A4-14, A4-24); phone numbers in
-// the 555-01xx range (rule 9).
+// steps (S2-22, S11-42, S11-53, S11-22, S11-25, S11-61, S12-23, S12-24, A7-66, A7-02, A7-11, A7-17, A7-81, A7-98, A3-30,
+// A3-48, A3-50, A3-51, A4-14, A4-24, A4-82); phone numbers in the 555-01xx range (rule 9).
 
 import type { BookingHead } from "../../../../db/repo/bookings-head";
 import { createIdentityAccess, type IdentityAccess } from "../../domain/identity-access";
@@ -160,6 +160,8 @@ export const GIFT_BEING_MADE = "booking-alex-gift-being-made";
 export const NEW_REQUEST = "booking-alex-new-request";
 /** A booked visit whose person served is not on the record. */
 export const SERVED_UNKNOWN = "booking-alex-served-unknown";
+/** A booked visit at Lee Home Services (flow B), where Pat is an admin: Alex books it for himself and pays. */
+export const HOME_VISIT = "booking-alex-home-visit";
 
 function alexBooking(
   id: string,
@@ -200,6 +202,11 @@ export function limitRecord(): TestRecord {
       alexBooking(GIFT_BEING_MADE, "entry", "person-alex-brother", "person-alex"),
       alexBooking(NEW_REQUEST, "entry", null, null),
       alexBooking(SERVED_UNKNOWN, "booked", null, "person-alex"),
+      {
+        ...alexBooking(HOME_VISIT, "booked", "person-alex", "person-alex"),
+        businessId: HOME_SERVICES,
+        flow: "B",
+      },
     ],
   });
 }
@@ -465,6 +472,11 @@ export function anytimeRow(
   return { ...choiceBase(choiceId, handler, row, target, stakesFrom), kind: "anytime", anytimeRow: row };
 }
 
+/** An entry step meaning search adds when nothing fits (K-02 searchEntry; arch 03 line 189), entered. */
+export function searchEntry(choiceId: string, step: string, label: string, target: Choice["target"]): Choice {
+  return { ...choiceBase(choiceId, step, label, target, []), kind: "searchEntry" };
+}
+
 /** A door (arch 03 line 165), entered. */
 export function doorOf(
   choiceId: string,
@@ -723,6 +735,74 @@ export function newBookingDoor(): Choice {
 /** The danger row, which only the safety read sets (A3-22). */
 export function dangerRow(): Choice {
   return anytimeRow("c-danger", "danger-or-crisis", "A3-22", barbershop(HAIRCUT));
+}
+
+// The round 2 scenarios (DL-183)
+
+/** S12-24's question to the owner (san→owner msg), about no booking: "Reply 1 Keep asking me, 2 Block it, 3 Let it book." */
+export function s12Options(businessId: string = BARBERSHOP): Choice[] {
+  return ["1 Keep asking me", "2 Block it", "3 Let it book"].map((label, index) =>
+    option(`c-s12-24-${String(index + 1)}`, "oq-s12-24", "S12-24", label, targetOf(businessId, null)),
+  );
+}
+
+/** S12-24's "3 Let it book": the owner lets a number that booked under several names book as usual. */
+export function letItBook(businessId: string = BARBERSHOP): Choice {
+  return option("c-s12-24-3", "oq-s12-24", "S12-24", "3 Let it book", targetOf(businessId, null));
+}
+
+/** S12-23 "A booking or a payment looks wrong" as the entry meaning search adds, about no booking. */
+export function s12Entry(): Choice {
+  return searchEntry("c-s12-23", "S12-23", "A booking or a payment looks wrong", barbershop(null));
+}
+
+/** closest-entries.json's entry: A3-51's "Asks for a person", about no booking. */
+export function askForAPerson(): Choice {
+  return searchEntry("c-a3-51", "A3-51", "Asks for a person", barbershop(null));
+}
+
+/** A7-98 "Sends updates to a new phone or email" (the contact-change row's handler) as an entry, about no booking. */
+export function newContactEntry(): Choice {
+  return searchEntry("c-a7-98", "A7-98", "Sends updates to a new phone or email", barbershop(null));
+}
+
+/** A3-30's read-back to the owner (san→owner msg) of a booking the business adds: "3 Change it", about no booking. */
+export function changeTheReadBack(): Choice {
+  return option("c-a3-30", "oq-a3-30", "A3-30", "3 Change it", barbershop(null));
+}
+
+/** A4-82's reach card (agent→cust chat): how to reach the customer (gives reach_by). */
+export function reachBy(label = "Texts only", bookingId: string | null = null): Choice {
+  return option("c-a4-82", "oq-a4-82", "A4-82", label, barbershop(bookingId));
+}
+
+/** A4-24's "Another adult": the booking is for another adult, a person added to it. */
+export function anotherAdult(bookingId: string, businessId: string = BARBERSHOP): Choice {
+  return option("c-a4-24-adult", "oq-a4-24", "A4-24", "Another adult", targetOf(businessId, bookingId));
+}
+
+/** A4-24's "An adult the booker acts for": authority added to the booking. */
+export function actsFor(bookingId: string): Choice {
+  return option("c-a4-24-acts", "oq-a4-24", "A4-24", "An adult the booker acts for", barbershop(bookingId));
+}
+
+/** A7-17's "1 The stand-in instead": no stake of its own. */
+export function standIn(bookingId: string): Choice {
+  return option("c-stand-in", "oq-a7-17", "A7-17", "1 The stand-in instead", barbershop(bookingId));
+}
+
+/** S11-25's question to the owner after a late cancel: "1 Charge or keep it" (a fee: S11-26 takes it). */
+export function lateFee(bookingId: string): Choice {
+  return option("c-late-fee", "oq-s11-25", "S11-25", "1 Charge or keep it", barbershop(bookingId), [
+    { why: "charge", step: "S11-26", ref: "pay.late" },
+  ]);
+}
+
+/** A7-17's "3 Cancel, no fee" when the frontier builder could not walk it (stake unknown). */
+export function unwalked(bookingId: string): Choice {
+  return option("c-unwalked", "oq-a7-17", "A7-17", "3 Cancel, no fee", barbershop(bookingId), [
+    { why: "unknown", step: null, ref: null },
+  ]);
 }
 
 /** The one "which booking?" choice for a booking (arch 03 line 167). */

@@ -6,55 +6,83 @@
 //
 // For one gated part, in this order:
 //   1. What it changes (changeOf): nothing the limit applies to (notChecked); a change that only protects (pass, on
-//      anyone's word); S13-45 row 1, open to anyone at any door (pass); or matters that need the decider's own yes.
+//      anyone's word); S13-45 row 1, open to anyone at its doors (pass); or matters that need the decider's own yes.
 //   2. Who decides each matter: T-308's identity and access service (the person served or who decides for them; the
 //      owner or an admin the owner lets; the owner alone for closing, export and hand-over), the booker of a booking still
-//      being made, the person themself for their own record, or the one a business question was asked of in their role.
+//      being made, or the person themself for their own record.
 //   3. Whose word it is (S13-45's one rule first, then its rows): the call's person (K-09 v1 caller.personId, "the
 //      sender of the turn's texts"), proven only from their own contact on file for the standing they would act in. An
 //      unproven sender in a turn gets a code to that contact on file, typed back in this chat (proofCodeSent); proven, or
 //      off the chat, someone T-308 does not name gets a question in each decider's own chat (askedDecider). Nobody to ask:
 //      askedDecider with the step's safe default for the commit (S13-31: "When nobody allowed can decide in time, the
-//      step's safe default runs and a person is told").
+//      step's safe default runs and a person is told"), never a question with nobody to put it to.
 //
 // What an outcome writes (the code, the question, the safe default and who is told) is the commit's (K-09 v1
 // limitNOutcome; T-305 default 8): decideAllowed says what, and the limit hands the gate its K-09 outcome. Nothing here
 // logs. What it returns names labels, ids and steps, never a person's words, name or number; an unproven sender's code
 // and decision name no booking, so they read the same whether or not one exists.
 //
-// Defaults used (for ops/QUESTIONS.md):
+// Defaults used (for ops/QUESTIONS.md; round 2 follows the lead's rulings on the card, DL-183):
 //   1. Every change that does not only protect needs the decider's own yes, not only one that adds a person, a way in,
 //      money or authority: S13-45's rule "Showing, changing or paying waits for the one rule", row 2 "See or change a
-//      booking: the person served, by the one rule", S13-57 "or shows something". The exception is row 1: the doors for a
-//      new booking, an existing booking (A3-43 runs its own code check) and an unclear owner text or HELP, the outage row
-//      (S12-11) and an entry step meaning search adds about no booking or business step.
+//      booking: the person served, by the one rule", S13-57 "or shows something". The exception is row 1 ("Ask, see
+//      prices and times, book a new visit: anyone, at any door"): the doors for a new booking, an existing booking (A3-43
+//      runs its own code check) and an unclear owner text or HELP, the outage row (S12-11), and a time picked for a new
+//      visit about no booking yet at NEW_VISIT_STEPS, the times cards and the pick (agent→cust and cust→agent chat in
+//      the step index: A4-14, A4-33, A4-62 and A4-68, A4-15; B4-15, B4-84, B4-85 and B4-89, B4-16). That last one is
+//      this round's own default: K-09 v1's frozen commit-limit-5-taken.json passes limit 1 on Alex's A4-14 pick, whose
+//      open question holds no booking yet (the K-30 request has no booking head), where DL-183's ruling 1 alone would
+//      ask the owner. A meaning-search entry is no door: default 3 below.
 //   2. What only protects is the commit's list (T-305 hold.ts PROTECTIVE_ROWS and PROTECTIVE_STEPS, DL-128, DL-133: a
 //      STOP, a death report, the A3-48 pause, A3-50's private booking and their twins), so the gate and the commit read
 //      one list. A STOP for another number is still the STOP path's to refuse (K-09 notFromThatPhone).
-//   3. A part's matters: the business's own for S1 steps, the owner and settings hubs, the owner door and the
-//      owner-command row (settings), S2 steps, the team hub and door (team), S11 steps (settings), and owner-only steps
-//      (S11-61 export, S11-73 leaving, S11-75, S11-76 and S11-95 closing, S11-100 hand-over); on the business's side, a
-//      charge or money stake is a fee, a refund stake a refund, an unknown stake (the frontier builder could not walk
-//      it) both, beside the base matter. Any other choice on a booking is its visit (its hubs included: a relayed "Alex
-//      wants it" becomes a question in Alex's own chat, B8-23), except an option answered by someone with a live owner,
-//      admin or staff role who is not that booking's booker, person served or payer: the question was put to the
-//      business, so its money is a fee or refund and the rest is theirs to answer in their role (S13-31: "Staff decide
-//      only what their role and the owner's rights give"; S13-45 rows 8, 9). An option about no booking, and the
-//      contact-change row (D75: "the request counts only from the customer's own chat"), are the person's own record.
-//      Any other choice (a danger row, a row with no booking) has no matter: nobody decides (fails closed).
+//   3. A part's matters:
+//      a. A choice about no booking (an open question's option, or an entry step meaning search adds) is the sender's
+//         own record only at a customer-side step that writes the sender's own person or handle rows (DL-183): the list
+//         OWN_RECORD_STEPS, taken from the step index (its "who→to via" and gives columns, with the field 02-contracts
+//         section 8 names for each key). On it: A4-82 and B4-93 "Asks how to reach Alex" (agent→cust chat; reach_by,
+//         K-28's way), A4-23 and B4-25 "The AI sends Alex's name" (agent→san sync, the customer's own AI; customer,
+//         K-28's row), A7-98 and B7-88 "Sends updates to a new phone or email" (cust→san msg; the contact-change row's
+//         handlers, S13-45 row 3 and D75). Left out: A3-30 and B3-08 (they write a customer's way and row, but as the
+//         owner's read-back of a booking the business adds: san→owner, owner→san), A4-80 and B4-92 (who_for: the
+//         booking's booker, person served and payer, not the sender's own rows), A4-42 and B4-29 (the secure link
+//         Rosie sends: K-30). Every other choice about no booking is a business matter (row 1's apart, default 1): S12
+//         and every S step, any step K-01 marks for the business (its who or to is the owner or staff) and any step on
+//         neither list, A3-51's meaning-search entries included. Its matter is the business's own: team for S2 steps,
+//         settings for any other step (S11-53's settings hold "Block a customer or address", which S12-24 decides), its
+//         money as in b, and the owner's alone at an owner-only step. It passes only for the owner, or an admin with the
+//         matching live power, from that role's own mobile or email on file (S13-45 row 8); anyone else gets the code
+//         or a question to them.
+//      b. The business's doors, rows and hubs: settings for the owner door, the owner-command row and the owner and
+//         settings hubs; team for the team door and hub; the owner alone at an owner-only step (S11-61 export, S11-73
+//         leaving, S11-75, S11-76 and S11-95 closing, S11-100 hand-over). On the business's side a charge or money stake
+//         is a fee, a refund stake a refund, and an unknown stake (the frontier builder could not walk it) both, beside
+//         the base matter.
+//      c. A choice on a booking is its visit (its hubs included: a relayed "Alex wants it" becomes a question in Alex's
+//         own chat, B8-23), except: at an owner-only step it is the owner's; put to someone with a live owner, admin or
+//         staff role who is not the booking's booker, person served or payer, it is theirs only for what S13-31 gives
+//         the business on a booking, a fee (a charge stake) or a refund beyond the terms (a refund stake), and anything
+//         else it may do (adding a person, a way in or authority; money taken at booking; a move or a cancel; whatever no
+//         stake names) is the booking's visit, for its decider, whatever proves their role (DL-183 N2), with an unknown
+//         stake all three; answered by anyone else at an S1, S2 or S11 step, it stays the business's, as in a.
+//      d. The contact-change row (D75: "the request counts only from the customer's own chat") is the person's own
+//         record. Any other choice (a danger row, a row or hub case with no booking) has no matter: nobody decides (fails
+//         closed).
 //   4. While a booking is still being made (stage entry), its booker goes on making it (S13-45 row 1; A4-26 "on a link
 //      the booker forwards"; A4-55 "paid on the page by the person booking"), beside whoever T-308 names.
 //   5. A sender is proven by ContactsOnFile (facts.ts) in the standing they would act in, whether or not they decide:
 //      as a customer (served, parent or guardian, booker, or for their own record), by the turn's handle K-04 links to
-//      them; in a business role (deciding as owner or admin, or holding a role here for a business matter), by the
-//      role's own mobile or email on file (K-22 accounts, staff: S13-45 rows 8 and 9), which has no reader yet (T-321),
-//      so it is unproven; a page's session (K-21) and an AI's bound token (T-328) are not read yet, so neither proves.
+//      them; in a business role (deciding as owner or admin, holding a role here for a business matter, or answering
+//      for the business a question about a booking they play no part in), by the role's own mobile or email on file
+//      (K-22 accounts, staff: S13-45 rows 8 and 9), which has no reader yet (T-321), so it is unproven; a page's session
+//      (K-21) and an AI's bound token (T-328) are not read yet, so neither proves.
 //   6. The one rule comes before the rows: an unproven sender in a turn gets the code whether or not they could decide,
 //      so the answer never hints at who decides or whether a booking exists; with no ProofCodes (T-322 not built) the
 //      part is refused (notBuilt), never passed. An unproven sender off the chat (a page, an AI) has no chat to type a
 //      code in: the deciders are asked in their own chats.
 //   7. A sender nobody on the record (caller.personId null) is the wrong person: the deciders are asked in their own
-//      chats. The frontier offers such a handle no booking of anyone's.
+//      chats. With nobody to ask, theirs or anyone's, the step's safe default runs (nothing changes) and no question goes
+//      out (DL-183 N4). The frontier offers such a handle no booking of anyone's.
 //   8. A choice at another business than the call's has no decider here (T-308 answers for the call's business alone),
 //      unless it only protects.
 
@@ -100,11 +128,8 @@ export function askedDeciderOutcome(): Limit1Outcome {
 
 // ---- what a part changes ------------------------------------------------------------------------------------------
 
-/**
- * A matter limit 1 asks who decides: T-308's (a visit, a business matter, an owner-only matter), the person's own record
- * (own), or the role a business question was put to them in (theirRole).
- */
-export type LimitMatter = Matter | { readonly kind: "own" } | { readonly kind: "theirRole" };
+/** A matter limit 1 asks who decides: T-308's (a visit, a business matter, an owner-only matter) or the person's own record. */
+export type LimitMatter = Matter | { readonly kind: "own" };
 
 export type Change =
   /** Nothing the limit applies to (K-08 v1 limitResult notChecked). */
@@ -113,8 +138,11 @@ export type Change =
   | { readonly kind: "protects" }
   /** S13-45 row 1: "Ask, see prices and times, book a new visit: anyone, at any door." */
   | { readonly kind: "anyone" }
-  /** Needs the decider's own yes for every one of these matters. */
-  | { readonly kind: "decided"; readonly matters: readonly LimitMatter[] }
+  /**
+   * Needs the decider's own yes for every one of these matters. inRole: a question about a booking put to the sender in
+   * the business role they hold there (default 3c), so their role's contact on file proves them (default 5).
+   */
+  | { readonly kind: "decided"; readonly matters: readonly LimitMatter[]; readonly inRole: boolean }
   /** Nothing says who decides it: nobody does (fails closed). */
   | { readonly kind: "unknown" };
 
@@ -122,7 +150,7 @@ const NOTHING: Change = { kind: "nothing" };
 const PROTECTS: Change = { kind: "protects" };
 const ANYONE: Change = { kind: "anyone" };
 const UNKNOWN: Change = { kind: "unknown" };
-const decided = (...matters: LimitMatter[]): Change => ({ kind: "decided", matters });
+const decided = (...matters: LimitMatter[]): Change => ({ kind: "decided", matters, inRole: false });
 
 /**
  * The steps whose matter is the owner's alone (S13-45 row 8: "Admins never close the business, export, hand it over, or
@@ -141,17 +169,61 @@ export const OWNER_ONLY_STEPS: Readonly<Partial<Record<string, OwnerOnlyMatter>>
   "S11-100": "handOver",
 };
 
+/**
+ * The customer-side steps that write the sender's own person or handle rows: there, and only there, a choice about no
+ * booking is the sender's own record (default 3a; DL-183). Taken from the step index ("who→to via", gives) with the field
+ * 02-contracts section 8 names for each key; every other step's choice about no booking is a business matter.
+ */
+export const OWN_RECORD_STEPS: readonly string[] = [
+  /** "Asks how to reach Alex" (agent→cust chat): gives reach_by, K-28's customer's way. */
+  "A4-82",
+  /** "The AI sends Alex's name" (agent→san sync, the customer's own AI: MC R1): gives customer, K-28's customer row. */
+  "A4-23",
+  /** "Sends updates to a new phone or email" (cust→san msg): the contact-change row's handler (S13-45 row 3; D75). */
+  "A7-98",
+  /** Flow B's twins of the three: "Asks how to reach Alex", "The AI sends Alex's name", "Sends updates to a new phone". */
+  "B4-93",
+  "B4-25",
+  "B7-88",
+];
+
+/**
+ * The times cards and the pick, where a time is picked for a new visit before it has a booking (default 1, S13-45 row 1:
+ * "see prices and times, book a new visit: anyone"): a choice about no booking there passes on anyone's word, as K-09 v1's
+ * commit-limit-5-taken.json states for A4-14. From the step index, each "agent→cust chat" (gives times) or "cust→agent
+ * chat" (the pick).
+ */
+export const NEW_VISIT_STEPS: readonly string[] = [
+  /** "The times card", "Shows sessions with seats left", "Shows spaces that fit", "Offers a start and an end for a stay". */
+  "A4-14",
+  "A4-33",
+  "A4-62",
+  "A4-68",
+  /** "Alex picks a time". */
+  "A4-15",
+  /** Flow B: "The times card", "Times read as a set start", "Offers a start and an end", "Times are seats in a session". */
+  "B4-15",
+  "B4-84",
+  "B4-85",
+  "B4-89",
+  /** "Alex picks a time". */
+  "B4-16",
+];
+
 /** The roles that answer for the business (K-04 v1 person_roles). */
 export const BUSINESS_ROLES: readonly Role[] = ["owner", "admin", "staff"];
 
-/** The business's own matter a step stands for (default 3): team for S2 (journey 2), settings for S1 and S11. */
-function businessStep(step: string): "team" | "settings" | null {
-  if (step.startsWith("S2-")) return "team";
-  if (step.startsWith("S1-") || step.startsWith("S11-")) return "settings";
-  return null;
+/** The business's own matter at a step (default 3a): team for S2 (journey 2), settings for any other step. */
+function businessBase(step: string): "team" | "settings" {
+  return step.startsWith("S2-") ? "team" : "settings";
 }
 
-/** The money matters a choice's stakes name on the business's side (K-02 v1 stakesReason; default 3). */
+/** The steps whose choices stay the business's on a booking too (default 3c): S1, S2 and S11 (journeys 1, 2 and 11). */
+function staysBusiness(step: string): boolean {
+  return step.startsWith("S1-") || step.startsWith("S2-") || step.startsWith("S11-");
+}
+
+/** The money matters a choice's stakes name on the business's side (K-02 v1 stakesReason; default 3b). */
 function moneyMatters(choice: Choice): BusinessMatter[] {
   const why = new Set(choice.stakesFrom.map((reason) => reason.why));
   if (why.has("unknown")) return ["fee", "refund"];
@@ -173,10 +245,21 @@ function businessChange(choice: Choice, base: "team" | "settings"): Change {
   return decided(...matters);
 }
 
-/** A business question about a booking, put to someone in their role (default 3): its money, else their role. */
-function askedOfBusiness(choice: Choice): Change {
-  const money = moneyMatters(choice);
-  return money.length === 0 ? decided({ kind: "theirRole" }) : decided(...money.map((kind) => ({ kind })));
+/**
+ * A question about a booking put to a business role who plays no part in it (default 3c; DL-183 N2): theirs only for
+ * what S13-31 gives the business on a booking, a fee (a charge stake) or a refund beyond the terms (a refund stake).
+ * Anything else it may do (adding a person, a way in or authority; money taken at booking; a move or a cancel; whatever no
+ * stake names) is the booking's visit, for its decider; an unknown stake may be all three. Another option's stake
+ * (question) says nothing about this one's own.
+ */
+function forTheBusiness(choice: Choice, bookingId: string): Change {
+  const why = new Set(choice.stakesFrom.map((reason) => reason.why).filter((each) => each !== "question"));
+  const matters: LimitMatter[] = [];
+  if (why.has("charge") || why.has("unknown")) matters.push({ kind: "fee" });
+  if (why.has("refund") || why.has("unknown")) matters.push({ kind: "refund" });
+  const feeOrRefundOnly = why.size > 0 && [...why].every((each) => each === "charge" || each === "refund");
+  if (!feeOrRefundOnly) matters.push({ kind: "visit", bookingId });
+  return { kind: "decided", matters, inRole: true };
 }
 
 /** A choice on a booking (its visit), or with none, what `none` says. */
@@ -190,11 +273,10 @@ export interface ChangeReads {
   readonly identity: () => IdentityAccess;
 }
 
-/** Whether the sender answers an option about a booking for the business: a business role, and no part in it. */
-async function putToBusiness(choice: Choice, turn: GateTurn, reads: ChangeReads): Promise<boolean> {
+/** Whether the sender answers a choice about a booking for the business: a business role, and no part in it. */
+async function putToBusiness(bookingId: string, turn: GateTurn, reads: ChangeReads): Promise<boolean> {
   const sender = turn.request.caller.personId;
-  const bookingId = choice.target.bookingId;
-  if (sender === null || bookingId === null) return false;
+  if (sender === null) return false;
   const identity = reads.identity();
   const roles = await identity.rolesOf(sender);
   if (!roles.some((role) => BUSINESS_ROLES.includes(role))) return false;
@@ -202,6 +284,26 @@ async function putToBusiness(choice: Choice, turn: GateTurn, reads: ChangeReads)
   const parties = await identity.parties(bookingId);
   if (parties === null) return false;
   return parties.booker !== sender && parties.served !== sender && parties.payer !== sender;
+}
+
+/**
+ * An open question's option or a meaning-search entry (defaults 1 and 3): about no booking, the sender's own record at an
+ * own-record step, anyone's at a new visit's times (row 1), and the business's matter anywhere else (3a); on a booking,
+ * the owner's at an owner-only step, then a question put to the business (3c), then the business's at an S1, S2 or S11
+ * step, then the booking's visit.
+ */
+async function atStep(choice: Choice, turn: GateTurn, reads: ChangeReads): Promise<Change> {
+  const bookingId = choice.target.bookingId;
+  if (bookingId === null) {
+    if (OWN_RECORD_STEPS.includes(choice.step)) return decided({ kind: "own" });
+    if (NEW_VISIT_STEPS.includes(choice.step)) return ANYONE;
+    return businessChange(choice, businessBase(choice.step));
+  }
+  const ownerOnly = OWNER_ONLY_STEPS[choice.step];
+  if (ownerOnly !== undefined) return decided({ kind: ownerOnly });
+  if (await putToBusiness(bookingId, turn, reads)) return forTheBusiness(choice, bookingId);
+  if (staysBusiness(choice.step)) return businessChange(choice, businessBase(choice.step));
+  return decided({ kind: "visit", bookingId });
 }
 
 /** What one gated part changes (defaults 1 to 3). */
@@ -257,16 +359,9 @@ export async function changeOf(part: GatePart, turn: GateTurn, reads: ChangeRead
         default:
           return UNKNOWN;
       }
-    case "searchEntry": {
-      const base = businessStep(choice.step);
-      return base === null ? onBooking(choice, ANYONE) : businessChange(choice, base);
-    }
-    case "option": {
-      const base = businessStep(choice.step);
-      if (base !== null) return businessChange(choice, base);
-      if (await putToBusiness(choice, turn, reads)) return askedOfBusiness(choice);
-      return onBooking(choice, decided({ kind: "own" }));
-    }
+    case "searchEntry":
+    case "option":
+      return atStep(choice, turn, reads);
     default:
       return UNKNOWN;
   }
@@ -316,11 +411,6 @@ async function decidersOf(
   switch (matter.kind) {
     case "own":
       return sender === null ? nobody("noSender") : these([{ personId: sender, as: "self" }]);
-    case "theirRole": {
-      const role = sender === null ? undefined : await businessRoleOf(identity, sender);
-      if (sender === null || role === undefined) return nobody("nobodyAllowed");
-      return these([{ personId: sender, as: asProof(role) }]);
-    }
     case "visit": {
       const who = await identity.whoDecides(matter);
       const deciders: LimitDecider[] = who.ok ? [...who.deciders] : [];
@@ -367,20 +457,19 @@ function sideOfMatters(matters: readonly LimitMatter[]): Side {
 
 /**
  * Which contact on file proves the sender (default 5): their business role's own when they would act in it (deciding as
- * owner or admin, or holding a role at the business for a business matter), else their own as a customer. It turns on
- * the standing they would act in, never on whether a booking exists or whether they decide it (the one case apart: the
- * owner acts as owner on a booking a death was reported on, T-308 default 4).
+ * owner or admin, holding a role at the business for a business matter, or answering for the business a question about a
+ * booking they play no part in), else their own as a customer. It turns on the standing they would act in, never on
+ * whether they decide it (the one case apart: the owner acts as owner on a booking a death was reported on, T-308
+ * default 4).
  */
 async function proofStandingOf(
   mine: LimitDecider | undefined,
-  matters: readonly LimitMatter[],
+  change: { readonly matters: readonly LimitMatter[]; readonly inRole: boolean },
   sender: string,
   ports: AllowedPorts,
 ): Promise<ProofStanding> {
-  if (mine !== undefined) {
-    return mine.as === "owner" || mine.as === "admin" || mine.as === "staff" ? mine.as : "self";
-  }
-  if (sideOfMatters(matters) === "customer") return "self";
+  if (mine !== undefined) return mine.as === "owner" || mine.as === "admin" ? mine.as : "self";
+  if (!change.inRole && sideOfMatters(change.matters) === "customer") return "self";
   const role = await businessRoleOf(ports.identity(), sender);
   return role === undefined ? "self" : asProof(role);
 }
@@ -397,7 +486,7 @@ export type FailWhy = "unproven" | "notDecider" | "nobodyDecides";
 export type AllowedNext =
   /** The code to the contact on file, and the question in this chat that takes it typed back: ids only. */
   | { readonly kind: "proofCode"; readonly proofCodeId: string; readonly openQuestionId: string }
-  /** A question in each decider's own chat, about these matters. */
+  /** A question in each decider's own chat, about these matters: at least one decider, never none (default 7). */
   | {
       readonly kind: "askDecider";
       readonly deciders: readonly string[];
@@ -475,12 +564,17 @@ export async function decideAllowed(
   const sender = caller.personId;
   const deciders = await decidersOfAll(change.matters, sender, ports);
   const named = deciders.ok ? deciders.deciders.map((decider) => decider.personId) : [];
-  if (sender === null) return askDeciders("notDecider", named, change.matters);
+  // A question goes to someone, or not at all: with nobody to ask, the step's safe default (default 7; DL-183 N4).
+  const askOrDefault = (why: FailWhy): AllowedDecision =>
+    named.length > 0
+      ? askDeciders(why, named, change.matters)
+      : nobodyDecides(deciders.ok ? "nobodyAllowed" : deciders.why, step);
+  if (sender === null) return askOrDefault("notDecider");
 
   // The one rule first (default 6): is this the sender's own word? Nothing about who decides, or whether a booking
   // exists, reaches the answer before it.
   const mine = deciders.ok ? deciders.deciders.find((decider) => decider.personId === sender) : undefined;
-  const as = await proofStandingOf(mine, change.matters, sender, ports);
+  const as = await proofStandingOf(mine, change, sender, ports);
   const handleId = turn.request.turn?.handleId ?? null;
   const own = await ports.contacts().isOwn({
     businessId: turn.businessId,
@@ -491,9 +585,7 @@ export async function decideAllowed(
   });
   if (!own) {
     const turnId = turn.request.turn?.id;
-    if (caller.kind !== "turn" || handleId === null || turnId === undefined) {
-      return askDeciders("unproven", named, change.matters);
-    }
+    if (caller.kind !== "turn" || handleId === null || turnId === undefined) return askOrDefault("unproven");
     if (ports.proofCodes === null) return NOT_BUILT;
     const ask: CodeAsk = {
       businessId: turn.businessId,
@@ -514,6 +606,6 @@ export async function decideAllowed(
 
   // Then the rows: their own word, but are they someone who decides it?
   if (!deciders.ok) return nobodyDecides(deciders.why, step);
-  if (mine === undefined) return askDeciders("notDecider", named, change.matters);
+  if (mine === undefined) return askOrDefault("notDecider");
   return pass("decider");
 }

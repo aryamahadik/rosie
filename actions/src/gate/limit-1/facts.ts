@@ -31,11 +31,12 @@ export type CallerKind = GateRequest["caller"]["kind"];
 
 /**
  * The standing a person would decide in, which says which contact on file is theirs (S13-45): T-308's (the person
- * served, a parent or guardian, the owner, an admin), the booker of a booking still being made (row 1), the person
- * themself for their own record (row 3: "Change where updates go: the customer"), or a staff member asked in their role
- * (row 9: "their own day and jobs").
+ * served, a parent or guardian, the owner, an admin), the booker of a booking still being made (row 1), or the person
+ * themself for their own record (row 3: "Change where updates go: the customer"). A staff member decides nothing in their
+ * role here: on a booking they play no part in, only the business's fee or refund, which the owner or an admin decides
+ * (S13-31; DL-183 N2).
  */
-export type Standing = DecidesAs | "booker" | "self" | "staff";
+export type Standing = DecidesAs | "booker" | "self";
 
 /**
  * Which contact on file proves a sender (S13-45): their own as a customer, whatever they decide as (self: rows 2, 3 and

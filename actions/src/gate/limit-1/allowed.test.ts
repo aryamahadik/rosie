@@ -9,6 +9,10 @@
 // unproven sender's answer never depends on who decides or whether a booking exists; nobody to ask gives the step's safe
 // default; limit 1 checks only what it applies to; what it returns holds no person's words; the shipped limit sits in
 // slot 1, fails closed without T-322's codes, and reads only through the call's database (with none, it refuses).
+// Round 2 (the lead's rulings on the card, DL-183): a choice about no booking is the sender's own record only at a listed
+// customer-side step and the business's anywhere else (S12-24's "3 Let it book" from Sam's new mobile gets the code, as
+// S2-22 does; staff, an admin without the power and a customer are refused), search entries alike; a business role with
+// no part in a booking decides only its fee or refund, whatever proves the role; nobody to ask gives the safe default.
 
 import { describe, expect, it } from "vitest";
 
@@ -29,6 +33,8 @@ import {
 import { callContext, fixtureScript, gateExchange, type LimitCall } from "../framework/test-support";
 import { LIMITS } from "../limits";
 import {
+  NEW_VISIT_STEPS,
+  OWN_RECORD_STEPS,
   askedDeciderOutcome,
   contactsOnFileOver,
   createLimit1,
@@ -36,6 +42,7 @@ import {
   proofCodeSentOutcome,
   type AllowedDecision,
   type CodeAsk,
+  type NobodyWhy,
   type OwnAsk,
 } from "./index";
 import {
@@ -50,6 +57,7 @@ import {
   GIFT_BEING_MADE,
   HAIRCUT,
   HOME_SERVICES,
+  HOME_VISIT,
   JORDAN,
   NEW_REQUEST,
   PAT,
@@ -60,10 +68,14 @@ import {
   SERVED_UNKNOWN,
   STRANGER,
   TEST_REPO,
+  actsFor,
   addPayer,
+  anotherAdult,
   anotherTime,
+  askForAPerson,
   bookingRules,
   callOff,
+  changeTheReadBack,
   chargeTheFee,
   contactChange,
   contactsOf,
@@ -72,25 +84,33 @@ import {
   exchangeRequest,
   exportList,
   identityFrom,
+  lateFee,
+  letItBook,
   letThemTakeBookings,
   limitIn,
   limitRecord,
   moveVisit,
   newBookingDoor,
+  newContactEntry,
   partOf,
   patWith,
   pauseRow,
   pickTime,
   privateBooking,
   proofCodesOf,
+  reachBy,
   refundBeyondTerms,
   registryWith,
   requestFor,
+  s12Entry,
+  s12Options,
   someoneElsePays,
   someoneJoins,
   stagesFrom,
+  standIn,
   stopRow,
   turnOf,
+  unwalked,
   whichBooking,
   withoutLimit1,
   type Someone,
@@ -472,6 +492,257 @@ describe("the wrong person, off the chat, and nobody to ask", () => {
     });
     const stopElsewhere = { ...stopRow(), target: { ...stopRow().target, businessId: "biz-yoga-studio" } };
     expect(await decision({}, ask(ALEX, stopElsewhere, "stop"))).toEqual(PASS_PROTECTS);
+  });
+});
+
+describe("round 2, GAP 1: a choice about no booking is a business matter unless it is the sender's own record at a listed customer-side step", () => {
+  const settings = [{ kind: "settings" }];
+
+  it("the reviewer's scenario: Sam's new mobile picks S12-24's '3 Let it book': a code to his owner contact on file, as on S2-22", async () => {
+    const codeAsked: CodeAsk[] = [];
+    const turnId = "turn-sam-new-mobile-s12-24";
+    expect(await decision({ codeAsked }, ask(SAM_NEW_MOBILE, letItBook(), "3", { turnId }))).toEqual({
+      result: "fail",
+      why: "unproven",
+      outcome: proofCodeSentOutcome(SAM_NEW_MOBILE_CODE),
+      next: { kind: "proofCode", ...SAM_NEW_MOBILE_CODE },
+    });
+    // The same code ask as commit-limit-1-unproven-sender.json's S2-22 turn: to Sam as owner, typed back in the new mobile.
+    const onS2: CodeAsk[] = [];
+    const fixture = exchangeRequest(LIMIT_1_FIXTURE);
+    await limitIn({ codeAsked: onS2 }).decide(partOf(fixture), turnOf(fixture));
+    expect(onS2[0]).toMatchObject({ forPersonId: "person-sam", as: "owner" });
+    expect(codeAsked).toEqual([{ ...onS2[0], turnId }]);
+  });
+
+  it("through the gate: the part stops at limit 1 with proofCodeSent and limits 2 to 6 never run", async () => {
+    const calls: LimitCall[] = [];
+    const request = ask(SAM_NEW_MOBILE, letItBook(), "3");
+    const [part] = gatedParts(
+      await runGate(request, callContext(BARBERSHOP), registryWith(limitIn(), {}, calls)),
+    );
+    expect(part).toMatchObject({
+      result: "stopped",
+      stoppedBy: { limit: 1, outcome: "wait", action: "proofCodeSent", ...SAM_NEW_MOBILE_CODE },
+    });
+    expect(calls).toEqual([{ limit: 1, part: 0 }]);
+  });
+
+  const refused: readonly [string, Someone, string][] = [
+    ["a staff member (Riley)", RILEY, BARBERSHOP],
+    ["an admin without the settings power (Pat, prices only)", PAT, HOME_SERVICES],
+    ["a customer (Alex)", ALEX, BARBERSHOP],
+  ];
+
+  it.each(refused)(
+    "S12-24's options offered to %s are refused: a question in the owner's own chat",
+    async (_who, who, businessId) => {
+      for (const choice of s12Options(businessId)) {
+        expect(
+          await decision({}, ask(who, choice, choice.label, { businessId, choices: s12Options(businessId) })),
+        ).toEqual(askedOf(["person-sam"], settings));
+      }
+    },
+  );
+
+  it("S12-24 passes for the owner from his mobile on file, and for an admin the owner lets with the settings power", async () => {
+    expect(await decision({}, ask(SAM, letItBook(), "3"))).toEqual(PASS_DECIDER);
+    const at = { businessId: HOME_SERVICES };
+    const record = patWith(limitRecord(), "settings");
+    expect(await decision({ record }, ask(PAT, letItBook(HOME_SERVICES), "3", at))).toEqual(PASS_DECIDER);
+    const otherPowers = patWith(limitRecord(), "money", "team");
+    expect(await decision({ record: otherPowers }, ask(PAT, letItBook(HOME_SERVICES), "3", at))).toEqual(
+      askedOf(["person-sam"], settings),
+    );
+  });
+
+  it("a sender nobody on the record offered S12-24 gets a question in the owner's own chat", async () => {
+    expect(await decision({}, ask(STRANGER, letItBook(), "3"))).toEqual(askedOf(["person-sam"], settings));
+  });
+
+  it("over the shipped defaults (K-04's links, no K-22 reader, no T-322 codes), S12-24 passes for nobody", async () => {
+    const record = limitRecord();
+    const limit = createLimit1({ identity: identityFrom(record), stages: stagesFrom(record) });
+    for (const who of [SAM, SAM_NEW_MOBILE, RILEY]) {
+      const request = ask(who, letItBook(), "3");
+      expect(await limit.decide(partOf(request), turnOf(request))).toEqual({
+        result: "notBuilt",
+        port: "proofCodes",
+      });
+    }
+    const fromAlex = ask(ALEX, letItBook(), "3");
+    expect(await limit.decide(partOf(fromAlex), turnOf(fromAlex))).toEqual(askedOf(["person-sam"], settings));
+  });
+
+  it("N1: a meaning-search entry about no booking at an S12 step follows the same rule", async () => {
+    expect(await decision({}, ask(SAM_NEW_MOBILE, s12Entry(), "someone keeps booking"))).toMatchObject({
+      result: "fail",
+      why: "unproven",
+      outcome: { action: "proofCodeSent" },
+    });
+    for (const who of [RILEY, ALEX, STRANGER]) {
+      expect(await decision({}, ask(who, s12Entry(), "someone keeps booking"))).toEqual(
+        askedOf(["person-sam"], settings),
+      );
+    }
+    expect(await decision({}, ask(SAM, s12Entry(), "someone keeps booking"))).toEqual(PASS_DECIDER);
+  });
+
+  it("any step on neither list is the business's too: A3-30's read-back K-01 marks for the owner, and A3-51's meaning-search entry, with no booking", async () => {
+    expect(await decision({}, ask(RILEY, changeTheReadBack(), "3"))).toEqual(
+      askedOf(["person-sam"], settings),
+    );
+    expect(await decision({}, ask(SAM, changeTheReadBack(), "3"))).toEqual(PASS_DECIDER);
+    expect(await decision({}, ask(ALEX, askForAPerson(), "can riley call me"))).toEqual(
+      askedOf(["person-sam"], settings),
+    );
+  });
+
+  it("the lists: customer-side steps that write the sender's own person or handle rows; a new visit's times cards and pick (row 1)", () => {
+    expect([...OWN_RECORD_STEPS].sort()).toEqual(["A4-23", "A4-82", "A7-98", "B4-25", "B4-93", "B7-88"]);
+    expect([...NEW_VISIT_STEPS].sort()).toEqual([
+      "A4-14",
+      "A4-15",
+      "A4-33",
+      "A4-62",
+      "A4-68",
+      "B4-15",
+      "B4-16",
+      "B4-84",
+      "B4-85",
+      "B4-89",
+    ]);
+  });
+
+  it("row 1 at a new visit's times: a time picked about no booking yet passes on anyone's word, with no proof asked, as commit-limit-5-taken.json states", async () => {
+    for (const who of [ALEX, ALEX_NEW_MOBILE, ALEX_PARTNER, STRANGER]) {
+      const ownAsked: OwnAsk[] = [];
+      expect(await decision({ ownAsked, proofCodes: null }, ask(who, pickTime(null), "2pm works"))).toEqual({
+        result: "pass",
+        why: "anyone",
+      });
+      expect(ownAsked).toEqual([]);
+    }
+  });
+
+  it("at a listed step it is the sender's own record: from their own phone it passes; from a phone not on file, the code", async () => {
+    for (const choice of [reachBy("Texts only"), newContactEntry()]) {
+      expect(await decision({}, ask(ALEX, choice, "texts only please"))).toEqual(PASS_DECIDER);
+      const asked: CodeAsk[] = [];
+      expect(
+        await decision({ codeAsked: asked }, ask(ALEX_NEW_MOBILE, choice, "texts only please")),
+      ).toMatchObject({ result: "fail", why: "unproven", outcome: { action: "proofCodeSent" } });
+      expect(asked[0]).toMatchObject({ forPersonId: "person-alex", as: "self" });
+    }
+  });
+});
+
+describe("round 2, N2: a business role with no part in a booking decides only its fee or refund beyond the terms", () => {
+  const adding: readonly [string, (bookingId: string) => Choice][] = [
+    ["a person (A4-24's 'Another adult')", (bookingId) => anotherAdult(bookingId)],
+    ["a payer (A4-24's 'Someone else pays')", someoneElsePays],
+    ["a way in (A4-82's 'Email')", (bookingId) => reachBy("Email", bookingId)],
+    ["authority (A4-24's 'An adult the booker acts for')", actsFor],
+    ["nothing its stakes name (A7-17's '1 The stand-in instead')", standIn],
+  ];
+
+  it.each(adding)(
+    "adding %s to Alex's haircut, from Riley (staff) or Sam (owner), each proven in their role by a stand-in reader: a question in Alex's own chat",
+    async (_what, choiceOf) => {
+      for (const [who, role] of [
+        [RILEY, "staff"],
+        [SAM, "owner"],
+      ] as const) {
+        const ownAsked: OwnAsk[] = [];
+        expect(await decision({ ownAsked }, ask(who, choiceOf(HAIRCUT), "yes"))).toEqual(
+          askedOf(["person-alex"], [visit(HAIRCUT)]),
+        );
+        // The stand-in reader (the role's own contact on file, as T-321's K-22 reader will be) proved the role.
+        expect(ownAsked).toEqual([
+          {
+            businessId: BARBERSHOP,
+            personId: who.personId,
+            as: role,
+            caller: "turn",
+            handleId: who.handleId,
+          },
+        ]);
+      }
+    },
+  );
+
+  it("an admin the owner lets with every power (Pat at Lee Home Services) adds no person to a customer's booking there", async () => {
+    const record = patWith(limitRecord(), "money", "team", "settings");
+    const request = ask(PAT, anotherAdult(HOME_VISIT, HOME_SERVICES), "yes", { businessId: HOME_SERVICES });
+    expect(await decision({ record }, request)).toEqual(askedOf(["person-alex"], [visit(HOME_VISIT)]));
+  });
+
+  it("the booking's fee stays the business's: S11-25's late fee passes for Sam; Riley and Alex himself get a question in Sam's chat", async () => {
+    expect(await decision({}, ask(SAM, lateFee(HAIRCUT), "1"))).toEqual(PASS_DECIDER);
+    for (const who of [RILEY, ALEX]) {
+      expect(await decision({}, ask(who, lateFee(HAIRCUT), "1"))).toEqual(
+        askedOf(["person-sam"], [{ kind: "fee" }]),
+      );
+    }
+  });
+
+  it("an unknown stake may be a fee, a refund and the visit: nobody holds all three, so the step's safe default", async () => {
+    for (const who of [SAM, RILEY]) {
+      expect(await decision({}, ask(who, unwalked(HAIRCUT), "3"))).toEqual({
+        result: "fail",
+        why: "nobodyDecides",
+        outcome: askedDeciderOutcome(),
+        next: { kind: "nobodyDecides", why: "nobodyAllowed", step: "A7-17" },
+      });
+    }
+  });
+});
+
+describe("round 2, N4: nobody to ask gives the step's safe default, never a question to nobody", () => {
+  const safeDefault = (why: NobodyWhy, step: string): AllowedDecision => ({
+    result: "fail",
+    why: "nobodyDecides",
+    outcome: askedDeciderOutcome(),
+    next: { kind: "nobodyDecides", why, step },
+  });
+
+  it("a sender nobody on the record, at an own-record step: nobody's record to change, so the safe default", async () => {
+    expect(await decision({}, ask(STRANGER, reachBy("Texts only"), "texts only"))).toEqual(
+      safeDefault("noSender", "A4-82"),
+    );
+  });
+
+  it("a sender nobody on the record, on a booking nobody decides or this business does not hold: the safe default", async () => {
+    expect(await decision({}, ask(STRANGER, addPayer(SERVED_UNKNOWN), "add a payer"))).toEqual(
+      safeDefault("servedNotOnRecord", "A7-02"),
+    );
+    expect(await decision({}, ask(STRANGER, anotherTime("booking-not-on-file"), "2"))).toEqual(
+      safeDefault("bookingNotFound", "A7-17"),
+    );
+  });
+
+  it("off the chat, an unproven caller with nobody to ask: the safe default too", async () => {
+    expect(
+      await decision({}, ask(ALEX, addPayer(SERVED_UNKNOWN), "my work pays", { caller: "page" })),
+    ).toEqual(safeDefault("servedNotOnRecord", "A7-02"));
+  });
+
+  it("no decision ever asks nobody", async () => {
+    const requests = [
+      ask(STRANGER, letItBook(), "3"),
+      ask(STRANGER, reachBy("Email"), "email"),
+      ask(STRANGER, addPayer(HAIRCUT), "add a payer"),
+      ask(STRANGER, addPayer(SERVED_UNKNOWN), "add a payer"),
+      ask(ALEX, addPayer(SERVED_UNKNOWN), "my work pays", { caller: "agent" }),
+      ask(RILEY, unwalked(HAIRCUT), "3"),
+      ask(RILEY, callOff("booking-not-on-file"), "1"),
+    ];
+    for (const request of requests) {
+      const decided = await decision({}, request);
+      if (decided.result === "fail" && decided.next.kind === "askDecider") {
+        expect(decided.next.deciders.length).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

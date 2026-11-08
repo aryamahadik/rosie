@@ -110,7 +110,9 @@ export const limit1: AllowedLimit = createLimit1();
 
 export {
   BUSINESS_ROLES,
+  NEW_VISIT_STEPS,
   OWNER_ONLY_STEPS,
+  OWN_RECORD_STEPS,
   askedDeciderOutcome,
   changeOf,
   decideAllowed,
