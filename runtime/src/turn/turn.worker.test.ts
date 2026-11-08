@@ -794,6 +794,38 @@ describe("a run that is no longer the turn's", () => {
     expect(t.commits).toEqual([]);
   });
 
+  it("a run replaced during its valueFailsWords re-read sends the turn to the gate no second time", async () => {
+    const first = commitLimit6First.request.input.decided;
+    const { t, face, ai } = await setUp({
+      who: SAM,
+      turnId: "turn-s1-02-sam-vague",
+      traceId: "trace-sam-0002",
+      texts: [
+        { eventId: "evt-sam-0002", body: "barbering and some other stuff", sentAt: "2026-10-19T14:06:00Z" },
+      ],
+      times: ["2026-10-19T14:06:02Z", commitLimit6First.request.now, commitLimit6Fails.request.now],
+      targets: {
+        roles: [{ businessId: "biz-lees-barbershop", personId: "person-sam", role: "owner" }],
+        openQuestionIds: ["oq-s1-02"],
+        bookingIds: [],
+      },
+    });
+    face.frontier = () => ({ context: structuredClone(first.context), flagged: [], collapsedBookingIds: [] });
+    ai.decide = () => decided(first.decide);
+    ai.reread = () => {
+      t.abort();
+      return decided(commitLimit6Fails.request.input.decided.decide, ONE_REREAD);
+    };
+    face.gate = answersInTurn(commitLimit6First.outcome, commitLimit6Fails.outcome);
+
+    const outcome = await runTurnLoop(t.turn);
+
+    expect(ai.rereadCalls).toHaveLength(1);
+    expect(requestsOf(face)).toEqual([commitLimit6First.request]);
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 1 });
+    expect(t.commits).toHaveLength(1);
+  });
+
   it("a STOP's run replaced before its commit sends nothing: the restart's run records it", async () => {
     const { t, face, facts } = await setUp({
       who: BEN,
