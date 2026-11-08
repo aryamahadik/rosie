@@ -84,3 +84,131 @@ describe("the runner's clock", () => {
     expect(clock.now() - before).toBeLessThan(MINUTE);
   });
 });
+
+// The system clock on a timer that fires early (T-1112). DL-195: under load the runtime's timer fired 1 ms before its
+// instant by Date.now. Here the time and the timer are the test's: the time moves only when the test moves it, and a
+// timer fires only when the test fires it.
+
+const DAY = 24 * 60 * MINUTE;
+
+/** One turn of the event loop, after which every promise that could settle has. */
+async function nextTurn(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setImmediate(resolve);
+  });
+}
+
+/** A timer the test fires by hand: it records the delay of each timer set (handles 1, 2, ...) and each handle cleared. */
+function handTimer() {
+  const delays: number[] = [];
+  const cleared: number[] = [];
+  let pending: { readonly handle: number; readonly wake: () => void } | null = null;
+  return {
+    delays,
+    cleared,
+    timer: {
+      set: (wake: () => void, ms: number): number => {
+        delays.push(ms);
+        pending = { handle: delays.length, wake };
+        return delays.length;
+      },
+      clear: (handle: number): void => {
+        cleared.push(handle);
+        if (pending?.handle === handle) pending = null;
+      },
+    },
+    /** Fires the timer set last and not cleared, as the runtime does once its delay has run by its own reckoning. */
+    fire: (): void => {
+      const due = pending;
+      pending = null;
+      due?.wake();
+    },
+  };
+}
+
+describe("the system clock on a timer that fires early", () => {
+  it("waits again for the time left, so the wait ends only once the instant has come", async () => {
+    const time = { now: FIRST };
+    const hand = handTimer();
+    const clock = systemClock({ now: () => time.now, timer: hand.timer });
+    const at = FIRST + 5;
+    let ended = false;
+    const waiting = clock.sleepUntil(at).then(() => {
+      ended = true;
+    });
+    expect(hand.delays).toEqual([5]);
+
+    time.now = at - 1;
+    hand.fire(); // 1 ms short of the instant (DL-195)
+    await nextTurn();
+    expect(ended).toBe(false);
+    expect(hand.delays).toEqual([5, 1]);
+
+    time.now = at;
+    hand.fire();
+    await waiting;
+    expect(clock.now()).toBeGreaterThanOrEqual(at);
+    expect(hand.delays).toEqual([5, 1]);
+    expect(hand.cleared).toEqual([]);
+  });
+
+  it("ends a wait at once when its signal aborts in the middle, and clears the timer pending then", async () => {
+    const time = { now: FIRST };
+    const hand = handTimer();
+    const clock = systemClock({ now: () => time.now, timer: hand.timer });
+
+    const stop = new AbortController();
+    let ended = false;
+    const waiting = clock.sleepUntil(FIRST + 60 * MINUTE, stop.signal).then(() => {
+      ended = true;
+    });
+    time.now = FIRST + 30 * MINUTE;
+    stop.abort();
+    await nextTurn();
+    expect(ended).toBe(true);
+    expect(hand.delays).toEqual([60 * MINUTE]);
+    expect(hand.cleared).toEqual([1]);
+    await waiting;
+
+    // Aborted after its first timer fired early: the timer cleared is the one set for the time left.
+    const later = new AbortController();
+    const at = time.now + 5;
+    let laterEnded = false;
+    const second = clock.sleepUntil(at, later.signal).then(() => {
+      laterEnded = true;
+    });
+    time.now = at - 1;
+    hand.fire();
+    expect(hand.delays).toEqual([60 * MINUTE, 5, 1]);
+    later.abort();
+    await nextTurn();
+    expect(laterEnded).toBe(true);
+    expect(hand.cleared).toEqual([1, 3]);
+    await second;
+    expect(clock.now()).toBe(at - 1);
+  });
+
+  it("waits in parts of at most 2^31 - 1 ms, the longest one timer keeps, so a 30-day wait ends at its instant", async () => {
+    const time = { now: FIRST };
+    const hand = handTimer();
+    const clock = systemClock({ now: () => time.now, timer: hand.timer });
+    const longest = 2 ** 31 - 1;
+    const at = FIRST + 30 * DAY;
+    let ended = false;
+    const waiting = clock.sleepUntil(at).then(() => {
+      ended = true;
+    });
+    expect(hand.delays).toEqual([longest]);
+
+    time.now = FIRST + longest;
+    hand.fire();
+    await nextTurn();
+    expect(ended).toBe(false);
+    expect(hand.delays).toEqual([longest, 30 * DAY - longest]);
+
+    time.now = at;
+    hand.fire();
+    await waiting;
+    expect(clock.now()).toBe(at);
+  });
+});
