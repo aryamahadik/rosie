@@ -5,6 +5,8 @@
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
 // Each webhook opens its own id at receipt (runtime/src/gateway).
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
+// The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
+// for the Worker's environment.
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
@@ -13,9 +15,9 @@ import {
   LINQ_WEBHOOK_PATH,
   providerDepsOf,
   providerRouteOf,
-  unconfiguredGateway,
   type GatewayDeps,
 } from "./gateway";
+import { workerRoot } from "./wiring";
 
 // The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
 export { HandleActor } from "./actor";
@@ -136,6 +138,7 @@ export function createWorker(
   return { fetch: fetch as RosieWorker["fetch"], scheduled, queue: retryQueueHandler };
 }
 
-// Until the Linq adapter (T-413), the handle actor (T-243) and the provider doors' ports and store (T-275) are joined, the
-// gateway's doors fail and each webhook route answers 503 (a Stripe request with an unreadable signature header, 401).
-export default createWorker(() => unconfiguredGateway());
+// The composition root's gateway for the Worker's environment (T-550). Until its joins land (T-552 to T-564) every port is
+// closed there, so the gateway's doors fail and each webhook route answers 503 (a Stripe request with an unreadable
+// signature header, 401); the provider doors stay unconfigured (T-275).
+export default createWorker((env) => workerRoot(env).gateway);
