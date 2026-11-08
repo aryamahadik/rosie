@@ -1,0 +1,22 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-21T23:15:03Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json"
+    ],
+    "note": "A3-04 with A3-02's words: on Wed Oct 21, 7:15pm, on Lee's Barbershop's booking page (its barber listing's code: README default 40), someone types 'Book me a haircut at Lee's Barbershop on Saturday.' in the page's 'book' box (A3-51's 'A new booking': README default 25). Lee's Barbershop is live in its own seeds (K-04 seed-business-head.json, through seed-business-demo-shop.json's after) and has the barber kind (K-23 seed-company-two-kinds.json), and no pause of new bookings is open (the action-layer engineer's note d on dc9295e: round 1's Lee Home Services is saved, not live, in its own seed). The page entry swaps first (the words hold no card number or Social Security number, so they pass on unchanged: README default 39), checks the code (live, with that kind), then makes K-09 v1.1's calls, each with its own caller.requestId kept with this request's id, as K-09's page fixtures do at Lee Home Services (tool-api/fixtures/j3-safety-page-request.json, j3-open-request-page.json): recordSafetyOutcome alone, source page (No, nothing holds; gives safe), then openRequest at door page, flow A (README default 38: the barbershop's kinds go both ways), a booking head whose booker is a new person with no name, and the K-30 details row (gives request). The booking id and the booker stay on the server with requestRef, bound to this browser's device token; neither reaches the page (README default 27). The read was No, so there is no safety line. Nothing is read back: opening a request at the door changes no one's booking or money (README default 26). The next screens are K-21 v1.2's. The device token and requestRef are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0011",
+      "traceId": "trace-page-lees-0011",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    },
+    "deviceToken": "placeholder-device-token-page-lees-2",
+    "words": "Book me a haircut at Lee's Barbershop on Saturday."
+  },
+  "outcome": { "result": "opened", "requestRef": "reqref-page-lees-0011", "safetyLine": null }
+}

@@ -1,0 +1,19 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-20T12:15:03Z",
+    "environment": "staging",
+    "after": ["db-schema/business-setup/fixtures/seed-company-two-kinds.json"],
+    "note": "B3-07's words ('My kitchen sink drains slowly. Can a plumber come this week?') on the booking page of Lee Plumbing, Lee Home Services's plumber listing (the code's kind part e8cb269a3f0cb4b1 is the first 16 hex characters of the SHA-256 of 'biz-lee-home-services:plumber': README default 40). In its own seed Lee Home Services is saved, not live (K-23 seed-company-two-kinds.json: status saved; S1-35 gives live), so the live check, which comes first (README default 37; the action-layer engineer's note c on dc9295e), answers notListed: no safety read, no safety record, no request, nothing read beyond the code's own lookup and nothing written. An unknown business, and a kind the business does not have, get the same answer. The device token is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-home-0001",
+      "traceId": "trace-page-home-0001",
+      "listingCode": { "business": "biz-lee-home-services", "kind": "e8cb269a3f0cb4b1" }
+    },
+    "deviceToken": "placeholder-device-token-page-home-1",
+    "words": "My kitchen sink drains slowly. Can a plumber come this week?"
+  },
+  "outcome": { "error": "notListed" }
+}

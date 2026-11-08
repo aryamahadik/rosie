@@ -1,0 +1,23 @@
+{
+  "call": "bookingCheckStart",
+  "given": {
+    "now": "2026-10-22T22:00:02Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json",
+      "tool-api/fixtures/j3-confirm-business-booking-yes.json"
+    ],
+    "note": "A3-43: a new conversation texted 'I booked a haircut for Saturday. Can I move it to 2pm?' on Thu Oct 22; the reply gave Lee's Barbershop's booking page and sent nothing. On the page's 'a booking I already have' entry (README default 28) they type the name and the day and tap. The page entry swaps first (the name holds no card number or Social Security number: README default 39) and checks the code (live, with the barber kind: README default 37). Served by K-09 v1.1 checkBookingFirst (tool-api/fixtures/j3-check-booking-first.json: caller.kind page, personId null; a booking under Alex M. on Sat Oct 24 matches, so a link_record code goes to Alex's contact on file, his way, never back to the page; from a page the send waits for CQ-44: open gap 25). The answer is the same as when nothing matches and says nothing about a visit; the page holds only checkId, bound to this browser's device token, and the server keeps K-09's attempt id with it. checkBookingFirst gives the page server no code id, so no typed code can be checked yet (open gap 34; README default 29). checkId and the device token are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-check-0001",
+      "traceId": "trace-page-check-0001",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    },
+    "deviceToken": "placeholder-device-token-check-1",
+    "nameTyped": "Alex M.",
+    "dayTyped": "2026-10-24"
+  },
+  "outcome": { "result": "sentIfMatched", "checkId": "check-lees-0001", "expiresAt": "2026-10-22T22:10:02Z" }
+}

@@ -1,0 +1,289 @@
+{
+  "call": "readListing",
+  "given": {
+    "now": "2026-10-30T16:00:00Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json",
+      "db-schema/business-setup/fixtures/seed-location-travel-centre.json",
+      "db-schema/services-prices/fixtures/seed-price-rule-dates.json",
+      "db-schema/availability/fixtures/seed-hours.json",
+      "db-schema/documents-licenses/fixtures/seed-license-as-given.json"
+    ],
+    "note": "Fri Oct 30, noon in Springfield: someone opens Lee's Barbershop's listing under its one kind of work, barber (S1-04: one listing per kind; FS row B10), whose address is the link host plus /b/ plus the business id, a slash and the kind part 6032ba2577446134, the first 16 hex characters of the SHA-256 of 'biz-lees-barbershop:barber' (README default 40). The booking page's screen 1 shows the same services, About us line and photos (A3-04). The call acts for no one. Every value comes from the frozen seeds named in after, and only from columns whose audience names customers (README default 42): the display name from K-04's business row; no trade name, since the barber kind keeps the business's name (K-23 seed-company-two-kinds.json, trade_name null), and the kind's name Barber (K-24 seed-kinds-sample.json); About us, the three photos with their labels and the FAQ from K-23's seed-business-demo-shop.json; all ten active barber services in the owner's order, each with its length by price kind (README default 43) and each way with its price and money lines from K-25's seeds (the haircut's $35 rule is the one in force before Nov 2, the $75 at the customer's place is that way's own rule; event hours show the $120 for no particular worker, not Andre's $140: README default 31; the wedding party is priced by the party's answers); the two shops the ways name, the first at 88 Elm St with its hours from K-27's seed-hours.json, the second (S11-59) with house calls 25 miles from a centre that is not its own address, so the page shows the miles alone (README default 33), and neither with a travel fee (both seeds' travel_fee_cents are null); the business's and Riley's barber licenses, both for the barber kind (K-35 seed-license-as-given.json, kind_id barber), shown only as added by the business (FS 6.3; D96), with neither whose they are nor a number. The money words are the server's (README default 30): what is taken when they book, what is paid after, and the free-cancel time from the way's own cutoff (the skin fade's 2 hours) or the flow's 24 hours (K-23 flow_defaults), with the fee for a later cancel or a no-show; the wedding party's deposit is its fee (S13-55); the home grooming visit's tip line is the owner's only (K-25 service_money.tip_line), so no line names it. No rating (journey 10), no badge, no map point, no license number. Photo addresses are placeholders that live 10 minutes."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-listing-lees-0001",
+      "traceId": "trace-listing-lees-0001",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    }
+  },
+  "outcome": {
+    "result": "listing",
+    "displayName": "Lee's Barbershop",
+    "tradeName": null,
+    "kindName": "Barber",
+    "about": "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "photos": [
+      {
+        "photoId": "photo-lees-barbershop-front",
+        "url": "https://files.example/placeholder-signed-read-front",
+        "expiresAt": "2026-10-30T16:10:00Z",
+        "label": "The shop front"
+      },
+      {
+        "photoId": "photo-lees-barbershop-chairs",
+        "url": "https://files.example/placeholder-signed-read-chairs",
+        "expiresAt": "2026-10-30T16:10:00Z",
+        "label": "The chairs"
+      },
+      {
+        "photoId": "photo-lees-barbershop-chair-ready",
+        "url": "https://files.example/placeholder-signed-read-chair-ready",
+        "expiresAt": "2026-10-30T16:10:00Z",
+        "label": "A chair, ready"
+      }
+    ],
+    "faqs": [{ "question": "Do you cut kids' hair?", "answer": "Yes: a kids cut (12 and under) is $25." }],
+    "services": [
+      {
+        "serviceId": "svc-lees-haircut",
+        "name": "Haircut",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "30 minutes", "minutes": 30 },
+        "ways": [
+          {
+            "wayId": "way-lees-haircut-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $20 fee, nothing charged",
+              "After the visit: paid at the counter",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          },
+          {
+            "wayId": "way-lees-haircut-home",
+            "place": "customer",
+            "locationId": "loc-lees-barbershop-second-shop",
+            "price": { "words": "$75 at your place", "amount": { "cents": 7500, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: the full $75",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-skin-fade",
+        "name": "Skin fade",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "45 minutes", "minutes": 45 },
+        "ways": [
+          {
+            "wayId": "way-lees-skin-fade-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$40", "amount": { "cents": 4000, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $20 fee, nothing charged",
+              "After the visit: paid at the counter",
+              "Free to cancel up to 2 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-beard-trim",
+        "name": "Beard trim",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "15 minutes", "minutes": 15 },
+        "ways": [
+          {
+            "wayId": "way-lees-beard-trim-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$20", "amount": { "cents": 2000, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $20 fee, nothing charged",
+              "After the visit: paid at the counter",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-kids-cut",
+        "name": "Kids cut (12 and under)",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "30 minutes", "minutes": 30 },
+        "ways": [
+          {
+            "wayId": "way-lees-kids-cut-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$25", "amount": { "cents": 2500, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $20 fee, nothing charged",
+              "After the visit: paid at the counter",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-signature-cut",
+        "name": "Signature cut and hot towel shave",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "1 hour", "minutes": 60 },
+        "ways": [
+          {
+            "wayId": "way-lees-signature-cut-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$55", "amount": { "cents": 5500, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: the full $55",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-grooms-package",
+        "name": "Groom's package (cut, shave, facial)",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "2 hours 30 minutes", "minutes": 150 },
+        "ways": [
+          {
+            "wayId": "way-lees-grooms-package-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$140", "amount": { "cents": 14000, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a $40 deposit",
+              "After the visit: the $100 rest at the counter",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $40 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-style-consult",
+        "name": "Style consult",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "15 minutes", "minutes": 15 },
+        "ways": [
+          {
+            "wayId": "way-lees-style-consult-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "Free", "amount": { "cents": 0, "currency": "USD" } },
+            "moneyLines": ["Nothing taken when you book and nothing after, so no fee to cancel or miss"]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-home-grooming",
+        "name": "Home grooming visit (cut, beard trim, hot towel)",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "1 hour", "minutes": 60 },
+        "ways": [
+          {
+            "wayId": "way-lees-home-grooming-home",
+            "place": "customer",
+            "locationId": "loc-lees-barbershop-second-shop",
+            "price": { "words": "$179", "amount": { "cents": 17900, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $89 fee, nothing charged",
+              "After the visit: paid on the bill",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $89 fee"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-wedding-party",
+        "name": "Wedding party grooming",
+        "priceKind": "by_answers",
+        "unit": null,
+        "length": { "words": "35 minutes each", "minutes": 35 },
+        "ways": [
+          {
+            "wayId": "way-lees-wedding-party-home",
+            "place": "customer",
+            "locationId": "loc-lees-barbershop-second-shop",
+            "price": { "words": "Quoted from your party's details", "amount": null },
+            "moneyLines": [
+              "When you book: a 25% deposit",
+              "After the visit: the rest on the bill",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the deposit"
+            ]
+          }
+        ]
+      },
+      {
+        "serviceId": "svc-lees-event-hours",
+        "name": "Event hours (a barber on site at an event)",
+        "priceKind": "per_hour",
+        "unit": null,
+        "length": { "words": "at least 1 hour", "minutes": 60 },
+        "ways": [
+          {
+            "wayId": "way-lees-event-hours-home",
+            "place": "customer",
+            "locationId": "loc-lees-barbershop-second-shop",
+            "price": { "words": "$120 an hour", "amount": { "cents": 12000, "currency": "USD" } },
+            "moneyLines": [
+              "Nothing taken when you book",
+              "After the visit: paid on the bill",
+              "No fee to cancel or miss"
+            ]
+          }
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "locationId": "loc-lees-barbershop-shop",
+        "name": null,
+        "address": "88 Elm St, Springfield",
+        "travelArea": null,
+        "hours": ["Mon to Fri, 9am to 5pm", "Sat, 10am to 2pm"]
+      },
+      {
+        "locationId": "loc-lees-barbershop-second-shop",
+        "name": null,
+        "address": "123 Demo St, Anytown",
+        "travelArea": { "miles": 25, "around": null },
+        "hours": []
+      }
+    ],
+    "documents": [
+      {
+        "documentId": "doc-barbershop-license",
+        "kind": "license",
+        "title": "Barber license",
+        "shownAs": "addedByTheBusiness"
+      },
+      {
+        "documentId": "doc-riley-barber-license",
+        "kind": "license",
+        "title": "Barber license",
+        "shownAs": "addedByTheBusiness"
+      }
+    ],
+    "newBookings": "taking"
+  }
+}

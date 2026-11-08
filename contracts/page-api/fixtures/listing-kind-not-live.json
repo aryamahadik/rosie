@@ -1,0 +1,20 @@
+{
+  "call": "readListing",
+  "given": {
+    "now": "2026-10-30T16:03:00Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json",
+      "db-schema/kinds-of-work/fixtures/seed-business-kinds.json"
+    ],
+    "note": "Lee Home Services is live with plumbing while Electrical is not yet live, as S1-50 reports them ('Plumbing · Now. Stripe still to connect / Electrical · Once you say yes'; S1-38: 'Each goes live on its own'): K-09 v1 readSetup answers the business live, its plumber pick live and its electrician pick not live (readSetup.response kinds[].live). This is Lee Electric's code: the kind part fadb68cc3265a381, from 'biz-lee-home-services:electrician' (README default 40), matches one of the business's kinds (K-23 company_kinds: electrician, trade name Lee Electric), but that kind is not live, so the answer is notListed, the same as for an unknown business, a business not live or a kind part that matches none of its kinds (README default 37). No listing shows for work that is not live; nothing is read beyond the live check and nothing is written, and the page shows a plain 'not found' page. No frozen seed holds this standing (K-23's seed-company-two-kinds keeps Lee Home Services saved, and there this code answers notListed too), so the mock takes it from this note and the contract test (T-117) sets the business live with the electrician kind not live by readSetup's per-kind rule."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-listing-electric-0001",
+      "traceId": "trace-listing-electric-0001",
+      "listingCode": { "business": "biz-lee-home-services", "kind": "fadb68cc3265a381" }
+    }
+  },
+  "outcome": { "error": "notListed" }
+}

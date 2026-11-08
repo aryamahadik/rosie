@@ -1,0 +1,6 @@
+{
+  "call": "startBookingRequest",
+  "field": "/words",
+  "typed": "Book me a haircut at Lee's Barbershop on Saturday. My card is 4242 4242 4242 4242",
+  "passedOn": "Book me a haircut at Lee's Barbershop on Saturday. My card is 4242 4242 4242 4242"
+}

@@ -1,0 +1,69 @@
+{
+  "call": "readListing",
+  "given": {
+    "now": "2026-10-30T16:00:00Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json",
+      "db-schema/documents-licenses/fixtures/seed-license-as-given.json"
+    ],
+    "note": "Refused: a cut-down listing of Lee's Barbershop's barber listing showing its barber license as checked. A document shows only as added by the business, never checked and never a badge (FS 6.3; D96; MC C4, C7). The one fault is documents[0].shownAs; with addedByTheBusiness it is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-listing-lees-0002",
+      "traceId": "trace-listing-lees-0002",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    }
+  },
+  "outcome": {
+    "result": "listing",
+    "displayName": "Lee's Barbershop",
+    "tradeName": null,
+    "kindName": "Barber",
+    "about": "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "photos": [],
+    "faqs": [],
+    "services": [
+      {
+        "serviceId": "svc-lees-haircut",
+        "name": "Haircut",
+        "priceKind": "one_price",
+        "unit": null,
+        "length": { "words": "30 minutes", "minutes": 30 },
+        "ways": [
+          {
+            "wayId": "way-lees-haircut-shop",
+            "place": "business",
+            "locationId": "loc-lees-barbershop-shop",
+            "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+            "moneyLines": [
+              "When you book: a card saved for the $20 fee, nothing charged",
+              "After the visit: paid at the counter",
+              "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+            ]
+          }
+        ]
+      }
+    ],
+    "locations": [
+      {
+        "locationId": "loc-lees-barbershop-shop",
+        "name": null,
+        "address": "88 Elm St, Springfield",
+        "travelArea": null,
+        "hours": ["Mon to Fri, 9am to 5pm", "Sat, 10am to 2pm"]
+      }
+    ],
+    "documents": [
+      {
+        "documentId": "doc-barbershop-license",
+        "kind": "license",
+        "title": "Barber license",
+        "shownAs": "checkedByRosie"
+      }
+    ],
+    "newBookings": "taking"
+  }
+}
