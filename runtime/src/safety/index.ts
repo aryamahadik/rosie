@@ -2,6 +2,7 @@
 // (T-1088). The safety prompt and labels are T-365's.
 
 export {
+  SAFETY_RETURN_CALLS,
   SafetyOnArrival,
   isReadable,
   isReadableEvent,
@@ -9,6 +10,9 @@ export {
   type HoldEntry,
   type OpenHold,
   type ResumedRead,
+  type ReturnedWrite,
+  type ReturnStep,
+  type ReturnWrites,
   type SafetyEntry,
   type SafetyHost,
   type StoredText,

@@ -6,7 +6,7 @@
 //   2. on a verdict with danger, hands the outcome step's checked line to the send path first: with PostgreSQL up, K-09's
 //      `recordSafetyOutcome` writes it as an outbox row of send class safety, which limit 8 lets past any opt-out
 //      (NQ-RT-9's default); with it down, the actor sends it straight through Linq from the bundle's copy and writes the
-//      record on return (arch 11 line 566);
+//      record on return (arch 11 line 566), the record waiting in the actor's write-on-return queue (T-269);
 //   3. on no verdict in 4 s (or a read that failed), a danger-word match from the bundle's list counts as Unsure and gets
 //      the safety line (988 and 911 for self-harm words, else 911); otherwise the outage line, never to a stopped number;
 //   4. keeps routine work held per the outcome (arch 06 lines 317 to 327) until a hold's rule releases it.
@@ -67,6 +67,7 @@ import {
 import {
   REREAD_MS,
   SAFETY_LINE_BUDGET_MS,
+  SAFETY_OUTCOMES,
   SAFETY_RETRY_MS,
   VERDICT_DEADLINE_MS,
   type CheckedLine,
@@ -74,12 +75,14 @@ import {
   type CoreError,
   type HandleIds,
   type RecordSafetyOutcomeRequest,
+  type RecordSafetyOutcomeResponse,
   type ReleaseRule,
   type SafetyDeps,
   type SafetyOutcome,
   type SafetyReadAnswer,
   type SafetyResult,
   type SendFixedLineRequest,
+  type SendFixedLineResponse,
   type SentByActor,
 } from "./types";
 
@@ -247,11 +250,8 @@ export function createSafetyTables(sql: SqlStorage): void {
        released INTEGER NOT NULL DEFAULT 0
      )`,
   );
-  // A record the actor could not give the core while PostgreSQL was down, sealed under the handle's key (it holds the
-  // read's evidence words), written on return.
-  sql.exec(
-    "CREATE TABLE IF NOT EXISTS safety_return (event_id TEXT PRIMARY KEY, kind TEXT NOT NULL, box TEXT NOT NULL)",
-  );
+  // A record the actor could not give the core while PostgreSQL was down waits in the actor's write-on-return queue
+  // (T-269, `SafetyHost.returns`), sealed under the handle's key (it holds the read's evidence words).
   // What the read (or its timeout stand-in) found in each text, as K-02 outcome labels (a JSON list): a turn is handed
   // each open hold with the outcomes that made it (DL-119). Labels only, never the read's evidence words.
   sql.exec("CREATE TABLE IF NOT EXISTS safety_outcomes (event_id TEXT PRIMARY KEY, outcomes TEXT NOT NULL)");
@@ -287,7 +287,41 @@ export interface SafetyHost {
   afterLate?: (eventId: string) => void;
   /** The stored texts with these event ids, sealed, in arrival order (the actor's inbox): a resumed read reads them again. */
   storedTexts(eventIds: readonly string[]): StoredText[];
+  /**
+   * The actor's queue of writes to replay when PostgreSQL returns (T-269, ../actor/copies): a record the core could not
+   * take waits there, sealed, and `replayOnReturn` sends it when the queue replays it.
+   */
+  returns: ReturnWrites;
+  /**
+   * The actor's own copy of the handle's stopped flag (T-269): true once it says stopped. The outage line never goes to a
+   * number it, or the stopped flag the deps read, says is stopped (arch 11 line 564).
+   */
+  stopped?: () => boolean;
 }
+
+/** The actor's write-on-return queue, as the safety read queues its records in it (T-269; ../actor/copies). */
+export interface ReturnWrites {
+  enqueue(write: { key: string; call: string; rank: "danger" | "stop" | "rest"; box: string }): unknown;
+}
+
+/** One queued write as the queue hands it back to be sent: its key, its call and its sealed request. */
+export interface ReturnedWrite {
+  readonly key: string;
+  readonly call: string;
+  readonly box: string;
+}
+
+/** What sending one queued write gave the queue: taken, the core not answering yet, or refused with the core's code. */
+export type ReturnStep = "written" | "notBack" | { readonly refused: string };
+
+/** The K-09 calls whose records the safety read queues while PostgreSQL is down, and sends when the queue replays them. */
+export const SAFETY_RETURN_CALLS: readonly string[] = ["recordSafetyOutcome", "sendFixedLine"];
+
+/** The fixed lines the safety read can send (K-01 v1): 911, 988 and 911, the danger question, the outage line. */
+const SAFETY_FIXED_LINES = ["safetyEmergency", "safetyCrisis", "safetyAsk", "outage"] as const;
+
+/** The outcomes whose step has its own checked line (No sends nothing; Unsure takes the fixed lines). */
+const OUTCOMES_WITH_LINES = SAFETY_OUTCOMES.filter((outcome) => outcome !== "No" && outcome !== "Unsure");
 
 /** A text whose read is resumed after an eviction, with the time its arrival was noted (on the safety clock). */
 interface CutOffRow extends Record<string, SqlStorageValue> {
@@ -704,54 +738,84 @@ export class SafetyOnArrival {
   }
 
   /**
-   * Writes to the core what the actor sent straight through Linq while it was down (arch 11 line 566): each record is
-   * sent again with `sentByActor`, and never as a new send. Returns how many were written; a record the core still
-   * refuses stays for the next call.
+   * Sends one of the safety read's queued records when the actor's write-on-return queue replays it (T-269; arch 11 line
+   * 566): what the actor sent straight through Linq while PostgreSQL was down is written with `sentByActor`, caller kind
+   * actorOnReturn, and never as a new send. A record's hold id lands on its hold. The core not answering (a throw, or
+   * `transient`), or the handle's key not to be had, is `notBack`: the record waits, and nothing queued after it goes
+   * first. Any other error is the core's refusal, and a box that does not open is refused as `unopened`.
    */
-  async writeOnReturn(): Promise<number> {
+  async replayOnReturn(write: ReturnedWrite): Promise<ReturnStep> {
     const set = deps;
-    if (set === null) return 0;
-    const rows = this.host.storage.sql
-      .exec<{ event_id: string; kind: string; box: string }>(
-        "SELECT event_id, kind, box FROM safety_return ORDER BY rowid",
-      )
-      .toArray();
-    let written = 0;
-    for (const row of rows) {
-      let request: RecordSafetyOutcomeRequest | SendFixedLineRequest;
-      try {
-        const key = await set.keys.getOrCreateKey(this.handleOf());
-        const opened = await openWords(
-          JSON.parse(row.box) as Parameters<typeof openWords>[0],
-          key,
-          this.actorName,
-          `return:${row.event_id}`,
-        );
-        request = JSON.parse(opened.body ?? "null") as RecordSafetyOutcomeRequest | SendFixedLineRequest;
-      } catch {
-        continue;
-      }
-      const onReturn = { ...request, caller: { ...request.caller, kind: "actorOnReturn" as const } };
-      try {
-        const answer =
-          row.kind === "record"
-            ? await set.core.recordSafetyOutcome(onReturn as RecordSafetyOutcomeRequest)
-            : await set.core.sendFixedLine(onReturn as SendFixedLineRequest);
-        if (isError(answer)) continue;
-        this.host.storage.sql.exec("DELETE FROM safety_return WHERE event_id = ?", row.event_id);
-        if (row.kind === "record" && "hold" in answer && answer.hold !== null) {
-          this.host.storage.sql.exec(
-            "UPDATE safety_holds SET hold_id = ? WHERE event_id = ? AND hold_id IS NULL",
-            answer.hold.holdId,
-            row.event_id,
-          );
-        }
-        written += 1;
-      } catch {
-        continue;
-      }
+    if (set === null) return "notBack";
+    const prefix = `${write.call}:`;
+    if (!SAFETY_RETURN_CALLS.includes(write.call) || !write.key.startsWith(prefix)) {
+      return { refused: "notSafetyRecord" };
     }
-    return written;
+    const eventId = write.key.slice(prefix.length);
+    let sealingKey: Uint8Array;
+    try {
+      sealingKey = await set.keys.getOrCreateKey(this.handleOf());
+    } catch {
+      return "notBack";
+    }
+    let request: RecordSafetyOutcomeRequest | SendFixedLineRequest;
+    try {
+      const opened = await openWords(
+        JSON.parse(write.box) as Parameters<typeof openWords>[0],
+        sealingKey,
+        this.actorName,
+        `return:${write.key}`,
+      );
+      request = JSON.parse(opened.body ?? "null") as RecordSafetyOutcomeRequest | SendFixedLineRequest;
+    } catch {
+      return { refused: "unopened" };
+    }
+    const onReturn = { ...request, caller: { ...request.caller, kind: "actorOnReturn" as const } };
+    let answer: RecordSafetyOutcomeResponse | SendFixedLineResponse | CoreError;
+    try {
+      answer =
+        write.call === "recordSafetyOutcome"
+          ? await set.core.recordSafetyOutcome(onReturn as RecordSafetyOutcomeRequest)
+          : await set.core.sendFixedLine(onReturn as SendFixedLineRequest);
+    } catch {
+      return "notBack";
+    }
+    if (isError(answer)) return answer.error === "transient" ? "notBack" : { refused: answer.error };
+    if ("hold" in answer && answer.hold !== null) {
+      this.host.storage.sql.exec(
+        "UPDATE safety_holds SET hold_id = ? WHERE event_id = ? AND hold_id IS NULL",
+        answer.hold.holdId,
+        eventId,
+      );
+    }
+    return "written";
+  }
+
+  /**
+   * The checked lines the safety read can send, as its bundle gives them now (T-269: the actor copies them on every write):
+   * the fixed lines by K-01 id and each outcome step's own line. Null while nothing is wired to read; a line the bundle
+   * cannot give now is null.
+   */
+  checkedLines(): { slot: string; line: CheckedLine | null }[] | null {
+    const set = deps;
+    if (set === null) return null;
+    const read = (get: () => CheckedLine | null): CheckedLine | null => {
+      try {
+        return get();
+      } catch {
+        return null;
+      }
+    };
+    return [
+      ...SAFETY_FIXED_LINES.map((id) => ({
+        slot: `fixed:${id}`,
+        line: read(() => set.bundle.fixedLine(id)),
+      })),
+      ...OUTCOMES_WITH_LINES.map((outcome) => ({
+        slot: `outcome:${OUTCOME_LABEL[outcome]}`,
+        line: read(() => set.bundle.outcomeLine(outcome)),
+      })),
+    ];
   }
 
   // ---- the read -------------------------------------------------------------------------------------------------
@@ -1199,25 +1263,33 @@ export class SafetyOnArrival {
     }
   }
 
+  /**
+   * Queues a record for the core that is not answering (T-269's write-on-return queue), sealed under the handle's key: a
+   * danger's record ranks with danger, the outage line's with the rest (arch 11 line 566: "On return: danger, stops, then
+   * the rest"). One key per call and text, so a text's danger record and its outage line's record both wait (QUESTIONS.md
+   * CQ-79 b); the same record queued again keeps its place with the newer box.
+   */
   private async keep(
     set: SafetyDeps,
     eventId: string,
     kind: "record" | "fixed",
     request: object,
   ): Promise<void> {
-    const key = await set.keys.getOrCreateKey(this.handleOf());
+    const call = kind === "record" ? "recordSafetyOutcome" : "sendFixedLine";
+    const key = `${call}:${eventId}`;
+    const sealingKey = await set.keys.getOrCreateKey(this.handleOf());
     const box = await sealWords(
       { body: JSON.stringify(request), subject: null },
-      key,
+      sealingKey,
       this.actorName,
-      `return:${eventId}`,
+      `return:${key}`,
     );
-    this.host.storage.sql.exec(
-      "INSERT OR REPLACE INTO safety_return (event_id, kind, box) VALUES (?, ?, ?)",
-      eventId,
-      kind,
-      JSON.stringify(box),
-    );
+    this.host.returns.enqueue({
+      key,
+      call,
+      rank: kind === "record" ? "danger" : "rest",
+      box: JSON.stringify(box),
+    });
   }
 
   /**
@@ -1335,7 +1407,9 @@ export class SafetyOnArrival {
     const eventId = handoff.event.eventId;
     const line = set.bundle.fixedLine("outage");
     if (line === null) return { path: "none", lineId: null, handedAfterMs: null };
-    if (await set.isStopped(this.actorName)) return { path: "none", lineId: line.id, handedAfterMs: null };
+    if (this.copySaysStopped() || (await set.isStopped(this.actorName))) {
+      return { path: "none", lineId: line.id, handedAfterMs: null };
+    }
     const ids = await this.idsOf(set);
     if (ids !== null) {
       const request: SendFixedLineRequest = {
@@ -1359,6 +1433,15 @@ export class SafetyOnArrival {
     return sent === null
       ? { path: "none", lineId: line.id, handedAfterMs: null }
       : { path: "outage", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
+  }
+
+  /** True when the actor's own copy of the stopped flag says stopped (T-269); a copy that cannot be read says nothing. */
+  private copySaysStopped(): boolean {
+    try {
+      return this.host.stopped?.() === true;
+    } catch {
+      return false;
+    }
   }
 
   private async sendDirect(

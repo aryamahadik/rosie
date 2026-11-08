@@ -1,14 +1,30 @@
 // The handle actor (T-244; C-046): one Durable Object per handle with an ordered, persisted inbox of sealed events, the
-// safety read on arrival (T-246), the batch window (T-247), the turn lease (T-248) with its crash path and park (T-253), and
-// the bundle pin at turn start (T-249).
+// safety read on arrival (T-246), the batch window (T-247), the turn lease (T-248) with its crash path and park (T-253), the
+// bundle pin at turn start (T-249), and its own copies for the database-down path with the write-on-return queue (T-269).
 
 export {
   ActorRefusal,
   HandleActor,
   setReceiptHooks,
+  type CopiesView,
   type ReceiptHandoff,
   type ReceiptHooks,
 } from "./handle-actor";
+export {
+  RETURN_RANKS,
+  setCopyDeps,
+  type CheckedLineCopy,
+  type CopyDeps,
+  type LiveTimersAnswer,
+  type QueuedEntry,
+  type ReplayReport,
+  type ReturnRank,
+  type ReturnWrite,
+  type SafetyTimerCopy,
+  type SafetyTimerRow,
+  type SafetyTimerSource,
+  type StoppedCopy,
+} from "./copies";
 export type { InboxEntry } from "./inbox";
 export {
   setBatchHooks,

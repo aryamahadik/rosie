@@ -46,6 +46,9 @@
 // The lease refuses nothing for a hold: T-252's gate commits only protective changes and the safety flow while one is
 // open (arch 06 lines 327 and 329), and until it is wired no turn runs at all.
 //
+// Each commit that comes back committed, first or repeated, is handed to the host before the run is answered (T-269,
+// `committed`): the actor copies the stopped flag a STOP or START wrote, so the copy is set before that turn's reply can go.
+//
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks, and the park's request (T-253, ../turn/park.ts), joined through `park`. Unwired, no turn
 // runs and each closed batch stays stored with the batch window (fails closed); with no park wired, a third lapse is left
@@ -403,6 +406,12 @@ export interface LeaseHost {
    * was ever pinned; null when neither is known. It records nothing.
    */
   parkTrace(request: ParkTraceRequest): { bundleId: BundleId; trace: TraceContext } | null;
+  /**
+   * Told of each commit that came back committed, first or repeated, before the run that sent it is answered (T-269): the
+   * actor refreshes its own copies from it, so the stopped flag a STOP or START wrote is set before any reply that commit
+   * wrote can go. Optional; a throw changes nothing for the commit.
+   */
+  committed?(turn: CommitTurnRef, answer: CommitTurnCommitted): void;
 }
 
 /** What the park's trace is opened from (T-253). */
@@ -629,12 +638,25 @@ export class TurnLease {
       return { error: "noAnswer" };
     }
     if (isCommitted(answer)) {
+      this.tellCommitted(request.turn, answer);
       if (reply) await this.holdForReply(turnId, answer.committedAt);
       else await this.finish(turnId, "committed", answer.committedAt);
     } else if (answer.error === "turnParked") {
       await this.finish(turnId, "parked", null);
     }
     return answer;
+  }
+
+  /**
+   * Tells the host of a committed answer before the run is answered (T-269: the actor's copies). A copy that cannot be
+   * refreshed never fails the commit: the next write refreshes it.
+   */
+  private tellCommitted(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
+    try {
+      this.host.committed?.(turn, answer);
+    } catch {
+      // The commit stands; the copies are refreshed on the next write.
+    }
   }
 
   /**

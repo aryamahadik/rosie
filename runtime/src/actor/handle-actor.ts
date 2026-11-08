@@ -20,6 +20,13 @@
 // turn whose commit reads the holds open and the texts not read yet, as a turn's does. The minute sweep and staging's
 // Fire now hand a row in through `fireClockRow`; the clock arming (T-255) names the handle through `syncClocks`.
 //
+// The actor keeps its own copies for the database-down path (T-269, ./copies): the handle's stopped flag, copied from each
+// commit the lease is answered committed, before the run is answered, so it is set before that turn's reply can go; the
+// checked safety lines, copied from the safety read's bundle each time a text is written; each live safety timer's due
+// time, address (as K-34 seals it) and emergency contact, reloaded after a commit that wrote a timer row; and the queue of
+// writes to replay when PostgreSQL returns (danger, stops, then the rest, each once), where the safety read's records
+// wait. Sending from the copies while PostgreSQL is down, and replaying on return, are T-270's.
+//
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
 // a sealed box. Never logged: a word, a phone number, a key, a sealed body.
 
@@ -31,6 +38,7 @@ import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import {
   REREAD_MS,
+  SAFETY_RETURN_CALLS,
   SafetyOnArrival,
   isReadable,
   isReadableEvent,
@@ -47,6 +55,18 @@ import {
   type BatchEntry,
 } from "./batch";
 import {
+  ActorCopies,
+  readCommit,
+  ReturnQueue,
+  type CheckedLineCopy,
+  type QueuedEntry,
+  type QueuedWrite,
+  type ReplayReport,
+  type ReplayStep,
+  type SafetyTimerCopy,
+  type StoppedCopy,
+} from "./copies";
+import {
   createInboxTables,
   markReceiptSeen,
   readInbox,
@@ -56,7 +76,13 @@ import {
   writeToInbox,
   type InboxEntry,
 } from "./inbox";
-import { TurnLease, type ParkTraceRequest, type TurnEntry } from "./lease";
+import {
+  TurnLease,
+  type CommitTurnCommitted,
+  type CommitTurnRef,
+  type ParkTraceRequest,
+  type TurnEntry,
+} from "./lease";
 
 /** A delivery receipt as the actor passes it on: the scrubbed K-06 event (no words) with `partKey` beside it. */
 export interface ReceiptHandoff {
@@ -92,6 +118,18 @@ export function setReceiptHooks(hooks: ReceiptHooks): () => void {
   };
 }
 
+/**
+ * The actor's own copies, as a reader sees them (T-269): the stopped flag, the checked safety lines, the live safety timers
+ * (each address as K-34 seals it), whether the timers' copy is behind a write, and the queued writes as labels.
+ */
+export interface CopiesView {
+  stopped: StoppedCopy | null;
+  lines: CheckedLineCopy[];
+  timers: SafetyTimerCopy[];
+  timersStale: boolean;
+  returns: QueuedEntry[];
+}
+
 /** A hand-off the actor cannot read; `code` is a label, and the message never holds words. */
 export class ActorRefusal extends Error {
   readonly code: string;
@@ -120,12 +158,19 @@ export class HandleActor extends DurableObject {
   private readonly lease: TurnLease;
   private readonly pins: BundlePins;
   private readonly clocks: ActorClocks;
+  private readonly copies: ActorCopies;
+  private readonly returns: ReturnQueue;
   private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
     createInboxTables(ctx.storage.sql);
+    // The actor's own copies and its write-on-return queue (T-269), before the safety read, which queues its records there.
+    this.copies = new ActorCopies({ storage: ctx.storage, now: () => actorClock().now() });
+    this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
     this.safety = new SafetyOnArrival({
+      returns: this.returns,
+      stopped: () => this.copies.readStopped()?.stopped === true,
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
       // A late answer or a re-read's: danger closes the open batch at once, a lifted unread hold lets the waiting batches
@@ -164,6 +209,9 @@ export class HandleActor extends DurableObject {
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
       parkTrace: (request) => this.parkTrace(request),
+      committed: (turn, answer) => {
+        this.afterCommit(turn, answer);
+      },
     });
     // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
     // armed row; a clock turn's commit is handed the holds open and the texts not read yet, read at commit time.
@@ -237,7 +285,10 @@ export class HandleActor extends DurableObject {
         this.settleAfter(eventId, safe);
         this.syncSafetySchedule();
       }
-      if (answer === "written") await this.batch.arm();
+      if (answer === "written") {
+        this.refreshLines();
+        await this.batch.arm();
+      }
     } else {
       answer = await this.passReceipt(handoff);
     }
@@ -458,9 +509,64 @@ export class HandleActor extends DurableObject {
     return row.seq;
   }
 
-  /** Writes to the shared core what the actor sent straight through Linq while PostgreSQL was down; returns how many. */
-  writeSafetyOnReturn(): Promise<number> {
-    return this.safety.writeOnReturn();
+  /**
+   * Replays the write-on-return queue (T-269): what the actor sent by itself while PostgreSQL was down is written to the
+   * shared core, danger first, then stops, then the rest, each in the order queued and each once; a write the core is not
+   * answering yet for stops the replay there. T-270 calls it when PostgreSQL is back.
+   */
+  writeOnReturn(): Promise<ReplayReport> {
+    return this.returns.replay((write) => this.replayWrite(write));
+  }
+
+  /** Replays the write-on-return queue and says how many writes the shared core took (T-246's name, kept). */
+  async writeSafetyOnReturn(): Promise<number> {
+    return (await this.writeOnReturn()).written;
+  }
+
+  /** The actor's own copies and its queued writes, as labels and sealed values only (T-269). */
+  readCopies(): CopiesView {
+    return {
+      stopped: this.copies.readStopped(),
+      lines: this.copies.readLines(),
+      timers: this.copies.readTimers(),
+      timersStale: this.copies.timersStale(),
+      returns: this.returns.read(),
+    };
+  }
+
+  /**
+   * Sends one queued write: the safety read's records through the safety read. A write of a call no sender is wired for
+   * yet (T-270's stop and start records) waits, and nothing queued after it goes before it.
+   */
+  private replayWrite(write: QueuedWrite): Promise<ReplayStep> {
+    if (SAFETY_RETURN_CALLS.includes(write.call)) return this.safety.replayOnReturn(write);
+    return Promise.resolve("notBack");
+  }
+
+  /**
+   * A commit came back committed (T-269; the lease calls this before the run that sent it is answered): the stopped flag a
+   * STOP or START wrote is copied at once, so it is set before that turn's reply can go; a commit that wrote a safety timer
+   * row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's K-04 handle
+   * id), as work lent to the platform.
+   */
+  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
+    const read = readCommit(answer.committed);
+    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
+    if (read.timersWritten || this.copies.timersStale()) {
+      this.lend(this.copies.refreshTimers(turn.handleId).then(() => undefined));
+    }
+  }
+
+  /**
+   * Copies the checked safety lines from the safety read's bundle, as they are now (T-269: refreshed on every write). A
+   * failure keeps the copy as it was: the next text refreshes it.
+   */
+  private refreshLines(): void {
+    try {
+      this.copies.refreshLines(this.safety.checkedLines());
+    } catch {
+      // The copy keeps the lines it had.
+    }
   }
 
   /** Resolves when the safety work of every text that has arrived is done (tests). */
