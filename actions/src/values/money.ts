@@ -33,14 +33,18 @@ const NUMBER = String.raw`(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?(?!\d|[.,]\d)`
 const DOLLAR_WORD = String.raw`(?:dollars?|bucks?|dolares|dolar)`;
 const CENT_WORD = String.raw`(?:cents?|centavos?)`;
 
-const PREFIXED = new RegExp(String.raw`(?<![\w$])(?:us ?\$|\$|usd ?) ?${NUMBER}`, "g");
+/** "$12", "US$12", "USD 12", and with a currency word after it said twice ("$12 dollars"). */
+const PREFIXED = new RegExp(
+  String.raw`(?<![\w$])(?:us ?\$|\$|usd ?) ?${NUMBER}(?: ?(?:${DOLLAR_WORD}|usd)\b)?`,
+  "g",
+);
 const SUFFIXED = new RegExp(String.raw`(?<![\w.,])${NUMBER} ?(?:\$|usd\b|${DOLLAR_WORD}\b)`, "g");
 const CENTS = new RegExp(String.raw`(?<![\w.,])(\d+) ?(?:${CENT_WORD}\b|¢)`, "g");
 const FREE = /\b(?:free|gratis|no charge|sin costo|sin cargo)\b/g;
 const BARE = new RegExp(String.raw`(?<![\w.,:/$])${NUMBER}`, "g");
 /** What a bare number may not be followed by: a time of day, a date, an ordinal, a share or a span of time. */
 const NOT_AMOUNT_AFTER =
-  /^(?: ?(?:am|pm)\b|[ap]\b|:\d|\/\d|(?:st|nd|rd|th)\b| ?%| ?(?:percent|por ciento)\b| ?(?:min|mins|minutes?|minutos?|h|hrs?|hours?|horas?|days?|dias?|weeks?|semanas?|months?|mes|meses|years?|anos?|oclock)\b)/;
+  /^(?: ?(?:am|pm)\b|[ap]\b|:\d|\/\d|(?:st|nd|rd|th)\b| ?%| ?(?:percent|per cent|pct|por ciento)\b| ?(?:min|mins|minutes?|minutos?|h|hrs?|hours?|horas?|days?|dias?|weeks?|semanas?|months?|mes|meses|years?|anos?|oclock)\b)/;
 /** A number right after an amount by a dash or "to": the other end of a range, so an amount too. */
 const RANGE_TAIL = new RegExp(String.raw`^ ?(?:-|to) ?\$? ?${NUMBER}`);
 

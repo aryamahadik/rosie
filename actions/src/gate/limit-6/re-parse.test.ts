@@ -723,3 +723,175 @@ describe("the shipped limit 6", () => {
     }
   });
 });
+
+// Round 3 (DL-189): word edges are judged on the folded text the readers read (fullwidth and small marks are their
+// marks, every apostrophe a joiner, what shows nothing taken out), and a number's value is re-read from its whole value
+// phrase in the text, so a unit, part of an hour or a zone left out of the cited words fails.
+
+const ZERO_WIDTH_SPACE = "​";
+
+describe("cut out of a longer number behind a fullwidth mark or a character that shows nothing (DL-189 item 1)", () => {
+  const LATER = "can you move me to tomorrow at 10：30";
+  const TABLE = "table for 9：30 tomorrow";
+  const HIDDEN = `raise haircut to 1${ZERO_WIDTH_SPACE}40`;
+  // [case, the field, the request citing words cut out of the person's text, the same text cited whole]
+  const cases: [string, string, () => GateRequest, () => GateRequest][] = [
+    [
+      "money: '$1' out of '$1，200' (the whole is $1,200)",
+      "price",
+      () => priceChangeRequest("raise haircut to $1，200", usd(100), "$1"),
+      () => priceChangeRequest("raise haircut to $1，200", usd(120000), "$1，200"),
+    ],
+    [
+      "time: 'tomorrow at 10' out of 'tomorrow at 10：30' (the whole is Sun Nov 1 at 10:30am)",
+      "time_saved",
+      () => haircutMoveRequest(at("2026-11-01T15:00:00Z", NEW_YORK), "tomorrow at 10", LATER),
+      () => haircutMoveRequest(at("2026-11-01T15:30:00Z", NEW_YORK), "tomorrow at 10：30", LATER),
+    ],
+    [
+      "money: '$12' out of '$12．50' (the whole is $12.50)",
+      "price",
+      () => priceChangeRequest("raise haircut to $12．50", usd(1200), "$12"),
+      () => priceChangeRequest("raise haircut to $12．50", usd(1250), "$12．50"),
+    ],
+    [
+      "count: 9 out of 'table for 9：30 tomorrow' (the whole '9：30 tomorrow' is a time: 9:30am)",
+      "people",
+      () => groupRequest(9, "9", TABLE),
+      () => haircutMoveRequest(at("2026-11-01T14:30:00Z", NEW_YORK), "9：30 tomorrow", TABLE),
+    ],
+    [
+      "money: '40' out of '1​40', a zero-width space inside (the whole is $140)",
+      "price",
+      () => priceChangeRequest(HIDDEN, usd(4000), "40"),
+      () => priceChangeRequest(HIDDEN, usd(14000), `1${ZERO_WIDTH_SPACE}40`),
+    ],
+    [
+      "money: '$40' out of '$40/hr' (the whole is $40 an hour)",
+      "price",
+      () => priceChangeRequest("raise haircut to $40/hr", usd(4000), "$40"),
+      () => priceChangeRequest("raise haircut to $40/hr", usd(4000), "$40/hr"),
+    ],
+  ];
+
+  it.each(cases)("%s: the cut fails (noText), the whole passes", async (_case, name, cut, whole) => {
+    const request = cut();
+    const cited = citedIn(request, name);
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [[name, "noText"]]));
+    expect(await decision({}, whole())).toEqual({ result: "pass" });
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check refuses the cut before any limit (quoteInText); the whole passes limit 6",
+    async (_case, _name, cut, whole) => {
+      expect(await runGate(cut(), callContext(BARBERSHOP), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "decideRefused", rule: "quoteInText", parts: [0] },
+      });
+      const [part] = gatedParts(await runGate(whole(), callContext(BARBERSHOP), registryWith(limitIn())));
+      expect(part?.result).toBe("passed");
+      expect(part?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+    },
+  );
+
+  it("the whole '9：30' holds no count, and the same text read whole as 140 passes from '140' too", async () => {
+    expect(await decision({}, groupRequest(9, "9：30", TABLE))).toEqual(
+      failed(oneQuestionOutcome(), [["people", "noValue"]]),
+    );
+    expect(await decision({}, priceChangeRequest(HIDDEN, usd(14000), "140"))).toEqual({ result: "pass" });
+  });
+});
+
+describe("a number's value is re-read from its whole value phrase (DL-189 item 2)", () => {
+  const QUARTER = "can you move me to quarter to 3 tomorrow";
+  const MEDIA = "¿me puede cambiar a mañana a las 3 y media?";
+  const PACIFIC = "can you move me to tomorrow at 3pm PST";
+  const THREE_PM = at("2026-11-01T20:00:00Z", NEW_YORK);
+  // [case, the field, the request citing words that leave part of the phrase out, its fault, the whole cited, its decision]
+  const cases: [string, string, () => GateRequest, ValueFault, () => GateRequest, ValuesDecision][] = [
+    [
+      "'40' out of '40%' (the whole '40%' is a share, no amount)",
+      "price",
+      () => priceChangeRequest("raise haircut to 40%", usd(4000), "40"),
+      "noText",
+      () => priceChangeRequest("raise haircut to 40%", usd(4000), "40%"),
+      failed(oneQuestionOutcome(), [["price", "noValue"]]),
+    ],
+    [
+      "'40' out of '40¢' (the whole is 40 cents)",
+      "price",
+      () => priceChangeRequest("raise haircut to 40¢", usd(4000), "40"),
+      "differs",
+      () => priceChangeRequest("raise haircut to 40¢", usd(40), "40¢"),
+      { result: "pass" },
+    ],
+    [
+      "'3 tomorrow' out of 'quarter to 3 tomorrow' (the whole is 2:45)",
+      "time_saved",
+      () => haircutMoveRequest(THREE_PM, "3 tomorrow", QUARTER),
+      "differs",
+      () => haircutMoveRequest(at("2026-11-01T19:45:00Z", NEW_YORK), "quarter to 3 tomorrow", QUARTER),
+      { result: "pass" },
+    ],
+    [
+      "'mañana a las 3' out of 'mañana a las 3 y media' (the whole is 3:30)",
+      "time_saved",
+      () => haircutMoveRequest(THREE_PM, "mañana a las 3", MEDIA, { language: "es" }),
+      "differs",
+      () =>
+        haircutMoveRequest(at("2026-11-01T20:30:00Z", NEW_YORK), "mañana a las 3 y media", MEDIA, {
+          language: "es",
+        }),
+      { result: "pass" },
+    ],
+    [
+      "'tomorrow at 3pm' out of 'tomorrow at 3pm PST' for a New York visit (the whole is 3pm Pacific)",
+      "time_saved",
+      () => haircutMoveRequest(THREE_PM, "tomorrow at 3pm", PACIFIC),
+      "wrongZone",
+      () => haircutMoveRequest(THREE_PM, "tomorrow at 3pm PST", PACIFIC),
+      failed(oneQuestionOutcome(), [["time_saved", "wrongZone"]]),
+    ],
+  ];
+
+  it.each(cases)(
+    "%s: the cut words stand whole but fail on the whole phrase; the whole gives its own reading",
+    async (_case, name, cut, why, whole, wholeDecision) => {
+      const request = cut();
+      expect(
+        decidedIn(request).context.texts.some((text) => text.words.includes(citedIn(request, name))),
+      ).toBe(true);
+      expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+      expect(await decision({}, whole())).toEqual(wholeDecision);
+    },
+  );
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read it is refused naming the field, after it one question",
+    async (_case, name, cut) => {
+      expect(await runGate(cut(), callContext(BARBERSHOP), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: [name] }] },
+      });
+      const [part] = gatedParts(
+        await runGate(afterReread(cut()), callContext(BARBERSHOP), registryWith(limitIn())),
+      );
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it("'tomorrow at 3pm PST' passes for Alex's Los Angeles visit, read in its zone", async () => {
+    const words = "can we do tomorrow at 3pm PST instead";
+    const pacific = (cited: string) => moveRequest(at("2026-10-26T22:00:00Z", LOS_ANGELES), { words, cited });
+    expect(await decision({}, pacific("tomorrow at 3pm PST"))).toEqual({ result: "pass" });
+    expect(await decision({}, pacific("tomorrow at 3pm"))).toEqual({ result: "pass" });
+    expect(
+      await decision(
+        {},
+        moveRequest(at("2026-10-26T19:00:00Z", NEW_YORK), { words, cited: "tomorrow at 3pm" }),
+      ),
+    ).toEqual(failed(oneQuestionOutcome(), [["time_saved", "wrongZone"]]));
+  });
+});
