@@ -1,0 +1,45 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-line-price-copied.json"],
+  "rows": [
+    {
+      "table": "no_shows",
+      "values": {
+        "visit_id": "visit-dee-haircut-1",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "marked_at": "2026-11-07T16:15:00Z",
+        "marked_by_person_id": "person-avery",
+        "marked_via": "staff_text",
+        "welfare_first": false,
+        "found_safe_at": null,
+        "owner_told_at": null,
+        "asked_at": "2026-11-07T16:15:02Z",
+        "reply_by": "2026-11-07T16:45:02Z",
+        "open_question_id": null,
+        "replied_at": "2026-11-07T16:31:00Z",
+        "reply": "emergency",
+        "outcome": null,
+        "outcome_at": null,
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "no_shows",
+    "set": {
+      "outcome": "no_visit",
+      "outcome_at": "2026-11-07T16:45:02Z",
+      "version": 3
+    },
+    "where": {
+      "visit_id": "visit-dee-haircut-1"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["no_shows_no_visit_after_silence"]
+    }
+  }
+}

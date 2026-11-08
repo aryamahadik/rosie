@@ -1,0 +1,54 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-flow-b.json"],
+  "rows": [
+    {
+      "table": "visit_events",
+      "values": {
+        "id": "vev-alex-drain-teen-home",
+        "visit_id": "visit-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "kind": "only_child_home",
+        "at": "2026-10-22T12:20:00Z",
+        "by_person_id": "person-jordan",
+        "turn_id": null,
+        "minutes": null,
+        "arrives_about": null,
+        "late_report_id": null,
+        "new_start": null,
+        "new_window": null,
+        "open_question_id": null,
+        "wait_until": "2026-10-22T12:50:00Z"
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "no_shows",
+    "values": {
+      "visit_id": "visit-alex-drain-1",
+      "booking_id": "booking-alex-drain",
+      "business_id": "biz-lee-home-services",
+      "marked_at": "2026-10-22T12:50:00Z",
+      "marked_by_person_id": "person-jordan",
+      "marked_via": "clock",
+      "welfare_first": false,
+      "found_safe_at": null,
+      "owner_told_at": null,
+      "asked_at": "2026-10-22T12:50:02Z",
+      "reply_by": "2026-10-22T13:20:02Z",
+      "open_question_id": null,
+      "replied_at": null,
+      "reply": null,
+      "outcome": null,
+      "outcome_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["no_shows_marked_by"]
+    }
+  }
+}

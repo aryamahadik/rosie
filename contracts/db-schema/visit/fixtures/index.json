@@ -119,6 +119,38 @@
       "expect": "refuse",
       "shows": "A Tool API call scoped to Lee's Barbershop checks in Lee Home Services' visit for Alex's drain, with its own business and Riley: refused (the insert policy requires a booking the call's scope can see: SQLSTATE 42501), though the key to K-30's visit alone would let it through; the same mark on the barbershop's own visit passes",
       "source": "arch 10 line 546; K-04 v1 rule 4; README rule 5 (a row names a booking of its own business); S13-42 ('Each business's customer data is used only for that business')"
+    },
+    {
+      "file": "invalid/refuse-turned-away-reason-in-side.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "Riley can't start Alex M.'s 11:00am haircut for the customer's own state, and a Tool API call scoped to Lee's Barbershop writes that reason into side, the column owner and staff texts may carry: refused (side holds only the customer's side or the shop's side: CHECK visit_marks_side_known, SQLSTATE 23514), so why a person was turned away can never reach a text; the same row with side customer and customer_state true, which only the secure page shows, passes",
+      "source": "A8-51 ('Never: put why it couldn't start in a text. It goes on the signed-in page'); A8-81 ('Riley couldn't start Alex M.'s 11:00am. The reason is on the secure page'; 'Never: ... tell anyone why'); B8-54; B8-76 ('Texts say only that the visit couldn't start, with details on the secure page'); A8-56; A8-61; RULES 4.5 ('Why a person was turned away'); DL-174 ruling 1"
+    },
+    {
+      "file": "invalid/refuse-first-step-result-in-stopped-why.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "Jordan checks in at Alex's door at 8:20am Thu Oct 22, and the first step shows the work can't go ahead safely today; a Tool API call scoped to Lee Home Services writes first_step into stopped_why, the column an owner text may carry: refused (stopped_why holds only safety or conduct: CHECK visit_marks_stopped_why_known, SQLSTATE 23514), so a first step's result or a finding never reaches a text; the same update with first_step in stopped_found, which only the secure page shows, passes",
+      "source": "B8-90 ('The text says only result added'; 'Never: put the result in a text'; 'Not OK: it can't go ahead safely today. That's the business's side'); A8-72; A8-35 ('Health details stay on the secure page, never in a text'); B8-04 (8:20am); RULES 4.5 ('test results'); DL-174 ruling 2"
+    },
+    {
+      "file": "invalid/refuse-no-visit-after-reply.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "refuse",
+      "shows": "Avery marked Dee a no-show at 11:15am Sat Nov 7 and Dee replied at 11:31am with an emergency; at 11:45am the 30-minute clock closes the mark as no_visit, which tells Sam she didn't answer: refused (no_visit only follows silence: CHECK no_shows_no_visit_after_silence, SQLSTATE 23514); the same update closing it not_met, heard but not met, with her reply going to Sam's fee question, passes",
+      "source": "A8-14 ('An emergency goes to Sam, in their words only if nothing private'; 'Never: tell Sam didn't answer when the customer replied'); B8-11 ('An emergency reason goes to Sam with the fee question'; 'I cancelled: check the record; no fee until Sam sees it'); B8-10; A8-15; S11-22; DL-174 ruling 3"
+    },
+    {
+      "file": "invalid/refuse-clock-mark-names-person.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "refuse",
+      "shows": "Only a teen is home at Alex's at 8:20am Thu Oct 22, so Jordan waits up to 30 minutes for an adult; none comes, and at 8:50am the clock's silence marks the no-show on the runtime side, naming Jordan as if he had marked it: refused (a clock's mark names no person: CHECK no_shows_marked_by, SQLSTATE 23514), so the commit never invents who marked it; the same mark with no person, Jordan staying the visit event's word, passes",
+      "source": "B8-09 ('Jordan waits up to 30 minutes'; 'No adult in 30 minutes: it's handled like nobody home'; 'Only a teen is home at Alex M.'s'); B8-52 ('Clock: a new code ... by 15 minutes after Jordan's text; silence goes on as nobody home'); B8-10; B8-11 ('or says it was set on silence'); S11-22; NQ-RT-4; DL-174 ruling 4"
     }
   ]
 }

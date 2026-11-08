@@ -4,7 +4,7 @@
   "tables": [
     {
       "name": "visit_marks",
-      "description": "One row per visit for what happens at it: FS line 729's checked_in_at, done_at and done_by, which K-30 leaves to this part. It holds how the visit was checked in (the code from the pro's own phone or the desk's Today page, a roster tick, a drop-off or a mail-in, or a self check-in), the wrong code tries in a row (their times only, never the digits typed) and when the owner was told after the third, a visit with no code, a self check-in's 'I've left', and how the visit ended: done (the pro's DONE, the desk, the owner's yes when nothing was entered by night, or the code when nothing is billed after), part (PART: stopped partway, priced for what was done), not started (whose side), stopped (safety, a finding, conduct or a first step), the door kept shut, or it did not happen. Written at the visit's first mark; each value is set once and never changed (README rule 7, trigger visit_marks_set_once). A no-show mark is its own row (no_shows).",
+      "description": "One row per visit for what happens at it: FS line 729's checked_in_at, done_at and done_by, which K-30 leaves to this part. It holds how the visit was checked in (the code from the pro's own phone or the desk's Today page, a roster tick, a drop-off or a mail-in, or a self check-in), the wrong code tries in a row (their times only, never the digits typed) and when the owner was told after the third, a visit with no code, a self check-in's 'I've left', and how the visit ended: done (the pro's DONE, the desk, the owner's yes when nothing was entered by night, or the code when nothing is billed after), part (PART: stopped partway, priced for what was done), not started (whose side: the customer's or the shop's, and, on the secure page only, whether it was the customer's own state), stopped (for safety or conduct, or, on the secure page only, on a finding or a first step's result), the door kept shut, or it did not happen. Written at the visit's first mark; each value is set once and never changed (README rule 7, trigger visit_marks_set_once). A no-show mark is its own row (no_shows).",
       "source": "02-contracts section 7 row K-31 ('Check-ins (the code entered, wrong tries), DONE (when and by whom)'); FS line 729 (checked_in_at, done_at, done_by); A8-03 to A8-10, A8-70, A8-87; B8-03 to B8-08, B8-40, B8-41; K-30 v1 README ('K-31 the visit (F17) will name booking_visits.id for check-ins, DONE and no-shows and owns FS line 729's checked_in_at, done_at and done_by')",
       "columns": [
         {
@@ -148,16 +148,32 @@
           "type": "text",
           "null": true,
           "audience": ["staff", "owner"],
-          "description": "Whose side a visit that could not start, or stopped, is on: customer (theirs to bring: any fee is the owner's question), business (nothing is charged) or customer_state (they arrived impaired, refused a safety rule or gave an answer that was not true: money follows the signed terms). Required when it did not start. A stop takes it where the plug-in or the step says (a first step that is not OK, or a safety stop where the plug-in sets no rule of its own, is the business's side).",
-          "source": "A8-51 ('Whose side is it on?'; 'Safe default: the business's side'); A8-56; A8-61; A8-81; B8-54; A8-72 ('That's the business's side'); A8-40 ('the part not given is the business's side')"
+          "description": "Whose side a visit that could not start, or stopped, is on, as an owner or staff text may say it: customer (the customer's side: what they were to bring, or their own state; any fee is the owner's question under the signed terms) or business (the shop's side: nothing is charged). Why it was on the customer's side is never here: whether it was their own state is customer_state, on the secure page only. Required when it did not start. A stop takes it where the plug-in or the step says (a first step that is not OK, a finding, or a safety stop where the plug-in sets no rule of its own, is the business's side).",
+          "source": "A8-51 ('Whose side is it on?'; 'Safe default: the business's side'); A8-56 ('what they were to bring is missing'); A8-61 ('Shop's side. Details on the page'; 'A stop partway for a reason found during it is the business's side too'); A8-81; B8-54; B8-60; B8-61; A8-72 ('That's the business's side'); A8-40 ('the part not given is the business's side'); RULES 4.5"
+        },
+        {
+          "name": "customer_state",
+          "type": "boolean",
+          "null": true,
+          "audience": "secure-page-only",
+          "description": "For the customer's side only: true when it was the customer's own state (they arrived impaired, refused a safety rule or gave an answer that was not true: only that person does not start, and money follows the signed terms), false when it was theirs to bring. Set with side when side is customer, and null otherwise (visit_marks_customer_state_with_side). Why a person was turned away goes only on the secure page, never in a text, an email, a call summary or a customer's AI: owner and staff texts say only the customer's side or the shop's side ('The reason is on the secure page'). Set once.",
+          "source": "A8-51 ('Never: put why it couldn't start in a text. It goes on the signed-in page'; 'Means The customer's own state'); A8-81 ('Never: ... tell anyone why'; 'The reason is on the secure page'); B8-54 ('Means the customer's own state: their state turns them away'); B8-76 ('Texts say only that the visit couldn't start, with details on the secure page'); A8-56; A8-61; RULES 4.5 ('Why a person was turned away')"
         },
         {
           "name": "stopped_why",
           "type": "text",
           "null": true,
           "audience": ["staff", "owner"],
-          "description": "Why it stopped: safety (it isn't safe to go on, or the pro feels unsafe and leaves), finding (a finding stops the work, with a written note), conduct (ended for conduct) or first_step (the first step shows it can't go ahead safely today). The details go only on the secure page, never here.",
-          "source": "A8-40; B8-29; A8-35; B8-30; A8-80; B8-88; A8-72; B8-90; A8-86 ('Details go only on the secure page')"
+          "description": "Why it stopped, where an owner text may say so: safety (it isn't safe to go on, or the pro feels unsafe and leaves) or conduct (ended for conduct under the signed terms). Null for a stop on what the work found, which is stopped_found, on the secure page only. The details go only on the secure page, never here.",
+          "source": "A8-40 ('Riley stopped a visit for safety'); B8-29 ('Jordan left Alex M.'s visit at 42 Oak St for safety'); A8-80 ('Riley ended Alex M.'s visit for conduct under the signed terms. Details on the secure page'); B8-88; A8-86 ('Details go only on the secure page'); B8-97"
+        },
+        {
+          "name": "stopped_found",
+          "type": "text",
+          "null": true,
+          "audience": "secure-page-only",
+          "description": "Why it stopped, when what the work found stopped it: finding (a finding the plug-in says stops the work, with a written note) or first_step (the first step's result shows it can't go ahead safely today). Secure page only: a first step's result, health details and test results never go in a text; the texts say only that it stopped and that the note or the result is on the secure page ('RESULT added'). Null for a stop for safety or conduct (stopped_why). The note's and the result's own words are not kept here (README open gaps). Set once.",
+          "source": "A8-35 ('Health details stay on the secure page, never in a text'; 'Riley stopped Alex M.'s cut. The note and photo are on the secure page'); B8-30; A8-72 ('The text says only result added'; 'Never: put the result in a text'); B8-90 ('Never: put the result in a text'); RULES 4.5 ('test results')"
         },
         {
           "name": "done_price_id",
@@ -172,8 +188,8 @@
           "type": "text",
           "null": true,
           "audience": ["customer", "staff", "owner"],
-          "description": "DONE's photo when nobody needs to be home: the object key of the photo in the private file store (K-13), never the photo. It rides on the first message after the visit, the bill or the receipt.",
-          "source": "B8-17 ('DONE needs a photo'; 'The DONE photo rides on the first message after the visit, the bill or the receipt'); B8-41; B9-06; 02-contracts row K-13"
+          "description": "DONE's photo when nobody needs to be home: the object key of the photo in the private file store (K-13), never the photo. The photo rides on the first message after the visit, the bill or the receipt, and its audience is the photo's: the key itself never goes in a message (README rule 8).",
+          "source": "B8-17 ('DONE needs a photo'; 'The DONE photo rides on the first message after the visit, the bill or the receipt'); B8-41; B9-06; 02-contracts row K-13; MC C10 and section 8 ('Uploads stay private in R2')"
         },
         {
           "name": "report_by",
@@ -346,8 +362,13 @@
         },
         {
           "name": "visit_marks_side_known",
-          "expression": "side is null or side in ('customer', 'business', 'customer_state')",
-          "source": "A8-51"
+          "expression": "side is null or side in ('customer', 'business')",
+          "source": "A8-51; A8-56; A8-61 (texts say only the customer's side or the shop's side); RULES 4.5"
+        },
+        {
+          "name": "visit_marks_customer_state_with_side",
+          "expression": "(customer_state is not null) = coalesce(side = 'customer', false)",
+          "source": "A8-51 ('Means The customer's own state'); A8-81; B8-54; B8-76"
         },
         {
           "name": "visit_marks_side_when",
@@ -356,13 +377,18 @@
         },
         {
           "name": "visit_marks_stopped_why_known",
-          "expression": "stopped_why is null or stopped_why in ('safety', 'finding', 'conduct', 'first_step')",
-          "source": "A8-86; B8-97; A8-72"
+          "expression": "stopped_why is null or stopped_why in ('safety', 'conduct')",
+          "source": "A8-86; B8-97; A8-40; A8-80 (an owner text may say safety or conduct)"
+        },
+        {
+          "name": "visit_marks_stopped_found_known",
+          "expression": "stopped_found is null or stopped_found in ('finding', 'first_step')",
+          "source": "A8-35; B8-30; A8-72; B8-90 (the result and the finding stay on the secure page); RULES 4.5"
         },
         {
           "name": "visit_marks_stopped_with_why",
-          "expression": "coalesce(ended_how = 'stopped', false) = (stopped_why is not null)",
-          "source": "A8-86"
+          "expression": "coalesce(ended_how = 'stopped', false) = (stopped_why is not null or stopped_found is not null) and (stopped_why is null or stopped_found is null)",
+          "source": "A8-86 (one reason per stop)"
         },
         {
           "name": "visit_marks_photo_report_with_done",
@@ -917,8 +943,8 @@
           "type": "text",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "The line as priced or texted ('Color correction', 'Shutoff valve and wall pipe', 'drain'): the work or the parts, never anything about the person; a note about the person goes on the signed-in page (README open gaps).",
-          "source": "A8-25; A8-29; B8-20; B8-92; B8-41; A8-23 ('Notes and photos of a person's body go only on the signed-in page')"
+          "description": "The line as priced or texted ('Color correction', 'Shutoff valve and wall pipe', 'drain'): the work or the parts, never anything about the person; a note about the person goes on the signed-in page (README open gaps). Under the sensitive switch the words are the service, so no text carries them: texts say 'your visit' (README rule 8).",
+          "source": "A8-25; A8-29; B8-20; B8-92; B8-41; A8-23 ('Notes and photos of a person's body go only on the signed-in page'); RULES 4.6 ('Never the service or the reason')"
         },
         {
           "name": "amount_cents",
@@ -957,8 +983,8 @@
           "type": "text",
           "null": true,
           "audience": ["customer", "staff", "owner"],
-          "description": "For parts at cost: the object key of the store's receipt in the private file store (K-13), shown on the bill ('receipts shown').",
-          "source": "B8-41 ('parts at cost where the price said so, with the store's receipt'); B9-05 ('Costs passed on at cost: receipts shown')"
+          "description": "For parts at cost: the object key of the store's receipt in the private file store (K-13). The receipt is shown on the bill ('receipts shown'), and its audience is the receipt's: the key itself never goes in a message (README rule 8).",
+          "source": "B8-41 ('parts at cost where the price said so, with the store's receipt'); B9-05 ('Costs passed on at cost: receipts shown'); MC C10 and section 8 ('Uploads stay private in R2')"
         },
         {
           "name": "customer_ok",
@@ -1081,8 +1107,8 @@
     },
     {
       "name": "no_shows",
-      "description": "A no-show mark on a visit and what follows it: 15 minutes after the start (10 for a video or phone session nobody joined) the pro or the desk marks the customer as not there; where they may be unable to answer, a safety check comes first and no fee or no-show words go until they are found safe (alerts per Q-06); then the customer is asked to reply within 30 minutes; their reply, and how the mark ended. No fee is asked here: any fee is the owner's question (K-32 booking_fees), only after the customer is heard. One per visit; each value set once (README rule 7, trigger no_shows_set_once).",
-      "source": "02-contracts section 7 row K-31 ('no-show marks'); A8-14, A8-15, A8-16; B8-10, B8-11, B8-12; FS line 623 (No-shows: 'A missed visit is marked 15 minutes after the start; safety first where the welfare switch applies; then the customer is asked; no fee until the owner decides'); S11-22; Q-06",
+      "description": "A no-show mark on a visit and what follows it: 15 minutes after the start (10 for a video or phone session nobody joined) the pro or the desk marks the customer as not there, or, at a door in flow B, the clock's silence marks it when the pro's wait runs out (no new way in within 15 minutes, or no adult within 30 when only a child answered), naming no person; where they may be unable to answer, a safety check comes first and no fee or no-show words go until they are found safe (alerts per Q-06); then the customer is asked to reply within 30 minutes; their reply, and how the mark ended. No fee is asked here: any fee is the owner's question (K-32 booking_fees), only after the customer is heard. One per visit; each value set once (README rule 7, trigger no_shows_set_once).",
+      "source": "02-contracts section 7 row K-31 ('no-show marks'); A8-14, A8-15, A8-16; B8-10, B8-11, B8-12; B8-52 ('silence goes on as nobody home'); B8-09 ('No adult in 30 minutes: it's handled like nobody home'); FS line 623 (No-shows: 'A missed visit is marked 15 minutes after the start; safety first where the welfare switch applies; then the customer is asked; no fee until the owner decides'); S11-22; Q-06",
       "columns": [
         {
           "name": "visit_id",
@@ -1113,24 +1139,24 @@
           "type": "timestamptz",
           "null": false,
           "audience": ["customer", "staff", "owner"],
-          "description": "When the no-show was marked ('NO SHOW Alex M.'): 15 minutes after the start, 10 for a video or phone session nobody joined (code holds it to the visit's start: README rule 10).",
-          "source": "A8-14 ('15 minutes after the start, Riley marks a no-show'; 'A video or phone session nobody joined: after 10 minutes'); B8-10; FS line 623"
+          "description": "When the no-show was marked ('NO SHOW Alex M.'): 15 minutes after the start, 10 for a video or phone session nobody joined, the start being a later start a late notice gave, where one stands (code holds it to the visit's start: README rule 10); for the clock's silence, when the pro's wait ran out (the visit event's wait_until).",
+          "source": "A8-14 ('15 minutes after the start, Riley marks a no-show'; 'A video or phone session nobody joined: after 10 minutes'); B8-10; FS line 623; A7-14 ('the later start stands'); B7-18; B8-52; B8-09"
         },
         {
           "name": "marked_by_person_id",
           "type": "text",
-          "null": false,
+          "null": true,
           "audience": "never",
-          "description": "Who marked it (persons.id): the pro or the desk.",
-          "source": "A8-14; B8-10; FS line 623"
+          "description": "Who marked it (persons.id): the pro or the desk. Null when the clock's silence marked it (marked_via clock): no person marked it, so the commit names none; the pro whose wait ran out is the by_person_id of the visit event that started the wait (way_in_failed, only_child_home).",
+          "source": "A8-14; B8-10; FS line 623; B8-52 ('Clock: a new code ... by 15 minutes after Jordan's text; silence goes on as nobody home'); B8-09; NQ-RT-4"
         },
         {
           "name": "marked_via",
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "staff_text (from their own phone) or today_page (the owner console).",
-          "source": "A8-14; FS lines 618, 623"
+          "description": "staff_text (from their own phone), today_page (the owner console) or clock (the clock's silence at a door in flow B: no new way in came within 15 minutes of the pro's text, or no adult came within 30 minutes when only a child answered, so it goes on as nobody home; the fee question then says the mark was set on silence).",
+          "source": "A8-14; FS lines 618, 623; B8-52 ('If none comes, Jordan has to leave'); B8-09 ('No adult in 30 minutes: it's handled like nobody home'); B8-11 ('The fee question gets the real arrival time, or says it was set on silence'); S11-22; NQ-RT-4"
         },
         {
           "name": "welfare_first",
@@ -1193,7 +1219,7 @@
           "type": "text",
           "null": true,
           "audience": ["staff", "owner"],
-          "description": "here (3 I'm here, or home: they or another adult on the booking is there), on_way ('On my way', 'I'm outside', 'Be there in 2 minutes': held to the grace time), cancelled ('I cancelled': the record is checked) or emergency (an emergency reason, which goes to the owner with any fee question, in their words only if nothing private).",
+          "description": "here (3 I'm here, or home: they or another adult on the booking is there), on_way ('On my way', 'I'm outside', 'Be there in 2 minutes': held to the grace time), cancelled ('I cancelled': the record is checked; a cancel on record ends the mark cancelled_before, and none ends it not_met, with no fee until the owner sees it) or emergency (an emergency reason, which goes to the owner with any fee question, in their words only if nothing private). Any reply means the customer was heard: the owner never reads 'didn't answer'.",
           "source": "A8-14 ('On my way or I'm outside: Riley is told, and the time is held to the grace time'; 'I cancelled: the record is checked'); A8-15; B8-11 ('Means I'm home: any reply saying Alex or another adult on the booking is there'; 'An emergency reason goes to Sam with the fee question')"
         },
         {
@@ -1201,8 +1227,8 @@
           "type": "text",
           "null": true,
           "audience": ["staff", "owner"],
-          "description": "checked_in (they came after all: checked in with the code, a normal visit, no fee), not_met (they said they were there but still could not be met: nothing is charged now, and any fee is the owner's question with the facts), no_visit (no reply in the 30 minutes: no visit; any fee is the owner's call, and silence charges nothing) or cancelled_before (the record shows they cancelled first: no no-show). Set once.",
-          "source": "A8-16; B8-12 ('Still can't meet after they said they're there: nothing is charged now'); A8-15 ('No reply ... No visit. Any fee is Sam's call; silence charges nothing'); B8-11; A8-14 ('I cancelled: the record is checked')"
+          "description": "checked_in (they came after all: checked in with the code, a normal visit, no fee), not_met (the customer was heard and still was not met: they said they were there or on the way and could not be met, replied with an emergency, or said 'I cancelled' when the record shows no cancel; nothing is charged now, and any fee is the owner's question with their reply and the facts), no_visit (no reply in the 30 minutes: no visit; any fee is the owner's call, and silence charges nothing) or cancelled_before (the record shows they cancelled first: no no-show). Set once.",
+          "source": "A8-16; B8-12 ('Still can't meet after they said they're there: nothing is charged now'); A8-15 ('No reply ... No visit. Any fee is Sam's call; silence charges nothing'); B8-11 ('I cancelled: check the record; no fee until Sam sees it'; 'An emergency reason goes to Sam with the fee question'); A8-14 ('I cancelled: the record is checked. An emergency goes to Sam'; 'Never: tell Sam didn't answer when the customer replied'); B8-10"
         },
         {
           "name": "outcome_at",
@@ -1264,8 +1290,13 @@
       "checks": [
         {
           "name": "no_shows_marked_via_known",
-          "expression": "marked_via in ('staff_text', 'today_page')",
-          "source": "A8-14; FS line 623"
+          "expression": "marked_via in ('staff_text', 'today_page', 'clock')",
+          "source": "A8-14; FS line 623; B8-52; B8-09"
+        },
+        {
+          "name": "no_shows_marked_by",
+          "expression": "(marked_via = 'clock') = (marked_by_person_id is null)",
+          "source": "A8-14; B8-10 (the pro or the desk marks it); B8-52; B8-09; NQ-RT-4 (the clock's silence names no person)"
         },
         {
           "name": "no_shows_safety_check_with_welfare",
@@ -1314,8 +1345,8 @@
         },
         {
           "name": "no_shows_not_met_after_reply",
-          "expression": "outcome is distinct from 'not_met' or coalesce(reply in ('here', 'on_way'), false)",
-          "source": "A8-16 ('Still can't meet after they said they're there'); B8-12"
+          "expression": "outcome is distinct from 'not_met' or (reply is not null and outcome_at >= replied_at)",
+          "source": "A8-16 ('Still can't meet after they said they're there'); B8-12; A8-14 ('I cancelled: the record is checked. An emergency goes to Sam'); B8-11 ('An emergency reason goes to Sam with the fee question'); A8-14, B8-10 ('Never: tell Sam didn't answer when the customer replied')"
         }
       ],
       "indexes": [
@@ -1456,7 +1487,7 @@
           "type": "timestamptz",
           "null": true,
           "audience": ["customer", "staff", "owner"],
-          "description": "How long the pro waits: 30 minutes for an adult when only a child answers; 15 minutes for a new way in.",
+          "description": "How long the pro waits: 30 minutes for an adult when only a child answers; 15 minutes for a new way in. When it runs out with nothing, it goes on as nobody home: the clock's silence marks the no-show (no_shows.marked_via clock, naming no person).",
           "source": "B8-09 ('Jordan waits up to 30 minutes'); B8-52 ('within 15 minutes'; 'Clock: a new code ... by 15 minutes after Jordan's text')"
         }
       ],
