@@ -93,10 +93,20 @@ interface Compared {
   readonly rows: Readonly<Record<string, number | null>>;
 }
 
-/** Every reading compared with the master's own, per flow. */
-const compared: Record<Flow, Compared[]> = { A: [], B: [] };
+/** Every reading compared with the master's own, per flow, made once by the first test that asks for it. */
+const comparedSoFar: Record<Flow, Compared[] | null> = { A: null, B: null };
 
-function compareFlow(flow: Flow): void {
+/** The flow's readings, each held to the master's own reading of the same path (the comparison runs once per flow). */
+function comparedOf(flow: Flow): readonly Compared[] {
+  const done = comparedSoFar[flow];
+  if (done !== null) return done;
+  const made: Compared[] = [];
+  compareFlow(flow, made);
+  comparedSoFar[flow] = made;
+  return made;
+}
+
+function compareFlow(flow: Flow, out: Compared[]): void {
   const money = record(flow);
   const slots = money.moneySlots;
   for (const combo of moneyPathsOf(src, flow))
@@ -120,7 +130,7 @@ function compareFlow(flow: Flow): void {
         const reader = recordReading(reading, money);
         const rows = Object.fromEntries(slots.map((slot) => [slot, firstFit(reader, slot)]));
         expect(rows, label).toEqual(expected.rows);
-        compared[flow].push({ flow, label, money: reading, rows });
+        out.push({ flow, label, money: reading, rows });
       }
     }
 }
@@ -222,14 +232,13 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
   it.each(FLOWS)(
     "flow %s: on every money path, booking value and fixture, before and after the money step, the module reads the master's record values, ledger and rows",
     (flow) => {
-      compareFlow(flow);
-      expect(compared[flow].length).toBeGreaterThan(500);
+      expect(comparedOf(flow).length).toBeGreaterThan(500);
     },
   );
 
   it("every row of every pay.* slot of the A record is the row some booking takes, and only where its when fits", () => {
     const money = record("A");
-    // Flow A's own bookings take every row but the two that read the after 'own' (the business bills its own way),
+    // Flow A's own bookings take every row but the six that read the after 'own' (the business bills its own way),
     // which only flow B's paths have (lib.js AFTER_IN); flow B's bookings take those, read on the A record's rows.
     const takenBy = (readings: readonly Compared[]): Map<string, Set<number>> => {
       const taken = new Map<string, Set<number>>();
@@ -243,8 +252,8 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
       }
       return taken;
     };
-    const byA = takenBy(compared.A);
-    const byBoth = takenBy([...compared.A, ...compared.B]);
+    const byA = takenBy(comparedOf("A"));
+    const byBoth = takenBy([...comparedOf("A"), ...comparedOf("B")]);
     const missedByA: string[] = [];
     for (const slot of money.moneySlots) {
       const count = money.rows[slot]?.length ?? 0;
@@ -270,7 +279,7 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
       expect(money.rows[slot as keyof typeof money.rows]?.[Number(row)]?.text, missed).toMatch(/own way$/);
     }
     // A row is taken only where its own when fits and no earlier row's does: the reader on that row alone agrees.
-    for (const { label, money: reading, rows } of compared.A.slice(0, 400)) {
+    for (const { label, money: reading, rows } of comparedOf("A").slice(0, 400)) {
       const reader = recordReading(reading, money);
       for (const [slot, row] of Object.entries(rows)) {
         if (row === null) continue;
@@ -289,7 +298,7 @@ describe("each pay.* row of A-record.json is chosen for its when conditions", ()
   it("a money slot's line is its first-fit row, refused only where the row claims what the booking did not take", () => {
     const refusedRows = new Set<string>();
     for (const flow of FLOWS)
-      for (const { money: reading, rows } of compared[flow]) {
+      for (const { money: reading, rows } of comparedOf(flow)) {
         for (const line of moneyLines(reading, record(flow))) {
           expect(line.row).toBe(rows[line.slot]);
           if (line.ok) {
@@ -315,7 +324,7 @@ describe("the one fee: the largest service fee, never above what was paid now", 
   it("a deposit booking's fee never exceeds the deposit, on every deposit booking of both flows", () => {
     let deposits = 0;
     for (const flow of FLOWS)
-      for (const { label, money: reading } of compared[flow]) {
+      for (const { label, money: reading } of comparedOf(flow)) {
         const paidNow = reading.ledger.paidnow;
         const fee = reading.oneFee.amount;
         if (paidNow !== null && paidNow.cents > 0 && fee !== null)
@@ -703,7 +712,7 @@ describe("the money home in the registry (T-586)", () => {
     expect(module.points).toEqual(MONEY_POINTS);
     for (const point of MONEY_POINTS) expect(isLabel(point), point).toBe(true);
     for (const flow of FLOWS)
-      for (const { money } of compared[flow].slice(0, 300))
+      for (const { money } of comparedOf(flow).slice(0, 300))
         for (const point of module.points) expect(isLabel(module.rule(point, { money })), point).toBe(true);
   });
 });
