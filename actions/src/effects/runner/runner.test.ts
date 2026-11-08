@@ -225,6 +225,48 @@ describe("effects runner: 5 network errors in 10 minutes write the outage row an
     expect(must(h.repo.results[0]).request).toEqual(fixture.request);
     expect(must(h.repo.results[0]).answer).toEqual(fixture.outcome);
   });
+
+  it("runs an outage row once more when the service is back (serviceBack's claim): a new run, on the same key", async () => {
+    const h = harness("2026-11-07T16:00:00Z");
+    const row: EffectRow = {
+      ...calendarWrite(),
+      state: "running",
+      tries: 0,
+      runs: 2,
+      firstTryAt: "2026-11-07T16:00:00Z",
+      errorCode: "503",
+    };
+    h.repo.put(
+      {
+        row,
+        version: 9,
+        claimedBy: "effects-runner-1",
+        claimLapsesAt: "2026-11-07T16:01:00Z",
+        lastTryAt: "2026-11-07T15:14:33Z",
+      },
+      COMMITTED,
+    );
+    const claimed: ClaimedEffect = {
+      effect: row as ClaimedEffect["effect"],
+      version: 9,
+      claimedFrom: "outage",
+      claimedBy: "effects-runner-1",
+      claimLapsesAt: "2026-11-07T16:01:00Z",
+    };
+    const port = new FakeKindPort(h.clock, () => ok("gcal-event-demo-0001"));
+
+    const rows = await h.clock.drive(h.runner("effects-runner-1", calendarPorts(port)).run([claimed]));
+
+    expect(rows).toEqual([
+      { effectId: row.effectId, kind: "calendar_write", end: "succeeded", refusal: null, calls: 1 },
+    ]);
+    expect(port.calls.map((call) => [call.attempt, call.idempotencyKey])).toEqual([[1, row.idempotencyKey]]);
+    expect(must(h.repo.results[0]).request.events[0]).toMatchObject({
+      id: `log-${row.effectId}-run-2-try-1-ok`,
+      oldValues: { state: "running", tries: 0, runs: 2 },
+      newValues: { state: "succeeded", tries: 1, runs: 2 },
+    });
+  });
 });
 
 // ---- 2 -------------------------------------------------------------------------------------------------------------
