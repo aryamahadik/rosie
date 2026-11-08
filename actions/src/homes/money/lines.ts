@@ -10,7 +10,8 @@
 
 import { pickRow, type RecordReading } from "../../finalize/slots/record";
 import type { RecordSlotName } from "../../finalize/slots/vocabulary";
-import { checkMoneyLine, type ClaimRefusal, type MoneyClaim } from "./claims";
+import { checkMoneyText, type ClaimRefusal, type MoneyClaim } from "./claims";
+import { recordGate } from "./gate";
 import { readMoney, type MoneyBooking, type MoneyReading } from "./money";
 import type { MoneyRecord } from "./record";
 
@@ -71,7 +72,8 @@ export function moneyLine(money: MoneyReading, record: MoneyRecord, slot: Record
   const row = firstFit(reading, slot);
   const text = row === null ? undefined : record.rows[slot]?.[row]?.text;
   if (row === null || text === undefined) return { slot, ok: false, row: null, refused: [], why: "noRow" };
-  const check = checkMoneyLine(text, money);
+  // The row is one of the record's rows, so it passes the money-topic gate (DL-182); its claims are checked on the booking.
+  const check = checkMoneyText(text, money, recordGate(record));
   if (!check.ok) return { slot, ok: false, row, refused: check.refused, why: "claims" };
   return { slot, ok: true, row, text, claims: check.claims };
 }
