@@ -8,6 +8,10 @@
 // keyed by v1's input-s1-02.json; K-03 v1.1 pairs that same plan, word for word, with input-s1-02's twin, whose term
 // facts hold its 15 and 2 (input-and-plan-s1-02.json). So the twin's call is answered with the double's S1-02 plan.
 // v1.1's fixtures are read by their v1.1 index entries (test-support.ts).
+//
+// Round 3 (DL-163): a price in words is refused unless a fact states its amount ("five dollars a booking" on the twin);
+// a month name in words is refused unless a fact holds it ("See you in October"); a term fact whose words hold "{{" is
+// refused before any call; and the model reads each term fact as a <term>, its words alone, never its source.
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -146,7 +150,7 @@ describe("one row's K-03 input gives its plan, through the recorded-model double
     }
   });
 
-  it("input-s1-02-v1.1.json gives plan-s1-02.json: the double's S1-02 plan, whose 15 and 2 the twin's term facts hold, from one Haiku call, each term read as a fact with its source and no slot", async () => {
+  it("input-s1-02-v1.1.json gives plan-s1-02.json: the double's S1-02 plan, whose 15 and 2 the twin's term facts hold, from one Haiku call, each term read as a <term>, its words alone: no slot, no source, no step id or K-01 path", async () => {
     const v1 = k03("input-s1-02.json") as ComposeInput;
     const twin = twinInput();
     const plan = k03("plan-s1-02.json");
@@ -178,8 +182,14 @@ describe("one row's K-03 input gives its plan, through the recorded-model double
     ]);
     expect(call?.body.messages).toEqual([{ role: "user", content: composeInputText(twin) }]);
     const turn = composeInputText(twin);
-    expect(turn.split("<fact source=").length - 1).toBe(4);
-    expect(turn).not.toContain("<fact slot=");
+    expect(turn.split("<term>").length - 1).toBe(4);
+    expect(turn).not.toContain("<fact ");
+    expect(turn).not.toContain("<fact>");
+    // The sources stay in the input, for the checks; none of their words reaches the model (DL-163 rule 4).
+    expect(turn).not.toContain("source");
+    for (const fact of twin.facts) if ("source" in fact) expect(turn).not.toContain(fact.source);
+    for (const marker of ["S1-02", "K-01", "flows.A", "MASTER-FLOW", "RULES", "arch 12"])
+      expect(turn, marker).not.toContain(marker);
     expect(call?.body.output_config).toEqual({
       effort: "low",
       format: { type: "json_schema", schema: PLAN_SCHEMA },
@@ -260,6 +270,25 @@ describe("a typed refusal, never a plan", () => {
         { check: "formatNotAllowed", at: "formats[2]" },
       ],
     });
+  });
+
+  it("a term fact whose words hold '{{' is refused before any call, though v1.1's schema takes it (DL-163 rule 3): the filler would fill the business's fee into Rosie's own fee line", async () => {
+    const twin = twinInput();
+    const slotted = {
+      ...twin,
+      facts: twin.facts.map((fact, k) =>
+        k === 3 ? { ...fact, value: "{{fee}} a booking, counted at its check-in or DONE" } : fact,
+      ),
+    } as ComposeInput;
+    expect(v1dot1Errors("composeInput", slotted)).toEqual([]);
+    const api = fakeComposerApi([]);
+    expect(await composerOn(api.fetch).compose(slotted)).toEqual({
+      status: "refused",
+      stage: "input",
+      problems: [{ check: "input", at: "facts[3]" }],
+      modelCalls: [],
+    });
+    expect(api.calls).toHaveLength(0);
   });
 
   it("a 'hold' slot is refused (refuse-hold-slot.json)", async () => {
@@ -399,6 +428,62 @@ describe("no plan carries a literal number, date or price the input's facts do n
       ).toEqual(["lines[1].text"]);
       expect(rules.numbersHeldByFacts({ input: twin, plan: withFactLine(text) }), what).toHaveLength(1);
     }
+  });
+
+  it("a price in words (DL-163 rule 1): on the S1-02 twin, '... · five dollars a booking' is refused for its price, though the twin's 'About 5 minutes' holds the digit 5; the amount a term fact states, in words, is held", async () => {
+    const twin = twinInput();
+    const plan = k03("plan-s1-02.json") as MessagePlan;
+    const factLine = plan.lines[1]?.text ?? "";
+    const withFactLine = (text: string): MessagePlan => ({
+      ...plan,
+      lines: plan.lines.map((line, k) => (k === 1 ? { ...line, text } : line)),
+    });
+    const fiveDollars = withFactLine(`${factLine} · five dollars a booking`);
+    const refused = await composeRow(twin, fiveDollars);
+    expect(refused.answer).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: [{ check: "literalValue", at: "lines[1].text", kind: "price" }],
+      modelCalls: expect.any(Array) as unknown,
+    });
+    expect(refused.api.calls).toHaveLength(1);
+    expect(JSON.stringify(refused.answer)).not.toMatch(/five|dollars/iu);
+    // The named rule states digits only, so it passes this plan: a price in words is this check's (README line 87).
+    expect(rules.numbersHeldByFacts({ input: twin, plan: fiveDollars })).toEqual([]);
+    // Rosie's fee term states $2: the same amount in words, English or Spanish, is held.
+    for (const words of ["two dollars a booking", "two bucks a booking", "dos dólares por reserva"]) {
+      const held = await composeRow(
+        twin,
+        withFactLine(`About 15 minutes for your first kind of work · Free to use · ${words}`),
+      );
+      expect(held.answer.status, words).toBe("ok");
+    }
+  });
+
+  it("a date in words (DL-163 rule 2): 'See you in October' is refused unless a fact holds October; the row's 'Sat Oct 24' holds Oct, not October", async () => {
+    const input = recordedInput("confirmation-a6-14");
+    const october = confirmationWith(4, "See you in October");
+    const refused = await composeRow(input, october);
+    expect(refused.answer).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: [{ check: "literalValue", at: "lines[4].text", kind: "date" }],
+      modelCalls: expect.any(Array) as unknown,
+    });
+    expect(JSON.stringify(refused.answer)).not.toContain("October");
+    const holdsOctober: ComposeInput = {
+      ...input,
+      facts: input.facts.map((fact) =>
+        "slot" in fact && fact.slot === "day" ? { ...fact, value: "Saturday, October 24" } : fact,
+      ),
+    };
+    const held = await composeRow(holdsOctober, october);
+    expect(held.answer.status).toBe("ok");
+    // The same for a day name, and in Spanish: the fact must hold the same word.
+    const saturday = await composeRow(input, confirmationWith(4, "See you Saturday"));
+    expect(saturday.answer).toMatchObject({ status: "refused", problems: [{ kind: "date" }] });
+    const octubre = await composeRow(input, confirmationWith(4, "Nos vemos en octubre"));
+    expect(octubre.answer).toMatchObject({ status: "refused", problems: [{ kind: "date" }] });
   });
 
   it("a value a fact holds is not refused here (the Values check after the fill matches it to that fact, arch 07 line 409), nor are a slot's example words", async () => {

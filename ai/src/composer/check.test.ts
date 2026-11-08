@@ -7,6 +7,9 @@
 //   - each refusal is typed: the frontier, a format outside the five, {{hold}}, a slot outside the vocabulary;
 //   - the literal-value check: a number, date or price typed outside the slots is refused unless a fact holds it, a
 //     slot fact or a term fact (facts[].value); on numbers it is K-03 v1.1's named rule numbersHeldByFacts exactly.
+// Round 3 (DL-163): prices written in words are literals, held only by a fact's value with the same amount (rule 1);
+// English month names join the date words, beside the Spanish ones and the day names (rule 2); the input check refuses
+// a term fact whose words hold "{{", one rule stricter than v1.1's schema (rule 3).
 
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -35,6 +38,7 @@ import {
   type InputFact,
   type MessagePlan,
 } from "./index";
+import { COMPOSER_EXAMPLES } from "./prompt";
 import {
   RECORDED_INPUTS,
   REPO_ROOT,
@@ -92,6 +96,18 @@ const inputs = (): ComposeInput[] => [
 type Path = readonly (string | number)[];
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+/**
+ * Whether an input has a fact with no slot (a term fact, if the schema takes it) whose words hold "{{": the one rule the
+ * input check adds to K-03 v1.1's composeInput (DL-163 rule 3).
+ */
+const termWordsHoldSlot = (input: unknown): boolean =>
+  isObject(input) &&
+  Array.isArray(input.facts) &&
+  (input.facts as unknown[]).some(
+    (fact) =>
+      isObject(fact) && !("slot" in fact) && typeof fact.value === "string" && fact.value.includes("{{"),
+  );
 
 /** Every node's path in a JSON value, the root first. */
 function pathsOf(value: unknown, at: Path = []): Path[] {
@@ -211,20 +227,23 @@ describe("the checks refuse exactly what K-03's own schema refuses", () => {
     expect(refused).toBeGreaterThan(500);
   });
 
-  it("inputProblems: K-03 v1.1's composeInput over K-03's input and its v1.1 twin, the double's five inputs, the frontier fixture, inputs mixing slot and term facts, and damaged copies of each", () => {
+  it("inputProblems: K-03 v1.1's composeInput, less a term fact whose words hold '{{' (DL-163 rule 3), over K-03's input and its v1.1 twin, the double's five inputs, the frontier fixture, inputs mixing slot and term facts, and damaged copies of each", () => {
     let compared = 0;
     let refused = 0;
     let termFactsAccepted = 0;
+    let slotInTermRefused = 0;
     const twin = twinInput();
     const confirmation = recordedInput("confirmation-a6-14");
     const mixed: ComposeInput = { ...confirmation, facts: [...confirmation.facts, ...twin.facts] };
     const all: unknown[] = [...inputs(), mixed, invalid("refuse-frontier-in-input.json")];
     for (const input of all) {
       for (const variant of [input, ...damagedCopies(input)]) {
-        const accepted = v1dot1Errors("composeInput", variant).length === 0;
+        const schemaAccepts = v1dot1Errors("composeInput", variant).length === 0;
+        const accepted = schemaAccepts && !termWordsHoldSlot(variant);
         expect(inputProblems(variant).length === 0, JSON.stringify(variant)).toBe(accepted);
         compared += 1;
         if (!accepted) refused += 1;
+        if (schemaAccepts && !accepted) slotInTermRefused += 1;
         const facts = isObject(variant) ? variant.facts : undefined;
         if (accepted && Array.isArray(facts) && facts.some((fact) => isObject(fact) && !("slot" in fact)))
           termFactsAccepted += 1;
@@ -233,6 +252,8 @@ describe("the checks refuse exactly what K-03's own schema refuses", () => {
     expect(compared).toBeGreaterThan(3000);
     expect(refused).toBeGreaterThan(1500);
     expect(termFactsAccepted).toBeGreaterThan(20);
+    // The damaged copies whose term words became "{{hold}}": v1.1's schema takes each, and the input check refuses it.
+    expect(slotInTermRefused).toBeGreaterThanOrEqual(8);
   });
 
   it("inputProblems still refuses exactly what K-03 v1's own schema refuses on every v1 input and its damaged copies: v1.1 adds term facts and loosens nothing else", () => {
@@ -287,13 +308,58 @@ describe("each refusal is typed", () => {
       expect(inputProblems(input), JSON.stringify(fact)).toEqual([{ check: "input", at: "facts[0]" }]);
     }
     // Words that only look odd are still a term's words: v1.1 holds a term to "some words" and its source, nothing more.
-    for (const value of ["Free to use\n", "{{fee}} a booking", " "]) {
+    for (const value of ["Free to use\n", " "]) {
       const input = withFacts([{ value, source: "S1-02's card" }]);
       expect(v1dot1Errors("composeInput", input), value).toEqual([]);
       expect(inputProblems(input), value).toEqual([]);
     }
+    // But for "{{": v1.1's schema takes "{{fee}} a booking" as a term's words, and the input check refuses it (DL-163).
+    const slotted = withFacts([{ value: "{{fee}} a booking", source: "S1-02's card" }]);
+    expect(v1dot1Errors("composeInput", slotted)).toEqual([]);
+    expect(inputProblems(slotted)).toEqual([{ check: "input", at: "facts[0]" }]);
     // The frontier is refused by name on a v1.1 input too.
     expect(inputProblems({ ...twin, frontier: [] })).toEqual([{ check: "frontier", at: "frontier" }]);
+  });
+
+  it("a term fact whose words hold '{{' is refused at its place, though v1.1's schema takes it (DL-163 rule 3; the security review's N3): the filler would fill that slot inside Rosie's own line", () => {
+    const twin = twinInput();
+    const fee = twin.facts[3];
+    if (fee === undefined || !("source" in fee))
+      throw new Error("the twin's fourth fact is Rosie's fee term");
+    const termWords = [
+      "{{fee}} a booking, counted at its check-in or DONE, explained before you go live",
+      "{{price}}",
+      "About {{visit.time}} minutes for your first kind of work",
+      "Free {{ to use",
+      "$2 a booking {{",
+    ];
+    for (const value of termWords) {
+      const input: ComposeInput = { ...twin, facts: [...twin.facts.slice(0, 3), { ...fee, value }] };
+      expect(v1dot1Errors("composeInput", input), value).toEqual([]);
+      expect(inputProblems(input), value).toEqual([{ check: "input", at: "facts[3]" }]);
+    }
+    // Each such term is named at its own place, beside the other problems of the input.
+    const two: ComposeInput = {
+      ...twin,
+      facts: [
+        { ...fee, value: "{{fee}} a booking" },
+        ...twin.facts.slice(1, 3),
+        { ...fee, value: "{{fee}}" },
+      ],
+    };
+    expect(inputProblems({ ...two, frontier: [] })).toEqual([
+      { check: "frontier", at: "frontier" },
+      { check: "input", at: "facts[0]" },
+      { check: "input", at: "facts[3]" },
+    ]);
+    // A single brace opens no slot, and a term's source is never filled or shown: neither is held to this rule.
+    for (const fact of [
+      { ...fee, value: "Free to use {" },
+      { ...fee, value: "Free to use }}" },
+      { ...fee, source: "S1-02's card, line 4 {{fee}}" },
+    ]) {
+      expect(inputProblems({ ...twin, facts: [fact] }), JSON.stringify(fact)).toEqual([]);
+    }
   });
 
   it("a format outside K-03's five: refuse-format-not-allowed.json's contact card", () => {
@@ -551,6 +617,115 @@ describe("no plan carries a literal number, date or price the input's facts do n
     expect(literalProblems(variant, held.input)).toEqual([
       { check: "literalValue", at: "lines[1].text", kind: "date" },
     ]);
+  });
+
+  // Round 3 (DL-163): dates and prices written in words, which K-03 README line 87 keeps with this check.
+  const FEE_TERM = {
+    value: "$2 a booking, counted at its check-in or DONE, explained before you go live",
+    source: "S1-02's card, line 4; RULES 3.15",
+  };
+  const SETUP_TERM = {
+    value: "About 15 minutes for your first kind of work",
+    source: "S1-02's card, line 1",
+  };
+  const LATER_TERM = { value: "About 5 minutes for each one after", source: "S1-02's card, line 2" };
+  const priced = (value: string): InputFact => ({ slot: "price", value });
+
+  it("a price in words is a literal (DL-163 rule 1): number words, then a money word, held when a fact's value states the same amount, in digits or in words", () => {
+    // Rosie's fee term states $2, so two dollars, said any way, is held.
+    expect(literals("Two dollars a booking.", [FEE_TERM])).toEqual([]);
+    expect(literals("It's two bucks a booking.", [FEE_TERM])).toEqual([]);
+    expect(literals("Dos dólares por reserva.", [FEE_TERM])).toEqual([]);
+    expect(literals("two hundred cents a booking", [FEE_TERM])).toEqual([]);
+    // Amounts in digits, held by words that say them.
+    expect(literals("Thirty-five dollars at the chair.", [priced("$35")])).toEqual([]);
+    expect(literals("Treinta y cinco dólares.", [priced("$35")])).toEqual([]);
+    expect(literals("Fifty cents more.", [priced("$0.50")])).toEqual([]);
+    expect(literals("Fifty cents more.", [priced("50¢")])).toEqual([]);
+    expect(literals("A dollar a booking.", [priced("$1")])).toEqual([]);
+    expect(literals("One hundred and fifty dollars in all.", [priced("$150")])).toEqual([]);
+    expect(literals("Mil quinientos dólares.", [priced("$1,500")])).toEqual([]);
+    expect(literals("A fifteen-dollar fee.", [priced("15 dollars")])).toEqual([]);
+    expect(literals("Veinte pesos.", [priced("20 pesos")])).toEqual([]);
+    // A fact that says its amount in words holds it in words too.
+    expect(
+      literals("Two dollars a booking.", [{ value: "two dollars a booking", source: "a card line" }]),
+    ).toEqual([]);
+  });
+
+  it("a price in words that no fact's value states is refused, though a fact holds the same number for something else, another currency or only in its source", () => {
+    // The S1-02 terms hold 5 and 15 as minutes and 2 as dollars: no five, fifteen or one dollars, and no cents.
+    const terms = [SETUP_TERM, LATER_TERM, FEE_TERM];
+    for (const words of [
+      "Five dollars a booking.",
+      "Fifteen bucks a booking.",
+      "A dollar a booking.",
+      "Fifty cents a booking.",
+      "Cinco dólares por reserva.",
+      "Un dólar por reserva.",
+      "Two euros a booking.",
+      "Two pesos a booking.",
+      "Twenty-five dollars.",
+      "Zero dollars to start.",
+    ])
+      expect(literals(words, terms), words).toEqual([problem("price")]);
+    // A source never holds an amount.
+    expect(
+      literals("Two dollars a booking.", [{ value: "Rosie's own fee", source: "RULES 3.15: $2" }]),
+    ).toEqual([problem("price")]);
+    // "$2.50" is not two dollars, and two dollars and fifty cents are two amounts, neither of them $2.50.
+    expect(literals("Two dollars a booking.", [priced("$2.50")])).toEqual([problem("price")]);
+    expect(literals("Two dollars and fifty cents.", [priced("$2.50")])).toEqual([problem("price")]);
+  });
+
+  it("a number word outside a price stays outside this check: with no money word after it, it is not a literal (DL-163)", () => {
+    expect(literals("One more thing: two people can come.")).toEqual([]);
+    expect(literals("About five minutes for each one after.")).toEqual([]);
+    expect(literals("Prices are in dollars, a booking at a time.")).toEqual([]);
+    expect(literals("Fifty percent of the visits.")).toEqual([]);
+    expect(literals("Free to use: no dollars, no cents.")).toEqual([]);
+  });
+
+  it("a date in words is a literal (DL-163 rule 2): the English month names beside the Spanish ones, and the English and Spanish day names, each held only by a fact's value with the same word", () => {
+    // "See you in October" is refused unless a fact holds October: "Sat Oct 24" holds Oct, not October.
+    expect(literals("See you in October.", [DAY])).toEqual([problem("date")]);
+    expect(literals("See you in October.", [{ slot: "day", value: "Saturday, October 24" }])).toEqual([]);
+    const words = [
+      ...["January", "February", "March", "April", "May", "June", "July", "August", "September"],
+      ...["October", "November", "December", "Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Sept"],
+      ...["Oct", "Nov", "Dec", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      ...["Mon", "Tue", "Tues", "Wed", "Thu", "Thur", "Thurs", "Fri", "Sat", "Sun", "Saturdays", "Sundays"],
+      ...["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre"],
+      ...["noviembre", "diciembre", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+      ...["miercoles", "sabado", "sábados", "domingos"],
+    ];
+    for (const word of words) {
+      expect(literals(`See you ${word}.`), word).toEqual([problem("date")]);
+      expect(literals(`See you ${word}.`, [{ slot: "day", value: `${word} 24` }]), word).toEqual([]);
+    }
+    // The full names that are no everyday word are read in any case; Spanish ones too.
+    for (const typed of ["see you in october", "SEE YOU SATURDAY", "Te vemos el SÁBADO", "hasta el Lunes"])
+      expect(literals(typed), typed).toEqual([problem("date")]);
+    // An accent typed as its own mark (U+0301, the combining acute) reads the same, as the check reads NFC.
+    const decomposed = `Te vemos el sa${String.fromCodePoint(0x301)}bado.`;
+    expect(decomposed.normalize("NFC")).not.toBe(decomposed);
+    expect(literals(decomposed)).toEqual([problem("date")]);
+  });
+
+  it("words that only look like a month stay words: may, march and august in lowercase, as round 1 kept sat and may", () => {
+    expect(literals("You may cancel; we march on in an august hall.")).toEqual([]);
+    expect(literals("She sat down; you may cancel.")).toEqual([]);
+    // Capitalized, they are month names, held as any date word is.
+    expect(literals("May we see you in March?", [{ slot: "day", value: "May 3" }])).toEqual([
+      problem("date"),
+    ]);
+    expect(literals("See you in March.", [{ slot: "day", value: "Tue March 3" }])).toEqual([]);
+  });
+
+  it("the prompt's five worked examples, whose plans the model learns from, still pass the whole check against their own inputs", () => {
+    expect(COMPOSER_EXAMPLES).toHaveLength(5);
+    for (const { title, input, plan } of COMPOSER_EXAMPLES)
+      expect(planAgainstInput(plan, input), title).toEqual([]);
   });
 });
 

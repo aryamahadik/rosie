@@ -5,15 +5,15 @@
 //
 //   1. The input is checked as a K-03 v1.1 composeInput (check.ts): its facts are slot facts and term facts (Rosie's
 //      own fixed terms that the step's card states, each with its source line: README "v1.1"); one carrying the
-//      frontier, or any other field, is a typed refusal before any call.
+//      frontier, or any other field, or a term whose words hold "{{" (DL-163), is a typed refusal before any call.
 //   2. One call through the AI gateway (T-361) with T-364's cache markers, Haiku first: the bundle's composer prompt
 //      (T-372, K-01 manifest.prompts.composer) is the cached system prompt, and the row's tagged input
 //      (composeInputText, every value escaped as data: S13-54 rule 67) is the per-turn part. The structured-output
 //      schema is K-03's plan, bundled and static (schema.ts). The gateway retries Haiku once, then asks Sonnet once,
 //      then answers modelsDown.
 //   3. The answer is checked before it leaves the AI layer (check.ts): a K-03 v1 plan (v1.1 leaves the plan as it is);
-//      its formats from the row's allowedFormats; no number, date or price typed in its words that no fact of the row,
-//      a slot fact or a term fact, holds. Any failure is a typed refusal, never a plan.
+//      its formats from the row's allowedFormats; no number, date or price typed in its words, in digits or in words,
+//      that no fact of the row, a slot fact or a term fact, holds. Any failure is a typed refusal, never a plan.
 //
 // Rows of one turn are composed side by side by calling compose once per row (each call is independent). An email copy
 // takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines, the message checks and the

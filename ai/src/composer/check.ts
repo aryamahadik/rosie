@@ -3,6 +3,8 @@
 //
 //   inputProblems   the input is a K-03 v1.1 `composeInput` (each fact a slot fact or a term fact; every v1 input is
 //                   one), and carries no frontier (arch 07 line 397: "never the frontier"; refuse-frontier-in-input.json);
+//                   one rule stricter than the schema: no term fact's words hold "{{" (DL-163 rule 3), since the filler
+//                   would fill that slot inside Rosie's own line, such as the business's late-cancel fee in Rosie's fee;
 //   planProblems    the answer is a K-03 v1 `plan` (refuse-format-not-allowed.json: a format outside the five;
 //                   refuse-hold-slot.json: {{hold}}, refused since D66);
 //   allowedFormatProblems  each format is one the input's allowedFormats lists (arch 07 line 365);
@@ -11,7 +13,10 @@
 //                   facts are composeInput.facts[].value, slot facts' and term facts' alike, never a term's source (K-03
 //                   v1.1 README "Where the composer's literal check reads these facts"). Its numbers are K-03 v1.1's
 //                   named rule numbersHeldByFacts exactly: every run of digits outside the slots is held by a run of
-//                   some fact's value; dates written in words are held the same way, by a fact's words.
+//                   some fact's value. Dates and prices written in words are the check's alone (README line 87;
+//                   DL-163): a day or month name, or a day said in words, is held by a fact's value with the same word;
+//                   a price in words ("two dollars", "dos dólares") by a fact's value with the same amount of money, in
+//                   digits or in words.
 //
 // Structured outputs keep a model to its schema, but a refusal or a cut-off answer may not match it (T-360 finding 4),
 // and no grammar knows the row's allowed formats or facts, so every answer is checked. The Worker cannot run Ajv (it
@@ -112,11 +117,20 @@ const isSlotFact = (value: unknown): boolean =>
   exactKeys(value, ["slot", "value"]) &&
   isIn(SLOT_NAMES, value.slot) &&
   isText(value.value);
-/** A term fact (K-03 v1.1 `termFact`): one of Rosie's own fixed terms, its words and its source line, and no slot. */
+/**
+ * Words that hold "{{": a slot, or the start of one. Rosie's own term never does (DL-163 rule 3; the security review's
+ * N3): the filler would fill it inside Rosie's own line, so such a term is refused, though v1.1's pattern "." takes it.
+ */
+const holdsSlot = (words: unknown): boolean => typeof words === "string" && words.includes("{{");
+/**
+ * A term fact (K-03 v1.1 `termFact`): one of Rosie's own fixed terms, its words and its source line, and no slot; its
+ * words hold no "{{".
+ */
 const isTermFact = (value: unknown): boolean =>
   isRecord(value) &&
   exactKeys(value, ["value", "source"]) &&
   matches(TERM_FACT_VALUE, value.value) &&
+  !holdsSlot(value.value) &&
   matches(TERM_FACT_SOURCE, value.source);
 /** One fact of the input (K-03 v1.1 `inputFact`): a slot fact or a term fact. */
 const isFact = (value: unknown): boolean => isSlotFact(value) || isTermFact(value);
@@ -142,8 +156,8 @@ function listPlaces(value: unknown, at: string, item: (entry: unknown) => boolea
 }
 
 /**
- * Each way `value` is not a K-03 v1.1 `composeInput`, one problem per place; a frontier field is its own check. Empty
- * when the input is whole.
+ * Each way `value` is not a K-03 v1.1 `composeInput`, one problem per place; a frontier field is its own check, and a
+ * term fact whose words hold "{{" is refused at its place (DL-163 rule 3). Empty when the input is whole.
  */
 export function inputProblems(value: unknown): ComposeProblem[] {
   if (!isRecord(value)) return [{ check: "input", at: "(root)" }];
@@ -260,7 +274,10 @@ export function allowedFormatProblems(plan: MessagePlan, input: ComposeInput): C
 
 // ---------------------------------------------------------------------------------------------------------------
 // Literal values: what a number, a date or a price looks like in a plan's own words (arch 07 line 409: each number,
-// time, date, price, code, phone, link and name), read the way T-372's prompt test reads its examples' words.
+// time, date, price, code, phone, link and name), read the way T-372's prompt test reads its examples' words. Dates
+// and prices written in words are literals too (K-03 README line 87: "Dates and prices written in words, such as
+// 'Saturday' or 'two dollars', stay with the composer's literal check"; DL-163 rules 1 and 2). A number word outside a
+// price ("one more thing") is not one: the Values check after the fill is its backstop (DL-163).
 
 /** A slot in words K-03's pattern accepts: every {{ opens one, and a slot holds no brace. */
 const SLOT_ANYWHERE = /\{\{[^{}]*\}\}/gu;
@@ -272,15 +289,22 @@ const DATES_WITH_DIGITS = [
   /\d{4}-\d{2}-\d{2}/gu,
   /(?<!\p{L})(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\p{L}*\.?\s+\d{1,2}(?!\d)/gu,
 ];
+/**
+ * Dates in words (DL-163 rule 2), each held only by a fact's value with the same word: the English day names (and their
+ * plurals) and month names in full, in any case, but for May, March and August, which with every short form ("Sat",
+ * "Oct") count only as written, capitalized, so "you may cancel", "we march on" and "she sat down" stay words; the days
+ * said in words; the Spanish day names (with and without their accent, and the plurals sábados and domingos) and month
+ * names, in any case.
+ */
 const DATE_WORDS = [
-  /(?<!\p{L})(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tues|Tue|Wed|Thurs|Thur|Thu|Fri|Sat|Sun)(?!\p{L})/gu,
+  /(?<!\p{L})(?:Mondays?|Tuesdays?|Wednesdays?|Thursdays?|Fridays?|Saturdays?|Sundays?|January|February|April|June|July|September|October|November|December)(?!\p{L})/giu,
+  /(?<!\p{L})(?:May|March|August|Mon|Tues|Tue|Wed|Thurs|Thur|Thu|Fri|Sat|Sun|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)(?!\p{L})/gu,
   /(?<!\p{L})(?:today|tomorrow|tonight|yesterday)(?!\p{L})/giu,
-  /(?<!\p{L})(?:lunes|martes|miércoles|jueves|viernes|sábado|domingo|hoy|mañana|ayer)(?!\p{L})/giu,
-  /(?<!\p{L})(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)(?!\p{L})/giu,
+  /(?<!\p{L})(?:lunes|martes|miércoles|miercoles|jueves|viernes|sábados?|sabados?|domingos?|hoy|mañana|ayer)(?!\p{L})/giu,
+  /(?<!\p{L})(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)(?!\p{L})/giu,
 ];
 const DIGITS = /\d+/gu;
 const WORD = /\p{L}+/gu;
-const ALL_DIGITS = /^\d+$/u;
 
 interface Found {
   readonly start: number;
@@ -303,40 +327,333 @@ const digitRuns = (text: string): string[] => found(DIGITS, text).map((run) => r
 const wordsIn = (text: string): string[] => found(WORD, text).map((word) => word.text.toLowerCase());
 const overlaps = (a: Found | Literal, b: Found | Literal): boolean => a.start < b.end && b.start < a.end;
 
-/** One literal value in words: its kind and the parts a fact must hold, each digit run and each date word. */
+// Prices in words (DL-163 rule 1): number words, then a money word ("two dollars", "a buck", "fifty cents", "dos
+// dólares", "treinta y cinco dólares"). Such a price is held only by a fact's value that states the same amount of
+// money, in digits or in words: "$2 a booking" holds "two dollars", but "About 5 minutes" holds no "five dollars".
+
+/** What a money word or sign names: a currency, counted in its whole units or in its hundredths (cents). */
+interface MoneyUnit {
+  readonly currency: string;
+  readonly hundredths: boolean;
+}
+const DOLLAR: MoneyUnit = { currency: "USD", hundredths: false };
+const CENT: MoneyUnit = { currency: "USD", hundredths: true };
+const EURO: MoneyUnit = { currency: "EUR", hundredths: false };
+const EURO_CENT: MoneyUnit = { currency: "EUR", hundredths: true };
+const PESO: MoneyUnit = { currency: "PESO", hundredths: false };
+
+/**
+ * The money words a price ends with, in English and Spanish, lowercased, each with what it names. No pound: "fifty
+ * pounds" may be a dog's weight.
+ */
+const MONEY_WORDS: ReadonlyMap<string, MoneyUnit> = new Map([
+  ["dollar", DOLLAR],
+  ["dollars", DOLLAR],
+  ["buck", DOLLAR],
+  ["bucks", DOLLAR],
+  ["usd", DOLLAR],
+  ["dólar", DOLLAR],
+  ["dólares", DOLLAR],
+  ["dolar", DOLLAR],
+  ["dolares", DOLLAR],
+  ["cent", CENT],
+  ["cents", CENT],
+  ["centavo", CENT],
+  ["centavos", CENT],
+  ["euro", EURO],
+  ["euros", EURO],
+  ["eur", EURO],
+  ["céntimo", EURO_CENT],
+  ["céntimos", EURO_CENT],
+  ["centimo", EURO_CENT],
+  ["centimos", EURO_CENT],
+  ["peso", PESO],
+  ["pesos", PESO],
+]);
+/** The signs, written before digits, of the currencies a money word names; "¢" is written after them. */
+const MONEY_SIGNS: ReadonlyMap<string, MoneyUnit> = new Map([
+  ["$", DOLLAR],
+  ["€", EURO],
+]);
+
+/** Number words with their values: each word of `words`, the first worth `first` and each next one `step` more. */
+function counted(words: string, first: number, step: number): [string, number][] {
+  return words.split(" ").map((word, k): [string, number] => [word, first + step * k]);
+}
+
+const EN_UNITS: ReadonlyMap<string, number> = new Map(
+  counted(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen",
+    0,
+    1,
+  ),
+);
+const EN_TENS: ReadonlyMap<string, number> = new Map(
+  counted("twenty thirty forty fifty sixty seventy eighty ninety", 20, 10),
+);
+const EN_SCALES: ReadonlyMap<string, number> = new Map([
+  ["thousand", 1000],
+  ["million", 1_000_000],
+]);
+/** Spanish 0 to 19 and 21 to 29 (20 is a ten), then their other spellings: un and una, and the words without accents. */
+const ES_UNITS: ReadonlyMap<string, number> = new Map([
+  ...counted(
+    "cero uno dos tres cuatro cinco seis siete ocho nueve diez once doce trece catorce quince dieciséis diecisiete dieciocho diecinueve",
+    0,
+    1,
+  ),
+  ...counted(
+    "veintiuno veintidós veintitrés veinticuatro veinticinco veintiséis veintisiete veintiocho veintinueve",
+    21,
+    1,
+  ),
+  ...counted("un una", 1, 0),
+  ...counted("veintiún veintiun veintiuna", 21, 0),
+  ...counted("dieciseis", 16, 0),
+  ...counted("veintidos veintitres", 22, 1),
+  ...counted("veintiseis", 26, 0),
+]);
+const ES_TENS: ReadonlyMap<string, number> = new Map(
+  counted("veinte treinta cuarenta cincuenta sesenta setenta ochenta noventa", 20, 10),
+);
+/** Spanish hundreds, in both genders; cien and ciento are 100. */
+const ES_HUNDREDS: ReadonlyMap<string, number> = new Map([
+  ...counted("cien ciento", 100, 0),
+  ...counted(
+    "doscientos trescientos cuatrocientos quinientos seiscientos setecientos ochocientos novecientos",
+    200,
+    100,
+  ),
+  ...counted(
+    "doscientas trescientas cuatrocientas quinientas seiscientas setecientas ochocientas novecientas",
+    200,
+    100,
+  ),
+]);
+
+/** Every word that can be part of a number said in words, in English or Spanish, "and" and "y" between its parts included. */
+const NUMBER_WORDS: ReadonlySet<string> = new Set([
+  "a",
+  "and",
+  "hundred",
+  "y",
+  "mil",
+  ...[EN_UNITS, EN_TENS, EN_SCALES, ES_UNITS, ES_TENS, ES_HUNDREDS].flatMap((words) => [...words.keys()]),
+]);
+
+/**
+ * The number some English words say, the whole of them, or undefined: "two", "twenty-five" (as "twenty", "five"),
+ * "a hundred and fifty", "fifteen hundred", "two thousand five hundred"; "a" is 1 only first ("a dollar", "a hundred").
+ */
+function englishNumber(words: readonly string[]): number | undefined {
+  let total = 0;
+  let group = 0;
+  let last: "start" | "a" | "unit" | "teen" | "tens" | "hundred" | "scale" | "and" = "start";
+  for (const word of words) {
+    const unit = EN_UNITS.get(word);
+    const tens = EN_TENS.get(word);
+    const scale = EN_SCALES.get(word);
+    // Where a new part of the number may start: first, or after a hundred, a thousand or "and".
+    const partMayStart = last === "start" || last === "hundred" || last === "scale" || last === "and";
+    if (word === "a" && last === "start") {
+      group = 1;
+      last = "a";
+    } else if (word === "and" && (last === "hundred" || last === "scale")) {
+      last = "and";
+    } else if (unit !== undefined && (partMayStart || (last === "tens" && unit >= 1 && unit <= 9))) {
+      group += unit;
+      last = unit < 10 ? "unit" : "teen";
+    } else if (tens !== undefined && partMayStart) {
+      group += tens;
+      last = "tens";
+    } else if (word === "hundred" && last !== "hundred" && last !== "and") {
+      group = (group === 0 ? 1 : group) * 100;
+      last = "hundred";
+    } else if (scale !== undefined && last !== "scale" && last !== "and") {
+      total += (group === 0 ? 1 : group) * scale;
+      group = 0;
+      last = "scale";
+    } else {
+      return undefined;
+    }
+  }
+  return last === "start" || last === "and" ? undefined : total + group;
+}
+
+/**
+ * The number some Spanish words say, the whole of them, or undefined: "dos", "veinticinco", "treinta y cinco",
+ * "ciento cincuenta", "dos mil quinientos"; "y" joins only tens and units.
+ */
+function spanishNumber(words: readonly string[]): number | undefined {
+  let total = 0;
+  let group = 0;
+  let last: "start" | "unit" | "tens" | "y" | "hundreds" | "mil" = "start";
+  for (const word of words) {
+    const unit = ES_UNITS.get(word);
+    const tens = ES_TENS.get(word);
+    const hundreds = ES_HUNDREDS.get(word);
+    const groupStart = last === "start" || last === "hundreds" || last === "mil";
+    if (word === "y" && last === "tens") {
+      last = "y";
+    } else if (unit !== undefined && (groupStart || (last === "y" && unit >= 1 && unit <= 9))) {
+      group += unit;
+      last = "unit";
+    } else if (tens !== undefined && groupStart) {
+      group += tens;
+      last = "tens";
+    } else if (hundreds !== undefined && (last === "start" || last === "mil")) {
+      group += hundreds;
+      last = "hundreds";
+    } else if (word === "mil" && last !== "mil" && last !== "y") {
+      total += (group === 0 ? 1 : group) * 1000;
+      group = 0;
+      last = "mil";
+    } else {
+      return undefined;
+    }
+  }
+  return last === "start" || last === "y" ? undefined : total + group;
+}
+
+/** An amount of money as one atom: its currency and its value in hundredths ("USD 200" for $2 or two dollars). */
+const amountOf = (unit: MoneyUnit, value: number): string =>
+  `${unit.currency} ${String(Math.round(unit.hundredths ? value : value * 100))}`;
+
+/** At most this many number words make one amount: "two thousand five hundred and twenty-five" is seven. */
+const MAX_NUMBER_WORDS = 12;
+/** What may join the words of a number said in words, and the number to its money word: spaces and hyphens. */
+const JOINER = /^[-\s]+$/u;
+
+/** One price in words: where it starts and ends, and its amount. */
+interface WordPrice extends Found {
+  readonly amount: string;
+}
+
+/**
+ * The prices in words of a text: each money word with the number words right before it, joined by spaces or hyphens
+ * ("fifteen-dollar fee"). The amount is the longest run of those words, ending at the money word, that says one number
+ * in English or in Spanish: "a five-dollar fee" is five dollars, and "a dollar" is one.
+ */
+function wordPricesIn(text: string): WordPrice[] {
+  const words = found(WORD, text);
+  /** Whether the word before word k is a number word, joined to word k by spaces or hyphens alone. */
+  const numberWordBefore = (k: number): boolean => {
+    const before = words[k - 1];
+    const after = words[k];
+    return (
+      before !== undefined &&
+      after !== undefined &&
+      NUMBER_WORDS.has(before.text.toLowerCase()) &&
+      JOINER.test(text.slice(before.end, after.start))
+    );
+  };
+  const prices: WordPrice[] = [];
+  words.forEach((money, at) => {
+    const unit = MONEY_WORDS.get(money.text.toLowerCase());
+    if (unit === undefined) return;
+    let from = at;
+    while (at - from < MAX_NUMBER_WORDS && numberWordBefore(from)) from -= 1;
+    for (let start = from; start < at; start += 1) {
+      const said = words.slice(start, at).map((word) => word.text.toLowerCase());
+      const value = englishNumber(said) ?? spanishNumber(said);
+      const first = words[start];
+      if (value !== undefined && first !== undefined) {
+        prices.push({
+          start: first.start,
+          end: money.end,
+          text: text.slice(first.start, money.end),
+          amount: amountOf(unit, value),
+        });
+        break;
+      }
+    }
+  });
+  return prices;
+}
+
+/**
+ * A number in digits as a price writes it, or undefined: "2", "2.50", "1,200", "1,200.50"; a comma before its last one
+ * or two digits is a decimal comma ("2,50"); a stop or comma ending a sentence is not part of it.
+ */
+function priceNumber(digits: string): number | undefined {
+  const text = digits.replace(/[.,]+$/u, "");
+  if (/^\d{1,3}(?:,\d{3})+(?:\.\d+)?$/u.test(text)) return Number(text.replace(/,/gu, ""));
+  if (/^\d+,\d{1,2}$/u.test(text)) return Number(text.replace(",", "."));
+  if (/^\d+(?:\.\d+)?$/u.test(text)) return Number(text);
+  return undefined;
+}
+
+const SIGN_THEN_DIGITS = /([$€])\s*(\d[\d.,]*)/gu;
+const DIGITS_THEN_WORD = /(\d[\d.,]*)\s*(\p{L}+)/gu;
+const DIGITS_THEN_CENTS = /(\d[\d.,]*)\s*¢/gu;
+
+/**
+ * Every amount of money a fact's value states, in digits ("$2", "2 dollars", "50¢") or in words ("two dollars"), each
+ * as one atom: "$2 a booking" states "USD 200".
+ */
+function amountsIn(text: string): string[] {
+  const amounts: string[] = [];
+  const add = (unit: MoneyUnit | undefined, digits: string | undefined): void => {
+    const value = priceNumber(digits ?? "");
+    if (unit !== undefined && value !== undefined) amounts.push(amountOf(unit, value));
+  };
+  for (const match of text.matchAll(SIGN_THEN_DIGITS)) add(MONEY_SIGNS.get(match[1] ?? ""), match[2]);
+  for (const match of text.matchAll(DIGITS_THEN_WORD))
+    add(MONEY_WORDS.get((match[2] ?? "").toLowerCase()), match[1]);
+  for (const match of text.matchAll(DIGITS_THEN_CENTS)) add(CENT, match[1]);
+  for (const price of wordPricesIn(text)) amounts.push(price.amount);
+  return amounts;
+}
+
+/** What a fact's value must hold for a literal to be held: a run of digits, a date word, or an amount of money. */
+interface Atom {
+  readonly kind: "digits" | "word" | "amount";
+  readonly text: string;
+}
+
+/** One literal value in words: its kind and the atoms a fact must hold. */
 interface Literal {
   readonly start: number;
   readonly end: number;
   readonly kind: LiteralKind;
-  readonly atoms: readonly string[];
+  readonly atoms: readonly Atom[];
 }
 
 /**
- * The literal values in words outside slots: prices, dates and times, date words, and any other digits. A literal's
- * digits are the whole runs of digits of the words it touches, never part of one ("10/255" holds 10 and 255), and a
- * run no price or date touches is a number of its own, so every run of digits is an atom of some literal: the runs
- * K-03 v1.1's numbersHeldByFacts reads, each held or refused as that rule holds it.
+ * The literal values in words outside slots: prices in digits and in words, dates and times, date words, and any other
+ * digits. A literal's digits are the whole runs of digits of the words it touches, never part of one ("10/255" holds 10
+ * and 255), and a run no price or date touches is a number of its own, so every run of digits is an atom of some
+ * literal: the runs K-03 v1.1's numbersHeldByFacts reads, each held or refused as that rule holds it. A price in words
+ * holds no digit; its atom is its amount.
  */
 function literalsIn(words: string): Literal[] {
   const runs = found(DIGITS, words);
-  const runsTouching = (match: Found): string[] =>
-    runs.filter((run) => overlaps(run, match)).map((run) => run.text);
+  const runsTouching = (match: Found): Atom[] =>
+    runs.filter((run) => overlaps(run, match)).map((run): Atom => ({ kind: "digits", text: run.text }));
   const literals: Literal[] = [];
-  const take = (
-    patterns: readonly RegExp[],
-    kind: LiteralKind,
-    atomsOf: (match: Found) => string[],
-  ): void => {
+  const take = (patterns: readonly RegExp[], kind: LiteralKind, atomsOf: (match: Found) => Atom[]): void => {
     for (const pattern of patterns)
       for (const match of found(pattern, words))
         literals.push({ start: match.start, end: match.end, kind, atoms: atomsOf(match) });
   };
   take(PRICES, "price", runsTouching);
+  for (const price of wordPricesIn(words))
+    literals.push({
+      start: price.start,
+      end: price.end,
+      kind: "price",
+      atoms: [{ kind: "amount", text: price.amount }],
+    });
   take(DATES_WITH_DIGITS, "date", runsTouching);
-  take(DATE_WORDS, "date", (match) => [match.text.toLowerCase()]);
+  take(DATE_WORDS, "date", (match) => [{ kind: "word", text: match.text.toLowerCase() }]);
   for (const run of runs) {
     if (!literals.some((literal) => overlaps(run, literal)))
-      literals.push({ start: run.start, end: run.end, kind: "number", atoms: [run.text] });
+      literals.push({
+        start: run.start,
+        end: run.end,
+        kind: "number",
+        atoms: [{ kind: "digits", text: run.text }],
+      });
   }
   return literals;
 }
@@ -344,16 +661,19 @@ function literalsIn(words: string): Literal[] {
 /**
  * Each words field of the plan (its lines' text and its question's) that types a number, a date or a price outside its
  * slots that no fact of the input holds: one problem per field and kind. A digit run is held when a fact's value, a
- * slot fact's or a term fact's, has the same digit run; a date word when a fact's value has that word. A term fact holds
- * a literal only by its own words, never by its source. Words inside a slot, its example words included, are code's to
- * replace, so they are never literals.
+ * slot fact's or a term fact's, has the same digit run; a date word when a fact's value has that word; a price in words
+ * when a fact's value states the same amount of money, in digits or in words. A term fact holds a literal only by its
+ * own words, never by its source. Words inside a slot, its example words included, are code's to replace, so they are
+ * never literals. Words are read in one Unicode form (NFC), so an accent typed as its own mark reads the same.
  */
 export function literalProblems(plan: MessagePlan, input: ComposeInput): ComposeProblem[] {
-  const values = input.facts.map((fact) => fact.value);
-  const heldDigits = new Set(values.flatMap(digitRuns));
-  const heldWords = new Set(values.flatMap(wordsIn));
-  const held = (atom: string): boolean =>
-    ALL_DIGITS.test(atom) ? heldDigits.has(atom) : heldWords.has(atom);
+  const values = input.facts.map((fact) => fact.value.normalize("NFC"));
+  const held: Readonly<Record<Atom["kind"], ReadonlySet<string>>> = {
+    digits: new Set(values.flatMap(digitRuns)),
+    word: new Set(values.flatMap(wordsIn)),
+    amount: new Set(values.flatMap(amountsIn)),
+  };
+  const isHeld = (atom: Atom): boolean => held[atom.kind].has(atom.text);
   const fields: [string, string][] = plan.lines.map((line, k): [string, string] => [
     `lines[${String(k)}].text`,
     line.text,
@@ -362,8 +682,8 @@ export function literalProblems(plan: MessagePlan, input: ComposeInput): Compose
 
   const problems: ComposeProblem[] = [];
   for (const [at, words] of fields) {
-    for (const literal of literalsIn(words.replace(SLOT_ANYWHERE, " "))) {
-      if (literal.atoms.every(held)) continue;
+    for (const literal of literalsIn(words.normalize("NFC").replace(SLOT_ANYWHERE, " "))) {
+      if (literal.atoms.every(isHeld)) continue;
       if (!problems.some((problem) => problem.at === at && problem.kind === literal.kind))
         problems.push({ check: "literalValue", at, kind: literal.kind });
     }

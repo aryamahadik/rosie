@@ -13,7 +13,8 @@ export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
 /**
  * Why a row is refused: a label and a place, never words (K-08 README: no message words in a span or a log line).
  *
- *   input             the input is not a K-03 v1.1 composeInput;
+ *   input             the input is not a K-03 v1.1 composeInput, or a term fact's words hold "{{" (DL-163 rule 3: the
+ *                     filler would fill that slot inside Rosie's own line);
  *   frontier          the input carries the frontier, which the composer never gets (arch 07 line 397;
  *                     refuse-frontier-in-input.json);
  *   plan              the model's answer is not a K-03 v1 plan;
@@ -23,7 +24,7 @@ export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
  *   unknownSlot       a {{ that opens no slot of K-03's vocabulary;
  *   literalValue      a number, date or price typed in the plan's words, outside its slots, that no fact of the input
  *                     holds, a slot fact or a term fact (rule 4: code fills every value; arch 07 lines 403 and 409;
- *                     K-03 v1.1 README "v1.1").
+ *                     K-03 v1.1 README "v1.1"); dates and prices written in words among them (DL-163).
  */
 export const REFUSAL_CHECKS = [
   "input",
