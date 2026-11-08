@@ -51,7 +51,10 @@ interface RefusedFixture {
 const readCore = (relative: string): unknown => JSON.parse(readFileSync(new URL(relative, CORE_DIR), "utf8"));
 
 const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).tables;
-/** Every table the migrations make: K-04 v1 core, and K-29 v1 conversations and consent (T-192). */
+/**
+ * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), and K-37 v1 platform and
+ * review (T-193).
+ */
 const ALL_TABLES = [
   ...TABLES,
   ...(
@@ -61,6 +64,14 @@ const ALL_TABLES = [
           "../../contracts/db-schema/conversations-consent/conversations-consent.v1.tables.json",
           import.meta.url,
         ),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/platform-review/platform-review.v1.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
