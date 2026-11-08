@@ -471,11 +471,17 @@ export const LATE_SUNDAY = "2026-10-26T03:30:00Z";
 /**
  * Alex texts "can we do tomorrow at 3 instead" at 23:30 New York time to move his flow B visit (the any-time row move,
  * handled by B7-07), decide giving the time `time_saved` as `value` from the words "tomorrow at 3". With `bookingId`
- * null it is a new booking's door instead (B4-16's pick with a time), whose zone is the visit address's.
+ * null it is a new booking's door instead (B4-16's pick with a time), whose zone is the visit address's. `words` and
+ * `cited` give Alex's text and the words decide cites in place of those.
  */
 export function moveRequest(
   value: Field["value"],
-  options: { readonly bookingId?: string | null; readonly reread?: boolean } = {},
+  options: {
+    readonly bookingId?: string | null;
+    readonly reread?: boolean;
+    readonly words?: string;
+    readonly cited?: string;
+  } = {},
 ): GateRequest {
   const bookingId = options.bookingId === undefined ? ALEX_VISIT : options.bookingId;
   const target = targetAt(HOME_SERVICES, bookingId, bookingId === null ? null : ALEX_VISIT_AT);
@@ -498,14 +504,14 @@ export function moveRequest(
           target,
           fields,
         });
-  const words = "can we do tomorrow at 3 instead";
+  const words = options.words ?? "can we do tomorrow at 3 instead";
   return requestFor({
     turnId: `turn-alex-move-${bookingId ?? "new"}`,
     flow: "B",
     writer: ALEX_FLOW_B,
     texts: [typed("evt-alex-0201", words, LATE_SUNDAY)],
     choices: [choice],
-    parts: [partFor(choice, words, [field("time_saved", value, "tomorrow at 3")])],
+    parts: [partFor(choice, words, [field("time_saved", value, options.cited ?? "tomorrow at 3")])],
     reread: options.reread ?? false,
   });
 }

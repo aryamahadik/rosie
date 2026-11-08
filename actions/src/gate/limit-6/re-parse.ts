@@ -12,9 +12,14 @@
 //      re-parsed from that read-back's words: never from a caption, never before the yes;
 //   3. any other value re-parses from its words (actions/src/values reparse) as each text that carries them sent them:
 //      a value no text carries fails. A text carries the words only where they stand in it whole, starting and ending
-//      at a word edge (values foundAtWordEdges; DL-184): "40" cut out of "raise haircut to 140", "tomorrow at 1" out of
-//      "tomorrow at 10", "$1" out of "$1,200", "Oct 2" out of "Oct 24", "2" out of "12 people" and "1" out of "10am" are
-//      carried by no text, so they fail (noText) and never re-parse as a value the person did not say;
+//      at a word edge of the text as the readers fold it (values foundAtWordEdges; DL-184, DL-189): "40" cut out of
+//      "raise haircut to 140", "tomorrow at 1" out of "tomorrow at 10", "$1" out of "$1,200" or "$1，200", "Oct 2" out of
+//      "Oct 24", "2" out of "12 people", "1" out of "10am" and "40" out of 140 with a zero-width space inside are carried
+//      by no text, so they fail (noText) and never re-parse as a value the person did not say. A number's value (money,
+//      a count, a date or time) is then re-read from its whole value phrase in each text that carries its words (values
+//      wholePhraseFault; DL-189 item 2), so a unit, part of an hour or a zone the words leave out fails: "40" out of
+//      "40%" (noText) or "40¢" (differs), "3 tomorrow" out of "quarter to 3 tomorrow" (differs), "tomorrow at 3pm" out of
+//      "tomorrow at 3pm PST" for a New York visit (wrongZone);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -45,12 +50,17 @@
 //   7. Words several texts of the turn carry must re-parse as each one sent them.
 //   8. The text's language (K-02 v1 decideResult.language) picks the number words read: English or Spanish, both when
 //      decide gave none.
+//   9. Words that stand whole at several places in a text must hold their value on the whole phrase at each place; the
+//      whole phrase's pieces, and a per-unit after an amount being no part of its value ("$40/hr" is $40, as "$12 a
+//      foot" is $12), are values/phrase.ts's (DL-189).
 
 import {
   foundAtWordEdges,
+  isPhraseType,
   isZone,
   languagesOf,
   reparse,
+  wholePhraseFault,
   type ChoiceOption,
   type FieldType,
   type FieldValue,
@@ -220,13 +230,36 @@ async function faultOf(field: Field, run: FieldRun): Promise<ValueFault | null> 
     return reparsed(type, field.value, source.readBack.words, [source.readBack.sentAt], run);
   }
   if (texts.length === 0) return "noText";
-  return reparsed(
+  const cited = await reparsed(
     type,
     field.value,
     field.words,
     texts.map((text) => text.sentAt.utc),
     run,
   );
+  return cited ?? (await wholeReparsed(type, field.value, field.words, texts, run));
+}
+
+/**
+ * Re-reads a number's value (money, a count, a date or time) from the whole value phrase its words stand in, in each text
+ * that carries them (values wholePhraseFault; DL-189 item 2): null when every one gives the same value, else the fault.
+ */
+async function wholeReparsed(
+  type: FieldType,
+  value: FieldValue,
+  words: string,
+  texts: readonly Text[],
+  run: FieldRun,
+): Promise<ValueFault | null> {
+  if (!isPhraseType(type)) return null;
+  const zones = type === "time" ? (await run.zones()).zones : [];
+  const languages = languagesOf(run.turn.decide.language);
+  for (const text of texts) {
+    const context = { sentAt: text.sentAt.utc, zones, languages };
+    const why = wholePhraseFault(type, value, text.words, words, context);
+    if (why !== null) return why;
+  }
+  return null;
 }
 
 type OpenQuestion = Context["openQuestions"][number];

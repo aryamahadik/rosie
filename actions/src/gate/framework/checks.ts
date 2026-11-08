@@ -8,7 +8,9 @@
 // quoteInText is held a little stricter than the rules file's plain substring (T-304 round 2, DL-184): a quote, a field's
 // words and pass_on's or redact's words count only where they stand in a text whole, at word edges (actions/src/values
 // foundAtWordEdges, the rule limit 6 reads values by), so "yes" cut out of "yesterday" or "no" out of "know" is no quote.
-// Every accepted K-02 and K-09 fixture still passes (T-298's precedent: stricter only while they all do).
+// The edges are judged on the text as the readers fold it (round 3, DL-189): "$1" out of "$1，200", "I can" out of "I
+// can´t" and "no" out of "no.reply@example.com" are no quote either. Every accepted K-02 and K-09 fixture still passes
+// (T-298's precedent: stricter only while they all do).
 // Each part, in order, is checked for its verb, then its quote, then its option, then each value's words; the first
 // check a part fails is its problem. The agreed parts (decide.parts) come first, then every read's parts, as the named
 // rules check them all.
