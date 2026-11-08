@@ -3,19 +3,19 @@
   "setVersion": "gs-1",
   "kind": "turn",
   "journey": 1,
-  "trade": "barber",
+  "trade": null,
   "path": {
     "flow": "A",
     "price": "list",
     "before": "card",
     "after": "counter",
     "switches": {},
-    "facts": ["children", "documents", "extrawork", "groups", "photos"]
+    "facts": null
   },
   "seed": {
     "kind": "fixtureSet",
-    "shop": "barber",
-    "business": "biz-lees-barbershop",
+    "shop": "movers",
+    "business": "biz-movers",
     "rows": [
       "db-schema/core/fixtures/seed-business-head.json",
       "db-schema/core/fixtures/seed-person-roles.json",
@@ -45,7 +45,7 @@
           "text": {
             "eventId": "evt-gold-0003",
             "kind": "text",
-            "words": "Barbería, plomería y electricidad",
+            "words": "Mudanzas y retiro de trastos",
             "sentAt": { "utc": "2026-10-19T18:05:00Z", "zone": "America/New_York" },
             "attachments": [],
             "poll": null,
@@ -71,7 +71,7 @@
               "hub": null,
               "bookingId": null
             },
-            "fields": [{ "name": "kinds", "type": "text", "value": "Barbería, plomería y electricidad" }],
+            "fields": [{ "name": "kinds", "type": "text", "value": "Mudanzas y retiro de trastos" }],
             "about": null
           }
         ],

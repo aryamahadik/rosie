@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/eval-set/eval-set.v1.schema.json",
   "title": "EvalSetV1",
-  "description": "K-10 v1, the eval-set format (02-contracts K-10; arch 08 lines 419 to 449; arch 10 line 552; arch 12 line 590: 'the eval set, generated from the master's needs and gives keys'; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP starting shape, last paragraph; BP section 10's release card). Two documents: a gold-set item (goldItem), one turn or a whole chat walked from the step graph with its gold label, and an accuracy report (accuracyReport), what one eval run of a bundle on the gold set or its smoke slice found, per section 08 measure and per journey. The root is either, so the type generator writes a type for each (ADR-005). K-01's, K-02's and K-08's definitions are reused by relative $ref where the meaning is the same. Not model-facing, so number and length limits are schema rules here. The report's arithmetic (each point estimate, its 95% interval, each status, the cost per booking, the changed-effect counts) is the named rule reportNumbers in eval-set.rules.mjs.",
+  "description": "K-10 v1, the eval-set format (02-contracts K-10; arch 08 lines 419 to 449; arch 10 line 552; arch 12 line 590: 'the eval set, generated from the master's needs and gives keys'; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP starting shape, last paragraph; BP section 10's release card). Two documents: a gold-set item (goldItem), one turn or a whole chat walked from the step graph with its gold label, and an accuracy report (accuracyReport), what one eval run of a bundle at a commit on the gold set or its smoke slice found, per section 08 measure and per journey. The root is either, so the type generator writes a type for each (ADR-005). K-01's, K-02's and K-08's definitions are reused by relative $ref where the meaning is the same. Not model-facing, so number and length limits are schema rules here. The report's arithmetic (each point estimate, its 95% interval, each status, the cost per booking, the changed-effect counts) is the named rule reportNumbers in eval-set.rules.mjs.",
   "anyOf": [{ "$ref": "#/$defs/goldItem" }, { "$ref": "#/$defs/accuracyReport" }],
   "$defs": {
     "id": {
@@ -46,6 +46,11 @@
       },
       "required": ["hash", "build"],
       "additionalProperties": false
+    },
+    "commit": {
+      "title": "EvalCommit",
+      "description": "A git commit, 7 to 40 lowercase hex characters, spelled as K-01 v1 spells the compiler's commit (K-01 v1 manifest.compiler.commit; DL-201). A commit may be written short or in full, so two names are the same commit when one begins the other (README 'The accuracy report').",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/manifest/properties/compiler/properties/commit"
     },
     "fieldValue": {
       "title": "EvalValue",
@@ -755,8 +760,8 @@
           "$ref": "#/$defs/journey"
         },
         "trade": {
-          "description": "The trade whose overlay the walk runs (K-01 v1 tradeId; 02-contracts K-10 'trade').",
-          "$ref": "../bundle/bundle.v1.schema.json#/$defs/tradeId"
+          "description": "The trade whose overlay the walk runs (K-01 v1 tradeId; 02-contracts K-10 'trade'), or null when the walk runs the master itself with no trade's overlay, as K-01 v1's lintFailure.trade allows null: a sign-up turn before any kind of work is chosen (S1-01, S1-02; bundle v0 holds no trade), or a fixture set v1 test shop with no trade file (test-mixed-A, test-mixed-B) (DL-201).",
+          "anyOf": [{ "$ref": "../bundle/bundle.v1.schema.json#/$defs/tradeId" }, { "type": "null" }]
         },
         "path": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/path" },
         "seed": {
@@ -1031,7 +1036,7 @@
     },
     "regression": {
       "title": "Regression",
-      "description": "An item the last passing bundle got right that this one gets wrong, with its explanation (BP 8 'Eval gate': 'a list on the card of every item the last passing bundle got right that this one gets wrong, each explained').",
+      "description": "An item the last passing run got right that this one gets wrong, with its explanation (BP 8 'Eval gate': 'a list on the card of every item the last passing bundle got right that this one gets wrong, each explained'; DL-201: the last passing run is a bundle and a commit, so a code-only change lists its own).",
       "type": "object",
       "properties": {
         "itemId": { "$ref": "#/$defs/itemId" },
@@ -1055,7 +1060,7 @@
     },
     "changedEffect": {
       "title": "ChangedEffect",
-      "description": "One money, booking, consent or safety effect that differs from the last passing bundle's on the same replay: what that bundle committed and what this one commits (BP 8 'Bundle'; arch 10 line 552: 'Rosie's team reviews each changed money, booking, consent or safety effect').",
+      "description": "One money, booking, consent or safety effect that differs from the last passing run's on the same replay: what that run committed and what this one commits (BP 8 'Bundle'; arch 10 line 552: 'Rosie's team reviews each changed money, booking, consent or safety effect'; DL-201: the last passing run is a bundle and a commit).",
       "type": "object",
       "properties": {
         "replayed": {
@@ -1084,12 +1089,12 @@
           "$ref": "#/$defs/changedEffectClass"
         },
         "last": {
-          "description": "The effects of this class the last passing bundle committed there (none: empty).",
+          "description": "The effects of this class the last passing run committed there (none: empty).",
           "type": "array",
           "items": { "$ref": "#/$defs/goldEffect" }
         },
         "now": {
-          "description": "The effects of this class this bundle commits there (none: empty).",
+          "description": "The effects of this class this run commits there (none: empty).",
           "type": "array",
           "items": { "$ref": "#/$defs/goldEffect" }
         }
@@ -1099,7 +1104,7 @@
     },
     "accuracyReport": {
       "title": "AccuracyReport",
-      "description": "What one eval run of a bundle found on the gold set or its smoke slice (02-contracts K-10 'An accuracy report'; arch 08; arch 10 line 552; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP section 10's release card, whose accuracy lines read from it). Before launch the replay is the gold set and fixture set v1's scenarios (BP 8 'Bundle').",
+      "description": "What one eval run of a bundle, at a commit, found on the gold set or its smoke slice (02-contracts K-10 'An accuracy report'; DL-201; arch 08; arch 10 line 552; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP section 10's release card, whose accuracy lines read from it). Before launch the replay is the gold set and fixture set v1's scenarios (BP 8 'Bundle').",
       "type": "object",
       "properties": {
         "reportId": {
@@ -1107,8 +1112,12 @@
           "$ref": "#/$defs/itemId"
         },
         "bundleId": {
-          "description": "The bundle run (arch 10 line 548: the bundle id on every turn and trace).",
+          "description": "The bundle run (arch 10 line 548: the bundle id on every turn and trace). With commit, it names the run.",
           "$ref": "#/$defs/bundleId"
+        },
+        "commit": {
+          "description": "The git commit the run evaluated: the code around the bundle. A change to the frontier, the composer or other AI code changes what the AI does but keeps the bundle id (BP 3.5 (f); K-01 v1's manifest holds prompts, models and policy, not code), so the bundle and the commit together name the run (DL-201; BP 6.5 step 2: the smoke slice runs on the rebased result; BP 8 'Eval gate': 'a bundle, or a deployment that changes what the AI does').",
+          "$ref": "#/$defs/commit"
         },
         "goldSetVersion": {
           "description": "The gold-set version run (02-contracts K-10).",
@@ -1268,16 +1277,20 @@
           ]
         },
         "lastPassingBundleId": {
-          "description": "The last bundle whose gate passed, the one regressions and changed effects compare with; null for the first gate, which then lists none (BP 8 'Bundle', 'Eval gate'; arch 08 line 447: a breach rolls back to the last passing bundle).",
+          "description": "The bundle of the last run whose gate passed, the run regressions and changed effects compare with; with lastPassingCommit it names that run. Null, with lastPassingCommit null, for the first gate, which then lists none (BP 8 'Bundle', 'Eval gate'; arch 08 line 447: a breach rolls back to the last passing bundle; DL-201).",
           "anyOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }]
         },
+        "lastPassingCommit": {
+          "description": "The git commit of the last run whose gate passed; with lastPassingBundleId it names that run. A code-only change keeps the bundle and changes the commit, so it is compared with the last passing run on the same bundle (BP 3.5 (f); BP 8 'Eval gate'; DL-201). Null exactly when lastPassingBundleId is null.",
+          "anyOf": [{ "$ref": "#/$defs/commit" }, { "type": "null" }]
+        },
         "regressions": {
-          "description": "Every item the last passing bundle got right that this one gets wrong, each explained; empty when there is none (BP 8 'Eval gate').",
+          "description": "Every item the last passing run got right that this one gets wrong, each explained; empty when there is none (BP 8 'Eval gate': 'every item the last passing bundle got right that this one gets wrong'; DL-201: the last passing run is a bundle and a commit).",
           "type": "array",
           "items": { "$ref": "#/$defs/regression" }
         },
         "changedEffects": {
-          "description": "Every money, booking, consent or safety effect that differs from the last passing bundle on the same replay, with the count of each class (BP 8 'Bundle'; arch 10 line 552; BP section 10's card: 'Changed effects: none (money 0, booking 0, consent 0, safety 0)').",
+          "description": "Every money, booking, consent or safety effect that differs from the last passing run on the same replay, with the count of each class (BP 8 'Bundle'; arch 10 line 552; BP section 10's card: 'Changed effects: none (money 0, booking 0, consent 0, safety 0)'; DL-201).",
           "type": "object",
           "properties": {
             "counts": {
@@ -1305,6 +1318,7 @@
       "required": [
         "reportId",
         "bundleId",
+        "commit",
         "goldSetVersion",
         "slice",
         "ranAt",
@@ -1320,23 +1334,26 @@
         "cost",
         "replyTime",
         "lastPassingBundleId",
+        "lastPassingCommit",
         "regressions",
         "changedEffects"
       ],
       "additionalProperties": false,
       "dependentSchemas": {
         "lastPassingBundleId": {
-          "description": "The first gate has no bundle to compare with, so it lists no regression and no changed effect (BP 8).",
+          "description": "The last passing run is a bundle and a commit, both given or both null. The first gate has no run to compare with, so both are null and it lists no regression and no changed effect (BP 8; DL-201).",
           "if": { "properties": { "lastPassingBundleId": { "type": "null" } } },
           "then": {
             "properties": {
+              "lastPassingCommit": { "type": "null" },
               "regressions": { "type": "array", "maxItems": 0 },
               "changedEffects": {
                 "type": "object",
                 "properties": { "effects": { "type": "array", "maxItems": 0 } }
               }
             }
-          }
+          },
+          "else": { "properties": { "lastPassingCommit": { "type": "string" } } }
         }
       }
     }

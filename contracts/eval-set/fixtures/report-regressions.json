@@ -1,6 +1,7 @@
 {
   "reportId": "report-regressions",
   "bundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 2 },
+  "commit": "8c3f6a1",
   "goldSetVersion": "gs-1",
   "slice": "smoke",
   "ranAt": "2026-11-08T13:00:00Z",
@@ -548,6 +549,7 @@
   },
   "replyTime": { "turns": 36, "p50Ms": 5400, "p95Ms": 12800 },
   "lastPassingBundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 1 },
+  "lastPassingCommit": "5d20e9b",
   "regressions": [
     {
       "itemId": "item-high-stakes-a6-02-accept",

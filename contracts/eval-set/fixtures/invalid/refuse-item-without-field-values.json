@@ -3,19 +3,19 @@
   "setVersion": "gs-1",
   "kind": "turn",
   "journey": 1,
-  "trade": "barber",
+  "trade": null,
   "path": {
     "flow": "A",
     "price": "list",
     "before": "card",
     "after": "counter",
     "switches": {},
-    "facts": ["children", "documents", "extrawork", "groups", "photos"]
+    "facts": null
   },
   "seed": {
     "kind": "fixtureSet",
-    "shop": "barber",
-    "business": "biz-lees-barbershop",
+    "shop": "movers",
+    "business": "biz-movers",
     "rows": [
       "db-schema/core/fixtures/seed-business-head.json",
       "db-schema/core/fixtures/seed-person-roles.json",
@@ -45,7 +45,7 @@
           "text": {
             "eventId": "evt-gold-0001",
             "kind": "text",
-            "words": "Barbershop, plumbing, electrical",
+            "words": "Moving and junk hauling",
             "sentAt": { "utc": "2026-10-19T18:05:00Z", "zone": "America/New_York" },
             "attachments": [],
             "poll": null,

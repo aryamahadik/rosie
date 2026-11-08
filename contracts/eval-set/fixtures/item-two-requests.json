@@ -3,18 +3,18 @@
   "setVersion": "gs-1",
   "kind": "turn",
   "journey": 11,
-  "trade": "flooring",
+  "trade": "plumber",
   "path": {
     "flow": "B",
-    "price": "visit",
-    "before": "none",
+    "price": "list",
+    "before": "card",
     "after": "bill",
     "switches": { "cancelright": true },
-    "facts": ["photos", "documents", "firststeps", "extrawork", "stages", "banktransfer", "multiday"]
+    "facts": ["firststeps", "documents", "forms", "sentnow", "planbill", "dropoff", "extrawork", "photos", "video"]
   },
   "seed": {
     "kind": "fixtureSet",
-    "shop": "flooring",
+    "shop": "plumber",
     "business": "biz-lee-home-services",
     "rows": [
       "db-schema/core/fixtures/seed-business-head.json",

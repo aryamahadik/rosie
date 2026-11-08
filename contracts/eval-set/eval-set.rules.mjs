@@ -95,13 +95,22 @@ function measuresProblems(where, measures) {
 const sameBundle = (a, b) => a !== null && b !== null && a.hash === b.hash && a.build === b.build;
 
 /**
+ * Two names of a git commit are the same commit when they are equal or one begins the other: git writes a commit in
+ * full (40 hex digits) or by any unique prefix of at least 7, so "5d20e9b" and its full name are one commit (README
+ * "The accuracy report"; DL-201).
+ */
+export const sameCommit = (a, b) => a !== null && b !== null && (a.startsWith(b) || b.startsWith(a));
+
+/**
  * reportNumbers: every point estimate is its count over its total; every interval is the two-sided 95% Wilson score
  * interval of them (CQ-10); every status follows its target, its direction and its sized volume (BP 8; Q-16; J-19);
  * the journeys broken down are the journeys the slice holds, each once (BP 8 "Journey milestone"); a hard invariant
  * lists breaching items only when it has breaches (arch 08 line 427); the cost per booking is the cost over the
  * completed bookings, met only at or under the target (arch 10 line 552; CQ-12); p50 is not above p95 (K-08 v1
- * replyTime); the last passing bundle is another bundle; and each changed effect differs, holds effects of its own
- * class, and is counted in its class (BP 8 "Bundle").
+ * replyTime); the last passing run is another run, its bundle or its commit not the run's own, so a code-only change
+ * (the same bundle at another commit) is compared with the last passing run on that bundle (BP 3.5 (f); BP 8 "Eval
+ * gate"; DL-201); and each changed effect differs, holds effects of its own class, and is counted in its class (BP 8
+ * "Bundle").
  */
 export function reportNumbers(report) {
   const problems = [...measuresProblems("measures", report.measures)];
@@ -153,9 +162,13 @@ export function reportNumbers(report) {
     problems.push("replyTime: p50Ms is above p95Ms");
   }
 
-  if (sameBundle(report.lastPassingBundleId, report.bundleId)) {
+  if (
+    sameBundle(report.lastPassingBundleId, report.bundleId) &&
+    sameCommit(report.lastPassingCommit, report.commit)
+  ) {
     problems.push(
-      "lastPassingBundleId is the bundle run: a bundle is compared with the last one that passed before it",
+      "lastPassingBundleId and lastPassingCommit are the run itself: a run is compared with the last run that passed " +
+        "before it, whose bundle or commit differs (a code-only change keeps the bundle and changes the commit)",
     );
   }
 

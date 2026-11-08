@@ -1,6 +1,7 @@
 {
   "reportId": "report-journey-1-sample",
   "bundleId": { "hash": "7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346", "build": 1 },
+  "commit": "4e1a9c7",
   "goldSetVersion": "gs-1",
   "slice": "full",
   "ranAt": "2026-11-08T12:00:00Z",
@@ -233,6 +234,7 @@
   },
   "replyTime": { "turns": 640, "p50Ms": 6100, "p95Ms": 11200 },
   "lastPassingBundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "lastPassingCommit": "2b7d05f",
   "regressions": [],
   "changedEffects": {
     "counts": { "money": 0, "booking": 0, "consent": 0, "safety": 0 },
