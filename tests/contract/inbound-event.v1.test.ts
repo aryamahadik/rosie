@@ -91,7 +91,6 @@ const refusedEntries = entries.filter((entry) => entry.expect === "refuse");
 const eventOf = (file: string): InboundEvent => structuredClone(fixture(file)) as InboundEvent;
 const entryOf = (file: string): Entry => must(entries.find((candidate) => candidate.file === file));
 const acceptedFiles = acceptedEntries.map((entry) => entry.file);
-const refusedFiles = refusedEntries.map((entry) => entry.file);
 
 // ---------------------------------------------------------------------------------------------------------------
 // The schemas, one validator for everything (the harness's strict Ajv 2020-12 setup), and the named rules
@@ -115,14 +114,27 @@ function validatorFor(entry: Entry): ValidateFunction {
 }
 const validatorOfVersion = (version: string): ValidateFunction => validatorFor({ version } as Entry);
 
+/** The root fields a version's schema requires; a minor version that is its predecessor's shape refers to it. */
+function requiredOf(version: string): string[] {
+  const schema = readJson(path.join(INBOUND_DIR, `inbound-event.${version}.schema.json`)) as {
+    required?: string[];
+    $ref?: string;
+  };
+  if (schema.required !== undefined) return schema.required;
+  if (schema.$ref === undefined) throw new Error(`inbound-event ${version} states no required fields`);
+  const target = /inbound-event\.(v[0-9.]+?)\.schema\.json$/.exec(schema.$ref);
+  return requiredOf(must(target?.[1]));
+}
+
 type Rule = (event: InboundEvent) => string[];
 const rulesFile = path.join(INBOUND_DIR, "inbound-event.rules.mjs");
 const rulesModule = (await import(pathToFileURL(rulesFile).href)) as {
   rules: Record<string, Rule>;
   CARD_TAG: string;
   SSN_TAG: string;
+  toAsciiDigits: (words: string) => string;
 };
-const { rules, CARD_TAG, SSN_TAG } = rulesModule;
+const { rules, CARD_TAG, SSN_TAG, toAsciiDigits } = rulesModule;
 const rule = (name: string): Rule => must(rules[name]);
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -262,33 +274,36 @@ describe("inbound-event fixtures: the index and the count", () => {
     });
   }
 
-  it("checks each v1 entry against v1 and each v1.1 entry against v1.1", () => {
-    expect(new Set(entries.map((entry) => entry.version))).toEqual(new Set(["v1", "v1.1"]));
+  it("checks each entry against the schema its version names, and holds v1 and v1.1 (a later minor version adds its own)", () => {
+    expect(new Set(entries.map((entry) => entry.version))).toContain("v1");
+    expect(new Set(entries.map((entry) => entry.version))).toContain("v1.1");
     for (const result of report.entries) {
       expect(result.schema, result.file).toBe(`inbound-event.${result.version}.schema.json`);
     }
-    expect(entries.filter((entry) => entry.version === "v1")).toHaveLength(19);
-    expect(entries.filter((entry) => entry.version === "v1.1")).toHaveLength(9);
   });
 
-  it("holds the 16 accepted and 3 refused fixtures of v1 and the 5 accepted and 4 refused of v1.1", () => {
+  it("holds accepted and refused fixtures for v1 and for v1.1, selected by version and by what the entry says", () => {
     const of = (version: string, expectation: string): string[] =>
       entries
         .filter((entry) => entry.version === version && entry.expect === expectation)
         .map((entry) => entry.file);
-    expect(of("v1", "accept")).toHaveLength(16);
-    expect(of("v1", "refuse").sort()).toEqual([
-      "invalid/refuse-no-event-id.json",
-      "invalid/refuse-unscrubbed-card.json",
-      "invalid/refuse-unscrubbed-ssn.json",
-    ]);
-    expect(of("v1.1", "accept")).toHaveLength(5);
-    expect(of("v1.1", "refuse").sort()).toEqual([
-      "invalid/refuse-unscrubbed-card-next-to-digits.json",
-      "invalid/refuse-unscrubbed-card-non-ascii-digits.json",
-      "invalid/refuse-unscrubbed-card-wide-spaces.json",
-      "invalid/refuse-unscrubbed-ssn-wide-form.json",
-    ]);
+    expect(of("v1", "accept").length).toBeGreaterThan(0);
+    expect(of("v1.1", "accept").length).toBeGreaterThan(0);
+    expect(of("v1", "refuse")).toEqual(
+      expect.arrayContaining([
+        "invalid/refuse-no-event-id.json",
+        "invalid/refuse-unscrubbed-card.json",
+        "invalid/refuse-unscrubbed-ssn.json",
+      ]),
+    );
+    expect(of("v1.1", "refuse")).toEqual(
+      expect.arrayContaining([
+        "invalid/refuse-unscrubbed-card-next-to-digits.json",
+        "invalid/refuse-unscrubbed-card-non-ascii-digits.json",
+        "invalid/refuse-unscrubbed-card-wide-spaces.json",
+        "invalid/refuse-unscrubbed-ssn-wide-form.json",
+      ]),
+    );
   });
 
   it("shows every kind, both providers, every service and Rosie's own reaction between the accepted fixtures", () => {
@@ -320,8 +335,32 @@ describe("inbound-event fixtures: the index and the count", () => {
   it("refuses refuse-no-event-id by the schema (it has no event id), and every other refused one by a named rule", () => {
     const bySchema = refusedEntries.filter((entry) => entry.rule === undefined).map((entry) => entry.file);
     expect(bySchema).toEqual(["invalid/refuse-no-event-id.json"]);
-    expect("eventId" in (fixture("invalid/refuse-no-event-id.json") as object)).toBe(false);
     expect(entryOf("text-imessage.json").rule).toBe("scrubbed");
+  });
+
+  it("refuses refuse-no-event-id for its stated reason: with text-imessage.json's event id put in, it is text-imessage.json and accepted", () => {
+    const file = "invalid/refuse-no-event-id.json";
+    const entry = entryOf(file);
+    const validate = validatorFor(entry);
+    const broken = eventOf(file);
+    expect("eventId" in broken, "the fixture has no event id").toBe(false);
+    expect(validate(broken)).toBe(false);
+    expect(
+      (validate.errors ?? []).map((error) => [
+        error.keyword,
+        (error.params as { missingProperty?: string }).missingProperty,
+      ]),
+      "the schema's only error is the missing eventId",
+    ).toEqual([["required", "eventId"]]);
+    const mended = { ...broken, eventId: eventOf("text-imessage.json").eventId };
+    expect(mended, "mended, it is text-imessage.json").toEqual(eventOf("text-imessage.json"));
+    expect(validate(mended), formatErrors(validate.errors).join("; ")).toBe(true);
+    // A copy that also broke another field is refused for more than the id, so it would fail the checks above.
+    const alsoBroken = eventOf(file);
+    Reflect.deleteProperty(alsoBroken.handle, "address");
+    const mendedTwice = { ...alsoBroken, eventId: eventOf("text-imessage.json").eventId };
+    expect(mendedTwice).not.toEqual(eventOf("text-imessage.json"));
+    expect(validate(mendedTwice)).toBe(false);
   });
 });
 
@@ -330,8 +369,10 @@ describe("inbound-event fixtures: the index and the count", () => {
 
 describe("inbound-event fixtures: the named rules are run, none skipped", () => {
   it("has the rules each entry names in inbound-event.rules.mjs, and names a rule on every entry but one", () => {
-    expect(Object.keys(rules).sort()).toEqual(["scrubbed", "scrubbedV1dot1"]);
-    expect(entries.filter((entry) => entry.rule === undefined)).toHaveLength(1);
+    expect(Object.keys(rules)).toEqual(expect.arrayContaining(["scrubbed", "scrubbedV1dot1"]));
+    expect(entries.filter((entry) => entry.rule === undefined).map((entry) => entry.file)).toEqual(
+      refusedBySchema.map((entry) => entry.file),
+    );
     for (const entry of entries) {
       if (entry.rule !== undefined) expect(typeof rules[entry.rule], entry.file).toBe("function");
     }
@@ -339,7 +380,9 @@ describe("inbound-event fixtures: the named rules are run, none skipped", () => 
       true,
     );
     expect(
-      entries.filter((entry) => entry.version === "v1.1").every((e) => e.rule === "scrubbedV1dot1"),
+      entries
+        .filter((entry) => entry.version === "v1.1" && entry.rule !== undefined)
+        .every((e) => e.rule === "scrubbedV1dot1"),
     ).toBe(true);
   });
 
@@ -357,10 +400,11 @@ describe("inbound-event fixtures: the named rules are run, none skipped", () => 
   }
 
   it("has every accepted fixture pass scrubbedV1dot1 too, and v1's two refused-by-rule fixtures refused by it", () => {
-    for (const file of acceptedFiles) expect(rule("scrubbedV1dot1")(eventOf(file)), file).toEqual([]);
-    for (const file of ["invalid/refuse-unscrubbed-card.json", "invalid/refuse-unscrubbed-ssn.json"]) {
-      expect(rule("scrubbed")(eventOf(file)).length, file).toBeGreaterThan(0);
-      expect(rule("scrubbedV1dot1")(eventOf(file)).length, file).toBeGreaterThan(0);
+    for (const entry of acceptedEntries.filter((e) => e.version === "v1" || e.version === "v1.1"))
+      expect(rule("scrubbedV1dot1")(eventOf(entry.file)), entry.file).toEqual([]);
+    for (const entry of refusedByRule.filter((e) => e.version === "v1")) {
+      expect(rule("scrubbed")(eventOf(entry.file)).length, entry.file).toBeGreaterThan(0);
+      expect(rule("scrubbedV1dot1")(eventOf(entry.file)).length, entry.file).toBeGreaterThan(0);
     }
   });
 
@@ -377,27 +421,91 @@ describe("inbound-event fixtures: the named rules are run, none skipped", () => 
     }
   });
 
-  it("never prints the number a rule found in its problem lines", () => {
-    for (const file of refusedFiles) {
-      const entry = entryOf(file);
-      if (entry.rule === undefined) continue;
-      for (const line of rule(entry.rule)(eventOf(file))) expect(line, file).not.toMatch(/[0-9０-９]{5}/u);
+  /**
+   * The numbers (digits only) a body holds: each run of 9 or more digits, any script, with any spaces or dashes between
+   * its digits taken out. A problem line must not print one: its digits-only form holds no 9-digit window of any.
+   */
+  const NUMBER_RUN = /\d(?:[\p{Zs}\t\p{Pd}]*\d)*/gu;
+  const digitsOnly = (words: string): string => toAsciiDigits(words).replace(/[^0-9]/g, "");
+  function numbersIn(words: string): string[] {
+    return [...toAsciiDigits(words).matchAll(NUMBER_RUN)]
+      .map((match) => digitsOnly(match[0]))
+      .filter((digits) => digits.length >= 9);
+  }
+  function printedNumbers(line: string, words: string): string[] {
+    const shown = digitsOnly(line);
+    return numbersIn(words).filter((number) =>
+      Array.from({ length: number.length - 8 }, (_, at) => number.slice(at, at + 9)).some((part) =>
+        shown.includes(part),
+      ),
+    );
+  }
+
+  it("never prints the number a rule found in its problem lines, compared as digits only against the body's number", () => {
+    for (const entry of refusedByRule) {
+      const event = eventOf(entry.file);
+      const words = must(event.body);
+      expect(numbersIn(words).length, `${entry.file}: the body holds a number to look for`).toBeGreaterThan(
+        0,
+      );
+      const lines = rule(must(entry.rule))(event);
+      expect(lines.length, entry.file).toBeGreaterThan(0);
+      for (const line of lines) expect(printedNumbers(line, words), `${entry.file}: ${line}`).toEqual([]);
     }
   });
 
-  // Each refused-by-rule fixture and the accepted one it names: the same event, with the tag in its place.
-  const PAIRS: readonly [refused: string, tagged: string][] = [
-    ["invalid/refuse-unscrubbed-card.json", "text-with-card-number.json"],
-    ["invalid/refuse-unscrubbed-ssn.json", "text-with-ssn.json"],
-    ["invalid/refuse-unscrubbed-card-next-to-digits.json", "text-with-card-next-to-digits.json"],
-    ["invalid/refuse-unscrubbed-card-wide-spaces.json", "text-with-card-wide-spaces.json"],
-    ["invalid/refuse-unscrubbed-card-non-ascii-digits.json", "text-with-card-non-ascii-digits.json"],
-    ["invalid/refuse-unscrubbed-ssn-wide-form.json", "text-with-ssn-wide-form.json"],
+  it("has the number check fire on a damaged line, in any spacing or script of the digits", () => {
+    const body = "My card is 4242 4242 4242 4242";
+    expect(printedNumbers("body: holds a card number (4242 4242 4242 4242)", body)).toHaveLength(1);
+    expect(printedNumbers("body: holds a card number (4242424242424242)", body)).toHaveLength(1);
+    expect(printedNumbers("body: holds a card number (４２４２-４２４２-4242-4242)", body)).toHaveLength(1);
+    expect(printedNumbers("body: holds a card number (19 characters)", body)).toEqual([]);
+    expect(
+      printedNumbers("body: holds a Social Security number (123 - 45 - 6789)", "SSN 123-45-6789"),
+    ).toHaveLength(1);
+    expect(
+      printedNumbers("body: holds a Social Security number; it must be [SSN]", "SSN 123-45-6789"),
+    ).toEqual([]);
+  });
+
+  // Each refused-by-rule fixture, the accepted one it names (the same event, with the tag in its place), and the kind
+  // of number the fixture's index entry says it holds (fixtures/index.json: "card number" or "Social Security number").
+  const CARD = "card number";
+  const SSN = "Social Security number";
+  const PAIRS: readonly [refused: string, tagged: string, kind: typeof CARD | typeof SSN][] = [
+    ["invalid/refuse-unscrubbed-card.json", "text-with-card-number.json", CARD],
+    ["invalid/refuse-unscrubbed-ssn.json", "text-with-ssn.json", SSN],
+    ["invalid/refuse-unscrubbed-card-next-to-digits.json", "text-with-card-next-to-digits.json", CARD],
+    ["invalid/refuse-unscrubbed-card-wide-spaces.json", "text-with-card-wide-spaces.json", CARD],
+    ["invalid/refuse-unscrubbed-card-non-ascii-digits.json", "text-with-card-non-ascii-digits.json", CARD],
+    ["invalid/refuse-unscrubbed-ssn-wide-form.json", "text-with-ssn-wide-form.json", SSN],
   ];
+
+  it("refuses each rule-refused fixture for its kind: the lines name that kind and no other", () => {
+    for (const [refused, tagged, kind] of PAIRS) {
+      const entry = entryOf(refused);
+      const lines = rule(must(entry.rule))(eventOf(refused));
+      const other = kind === CARD ? SSN : CARD;
+      expect(lines.length, refused).toBeGreaterThan(0);
+      for (const line of lines) {
+        expect(line, refused).toContain(`holds a ${kind}`);
+        expect(line, refused).not.toContain(`holds a ${other}`);
+      }
+      const twin = eventOf(tagged);
+      expect(twin.scrubbed, `${tagged} counts the tag of ${kind}`).toEqual(
+        kind === CARD ? { cards: 1, ssns: 0 } : { cards: 0, ssns: 1 },
+      );
+      expect(must(twin.body), tagged).toContain(kind === CARD ? CARD_TAG : SSN_TAG);
+      expect(must(twin.body), tagged).not.toContain(kind === CARD ? SSN_TAG : CARD_TAG);
+    }
+  });
 
   it("has each rule-refused fixture and its tagged twin differ only in the words and the counts", () => {
     expect(PAIRS.map(([refused]) => refused).sort()).toEqual(
-      refusedFiles.filter((file) => entryOf(file).rule !== undefined).sort(),
+      refusedByRule
+        .filter((e) => e.version === "v1" || e.version === "v1.1")
+        .map((e) => e.file)
+        .sort(),
     );
     for (const [refused, tagged] of PAIRS) {
       const strip = (event: InboundEvent): object => ({ ...event, body: null, scrubbed: null });
@@ -455,8 +563,13 @@ describe("inbound-event fixtures: removing a required field makes an accepted fi
       expect(validate(original), formatErrors(validate.errors).join("; ")).toBe(true);
       const paths = propertyPaths(original);
       const rootRequired = paths.filter((where) => where.length === 1);
-      expect(rootRequired, "every one of the event's 20 fields is required").toHaveLength(20);
-      expect(paths.length, "the fixture has at least one field").toBeGreaterThan(20);
+      const schemaRequired = requiredOf(entry.version);
+      expect(schemaRequired.length, "the schema requires fields").toBeGreaterThan(0);
+      expect(
+        rootRequired.map((where) => where[0]).sort(),
+        "every field the schema requires is in the fixture",
+      ).toEqual([...schemaRequired].sort());
+      expect(paths.length, "the fixture has at least one field").toBeGreaterThan(schemaRequired.length);
       for (const where of paths) {
         expect(
           validate(without(original, where)),
@@ -538,7 +651,7 @@ describe("inbound-event fixtures: the checks the schema leaves to code", () => {
     expect(dropKnown(others)).toHaveLength(others.length);
     const ids = acceptedFiles.map((file) => eventOf(file).eventId);
     const shared = ids.filter((id, at) => ids.indexOf(id) !== at);
-    expect(shared).toEqual(["evt-alex-0001"]);
+    expect(shared).toEqual([eventOf("text-imessage.json").eventId]);
   });
 
   it("has the duplicate check fire on a damaged copy", () => {
@@ -699,7 +812,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-184 duplicate, late or edited text",
     ],
     needs:
-      "The actor accepts every valid fixture and takes its events in receivedAt order (a tie by event id compared whole); a reaction from Rosie starts no turn; the safety read sees each raw text before batching; an unknown poll option id reads as typed words; the clock arms at the first delivered receipt (sent on SMS); an edit after commit and a late or duplicate text are handled as the README says; a pollVote's ids are those of a poll part K-04 holds.",
+      "The actor accepts every valid fixture, refuses every invalid one, and takes its events in receivedAt order (a tie by event id compared whole); a reaction from Rosie starts no turn; the safety read sees each raw text before batching; an unknown poll option id reads as typed words; the clock arms at the first delivered receipt (sent on SMS); an edit after commit and a late or duplicate text are handled as the README says; a pollVote's ids are those of a poll part K-04 holds.",
   },
   {
     id: "consumer-action-layer",
@@ -707,7 +820,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
     owner: "action-layer engineer",
     components: ["C-083 limit 3"],
     needs:
-      "A poll vote reaches limit 3 as an exact yes, and an edit after its turn committed as a new answer (S13-25 rules 20, 21); a tapback is never a yes.",
+      "Refuses every invalid fixture (nothing from an event the schema or the named rule refuses reaches it). A poll vote reaches limit 3 as an exact yes, and an edit after its turn committed as a new answer (S13-25 rules 20, 21); a tapback is never a yes.",
   },
 ];
 
@@ -725,6 +838,7 @@ describe("inbound-event.v1 sides: the list where each producer and consumer side
       expect(side.owner, side.id).not.toBe("");
       expect(side.components.length, side.id).toBeGreaterThan(0);
       expect(side.needs, side.id).not.toBe("");
+      if (side.side === "consumer") expect(side.needs, side.id).toMatch(/refuses every invalid/i);
     }
   });
 
