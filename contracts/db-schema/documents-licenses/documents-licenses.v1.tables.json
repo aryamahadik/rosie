@@ -1,0 +1,950 @@
+{
+  "part": "documents-licenses",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "documents",
+      "description": "One document of a business, a team member, a space or thing, a booking or a customer (FS document row): a license, insurance, registration, background check or certificate a person gave as their own word (S1-23, S1-61, S1-81, S2-06), kept exactly as given and never checked, or an agreement, contract, estimate, proposal, design or form Rosie built for its signers to sign or OK on the secure page (S1-72, A4-43, A5-19, A5-20). There is no column that says Rosie checked, verified or approved it (FS line 736: 'No checked column'; D96; MC C4, C7). What a person gave (number, issuer, end) is sealed under the key of the person it is about. Its files are document_files rows, its words to sign document_texts rows, who must sign document_signers rows and each signature a document_signatures row. No row is ever deleted: a document taken off, replaced or not signed in time keeps its row with withdrawn_at.",
+      "source": "FS line 736 (document); FS line 741 (place_or_thing papers); S1-23, S1-60, S1-61, S1-72, S1-81, S2-06, S2-11, S2-28, S2-29, A4-43, A5-19, A5-20; MC C4, C7; D96; RULES 10.1 to 10.5; arch 09 line 472; 02-contracts section 7 row K-35 and section 8 (license, license_checked)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 736 (id); CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose document it is (businesses.id). Every document belongs to one business, and row-level security keeps it there: a person on two teams gives each its own, and neither sees the other's (RULES 4.10; S13-42).",
+          "source": "FS line 736; arch 10 line 546; RULES 4.10 ('never joined across businesses'); S13-42 ('each business's data stays with it')"
+        },
+        {
+          "name": "owner_kind",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Whose document it is (FS line 736's owner): business (the business's own paper, S1-23 and S1-61, or an agreement its work needs, S1-72), staff (a team member's own, S2-06, S2-11, S2-29), place_or_thing (a space's or thing's papers, S1-81), booking (a document a booking's signers sign, A4-43, A5-20) or customer (a customer's own at this business).",
+          "source": "FS line 736 (owner: business, staff, place_or_thing, booking, customer); FS line 741 (papers); S1-23; S1-72; S1-81; S2-06; A4-43; A5-20"
+        },
+        {
+          "name": "staff_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a team member's document: that person, whose K-22 staff row at this business it belongs to (held by documents_staff_fk to staff's key business_id and person_id); null otherwise. It is also person_id, so the document is sealed under the team member's own key (documents_sealed_for_owner).",
+          "source": "FS line 736 (owner staff); FS line 723 (staff); S2-06; S2-11; K-22 v1 staff_business_person_key"
+        },
+        {
+          "name": "place_or_thing_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a space's or thing's papers: the space or thing (K-23 places_or_things.id) of this business; null otherwise.",
+          "source": "FS line 741 (place_or_thing: papers, document ids); S1-81 ('Lists each space or thing, and its papers'); K-23 v1 places_or_things"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a booking's document: the booking (K-04 bookings.id, the head row) of this business; null otherwise.",
+          "source": "FS line 736 (owner booking); A4-43; A5-19; A5-20"
+        },
+        {
+          "name": "customer_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a customer's own document at this business: that customer (persons.id); null otherwise. It is also person_id, so the document is sealed under the customer's own key (documents_sealed_for_owner).",
+          "source": "FS line 736 (owner customer)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person the document is about, whose key in K-04's sealing_keys seals its number, issuer and end and the object keys of its files, so erasing that person's key makes them unreadable: the team member for theirs, the customer for theirs, the person who gave a business's or a place's paper (the owner or an admin: documents_paper_sealed_for_giver), and for a document Rosie built, the person it is for (the owner who signs S1-72's agreement, a booking's person served).",
+          "source": "arch 01 line 93; arch 09 line 492; RULES 4.10; K-04 v1 rule 6 (sealing_keys); K-22 v1 id_uploads.person_id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "license, insurance, registration, background_check, certificate, contract, estimate, proposal, design, form or agreement (FS line 736). An ID document is never one: the owner's ID upload is K-22's id_uploads (MC C10).",
+          "source": "FS line 736 (kind); S1-23 ('any license, insurance or document'); S1-61 (registration); S2-28, S2-29 (background check, certificate); A5-19 ('A document is a contract, a written estimate, a proposal or a design'); A4-43 (form); S1-72 (agreement); MC C10"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "What the document is called: the plug-in's name for the paper (S1-60: the plug-in names the licenses) or the kind's own name, such as Barber license or Health privacy agreement. Never words the person typed: those are sealed in number, issuer and ends. It is shown as the business's own word, never as checked (S13-11).",
+          "source": "FS line 736 (name or number); S1-60 ('The plug-in names the licenses and who issues them'); S2-06 ('Barber license: as you gave it, not checked'); S13-11"
+        },
+        {
+          "name": "number",
+          "type": "bytea",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "sealedBy": "person_id",
+          "description": "The paper's number exactly as the person gave it (the quoted words of their text, or the page's field), never parsed or corrected, sealed under person_id's key: a license number is personal data. Customers see it only as the business's own word, where shown_on_listing is true or the plug-in's rules want it on the job (S13-13); a team member's read-back says 'as you gave it', never the number (S2-06). Null: none given, or a document Rosie built.",
+          "source": "FS line 736 (name or number); S1-23 ('BS20981'; 'It shows as you gave it; Rosie doesn't check it'); S1-61 ('Registration 2020-1187'); S2-06; S13-11; S13-13; RULES 10.1; arch 01 line 93"
+        },
+        {
+          "name": "issuer",
+          "type": "bytea",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "sealedBy": "person_id",
+          "description": "Who issued it (a state, a city or the federal government, or for insurance its carrier), exactly as given, sealed under person_id's key. Shown as number is. Null: not given, or a document Rosie built.",
+          "source": "FS line 736 (issuer); S1-60 ('who issues them: a state, a city or the federal government'); RULES 10.4; S1-23 ('Insurance or a bond may be added here too')"
+        },
+        {
+          "name": "ends",
+          "type": "bytea",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "sealedBy": "person_id",
+          "description": "Its end date exactly as the person gave it (their words, such as 06/2027), sealed under person_id's key. Rosie never reads it as a date, since no lapse is checked while switch verify is off (MC C4: S2-11's Expired branch is hidden), so it holds no instant and no zone. Shown as number is. Null: not given, or a document Rosie built.",
+          "source": "FS line 736 (end_date); MC C4; RULES 10.5; S2-11 ('With checks on, Rosie checks the name, kind, status, places and end date')"
+        },
+        {
+          "name": "shown_on_listing",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["staff", "owner"],
+          "description": "Whether customers see it on the listing and with the work it is for, always as the business's own word, never as checked (S1-23: 'to show customers'; S2-06: 'Any license you want shown'; S13-11). Set by the person it is about or the owner.",
+          "source": "FS line 736 (shown_on_listing); S1-23; S2-06; S13-11; RULES 10.1; 01-inventory C-196 ('documents only as added by the business')"
+        },
+        {
+          "name": "origin",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "given: a person gave it as their own word (S1-23, S1-61, S1-81, S2-06), kept exactly as given and never checked; built: Rosie built it from the plug-in's and the owner's parts for its signers to sign or OK on the secure page (S1-72, A4-43, A5-20).",
+          "source": "S1-23; S1-61; S2-06; S1-72; A5-20 ('Rosie builds the document from the price and the parts the plug-in and the owner require'); MC C7"
+        },
+        {
+          "name": "given_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a given document: who gave it (persons.id), the person it is about, the owner or an admin; null for one Rosie built.",
+          "source": "S1-23; S1-81; S2-06; RULES 10.1 ('as the business gave it')"
+        },
+        {
+          "name": "given_via",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a given document: where it was given: chat (their own chat with Rosie, by text: S1-23's 'Send it', S1-61), secure_page (the person's secure page, S2-06) or portal (the owner console). Never by a call, since nothing goes by voice (DL-029). Null for one Rosie built.",
+          "source": "S1-23 ('by text or a call, or on the secure page'); S1-61; S2-06; 02-contracts K-21 (owner console: Documents); DL-029"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it was given, or built and sent to its signers: an instant in UTC (CQ-09), shown in the business's zone (K-04 businesses.time_zone), or for a booking's document in the visit's zone (S13-03; CQ-05).",
+          "source": "FS line 736; S13-03; CQ-09; CQ-05"
+        },
+        {
+          "name": "signed_by_all_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a document Rosie built: when the last signer it asks signed (A5-20's 'All signed'; S1-72's 'Signed'), set in the commit that writes that signature; null until then, and always for a given document. The money step waits for it (A5-20), and Go live reads a business's agreement with none as left unsigned (S1-29). Shown in the zone added_at is.",
+          "source": "FS line 736 (signers and signed_at); A5-20 ('The money step comes only once everyone has signed'); S1-72; S1-29 ('2 Left unsigned')"
+        },
+        {
+          "name": "withdrawn_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When it stopped counting and showing; the row stays, since records are kept (RULES 4.10; S13-08). Null: it stands. Shown in the zone added_at is.",
+          "source": "RULES 10.1 ('A business adds what it wants, or none'); S2-06 ('2 Fix something'); A5-23; RULES 4.10; S13-08"
+        },
+        {
+          "name": "withdrawn_why",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "taken_off (the person or the owner took it off), replaced (a new one was given in its place: a correction is a new document, never an edit of what was given) or not_signed_in_time (a document Rosie built that not everyone signed before the saved time ended, so the time was let go: A5-20, A5-23). Null while it stands.",
+          "source": "RULES 10.1; S2-06; A5-20 ('Not signed in time'); A5-23 ('Not everyone signed in time: the time is let go')"
+        },
+        {
+          "name": "withdrawn_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who took it off or replaced it (persons.id); null when Rosie let it go because it was not signed in time, and while it stands.",
+          "source": "RULES 10.1; A5-23"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "documents_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_staff_fk",
+          "columns": ["business_id", "staff_person_id"],
+          "references": {
+            "table": "staff",
+            "columns": ["business_id", "person_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_place_or_thing_fk",
+          "columns": ["place_or_thing_id"],
+          "references": {
+            "table": "places_or_things",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_customer_fk",
+          "columns": ["customer_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_given_by_fk",
+          "columns": ["given_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "documents_withdrawn_by_fk",
+          "columns": ["withdrawn_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "documents_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "Each text, signer and signature stays inside its document's business (row-level security)"
+        },
+        {
+          "name": "documents_id_business_person_key",
+          "columns": ["id", "business_id", "person_id"],
+          "source": "Each file is sealed under its document's person's key (arch 01 line 93)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "documents_owner_kind_known",
+          "expression": "owner_kind in ('business', 'staff', 'place_or_thing', 'booking', 'customer')",
+          "source": "FS line 736 (owner)"
+        },
+        {
+          "name": "documents_owner_named",
+          "expression": "(owner_kind = 'staff') = (staff_person_id is not null) and (owner_kind = 'place_or_thing') = (place_or_thing_id is not null) and (owner_kind = 'booking') = (booking_id is not null) and (owner_kind = 'customer') = (customer_person_id is not null)",
+          "source": "FS line 736 (owner: business, staff, place_or_thing, booking, customer); FS line 741"
+        },
+        {
+          "name": "documents_sealed_for_owner",
+          "expression": "(staff_person_id is null or person_id = staff_person_id) and (customer_person_id is null or person_id = customer_person_id)",
+          "source": "arch 01 line 93 (sealed per person); RULES 4.10"
+        },
+        {
+          "name": "documents_kind_known",
+          "expression": "kind in ('license', 'insurance', 'registration', 'background_check', 'certificate', 'contract', 'estimate', 'proposal', 'design', 'form', 'agreement')",
+          "source": "FS line 736 (kind)"
+        },
+        {
+          "name": "documents_title_given",
+          "expression": "length(btrim(title)) > 0",
+          "source": "FS line 736 (name or number); S1-60"
+        },
+        {
+          "name": "documents_origin_known",
+          "expression": "origin in ('given', 'built')",
+          "source": "S1-23; S2-06; S1-72; A5-20"
+        },
+        {
+          "name": "documents_given_by_whom",
+          "expression": "(origin = 'given' and given_by_person_id is not null and given_via is not null) or (origin = 'built' and given_by_person_id is null and given_via is null)",
+          "source": "RULES 10.1 ('as the business gave it'); S1-23; S2-06; A5-20 ('Rosie builds the document')"
+        },
+        {
+          "name": "documents_given_via_known",
+          "expression": "given_via is null or given_via in ('chat', 'secure_page', 'portal')",
+          "source": "S1-23; S2-06; DL-029 (no voice)"
+        },
+        {
+          "name": "documents_built_to_sign",
+          "expression": "origin = 'given' or kind in ('contract', 'estimate', 'proposal', 'design', 'form', 'agreement')",
+          "source": "A5-19 ('A document is a contract, a written estimate, a proposal or a design'); A4-43 (forms); S1-72 (agreement)"
+        },
+        {
+          "name": "documents_built_holds_no_given_values",
+          "expression": "origin = 'given' or (number is null and issuer is null and ends is null)",
+          "source": "FS line 736; A5-20"
+        },
+        {
+          "name": "documents_paper_sealed_for_giver",
+          "expression": "origin = 'built' or owner_kind not in ('business', 'place_or_thing') or person_id = given_by_person_id",
+          "source": "arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "documents_signed_only_built",
+          "expression": "signed_by_all_at is null or (origin = 'built' and signed_by_all_at >= added_at)",
+          "source": "FS line 736 (signers and signed_at); A5-20"
+        },
+        {
+          "name": "documents_withdrawn_with_why",
+          "expression": "(withdrawn_at is null) = (withdrawn_why is null) and (withdrawn_at is null or withdrawn_at >= added_at)",
+          "source": "RULES 10.1; A5-23"
+        },
+        {
+          "name": "documents_withdrawn_why_known",
+          "expression": "withdrawn_why is null or withdrawn_why in ('taken_off', 'replaced', 'not_signed_in_time')",
+          "source": "RULES 10.1; S2-06; A5-20; A5-23"
+        },
+        {
+          "name": "documents_withdrawn_by_whom",
+          "expression": "case when withdrawn_why is null then withdrawn_by_person_id is null else (withdrawn_why = 'not_signed_in_time') = (withdrawn_by_person_id is null) end",
+          "source": "RULES 10.1; A5-23 (Rosie lets the time go)"
+        },
+        {
+          "name": "documents_not_signed_only_built",
+          "expression": "withdrawn_why is distinct from 'not_signed_in_time' or (origin = 'built' and signed_by_all_at is null)",
+          "source": "A5-20; A5-23"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "documents_business_owner_idx",
+          "columns": ["business_id", "owner_kind"],
+          "why": "A business's documents by whose they are: the owner console's Documents page (02-contracts K-21) and Go live's check for an agreement left unsigned (S1-29)."
+        },
+        {
+          "name": "documents_staff_idx",
+          "columns": ["business_id", "staff_person_id"],
+          "where": "staff_person_id is not null",
+          "why": "A team member's papers: their secure page and read-back (S2-06), S2-11 and S2-29, and the job limits the business states (S13-15)."
+        },
+        {
+          "name": "documents_place_or_thing_idx",
+          "columns": ["place_or_thing_id"],
+          "where": "place_or_thing_id is not null",
+          "why": "A space's or thing's papers (S1-81; FS line 741)."
+        },
+        {
+          "name": "documents_booking_idx",
+          "columns": ["booking_id"],
+          "where": "booking_id is not null",
+          "why": "A booking's documents to sign before its money step (A4-43, A5-19, A5-20)."
+        },
+        {
+          "name": "documents_customer_idx",
+          "columns": ["business_id", "customer_person_id"],
+          "where": "customer_person_id is not null",
+          "why": "A customer's own documents at a business, on their secure page."
+        },
+        {
+          "name": "documents_listing_idx",
+          "columns": ["business_id"],
+          "where": "shown_on_listing and withdrawn_at is null",
+          "why": "The documents the listing shows, as the business's own word (S1-23; S13-11; 01-inventory C-196)."
+        },
+        {
+          "name": "documents_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's documents: their own secure page, and the 45-day copy or delete (RULES 4.10; S13-08)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "document_files",
+      "description": "A file of a given document: a photo or a file such as a PDF the person uploaded with it (a license photo, an insurance certificate), kept private in R2 behind the files port (K-13). The row holds only the file's object key, sealed under the key of the document's person, never the file or its bytes. Files are taken only on the secure page or in the portal, never from the chat (S13-43: 'A license photo goes only on the secure page'; MC C10). Written once: never edited or deleted by the application.",
+      "source": "FS line 736 (file (secure)); MC 8 'Files' (uploads stay private in R2); MC C10; S13-43; RULES 4.5; Q-31; 02-contracts K-13 (signed uploads: license file, form, signed document)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The file's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document it is a file of (documents.id).",
+          "source": "FS line 736 (file)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's business, held to it by document_files_document_fk, for row-level security.",
+          "source": "arch 10 line 546; RULES 4.10"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's person (documents.person_id, held to it by document_files_document_fk), whose key seals object_key.",
+          "source": "arch 01 line 93; K-04 v1 rule 6"
+        },
+        {
+          "name": "object_key",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "The file's object key in R2 (K-13), sealed under person_id's key, so deleting that key erases the way to the file (arch 01 line 93; RULES 4.10). Seen only on the secure page of the person it is about and in the owner's portal, each view logged through K-13's short read link (RULES 4.5); never in a text, an email, an AI's answer or to customers. Never the file or its bytes.",
+          "source": "FS line 736 (file (secure)); MC 8 'Files'; MC C10 ('Uploads stay private in R2'); S13-43; RULES 4.5 ('These stay on the secure page, each view logged'), 4.10; Q-31; arch 01 line 93"
+        },
+        {
+          "name": "content_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The file's media type: a photo (image/...) or a file such as a PDF (application/...).",
+          "source": "FS line 736 (file); K-22 v1 id_uploads.content_type"
+        },
+        {
+          "name": "uploaded_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it was uploaded: an instant in UTC (CQ-09), shown in the business's zone (K-04 businesses.time_zone).",
+          "source": "CQ-09; S13-03"
+        },
+        {
+          "name": "uploaded_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who uploaded it (persons.id): the person it is about, the owner or an admin.",
+          "source": "S2-06; S1-23; RULES 10.1"
+        },
+        {
+          "name": "uploaded_via",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "secure_page (the person's secure page, S2-06) or portal (the owner console); never the chat (S13-43; MC C10).",
+          "source": "S13-43 ('A license photo goes only on the secure page'); MC C10 ('on the secure page, never in the chat'); S2-06"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "document_files_document_fk",
+          "columns": ["document_id", "business_id", "person_id"],
+          "references": {
+            "table": "documents",
+            "columns": ["id", "business_id", "person_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "document_files_uploaded_by_fk",
+          "columns": ["uploaded_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "document_files_content_type_form",
+          "expression": "content_type ~ '^(image|application)/[a-z0-9.+-]+$'",
+          "source": "FS line 736 (file); K-22 v1 id_uploads_content_type_form"
+        },
+        {
+          "name": "document_files_via_page_or_portal",
+          "expression": "uploaded_via in ('secure_page', 'portal')",
+          "source": "S13-43; MC C10; RULES 4.5"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "document_files_document_idx",
+          "columns": ["document_id"],
+          "why": "A document's files, for the secure page and the portal (S2-06)."
+        },
+        {
+          "name": "document_files_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's files, for the 45-day copy or delete (RULES 4.10; S13-08)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "document_texts",
+      "description": "The exact words of a document Rosie built, as its signers read them, each in their own language from a checked text (A5-20; RULES 4.11): the words, their sha256 and the checked text's version. One per document and language, written once and never edited, so each signature names exactly the words it signed. Never sealed: a signature's proof survives a person's key being deleted, as its hash and the words shown (arch 09 line 492; RULES 4.10), as K-29's consent words do.",
+      "source": "A5-20 ('Each signer reads it in their own language, from a checked text'); S1-72; RULES 4.10, 4.11; S13-08 ('contracts and every yes are kept 7 years'); arch 09 line 492; FS line 754",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The text's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document Rosie built (documents.id).",
+          "source": "A5-20; S1-72"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's business, held to it by document_texts_document_fk, for row-level security.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The language of these words, a BCP 47 tag such as en or es: each signer reads the text in their own language (A5-20; RULES 4.11).",
+          "source": "A5-20; RULES 4.11; K-04 v1 persons_language_form"
+        },
+        {
+          "name": "words",
+          "type": "text",
+          "null": false,
+          "audience": "secure-page-only",
+          "description": "The exact words shown to sign or OK, as the secure page shows them and the signer's copy carries them (A5-20: 'each gets a copy'). Never sealed: they are the words shown that a signature's proof keeps (arch 09 line 492; RULES 4.10).",
+          "source": "A5-20; S1-72; S13-37; RULES 4.10; arch 09 line 492"
+        },
+        {
+          "name": "words_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of words in UTF-8, in lowercase hex: the hash each signature carries, so the proof survives as the hash and the words shown.",
+          "source": "arch 09 line 492 ('consent proofs survive as hashes and the words shown'); K-29 v1 consents_words_sha256_match"
+        },
+        {
+          "name": "text_version",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The checked text these words were made from and its version (RULES 4.11: 'from a checked text'; A5-20), such as the health privacy agreement's version, or the plug-in's or owner's document for a booking; with words_sha256 it is the signed text's version.",
+          "source": "RULES 4.11; A5-20; S1-72; S13-49"
+        },
+        {
+          "name": "made_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the words were made for this document: an instant in UTC (CQ-09).",
+          "source": "A5-20; CQ-09"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "document_texts_document_fk",
+          "columns": ["document_id", "business_id"],
+          "references": {
+            "table": "documents",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "document_texts_one_per_language",
+          "columns": ["document_id", "language"],
+          "source": "A5-20 (each signer reads it in their own language); a changed text is a new document"
+        },
+        {
+          "name": "document_texts_id_document_words_key",
+          "columns": ["id", "document_id", "words_sha256"],
+          "source": "A signature names the exact words of its own document (document_signatures_text_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "document_texts_language_form",
+          "expression": "language ~ '^[a-z]{2,3}(-[A-Za-z0-9]+)*$'",
+          "source": "K-04 v1 persons_language_form (BCP 47)"
+        },
+        {
+          "name": "document_texts_words_given",
+          "expression": "length(btrim(words)) > 0",
+          "source": "A5-20; RULES 4.11"
+        },
+        {
+          "name": "document_texts_words_sha256_match",
+          "expression": "words_sha256 = encode(sha256(convert_to(words, 'UTF8')), 'hex')",
+          "source": "arch 09 line 492; K-29 v1 consents_words_sha256_match"
+        },
+        {
+          "name": "document_texts_version_given",
+          "expression": "length(btrim(text_version)) > 0",
+          "source": "RULES 4.11"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "document_signers",
+      "description": "Who a document Rosie built asks to sign or OK it: the owner, for an agreement the work needs (S1-72), or everyone the plug-in or the owner says must sign a booking's document, each on their own link the customer forwards, never texted by Rosie (A5-20; MC C9). The business sending it is its own signature (A5-20), so the business is never a row here. Written once, when the document is sent.",
+      "source": "FS line 736 (signers); A5-20 ('Everyone the plug-in says must sign does, each on their own link the customer forwards. Rosie never texts them itself'); S1-72; A4-43; MC C9",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The signer row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document to sign (documents.id).",
+          "source": "FS line 736 (signers)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's business, held to it by document_signers_document_fk, for row-level security.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who must sign (persons.id): one person row across Rosie (FS line 743). A co-signer the customer names gets a K-04 person first, as anyone new does; nobody signs for someone else (A5-20: 'Never: sign for someone').",
+          "source": "A5-20; FS line 743; K-04 v1 persons"
+        },
+        {
+          "name": "signs_as",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "As whom they sign, in the plug-in's or the owner's words, such as Owner, Customer or Parent or guardian; the secure page shows it.",
+          "source": "A5-20 ('Everyone the plug-in says must sign'); S1-72"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When they were asked, with their own link: an instant in UTC (CQ-09), shown in the zone the document's added_at is.",
+          "source": "A5-20; S1-72; CQ-09"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "document_signers_document_fk",
+          "columns": ["document_id", "business_id"],
+          "references": {
+            "table": "documents",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "document_signers_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "document_signers_one_per_person",
+          "columns": ["document_id", "person_id"],
+          "source": "A5-20 (each signer on their own link)"
+        },
+        {
+          "name": "document_signers_id_document_person_key",
+          "columns": ["id", "document_id", "person_id"],
+          "source": "A signature is the signer's own, on the signer's own document (document_signatures_signer_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "document_signers_signs_as_given",
+          "expression": "length(btrim(signs_as)) > 0",
+          "source": "A5-20"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "document_signers_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's documents to sign, on their own secure page (A5-20; S1-72), and the 45-day copy (RULES 4.10)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "document_signatures",
+      "description": "One signer's signature, written once and never edited or deleted: who signed (their signer row and person), when, how (a tap or a typed name, on the secure page) and the exact words they read (their text row and its sha256). The typed name is sealed under the signer's key; the rest is the proof, which stays after a delete and for 7 years (RULES 4.10; S13-08; arch 09 line 492).",
+      "source": "FS line 736 (signers and signed_at); A5-20 ('A signature can be a tap or a typed name'); S1-72; A4-43; S13-38 ('A signature can be a typed name'); RULES 4.10; S13-08; arch 09 line 492",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The signature's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document signed (documents.id).",
+          "source": "FS line 736"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The document's business, held to it by document_signatures_document_fk, for row-level security.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "signer_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The signer row it answers (document_signers.id), of the same document and person (document_signatures_signer_fk); each signer signs once (document_signatures_one_per_signer).",
+          "source": "A5-20 (everyone the plug-in says must sign does)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who signed (persons.id): the signer row's person, whose key seals typed_name. Only that person signs, never someone for them (A5-20).",
+          "source": "A5-20 ('Never: sign for someone'); arch 01 line 93"
+        },
+        {
+          "name": "document_text_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The words they read and signed, in their language (document_texts.id), of the same document (document_signatures_text_fk).",
+          "source": "A5-20 ('Each signer reads it in their own language, from a checked text'); RULES 4.11"
+        },
+        {
+          "name": "words_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the words signed, held equal to that text row's by document_signatures_text_fk: the proof's hash, which survives a delete with the words shown.",
+          "source": "arch 09 line 492; RULES 4.10"
+        },
+        {
+          "name": "signed_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When they signed: an instant in UTC (CQ-09), shown in the zone the document's added_at is, on the page and on their copy.",
+          "source": "FS line 736 (signed_at); A5-20; S1-72; CQ-09; S13-03"
+        },
+        {
+          "name": "how",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "tap (they tapped to sign or OK it) or typed_name (they typed their name), on the secure page.",
+          "source": "A5-20 ('A signature can be a tap or a typed name'); S13-38; 01-inventory C-185 ('a typed name signs')"
+        },
+        {
+          "name": "typed_name",
+          "type": "bytea",
+          "null": true,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "For a typed_name signature: the name exactly as they typed it, sealed under the signer's key, so a delete of that person makes it unreadable while the signature's proof stays. Null for a tap.",
+          "source": "A5-20; S13-38; arch 01 line 93; arch 09 line 492; RULES 4.10"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where it was signed: secure_page, the only place a document is signed (S1-72; A4-43; A5-20).",
+          "source": "S1-72 ('Sam signs the agreement on the secure page'); A4-43 ('A form signed on the secure page'); A5-20"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "document_signatures_document_fk",
+          "columns": ["document_id", "business_id"],
+          "references": {
+            "table": "documents",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "document_signatures_signer_fk",
+          "columns": ["signer_id", "document_id", "person_id"],
+          "references": {
+            "table": "document_signers",
+            "columns": ["id", "document_id", "person_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "document_signatures_text_fk",
+          "columns": ["document_text_id", "document_id", "words_sha256"],
+          "references": {
+            "table": "document_texts",
+            "columns": ["id", "document_id", "words_sha256"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "document_signatures_one_per_signer",
+          "columns": ["signer_id"],
+          "source": "A5-20 (each signer signs or OKs it once)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "document_signatures_how_known",
+          "expression": "how in ('tap', 'typed_name')",
+          "source": "A5-20; S13-38"
+        },
+        {
+          "name": "document_signatures_typed_name_given",
+          "expression": "(how = 'typed_name') = (typed_name is not null)",
+          "source": "A5-20; S13-38"
+        },
+        {
+          "name": "document_signatures_channel_known",
+          "expression": "channel in ('secure_page')",
+          "source": "S1-72; A4-43; A5-20"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "document_signatures_document_idx",
+          "columns": ["document_id"],
+          "why": "Whether everyone has signed (A5-20's 'Does everyone sign in time?'; S1-29's 'Left unsigned')."
+        },
+        {
+          "name": "document_signatures_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's signatures, for their copy and the 45-day copy or delete (RULES 4.10; S13-08)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    }
+  ]
+}

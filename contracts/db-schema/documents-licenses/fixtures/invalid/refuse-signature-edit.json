@@ -1,0 +1,19 @@
+{
+  "after": ["seed-agreement-signed.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "document_signatures",
+    "set": {
+      "signed_at": "2026-10-20T15:00:00Z"
+    },
+    "where": {
+      "id": "docsig-health-privacy-sam"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

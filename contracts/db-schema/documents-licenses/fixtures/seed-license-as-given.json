@@ -1,0 +1,59 @@
+{
+  "after": [
+    "../../people-access/fixtures/seed-owner-id-upload.json",
+    "../../people-access/fixtures/seed-emergency-contact.json"
+  ],
+  "rows": [
+    {
+      "table": "documents",
+      "values": {
+        "id": "doc-barbershop-license",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "business",
+        "person_id": "person-sam",
+        "kind": "license",
+        "title": "Barber license",
+        "number": "\\x6b33352d7365616c65642d6e756d6265722d73686f70",
+        "shown_on_listing": true,
+        "origin": "given",
+        "given_by_person_id": "person-sam",
+        "given_via": "chat",
+        "added_at": "2026-10-19T14:20:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "documents",
+      "values": {
+        "id": "doc-riley-barber-license",
+        "business_id": "biz-lees-barbershop",
+        "owner_kind": "staff",
+        "staff_person_id": "person-riley",
+        "person_id": "person-riley",
+        "kind": "license",
+        "title": "Barber license",
+        "number": "\\x6b33352d7365616c65642d6e756d6265722d72696c6579",
+        "shown_on_listing": true,
+        "origin": "given",
+        "given_by_person_id": "person-riley",
+        "given_via": "secure_page",
+        "added_at": "2026-10-19T15:08:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "document_files",
+      "values": {
+        "id": "docfile-riley-barber-license-photo",
+        "document_id": "doc-riley-barber-license",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-riley",
+        "object_key": "\\x6b33352d7365616c65642d66696c652d6b65792d72696c6579",
+        "content_type": "image/jpeg",
+        "uploaded_at": "2026-10-19T15:08:00Z",
+        "uploaded_by_person_id": "person-riley",
+        "uploaded_via": "secure_page"
+      }
+    }
+  ]
+}

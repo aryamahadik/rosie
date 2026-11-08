@@ -1,0 +1,185 @@
+# db-schema/documents-licenses (K-35): the database schema, documents and licenses part
+
+**Status: v1, frozen** (`frozen.json`: `{"frozen": ["v1"]}`). Written and frozen by T-044. The freeze takes effect when T-044 merges, and the merge waits for every review below (build prompt 6.2, 6.5).
+
+## Freeze record
+
+Frozen v1, 2026-11-07, reviews required: database engineer, action-layer engineer, frontend engineer, QA and eval engineer.
+
+Each reviewer checks its own side (02-contracts section 1): the database engineer that the migrations can produce exactly this table list, with the rules below, beside K-04's, K-22's and K-23's tables without redefining any of their columns (C-171 Domain: Documents and licenses, with C-154 migrations queue and C-155 seeds from fixture set v1, whose setup seeds follow F14: 02-contracts section 7 notes); the action-layer engineer the rows journey 1's and journey 2's Tool API calls, turns and page calls write and read: a license or registration texted in the owner's chat (S1-23, S1-61), the agreement the work needs signed on the secure page (S1-72) and Go live's "Left unsigned" check (S1-29), a space's papers (S1-81), a team member's own papers on their secure page (S2-06) kept as added (S2-11, S2-29), and later the forms and documents signed before a booking's money step (A4-43, A5-19 to A5-23) (C-074, C-087, C-091, C-094); the frontend engineer the fields the registration screens ("documents (optional, never checked)", the health agreement), the staff page ("an optional license shown as given"), the secure page ("forms and signatures"; "a typed name signs"), the owner console's Documents page and the public listing page ("documents only as added by the business") show or save (C-187, C-195, C-199, C-185, C-192, C-196, through K-21); QA and eval the seeds and refused rows (C-147; the contract test `tests/contract/db-schema.documents-licenses.v1.test.ts`, T-112). The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
+
+**Owner:** the architect. **Table list:** `documents-licenses.v1.tables.json`, checked against `../tables.meta.schema.json` (02-contracts section 2 item 3). **Checked by:** `npm run contracts:check` (the list's shape, that every column a key, constraint, index, scope, version or seal names exists, and the fixtures index; each seed or refused row is left to the contract test, which loads it into a migrated database: 02-contracts section 2 item 12). **Contract test:** `tests/contract/db-schema.documents-licenses.v1.test.ts` (QA, T-112, not T-044): migrate a fresh schema with the core, people-access, business-setup and conversations-consent parts, compare the catalog with the table list, load the seeds, refuse the refused rows. A change after the freeze is a new file, `documents-licenses.v1.1.tables.json` (additive) or `documents-licenses.v2.tables.json` (breaking, with the CTO's OK), with new fixtures (build prompt 6.4); the frozen-contract guard fails any edit to v1's table list, its fixtures or their index entries.
+
+## What it defines
+
+The five tables of arch 09's "Documents and licenses" domain (arch 09 line 472: 5 tables; arch 09 gives no names), under Q-33's default (arch 09's shape, FS section 9 as the checklist), from FS line 736's document row and 02-contracts section 7 row K-35. Every table and column names its source in `documents-licenses.v1.tables.json`.
+
+- **`documents`**: one document of a business, a team member, a space or thing, a booking or a customer. Either a paper a person gave as their own word (a license, insurance, registration, background check or certificate, or any document they add), kept exactly as given and never checked, or a document Rosie built for its signers to sign or OK on the secure page (an agreement, contract, estimate, proposal, design or form). Sources: FS line 736; S1-23, S1-60, S1-61, S1-72, S1-81, S2-06, S2-11, S2-28, S2-29, A4-43, A5-19, A5-20; MC C4, C7; D96; RULES 10.1 to 10.5.
+- **`document_files`**: a photo or file uploaded with a given document (a license photo, an insurance certificate), kept private in R2: the row holds only its object key, sealed. Sources: FS line 736 ("file (secure)"); MC 8 "Files"; MC C10; S13-43; RULES 4.5; Q-31.
+- **`document_texts`**: the exact words of a document Rosie built, per language, with their sha256 and the checked text's version. Sources: A5-20; S1-72; RULES 4.11; arch 09 line 492.
+- **`document_signers`**: who a built document asks to sign or OK it. Sources: FS line 736 ("signers"); A5-20; S1-72.
+- **`document_signatures`**: each signer's signature, written once: who, when, how (a tap or a typed name, on the secure page) and the hash of the exact words signed. Sources: FS line 736 ("signed_at"); A5-20; S1-72; A4-43; S13-38; RULES 4.10; S13-08.
+
+### Which part owns what
+
+Each fact has one home; this part names the others' rows by their keys and repeats none of their columns.
+
+- **K-04 core** (frozen, #55) owns the business head (`businesses`, with `time_zone`), every person (`persons`: a signer, a giver, a customer), the booking head (`bookings`), the per-person sealing keys (`sealing_keys`, with migration 0003's seal, unseal and erase), the turns and the event log (every write here appends to it: arch 09 line 457).
+- **K-22 people and access** (frozen, #109) owns the team member (`staff`): a team member's document names their staff row by K-22's key `staff_business_person_key` (`business_id`, `person_id`). K-22 also owns the owner's ID upload (`id_uploads`, MC C10): an ID document is never a document here. K-22's README already places "a person's license, certificate or background check (T08)" here, kept as given (S2-11).
+- **K-23 business setup** (frozen, #78) owns spaces and things (`places_or_things`). FS line 741's "papers (document ids)" are the `documents` rows here that name the space or thing, so K-23 holds no papers column (K-23 v1 README).
+- **K-29 conversations and consent** (frozen, #59) owns every yes as a consent row. The owner's yes to the health privacy agreement (S1-72) is one of kind `health_agreement` (FS line 735), which Go live reads with this part's signed agreement. The commit that writes the signature here writes that consent row too, with the same words and sha256 (rule 9); no table here refers to K-29 (open gaps).
+- **K-13 files port** (not frozen: T-022) owns the files themselves, in R2: a signed upload, a short signed read link with each view logged, and the delete for erasure under RULES 4.10. A row here holds only a file's object key, sealed, never the file or its bytes.
+- **K-30 bookings and changes** (F15) owns a booking's secure link and its page answers; a booking's document names only K-04's booking head.
+
+### FS line 736, field by field
+
+- `id`: `documents.id`.
+- `owner` (business, staff, place_or_thing, booking, customer): `documents.owner_kind`, with exactly the matching one of `staff_person_id`, `place_or_thing_id`, `booking_id` and `customer_person_id` set (`documents_owner_named`), and none for the business itself.
+- `kind`: `documents.kind`, FS's eleven values (`documents_kind_known`).
+- `name or number`: `documents.title` (what the paper is called, from the plug-in or the kind, plain) and `documents.number` (the number as given, sealed).
+- `issuer`: `documents.issuer` (as given, sealed).
+- `end_date`: `documents.ends` (the words given, sealed, never read as a date).
+- `file (secure)`: `document_files` rows (the R2 object key, sealed, seen only on the secure page and in the portal).
+- `shown_on_listing`: `documents.shown_on_listing`.
+- `signers and signed_at`: `document_signers` rows, `document_signatures` rows (each with `signed_at`), and `documents.signed_by_all_at` once everyone has signed.
+- **No "checked" column**: none here, and none that says verified or approved (`refuse-checked-column`).
+
+### Kept as given, never checked (MC C4, C7; D96; RULES 10)
+
+- A given document is optional, the business's or the person's own word, shown as given and never checked; nothing waits on it, and it never stands for the owner's control (S1-23: "Never: let a license stand for control (S1-75), say Rosie checked it, or make it required"). Switch verify stays off (MC C4; RULES 10.5), so no lookup result, status, lapse or end-date check is stored: `ends` is the words given, which Rosie never compares with a clock.
+- "As given" means exactly as given, with who gave it (`given_by_person_id`), where (`given_via`: their chat, their secure page or the portal) and when (`added_at`). The number is the quoted words of the person's text or the page's field, never parsed or corrected. Neither application role may change a given value (rule 5: `refuse-as-given-edit`). A correction is a new document, and the old one is withdrawn as `replaced`.
+- No column says Rosie checked, verified or approved a document (`refuse-checked-column`). The gives keys `license` (S1-23, S1-61) and `license_checked` (S2-11, S2-29) are the step graph's runtime record (build prompt 3.5): each is given when its step runs, whether or not the person added anything, since adding is optional. This part stores only what was added, as given (02-contracts section 8: "license_checked: K-35: person licenses kept as given (C4)").
+- A document's photo or file is taken only on the secure page or in the portal, never kept from the chat (S13-43: "A license photo goes only on the secure page"; MC C10; RULES 4.5): `refuse-file-from-chat`. A number may come by text (S1-23, S1-61).
+- Customers see a document only as the business's own word (S13-11: "never as checked by Rosie"; C-196: "documents only as added by the business"), and only one whose `shown_on_listing` is true, or one the plug-in's rules want on the job (S13-13). Work with no license shows no license claim (RULES 10.1).
+
+### Built documents and signatures (S1-72, A4-43, A5-19 to A5-23)
+
+- Rosie builds an agreement, contract, estimate, proposal, design or form from the plug-in's and the owner's parts (A5-20: "Rosie builds the document from the price and the parts the plug-in and the owner require"; S1-72: the plug-in names the agreement). A built document has `origin` `built`, no given values (`documents_built_holds_no_given_values`) and its words in `document_texts`, one row per language, since "each signer reads it in their own language, from a checked text" (A5-20; RULES 4.11). The words are written once and never edited; `document_texts_words_sha256_match` holds the hash to them. A changed text is a new document.
+- `document_signers` lists who must sign: the owner for the agreement the work needs (S1-72), or everyone the plug-in or the owner says must sign a booking's document, each on their own link the customer forwards (A5-20; MC C9: Rosie never texts them itself). "The business sending it is its signature" (A5-20), so the business is never a signer row. A co-signer the customer names gets a K-04 person first; nobody signs for someone else (A5-20).
+- `document_signatures` holds each signature, written once: the signer row and person (`document_signatures_signer_fk` keeps both to the same document), when (`signed_at`), how (`tap` or `typed_name`, on the secure page) and the exact words signed (`document_signatures_text_fk` holds `words_sha256` equal to that text row's, of the same document). A typed name is sealed under the signer's key. Each signer signs once (`document_signatures_one_per_signer`). Neither application role may edit or delete one (`refuse-signature-edit`).
+- When the last signer signs, the same commit sets `documents.signed_by_all_at` (A5-20's "All signed"); the money step waits for it (A5-20). Go live reads a business's agreement with none as left unsigned, and that work stays offline, saved (S1-29, S1-31; S1-72: "Not signed now: setup goes on, but that work stays offline, saved"). Not everyone signed before the saved time ended: the clock withdraws it as `not_signed_in_time`, with no person (A5-23).
+- A signer's copy (A5-20: "each gets a copy") is made from the text and the signatures when it is sent; v1 stores no copy file (open gaps).
+
+## Each table: writer, readers, scope, version, retention, sealing
+
+### `documents`
+
+- **Written by:** the action layer, in a turn's one commit (C-074, C-087): a paper texted in the owner's chat (S1-23, S1-61), a space's papers (S1-81), the agreement the work needs, built and sent to the owner (S1-72); the page calls behind the secure page and the owner console (K-21): a team member's paper on their page (S2-06, kept as added at S2-11 or S2-29), the owner's Documents page; with journeys 4 and 5, a booking's forms and documents built and sent (A4-43, A5-19), `signed_by_all_at` when the last signer signs (A5-20), and the clock's withdrawal of one not signed in time (A5-23). Updates touch only `shown_on_listing`, `signed_by_all_at` and the withdrawn columns (rule 5).
+- **Read by:** the business's owner, and an admin the owner lets manage the team or settings (K-22 `team_powers`), in the portal and by text; a team member reads their own papers on their secure page (S2-06's read-back says "as you gave it", never the number) and never another member's number; a customer reads only a shown document's kind, title, number, issuer and end, as the business's own word, on the listing and with the work (S1-23; S13-11; S13-13); the person a document is about reads their own on their secure page; the composer's slot filler reads through limit 7's claim check, which holds each column to its audience (C-088, C-091). Never another business: row-level security.
+- **Scope:** business (`business_id`, not null).
+- **Version and repeats:** versioned; every update raises `version` by one (K-04's `enforce_version_raise`), and a commit compares and sets it. A retried write with the same id is refused by the primary key (rule 10).
+- **Kept:** no row is deleted (no DELETE grant): documents are records, kept 7 years, or longer where the trade's rules say (RULES 4.10; S13-08; FS line 754). No shorter rule is invented (Q-31). A withdrawn document keeps its row.
+- **Erasure:** `erasePerson()` (C-156, with migration 0003's erase) deletes the person's key, so `number`, `issuer` and `ends` of every document whose `person_id` is that person can never be read again (RULES 4.10's 45-day delete). The plain columns stay.
+- **Sealed, column by column:** `number`, `issuer` and `ends`, under `person_id`'s key: a license number, an ID detail or anything taken from a document is personal data. Plain: `title` and `kind` (they name a paper, never a person's detail, and never carry the person's own words), `owner_kind`, the ids, `shown_on_listing`, `origin`, `given_via`, the times, `withdrawn_why` and `version`. Not kept at all: any checked, verified or approved value (D96), a lookup result (MC C4), and the person's own message words (K-04's `messages` hold those, sealed: CQ-54).
+
+### `document_files`
+
+- **Written by:** the page calls that take an upload on the secure page or in the portal, through K-13's signed upload (K-21: "a signed upload for ... license files"; S2-06), once per file.
+- **Read by:** the person the document is about, on their own secure page, and the owner, or an admin the owner lets manage the team or settings, in the portal, each through K-13's short read link with each view logged (RULES 4.5: "These stay on the secure page, each view logged"). Never a customer, never in a text, an email or an AI's answer, never another business.
+- **Scope:** business.
+- **Version and repeats:** none: written once; no UPDATE or DELETE grant (rule 5). A retried upload with the same id is refused by the primary key.
+- **Kept:** the row as long as its document; the R2 object private, with no deletion rule invented (Q-31).
+- **Erasure:** deleting the person's key makes `object_key`, the only way to the file, unreadable. The object itself is removed through K-13's delete for erasure under RULES 4.10, which K-13 defines (not frozen: open gaps).
+- **Sealed, column by column:** `object_key`, under `person_id`'s key (held to its document's person by `document_files_document_fk`). Plain: `content_type`, `uploaded_at`, `uploaded_via` and the ids. Not kept at all: the file or its bytes, which live only in R2.
+
+### `document_texts`
+
+- **Written by:** the call that builds and sends a document (S1-72; A4-43; A5-19), once per language.
+- **Read by:** each signer on their secure page and in their copy (A5-20), and the owner in the portal; never another business.
+- **Scope:** business.
+- **Version and repeats:** none: written once, never edited (no UPDATE or DELETE grant); one text per document and language (`document_texts_one_per_language`).
+- **Kept:** 7 years with its signatures (S13-08: "contracts and every yes are kept 7 years"; FS line 754).
+- **Erasure:** nothing here is sealed: the words shown and their hash are the proof that survives a person's key being deleted (arch 09 line 492; RULES 4.10: "the proof of every yes stay"), as K-29's consent words are.
+- **Sealed, column by column:** none, on purpose. The builder keeps a private detail out of the words and points to the secure page instead (RULES 4.5; open gaps).
+
+### `document_signers`
+
+- **Written by:** the call that sends a built document, once per signer.
+- **Read by:** each signer, their own row, on their secure page; the customer whose booking it is (who still has to sign: A5-20); the owner in the portal; never another business.
+- **Scope:** business.
+- **Version and repeats:** none: written once; one row per person and document (`document_signers_one_per_person`).
+- **Kept:** with its document.
+- **Erasure:** nothing here is sealed; `signs_as` is a role in the plug-in's or the owner's words (such as Owner or Customer), never a name, and the person id is opaque.
+- **Sealed, column by column:** none. Plain: `signs_as`, `asked_at` and the ids.
+
+### `document_signatures`
+
+- **Written by:** the secure page's sign call, once per signer (S1-72; A4-43; A5-20); the commit that writes the last one also sets `documents.signed_by_all_at`.
+- **Read by:** the signer, their own; the owner in the portal (who signed and when); the customer whose booking it is (whether everyone has signed); a typed name only on the secure page; never another business.
+- **Scope:** business.
+- **Version and repeats:** none: written once, insert only, never edited or deleted (`refuse-signature-edit`); each signer signs once (`document_signatures_one_per_signer`).
+- **Kept:** 7 years (S13-08), and after a delete (RULES 4.10: "The ... proof of every yes stay").
+- **Erasure:** deleting the signer's key makes `typed_name` unreadable; who signed (the opaque person id), when, how and the hash of the words signed stay as the proof (arch 09 line 492).
+- **Sealed, column by column:** `typed_name`, under the signer's key (`person_id`, held to the signer row's person by `document_signatures_signer_fk`). Plain: `how`, `signed_at`, `words_sha256`, `channel` and the ids.
+
+## Database rules beyond the table list
+
+The table list's meta-schema has no place for these; the migrations must produce them too, and T-112 checks them.
+
+1. **Same schema as core:** the five tables live beside K-04's, K-22's and K-23's tables, and their foreign keys name `businesses.id`, `persons.id` and `bookings.id` (K-04), `staff (business_id, person_id)` (K-22's `staff_business_person_key`) and `places_or_things.id` (K-23), with no schema prefix. No table here refers to K-29, K-13 or K-30, and none of theirs to these. One seed loads K-29's `seed-consent-health-agreement` (Lee Nutrition Clinic and Sam's consent row), so the contract test migrates K-29 too.
+2. **Versions:** `documents` has `version integer not null default 1` and the BEFORE UPDATE trigger `documents_version_raised`, which runs K-04's `enforce_version_raise()` (migration 0002): an update must raise the version by exactly one, else SQLSTATE 23514, and a commit compares and sets it (arch 01 line 85; K-04 v1 rule 2). The other four tables are written once and carry none.
+3. **Ids** are `text`: opaque strings code makes and never parses (CQ-09).
+4. **Row-level security per business** (arch 10 line 546; K-04 v1 rule 4): all five tables are scoped by `business_id`, which is not null in every one, so each row is its business's alone and no other business scope sees it (RULES 4.10: "never joined across businesses"; S13-42). The runtime side reads unscoped only for jobs that work by person across businesses: the 45-day copy or delete (C-156; RULES 4.10).
+5. **Grants, the same for both application roles** (the Tool API role and the runtime side): `SELECT` and `INSERT` on all five tables; `UPDATE` on `documents` only of `shown_on_listing`, `signed_by_all_at`, `withdrawn_at`, `withdrawn_why`, `withdrawn_by_person_id` and `version`; no `UPDATE` on the other four; no `DELETE` on any. So what a person gave (`title`, `kind`, `number`, `issuer`, `ends`, the owner columns, `person_id`, `origin`, `given_by_person_id`, `given_via`, `added_at`) never changes (SQLSTATE 42501: `refuse-as-given-edit`), a file, a text, a signer and a signature are never edited (42501: `refuse-signature-edit`), and nothing is deleted. Only the tables' owner, the migrations' role, holds more, as K-29 v1 does for `consents`.
+6. **Sealed fields:** `documents.number`, `documents.issuer`, `documents.ends` and `document_files.object_key`, each under `person_id`'s key, and `document_signatures.typed_name` under the signer's (`person_id`), in K-04's `sealing_keys` (arch 01 line 93; K-04 v1 rule 6; migration 0003's seal, unseal and erase). The wrapping key is a Workers secret, named and never stored (rule 7). A document's `person_id` is the person it is about: the team member or the customer for their own (`documents_sealed_for_owner`), the person who gave a business's or a space's paper (`documents_paper_sealed_for_giver`), and for a built document the person it is for.
+7. **Times and zones:** every time here is a `timestamptz`, an instant in UTC (CQ-09). It is shown in the business's zone (K-04 `businesses.time_zone`), or for a booking's document in the visit's zone, else the business's (S13-03; CQ-05's default, as K-25 v1 reads its time conditions). No column holds a local clock time or a parsed date: `ends` is the words given, and Rosie never compares it with a clock (MC C4).
+8. **Kept and erased:** no application role deletes a row (rule 5); rows are records kept 7 years, or longer where the trade's rules say (RULES 4.10; S13-08; FS line 754), with no shorter deletion rule invented (Q-31). Files stay private in R2 with no deletion rule invented (Q-31). A person's delete within 45 days (RULES 4.10) deletes their key: every value sealed under it here (a document's number, issuer and end, a file's object key, a typed name) can never be read again, while the proof of every signature stays (who by id, when, how, the words' hash and the words shown: arch 09 line 492). The R2 objects of that person's files are removed through K-13's delete for erasure.
+9. **Rules across tables, kept by code** (not constraints): a booking's document's `person_id` is that booking's person served (K-04 `bookings.served_person_id`); a booking and a space named here belong to the document's business (K-04 v1 and K-23 v1 give `bookings` and `places_or_things` no key on their id with the business, so the foreign keys hold the id alone); a given document has files and no texts or signers, and a built one has texts and signers and no files; `signed_by_all_at` is set in the commit that writes the last signer's signature, and only then; a signature's `signed_at` is not before its signer's `asked_at`; for S1-72, K-29's `consents` row of kind `health_agreement` is written in the same commit as the signature, for the same person and business, with the same words and `words_sha256` and `at` equal to `signed_at`; `title` never holds words the person typed.
+10. **Repeats:** each row's id is made by code once per write (CQ-09), so a write retried with the same id is refused by its primary key (SQLSTATE 23505) and nothing is written twice; a turn's writes ride its one commit, which K-05 makes once per turn id. A signer is asked once per document (`document_signers_one_per_person`) and signs once (`document_signatures_one_per_signer`), and a document has one text per language (`document_texts_one_per_language`), each refused with 23505 when repeated.
+
+## Seed and refused-row fixtures (`fixtures/`, listed in `fixtures/index.json`)
+
+The fixture file format is K-04's (`../core/README.md`, "Seed and refused-row fixtures"): `after`, `rows`, and for a refused fixture `refused` with `role`, `scope`, `action` and `expect`. Each `after` path is relative to this part's `fixtures/` folder, so its seeds name another part's as `../../<part>/fixtures/<file>`; a loader loads each file once, its own `after` first. `seed-license-as-given` loads K-22's `seed-owner-id-upload` (Sam's sealing key) and `seed-emergency-contact` (Riley's sealing key, after K-22's `seed-staff-joined`, Riley's staff row at Lee's Barbershop); `seed-agreement-signed` loads K-29's `seed-consent-health-agreement` (Lee Nutrition Clinic, Sam's owner role there and his consent row) and K-22's `seed-owner-id-upload`. `npm run contracts:check` counts each entry as a seed row and leaves it to the contract test (02-contracts section 2 item 12).
+
+Accepted (2), the two of 02-contracts row K-35:
+
+- `seed-license-as-given`: Sam texts Lee's Barbershop's license number in his chat at S1-23 (the master's sample, BS20981, which the sealed stand-in bytes stand for), shown to customers, sealed under Sam's key; Riley adds his own barber license number and a photo of it on his secure page after joining (S2-06), kept as added (S2-11): the number and the photo's R2 object key sealed under Riley's key, the photo taken on the secure page. Each says who gave it, where and when; neither says it was checked.
+- `seed-agreement-signed`: S1-72 for Lee Nutrition Clinic, the dietitian demo shop: Rosie builds the health privacy agreement and asks Sam to sign it as the owner; Sam signs on the secure page by typing his name (A5-20, S13-38: "a typed name"), sealed under his key. The signature keeps who, when, how and the sha256 of the words signed, which are K-29's seed's words with the same hash, so the K-29 consent row and this signature are the one yes; the document is signed by all, so Go live finds nothing left to sign (S1-29).
+
+Refused (5, in `fixtures/invalid/`, beyond the row's one): `refuse-checked-column` (an insurance row that says `checked`: no such column, SQLSTATE 42703), `refuse-as-given-edit` (a Tool API update of the number Sam gave, with the version raised: no column grant, 42501), `refuse-signature-edit` (the runtime side moving Sam's signature time: no `UPDATE` on signatures, 42501), `refuse-cross-business-read` (the yoga studio's scope reading Riley's license at Lee's Barbershop: no row), `refuse-file-from-chat` (a photo of the barbershop's license kept from the chat: CHECK `document_files_via_page_or_portal`, 23514). Each is refused for its one reason: the same insurance row without `checked`, the same update of `shown_on_listing` (with the version raised), the same read in the barbershop's own scope and the same file uploaded on the secure page each pass, and only the tables' owner, the migrations' role, could move the signature's time.
+
+Names and values come from fixture set v1's demo shops (the barber as Lee's Barbershop, the yoga studio, the dietitian as Lee Nutrition Clinic: `fixtures/v1/test-kit/shops/barber.json`, `dietitian.json`, through K-04's, K-22's and K-29's seeds) and the master's sample cast (SPEC-master 6: Sam, Lee's Barbershop, Riley; S1-23's license number BS20981; S2-06's "Barber license"; S1-72's agreement card), never a real person (rule 9). The words of the agreement are S1-72's card, as K-29's seed stores them, since the agreement's own words are not in the sources (K-29 v1 README, open gaps). These are examples, not from the sources: every time of day (Sam's text at 14:20Z and Riley's page at 15:08Z on Mon Oct 19; the agreement sent at 15:05Z and signed at 15:10Z on Tue Oct 20, K-29's consent time), Riley's license number and photo, the insurance in the refused row and its title, the text's version label ("Health privacy agreement v1"), the ids, and the sealed values, which are short stand-in bytes, not ciphertext.
+
+**Checked on 2026-11-07** (T-044): `npm run contracts:check` passed with this part (its table list against `tables.meta.schema.json`, every column a key, constraint, index, scope or seal names found, and the 7 index entries counted as seed rows for the contract test), and so did `npm run contracts:types`, `npm run typecheck`, `npm run format:check`, `npm run lint`, `npm test` and the three guards. **The frozen-file guard** was run as it is (`infra/ci/contract-freeze-guard.mjs`, through `npm run guard:contracts -- --base <ref>`) on a throwaway branch whose base is this freeze's commit, never by editing a frozen file on `task/T-044`: an edit to the table list, an accepted fixture, a refused fixture or an index entry, removing a fixture and unfreezing v1 each failed (exit 1); adding `documents-licenses.v1.1.tables.json` and editing this README passed (exit 0). A throwaway PostgreSQL run of the seeds and refused rows was not made in this sitting (no container or script command is open to it); T-112 loads them into a migrated database.
+
+## Producers and consumers (02-contracts K-35 and section 7)
+
+- **Producers:** database engineer: C-171 Domain: Documents and licenses, with C-154 migrations queue and C-155 seeds from fixture set v1 (its setup seeds after F14: 02-contracts section 7 notes; CQ-14), C-156 per-person sealing keys (the seals here) and C-202 staging seeded state ("signed up": after F14).
+- **Consumers:** action-layer engineer: C-074 Tool API journey 1 and 2 calls (S1-23, S1-61, S1-72, S1-81, S2-06, S2-11, S2-29; S1-29's Go live check), C-087 one commit per turn, C-088 slot filler and C-091 claim check (each column's audience), C-094 identity and access (who may see a file), and with journeys 4, 5 and 10 the booking's documents (A4-43, A5-19 to A5-23; 02-contracts section 10 lists K-35 for journeys 1, 2 and 10); frontend engineer (through K-21): C-187 registration screens (documents, optional and never checked; the health agreement), C-195 staff page (an optional license shown as given), C-199 secure page (forms and signatures), C-185 signed links ("a typed name signs"), C-192 owner console (Documents), C-196 public listing page (documents only as added by the business); integrations engineer: C-219 R2 files (the object keys, behind K-13); database engineer: C-202; QA: C-147 scenario tests and T-112.
+- **Frozen before it:** K-04 (frozen, #55), K-22 (frozen, #109) and K-23 (frozen, #78), the card's three. Its seeds also load K-29's (frozen, #59). **Frozen with it (F14):** K-24, K-25, K-26, K-27, K-33 and K-02 v1.1; nothing here refers to them.
+
+## Defaults used (T-044)
+
+1. **Q-33** (arch 09's shape, FS section 9 as the checklist): five tables from FS line 736 and 02-contracts row K-35, matching arch 09's count of 5 (arch 09 gives no names).
+2. **Q-31** (uploaded ID files private in R2; no deletion rule invented): every document file is private in R2 and kept with no deletion rule invented; who may view one: the person it is about and the owner (or an admin the owner lets manage the team or settings), each view logged, never a customer.
+3. **What is personal data** (the lead's ruling for this freeze): a license number, an ID detail or anything taken from a document is sealed under the key of the person it is about, column by column above; a business's or a space's paper is sealed under the key of the person who gave it.
+4. **"As given"** means exactly as given, with who gave it, where and when; a given value is never updated, and a correction is a new document that replaces the old one (MC C4; RULES 10.1; S2-11).
+5. **The title is the plug-in's or the kind's name**, plain; the person's own words stay in the sealed columns.
+6. **Files only from the secure page or the portal** (S13-43; MC C10; RULES 4.5); a number may come by text (S1-23, S1-61).
+7. **No stored signed copy:** a signer's copy is made from the text and the signatures when sent (A5-20).
+8. **S1-72's yes has two rows, written in one commit:** K-29's consent of kind `health_agreement` (the yes) and this part's signature (the signed document), tied by code (rule 9), with no foreign key to K-29.
+9. **A signature is on the secure page, by a tap or a typed name** (A5-20; S13-38; S1-72; A4-43).
+10. **Times are shown in the business's zone, or the visit's for a booking's document** (S13-03; CQ-05's default).
+11. **The gives keys `license` and `license_checked` are the step graph's runtime record** (build prompt 3.5), not a column: no column may say checked (D96).
+
+## Open gaps
+
+- **K-13 is not frozen** (T-022): the object key's form, the read link that logs each view, and the delete for erasure are K-13's. `object_key` is sealed bytes with no form check until then, as K-23's `business_photos.object_key` waits for K-13. Whether erasure removes the R2 object before or after the key, and what it does to a file the trade's rules must keep (S13-08), is K-13's and C-156's to state. Proposed for QUESTIONS.md with Q-31.
+- **A lapse by the business's own word** (RULES 10.3; S11-50: a license, insurance, certificate or background check the owner or the pro says has lapsed, so that person is not booked for that work until they say it is fixed): journey 11's; no column in v1. A K-35 v1.1 column, or K-26's rules, before journey 11. Proposed for QUESTIONS.md.
+- **What a license covers** (S1-43, S13-15: the services, places or job sizes the business says a license does not cover): the business's own word, held as K-26 rules or notes, not here.
+- **Switch verify** (MC C4; RULES 10.5): no lookup result, status or parsed end date until Jay turns it on (02-contracts K-19: no ID-check or lookup contract is written); then `ends` gets a parsed date with its zone in a minor version.
+- **A business's paper sealed under the giver's key** (default 3): if that person is erased, or leaves at a hand-over (S11-100), the business's number, issuer and end can no longer be read, and the business adds them again. Proposed for QUESTIONS.md.
+- **Who within a business reads which row** is the Tool API's (the claim check, limit 7, and C-094), on top of row-level security per business; no policy binds a team member's or a customer's reads to their own rows. If the security reviewer wants one, a minor version binds them to K-22's `rosie.person_id` (K-22 v1 rule 4).
+- **No foreign key to K-29** (default 8): the signature and S1-72's consent row are tied by code; a v1.1 `consent_id` could hold them together.
+- **The health privacy agreement's own words and version** (RULES 4.10 [lawyer]; S1-72; S13-49): not in the sources, as K-29's README records; the fixture stores S1-72's card and an example version label.
+- **A built document's words may carry a private detail** (a contract built from a flow B job's parts could name the address): the words are never sealed, so the proof survives (RULES 4.10); the builder keeps private details out of them (RULES 4.5). Proposed for QUESTIONS.md beside K-29's open gap on a STOP's own words.
+- **A stored signed copy** (02-contracts K-13 lists a "signed document" upload): v1 stores none (default 7); a v1.1 file kind, sealed, if one is kept.
+- **K-08's event kinds** for a document given, a file uploaded, a text made, a signer asked and a signature written: every write appends to the event log (arch 09 line 457); if K-08 has no kind for them, a K-08 minor version adds them before the first writer commits (as CQ-56 records for other parts).
+- **The business of a booking or a space** named here is held by code (rule 9), since K-04 v1 and K-23 v1 give `bookings` and `places_or_things` no key on their id with the business. A minor version of either could let a composite key hold it.
+- **Where the saved time waits while signers sign** (A5-20: "minutes, or up to a day"; Q-12): K-04's reservations and clock rows, not here.
+- **A parent or guardian who signs for a child** (A4-25; RULES 4.7): the plug-in's `signs_as`; who may sign for whom is the action layer's check, not a constraint.
+- **CQ-09's id forms:** ids are opaque text until the CTO rules.
+
+## Change log
+
+- v1, 2026-11-07 (T-044): first version, frozen.

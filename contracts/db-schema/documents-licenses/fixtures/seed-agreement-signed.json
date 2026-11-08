@@ -1,0 +1,64 @@
+{
+  "after": [
+    "../../conversations-consent/fixtures/seed-consent-health-agreement.json",
+    "../../people-access/fixtures/seed-owner-id-upload.json"
+  ],
+  "rows": [
+    {
+      "table": "documents",
+      "values": {
+        "id": "doc-health-privacy-nutrition",
+        "business_id": "biz-lee-nutrition-clinic",
+        "owner_kind": "business",
+        "person_id": "person-sam",
+        "kind": "agreement",
+        "title": "Health privacy agreement",
+        "shown_on_listing": false,
+        "origin": "built",
+        "added_at": "2026-10-20T15:05:00Z",
+        "signed_by_all_at": "2026-10-20T15:10:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "document_texts",
+      "values": {
+        "id": "doctext-health-privacy-nutrition-en",
+        "document_id": "doc-health-privacy-nutrition",
+        "business_id": "biz-lee-nutrition-clinic",
+        "language": "en",
+        "words": "Health privacy agreement / Signed once, on the secure page / Covers every booking and intake form / Not signed: that work stays offline, saved",
+        "words_sha256": "5c1ff01fcaef292b82cf063cf1baeaa3dce1a8f617d83b8a93ce154e85e717c9",
+        "text_version": "Health privacy agreement v1",
+        "made_at": "2026-10-20T15:05:00Z"
+      }
+    },
+    {
+      "table": "document_signers",
+      "values": {
+        "id": "docsigner-health-privacy-sam",
+        "document_id": "doc-health-privacy-nutrition",
+        "business_id": "biz-lee-nutrition-clinic",
+        "person_id": "person-sam",
+        "signs_as": "Owner",
+        "asked_at": "2026-10-20T15:05:00Z"
+      }
+    },
+    {
+      "table": "document_signatures",
+      "values": {
+        "id": "docsig-health-privacy-sam",
+        "document_id": "doc-health-privacy-nutrition",
+        "business_id": "biz-lee-nutrition-clinic",
+        "signer_id": "docsigner-health-privacy-sam",
+        "person_id": "person-sam",
+        "document_text_id": "doctext-health-privacy-nutrition-en",
+        "words_sha256": "5c1ff01fcaef292b82cf063cf1baeaa3dce1a8f617d83b8a93ce154e85e717c9",
+        "signed_at": "2026-10-20T15:10:00Z",
+        "how": "typed_name",
+        "typed_name": "\\x6b33352d7365616c65642d74797065642d6e616d652d73616d",
+        "channel": "secure_page"
+      }
+    }
+  ]
+}

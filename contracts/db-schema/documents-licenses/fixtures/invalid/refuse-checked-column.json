@@ -1,0 +1,29 @@
+{
+  "after": ["seed-license-as-given.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "documents",
+    "values": {
+      "id": "doc-barbershop-insurance",
+      "business_id": "biz-lees-barbershop",
+      "owner_kind": "business",
+      "person_id": "person-sam",
+      "kind": "insurance",
+      "title": "Insurance",
+      "shown_on_listing": true,
+      "origin": "given",
+      "given_by_person_id": "person-sam",
+      "given_via": "chat",
+      "added_at": "2026-10-19T14:22:00Z",
+      "checked": true
+    },
+    "expect": {
+      "sqlstate": "42703"
+    }
+  }
+}

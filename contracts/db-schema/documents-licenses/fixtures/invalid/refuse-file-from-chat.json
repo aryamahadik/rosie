@@ -1,0 +1,27 @@
+{
+  "after": ["seed-license-as-given.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "document_files",
+    "values": {
+      "id": "docfile-barbershop-license-chat-photo",
+      "document_id": "doc-barbershop-license",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-sam",
+      "object_key": "\\x6b33352d7365616c65642d66696c652d6b65792d63686174",
+      "content_type": "image/jpeg",
+      "uploaded_at": "2026-10-19T14:21:00Z",
+      "uploaded_by_person_id": "person-sam",
+      "uploaded_via": "chat"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["document_files_via_page_or_portal"]
+    }
+  }
+}
