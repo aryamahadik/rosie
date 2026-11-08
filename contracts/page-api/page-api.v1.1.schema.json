@@ -1,0 +1,801 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/page-api/page-api.v1.1.schema.json",
+  "title": "PageApiV1dot1",
+  "description": "K-21 v1.1, a minor version for journey 3's screens (T-060; 02-contracts K-21 'Minor versions': customer screen 1 with journey 3, and the public listing page, FS section 6.3, with journey 3; section 9 F15). It only adds to v1 (page-api.v1.schema.json, frozen by T-030 and unchanged, referred to here): every v1 definition is here under its own name, all but callName by reference (callName takes only the four new names), so every v1 exchange is a v1.1 exchange. Added: the public page envelope (publicPage: a business's public page code, no session, no link) and four calls: readListing (the business's public listing, FS 6.3, which the booking page's screen 1 also shows: A3-04, B3-07; page-only, since no K-09 v1.1 call reads it), startBookingRequest (the booking page's first words: K-09 v1.1 recordSafetyOutcome alone, source page, then K-09 v1.1 openRequest at door page, which gives request), bookingCheckStart (A3-43's and B3-35's tap on the booking page: K-09 v1.1 checkBookingFirst) and bookingCheckCode (the code typed back on the page: K-09 v1 proveCode, by the code id the server kept). A request still never names the person or the business it acts for: these pages act for no one, and the business is the one the public page code names, live only. contracts/page-api/README.md, section 'v1.1', states for each call who may call it, how it is bound, what serves it, its repeat rule and its errors. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/openLink.exchange" },
+    { "$ref": "#/$defs/signInStart.exchange" },
+    { "$ref": "#/$defs/signInCheck.exchange" },
+    { "$ref": "#/$defs/signOut.exchange" },
+    { "$ref": "#/$defs/codeStart.exchange" },
+    { "$ref": "#/$defs/codeCheck.exchange" },
+    { "$ref": "#/$defs/readRegistration.exchange" },
+    { "$ref": "#/$defs/answerOnPage.exchange" },
+    { "$ref": "#/$defs/confirmOnPage.exchange" },
+    { "$ref": "#/$defs/signedUpload.exchange" },
+    { "$ref": "#/$defs/finishUpload.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingStart.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingReturn.exchange" },
+    { "$ref": "#/$defs/billCard.exchange" },
+    { "$ref": "#/$defs/calendarConnectStart.exchange" },
+    { "$ref": "#/$defs/calendarConnectReturn.exchange" },
+    { "$ref": "#/$defs/readStaffPage.exchange" },
+    { "$ref": "#/$defs/teamConsole.exchange" },
+    { "$ref": "#/$defs/teamAcknowledgePage.exchange" },
+    { "$ref": "#/$defs/teamDecideReviewItem.exchange" },
+    { "$ref": "#/$defs/testRoster.exchange" },
+    { "$ref": "#/$defs/testPhoneSend.exchange" },
+    { "$ref": "#/$defs/testPhoneParts.exchange" },
+    { "$ref": "#/$defs/testClockRows.exchange" },
+    { "$ref": "#/$defs/fireNow.exchange" },
+    { "$ref": "#/$defs/textHoursOverride.exchange" },
+    { "$ref": "#/$defs/readListing.exchange" },
+    { "$ref": "#/$defs/startBookingRequest.exchange" },
+    { "$ref": "#/$defs/bookingCheckStart.exchange" },
+    { "$ref": "#/$defs/bookingCheckCode.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "page-api.v1.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "page-api.v1.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "page-api.v1.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "page-api.v1.schema.json#/$defs/nullableUtc" },
+    "version": { "$ref": "page-api.v1.schema.json#/$defs/version" },
+    "rowRef": { "$ref": "page-api.v1.schema.json#/$defs/rowRef" },
+    "traceId": { "$ref": "page-api.v1.schema.json#/$defs/traceId" },
+    "stepId": { "$ref": "page-api.v1.schema.json#/$defs/stepId" },
+    "opaqueToken": { "$ref": "page-api.v1.schema.json#/$defs/opaqueToken" },
+    "linkCode": { "$ref": "page-api.v1.schema.json#/$defs/linkCode" },
+    "httpsUrl": { "$ref": "page-api.v1.schema.json#/$defs/httpsUrl" },
+    "page": { "$ref": "page-api.v1.schema.json#/$defs/page" },
+    "linkPage": { "$ref": "page-api.v1.schema.json#/$defs/linkPage" },
+    "signedInPage": { "$ref": "page-api.v1.schema.json#/$defs/signedInPage" },
+    "signedInLinkPage": { "$ref": "page-api.v1.schema.json#/$defs/signedInLinkPage" },
+    "given": { "$ref": "page-api.v1.schema.json#/$defs/given" },
+    "signInNeededError": { "$ref": "page-api.v1.schema.json#/$defs/signInNeededError" },
+    "linkExpiredError": { "$ref": "page-api.v1.schema.json#/$defs/linkExpiredError" },
+    "notTeamError": { "$ref": "page-api.v1.schema.json#/$defs/notTeamError" },
+    "notTesterError": { "$ref": "page-api.v1.schema.json#/$defs/notTesterError" },
+    "stagingOnlyError": { "$ref": "page-api.v1.schema.json#/$defs/stagingOnlyError" },
+    "notTestPhoneError": { "$ref": "page-api.v1.schema.json#/$defs/notTestPhoneError" },
+    "notTestHandleError": { "$ref": "page-api.v1.schema.json#/$defs/notTestHandleError" },
+    "providerUnavailableError": { "$ref": "page-api.v1.schema.json#/$defs/providerUnavailableError" },
+    "notAllowedError": { "$ref": "page-api.v1.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "page-api.v1.schema.json#/$defs/bookingPausedError" },
+    "transientError": { "$ref": "page-api.v1.schema.json#/$defs/transientError" },
+    "versionChangedError": { "$ref": "page-api.v1.schema.json#/$defs/versionChangedError" },
+    "pageKind": { "$ref": "page-api.v1.schema.json#/$defs/pageKind" },
+    "pageSection": { "$ref": "page-api.v1.schema.json#/$defs/pageSection" },
+    "pageQuestion": { "$ref": "page-api.v1.schema.json#/$defs/pageQuestion" },
+    "readBack": { "$ref": "page-api.v1.schema.json#/$defs/readBack" },
+    "servedSetupStep": { "$ref": "page-api.v1.schema.json#/$defs/servedSetupStep" },
+    "uploadPurpose": { "$ref": "page-api.v1.schema.json#/$defs/uploadPurpose" },
+    "uploadRefusedErrors": { "$ref": "page-api.v1.schema.json#/$defs/uploadRefusedErrors" },
+    "calendarProvider": { "$ref": "page-api.v1.schema.json#/$defs/calendarProvider" },
+    "textHours": { "$ref": "page-api.v1.schema.json#/$defs/textHours" },
+    "textHoursOverrideState": { "$ref": "page-api.v1.schema.json#/$defs/textHoursOverrideState" },
+    "shownPhoto": { "$ref": "page-api.v1.schema.json#/$defs/shownPhoto" },
+    "registrationPreview": { "$ref": "page-api.v1.schema.json#/$defs/registrationPreview" },
+    "registrationSummary": { "$ref": "page-api.v1.schema.json#/$defs/registrationSummary" },
+    "stagingOnlyCall": { "$ref": "page-api.v1.schema.json#/$defs/stagingOnlyCall" },
+    "callName": {
+      "title": "PageCallName",
+      "description": "Every call v1.1 holds: v1's (page-api.v1.schema.json callName, unchanged) and the four v1.1 adds (readListing, startBookingRequest, bookingCheckStart, bookingCheckCode); the only v1 definition v1.1 changes, and only by new enum values. Each has <call>.request, <call>.response, <call>.errors and <call>.exchange under $defs (02-contracts section 2 item 2). None of the four is staging-only (stagingOnlyCall is v1's, unchanged).",
+      "type": "string",
+      "enum": [
+        "openLink",
+        "signInStart",
+        "signInCheck",
+        "signOut",
+        "codeStart",
+        "codeCheck",
+        "readRegistration",
+        "answerOnPage",
+        "confirmOnPage",
+        "signedUpload",
+        "finishUpload",
+        "stripeOnboardingStart",
+        "stripeOnboardingReturn",
+        "billCard",
+        "calendarConnectStart",
+        "calendarConnectReturn",
+        "readStaffPage",
+        "teamConsole",
+        "teamAcknowledgePage",
+        "teamDecideReviewItem",
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride",
+        "readListing",
+        "startBookingRequest",
+        "bookingCheckStart",
+        "bookingCheckCode"
+      ]
+    },
+
+    "openLink.request": { "$ref": "page-api.v1.schema.json#/$defs/openLink.request" },
+    "openLink.response": { "$ref": "page-api.v1.schema.json#/$defs/openLink.response" },
+    "openLink.errors": { "$ref": "page-api.v1.schema.json#/$defs/openLink.errors" },
+    "openLink.exchange": { "$ref": "page-api.v1.schema.json#/$defs/openLink.exchange" },
+    "signInStart.request": { "$ref": "page-api.v1.schema.json#/$defs/signInStart.request" },
+    "signInStart.response": { "$ref": "page-api.v1.schema.json#/$defs/signInStart.response" },
+    "signInStart.errors": { "$ref": "page-api.v1.schema.json#/$defs/signInStart.errors" },
+    "signInStart.exchange": { "$ref": "page-api.v1.schema.json#/$defs/signInStart.exchange" },
+    "signInCheck.request": { "$ref": "page-api.v1.schema.json#/$defs/signInCheck.request" },
+    "signInCheck.response": { "$ref": "page-api.v1.schema.json#/$defs/signInCheck.response" },
+    "signInCheck.errors": { "$ref": "page-api.v1.schema.json#/$defs/signInCheck.errors" },
+    "signInCheck.exchange": { "$ref": "page-api.v1.schema.json#/$defs/signInCheck.exchange" },
+    "signOut.request": { "$ref": "page-api.v1.schema.json#/$defs/signOut.request" },
+    "signOut.response": { "$ref": "page-api.v1.schema.json#/$defs/signOut.response" },
+    "signOut.errors": { "$ref": "page-api.v1.schema.json#/$defs/signOut.errors" },
+    "signOut.exchange": { "$ref": "page-api.v1.schema.json#/$defs/signOut.exchange" },
+    "codeStart.request": { "$ref": "page-api.v1.schema.json#/$defs/codeStart.request" },
+    "codeStart.response": { "$ref": "page-api.v1.schema.json#/$defs/codeStart.response" },
+    "codeStart.errors": { "$ref": "page-api.v1.schema.json#/$defs/codeStart.errors" },
+    "codeStart.exchange": { "$ref": "page-api.v1.schema.json#/$defs/codeStart.exchange" },
+    "codeCheck.request": { "$ref": "page-api.v1.schema.json#/$defs/codeCheck.request" },
+    "codeCheck.response": { "$ref": "page-api.v1.schema.json#/$defs/codeCheck.response" },
+    "codeCheck.errors": { "$ref": "page-api.v1.schema.json#/$defs/codeCheck.errors" },
+    "codeCheck.exchange": { "$ref": "page-api.v1.schema.json#/$defs/codeCheck.exchange" },
+    "readRegistration.request": { "$ref": "page-api.v1.schema.json#/$defs/readRegistration.request" },
+    "readRegistration.response": { "$ref": "page-api.v1.schema.json#/$defs/readRegistration.response" },
+    "readRegistration.errors": { "$ref": "page-api.v1.schema.json#/$defs/readRegistration.errors" },
+    "readRegistration.exchange": { "$ref": "page-api.v1.schema.json#/$defs/readRegistration.exchange" },
+    "answerOnPage.request": { "$ref": "page-api.v1.schema.json#/$defs/answerOnPage.request" },
+    "answerOnPage.response": { "$ref": "page-api.v1.schema.json#/$defs/answerOnPage.response" },
+    "answerOnPage.errors": { "$ref": "page-api.v1.schema.json#/$defs/answerOnPage.errors" },
+    "answerOnPage.exchange": { "$ref": "page-api.v1.schema.json#/$defs/answerOnPage.exchange" },
+    "confirmOnPage.request": { "$ref": "page-api.v1.schema.json#/$defs/confirmOnPage.request" },
+    "confirmOnPage.response": { "$ref": "page-api.v1.schema.json#/$defs/confirmOnPage.response" },
+    "confirmOnPage.errors": { "$ref": "page-api.v1.schema.json#/$defs/confirmOnPage.errors" },
+    "confirmOnPage.exchange": { "$ref": "page-api.v1.schema.json#/$defs/confirmOnPage.exchange" },
+    "signedUpload.request": { "$ref": "page-api.v1.schema.json#/$defs/signedUpload.request" },
+    "signedUpload.response": { "$ref": "page-api.v1.schema.json#/$defs/signedUpload.response" },
+    "signedUpload.errors": { "$ref": "page-api.v1.schema.json#/$defs/signedUpload.errors" },
+    "signedUpload.exchange": { "$ref": "page-api.v1.schema.json#/$defs/signedUpload.exchange" },
+    "finishUpload.request": { "$ref": "page-api.v1.schema.json#/$defs/finishUpload.request" },
+    "finishUpload.response": { "$ref": "page-api.v1.schema.json#/$defs/finishUpload.response" },
+    "finishUpload.errors": { "$ref": "page-api.v1.schema.json#/$defs/finishUpload.errors" },
+    "finishUpload.exchange": { "$ref": "page-api.v1.schema.json#/$defs/finishUpload.exchange" },
+    "stripeOnboardingStart.request": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingStart.request"
+    },
+    "stripeOnboardingStart.response": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingStart.response"
+    },
+    "stripeOnboardingStart.errors": { "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingStart.errors" },
+    "stripeOnboardingStart.exchange": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingStart.exchange"
+    },
+    "stripeOnboardingReturn.request": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingReturn.request"
+    },
+    "stripeOnboardingReturn.response": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingReturn.response"
+    },
+    "stripeOnboardingReturn.errors": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingReturn.errors"
+    },
+    "stripeOnboardingReturn.exchange": {
+      "$ref": "page-api.v1.schema.json#/$defs/stripeOnboardingReturn.exchange"
+    },
+    "billCard.request": { "$ref": "page-api.v1.schema.json#/$defs/billCard.request" },
+    "billCard.response": { "$ref": "page-api.v1.schema.json#/$defs/billCard.response" },
+    "billCard.errors": { "$ref": "page-api.v1.schema.json#/$defs/billCard.errors" },
+    "billCard.exchange": { "$ref": "page-api.v1.schema.json#/$defs/billCard.exchange" },
+    "calendarConnectStart.request": { "$ref": "page-api.v1.schema.json#/$defs/calendarConnectStart.request" },
+    "calendarConnectStart.response": {
+      "$ref": "page-api.v1.schema.json#/$defs/calendarConnectStart.response"
+    },
+    "calendarConnectStart.errors": { "$ref": "page-api.v1.schema.json#/$defs/calendarConnectStart.errors" },
+    "calendarConnectStart.exchange": {
+      "$ref": "page-api.v1.schema.json#/$defs/calendarConnectStart.exchange"
+    },
+    "calendarConnectReturn.request": {
+      "$ref": "page-api.v1.schema.json#/$defs/calendarConnectReturn.request"
+    },
+    "calendarConnectReturn.response": {
+      "$ref": "page-api.v1.schema.json#/$defs/calendarConnectReturn.response"
+    },
+    "calendarConnectReturn.errors": { "$ref": "page-api.v1.schema.json#/$defs/calendarConnectReturn.errors" },
+    "calendarConnectReturn.exchange": {
+      "$ref": "page-api.v1.schema.json#/$defs/calendarConnectReturn.exchange"
+    },
+    "readStaffPage.request": { "$ref": "page-api.v1.schema.json#/$defs/readStaffPage.request" },
+    "readStaffPage.response": { "$ref": "page-api.v1.schema.json#/$defs/readStaffPage.response" },
+    "readStaffPage.errors": { "$ref": "page-api.v1.schema.json#/$defs/readStaffPage.errors" },
+    "readStaffPage.exchange": { "$ref": "page-api.v1.schema.json#/$defs/readStaffPage.exchange" },
+    "teamConsole.request": { "$ref": "page-api.v1.schema.json#/$defs/teamConsole.request" },
+    "teamConsole.response": { "$ref": "page-api.v1.schema.json#/$defs/teamConsole.response" },
+    "teamConsole.errors": { "$ref": "page-api.v1.schema.json#/$defs/teamConsole.errors" },
+    "teamConsole.exchange": { "$ref": "page-api.v1.schema.json#/$defs/teamConsole.exchange" },
+    "teamAcknowledgePage.request": { "$ref": "page-api.v1.schema.json#/$defs/teamAcknowledgePage.request" },
+    "teamAcknowledgePage.response": { "$ref": "page-api.v1.schema.json#/$defs/teamAcknowledgePage.response" },
+    "teamAcknowledgePage.errors": { "$ref": "page-api.v1.schema.json#/$defs/teamAcknowledgePage.errors" },
+    "teamAcknowledgePage.exchange": { "$ref": "page-api.v1.schema.json#/$defs/teamAcknowledgePage.exchange" },
+    "teamDecideReviewItem.request": { "$ref": "page-api.v1.schema.json#/$defs/teamDecideReviewItem.request" },
+    "teamDecideReviewItem.response": {
+      "$ref": "page-api.v1.schema.json#/$defs/teamDecideReviewItem.response"
+    },
+    "teamDecideReviewItem.errors": { "$ref": "page-api.v1.schema.json#/$defs/teamDecideReviewItem.errors" },
+    "teamDecideReviewItem.exchange": {
+      "$ref": "page-api.v1.schema.json#/$defs/teamDecideReviewItem.exchange"
+    },
+    "testRoster.request": { "$ref": "page-api.v1.schema.json#/$defs/testRoster.request" },
+    "testRoster.response": { "$ref": "page-api.v1.schema.json#/$defs/testRoster.response" },
+    "testRoster.errors": { "$ref": "page-api.v1.schema.json#/$defs/testRoster.errors" },
+    "testRoster.exchange": { "$ref": "page-api.v1.schema.json#/$defs/testRoster.exchange" },
+    "testPhoneSend.request": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneSend.request" },
+    "testPhoneSend.response": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneSend.response" },
+    "testPhoneSend.errors": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneSend.errors" },
+    "testPhoneSend.exchange": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneSend.exchange" },
+    "testPhoneParts.request": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneParts.request" },
+    "testPhoneParts.response": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneParts.response" },
+    "testPhoneParts.errors": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneParts.errors" },
+    "testPhoneParts.exchange": { "$ref": "page-api.v1.schema.json#/$defs/testPhoneParts.exchange" },
+    "testClockRows.request": { "$ref": "page-api.v1.schema.json#/$defs/testClockRows.request" },
+    "testClockRows.response": { "$ref": "page-api.v1.schema.json#/$defs/testClockRows.response" },
+    "testClockRows.errors": { "$ref": "page-api.v1.schema.json#/$defs/testClockRows.errors" },
+    "testClockRows.exchange": { "$ref": "page-api.v1.schema.json#/$defs/testClockRows.exchange" },
+    "fireNow.request": { "$ref": "page-api.v1.schema.json#/$defs/fireNow.request" },
+    "fireNow.response": { "$ref": "page-api.v1.schema.json#/$defs/fireNow.response" },
+    "fireNow.errors": { "$ref": "page-api.v1.schema.json#/$defs/fireNow.errors" },
+    "fireNow.exchange": { "$ref": "page-api.v1.schema.json#/$defs/fireNow.exchange" },
+    "textHoursOverride.request": { "$ref": "page-api.v1.schema.json#/$defs/textHoursOverride.request" },
+    "textHoursOverride.response": { "$ref": "page-api.v1.schema.json#/$defs/textHoursOverride.response" },
+    "textHoursOverride.errors": { "$ref": "page-api.v1.schema.json#/$defs/textHoursOverride.errors" },
+    "textHoursOverride.exchange": { "$ref": "page-api.v1.schema.json#/$defs/textHoursOverride.exchange" },
+
+    "listingCode": {
+      "title": "ListingCode",
+      "description": "The code in the address of a business's own public pages: its public listing (FS section 6.3) and its booking page (customer screen 1, FS section 7; A3-04: 'linked from its Google listing, its texts or a link Sam shared'). No frozen part stores a booking-page address (K-23 v1 default 4: 'no link host or booking-page address is stored here'; Q-51: the host is a config value, rosfield.com/test on staging: DL-014, DL-023), so in v1.1 the code is the business's own id (K-04 v1 businesses.id, an opaque id: CQ-09) and the address is the host plus /b/ plus the code (README default 24). It is public, never a secret: it names which business's public page, never who is at the browser, and grants nothing a stranger could not do by text (A3-01: 'Every way in gets the same rules'). An unknown code and a business that is not live get the same answer (notListed).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "publicPage": {
+      "title": "PublicPageEnvelope",
+      "description": "What a request from a business's public page carries (v1.1: the public listing page and the booking page) in place of v1's page envelope: the page's own request id, the trace id and the business's public page code. It carries no session token and no signed link: these pages act for no one (FS line 701: 'Customers have no login and no password'; S13-45: 'Opening a link never counts'; K-22 v1 rule 4), and no request names a person or a business id of its own. The action layer's page entry turns it into K-09 v1.1's businessCaller: kind page, businessId the business the code names (refused as notListed unless it is live, K-04 v1 businesses.status live: S1-35; S1-32), personId null, requestId and traceId as given.",
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "description": "The page's own id for this submit, made once per form by the web app and never reused: the key a repeat is known by, within the device token it came with (startBookingRequest, bookingCheckStart, bookingCheckCode), so the same id from another browser never matches (02-contracts section 2 item 2). Each K-09 call the page entry makes for it carries its own caller.requestId, kept with this one, so a repeat of this request repeats each of them and answers the first result.",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The trace the request opens (CQ-06: a page request opens its own trace id); each call adds its pageRequest span (K-08 v1) and passes the id on as K-09 caller.traceId.",
+          "$ref": "#/$defs/traceId"
+        },
+        "listingCode": { "$ref": "#/$defs/listingCode" }
+      },
+      "required": ["requestId", "traceId", "listingCode"],
+      "additionalProperties": false
+    },
+    "notListedError": {
+      "title": "NotListedError",
+      "description": "The business has no public page: no business has this code, or its business is not live (K-04 v1 businesses.status: S1-35 gives live; FS section 6.1: 'Nothing goes live until the ID, the control proof and the owner's OK to the fee are in', S1-32; B3-01 needs live). One answer for both, so a code learns nothing (as v1's linkExpired). Nothing was read or written.",
+      "type": "object",
+      "properties": { "error": { "const": "notListed" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "notTakingNewBookingsError": {
+      "title": "NotTakingNewBookingsError",
+      "description": "The owner has paused new bookings (K-23 v1 new_booking_pauses: an open row for this business; S11-15: 'While open, AI assistants and the booking page hear only \"not taking new bookings\"'). Nothing was written. Times already saved can still be confirmed (S11-15), which is journey 4's (K-21 v1.2). The page entry reads the pause itself, since K-09 v1.1 openRequest names no answer for it (README default 36; open gap 28).",
+      "type": "object",
+      "properties": { "error": { "const": "notTakingNewBookings" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "safetyFirstError": {
+      "title": "SafetyFirstError",
+      "description": "v1's answer for danger in a page's free words (answerOnPage's safetyFirst: the outcome row, the checked line's fixed line id and its words as the pinned bundle holds them), reused unchanged: the safety message comes back to the page and nothing books (arch 02 line 129: 'Danger returns the safety message to the caller, and nothing books'; A3-22, A3-24, A3-25; B3-17; K-09 v1.1 recordSafetyOutcome, called alone with source page, whose safetyLine names the line).",
+      "$ref": "page-api.v1.schema.json#/$defs/answerOnPage.errors/anyOf/4"
+    },
+    "localDate": {
+      "title": "LocalDate",
+      "description": "A day in the business's zone, as YYYY-MM-DD (K-09 v1 localDate; CQ-05).",
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/localDate"
+    },
+    "money": {
+      "title": "Money",
+      "description": "An amount in whole cents with its currency code (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/money"
+    },
+    "currency": {
+      "title": "Currency",
+      "description": "A three-letter currency code (CQ-09), the one money carries; named here as well, so the type generator resolves money's own reference to it.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/currency"
+    },
+
+    "listedPrice": {
+      "title": "ListedPrice",
+      "description": "A way's price as the public pages show it (FS 6.3: 'Services with price kind and price (V01 to V04)'; A3-04: 'shows the same times and prices' an AI gets). words: the price in plain words the server builds (README default 30), such as '$35', '$120 an hour' or 'Quoted from your details'; amount: the list price of the K-25 v1 price rule in force at the read's moment for this service and way (the way's own rule where one names it, else the service's own: price_rules.service_money_id, price_cents and currency; effective dates: S11-54, README default 31), or null when the price is not a list price: known from photos or at the visit (FS row V02: the way's path's first part, K-25 v1 service_money.path) or set by the customer's answers (K-25 v1 services.price_kind by_answers). A price by worker or by time (T06; K-25 price_rules worker_resource_id, weekdays, from_time) shows on the times card, journey 4's (A4-14; open gap 31).",
+      "type": "object",
+      "properties": {
+        "words": { "type": "string", "minLength": 1 },
+        "amount": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+      },
+      "required": ["words", "amount"],
+      "additionalProperties": false
+    },
+    "listedWay": {
+      "title": "ListedWay",
+      "description": "One way a service is offered (K-25 v1 service_money: one per service and place, FS line 725; S1-13, S1-43), with its price and its money rules beside it (FS 6.3: 'The money rules next to the first price: every charge the customer must pay, and the terms to cancel or miss', S11-57, S13-17).",
+      "type": "object",
+      "properties": {
+        "wayId": {
+          "description": "K-25 v1 service_money.id.",
+          "$ref": "#/$defs/id"
+        },
+        "place": {
+          "description": "Where it happens (K-25 v1 service_money.place; FS row L01): business, at the shop or office; customer, at the customer's place (flow B); meeting_spot; video (a video or phone visit, flow A).",
+          "type": "string",
+          "enum": ["business", "customer", "meeting_spot", "video"]
+        },
+        "locationId": {
+          "description": "K-25 v1 service_money.location_id: the shop, office or meeting spot (listing.locations); for place customer, the shop or office whose travel area a customer's address is checked against (L02, B4-77); null for video.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "price": { "$ref": "#/$defs/listedPrice" },
+        "moneyLines": {
+          "description": "Every charge the customer must pay on this way and the terms to cancel or miss, in plain words the server builds from the way's own row (K-25 v1 service_money: path, deposit_cents or deposit_percent, fee_cents, cutoff_before or cutoff_day_before_at, tip_line) and the business's flow default where the way sets no cutoff (K-23 v1 flow_defaults; H06): what is taken when they book, what is paid after the visit, and the free-cancel time with the fee for a later cancel or a no-show (S11-57; S13-17; S13-55). Never a word that holds money (RULES 3.2: never a hold).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      },
+      "required": ["wayId", "place", "locationId", "price", "moneyLines"],
+      "additionalProperties": false
+    },
+    "listedService": {
+      "title": "ListedService",
+      "description": "One of the business's services as the public pages list it (A3-04: 'It lists only what Lee's Barbershop offers, with each service's price kind'; FS 6.3: V01 to V04): an active K-25 v1 services row, in the owner's order (services.position: customers see the order, never the number), with each active way.",
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "description": "K-25 v1 services.id: the id the booking page's later screens name it by (K-21 v1.2).",
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "description": "K-25 v1 services.name (FS row V01), as the business set it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "priceKind": {
+          "description": "K-25 v1 services.price_kind (S1-12's four; FS rows V02, V03): one_price, per_hour, per_unit (with its unit) or by_answers (set by the customer's answers).",
+          "type": "string",
+          "enum": ["one_price", "per_hour", "per_unit", "by_answers"]
+        },
+        "unit": {
+          "description": "K-25 v1 services.unit for per_unit, such as night; null otherwise.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "ways": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listedWay" },
+          "minItems": 1
+        }
+      },
+      "required": ["serviceId", "name", "priceKind", "unit", "ways"],
+      "additionalProperties": false
+    },
+    "listedLocation": {
+      "title": "ListedLocation",
+      "description": "A shop, office or meeting spot of the business (K-23 v1 locations; FS rows B03, L01, L02), with its hours (FS row H01).",
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "description": "K-23 v1 locations.id.",
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "description": "K-23 v1 locations.kind, as stored: a shop, an office or a meeting spot (FS line 722).",
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "description": "A meeting spot's name (K-23 v1 locations.name); null otherwise.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "address": {
+          "description": "K-23 v1 locations.address (FS row B03 as the owner confirmed it): customers get the address (L02, B4-77), never its map point (K-23 v1 audience owner).",
+          "type": "string",
+          "minLength": 1
+        },
+        "travelArea": {
+          "description": "Flow B's travel area from this location (FS row L02; K-23 v1 locations.travel_miles), or null when it has none. around is the location's own address when no other centre is set; when a centre other than the location's own is set (K-23 v1 travel_centre and travel_centre_address, audience owner: it may be the owner's home), around is null and the page shows the miles alone, with the inside-or-outside answer coming at B4-77 (K-23 v1 README open gaps; README default 33).",
+          "anyOf": [
+            {
+              "title": "TravelArea",
+              "type": "object",
+              "properties": {
+                "miles": { "type": "integer", "minimum": 1 },
+                "around": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+              },
+              "required": ["miles", "around"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "hours": {
+          "description": "The location's opening hours (FS row H01: K-27 v1 weekly_hours owned by the location, read in its own time zone), as plain lines the server builds, such as 'Mon to Fri, 9am to 5pm' (v1 default 22's rule); empty when none are set.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "required": ["locationId", "kind", "name", "address", "travelArea", "hours"],
+      "additionalProperties": false
+    },
+    "listedDocument": {
+      "title": "ListedDocument",
+      "description": "A license, insurance or other document the business or a team member gave and chose to show (K-35 v1 documents.shown_on_listing, not withdrawn; FS rows Q10, T08), shown only as added by the business (FS 6.3: 'Licenses, insurance and other documents (Q10, T08) only as \"added by the business\". Never \"checked\", never a badge'; D96; MC C4, C7). Only its kind and its plain title: never its number, issuer or end words (K-35 v1 documents.number, issuer and ends are sealed and stay so), never its file, and no field that says checked, verified or approved (README default 32).",
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "description": "K-35 v1 documents.id.",
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "description": "K-35 v1 documents.kind as stored (documents_kind_known), such as license or insurance.",
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "description": "K-35 v1 documents.title: what the paper is called, plain, such as 'Barber license'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "whose": {
+          "description": "K-35 v1 documents.owner_kind: business (the business's own, Q10) or team (a team member's, T08), never who.",
+          "type": "string",
+          "enum": ["business", "team"]
+        },
+        "shownAs": {
+          "description": "Always addedByTheBusiness: the page shows it as 'added by the business' and nothing more (FS 6.3; D96).",
+          "const": "addedByTheBusiness"
+        }
+      },
+      "required": ["documentId", "kind", "title", "whose", "shownAs"],
+      "additionalProperties": false
+    },
+    "listedFaq": {
+      "title": "ListedFaq",
+      "description": "One of the business's FAQs (K-23 v1 business_faqs, in the owner's order; FS row B08; S1-84).",
+      "type": "object",
+      "properties": {
+        "question": { "type": "string", "minLength": 1 },
+        "answer": { "type": "string", "minLength": 1 }
+      },
+      "required": ["question", "answer"],
+      "additionalProperties": false
+    },
+
+    "readListing.request": {
+      "title": "ReadListingRequest",
+      "description": "Read a business's public listing (FS section 6.3: 'What shows (S1-29 preview, S11-57 preview, A3-04)'), which the booking page's screen 1 also shows (A3-04: 'It lists only what Lee's Barbershop offers, with each service's price kind. The page shows the business's About us line and photos (S1-84)'; FS section 7 screen 1; B3-07). Served by a page-only read of the action layer: no K-09 v1.1 call reads a business's public listing, and K-20's 'a business's details and services' (02-contracts K-20) is not frozen (T-029), so the page entry reads the rows itself (02-contracts K-21: 'each served by a Tool API call or a page-only call of the action layer'), under the business's own scope (arch 10 line 546), and only the columns whose audience names customers (02-contracts section 2 item 3; RULES 4.5): K-04 v1 businesses, K-23 v1 business_setup, business_photos, business_faqs, locations and new_booking_pauses, K-25 v1 services, service_money and price_rules, K-27 v1 weekly_hours and K-35 v1 documents. Who may call: anyone with the page's address. Binds: the business the code names, live only; the call acts for no one. Changes nothing: a read. Reads: the primary, uncached (arch 10 line 538: the replica serves search and reports only; the prices it shows are the ones a booking copies, RULES 3.7). Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/publicPage" }
+      },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "readListing.response": {
+      "title": "Listing",
+      "description": "What the public listing shows (FS 6.3), in the business's own words as stored and the server's plain words for prices and money rules (README default 30). No paid placement, no referral fee and no endorsement label: nothing here ranks or rates the business (FS 6.3; D99; S13-07). Reviews and ratings come from Rosie's own rating after a visit, with journey 10's version (A10-02), never for sensitive work (S13-22), so none is here (README default 34). A word the business's kinds ban (FS 6.3: 'Words a profession bans, like \"licensed\" for unlicensed work, never appear', S1-09, S13-11) is in no line: the server leaves out a stored line that holds one (README default 35). Never a map point, a travel centre other than the location's own address, a document's number, issuer or file, or anything about a booking or a customer.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "listing" },
+        "displayName": {
+          "description": "K-04 v1 businesses.display_name (FS row B02), or its name (B01) before B02 is set: the plain name customers see.",
+          "type": "string",
+          "minLength": 1
+        },
+        "about": {
+          "description": "The About us line (K-23 v1 business_setup.about; FS row B06), as the owner confirmed it at S1-84; null when there is none.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "photos": {
+          "description": "The business's photos (K-23 v1 business_photos, in the owner's order; FS row B07; S1-84), each a short-lived signed address to read that one private file (v1's shownPhoto).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownPhoto" }
+        },
+        "faqs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listedFaq" }
+        },
+        "services": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listedService" }
+        },
+        "locations": {
+          "description": "The business's shops, offices and meeting spots (K-23 v1 locations), with their hours and travel areas.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/listedLocation" }
+        },
+        "documents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listedDocument" }
+        },
+        "newBookings": {
+          "description": "taking; or paused while the owner's PAUSE of new bookings holds (K-23 v1 new_booking_pauses, an open row; S11-15: the booking page hears only 'not taking new bookings'), when the booking page shows that line in place of its first question (README default 36).",
+          "type": "string",
+          "enum": ["taking", "paused"]
+        }
+      },
+      "required": [
+        "result",
+        "displayName",
+        "about",
+        "photos",
+        "faqs",
+        "services",
+        "locations",
+        "documents",
+        "newBookings"
+      ],
+      "additionalProperties": false
+    },
+    "readListing.errors": {
+      "title": "ReadListingErrors",
+      "description": "Nothing to show.",
+      "anyOf": [
+        { "$ref": "#/$defs/notListedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readListing.exchange": {
+      "title": "ReadListingExchange",
+      "description": "One readListing request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readListing" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readListing.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readListing.response" }, { "$ref": "#/$defs/readListing.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "startBookingRequest.request": {
+      "title": "StartBookingRequestRequest",
+      "description": "The booking page's first words (customer screen 1: 'asks what an AI would ask', FS section 7; A3-04 and B3-07: 'From here, the steps are the same as in an AI chat'), the request an AI would pass on (A3-02: 'the service and the day. No name, phone or street address yet'). Served by K-09 v1.1 recordSafetyOutcome, called alone with caller.kind page and source page (the words get the safety read first, before any answer: arch 02 line 129; A3-22, B3-17), then, when the read holds no danger, K-09 v1.1 openRequest with door page (gives request: A3-01, B3-01; A3-04, B3-07), its flow set on the server (README default 38) and its booker a new person with no name (openRequest booker kind new), never a person the browser names. The page's own 'book' entry is A3-51's 'A new booking', as its safe default says (README default 25); A3-43's entry is bookingCheckStart. Order of the checks (README default 37): the business the code names (no business: notListed, nothing read); the safety read and its record under that business (danger: safetyFirst, nothing booked); the business is live (else notListed); no open pause of new bookings (else notTakingNewBookings); then openRequest. Who may call: anyone with the booking page. Binds: the business from the code, live only; the call acts for no one (K-09 v1.1 businessCaller.personId null: 'an anonymous booking page'); the K-04 booking id and the booker's person id stay on the server with requestRef, bound to the device token, and never reach the browser (K-09 v1.1 open gap 29; README default 27). Changes: it opens a request in progress (the K-04 head at stage entry, the K-30 details row, the new person), which changes no booking, money or record of anyone's and is not read back on any way in (A3-01, A3-51; K-09 v1.1 openRequest); the customer's first change is read back and confirmed before the yes on screen 7's times card (FS section 7 screen 7: 'all before the yes'; A4-14; K-21 v1.2) (FS line 630; README default 26). Reads: the primary, uncached. Repeat: safe: page.requestId with the device token is the key; a repeat writes nothing and answers the same requestRef (K-09 v1.1 recordSafetyOutcome and openRequest answer repeated). Time budget: none in the sources; the safety read's own is 4 seconds (arch 02 line 111).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/publicPage" },
+        "deviceToken": {
+          "description": "The browser's device cookie (v1's opaqueToken; v1 signInStart.deviceToken): the server keeps its sha256 with requestRef, so only this browser carries the request on (K-21 v1.2's screens).",
+          "$ref": "#/$defs/opaqueToken"
+        },
+        "words": {
+          "description": "The customer's words as typed, free text that gets the safety read first (arch 02 line 129; K-02 v1 safety read, source page). They never enter a span, a log or the event log; K-34 v1 keeps only the sealed evidence words a read names (README 'Never in a span or a log', v1.1).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        }
+      },
+      "required": ["page", "deviceToken", "words"],
+      "additionalProperties": false
+    },
+    "startBookingRequest.response": {
+      "title": "BookingRequestOpened",
+      "description": "The request is open (K-09 v1.1 openRequest: gives request). The page goes on to the next screens, who it is for first (FS section 7 screen 2: A4-80, B4-92), which are K-21 v1.2's; they send requestRef back with the same device token.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "opened" },
+        "requestRef": {
+          "description": "An opaque id the server makes for this request, never K-04's booking id or the booker's person id (K-09 v1.1 openRequest.response.bookingId and bookerPersonId stay on the server with it), with at least 128 bits from a cryptographically secure random generator, as v1's attempt ids (v1 default 18), bound on the server to the device token's sha256 and the business (README default 27).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "requestRef"],
+      "additionalProperties": false
+    },
+    "startBookingRequest.errors": {
+      "title": "StartBookingRequestErrors",
+      "description": "Nothing was booked. K-09 v1.1 openRequest's answers map so: notLive gives notListed; bookingPaused gives bookingPaused; constraint and transient give transient. Its waitsForOwner, customerBlocked, safetyHeld and notAllowed name a known person, phone or hold, which a new person with no name and no handle never has, and its notFound a row this call never names.",
+      "anyOf": [
+        { "$ref": "#/$defs/safetyFirstError" },
+        { "$ref": "#/$defs/notListedError" },
+        { "$ref": "#/$defs/notTakingNewBookingsError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "startBookingRequest.exchange": {
+      "title": "StartBookingRequestExchange",
+      "description": "One startBookingRequest request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "startBookingRequest" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/startBookingRequest.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/startBookingRequest.response" },
+            { "$ref": "#/$defs/startBookingRequest.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "bookingCheckStart.request": {
+      "title": "BookingCheckStartRequest",
+      "description": "A booking already made, checked first (A3-43, B3-35; S13-45's one rule), on the business's booking page: the text reply gives the page and sends nothing, and only the page's tap sends a code (A3-43: 'In a text or chat, the reply gives the page and sends nothing yet. Only the page's tap sends a code'); this is that tap, on the booking page's 'a booking I already have' entry (README default 28). Served by K-09 v1.1 checkBookingFirst (caller.kind page, personId null): if one booking at this business matches the name and the day, a K-22 v1 link_record code goes to its contact on file, their way, never back to the page (K-09 v1.1 default 45), at most one live code per contact (default 51); from a page the send waits for CQ-44 (K-09 v1.1 open gap 51; open gap 25). Who may call: anyone with the booking page. Binds: the business from the code, live only; the call acts for no one until the code is right (K-22 v1 rule 4). Changes: a code row and its send only when a booking matches; no booking or record changes ('Nothing changes until you type the code'). Reads: the primary, uncached. Repeat: safe: page.requestId with the device token is the key; a repeat sends no second code and answers the same checkId (K-09 v1.1 checkBookingFirst repeated). Time budget: a code lives 10 minutes (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/publicPage" },
+        "deviceToken": {
+          "description": "The browser's device cookie (opaqueToken): the server keeps its sha256 with the check, so only this browser can type its code (bookingCheckCode).",
+          "$ref": "#/$defs/opaqueToken"
+        },
+        "nameTyped": {
+          "description": "The name the booking is under, as typed (A3-43: 'Ask which booking by name and day. Never read one out'; K-09 v1.1 checkBookingFirst.nameTyped).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "dayTyped": {
+          "description": "The day, in the business's zone (K-09 v1.1 checkBookingFirst.dayTyped; CQ-05).",
+          "$ref": "#/$defs/localDate"
+        }
+      },
+      "required": ["page", "deviceToken", "nameTyped", "dayTyped"],
+      "additionalProperties": false
+    },
+    "bookingCheckStart.response": {
+      "title": "BookingCheckStarted",
+      "description": "The same answer whether or not a booking matched, and nothing about a visit (A3-43: 'These replies use the same words whether or not a booking exists'; 'Never: say anything about a visit, or that one exists, before the check passes'). The page says: 'If that matches a booking, a code goes to the contact on file, their way. Nothing changes until you type the code.'",
+      "type": "object",
+      "properties": {
+        "result": { "const": "sentIfMatched" },
+        "checkId": {
+          "description": "An opaque id the server makes for this check, never K-09's attempt id or K-22's code id, which stay on the server with it, with the code's person (K-22 v1 rule 4; K-09 v1.1 open gap 29); at least 128 bits from a cryptographically secure random generator (v1 default 18), bound to the device token's sha256 (README default 29). The same whether or not a code went.",
+          "$ref": "#/$defs/id"
+        },
+        "expiresAt": {
+          "description": "10 minutes after the tap, whether or not a code went (RULES 6.2), so the time tells nothing either.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "checkId", "expiresAt"],
+      "additionalProperties": false
+    },
+    "bookingCheckStart.errors": {
+      "title": "BookingCheckStartErrors",
+      "description": "Nothing was sent; none of them tells whether a booking exists.",
+      "anyOf": [
+        { "$ref": "#/$defs/notListedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "bookingCheckStart.exchange": {
+      "title": "BookingCheckStartExchange",
+      "description": "One bookingCheckStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "bookingCheckStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/bookingCheckStart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/bookingCheckStart.response" },
+            { "$ref": "#/$defs/bookingCheckStart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "bookingCheckCode.request": {
+      "title": "BookingCheckCodeRequest",
+      "description": "The code typed back on the booking page (A3-43, B3-35: 'Nothing changes until you type the code'; FS line 701: a request counts 'after a code to that contact is typed back in the same conversation'). Served by K-09 v1 proveCode, by the K-22 code id the server kept with the check (K-22 v1 check_proof_code), never one the page sends; when no booking matched there is no code, and the page entry answers wrong itself, counting the try, so the answers never tell whether a booking matched (README default 29). Who may call: the browser that tapped (the same device token); any other answers checkNotFound. Binds: no person until the code is right (K-22 v1 rule 4); then the code's person, kept on the server with the check. Changes: the code's use and its tries (K-22 v1 proof_codes); no booking or record. What a passed check then opens on the page, the steps before the visit, is K-21's journey 7 version (v1.5; open gap 26). Reads: the primary, uncached. Repeat: keyed: page.requestId with the check and the device; each new request with a code counts a try. Time budget: 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/publicPage" },
+        "checkId": { "$ref": "#/$defs/id" },
+        "code": {
+          "description": "The code as typed (digits; K-22 v1 keeps only its keyed hash, never the code). It never enters a span, a log or the event log.",
+          "type": "string",
+          "pattern": "^[0-9]{4,8}$"
+        },
+        "deviceToken": {
+          "description": "The same device cookie the check started with.",
+          "$ref": "#/$defs/opaqueToken"
+        }
+      },
+      "required": ["page", "checkId", "code", "deviceToken"],
+      "additionalProperties": false
+    },
+    "bookingCheckCode.response": {
+      "title": "BookingCheckCodeResponse",
+      "description": "Where the check stands (K-22 v1 check_proof_code's outcomes, as K-09 v1 proveCode gives them).",
+      "oneOf": [
+        {
+          "title": "BookingCheckPassed",
+          "description": "The code was right: the check passed (S13-45's one rule; K-09 v1 proveCode right), and the server keeps the code's person with the check. The page says only that the check passed; the booking itself and its change or cancel are the steps before the visit (A3-43: 'Goes on as the steps before the visit, once the check passes'), K-21's journey 7 version (v1.5), which takes the check by its checkId with the same device token (open gap 26).",
+          "type": "object",
+          "properties": { "result": { "const": "checked" } },
+          "required": ["result"],
+          "additionalProperties": false
+        },
+        {
+          "title": "BookingCheckWrong",
+          "description": "A wrong code, or any code when no booking matched: one of 5 tries (RULES 6.2; K-09 v1 proveCode wrong).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "wrong" },
+            "triesLeft": { "type": "integer", "minimum": 0, "maximum": 4 }
+          },
+          "required": ["result", "triesLeft"],
+          "additionalProperties": false
+        },
+        {
+          "title": "BookingCheckPaused",
+          "description": "The fifth wrong code paused the check for 15 minutes (RULES 6.2); the page sends no further code until then.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "paused" },
+            "until": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "until"],
+          "additionalProperties": false
+        },
+        {
+          "title": "BookingCheckExpired",
+          "description": "Past the code's 10 minutes (RULES 6.2), whether or not a code went; the page taps again.",
+          "type": "object",
+          "properties": { "result": { "const": "expired" } },
+          "required": ["result"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "bookingCheckCode.errors": {
+      "title": "BookingCheckCodeErrors",
+      "description": "Nothing was checked.",
+      "anyOf": [
+        {
+          "title": "CheckNotFoundError",
+          "description": "No check with this id was started by this device, or its business no longer matches the code: one answer, so another browser learns nothing.",
+          "type": "object",
+          "properties": { "error": { "const": "checkNotFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/notListedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "bookingCheckCode.exchange": {
+      "title": "BookingCheckCodeExchange",
+      "description": "One bookingCheckCode request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "bookingCheckCode" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/bookingCheckCode.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/bookingCheckCode.response" },
+            { "$ref": "#/$defs/bookingCheckCode.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

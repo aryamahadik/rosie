@@ -1,0 +1,19 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-20T12:15:03Z",
+    "environment": "staging",
+    "after": ["db-schema/business-setup/fixtures/seed-company-two-kinds.json"],
+    "note": "B3-07: on Lee Home Services's booking page, someone types 'My kitchen sink drains slowly. Can a plumber come this week?' on Tue Oct 20, 8:15am, in the page's 'book' box (A3-51's 'A new booking': README default 25). The page entry makes K-09 v1.1's calls, each with its own caller.requestId kept with this request's id: recordSafetyOutcome alone, source page (tool-api/fixtures/j3-safety-page-request.json: No, gives safe), then openRequest at door page, flow B (tool-api/fixtures/j3-open-request-page.json: a booking head whose booker is a new person with no name, and the K-30 details row; gives request), with the business live as that fixture has it and no pause of new bookings open. The booking id (booking-page-home-oct20) and the booker (person-page-home-0001) stay on the server with requestRef, bound to this browser's device token; neither reaches the page (README default 27). Nothing is read back: opening a request at the door changes no one's booking or money (README default 26). The next screens are K-21 v1.2's. The device token and requestRef are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-home-0001",
+      "traceId": "trace-page-home-0001",
+      "listingCode": "biz-lee-home-services"
+    },
+    "deviceToken": "placeholder-device-token-page-home-1",
+    "words": "My kitchen sink drains slowly. Can a plumber come this week?"
+  },
+  "outcome": { "result": "opened", "requestRef": "reqref-page-home-0001" }
+}

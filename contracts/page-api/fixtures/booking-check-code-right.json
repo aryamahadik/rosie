@@ -1,0 +1,20 @@
+{
+  "call": "bookingCheckCode",
+  "given": {
+    "now": "2026-10-22T22:02:10Z",
+    "environment": "staging",
+    "after": ["booking-check-start.json", "booking-check-code-wrong.json"],
+    "note": "Alex types the code that reached his contact on file (the code K-09 v1.1's j3-check-booking-first.json sends; from a page the send waits for CQ-44's commit with no turn under K-09 v1.1 open gap 51's default, and until then every typed code answers wrong: open gap 25). K-09 v1 proveCode, by the code id the server kept with check-lees-0001, answers right: the check passed (S13-45's one rule; FS line 701), and the server keeps the code's person with the check. The page says only that the check passed; showing the booking and changing it are the steps before the visit, K-21's journey 7 version (open gap 26). The typed code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-check-0003",
+      "traceId": "trace-page-check-0003",
+      "listingCode": "biz-lees-barbershop"
+    },
+    "checkId": "check-lees-0001",
+    "code": "482913",
+    "deviceToken": "placeholder-device-token-check-1"
+  },
+  "outcome": { "result": "checked" }
+}

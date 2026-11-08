@@ -1,0 +1,25 @@
+{
+  "call": "bookingCheckStart",
+  "given": {
+    "now": "2026-10-22T22:00:02Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/j3-confirm-business-booking-yes.json"],
+    "note": "Refused: booking-check-start.json's tap answered with whether a booking matched. A3-43: 'These replies use the same words whether or not a booking exists'; 'Never: say anything about a visit, or that one exists, before the check passes'. The one fault is outcome.matched; without it the exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-check-0001",
+      "traceId": "trace-page-check-0001",
+      "listingCode": "biz-lees-barbershop"
+    },
+    "deviceToken": "placeholder-device-token-check-1",
+    "nameTyped": "Alex M.",
+    "dayTyped": "2026-10-24"
+  },
+  "outcome": {
+    "result": "sentIfMatched",
+    "checkId": "check-lees-0001",
+    "expiresAt": "2026-10-22T22:10:02Z",
+    "matched": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "call": "bookingCheckCode",
+  "given": {
+    "now": "2026-10-22T22:01:30Z",
+    "environment": "staging",
+    "after": ["booking-check-start.json"],
+    "note": "The same browser types a wrong code for check-lees-0001: one of 5 tries (RULES 6.2), through K-09 v1 proveCode by the code id the server kept. Had no booking matched, there would be no code, and the page entry would answer the same wrong itself, counting the try, so the answer never tells whether a booking matched (README default 29). Nothing about a visit is shown. The typed code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-check-0002",
+      "traceId": "trace-page-check-0002",
+      "listingCode": "biz-lees-barbershop"
+    },
+    "checkId": "check-lees-0001",
+    "code": "000000",
+    "deviceToken": "placeholder-device-token-check-1"
+  },
+  "outcome": { "result": "wrong", "triesLeft": 4 }
+}

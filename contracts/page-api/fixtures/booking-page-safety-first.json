@@ -1,0 +1,24 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-23T14:20:03Z",
+    "environment": "staging",
+    "after": ["db-schema/business-setup/fixtures/seed-business-demo-shop.json"],
+    "note": "A3-04 then A3-22 and A3-24: on Lee's Barbershop's booking page someone types 'my lips are swelling after the beard color and I can't breathe well' (contracts/model/fixtures/safety-emergency-now.json's words, word for word). The words get the safety read first (arch 02 line 129: 'Danger returns the safety message to the caller, and nothing books'): the read says An emergency, K-09 v1.1 recordSafetyOutcome records it alone under the business with source page (its safetyLine names the 911 line, with no outbox row, since a page's call writes none), and the page shows A3-24's words at once (MASTER-FLOW-A line 1692). openRequest is never called: nothing books and no request opens (README default 37). The outcome id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0001",
+      "traceId": "trace-page-lees-0001",
+      "listingCode": "biz-lees-barbershop"
+    },
+    "deviceToken": "placeholder-device-token-page-lees-1",
+    "words": "my lips are swelling after the beard color and I can't breathe well"
+  },
+  "outcome": {
+    "error": "safetyFirst",
+    "outcomeId": "safety-outcome-page-lees-0001",
+    "fixedLineId": "safetyEmergency",
+    "words": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now."
+  }
+}
