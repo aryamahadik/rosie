@@ -5,7 +5,8 @@
 // arrival (T-246, ../safety), then into the batch window (T-247, batch.ts), whose closed batches go to the turn lease
 // (T-248, lease.ts) once each of their texts has been read; the open safety holds go with the turn to its commit
 // (QUESTIONS.md CQ-65 as DL-119 replaced it: holds bind commits, not hand-offs). Each run of a turn pins its bundle first
-// (T-249, ../bundle).
+// (T-249, ../bundle). A turn parked after its third lapse with no commit (T-253) has its park's span on the turn's trace,
+// under the bundle pinned for it (`parkTrace`).
 //
 // A safety read lives in memory, so the actor keeps a stored alarm at each read's 4 s deadline (T-1088): if the actor is
 // evicted mid-read (a deploy, a reset), the alarm brings a new instance, which resumes every read cut off, in arrival

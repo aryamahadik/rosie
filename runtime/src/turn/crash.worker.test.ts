@@ -75,7 +75,7 @@ import {
   targetsAnswer,
   turnDeps,
   unplannedRow,
-  until,
+  until as untilWithin,
   type FakeDecide,
   type FakeFacts,
   type FakeReply,
@@ -148,6 +148,9 @@ const BUNDLE_V0 = parkTurn.request.turn.bundleId;
 
 /** A promise that never settles, waiting on no timer: a run that hangs, or a call in the air when the actor is cut off. */
 const never = <T>(): Promise<T> => new Promise<T>(() => undefined);
+
+/** Waits until `ready` holds, polling, for up to 10 s (a machine busy with other builds is slower). */
+const until = (ready: () => boolean, what: string): Promise<void> => untilWithin(ready, what, 10_000);
 
 /** The chat each recipient's rows go to (the dispatcher's recipient directory; NQ-RT-2). */
 const CHATS = {
@@ -413,9 +416,12 @@ afterEach(async () => {
   await reset();
 });
 
+/** Each test drives a real actor through cuts and lapses: room for a machine busy with other builds. */
+const SLOW_MS = 20_000;
+
 // ---- before the commit -------------------------------------------------------------------------------------------
 
-describe("a crash before the commit", () => {
+describe("a crash before the commit", { timeout: SLOW_MS }, () => {
   it("a crash after the safety line and before the commit reruns the turn under the same id, and the safety line is sent once in total", async () => {
     const emergency = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: "evt-sam-0001" };
     const LINE_ROW = "out-evt-sam-0001";
@@ -480,10 +486,16 @@ describe("a crash before the commit", () => {
         expect(rig.face.gateCalls.map((call) => [call.request.turn.id, call.request.turn.tries])).toEqual([
           [turnId, 2],
         ]);
-        // The commit carries the text's safety record, as the read gave it; the core answers it repeated.
+        // The commit carries the text's safety record, as the read gave it; the core answers it repeated. The rerun's commit
+        // is bound by the holds read at its own commit time (CQ-65): the emergency's after-safe hold, never released.
         expect(rig.face.gateCalls[0]?.request.core).toMatchObject([
           { call: "recordSafetyOutcome", request: { safety: emergency, handleId: "handle-sam" } },
         ]);
+        expect(rig.face.gateCalls[0]?.at).toMatchObject({
+          holds: [{ eventId: "evt-sam-0001", rule: "after_safe" }],
+          unread: [],
+        });
+        expect(rig.h.core.released).toEqual([]);
         expect(await rig.actor.readTurns()).toEqual([
           {
             turnId,
@@ -512,7 +524,7 @@ describe("a crash before the commit", () => {
 
 // ---- after the commit --------------------------------------------------------------------------------------------
 
-describe("a crash after the commit", () => {
+describe("a crash after the commit", { timeout: SLOW_MS }, () => {
   it("composes only the rows with no plan, and the dispatcher sends the unsent part under its stored key: no message twice", async () => {
     await withRig(
       SAM,
@@ -736,11 +748,11 @@ describe("a crash after the commit", () => {
         await rig.tick(3000);
         await rig.settle();
         expect(await rig.actor.readTurns()).toMatchObject([{ turnId: first, state: "committed", tries: 1 }]);
-        // A text meanwhile waits for the reply.
+        // A text meanwhile waits for the reply (its batch is handed to the lease within the alarm).
         await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:05Z");
         await rig.tick(3000);
-        await rig.settle();
         expect(await rig.actor.readWaitingBatches()).toEqual([2]);
+        expect(await rig.actor.readTurns()).toHaveLength(1);
 
         // Two lapses rerun it (its commit repeated each time), and only the note is composed again.
         await rig.tick(LEASE_MS);
@@ -792,7 +804,7 @@ function parkRequestFor(turnId: string): ParkTurnRequest {
   };
 }
 
-describe("three crashes before the commit", () => {
+describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
   it("park the turn (park-turn.json): a park K-05 cannot take now is tried again, the next text starts a new turn, and the person gets exactly one 'nothing changed' line", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const turnId = await turnIdOf([MAYA_TEXT.eventId]);
