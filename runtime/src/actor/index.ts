@@ -1,5 +1,5 @@
 // The handle actor (T-244; C-046): one Durable Object per handle with an ordered, persisted inbox of sealed events, the
-// safety read on arrival (T-246), the batch window (T-247) and the turn lease (T-248).
+// safety read on arrival (T-246), the batch window (T-247), the turn lease (T-248) and the bundle pin at turn start (T-249).
 
 export {
   ActorRefusal,
@@ -38,3 +38,4 @@ export {
   type TurnState,
 } from "./lease";
 export { setSafetyDeps, type HoldEntry, type SafetyEntry } from "../safety";
+export { setBundleDeps, type PinEntry } from "../bundle";

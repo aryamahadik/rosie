@@ -5,7 +5,9 @@
 // work (T-251, T-252), which only records each turn it is handed; and K-05 v1 commitTurn, which answers as
 // commit-first.json and commit-repeat-same-turn.json state (a repeat of a committed turn id writes nothing and returns
 // the first result). The alarm is fired with `runDurableObjectAlarm`, so "not yet due" is tested against the fake clock.
-// Test method: T-1128's (runtime/src/spikes/do-test-pool/FINDINGS.md). Test values only (rule 9).
+// Each run pins its bundle first (T-249), so K-05's bundle reads and the KV namespace are the doubles of
+// src/bundle/test-support.ts, with bundle v0 active (active-bundle.json). Test method: T-1128's
+// (runtime/src/spikes/do-test-pool/FINDINGS.md). Test values only (rule 9).
 import { evictDurableObject, reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -22,11 +24,13 @@ import {
   type InboundEvent,
 } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
+import { fakeBundles } from "../bundle/test-support";
 import { harness, type Harness } from "../safety/test-support";
 import type { SafetyResult } from "../safety/types";
 import {
   LEASE_MS,
   setBatchHooks,
+  setBundleDeps,
   setLeaseHooks,
   setSafetyDeps,
   turnIdOf,
@@ -210,6 +214,7 @@ async function withLease(
           commit: (request) => k05.commitTurn(request),
         },
   );
+  const restoreBundles = setBundleDeps(fakeBundles().deps);
   const run: Run = {
     h,
     k05,
@@ -229,6 +234,7 @@ async function withLease(
   try {
     await body(run);
   } finally {
+    restoreBundles();
     restoreLease();
     restoreBatch();
     restoreSafety();

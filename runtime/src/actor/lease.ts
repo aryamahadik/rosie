@@ -17,11 +17,18 @@
 // The batch window hands a batch at least once (a crash between the hand-off and its mark hands it again): a batch id the
 // lease has seen counts as handed and never starts a second turn (T-247 security note b).
 //
+// Each run of a turn first pins the turn's bundle (T-249, ../bundle/pin.ts, through the host's `pin`): the id stored for
+// the turn id, so a rerun keeps it, or else the active id read now; the turn's work is handed the pinned id, the bundle and
+// the turn's trace under that id. A run whose bundle cannot be pinned never starts its work: like a crash, nothing is
+// written and the lease lapses into a rerun. The lease's own rules above do not depend on the pin.
+//
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks. Unwired, no turn runs and each closed batch stays stored with the batch window (fails
 // closed). The park after a third crash is T-253: a third lapse is left as it is, with no fourth try. Never logged or put
-// in a span: a text's words (K-08 README line 75). Nothing here logs.
+// in a span: a text's words (K-08 README line 75). Nothing here logs (the pin records the turn's `lease` span).
 
+import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
+import type { BundleId, TraceContext } from "../trace";
 import { actorClock, createScheduleTable, scheduleEntry, unscheduleEntry, type ClosedBatch } from "./batch";
 import { readInboxEvents, type InboxEntry } from "./inbox";
 
@@ -106,7 +113,7 @@ function isCommitted(answer: CommitTurnAnswer): answer is CommitTurnCommitted {
 
 // ---- the seam ---------------------------------------------------------------------------------------------------
 
-/** What a turn's work is handed: the turn and its sealed texts. */
+/** What a turn's work is handed: the turn, its sealed texts, and the bundle pinned for it. */
 export interface LeasedTurn {
   turnId: string;
   /** The texts' event ids, in arrival order (K-05 turn.eventIds). */
@@ -126,6 +133,15 @@ export interface LeasedTurn {
   signal: AbortSignal;
   /** Commits the turn through the lease (K-05 commitTurn); refused once a restart has replaced the turn. */
   commit(request: CommitTurnRequest): Promise<CommitAnswer>;
+  /**
+   * The bundle id pinned at the turn's start (T-249): the same for every run of this turn id, whatever the active id is by
+   * then. The commit names it (K-05 turn.bundleId; arch 10 line 548: the bundle id on every turn).
+   */
+  bundleId: BundleId;
+  /** The pinned bundle: its manifest, and its step graph read under the pinned id (KV, or PostgreSQL on a miss). */
+  bundle: PinnedBundle;
+  /** The turn's trace (the first text's trace id, CQ-06) under the pinned bundle id: every span of the turn goes on it (K-08). */
+  trace: TraceContext;
 }
 
 /** Joined at D-017; a test sets doubles. Unwired, no turn runs and no turn commits (fails closed). */
@@ -241,6 +257,11 @@ export interface LeaseHost {
   arm(): Promise<void>;
   /** Keeps a turn's work alive past the call that started it (the actor's waitUntil). */
   lend(work: Promise<void>): void;
+  /**
+   * Pins the turn's bundle for one run (T-249): null when it cannot (the run's work then never starts), or when `signal`
+   * says the run is no longer the turn's.
+   */
+  pin(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null>;
 }
 
 const bySeq = (items: Item[]): Item[] => [...items].sort((a, b) => a.seq - b.seq);
@@ -360,7 +381,10 @@ export class TurnLease {
 
   // ---- running and committing ---------------------------------------------------------------------------------------
 
-  /** Starts a run of the turn that holds the lease, from its sealed texts. */
+  /**
+   * Starts a run of the turn that holds the lease, from its sealed texts. The run first pins the turn's bundle (T-249), then
+   * hands the turn's work the turn with the pin; a run that is no longer the turn's by then never starts its work.
+   */
   private start(turnId: string): void {
     const runTurn = leaseHooks.runTurn;
     const lease = this.leaseRow();
@@ -375,7 +399,8 @@ export class TurnLease {
     this.runs.get(turnId)?.abort();
     const controller = new AbortController();
     this.runs.set(turnId, controller);
-    const leased: LeasedTurn = {
+    const signal = controller.signal;
+    const run: Omit<LeasedTurn, keyof TurnPin> = {
       turnId,
       eventIds,
       entries,
@@ -384,13 +409,28 @@ export class TurnLease {
       tries: turn.tries,
       restart: turn.restart === 1,
       leaseUntil: lease.until_ms,
-      signal: controller.signal,
+      signal,
       commit: (request) => this.commit(turnId, request),
     };
-    // A run that throws has crashed: nothing is written, and the lease lapses into a rerun.
+    const pinRequest: PinRequest = {
+      turnId,
+      traceId,
+      joinedTraceIds,
+      texts: entries.length,
+      tries: run.tries,
+      restart: run.restart,
+      leaseMs: LEASE_MS,
+      arrivedUnder: entries[0]?.bundleId ?? null,
+    };
+    // A run that throws has crashed: nothing is written, and the lease lapses into a rerun. A run whose bundle cannot be
+    // pinned is the same, with its work never started.
     this.host.lend(
       Promise.resolve()
-        .then(() => runTurn(leased))
+        .then(() => this.host.pin(pinRequest, signal))
+        .then((pinned) => {
+          if (pinned === null || signal.aborted) return;
+          return runTurn({ ...run, ...pinned });
+        })
         .then(
           () => undefined,
           () => undefined,

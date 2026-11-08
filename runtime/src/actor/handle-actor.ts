@@ -3,18 +3,19 @@
 // sealed events in its own storage (inbox.ts), drops a known event id, starts no turn for Rosie's own reaction, and
 // sends a receipt that reaches it to the receipt hooks, never to the inbox. Each raw text goes to the safety read on
 // arrival (T-246, ../safety), then into the batch window (T-247, batch.ts), whose closed batches go to the turn lease
-// (T-248, lease.ts) once no safety hold keeps them back.
+// (T-248, lease.ts) once no safety hold keeps them back. Each run of a turn pins its bundle first (T-249, ../bundle).
 //
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
 // a sealed box. Never logged: a word, a phone number, a key, a sealed body.
 
 import { DurableObject } from "cloudflare:workers";
 
+import { BundlePins, bundleKvOf, type PinEntry } from "../bundle";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import { SafetyOnArrival, isReadable, isReadableEvent, type HoldEntry, type SafetyEntry } from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
-import { BatchWindow, type BatchEntry } from "./batch";
+import { actorClock, BatchWindow, type BatchEntry } from "./batch";
 import {
   createInboxTables,
   markReceiptSeen,
@@ -87,6 +88,7 @@ export class HandleActor extends DurableObject {
   private readonly safety: SafetyOnArrival;
   private readonly batch: BatchWindow;
   private readonly lease: TurnLease;
+  private readonly pins: BundlePins;
   private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
@@ -113,12 +115,19 @@ export class HandleActor extends DurableObject {
         this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
       lease: (batch) => this.lease.take(batch),
     });
+    this.pins = new BundlePins({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      kv: () => bundleKvOf(this.env.BUNDLES),
+      spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+    });
     this.lease = new TurnLease({
       storage: ctx.storage,
       arm: () => this.batch.arm(),
       lend: (work) => {
         this.lend(work);
       },
+      pin: (request, signal) => this.pins.pin(request, signal),
     });
     // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes and a
     // lease that lapsed while the actor was gone still reruns its turn.
@@ -217,6 +226,11 @@ export class HandleActor extends DurableObject {
   /** The batch ids the lease has taken that wait for the next turn. */
   readWaitingBatches(): number[] {
     return this.lease.waiting();
+  }
+
+  /** The bundle pinned for each turn id, in the order the pins were taken (T-249). */
+  readPins(): PinEntry[] {
+    return this.pins.read();
   }
 
   /**
