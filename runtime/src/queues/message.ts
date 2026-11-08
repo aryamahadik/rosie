@@ -93,9 +93,14 @@ export function waitMsOf(kind: string, retryAfterSeconds: number | null): number
   return (kind === SEND_KIND ? SEND_SPACING_S : JOB_SPACING_S) * 1000;
 }
 
-/** The whole seconds from `now` until `notBefore`, as a queue delay: 0 when it has passed, at most 12 hours. */
+/**
+ * The whole seconds from `now` until `notBefore`, as a queue delay: 0 when it has passed, at most 12 hours. A time that
+ * cannot be read gives 0: the message goes now, and the consumer, which checks notBefore itself, holds it if early.
+ */
 export function secondsUntil(notBefore: string, now: number): number {
-  return Math.min(MAX_DELAY_S, Math.max(0, Math.ceil((Date.parse(notBefore) - now) / 1000)));
+  const ms = Date.parse(notBefore) - now;
+  if (!Number.isFinite(ms)) return 0;
+  return Math.min(MAX_DELAY_S, Math.max(0, Math.ceil(ms / 1000)));
 }
 
 /** True when the value is a JSON object that survives a round trip unchanged (no undefined, function or NaN inside). */
