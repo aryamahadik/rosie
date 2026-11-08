@@ -36,8 +36,6 @@ const OWN_TABLES = ["handles", "person_handles", "phones", "pauses"] as const;
 // Tables the fixtures' `after` chains bring in from the earlier migrations (0002).
 const EARLIER_TABLES = ["businesses", "persons", "person_roles"];
 const LOADABLE_TABLES: readonly string[] = [...EARLIER_TABLES, ...OWN_TABLES];
-// Foreign keys of the table list whose target table a later migration makes. The key is added there.
-const WAITING_FOREIGN_KEYS = ["pauses_turn_fk"];
 
 interface FixtureFile {
   after: string[];
@@ -102,7 +100,7 @@ function toHex(bytes: Uint8Array): string {
 // Later migrations add tables that reference these (0005's threads, openers_sent and messages first), so the
 // truncate cascades to them. Each test file runs in its own schema (createTestDatabase), so nothing else is touched.
 async function emptyTables(sql: Sql): Promise<void> {
-  await sql`truncate pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
+  await sql`truncate pauses, turns, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
 }
 
 /** What the database says about a failed statement: its SQLSTATE and the constraint it names. */
@@ -190,12 +188,8 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
           .map((constraint) => constraint.name)
           .sort();
       expect(named("c")).toEqual((table.checks ?? []).map((check) => check.name).sort());
-      expect(named("f")).toEqual(
-        (table.foreignKeys ?? [])
-          .map((key) => key.name)
-          .filter((name) => !WAITING_FOREIGN_KEYS.includes(name))
-          .sort(),
-      );
+      // pauses_turn_fk is here too: the turns migration (T-188) adds it.
+      expect(named("f")).toEqual((table.foreignKeys ?? []).map((key) => key.name).sort());
       expect(named("u")).toEqual((table.unique ?? []).map((rule) => rule.name).sort());
 
       const indexes = await db.sql<{ name: string; definition: string }[]>`
@@ -844,6 +838,17 @@ describe("pauses: the paused flag for a person, a phone or an address", () => {
     await createBusiness(db.sql, { id: "biz-pz", name: "PZ", displayName: "PZ", timeZone: "UTC" });
     await createPerson(db.sql, { id: "p-pz", name: "Demo" });
     const phone = await newPhone();
+    // pauses_turn_fk (0009) checks setByTurnId, so the turn "turn-demo" exists first, on a registered bundle.
+    const bundleHash = "a".repeat(64);
+    await db.sql`
+      insert into bundles (hash, build, manifest_key, built_at)
+      values (${bundleHash}, 1, ${`bundle/${bundleHash}/1/manifest`}, now())
+      on conflict do nothing
+    `;
+    await db.sql`
+      insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+      values ('turn-demo', ${phone.handleId}, ${["evt-demo-1"]}, 'committed', ${bundleHash}, 1, 'trace-demo', now())
+    `;
 
     const person = await createPause(db.sql, {
       id: "pz-person",
