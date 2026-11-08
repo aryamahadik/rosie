@@ -10,6 +10,9 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
+import { checksWithoutValues } from "../rewrite/told";
+import { filledOf, markOut, withoutInserted } from "./reading";
+import { markOutIn, readingOf, withoutInsertedIn } from "./values";
 import {
   BLOCKING_CHECKS,
   CHECK_NAMES,
@@ -961,5 +964,202 @@ describe("runMessageChecks: every check once, and which misses block", () => {
     const sent = runMessageChecks(finalTwoSends, contextFor(finalTwoSends));
     expect(sent.passed).toBe(true);
     expect(sent.blocked).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+
+describe("details: never a piece of a filled value where a scan splits a value glued to a letter or digit (T-1105)", () => {
+  // Values the composer never gets (K-09 README default 32; T-310's security note b: visit.code and visit.place never
+  // pass through the AI, A6-14). A value glued to a letter or digit is not taken out of the words, and T-312's scans
+  // split it: "The number 11:00 ...", "The name Springfieldx ...", "The number 12 ..." and "The name CodeAB ...", pieces
+  // the finalize answer's scrub (T-313) cannot see, as it writes only a whole value as its slot.
+  const PLACE: SlotValue = { slot: "visit.place", value: "88 Elm St, Springfield" };
+  const CODE: SlotValue = { slot: "visit.code", value: "AB12" };
+
+  /** A check's detail on the parts: null when it passed. */
+  const detailOf = (parts: FinalParts, check: CheckOutcome["check"]): string | null =>
+    runMessageChecks(parts, contextFor(parts)).checks.find((outcome) => outcome.check === check)?.detail ??
+    null;
+  /** What the Values check says of a slot whose value is glued: the check and the slot, never a piece. */
+  const glued = (slot: string): string =>
+    `values: the slot {{${slot}}} is glued to the word beside it, so its value is not read whole; put a space between them.`;
+
+  it('"{{visit.time}}x", a right-glued "{{visit.place}}x" and "Code{{visit.code}}" with letters name the check and the slot', () => {
+    const cases: [string, readonly SlotValue[], string, readonly string[]][] = [
+      ["Riley can see you Sat Oct 24 at 11:00amx.", VISIT, "visit.time", ["11:00", "00am"]],
+      ["Your visit is at 88 Elm St, Springfieldx.", [PLACE], "visit.place", ["Springfield"]],
+      ["Give CodeAB12 at the chair when you arrive.", [CODE], "visit.code", ["AB", "12"]],
+    ];
+    for (const [text, values, slot, pieces] of cases) {
+      const parts = textOf(text, values);
+      // The message still blocks as before (arch 07 line 417): only the detail's words change.
+      expect(runMessageChecks(parts, contextFor(parts)).blocked, text).toBe(true);
+      expect(detailOf(parts, "values"), text).toBe(glued(slot));
+      expect(detailOf(parts, "neverInMessage"), text).toBeNull();
+      for (const piece of pieces) expect(detailOf(parts, "values"), text).not.toContain(piece);
+    }
+  });
+
+  it("names each slot a piece cuts into: a value glued on its left, and two slots glued together", () => {
+    const left = textOf("Riley can see you Sat Oct 24 at x11:00am.", VISIT);
+    expect(detailOf(left, "values")).toBe(glued("visit.time"));
+    const together = textOf("Riley can see you Sat Oct 2411:00am.", VISIT);
+    expect(detailOf(together, "values")).toBe(`${glued("visit.time")} ${glued("day")}`);
+    for (const piece of ["11", "00am", "24"]) {
+      expect(detailOf(left, "values"), piece).not.toContain(piece);
+      expect(detailOf(together, "values"), piece).not.toContain(piece);
+    }
+    // A name is quoted without its "'s", so it holds a value ending "'s" only in part: the slot, never "TheSam".
+    const shop = textOf("Your visit is at TheSam's now.", [{ slot: "biz.name", value: "Sam's" }]);
+    expect(detailOf(shop, "values")).toBe(glued("biz.name"));
+    expect(detailOf(shop, "values")).not.toContain("Sam");
+  });
+
+  it("a digit-only code (5160) gives what it gives today: the number is read whole, so no piece is split off", () => {
+    const code: SlotValue = { slot: "visit.code", value: "5160" };
+    const named = textOf("Give Code5160 at the chair when you arrive.", [code]);
+    expect(detailOf(named, "values")).toBe(
+      "The name Code is not a code-supplied fact; write each name as its slot.",
+    );
+    expect(detailOf(named, "neverInMessage")).toBeNull();
+    for (const text of ["Code5160 is your check-in code.", "Your check-in code is 5160x."]) {
+      const parts = textOf(text, [code]);
+      expect(runMessageChecks(parts, contextFor(parts)).passed, text).toBe(true);
+    }
+  });
+
+  it("a value read whole, glued or not, is quoted as before: the finalize answer writes its slot (T-313)", () => {
+    const secure: SlotValue = { slot: "link.secure", value: "rosfield.com/v/s03" };
+    const link = textOf("Open rosfield.com/v/s03now to see your visit.", [secure]);
+    expect(detailOf(link, "values")).toBe(
+      "The link rosfield.com/v/s03now is not a code-supplied fact; write the link as the {{link.secure}} slot.",
+    );
+  });
+
+  it("cuts a detail that would still hold a piece down to its check's name alone", () => {
+    // The model's own "11:00" is quoted, and it is also the piece the glued visit.time gives: the check's name alone.
+    const parts = textOf("Come by 11:00. Riley can see you Sat Oct 24 at 11:00amx.", VISIT);
+    expect(valuesFaults(parts, contextFor(parts))).toEqual(["values"]);
+    expect(detailOf(parts, "values")).toBe("values");
+    // Without the glued value, the model's own words are quoted as before.
+    const own = textOf("Come by 11:00. Riley can see you Sat Oct 24 at 11:00am.", VISIT);
+    expect(detailOf(own, "values")).toBe(
+      "The time 11:00 is not a code-supplied fact; write the time as the {{visit.time}} slot.",
+    );
+  });
+
+  it("Never in a message names the slot where a step id or a word that never goes in is a piece of a filled value", () => {
+    const unit: SlotValue = { slot: "visit.place", value: "Unit A4-12, 88 Elm St" };
+    const shop: SlotValue = { slot: "svc.intext", value: "Fade with coupon" };
+    const cases: [string, SlotValue, string][] = [
+      ["Your visit is at Unit A4-12, 88 Elm St.", unit, "A4-12"],
+      ["Your Fade with coupons is booked.", shop, "coupon"],
+    ];
+    for (const [text, value, piece] of cases) {
+      const parts = textOf(text, [value]);
+      expect(runMessageChecks(parts, contextFor(parts)).blocked, text).toBe(true);
+      expect(detailOf(parts, "neverInMessage"), text).toBe(
+        `neverInMessage: the slot {{${value.slot}}} reads with the words beside it as words that never go in a message; reword the text around it.`,
+      );
+      expect(detailOf(parts, "neverInMessage"), text).not.toContain(piece);
+    }
+    // The model's own step id is quoted first, and it is also the piece the place gives: the check's name alone.
+    const own = textOf("This is step A4-12 at Unit A4-12, 88 Elm St.", [unit]);
+    expect(neverInMessageFaults(own, contextFor(own))).toEqual(["neverInMessage"]);
+  });
+
+  // Round 2 (DL-176; the security reviewer's FAIL 1 and note a). A value that stands whole inside a longer glued value
+  // is taken out of the words, and an unclosed "{{foo" takes out the head of the value it is glued to; either way the
+  // glued value no longer stands in what is left, so it must keep the place it has in the send text.
+  const BIZ_NAME: SlotValue = { slot: "biz.name", value: "Lee's Barbershop" };
+  const SHOP_PLACE: SlotValue = { slot: "visit.place", value: "Lee's Barbershop, 88 Elm St, Springfield" };
+
+  /**
+   * Every piece a value can be cut into, for the tests to look for: each run of letters or digits in it, of two
+   * characters or more or with a digit ("Lee", "Barbershop", "88", "Springfield"; "11" and "00am" of "11:00am").
+   */
+  const piecesOf = (values: readonly SlotValue[]): string[] =>
+    values.flatMap((fact) =>
+      [...fact.value.matchAll(/[\p{L}\p{N}]+/gu)]
+        .map(([run]) => run)
+        .filter((run) => run.length > 1 || /\p{N}/u.test(run)),
+    );
+
+  /**
+   * Each case's text gives the Values detail `glued(slot)` and no Never-in-a-message detail, and no check's detail holds a
+   * piece of any value: as runMessageChecks gives the checks, and as the finalize answer gives them after T-313's scrub
+   * (checksWithoutValues, as finalize's index.ts resultOf runs it). The message still blocks.
+   */
+  const namesOnlyTheSlot = (cases: readonly (readonly [string, readonly SlotValue[], string])[]): void => {
+    for (const [text, values, slot] of cases) {
+      const parts = textOf(text, values);
+      const result = runMessageChecks(parts, contextFor(parts));
+      expect(result.blocked, text).toBe(true);
+      for (const [when, checks] of [
+        ["before the scrub", result.checks],
+        ["after the scrub", checksWithoutValues(result.checks, parts.slotValues)],
+      ] as const) {
+        const detail = (check: CheckOutcome["check"]): string | null =>
+          checks.find((outcome) => outcome.check === check)?.detail ?? null;
+        expect(detail("values"), `${text} (${when})`).toBe(glued(slot));
+        expect(detail("neverInMessage"), `${text} (${when})`).toBeNull();
+        for (const outcome of checks) {
+          for (const piece of piecesOf(values)) {
+            expect(outcome.detail ?? "", `${text} (${when}): ${outcome.check}`).not.toContain(piece);
+          }
+        }
+      }
+    }
+  };
+
+  it("a value nested in a longer glued value keeps the longer value's place: the detail names its slot, before and after T-313's scrub", () => {
+    const chair: SlotValue = { slot: "visit.place", value: "Riley's chair, 88 Elm St, Springfield" };
+    const askBy: SlotValue = { slot: "ask.by", value: "11:00am Sat" };
+    const change: SlotValue = { slot: "change.when", value: "Sat Oct 24, 2–3pm" };
+    namesOnlyTheSlot([
+      // biz.name inside visit.place, the place glued on its right (the A6-14 confirmation fills both).
+      [
+        "Riley can see you Sat Oct 24 at 11:00am. Your visit is at Lee's Barbershop, 88 Elm St, Springfieldx.",
+        [...VISIT, BIZ_NAME, SHOP_PLACE],
+        "visit.place",
+      ],
+      // pro.name inside visit.place.
+      ["Your visit is at Riley's chair, 88 Elm St, Springfieldx.", [RILEY, chair], "visit.place"],
+      // visit.time inside ask.by, glued.
+      ["Riley can see you Sat Oct 24 at 11:00am. Please reply by 11:00am Satx.", [...VISIT, askBy], "ask.by"],
+      // day inside change.when, glued.
+      ["Riley moved your visit to Sat Oct 24, 2–3pmx.", [RILEY, DAY, change], "change.when"],
+    ]);
+  });
+
+  it("an unclosed '{{foo' glued before a value takes none of its place away: the detail names its slot (note a)", () => {
+    namesOnlyTheSlot([
+      ["Your visit is at {{foo88 Elm St, Springfieldx.", [PLACE], "visit.place"],
+      ["Please reply by {{foo11:00am Satx.", [{ slot: "ask.by", value: "11:00am Sat" }], "ask.by"],
+    ]);
+  });
+
+  it("reads the same words as before: what is left is withoutInserted's and markOut's, each character where it stood", () => {
+    const quote: SlotValue = { slot: "relay.quote", value: "3pm" };
+    const cases: [string, readonly string[], readonly SlotValue[]][] = [
+      [confirmation, [], finalTwoSends.slotValues],
+      [`${OPENER} Riley says yes.\n${OPT_OUT_LINE}`, [OPENER, OPT_OUT_LINE], [RILEY]],
+      ["Riley can do 3pm.\nAlex M. asks: 3pm", [], [RILEY, ALEX, quote]],
+      ["It costs $40.00, or $40 at the chair.", [], [PRICE]],
+      ["Ask Alex M. today. Alex M.x is out.", [], [ALEX]],
+      ["Your visit is at Lee's Barbershop, 88 Elm St, Springfieldx.", [], [BIZ_NAME, SHOP_PLACE]],
+    ];
+    for (const [text, inserted, values] of cases) {
+      const filled = filledOf(textOf(text, values));
+      const own = markOutIn(withoutInsertedIn(readingOf(text), inserted), filled, " ");
+      expect(own.text, text).toBe(markOut(withoutInserted(text, inserted), filled, " "));
+      expect(own.at, text).toHaveLength(own.text.length);
+      for (let index = 0; index < own.text.length; index += 1) {
+        const stood = own.at[index] ?? -1;
+        if (stood >= 0)
+          expect(text.charAt(stood), `${text} at ${String(index)}`).toBe(own.text.charAt(index));
+      }
+    }
   });
 });

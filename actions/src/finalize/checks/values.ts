@@ -3,12 +3,22 @@
 // "tomorrow" are slots filled at send. The text it reads has every slot value taken out already, so what is left of
 // these was written by the model; each must still be held by a code-supplied fact (a slot value, a fact the composer
 // was given, the reader's name or the master line's own words) or it fails.
+//
+// No detail quotes a piece of a filled value (T-1105; K-09 README default 32: "C-092's details name slots, never filled
+// values"; T-310's security note b). A value glued to a letter or digit is not taken out of the words, and a scan that
+// cuts into it would quote a piece the finalize answer's scrub cannot see, since it writes only a whole value as its
+// slot: "11:00" of "11:00amx", "Springfieldx" of "88 Elm St, Springfieldx", "CodeAB" and "12" of "CodeAB12". That fault
+// names the check and the slot instead, and a detail that would still hold such a piece is cut down to the check's name.
+// Where each value stands is found in the send text before anything is taken out, and the scans read what is left with
+// each character where it stood there (T-1105 round 2, DL-176): a value taken out of the words, standing whole inside a
+// longer glued value (biz.name in "Lee's Barbershop, 88 Elm St, Springfieldx"), or the head of a value an unclosed "{{"
+// took with it, leaves the glued value its place.
 
 import COMMON_WORDS from "./common-words.json";
-import { BUSINESS, LINK, QUOTE_SLOT, closingOf, escapeForPattern } from "./reading";
-import type { CheckContext, FinalParts } from "./types";
+import { BUSINESS, LINK, QUOTE_SLOT, closingOf, escapeForPattern, type Filled } from "./reading";
+import type { CheckContext, CheckName, FinalParts, SlotValue } from "./types";
 
-/** One kind of value and how the model may write it. The patterns are global: used only with String#replace. */
+/** One kind of value and how the model may write it. The patterns are global: used only to replace (replaceIn). */
 interface Scan {
   readonly noun: string;
   readonly pattern: RegExp;
@@ -137,57 +147,271 @@ export function plainWordsOf(context: CheckContext): (word: string) => boolean {
       .every((part) => COMMON.has(part) || fixed.has(part));
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// No piece of a filled value in a detail (T-1105): what the Values and Never-in-a-message checks may quote.
+
+/** Where a filled value (K-03 `slotValues`) stands in a text a check reads: its slot and the characters it covers. */
+export interface Place {
+  readonly slot: string;
+  readonly start: number;
+  readonly end: number;
+}
+
+/**
+ * Each place in `text` where a filled value stands, whole or glued to a letter or digit: the longest value first, and
+ * never a place inside another. A relay's quote stands nowhere: its words are the sender's, which a check quotes as the
+ * model's wherever they stand outside the quote's own place (arch 07 line 409); nor does an empty value.
+ */
+export function placesOf(text: string, values: readonly SlotValue[]): Place[] {
+  const places: Place[] = [];
+  const filled = values
+    .filter((fact) => fact.slot !== QUOTE_SLOT && fact.value.trim() !== "")
+    .sort((a, b) => b.value.length - a.value.length);
+  for (const { slot, value } of filled) {
+    for (let start = text.indexOf(value); start !== -1; start = text.indexOf(value, start + 1)) {
+      const end = start + value.length;
+      if (places.every((place) => end <= place.start || place.end <= start))
+        places.push({ slot, start, end });
+    }
+  }
+  return places;
+}
+
+/** What one check may quote of one text it reads: where the filled values stand in it, and the pieces split off. */
+export interface Quoting {
+  readonly check: CheckName;
+  readonly text: string;
+  readonly places: readonly Place[];
+  /** Each piece of a filled value a scan split off, kept across every text the check reads (withoutPieces). */
+  readonly pieces: string[];
+}
+
+/** A check's quoting of one text it reads (placesOf), keeping the pieces it splits off in `pieces`. */
+export function quotingOf(
+  check: CheckName,
+  text: string,
+  values: readonly SlotValue[],
+  pieces: string[],
+): Quoting {
+  return { check, text, places: placesOf(text, values), pieces };
+}
+
+/**
+ * The places the characters [start, end) of a quoting's text cut into: every place they touch, in the text's order,
+ * when they hold one of them only in part, and none when they hold each place they touch whole. A value read whole,
+ * glued or not ("rosfield.com/v/s03now"), is quoted as it stands, since the finalize answer writes its slot there
+ * (T-313; DL-158 ruling c); a piece of one it cannot see. Each piece split off that holds a letter or digit is kept.
+ */
+export function cutInto(quoting: Quoting, start: number, end: number): Place[] {
+  const touched = quoting.places
+    .filter((place) => start < place.end && place.start < end)
+    .sort((a, b) => a.start - b.start);
+  const split = touched.filter((place) => place.start < start || end < place.end);
+  for (const place of split) {
+    const piece = quoting.text.slice(Math.max(start, place.start), Math.min(end, place.end));
+    if (/[\p{L}\p{N}]/u.test(piece)) quoting.pieces.push(piece);
+  }
+  return split.length === 0 ? [] : touched;
+}
+
+/** What the rewrite is told where a fault would quote a piece of a filled value: the check and the slot, never the piece. */
+export function cutFault(check: CheckName, slot: string): string {
+  return check === "neverInMessage"
+    ? `${check}: the slot {{${slot}}} reads with the words beside it as words that never go in a message; reword the text around it.`
+    : `${check}: the slot {{${slot}}} is glued to the word beside it, so its value is not read whole; put a space between them.`;
+}
+
+/** `fault` as it is worded where nothing is cut, else the check and each slot cut into (cutFault). */
+export function faultOr(quoting: Quoting, cut: readonly Place[], fault: string): string[] {
+  return cut.length === 0 ? [fault] : [...new Set(cut.map((place) => cutFault(quoting.check, place.slot)))];
+}
+
+/** The fault for a piece of a quoting's text at [start, end): as worded, or the slots where it cuts into one (faultOr). */
+export function quoted(quoting: Quoting, start: number, end: number, fault: string): string[] {
+  return faultOr(quoting, cutInto(quoting, start, end), fault);
+}
+
+/** A check's faults, or its name alone where one would still hold a piece of a filled value a scan split off. */
+export function withoutPieces(
+  check: CheckName,
+  faults: readonly string[],
+  pieces: readonly string[],
+): string[] {
+  return faults.some((fault) => pieces.some((piece) => fault.includes(piece))) ? [check] : [...faults];
+}
+
+/** A character a mark or a scan put in, which stood nowhere in the text first read. */
+const PUT = -1;
+
+/**
+ * A text the scans read, with where each of its characters stood in the text first read, the send text (PUT where a
+ * mark or a scan put one).
+ */
+export interface Reading {
+  readonly text: string;
+  readonly at: readonly number[];
+}
+
+/** A text as first read: each character (a UTF-16 unit, as string indexes count) where it stands. */
+export function readingOf(text: string): Reading {
+  return { text, at: Array.from({ length: text.length }, (_, index) => index) };
+}
+
+/** Where the characters [from, to) of a reading stood in the text first read: the first that stood there to the last. */
+function spanOf(reading: Reading, from: number, to: number): [number, number] {
+  let start = PUT;
+  let end = PUT;
+  for (let index = from; index < to; index += 1) {
+    const stood = reading.at[index] ?? PUT;
+    if (stood === PUT) continue;
+    if (start === PUT) start = stood;
+    end = stood + 1;
+  }
+  return [start, end];
+}
+
+/**
+ * String#replace with a global pattern and a function, keeping where each character stood; `put` gets each place too.
+ * It reads from the start, as String#replace does, whatever the shared pattern's lastIndex; `once` replaces only the
+ * first match, as String#replace does with a pattern that is not global.
+ */
+export function replaceIn(
+  reading: Reading,
+  pattern: RegExp,
+  put: (item: string, start: number, end: number) => string,
+  once = false,
+): Reading {
+  let text = "";
+  let at: number[] = [];
+  let last = 0;
+  const matches = [...reading.text.matchAll(new RegExp(pattern))];
+  for (const match of once ? matches.slice(0, 1) : matches) {
+    const [item] = match;
+    const [start, end] = spanOf(reading, match.index, match.index + item.length);
+    const written = put(item, start, end);
+    text += reading.text.slice(last, match.index) + written;
+    at = at.concat(
+      reading.at.slice(last, match.index),
+      Array.from({ length: written.length }, () => PUT),
+    );
+    last = match.index + item.length;
+  }
+  return { text: text + reading.text.slice(last), at: at.concat(reading.at.slice(last)) };
+}
+
+/** reading.ts withoutInserted, keeping where each character stood: each inserted piece out at its first place. */
+export function withoutInsertedIn(reading: Reading, inserted: readonly string[]): Reading {
+  return inserted.reduce((rest, piece) => {
+    const start = piece === "" ? -1 : rest.text.indexOf(piece);
+    if (start === -1) return rest;
+    const end = start + piece.length;
+    return {
+      text: rest.text.slice(0, start) + rest.text.slice(end),
+      at: [...rest.at.slice(0, start), ...rest.at.slice(end)],
+    };
+  }, reading);
+}
+
+/**
+ * Where a filled piece stands whole, as reading.ts wholePlaces reads it: no letter or digit right before it, none right
+ * after it, and no digit across a point, comma or colon after it ("$40" is not in "$40.00"). Always global, as replaceIn
+ * reads it; markOutIn replaces a quote at its first place only.
+ */
+const wholeIn = (piece: string): RegExp =>
+  new RegExp(`(?<![\\p{L}\\p{N}])${escapeForPattern(piece)}(?![\\p{L}\\p{N}]|[.,:]\\p{N})`, "gu");
+
+/**
+ * reading.ts markOut, keeping where each character stood: each piece's whole places as `mark` and its closing ".", "!"
+ * or "?", the longest piece first, a quote at its first place only. What is left reads as markOut leaves it, character
+ * for character, so a check reads the same words; only where each stood in the send text is kept besides (T-1105).
+ */
+export function markOutIn(reading: Reading, pieces: readonly Filled[], mark: string): Reading {
+  return pieces
+    .filter((piece) => piece.text !== "")
+    .sort((a, b) => b.text.length - a.text.length)
+    .reduce(
+      (rest, piece) => replaceIn(rest, wholeIn(piece.text), () => mark + closingOf(piece.text), piece.once),
+      reading,
+    );
+}
+
+/** A run of characters between spaces: a word as the names are read. */
+const TOKEN = /\S+/g;
+
 /**
  * The names of a person or business the model wrote that no code-supplied fact holds: each capitalized word (a
  * capital, then a small letter; STOP, HELP and AI are not names) that no fact holds and that is not Rosie's own name.
  * A word that starts a line or a sentence, follows ":" or " · ", or opens with a quote or a bracket is read as a name
  * too, unless it is a plain word (plainWordsOf). This fails closed: a plain word read as a name costs a rewrite or the
- * master's fallback line, while an invented name going out is the harm (arch 07 line 409; T-312 round 2).
+ * master's fallback line, while an invented name going out is the harm (arch 07 line 409; T-312 round 2). A name that
+ * cuts into a filled value is never quoted: its fault names the slot (cutInto; T-1105).
  */
 export function unstatedNames(
-  text: string,
+  reading: Reading,
   stated: (item: string) => boolean,
   plain: (word: string) => boolean,
+  quoting: Quoting,
 ): string[] {
   const faults: string[] = [];
-  for (const line of text.split("\n")) {
+  let lineStart = 0;
+  for (const line of reading.text.split("\n")) {
     let starts = true;
-    for (const raw of line.split(/\s+/)) {
-      if (raw === "") continue;
+    for (const token of line.matchAll(TOKEN)) {
+      const [raw] = token;
       const first = starts || /^[("“‘'[]/u.test(raw);
       starts = /[.!?:]["”’')\]]*$/u.test(raw) || raw === "·";
-      const word = raw.replace(/^[^\p{L}\p{N}]+/u, "").replace(/[^\p{L}\p{N}'’]+$/u, "");
+      const opened = raw.replace(/^[^\p{L}\p{N}]+/u, "");
+      const word = opened.replace(/[^\p{L}\p{N}'’]+$/u, "");
       if (!/^\p{Lu}\p{Ll}/u.test(word)) continue;
       const bare = word.replace(/['’]s$/u, "");
+      // Cut or not by what the fault quotes, the name without its "'s": a value ending "'s" it holds only in part.
+      const from = lineStart + token.index + raw.length - opened.length;
+      const [start, end] = spanOf(reading, from, from + bare.length);
+      const cut = cutInto(quoting, start, end);
       if (OWN_NAMES.has(bare) || stated(word) || stated(bare)) continue;
       if (first && (plain(word) || plain(bare))) continue;
-      faults.push(`The name ${bare} is not a code-supplied fact; write each name as its slot.`);
+      faults.push(
+        ...faultOr(
+          quoting,
+          cut,
+          `The name ${bare} is not a code-supplied fact; write each name as its slot.`,
+        ),
+      );
     }
+    lineStart += line.length + 1;
   }
   return faults;
 }
 
 /**
- * The values the model wrote that no code-supplied fact holds, each as the rewrite is told it. `text` is a send's words
- * with every slot value already taken out (reading.ts markOut), so all that is left is the model's own.
+ * The values the model wrote that no code-supplied fact holds, each as the rewrite is told it. `own` is a send's words
+ * with every slot value already taken out (markOutIn), so all that is left is the model's own, and a value glued to a
+ * letter or digit, which a scan may cut into: that fault names the slot, never the piece, and each piece split off is
+ * kept in the quoting's `pieces` (T-1105). `quoting` is of the send text, where `own`'s characters stood: so a glued
+ * value has its place there even where a value inside it, or its head with an unclosed "{{", was taken out (DL-176).
  */
 export function unstatedValues(
-  text: string,
+  own: Reading,
+  quoting: Quoting,
   parts: FinalParts,
   stated: (item: string) => boolean,
   plain: (word: string) => boolean,
 ): string[] {
   const faults: string[] = [];
-  let rest = text.replace(SEND_DAY, (item) => {
-    faults.push(`"${item}" is filled at send; write it as the {{${item.toLowerCase()}}} slot.`);
+  let rest = replaceIn(own, SEND_DAY, (item, start, end) => {
+    const fault = `"${item}" is filled at send; write it as the {{${item.toLowerCase()}}} slot.`;
+    faults.push(...quoted(quoting, start, end, fault));
     return " ";
   });
   for (const scan of SCANS) {
-    rest = rest.replace(scan.pattern, (item) => {
-      if (!stated(item))
-        faults.push(`The ${scan.noun} ${item.trim()} is not a code-supplied fact; ${advice(scan, parts)}`);
+    rest = replaceIn(rest, scan.pattern, (item, start, end) => {
+      const cut = cutInto(quoting, start, end);
+      if (!stated(item)) {
+        const fault = `The ${scan.noun} ${item.trim()} is not a code-supplied fact; ${advice(scan, parts)}`;
+        faults.push(...faultOr(quoting, cut, fault));
+      }
       return ` ${closingOf(item)}`;
     });
   }
-  return [...faults, ...unstatedNames(rest, stated, plain)];
+  return [...faults, ...unstatedNames(rest, stated, plain, quoting)];
 }

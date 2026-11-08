@@ -3,6 +3,7 @@
 // Each check returns the faults it finds, in the words the rewrite is told; none means it passed. The first four block
 // the message and take step 7's path; Shape, Length and reading, and Format never block (arch 07 line 417). What
 // happens next (one rewrite, the fallback, the passed-on line) is the rewrite and fallback path's (C-093, T-313).
+// The Values and Never-in-a-message details never quote a piece of a filled value (T-1105; values.ts cutInto).
 
 import { LIMITS, grade, ideasIn, sentencesOf, wordsOf } from "./grade";
 import { isOptOutOnly, typedLabels } from "./opt-out";
@@ -11,7 +12,6 @@ import {
   filledOf,
   fixedLineWords,
   insertedWords,
-  markOut,
   optionsOf,
   ownWords,
   quotesOf,
@@ -20,7 +20,21 @@ import {
   withoutInserted,
   wordsText,
 } from "./reading";
-import { plainWordsOf, statedBy, unstatedValues } from "./values";
+import {
+  cutInto,
+  faultOr,
+  markOutIn,
+  plainWordsOf,
+  quoted,
+  quotingOf,
+  readingOf,
+  replaceIn,
+  statedBy,
+  unstatedValues,
+  withoutInsertedIn,
+  withoutPieces,
+  type Quoting,
+} from "./values";
 import type {
   CheckContext,
   CheckName,
@@ -88,21 +102,36 @@ export const fixedLinesFaults: Check = (parts, context) => {
 /** A slot left in the words, {{name}} or an unclosed "{{name": its own fault, never read as a value or a link. */
 const UNFILLED = /\{\{[^{}]*\}\}|\{\{[^{}\s]*/g;
 
-/** Every value a code-supplied fact, every slot filled, every link a link slot's value. */
+/**
+ * Every value a code-supplied fact, every slot filled, every link a link slot's value; no detail quotes a piece of a
+ * filled value, and one that would still hold such a piece is the check's name alone (T-1105). Where each value stands
+ * is read in the send text before anything is taken out of it (DL-176).
+ */
 export const valuesFaults: Check = (parts, context) => {
   const faults: string[] = [];
-  const texts = sendTexts(parts);
-  for (const text of texts) {
+  const pieces: string[] = [];
+  const quotings = sendTexts(parts).map((text) => quotingOf("values", text, parts.slotValues, pieces));
+  for (const quoting of quotings) {
+    const { text } = quoting;
     for (const match of text.matchAll(/\{\{\s*([^{}:|\s]*)/g)) {
       const name = match[1] ?? "";
+      const end = match.index + match[0].length;
       faults.push(
-        name === ""
-          ? "A slot is left unfilled, so '{{' is in the text."
-          : `The slot {{${name}}} has no value, so '{{' is left in the text.`,
+        ...(name === ""
+          ? ["A slot is left unfilled, so '{{' is in the text."]
+          : quoted(
+              quoting,
+              end - name.length,
+              end,
+              `The slot {{${name}}} has no value, so '{{' is left in the text.`,
+            )),
       );
     }
     for (const match of text.matchAll(/\b(?:null|undefined)\b/g)) {
-      faults.push(`The text says "${match[0]}" where code left a value empty.`);
+      const end = match.index + match[0].length;
+      faults.push(
+        ...quoted(quoting, match.index, end, `The text says "${match[0]}" where code left a value empty.`),
+      );
     }
   }
   const values = valuesOf(parts);
@@ -115,13 +144,14 @@ export const valuesFaults: Check = (parts, context) => {
   const plain = plainWordsOf(context);
   const inserted = insertedWords(parts, context);
   const filled = filledOf(parts);
-  for (const text of texts) {
+  for (const quoting of quotings) {
     // Fixed lines and typed options out, each unfilled slot (its fault is named above), then every slot value, a quote
-    // at its own place only: what is left is the model's.
-    const own = markOut(withoutInserted(text, inserted).replace(UNFILLED, " "), filled, " ");
-    faults.push(...unstatedValues(own, parts, stated, plain));
+    // at its own place only: what is left is the model's, each character read where it stood in the send text, so a
+    // scan cuts into a glued value at the place the quoting found for it there.
+    const taken = replaceIn(withoutInsertedIn(readingOf(quoting.text), inserted), UNFILLED, () => " ");
+    faults.push(...unstatedValues(markOutIn(taken, filled, " "), quoting, parts, stated, plain));
   }
-  return unique(faults);
+  return withoutPieces("values", unique(faults), pieces);
 };
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -148,16 +178,33 @@ export const oneQuestionFaults: Check = (parts, context) => {
 const EMOJI = /[\p{Extended_Pictographic}\p{Regional_Indicator}\u{20E3}]/u;
 const MARKDOWN = /\*\*|`/;
 const LEADING_MARK = /^[ \t]*(?:#|[•◦▪‣]|[-*+–—](?=\s))/m;
-/** A step id such as A4-12, S1-02 or S11-102: a flow letter, a section, a dash and the step (SPEC-master section 4). */
-const STEP_ID = /\b[SAB]\d{1,2}-\d{2,3}\b/;
+/**
+ * A step id such as A4-12, S1-02 or S11-102: a flow letter, a section, a dash and the step (SPEC-master section 4).
+ * Global, as NEVER_SAID's are: read only with String#matchAll (firstQuoted), so every place a pattern matches is seen.
+ */
+const STEP_ID = /\b[SAB]\d{1,2}-\d{2,3}\b/g;
 /** Words that never go in a message (arch 07 line 415; RULES 4.4: no offers and no "book again"). */
 const NEVER_SAID = [
-  /\bthe user\b/i,
-  /\bthe system prompt\b/i,
-  /\bbook again\b/i,
-  /\bcoupons?\b/i,
-  /%\s?off\b/i,
+  /\bthe user\b/gi,
+  /\bthe system prompt\b/gi,
+  /\bbook again\b/gi,
+  /\bcoupons?\b/gi,
+  /%\s?off\b/gi,
 ];
+
+/**
+ * The fault for the first place `pattern` matches a quoting's text, worded by `fault`, or the check and the slot where
+ * that place cuts into a filled value (faultOr); every place it matches keeps the pieces it splits off (cutInto), so a
+ * detail that would still hold one is cut down (T-1105). It reads from the start, whatever the pattern's lastIndex.
+ */
+function firstQuoted(quoting: Quoting, pattern: RegExp, fault: (item: string) => string): string[] {
+  const found = [...quoting.text.matchAll(new RegExp(pattern))].map((match) => ({
+    item: match[0],
+    cut: cutInto(quoting, match.index, match.index + match[0].length),
+  }));
+  const [first] = found;
+  return first === undefined ? [] : faultOr(quoting, first.cut, fault(first.item));
+}
 
 /**
  * Every option label the message carries or may carry, on any channel: each poll's, the step's own (typed wherever no
@@ -172,7 +219,11 @@ function optionLabels(parts: FinalParts, context: CheckContext): string[] {
   ];
 }
 
-/** Outside a quote: no emoji, markdown, leading # or bullet, step id or word that never goes in; no opt-out-only option. */
+/**
+ * Outside a quote: no emoji, markdown, leading # or bullet, step id or word that never goes in; no opt-out-only option.
+ * No detail quotes a piece of a filled value, and one that would still hold such a piece is the check's name alone
+ * (T-1105).
+ */
 export const neverInMessageFaults: Check = (parts, context) => {
   const quotes = quotesOf(parts);
   const texts = [
@@ -180,15 +231,19 @@ export const neverInMessageFaults: Check = (parts, context) => {
     ...optionsOf(parts).map((option) => option.label),
   ];
   const faults: string[] = [];
+  const pieces: string[] = [];
   for (const text of texts) {
+    const quoting = quotingOf("neverInMessage", text, parts.slotValues, pieces);
     if (EMOJI.test(text)) faults.push("The text holds an emoji; write it without one.");
     if (MARKDOWN.test(text)) faults.push("The text holds markdown (** or a backtick); write plain words.");
     if (LEADING_MARK.test(text)) faults.push("A line starts with # or a bullet; write plain lines.");
-    const step = STEP_ID.exec(text);
-    if (step !== null) faults.push(`The text names the step id ${step[0]}; never name a step.`);
+    faults.push(
+      ...firstQuoted(quoting, STEP_ID, (step) => `The text names the step id ${step}; never name a step.`),
+    );
     for (const pattern of NEVER_SAID) {
-      const said = pattern.exec(text);
-      if (said !== null) faults.push(`The text says "${said[0]}", which never goes in a message.`);
+      faults.push(
+        ...firstQuoted(quoting, pattern, (said) => `The text says "${said}", which never goes in a message.`),
+      );
     }
   }
   for (const label of optionLabels(parts, context)) {
@@ -198,7 +253,7 @@ export const neverInMessageFaults: Check = (parts, context) => {
       );
     }
   }
-  return unique(faults);
+  return withoutPieces("neverInMessage", unique(faults), pieces);
 };
 
 // ---------------------------------------------------------------------------------------------------------------
