@@ -9,13 +9,17 @@ import { describe, expect, it } from "vitest";
 import {
   amountsIn,
   countsIn,
+  foldWords,
   foundAtWordEdges,
   instantsAt,
   instantsFor,
   optionsNamedIn,
   readTimeWords,
   reparse,
+  wholePhraseFault,
   zonesNamedIn,
+  type FieldType,
+  type FieldValue,
   type ReparseContext,
   type TimeWords,
 } from "./index";
@@ -405,5 +409,297 @@ describe("re-parse", () => {
       ok: false,
       why: "unreadable",
     });
+  });
+});
+
+// ---- round 3 (DL-189): fold first, and the whole value phrase --------------------------------------------------------
+
+const ZERO_WIDTH_SPACE = "​";
+const SOFT_HYPHEN = "­";
+const WORD_JOINER = "⁠";
+
+describe("fold first: word edges are judged on the folded text the readers read (DL-189 item 1)", () => {
+  it("the readers' fold takes out what shows nothing and reads every apostrophe as one", () => {
+    expect(foldWords(`raise haircut to 1${ZERO_WIDTH_SPACE}40`)).toBe("raise haircut to 140");
+    expect(foldWords(`1${SOFT_HYPHEN}40`)).toBe("140");
+    expect(foldWords(`1${WORD_JOINER}40`)).toBe("140");
+    expect(foldWords("I can´t make it")).toBe("i can't make it");
+    expect(foldWords("$1，200 at 10：30")).toBe("$1,200 at 10:30");
+    expect(cents(`raise haircut to 1${ZERO_WIDTH_SPACE}40`)).toEqual([14000]);
+  });
+
+  it.each([
+    ["raise haircut to $1，200", "$1", "$1，200"],
+    ["can you move me to tomorrow at 10：30", "tomorrow at 10", "tomorrow at 10：30"],
+    ["$12．50 a foot", "$12", "$12．50"],
+    ["table for 9：30 tomorrow", "9", "9：30"],
+    ["raise haircut to $1﹐200", "$1", "$1﹐200"],
+    ["at 10﹕30", "at 10", "at 10﹕30"],
+    ["on 10／24", "10", "10／24"],
+    ["tile is $12－15 a foot", "$12", "$12－15"],
+    ["BLOCK Thu 2〜5", "Thu 2", "Thu 2〜5"],
+    ["2−5pm", "2", "2−5pm"],
+  ])(
+    "a compatibility form is its mark: in '%s', '%s' is cut out and not found; '%s' is",
+    (text, cut, whole) => {
+      expect(text.includes(cut)).toBe(true);
+      expect(foundAtWordEdges(text, cut)).toBe(false);
+      expect(foundAtWordEdges(text, whole)).toBe(true);
+    },
+  );
+
+  it.each([
+    ["I can´t make it", "I can", "I can´t"],
+    ["I can`t make it", "I can", "I can`t"],
+    ["I can‛t make it", "I can", "I can‛t"],
+    ["I can′t make it", "I can", "I can′t"],
+    ["I can＇t make it", "I can", "I can＇t"],
+    ["twenty－five people", "twenty", "twenty－five"],
+  ])(
+    "every mark read as an apostrophe or a dash joins words: in '%s', '%s' is not found; '%s' is",
+    (text, cut, whole) => {
+      expect(foundAtWordEdges(text, cut)).toBe(false);
+      expect(foundAtWordEdges(text, whole)).toBe(true);
+    },
+  );
+
+  it.each([
+    [`raise haircut to 1${ZERO_WIDTH_SPACE}40`, "40"],
+    [`raise haircut to 1${SOFT_HYPHEN}40`, "40"],
+    [`raise haircut to 1${WORD_JOINER}40`, "40"],
+    ["raise haircut to 1﻿40", "40"],
+    [`raise haircut to 1${ZERO_WIDTH_SPACE}40`, "1"],
+  ])("what shows nothing is taken out first: in %j, '%s' is cut out of 140", (text, cut) => {
+    expect(text.includes(cut)).toBe(true);
+    expect(foundAtWordEdges(text, cut)).toBe(false);
+  });
+
+  it("the whole number is found, with or without the character that shows nothing", () => {
+    const text = `raise haircut to 1${ZERO_WIDTH_SPACE}40`;
+    expect(foundAtWordEdges(text, `1${ZERO_WIDTH_SPACE}40`)).toBe(true);
+    expect(foundAtWordEdges(text, "140")).toBe(true);
+    expect(foundAtWordEdges(text, ZERO_WIDTH_SPACE)).toBe(false);
+  });
+
+  it.each([
+    ["no.reply@example.com", "no"],
+    ["no.reply@example.com", "reply"],
+    ["no.reply@example.com", "example"],
+    ["no.reply@example.com", "com"],
+    ["ok,yes", "ok"],
+    ["ok,yes", "yes"],
+    ["see you at 3.Thanks", "see you at 3"],
+  ])(
+    "a . , : or / with a letter or digit right after it is no word edge: in '%s', '%s' is not found",
+    (text, cut) => {
+      expect(foundAtWordEdges(text, cut)).toBe(false);
+    },
+  );
+
+  it.each([
+    ["no.reply@example.com", "no.reply@example.com"],
+    ["well...yes", "yes"],
+    ["yes. 3pm works", "yes"],
+    ["yes, 3pm works", "3pm works"],
+    ["see you at 3. Thanks", "see you at 3"],
+  ])("a mark with a space or nothing after it is an edge: in '%s', '%s' is found", (text, whole) => {
+    expect(foundAtWordEdges(text, whole)).toBe(true);
+  });
+});
+
+describe("the readers' own phrase words: quarter to, half past, y media (DL-189 item 2)", () => {
+  // Sat Oct 31 2026 at 10:00am EDT: tomorrow is Sun Nov 1, after the clocks fall back (EST).
+  const SATURDAY = "2026-10-31T14:00:00Z";
+
+  it.each([
+    ["quarter to 3 tomorrow", ["2026-11-01T07:45:00Z", "2026-11-01T19:45:00Z"]],
+    ["a quarter to 3pm tomorrow", ["2026-11-01T19:45:00Z"]],
+    ["quarter past 3pm tomorrow", ["2026-11-01T20:15:00Z"]],
+    ["tomorrow at half past three in the afternoon", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow at quarter to 1pm", ["2026-11-01T17:45:00Z"]],
+    ["tomorrow at quarter to 12pm", ["2026-11-01T16:45:00Z"]],
+  ])("'%s' reads as %j in New York", (words, expected) => {
+    expect(readings(words, SATURDAY, NEW_YORK)).toEqual(expected);
+  });
+
+  it.each([
+    ["mañana a las 3 y media", ["2026-11-01T08:30:00Z", "2026-11-01T20:30:00Z"]],
+    ["mañana a las tres y cuarto de la tarde", ["2026-11-01T20:15:00Z"]],
+    ["mañana a las 4 menos cuarto de la tarde", ["2026-11-01T20:45:00Z"]],
+  ])("Spanish '%s' reads as %j in New York", (words, expected) => {
+    expect(readings(words, SATURDAY, NEW_YORK, ["es"])).toEqual(expected);
+  });
+});
+
+describe("a zone the time's own words name is the zone it is in (DL-189 item 2)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const at = (utc: string, zone = NEW_YORK) => ({ utc, zone });
+
+  it("'tomorrow at 3pm PST' for a New York visit is the wrong zone, whichever instant is given", () => {
+    const pst = "tomorrow at 3pm PST";
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), pst, context)).toEqual({
+      ok: false,
+      why: "wrongZone",
+    });
+    expect(reparse("time", at("2026-11-01T23:00:00Z"), pst, context)).toEqual({
+      ok: false,
+      why: "wrongZone",
+    });
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), "tomorrow at 3pm EST", context)).toEqual({ ok: true });
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), "tomorrow at 3pm (Eastern time)", context)).toEqual({
+      ok: true,
+    });
+  });
+
+  it("for a visit that shows Los Angeles too, 3pm Pacific passes only in Los Angeles' zone", () => {
+    const both: ReparseContext = { ...context, zones: [NEW_YORK, LOS_ANGELES] };
+    const pst = "tomorrow at 3pm PST";
+    expect(reparse("time", at("2026-11-01T23:00:00Z", LOS_ANGELES), pst, both)).toEqual({ ok: true });
+    expect(reparse("time", at("2026-11-01T23:00:00Z"), pst, both)).toEqual({ ok: false, why: "wrongZone" });
+  });
+
+  it("a zone word away from the time names no zone for it ('PT session')", () => {
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), "PT session, tomorrow at 3pm", context)).toEqual({
+      ok: true,
+    });
+  });
+});
+
+describe("a number's value is re-read from its whole value phrase (DL-189 item 2)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const usd = (amount: number) => ({ cents: amount, currency: "USD" });
+  const THREE_PM = at("2026-11-01T20:00:00Z");
+  // [case, the field's type, the value, the person's text, the words cited, the fault or null]
+  const cases: [string, FieldType, FieldValue, string, string, string | null][] = [
+    ["'40' out of '40%'", "money", usd(4000), "raise haircut to 40%", "40", "noText"],
+    ["'40' out of '40 per cent'", "money", usd(4000), "raise haircut 40 per cent", "40", "noText"],
+    ["'40' out of '40¢'", "money", usd(4000), "raise haircut to 40¢", "40", "differs"],
+    ["the whole '40¢' is 40 cents", "money", usd(40), "raise haircut to 40¢", "40¢", null],
+    ["the whole '$40/hr' is $40 an hour", "money", usd(4000), "handyman is $40/hr now", "$40/hr", null],
+    ["'$2k', whose k is not read", "money", usd(200), "raise it to $2k", "$2k", "noText"],
+    ["'$40' out of '$40 thousand'", "money", usd(4000), "raise it to $40 thousand", "$40", "noText"],
+    ["'$12' out of '$12 to 15'", "money", usd(1200), "tile is $12 to 15 a foot", "$12", "several"],
+    [
+      "K-02's '$12 a foot', whole",
+      "money",
+      usd(1200),
+      "block thursday afternoon and also tile is $12 a foot from now on",
+      "$12 a foot",
+      null,
+    ],
+    ["'$12 dollars', whole", "money", usd(1200), "tile is $12 dollars a foot", "$12 dollars", null],
+    ["'$1' out of '$1 200', thousands spaced", "money", usd(100), "raise haircut to $1 200", "$1", "noText"],
+    [
+      "'200' out of '$1 200', thousands spaced",
+      "money",
+      usd(20000),
+      "raise haircut to $1 200",
+      "200",
+      "differs",
+    ],
+    ["'2' out of '2 dozen'", "integer", 2, "2 dozen cupcakes", "2", "noText"],
+    [
+      "'forty' out of 'a hundred and forty'",
+      "integer",
+      40,
+      "a table for a hundred and forty",
+      "forty",
+      "differs",
+    ],
+    ["'twenty' out of 'twenty five'", "integer", 20, "twenty five people", "twenty", "differs"],
+    ["'6 people' out of '4 to 6 people'", "integer", 6, "4 to 6 people", "6 people", "several"],
+    ["'9' out of '9 pm'", "integer", 9, "table at 9 pm", "9", "noText"],
+    [
+      "'3 tomorrow' out of 'quarter to 3 tomorrow'",
+      "time",
+      THREE_PM,
+      "quarter to 3 tomorrow",
+      "3 tomorrow",
+      "differs",
+    ],
+    [
+      "the whole 'quarter to 3 tomorrow' is 2:45",
+      "time",
+      at("2026-11-01T19:45:00Z"),
+      "quarter to 3 tomorrow",
+      "quarter to 3 tomorrow",
+      null,
+    ],
+    [
+      "'tomorrow at 3' out of 'tomorrow at 3 pm', as 3am",
+      "time",
+      at("2026-11-01T08:00:00Z"),
+      "tomorrow at 3 pm",
+      "tomorrow at 3",
+      "differs",
+    ],
+    [
+      "'tomorrow at three' out of '... three thirty'",
+      "time",
+      THREE_PM,
+      "tomorrow at three thirty",
+      "tomorrow at three",
+      "noText",
+    ],
+    [
+      "'tomorrow at 3' out of 'tomorrow at 3 30'",
+      "time",
+      THREE_PM,
+      "tomorrow at 3 30",
+      "tomorrow at 3",
+      "noText",
+    ],
+    [
+      "'3 tomorrow' out of 'twenty to 3 tomorrow'",
+      "time",
+      THREE_PM,
+      "twenty to 3 tomorrow",
+      "3 tomorrow",
+      "noText",
+    ],
+    [
+      "'tomorrow at 3pm' out of '... 3pm or 4pm'",
+      "time",
+      THREE_PM,
+      "tomorrow at 3pm or 4pm",
+      "tomorrow at 3pm",
+      "several",
+    ],
+    [
+      "'tomorrow at 3pm' out of '... 3pm PST'",
+      "time",
+      THREE_PM,
+      "tomorrow at 3pm PST",
+      "tomorrow at 3pm",
+      "wrongZone",
+    ],
+    [
+      "'tomorrow at 3' with nothing more beside it",
+      "time",
+      THREE_PM,
+      "can we do tomorrow at 3 instead",
+      "tomorrow at 3",
+      null,
+    ],
+  ];
+
+  it.each(cases)("%s", (_case, type, value, text, words, expected) => {
+    expect(text.includes(words)).toBe(true);
+    expect(wholePhraseFault(type, value, text, words, context)).toBe(expected);
+  });
+
+  it("Spanish: 'mañana a las 3' out of 'mañana a las 3 y media' differs; the whole is 3:30", () => {
+    const spanish: ReparseContext = { ...context, languages: ["es"] };
+    const text = "¿me puede cambiar a mañana a las 3 y media?";
+    expect(wholePhraseFault("time", THREE_PM, text, "mañana a las 3", spanish)).toBe("differs");
+    expect(
+      wholePhraseFault("time", at("2026-11-01T20:30:00Z"), text, "mañana a las 3 y media", spanish),
+    ).toBeNull();
+  });
+
+  it("types not written as numbers have no value phrase; words standing nowhere whole are noText", () => {
+    expect(wholePhraseFault("text", "haircut", "raise haircut to 40%", "haircut", context)).toBeNull();
+    expect(wholePhraseFault("money", usd(4000), "raise haircut to 140", "40", context)).toBe("noText");
   });
 });

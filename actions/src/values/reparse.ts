@@ -7,7 +7,8 @@
 //   - boolean: the words say yes or no, not both;
 //   - money: the one amount in the words (money.ts), in whole cents and its currency;
 //   - time: the one date and time in the words, read from the send time in a zone the value may be in (times.ts): the
-//     visit's, or for a video or phone visit either side's (S13-03); an hour with no am or pm may be either;
+//     visit's, or for a video or phone visit either side's (S13-03); an hour with no am or pm may be either; a zone the
+//     time's own words name ("3pm PST") must be the value's zone, or it is the wrong one (DL-189);
 //   - zone: the one time zone the words name ("Pacific", "ET", an IANA name);
 //   - id: the id stands in the words as a whole;
 //   - choice: the words name exactly one of the question's options, by its number, letter or words.
@@ -16,7 +17,7 @@
 
 import { amountsIn, distinctMoney, sameMoney, type Money } from "./money";
 import { numberPhrasesIn } from "./numbers";
-import { instantsFor, readTimeWords, timeSpansIn } from "./times";
+import { instantsFor, timeReadingOf, timeSpansIn } from "./times";
 import {
   BOTH_LANGUAGES,
   findAll,
@@ -121,17 +122,25 @@ function theOne<T>(found: readonly T[], same: (a: T, b: T) => boolean, value: T)
 const NUMERAL = /(?<![\w.,:/$])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w,:/%$]|\.\d)/g;
 const NONE = /\b(?:none|ninguno|ninguna)\b/g;
 
+/** One count and where it stands in the folded words. */
+export interface FoundCount extends Span {
+  readonly value: number;
+}
+
 /**
- * Every count in the words: digits and number words, "none" as 0. Amounts of money, dates and times of day stand apart:
- * "a table for 4 at 7pm" holds the count 4.
+ * Every count in the words, with where it stands in their folded form: digits and number words, "none" as 0. Amounts of
+ * money, dates and times of day stand apart: "a table for 4 at 7pm" holds the count 4.
  */
-export function countsIn(words: string, languages: readonly ValueLanguage[] = BOTH_LANGUAGES): number[] {
+export function countSpansIn(
+  words: string,
+  languages: readonly ValueLanguage[] = BOTH_LANGUAGES,
+): FoundCount[] {
   const folded = foldWords(words);
   const apart: Span[] = [
     ...amountsIn(words, languages).filter((amount) => amount.marked),
     ...timeSpansIn(folded),
   ];
-  const counts: { value: number; at: number; end: number }[] = [];
+  const counts: FoundCount[] = [];
   for (const found of findAll(folded, NUMERAL)) {
     const whole = Number((found.groups[0] ?? "").replaceAll(",", ""));
     const value = found.groups[1] === undefined ? whole : Number(`${String(whole)}.${found.groups[1]}`);
@@ -139,10 +148,12 @@ export function countsIn(words: string, languages: readonly ValueLanguage[] = BO
   }
   for (const phrase of numberPhrasesIn(folded, languages)) counts.push(phrase);
   for (const found of findAll(folded, NONE)) counts.push({ value: 0, at: found.at, end: found.end });
-  return counts
-    .filter((count) => !overlaps(count, apart))
-    .sort((a, b) => a.at - b.at)
-    .map((count) => count.value);
+  return counts.filter((count) => !overlaps(count, apart)).sort((a, b) => a.at - b.at);
+}
+
+/** Every count in the words, in order (countSpansIn's values). */
+export function countsIn(words: string, languages: readonly ValueLanguage[] = BOTH_LANGUAGES): number[] {
+  return countSpansIn(words, languages).map((count) => count.value);
 }
 
 const YES = /\b(?:yes|yeah|yep|yup|sure|ok|okay|si|claro|correct|true|absolutely|definitely)\b/;
@@ -174,6 +185,43 @@ export function zonesNamedIn(words: string): string[] {
     if (isZone(name)) named.push(name);
   }
   return named;
+}
+
+/** One zone word and where it stands in the folded words, with the zone it names (a lower-case IANA name). */
+export interface ZoneWord extends Span {
+  readonly zone: string;
+}
+
+/** Every zone word in the words, with where it stands in their folded form: "PST", "Pacific", "hora del este". */
+export function zoneWordSpansIn(words: string): ZoneWord[] {
+  const folded = foldWords(words);
+  const found: ZoneWord[] = [];
+  for (const [pattern, zone] of ZONE_WORDS) {
+    for (const each of findAll(folded, pattern))
+      found.push({ at: each.at, end: each.end, zone: zone.toLowerCase() });
+  }
+  for (const each of findAll(folded, IANA_NAME)) {
+    const name = folded.slice(each.at, each.end);
+    if (isZone(name)) found.push({ at: each.at, end: each.end, zone: name });
+  }
+  return found;
+}
+
+/**
+ * The distinct zones named inside the time the words read or right beside it (T-304 round 3, DL-189 item 2): "3pm PST",
+ * "3pm (Pacific time)", "PT 3pm". A zone word elsewhere in the words ("PT session") names no zone for the time.
+ */
+function zonesOfTime(words: string, read: readonly Span[]): string[] {
+  if (read.length === 0) return [];
+  const folded = foldWords(words);
+  const from = Math.min(...read.map((span) => span.at));
+  const to = Math.max(...read.map((span) => span.end));
+  const beside = zoneWordSpansIn(words).filter((word) => {
+    if (word.at >= to) return /^[ (]*$/.test(folded.slice(to, word.at));
+    if (word.end <= from) return /^ *$/.test(folded.slice(word.end, from));
+    return true;
+  });
+  return [...new Set(beside.map((word) => word.zone))];
 }
 
 const LETTERS = "abcdefghijklmnopqrstuvwxyz";
@@ -216,9 +264,13 @@ function reparseTime(value: FieldValue, words: string, context: ReparseContext):
   const zones = context.zones.filter((zone) => isZone(zone));
   if (zones.length === 0) return fault("noZone");
   if (!zones.includes(value.zone)) return fault("wrongZone");
-  const read = readTimeWords(words, context.languages ?? BOTH_LANGUAGES);
+  const { read, spans } = timeReadingOf(words, context.languages ?? BOTH_LANGUAGES);
   if (read.kind === "none") return fault("noValue");
   if (read.kind === "several") return fault("several");
+  // A zone the time's own words name ("3pm PST") is the one it is in: any other zone is the wrong one (DL-189 item 2).
+  const [named, ...more] = zonesOfTime(words, spans);
+  if (more.length > 0) return fault("several");
+  if (named !== undefined && named !== value.zone.toLowerCase()) return fault("wrongZone");
   return instantsFor(read.time, sentMs, value.zone).includes(valueMs) ? OK : fault("differs");
 }
 
