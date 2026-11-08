@@ -1,0 +1,34 @@
+{
+  "after": ["seed-booking-flow-a.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "owner_oks",
+    "values": {
+      "id": "ok-alex-haircut-late-move",
+      "booking_id": "booking-alex-haircut",
+      "business_id": "biz-lees-barbershop",
+      "about": "late_move",
+      "quote_id": null,
+      "asked_at": "2026-10-23T15:10:00Z",
+      "answer_by": "2026-10-23T19:10:00Z",
+      "reminded_at": null,
+      "answer": "accept",
+      "answered_at": "2026-10-23T15:20:00Z",
+      "answered_by_person_id": null,
+      "answered_by_role": null,
+      "open_question_id": null,
+      "option_id": null,
+      "event_id": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["owner_oks_answered_by"]
+    }
+  }
+}

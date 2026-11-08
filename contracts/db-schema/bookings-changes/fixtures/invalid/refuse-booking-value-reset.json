@@ -1,0 +1,23 @@
+{
+  "after": ["seed-booking-flow-a.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "booking_details",
+    "set": {
+      "approval": "now",
+      "version": 7
+    },
+    "where": {
+      "booking_id": "booking-alex-haircut"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["booking_details_set_once"]
+    }
+  }
+}

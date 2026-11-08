@@ -1,0 +1,350 @@
+{
+  "after": [
+    "../../core/fixtures/seed-resources.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json",
+    "../../rules/fixtures/seed-rules-tap-list.json",
+    "../../rules/fixtures/seed-note-only-rule.json"
+  ],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-dee",
+        "name": "Dee",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-dee",
+        "kind": "phone",
+        "address": "+15555550131"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-dee",
+        "handle_id": "handle-dee"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550131",
+        "handle_id": "handle-dee",
+        "chat_open": true,
+        "chat_open_at": "2026-10-12T15:20:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-12T15:19:00Z",
+        "optout_line_delivered_at": "2026-10-12T15:20:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-dee",
+        "wrapped_key": "\\x6b33302d777261707065642d6b65792d646565",
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-12T15:20:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-dee-barber",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-dee-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-dee",
+        "name": "Dee",
+        "mobile_handle_id": "handle-dee",
+        "email_handle_id": null,
+        "way": "texts",
+        "contact_times": null,
+        "first_name_only": false,
+        "no_voicemail": false,
+        "age_band": "18_or_older",
+        "fee_free": false,
+        "added_at": "2026-10-12T15:30:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "rules",
+      "values": {
+        "id": "rule-lees-barbershop-no-show-count",
+        "business_id": "biz-lees-barbershop",
+        "rule_kind": "no_show_count",
+        "value_type": "count",
+        "flow": null,
+        "kind_id": null,
+        "value_count": 2,
+        "words": null,
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-28T13:00:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-dee-waitlist",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "cancelled",
+        "booker_person_id": "person-dee",
+        "served_person_id": "person-dee",
+        "payer_person_id": "person-dee",
+        "private": false,
+        "deceased": false,
+        "version": 3
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-dee-waitlist",
+        "business_id": "biz-lees-barbershop",
+        "number": "LB1027",
+        "door": "ai",
+        "made_by": "customer",
+        "approval": null,
+        "timing": null,
+        "times": "setstart",
+        "taken": null,
+        "need_by": null,
+        "meets_pro": null,
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": null,
+        "upset_count": 0,
+        "request_ended_at": "2026-10-21T23:31:00Z",
+        "request_ended_why": "waitlist",
+        "version": 3
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-dee-waitlist-texts",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "kind": "texts",
+        "revoked": false,
+        "handle_id": "handle-dee",
+        "booking_id": "booking-dee-waitlist",
+        "exact_words": "Want a text if a Saturday-morning spot opens? / Reply 1 Yes, text me, 2 No thanks.",
+        "words_sha256": "ec354f26a3bda595e7ab9c414ae5eacb184a3d1a54e4f5c6dac7cea75a0d3939",
+        "at": "2026-10-21T23:31:00Z",
+        "channel": "ai",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "waitlist_entries",
+      "values": {
+        "id": "wait-dee-saturday-morning",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-waitlist",
+        "person_id": "person-dee",
+        "service_id": "svc-lees-skin-fade",
+        "resource_id": null,
+        "wanted": "[2026-10-24T04:00:00Z,2026-10-24T16:00:00Z)",
+        "consent_id": "consent-dee-waitlist-texts",
+        "joined_at": "2026-10-21T23:31:00Z",
+        "ended_at": "2026-10-22T22:30:00Z",
+        "ended_why": "booked",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-dee",
+        "served_person_id": "person-dee",
+        "payer_person_id": "person-dee",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-riley",
+        "resource_kind": "worker",
+        "worker_person_id": "person-riley",
+        "during": "[2026-10-24T14:00:00Z,2026-10-24T14:45:00Z)",
+        "state": "booked",
+        "queued_at": "2026-10-22T22:28:00Z",
+        "seats": 1,
+        "held_until": null,
+        "extended": false,
+        "for_phone_number": "+15555550131",
+        "booking_id": "booking-dee-skin-fade",
+        "version": 2
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-dee-ticked-terms-skin-fade",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "kind": "ticked_terms",
+        "revoked": false,
+        "handle_id": null,
+        "booking_id": "booking-dee-skin-fade",
+        "exact_words": "Lee's Barbershop · Skin fade / Sat Oct 24 · 10:00am · Riley / $40, paid at the chair / A card is saved when you book, for a $20 fee / Free to cancel until Sat 8am, then a $20 fee may apply",
+        "words_sha256": "ad9a9e7048c5742c33fc79ef98aa799cea6179a272eb08c7f35830e0aa8daeb6",
+        "at": "2026-10-22T22:29:30Z",
+        "channel": "page",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "number": "LB1029",
+        "door": "chat",
+        "made_by": "customer",
+        "approval": "now",
+        "timing": "settime",
+        "times": "setstart",
+        "taken": "asked",
+        "need_by": null,
+        "meets_pro": null,
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": "2026-10-22T22:31:10Z",
+        "upset_count": 0,
+        "request_ended_at": null,
+        "request_ended_why": null,
+        "version": 5
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-dee-skin-fade-1",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": "rsv-dee-skin-fade",
+        "arrival_window": null,
+        "cutoff_at": "2026-10-24T12:00:00Z",
+        "check_in_code": "\\x6b33302d7365616c2d636f64652d34",
+        "code_for_person_id": "person-dee",
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-dee-skin-fade-1",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-skin-fade",
+        "service_money_id": "way-lees-skin-fade-shop",
+        "price_rule_id": "price-lees-skin-fade",
+        "quote_option_id": null,
+        "path": "list|card|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 4000,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_terms",
+      "values": {
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "terms_consent_id": "consent-dee-ticked-terms-skin-fade",
+        "terms_version": "2026-10-19.1",
+        "terms_language": "en",
+        "notices_shown": [],
+        "cutoff_before": "2 hours",
+        "cutoff_day_before_at": null,
+        "cutoff_zone": null,
+        "written_at": "2026-10-22T22:30:00Z"
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-skin-fade-ok-same-day",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-same-day",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-skin-fade-ok-new-customer",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-new-customer",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-skin-fade-note-kids-cut",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-note-kids-cut",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-skin-fade-price-oks",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": null,
+        "price_ok_limit_id": "pok-lees-barbershop-quotes"
+      }
+    }
+  ]
+}

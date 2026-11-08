@@ -1,0 +1,330 @@
+{
+  "after": ["seed-terms-snapshot.json", "../../core/fixtures/seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-dee",
+        "served_person_id": "person-dee",
+        "payer_person_id": "person-dee",
+        "private": false,
+        "deceased": false,
+        "version": 5
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-dee-haircut-first",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-07T15:00:00Z,2026-11-07T15:30:00Z)",
+        "state": "released",
+        "queued_at": "2026-10-23T14:01:00Z",
+        "seats": 1,
+        "held_until": null,
+        "extended": false,
+        "for_phone_number": "+15555550131",
+        "booking_id": "booking-dee-haircut",
+        "released_at": "2026-10-28T14:10:02Z",
+        "released_why": "let_go",
+        "version": 3
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-07T16:00:00Z,2026-11-07T16:30:00Z)",
+        "state": "booked",
+        "queued_at": "2026-10-28T14:10:02Z",
+        "seats": 1,
+        "held_until": null,
+        "extended": false,
+        "for_phone_number": "+15555550131",
+        "booking_id": "booking-dee-haircut",
+        "version": 1
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-dee-ticked-terms-haircut",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "kind": "ticked_terms",
+        "revoked": false,
+        "handle_id": null,
+        "booking_id": "booking-dee-haircut",
+        "exact_words": "Lee's Barbershop · Haircut / Sat Nov 7 · 10:00am · Avery / $35, paid at the chair / A card is saved when you book, for a $20 fee / Free to cancel until Fri 10am, then a $20 fee may apply",
+        "words_sha256": "fb2bfda6d035b14f8df7144cea670f49f2b6a57cf5657b59267b292f78034152",
+        "at": "2026-10-23T14:04:30Z",
+        "channel": "page",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "number": "LB1031",
+        "door": "page",
+        "made_by": "customer",
+        "approval": "now",
+        "timing": "settime",
+        "times": "setstart",
+        "taken": "asked",
+        "need_by": null,
+        "meets_pro": null,
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": "2026-10-23T14:06:10Z",
+        "upset_count": 0,
+        "request_ended_at": null,
+        "request_ended_why": null,
+        "version": 5
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-dee-haircut-1",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": "rsv-dee-haircut",
+        "arrival_window": null,
+        "cutoff_at": "2026-11-06T16:00:00Z",
+        "check_in_code": "\\x6b33302d7365616c2d636f64652d33",
+        "code_for_person_id": "person-dee",
+        "version": 2
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-dee-haircut-1",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-haircut",
+        "service_money_id": "way-lees-haircut-shop",
+        "price_rule_id": "price-lees-haircut-35",
+        "quote_option_id": null,
+        "path": "list|card|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 3500,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_terms",
+      "values": {
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "terms_consent_id": "consent-dee-ticked-terms-haircut",
+        "terms_version": "2026-10-19.1",
+        "terms_language": "en",
+        "notices_shown": [],
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "cutoff_zone": null,
+        "written_at": "2026-10-23T14:05:00Z"
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-haircut-ok-same-day",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-same-day",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-haircut-ok-new-customer",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-new-customer",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-haircut-note-kids-cut",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-note-kids-cut",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-dee-haircut-price-oks",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": null,
+        "price_ok_limit_id": "pok-lees-barbershop-quotes"
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-dee-move-ask",
+        "handle_id": "handle-dee",
+        "event_ids": ["evt-dee-0011"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-dee-0011",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-28T14:08:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-dee-move-pick",
+        "handle_id": "handle-dee",
+        "event_ids": ["evt-dee-0012"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-dee-0012",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-28T14:10:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a7-03-dee-haircut",
+        "turn_id": "turn-dee-move-ask",
+        "handle_id": "handle-dee",
+        "person_id": "person-dee",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-haircut",
+        "step": "A7-03",
+        "options": [
+          {
+            "id": "A7-03/1",
+            "label": "Sat Nov 7 · 11:00am · Avery"
+          },
+          {
+            "id": "A7-03/2",
+            "label": "Sat Nov 7 · 12:30pm · Avery"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-dee-haircut",
+            "version": 4
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-dee-haircut-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "24 h",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "A7-03/1",
+        "closed_at": "2026-10-28T14:10:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "booking_changes",
+      "values": {
+        "id": "change-dee-haircut-moved",
+        "booking_id": "booking-dee-haircut",
+        "business_id": "biz-lees-barbershop",
+        "visit_id": "visit-dee-haircut-1",
+        "kind": "moved",
+        "asked_by": "customer",
+        "asked_by_person_id": "person-dee",
+        "approved_by": {
+          "kind": "answer",
+          "open_question_id": "oq-a7-03-dee-haircut",
+          "option_id": "A7-03/1",
+          "event_id": "evt-dee-0012"
+        },
+        "turn_id": "turn-dee-move-pick",
+        "job_id": null,
+        "at": "2026-10-28T14:10:02Z",
+        "after_free_cancel": false,
+        "old_values": {
+          "reservation_id": "rsv-dee-haircut-first",
+          "during": "[2026-11-07T15:00:00Z,2026-11-07T15:30:00Z)",
+          "cutoff_at": "2026-11-06T15:00:00Z"
+        },
+        "new_values": {
+          "reservation_id": "rsv-dee-haircut",
+          "during": "[2026-11-07T16:00:00Z,2026-11-07T16:30:00Z)",
+          "cutoff_at": "2026-11-06T16:00:00Z"
+        },
+        "booking_version_before": 4,
+        "booking_version_after": 5,
+        "rows_changed": [
+          {
+            "table": "reservations",
+            "rowId": "rsv-dee-haircut-first",
+            "versionBefore": 2,
+            "versionAfter": 3
+          },
+          {
+            "table": "reservations",
+            "rowId": "rsv-dee-haircut",
+            "versionBefore": null,
+            "versionAfter": 1
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-dee-haircut-1",
+            "versionBefore": 1,
+            "versionAfter": 2
+          }
+        ]
+      }
+    }
+  ]
+}

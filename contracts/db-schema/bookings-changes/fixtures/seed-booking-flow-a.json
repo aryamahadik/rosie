@@ -1,0 +1,254 @@
+{
+  "after": [
+    "../../core/fixtures/seed-reservation.json",
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-sealing-key.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json",
+    "../../rules/fixtures/seed-rules-tap-list.json",
+    "../../rules/fixtures/seed-note-only-rule.json",
+    "../../customers/fixtures/seed-customer-mobile-email.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-haircut-request",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0031"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0031",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-21T23:20:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-accept-alex-haircut",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0051"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0051",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-22T12:05:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a6-02-alex-haircut",
+        "turn_id": "turn-alex-haircut-request",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "step": "A6-02",
+        "options": [
+          {
+            "id": "A6-02/1",
+            "label": "Accept"
+          },
+          {
+            "id": "A6-02/2",
+            "label": "Another time"
+          },
+          {
+            "id": "A6-02/3",
+            "label": "Decline"
+          }
+        ],
+        "readback": "New request from Alex M. Please answer within 4 of your text hours, or it isn't booked. / Haircut / Sat Oct 24 · 11:00am · Riley / Nothing is charged for this visit until you accept / Reply 1 Accept, 2 Another time, 3 Decline.",
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-alex-haircut",
+            "version": 4
+          },
+          {
+            "table": "booking_details",
+            "rowId": "booking-alex-haircut",
+            "version": 4
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "4 text hours",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "A6-02/1",
+        "closed_at": "2026-10-22T12:05:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-alex-ticked-terms-haircut",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "kind": "ticked_terms",
+        "revoked": false,
+        "handle_id": null,
+        "booking_id": "booking-alex-haircut",
+        "exact_words": "Lee's Barbershop · Haircut / Sat Oct 24 · 11:00am · Riley / $35, paid at the chair / A card is saved when you book, for a $20 fee / Free to cancel until Fri 11am, then a $20 fee may apply",
+        "words_sha256": "71a10bcf0632305da775af2c26d96f91319da9cc7969acc7eedd0999d45d4f18",
+        "at": "2026-10-21T23:19:30Z",
+        "channel": "page",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "booking_details",
+      "values": {
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "number": "LB1024",
+        "door": "ai",
+        "made_by": "customer",
+        "approval": "ownerok",
+        "timing": "settime",
+        "times": "setstart",
+        "taken": "asked",
+        "need_by": null,
+        "meets_pro": null,
+        "meets_pro_person_id": null,
+        "first_link_given_at": null,
+        "staff_told_at": "2026-10-22T12:06:10Z",
+        "upset_count": 0,
+        "request_ended_at": null,
+        "request_ended_why": null,
+        "version": 6
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-alex-haircut-1",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": "rsv-alex-haircut",
+        "arrival_window": null,
+        "cutoff_at": "2026-10-23T15:00:00Z",
+        "check_in_code": "\\x6b33302d7365616c2d636f64652d31",
+        "code_for_person_id": "person-alex",
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-haircut-1",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-haircut",
+        "service_money_id": "way-lees-haircut-shop",
+        "price_rule_id": "price-lees-haircut-35",
+        "quote_option_id": null,
+        "path": "list|card|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 3500,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_terms",
+      "values": {
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "terms_consent_id": "consent-alex-ticked-terms-haircut",
+        "terms_version": "2026-10-19.1",
+        "terms_language": "en",
+        "notices_shown": [],
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "cutoff_zone": null,
+        "written_at": "2026-10-22T12:05:02Z"
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-alex-haircut-ok-same-day",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-same-day",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-alex-haircut-ok-new-customer",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-ok-new-customer",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-alex-haircut-note-kids-cut",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": "rule-lees-barbershop-note-kids-cut",
+        "price_ok_limit_id": null
+      }
+    },
+    {
+      "table": "booking_terms_rules",
+      "values": {
+        "id": "btr-alex-haircut-price-oks",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "rule_id": null,
+        "price_ok_limit_id": "pok-lees-barbershop-quotes"
+      }
+    },
+    {
+      "table": "owner_oks",
+      "values": {
+        "id": "ok-alex-haircut-request",
+        "booking_id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "about": "request",
+        "quote_id": null,
+        "asked_at": "2026-10-21T23:20:02Z",
+        "answer_by": "2026-10-22T15:20:00Z",
+        "reminded_at": "2026-10-21T23:50:02Z",
+        "answer": "accept",
+        "answered_at": "2026-10-22T12:05:00Z",
+        "answered_by_person_id": "person-sam",
+        "answered_by_role": "owner",
+        "open_question_id": "oq-a6-02-alex-haircut",
+        "option_id": "A6-02/1",
+        "event_id": "evt-sam-0051",
+        "version": 3
+      }
+    }
+  ]
+}
