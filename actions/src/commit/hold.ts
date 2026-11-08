@@ -8,11 +8,12 @@
 //      (K-05 v1 turn.bundleId; arch 10 line 548). A context or decide result naming another bundle is refused before any
 //      limit runs: nothing is written.
 //   3. Safety holds (CQ-65's replaced default, DL-119; arch 06 lines 315 to 329): while a hold is open on the handle, only
-//      changes that only protect (a STOP, a death report, a pause or a private flag: the any-time rows whose effect is a
-//      record flag) and the safety flow (the danger read's own steps, a clear "we're safe" with a fresh read-back: A3-22 to
-//      A3-26) commit; every routine part is held (K-09 v1 partResult `held`). A threat's hold (release rule never) lets
-//      only the protective changes through. Held parts are held back before the gate, so no limit runs for them (K-09 v1
-//      valueFailsWords: "parts a safety outcome holds are held, not gated").
+//      changes that only protect (a STOP, a death report, the A3-48 pause or the A3-50 private flag: the any-time rows
+//      whose effect is a record flag, and their handler steps; a hand-off to a person) and the safety flow (the danger
+//      read's own steps, a clear "we're safe" with a fresh read-back: A3-22 to A3-26) commit; every routine part is held
+//      (K-09 v1 partResult `held`). A threat's hold (release rule never) lets only the protective changes through. Held
+//      parts are held back before the gate, so no limit runs for them (K-09 v1 valueFailsWords: "parts a safety outcome
+//      holds are held, not gated"). Every open hold holds, whatever its rule: an at-once hold binds until it is released.
 //   4. One question first (CQ-73's default): a part the gate passed on the booking of a part decide ended in one question
 //      (oneQuestion, or the verb ask) waits for the answer: it is answered `asked` and writes nothing.
 
@@ -81,14 +82,30 @@ export const PROTECTIVE_ROWS: readonly string[] = [
   "child-elder-or-unsafe-at-home",
 ];
 
+/**
+ * The handler steps of those rows (01-inventory any-time rows 2, 3, 5 and 6; QUESTIONS.md CQ-65: "the A3-48 pause"): the
+ * threat's pause (A3-48, flow B's B3-30), the unsafe-at-home private booking (A3-50, B3-32), a death report (A7-81) and a
+ * STOP (A7-11, B7-15; a staff member's at joining, S2-08). A choice at one of them is protective too.
+ */
+export const PROTECTIVE_STEPS: readonly string[] = [
+  "A3-48",
+  "B3-30",
+  "A3-50",
+  "B3-32",
+  "A7-81",
+  "A7-11",
+  "B7-15",
+  "S2-08",
+];
+
 /** The danger read's own any-time row: entering it is the safety flow (A3-22). */
 export const SAFETY_ROW = "danger-or-crisis";
 
 /**
- * The steps of the safety flow a hold lets through (arch 06 lines 319 to 325; 01-inventory any-time rows 1 to 3): the
- * danger outcome and its "we're safe" with a fresh read-back (A3-22 to A3-26), the threat's pause (A3-48), the child or
- * elder hotline and the private booking (A3-49, A3-50), and flow B's steps the sources name for them (B3-17, B3-30 to
- * B3-32).
+ * The steps of the safety flow a hold lets through but a threat's (arch 06 lines 319 to 325; 01-inventory any-time rows 1
+ * and 3): the danger outcome and its "we're safe" with a fresh read-back (A3-22 to A3-26; flow B's danger read, B3-17), and
+ * the child or elder hotline with the team told that day (A3-49, B3-31). Flow B's own "we're safe" steps are not named in
+ * the sources this task reads, so they are held until they are (fail closed).
  */
 export const SAFETY_FLOW_STEPS: readonly string[] = [
   "A3-22",
@@ -96,13 +113,9 @@ export const SAFETY_FLOW_STEPS: readonly string[] = [
   "A3-24",
   "A3-25",
   "A3-26",
-  "A3-48",
   "A3-49",
-  "A3-50",
   "B3-17",
-  "B3-30",
   "B3-31",
-  "B3-32",
 ];
 
 /**
@@ -128,6 +141,7 @@ export function holdClassOf(part: DecidePart, choice: Choice | null): HoldClass 
     case "enter":
       if (choice === null) return "routine";
       if (choice.anytimeRow !== null && PROTECTIVE_ROWS.includes(choice.anytimeRow)) return "protective";
+      if (PROTECTIVE_STEPS.includes(choice.step)) return "protective";
       if (choice.anytimeRow === SAFETY_ROW || SAFETY_FLOW_STEPS.includes(choice.step)) return "safetyFlow";
       return "routine";
     default:

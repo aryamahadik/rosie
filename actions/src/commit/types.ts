@@ -147,16 +147,23 @@ export interface CommitTurnContext<Repo = unknown> {
  * What the commit calls, each another task's:
  *   - commitTurn: K-05 v1.1 commitTurn (T-306 wires the database engineer's data-access call; tests use a fake);
  *   - writesOf: what a passed part's choice writes (the walk after a choice, arch 03 line 191, and each step's writes);
- *   - runCore: one shared-core call made in the turn (K-09 v1 `coreAction`; M3b's calls);
+ *   - runCore: one shared-core call made in the turn (K-09 v1 `coreAction`; M3b's calls), in the request's order;
  *   - openHolds: the safety holds open on the turn's handle, read at commit time (QUESTIONS.md CQ-65's replaced default:
  *     the commit path reads them again, so a hold opened mid-turn binds this commit too). K-05 v1.2 has no read for K-34's
  *     holds yet (its open gap 26).
+ * runCore and writesOf are handed the holds in force: those open on the handle, with those the turn's earlier core
+ * actions opened (a safety outcome's hold binds the core actions after it), so a core call that is not protective holds
+ * itself back with its own answer (K-09 v1 coreResult: "A refused core action stops only itself").
  * Each throws CommitNotBuiltError until its task lands (notBuiltPorts), so the commit fails closed.
  */
 export interface CommitPorts<Repo = unknown> {
   commitTurn(request: CommitTurnRequest, call: CallContext<Repo>): Promise<CommitTurnAnswer>;
-  writesOf(part: PassedPart, turn: CommitTurnContext<Repo>): Promise<UnitWrites>;
-  runCore(action: CoreAction, turn: CommitTurnContext<Repo>): Promise<CoreRun>;
+  writesOf(
+    part: PassedPart,
+    turn: CommitTurnContext<Repo>,
+    holds: readonly SafetyHold[],
+  ): Promise<UnitWrites>;
+  runCore(action: CoreAction, turn: CommitTurnContext<Repo>, holds: readonly SafetyHold[]): Promise<CoreRun>;
   openHolds(turn: CommitTurnContext<Repo>): Promise<readonly SafetyHold[]>;
 }
 

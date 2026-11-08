@@ -314,6 +314,13 @@ describe("repeating the same turn id returns the first result and writes nothing
       openQuestions: { opened: [], closed: [] },
     });
     expect(validator.check("gateAndCommit", "response", secondRun.answer)).toEqual([]);
+    // The span keeps the rows a call wrote: the first run's (as K-05 answered them), and none for the repeat.
+    const written = k05.commits[0]?.written ?? fail();
+    expect(firstRun.spans[0]?.rows).toEqual([
+      ...written.map((row) => ({ table: row.table, id: row.rowId })),
+      { table: "outbox_rows", id: "out-s1-04-sam" },
+    ]);
+    expect(secondRun.spans[0]?.rows).toBeUndefined();
   });
 });
 
@@ -573,12 +580,23 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
     expect(request.writes.state).toEqual([]);
   });
 
+  it("each core action is handed the holds in force: the handle's, and those the core actions before it opened", async () => {
+    const request = copy(gateExchange(S1_02).request);
+    const [safety] = request.core;
+    if (safety === undefined) throw new Error("commit-s1-02 carries one core action");
+    request.core = [safety, copy(safety)];
+    const deps = s1_02Deps({ holds: [AFTER_SAFE_HOLD], core: [holdingSafetyOutcome(), s1_02CoreRun()] });
+    await callCommit(request, deps);
+    expect(deps.calls.coreHolds).toEqual([["hold-sam-0002"], ["hold-sam-0002", "hold-alex-0204"]]);
+  });
+
   it("only protective changes pass a threat's hold; the safety flow passes every other hold", () => {
     const decided = samKinds();
     const [option, , , , danger] = decided.context.choices;
     if (danger === undefined) throw new Error("context-s1-02 changed");
     const stopRow: Choice = { ...danger, anytimeRow: "stop", step: "A7-11", choiceId: "c-90" };
     const weAreSafe: Choice = { ...option, step: "A3-24", choiceId: "c-91" };
+    const threatPause: Choice = { ...option, step: "A3-48", choiceId: "c-92" };
     const { part } = decided.decide.parts[0];
     const enter: DecidePart = { verb: "enter", quote: part.quote, choice: danger.choiceId, fields: [] };
     const partOf = (file: string): DecidePart => (modelFixture(file) as DecideResult).parts[0].part;
@@ -587,7 +605,9 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
       ["the danger row", holdClassOf(enter, danger)],
       ["the stop row", holdClassOf(enter, stopRow)],
       ["a 'we're safe' answer", holdClassOf(part, weAreSafe)],
+      ["the threat's pause", holdClassOf(part, threatPause)],
       ["a hand-off", holdClassOf(partOf("decide-hand-off.json"), null)],
+      ["a pass-on", holdClassOf(partOf("decide-pass-on.json"), null)],
       ["a no-op", holdClassOf(partOf("decide-no-op-thanks.json"), null)],
     ];
     expect(table).toEqual([
@@ -595,7 +615,9 @@ describe("parts under a safety hold are held back before the gate (CQ-65's repla
       ["the danger row", "safetyFlow"],
       ["the stop row", "protective"],
       ["a 'we're safe' answer", "safetyFlow"],
+      ["the threat's pause", "protective"],
       ["a hand-off", "protective"],
+      ["a pass-on", "routine"],
       ["a no-op", "none"],
     ]);
     expect(isHeld("routine", [])).toBe(false);

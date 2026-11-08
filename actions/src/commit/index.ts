@@ -25,6 +25,7 @@ export {
 export { CommitNotBuiltError, CommitRefusedError, type CommitFault, type CommitSeam } from "./errors";
 export {
   PROTECTIVE_ROWS,
+  PROTECTIVE_STEPS,
   SAFETY_FLOW_STEPS,
   SAFETY_ROW,
   askedBookings,

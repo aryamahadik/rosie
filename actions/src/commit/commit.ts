@@ -6,8 +6,9 @@
 //      turn's own, under its turn id and trace (hold.ts checkTurn; CQ-69: the id is the lease's, never made here);
 //   2. the bundle: a context or decide result naming another bundle than the turn's pin answers bundleMismatch, before
 //      any limit runs (CQ-72's default 2);
-//   3. the holds: the safety holds open on the handle are read now, at commit time, with any this turn's own safety outcome
-//      opens; routine parts are held back before the gate (hold.ts; CQ-65's replaced default, DL-119);
+//   3. the holds: the safety holds open on the handle are read now, at commit time; the turn's core actions run in order,
+//      each handed the holds in force (a safety outcome's hold binds what follows it); routine parts are held back before
+//      the gate under any of them (hold.ts; CQ-65's replaced default, DL-119);
 //   4. the gate (T-298): decide's output checked, then limits 1 to 6 on each part the holds let through; a refusal of the
 //      whole call (decideRefused, valueFailsWords) comes back as it is, and a limit not built yet throws (notBuilt);
 //   5. one question first: a passed part on the booking of a part decide ended in one question waits (CQ-73's default);
@@ -114,14 +115,30 @@ export function holdingBack<Repo>(
   return [slot(one), slot(two), slot(three), slot(four), slot(five), slot(six)];
 }
 
-/** The holds this turn's own core actions open (a safety outcome's hold: K-09 v1 recordSafetyOutcome.response.hold). */
-function holdsOpenedBy(runs: readonly CoreRun[]): SafetyHold[] {
-  const holds: SafetyHold[] = [];
-  for (const { result } of runs) {
-    if (result.call !== "recordSafetyOutcome" || result.response === null) continue;
-    if (result.response.hold !== null) holds.push(result.response.hold);
+/** The hold a core action opens: a safety outcome's (K-09 v1 recordSafetyOutcome.response.hold), or null. */
+function holdOpenedBy({ result }: CoreRun): SafetyHold | null {
+  if (result.call !== "recordSafetyOutcome" || result.response === null) return null;
+  return result.response.hold;
+}
+
+/**
+ * The turn's core actions, run in the request's order, each handed the holds in force: those open on the handle, and
+ * those the core actions before it opened. Returns the runs and every hold in force after them.
+ */
+async function runCoreActions<Repo>(
+  ports: CommitPorts<Repo>,
+  context: CommitTurnContext<Repo>,
+  stored: readonly SafetyHold[],
+): Promise<{ runs: CoreRun[]; holds: SafetyHold[] }> {
+  const holds = [...stored];
+  const runs: CoreRun[] = [];
+  for (const action of context.request.core) {
+    const run = await ports.runCore(action, context, [...holds]);
+    runs.push(run);
+    const opened = holdOpenedBy(run);
+    if (opened !== null) holds.push(opened);
   }
-  return holds;
+  return { runs, holds };
 }
 
 const GATED_VERBS: readonly string[] = ["choose", "enter", "pass_on", "hand_off"];
@@ -243,9 +260,8 @@ async function gateAndCommitOnce<Repo>(
   const context: CommitTurnContext<Repo> = { request, turn, repo: call.repo, businessId: call.businessId };
 
   const stored = await ports.openHolds(context);
-  const core: CoreRun[] = [];
-  for (const action of request.core) core.push(await ports.runCore(action, context));
-  const held = heldParts(request, [...stored, ...holdsOpenedBy(core)]);
+  const { runs: core, holds } = await runCoreActions(ports, context, stored);
+  const held = heldParts(request, holds);
 
   // The gate gets its own copy: a limit reads the turn, and what it reads cannot change what is committed.
   const verdict = await runGate(copy(request), call, holdingBack(deps.limits, held));
@@ -270,7 +286,7 @@ async function gateAndCommitOnce<Repo>(
       parts.push(waitingResult(gated));
       continue;
     }
-    const writes = await ports.writesOf(passed, context);
+    const writes = await ports.writesOf(passed, context, [...holds]);
     units.push({ writes, answer: answerOf(decided, passed, writes) });
     parts.push(partResultOf(gated, writes.gives));
   }
@@ -295,7 +311,8 @@ async function gateAndCommitOnce<Repo>(
         return { kind: "answer", answer };
     }
   }
-  call.span.rows.splice(0, call.span.rows.length, ...spanRowsOf(answer));
+  // The span keeps the rows this call wrote: none on a repeat.
+  if (!answer.repeated) call.span.rows.splice(0, call.span.rows.length, ...spanRowsOf(answer));
   return { kind: "answer", answer: committedOf(answer, commitRequest, parts, core) };
 }
 

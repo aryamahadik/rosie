@@ -237,6 +237,8 @@ export interface PortCalls {
   readonly writesOf: number[];
   /** The core actions run, by call name, in order. */
   readonly runCore: string[];
+  /** The ids of the holds each core action was handed, in order. */
+  readonly coreHolds: string[][];
   /** How many times the holds were read. */
   openHolds: number;
 }
@@ -254,7 +256,7 @@ export interface Doubles {
 /** The commit's ports as doubles, every call written down. */
 export function doublePorts(doubles: Doubles = {}): { ports: CommitPorts; calls: PortCalls; k05: K05Fake } {
   const k05 = doubles.k05 ?? k05Fake();
-  const calls: PortCalls = { writesOf: [], runCore: [], openHolds: 0 };
+  const calls: PortCalls = { writesOf: [], runCore: [], coreHolds: [], openHolds: 0 };
   const core = [...(doubles.core ?? [])];
   const ports: CommitPorts = {
     commitTurn: (request, call) => k05.commitTurn(request, call),
@@ -262,8 +264,9 @@ export function doublePorts(doubles: Doubles = {}): { ports: CommitPorts; calls:
       calls.writesOf.push(part.index);
       return Promise.resolve(copy(doubles.writes?.[part.index] ?? noWrites(whyOfChoice(part.choice))));
     },
-    runCore(action: CoreAction) {
+    runCore(action: CoreAction, _turn, holds) {
       calls.runCore.push(action.call);
+      calls.coreHolds.push(holds.map((hold) => hold.holdId));
       const run = core[calls.runCore.length - 1];
       if (run === undefined) return Promise.reject(new Error("no core run scripted"));
       return Promise.resolve(copy(run));
