@@ -10,6 +10,7 @@ import { DurableObject } from "cloudflare:workers";
 
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
+import { SafetyOnArrival, isReadable, type HoldEntry, type SafetyEntry } from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
 import {
   createInboxTables,
@@ -78,9 +79,15 @@ function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
 }
 
 export class HandleActor extends DurableObject {
+  private readonly safety: SafetyOnArrival;
+
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
     createInboxTables(ctx.storage.sql);
+    this.safety = new SafetyOnArrival({
+      storage: ctx.storage,
+      spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+    });
   }
 
   /**
@@ -94,6 +101,9 @@ export class HandleActor extends DurableObject {
     if (route === "inbox") {
       // One synchronous step: the check and the write cannot be split by a concurrent retry.
       answer = writeToInbox(this.ctx.storage, handoff);
+      // The safety read starts in the same step as the write, before any batch (arch 02 step S): the 4 s deadline
+      // begins now and the read is queued in arrival order. It runs on; the gateway is answered at once.
+      if (answer === "written" && isReadable(handoff)) this.ctx.waitUntil(this.safety.arrive(handoff));
     } else {
       answer = await this.passReceipt(handoff);
     }
@@ -104,6 +114,36 @@ export class HandleActor extends DurableObject {
   /** The inbox in arrival order (what a turn reads later). */
   readInbox(): InboxEntry[] {
     return readInbox(this.ctx.storage.sql);
+  }
+
+  /** Each stored text's safety state, in arrival order (the batch and the turn read it: T-247). */
+  readSafety(): SafetyEntry[] {
+    return this.safety.readSafety();
+  }
+
+  /** The holds on routine work, in the order they were made. */
+  readHolds(): HoldEntry[] {
+    return this.safety.readHolds();
+  }
+
+  /** True while routine work must wait: a text is unread, or a safety hold is not released. */
+  routineHeld(): boolean {
+    return this.safety.routineHeld();
+  }
+
+  /** Notes that the shared core released the hold of this text; a threat's is never released (A3-48) and answers "neverReleased". */
+  markHoldReleased(eventId: string): "released" | "neverReleased" | "noSuchHold" {
+    return this.safety.markHoldReleased(eventId);
+  }
+
+  /** Writes to the shared core what the actor sent straight through Linq while PostgreSQL was down; returns how many. */
+  writeSafetyOnReturn(): Promise<number> {
+    return this.safety.writeOnReturn();
+  }
+
+  /** Resolves when the safety work of every text that has arrived is done (tests). */
+  safetyIdle(): Promise<void> {
+    return this.safety.idle();
   }
 
   private async passReceipt(handoff: SealedHandoff): Promise<StoreAnswer> {
