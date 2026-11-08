@@ -584,14 +584,13 @@ describe("hard invariant: no time booked twice", () => {
     const answers = await Promise.all(
       built.map((each) => gateAndCommit(each.run.request, callContext(BARBERSHOP), each.deps)),
     );
-    const deps = built;
     const parts = answers.map((answer) => committed(answer).parts[0]);
     expect(parts.map((part) => part?.result).sort()).toEqual(["committed", "stopped"]);
     const stopped = parts.find((part) => part?.result === "stopped");
     expect(stopped?.stoppedBy).toEqual(nextOpenTimesOutcome());
     // Both passed the gate once; the one refused at K-05 was gated again and found the time booked.
-    expect(deps.map((each) => each.calls.writesOf)).toEqual([[0], [0]]);
-    const refusedWhys = deps.flatMap((each) =>
+    expect(built.map((each) => each.calls.writesOf)).toEqual([[0], [0]]);
+    const refusedWhys = built.flatMap((each) =>
       each.seen.queries.map((query) => query.lost.map((time) => time.why)),
     );
     expect(refusedWhys).toEqual([["booked"]]);
@@ -600,6 +599,35 @@ describe("hard invariant: no time booked twice", () => {
     expect(
       fake.commits.flatMap((each) => each.written.filter((row) => row.table === "reservations")),
     ).toHaveLength(1);
+  });
+
+  it("a saved time that ends between the gate's now and the commit, its clock not fired yet: K-05 refuses it by its own clock, so it is never booked", async () => {
+    const fake = averyWorld();
+    // The gate reads at 15:09:59, a second before Alex's saved time ends; the commit lands at 15:10:00, before its clock.
+    const run: BookingRun = {
+      request: alexPicksAvery({ sentAt: "2026-11-07T15:09:58Z", now: "2026-11-07T15:09:59Z" }),
+      bookingId: "booking-alex-avery-nov14",
+      savedTimes: [AVERY_SAVED],
+      beforeWrites: () => {
+        fake.now = "2026-11-07T15:10:00Z";
+      },
+    };
+    const built = bookingDeps(fake, run, AVERY_NEXT);
+    const answer: unknown = await gateAndCommit(run.request, callContext(BARBERSHOP), built.deps).catch(
+      (thrown: unknown) => thrown,
+    );
+    // Whatever the commit then answers (today a second conflict fails closed), no part commits and nothing is booked.
+    if (!(answer instanceof Error)) {
+      expect(committed(answer as GateAndCommitAnswer).parts.map((part) => part.result)).not.toContain(
+        "committed",
+      );
+    }
+    expect(fake.requests[0]?.writes.reservations.confirm.map((confirm) => confirm.id)).toEqual([AVERY_SAVED]);
+    expect(fake.rows.get(AVERY_SAVED)).toMatchObject({ state: "held", bookingId: null });
+    expect(bookedOn(fake, "res-avery", AVERY_10AM)).toEqual([]);
+    expect(
+      fake.commits.flatMap((each) => each.written.filter((row) => row.table === "reservations")),
+    ).toEqual([]);
   });
 });
 
