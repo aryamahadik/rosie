@@ -4,7 +4,8 @@
 // these was written by the model; each must still be held by a code-supplied fact (a slot value, a fact the composer
 // was given, the reader's name or the master line's own words) or it fails.
 
-import { LINK, QUOTE_SLOT, closingOf, escapeForPattern } from "./reading";
+import COMMON_WORDS from "./common-words.json";
+import { BUSINESS, LINK, QUOTE_SLOT, closingOf, escapeForPattern } from "./reading";
 import type { CheckContext, FinalParts } from "./types";
 
 /** One kind of value and how the model may write it. The patterns are global: used only with String#replace. */
@@ -45,6 +46,19 @@ const SEND_DAY = /\b(?:today|tomorrow)\b/gi;
 /** Rosie's own name, which it says of itself (arch 07 line 351; the opener, S13-01). */
 const OWN_NAMES: ReadonlySet<string> = new Set(["Rosie"]);
 
+/**
+ * The common words: each word the master writes in lower case in Rosie's own message lines, recorded from the master
+ * by common-words.record.mjs, so no check needs the master at run time. No name is one (the master writes names
+ * capitalized), so a capitalized word that starts a sentence and is one of these reads as a plain word, not a name.
+ */
+const COMMON: ReadonlySet<string> = new Set(COMMON_WORDS.words);
+
+/** A word, with an apostrophe inside ("don't"). */
+const WORD = /\p{L}+(?:['’]\p{L}+)*/gu;
+
+/** A word in the word lists' form: lower case, with a straight apostrophe. */
+const wordForm = (word: string): string => word.toLowerCase().replace(/[’‘]/g, "'");
+
 /** A value's words in one form for matching: lower case, "11:00 a.m." as "11am", "$1,000.00" as "$1000". */
 export function matchForm(text: string): string {
   return text
@@ -60,9 +74,17 @@ export function matchForm(text: string): string {
     .trim();
 }
 
-/** Whether `needle` stands in `source` as whole words: no letter or digit right before or after it. */
+/**
+ * Whether `needle` stands in `source` as whole words: no letter or digit right before or after it, and no digit across
+ * a point, comma or colon on either side (the guard after it is reading.ts wholePlaces's), so a shortened amount or
+ * time is never held by the whole one: "$45" is not in "$45.99", "10" not in "10:30am", "45" not in "$12.45" (arch 07
+ * lines 357 and 409).
+ */
 export function holdsWhole(source: string, needle: string): boolean {
-  return new RegExp(`(?<![\\p{L}\\p{N}])${escapeForPattern(needle)}(?![\\p{L}\\p{N}])`, "u").test(source);
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}]|\\p{N}[.,:])${escapeForPattern(needle)}(?![\\p{L}\\p{N}]|[.,:]\\p{N})`,
+    "u",
+  ).test(source);
 }
 
 /**
@@ -96,10 +118,36 @@ function advice(scan: Scan, parts: FinalParts): string {
 }
 
 /**
- * Capitalized words inside a sentence that no code-supplied fact holds: names of a person or business. A sentence's
- * first word, a word after a colon or " · " and a word in capitals (STOP, HELP, AI) are not read as names.
+ * Whether a word is a plain word where a sentence starts, not a name: a common word (common-words.json) or a word of
+ * one of the bundle's fixed lines (K-01 `fixedLines`, any language, <business> left out), each part of a hyphened word
+ * ("Check-in") alike. A word of the step's master line is a code-supplied fact already (statedBy).
  */
-export function unstatedNames(text: string, stated: (item: string) => boolean): string[] {
+export function plainWordsOf(context: CheckContext): (word: string) => boolean {
+  const fixed = new Set(
+    context.lists.fixedLines.lines.flatMap((line) =>
+      line.text === null
+        ? []
+        : [...line.text.replaceAll(BUSINESS, " ").matchAll(WORD)].map(([word]) => wordForm(word)),
+    ),
+  );
+  return (word) =>
+    wordForm(word)
+      .split("-")
+      .every((part) => COMMON.has(part) || fixed.has(part));
+}
+
+/**
+ * The names of a person or business the model wrote that no code-supplied fact holds: each capitalized word (a
+ * capital, then a small letter; STOP, HELP and AI are not names) that no fact holds and that is not Rosie's own name.
+ * A word that starts a line or a sentence, follows ":" or " · ", or opens with a quote or a bracket is read as a name
+ * too, unless it is a plain word (plainWordsOf). This fails closed: a plain word read as a name costs a rewrite or the
+ * master's fallback line, while an invented name going out is the harm (arch 07 line 409; T-312 round 2).
+ */
+export function unstatedNames(
+  text: string,
+  stated: (item: string) => boolean,
+  plain: (word: string) => boolean,
+): string[] {
   const faults: string[] = [];
   for (const line of text.split("\n")) {
     let starts = true;
@@ -108,9 +156,10 @@ export function unstatedNames(text: string, stated: (item: string) => boolean): 
       const first = starts || /^[("“‘'[]/u.test(raw);
       starts = /[.!?:]["”’')\]]*$/u.test(raw) || raw === "·";
       const word = raw.replace(/^[^\p{L}\p{N}]+/u, "").replace(/[^\p{L}\p{N}'’]+$/u, "");
-      if (first || !/^\p{Lu}\p{Ll}/u.test(word)) continue;
+      if (!/^\p{Lu}\p{Ll}/u.test(word)) continue;
       const bare = word.replace(/['’]s$/u, "");
       if (OWN_NAMES.has(bare) || stated(word) || stated(bare)) continue;
+      if (first && (plain(word) || plain(bare))) continue;
       faults.push(`The name ${bare} is not a code-supplied fact; write each name as its slot.`);
     }
   }
@@ -121,7 +170,12 @@ export function unstatedNames(text: string, stated: (item: string) => boolean): 
  * The values the model wrote that no code-supplied fact holds, each as the rewrite is told it. `text` is a send's words
  * with every slot value already taken out (reading.ts markOut), so all that is left is the model's own.
  */
-export function unstatedValues(text: string, parts: FinalParts, stated: (item: string) => boolean): string[] {
+export function unstatedValues(
+  text: string,
+  parts: FinalParts,
+  stated: (item: string) => boolean,
+  plain: (word: string) => boolean,
+): string[] {
   const faults: string[] = [];
   let rest = text.replace(SEND_DAY, (item) => {
     faults.push(`"${item}" is filled at send; write it as the {{${item.toLowerCase()}}} slot.`);
@@ -134,5 +188,5 @@ export function unstatedValues(text: string, parts: FinalParts, stated: (item: s
       return ` ${closingOf(item)}`;
     });
   }
-  return [...faults, ...unstatedNames(rest, stated)];
+  return [...faults, ...unstatedNames(rest, stated, plain)];
 }

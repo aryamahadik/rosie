@@ -20,7 +20,7 @@ export {
   type Check,
 } from "./checks";
 export { LIMITS, grade, longestSentence, sentencesOf, syllables, wordsOf } from "./grade";
-export { isOptOutOnly } from "./opt-out";
+export { isOptOutOnly, typedLabels } from "./opt-out";
 export type {
   CheckContext,
   CheckLists,

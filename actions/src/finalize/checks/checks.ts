@@ -5,9 +5,10 @@
 // happens next (one rewrite, the fallback, the passed-on line) is the rewrite and fallback path's (C-093, T-313).
 
 import { LIMITS, grade, ideasIn, sentencesOf, wordsOf } from "./grade";
-import { isOptOutOnly } from "./opt-out";
+import { isOptOutOnly, typedLabels } from "./opt-out";
 import {
   blankOut,
+  filledOf,
   fixedLineWords,
   insertedWords,
   markOut,
@@ -19,7 +20,7 @@ import {
   withoutInserted,
   wordsText,
 } from "./reading";
-import { statedBy, unstatedValues } from "./values";
+import { plainWordsOf, statedBy, unstatedValues } from "./values";
 import type {
   CheckContext,
   CheckName,
@@ -84,6 +85,9 @@ export const fixedLinesFaults: Check = (parts, context) => {
 // ---------------------------------------------------------------------------------------------------------------
 // Values (arch 07 line 409; S13-28 rule 51): each value matches a code-supplied fact; no "{{", "null" or "undefined".
 
+/** A slot left in the words, {{name}} or an unclosed "{{name": its own fault, never read as a value or a link. */
+const UNFILLED = /\{\{[^{}]*\}\}|\{\{[^{}\s]*/g;
+
 /** Every value a code-supplied fact, every slot filled, every link a link slot's value. */
 export const valuesFaults: Check = (parts, context) => {
   const faults: string[] = [];
@@ -108,11 +112,14 @@ export const valuesFaults: Check = (parts, context) => {
     }
   }
   const stated = statedBy(parts, context);
+  const plain = plainWordsOf(context);
   const inserted = insertedWords(parts, context);
+  const filled = filledOf(parts);
   for (const text of texts) {
-    // Fixed lines and typed options out, then every slot value (a quote is one): what is left is the model's.
-    const own = markOut(withoutInserted(text, inserted), values, " ");
-    faults.push(...unstatedValues(own, parts, stated));
+    // Fixed lines and typed options out, each unfilled slot (its fault is named above), then every slot value, a quote
+    // at its own place only: what is left is the model's.
+    const own = markOut(withoutInserted(text, inserted).replace(UNFILLED, " "), filled, " ");
+    faults.push(...unstatedValues(own, parts, stated, plain));
   }
   return unique(faults);
 };
@@ -152,13 +159,25 @@ const NEVER_SAID = [
   /%\s?off\b/i,
 ];
 
+/**
+ * Every option label the message carries or may carry, on any channel: each poll's, the step's own (typed wherever no
+ * poll carries them, and beside a poll until the handle has voted; arch 07 lines 367, 371, 379) and those the typed
+ * options hold (msgtext.js line 64).
+ */
+function optionLabels(parts: FinalParts, context: CheckContext): string[] {
+  return [
+    ...optionsOf(parts).map((option) => option.label),
+    ...context.options.map((option) => option.label),
+    ...(context.typedOptions === null ? [] : typedLabels(context.typedOptions)),
+  ];
+}
+
 /** Outside a quote: no emoji, markdown, leading # or bullet, step id or word that never goes in; no opt-out-only option. */
 export const neverInMessageFaults: Check = (parts, context) => {
   const quotes = quotesOf(parts);
-  const options = optionsOf(parts);
   const texts = [
     ...sendTexts(parts).map((text) => blankOut(text, quotes)),
-    ...options.map((option) => option.label),
+    ...optionsOf(parts).map((option) => option.label),
   ];
   const faults: string[] = [];
   for (const text of texts) {
@@ -172,10 +191,10 @@ export const neverInMessageFaults: Check = (parts, context) => {
       if (said !== null) faults.push(`The text says "${said[0]}", which never goes in a message.`);
     }
   }
-  for (const option of options) {
-    if (isOptOutOnly(option.label, context.lists.keywords.optOut)) {
+  for (const label of optionLabels(parts, context)) {
+    if (isOptOutOnly(label, context.lists.keywords.optOut)) {
       faults.push(
-        `The option '${option.label}' is only an opt-out word; name what it does, such as 'Cancel visit'.`,
+        `The option '${label}' is only an opt-out word; name what it does, such as 'Cancel visit'.`,
       );
     }
   }

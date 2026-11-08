@@ -251,6 +251,20 @@ describe("fixedLines: each fixed line and option word for word (arch 07 line 361
     ]);
   });
 
+  it("fills <business> as written, so a name with '$' in it still matches word for word", () => {
+    for (const business of ["Ca$$h Cuts", "Fade $& Co", "Lee$'s Cuts"]) {
+      const opener = `This is Rosie, the automated booking assistant for ${business}.`;
+      const parts = partsOf(
+        [wordsSend(`${opener} Riley says yes.\n${OPT_OUT_LINE}`)],
+        [RILEY],
+        ["opener", "optOutLine"],
+      );
+      const context = contextFor(parts, { businessName: business });
+      expect(fixedLinesFaults(parts, context), business).toEqual([]);
+      expect(runMessageChecks(parts, context).passed, business).toBe(true);
+    }
+  });
+
   it("reads a fixed line in the reader's language, else in English", () => {
     expect(fixedLinesFaults(firstText, contextFor(firstText, { language: "es" }))).toEqual([]);
     const spanishLine = "Responda STOP para no recibir más.";
@@ -394,6 +408,115 @@ describe("values: each value a code-supplied fact (arch 07 line 409; S13-28 rule
     );
   });
 
+  it("never holds a shortened amount or time by the whole one: '$45' is not in '$45.99', '10' not in '10:30am'", () => {
+    const cases: [string, SlotValue, string][] = [
+      [
+        "It costs $45.",
+        { slot: "price", value: "$45.99" },
+        "The price $45 is not a code-supplied fact; write the price as the {{price}} slot.",
+      ],
+      [
+        "Your visit is at 10.",
+        { slot: "visit.time", value: "10:30am" },
+        "The number 10 is not a code-supplied fact; write each number as its slot.",
+      ],
+      [
+        "It costs 45 cents more.",
+        { slot: "price", value: "$12.45" },
+        "The number 45 is not a code-supplied fact; write each number as its slot.",
+      ],
+      [
+        "It takes 30 minutes.",
+        { slot: "visit.ends", value: "11:30" },
+        "The number 30 is not a code-supplied fact; write each number as its slot.",
+      ],
+    ];
+    for (const [text, fact, fault] of cases) {
+      const parts = textOf(text, [fact]);
+      expect(valuesFaults(parts, contextFor(parts)), text).toEqual([fault]);
+    }
+    // The whole value is still held, here by a fact the composer was given.
+    const whole: [string, SlotValue][] = [
+      ["It costs $45.99.", { slot: "price", value: "$45.99" }],
+      ["Your visit is at 10:30am.", { slot: "visit.time", value: "10:30am" }],
+    ];
+    for (const [text, fact] of whole) {
+      expect(valuesFaults(textOf(text), contextFor(textOf(text), { facts: [fact] })), text).toEqual([]);
+    }
+  });
+
+  it("reads any word shaped like a domain as a link, with or without https:// and a path", () => {
+    const cases: [string, string][] = [
+      ["Pay at lees-cuts.shop/pay to keep the time.", "lees-cuts.shop/pay"],
+      ["Pay at example.ca/pay before you come.", "example.ca/pay"],
+      ["Pay at https://example.ca/pay before you come.", "https://example.ca/pay"],
+      ["Pay at www.lees-cuts.shop.", "www.lees-cuts.shop"],
+      ["Email riley@example.ca to change it.", "riley@example.ca"],
+    ];
+    for (const [text, link] of cases) {
+      const parts = textOf(text);
+      expect(valuesFaults(parts, contextFor(parts)), text).toEqual([
+        `The link ${link} is not a code-supplied fact; write each link as its slot.`,
+      ]);
+    }
+    // A link code supplied passes: a slot's value, or a fact the composer was given.
+    const slot = textOf("Pay at lees-cuts.shop/pay to keep the time.", [
+      { slot: "link.pay", value: "lees-cuts.shop/pay" },
+    ]);
+    expect(valuesFaults(slot, contextFor(slot))).toEqual([]);
+    const fact = textOf("Pay at example.ca/pay before you come.");
+    const given = contextFor(fact, { facts: [{ slot: "link.pay", value: "example.ca/pay" }] });
+    expect(valuesFaults(fact, given)).toEqual([]);
+  });
+
+  it("reads a capitalized word that starts a line or a sentence, follows ':' or ' · ', or opens a quote or a bracket as a name too", () => {
+    const service: SlotValue = { slot: "svc.intext", value: "Haircut" };
+    for (const text of [
+      "Haircut · Sat Oct 24 · 11:00am · Jordan",
+      "Jordan can do your visit at 11:00am.",
+      "Riley can't come. Jordan can do your visit at 11:00am.",
+      "Your pro: Jordan.",
+      "Riley is out, so “Jordan” will do it.",
+      "Your visit is at 11:00am (Jordan).",
+    ]) {
+      const parts = textOf(text, [...VISIT, service]);
+      expect(valuesFaults(parts, contextFor(parts)), text).toEqual([
+        "The name Jordan is not a code-supplied fact; write each name as its slot.",
+      ]);
+    }
+    const held = textOf("Jordan can do your visit at 11:00am.", [
+      ...VISIT,
+      { slot: "name.staff", value: "Jordan" },
+    ]);
+    expect(valuesFaults(held, contextFor(held))).toEqual([]);
+  });
+
+  it("passes a plain word where a sentence starts: a common word, a fixed line's word or the master line's", () => {
+    const common = textOf(
+      "Thanks! Your visit is Sat Oct 24 at 11:00am. Check-in opens then. Please bring your card.",
+      VISIT,
+    );
+    expect(valuesFaults(common, contextFor(common))).toEqual([]);
+
+    // "Msg" is a word of the opt-out line, and no common word.
+    const fixedWord = textOf("Msg and data rates may apply.");
+    expect(valuesFaults(fixedWord, contextFor(fixedWord))).toEqual([]);
+    const noLines: CheckLists = { ...LISTS, fixedLines: { lines: [] } };
+    expect(valuesFaults(fixedWord, contextFor(fixedWord, { lists: noLines }))).toEqual([
+      "The name Msg is not a code-supplied fact; write each name as its slot.",
+    ]);
+
+    // "Hi" is no common word (Rosie's lines in the master write it capitalized only): only the master line holds it.
+    const greeting = textOf("Hi Sam, your visit is Sat Oct 24 at 11:00am.", VISIT);
+    const master = "Hi {{name}}, your visit is {{day}} at {{visit.time}}.";
+    expect(valuesFaults(greeting, contextFor(greeting, { readerName: "Sam", masterText: master }))).toEqual(
+      [],
+    );
+    expect(valuesFaults(greeting, contextFor(greeting, { readerName: "Sam" }))).toEqual([
+      "The name Hi is not a code-supplied fact; write each name as its slot.",
+    ]);
+  });
+
   it("passes a value the composer was given as a fact, and the reader's name", () => {
     const thanks = textOf("Thanks, Sam. Riley can see you at 11:00am, and the fee is $20.", [RILEY, TIME]);
     const given = contextFor(thanks, { facts: [{ slot: "fee", value: "$20" }], readerName: "Sam" });
@@ -420,6 +543,16 @@ describe("values: each value a code-supplied fact (arch 07 line 409; S13-28 rule
       { slot: "relay.quote", value: quote },
     ]);
     expect(valuesFaults(restated, contextFor(restated))).toEqual(faults);
+  });
+
+  it("takes a quote out at its own place only: the model may not repeat its words elsewhere", () => {
+    const quote: SlotValue = { slot: "relay.quote", value: "3pm" };
+    const alone = textOf("Alex M. asks: 3pm", [ALEX, quote]);
+    expect(valuesFaults(alone, contextFor(alone))).toEqual([]);
+    const repeated = textOf("Riley can do 3pm.\nAlex M. asks: 3pm", [RILEY, ALEX, quote]);
+    expect(valuesFaults(repeated, contextFor(repeated))).toEqual([
+      "The time 3pm is not a code-supplied fact; write each time as its slot.",
+    ]);
   });
 
   it("fails '{{', 'null' or 'undefined' left in the words, and a card link no link slot holds", () => {
@@ -479,6 +612,17 @@ describe("oneQuestion: at most one question per text (S13-28 rule 50)", () => {
     ]);
     expect(oneQuestionFaults(relay, contextFor(relay))).toEqual([]);
   });
+
+  it("leaves a quote's question out only at its own place: a repeat of it is the model's", () => {
+    const quote = "Can you come at 3pm instead?";
+    const repeated = textOf(`Alex M. asks: ${quote}\n${quote}\nYour answer for Alex M.?`, [
+      ALEX,
+      { slot: "relay.quote", value: quote },
+    ]);
+    expect(oneQuestionFaults(repeated, contextFor(repeated))).toEqual([
+      "The text asks two questions; ask at most one question per text.",
+    ]);
+  });
 });
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -522,6 +666,16 @@ describe("neverInMessage: no emoji, markdown, step id, word that never goes in, 
     expect(neverInMessageFaults(relay, contextFor(relay))).toEqual([]);
   });
 
+  it("leaves a quote out only at its own place: an emoji the model repeats outside it fails", () => {
+    const quote: SlotValue = { slot: "relay.quote", value: "👍" };
+    const alone = textOf("Alex M. sent: 👍", [ALEX, quote]);
+    expect(neverInMessageFaults(alone, contextFor(alone))).toEqual([]);
+    const repeated = textOf("Thanks 👍\nAlex M. sent: 👍", [ALEX, quote]);
+    expect(neverInMessageFaults(repeated, contextFor(repeated))).toEqual([
+      "The text holds an emoji; write it without one.",
+    ]);
+  });
+
   it("fails an option that is only one of msgtext.js's 16 opt-out words, in any case or with a mark", () => {
     const words = LISTS.keywords.optOut;
     expect(words).toHaveLength(16);
@@ -548,6 +702,64 @@ describe("neverInMessage: no emoji, markdown, step id, word that never goes in, 
         [RILEY, DAY],
       );
       expect(neverInMessageFaults(parts, contextFor(parts)), label).toEqual([]);
+    }
+  });
+
+  /** A words send carrying typed options (msgtext.js line 64), with no poll. */
+  const typedIn = (typed: string): FinalParts =>
+    partsOf([wordsSend(`Riley can't be in on Sat Oct 24.\n${typed}`)], [RILEY, DAY]);
+  const optOutOnly = (label: string): string =>
+    `The option '${label}' is only an opt-out word; name what it does, such as 'Cancel visit'.`;
+  const STEP_OPTIONS: Option[] = [
+    { id: "A7-17/1", label: "Avery instead" },
+    { id: "A7-17/2", label: "Cancel" },
+  ];
+
+  it("fails an opt-out-only option typed into the words, on every channel (msgtext.js lines 64 and 95)", () => {
+    const typed = "Reply 1 Avery instead, 2 Cancel.";
+    for (const channel of ["imessage", "rcs", "sms", "email"] as const) {
+      const parts: FinalParts = { ...typedIn(typed), channel };
+      const context = contextFor(parts, { options: STEP_OPTIONS, typedOptions: typed });
+      expect(neverInMessageFaults(parts, context), channel).toEqual([optOutOnly("Cancel")]);
+      expect(runMessageChecks(parts, context).blocked, channel).toBe(true);
+    }
+  });
+
+  it("fails one held by the step's options or by the typed options alone, each of the 16 words alike", () => {
+    // The step's options alone, with nothing typed and no poll.
+    const plain = typedIn("Does Avery instead work?");
+    expect(neverInMessageFaults(plain, contextFor(plain, { options: STEP_OPTIONS }))).toEqual([
+      optOutOnly("Cancel"),
+    ]);
+    // The typed options alone, numbered or lettered, in English or Spanish.
+    const typedAlone: [string, string][] = [
+      ["Reply 1 Avery instead, 2 Cancel.", "Cancel"],
+      ["Reply A Avery instead, B Stop.", "Stop"],
+      ["Responda 1 Avery, 2 Cancelar.", "Cancelar"],
+    ];
+    for (const [typed, label] of typedAlone) {
+      const parts = typedIn(typed);
+      expect(neverInMessageFaults(parts, contextFor(parts, { typedOptions: typed })), typed).toEqual([
+        optOutOnly(label),
+      ]);
+    }
+    for (const word of LISTS.keywords.optOut) {
+      const typed = `Reply 1 Avery instead, 2 ${word}.`;
+      const parts = typedIn(typed);
+      expect(neverInMessageFaults(parts, contextFor(parts, { typedOptions: typed })), word).toEqual([
+        optOutOnly(word),
+      ]);
+    }
+  });
+
+  it("passes typed options that name what they do, a label with a comma of its own kept whole", () => {
+    for (const typed of [
+      "Reply 1 Avery instead, 2 Cancel visit.",
+      "Reply 1 Yes, they agreed, 2 Not yet.",
+      "Reply 1 Yes, cancel it, 2 No.",
+    ]) {
+      const parts = typedIn(typed);
+      expect(neverInMessageFaults(parts, contextFor(parts, { typedOptions: typed })), typed).toEqual([]);
     }
   });
 });
