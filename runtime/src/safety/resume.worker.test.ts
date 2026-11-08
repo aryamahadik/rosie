@@ -183,17 +183,19 @@ interface Run {
 /**
  * Runs a test body with the doubles set for the isolate and put back after. Until `evict`, the read never answers and the
  * 4 s deadline has no timer (with `deadlineRuns`, it runs on the fake clock, so the timeout rule can apply before a cut);
- * after it, the read answers `answers` after `delayMs` and the deadline runs on the fake clock.
+ * after it, the read answers `answers` after `delayMs` and the deadline runs on the fake clock. With `before`, its doubles
+ * are the ones in place until the first cut instead (round 3: a read that answers, a core that refuses, a Linq send that
+ * never ends), on the fake clock.
  */
 async function withEviction(
   answers: Record<string, SafetyResult>,
-  options: { delayMs?: number; deadlineRuns?: boolean },
+  options: { delayMs?: number; deadlineRuns?: boolean; before?: (h: Harness) => SafetyDeps },
   body: (run: Run) => Promise<void>,
 ): Promise<void> {
   const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
   const cutOff: SafetyReadRequest[] = [];
   const handed: ClosedBatch[] = [];
-  const stalled: SafetyDeps = {
+  const stalled: SafetyDeps = options.before?.(h) ?? {
     ...h.deps,
     read: {
       read(request) {
@@ -945,5 +947,412 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
       restoreBatch();
       restoreSafety();
     }
+  });
+});
+
+// Round 3 (DL-132; the security reviewer's second FAIL on 032fc0f, GAP 1): a danger outcome stays open until its line has
+// gone and its record is kept. The danger path writes the outcome's hold before its direct send and its record, so an
+// eviction in between lost the line: a resumed read took the timeout rule and its danger verdict was dropped, or, on the
+// late path, no re-read came at all. PostgreSQL is down in these tests (the core refuses), so the line goes straight
+// through Linq; Linq's send before the cut never ends.
+describe("a danger outcome cut off before its line and record are done", () => {
+  type DirectLine = Parameters<SafetyDeps["direct"]["send"]>[0];
+
+  /** A Linq send that never ends (the cut comes during it); each request is kept. */
+  function hangingDirect(): { attempts: DirectLine[]; direct: SafetyDeps["direct"] } {
+    const attempts: DirectLine[] = [];
+    return {
+      attempts,
+      direct: {
+        send(request) {
+          attempts.push(request);
+          return new Promise(() => undefined);
+        },
+      },
+    };
+  }
+
+  /** The record kept for return: once the core answers again it is written, once, with the line the actor sent. */
+  async function expectRecordKept(h: Harness, result: SafetyResult): Promise<void> {
+    h.core.down = false;
+    expect(await stub().writeSafetyOnReturn()).toBe(1);
+    expect(h.core.recorded).toHaveLength(1);
+    expect(h.core.recorded[0]?.request).toMatchObject({
+      caller: { kind: "actorOnReturn" },
+      safety: result,
+      sentByActor: { fixedLineId: "safetyEmergency", linqMessageId: "linq-1" },
+    });
+    expect(await stub().writeSafetyOnReturn()).toBe(0);
+  }
+
+  it("the core refuses and Linq's send hangs until the cut: the resumed read's danger verdict is applied, not the timeout rule, so the emergency line goes once and its record is kept", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const hanging = hangingDirect();
+    await withEviction(
+      { "evt-1": answer },
+      { before: (h) => ({ ...h.deps, direct: hanging.direct }) },
+      async (run) => {
+        run.h.core.down = true;
+        await arrive("evt-1", SMOKE_TEXT);
+        // 0 s: the read says An emergency (the text holds no danger word). The core refuses, so the hold is written and
+        // the line goes to Linq, which never answers.
+        await vi.waitFor(() => {
+          expect(hanging.attempts.map((request) => request.fixedLineId)).toEqual(["safetyEmergency"]);
+        });
+        expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-1", state: "reading" }]);
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", rule: "after_safe", holdId: null, released: false },
+        ]);
+
+        // 1 s: the cut, during the send.
+        await run.h.clock.advance(1000);
+        await run.evict();
+
+        // 4 s: the stored alarm wakes a new instance past the deadline. A verdict came before the cut, so no timeout rule
+        // (no outage line): the text is read again, and its danger verdict goes through the same send with the same key.
+        await run.h.clock.advance(3000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        });
+        expect(run.h.direct.sent[0]).toMatchObject({
+          at: 4000,
+          fixedLineId: "safetyEmergency",
+          overrideOptout: true,
+          idempotencyKey: hanging.attempts[0]?.idempotencyKey,
+        });
+        expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1", "evt-1"]);
+        expect(run.h.core.fixed).toEqual([]);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "done", danger: true, path: "direct", lineId: "safetyEmergency" },
+          ]);
+          expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+        });
+        await expectRecordKept(run.h, answer);
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", rule: "after_safe", holdId: "hold-evt-1", released: false },
+        ]);
+        expect(run.h.direct.sent).toHaveLength(1);
+      },
+    );
+    const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
+    expect(lines).toContain('"hop":"safetyRead"');
+    expect(lines).not.toContain("smoke pouring");
+    expect(lines).not.toContain("+15555550101");
+  });
+
+  it.each(["late", "reread"] as const)(
+    "on the late path (a %s verdict found danger and its hold replaced the unread hold) the cut comes during the send: the stored re-read wakes the actor, and the line goes once with its record kept",
+    async (kind) => {
+      const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+      const hanging = hangingDirect();
+      await withEviction(
+        { "evt-1": answer },
+        {
+          before: (h) => {
+            let calls = 0;
+            const read: SafetyReadPort = {
+              async read(request) {
+                calls += 1;
+                // The read sent on arrival answers at 6 s, past the deadline: late, An emergency; reread, it gives up
+                // (timedOut), and the re-read at 36 s says An emergency.
+                if (calls === 1) {
+                  await h.clock.after(6000);
+                  return kind === "late" ? verdict(answer) : gaveUp(request.eventId);
+                }
+                return verdict(answer);
+              },
+            };
+            return { ...h.deps, read, direct: hanging.direct };
+          },
+        },
+        async (run) => {
+          await arrive("evt-1", SMOKE_TEXT);
+          // 4 s: no verdict and no danger word: the outage line (the core is still up) and the unread hold.
+          await run.h.clock.advance(4000);
+          await run.settle();
+          expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([
+            [4000, "outage"],
+          ]);
+          run.h.core.down = true;
+
+          // The danger verdict: its hold replaces the unread hold, the core refuses, and Linq's send never ends.
+          if (kind === "late") {
+            await run.h.clock.advance(2000);
+          } else {
+            await run.h.clock.advance(32_000);
+            await run.wake();
+          }
+          await vi.waitFor(() => {
+            expect(hanging.attempts.map((request) => request.fixedLineId)).toEqual(["safetyEmergency"]);
+          });
+          expect(await actorOf().readHolds()).toMatchObject([
+            { eventId: "evt-1", rule: "after_safe", released: false },
+          ]);
+          // The text stays scheduled: its stored re-read now waits for the danger's line and record.
+          const due = kind === "late" ? 34_000 : 66_000;
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: due });
+
+          // The cut, during the send; the stored re-read wakes a new instance.
+          await run.h.clock.advance(1000);
+          await run.evict();
+          await run.h.clock.advance(due - run.h.clock.now());
+          await run.wake();
+          await vi.waitFor(() => {
+            expect(run.h.direct.sent).toHaveLength(1);
+          });
+          expect(run.h.direct.sent[0]).toMatchObject({
+            at: due,
+            fixedLineId: "safetyEmergency",
+            idempotencyKey: hanging.attempts[0]?.idempotencyKey,
+          });
+          await vi.waitFor(async () => {
+            expect(await actorOf().readSafety()).toMatchObject([
+              { eventId: "evt-1", state: "done", danger: true, path: "direct", lineId: "safetyEmergency" },
+            ]);
+            expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+          });
+          expect(run.h.core.fixed).toHaveLength(1);
+          await expectRecordKept(run.h, answer);
+        },
+      );
+    },
+  );
+
+  it("a core that throws at once (no rejected promise) still gets the hold written and the line tried; with Linq refusing too, the text keeps its hold, stays scheduled, and its line goes once at the next re-read with its record kept (round 2 security note b)", async () => {
+    const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const h = harness(keys, {});
+    let reads = 0;
+    // The read sent on arrival says An emergency at 6 s, past the deadline; the re-read says it at once.
+    const read: SafetyReadPort = {
+      async read() {
+        reads += 1;
+        if (reads === 1) await h.clock.after(6000);
+        return verdict(answer);
+      },
+    };
+    const throwing: SafetyDeps["core"] = {
+      recordSafetyOutcome: () => {
+        throw new Error("the core broke");
+      },
+      sendFixedLine: (request) => h.core.sendFixedLine(request),
+      releaseSafetyHold: (request) => h.core.releaseSafetyHold(request),
+    };
+    const restoreSafety = setSafetyDeps({ ...h.deps, read, core: throwing });
+    const restoreBatch = setBatchHooks({ clock: h.clock, toLease: () => undefined });
+    try {
+      await arrive("evt-1", SMOKE_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+      expect(h.core.fixed.map((call) => call.request.fixedLineId)).toEqual(["outage"]);
+
+      // 6 s: the late verdict, An emergency. The core throws at once: the hold is still written in place of the unread
+      // hold, and the line is tried through Linq, which refuses. The text is in the holds, and stays scheduled.
+      h.direct.fail = true;
+      await h.clock.advance(2000);
+      await vi.waitFor(async () => {
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true, path: "none" },
+        ]);
+      });
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "after_safe", holdId: null, released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(h.direct.sent).toEqual([]);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 36_000 });
+      });
+
+      // 36 s: Linq answers again. The re-read's danger verdict sends the line once, and its record is kept.
+      h.direct.fail = false;
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(() => {
+        expect(h.direct.sent).toHaveLength(1);
+      });
+      expect(h.direct.sent[0]).toMatchObject({
+        at: 36_000,
+        fixedLineId: "safetyEmergency",
+        idempotencyKey: "safety:evt-1:safetyEmergency",
+      });
+      await vi.waitFor(async () => {
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", danger: true, path: "direct" },
+        ]);
+      });
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "after_safe", released: false },
+      ]);
+      expect(reads).toBe(2);
+      const restoreCore = setSafetyDeps(h.deps);
+      try {
+        await expectRecordKept(h, answer);
+      } finally {
+        restoreCore();
+      }
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
+
+  it("a re-read that is still out gets no second read while it hangs: the alarm only moves the next re-read 30 s on (round 2 security note a)", async () => {
+    const h = harness(keys, {});
+    const calls: SafetyReadRequest[] = [];
+    // The read sent on arrival gives up at once (timedOut): the timeout rule, and the first re-read due at 30 s. That
+    // re-read never answers.
+    const read: SafetyReadPort = {
+      read(request) {
+        calls.push(request);
+        return calls.length === 1 ? Promise.resolve(gaveUp(request.eventId)) : new Promise(() => undefined);
+      },
+    };
+    const restoreSafety = setSafetyDeps({ ...h.deps, read });
+    const restoreBatch = setBatchHooks({ clock: h.clock, toLease: () => undefined });
+    try {
+      await arrive("evt-1", PLAIN_TEXT);
+      await actorOf().safetyIdle();
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(() => {
+        expect(calls).toHaveLength(2);
+      });
+      for (const at of [60_000, 90_000]) {
+        await h.clock.advance(30_000);
+        await runDurableObjectAlarm(stub());
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: at + 30_000 });
+        });
+      }
+      expect(calls).toHaveLength(2);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
+
+  it("a resumed read that says No does not undo the danger its first read found: nothing goes for it, the hold stays, the text is read again 30 s on, and the next danger verdict sends the line once", async () => {
+    const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    const hanging = hangingDirect();
+    await withEviction(
+      { "evt-1": danger },
+      { before: (h) => ({ ...h.deps, direct: hanging.direct }) },
+      async (run) => {
+        run.h.core.down = true;
+        await arrive("evt-1", SMOKE_TEXT);
+        await vi.waitFor(() => {
+          expect(hanging.attempts).toHaveLength(1);
+        });
+        await run.h.clock.advance(1000);
+        let rereads = 0;
+        await run.evict({
+          ...run.h.deps,
+          read: {
+            read() {
+              rereads += 1;
+              return Promise.resolve(
+                verdict(rereads === 1 ? { ...asResult(safetyNo), eventId: "evt-1" } : danger),
+              );
+            },
+          },
+        });
+
+        // 4 s: woken; the read says No this time. Only the first verdict counts: nothing is sent, the hold stays, and the
+        // text is read again 30 s on.
+        await run.h.clock.advance(3000);
+        await run.wake();
+        await vi.waitFor(async () => {
+          expect(rereads).toBe(1);
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 34_000 });
+        });
+        expect(run.h.direct.sent).toEqual([]);
+        expect(run.h.core.fixed).toEqual([]);
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", rule: "after_safe", released: false },
+        ]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await actorOf().routineHeld()).toBe(true);
+
+        // 34 s: read again, An emergency: the line goes once, with the same key, and its record is kept.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        });
+        expect(run.h.direct.sent[0]).toMatchObject({
+          at: 34_000,
+          idempotencyKey: hanging.attempts[0]?.idempotencyKey,
+        });
+        expect(rereads).toBe(2);
+        await expectRecordKept(run.h, danger);
+      },
+    );
+  });
+
+  it("a danger-word text cut off during its timeout line: a resumed read with no danger verdict still gets the danger-word rule, so the 911 line goes once, its record is kept and nothing is read again", async () => {
+    const eventId = safetyTimeoutDangerWord.eventId;
+    const hanging = hangingDirect();
+    await withEviction(
+      {},
+      {
+        before: (h) => ({
+          ...h.deps,
+          direct: hanging.direct,
+          read: { read: () => new Promise(() => undefined) },
+        }),
+      },
+      async (run) => {
+        run.h.core.down = true;
+        await arrive(eventId, BLEEDING_TEXT);
+        // 4 s: no verdict: the danger word counts as Unsure; the core refuses and the 911 line goes to Linq, which never
+        // answers.
+        await run.h.clock.advance(4000);
+        await vi.waitFor(() => {
+          expect(hanging.attempts.map((request) => request.fixedLineId)).toEqual(["safetyEmergency"]);
+        });
+        await run.h.clock.advance(1000);
+        let rereads = 0;
+        await run.evict({
+          ...run.h.deps,
+          read: {
+            read(request) {
+              rereads += 1;
+              return Promise.resolve(verdict({ ...asResult(safetyNo), eventId: request.eventId }));
+            },
+          },
+        });
+
+        // 5 s: woken. The read says No, which does not undo the Unsure the danger word gave; the danger-word rule still
+        // holds, so the line goes now, once, with the same key, and nothing is read again.
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        });
+        expect(run.h.direct.sent[0]).toMatchObject({
+          at: 5000,
+          fixedLineId: "safetyEmergency",
+          idempotencyKey: hanging.attempts[0]?.idempotencyKey,
+        });
+        await vi.waitFor(async () => {
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId, state: "done", danger: true, path: "direct", lineId: "safetyEmergency" },
+          ]);
+          expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+        });
+        expect(rereads).toBe(1);
+        await expectRecordKept(run.h, asResult(safetyTimeoutDangerWord));
+      },
+    );
   });
 });
