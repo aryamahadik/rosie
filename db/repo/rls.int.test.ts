@@ -51,15 +51,35 @@ interface RefusedFixture {
 const readCore = (relative: string): unknown => JSON.parse(readFileSync(new URL(relative, CORE_DIR), "utf8"));
 
 const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).tables;
+/** Every table the migrations make: K-04 v1 core, and K-29 v1 conversations and consent (T-192). */
+const ALL_TABLES = [
+  ...TABLES,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL(
+          "../../contracts/db-schema/conversations-consent/conversations-consent.v1.tables.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+];
 /** The business-scoped tables, each with the column its policies key on and whether that column may be null. */
-const SCOPED = TABLES.flatMap((table) => {
-  const security = table.rowLevelSecurity;
-  if (security.scope !== "business") {
-    return [];
-  }
-  const nullable = table.columns.find((column) => column.name === security.column)?.null === true;
-  return [{ name: table.name, column: security.column, nullable }];
-});
+const scopedOf = (tables: readonly ContractTable[]): { name: string; column: string; nullable: boolean }[] =>
+  tables.flatMap((table) => {
+    const security = table.rowLevelSecurity;
+    if (security.scope !== "business") {
+      return [];
+    }
+    const nullable = table.columns.find((column) => column.name === security.column)?.null === true;
+    return [{ name: table.name, column: security.column, nullable }];
+  });
+/** The core tables scoped by business, which the core seeds fill. */
+const SCOPED = scopedOf(TABLES);
+/** Every business-scoped table in the schema, for the catalog's lists. */
+const ALL_SCOPED = scopedOf(ALL_TABLES);
 /** The tables that span businesses (scope none). */
 const SPANNING = TABLES.filter((table) => table.rowLevelSecurity.scope === "none").map((table) => table.name);
 
@@ -220,7 +240,7 @@ describe("the migration: row-level security on every business-scoped core table 
   });
 
   it("every business-scoped table has row-level security on: the catalog lists none without it", async () => {
-    const names = SCOPED.map((table) => table.name);
+    const names = ALL_SCOPED.map((table) => table.name);
     const found = await db.sql<{ name: string }[]>`
       select c.relname as name from pg_class c
       where c.relnamespace = ${db.schema}::regnamespace and c.relkind = 'r' and c.relname in ${db.sql(names)}
@@ -265,9 +285,9 @@ describe("the migration: row-level security on every business-scoped core table 
       order by tablename, policyname
     `;
     expect([...new Set(policies.map((policy) => policy.table))]).toEqual(
-      SCOPED.map((table) => table.name).sort(),
+      ALL_SCOPED.map((table) => table.name).sort(),
     );
-    for (const table of SCOPED) {
+    for (const table of ALL_SCOPED) {
       const own = policies.filter((policy) => policy.table === table.name);
       expect(own.map((policy) => [policy.name, policy.permissive, policy.roles, policy.command])).toEqual([
         [`${table.name}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"],
@@ -364,7 +384,7 @@ describe("the two roles", () => {
                    and has_schema_privilege(${RUNTIME}, ${again.schema}, 'USAGE') as usage
           from pg_class c where c.relnamespace = ${again.schema}::regnamespace and c.relkind = 'r'
         `;
-        expect(row).toEqual({ on: SCOPED.length, policies: 2 * SCOPED.length, usage: true });
+        expect(row).toEqual({ on: ALL_SCOPED.length, policies: 2 * ALL_SCOPED.length, usage: true });
       } finally {
         await again.drop();
       }
@@ -620,7 +640,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         and has_table_privilege(r.role, c.oid, p.privilege)
       order by 1, 2, 3
     `;
-    const tables = [...TABLES].sort((a, b) => a.name.localeCompare(b.name));
+    const tables = [...ALL_TABLES].sort((a, b) => a.name.localeCompare(b.name));
     const want = ROLES.flatMap((role) =>
       tables.flatMap((table) =>
         expected(role, table).map((privilege) => ({ role, table: table.name, privilege })),
