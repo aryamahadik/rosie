@@ -64,7 +64,7 @@ export default defineConfig({
         ],
         test: {
           name: "workers",
-          include: ["runtime/src/**/*.worker.test.ts"],
+          include: ["runtime/src/**/*.worker.test.ts", "runtime/test/**/*.worker.test.ts"],
         },
       },
       {

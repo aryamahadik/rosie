@@ -16,13 +16,15 @@
 //
 //   - The dispatcher, woken by the turn with the turn's trace, records each row's spans on that trace (`traceFor`).
 //   - The receipt door records the delivery on the trace of the row that sent the part (found by its Linq message id), so
-//     the delivery receipt carries the text's trace id. In production the receipt handler is handed the receipt's own trace
-//     before the row is known (T-260's handoff names it).
+//     the delivery receipt carries the text's trace id. In production the receipt door is handed the receipt's own trace
+//     before the row is known, and K-05 markPart's answer names no trace id (known gap receiptTrace, CQ-102).
 //
-// What the merged runtime does not write yet is named below (NOT_WRITTEN, CLOCK_NOT_WRITTEN), and the handle actor's own
-// receive span, written beside the gateway's, is named by `actorReceive`; each is shown still to be so, so the lists only
-// shrink. No span may carry a raw phone number or a message's words (asserted on every span of every test). Test values
-// only: the master's sample cast, the frozen fixtures' ids and the fictional 555-01xx numbers (rule 9).
+// Every hop the merged runtime has a writer for is judged in all four cases: once, in order, under one trace id and one
+// bundle id. What it does not write yet is the named list of known gaps (GAPS, T-260 round 2, DL-168), each with the
+// task that closes it and each asserted to still hold where a test meets it, so the list only shrinks: a writer that
+// lands fails its gap's check, and its task takes the gap off the list. No span may carry a raw phone number or a
+// message's words (asserted on every span of every test). Test values only: the master's sample cast, the frozen
+// fixtures' ids and the fictional 555-01xx numbers (rule 9).
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
@@ -54,7 +56,7 @@ import { BUNDLE_A, fakeBundles } from "../src/bundle/test-support";
 import { clockArming, setClockDeps, type FireReport } from "../src/clocks";
 import { A7_03_DELIVERED, A7_03_QUESTION, wireArming } from "../src/clocks/arming-support";
 import { A7_03, ALEX_ACTOR, ALEX_HANDLE, fakeClocks } from "../src/clocks/test-support";
-import { handleDeliveryReceipt, runDispatch } from "../src/dispatch";
+import { handleDeliveryReceipt, runDispatch, type MarkPartRequest } from "../src/dispatch";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../src/dispatch/test-support";
 import {
   actorNameOf,
@@ -102,41 +104,92 @@ import {
   type FakeTurnFace,
 } from "../src/turn/test-support";
 
-// ---- what the merged runtime does not write yet ----------------------------------------------------------------------
+// ---- the known gaps: what the merged runtime does not write yet (T-260 round 2, DL-168) -------------------------------
 
 /**
- * Hops of a text's trace (trace-skeleton.json, trace-batch-three-texts.json) with no writer in the merged runtime: left out
- * of the check, and unexpected (so the test fails) once a writer lands. Take a hop off when its writer merges.
+ * Each known gap by name, with the task that closes it. Each is asserted below to still hold, in a check that fails with
+ * `stillHolds(<name>)`'s words, so the list only shrinks: the task that writes what is missing takes its gap off this list,
+ * with the checks that name it.
  */
-const NOT_WRITTEN: Readonly<Partial<Record<Hop, string>>> = {
-  scrub: "the gateway's scrub span: T-1096, carded and not built",
-  batch:
-    "the batch window records no span (runtime/src/actor/batch.ts says nothing here logs), and runtime/src/trace closeBatch, which writes the batch spans of CQ-06, has no caller",
+const GAPS = {
+  scrubSpan: { task: "T-1096", what: "(a) the gateway writes no scrub span" },
+  batchSpans: {
+    task: "T-1108",
+    what: "(b) the batch window writes no batch span (runtime/src/actor/batch.ts logs nothing, and runtime/src/trace closeBatch, which writes CQ-06's batch spans, has no caller), so a joined text's trace has no joinedTurn span either",
+  },
+  actorReceive: {
+    task: "T-1108",
+    what: "(c) the handle actor writes a second receive span (runtime/src/actor/handle-actor.ts recordSpan, got.door handleActor) beside the gateway's, where K-08 shows one receive per inbound event",
+  },
+  seqPerWriter: {
+    task: "T-1108",
+    what: "(d) seq restarts at 1 in each writer's context (gateway, actor, safety read, pin), so a trace is not one run by seq and its order is read from each span's start",
+  },
+  receiveFields: {
+    task: "T-1108",
+    what: "the gateway's receive span has no sealedToActor (a text written to its actor) and no firstTrace (a repeated event), which K-08's receive spans hold",
+  },
+  clockHops: {
+    task: "T-1109",
+    what: "(e) runtime/src/clocks/fire.ts writes the clockFired span alone: its gate and commit go through K-09 with no span of their own, and nothing composes, sends or receipts the clock turn's rows",
+  },
+  clockTurnId: {
+    task: "T-1109",
+    what: "a clock firing's spans carry the clock turn's id, where trace-clock-fire.json's turn id is null",
+  },
+  clockJobId: {
+    task: "T-1109",
+    what: "a clock firing's job id is job-fire-<row>, where trace-clock-fire.json's is fire-<row>",
+  },
+  receiptTrace: {
+    task: "CQ-102",
+    what: "(f) a receipt does not keep its row's trace id: the gateway hands the receipt door the receipt's own new trace, and K-05 markPart's answer names no trace id, so only this test's door, which finds the row by its Linq message id, puts the delivery on the text's trace",
+  },
+} as const;
+
+type Gap = keyof typeof GAPS;
+
+/** What a gap's check says when it fails: the gap no longer holds, so its task takes it off the list. */
+function stillHolds(gap: Gap): string {
+  return `known gap ${gap} (${GAPS[gap].task}) no longer holds, so take it off GAPS: ${GAPS[gap].what}`;
+}
+
+/**
+ * Hops of a text's trace (trace-skeleton.json, trace-batch-three-texts.json) with no writer yet, each by its gap: left
+ * out of the check, and unexpected (so the test fails, naming the gap) once a writer lands.
+ */
+const NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = { scrub: "scrubSpan", batch: "batchSpans" };
+
+/** Hops of a clock firing's trace (trace-clock-fire.json) with no writer yet: seven of its eight. */
+const CLOCK_NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = {
+  gate: "clockHops",
+  commit: "clockHops",
+  compose: "clockHops",
+  fillAndChecks: "clockHops",
+  dispatch: "clockHops",
+  providerAccepted: "clockHops",
+  delivered: "clockHops",
 };
 
-/**
- * Hops of a clock firing's trace (trace-clock-fire.json) with no writer on the clock path: runtime/src/clocks/fire.ts
- * records the clockFired span alone (its gate and commit go through K-09 with no span of their own), and nothing composes
- * or sends the clock turn's rows yet.
- */
-const CLOCK_NOT_WRITTEN: Readonly<Partial<Record<Hop, string>>> = {
-  gate: "fire.ts records no gate span for the clock turn's gateAndCommit",
-  commit: "fire.ts records no commit span for it",
-  compose: "the clock turn's rows are not composed on the clock path",
-  fillAndChecks: "nor finalized",
-  dispatch: "the dispatcher is not woken on the clock path",
-  providerAccepted: "so no part goes",
-  delivered: "and no receipt comes",
-};
-
-const hopsIn = (gaps: Readonly<Partial<Record<Hop, string>>>): Hop[] => Object.keys(gaps) as Hop[];
+const hopsIn = (gaps: Readonly<Partial<Record<Hop, Gap>>>): Hop[] => Object.keys(gaps) as Hop[];
 
 /**
- * The handle actor's own receive span (runtime/src/actor/handle-actor.ts `recordSpan`, got.door handleActor), written under
- * the same trace id beside the gateway's: every text's trace shows exactly one of them (asserted), set aside from the
- * count, so K-08's one receive per webhook is judged on the gateway's span.
+ * The handle actor's own receive span (gap actorReceive), under the same trace id as the gateway's: set aside from the
+ * count, so K-08's one receive per inbound event is judged on the gateway's span, and asserted to be there, one per text.
  */
 const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
+
+/** Every key, at any depth, that names a trace (gap receiptTrace: K-05 markPart's answer has none). */
+function traceKeysIn(value: unknown, into: string[] = []): string[] {
+  if (Array.isArray(value)) for (const item of value as unknown[]) traceKeysIn(item, into);
+  else if (typeof value === "object" && value !== null) {
+    for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+      if (/trace/iu.test(key)) into.push(key);
+      traceKeysIn(item, into);
+    }
+  }
+  return into;
+}
 
 // ---- K-08 v1's traces ---------------------------------------------------------------------------------------------------
 
@@ -278,10 +331,21 @@ function wordsIn(value: unknown, into: string[] = []): string[] {
 
 // ---- the rig: every piece wired over its doubles ---------------------------------------------------------------------
 
+/** The dispatcher's K-05 double, keeping K-05's answer to each delivered mark (gap receiptTrace: none names a trace). */
+class ReceiptWatchedStore extends FakeOutboxStore {
+  readonly deliveredAnswers: unknown[] = [];
+
+  override async markPart(request: MarkPartRequest): ReturnType<FakeOutboxStore["markPart"]> {
+    const answer = await super.markPart(request);
+    if (request.outcome === "delivered") this.deliveredAnswers.push(answer);
+    return answer;
+  }
+}
+
 interface Rig {
   readonly clock: TestClock;
   readonly face: FakeTurnFace;
-  readonly store: FakeOutboxStore;
+  readonly store: ReceiptWatchedStore;
   readonly linq: FakeLinq;
   /**
    * Sets a text's safety result before it is sent: safety-no.json under its event id, what the read on arrival answers and
@@ -293,6 +357,8 @@ interface Rig {
   /** The trace each row was sent on, by row id: the turn's, as the dispatcher's `traceFor` was handed it. */
   readonly traces: Map<string, TraceContext>;
   readonly receipts: string[];
+  /** The trace id the gateway handed the receipt door with each receipt: the receipt's own (gap receiptTrace). */
+  readonly handedToDoor: string[];
   /** Signs one K-06 event as Linq's webhook and posts it to the gateway; answers the trace id the gateway opened. */
   post(event: InboundEvent, partKey?: string | null): Promise<string>;
   /** The spans logged so far. */
@@ -349,7 +415,7 @@ function rig(log: MockInstance, options: { turns: boolean }): Rig {
   const targets = fakeTargets();
   targets.answers.set(SAM.party.handleId, targetsAnswer(SAM.party.handleId, SAM_S1_02_TARGETS));
 
-  const store = new FakeOutboxStore([
+  const store = new ReceiptWatchedStore([
     {
       id: ROW,
       recipient: SAM.party.handleId,
@@ -370,6 +436,7 @@ function rig(log: MockInstance, options: { turns: boolean }): Rig {
   const sendState = new FakeSendState();
   const traces = new Map<string, TraceContext>();
   const receipts: string[] = [];
+  const handedToDoor: string[] = [];
   const arming = wireArming();
 
   const set: TurnDeps = {
@@ -396,8 +463,10 @@ function rig(log: MockInstance, options: { turns: boolean }): Rig {
     },
   };
 
-  // The receipt door: the delivery goes on the trace of the row whose part Linq delivered (one id end to end).
+  // The receipt door: the delivery goes on the trace of the row whose part Linq delivered (one id end to end). The
+  // gateway hands it the receipt's own trace, and nothing in K-05's answer names the row's (gap receiptTrace, CQ-102).
   async function acceptReceipt(handoff: ActorHandoff): Promise<StoreAnswer> {
+    handedToDoor.push(handoff.traceId);
     const status = handoff.event.status as { messageId: string; at: string } | null;
     if (status === null) throw new Error("a receipt with no status");
     const key = [...linq.accepted].find(
@@ -448,6 +517,7 @@ function rig(log: MockInstance, options: { turns: boolean }): Rig {
     linq,
     traces,
     receipts,
+    handedToDoor,
     known(eventId) {
       const result = safetyNoFor(eventId);
       answers[eventId] = result;
@@ -510,9 +580,13 @@ function expectNoWords(spans: readonly Span[], words: readonly string[]): void {
   expect(leaks(spans, [...CAST_NUMBERS, ...words])).toEqual([]);
 }
 
-/** The judged trace, with its problems shown when it fails. */
-function expectHops(report: HopCheck): void {
-  expect(report.problems).toEqual([]);
+/** The judged trace, with its problems shown when it fails; a hop of a known gap that shows up names its gap. */
+function expectHops(report: HopCheck, gaps: Readonly<Partial<Record<Hop, Gap>>> = {}): void {
+  const landed = report.problems.flatMap((problem) => {
+    const gap = problem.kind === "unexpected" ? gaps[problem.hop] : undefined;
+    return gap === undefined ? [] : [stillHolds(gap)];
+  });
+  expect(report.problems, landed.length === 0 ? undefined : landed.join(" ")).toEqual([]);
   expect(report.ok).toBe(true);
 }
 
@@ -573,7 +647,7 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
           notWritten: hopsIn(NOT_WRITTEN),
           extra: actorReceive,
         });
-        expectHops(report);
+        expectHops(report, NOT_WRITTEN);
         expect(report.judged).toEqual([
           "receive",
           "safetyRead",
@@ -590,10 +664,16 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
           "delivered",
           "clockArmed",
         ]);
-        // The actor's own receive span, set aside: exactly one, for this text.
-        expect(report.extra.map((span) => [span.hop, span.event_id, span.outcome])).toEqual([
-          ["receive", "evt-sam-0001", "ok"],
-        ]);
+        // Gap actorReceive: the actor's own receive span, set aside, is still written, exactly one, for this text.
+        expect(
+          report.extra.map((span) => [span.hop, span.event_id, span.outcome]),
+          stillHolds("actorReceive"),
+        ).toEqual([["receive", "evt-sam-0001", "ok"]]);
+        // Gap receiveFields: the gateway's receive span has no sealedToActor, which K-08's holds.
+        expect(SKELETON.spans[0]?.decided).toHaveProperty("sealedToActor", true);
+        const receive = trace.find((span) => span.hop === "receive" && !actorReceive(span));
+        expect(receive?.decided).toMatchObject({ signatureValid: true, knownEventId: false });
+        expect(receive?.decided, stillHolds("receiveFields")).not.toHaveProperty("sealedToActor");
 
         // One bundle id: the gateway's active id at receipt is the one the turn pinned, on every span.
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
@@ -616,9 +696,14 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
         expectHops(
           checkHops(spansOfTrace(spans, receiptTraceId), { traceId: receiptTraceId, expected: ["receive"] }),
         );
+        // Gap receiptTrace: the gateway handed the receipt door that trace, not the text's, and K-05's answer to the
+        // delivered mark names no trace, so only this test's join by Linq message id kept the text's trace id.
+        expect(run.handedToDoor).toEqual([receiptTraceId]);
+        expect(run.store.deliveredAnswers).toHaveLength(1);
+        expect(traceKeysIn(run.store.deliveredAnswers), stillHolds("receiptTrace")).toEqual([]);
 
-        // Each writer opens its own context and numbers from 1, so seq is not one run on this trace (T-260's handoff).
-        expect(seqProblems(trace)).not.toEqual([]);
+        // Gap seqPerWriter: each writer opens its own context and numbers from 1, so seq is not one run on this trace.
+        expect(seqProblems(trace), stillHolds("seqPerWriter")).not.toEqual([]);
         expectNoWords(spans, [words, ...FIXTURE_WORDS]);
       } finally {
         run.restore();
@@ -655,18 +740,25 @@ describe("a repeated webhook adds only a 'dropped at receipt' span (trace-duplic
       expect(dropped?.outcome).toBe(expected?.outcome);
       expect(dropped?.event_id).toBe(first.eventId);
       expect(dropped?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
-      // The actor's own receive span, set aside: one, also dropped.
-      expect(report.extra.map((span) => span.outcome)).toEqual(["dropped"]);
+      // Gap receiveFields: the dropped span does not name the first arrival's trace, which K-08's does (firstTrace).
+      expect(expected?.decided).toHaveProperty("firstTrace");
+      expect(dropped?.decided, stillHolds("receiveFields")).not.toHaveProperty("firstTrace");
+      // Gap actorReceive: the actor's own receive span, set aside, is still written: one, also dropped.
+      expect(
+        report.extra.map((span) => span.outcome),
+        stillHolds("actorReceive"),
+      ).toEqual(["dropped"]);
 
       // The first arrival's trace went on to its safety read; the repeat's ran no hop after receive.
-      expect(
+      expectHops(
         checkHops(spansOfTrace(spans, firstTrace), {
           traceId: firstTrace,
           expected: ["receive", "scrub", "safetyRead"],
           notWritten: hopsIn(NOT_WRITTEN),
           extra: actorReceive,
-        }).problems,
-      ).toEqual([]);
+        }),
+        NOT_WRITTEN,
+      );
       expectNoWords(spans, [String((textFixture as Json).body)]);
     } finally {
       run.restore();
@@ -719,8 +811,9 @@ describe("a three-text batch (trace-batch-three-texts.json)", () => {
             notWritten: hopsIn(NOT_WRITTEN),
             extra: actorReceive,
           });
-          expectHops(report);
-          expect(report.extra).toHaveLength(1);
+          expectHops(report, NOT_WRITTEN);
+          // Gap actorReceive: the actor's own receive span, set aside, is still written, one per text.
+          expect(report.extra, stillHolds("actorReceive")).toHaveLength(1);
         });
         // The joined texts' traces carry no turn: nothing ran on them after their safety read.
         for (const traceId of [secondTrace, thirdTrace]) {
@@ -758,10 +851,20 @@ describe("a clock firing (trace-clock-fire.json)", () => {
           expected: hopsOfTrace(CLOCK_FIRE),
           notWritten: hopsIn(CLOCK_NOT_WRITTEN),
         }),
+        CLOCK_NOT_WRITTEN,
       );
       // Its own trace under the firing's job id, on every span (CQ-06: a clock firing never shares a text's id).
-      expect(new Set(trace.map((span) => span.job_id))).toEqual(new Set([`job-fire-${A7_03.clockRowId}`]));
       expect(CLOCK_FIRE.opened_by).toBe("clockFiring");
+      // Gap clockJobId: that job id is job-fire-<row>, where K-08's is fire-<row>.
+      expect(CLOCK_FIRE.job_id).toBe(`fire-${String(CLOCK_FIRE.spans[0]?.got?.clockRow)}`);
+      expect(new Set(trace.map((span) => span.job_id)), stillHolds("clockJobId")).toEqual(
+        new Set([`job-fire-${A7_03.clockRowId}`]),
+      );
+      // Gap clockTurnId: the spans carry the clock turn's id (the lease's hash of the row's id), where K-08's is null.
+      expect(CLOCK_FIRE.turn_id).toBeNull();
+      expect([...new Set(trace.map((span) => span.turn_id))], stillHolds("clockTurnId")).toEqual([
+        expect.stringMatching(/^[0-9a-f]{64}$/u),
+      ]);
       expectNoWords(spans, wordsIn(A7_03.fires));
     } finally {
       for (const restore of restores.reverse()) restore();
