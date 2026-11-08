@@ -12,6 +12,7 @@ import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
 import { SafetyOnArrival, isReadable, type HoldEntry, type SafetyEntry } from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
+import { BatchWindow, type BatchEntry } from "./batch";
 import {
   createInboxTables,
   markReceiptSeen,
@@ -80,6 +81,8 @@ function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
 
 export class HandleActor extends DurableObject {
   private readonly safety: SafetyOnArrival;
+  private readonly batch: BatchWindow;
+  private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
@@ -88,6 +91,19 @@ export class HandleActor extends DurableObject {
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
     });
+    this.batch = new BatchWindow({
+      storage: ctx.storage,
+      held: () => this.safety.routineHeld(),
+      isDanger: (eventId) =>
+        this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
+    });
+    // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes.
+    ctx.waitUntil(this.batch.arm());
+  }
+
+  /** The Durable Object alarm: the stored schedule's due entries (the batch close, a held batch's hand-off). */
+  override async alarm(): Promise<void> {
+    await this.batch.onAlarm();
   }
 
   /**
@@ -100,10 +116,30 @@ export class HandleActor extends DurableObject {
     let answer: StoreAnswer;
     if (route === "inbox") {
       // One synchronous step: the check and the write cannot be split by a concurrent retry.
-      answer = writeToInbox(this.ctx.storage, handoff);
+      // The text joins the batch window in the same all-or-nothing step as its write (T-247).
+      answer = this.ctx.storage.transactionSync(() => {
+        const written = writeToInbox(this.ctx.storage, handoff);
+        if (written === "written" && startsTurn(handoff.event)) {
+          this.batch.add(this.seqOf(handoff.event.eventId), handoff.event.eventId);
+        }
+        return written;
+      });
       // The safety read starts in the same step as the write, before any batch (arch 02 step S): the 4 s deadline
       // begins now and the read is queued in arrival order. It runs on; the gateway is answered at once.
-      if (answer === "written" && isReadable(handoff)) this.ctx.waitUntil(this.safety.arrive(handoff));
+      if (answer === "written" && isReadable(handoff)) {
+        const eventId = handoff.event.eventId;
+        const safe = this.safety.arrive(handoff);
+        // Danger closes the batch at once; each safety result may also let a held batch go to the lease.
+        this.lend(
+          safe
+            .then(() => {
+              this.batch.afterSafety(eventId);
+            })
+            .then(() => this.settleBatch()),
+        );
+        this.ctx.waitUntil(safe);
+      }
+      if (answer === "written") await this.batch.arm();
     } else {
       answer = await this.passReceipt(handoff);
     }
@@ -133,7 +169,40 @@ export class HandleActor extends DurableObject {
 
   /** Notes that the shared core released the hold of this text; a threat's is never released (A3-48) and answers "neverReleased". */
   markHoldReleased(eventId: string): "released" | "neverReleased" | "noSuchHold" {
-    return this.safety.markHoldReleased(eventId);
+    const answer = this.safety.markHoldReleased(eventId);
+    // A lifted hold lets the batches that waited for it go to the lease.
+    if (answer === "released") this.lend(this.settleBatch());
+    return answer;
+  }
+
+  /** Every batch the actor holds, in order: closed ones with how they closed and whether the lease has them, and the open one last. */
+  readBatches(): BatchEntry[] {
+    return this.batch.read();
+  }
+
+  /** Resolves when the batch work started so far is done (tests). */
+  async batchIdle(): Promise<void> {
+    while (this.batchWork.size > 0) await Promise.all([...this.batchWork]);
+  }
+
+  /** Hands what is ready to the lease and sets the alarm for what is still waiting. */
+  private async settleBatch(): Promise<void> {
+    await this.batch.release();
+    await this.batch.arm();
+  }
+
+  private lend(work: Promise<void>): void {
+    const tracked = work.catch(() => undefined);
+    this.batchWork.add(tracked);
+    void tracked.finally(() => this.batchWork.delete(tracked));
+    this.ctx.waitUntil(tracked);
+  }
+
+  private seqOf(eventId: string): number {
+    const row = this.ctx.storage.sql
+      .exec<{ seq: number }>("SELECT seq FROM inbox WHERE event_id = ?", eventId)
+      .one();
+    return row.seq;
   }
 
   /** Writes to the shared core what the actor sent straight through Linq while PostgreSQL was down; returns how many. */
