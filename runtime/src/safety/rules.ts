@@ -99,6 +99,11 @@ export function strictestHold(outcomes: readonly SafetyOutcome[]): ReleaseRule |
   return strictest;
 }
 
+/** The stricter of two release rules: a hold written again for the same text is never looser than the open one. */
+export function stricterHold(a: ReleaseRule, b: ReleaseRule): ReleaseRule {
+  return STRICTNESS.indexOf(a) >= STRICTNESS.indexOf(b) ? a : b;
+}
+
 /** The order in which an outcome's line is chosen when several hold: 988 and 911 first, then the others (strictest first). */
 const LINE_ORDER: readonly SafetyOutcome[] = [
   "Crisis words",

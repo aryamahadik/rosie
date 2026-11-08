@@ -14,6 +14,7 @@ export {
   MAX_MS,
   MAX_TEXTS,
   QUIET_MS,
+  SCHEDULE_SAFETY,
   type BatchClock,
   type BatchEntry,
   type BatchHooks,
@@ -26,6 +27,7 @@ export {
   LEASE_MS,
   MAX_TRIES,
   type CommitAnswer,
+  type CommitContext,
   type CommitTurnAnswer,
   type CommitTurnCommitted,
   type CommitTurnError,
@@ -37,5 +39,5 @@ export {
   type TurnEntry,
   type TurnState,
 } from "./lease";
-export { setSafetyDeps, type HoldEntry, type SafetyEntry } from "../safety";
+export { setSafetyDeps, type HoldEntry, type OpenHold, type SafetyEntry } from "../safety";
 export { setBundleDeps, type PinEntry } from "../bundle";

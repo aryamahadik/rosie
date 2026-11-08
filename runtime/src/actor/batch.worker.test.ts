@@ -59,6 +59,7 @@ interface BatchRpc {
   readBatches(): Promise<BatchEntry[]>;
   readHolds(): Promise<HoldEntry[]>;
   readSafety(): Promise<SafetyEntry[]>;
+  routineHeld(): Promise<boolean>;
   markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
@@ -305,14 +306,23 @@ describe("the batch window", () => {
   });
 });
 
+// Holds bind commits, not hand-offs (QUESTIONS.md CQ-65 as DL-119 replaced it; T-1088): once every text of a batch has been
+// read, the batch goes on while its outcome hold stays open, and the turn carries the hold to its commit (lease.ts), so a
+// STOP or a protecting change inside a danger or threat text reaches its turn. The first two tests and the two note e
+// tests below held the batch for the hold (T-247's rule, which DL-119 replaced); they now show the hold staying open.
 describe("a hold from the safety read", () => {
-  it("danger closes the batch at once, and no text is handed on until the hold lifts", async () => {
+  it("danger closes the batch at once, and the read batch goes on while its hold stays open (DL-119)", async () => {
     await withBatch({ "evt-1": asResult(safetyCrisisWords), ...NO(["evt-2"]) }, async (run) => {
       await arrive("evt-1", "I don't want to be alive anymore");
       await run.settle();
-      // Closed at once (before 3 s), but held.
+      // Closed at once (before 3 s) and handed on: its text has been read; the hold is open and binds the commit.
       expect(await actorOf().readBatches()).toMatchObject([
-        { reason: "danger", handed: false, eventIds: ["evt-1"] },
+        { reason: "danger", handed: true, eventIds: ["evt-1"] },
+      ]);
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+      expect(run.handed[0]).toMatchObject({ reason: "danger", closedAt: 0 });
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "after_safe", released: false },
       ]);
 
       await arrive("evt-2");
@@ -320,19 +330,22 @@ describe("a hold from the safety read", () => {
       await run.tick(3000);
       await run.settle();
       expect(await actorOf().readBatches()).toMatchObject([
-        { reason: "danger", handed: false, eventIds: ["evt-1"] },
-        { reason: "quiet", handed: false, eventIds: ["evt-2"] },
+        { reason: "danger", handed: true, eventIds: ["evt-1"] },
+        { reason: "quiet", handed: true, eventIds: ["evt-2"] },
       ]);
-      expect(run.handed).toHaveLength(0);
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"], ["evt-2"]]);
+      expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", released: false }]);
 
-      // The hold lifts (after a clear "we're safe"): both go on, in order. The core's hold id names it (note a).
+      // The hold lifts (after a clear "we're safe"): the hold changes, and nothing is handed twice. The core's hold id
+      // names it (note a).
       expect(await actorOf().markHoldReleased(await holdIdOf("evt-1"))).toBe("released");
       await run.settle();
+      expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", released: true }]);
       expect(run.handed.map(idsOf)).toEqual([["evt-1"], ["evt-2"]]);
     });
   });
 
-  it("a threat's hold never lifts, so nothing is handed on", async () => {
+  it("a threat's hold never lifts, yet its read batch goes on to its turn (a STOP in it must reach the turn), in order", async () => {
     await withBatch({ "evt-1": asResult(safetyThreat), ...NO(["evt-2"]) }, async (run) => {
       await arrive("evt-1", "if Riley messes up my hair again I'll hurt him");
       await run.settle();
@@ -343,8 +356,14 @@ describe("a hold from the safety read", () => {
       expect(await actorOf().markHoldReleased(await holdIdOf("evt-1"))).toBe("neverReleased");
       await run.tick(3000);
       await run.settle();
-      expect(run.handed).toHaveLength(0);
-      expect(await actorOf().readBatches()).toMatchObject([{ handed: false }, { handed: false }]);
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"], ["evt-2"]]);
+      expect(await actorOf().readBatches()).toMatchObject([
+        { reason: "danger", handed: true },
+        { reason: "quiet", handed: true },
+      ]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "never", released: false },
+      ]);
     });
   });
 
@@ -359,6 +378,69 @@ describe("a hold from the safety read", () => {
       expect(run.handed).toHaveLength(0);
       expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
     });
+  });
+
+  it("a text with no verdict in 4 s keeps its batch back (its unread hold) until a late verdict lifts it; then the batch goes on", async () => {
+    await withBatch(
+      NO(["evt-1"]),
+      async (run) => {
+        await arrive("evt-1");
+        await run.tick(3000);
+        await run.tick(1000);
+        await run.settle();
+        // 4 s: no verdict, the outage line, and the unread hold: the text is not read yet, so its batch waits.
+        expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+        expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
+        expect(run.handed).toHaveLength(0);
+
+        // 6 s: the late verdict says No; the hold lifts, and the settle path hands the batch on (nothing polled for it).
+        await run.h.clock.advance(2000);
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+        });
+        expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: true }]);
+      },
+      "wired",
+      { delayMs: 6000 },
+    );
+  });
+
+  it("a batch waits only for its own texts' reads: a read batch goes on while a later text is still read; a held batch keeps later ones behind it", async () => {
+    // evt-1 to evt-3 and evt-5 are read as No 1 s after they arrive; evt-4 has no answer, so it is never read.
+    await withBatch(
+      NO(["evt-1", "evt-2", "evt-3", "evt-5"]),
+      async (run) => {
+        await arrive("evt-1");
+        await arrive("evt-2");
+        await arrive("evt-3");
+        await arrive("evt-4");
+        expect(await actorOf().readBatches()).toMatchObject([
+          { batchId: 1, reason: "third", handed: false, eventIds: ["evt-1", "evt-2", "evt-3"] },
+          { batchId: 0, reason: null, eventIds: ["evt-4"] },
+        ]);
+
+        // 1 s: the first batch's texts are read. evt-4 is still being read, and keeps only its own batch back.
+        await run.h.clock.advance(1000);
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1", "evt-2", "evt-3"]]);
+        });
+
+        // 3 s: evt-4's batch closes, held while it is read; 4 s: no verdict, so its unread hold keeps it back.
+        await run.tick(2000);
+        await run.tick(1000);
+        await arrive("evt-5");
+        await run.tick(3000);
+        await run.settle();
+        expect(await actorOf().readBatches()).toMatchObject([
+          { batchId: 1, handed: true },
+          { batchId: 2, reason: "quiet", handed: false, eventIds: ["evt-4"] },
+          { batchId: 3, reason: "quiet", handed: false, eventIds: ["evt-5"] },
+        ]);
+        expect(run.handed).toHaveLength(1);
+      },
+      "wired",
+      { delayMs: 1000 },
+    );
   });
 });
 
@@ -527,6 +609,39 @@ describe("T-247's security notes, before the lease is wired (DL-110)", () => {
     });
   });
 
+  it("T-248 security note d: the routineHeld() RPC counts a waiting text with no safety row as held, as the batch does", async () => {
+    await withBatch(NO(["evt-1", "evt-2"]), async (run) => {
+      // As above: evt-1 is stored and batched, but its read never started, so it has no safety row.
+      let broken = true;
+      const restore = setSafetyDeps({
+        ...run.h.deps,
+        clock: {
+          now: () => {
+            if (broken) {
+              broken = false;
+              throw new Error("the clock broke");
+            }
+            return run.h.clock.now();
+          },
+          after: (ms) => run.h.clock.after(ms),
+        },
+      });
+      try {
+        await expect(
+          door().accept(await handoffOf("evt-1", "Can I get a haircut on Thursday afternoon?")),
+        ).rejects.toThrow();
+      } finally {
+        restore();
+      }
+      await arrive("evt-2");
+      await run.settle();
+      // evt-2 was read (No), and no hold is open: only evt-1, with no safety row, holds routine work.
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-2", state: "done" }]);
+      expect(await actorOf().readHolds()).toEqual([]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
   it("note e: a late danger verdict after a no-match timeout closes the open batch at once, as an on-time one does", async () => {
     const late = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
     await withBatch(
@@ -562,25 +677,27 @@ describe("T-247's security notes, before the lease is wired (DL-110)", () => {
     );
   });
 
-  it("note e: one threat text sets no alarm that fires every second; nothing is handed on", async () => {
+  it("note e: one threat text sets no alarm that fires every second; its batch is handed on once, with the hold open", async () => {
     await withBatch({ "evt-1": asResult(safetyThreat) }, async (run) => {
       await arrive("evt-1", "if Riley messes up my hair again I'll hurt him");
       await run.settle();
-      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: false }]);
+      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: true }]);
       expect(await scheduleOf()).toEqual([]);
       expect(await alarmOf()).toBeNull();
 
       await run.h.clock.advance(5000);
       expect(await runDurableObjectAlarm(stub())).toBe(false);
-      expect(run.handed).toHaveLength(0);
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "never", released: false }]);
     });
   });
 
-  it("note e: a held batch polls nothing until its hold is released, and the release hands it on", async () => {
+  it("note e: an outcome hold keeps no batch back and nothing polls; its release hands nothing again", async () => {
     await withBatch({ "evt-1": asResult(safetyCrisisWords) }, async (run) => {
       await arrive("evt-1", "I don't want to be alive anymore");
       await run.settle();
-      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: false }]);
+      expect(await actorOf().readBatches()).toMatchObject([{ reason: "danger", handed: true }]);
+      expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
       expect(await scheduleOf()).toEqual([]);
       expect(await alarmOf()).toBeNull();
 
@@ -588,6 +705,7 @@ describe("T-247's security notes, before the lease is wired (DL-110)", () => {
       await run.settle();
       expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
       expect(await scheduleOf()).toEqual([]);
+      expect(await alarmOf()).toBeNull();
     });
   });
 

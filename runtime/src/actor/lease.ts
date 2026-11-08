@@ -22,12 +22,21 @@
 // the turn's trace under that id. A run whose bundle cannot be pinned never starts its work: like a crash, nothing is
 // written and the lease lapses into a rerun. The lease's own rules above do not depend on the pin.
 //
+// Safety holds bind commits, not hand-offs (QUESTIONS.md CQ-65 as DL-119 replaced it; T-1088): a batch reaches its turn
+// once its texts have been read, even while a hold is open. Each run of a turn is handed the holds open at its start, read
+// after the pin (`LeasedTurn.holds`: the first run, a restart, a lapsed turn's rerun and the next turn after a commit each
+// read them again), and the commit hook is handed the holds open at commit time, so a hold that opened mid-turn binds
+// that commit too, with the texts not read yet then (CQ-65's addendum, DL-127: T-252's gate counts each as an open hold).
+// The lease refuses nothing for a hold: T-252's gate commits only protective changes and the safety flow while one is
+// open (arch 06 lines 327 and 329), and until it is wired no turn runs at all.
+//
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks. Unwired, no turn runs and each closed batch stays stored with the batch window (fails
 // closed). The park after a third crash is T-253: a third lapse is left as it is, with no fourth try. Never logged or put
 // in a span: a text's words (K-08 README line 75). Nothing here logs (the pin records the turn's `lease` span).
 
 import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
+import type { OpenHold } from "../safety";
 import type { BundleId, TraceContext } from "../trace";
 import { actorClock, createScheduleTable, scheduleEntry, unscheduleEntry, type ClosedBatch } from "./batch";
 import { readInboxEvents, type InboxEntry } from "./inbox";
@@ -142,14 +151,37 @@ export interface LeasedTurn {
   bundle: PinnedBundle;
   /** The turn's trace (the first text's trace id, CQ-06) under the pinned bundle id: every span of the turn goes on it (K-08). */
   trace: TraceContext;
+  /**
+   * The handle's safety holds open at this run's start (read after the pin), in the order they were made (CQ-65 as DL-119
+   * replaced it): the turn runs with them open. While one is open, T-252's gate commits only protective changes (a STOP,
+   * stricter contact, a death report; the A3-48 pause) and the safety flow (a clear "we're safe" with a fresh read-back),
+   * never routine actions; a threat's never-released hold commits only protective changes. The commit is handed them again.
+   */
+  holds: OpenHold[];
+}
+
+/** What the commit hook is handed beside the request, read at commit time (after the lease's own gate). */
+export interface CommitContext {
+  /** The safety holds open now: a hold that opened mid-turn binds this commit too (DL-119). */
+  holds: OpenHold[];
+  /**
+   * The handle's texts not read yet now, by event id in arrival order (QUESTIONS.md CQ-65's addendum, DL-127): a text still
+   * being read, never wired, given up with no hold open, or with no safety row. Arch 02 step S holds routine actions until
+   * a text's outcome, so T-252's gate counts each as an open hold (protective changes only). A text under an open unread
+   * hold (no verdict in 4 s) is among `holds`, with rule `unread`.
+   */
+  unread: string[];
 }
 
 /** Joined at D-017; a test sets doubles. Unwired, no turn runs and no turn commits (fails closed). */
 export interface LeaseHooks {
   /** The turn's work (T-251, T-252). A throw is a crash: the lease lapses and the turn reruns. */
   runTurn?: (turn: LeasedTurn) => void | Promise<void>;
-  /** K-05 v1 commitTurn (C-087, through the Tool API). */
-  commit?: (request: CommitTurnRequest) => Promise<CommitTurnAnswer>;
+  /**
+   * K-05 v1 commitTurn (C-087, through the Tool API), behind T-252's gate, which reads `at.holds` and `at.unread`: the
+   * safety holds open and the texts not read yet at commit time, so it can refuse a routine commit while either is there.
+   */
+  commit?: (request: CommitTurnRequest, at: CommitContext) => Promise<CommitTurnAnswer>;
 }
 
 let leaseHooks: LeaseHooks = {};
@@ -262,6 +294,10 @@ export interface LeaseHost {
    * says the run is no longer the turn's.
    */
   pin(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null>;
+  /** The handle's safety holds open now, in the order they were made (the actor's safety read keeps them). */
+  holds(): OpenHold[];
+  /** The handle's texts not read yet now, by event id in arrival order (CommitContext.unread). */
+  unread(): string[];
 }
 
 const bySeq = (items: Item[]): Item[] => [...items].sort((a, b) => a.seq - b.seq);
@@ -400,7 +436,7 @@ export class TurnLease {
     const controller = new AbortController();
     this.runs.set(turnId, controller);
     const signal = controller.signal;
-    const run: Omit<LeasedTurn, keyof TurnPin> = {
+    const run: Omit<LeasedTurn, keyof TurnPin | "holds"> = {
       turnId,
       eventIds,
       entries,
@@ -429,7 +465,9 @@ export class TurnLease {
         .then(() => this.host.pin(pinRequest, signal))
         .then((pinned) => {
           if (pinned === null || signal.aborted) return;
-          return runTurn({ ...run, ...pinned });
+          // The holds are read at the run's start, once its bundle is pinned: a restart, a rerun and the next turn after a
+          // commit carry the holds open then, a hold opened while the pin was read included.
+          return runTurn({ ...run, ...pinned, holds: this.host.holds() });
         })
         .then(
           () => undefined,
@@ -446,8 +484,10 @@ export class TurnLease {
 
   /**
    * The commit, through the lease: a replaced turn never commits; the first commit call of a turn marks it committing, so
-   * no later batch restarts it (the call may go through even when its answer is lost). Committed (first or repeat), or
-   * parked: the lease is released and the waiting batches open the next turn.
+   * no later batch restarts it (the call may go through even when its answer is lost). The commit hook is handed the
+   * safety holds open now and the texts not read yet, read again after the gate, so a hold that opened mid-turn binds this
+   * commit (DL-119, DL-127). Committed (first or repeat), or parked: the lease is released and the waiting batches open
+   * the next turn.
    */
   private async commit(turnId: string, request: CommitTurnRequest): Promise<CommitAnswer> {
     if (request.turn.id !== turnId) return { error: "wrongTurn" };
@@ -464,9 +504,10 @@ export class TurnLease {
       return null;
     });
     if (gate !== null) return gate;
+    const at: CommitContext = { holds: this.host.holds(), unread: this.host.unread() };
     let answer: CommitTurnAnswer;
     try {
-      answer = await port(request);
+      answer = await port(request, at);
     } catch {
       return { error: "noAnswer" };
     }
@@ -506,13 +547,18 @@ export class TurnLease {
   /**
    * The schedule's lease entry (the actor's alarm): a lease past its 60 s with no commit reruns the turn from its sealed
    * texts under the same turn id, with one more try. A third lapse is left for the park (T-253): no fourth try. Then any
-   * batch still waiting is given its turn (a crash may have come between taking a batch and giving it a turn).
+   * batch still waiting is given its turn (a crash may have come between taking a batch and giving it a turn). With no
+   * lapsed lease the entry is put in step with what is stored, so an entry due now that a wired `runTurn` left cannot
+   * re-arm the alarm at once on every run after `runTurn` becomes unwired (T-248 security note c).
    */
   async onAlarm(): Promise<void> {
     const now = actorClock().now();
     const rerun = this.host.storage.transactionSync((): string | null => {
       const lease = this.leaseRow();
-      if (lease === undefined || lease.until_ms > now) return null;
+      if (lease === undefined || lease.until_ms > now) {
+        this.syncSchedule();
+        return null;
+      }
       const turn = this.turnRow(lease.turn_id);
       const running = turn !== undefined && (turn.state === "leased" || turn.state === "committing");
       if (!running || leaseHooks.runTurn === undefined || turn.tries >= MAX_TRIES) {

@@ -7,19 +7,23 @@
 //   - a danger outcome of one of its texts ("danger"; arch 02 step S: the actor hands the safety line on first, and the
 //     batch is not kept waiting).
 //
-// A closed batch is final: a later text opens the next one. A closed batch goes to the turn lease (T-248) only when no
-// safety work holds routine work (`held()`: a text still unread, or a hold not released; arch 02 step S, arch 06 lines
-// 317 to 327), and in order: a held batch keeps the later ones behind it.
+// A closed batch is final: a later text opens the next one. A closed batch goes to the turn lease (T-248) once every one
+// of its texts has been read (`held(eventIds)`: a text still being read, never wired, with no safety row, or with no
+// verdict yet; arch 02 step S, T-247's security notes a and d), and in order: a held batch keeps the later ones behind
+// it. Holds bind commits, not hand-offs (QUESTIONS.md CQ-65 as DL-119 replaced it): an outcome hold (arch 06 lines 317
+// to 327) never keeps a read batch back; the turn carries it and its commit reads it again (lease.ts), so a STOP or a
+// protecting change inside a danger or threat text still reaches its turn (arch 06 line 329).
 //
 // The Durable Object has one alarm. What is due is kept in a small stored schedule (`batch_schedule`: one row per kind of
-// entry; the turn lease adds its own kind, and the resume of a cut-off safety read, T-1088, will add one), the alarm is set
-// to the earliest row, and each entry's handler is idempotent: a restart inside the window still closes the batch from
-// stored state.
+// entry; the turn lease adds its own kind, and so does the resume of a safety read cut off by an eviction, T-1088), the
+// alarm is set to the earliest row, and each entry's handler is idempotent: a restart inside the window still closes the
+// batch from stored state.
 //
 // The hand-off (T-247's security notes c and e): the release entry stays stored while a batch is being handed, so a crash
-// in the middle of a hand-off still hands the batch again after the restart; and nothing polls while a hold keeps a batch
-// back, because every way a hold lifts (the read's end, a late verdict, a released hold) hands the waiting batches on
-// itself, so one threat text cannot keep an alarm firing every second.
+// in the middle of a hand-off still hands the batch again after the restart; and nothing here polls while a batch waits
+// for a read, because every way a text comes to be read (the read's end, a late verdict, a resumed read or a re-read)
+// hands the waiting batches on itself, so one unanswered text cannot keep an alarm firing every second. (A text with no
+// verdict is read again every 30 s from the safety read's own schedule entry, DL-127; that is not a poll of this one.)
 //
 // The lease (T-248, lease.ts) takes each closed, released batch once, in order. A hand-off is at least once: one that
 // throws is tried again later with the same batch id, and the lease takes a batch id it has seen as already handed. Never
@@ -93,6 +97,11 @@ export interface BatchEntry {
 /** The schedule's kinds. */
 export const SCHEDULE_BATCH_CLOSE = "batchClose";
 export const SCHEDULE_RELEASE = "batchRelease";
+/**
+ * Wakes the actor for the safety read's work (T-1088; handle-actor.ts): at a read's 4 s deadline, so a read an eviction
+ * cut off is resumed, and at the 30 s re-read of a text with no verdict yet (DL-127).
+ */
+export const SCHEDULE_SAFETY = "safetyRead";
 
 /** The actor's one stored schedule: one entry per kind, each due at a time on the actor's clock. */
 export function createScheduleTable(sql: SqlStorage): void {
@@ -111,8 +120,11 @@ export function unscheduleEntry(sql: SqlStorage, kind: string): void {
 
 export interface BatchHost {
   storage: DurableObjectStorage;
-  /** True while routine work must wait (the safety hold). */
-  held(): boolean;
+  /**
+   * True while one of these texts (a closed batch's) has not been read yet, so the batch waits. An outcome hold is not
+   * asked here: it binds the turn's commit, not the hand-off (CQ-65 as DL-119 replaced it).
+   */
+  held(eventIds: readonly string[]): boolean;
   /** True when this text found danger. */
   isDanger(eventId: string): boolean;
   /**
@@ -227,7 +239,10 @@ export class BatchWindow {
     });
   }
 
-  /** Danger in a text of the open batch closes the batch at once (it still waits for the hold before the lease). */
+  /**
+   * Danger in a text of the open batch closes the batch at once. The closed batch goes to the lease once its texts have
+   * been read, with the danger's hold open: the hold binds the turn's commit, not the hand-off (CQ-65 as DL-119 replaced it).
+   */
   afterSafety(eventId: string): void {
     if (!this.host.isDanger(eventId)) return;
     if (this.openItems().some((item) => item.event_id === eventId)) this.close("danger");
@@ -286,7 +301,7 @@ export class BatchWindow {
 
   // ---- the hand-off to the lease ---------------------------------------------------------------------------------
 
-  /** Hands each closed batch to the lease, in order, once no safety work holds routine work. */
+  /** Hands each closed batch to the lease, in order, once every text of it has been read. */
   release(): Promise<void> {
     const run = this.releasing.then(() => this.releaseNow());
     this.releasing = run.catch(() => undefined);
@@ -304,16 +319,20 @@ export class BatchWindow {
         unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;
       }
-      // Held: nothing polls (note e). The hold lifts only through a call that hands the waiting batches on itself: the
-      // read's end or a late verdict (the actor's safety callbacks), or a released hold (`markHoldReleased`).
-      if (this.host.held()) {
+      const items = this.sql
+        .exec<{ seq: number; event_id: string }>(
+          "SELECT seq, event_id FROM batch_items WHERE batch_id = ? ORDER BY seq",
+          next.batch_id,
+        )
+        .toArray();
+      // Held, a text of it not read yet: nothing polls (note e). A text comes to be read only through a call that hands
+      // the waiting batches on itself: the read's end, a late verdict, a resumed read or a re-read (the actor's safety
+      // callbacks).
+      if (this.host.held(items.map((item) => item.event_id))) {
         unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;
       }
-      const eventSeqs = this.sql
-        .exec<{ seq: number }>("SELECT seq FROM batch_items WHERE batch_id = ? ORDER BY seq", next.batch_id)
-        .toArray()
-        .map((row) => row.seq);
+      const eventSeqs = items.map((item) => item.seq);
       const batch: ClosedBatch = {
         batchId: next.batch_id,
         reason: next.reason as CloseReason,

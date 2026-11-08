@@ -259,7 +259,12 @@ describe("the sealed body", () => {
     await handleLinqWebhook(webhook(), depsOf(eventResult(withSubject), d), WHERE);
 
     const stored = JSON.stringify(d.actor.written);
-    expect(stored).not.toContain("4242");
+    // The whole test card number, spaced as the text holds it, and run together: the stored hand-offs hold random trace
+    // ids and sealed boxes in hex and base64, which can hold "4242" by chance (DL-116, as below).
+    const card = "4242 4242 4242 4242";
+    expect(refuseCard.body).toContain(card);
+    expect(stored).not.toContain(card);
+    expect(stored).not.toContain(card.replaceAll(" ", ""));
     expect(stored).not.toContain("My card is");
     expect(stored).not.toContain("Re: Your haircut");
     const first = present(d.actor.written[0], "the first hand-off");
@@ -312,7 +317,12 @@ describe("the sealed body", () => {
 
     const key = d.keys.keyOf(refuseCard.handle);
     const text = logLines() + (await response.text()) + (await failing.text());
-    expect(text).not.toContain("4242");
+    // The whole test card number, spaced as the text and the key store's error hold it, and run together: the log holds
+    // random trace ids, whose hex digits can hold "4242" by chance (about one run in two thousand; DL-116).
+    const card = "4242 4242 4242 4242";
+    expect(refuseCard.body).toContain(card);
+    expect(text).not.toContain(card);
+    expect(text).not.toContain(card.replaceAll(" ", ""));
     expect(text).not.toContain(refuseCard.handle.address);
     expect(text).not.toContain(toBase64(key));
     expect(text).not.toContain(JSON.stringify([...key]));
