@@ -252,7 +252,7 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     });
   }
 
-  it("is expand only: plain tables, no row-level security here (T-191)", async () => {
+  it("is expand only: plain tables; row-level security per business on outbox_rows, none on its parts (T-191)", async () => {
     const rows = await db.sql<{ name: string; kind: string; rls: boolean }[]>`
       select c.relname as name, c.relkind as kind, c.relrowsecurity as rls
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
@@ -261,7 +261,7 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     `;
     expect(rows.map((row) => [row.name, row.kind, row.rls])).toEqual([
       ["outbox_parts", "r", false],
-      ["outbox_rows", "r", false],
+      ["outbox_rows", "r", true],
     ]);
   });
 

@@ -11,12 +11,14 @@ import {
   getReservation,
   holdMinutesFor,
   release,
+  releaseIn,
   reserve,
+  reserveIn,
   type ReleaseOutcome,
   type ReserveOutcome,
   type ReserveRequest,
 } from "./reservations";
-import { withBusiness, type Sql } from "./scope";
+import { SCOPE_SETTING, withBusiness, type Sql } from "./scope";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 const CORE_DIR = new URL("../../contracts/db-schema/core/", import.meta.url);
@@ -250,7 +252,7 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     expect(byName.get("reservations_booking_fk")).toContain("REFERENCES bookings(id)");
   });
 
-  it("is expand only: plain tables, no row-level security here (T-191)", async () => {
+  it("is expand only: plain tables, each with row-level security per business (T-191)", async () => {
     const rows = await db.sql<{ name: string; kind: string; rls: boolean }[]>`
       select c.relname as name, c.relkind as kind, c.relrowsecurity as rls
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
@@ -258,8 +260,8 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
       order by c.relname
     `;
     expect(rows.map((row) => [row.name, row.kind, row.rls])).toEqual([
-      ["class_seats", "r", false],
-      ["reservations", "r", false],
+      ["class_seats", "r", true],
+      ["reservations", "r", true],
     ]);
   });
 
@@ -1079,6 +1081,286 @@ describe("a repeat answers before the resource is looked at", () => {
       resourceId: "res-riley",
     });
     await db.sql`update resources set active = true, version = version + 1 where id = 'res-riley'`;
+  });
+});
+
+describe("under row-level security, the cap and the booked check still see every business (K-05 item 8; T-1085)", () => {
+  /**
+   * The test's connection owns the tables and bypasses row-level security (T-191), so these calls run as the Tool API's
+   * role, rosie_app, in one transaction on a reserved connection scoped to the request's business, as reserve() runs
+   * its own (inScopedTransaction; postgres.js's begin() would fail the whole transaction on a statement reserveIn
+   * refuses inside its savepoint).
+   */
+  async function asToolApi<T>(businessId: string, fn: (sql: Sql) => Promise<T>): Promise<T> {
+    const reserved = await db.sql.reserve();
+    try {
+      await reserved`begin`;
+      try {
+        await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
+        await reserved.unsafe("set local role rosie_app");
+        const result = await fn(reserved);
+        await reserved`commit`;
+        return result;
+      } catch (error) {
+        await reserved`rollback`;
+        throw error;
+      }
+    } finally {
+      reserved.release();
+    }
+  }
+  const ALEX = "+15555550101";
+  const alexAtYoga = {
+    id: "rsv-alex-maya-saved",
+    business_id: "biz-yoga-studio",
+    resource_id: "res-maya",
+    resource_kind: "worker",
+    worker_person_id: "person-maya",
+    during: "[2026-11-21T15:00:00Z,2026-11-21T16:00:00Z)",
+    state: "held",
+    held_until: "2026-11-07T15:20:00Z",
+    for_phone_number: ALEX,
+  };
+
+  it("a mobile's saved times at two businesses both count: its third is refused from either business, naming both", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // Alex's mobile holds rsv-alex-saved-avery at Lee's Barbershop (ends 15:10) and now one at the yoga studio (15:20).
+    await db.sql`insert into reservations ${db.sql(alexAtYoga)}`;
+    const at = "2026-11-07T15:06:00Z";
+    // The barbershop's scope shows only its own saved time: a direct count would see 1 and let a third through.
+    const direct = await asToolApi(
+      "biz-lees-barbershop",
+      (tx) =>
+        tx<{ id: string }[]>`select id from reservations where for_phone_number = ${ALEX} and state = 'held'`,
+    );
+    expect(direct.map((row) => row.id)).toEqual(["rsv-alex-saved-avery"]);
+    const both = [
+      { reservationId: "rsv-alex-saved-avery", heldUntil: "2026-11-07T15:10:00Z" },
+      { reservationId: "rsv-alex-maya-saved", heldUntil: "2026-11-07T15:20:00Z" },
+    ];
+    expect(
+      await asToolApi("biz-lees-barbershop", (tx) =>
+        reserveIn(tx, request({ reservationId: "rsv-alex-third", for: { phoneNumber: ALEX }, at })),
+      ),
+    ).toEqual({ error: "savedTimeCap", saved: both });
+    expect(
+      await asToolApi("biz-yoga-studio", (tx) =>
+        reserveIn(
+          tx,
+          request({
+            reservationId: "rsv-alex-third-yoga",
+            businessId: "biz-yoga-studio",
+            resourceId: "res-maya",
+            during: { start: "2026-11-28T15:00:00Z", end: "2026-11-28T16:00:00Z" },
+            for: { phoneNumber: ALEX },
+            at,
+          }),
+        ),
+      ),
+    ).toEqual({ error: "savedTimeCap", saved: both });
+    expect(await getReservation(db.sql, "rsv-alex-third")).toBeNull();
+    expect(await getReservation(db.sql, "rsv-alex-third-yoga")).toBeNull();
+    // Once the barbershop's has ended, the yoga studio's still counts: one saved time, so a second is held.
+    expect(
+      await asToolApi("biz-lees-barbershop", (tx) =>
+        reserveIn(
+          tx,
+          request({
+            reservationId: "rsv-alex-second",
+            for: { phoneNumber: ALEX },
+            at: "2026-11-07T15:11:00Z",
+          }),
+        ),
+      ),
+    ).toMatchObject({ result: "held", reservationId: "rsv-alex-second", repeated: false });
+  });
+
+  it("reserve-third-refused.json (Alex's third saved time, at another business) gives its outcome as the Tool API role", async () => {
+    const fixture = readJson(new URL("reserve-third-refused.json", ACCESS_DIR)) as AccessFixture;
+    await emptyTables(db.sql);
+    for (const seed of fixture.given.k04Seeds) {
+      await loadFixture(db.sql, seed);
+    }
+    for (const before of fixture.given.after) {
+      const earlier = (readJson(new URL(before, ACCESS_DIR)) as AccessFixture).request as ReserveRequest;
+      await asToolApi(earlier.businessId, (tx) => reserveIn(tx, earlier));
+    }
+    const asked = fixture.request as ReserveRequest;
+    expect(asked.businessId).not.toBe("biz-lees-barbershop");
+    expect(await asToolApi(asked.businessId, (tx) => reserveIn(tx, asked))).toEqual(fixture.outcome);
+  });
+
+  it("nothing but the held rows' ids and ends leaves reservations_saved_times, under any business's scope", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    await db.sql`insert into reservations ${db.sql(alexAtYoga)}`;
+    // Rows that never leave it: Alex's booked haircut (seeded), a waiting row, an ended saved time, another mobile's.
+    const others = [
+      {
+        id: "rsv-alex-waiting",
+        state: "waiting",
+        held_until: null,
+        during: "[2026-11-22T15:00:00Z,2026-11-22T16:00:00Z)",
+      },
+      {
+        id: "rsv-alex-ended",
+        state: "held",
+        held_until: "2026-11-07T15:01:00Z",
+        during: "[2026-11-23T15:00:00Z,2026-11-23T16:00:00Z)",
+      },
+      {
+        id: "rsv-other-mobile",
+        state: "held",
+        for_phone_number: "+15555550102",
+        during: "[2026-11-24T15:00:00Z,2026-11-24T16:00:00Z)",
+      },
+    ];
+    for (const row of others) {
+      await db.sql`insert into reservations ${db.sql({ ...alexAtYoga, ...row })}`;
+    }
+    for (const business of ["biz-lees-barbershop", "biz-yoga-studio", "biz-movers"]) {
+      const rows = await asToolApi(
+        business,
+        (tx) =>
+          tx<
+            Record<string, unknown>[]
+          >`select * from reservations_saved_times(${ALEX}, '2026-11-07T15:06:00Z')`,
+      );
+      expect(
+        rows.map((row) => Object.keys(row).sort()),
+        business,
+      ).toEqual([
+        ["held_until", "id"],
+        ["held_until", "id"],
+      ]);
+      expect(
+        rows.map((row) => ({ id: row.id, heldUntil: (row.held_until as Date).toISOString() })),
+        business,
+      ).toEqual([
+        { id: "rsv-alex-saved-avery", heldUntil: "2026-11-07T15:10:00.000Z" },
+        { id: "rsv-alex-maya-saved", heldUntil: "2026-11-07T15:20:00.000Z" },
+      ]);
+    }
+  });
+
+  it("a worker booked at one business is an overlap at another's resource, though that scope cannot see the booking", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    await createResource(db.sql, {
+      id: "res-riley-yoga",
+      businessId: "biz-yoga-studio",
+      kind: "worker",
+      name: "Riley at yoga",
+      personId: "person-riley",
+    });
+    // Riley's booked haircut at Lee's Barbershop is Oct 24, 15:00 to 15:30 (seed-reservation).
+    const booked = await asToolApi(
+      "biz-yoga-studio",
+      (tx) => tx`select id from reservations where state = 'booked' and worker_person_id = 'person-riley'`,
+    );
+    expect(booked).toHaveLength(0);
+    const ask = (id: string, start: string, end: string): ReserveRequest =>
+      request({
+        reservationId: id,
+        businessId: "biz-yoga-studio",
+        resourceId: "res-riley-yoga",
+        during: { start, end },
+        waitIfSaved: true,
+      });
+    // Asking to wait if saved: a booked time is never waited on (K-05 item 8), so this is an overlap, not a waiting row.
+    expect(
+      await asToolApi("biz-yoga-studio", (tx) =>
+        reserveIn(tx, ask("rsv-yoga-riley", "2026-10-24T15:10:00Z", "2026-10-24T15:20:00Z")),
+      ),
+    ).toEqual({ error: "overlap", resourceId: "res-riley-yoga" });
+    expect(await getReservation(db.sql, "rsv-yoga-riley")).toBeNull();
+    const [answer] = await asToolApi(
+      "biz-yoga-studio",
+      (tx) => tx<Record<string, unknown>[]>`
+        select reservations_booked_overlap('res-riley-yoga', 'person-riley',
+          tstzrange('2026-10-24T15:10:00Z', '2026-10-24T15:20:00Z', '[)')) as overlap
+      `,
+    );
+    expect(answer).toEqual({ overlap: true });
+    // Riley free at both businesses: held.
+    expect(
+      await asToolApi("biz-yoga-studio", (tx) =>
+        reserveIn(tx, ask("rsv-yoga-riley-free", "2026-10-24T16:00:00Z", "2026-10-24T16:30:00Z")),
+      ),
+    ).toMatchObject({ result: "held", reservationId: "rsv-yoga-riley-free" });
+  });
+
+  it("release() skips a waiting mobile capped by saved times at another business, as the Tool API role", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // The mobile +15555550103 holds two saved times at the movers and waits first in line for Avery at the barbershop.
+    for (const [id, resource] of [
+      ["rsv-cap-held-1", "res-truck-20"],
+      ["rsv-cap-held-2", "res-truck-26"],
+    ] as const) {
+      await db.sql`insert into reservations ${db.sql({
+        id,
+        business_id: "biz-movers",
+        resource_id: resource,
+        resource_kind: "vehicle",
+        worker_person_id: null,
+        during: "[2026-12-01T10:00:00Z,2026-12-01T11:00:00Z)",
+        state: "held",
+        held_until: "2026-11-07T16:00:00Z",
+        for_phone_number: "+15555550103",
+      })}`;
+    }
+    await db.sql`insert into reservations ${db.sql({
+      id: "rsv-aaa-capped",
+      business_id: "biz-lees-barbershop",
+      resource_id: "res-avery",
+      resource_kind: "worker",
+      worker_person_id: "person-avery",
+      during: "[2026-11-14T15:10:00Z,2026-11-14T15:20:00Z)",
+      state: "waiting",
+      queued_at: "2026-11-07T15:01:00Z",
+      for_phone_number: "+15555550103",
+    })}`;
+    const outcome = await asToolApi("biz-lees-barbershop", (tx) =>
+      releaseIn(tx, {
+        reservationId: "rsv-alex-saved-avery",
+        businessId: "biz-lees-barbershop",
+        expectVersion: 1,
+        why: "let_go",
+        at: "2026-11-07T15:06:00Z",
+      }),
+    );
+    expect(outcome).toMatchObject({
+      result: "released",
+      skipped: [{ reservationId: "rsv-aaa-capped", reason: "savedTimeCap" }],
+      promoted: { reservationId: "rsv-agent-waiting-avery" },
+    });
+    expect(await getReservation(db.sql, "rsv-aaa-capped")).toMatchObject({ state: "waiting" });
+  });
+
+  it("a reservation id another business holds is idConflict, though its scope cannot see it, and nothing is written", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // rsv-alex-saved-avery is Lee's Barbershop's.
+    expect(
+      await asToolApi("biz-yoga-studio", (tx) =>
+        reserveIn(
+          tx,
+          request({
+            reservationId: "rsv-alex-saved-avery",
+            businessId: "biz-yoga-studio",
+            resourceId: "res-maya",
+            during: { start: "2026-11-28T15:00:00Z", end: "2026-11-28T16:00:00Z" },
+          }),
+        ),
+      ),
+    ).toEqual({ error: "idConflict", reservationId: "rsv-alex-saved-avery" });
+    expect(await getReservation(db.sql, "rsv-alex-saved-avery")).toMatchObject({
+      businessId: "biz-lees-barbershop",
+      state: "held",
+      version: 1,
+    });
   });
 });
 
