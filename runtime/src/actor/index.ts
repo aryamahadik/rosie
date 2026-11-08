@@ -8,3 +8,4 @@ export {
   type ReceiptHooks,
 } from "./handle-actor";
 export type { InboxEntry } from "./inbox";
+export { setSafetyDeps, type HoldEntry, type SafetyEntry } from "../safety";
