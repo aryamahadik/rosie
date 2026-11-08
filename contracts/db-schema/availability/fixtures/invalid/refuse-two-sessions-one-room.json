@@ -2,6 +2,22 @@
   "after": ["seed-session-seats.json"],
   "rows": [
     {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-yin",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Yin class",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "1 hour",
+        "position": 3,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
       "table": "resources",
       "values": {
         "id": "res-yin-sat-nov-14",

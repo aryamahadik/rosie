@@ -10,7 +10,7 @@
     "table": "calendar_links",
     "columns": ["id", "provider", "state", "tokens"],
     "where": {
-      "id": "callink-riley-barbershop"
+      "id": "callink-riley-google"
     },
     "expect": {
       "sqlstate": "42501"

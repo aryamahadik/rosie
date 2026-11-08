@@ -482,8 +482,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The service a seat in it sells (K-25 services.id), whose name, price and money path the times card and the booking line read (A4-33; K-30). No foreign key in v1, since this part reads K-04, K-22 and K-23 only: code checks it is a service of this business (README open gap 1).",
-          "source": "A4-33 ('the times are the sessions in the timetable set at sign-up'); A4-66 ('A seat in a session'); S1-83; K-25 v1 services.id"
+          "description": "The service a seat in it sells (K-25 services.id), whose name, price and money path the times card and the booking line read (A4-33; K-30), held to a service of the same business by classes_service_fk.",
+          "source": "A4-33 ('the times are the sessions in the timetable set at sign-up'); A4-66 ('A seat in a session'); S1-83; K-25 v1 services.id, services_id_business_key"
         },
         {
           "name": "weekday",
@@ -600,6 +600,12 @@
           "name": "classes_business_fk",
           "columns": ["business_id"],
           "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "classes_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": { "table": "services", "columns": ["id", "business_id"] },
           "onDelete": "restrict"
         },
         {
@@ -724,8 +730,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The service a seat in it sells (K-25 services.id), copied from its class when there is one; no foreign key in v1 (README open gap 1).",
-          "source": "A4-33; A4-66; K-25 v1 services.id"
+          "description": "The service a seat in it sells (K-25 services.id), copied from its class when there is one, held to a service of the same business by class_sessions_service_fk.",
+          "source": "A4-33; A4-66; K-25 v1 services.id, services_id_business_key"
         },
         {
           "name": "during",
@@ -865,6 +871,12 @@
           "onDelete": "restrict"
         },
         {
+          "name": "class_sessions_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": { "table": "services", "columns": ["id", "business_id"] },
+          "onDelete": "restrict"
+        },
+        {
           "name": "class_sessions_teacher_fk",
           "columns": ["teacher_resource_id", "teacher_kind"],
           "references": { "table": "resources", "columns": ["id", "kind"] },
@@ -982,32 +994,24 @@
     },
     {
       "name": "calendar_links",
-      "description": "A person's own calendar linked to Rosie for one business (H03; S1-24; S2-06): Google or Microsoft, busy times only. One person has one calendar across every company (S1-24; FS line 743): the same calendar is linked to each business the person works in, one row per business, so each business reads only its own link and busy blocks (row-level security), and S1-38's carry-over writes the next business's row from the person's same grant, never asking twice. It holds only what the database needs: the person and business, the provider, the state, the sync marks (the provider's cursor and change subscription) and the OAuth tokens, sealed under the person's key. No secure link is texted to connect or reconnect it (MC 8 'Calendars'; Q-10).",
-      "source": "FS row H03 ('Calendar link per person (Rosie sees only busy times)'); FS lines 723 (staff.calendar_link), 743 ('one calendar'); S1-24 (gives calendar: 'One person has one calendar across every kind of work and company'; 'Each person can link their own calendar when they join'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-02, S2-06; arch 05 lines 261, 265, 271; arch 11 lines 578, 580; S12-13, S12-14; MC 8 'Calendars'; Q-10, Q-11, Q-56; 02-contracts row K-27 and section 8 (calendar: K-27)",
+      "description": "A person's own calendar linked to Rosie (H03; S1-24; S2-06): Google or Microsoft, busy times only. A link is the person's, never one business's: one person has one calendar across every company (S1-24; FS line 743; K-16 v1 calendarLinkId), so a person has one live link, with one change subscription (one Google channel or one Graph subscription) and one set of busy blocks, and each business they work in reads it through its own calendar_link_shares row (S1-38's carry-over adds one, never asking twice), seeing only free or busy through it. It holds only what the database needs: the person, the provider, the state, the sync marks (the provider's cursor and change subscription) and the OAuth tokens, sealed under the person's key. The row is written when the person starts connecting, with no tokens yet, and the connect's return seals the tokens into it (K-16 v1 connectStart, connectReturn). No secure link is texted to connect or reconnect it (MC 8 'Calendars'; Q-10).",
+      "source": "FS row H03 ('Calendar link per person (Rosie sees only busy times)'); FS lines 723 (staff.calendar_link), 743 ('one calendar'); S1-24 (gives calendar: 'One person has one calendar across every kind of work and company'; 'Each person can link their own calendar when they join'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-02, S2-06; arch 05 lines 261, 265, 271; arch 11 lines 578, 580; S12-13, S12-14; MC 8 'Calendars'; Q-10, Q-11, Q-56; 02-contracts row K-27 ('calendar links per person') and section 8 (calendar: K-27); K-16 v1 calendarLinkId ('a link belongs to a person, never to one business'), connectStart.request, tokensKept, watch.response",
       "columns": [
         {
           "name": "id",
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The link's id: an opaque string code makes and never parses (CQ-09).",
-          "source": "CQ-09 (other ids are opaque strings)"
-        },
-        {
-          "name": "business_id",
-          "type": "text",
-          "null": false,
-          "audience": "never",
-          "description": "The business it is linked for (businesses.id): the business whose page connected it (registration screen 16, the owner console, or the team member's staff page for this business: S2-06; Q-10), or the next business S1-38 carried it over to.",
-          "source": "arch 10 line 546; S1-24; S1-38; S2-06; Q-10; K-22 v1 emergency_contacts.business_id (a person's row for the business whose page asked)"
+          "description": "The link's id: an opaque string code makes and never parses (CQ-09); K-16 v1's calendarLinkId.",
+          "source": "CQ-09 (other ids are opaque strings); K-16 v1 calendarLinkId"
         },
         {
           "name": "person_id",
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "Whose calendar (persons.id); their key in K-04 sealing_keys seals the tokens. Each person links their own.",
-          "source": "S1-24 ('Each person can link their own calendar when they join'); arch 05 line 261 ('Each person links their own calendar'); FS line 743"
+          "description": "Whose calendar (persons.id); their key in K-04 sealing_keys seals the tokens. Each person links their own, and has at most one live link (calendar_links_one_live_per_person).",
+          "source": "S1-24 ('Each person can link their own calendar when they join'; 'One person has one calendar across every kind of work and company'); arch 05 line 261 ('Each person links their own calendar'); FS line 743; K-16 v1 connectStart.request personId"
         },
         {
           "name": "provider",
@@ -1021,10 +1025,10 @@
           "name": "state",
           "type": "text",
           "null": false,
-          "default": "'linked'",
+          "default": "'connecting'",
           "audience": ["staff", "owner"],
-          "description": "linked: busy times read in (arch 05 line 261). dropped: its change subscription could not be renewed after the effects retries, or the provider refused its tokens, so that person's open times are not offered at this business until it is reconnected; booked visits stay and the rest of the team is still offered (arch 05 line 271; arch 11 line 580; S12-13). unlinked: ended (the person took it off, left the team, or linked another calendar), its tokens erased and its busy blocks deleted.",
-          "source": "arch 05 line 271 ('a renewal still failing after section 10's Effects retries is a dropped link'); arch 11 line 580; S12-13, S12-14; RULES 8.7"
+          "description": "connecting: the person started connecting on a page they already have open (K-16 v1 connectStart: 'The caller (C-189) writes the link row first'), so the row exists with no tokens yet and nothing is read or watched; it takes no time out of offer (S1-24's safe default: 'nothing blocked yet'), and a start not finished, or declined, leaves it connecting for the next start to reuse. linked: the connect's return sealed the tokens (K-16 v1 connectReturn, tokensKept), and busy times are read in (arch 05 line 261). dropped: its change subscription could not be renewed after the effects retries, or the provider refused its tokens, so that person's open times are not offered at any business that reads the link until it is reconnected; booked visits stay and the rest of the team is still offered (arch 05 line 271; arch 11 line 580; S12-13); a reconnect leaves it dropped until the return. unlinked: ended (the person took it off, left every team that reads it, or linked another calendar), its tokens erased and its busy blocks deleted.",
+          "source": "K-16 v1 connectStart.request, connectReturn.response, tokensKept; S1-24 (safe default: 'nothing blocked yet, with one reminder'); arch 05 line 271 ('a renewal still failing after section 10's Effects retries is a dropped link'); arch 11 line 580; S12-13, S12-14; RULES 8.7"
         },
         {
           "name": "tokens",
@@ -1032,16 +1036,16 @@
           "null": true,
           "audience": "never",
           "sealedBy": "person_id",
-          "description": "The provider's OAuth tokens (the refresh token, and the access token with its expiry) as one value sealed under the person's key in K-04 sealing_keys (arch 05 line 271: 'Links keep their tokens sealed under the person's key'), never plain and never in a message, log or trace; the Tool API cannot read it (README rule 5). Null once unlinked. Its inner form is K-16's.",
-          "source": "arch 05 line 271; arch 01 line 93; BP rule 7; RULES 4.10; 02-contracts K-16 ('the tokens sealed under the person's key')"
+          "description": "The provider's OAuth tokens (the refresh token, and the access token with its expiry) as one value sealed under the person's key in K-04 sealing_keys (arch 05 line 271: 'Links keep their tokens sealed under the person's key'), never plain and never in a message, log or trace. Only the runtime side writes it: the calendar adapter seals it at the connect's return and seals each refresh again (K-16 v1 tokensKept: 'The adapter seals and keeps them at connectReturn'), and the Tool API can neither read nor write it (README rule 5). Null while connecting and once unlinked. Its inner form is K-16's.",
+          "source": "arch 05 line 271; arch 01 line 93; BP rule 7; RULES 4.10; 02-contracts K-16 ('the tokens sealed under the person's key'); K-16 v1 tokensKept, connectReturn.response (tokens: sealedUnderPersonKey); migration 0003 (sealing_keys reached only from the runtime side)"
         },
         {
           "name": "linked_at",
           "type": "timestamptz",
-          "null": false,
+          "null": true,
           "audience": ["staff", "owner"],
-          "description": "When the person connected it (the OAuth return), or S1-38 carried it over.",
-          "source": "S1-24 ('Connected'); S1-38"
+          "description": "When the connect's return sealed the tokens (K-16 v1 connectReturn linkedAt), first or at a reconnect; null while connecting, and on a link unlinked before it was ever linked.",
+          "source": "S1-24 ('Connected'); K-16 v1 connectReturn.response linkedAt; S12-13, S12-14 (reconnect)"
         },
         {
           "name": "sync_cursor",
@@ -1056,8 +1060,8 @@
           "type": "timestamptz",
           "null": true,
           "audience": ["owner"],
-          "description": "When the last read of changes finished (after a push, the 30-minute poll or a full read); a linked person's times are offered only up to 90 days after it. Null before the first.",
-          "source": "arch 05 line 265 ('Rosie reads 90 days ahead ... and never offers a linked person's time past that'); arch 11 line 578 (the 30-minute poll)"
+          "description": "When the last read of changes finished (after a push, the 30-minute poll or a full read); a linked person's times are offered only up to 90 days after it. Null before the first; a reconnect's return nulls it with sync_cursor, since the return moves linked_at past it (calendar_links_times_in_order) and everything since the drop is read again.",
+          "source": "arch 05 line 265 ('Rosie reads 90 days ahead ... and never offers a linked person's time past that'); arch 11 lines 578 (the 30-minute poll), 580 (a reconnect reads everything since)"
         },
         {
           "name": "subscription_id",
@@ -1072,8 +1076,8 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "Google's resource id for the watched calendar, which stopping the channel needs; null for Microsoft, or with no subscription.",
-          "source": "arch 05 line 261; 02-contracts K-16 ('Watch and renew')"
+          "description": "Google's resource id for the watched calendar, which stopping the channel needs; null for Microsoft, or with no subscription. Its writer is K-16 v1.1's watch and renew answers (lead card T-1082): K-16 v1's answers do not carry it, so until then it stays null.",
+          "source": "arch 05 line 261; 02-contracts K-16 ('Watch and renew'); K-16 v1 README spike row 1 (channels/stop with id and resourceId); lead card T-1082"
         },
         {
           "name": "subscribed_at",
@@ -1096,7 +1100,7 @@
           "type": "timestamptz",
           "null": true,
           "audience": ["staff", "owner"],
-          "description": "When it dropped; the owner is texted at once (S12-13). Null unless dropped; a reconnect clears it.",
+          "description": "When it dropped; the owner of each business that reads it is texted at once (S12-13). Null unless dropped; a reconnect's return clears it.",
           "source": "arch 11 line 580 ('The owner is texted at once'); S12-13"
         },
         {
@@ -1129,18 +1133,12 @@
           "null": false,
           "default": "1",
           "audience": "never",
-          "description": "The row's version: every update raises it by one, and each write (a sync mark, a renewal, a drop, a reconnect) compares and sets it, so two readers of one link never both move it.",
-          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+          "description": "The row's version: every update raises it by one, and each write (a sync mark, a renewal, a token refresh, a drop, a reconnect) compares and sets it, so two writers of one link never both move it. One version covers the tokens and the sync marks: a token refresh during a call raises it, so a caller whose compare-and-set of the cursor or the subscription then fails with versionChanged re-reads the row and applies its write again (safe: the same cursor reads the same changes, K-16 v1 readChanges).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2; K-16 v1 tokensKept (refresh and seal again), readChanges.request ('Repeating it with the same cursor is safe')"
         }
       ],
       "primaryKey": ["id"],
       "foreignKeys": [
-        {
-          "name": "calendar_links_business_fk",
-          "columns": ["business_id"],
-          "references": { "table": "businesses", "columns": ["id"] },
-          "onDelete": "restrict"
-        },
         {
           "name": "calendar_links_person_fk",
           "columns": ["person_id"],
@@ -1151,20 +1149,20 @@
       "unique": [
         {
           "name": "calendar_links_one_live_per_person",
-          "columns": ["business_id", "person_id"],
+          "columns": ["person_id"],
           "where": "state <> 'unlinked'",
-          "source": "FS row H03 ('Calendar link per person'); FS line 743 ('one calendar'); S1-24"
+          "source": "FS row H03 ('Calendar link per person'); FS line 743 ('one calendar'); S1-24 ('One person has one calendar across every kind of work and company'); 02-contracts row K-27 ('calendar links per person'); K-16 v1 calendarLinkId, watch.response (one person has one link)"
         },
         {
           "name": "calendar_links_subscription_key",
           "columns": ["provider", "subscription_id"],
           "where": "subscription_id is not null",
-          "source": "arch 05 line 261 (a notification names its channel or subscription)"
+          "source": "arch 05 line 261 (a notification names its channel or subscription); K-16 v1 README default 16 (Graph's 409 answers the person's one subscription)"
         },
         {
-          "name": "calendar_links_id_business_person_key",
-          "columns": ["id", "business_id", "person_id"],
-          "source": "arch 10 line 546 (a busy block keeps its link's business and person: busy_blocks_link_fk)"
+          "name": "calendar_links_id_person_key",
+          "columns": ["id", "person_id"],
+          "source": "S1-24 (each person links their own): a share and a busy block keep their link's person (calendar_link_shares_link_fk, busy_blocks_link_fk)"
         }
       ],
       "checks": [
@@ -1175,13 +1173,23 @@
         },
         {
           "name": "calendar_links_state_known",
-          "expression": "state in ('linked', 'dropped', 'unlinked')",
-          "source": "arch 05 line 271; arch 11 line 580"
+          "expression": "state in ('connecting', 'linked', 'dropped', 'unlinked')",
+          "source": "K-16 v1 connectStart.request (the row written first), connectReturn.response; arch 05 line 271; arch 11 line 580"
         },
         {
           "name": "calendar_links_tokens_while_live",
-          "expression": "(state = 'unlinked') = (tokens is null)",
-          "source": "arch 05 line 271 (tokens sealed); RULES 4.10 (nothing kept that is no longer needed)"
+          "expression": "(state in ('linked', 'dropped')) = (tokens is not null)",
+          "source": "K-16 v1 tokensKept ('The adapter seals and keeps them at connectReturn'); arch 05 line 271 (tokens sealed); RULES 4.10 (nothing kept that is no longer needed)"
+        },
+        {
+          "name": "calendar_links_linked_has_time",
+          "expression": "(state <> 'connecting' or linked_at is null) and (state not in ('linked', 'dropped') or linked_at is not null)",
+          "source": "K-16 v1 connectReturn.response linkedAt; S1-24 ('Connected')"
+        },
+        {
+          "name": "calendar_links_connecting_unread",
+          "expression": "state <> 'connecting' or (sync_cursor is null and synced_at is null and subscription_id is null)",
+          "source": "K-16 v1 connectReturn.response ('the caller then starts the link's watch and its first read'): a link with no tokens yet is never read or watched"
         },
         {
           "name": "calendar_links_dropped_has_time",
@@ -1219,7 +1227,116 @@
         {
           "name": "calendar_links_person_idx",
           "columns": ["person_id"],
-          "why": "A person's links across businesses, on the runtime side: S1-38's carry-over and erasure (FS line 743; RULES 4.10)."
+          "why": "A person's links, live and unlinked: S1-38's carry-over finds the live one, erasure finds them all (FS line 743; RULES 4.10)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A link is a person's, across every business they work in (S1-24: 'One person has one calendar across every kind of work and company'; FS line 743; K-16 v1 calendarLinkId: 'a link belongs to a person, never to one business'), so it has no business column. A Tool API call sees a link only through a live calendar_link_shares row of its own business, or in the call of the link's own person (K-22 v1 rosie.person_id), and never the tokens; every write is the runtime side's (README rule 5)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "calendar_link_shares",
+      "description": "A business that reads a person's calendar link: one row per link and business, while it reads it. A person links one calendar (S1-24; FS line 743), and each business they work in reads that one link through its own row: the business whose page the person connected on (registration screen 16, the owner console, the staff page: Q-10), and each next business S1-38's carry-over adds ('The ID, mobile, calendar and bill card carry over, never asked twice'). Through it the business sees only free or busy: the link's state and its busy blocks' times, never the tokens or what an event is (S1-24: 'Rosie sees only when Sam is busy, never what the job is'). So one change subscription and one set of busy blocks serve every business. A business stops reading it when the person takes it off that business or leaves its team (RULES 8.7): the row is ended, never deleted or reopened.",
+      "source": "S1-24 ('One person has one calendar across every kind of work and company'; 'Each person can link their own calendar when they join'); S1-38; S11-43 ('Each business sees only busy times from the other'); FS line 743 ('one calendar'; 'A booking in any of their businesses blocks that time in all of them'); FS row H03; arch 10 line 546; RULES 8.7; 02-contracts row K-27 ('calendar links per person'); K-16 v1 calendarLinkId",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The share's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "calendar_link_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link the business reads (calendar_links.id), held to its person by calendar_link_shares_link_fk.",
+          "source": "S1-24; K-16 v1 calendarLinkId"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Whose calendar (persons.id), copied from the link and held to it by calendar_link_shares_link_fk, so the Tool API's insert policy admits only the call's own person's link (README rule 5: each person shares their own).",
+          "source": "S1-24 ('Each person can link their own calendar when they join'); arch 05 line 261; K-22 v1 rule 4 (rosie.person_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business that reads the link (businesses.id): the business whose page the person connected on, or the next business S1-38 carried it over to.",
+          "source": "arch 10 line 546; S1-24; S1-38; S2-06; Q-10"
+        },
+        {
+          "name": "shared_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the business started reading the link: the connect's start on its page (K-16 v1 connectStart), or S1-38's carry-over.",
+          "source": "S1-24; S1-38; K-16 v1 connectStart.request"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the business stopped reading it: the person took it off this business, left its team (RULES 8.7), linked another calendar, or the link was unlinked; null while it reads it.",
+          "source": "RULES 8.7 (access ends when a person leaves); S11-49"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "calendar_link_shares_link_fk",
+          "columns": ["calendar_link_id", "person_id"],
+          "references": { "table": "calendar_links", "columns": ["id", "person_id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "calendar_link_shares_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "calendar_link_shares_one_per_person",
+          "columns": ["business_id", "person_id"],
+          "where": "ended_at is null",
+          "source": "S1-24 ('One person has one calendar'); FS line 743: a business reads one calendar per person, so a repeated connect start or carry-over never adds a second"
+        }
+      ],
+      "checks": [
+        {
+          "name": "calendar_link_shares_times_in_order",
+          "expression": "ended_at is null or ended_at >= shared_at",
+          "source": "S1-24; RULES 8.7"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "calendar_link_shares_link_idx",
+          "columns": ["calendar_link_id"],
+          "where": "ended_at is null",
+          "why": "The businesses that read a link: the read policies of calendar_links and busy_blocks (README rule 5), and a drop told to each business's owner (S12-13; C-182)."
         }
       ],
       "rowLevelSecurity": {
@@ -1232,7 +1349,7 @@
     },
     {
       "name": "busy_blocks",
-      "description": "When a person is busy, never what (S1-24: 'Rosie sees only when Sam is busy, never what the job is'): start, end and source only (arch 05 line 261). From a linked calendar, one row per busy event, or per repeat of a repeating event, read 90 days ahead (arch 05 line 265); or from a photo of the owner's schedule, one row per time read back, written only on the owner's yes (S1-24; arch 05 line 263; limit 6). An open time for the person at this business is outside every busy block (RULES 2.6). The table has no column for a title, description, place, attendee or organizer, so none can be stored (refuse-busy-block-title).",
+      "description": "When a person is busy, never what (S1-24: 'Rosie sees only when Sam is busy, never what the job is'): start, end and source only (arch 05 line 261). From a linked calendar, one row per busy event, or per repeat of a repeating event, read 90 days ahead (arch 05 line 265): such a block is its link's, so its person's, written once however many businesses read the link, and each of them reads it through its live calendar_link_shares row; or from a photo of the owner's schedule, one row per time read back, written only on the owner's yes (S1-24; arch 05 line 263; limit 6), for the business whose owner said it. An open time for the person at a business is outside every busy block it reads (RULES 2.6). The table has no column for a title, description, place, attendee or organizer, so none can be stored (refuse-busy-block-title).",
       "source": "arch 05 lines 259, 261 ('Rosie keeps each busy block's start, end and source, never its title'), 263, 265; arch 11 line 578; S1-24 (gives calendar); S12-33 ('The event's title is never shown'); RULES 2.6; MC 8 'Calendars' ('busy times only'); 02-contracts row K-27 ('busy blocks with start, end and source, never the title'); 02-contracts K-02 v1.1 (schedule: busy times with start and end, never what the job is)",
       "columns": [
         {
@@ -1246,17 +1363,17 @@
         {
           "name": "business_id",
           "type": "text",
-          "null": false,
+          "null": true,
           "audience": "never",
-          "description": "The business it blocks the person at (businesses.id): its link's, or the business whose owner sent the photo.",
-          "source": "arch 10 line 546; S1-24"
+          "description": "For a photo block, the business whose owner said yes to its times, where it blocks the person (businesses.id); null for a calendar block, which is its link's, and is read by each business that reads the link through its live share (README rule 5).",
+          "source": "arch 10 line 546; S1-24; FS line 743; K-16 v1 calendarLinkId"
         },
         {
           "name": "person_id",
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "Whose busy time (persons.id): the link's person, or, for a photo, the person whose schedule it is (S1-24: the owner's own).",
+          "description": "Whose busy time (persons.id): the link's person (held to it by busy_blocks_link_fk), or, for a photo, the person whose schedule it is (S1-24: the owner's own).",
           "source": "arch 05 line 261 ('the person's busy blocks'); S1-24; FS line 743"
         },
         {
@@ -1272,7 +1389,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "For a calendar block, the link it was read through (calendar_links.id), held to the same business and person by the foreign key; null for a photo.",
+          "description": "For a calendar block, the link it was read through (calendar_links.id), held to the same person by the foreign key; null for a photo.",
           "source": "arch 05 line 261"
         },
         {
@@ -1341,8 +1458,8 @@
         },
         {
           "name": "busy_blocks_link_fk",
-          "columns": ["calendar_link_id", "business_id", "person_id"],
-          "references": { "table": "calendar_links", "columns": ["id", "business_id", "person_id"] },
+          "columns": ["calendar_link_id", "person_id"],
+          "references": { "table": "calendar_links", "columns": ["id", "person_id"] },
           "onDelete": "restrict"
         },
         {
@@ -1368,8 +1485,8 @@
         },
         {
           "name": "busy_blocks_source_fields",
-          "expression": "(source = 'calendar' and calendar_link_id is not null and provider_event_ref is not null and confirmed_at is null and confirmed_by_person_id is null) or (source = 'photo' and calendar_link_id is null and provider_event_ref is null and confirmed_at is not null and confirmed_by_person_id is not null)",
-          "source": "arch 05 lines 261, 263 ('its times block on the owner's yes'); S1-24; limit 6"
+          "expression": "(source = 'calendar' and business_id is null and calendar_link_id is not null and provider_event_ref is not null and confirmed_at is null and confirmed_by_person_id is null) or (source = 'photo' and business_id is not null and calendar_link_id is null and provider_event_ref is null and confirmed_at is not null and confirmed_by_person_id is not null)",
+          "source": "arch 05 lines 261, 263 ('its times block on the owner's yes'); S1-24; limit 6; FS line 743 (a calendar block is its link's, so its person's)"
         },
         {
           "name": "busy_blocks_during_bounded",
@@ -1393,12 +1510,12 @@
           "name": "busy_blocks_link_idx",
           "columns": ["calendar_link_id"],
           "where": "calendar_link_id is not null",
-          "why": "A link's blocks, deleted when it is unlinked."
+          "why": "A link's blocks: the read policy through its shares (README rule 5), a full read replacing them, and their delete when it is unlinked."
         }
       ],
       "rowLevelSecurity": {
-        "scope": "business",
-        "column": "business_id"
+        "scope": "none",
+        "why": "A calendar block is its link's, so a person's across every business they work in (FS line 743), and has no business: a Tool API call sees it only through a live calendar_link_shares row of its own business. A photo block has its business, and a Tool API call sees and writes only its own business's photo blocks (README rule 5)."
       },
       "versioned": true,
       "versionColumn": "version",

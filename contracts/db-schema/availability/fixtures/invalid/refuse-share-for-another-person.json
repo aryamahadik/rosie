@@ -1,0 +1,23 @@
+{
+  "after": ["seed-calendar-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam"
+    },
+    "action": "insert",
+    "table": "calendar_link_shares",
+    "values": {
+      "id": "share-riley-home-services",
+      "calendar_link_id": "callink-riley-google",
+      "person_id": "person-riley",
+      "business_id": "biz-lee-home-services",
+      "shared_at": "2026-11-07T17:00:00Z"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

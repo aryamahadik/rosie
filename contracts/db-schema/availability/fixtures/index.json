@@ -21,24 +21,24 @@
       "version": "v1",
       "table": "class_sessions",
       "expect": "accept",
-      "shows": "The yoga studio's timetable class Hot Flow, Saturdays 10:00 to 11:00am with Maya in the Studio room, 12 seats Rosie can book and a minimum of 3; its Sat Nov 14 session (a K-04 class_session resource with its class_seats counter at capacity 12) and its Sat Nov 7 session, counted 24 hours before with too few and cancelled by Sam; and K-04's one-off Handstand workshop, Sat Nov 14 11:00am to 1:00pm with Maya in the same room (10 seats in its K-04 counter, 2 taken), as a session with no class",
-      "source": "S1-83 ('Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run'; 'At the plug-in's cutoff, Rosie counts the bookings. Too few: the owner decides to run it or cancel'); A4-33 ('Each shows its teacher, room and seats left'); FS rows K01, K02; FS line 726; K-04 v1 seed-resources, seed-class-seats; fixtures/v1/test-kit/shops/yoga.json (the Handstand workshop with Maya, Sat 11:00am, 10 spots; the Hot Flow class; 'Maya teaches Saturday mornings alone'; cutoff '24 hours before')"
+      "shows": "The yoga studio's timetable class Hot Flow, Saturdays 10:00 to 11:00am with Maya in the Studio room, 12 seats Rosie can book and a minimum of 3; its Sat Nov 14 session (a K-04 class_session resource with its class_seats counter at capacity 12) and its Sat Nov 7 session, counted 24 hours before with too few and cancelled by Sam; and K-04's one-off Handstand workshop, Sat Nov 14 11:00am to 1:00pm with Maya in the same room (10 seats in its K-04 counter, 2 taken), as a session with no class; each selling a K-25 service of the yoga studio (the Handstand workshop and the Hot Flow class, written here as K-25 services rows of kind yoga), held to it by classes_service_fk and class_sessions_service_fk",
+      "source": "S1-83 ('Each class gets its day and time, who teaches and the room. It also gets the spots Rosie can book and the fewest it needs to run'; 'At the plug-in's cutoff, Rosie counts the bookings. Too few: the owner decides to run it or cancel'); A4-33 ('Each shows its teacher, room and seats left'); FS rows K01, K02; FS line 726; K-04 v1 seed-resources, seed-class-seats; K-24 v1 seed-kinds-sample (kind yoga); K-25 v1 services, services_id_business_key; fixtures/v1/test-kit/shops/yoga.json (the Handstand workshop with Maya, Sat 11:00am, 10 spots; the Hot Flow class; 'Maya teaches Saturday mornings alone'; cutoff '24 hours before')"
     },
     {
       "file": "seed-calendar-link.json",
       "version": "v1",
       "table": "calendar_links",
       "expect": "accept",
-      "shows": "Sam's Google calendar linked for Lee's Barbershop at S1-24 (Mon Oct 19, 2:16pm), dropped at 4:30pm Mon Nov 9 when its subscription's renewal kept failing, with the one reminder 24 hours later; the same calendar carried over to Lee Home Services at S1-38 (Tue Oct 20, 10:44am) and still linked, one row per business; Riley's Microsoft calendar linked on his staff page (S2-06); each row with its tokens sealed under the person's K-22 seed key, its sync cursor and its change subscription",
-      "source": "S1-24 ('Connected'; 'One person has one calendar across every kind of work and company'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-06; S12-13 ('Mon Nov 9, 4:30pm'; 'His open times come off until it's back'); S12-14; arch 05 lines 261, 271; arch 11 line 580; FS row H03; K-22 v1 seed-owner-id-upload and seed-emergency-contact (Sam's and Riley's sealing keys)"
+      "shows": "One link per person, in K-16 v1's double world: Sam's Outlook calendar (callink-sam-microsoft), linked at S1-24 (Mon Oct 19, 2:16pm) and read by Lee's Barbershop, carried over to Lee Home Services at S1-38 (Tue Oct 20, 10:44am) as a second share of the same link, its one Graph subscription graph-sub-sam-01, dropped at 4:30pm Mon Nov 9 when that subscription's renewal kept failing, with the one reminder 24 hours later; Riley's Google calendar (callink-riley-google), linked on his staff page (S2-06) and read by Lee's Barbershop, with its one channel and Google's resource id; Avery connecting a Google calendar on his staff page, the row written at the connect's start with no tokens and no linked time; the linked and dropped rows' tokens sealed under the person's K-22 seed key",
+      "source": "S1-24 ('Connected'; 'One person has one calendar across every kind of work and company'); S1-38 ('The ID, mobile, calendar and bill card carry over, never asked twice'); S2-06; S12-13 ('Mon Nov 9, 4:30pm'; 'His open times come off until it's back'); S12-14; arch 05 lines 261, 271; arch 11 line 580; FS row H03; FS line 743; 02-contracts row K-27 ('calendar links per person'); K-16 v1 calendarLinkId, connectStart.request, connectReturn.response, README 'The double' (Sam on Outlook, Riley on Google), fixtures connect-return-google, renew-google, renew-microsoft, renewal-failed-dropped-link, notification-google; K-22 v1 seed-owner-id-upload and seed-emergency-contact (Sam's and Riley's sealing keys)"
     },
     {
       "file": "seed-busy-block.json",
       "version": "v1",
       "table": "busy_blocks",
       "expect": "accept",
-      "shows": "Times only, never what: Riley's personal event over Ben T.'s visit on Sat Nov 7 at 2:00pm, read from his linked calendar with its zone; a job already on Sam's calendar blocking Thu Nov 12 at Lee Home Services; and, for the movers, a time read from a photo of Sam's schedule that blocks only from his yes to the read-back",
-      "source": "S12-33 ('Riley adds a personal event to the phone calendar, over Ben T.'s booked visit'; 'The event's title is never shown'); S1-24 ('jobs already booked block those times'; 'Or Sam sends a photo of the schedule'; 'Rosie sees only when Sam is busy, never what'); arch 05 lines 261, 263, 265; limit 6"
+      "shows": "Times only, never what: Riley's personal event over Ben T.'s visit on Sat Nov 7 at 2:00pm, read from his linked calendar with its zone; one occurrence of a repeating event on Sam's Outlook calendar, Thu Nov 12 (as K-16 v1's full read answers it), written once on his link and read by both his businesses through their shares; both calendar blocks with no business; and, for the movers, a time read from a photo of Sam's schedule that blocks only from his yes to the read-back",
+      "source": "S12-33 ('Riley adds a personal event to the phone calendar, over Ben T.'s booked visit'; 'The event's title is never shown'); S1-24 ('jobs already booked block those times'; 'Or Sam sends a photo of the schedule'; 'Rosie sees only when Sam is busy, never what'); arch 05 lines 261, 263, 265; limit 6; FS line 743; K-16 v1 changes-full-read.json (graph-ev-sam-series-01-20261112)"
     },
     {
       "file": "invalid/refuse-busy-block-title.json",
@@ -53,15 +53,15 @@
       "version": "v1",
       "table": "busy_blocks",
       "expect": "refuse",
-      "shows": "A Tool API call scoped to the yoga studio reading Riley's busy block at Lee's Barbershop gets no row (row-level security per business); the same read in the barbershop's own scope gets it",
-      "source": "arch 10 line 546 ('Row-level security per business on every Tool API call'); S11-43 ('Each business sees only busy times from the other'); RULES 4.5"
+      "shows": "A Tool API call scoped to the yoga studio, which reads no link of Riley's, reading Riley's calendar block gets no row (the read policy admits a calendar block only through a live share of its link); the same read in the scope of Lee's Barbershop, which reads Riley's link, gets it",
+      "source": "arch 10 line 546 ('Row-level security per business on every Tool API call'); README rule 5; FS line 743; RULES 4.5"
     },
     {
       "file": "invalid/refuse-calendar-tokens-read.json",
       "version": "v1",
       "table": "calendar_links",
       "expect": "refuse",
-      "shows": "A Tool API read of Riley's link naming its sealed tokens is refused (SQLSTATE 42501: no Tool API grant reaches tokens); the same read of its id, provider and state passes",
+      "shows": "A Tool API read of Riley's link, scoped to Lee's Barbershop, which reads it through its share, naming the sealed tokens is refused (SQLSTATE 42501: no Tool API grant reaches tokens); the same read of its id, provider and state passes",
       "source": "arch 05 line 271 ('Links keep their tokens sealed under the person's key'); BP rule 7; README rule 5"
     },
     {
@@ -85,8 +85,24 @@
       "version": "v1",
       "table": "calendar_links",
       "expect": "refuse",
-      "shows": "Avery linking an Apple iCloud calendar is refused (CHECK calendar_links_provider_known, SQLSTATE 23514); the same link as Google passes",
-      "source": "Q-11 ('Apple iCloud calendars: Not linked'); MC 8 'Calendars' ('Google and Microsoft'); 02-contracts K-16 (refuse-icloud)"
+      "shows": "Avery's connect start writing a link row for an Apple iCloud calendar (the runtime side's write of a link, still connecting, with no tokens) is refused (CHECK calendar_links_provider_known, SQLSTATE 23514); the same row as Google passes",
+      "source": "Q-11 ('Apple iCloud calendars: Not linked'); MC 8 'Calendars' ('Google and Microsoft'); 02-contracts K-16 (refuse-icloud); K-16 v1 connectStart.request; README rule 5"
+    },
+    {
+      "file": "invalid/refuse-connecting-with-tokens.json",
+      "version": "v1",
+      "table": "calendar_links",
+      "expect": "refuse",
+      "shows": "The connect's return writing Avery's sealed tokens into his link while leaving it connecting is refused (CHECK calendar_links_tokens_while_live, SQLSTATE 23514); the same write that also moves it to linked with its linked time passes, as K-16 v1's connectReturn writes it on the runtime side",
+      "source": "K-16 v1 tokensKept ('The adapter seals and keeps them at connectReturn'), connectReturn.response (linked, linkedAt); arch 05 line 271; README rule 5"
+    },
+    {
+      "file": "invalid/refuse-share-for-another-person.json",
+      "version": "v1",
+      "table": "calendar_link_shares",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Home Services and acting for Sam giving that business a share of Riley's calendar is refused by the insert policy (SQLSTATE 42501); the same share in Riley's own call passes, as when he carries his calendar to a business he joins",
+      "source": "S1-24 ('Each person can link their own calendar when they join'); arch 05 line 261 ('Each person links their own calendar'); S1-38; FS line 743; K-22 v1 rule 4 (rosie.person_id); README rule 5"
     }
   ]
 }

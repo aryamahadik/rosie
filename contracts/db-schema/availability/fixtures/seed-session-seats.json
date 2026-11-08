@@ -1,6 +1,42 @@
 {
-  "after": ["seed-hours.json", "../../core/fixtures/seed-class-seats.json"],
+  "after": [
+    "seed-hours.json",
+    "../../core/fixtures/seed-class-seats.json",
+    "../../kinds-of-work/fixtures/seed-kinds-sample.json"
+  ],
   "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-handstand-workshop",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Handstand workshop",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "2 hours",
+        "position": 1,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Hot Flow class",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "1 hour",
+        "position": 2,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
     {
       "table": "classes",
       "values": {

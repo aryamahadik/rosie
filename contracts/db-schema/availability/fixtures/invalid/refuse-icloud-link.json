@@ -1,21 +1,16 @@
 {
-  "after": ["seed-calendar-link.json"],
+  "after": ["../../core/fixtures/seed-person-roles.json"],
   "rows": [],
   "refused": {
-    "role": "toolApi",
-    "scope": {
-      "businessId": "biz-lees-barbershop"
-    },
+    "role": "runtime",
+    "scope": null,
     "action": "insert",
     "table": "calendar_links",
     "values": {
-      "id": "callink-avery-barbershop",
-      "business_id": "biz-lees-barbershop",
+      "id": "callink-avery-icloud",
       "person_id": "person-avery",
       "provider": "apple",
-      "state": "linked",
-      "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d61766572792d6e6f742d7265616c",
-      "linked_at": "2026-11-07T16:00:00Z",
+      "state": "connecting",
       "version": 1
     },
     "expect": {

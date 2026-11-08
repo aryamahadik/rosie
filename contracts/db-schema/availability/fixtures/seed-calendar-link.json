@@ -7,19 +7,18 @@
     {
       "table": "calendar_links",
       "values": {
-        "id": "callink-sam-barbershop",
-        "business_id": "biz-lees-barbershop",
+        "id": "callink-sam-microsoft",
         "person_id": "person-sam",
-        "provider": "google",
+        "provider": "microsoft",
         "state": "dropped",
-        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d73616d2d62617262657273686f702d6e6f742d7265616c",
+        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d73616d2d6d6963726f736f66742d6e6f742d7265616c",
         "linked_at": "2026-10-19T18:16:00Z",
-        "sync_cursor": "sync-token-demo-sam-barbershop-41",
+        "sync_cursor": "graph-delta-sam-0009",
         "synced_at": "2026-11-09T21:00:00Z",
-        "subscription_id": "channel-demo-sam-barbershop-3",
-        "subscription_resource_id": "resource-demo-sam-primary",
-        "subscribed_at": "2026-11-06T09:20:00Z",
-        "subscription_expires_at": "2026-11-13T09:20:00Z",
+        "subscription_id": "graph-sub-sam-01",
+        "subscription_resource_id": null,
+        "subscribed_at": "2026-11-06T09:21:30Z",
+        "subscription_expires_at": "2026-11-13T09:20:30Z",
         "dropped_at": "2026-11-09T21:30:00Z",
         "dropped_why": "renewal_failed",
         "drop_reminded_at": "2026-11-10T21:30:00Z",
@@ -30,47 +29,93 @@
     {
       "table": "calendar_links",
       "values": {
-        "id": "callink-sam-home-services",
-        "business_id": "biz-lee-home-services",
-        "person_id": "person-sam",
+        "id": "callink-riley-google",
+        "person_id": "person-riley",
         "provider": "google",
         "state": "linked",
-        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d73616d2d686f6d652d73657276696365732d6e6f742d7265616c",
-        "linked_at": "2026-10-20T14:44:00Z",
-        "sync_cursor": "sync-token-demo-sam-home-services-12",
-        "synced_at": "2026-11-07T13:30:00Z",
-        "subscription_id": "channel-demo-sam-home-services-2",
-        "subscription_resource_id": "resource-demo-sam-primary",
-        "subscribed_at": "2026-11-04T13:30:00Z",
-        "subscription_expires_at": "2026-11-11T13:30:00Z",
-        "dropped_at": null,
-        "dropped_why": null,
-        "drop_reminded_at": null,
-        "unlinked_at": null,
-        "version": 5
-      }
-    },
-    {
-      "table": "calendar_links",
-      "values": {
-        "id": "callink-riley-barbershop",
-        "business_id": "biz-lees-barbershop",
-        "person_id": "person-riley",
-        "provider": "microsoft",
-        "state": "linked",
-        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d72696c65792d62617262657273686f702d6e6f742d7265616c",
-        "linked_at": "2026-10-19T15:04:00Z",
-        "sync_cursor": "delta-link-demo-riley-7",
+        "tokens": "\\x6b32372d736565642d7365616c65642d746f6b656e732d72696c65792d676f6f676c652d6e6f742d7265616c",
+        "linked_at": "2026-11-02T15:01:11Z",
+        "sync_cursor": "gcal-sync-riley-0004",
         "synced_at": "2026-11-07T19:05:00Z",
-        "subscription_id": "subscription-demo-riley-5",
-        "subscription_resource_id": null,
-        "subscribed_at": "2026-11-06T15:00:00Z",
-        "subscription_expires_at": "2026-11-09T09:00:00Z",
+        "subscription_id": "gcal-channel-riley-02",
+        "subscription_resource_id": "gcal-resource-riley-primary",
+        "subscribed_at": "2026-11-06T03:02:00Z",
+        "subscription_expires_at": "2026-11-13T03:02:00Z",
         "dropped_at": null,
         "dropped_why": null,
         "drop_reminded_at": null,
         "unlinked_at": null,
         "version": 7
+      }
+    },
+    {
+      "table": "calendar_links",
+      "values": {
+        "id": "callink-avery-google",
+        "person_id": "person-avery",
+        "provider": "google",
+        "state": "connecting",
+        "tokens": null,
+        "linked_at": null,
+        "sync_cursor": null,
+        "synced_at": null,
+        "subscription_id": null,
+        "subscription_resource_id": null,
+        "subscribed_at": null,
+        "subscription_expires_at": null,
+        "dropped_at": null,
+        "dropped_why": null,
+        "drop_reminded_at": null,
+        "unlinked_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "calendar_link_shares",
+      "values": {
+        "id": "share-sam-barbershop",
+        "calendar_link_id": "callink-sam-microsoft",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "shared_at": "2026-10-19T18:15:00Z",
+        "ended_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "calendar_link_shares",
+      "values": {
+        "id": "share-sam-home-services",
+        "calendar_link_id": "callink-sam-microsoft",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-home-services",
+        "shared_at": "2026-10-20T14:44:00Z",
+        "ended_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "calendar_link_shares",
+      "values": {
+        "id": "share-riley-barbershop",
+        "calendar_link_id": "callink-riley-google",
+        "person_id": "person-riley",
+        "business_id": "biz-lees-barbershop",
+        "shared_at": "2026-11-02T15:00:00Z",
+        "ended_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "calendar_link_shares",
+      "values": {
+        "id": "share-avery-barbershop",
+        "calendar_link_id": "callink-avery-google",
+        "person_id": "person-avery",
+        "business_id": "biz-lees-barbershop",
+        "shared_at": "2026-11-07T16:00:00Z",
+        "ended_at": null,
+        "version": 1
       }
     }
   ]
