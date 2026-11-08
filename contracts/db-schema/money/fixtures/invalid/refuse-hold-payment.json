@@ -1,0 +1,216 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-person-roles.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-grooms-card",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0099"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0099",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T15:18:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-grooms-1",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0100"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0100",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T15:20:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-grooms-1",
+        "booking_id": "booking-alex-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-grooms-package",
+        "service_money_id": "way-lees-grooms-package-shop",
+        "price_rule_id": "price-lees-grooms-package",
+        "quote_option_id": null,
+        "path": "list|deposit|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 14000,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": 4000,
+        "fee_cents": 4000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-grooms-save-card",
+        "turn_id": "turn-alex-grooms-card",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-grooms-package",
+        "kind": "stripe_save_card",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": null,
+        "currency": null,
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "customerId": "stripe-customer-demo-alex"
+        },
+        "idempotency_key": "eff-alex-grooms-save-card",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-07T15:18:01Z",
+        "last_try_at": "2026-11-07T15:18:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-setup-demo-alex-2",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-alex-0099",
+        "created_at": "2026-11-07T15:18:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "saved_cards",
+      "values": {
+        "id": "card-alex-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-alex",
+        "booking_id": "booking-alex-grooms-package",
+        "membership_id": null,
+        "stripe_customer_id": "stripe-customer-demo-alex",
+        "stripe_payment_method_id": "stripe-card-demo-alex",
+        "save_effect_id": "eff-alex-grooms-save-card",
+        "saved_from_payment_id": null,
+        "asked_at": "2026-11-07T15:18:00Z",
+        "saved_at": "2026-11-07T15:19:10Z",
+        "replaced_at": null,
+        "removed_at": null,
+        "removed_why": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-grooms-deposit",
+        "turn_id": "turn-alex-grooms-1",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-grooms-package",
+        "kind": "stripe_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": 4000,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "purpose": "deposit",
+          "customerId": "stripe-customer-demo-alex",
+          "paymentMethodId": "stripe-card-demo-alex",
+          "customerPresent": true,
+          "description": "Lee's Barbershop: deposit for the Groom's package"
+        },
+        "idempotency_key": "eff-alex-grooms-deposit",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-07T15:20:01Z",
+        "last_try_at": "2026-11-07T15:20:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-0001",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-alex-0100",
+        "created_at": "2026-11-07T15:20:00Z",
+        "version": 3
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "payments",
+    "values": {
+      "id": "pay-alex-grooms-deposit",
+      "business_id": "biz-lees-barbershop",
+      "payer_person_id": "person-alex",
+      "booking_id": "booking-alex-grooms-package",
+      "purpose": "deposit",
+      "method": "card",
+      "amount_cents": 4000,
+      "currency": "USD",
+      "state": "held",
+      "effect_id": "eff-alex-grooms-deposit",
+      "saved_card_id": "card-alex-grooms-package",
+      "booking_fee_id": null,
+      "plan_charge_id": null,
+      "recorded_by_person_id": null,
+      "asked_at": "2026-11-07T15:20:00Z",
+      "paid_at": null,
+      "failed_at": null,
+      "failed_why": null,
+      "cancelled_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["payments_state_known"]
+    }
+  }
+}

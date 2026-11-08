@@ -1,0 +1,179 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-person-roles.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-done-alex-home",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0091"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0091",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-05T16:05:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-home-grooming",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "stage": "done",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-home-grooming-1",
+        "booking_id": "booking-alex-home-grooming",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-home-grooming",
+        "service_money_id": "way-lees-home-grooming-home",
+        "price_rule_id": "price-lees-home-grooming",
+        "quote_option_id": null,
+        "path": "list|card|bill",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 17900,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 8900,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-home-grooming-bill",
+        "turn_id": "turn-sam-done-alex-home",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-home-grooming",
+        "kind": "stripe_pay_link",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": 17900,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "purpose": "rest",
+          "customerId": "stripe-customer-demo-alex",
+          "saveCardForLater": false,
+          "description": "Lee's Barbershop: home grooming visit, Thu Nov 5"
+        },
+        "idempotency_key": "eff-alex-home-grooming-bill",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-05T16:05:01Z",
+        "last_try_at": "2026-11-05T16:05:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-home-0001",
+        "error_code": null,
+        "ledger_line_id": "ledger-alex-home-grooming-rest",
+        "trace_id": "trace-sam-0091",
+        "created_at": "2026-11-05T16:05:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-alex-home-grooming-rest",
+        "business_id": "biz-lees-barbershop",
+        "payer_person_id": "person-alex",
+        "booking_id": "booking-alex-home-grooming",
+        "purpose": "rest",
+        "method": "card",
+        "amount_cents": 17900,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-alex-home-grooming-bill",
+        "saved_card_id": null,
+        "booking_fee_id": null,
+        "plan_charge_id": null,
+        "recorded_by_person_id": null,
+        "asked_at": "2026-11-05T16:05:00Z",
+        "paid_at": "2026-11-06T00:30:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "payment_items",
+      "values": {
+        "id": "item-alex-home-grooming-rest-1",
+        "payment_id": "pay-alex-home-grooming-rest",
+        "business_id": "biz-lees-barbershop",
+        "booking_line_id": "line-alex-home-grooming-1",
+        "share": "rest",
+        "amount_cents": 17900,
+        "currency": "USD"
+      }
+    },
+    {
+      "table": "pay_links",
+      "values": {
+        "id": "link-alex-home-grooming-bill",
+        "business_id": "biz-lees-barbershop",
+        "payment_id": "pay-alex-home-grooming-rest",
+        "person_id": "person-alex",
+        "given_via": ["text", "email"],
+        "code_sha256": "05099c868a54bf0280cd24b1950842c891e1df53f1a84b1201c8b0767145fe58",
+        "due_at": null,
+        "sent_at": "2026-11-05T16:05:03Z",
+        "ended_at": "2026-11-06T00:30:02Z",
+        "ended_why": "paid",
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-alex-home-grooming-rest",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-home-grooming",
+        "kind": "charge",
+        "amount_cents": 17900,
+        "currency": "USD",
+        "payment_id": "pay-alex-home-grooming-rest",
+        "refund_id": null,
+        "effect_id": "eff-alex-home-grooming-bill",
+        "stripe_object_id": "stripe-charge-demo-home-0001",
+        "moved_at": "2026-11-06T00:30:02Z",
+        "written_by": "provider_event",
+        "written_at": "2026-11-06T00:30:03Z"
+      }
+    }
+  ]
+}

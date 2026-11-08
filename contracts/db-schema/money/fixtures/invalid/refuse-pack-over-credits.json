@@ -1,0 +1,23 @@
+{
+  "after": ["seed-pack-credits.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "update",
+    "table": "packs",
+    "set": {
+      "credits_used": 6,
+      "version": 3
+    },
+    "where": {
+      "id": "pack-alex-yoga-5-visits"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["packs_credits_within_total"]
+    }
+  }
+}

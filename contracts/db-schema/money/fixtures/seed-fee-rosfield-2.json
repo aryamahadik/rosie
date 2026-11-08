@@ -1,0 +1,92 @@
+{
+  "after": [
+    "../../bookings-changes/fixtures/seed-booking-flow-a.json",
+    "../../platform-billing/fixtures/seed-monthly-bill.json"
+  ],
+  "rows": [
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-owen-plan-oct31-1",
+        "booking_id": "booking-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": null,
+        "arrival_window": null,
+        "cutoff_at": null,
+        "check_in_code": null,
+        "code_for_person_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-ben-trim-1",
+        "booking_id": "booking-ben-trim",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": null,
+        "arrival_window": null,
+        "cutoff_at": null,
+        "check_in_code": null,
+        "code_for_person_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "rosfield_fees",
+      "values": {
+        "id": "fee-rosfield2-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "booking_id": "booking-alex-haircut",
+        "visit_id": "visit-alex-haircut-1",
+        "plan_charge_id": null,
+        "counted_at": "2026-10-24T15:01:00Z",
+        "counted_by": "check_in_code",
+        "counts_for_person_id": "person-riley",
+        "month": "2026-10-01",
+        "amount_cents": 200,
+        "currency": "USD",
+        "plan_charge_cents": null
+      }
+    },
+    {
+      "table": "rosfield_fees",
+      "values": {
+        "id": "fee-rosfield2-ben-trim",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "booking_id": "booking-ben-trim",
+        "visit_id": "visit-ben-trim-1",
+        "plan_charge_id": null,
+        "counted_at": "2026-10-29T18:30:00Z",
+        "counted_by": "done",
+        "counts_for_person_id": "person-avery",
+        "month": "2026-10-01",
+        "amount_cents": 200,
+        "currency": "USD",
+        "plan_charge_cents": null
+      }
+    },
+    {
+      "table": "rosfield_fees",
+      "values": {
+        "id": "fee-rosfield2-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "booking_id": "booking-owen-plan-oct31",
+        "visit_id": "visit-owen-plan-oct31-1",
+        "plan_charge_id": null,
+        "counted_at": "2026-10-31T14:40:00Z",
+        "counted_by": "done",
+        "counts_for_person_id": "person-riley",
+        "month": "2026-10-01",
+        "amount_cents": 200,
+        "currency": "USD",
+        "plan_charge_cents": null
+      }
+    }
+  ]
+}

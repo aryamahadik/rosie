@@ -1,0 +1,19 @@
+{
+  "after": ["seed-payment-deposit.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "ledger_lines",
+    "set": {
+      "amount_cents": 14000
+    },
+    "where": {
+      "id": "ledger-alex-grooms-deposit"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

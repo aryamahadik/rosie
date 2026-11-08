@@ -1,0 +1,19 @@
+{
+  "after": ["seed-fee-rosfield-2.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "rosfield_fees",
+    "set": {
+      "amount_cents": 0
+    },
+    "where": {
+      "id": "fee-rosfield2-ben-trim"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

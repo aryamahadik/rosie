@@ -1,0 +1,36 @@
+{
+  "after": ["seed-payment-deposit.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "payments",
+    "values": {
+      "id": "pay-alex-grooms-deposit-again",
+      "business_id": "biz-lees-barbershop",
+      "payer_person_id": "person-alex",
+      "booking_id": "booking-alex-grooms-package",
+      "purpose": "deposit",
+      "method": "card",
+      "amount_cents": 4000,
+      "currency": "USD",
+      "state": "paid",
+      "effect_id": "eff-alex-grooms-deposit",
+      "saved_card_id": "card-alex-grooms-package",
+      "booking_fee_id": null,
+      "plan_charge_id": null,
+      "recorded_by_person_id": null,
+      "asked_at": "2026-11-07T15:20:00Z",
+      "paid_at": "2026-11-07T15:24:02Z",
+      "failed_at": null,
+      "failed_why": null,
+      "cancelled_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": ["payments_effect_key"]
+    }
+  }
+}

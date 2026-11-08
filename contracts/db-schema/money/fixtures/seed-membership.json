@@ -1,0 +1,400 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-phone-chat-open.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json",
+    "../../platform-billing/fixtures/seed-monthly-bill.json"
+  ],
+  "rows": [
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-owen",
+        "kind": "phone",
+        "address": "+15555550147"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-owen",
+        "handle_id": "handle-owen"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550147",
+        "handle_id": "handle-owen",
+        "chat_open": true,
+        "chat_open_at": "2026-10-03T12:55:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-03T12:54:00Z",
+        "optout_line_delivered_at": "2026-10-03T12:55:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-owen-barber",
+        "person_id": "person-owen",
+        "business_id": "biz-lees-barbershop",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-owen-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-owen",
+        "name": "Owen H.",
+        "mobile_handle_id": "handle-owen",
+        "email_handle_id": null,
+        "way": "texts",
+        "contact_times": null,
+        "first_name_only": false,
+        "no_voicemail": false,
+        "age_band": "18_or_older",
+        "fee_free": false,
+        "added_at": "2026-10-03T13:05:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-owen-plan-terms",
+        "person_id": "person-owen",
+        "business_id": "biz-lees-barbershop",
+        "kind": "plan_terms",
+        "revoked": false,
+        "handle_id": null,
+        "booking_id": null,
+        "exact_words": "The plan's terms, before any card: / Haircut plan · every 4 weeks / Saturdays · 10:00am · Riley / Each visit: $35 / Each visit is booked and paid like this one / Skip, pause or end any time, by text",
+        "words_sha256": "2937e94f74559c036e4533e7ec73e6c8576878ed71ae90b148154317b44f3f87",
+        "at": "2026-10-03T13:04:00Z",
+        "channel": "page",
+        "chat_link_id": null,
+        "turn_id": null
+      }
+    },
+    {
+      "table": "memberships",
+      "values": {
+        "id": "plan-owen-haircut",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-owen",
+        "service_id": "svc-lees-haircut",
+        "kind": "plan",
+        "name": "Haircut plan · every 4 weeks",
+        "price_cents": 3500,
+        "currency": "USD",
+        "period": "28 days",
+        "billed": "per_visit",
+        "visits_per_period": null,
+        "terms_consent_id": "consent-owen-plan-terms",
+        "started_on": "2026-10-03",
+        "renews_on": "2026-12-26",
+        "next_charge_on": null,
+        "status": "active",
+        "paused_at": null,
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-owen-plan-card",
+        "handle_id": "handle-owen",
+        "event_ids": ["evt-owen-0001"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-owen-0001",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-03T13:04:30Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-owen-plan-save-card",
+        "turn_id": "turn-owen-plan-card",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "kind": "stripe_save_card",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-owen",
+        "handle_id": null,
+        "amount_cents": null,
+        "currency": null,
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "customerId": null
+        },
+        "idempotency_key": "eff-owen-plan-save-card",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-10-03T13:04:31Z",
+        "last_try_at": "2026-10-03T13:04:31Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-setup-demo-owen-1",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-owen-0001",
+        "created_at": "2026-10-03T13:04:30Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "saved_cards",
+      "values": {
+        "id": "card-owen-plan",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-owen",
+        "booking_id": null,
+        "membership_id": "plan-owen-haircut",
+        "stripe_customer_id": "stripe-customer-demo-owen",
+        "stripe_payment_method_id": "stripe-card-demo-owen",
+        "save_effect_id": "eff-owen-plan-save-card",
+        "saved_from_payment_id": null,
+        "asked_at": "2026-10-03T13:04:30Z",
+        "saved_at": "2026-10-03T13:05:10Z",
+        "replaced_at": null,
+        "removed_at": null,
+        "removed_why": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-owen-plan-reminder-oct30",
+        "handle_id": "handle-owen",
+        "event_ids": ["clock-owen-plan-oct31-reminder"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-owen-0030",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-30T14:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "outbox_rows",
+      "values": {
+        "id": "out-a7-54-owen-oct31",
+        "turn_id": "turn-owen-plan-reminder-oct30",
+        "recipient_handle_id": "handle-owen",
+        "recipient_person_id": "person-owen",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-owen-plan-oct31",
+        "channel": "imessage",
+        "send_class": "routine",
+        "versions_read": [
+          { "table": "memberships", "rowId": "plan-owen-haircut", "version": 1 },
+          { "table": "bookings", "rowId": "booking-owen-plan-oct31", "version": 3 }
+        ],
+        "open_question_id": null,
+        "plan": {
+          "row": "out-a7-54-owen-oct31",
+          "channel": "imessage",
+          "copyOf": null,
+          "plan": {
+            "formats": ["text"],
+            "lines": [
+              {
+                "role": "first",
+                "text": "Your haircut plan with {{biz.name:Lee's Barbershop}} charges {{due:$35}} to your saved card on {{day:Sat Oct 31}}. Think this is wrong? Reply here."
+              }
+            ],
+            "question": null,
+            "pageType": null,
+            "threadReplyTo": null
+          }
+        },
+        "final_parts": {
+          "row": "out-a7-54-owen-oct31",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Your haircut plan with Lee's Barbershop charges $35 to your saved card on Sat Oct 31. Think this is wrong? Reply here.\nPlan charge · $35\nHaircut · Sat Oct 31 · 10:00am · Riley\nCharged Sat Oct 31, after the visit",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "due", "value": "$35" },
+            { "slot": "day", "value": "Sat Oct 31" }
+          ],
+          "threadReplyTo": null
+        },
+        "copy_of_row_id": null,
+        "state": "delivered",
+        "held_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-owen-0030",
+        "version": 6
+      }
+    },
+    {
+      "table": "outbox_parts",
+      "values": {
+        "outbox_row_id": "out-a7-54-owen-oct31",
+        "part_no": 1,
+        "try_no": 1,
+        "idempotency_key": "out-a7-54-owen-oct31/1/1",
+        "attempts": 1,
+        "kind": "words",
+        "linq_message_id": "linq-msg-demo-0054",
+        "state": "delivered",
+        "sent_at": "2026-10-30T14:00:03Z",
+        "delivered_at": "2026-10-30T14:00:04Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-riley-done-owen-oct31",
+        "handle_id": "handle-riley",
+        "event_ids": ["evt-riley-0031"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-riley-0031",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-31T14:40:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-owen-plan-oct31-charge",
+        "turn_id": "turn-riley-done-owen-oct31",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-owen-plan-oct31",
+        "kind": "stripe_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-owen",
+        "handle_id": null,
+        "amount_cents": 3500,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "purpose": "planCharge",
+          "customerId": "stripe-customer-demo-owen",
+          "paymentMethodId": "stripe-card-demo-owen",
+          "customerPresent": false,
+          "description": "Lee's Barbershop: haircut plan, Sat Oct 31 visit"
+        },
+        "idempotency_key": "eff-owen-plan-oct31-charge",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-10-31T14:40:01Z",
+        "last_try_at": "2026-10-31T14:40:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-owen-oct31",
+        "error_code": null,
+        "ledger_line_id": "ledger-owen-plan-oct31",
+        "trace_id": "trace-riley-0031",
+        "created_at": "2026-10-31T14:40:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "plan_charges",
+      "values": {
+        "id": "plancharge-owen-2026-10-31",
+        "business_id": "biz-lees-barbershop",
+        "membership_id": "plan-owen-haircut",
+        "booking_id": "booking-owen-plan-oct31",
+        "period_start": "2026-10-31",
+        "period_end": "2026-10-31",
+        "amount_cents": 3500,
+        "currency": "USD",
+        "due_on": "2026-10-31",
+        "reminder_outbox_row_id": "out-a7-54-owen-oct31",
+        "state": "charged",
+        "skipped_why": null,
+        "charged_at": "2026-10-31T14:40:02Z",
+        "failed_at": null,
+        "skipped_at": null,
+        "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "payer_person_id": "person-owen",
+        "booking_id": "booking-owen-plan-oct31",
+        "purpose": "plan_charge",
+        "method": "card",
+        "amount_cents": 3500,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-owen-plan-oct31-charge",
+        "saved_card_id": "card-owen-plan",
+        "booking_fee_id": null,
+        "plan_charge_id": "plancharge-owen-2026-10-31",
+        "recorded_by_person_id": null,
+        "asked_at": "2026-10-31T14:40:00Z",
+        "paid_at": "2026-10-31T14:40:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-owen-plan-oct31",
+        "kind": "charge",
+        "amount_cents": 3500,
+        "currency": "USD",
+        "payment_id": "pay-owen-plan-oct31",
+        "refund_id": null,
+        "effect_id": "eff-owen-plan-oct31-charge",
+        "stripe_object_id": "stripe-charge-demo-owen-oct31",
+        "moved_at": "2026-10-31T14:40:02Z",
+        "written_by": "effect_result",
+        "written_at": "2026-10-31T14:40:02Z"
+      }
+    }
+  ]
+}

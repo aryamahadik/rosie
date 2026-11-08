@@ -1,0 +1,446 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-person-roles.json",
+    "../../bookings-changes/fixtures/seed-terms-snapshot.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-dee-beard-trim-1",
+        "handle_id": "handle-dee",
+        "event_ids": ["evt-dee-0040"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-dee-0040",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-02T15:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-dee-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "cancelled",
+        "booker_person_id": "person-dee",
+        "served_person_id": "person-dee",
+        "payer_person_id": "person-dee",
+        "private": false,
+        "deceased": false,
+        "version": 3
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-dee-beard-trim-1",
+        "booking_id": "booking-dee-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-beard-trim",
+        "service_money_id": "way-lees-beard-trim-shop",
+        "price_rule_id": "price-lees-beard-trim",
+        "quote_option_id": null,
+        "path": "list|card|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 2000,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-dee-beard-trim-1",
+        "booking_id": "booking-dee-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": null,
+        "arrival_window": null,
+        "cutoff_at": "2026-11-06T15:00:00Z",
+        "check_in_code": null,
+        "code_for_person_id": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-dee-beard-trim-save-card",
+        "turn_id": "turn-dee-beard-trim-1",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-beard-trim",
+        "kind": "stripe_save_card",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-dee",
+        "handle_id": null,
+        "amount_cents": null,
+        "currency": null,
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "customerId": null
+        },
+        "idempotency_key": "eff-dee-beard-trim-save-card",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-02T15:00:01Z",
+        "last_try_at": "2026-11-02T15:00:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-setup-demo-dee-1",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-dee-0040",
+        "created_at": "2026-11-02T15:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "saved_cards",
+      "values": {
+        "id": "card-dee-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-dee",
+        "booking_id": "booking-dee-beard-trim",
+        "membership_id": null,
+        "stripe_customer_id": "stripe-customer-demo-dee",
+        "stripe_payment_method_id": "stripe-card-demo-dee",
+        "save_effect_id": "eff-dee-beard-trim-save-card",
+        "saved_from_payment_id": null,
+        "asked_at": "2026-11-02T15:00:00Z",
+        "saved_at": "2026-11-02T15:00:40Z",
+        "replaced_at": null,
+        "removed_at": null,
+        "removed_why": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-dee-cancel-late",
+        "handle_id": "handle-dee",
+        "event_ids": ["evt-dee-0041"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-dee-0041",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T13:30:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-s11-25-dee-fee",
+        "turn_id": "turn-dee-cancel-late",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-beard-trim",
+        "step": "S11-25",
+        "options": [
+          { "id": "S11-25/1", "label": "Charge or keep it" },
+          { "id": "S11-25/2", "label": "No fee" }
+        ],
+        "readback": "Dee cancelled the Sat 10:00am beard trim after free cancel ended. / Charge or keep the late-cancel fee? / Dee agreed to it when booking / A card is saved, nothing paid now / No answer by 8:30am Sun: no fee / Reply 1 Charge or keep it, 2 No fee.",
+        "versions_read": [{ "table": "bookings", "rowId": "booking-dee-beard-trim", "version": 3 }],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "24 hours",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "S11-25/1",
+        "closed_at": "2026-11-07T13:59:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "booking_fees",
+      "values": {
+        "id": "fee-dee-late-cancel",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-beard-trim",
+        "visit_id": "visit-dee-beard-trim-1",
+        "kind": "late_cancel",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "comes_from": "card",
+        "from_payment_id": null,
+        "saved_card_id": "card-dee-beard-trim",
+        "credit_id": null,
+        "open_question_id": "oq-s11-25-dee-fee",
+        "asked_at": "2026-11-07T13:30:00Z",
+        "answer_by": "2026-11-08T13:30:00Z",
+        "reminded_at": null,
+        "answer": "charge",
+        "answered_at": "2026-11-07T13:59:00Z",
+        "answered_by_person_id": "person-sam",
+        "answered_by_role": "owner",
+        "option_id": "S11-25/1",
+        "event_id": "evt-sam-0081",
+        "state": "charged",
+        "charged_at": "2026-11-07T14:00:02Z",
+        "dropped_at": null,
+        "version": 3
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-dee-fee-yes",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0081"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0081",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T14:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-dee-late-cancel-fee",
+        "turn_id": "turn-sam-dee-fee-yes",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-beard-trim",
+        "kind": "stripe_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-dee",
+        "handle_id": null,
+        "amount_cents": 2000,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "purpose": "fee",
+          "customerId": "stripe-customer-demo-dee",
+          "paymentMethodId": "stripe-card-demo-dee",
+          "customerPresent": false,
+          "description": "Lee's Barbershop: late-cancel fee, Sat Nov 7 beard trim"
+        },
+        "idempotency_key": "eff-dee-late-cancel-fee",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-07T14:00:01Z",
+        "last_try_at": "2026-11-07T14:00:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-0020",
+        "error_code": null,
+        "ledger_line_id": "ledger-dee-late-cancel-fee",
+        "trace_id": "trace-sam-0081",
+        "created_at": "2026-11-07T14:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-dee-late-cancel-fee",
+        "business_id": "biz-lees-barbershop",
+        "payer_person_id": "person-dee",
+        "booking_id": "booking-dee-beard-trim",
+        "purpose": "fee",
+        "method": "card",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-dee-late-cancel-fee",
+        "saved_card_id": "card-dee-beard-trim",
+        "booking_fee_id": "fee-dee-late-cancel",
+        "plan_charge_id": null,
+        "recorded_by_person_id": null,
+        "asked_at": "2026-11-07T14:00:00Z",
+        "paid_at": "2026-11-07T14:00:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-dee-late-cancel-fee",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-beard-trim",
+        "kind": "charge",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "payment_id": "pay-dee-late-cancel-fee",
+        "refund_id": null,
+        "effect_id": "eff-dee-late-cancel-fee",
+        "stripe_object_id": "stripe-charge-demo-0020",
+        "moved_at": "2026-11-07T14:00:02Z",
+        "written_by": "effect_result",
+        "written_at": "2026-11-07T14:00:02Z"
+      }
+    },
+    {
+      "table": "reconciliation_runs",
+      "values": {
+        "id": "recon-lees-barbershop-2026-11-09",
+        "business_id": "biz-lees-barbershop",
+        "window_from": "2026-11-07T03:00:00Z",
+        "window_to": "2026-11-09T03:00:00Z",
+        "job_id": "job-reconcile-2026-11-09",
+        "started_at": "2026-11-09T03:00:01Z",
+        "finished_at": "2026-11-09T03:00:08Z",
+        "charges_listed": 2,
+        "refunds_listed": 0,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-dee-second-charge",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "kind": "charge",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "payment_id": null,
+        "refund_id": null,
+        "effect_id": "eff-dee-late-cancel-fee",
+        "stripe_object_id": "stripe-charge-demo-0021",
+        "moved_at": "2026-11-08T14:05:02Z",
+        "written_by": "reconciliation",
+        "written_at": "2026-11-09T03:00:05Z"
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-reconcile-dee-second-charge-refund",
+        "turn_id": null,
+        "job_id": "job-reconcile-2026-11-09",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "kind": "stripe_refund",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-dee",
+        "handle_id": null,
+        "amount_cents": 2000,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "paymentId": "stripe-payment-demo-0021",
+          "reason": "duplicate"
+        },
+        "idempotency_key": "eff-reconcile-dee-second-charge-refund",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-09T03:00:06Z",
+        "last_try_at": "2026-11-09T03:00:06Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-refund-demo-0021",
+        "error_code": null,
+        "ledger_line_id": "ledger-dee-second-charge-refund",
+        "trace_id": "trace-reconcile-0001",
+        "created_at": "2026-11-09T03:00:05Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "refunds",
+      "values": {
+        "id": "refund-dee-second-charge",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "booking_line_id": null,
+        "payment_id": null,
+        "charge_line_id": "ledger-dee-second-charge",
+        "to_person_id": "person-dee",
+        "via": "stripe",
+        "reason": "double_charge",
+        "decided_by": "at_once",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "effect_id": "eff-reconcile-dee-second-charge-refund",
+        "answered_by_person_id": null,
+        "answered_by_role": null,
+        "open_question_id": null,
+        "option_id": null,
+        "event_id": null,
+        "answered_at": null,
+        "marked_done_by_person_id": null,
+        "state": "succeeded",
+        "asked_at": "2026-11-09T03:00:05Z",
+        "refunded_at": "2026-11-09T03:00:07Z",
+        "failed_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-dee-second-charge-refund",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "kind": "refund",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "payment_id": null,
+        "refund_id": "refund-dee-second-charge",
+        "effect_id": "eff-reconcile-dee-second-charge-refund",
+        "stripe_object_id": "stripe-refund-demo-0021",
+        "moved_at": "2026-11-09T03:00:07Z",
+        "written_by": "effect_result",
+        "written_at": "2026-11-09T03:00:07Z"
+      }
+    },
+    {
+      "table": "reconciliation_findings",
+      "values": {
+        "id": "finding-2026-11-09-dee-second-charge",
+        "run_id": "recon-lees-barbershop-2026-11-09",
+        "business_id": "biz-lees-barbershop",
+        "kind": "refunded_at_once",
+        "stripe_object_id": "stripe-charge-demo-0021",
+        "effect_id": "eff-dee-late-cancel-fee",
+        "ledger_line_id": "ledger-dee-second-charge",
+        "refund_id": "refund-dee-second-charge",
+        "to_team": false,
+        "found_at": "2026-11-09T03:00:05Z"
+      }
+    }
+  ]
+}
