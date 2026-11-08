@@ -8,7 +8,10 @@
 // "USD"); its currency word, in currencies other than the dollar too ("40 euros", "40 pesos", "€40" are no dollars, and a
 // currency sign the reader does not know is no dollar either); its scale ("$2k", "$40 thousand", "$1 million", "2 mil
 // pesos"); the per-unit after it ("$40/hr", "$12 a foot", "$35 each": part of its words, never of its value); and the far
-// end of a range ("$12-15", "$12 to 15", "$12 or 15", "$12～15"). Nothing here keeps or logs the words.
+// end of a range ("$12-15", "$12 to 15", "$12 or 15", "$12～15"). Round 5 (DL-209): a currency code right before a sign
+// or a currency word right after one names the currency ("MXN $40" is 40 Mexican pesos, "40$ CAD" 40 Canadian dollars),
+// and "M" right after an amount is a million ("$1M"; "MM" too, and "B" or "bn" a billion). Nothing here keeps or logs the
+// words.
 
 import { numberPhrasesIn } from "./numbers";
 import { BOTH_LANGUAGES, foldWords, overlaps, type ValueLanguage } from "./words";
@@ -55,8 +58,12 @@ const SIGN_CURRENCIES: Readonly<Partial<Record<string, string>>> = {
 const SIGN = String.raw`(?<sign>us ?\$|mx ?\$|(?!¢)\p{Sc})`;
 /** A sign after the number: "12$", "12 €". */
 const SIGN_AFTER = String.raw`(?<signAfter>(?!¢)\p{Sc})`;
+/** The currency codes the reader knows before a number. */
+const CODES = "usd|eur|mxn|gbp|cad|aud|jpy";
 /** A currency code before the number: "USD 12". */
-const CODE = String.raw`(?<code>usd|eur|mxn|gbp|cad|aud|jpy)`;
+const CODE = String.raw`(?<code>${CODES})`;
+/** A currency code right before a sign, which names the sign's currency: "MXN $40", "CAD$40" (DL-209). */
+const CODE_BEFORE_SIGN = String.raw`(?<signCode>${CODES}) ?`;
 
 /** Currency words, folded, longest first where one starts another, and the currency each names. */
 const CURRENCY_WORDS: readonly (readonly [string, string])[] = [
@@ -95,10 +102,15 @@ const CENT_WORD = String.raw`(?:cents?|centavos?)`;
 /**
  * Scale words, by what each multiplies by: "k", "thousand", "grand", "hundred", "million", "billion"; Spanish "mil" (a
  * thousand), "millón". "mil" in an English text is a million ("2 mil"), in a Spanish one or one of either language a
- * thousand, as numbers.ts reads it.
+ * thousand, as numbers.ts reads it. The short ones right after the number (DL-209): "m" and "mm" a million ("$1M",
+ * "$1MM"), "b" and "bn" a billion ("$1B", "$1bn").
  */
 const SCALES: Readonly<Partial<Record<string, number>>> = {
   k: 1_000,
+  m: 1_000_000,
+  mm: 1_000_000,
+  b: 1_000_000_000,
+  bn: 1_000_000_000,
   thousand: 1_000,
   grand: 1_000,
   hundred: 100,
@@ -121,8 +133,10 @@ const FREE = /\b(?:free|gratis|no charge|sin costo|sin cargo)\b/g;
 
 /** The patterns of one set of languages (their scale words differ). */
 interface MoneyPatterns {
-  /** "$12", "US$12", "USD 12", "€40", "$2k", "$1 million", "$12 dollars", "$40 pesos". */
+  /** "$12", "US$12", "USD 12", "€40", "$2k", "$1M", "$1 million", "$12 dollars", "$40 pesos", "MXN $40". */
   readonly prefixed: RegExp;
+  /** A sign after the number, then a currency word or code: "40$ CAD", "40 $ pesos" (DL-209). */
+  readonly signThenWord: RegExp;
   /** "12 dollars", "12$", "40 euros", "2 mil pesos", "40 thousand dollars". */
   readonly suffixed: RegExp;
   /** "50 cents", "50¢". */
@@ -147,12 +161,13 @@ function patternsOf(languages: readonly ValueLanguage[]): MoneyPatterns {
     ...(languages.includes("en") ? ENGLISH_SCALES : []),
     ...(languages.includes("es") ? SPANISH_SCALES : []),
   ].join("|");
-  const scale = String.raw`(?: ?(?<k>k)(?![\p{L}\p{N}])| (?<scale>${scaleWords})\b)`;
+  const scale = String.raw`(?: ?(?<k>k)(?![\p{L}\p{N}])|(?<short>mm|m|bn|b)(?![\p{L}\p{N}])| (?<scale>${scaleWords})\b)`;
   const patterns: MoneyPatterns = {
     prefixed: new RegExp(
-      String.raw`(?<![\w$])(?:${SIGN}|${CODE} ?) ?${NUMBER}${scale}?(?: ?${WORD}\b)?`,
+      String.raw`(?<![\w$])(?:(?:${CODE_BEFORE_SIGN})?${SIGN}|${CODE} ?) ?${NUMBER}${scale}?(?: ?${WORD}\b)?`,
       "gu",
     ),
+    signThenWord: new RegExp(String.raw`(?<![\w.,])${NUMBER}${scale}? ?${SIGN_AFTER} ?${WORD}\b`, "gu"),
     suffixed: new RegExp(String.raw`(?<![\w.,])${NUMBER}${scale}? ?(?:${WORD}\b|${SIGN_AFTER})`, "gu"),
     cents: new RegExp(String.raw`(?<![\w.,])(?<count>\d+) ?(?:${CENT_WORD}\b|¢)`, "gu"),
     wordsAfter: new RegExp(String.raw`^${scale}? (?:${WORD}|(?<cent>${CENT_WORD}))\b`, "u"),
@@ -175,7 +190,7 @@ function centsOf(groups: Groups, languages: readonly ValueLanguage[]): number {
 
 /** What a number's scale word multiplies it by; 1 for none. */
 function scaleOf(groups: Groups, languages: readonly ValueLanguage[]): number {
-  const word = groups.k ?? groups.scale;
+  const word = groups.k ?? groups.short ?? groups.scale;
   if (word === undefined) return 1;
   if (word === "mil") return languages.includes("es") ? 1_000 : 1_000_000;
   return SCALES[word] ?? 1;
@@ -187,10 +202,14 @@ function currencyOfWord(word: string): string {
   return found?.[1] ?? UNKNOWN_CURRENCY;
 }
 
-/** The currency an amount's own words name: its currency word, else its code, else its sign; else the dollar. */
+/**
+ * The currency an amount's own words name: its currency word, else its code (before the number, or right before its
+ * sign: "MXN $40"), else its sign; else the dollar.
+ */
 function currencyOf(groups: Groups): string {
   if (groups.word !== undefined) return currencyOfWord(groups.word);
-  if (groups.code !== undefined) return groups.code.toUpperCase();
+  const code = groups.code ?? groups.signCode;
+  if (code !== undefined) return code.toUpperCase();
   const sign = groups.sign ?? groups.signAfter;
   if (sign === undefined) return DEFAULT_CURRENCY;
   if (sign.startsWith("us")) return DEFAULT_CURRENCY;
@@ -238,6 +257,9 @@ export function amountsIn(
     marked: true,
   });
   for (const each of matchesOf(folded, patterns.prefixed)) {
+    take(amount(each.at, each.end, centsOf(each.groups, languages), currencyOf(each.groups)));
+  }
+  for (const each of matchesOf(folded, patterns.signThenWord)) {
     take(amount(each.at, each.end, centsOf(each.groups, languages), currencyOf(each.groups)));
   }
   for (const each of matchesOf(folded, patterns.suffixed)) {
