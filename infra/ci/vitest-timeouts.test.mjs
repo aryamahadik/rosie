@@ -1,5 +1,6 @@
 // T-1073: the unit project's per-test and per-hook time limits are 30 s, sized for the build Mac under parallel load
-// (Vitest's default is 5 s). No project lowers a limit below that default. T-1113: the integration project runs its
+// (Vitest's default is 5 s). T-1114: the parity project has the same limits (DL-200: routing parity tests timed out
+// at 5 s beside builders). No project lowers a limit below that default. T-1113: the integration project runs its
 // files one after another (fileParallelism: false; DL-106, DL-196), so files that share one PostgreSQL never pass its
 // 100 connections; the root and the other projects leave file parallelism on. No TypeScript parser: this reads the
 // few lines it needs as text, like parity-placement.test.mjs.
@@ -33,6 +34,12 @@ test("the unit project's testTimeout and hookTimeout are 30000", () => {
   const unit = project("unit");
   assert.equal(limit(unit, "testTimeout"), 30000);
   assert.equal(limit(unit, "hookTimeout"), 30000);
+});
+
+test("the parity project's testTimeout and hookTimeout are 30000", () => {
+  const parity = project("parity");
+  assert.equal(limit(parity, "testTimeout"), 30000);
+  assert.equal(limit(parity, "hookTimeout"), 30000);
 });
 
 test("no project lowers a time limit below Vitest's default", () => {
