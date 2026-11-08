@@ -382,6 +382,52 @@ describe("a request the double cannot sign names a label, never a value", () => 
     await expect(failed).rejects.toMatchObject({ code, message: code });
   });
 
+  // Kinds beyond a text: each fixture is the K-06 event of its kind.
+  const KIND_FIXTURES: [string, string, string | null][] = [
+    ["text", "text-imessage.json", null],
+    ["photo", "photo.json", null],
+    ["edit", "edit-after-commit.json", null],
+    ["pollVote", "poll-vote.json", null],
+    ["voteRemoved", "poll-vote-removed.json", null],
+    ["sent", "sent.json", "out-tomas-booked/1/1"],
+    ["delivered", "delivered.json", "out-a7-03-alex/1/1"],
+    ["failed", "poll-failed.json", null],
+    ["reaction from a customer", "reaction-from-customer.json", null],
+    ["reaction from Rosie", "reaction-from-rosie.json", null],
+  ];
+  const NO_SUCH_LINE = "+11235550100";
+
+  it.each(
+    KIND_FIXTURES.filter(([name]) => name !== "reaction from a customer" && name !== "reaction from Rosie"),
+  )("refuses fromRosie true on a %s", async (_name, file, partKey) => {
+    const failed = double.sign({ event: { ...k06(file), fromRosie: true }, partKey });
+    await expect(failed).rejects.toMatchObject({ code: "fromRosieOnNonReaction" });
+  });
+
+  it.each(KIND_FIXTURES)("refuses a number outside 555-01xx on a %s", async (_name, file, partKey) => {
+    const event = { ...k06(file), handle: { kind: "phone" as const, address: NO_SUCH_LINE } };
+    const failed = double.sign({ event, partKey });
+    await expect(failed).rejects.toMatchObject({ code: "notFictionalPhone" });
+  });
+
+  it.each(["sent", "delivered", "failed"] as const)(
+    "refuses a faked %s event of T-411's double whose handle is not fictional",
+    async (kind) => {
+      const doubleEvent =
+        kind === "failed"
+          ? { kind, at: "2026-11-07T10:00:00Z", partKey: null, messageId: "m-1", code: "4006", reason: "x" }
+          : { kind, at: "2026-11-07T10:00:00Z", partKey: "k/1/1", messageId: "m-1", chatId: "chat-1" };
+      const request = eventFromDoubleEvent(doubleEvent, {
+        eventId: "evt-1",
+        receivedAt: "2026-11-07T10:00:01Z",
+        traceId: "trace-1",
+        handle: NO_SUCH_LINE,
+        chatId: "chat-1",
+      });
+      await expect(double.sign(request)).rejects.toMatchObject({ code: "notFictionalPhone" });
+    },
+  );
+
   it("refuses a secret that is not whsec_ and base64, and a Rosie line that is not fictional", async () => {
     await expect(
       createLinqWebhookDouble({ secret: "not-a-secret" }).sign({ event: text, partKey: null }),

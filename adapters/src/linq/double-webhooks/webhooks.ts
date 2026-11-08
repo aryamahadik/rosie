@@ -34,6 +34,7 @@ export class LinqDoubleWebhookError extends Error {
     | "badTime"
     | "missingField"
     | "keyOnNonReceipt"
+    | "fromRosieOnNonReaction"
     | "notAnImage"
     | "imageOnText"
     | "unknownKind";
@@ -312,6 +313,10 @@ function build(request: DoubleWebhookRequest, rosieLine: string): Built {
   // A test may hand in any value, whatever the type says.
   if ((event.provider as string) !== "linq") throw bad("notLinq");
   if (partKey !== null && event.kind !== "sent" && event.kind !== "delivered") throw bad("keyOnNonReceipt");
+  // Only a reaction carries fromRosie true (T-413's parse); Rosie's own words are made by `echo`, as is_me.
+  if (event.fromRosie && event.kind !== "reaction") throw bad("fromRosieOnNonReaction");
+  // Every kind names a test phone: a number outside 555-01xx never reaches a body.
+  phone(event.handle.address);
   switch (event.kind) {
     case "text":
     case "photo":
