@@ -1,0 +1,113 @@
+{
+  "itemId": "item-high-stakes-a6-02-accept",
+  "setVersion": "gs-1",
+  "kind": "turn",
+  "journey": 6,
+  "trade": "barber",
+  "path": {
+    "flow": "A",
+    "price": "list",
+    "before": "card",
+    "after": "counter",
+    "booking": { "approval": "ownerok" },
+    "switches": {},
+    "facts": ["children", "documents", "extrawork", "groups", "photos"]
+  },
+  "seed": {
+    "kind": "fixtureSet",
+    "shop": "barber",
+    "business": "biz-lees-barbershop",
+    "rows": [
+      "db-schema/core/fixtures/seed-business-head.json",
+      "db-schema/core/fixtures/seed-person-roles.json",
+      "db-schema/core/fixtures/seed-booking-head.json",
+      "db-schema/core/fixtures/seed-phone-chat-open.json"
+    ],
+    "openQuestions": [
+      {
+        "id": "oq-a6-02-sam",
+        "step": "A6-02",
+        "status": "open",
+        "askCount": 1,
+        "bookingId": "booking-alex-haircut"
+      }
+    ],
+    "booking": { "id": "booking-alex-haircut", "stage": "entry" },
+    "flags": []
+  },
+  "labelledFrom": {
+    "bundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 1 },
+    "overlays": []
+  },
+  "labelledBy": "walk",
+  "writer": {
+    "handle": "handle-sam",
+    "personId": "person-sam",
+    "role": "owner",
+    "language": "en",
+    "channel": "imessage"
+  },
+  "turns": [
+    {
+      "walk": ["A6-01", "A6-02"],
+      "texts": [
+        {
+          "text": {
+            "eventId": "evt-gold-0006",
+            "kind": "text",
+            "words": "1",
+            "sentAt": { "utc": "2026-10-22T13:15:00Z", "zone": "America/New_York" },
+            "attachments": [],
+            "poll": null,
+            "tapback": null
+          },
+          "variants": [],
+          "safety": [{ "outcome": "No", "tense": "now" }]
+        }
+      ],
+      "label": {
+        "language": "en",
+        "stakes": "high",
+        "questionExpected": false,
+        "parts": [
+          {
+            "verb": "choose",
+            "choice": {
+              "kind": "option",
+              "step": "A6-02",
+              "branch": "1 Accept",
+              "anytimeRow": null,
+              "door": null,
+              "hub": null,
+              "bookingId": "booking-alex-haircut"
+            },
+            "fields": [],
+            "about": null
+          }
+        ],
+        "effects": [
+          {
+            "class": "booking",
+            "kind": "recordWrite",
+            "ref": "booked",
+            "values": [
+              { "name": "time_saved", "value": { "utc": "2026-10-24T15:00:00Z", "zone": "America/New_York" } },
+              { "name": "service", "value": "Haircut" }
+            ]
+          }
+        ],
+        "messages": [
+          {
+            "step": "A6-14",
+            "to": "cust",
+            "values": [
+              { "name": "svc.intext", "value": "Haircut", "audience": ["customer"] },
+              { "name": "price", "value": { "cents": 3500, "currency": "USD" }, "audience": ["customer"] },
+              { "name": "fee", "value": { "cents": 2000, "currency": "USD" }, "audience": ["customer"] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

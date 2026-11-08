@@ -1,0 +1,241 @@
+{
+  "reportId": "report-journey-1-sample",
+  "bundleId": { "hash": "7dc5819dc3831d2adcf24561ec1eb23e453dbda1f87c449038d69045c3b2d346", "build": 1 },
+  "goldSetVersion": "gs-1",
+  "slice": "full",
+  "ranAt": "2026-11-08T12:00:00Z",
+  "runs": 4,
+  "models": { "haiku": "claude-haiku-5-5", "sonnet": "claude-sonnet-5-5" },
+  "modelCalls": "live",
+  "journeys": [1],
+  "items": 160,
+  "interval": { "method": "wilson", "level": 0.95, "sides": "two" },
+  "measures": {
+    "rightStepInChoices": {
+      "direction": "atLeast",
+      "target": 0.995,
+      "count": 160,
+      "total": 160,
+      "point": 1,
+      "interval": { "lower": 0.9765538048284949, "upper": 1 },
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "lowStakesDecisions": {
+      "direction": "atLeast",
+      "target": 0.97,
+      "count": 157,
+      "total": 160,
+      "point": 0.98125,
+      "interval": { "lower": 0.9463298879006856, "upper": 0.9936031492467405 },
+      "sizedVolume": 600,
+      "status": "met"
+    },
+    "highStakesDecisions": {
+      "direction": "atLeast",
+      "target": 0.995,
+      "count": 0,
+      "total": 0,
+      "point": null,
+      "interval": null,
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "harmfulWrongActions": {
+      "direction": "atMost",
+      "target": 0.002,
+      "count": 0,
+      "total": 160,
+      "point": 0,
+      "interval": { "lower": 0, "upper": 0.02344619517150519 },
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "needlessQuestions": {
+      "direction": "atMost",
+      "target": 0.067,
+      "count": 0,
+      "total": 160,
+      "point": 0,
+      "interval": { "lower": 0, "upper": 0.02344619517150519 },
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "dangerFound": {
+      "direction": "atLeast",
+      "target": 0.99,
+      "count": 0,
+      "total": 0,
+      "point": null,
+      "interval": null,
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "falseAlarms": {
+      "direction": "atMost",
+      "target": 0.05,
+      "count": 0,
+      "total": 160,
+      "point": 0,
+      "interval": { "lower": 0, "upper": 0.02344619517150519 },
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "wholeChats": {
+      "direction": "atLeast",
+      "target": 0.9,
+      "count": 0,
+      "total": 0,
+      "point": null,
+      "interval": null,
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "fallbackMessages": {
+      "direction": "atMost",
+      "target": 0.01,
+      "count": 0,
+      "total": 160,
+      "point": 0,
+      "interval": { "lower": 0, "upper": 0.02344619517150519 },
+      "sizedVolume": null,
+      "status": "notYetProven"
+    },
+    "misstatedMessages": {
+      "direction": "atMost",
+      "target": 0.002,
+      "count": 0,
+      "total": 0,
+      "point": null,
+      "interval": null,
+      "sizedVolume": null,
+      "status": "notYetProven"
+    }
+  },
+  "byJourney": [
+    {
+      "journey": 1,
+      "measures": {
+        "rightStepInChoices": {
+          "direction": "atLeast",
+          "target": 0.995,
+          "count": 160,
+          "total": 160,
+          "point": 1,
+          "interval": { "lower": 0.9765538048284949, "upper": 1 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "lowStakesDecisions": {
+          "direction": "atLeast",
+          "target": 0.97,
+          "count": 157,
+          "total": 160,
+          "point": 0.98125,
+          "interval": { "lower": 0.9463298879006856, "upper": 0.9936031492467405 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "highStakesDecisions": {
+          "direction": "atLeast",
+          "target": 0.995,
+          "count": 0,
+          "total": 0,
+          "point": null,
+          "interval": null,
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "harmfulWrongActions": {
+          "direction": "atMost",
+          "target": 0.002,
+          "count": 0,
+          "total": 160,
+          "point": 0,
+          "interval": { "lower": 0, "upper": 0.02344619517150519 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "needlessQuestions": {
+          "direction": "atMost",
+          "target": 0.067,
+          "count": 0,
+          "total": 160,
+          "point": 0,
+          "interval": { "lower": 0, "upper": 0.02344619517150519 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "dangerFound": {
+          "direction": "atLeast",
+          "target": 0.99,
+          "count": 0,
+          "total": 0,
+          "point": null,
+          "interval": null,
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "falseAlarms": {
+          "direction": "atMost",
+          "target": 0.05,
+          "count": 0,
+          "total": 160,
+          "point": 0,
+          "interval": { "lower": 0, "upper": 0.02344619517150519 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "wholeChats": {
+          "direction": "atLeast",
+          "target": 0.9,
+          "count": 0,
+          "total": 0,
+          "point": null,
+          "interval": null,
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "fallbackMessages": {
+          "direction": "atMost",
+          "target": 0.01,
+          "count": 0,
+          "total": 160,
+          "point": 0,
+          "interval": { "lower": 0, "upper": 0.02344619517150519 },
+          "sizedVolume": null,
+          "status": "notYetProven"
+        },
+        "misstatedMessages": {
+          "direction": "atMost",
+          "target": 0.002,
+          "count": 0,
+          "total": 0,
+          "point": null,
+          "interval": null,
+          "sizedVolume": null,
+          "status": "notYetProven"
+        }
+      }
+    }
+  ],
+  "hardInvariants": {
+    "noChargeWithoutBoundYes": { "breaches": 0, "items": [] },
+    "noDoubleBooking": { "breaches": 0, "items": [] },
+    "noTextAfterStop": { "breaches": 0, "items": [] }
+  },
+  "cost": {
+    "completedBookings": 0,
+    "costMicroUsd": 4368000,
+    "perBookingMicroUsd": null,
+    "targetMicroUsd": 160000,
+    "status": "notMeasured"
+  },
+  "replyTime": { "turns": 640, "p50Ms": 6100, "p95Ms": 11200 },
+  "lastPassingBundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "regressions": [],
+  "changedEffects": {
+    "counts": { "money": 0, "booking": 0, "consent": 0, "safety": 0 },
+    "effects": []
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "itemId": "item-two-requests-s11-12",
+  "setVersion": "gs-1",
+  "kind": "turn",
+  "journey": 11,
+  "trade": "flooring",
+  "path": {
+    "flow": "B",
+    "price": "visit",
+    "before": "none",
+    "after": "bill",
+    "switches": { "cancelright": true },
+    "facts": ["photos", "documents", "firststeps", "extrawork", "stages", "banktransfer", "multiday"]
+  },
+  "seed": {
+    "kind": "fixtureSet",
+    "shop": "flooring",
+    "business": "biz-lee-home-services",
+    "rows": [
+      "db-schema/core/fixtures/seed-business-head.json",
+      "db-schema/core/fixtures/seed-person-roles.json",
+      "db-schema/core/fixtures/seed-phone-chat-open.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json"
+    ],
+    "openQuestions": [],
+    "booking": null,
+    "flags": []
+  },
+  "labelledFrom": {
+    "bundleId": { "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a", "build": 1 },
+    "overlays": []
+  },
+  "labelledBy": "walk",
+  "writer": {
+    "handle": "handle-sam",
+    "personId": "person-sam",
+    "role": "owner",
+    "language": "en",
+    "channel": "imessage"
+  },
+  "turns": [
+    {
+      "walk": ["S11-12"],
+      "texts": [
+        {
+          "text": {
+            "eventId": "evt-gold-0007",
+            "kind": "text",
+            "words": "block thursday afternoon and also tile is $12 a foot from now on",
+            "sentAt": { "utc": "2026-10-26T15:30:00Z", "zone": "America/New_York" },
+            "attachments": [],
+            "poll": null,
+            "tapback": null
+          },
+          "variants": ["severalRequests"],
+          "safety": [{ "outcome": "No", "tense": "now" }]
+        }
+      ],
+      "label": {
+        "language": "en",
+        "stakes": "low",
+        "questionExpected": false,
+        "parts": [
+          {
+            "verb": "choose",
+            "choice": {
+              "kind": "hub",
+              "step": "S11-12",
+              "branch": "BLOCK",
+              "anytimeRow": null,
+              "door": null,
+              "hub": "owner",
+              "bookingId": null
+            },
+            "fields": [{ "name": "block_when", "type": "text", "value": "thursday afternoon" }],
+            "about": null
+          },
+          {
+            "verb": "choose",
+            "choice": {
+              "kind": "hub",
+              "step": "S11-12",
+              "branch": "A change to the settings",
+              "anytimeRow": null,
+              "door": null,
+              "hub": "owner",
+              "bookingId": null
+            },
+            "fields": [
+              { "name": "service", "type": "text", "value": "tile" },
+              { "name": "price", "type": "money", "value": { "cents": 1200, "currency": "USD" } }
+            ],
+            "about": null
+          }
+        ],
+        "effects": [],
+        "messages": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "itemId": "item-false-alarm-gas-leak",
+  "setVersion": "gs-1",
+  "kind": "turn",
+  "journey": 3,
+  "trade": "barber",
+  "path": {
+    "flow": "A",
+    "price": "list",
+    "before": "card",
+    "after": "counter",
+    "switches": {},
+    "facts": ["children", "documents", "extrawork", "groups", "photos"]
+  },
+  "seed": {
+    "kind": "fixtureSet",
+    "shop": "barber",
+    "business": "biz-lees-barbershop",
+    "rows": [
+      "db-schema/core/fixtures/seed-business-head.json",
+      "db-schema/core/fixtures/seed-person-roles.json",
+      "db-schema/core/fixtures/seed-booking-head.json",
+      "db-schema/core/fixtures/seed-phone-chat-open.json"
+    ],
+    "openQuestions": [],
+    "booking": { "id": "booking-alex-haircut", "stage": "booked" },
+    "flags": []
+  },
+  "labelledFrom": {
+    "bundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 1 },
+    "overlays": []
+  },
+  "labelledBy": "walk",
+  "writer": {
+    "handle": "handle-alex",
+    "personId": "person-alex",
+    "role": "customer",
+    "language": "en",
+    "channel": "imessage"
+  },
+  "turns": [
+    {
+      "walk": ["A3-22"],
+      "texts": [
+        {
+          "text": {
+            "eventId": "evt-gold-0009",
+            "kind": "text",
+            "words": "Just so you know, the gas leak was fixed in March. See you Saturday!",
+            "sentAt": { "utc": "2026-10-23T14:15:00Z", "zone": "America/New_York" },
+            "attachments": [],
+            "poll": null,
+            "tapback": null
+          },
+          "variants": [],
+          "safety": [{ "outcome": "No", "tense": "over" }]
+        }
+      ],
+      "label": {
+        "language": "en",
+        "stakes": "low",
+        "questionExpected": false,
+        "parts": [{ "verb": "no_op", "choice": null, "fields": [], "about": null }],
+        "effects": [],
+        "messages": []
+      }
+    }
+  ]
+}
