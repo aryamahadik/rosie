@@ -440,3 +440,152 @@ export function samSeed(): TurnSeed {
     },
   };
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// The master's steps around K-01 v1's sample bundles, for the stakes walk (fixture set v1: rule 9)
+//
+// Each is a step of the master (scratch/fixture-v1-copy/engine/work/master/master-A.json, read-only) written by hand
+// in K-01 v1's shape with the fields the frontier reads: its type, who and via, needs, gives, title, its branches (each
+// label word for word, its own steps by id, its end) and its next. What the compiler (C-065 to C-070, not built yet)
+// adds is filled the way K-01 v1 defines it: each branch's tag (branch.tag: "message: the model may choose it; lookup:
+// code settles it; clock: a clock row settles it"), where a merging branch rejoins (the step after its split, in
+// bundle-mini-a's section order: A5-01, A5-19, A5-04, A5-31; A6-01, A6-10, A6-14, A6-15), and a message effect for a
+// listed step that tells someone (as bundle-mini-a's A6-02 '2 Another time' shows).
+
+/** A step as K-01 v1 holds it (a test's hand-written one), by its id. */
+export interface StepJson extends Json {
+  id: string;
+  branches?: Json[];
+}
+
+/** A merging branch as K-01 v1 holds it. */
+function merging(
+  label: string,
+  tag: string,
+  steps: string[],
+  rejoinAt: string | null,
+  effects: Json[] = [],
+): Json {
+  return { label, tag, steps, end: "merge", rejoinAt, answerFields: [], effects };
+}
+
+/**
+ * A5-01 (master-A.json, from line 13165): the customer picks on the secure page, each pick a branch its card's Means
+ * lines define (message). 'None' has no steps of its own and rejoins at A5-19.
+ */
+export const MASTER_A5_01: StepJson = {
+  type: "split",
+  id: "A5-01",
+  who: "cust",
+  to: "san",
+  via: "page",
+  needs: ["contact"],
+  title: "Any package, plan or discount code?",
+  branches: [
+    merging("None", "message", [], "A5-19"),
+    merging("A discount code", "message", ["A5-02"], "A5-19"),
+    merging("A package or membership", "message", ["A5-03"], "A5-19"),
+    merging("Buys a pack or membership", "message", ["A5-22"], "A5-19"),
+    merging("A repeat plan", "message", ["A5-21"], "A5-19"),
+  ],
+  next: "A5-19",
+};
+
+/**
+ * A5-19 (from line 13467): Rosie reads the plug-in's rules (via auto, needs pf.rules; "Plug-in silent: no document"),
+ * so code settles it: lookup. 'Yes: everyone signs' lists A5-20, where everyone signs on the page.
+ */
+export const MASTER_A5_19: StepJson = {
+  type: "split",
+  id: "A5-19",
+  who: "san",
+  via: "auto",
+  needs: ["pf.rules"],
+  title: "Does it need a document signed?",
+  branches: [
+    merging("No", "lookup", [], "A5-04"),
+    merging("Yes: everyone signs", "lookup", ["A5-20"], "A5-04"),
+  ],
+  next: "A5-04",
+};
+
+/**
+ * A6-01 (from line 14470): it follows the choice made on the page (A4-98), "never decided again", so code settles it:
+ * lookup. Its 'Sam's OK first' lists A6-02 alone, the step bundle-mini-a holds (whose own next is null).
+ */
+export const MASTER_A6_01: StepJson = {
+  type: "split",
+  id: "A6-01",
+  who: "san",
+  via: "auto",
+  needs: ["money_before"],
+  title: "Books now, or asks first",
+  branches: [
+    merging("Right away", "lookup", [], "A6-10"),
+    merging("Sam's OK first", "lookup", ["A6-02"], "A6-10"),
+  ],
+  next: "A6-10",
+};
+
+/** A6-03 (lines 14527-14539), the one step of A6-02's '1 Accept': a plain step at the end of its list. */
+export const MASTER_A6_03: StepJson = {
+  id: "A6-03",
+  who: "pay",
+  via: "sync",
+  title: "Charges what's due on the OK",
+  next: null,
+};
+
+/**
+ * A6-10 (lines 15276-15289, its branches below): Rosie writes the booking, system to system (via sync), and it gives booked; which branch
+ * follows is the write's own outcome, so code settles it: lookup.
+ */
+export const MASTER_A6_10: StepJson = {
+  type: "split",
+  id: "A6-10",
+  who: "san",
+  via: "sync",
+  needs: ["time_saved"],
+  gives: ["booked"],
+  title: "Writes the booking",
+  branches: [
+    merging("Yes", "lookup", [], "A6-14"),
+    merging("Taken a moment ago", "lookup", ["A6-11"], "A6-14", [
+      { kind: "message", ref: "A6-11", to: ["cust"] },
+    ]),
+    merging("The charge fails", "lookup", ["A6-32"], "A6-14", [
+      { kind: "message", ref: "A6-32", to: ["cust"] },
+    ]),
+  ],
+  next: "A6-14",
+};
+
+/** A6-10 as the master writes it (lines 15276-15289, its branches below, their steps by id): no tags, no rejoinAt. */
+export const MASTER_A6_10_AS_WRITTEN: StepJson = {
+  type: "split",
+  id: "A6-10",
+  who: "san",
+  via: "sync",
+  needs: ["time_saved"],
+  gives: ["booked"],
+  title: "Writes the booking",
+  branches: [
+    { label: "Yes", steps: [], end: "merge" },
+    { label: "Taken a moment ago", steps: ["A6-11"], end: "merge" },
+    { label: "The charge fails", steps: ["A6-32"], end: "merge" },
+  ],
+};
+
+/** A sample bundle (a fresh copy) with more steps in its flow A, by id, and partial or not. */
+export function withSteps(
+  document: BundleDocument,
+  steps: readonly StepJson[],
+  partial = true,
+): BundleDocument {
+  const copy = structuredClone(document);
+  copy.manifest.partial = partial;
+  const flow = copy.flows.A;
+  if (!isRecord(flow) || !isRecord(flow.steps)) throw new Error("the bundle holds no flow A");
+  for (const step of steps) flow.steps[step.id] = structuredClone(step);
+  return copy;
+}

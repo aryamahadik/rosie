@@ -15,6 +15,9 @@ import { createFrontierChecker } from "../../assemble/check";
 import { frontierHandlers } from "../../assemble/handler";
 import {
   BUNDLE_V0,
+  MASTER_A6_01,
+  MASTER_A6_03,
+  MASTER_A6_10,
   bundleIdOf,
   captureLog,
   fakeBundles,
@@ -25,6 +28,7 @@ import {
   samSeed,
   sampleBundle,
   stringsIn,
+  withSteps,
   type BundleDocument,
   type FakeRepo,
   type TurnSeed,
@@ -301,11 +305,25 @@ function stakesOf(choices: readonly Choice[]): [string, string, Choice["stakesFr
 }
 
 describe("each option's stakes, from its walk (K-02 README, 'Stakes')", () => {
-  it("A6-02 as the master writes it walks to no charge, refund, calendar write or booking: every option low", async () => {
+  it("bundle-mini-a holds none of the steps A6-02's options walk to: not reachable in a partial bundle, every option low", async () => {
+    // bundle-mini-a is partial: it holds neither A6-03, A6-04 nor A6-05 (the steps the options list) nor A6-01, whose
+    // branch lists A6-02, so no walk reaches further here. The master's '1 Accept' does: see the next test.
     const { context } = await callFrontier(request([ALEX_Q.id]), twoBookings([ALEX_Q]));
     expect(context.choices.every((choice) => choice.stakes === "low" && choice.stakesFrom.length === 0)).toBe(
       true,
     );
+  });
+
+  it("with the master's A6-01, A6-03 and A6-10 around A6-02, '1 Accept' walks on to A6-10, which books: every option high", async () => {
+    // '1 Accept' lists A6-03, the end of its list; A6-02 ends A6-01's 'Sam's OK first', which rejoins at A6-10: a split
+    // code settles (the booking write's outcome), which gives booked. The walk counts it rather than stopping there.
+    const document = withSteps(MINI_A, [MASTER_A6_01, MASTER_A6_03, MASTER_A6_10]);
+    const { context } = await callFrontier(request([ALEX_Q.id]), twoBookings([ALEX_Q]), [document]);
+    expect(stakesOf(context.choices)).toEqual([
+      ["c-01", "high", [{ why: "booked", step: "A6-10", ref: "booked" }]],
+      ["c-02", "high", [{ why: "question", step: null, ref: "c-01" }]],
+      ["c-03", "high", [{ why: "question", step: null, ref: "c-01" }]],
+    ]);
   });
 
   it("a charge on '1 Accept' makes it high, and so every option of that question (why: question, its id)", async () => {

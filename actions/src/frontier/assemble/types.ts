@@ -106,11 +106,19 @@ export interface BundleBranch {
   effects: BundleEffect[];
 }
 
+/**
+ * What a split is to the stakes walk, from its branches' tags (K-01 v1 branch.tag; arch 03 lines 161 and 191):
+ *   - asks: a message or a clock branch, so the split asks someone or waits; the walk stops there;
+ *   - code: every branch a lookup, so code settles it and nobody is asked; the walk counts it and goes down every branch;
+ *   - unknown: a split the walk cannot classify (bundle.ts splitOf), the safer route.
+ */
+export type SplitKind = "asks" | "code" | "unknown";
+
 /** K-01 v1 `step`, the fields the frontier reads. */
 export interface BundleStep {
   id: string;
-  /** True for a split: the step asks someone (SPEC-master 4 'q'). */
-  asks: boolean;
+  /** For a split (SPEC-master 4 'type'), what it is to the stakes walk; null for a plain step. */
+  split: SplitKind | null;
   gives: string[];
   next: string | null;
   branches: BundleBranch[];
@@ -119,10 +127,22 @@ export interface BundleStep {
   card: StepCard["card"] | null;
 }
 
+/** A split's branch whose own steps list a step (K-01 v1 branch.steps). */
+export interface Enclosing {
+  readonly split: BundleStep;
+  readonly branch: BundleBranch;
+}
+
 /** One flow graph of a bundle. */
 export interface FlowView {
   readonly flow: FlowLetter;
   step(id: string): BundleStep | null;
+  /**
+   * The branches whose own steps list this step: one for a step on a branch's list, none for a step on its section's
+   * main path (or whose split this graph does not hold). Where a list ends (K-01 v1 step.next null), that branch decides
+   * where the walk goes (its end, or its rejoinAt).
+   */
+  enclosing(id: string): readonly Enclosing[];
   /** The always-on rules' prefix hash (K-01 v1 routingTables.alwaysOn.prefixSha256), or null when the graph has none. */
   readonly alwaysOnSha256: string | null;
   /**
