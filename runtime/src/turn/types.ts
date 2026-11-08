@@ -9,7 +9,8 @@
 //     reads and its re-read flag (`decideResult`);
 //   - K-03 v1 (contracts/message-plan): the composer's input, the plan, the plan a row stores (`rowPlan`), the final
 //     parts and the check result (T-252);
-//   - K-05 v1 item 2 (contracts/data-access, "write a plan"): `unplannedRows` and `writePlan` (T-252);
+//   - K-05 v1 item 2 (contracts/data-access, "write a plan"): `unplannedRows` and `writePlan` (T-252); item 12 ("park a
+//     turn"): `parkTurn`, with its outbox row and event-log entry shapes (T-253);
 //   - K-08 v1: the model calls a decide stage or the composer reports for its span.
 //
 // Every outside call is a port (`TurnDeps`), set once per Worker isolate and joined at D-017 (T-552 onward): the Tool
@@ -503,24 +504,103 @@ export interface WriteRowPlanRequest {
 export type WriteRowPlanAnswer =
   { readonly result: "written"; readonly outboxRowId: string; readonly version: number } | ToolApiError;
 
+// ---- K-05 v1 item 12, "park a turn" (T-253) ------------------------------------------------------------------------
+
+/** K-05 v1 `rowRef`: a row and the version it was read at. */
+export interface RowVersionRef {
+  table: string;
+  rowId: string;
+  version: number;
+}
+
+/**
+ * K-05 v1 `outboxRowNew`: one message to one recipient on one channel, written with no plan ("Words are written into
+ * those rows after the commit": arch 01 lines 39 to 41). A plan or final parts here is refused.
+ */
+export interface OutboxRowNew {
+  id: string;
+  recipientHandleId: string;
+  recipientPersonId: string | null;
+  businessId: string | null;
+  bookingId: string | null;
+  channel: OutboxChannel;
+  /** K-04 outbox_rows.send_class: only routine waits for text hours (RULES 4.3); quick_reply is a reply in the same turn. */
+  sendClass: "routine" | "quick_reply" | "visit_now" | "safety";
+  openQuestionId: string | null;
+  copyOfRowId: string | null;
+  versionsRead: RowVersionRef[];
+}
+
+/** K-05 v1 `eventEntry`: one event-log entry the call appends, never edited (K-04 event_log; K-08's kinds). */
+export interface EventEntry {
+  id: string;
+  kind: string;
+  /** The IANA zone the event is read in; null: UTC. */
+  zone: string | null;
+  businessId: string | null;
+  actorKind: "person" | "rosie" | "job" | "provider";
+  actorPersonId: string | null;
+  actorRole: "owner" | "admin" | "staff" | "own_business" | "customer" | null;
+  tableName: string | null;
+  rowId: string | null;
+  oldValues: Record<string, unknown> | null;
+  newValues: Record<string, unknown> | null;
+  /** Private values sealed under one person's key; the park writes none. */
+  sealed: { forPersonId: string; base64: string } | null;
+  why: Record<string, unknown> | null;
+  approvedBy: Record<string, unknown> | null;
+  proofs: Record<string, unknown> | null;
+}
+
+/**
+ * K-05 v1 `parkTurn.request` (park-turn.json): the turn with tries 3, when it was parked, the one "nothing changed" row
+ * (at most one; written with no plan, so the runtime never words it) and its event-log entries.
+ */
+export interface ParkTurnRequest {
+  turn: CommitTurnRef;
+  parkedAt: string;
+  outboxRows: OutboxRowNew[];
+  events: EventEntry[];
+}
+
+/** K-05 v1 `parkTurn.response`: parked; a repeat writes nothing and returns the first result with `repeated` true. */
+export interface ParkTurnResponse {
+  readonly result: "parked";
+  readonly turnId: string;
+  readonly parkedAt: string;
+  readonly outboxRows: readonly { readonly id: string; readonly commitSeq: number }[];
+  readonly repeated: boolean;
+}
+
+/**
+ * K-05 v1 `parkTurn.response`, or one of its errors: alreadyCommitted (with `turnId` and `committedAt`: the turn committed,
+ * so it is never parked) or transient (nothing written; the same request may be sent again).
+ */
+export type ParkTurnAnswer = ParkTurnResponse | ToolApiError;
+
 /**
  * K-05 v1's plan calls as the turn reaches them (the database engineer's C-152, T-196; joined at D-017). The finalize call
- * writes a composed row's plan itself; the turn writes only an email copy's, which takes its text row's plan.
+ * writes a composed row's plan itself; the turn writes only an email copy's, which takes its text row's plan. The park
+ * after a third crash before the commit (T-253) is K-05 v1 item 12's `parkTurn` (T-197 builds it).
  */
 export interface TurnRows {
   unplannedRows(request: { turnId: string }): Promise<RowsAnswer>;
   writePlan(request: WriteRowPlanRequest): Promise<WriteRowPlanAnswer>;
+  parkTurn(request: ParkTurnRequest): Promise<ParkTurnAnswer>;
 }
 
 // ---- the outbox dispatcher (T-252) ----------------------------------------------------------------------------------
 
-/** What the dispatcher is told when a turn has committed and its rows are composed: once per committed turn. */
+/**
+ * What the dispatcher is told when a turn has committed and its rows are composed: once per run that commits. Also once
+ * per park (T-253), for the parked turn's one "nothing changed" row.
+ */
 export interface DispatchWake {
-  /** The committed turn (K-04 turns.id). */
+  /** The committed (or parked) turn (K-04 turns.id). */
   readonly turnId: string;
   /** The turn's own handle (K-04 handles.id): the actor's recipient (runtime/src/dispatch DispatchOptions). */
   readonly handleId: string;
-  /** Every row the commit wrote, in commit order (fixed lines' rows included), whatever its compose ended with. */
+  /** Every row the commit (or the park) wrote, in commit order (fixed lines' rows included), whatever its compose ended with. */
   readonly outboxRowIds: readonly string[];
 }
 

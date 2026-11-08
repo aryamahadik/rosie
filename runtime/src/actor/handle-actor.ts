@@ -36,7 +36,7 @@ import {
   type HoldEntry,
   type SafetyEntry,
 } from "../safety";
-import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
+import { isLabel, logSink, openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
 import {
   actorClock,
   BatchWindow,
@@ -55,7 +55,7 @@ import {
   writeToInbox,
   type InboxEntry,
 } from "./inbox";
-import { TurnLease, type TurnEntry } from "./lease";
+import { TurnLease, type ParkTraceRequest, type TurnEntry } from "./lease";
 
 /** A delivery receipt as the actor passes it on: the scrubbed K-06 event (no words) with `partKey` beside it. */
 export interface ReceiptHandoff {
@@ -162,6 +162,7 @@ export class HandleActor extends DurableObject {
       pin: (request, signal) => this.pins.pin(request, signal),
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
+      parkTrace: (request) => this.parkTrace(request),
     });
     // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
     // armed row; a clock turn's commit is handed the holds open and the texts not read yet, read at commit time.
@@ -337,6 +338,31 @@ export class HandleActor extends DurableObject {
     const inOrder = readInboxEvents(this.ctx.storage.sql, [...unread]).map((entry) => entry.event.eventId);
     // A text the inbox does not hold cannot be put in order; it is named all the same (fails closed).
     return [...inOrder, ...[...unread].filter((eventId) => !inOrder.includes(eventId))];
+  }
+
+  /**
+   * The trace a park goes on (T-253): the turn's first text's trace id (CQ-06), under the bundle pinned for the turn id
+   * (T-249), or the one its first text arrived under when no run was ever pinned; null when neither is known (the park is
+   * then tried again later). A trace that cannot be opened is null too. Nothing is recorded here.
+   */
+  private parkTrace(request: ParkTraceRequest): { bundleId: BundleId; trace: TraceContext } | null {
+    const pinned = this.pins.read().find((entry) => entry.turnId === request.turnId)?.bundleId;
+    const bundleId = pinned ?? request.arrivedUnder;
+    if (bundleId === null) return null;
+    try {
+      const trace = openTrace({
+        openedBy: "textWebhook",
+        bundleId,
+        incomingTraceId: request.traceId,
+        sink: logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+        now: () => actorClock().now(),
+      });
+      trace.setTurn(request.turnId);
+      trace.listJoined(request.joinedTraceIds);
+      return { bundleId, trace };
+    } catch {
+      return null;
+    }
   }
 
   /** Resolves when the batch work started so far is done (tests). */
