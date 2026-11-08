@@ -1,0 +1,29 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-04T16:00:00Z",
+    "note": "monthly-charge.json run on the yoga studio's own connected account instead of Rosfield's. Refused: Rosfield's monthly bill goes on the card saved for it, on Rosfield's own account, never on a customer's card or into a business's Stripe (S11-67; FS row M04)."
+  },
+  "request": {
+    "effect": {
+      "effectId": "effect-bill-yoga-studio-2026-10-charge",
+      "idempotencyKey": "rosfield-bill-yoga-studio-2026-10-charge"
+    },
+    "amount": { "cents": 200, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-yoga-studio" },
+      "purpose": "rosfieldMonthlyBill",
+      "customerId": "stripe-customer-demo-sam-lee",
+      "paymentMethodId": "stripe-card-demo-sam-lee-1",
+      "customerPresent": false,
+      "description": "Rosfield's October bill for the yoga studio"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-yoga-studio-2026-10",
+    "chargeId": "stripe-charge-demo-yoga-studio-2026-10",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-11-04T16:00:02Z"
+  }
+}

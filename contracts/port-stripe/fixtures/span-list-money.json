@@ -1,0 +1,20 @@
+{
+  "trace_id": "trace-reconcile-0001",
+  "span_id": "span-reconcile-0001-02",
+  "seq": 2,
+  "hop": "portCall",
+  "at": "2026-11-09T03:00:01.000Z",
+  "ms": 640,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "job_id": "job-reconcile-2026-11-09",
+  "handle_ref": null,
+  "business_id": "biz-lees-barbershop",
+  "provider": "stripe",
+  "call": "listMoney",
+  "attempt": 1,
+  "got": { "step": "C-112", "account": "business" },
+  "decided": { "result": "listed", "items": 5, "withoutEffectId": 0 },
+  "outcome": "ok",
+  "error_code": null
+}

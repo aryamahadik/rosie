@@ -1,0 +1,33 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-02T15:30:01Z",
+    "note": "S11-64 'A problem at Stripe', Mon Nov 2, 10:30am: Stripe couldn't send Lee's Barbershop's payout because the bank account is closed; the money waits in the shop's Stripe balance, and Sam is told to fix it at Stripe (S11-65). The $40 is an illustration of a payout, not a computed balance.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1793633401,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0401\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1793633400,\"livemode\":false,\"type\":\"payout.failed\",\"data\":{\"object\":{\"id\":\"stripe-payout-demo-0001\",\"object\":\"payout\",\"amount\":4000,\"currency\":\"usd\",\"failure_code\":\"account_closed\",\"status\":\"failed\"}}}",
+    "receivedAt": "2026-11-02T15:30:01Z",
+    "traceId": "trace-stripe-0401"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0401",
+      "kind": "payoutFailed",
+      "stripeType": "payout.failed",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-11-02T15:30:00Z",
+      "effectId": null,
+      "payload": {
+        "payoutId": "stripe-payout-demo-0001",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "failureCode": "account_closed"
+      }
+    }
+  }
+}

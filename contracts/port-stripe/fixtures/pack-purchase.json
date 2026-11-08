@@ -1,0 +1,29 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-05T15:00:01Z",
+    "note": "A5-22: Alex buys a pack of 5 visits for $160 on the yoga studio's secure page while booking a Hot Flow class; it is charged when bought, into the studio's own Stripe, and this visit uses 1 credit (A5-22's form). If the booking is not confirmed, the pack stays bought."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-hot-flow-pack",
+      "idempotencyKey": "eff-alex-hot-flow-pack"
+    },
+    "amount": { "cents": 16000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-yoga-studio" },
+      "purpose": "pack",
+      "customerId": "stripe-customer-demo-alex-yoga-studio",
+      "paymentMethodId": "stripe-card-demo-alex-yoga-studio",
+      "customerPresent": true,
+      "description": "Yoga studio: pack of 5 visits"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-yoga-0002",
+    "chargeId": "stripe-charge-demo-yoga-0002",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-11-05T15:00:02Z"
+  }
+}

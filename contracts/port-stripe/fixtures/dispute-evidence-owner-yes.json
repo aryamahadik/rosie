@@ -1,0 +1,35 @@
+{
+  "call": "disputeEvidence",
+  "given": {
+    "now": "2026-11-02T14:40:01Z",
+    "note": "A10-16: Alex's bank opened a dispute about the payment for Sat Oct 24 (webhook-dispute-opened.json); the record must be in by Fri Nov 6, 5pm. Rosie built the record from its own texts and the check-in, and Sam taps 'Send the record'. Only on that yes does it go, once, as a private file; nothing Alex wrote enters the request."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-haircut-dispute-evidence",
+      "idempotencyKey": "eff-alex-haircut-dispute-evidence"
+    },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "disputeId": "stripe-dispute-demo-0001",
+      "ownerYes": {
+        "kind": "ownerYes",
+        "person_id": "person-sam",
+        "role": "owner",
+        "open_question_id": "oq-a10-16-sam",
+        "option_id": "send-the-record",
+        "event_id": "evt-sam-0042"
+      },
+      "serviceDate": "2026-10-24",
+      "serviceDescription": "Haircut with Riley",
+      "customerName": "Alex M.",
+      "recordFileId": "file-dispute-record-alex-2026-10-24"
+    }
+  },
+  "outcome": {
+    "result": "submitted",
+    "disputeId": "stripe-dispute-demo-0001",
+    "submittedAt": "2026-11-02T14:40:02Z",
+    "dueBy": "2026-11-06T22:00:00Z"
+  }
+}

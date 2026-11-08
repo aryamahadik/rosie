@@ -1,0 +1,27 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-05T16:00:01Z",
+    "note": "A5-16 at the yoga studio: Alex takes a spot in Maya's $55 handstand workshop, paid in full when booking (fixture set v1 yoga.json). He is on the page, and his bank wants him to confirm the payment, so the page shows Stripe's check with the client secret; whether the money is taken comes later as paymentSucceeded or paymentFailed."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-handstand-workshop-full",
+      "idempotencyKey": "eff-alex-handstand-workshop-full"
+    },
+    "amount": { "cents": 5500, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-yoga-studio" },
+      "purpose": "fullPrice",
+      "customerId": "stripe-customer-demo-alex-yoga-studio",
+      "paymentMethodId": "stripe-card-demo-alex-yoga-studio",
+      "customerPresent": true,
+      "description": "Yoga studio: handstand workshop with Maya, paid in full"
+    }
+  },
+  "outcome": {
+    "result": "needsAuthentication",
+    "paymentId": "stripe-payment-demo-yoga-0001",
+    "clientSecret": "demo-client-secret-payment-yoga-0001"
+  }
+}

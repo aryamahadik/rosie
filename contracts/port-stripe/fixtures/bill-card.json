@@ -1,0 +1,23 @@
+{
+  "call": "saveCard",
+  "given": {
+    "now": "2026-10-19T18:17:00Z",
+    "note": "S1-29; FS row M04: on the go-live page, Mon Oct 19, Sam adds the card for Rosfield's monthly bill for Lee's Barbershop, on Rosfield's own account, never a customer's. He has no customer on Rosfield's account yet, so one is made. Saved, the card is K-33 v1's seed-bill-card.json (webhook-bill-card-saved.json, 2:18pm)."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-sam-bill-card-lees-barbershop",
+      "idempotencyKey": "eff-sam-bill-card-lees-barbershop"
+    },
+    "port": {
+      "account": { "kind": "rosfield" },
+      "customerId": null
+    }
+  },
+  "outcome": {
+    "result": "ready",
+    "setupId": "stripe-setup-demo-sam-lee-1",
+    "customerId": "stripe-customer-demo-sam-lee",
+    "clientSecret": "demo-client-secret-setup-sam-lee-1"
+  }
+}

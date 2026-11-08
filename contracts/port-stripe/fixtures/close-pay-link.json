@@ -1,0 +1,16 @@
+{
+  "call": "closePayLink",
+  "given": {
+    "now": "2026-11-06T18:00:01Z",
+    "note": "A6-32: Sam OK'd Ben T.'s request for the Groom's package, the $40 deposit on his saved card was declined, and his one pay link was due by the request's latest answer time, 18:00Z. The clock row fires with it unpaid: not booked, nothing taken, and the payment is closed so nothing can be paid after the deadline."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "paymentId": "stripe-payment-demo-0008"
+  },
+  "outcome": {
+    "result": "closed",
+    "paymentId": "stripe-payment-demo-0008",
+    "paidAt": null
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-20T14:05:31Z",
+    "note": "A signed event of a type Rosie does not use: the customer the adapter made for Alex on Lee's Barbershop's account (save-card.json). Answered 200 and dropped, so Stripe does not retry it.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1792505131,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0100\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1792505130,\"livemode\":false,\"type\":\"customer.created\",\"data\":{\"object\":{\"id\":\"stripe-customer-demo-alex\",\"object\":\"customer\",\"metadata\":{}}}}",
+    "receivedAt": "2026-10-20T14:05:31Z",
+    "traceId": "trace-stripe-0100"
+  },
+  "outcome": {
+    "result": "ignored",
+    "httpStatus": 200,
+    "stripeType": "customer.created"
+  }
+}

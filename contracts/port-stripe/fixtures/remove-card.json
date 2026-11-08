@@ -1,0 +1,16 @@
+{
+  "call": "removeCard",
+  "given": {
+    "now": "2026-11-06T18:00:03Z",
+    "note": "A6-32 and S13-55: Ben T.'s booking was never made (close-pay-link.json), so the card saved for it is removed at once; nothing else needs it. It can never be charged again."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "customerId": "stripe-customer-demo-ben",
+    "paymentMethodId": "stripe-card-demo-ben"
+  },
+  "outcome": {
+    "result": "removed",
+    "paymentMethodId": "stripe-card-demo-ben"
+  }
+}

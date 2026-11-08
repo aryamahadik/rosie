@@ -1,0 +1,27 @@
+{
+  "call": "doublePlant",
+  "given": {
+    "now": "2026-11-08T14:05:02Z",
+    "note": "The Stripe double's reconciliation hook (02-contracts K-14): a test plants a booking charged twice, a second $20 charge under the effect id of Dee W.'s late-cancel fee, which list-double-charge.json then lists beside the first (S12-26)."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "plant": "secondCharge",
+    "amount": { "cents": 2000, "currency": "USD" },
+    "createdAt": "2026-11-08T14:05:02Z",
+    "effectId": "eff-dee-late-cancel-fee"
+  },
+  "outcome": {
+    "result": "planted",
+    "item": {
+      "kind": "charge",
+      "stripeId": "stripe-charge-demo-0021",
+      "paymentId": "stripe-payment-demo-0021",
+      "refundOf": null,
+      "effectId": "eff-dee-late-cancel-fee",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "state": "succeeded",
+      "createdAt": "2026-11-08T14:05:02Z"
+    }
+  }
+}

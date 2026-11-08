@@ -1,0 +1,33 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-20T14:06:11Z",
+    "note": "A5-07's form shows 'Card •••• 4242': when Alex's card is saved to his customer, Stripe's payment_method.attached carries the card, and the port keeps only its brand and last four (cardDetails), joined to cardSaved by the saved card's id. The body carries no expiry or number: the adapter would drop any other card detail Stripe sends.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1792505171,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0102\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1792505170,\"livemode\":false,\"type\":\"payment_method.attached\",\"data\":{\"object\":{\"id\":\"stripe-card-demo-alex\",\"object\":\"payment_method\",\"card\":{\"brand\":\"visa\",\"last4\":\"4242\"},\"customer\":\"stripe-customer-demo-alex\",\"type\":\"card\"}}}",
+    "receivedAt": "2026-10-20T14:06:11Z",
+    "traceId": "trace-stripe-0102"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0102",
+      "kind": "cardDetails",
+      "stripeType": "payment_method.attached",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-10-20T14:06:10Z",
+      "effectId": null,
+      "payload": {
+        "paymentMethodId": "stripe-card-demo-alex",
+        "customerId": "stripe-customer-demo-alex",
+        "card": { "brand": "visa", "last4": "4242" }
+      }
+    }
+  }
+}

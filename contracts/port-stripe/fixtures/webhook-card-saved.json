@@ -1,0 +1,33 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-20T14:06:11Z",
+    "note": "A5-07: Alex typed his card into Stripe's form on the secure page (save-card.json), and Stripe saved it to his customer on Lee's Barbershop's account. cardSaved names the saved card, linked to the saveCard effect by its effect id; nothing is charged.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1792505171,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0101\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1792505170,\"livemode\":false,\"type\":\"setup_intent.succeeded\",\"data\":{\"object\":{\"id\":\"stripe-setup-demo-alex-1\",\"object\":\"setup_intent\",\"customer\":\"stripe-customer-demo-alex\",\"metadata\":{\"rosie_effect_id\":\"eff-alex-haircut-save-card\"},\"payment_method\":\"stripe-card-demo-alex\",\"status\":\"succeeded\",\"usage\":\"off_session\"}}}",
+    "receivedAt": "2026-10-20T14:06:11Z",
+    "traceId": "trace-stripe-0101"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0101",
+      "kind": "cardSaved",
+      "stripeType": "setup_intent.succeeded",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-10-20T14:06:10Z",
+      "effectId": "eff-alex-haircut-save-card",
+      "payload": {
+        "setupId": "stripe-setup-demo-alex-1",
+        "customerId": "stripe-customer-demo-alex",
+        "paymentMethodId": "stripe-card-demo-alex"
+      }
+    }
+  }
+}

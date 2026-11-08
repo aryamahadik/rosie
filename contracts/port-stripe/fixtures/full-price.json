@@ -1,0 +1,29 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-07T16:10:01Z",
+    "note": "A5-16: Alex books the $55 Signature cut and hot towel shave at Lee's Barbershop and pays the full price now, on the page; the payment confirms the visit. Charged on his saved card as the booking is written, all due now in one payment (RULES 3.2)."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-signature-cut-full",
+      "idempotencyKey": "eff-alex-signature-cut-full"
+    },
+    "amount": { "cents": 5500, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "fullPrice",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": true,
+      "description": "Lee's Barbershop: Signature cut and hot towel shave, paid in full"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-0003",
+    "chargeId": "stripe-charge-demo-0003",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-11-07T16:10:02Z"
+  }
+}

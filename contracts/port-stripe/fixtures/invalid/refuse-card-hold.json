@@ -1,0 +1,30 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-07T15:20:01Z",
+    "note": "deposit.json asking Stripe to hold the $40 on Alex's card and capture it later (Stripe's capture_method manual). Refused: nothing is ever held on a card (RULES 3.2; D65), and the port has no field for a hold."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-grooms-deposit",
+      "idempotencyKey": "eff-alex-grooms-deposit"
+    },
+    "amount": { "cents": 4000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "deposit",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": true,
+      "description": "Lee's Barbershop: deposit for the Groom's package",
+      "captureMethod": "manual"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-0001",
+    "chargeId": "stripe-charge-demo-0001",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-11-07T15:20:02Z"
+  }
+}

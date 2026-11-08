@@ -1,0 +1,29 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-04T16:00:00Z",
+    "note": "S11-67, Wed Nov 4: the yoga studio's October bill, $2 for Alex M.'s workshop seat, goes on the card Sam saved for Rosfield's monthly bill, on Rosfield's own account (K-33 v1 seed-monthly-bill-charged.json: its rosfield_monthly_charge effect, key and amount). Charged."
+  },
+  "request": {
+    "effect": {
+      "effectId": "effect-bill-yoga-studio-2026-10-charge",
+      "idempotencyKey": "rosfield-bill-yoga-studio-2026-10-charge"
+    },
+    "amount": { "cents": 200, "currency": "USD" },
+    "port": {
+      "account": { "kind": "rosfield" },
+      "purpose": "rosfieldMonthlyBill",
+      "customerId": "stripe-customer-demo-sam-lee",
+      "paymentMethodId": "stripe-card-demo-sam-lee-1",
+      "customerPresent": false,
+      "description": "Rosfield's October bill for the yoga studio"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-yoga-studio-2026-10",
+    "chargeId": "stripe-charge-demo-yoga-studio-2026-10",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-11-04T16:00:02Z"
+  }
+}

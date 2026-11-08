@@ -1,0 +1,27 @@
+{
+  "call": "doublePlant",
+  "given": {
+    "now": "2026-11-08T19:00:02Z",
+    "note": "The Stripe double's reconciliation hook (02-contracts K-14): a test plants a $35 charge Rosie's platform made on Lee's Barbershop's account with no effect id on it, which list-charge-without-effect-id.json then lists (CQ-15)."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "plant": "chargeWithoutEffectId",
+    "amount": { "cents": 3500, "currency": "USD" },
+    "createdAt": "2026-11-08T19:00:02Z",
+    "effectId": null
+  },
+  "outcome": {
+    "result": "planted",
+    "item": {
+      "kind": "charge",
+      "stripeId": "stripe-charge-demo-0030",
+      "paymentId": "stripe-payment-demo-0030",
+      "refundOf": null,
+      "effectId": null,
+      "amount": { "cents": 3500, "currency": "USD" },
+      "state": "succeeded",
+      "createdAt": "2026-11-08T19:00:02Z"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-07T15:20:03Z",
+    "note": "arch 02 line 109: Stripe's event for Alex's $40 deposit (deposit.json) reaches the gateway on the endpoint for connected accounts. The signature checks out within 300 s, and the body parses into paymentSucceeded with its effect id, which the gateway stores once as K-07 v1 provider-event-stripe.json's event and answers 200.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1794064803,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0001\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1794064802,\"livemode\":false,\"type\":\"payment_intent.succeeded\",\"data\":{\"object\":{\"id\":\"stripe-payment-demo-0001\",\"object\":\"payment_intent\",\"amount\":4000,\"amount_received\":4000,\"currency\":\"usd\",\"customer\":\"stripe-customer-demo-alex\",\"latest_charge\":\"stripe-charge-demo-0001\",\"metadata\":{\"rosie_effect_id\":\"eff-alex-grooms-deposit\"},\"payment_method\":\"stripe-card-demo-alex\",\"status\":\"succeeded\"}}}",
+    "receivedAt": "2026-11-07T15:20:03Z",
+    "traceId": "trace-stripe-0001"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0001",
+      "kind": "paymentSucceeded",
+      "stripeType": "payment_intent.succeeded",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-11-07T15:20:02Z",
+      "effectId": "eff-alex-grooms-deposit",
+      "payload": {
+        "paymentId": "stripe-payment-demo-0001",
+        "chargeId": "stripe-charge-demo-0001",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "paymentMethodId": "stripe-card-demo-alex"
+      }
+    }
+  }
+}

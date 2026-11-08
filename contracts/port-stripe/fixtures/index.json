@@ -1,0 +1,404 @@
+{
+  "fixtures": [
+    {
+      "file": "onboarding-link.json",
+      "version": "v1",
+      "def": "onboardingLink.exchange",
+      "expect": "accept",
+      "shows": "S1-27: Sam connects Stripe in Lee's Barbershop's own name. With no account yet, the adapter makes one named Lee's Barbershop and gives Stripe's single-use onboarding link, good for 5 minutes; the account id goes to K-23 v1 business_setup.stripe_account_id",
+      "source": "02-contracts K-14 Defines ('an onboarding link for the business's own account, in its own name (S1-27)') and Fixtures; S1-27 in master-A.json (Mon Oct 19; 'Bank and tax details go to Stripe, never to us'; link rosfield.com/pay/s02); FS row M01 ('the name Stripe uses must match the registration'); README spike rows 1, 3"
+    },
+    {
+      "file": "account-status.json",
+      "version": "v1",
+      "def": "accountStatus.exchange",
+      "expect": "accept",
+      "shows": "S11-63: on the Money page, Lee's Barbershop's own Stripe has finished onboarding, can take charges and pay out, and Stripe wants nothing more",
+      "source": "02-contracts K-14 Defines ('its status (whether it can take charges; payout status: S11-63, S11-64)') and Fixtures; S11-63 in master-A.json (Mon Nov 2, 10:15am); README spike row 4"
+    },
+    {
+      "file": "save-card.json",
+      "version": "v1",
+      "def": "saveCard.exchange",
+      "expect": "accept",
+      "shows": "A5-07: a card saved for Alex's $35 haircut's $20 fee, nothing taken: the adapter makes his customer on the shop's own Stripe and the card save the secure page's Stripe form finishes with its client secret",
+      "source": "02-contracts K-14 Defines ('save a card for later (A5-07)') and Fixtures; A5-07 in master-A.json ('The card goes on file through Stripe, in Lee's Barbershop's own account, and nothing is charged now'); fixture set v1 test-kit/shops/barber.json (Haircut $35, fee $20); README spike row 5"
+    },
+    {
+      "file": "deposit.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "A5-13: the $40 deposit for Alex's $140 Groom's package, charged on his saved card as the booking is written while he is on the page, captured at once; charged with the PaymentIntent, its charge and the card's brand and last four (K-07 v1 effect-charge.json)",
+      "source": "02-contracts K-14 Defines ('a deposit (A5-13) ... all due now in one payment on one card, never a hold') and Fixtures; A5-13 in master-A.json; RULES 3.2; S13-55; barber.json (Groom's package $140, deposit $40); K-07 v1 fixtures/effect-charge.json"
+    },
+    {
+      "file": "full-price.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "A5-16: Alex pays the $55 Signature cut and hot towel shave in full when booking, in one payment on one card",
+      "source": "02-contracts K-14 Defines ('or the full price (A5-16)') and Fixtures; A5-16 in master-A.json (amounts 'list|full|*': $55); RULES 3.2"
+    },
+    {
+      "file": "charge-at-owner-ok.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "A6-03: at Sam's OK on Alex's request for wedding party grooming, the $160 deposit is charged on the card saved while the OK was pending, without Alex present (customerPresent false)",
+      "source": "02-contracts K-14 Defines ('a charge at the owner's OK (A6-03)') and Fixtures; A6-03 in master-A.json ('If a deposit or the full price is due now, it's charged as the booking is written'); RULES 3.11 ('the card is saved, then charged at the OK'); barber.json (Wedding party grooming $640, deposit $160)"
+    },
+    {
+      "file": "charge-failed-pay-link.json",
+      "version": "v1",
+      "def": "payLink.exchange",
+      "expect": "accept",
+      "shows": "A6-32: after the $25 Color correction deposit was declined at Sam's OK, Alex gets one pay link: the payment Rosie's own pay page takes, with its client secret, saving the card that pays it; its deadline is the clock row's",
+      "source": "02-contracts K-14 Defines ('with one pay link if it fails (A6-32)') and Fixtures; A6-32 in master-A.json ('After an OK: one link to pay, with one deadline'; 'that card is the one saved for it'; link rosfield.com/p/f4); RULES 3.11; master-A.json amounts ('visit|deposit|*': Color correction $25); README spike row 11"
+    },
+    {
+      "file": "off-session-at-done.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "A9-12: Riley texts DONE and the agreed $35 goes on Alex's saved card without him present; try 2 on the effect's one key after try 1's network error, charged once",
+      "source": "02-contracts K-14 Defines ('the saved card charged off-session at DONE (A9-12)') and Fixtures; A9-12 in master-A.json ('This visit is paid by the saved card, so the agreed price goes on it when Riley texts DONE'); arch 10 line 542; K-07 v1 retry rule 8; barber.json (Haircut $35)"
+    },
+    {
+      "file": "charge-network-error.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "Try 1 of the $35 at DONE gets no answer: transient, with no HTTP status, retried on the same key; not a decline",
+      "source": "arch 10 line 542 ('Stripe and calendar calls retry network errors 5 times in 10 minutes on one idempotency key'); K-07 v1 retry rule 8; A6-32 ('Card payments down isn't a decline'); README spike row 7"
+    },
+    {
+      "file": "decline-not-retried.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "The $40 deposit declined by the card's bank (402, card_declined, generic_decline): never retried; the page shows 'Try another card' (K-07 v1 effect-charge-declined.json)",
+      "source": "02-contracts K-14 Defines ('a decline never retried (RULES 3.11; arch 10 line 542)') and Fixtures; RULES 3.11; arch 10 line 542; K-07 v1 fixtures/effect-charge-declined.json; README spike row 6"
+    },
+    {
+      "file": "needs-authentication.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "With Alex on the page, his bank wants him to confirm the $55 handstand workshop: needsAuthentication with the client secret for the page's Stripe check; the outcome follows as an event",
+      "source": "A5-16 (paid in full when booking); fixture set v1 test-kit/shops/yoga.json (Handstand workshop $55 with Maya); S13-55 ('What's due now is taken once the booking is written'); README spike row 6 (authentication_required; bring the customer back on-session)"
+    },
+    {
+      "file": "pack-purchase.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "A5-22: a pack of 5 visits, $160, charged when bought on the yoga studio's page, into the studio's own Stripe",
+      "source": "02-contracts K-14 Defines ('packs and plans charged when bought (A5-22; RULES 3.9)') and Fixtures; A5-22 in master-A.json (form 'Pack of 5 visits, $160, charged when you buy it'); RULES 3.9; yoga.json (Hot Flow class)"
+    },
+    {
+      "file": "refund-part.json",
+      "version": "v1",
+      "def": "refund.exchange",
+      "expect": "accept",
+      "shows": "A10-12: Sam refunds $20 of the $55 Signature cut, read back first; the refund carries its own effect id",
+      "source": "02-contracts K-14 Defines ('refunds by effect id, whole or in part (S13-55; A10-09 to A10-12)') and Fixtures; A10-12 in master-A.json ('Sam names the amount by text or a call, and it's read back first'); RULES 3.10"
+    },
+    {
+      "file": "refund-double-charge.json",
+      "version": "v1",
+      "def": "refund.exchange",
+      "expect": "accept",
+      "shows": "S12-26: reconciliation refunds the second of Dee W.'s two $20 charges at once, reason duplicate (K-07 v1 effect-reconciliation-refund.json)",
+      "source": "02-contracts K-14 Defines ('S12-26 at once') and Fixtures; S12-26 in master-A.json ('Refunds the second charge at once'; Dee W.; $20); arch 10 line 550; RULES 3.10; K-07 v1 fixtures/effect-reconciliation-refund.json; README spike row 10 (refund reason duplicate)"
+    },
+    {
+      "file": "dispute-evidence-owner-yes.json",
+      "version": "v1",
+      "def": "disputeEvidence.exchange",
+      "expect": "accept",
+      "shows": "A10-16: on Sam's 'Send the record', the record of Alex's Sat Oct 24 haircut goes to the bank once, as a private file, with the visit's date and description and the customer's name, before the Fri Nov 6, 5pm deadline",
+      "source": "02-contracts K-14 Defines ('dispute evidence sent only on the owner's yes (A10-16)') and Fixtures; A10-16 in master-A.json ('Rosie builds the record from its own texts and the check-in. Nothing is sent without Sam'; 'Answer by Fri Nov 6, 5pm'); K-08 v1 approvalOwnerYes; README spike row 12"
+    },
+    {
+      "file": "bill-card.json",
+      "version": "v1",
+      "def": "saveCard.exchange",
+      "expect": "accept",
+      "shows": "S1-29; FS row M04: the card for Rosfield's monthly bill, saved on Rosfield's own account for Lee's Barbershop, Sam's customer made there",
+      "source": "02-contracts K-14 Defines ('the bill card saved at sign-up (S1-29; FS row M04)') and Fixtures; S1-29 in master-A.json ('the card for Rosfield's monthly bill: add it now, or before the first bill'); FS row M04; K-33 v1 fixtures/seed-bill-card.json (stripe-customer-demo-sam-lee)"
+    },
+    {
+      "file": "monthly-charge.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "accept",
+      "shows": "S11-67: the yoga studio's $2 October bill charged Wed Nov 4 on Sam's bill card, on Rosfield's own account (K-33 v1's rosfield_monthly_charge effect, key and amount)",
+      "source": "02-contracts K-14 Defines ('the monthly charge (S11-66, S11-67)') and Fixtures; S11-67 in master-A.json ('Each bill goes on the card Sam saved for Rosfield's monthly bill, never on a customer's card'); K-33 v1 fixtures/seed-monthly-bill-charged.json"
+    },
+    {
+      "file": "bill-pay-link.json",
+      "version": "v1",
+      "def": "payLink.exchange",
+      "expect": "accept",
+      "shows": "S11-68: Lee Home Services' $2 bill declined, so one pay link on Rosfield's own account, to pay by Wed Nov 18 on Rosie's page (K-33 v1's stripe_pay_link effect and the link's Stripe id)",
+      "source": "02-contracts K-14 Defines ('one pay link when it fails (S11-68)'); S11-68 in master-A.json ('Sam gets one pay link, with no chasing'; rosfield.com/bill/pay); K-33 v1 fixtures/seed-bill-unpaid-pause.json"
+    },
+    {
+      "file": "close-pay-link.json",
+      "version": "v1",
+      "def": "closePayLink.exchange",
+      "expect": "accept",
+      "shows": "A6-32 'Not paid in time': Ben T.'s pay link is still unpaid when its clock row fires at the deadline, so its payment is closed and nothing can be paid after it",
+      "source": "A6-32 in master-A.json ('Means 'Not paid in time': not booked, and the time goes back'); RULES 3.11 ('Not paid: not booked, nothing taken'); README spike row 11 (a PaymentIntent has no deadline of its own)"
+    },
+    {
+      "file": "remove-card.json",
+      "version": "v1",
+      "def": "removeCard.exchange",
+      "expect": "accept",
+      "shows": "S13-55: Ben T.'s booking was never made, so the card saved for it is removed at once and can never be charged again",
+      "source": "S13-55 in master-A.json ('A saved card is removed once nothing needs it. A booking that's declined or never made removes it at once'); A6-32 ('Any card saved for it is removed')"
+    },
+    {
+      "file": "page-intent-pay-link.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "accept",
+      "shows": "A6-32: Alex opens his pay link 78 minutes after it went; the pay page's server reads the payment by the effect row's providerObjectId and gets the client secret for the page's Stripe form, the $25 it takes and needsCard; the deadline stays the clock row's",
+      "source": "T-023 round 2, frontend review of 89c3af8 gap 1 (a page opened later has no source for the client secret); A6-32 in master-A.json (link rosfield.com/p/f4; 'After an OK, the link is due by {{clock.pay}}'); 01-inventory C-200; README spike row 19 (a PaymentIntent read with the secret key carries its client_secret and status)"
+    },
+    {
+      "file": "page-intent-card-saved.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "accept",
+      "shows": "A5-07: the secure page reads Alex's card save after it succeeded: no client secret goes out any more, and the page shows the card saved, 'Card •••• 4242'",
+      "source": "T-023 round 2, frontend review gap 1; A5-07 in master-A.json ('Card •••• 4242'; nothing taken); 01-inventory C-199; README spike row 19 (SetupIntent statuses; Stripe: the client secret 'should not be stored, logged, or exposed to anyone other than the customer')"
+    },
+    {
+      "file": "saved-card-bill-card.json",
+      "version": "v1",
+      "def": "savedCard.exchange",
+      "expect": "accept",
+      "shows": "FS row M04: the monthly bill shows Sam's bill card, read live by K-33 v1 bill_cards' two ids on Rosfield's own account: 'Card •••• 4242'",
+      "source": "T-023 round 2, frontend review gap 2 (M04's card display: K-33 README 'Stripe's, read through K-14', with no K-14 call); FS row M04 ('Card for Rosfield's monthly bill', shown on the monthly bill); K-33 v1 fixtures/seed-bill-card.json and seed-monthly-bill.json; README spike row 20"
+    },
+    {
+      "file": "list-48-hours.json",
+      "version": "v1",
+      "def": "listMoney.exchange",
+      "expect": "accept",
+      "shows": "C-112 at 03:00 UTC: Lee's Barbershop's charges and refunds over the last 48 hours, each with the effect id it was made under, its amount, its state and its Stripe id; the declined deposit is a failed charge",
+      "source": "02-contracts K-14 Defines ('List charges and refunds for reconciliation') and Fixtures ('list-48-hours.json'); arch 10 line 550 ('Daily at 03:00 UTC over the last 48 hours ... each Stripe charge and refund matched to its ledger line by effect id'); README spike rows 9, 10"
+    },
+    {
+      "file": "list-charge-without-effect-id.json",
+      "version": "v1",
+      "def": "listMoney.exchange",
+      "expect": "accept",
+      "shows": "CQ-15: a $35 charge Rosie's platform made with no effect id is listed with effectId null; under CQ-15's default it gets no line and no refund and goes to Rosie's team",
+      "source": "02-contracts K-14 Fixtures ('list-charge-without-effect-id.json (CQ-15)'); 02-contracts section 12 CQ-15 (default: never given a line and never refunded by reconciliation; Rosie's team within 1 business day); arch 10 line 550; S12-24; README spike row 10 (Charge.application)"
+    },
+    {
+      "file": "list-double-charge.json",
+      "version": "v1",
+      "def": "listMoney.exchange",
+      "expect": "accept",
+      "shows": "S12-26: Dee W.'s $20 fee charged twice under one effect id; the second charge has no ledger line and no agreed booking behind it, so reconciliation refunds it at once",
+      "source": "02-contracts K-14 Fixtures ('list-double-charge.json ... reconciliation refunds it at once and both are told: S12-26; arch 10 line 550'); S12-26 in master-A.json; README spike row 7 (a key Stripe has let go makes a new request)"
+    },
+    {
+      "file": "look-up-before-late-try.json",
+      "version": "v1",
+      "def": "listMoney.exchange",
+      "expect": "accept",
+      "shows": "S12-16: Ben T.'s $20 no-show fee runs again 25 hours 50 minutes after its effect row was written, after Stripe's outage; first the effects runner looks its effect id up from when the row was written, finds the charge try 1 made and takes it as the result, so nothing is charged twice",
+      "source": "T-023 round 2 lead note 5 and README open gap 4 (Stripe keeps a key 24 hours and replays a saved 500); BP section 0 (no charge without a bound yes); S12-16 in master-A.json ('Nothing is charged twice: each payment waits, and runs once it's back'); arch 11 line 582; K-07 v1 retry rule 8; S11-22 and S11-26 (Ben T.'s missed Tue 1:00pm haircut, $20 fee); README spike rows 7, 9, 10"
+    },
+    {
+      "file": "double-plant-charge-without-effect-id.json",
+      "version": "v1",
+      "def": "doublePlant.exchange",
+      "expect": "accept",
+      "shows": "The Stripe double plants a charge with no effect id on Lee's Barbershop's account, which the listing then gives back",
+      "source": "02-contracts K-14 Defines ('The double ... can plant a charge with no effect id'); CQ-15"
+    },
+    {
+      "file": "double-plant-second-charge.json",
+      "version": "v1",
+      "def": "doublePlant.exchange",
+      "expect": "accept",
+      "shows": "The Stripe double plants a second charge under the effect id of Dee W.'s fee, a booking charged twice",
+      "source": "02-contracts K-14 Defines ('The double ... can plant ... a booking charged twice'); S12-26"
+    },
+    {
+      "file": "webhook-event.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "arch 02 line 109: Stripe's signed event for Alex's deposit, on the connected-accounts endpoint, checks out and parses into paymentSucceeded with its effect id, stored once as K-07 v1 provider-event-stripe.json's event",
+      "source": "02-contracts K-14 Defines ('Webhooks in: the signature checked at the gateway (arch 02 line 109), events stored once in PostgreSQL (K-07 provider events)') and Fixtures; arch 02 line 109; K-07 v1 fixtures/provider-event-stripe.json; README spike rows 13, 14"
+    },
+    {
+      "file": "webhook-card-saved.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A5-07: Alex's card saved to his customer on the shop's own Stripe (setup_intent.succeeded), linked to the saveCard effect by its effect id",
+      "source": "A5-07 in master-A.json; 02-contracts K-14 'Webhooks in'; README spike rows 5, 13, 14"
+    },
+    {
+      "file": "webhook-card-details.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Alex's saved card as it may be shown: only its brand and last four (cardDetails from payment_method.attached), with no effect id",
+      "source": "A5-07's form ('Card •••• 4242'); K-33 v1 README open gap ('The card's display (brand and last four on the owner's pages, FS M04): Stripe's, read through K-14'); RULES 4.5; README 'Webhook events'"
+    },
+    {
+      "file": "webhook-card-replaced.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A9-14: the card network replaced Alex's saved card in place (payment_method.automatically_updated), so the port reports cardReplaced with only the new brand and last four; the saved card is marked replaced and nothing goes on it without asking",
+      "source": "T-023 round 2, action-layer review of 89c3af8 gap 2; A9-14 in master-A.json ('The card is declined, or it was replaced. Nothing goes on a new card without asking, so the customer gets one pay link'); A9-12 ('declined, expired or replaced'); S11-26 ('A replaced card: nothing goes on the new card without asking the customer first'); README spike row 21; the last four 5556 of Stripe's published Visa debit test card (README spike row 16's document T)"
+    },
+    {
+      "file": "webhook-bill-card-saved.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "S1-29: Sam's bill card saved on Rosfield's own account, on the endpoint for Rosfield's own account (no business account on the event); its ids are K-33 v1's bill card's",
+      "source": "S1-29 in master-A.json; FS row M04; K-33 v1 fixtures/seed-bill-card.json (saved 2026-10-19T18:18:00Z; stripe-card-demo-sam-lee-1); README spike row 14"
+    },
+    {
+      "file": "webhook-dispute-opened.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A10-15: Alex's bank opens a dispute about the $35 for Sat Oct 24; the event names the dispute, the charge and the bank's deadline, Fri Nov 6, 5pm",
+      "source": "A10-15 and A10-16 in master-A.json ('Alex's bank opens a dispute'; 'Answer by Fri Nov 6, 5pm'); README spike rows 12, 13"
+    },
+    {
+      "file": "webhook-payout-failed.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "S11-64 'A problem at Stripe': a payout to Lee's Barbershop's bank failed because the account is closed (account_closed)",
+      "source": "02-contracts K-14 Defines ('payout status: S11-63, S11-64'); S11-64 and S11-65 in master-A.json ('Stripe couldn't send Lee's Barbershop's payout: the bank account is closed'; Mon Nov 2, 10:30am); README spike rows 14, 18"
+    },
+    {
+      "file": "verify-bad-signature.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A signature with one byte changed: rejected with 401 and never parsed",
+      "source": "arch 02 line 109 ('Bad signature: 401, dropped'); README spike row 13"
+    },
+    {
+      "file": "verify-ignored.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A signed event of a type Rosie does not use (customer.created): answered 200 and dropped",
+      "source": "arch 02 line 109; README default 6; README spike row 13 ('Only listen to event types your integration requires')"
+    },
+    {
+      "file": "double-signed-webhook.json",
+      "version": "v1",
+      "def": "doubleWebhook.exchange",
+      "expect": "accept",
+      "shows": "The Stripe double signs paymentSucceeded for Alex's $25 pay link, paid in time on staging's pay page with the card that is then saved for it; verifyWebhook gives the same event back",
+      "source": "02-contracts K-14 Defines ('The double: fakes charges, declines, refunds, pay links, onboarding and webhook events'); BP 9.4; A6-32 ('Paid in time: it's booked ... and that card is the one saved for it'); T-023 round 2, action-layer review gap 1; README spike row 19 (setup_future_usage)"
+    },
+    {
+      "file": "span-charge.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "The K-08 effectRun span of the $35 charge at DONE: provider stripe, call charge, attempt 2; it got the step, the effect, whose account, the purpose and that Alex was not present, and decided charged, with no amount or card detail",
+      "source": "K-08 v1 README ('Outside calls'; effectRun: 'A Stripe, calendar or contacts call run from its effect row'; 'never the raw number or words'); arch 10 line 542; A9-12; K-01 bundle v0's id"
+    },
+    {
+      "file": "span-list-money.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of reconciliation's listing: provider stripe, call listMoney, run by the job with no turn or handle; 5 items listed, none without an effect id",
+      "source": "K-08 v1 README ('portCall covers ... Stripe's onboarding link, account status and reconciliation listing (K-14; arch 10 line 550)'); arch 10 line 550; C-112"
+    },
+    {
+      "file": "invalid/refuse-card-hold.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "A charge asking Stripe to hold the money and capture it later: refused, since nothing is ever held on a card and the port has no field for a hold (without captureMethod it is deposit.json)",
+      "source": "02-contracts K-14 Fixtures ('refuse-card-hold.json (D65; RULES 3.2)'); RULES 3.2 ('Nothing is ever held on a card'); S13-55; README spike row 6 (capture_method manual places a hold)"
+    },
+    {
+      "file": "invalid/refuse-charge-without-key.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "A charge without its effect's idempotency key: refused (with the key it is deposit.json)",
+      "source": "02-contracts K-14 Fixtures ('refuse-charge-without-key.json') and Defines ('Every call carries its effect's idempotency key (arch 10 line 542)'); K-07 v1 retry rule 8"
+    },
+    {
+      "file": "invalid/refuse-charge-without-effect-id.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "A charge request that does not store its effect id: refused, since reconciliation could not match it (with the effect id it is deposit.json)",
+      "source": "02-contracts K-14 Fixtures ('refuse-charge-without-effect-id.json (a charge request that does not store its effect id)'); arch 10 line 550"
+    },
+    {
+      "file": "invalid/refuse-dispute-evidence-without-owner-yes.json",
+      "version": "v1",
+      "def": "disputeEvidence.exchange",
+      "expect": "refuse",
+      "shows": "Dispute evidence with no owner's yes behind it: refused (with Sam's yes it is dispute-evidence-owner-yes.json)",
+      "source": "02-contracts K-14 Defines ('dispute evidence sent only on the owner's yes (A10-16)'); A10-16 ('Never: send the record without Sam')"
+    },
+    {
+      "file": "invalid/refuse-off-session-needs-authentication.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "A charge at the owner's OK, without Alex present, answered needsAuthentication: refused, since off-session the bank's ask is a decline (answered charged, it is charge-at-owner-ok.json)",
+      "source": "RULES 3.11; A6-32; README spike row 6 (off_session; authentication_required decline code)"
+    },
+    {
+      "file": "invalid/refuse-monthly-bill-on-business-account.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "Rosfield's monthly bill charged on a business's connected account: refused, since it goes only on the bill card on Rosfield's own account (on Rosfield's account it is monthly-charge.json)",
+      "source": "S11-67 ('Each bill goes on the card Sam saved for Rosfield's monthly bill, never on a customer's card'); FS row M04; RULES 3.1"
+    },
+    {
+      "file": "invalid/refuse-decimal-amount.json",
+      "version": "v1",
+      "def": "charge.exchange",
+      "expect": "refuse",
+      "shows": "An amount with a fraction of a cent: refused, since money is whole cents (with 4000 it is deposit.json)",
+      "source": "CQ-09 ('money in integer cents with a currency code'); K-07 v1 effectRow.amount; K-33 v1 rule 5"
+    },
+    {
+      "file": "invalid/refuse-card-in-span.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "refuse",
+      "shows": "The charge's span with the card's last four added to what it got: refused by the span's closed list, though K-08 alone would take the four digits as a label (without last4 it is span-charge.json)",
+      "source": "K-08 v1 ('never the raw number or words'); RULES 4.5; lead note for T-023 ('No card number, CVC or full card data ever enters the contract, a fixture or a log')"
+    },
+    {
+      "file": "invalid/refuse-page-secret-after-saved.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "refuse",
+      "shows": "A page read of Alex's card save that succeeded, still handing out its client secret: refused, since the secret goes out only while the page's form has something to do (with clientSecret null it is page-intent-card-saved.json)",
+      "source": "T-023 round 2, frontend review gap 1 and security review note N4 (keep the secret out of everything but the page that needs it); README spike row 19 (Stripe: 'It should not be stored, logged, or exposed to anyone other than the customer')"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-07T15:20:03Z",
+    "note": "arch 02 line 109 'Bad signature: 401, dropped': webhook-event.json's body with its v1 signature one byte changed. No v1 matches '<t>.<raw>' under the connected-accounts endpoint's secret, so the gateway answers 401 and the body is never parsed.",
+    "signing": "oneByteChanged"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1794064803,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0001\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1794064802,\"livemode\":false,\"type\":\"payment_intent.succeeded\",\"data\":{\"object\":{\"id\":\"stripe-payment-demo-0001\",\"object\":\"payment_intent\",\"amount\":4000,\"amount_received\":4000,\"currency\":\"usd\",\"customer\":\"stripe-customer-demo-alex\",\"latest_charge\":\"stripe-charge-demo-0001\",\"metadata\":{\"rosie_effect_id\":\"eff-alex-grooms-deposit\"},\"payment_method\":\"stripe-card-demo-alex\",\"status\":\"succeeded\"}}}",
+    "receivedAt": "2026-11-07T15:20:03Z",
+    "traceId": "trace-stripe-0002"
+  },
+  "outcome": {
+    "result": "rejected",
+    "httpStatus": 401,
+    "reason": "badSignature"
+  }
+}

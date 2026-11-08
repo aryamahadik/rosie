@@ -1,0 +1,22 @@
+{
+  "call": "accountStatus",
+  "given": {
+    "now": "2026-11-02T15:15:00Z",
+    "note": "S11-63, Mon Nov 2, 10:15am: Sam opens the Money page. Lee's Barbershop's own Stripe has finished onboarding, takes charges and pays out to its bank, and Stripe wants nothing more from Sam."
+  },
+  "request": {
+    "accountId": "stripe-acct-demo-lees-barbershop"
+  },
+  "outcome": {
+    "result": "status",
+    "accountId": "stripe-acct-demo-lees-barbershop",
+    "checkedAt": "2026-11-02T15:15:00Z",
+    "state": {
+      "onboardingFinished": true,
+      "canTakeCharges": true,
+      "canPayOut": true,
+      "infoDue": false,
+      "infoDueBy": null
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-30T13:00:01Z",
+    "note": "A10-15: Alex's bank opens a dispute about the $35 paid for Sat Oct 24 (off-session-at-done.json); Stripe takes it from Lee's Barbershop's balance while the bank decides. The bank's deadline for the record is Fri Nov 6, 5pm (A10-16), which Rosie asks Sam about.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1793365201,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0301\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1793365200,\"livemode\":false,\"type\":\"charge.dispute.created\",\"data\":{\"object\":{\"id\":\"stripe-dispute-demo-0001\",\"object\":\"dispute\",\"amount\":3500,\"charge\":\"stripe-charge-demo-0010\",\"currency\":\"usd\",\"evidence_details\":{\"due_by\":1794002400,\"has_evidence\":false,\"past_due\":false,\"submission_count\":0},\"payment_intent\":\"stripe-payment-demo-0010\",\"reason\":\"general\",\"status\":\"needs_response\"}}}",
+    "receivedAt": "2026-10-30T13:00:01Z",
+    "traceId": "trace-stripe-0301"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0301",
+      "kind": "disputeOpened",
+      "stripeType": "charge.dispute.created",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-10-30T13:00:00Z",
+      "effectId": null,
+      "payload": {
+        "disputeId": "stripe-dispute-demo-0001",
+        "chargeId": "stripe-charge-demo-0010",
+        "paymentId": "stripe-payment-demo-0010",
+        "amount": { "cents": 3500, "currency": "USD" },
+        "evidenceDueBy": "2026-11-06T22:00:00Z"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "call": "savedCard",
+  "given": {
+    "now": "2026-11-02T16:05:00Z",
+    "note": "FS row M04; S11-66: Lee's Barbershop's October bill went out Mon Nov 2 at 11:00am (K-33 v1 seed-monthly-bill.json), and the monthly bill shows the card it goes on Wed Nov 4. The page reads Sam's bill card live by K-33 v1 bill_cards' two ids on Rosfield's own account, since K-33 stores no card display, and shows 'Card •••• 4242'."
+  },
+  "request": {
+    "account": { "kind": "rosfield" },
+    "customerId": "stripe-customer-demo-sam-lee",
+    "paymentMethodId": "stripe-card-demo-sam-lee-1"
+  },
+  "outcome": {
+    "result": "card",
+    "paymentMethodId": "stripe-card-demo-sam-lee-1",
+    "card": { "brand": "visa", "last4": "4242" }
+  }
+}

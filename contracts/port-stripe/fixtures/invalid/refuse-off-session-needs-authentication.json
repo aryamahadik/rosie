@@ -1,0 +1,27 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-05T19:30:01Z",
+    "note": "charge-at-owner-ok.json answered needsAuthentication. Refused: Alex is not on a page at Sam's OK, so nobody can confirm with his bank; Stripe's ask comes back as a decline (authentication_required), never retried (RULES 3.11), and A6-32's one pay link follows."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-wedding-party-deposit",
+      "idempotencyKey": "eff-alex-wedding-party-deposit"
+    },
+    "amount": { "cents": 16000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "deposit",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": false,
+      "description": "Lee's Barbershop: deposit for wedding party grooming"
+    }
+  },
+  "outcome": {
+    "result": "needsAuthentication",
+    "paymentId": "stripe-payment-demo-0005",
+    "clientSecret": "demo-client-secret-payment-0005"
+  }
+}
