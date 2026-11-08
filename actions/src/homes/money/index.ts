@@ -27,6 +27,7 @@ export {
   fourWays,
   holds,
   ledgerFacts,
+  moneyTaken,
   readMoney,
   wayEffect,
   type MoneyBooking,
