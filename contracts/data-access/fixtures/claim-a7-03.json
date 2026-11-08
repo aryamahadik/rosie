@@ -1,0 +1,90 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["write-plan-a7-03.json"],
+    "now": "2026-10-23T14:05:02Z",
+    "note": "The dispatcher claims A7-03's row, the only open row: its two parts, the words and the poll, get their keys, and the claim (claim 1) lapses in 60 s. This chain leaves out renewClaim, which writes only the claim row (item 14) and is no part of what the reads that follow return."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "now": "2026-10-23T14:05:02Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-a7-03-alex",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "openQuestionId": "oq-a7-03-alex",
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+        "finalParts": {
+          "row": "out-a7-03-alex",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            },
+            {
+              "kind": "poll",
+              "text": null,
+              "calendarFile": "none",
+              "options": [
+                { "id": "A7-03/1", "label": "Sat 12:00pm" },
+                { "id": "A7-03/2", "label": "Sat 2:00pm" },
+                { "id": "A7-03/3", "label": "Sat 3:30pm" }
+              ],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "pro.name", "value": "Riley" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-a7-03-alex/1/1",
+            "attempts": 1,
+            "sent": false
+          },
+          {
+            "partNo": 2,
+            "tryNo": 1,
+            "idempotencyKey": "out-a7-03-alex/2/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0007",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-10-23T14:05:02Z",
+          "lapsesAt": "2026-10-23T14:06:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq"
+      }
+    ],
+    "passedHeld": []
+  }
+}

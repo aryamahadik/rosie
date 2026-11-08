@@ -1,0 +1,66 @@
+{
+  "call": "readTurnState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["arm-clock-a7-03-after-4006.json"],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "Alex answers in words as A7-03's words arrive, before its poll goes: the frontier reads his state under the barbershop's scope. The words part failed with 4006 and was then delivered, with no acceptance recorded (sent_at null, delivered_at 14:05:04), so it has gone and sentAt is its delivered_at; the poll part is still pending, so no poll has gone and pollId is null. Read by sent_at alone, this question would show no send time although it went (README item 26, default 41). This chain loads no phone row (commit-opens-question's seeds hold none), so phone is null."
+  },
+  "request": {
+    "handleId": "handle-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingIds": ["booking-alex-haircut"],
+    "facts": []
+  },
+  "outcome": {
+    "result": "turnState",
+    "handleId": "handle-alex",
+    "handle": { "kind": "phone", "address": "+15555550101" },
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-23T14:05:04Z",
+    "persons": [{ "personId": "person-alex", "language": "en", "version": 1 }],
+    "roles": [{ "roleId": "role-alex-barber", "personId": "person-alex", "role": "customer", "version": 1 }],
+    "phone": null,
+    "openQuestions": [
+      {
+        "id": "oq-a7-03-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "personId": "person-alex",
+        "turnId": "turn-alex-move-1",
+        "step": "A7-03",
+        "status": "open",
+        "options": [
+          { "id": "A7-03/1", "label": "Sat 12:00pm" },
+          { "id": "A7-03/2", "label": "Sat 2:00pm" },
+          { "id": "A7-03/3", "label": "Sat 3:30pm" }
+        ],
+        "readback": null,
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+        "clock": "24 h",
+        "sentAt": "2026-10-23T14:05:04Z",
+        "pollId": null,
+        "askCount": 1,
+        "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+        "version": 2
+      }
+    ],
+    "bookings": [
+      {
+        "id": "booking-alex-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-alex",
+        "servedPersonId": "person-alex",
+        "payerPersonId": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      }
+    ],
+    "pauses": [],
+    "consents": [],
+    "facts": []
+  }
+}

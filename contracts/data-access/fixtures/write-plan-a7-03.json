@@ -1,0 +1,65 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-opens-question.json"],
+    "now": "2026-10-23T14:05:02Z",
+    "note": "After A7-03's commit, the composer's plan and the final parts after code go into the row that asks it: the words, then the poll of the three times, the same plan and parts as K-04's seed-outbox-row. The chain that follows sends A7-03, so a read can show when the question went and as which poll (README item 26, default 41)."
+  },
+  "request": {
+    "outboxRowId": "out-a7-03-alex",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-a7-03-alex",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text", "poll"],
+        "lines": [
+          {
+            "role": "first",
+            "text": "Sure. Pick a new time for your haircut at {{biz.name:Lee's Barbershop}} with {{pro.name:Riley}}."
+          }
+        ],
+        "question": { "text": "Which time works?", "optionIds": ["A7-03/1", "A7-03/2", "A7-03/3"] },
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-a7-03-alex",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        },
+        {
+          "kind": "poll",
+          "text": null,
+          "calendarFile": "none",
+          "options": [
+            { "id": "A7-03/1", "label": "Sat 12:00pm" },
+            { "id": "A7-03/2", "label": "Sat 2:00pm" },
+            { "id": "A7-03/3", "label": "Sat 3:30pm" }
+          ],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "pro.name", "value": "Riley" }
+      ],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRowId": "out-a7-03-alex",
+    "version": 2
+  }
+}

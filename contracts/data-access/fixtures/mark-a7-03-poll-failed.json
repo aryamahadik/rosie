@@ -1,0 +1,30 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-poll-sent.json"],
+    "now": "2026-10-23T14:05:07Z",
+    "note": "Linq reports A7-03's poll failed after accepting it (K-06 poll-failed): a refused part goes again plain, its options typed (arch 07 line 367; K-07 outbox-poll-failed-plain), so the failure takes a next try under a new key, try 2/2, a plain retry of kind words (K-07 'Parts'). An accepted part reported failed puts its sent row back to checked, to be claimed again (K-07 sent to checked)."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-a7-03-alex/2/1",
+    "errorCode": "poll.failed",
+    "retry": true,
+    "at": "2026-10-23T14:05:07Z",
+    "providerMessageId": null,
+    "nextTryNotBefore": null
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 2,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": "out-a7-03-alex/2/2",
+    "row": { "state": "checked", "version": 7 }
+  }
+}

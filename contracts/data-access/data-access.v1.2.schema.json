@@ -1169,16 +1169,57 @@
     },
     "factTable": {
       "title": "FactTable",
-      "description": "A fact's home table: a table name as a frozen table list spells it, never sealing_keys. No column of a person's sealing key is a fact (rule 7; arch 01 line 93: deleting the key erases the data, so no copy of it may outlive the row): a request that names one is refused, readTurnState answers unknownFact for one and never returns one, wrapped or not (README item 26, default 30; refuse-read-turn-state-sealing-key-fact, refuse-read-turn-state-returns-sealing-key). New in v1.2.",
+      "description": "A fact's home table: a table name as a frozen table list spells it, never sealing_keys and never a table only Rosie's team reads. No column of a person's sealing key is a fact (rule 7; arch 01 line 93: deleting the key erases the data, so no copy of it may outlive the row), nor any column of the tables no business may read, its owner included, whose Tool API grant has no SELECT: K-34 v1 harm_reports (safety-incidents rule 4), K-36 v1 team_pages and team_page_recipients (notifications rule 2), and K-37 v1 parked_turns, dead_letters, gap_cases, review_items and live_turn_labels (platform-review rule 2). A request that names one is refused, readTurnState answers unknownFact for one and never returns one (README item 26, default 30; refuse-read-turn-state-sealing-key-fact, refuse-read-turn-state-returns-sealing-key, refuse-read-turn-state-returns-harm-report). The columns that hold a secret's hash in tables a fact may read (K-22 v1 proof_codes and sessions) are refused by secretColumn. New in v1.2; the team-only tables from T-072 round 3.",
       "allOf": [
         {
           "$ref": "#/$defs/tableName"
         },
         {
           "not": {
-            "description": "K-04 v1 sealing_keys: person_id, wrapped_key, wrapping_key_name, created_at, erased_at and version are never facts.",
-            "const": "sealing_keys"
+            "description": "K-04 v1 sealing_keys (person_id, wrapped_key, wrapping_key_name, created_at, erased_at and version), and every column of the team-only tables K-34 v1 harm_reports, K-36 v1 team_pages and team_page_recipients, and K-37 v1 parked_turns, dead_letters, gap_cases, review_items and live_turn_labels, are never facts.",
+            "enum": [
+              "sealing_keys",
+              "harm_reports",
+              "team_pages",
+              "team_page_recipients",
+              "parked_turns",
+              "dead_letters",
+              "gap_cases",
+              "review_items",
+              "live_turn_labels"
+            ]
           }
+        }
+      ]
+    },
+    "secretColumn": {
+      "title": "SecretColumn",
+      "description": "A fact's home (table and column) that holds a secret's hash, which is never a fact (rule 7): K-22 v1 people-access proof_codes.code_hash (a proof code's keyed hash; the code itself is stored nowhere), sessions.token_sha256 (a session token's hash) and sessions.device_sha256 (a device's hash), which no Tool API call reads or searches (K-22 README rule 5). factRef and factValue are never one of these, so readTurnState answers unknownFact for one and never returns one, on the runtime side (businessId null) too, where no grant stands between the read and the row (README item 26, default 30; refuse-read-turn-state-session-token-fact). New in v1.2 (T-072 round 3).",
+      "type": "object",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "table": {
+              "const": "proof_codes"
+            },
+            "column": {
+              "const": "code_hash"
+            }
+          },
+          "required": ["table", "column"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "table": {
+              "const": "sessions"
+            },
+            "column": {
+              "enum": ["token_sha256", "device_sha256"]
+            }
+          },
+          "required": ["table", "column"]
         }
       ]
     },
@@ -1272,7 +1313,7 @@
     },
     "openQuestionRead": {
       "title": "OpenQuestionRead",
-      "description": "A live open question sent to a handle (K-04 open_questions with status waiting or open: arch 01 line 63; arch 09 line 490; tour lines 423 to 427), as the guard lists it and the frontier builds its options from it (arch 03 line 159: 'every one sent to this handle'; questions about other bookings add only their options, labeled by business, date and time), with the send time and poll id K-02 v1's openQuestion carries (model.v1.schema.json /$defs/openQuestion: sentAt, pollId), read from K-04 v1's outbox rows that ask it (outbox_rows.open_question_id) and their parts (outbox_parts.sent_at; the poll part's linq_message_id). New in v1.2.",
+      "description": "A live open question sent to a handle (K-04 open_questions with status waiting or open: arch 01 line 63; arch 09 line 490; tour lines 423 to 427), as the guard lists it and the frontier builds its options from it (arch 03 line 159: 'every one sent to this handle'; questions about other bookings add only their options, labeled by business, date and time), with the send time and poll id K-02 v1's openQuestion carries (model.v1.schema.json /$defs/openQuestion: sentAt, pollId), read from K-04 v1's outbox rows that ask it and go to its own handle (outbox_rows.open_question_id, recipient_handle_id) and their parts that have gone, sent or delivered, never pending or failed (outbox_parts.state, kind, sent_at, delivered_at, linq_message_id; K-07 v1 part states). New in v1.2.",
       "type": "object",
       "properties": {
         "id": {
@@ -1339,11 +1380,11 @@
           ]
         },
         "sentAt": {
-          "description": "When it went out (K-02 v1 openQuestion.sentAt; arch 01 line 63; arch 02 line 127): the latest outbox_parts.sent_at among the parts of the outbox rows that ask it (outbox_rows.open_question_id; K-04 v1), so a question asked again gives its newest send (README default 41); null until a part has gone. New in v1.2.",
+          "description": "When it went out (K-02 v1 openQuestion.sentAt: sent to this handle; arch 01 line 63; arch 02 line 127): the latest time a part went among the parts of the outbox rows that ask it and go to its own handle (outbox_rows.open_question_id, and recipient_handle_id the question's handle_id; K-04 v1), so an email copy to another handle never counts. A part has gone when it is sent or delivered, never while pending and never once failed (K-07 v1), and it went at its outbox_parts.sent_at, or at its delivered_at when Linq's acceptance was never recorded (a 4001 or 4006 that delivered anyway: K-07 failed to delivered; README item 31). So a question asked again gives its newest send (README default 41); null until a part has gone. New in v1.2.",
           "$ref": "#/$defs/nullableUtc"
         },
         "pollId": {
-          "description": "The poll it went out as, so a vote answers its own poll (K-02 v1 openQuestion.pollId; arch 03 line 187): the linq_message_id of the latest sent part of kind poll among those rows' parts, which a vote names as K-06 v1 poll.pollId (K-04 seed-outbox-row: linq-msg-demo-0002); null for a question that went out as text only, by email, or whose poll has not gone yet (README default 41). New in v1.2.",
+          "description": "The poll it went out as, so a vote answers its own poll (K-02 v1 openQuestion.pollId; arch 03 line 187): the linq_message_id of the latest part of kind poll that has gone (sent or delivered, never failed) among those rows' parts, which a vote names as K-06 v1 poll.pollId (K-04 seed-outbox-row: linq-msg-demo-0002); a poll delivered after a 4001 or 4006 gives the id its receipt stored (README item 31). Null for a question that went out as text only or by email, whose poll has not gone yet, or whose poll failed, even after Linq accepted it, since its options then go again as plain text (K-02: null when it went out as text; K-07 outbox-poll-failed-plain; README default 41). New in v1.2.",
           "$ref": "#/$defs/nullableId"
         },
         "askCount": {
@@ -1434,8 +1475,11 @@
     },
     "factRef": {
       "title": "FactRef",
-      "description": "A fact the frontier needs, named by its key and its one home: the table, the row's primary key as text and the column (arch 02 line 117: 'each fact once, from its one home'; S13-30; K-02 v1 fact row ids). Which home a key has is the frontier's and the bundle's (C-075), never this call's; that the request names each key once is the frontier's check (a second value for one key is refused there). Never a column of sealing_keys (factTable). New in v1.2.",
+      "description": "A fact the frontier needs, named by its key and its one home: the table, the row's primary key as text and the column (arch 02 line 117: 'each fact once, from its one home'; S13-30; K-02 v1 fact row ids). Which home a key has is the frontier's and the bundle's (C-075), never this call's; that the request names each key once is the frontier's check (a second value for one key is refused there). Never a column of sealing_keys or of a table only Rosie's team reads (factTable), nor a secret's hash (secretColumn). New in v1.2.",
       "type": "object",
+      "not": {
+        "$ref": "#/$defs/secretColumn"
+      },
       "properties": {
         "key": {
           "description": "The fact's key, such as biz.name.",
@@ -1458,8 +1502,11 @@
     },
     "factValue": {
       "title": "FactValue",
-      "description": "A fact read from its home row on the primary: its key and home, the column's value and the row's version, which a commit compares and sets (limit 4: arch 06 line 305). The value is written as K-04's seed fixtures write values: JSON for jsonb, JSON booleans and numbers, and PostgreSQL text input for the rest (a timestamptz in UTC ending in Z, a time as HH:MM). Never a column of sealing_keys, so no key, wrapped or not, reaches the Tool API, the frontier or the model's context (factTable). New in v1.2.",
+      "description": "A fact read from its home row on the primary: its key and home, the column's value and the row's version, which a commit compares and sets (limit 4: arch 06 line 305). The value is written as K-04's seed fixtures write values: JSON for jsonb, JSON booleans and numbers, and PostgreSQL text input for the rest (a timestamptz in UTC ending in Z, a time as HH:MM). Never a column of sealing_keys, so no key, wrapped or not, reaches the Tool API, the frontier or the model's context, nor a column of a table only Rosie's team reads (factTable), nor a secret's hash (secretColumn). New in v1.2.",
       "type": "object",
+      "not": {
+        "$ref": "#/$defs/secretColumn"
+      },
       "properties": {
         "key": {
           "type": "string",
@@ -1603,7 +1650,7 @@
     },
     "unknownFactError": {
       "title": "UnknownFactError",
-      "description": "A fact names a table or column that no frozen database part lists, a table whose rows carry no version (a fact is compared and set by its row's version: limit 4), or any column of sealing_keys, which is never a fact (factTable; rule 7). The call builds its reads from the names a frozen table list gives, never from the request's words alone. Nothing was read. New in v1.2.",
+      "description": "A fact names a table or column that no frozen database part lists, a table whose rows carry no version (a fact is compared and set by its row's version: limit 4), any column of sealing_keys or of a table only Rosie's team reads (factTable), or a secret's hash (K-22 proof_codes.code_hash, sessions.token_sha256, sessions.device_sha256: secretColumn), none of which is ever a fact (rule 7). The call builds its reads from the names a frozen table list gives, never from the request's words alone. Nothing was read. New in v1.2.",
       "type": "object",
       "properties": {
         "error": {
@@ -1645,7 +1692,7 @@
           "uniqueItems": true
         },
         "facts": {
-          "description": "The facts the frontier's steps need, each by its key and its home (factRef), never a column of sealing_keys (unknownFact). Each home row must be found under the scope (notFound otherwise).",
+          "description": "The facts the frontier's steps need, each by its key and its home (factRef), never a column of sealing_keys or of a table only Rosie's team reads, nor a secret's hash (unknownFact). Each home row must be found under the scope (notFound otherwise).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/factRef"
@@ -1741,7 +1788,7 @@
           ]
         },
         "openQuestions": {
-          "description": "Every live open question sent to this handle at this business (with no business: those with none), in id order (compared, never parsed: CQ-09; K-04 open_questions has no time column), each with its send time and poll id, read from the outbox rows that ask it under the same scope (README item 26).",
+          "description": "Every live open question sent to this handle at this business (with no business: those with none), in id order (compared, never parsed: CQ-09; K-04 open_questions has no time column), each with its send time and poll id, read from the outbox rows that ask it and go to this handle, under the same scope (README item 26).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/openQuestionRead"
@@ -1795,7 +1842,7 @@
     },
     "readTurnState.errors": {
       "title": "ReadTurnStateErrors",
-      "description": "notFound: the handle, a requested booking or a fact's home row does not exist, or the business scope hides it (another business's row: K-04 v1 rule 4), named by the first one missing; unknownFact (a column no frozen table list gives, a table with no version, or any column of sealing_keys); transient. Nothing is returned.",
+      "description": "notFound: the handle, a requested booking or a fact's home row does not exist, or the business scope hides it (another business's row: K-04 v1 rule 4), named by the first one missing; unknownFact (a column no frozen table list gives, a table with no version, any column of sealing_keys or of a table only Rosie's team reads, or a secret's hash: factTable, secretColumn); transient. Nothing is returned.",
       "oneOf": [
         {
           "$ref": "#/$defs/notFoundError"

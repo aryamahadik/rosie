@@ -1,0 +1,29 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["claim-a7-03.json"],
+    "now": "2026-10-23T14:05:03Z",
+    "note": "Linq answers A7-03's words part with 4006, which may still deliver (arch 01 line 65; K-11 mayStillDeliver), and names no message id (K-11 error-4006.json): the part is failed with no acceptance recorded and no next try yet, since a new key goes only if no receipt comes within 1 minute (K-07 rule 2). The poll waits for the words. The row stays sending; its version rises."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-a7-03-alex/1/1",
+    "errorCode": "4006",
+    "retry": false,
+    "at": "2026-10-23T14:05:03Z",
+    "providerMessageId": null
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "sending", "version": 4 }
+  }
+}

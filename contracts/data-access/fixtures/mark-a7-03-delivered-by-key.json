@@ -1,0 +1,27 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-failed-4006.json"],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "The receipt for A7-03's words comes a second after the 4006, with its message id and the part's key echoed (K-11 partKey). No part holds that message id, so the part is found by its key and moves failed to delivered (K-07 'a 4001 or 4006 that delivered anyway'), keeping the message id; its sent_at stays null, since Linq's acceptance was never recorded. It is the row's first delivery, so the caller arms the question's clock. The poll is still pending, so the row stays sending."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0301",
+    "at": "2026-10-23T14:05:04Z",
+    "idempotencyKey": "out-a7-03-alex/1/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": true,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "sending", "version": 5 }
+  }
+}

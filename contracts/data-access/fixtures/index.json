@@ -969,6 +969,78 @@
       "source": "QUESTIONS.md CQ-43; K-08 v1.1 effect.claimed, event-effect-claimed-outage.json; arch 11 line 582"
     },
     {
+      "file": "write-plan-a7-03.json",
+      "version": "v1.2",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "After A7-03's commit its row gets its plan and final parts, the words then the poll, as K-04's seed-outbox-row holds them, so the chain that follows can send the question",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts; K-04 v1 seed-outbox-row; tour lines 423 to 427"
+    },
+    {
+      "file": "claim-a7-03.json",
+      "version": "v1.2",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "The dispatcher claims A7-03's row: its two parts, the words and the poll, get their keys, with its claim and its port",
+      "source": "02-contracts K-05 item 3; K-05 v1.1 item 13, v1.2 item 30; K-07 v1 outboxClaim, port"
+    },
+    {
+      "file": "mark-a7-03-failed-4006.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq answers A7-03's words with 4006 and no message id: the part fails with no acceptance recorded and no next try yet, waiting a minute for a receipt",
+      "source": "arch 01 line 65; K-11 v1 mayStillDeliver, error-4006.json; K-07 v1 rule 2, partMove pending to failed"
+    },
+    {
+      "file": "mark-a7-03-delivered-by-key.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "The receipt for A7-03's words comes within the minute: found by the part's key, the part goes failed to delivered with no sent time, and it is the row's first delivery",
+      "source": "K-11 v1 README 'A late receipt after 4001 or 4006'; K-07 v1 partMove failed to delivered, outbox-4001-delivered-anyway; K-05 v1.2 item 31"
+    },
+    {
+      "file": "arm-clock-a7-03-after-4006.json",
+      "version": "v1.2",
+      "def": "armClock.exchange",
+      "expect": "accept",
+      "shows": "A7-03's clock arms at that first delivery, 24 hours on, and the question opens",
+      "source": "arch 02 line 127; tour line 425; K-05 v1 item 5, default 8; K-04 clock_rows.armed_at, due_at, due_zone"
+    },
+    {
+      "file": "read-turn-state-delivered-after-4006.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "A question delivered after a 4006: its words were never accepted but were delivered, so they have gone and the frontier reads A7-03's send time as their delivery; its poll has not gone, so it has no poll id",
+      "source": "K-02 v1 openQuestion.sentAt, pollId; arch 01 line 63; arch 02 line 127; K-07 v1 part states, outbox-4001-delivered-anyway; K-05 v1.2 items 26, 31, default 41; action-layer review of T-072 round 2 (point 12)"
+    },
+    {
+      "file": "mark-a7-03-poll-sent.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "After the words' receipt A7-03's poll goes and Linq accepts it with its option ids; the last part accepted, the row is sent",
+      "source": "K-07 v1 rule 4, partMove pending to sent, rowMove sending to sent; K-04 outbox_parts.linq_message_id, linq_option_ids"
+    },
+    {
+      "file": "mark-a7-03-poll-failed.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq reports the accepted poll failed: it goes again plain, its options typed under the next key, and the row is checked again to be claimed",
+      "source": "arch 07 line 367; K-06 v1 poll-failed; K-07 v1 partMove sent to failed, rowMove sent to checked, outbox-poll-failed-plain, Parts (a plain retry is words)"
+    },
+    {
+      "file": "targets-poll-failed-plain.json",
+      "version": "v1.2",
+      "def": "handleTargets.exchange",
+      "expect": "accept",
+      "shows": "A poll that failed after Linq accepted it and goes again as plain text: the guard lists A7-03 with no poll id and with the words' send time, never the failed poll's",
+      "source": "K-02 v1 openQuestion.pollId ('null when it went out as text'); arch 03 line 187; K-07 v1 outbox-poll-failed-plain; K-05 v1.2 items 26, 27, default 41; action-layer review of T-072 round 2 (points 11, 12)"
+    },
+    {
       "file": "invalid/refuse-handle-key-with-key-value.json",
       "version": "v1.2",
       "def": "handleSealingKey.request",
@@ -1031,6 +1103,22 @@
       "expect": "refuse",
       "shows": "A turn state that carries Alex's wrapped key (K-04's seed stand-in bytes) as a fact: readTurnState never returns a sealing key's column, wrapped or not, to the Tool API, the frontier or the model's context",
       "source": "BP rule 7; arch 01 lines 93, 95 (a gap case is logged with its state and frontier); K-02 v1 context facts; K-04 v1 sealing_keys, seed-sealing-key; security review of T-072 round 1 (gap 1)"
+    },
+    {
+      "file": "invalid/refuse-read-turn-state-session-token-fact.json",
+      "version": "v1.2",
+      "def": "readTurnState.request",
+      "expect": "refuse",
+      "shows": "A read on the runtime side that names Sam's session token's hash as a fact: a secret's hash is never a fact, so the request is refused (the call answers unknownFact for one)",
+      "source": "BP rule 7; K-22 v1 sessions.token_sha256, README rule 5, seed-session; security review of T-072 round 2 (N3)"
+    },
+    {
+      "file": "invalid/refuse-read-turn-state-returns-harm-report.json",
+      "version": "v1.2",
+      "def": "readTurnState.response",
+      "expect": "refuse",
+      "shows": "A turn state under the barbershop's scope that carries, as a fact, whom Alex's report about staff names: a table only Rosie's team reads is never a fact, so its rows never reach the business, its owner included",
+      "source": "S11-70; A3-49; K-34 v1 harm_reports, README rule 4, seed-harm-report; security review of T-072 round 2 (N3)"
     }
   ]
 }

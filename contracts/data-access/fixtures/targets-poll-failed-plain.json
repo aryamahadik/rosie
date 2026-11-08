@@ -1,0 +1,77 @@
+{
+  "call": "handleTargets",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-poll-failed.json"],
+    "now": "2026-10-23T14:05:08Z",
+    "note": "Alex texts again after A7-03's poll failed and before its options go again typed (try 2/2, pending): the guard lists his targets. The poll part was accepted at 14:05:05 and then failed, so it has not gone: it gives no pollId (K-02: null when the question goes out as text) and its sent_at is no send time. The words part went (delivered at 14:05:04 after its 4006), so sentAt is 14:05:04. Read by sent_at alone, this question would show the failed poll's id and 14:05:05 (README item 26, default 41). No phone row is loaded in this chain, so phone is null."
+  },
+  "request": {
+    "handleId": "handle-alex"
+  },
+  "outcome": {
+    "result": "targets",
+    "handleId": "handle-alex",
+    "readAt": "2026-10-23T14:05:08Z",
+    "persons": [
+      {
+        "personId": "person-alex",
+        "roles": [
+          { "roleId": "role-alex-barber", "businessId": "biz-lees-barbershop", "role": "customer", "version": 1 },
+          { "roleId": "role-alex-yoga", "businessId": "biz-yoga-studio", "role": "customer", "version": 1 }
+        ]
+      }
+    ],
+    "openQuestions": [
+      {
+        "id": "oq-a7-03-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "personId": "person-alex",
+        "turnId": "turn-alex-move-1",
+        "step": "A7-03",
+        "status": "open",
+        "options": [
+          { "id": "A7-03/1", "label": "Sat 12:00pm" },
+          { "id": "A7-03/2", "label": "Sat 2:00pm" },
+          { "id": "A7-03/3", "label": "Sat 3:30pm" }
+        ],
+        "readback": null,
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+        "clock": "24 h",
+        "sentAt": "2026-10-23T14:05:04Z",
+        "pollId": null,
+        "askCount": 1,
+        "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+        "version": 2
+      }
+    ],
+    "bookings": [
+      {
+        "id": "booking-alex-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-alex",
+        "servedPersonId": "person-alex",
+        "payerPersonId": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      },
+      {
+        "id": "booking-alex-workshop",
+        "businessId": "biz-yoga-studio",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-alex",
+        "servedPersonId": "person-alex",
+        "payerPersonId": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    ],
+    "phone": null
+  }
+}
