@@ -82,7 +82,7 @@ const validateCheckResult = ajv.getSchema(`${planSchema.$id}#/$defs/checkResult`
 /**
  * The context of a row like the fixtures' (K-03 composeInput): iMessage in an open chat, so every format is allowed;
  * English; Lee's Barbershop; the step's options are the ones its poll carries; nothing typed; no facts beyond the slot
- * values, no reader's name and no master line, so every value must be a slot value.
+ * values, none of Rosie's own terms, no reader's name and no master line, so every value must be a slot value.
  */
 function contextFor(parts: FinalParts, change: Partial<CheckContext> = {}): CheckContext {
   return {
@@ -93,6 +93,7 @@ function contextFor(parts: FinalParts, change: Partial<CheckContext> = {}): Chec
     typedOptions: null,
     allowedFormats: ["text", "poll", "linkCard", "calendarFile", "tapback"],
     facts: [],
+    terms: [],
     readerName: null,
     masterText: null,
     ...change,
@@ -866,6 +867,33 @@ describe("lengthAndReading: 22 words and 4 commas a sentence, 260 or 320 charact
     const quote = `${sentenceOf(30)} ${"a".repeat(400)}`;
     const relay = textOf(`Alex M. asks: ${quote}`, [ALEX, { slot: "relay.quote", value: quote }]);
     expect(lengthAndReadingFaults(relay, contextFor(relay))).toEqual([]);
+  });
+
+  it("counts none of Rosie's own fixed terms, like slot values, while Values still reads them (K-03 v1.1; DL-158)", () => {
+    // S1-02's four card lines, each naming no slot (K-03 v1.1 input-s1-02-v1.1.json's term facts), and plan-s1-02.json's
+    // fact line, which states three of them word for word.
+    const input = readJson(`${PLAN}/fixtures/input-s1-02-v1.1.json`) as { facts: { value: string }[] };
+    const plan = readJson(`${PLAN}/fixtures/plan-s1-02.json`) as { lines: { text: string }[] };
+    const terms = input.facts.map((fact) => fact.value);
+    const line = plan.lines[1]?.text ?? "";
+    expect(terms).toHaveLength(4);
+    const parts = textOf(
+      `I'll set up your business so you can be booked.\n${line}\nWhat kinds of work do you do?`,
+    );
+    const facts: SlotValue[] = terms.map((value) => ({ slot: "term", value }));
+    // Read as the model's own words, the fact line is one sentence of 26 words.
+    expect(lengthAndReadingFaults(parts, contextFor(parts, { facts }))).toEqual([
+      'The sentence "About 15 minutes for ..." has 26 words; keep each sentence to 22 words or fewer.',
+    ]);
+    // Given as the row's terms, none of their words is counted, and the line is still a line of the shape.
+    expect(lengthAndReadingFaults(parts, contextFor(parts, { facts, terms }))).toEqual([]);
+    expect(shapeFaults(parts, contextFor(parts, { facts, terms }))).toEqual([]);
+    expect(runMessageChecks(parts, contextFor(parts, { facts, terms })).passed).toBe(true);
+    // The Values check still reads each of their words: a number in a term stands only where a fact holds it.
+    expect(valuesFaults(parts, contextFor(parts, { terms }))).toEqual([
+      "The price $2 is not a code-supplied fact; write each price as its slot.",
+      "The number 15 is not a code-supplied fact; write each number as its slot.",
+    ]);
   });
 
   it("fails English above grade 9.5, and grades no other language", () => {

@@ -1,6 +1,6 @@
 // How the message checks read the final parts (arch 07 lines 361, 409 to 417): what code inserted (fixed lines and typed
-// options), what is a quote (outside Values, One question and Never in a message), what is a slot value or a link
-// (outside the Shape and Length counts), and what is left: the model's own words.
+// options), what is a quote (outside Values, One question and Never in a message), what is a slot value, one of Rosie's
+// own fixed terms or a link (outside the Shape and Length counts), and what is left: the model's own words.
 
 import type { CheckContext, FinalParts, Option } from "./types";
 
@@ -127,12 +127,21 @@ export function markOut(text: string, pieces: readonly Filled[], mark: string): 
 }
 
 /**
+ * Rosie's own fixed terms (K-03 v1.1 term facts; CQ-86; DL-158): code-supplied words like a slot value, wherever each
+ * stands whole.
+ */
+function termsOf(context: CheckContext): Filled[] {
+  return context.terms.map((text) => ({ text, once: false }));
+}
+
+/**
  * The model's own words in the words send (arch 07 line 417: Shape and Length "count only model-written words, not
  * fixed lines, options, slot values, links or quotes"): fixed lines and typed options out, each slot value (a quote at
- * its own place) and each link as `mark`. A mark of "$" keeps a sentence break the master's split sees (lib.js line
- * 481) and is no word of its own (line 482), so the counts read the model's words in the sentences the reader sees.
+ * its own place), each of Rosie's own fixed terms (DL-158) and each link as `mark`. A mark of "$" keeps a sentence break
+ * the master's split sees (lib.js line 481) and is no word of its own (line 482), so the counts read the model's words
+ * in the sentences the reader sees.
  */
 export function ownWords(parts: FinalParts, context: CheckContext, mark: string): string {
   const composed = withoutInserted(wordsText(parts), insertedWords(parts, context));
-  return markOut(composed, filledOf(parts), mark).replace(LINK, () => mark);
+  return markOut(composed, [...filledOf(parts), ...termsOf(context)], mark).replace(LINK, () => mark);
 }
