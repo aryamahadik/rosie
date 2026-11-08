@@ -13,14 +13,16 @@
 //      (rewrite/attempt.ts);
 //   3. what happens next (arch 07 line 417): every check passed, it sends; a miss on the composed plan gets its one
 //      rewrite, told what failed, and nothing is written; a blocking miss on the rewrite takes the step's fallback text
-//      through the same steps; nothing passed, the passed-on line goes, the question is withdrawn and one team review
-//      item is opened (rewrite/passed-on.ts); a miss only of Shape, Length and reading or Format after the rewrite, or a
-//      message past four fact lines, sends and is logged;
+//      through the same steps, except that limit 7 never cuts the master's words: a slot the reader may never see stays
+//      as written, so Values fails on its '{{' (rewrite/fallback.ts; DL-158 ruling b); nothing passed, the passed-on line
+//      goes, the question is withdrawn and one team review item is opened (rewrite/passed-on.ts); a miss only of Shape,
+//      Length and reading or Format after the rewrite, or a message past four fact lines, sends and is logged;
 //   4. the write: the plan and the final parts together (K-05 v1 writePlan, K-07 v1 planned to checked).
 //
 // Paging Rosie's team for a passed-on message is T-319's (M3b): teamPageId stays null here. Nothing here logs a value
-// or a text's words: the notes are labels (FinalizeNote), the span keeps row ids, every throw names a fault. What the
-// one rewrite is told is rewriteTold (rewrite/told.ts), never the parts it checked.
+// or a text's words: the notes are labels (FinalizeNote), the span keeps row ids, every throw names a fault. No check
+// detail the answer gives holds a filled value (rewrite/told.ts withoutValues; DL-158 ruling c), and what the one
+// rewrite is told is rewriteTold, never the parts it checked.
 
 import type { CallContext, Handler } from "../tool-api";
 import { claimPlan, claimText, type ClaimContext } from "./claim-check";
@@ -29,6 +31,8 @@ import {
   FinalizeRefusedError,
   buildParts,
   checkAttempt,
+  checksWithoutValues,
+  claimFallback,
   outcomeOf,
   passedOnParts,
   passedOnReview,
@@ -110,9 +114,12 @@ function addFaults(found: PartFaults, check: keyof PartFaults, faults: readonly 
   if (list.length > 0) found[check] = list;
 }
 
-/** K-03 v1 `checkResult` for one attempt: passedOn, and only it, withdraws the question and tells the team. */
+/**
+ * K-03 v1 `checkResult` for one attempt: passedOn, and only it, withdraws the question and tells the team. No detail
+ * holds a filled value (withoutValues), since T-252's compose loop tells the one rewrite these details as they come.
+ */
 function resultOf(row: FinalizeRow, checked: Checked, outcome: AttemptOutcome): CheckResult {
-  const [first, ...rest] = checked.check.checks;
+  const [first, ...rest] = checksWithoutValues(checked.check.checks, checked.parts.slotValues);
   if (first === undefined) throw new FinalizeRefusedError("partsNotWellFormed");
   const passedOn = outcome === "passedOn";
   return {
@@ -178,7 +185,10 @@ async function planAttempt<Repo>(
   return { attempt: request.attempt, parts, check: checkAttempt(parts, row.checks, found) };
 }
 
-/** The step's fallback text through the same steps: limit 7, the fill, the words (text alone), the fixed lines, the checks. */
+/**
+ * The step's fallback text through the same steps: limit 7, never cutting it (a slot the reader may never see stays as
+ * written), the fill, the words (text alone), the fixed lines, the checks.
+ */
 async function fallbackAttempt<Repo>(
   request: FinalizeRequest,
   row: FinalizeRow,
@@ -187,7 +197,7 @@ async function fallbackAttempt<Repo>(
   call: CallContext<Repo>,
   ports: FinalizePorts<Repo>,
 ): Promise<Checked> {
-  const claimed = claimText(text, row.source, claim);
+  const claimed = claimFallback(text, row.source, claim);
   const built = buildParts({
     row: row.outboxRowId,
     channel: row.channel,

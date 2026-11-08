@@ -90,6 +90,13 @@ export interface CheckContext {
   readonly allowedFormats: readonly Format[];
   /** The facts the composer was given (K-03 composeInput `facts`, after limit 7): a value may match one. */
   readonly facts: readonly SlotValue[];
+  /**
+   * Rosie's own fixed terms the row's step card states, or none: each line of the step's compiled card that names no
+   * slot, word for word (K-03 v1.1 term facts; CQ-86's default). Code-supplied words like slot values: where one stands
+   * whole in the words send, Shape and Length count none of its words (arch 07 line 417; DL-158), while the Values check
+   * still reads them against the facts.
+   */
+  readonly terms: readonly string[];
   /** The reader's name as Rosie addresses them (K-03 composeInput `audience.name`), or null: a name may match it. */
   readonly readerName: string | null;
   /**

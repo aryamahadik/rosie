@@ -67,15 +67,13 @@ export function bundleLists(): CheckLists {
 export const S1_02_OPENER = "Hi! I'm Rosie, an automated assistant.";
 
 /**
- * S1-02's card terms, Rosie's own fixed terms the plan's fact line states (plan-s1-02.json: "Rosie's own $2 fee term kept
- * as words", arch 12 line 592), as the composer's facts: CQ-82's ruling (DL-145) gives them to the composer as term facts
- * with their source lines (K-03 v1.1, T-1104), and the Values check reads every fact's value.
+ * S1-02's card terms: Rosie's own fixed terms, each a line of S1-02's card that names no slot, word for word (K-03 v1.1
+ * input-s1-02-v1.1.json's four term facts; CQ-82's ruling, DL-145; CQ-86's default). plan-s1-02.json's fact line states
+ * three of them ("Rosie's own $2 fee term kept as words", arch 12 line 592).
  */
-export const S1_02_TERMS = [
-  "About 15 minutes for your first kind of work",
-  "Free to use",
-  "$2 a booking, counted at its check-in or DONE, explained before you go live",
-];
+export const S1_02_TERMS: readonly string[] = (
+  contractFile("message-plan/fixtures/input-s1-02-v1.1.json") as { facts: { value: string }[] }
+).facts.map((fact) => fact.value);
 
 /** The row behind finalize-pass.json: S1-02's reply to Sam, the owner, before there is a business. */
 export function s102Row(): FinalizeRow {
@@ -110,7 +108,12 @@ export function s102Row(): FinalizeRow {
       options: [],
       typedOptions: null,
       allowedFormats: ["text"],
+      // The composer's facts are S1-02's term facts (K-03 v1.1), which the Values check reads. A term fact has no slot,
+      // while the checks' facts (T-312, K-03 v1 `fact`) each name one, so the row read labels each "term" until the
+      // message checks take term facts in their own task (K-03 README section "v1.1", consumers).
       facts: S1_02_TERMS.map((value) => ({ slot: "term", value })),
+      // The same lines as the row's terms: code-supplied words, outside the Shape and Length counts (DL-158).
+      terms: S1_02_TERMS,
       readerName: "Sam",
       masterText: input.masterText.text,
     },
@@ -139,6 +142,13 @@ export function openerFirst(parts: FinalParts): FinalParts {
 // ---------------------------------------------------------------------------------------------------------------
 // A7-17: Riley can't be in, told to Alex (finalize-rewrite.json, finalize-passed-on.json)
 
+/**
+ * The open question's deadline in finalize-passed-on.json: 7pm on Fri Oct 23, 2026 in the shop's zone. The fixture's
+ * "7pm" is test data (CQ-90 (c): a question's clock arms only at delivery, T-255); T-310's filler words this deadline as
+ * K-03 slots.json's ask.by example does ("9:00am Sat"): "7:00pm Fri".
+ */
+export const ASK_BY = { utc: "2026-10-23T23:00:00Z", zone: ZONE } as const;
+
 /** Lee's Barbershop's facts for Alex M.'s haircut with Riley on Sat Oct 24, 2026 at 11:00am, filled on Fri Oct 23. */
 export function a717Source(): SlotSource {
   return {
@@ -154,6 +164,7 @@ export function a717Source(): SlotSource {
       serviceName: "Haircut",
       visit: { start: { utc: "2026-10-24T15:00:00Z", zone: ZONE } },
       links: { secure: "rosfield.com/v/s03" },
+      askBy: ASK_BY,
     },
   };
 }
@@ -163,7 +174,8 @@ const A7_17_FACT_SLOTS: readonly SlotName[] = ["biz.name", "pro.name", "day", "v
 
 /**
  * A7-17's step fallback text, slotted, in the words of K-03 check-passed-on.json's checked text: Riley can't be in, who
- * can come in early instead, and the reply-by deadline.
+ * can come in early instead, and the reply-by deadline. name.staff is owner and staff only (K-03 slots.json), so for
+ * Alex limit 7 holds it back, and the text keeps "{{name.staff}}" (DL-158 ruling b).
  */
 export const A7_17_FALLBACK =
   "Sorry, {{pro.name}} can't be in on {{day}}. {{name.staff}} can come in early to do your visit, same time and price. Please reply by {{ask.by}}.";
@@ -189,6 +201,7 @@ export function a717Row(source: SlotSource = a717Source()): FinalizeRow {
       typedOptions: null,
       allowedFormats: ["text", "poll", "linkCard", "calendarFile", "tapback"],
       facts: claimFacts(A7_17_FACT_SLOTS, source, { reader: "customer" }),
+      terms: [],
       readerName: "Alex",
       masterText: null,
     },
