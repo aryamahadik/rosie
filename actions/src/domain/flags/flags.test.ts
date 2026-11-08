@@ -35,17 +35,27 @@ import {
   type LimitCall,
 } from "../../gate/framework/test-support";
 import { flagsFirst, type GateFlagReads } from "../../gate/flags";
-import { createToolApiValidator, type ToolApiValidator } from "../../tool-api";
+import {
+  createToolApi,
+  createToolApiValidator,
+  notBuiltHandlers,
+  type ToolApiValidator,
+} from "../../tool-api";
+import { recordingScope, traceFor, type RecordingRepo } from "../../tool-api/test-support";
 import { createMessagesConsent, textsStanding, type MessageRequest } from "../messages-consent";
 import { FlagRefusedError } from "./errors";
 import { KEYED_IDS } from "./ids";
 import {
+  recordFlagCore,
   recordStopOrStartAlone,
+  recordStopOrStartHandler,
   runtimeStopCall,
   setRecordFlagAlone,
+  setRecordFlagHandler,
   stopOrStartCore,
   type FlagsDeps,
 } from "./handlers";
+import { unitWritesOf } from "./writes";
 import { callOffDueAt, type RecordFlagRequest } from "./record-flag";
 import { EVERY_BUSINESS, type StopOrStartRequest } from "./stop-start";
 import { assertStopKept, keepStop, rowsAfterFreshYes, type CommitStop } from "./stopped";
@@ -1420,5 +1430,135 @@ describe("ids and labels only: no number, address or words leaves the flags call
       message: "flags refused: turnRidesInCommit",
     });
     expect(EVERY_BUSINESS).toBe("every-business");
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+
+describe("the Tool API calls: through the base under a business scope, and a flag set in a turn's commit", () => {
+  it("setRecordFlag through the Tool API base answers flag-paused.json, request and answer held to K-09 v1", async () => {
+    const exchange = flagPaused();
+    const world = worldOf(withNov14(flagsSeedRecord()));
+    const commit = fakeAloneCommit(world);
+    const scope = recordingScope();
+    const api = createToolApi<RecordingRepo>({
+      validator,
+      scope,
+      handlers: {
+        ...notBuiltHandlers(),
+        setRecordFlag: setRecordFlagHandler<RecordingRepo>(
+          depsOn(world, { commitAlone: commit, now: () => exchange.given.now }, BARBERSHOP),
+        ),
+      },
+    });
+    const { trace, spans } = traceFor(exchange.request);
+    expect(await api.call("setRecordFlag", exchange.request, trace)).toEqual({
+      rowId: "pause-alex-lees",
+      version: 1,
+      callOffClockRowIds: [],
+      repeated: false,
+    });
+    expect(scope.events.map((event) => event.what)).toEqual(["begin", "scope", "commit"]);
+    expect(spans.map((span) => [span.hop, span.outcome])).toEqual([["pageRequest", "ok"]]);
+    expect(commit.keys).toEqual(["req-portal-sam-0140"]);
+
+    // A refusal is one of its K-09 errors, and the base rolls the transaction back.
+    const byAlex = {
+      ...exchange.request,
+      action: "clear" as const,
+      target: { pauseId: "pause-alex-lees" },
+      expectVersion: 1,
+      caller: { ...exchange.request.caller, personId: "person-alex", requestId: "req-alex-2" },
+    };
+    expect(await api.call("setRecordFlag", byAlex, traceFor(byAlex).trace)).toEqual({
+      error: "notAllowed",
+      why: "notDecider",
+    });
+    expect(scope.events.at(-1)?.what).toBe("rollback");
+  });
+
+  it("a STOP names no business, so the base refuses it (noBusinessScope): it runs on the runtime side instead", async () => {
+    const world = benWorld();
+    const start = startRecorded();
+    const api = createToolApi<RecordingRepo>({
+      validator,
+      scope: recordingScope(),
+      handlers: { ...notBuiltHandlers(), recordStopOrStart: recordStopOrStartHandler(depsOn(world)) },
+    });
+    expect(await api.call("recordStopOrStart", start.request, traceFor(start.request).trace)).toEqual({
+      error: "noBusinessScope",
+      call: "recordStopOrStart",
+    });
+  });
+
+  it("a threat's pause rides in the turn's commit as a core action; its call-off clocks come back beside the unit", async () => {
+    const world = worldOf(withNov14(flagsSeedRecord()));
+    const turnRequest = stopRecorded().request;
+    const caller = {
+      kind: "turn" as const,
+      turnId: "turn-alex-threat",
+      requestId: "turn-alex-threat",
+      businessId: BARBERSHOP,
+      personId: "person-alex",
+      traceId: "trace-alex-0204",
+    };
+    const base = turnRequest.turn;
+    if (base === null) throw new Error("stop-recorded.json carries its turn");
+    turnRequest.caller = caller;
+    turnRequest.turn = {
+      ...base,
+      id: "turn-alex-threat",
+      handleId: "handle-alex",
+      eventIds: ["evt-alex-0204"],
+    };
+    turnRequest.now = "2026-10-23T14:42:02Z";
+    const action = {
+      call: "setRecordFlag" as const,
+      request: {
+        caller,
+        flag: "paused" as const,
+        action: "set" as const,
+        target: { personId: "person-alex" },
+        expectVersion: null,
+      },
+    };
+    turnRequest.core = [action];
+    const visits = {
+      visitsOf: () =>
+        Promise.resolve([
+          {
+            bookingId: "booking-alex-riley-nov14",
+            startsAt: "2026-11-14T15:00:00Z",
+            zone: "America/New_York",
+          },
+        ]),
+    };
+    const { run, clocks } = await recordFlagCore(
+      action,
+      turnContext(turnRequest),
+      depsOn(world, { visits }, BARBERSHOP),
+    );
+    expect(run.result.call).toBe("setRecordFlag");
+    expect(run.result.error).toBeNull();
+    expect(run.result.response).toMatchObject({ version: 1, repeated: false });
+    expect(run.writes.state).toEqual([
+      {
+        op: "insert",
+        table: "pauses",
+        values: expect.objectContaining({
+          business_id: BARBERSHOP,
+          target: "person",
+          person_id: "person-alex",
+          set_by_turn_id: "turn-alex-threat",
+          set_at: "2026-10-23T14:42:02Z",
+        }) as unknown,
+      },
+    ]);
+    expect(clocks.map((clock) => clock.bookingId)).toEqual(["booking-alex-riley-nov14"]);
+    expect(() => {
+      checkUnits([unitOf(run.writes)]);
+    }).not.toThrow();
+    // The turn's UnitWrites has no list for a core action's own clocks: a plan holding them is refused, never cut.
+    expect(() => unitWritesOf({ ...run.writes, clocks })).toThrow(TypeError);
   });
 });
