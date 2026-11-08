@@ -1,5 +1,6 @@
-// How the minute sweep and staging's Fire now reach a clock row's handle actor (T-254): the directory names the actor
-// of the row's handle (K-04 handles.id to actorNameOf's name), and the HandleActor namespace gives its stub. The
+// How the minute sweep, staging's Fire now (T-254) and the clock arming (T-255) reach a clock row's handle actor: the
+// directory names the actor of the row's handle (K-04 handles.id to actorNameOf's name), and the HandleActor namespace
+// gives its stub. The
 // namespace is the HANDLE_ACTOR binding of wrangler.jsonc (T-276; not edited here, NQ-RT-5); env.staging has no copy
 // until T-566, so there the Worker has none and a handle's row is left to its actor's own alarm.
 
@@ -27,7 +28,7 @@ export function clockActorsOf(env: Cloudflare.Env): ClockActors<DurableObjectId>
 
 /** The actor of a clock row's handle, or null when no namespace is bound or the directory cannot name it. */
 export async function actorOf(
-  set: ClockDeps,
+  set: Pick<ClockDeps, "directory">,
   actors: ClockActors | null,
   handleId: string,
 ): Promise<ClockActorRpc | null> {
