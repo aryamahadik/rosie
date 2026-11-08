@@ -10,6 +10,9 @@ import { handleLinqWebhook, LINQ_WEBHOOK_PATH, unconfiguredGateway, type Gateway
 // The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
 export { HandleActor } from "./actor";
 
+// The retry queue's consumer (T-256, runtime/src/queues): the Workers runtime hands it each batch of RETRY_QUEUE.
+import { retryQueueHandler } from "./queues";
+
 declare global {
   namespace Cloudflare {
     interface Env {
@@ -52,6 +55,8 @@ export interface RosieWorker {
   fetch(request: Request, env: Cloudflare.Env, context: ExecutionContext): Response | Promise<Response>;
   /** The one-minute cron (T-278's trigger): the clock rows' sweep, kept alive with the context's waitUntil (T-254). */
   scheduled(controller: ScheduledController, env: Cloudflare.Env, context: ExecutionContext): void;
+  /** The retry queue's consumer (T-256): each message of the batch acked or retried on its own (runtime/src/queues). */
+  queue(batch: MessageBatch, env: Cloudflare.Env): Promise<void>;
 }
 
 /**
@@ -106,7 +111,7 @@ export function createWorker(
     return jsonResponse(404, { ok: false, error: "not_found", trace_id: traceId }, traceId);
   };
   // The cast states the arity rule of RosieWorker: the runtime's three-argument call may get a Promise (the webhook).
-  return { fetch: fetch as RosieWorker["fetch"], scheduled };
+  return { fetch: fetch as RosieWorker["fetch"], scheduled, queue: retryQueueHandler };
 }
 
 // Until the Linq adapter (T-413) and the handle actor (T-243) exist, the gateway's doors fail and the route answers 503.
