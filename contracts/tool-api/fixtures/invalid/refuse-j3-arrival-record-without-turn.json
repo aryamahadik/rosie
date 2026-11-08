@@ -1,0 +1,42 @@
+{
+  "caller": {
+    "kind": "actorOnArrival",
+    "turnId": null,
+    "requestId": "turn-arrival-alex-0202",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-alex",
+    "traceId": "trace-alex-0202"
+  },
+  "turn": {
+    "id": "turn-arrival-alex-0202",
+    "handleId": "handle-alex",
+    "eventIds": ["evt-alex-0202"],
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "traceId": "trace-alex-0202",
+    "joinedTraceIds": [],
+    "tries": 1
+  },
+  "safety": {
+    "eventId": "evt-alex-0202",
+    "source": "text",
+    "tries": [{ "model": "haiku", "result": "verdict" }],
+    "read": {
+      "labels": [
+        {
+          "outcome": "An emergency",
+          "tense": "now",
+          "evidence": "my lips are swelling after the beard color and I can't breathe well",
+          "atRisk": "the writer",
+          "writer": "the person at the handle"
+        }
+      ]
+    },
+    "timedOut": false,
+    "dangerWords": [{ "words": "lips are swelling", "list": "plugin", "kind": "other" }],
+    "outcomes": ["An emergency"],
+    "liftedToUnsure": false
+  },
+  "handleId": "handle-alex",
+  "bookingId": null,
+  "sentByActor": null
+}

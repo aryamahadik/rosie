@@ -1,0 +1,11 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-kim-0001",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-kim",
+    "traceId": "trace-agent-kim-0001"
+  },
+  "action": { "do": "lift", "blockId": "block-kim-number-oct26", "expectVersion": 1 }
+}

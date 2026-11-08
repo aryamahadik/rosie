@@ -1,0 +1,56 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": ["customers/seed-customer-mobile-email.json", "core/seed-resources.json"],
+    "after": ["j3-open-request-business-text.json"],
+    "now": "2026-10-22T14:02:02Z",
+    "stated": { "step": "A3-30", "gives": ["who_for", "reach_by", "times", "customer"] },
+    "note": "A3-30: Rosie reads Sam's booking back once, with how to reach Alex, and Sam replies '1' at 10:02am. In Sam's turn the reply is the chosen choice, limit 3 holds it to the read-back's own words and the head's version 1, and this write is its effect inside gateAndCommit. It gives who_for (the head's person served and payer: Alex, 18 or older), reach_by (texts), times (a set start, Sat Oct 24 11:00am with Riley, held for the booking: the 30 minutes are the haircut's length as an example) and customer (Alex's row on the barbershop's list, found and unchanged, so not rewritten); '1 Yes, send the link' writes Alex's yes to messages for this booking as a K-29 texts consent bound to the read-back's exact words (RULES 2.5), which carries no version and so is not listed in written. Alex's mobile is already a Linq contact, so no contacts/add effect; Sam then gets Alex's chat link and QR to pass on (issueChatLink, given_via owner: MC C9; C-254). The {{two.count}} slot is filled with the shop row, as K-28's seed fills B3-08's. The booking itself is written by the same walk at A6-10 (K-09 v1.4)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-book-alex-yes",
+      "requestId": "turn-sam-book-alex-yes",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0302"
+    },
+    "bookingId": "booking-alex-sam-book",
+    "expectVersion": 1,
+    "answer": "yesSendLink",
+    "readBack": {
+      "exactWords": "Book this for Alex M.? Did Alex agree to messages from Rosie? / Haircut · Sat Oct 24 / 11:00am · Riley / For Alex, 18 or older / Alex M. · mobile on file / No Rosie $2: Lee's Barbershop added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+      "yesEventId": "evt-sam-0302"
+    },
+    "customer": {
+      "name": "Alex M.",
+      "mobile": "+15555550101",
+      "email": "alex@example.com",
+      "way": "texts",
+      "ageBand": "18_or_older"
+    },
+    "time": {
+      "resourceId": "res-riley",
+      "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+      "timesRead": "setstart",
+      "zone": "America/New_York"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-sam-book",
+    "customerId": "customer-alex-barbershop",
+    "gives": ["who_for", "reach_by", "times", "customer"],
+    "answer": "yesSendLink",
+    "consentId": "consent-alex-texts-sam-book",
+    "reservationId": "rsv-alex-sam-book-riley",
+    "effects": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-alex-sam-book", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-alex-sam-book-riley", "version": 1 }
+    ],
+    "outboxRowIds": [],
+    "repeated": false
+  }
+}

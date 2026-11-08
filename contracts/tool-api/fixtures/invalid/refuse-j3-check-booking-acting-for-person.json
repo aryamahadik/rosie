@@ -1,0 +1,12 @@
+{
+  "caller": {
+    "kind": "page",
+    "turnId": null,
+    "requestId": "req-page-check-0001",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-alex",
+    "traceId": "trace-page-check-0001"
+  },
+  "nameTyped": "Alex M.",
+  "dayTyped": "2026-10-24"
+}

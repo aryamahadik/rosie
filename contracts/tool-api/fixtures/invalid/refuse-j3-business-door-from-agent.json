@@ -1,0 +1,14 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0003",
+    "businessId": "biz-lees-barbershop",
+    "personId": null,
+    "traceId": "trace-agent-alex-0003"
+  },
+  "door": "business",
+  "flow": "A",
+  "booker": { "kind": "customer", "customerId": "customer-alex-barbershop" },
+  "safetyOutcomeId": null
+}

@@ -1,0 +1,62 @@
+{
+  "call": "recordSafetyOutcome",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-10-23T16:05:03Z",
+    "stated": { "step": "A3-22", "gives": ["safe"] },
+    "note": "A3-26: Alex texts 'is the beard color okay if I'm allergic to hair dye?' (contracts/model/fixtures/safety-business-own-line.json, word for word). The read on arrival says Needs the business's own line, so the handle actor records it at once in the text's arrival turn (turn-arrival-alex-0207 stands for the hash of evt-alex-0207): the outcome row, an at-once hold written at version 1, and the shop's own line as an outbox row of send class safety ('That's a question for the barbers themselves ... call Lee's Barbershop at (555) 010-0177. Call 911 if anyone is in danger.'). A barbershop's plug-in lists no words that stop a booking here, so the booking can go on once the line is handed on (j3-safety-arrival-release.json). Nobody is told for this outcome."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "turn-arrival-alex-0207",
+      "requestId": "turn-arrival-alex-0207",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0207"
+    },
+    "turn": {
+      "id": "turn-arrival-alex-0207",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0207"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0207",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "safety": {
+      "eventId": "evt-alex-0207",
+      "source": "text",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "read": {
+        "labels": [
+          {
+            "outcome": "Needs the business's own line",
+            "tense": "now",
+            "evidence": "is the beard color okay if I'm allergic to hair dye?",
+            "atRisk": "the writer",
+            "writer": "the person at the handle"
+          }
+        ]
+      },
+      "timedOut": false,
+      "dangerWords": [],
+      "outcomes": ["Needs the business's own line"],
+      "liftedToUnsure": false
+    },
+    "handleId": "handle-alex",
+    "bookingId": null,
+    "sentByActor": null
+  },
+  "outcome": {
+    "outcomeId": "safety-outcome-alex-0207",
+    "outcomes": ["Needs the business's own line"],
+    "hold": { "holdId": "hold-alex-0207", "releaseRule": "at_once", "blocksBooking": false, "version": 1 },
+    "safetyLine": { "fixedLineId": "safetyOwnLine", "outboxRowId": "out-alex-own-line" },
+    "told": [],
+    "nothingBooks": false,
+    "repeated": false,
+    "gives": ["safe"]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["customers/seed-customer-mobile-email.json"],
+    "after": [],
+    "now": "2026-10-22T14:00:02Z",
+    "stated": { "step": "A3-19", "gives": ["request"] },
+    "note": "A3-19: Alex asks Sam in person about Saturday, and Sam texts 'BOOK Alex M. haircut Sat 11am Riley' on Thu Oct 22, 10:00am. In Sam's turn the BOOK words are the chosen choice and this write is its effect inside gateAndCommit (an exchange with caller.kind turn shows it as it rides there): the request opens at door business, made_by shop, for Alex M., a customer on Lee's Barbershop's own list (K-28 customer-alex-barbershop), so the K-04 head's booker is Alex (K-28's seed of a booking the business adds names the customer as booker). Sam's text's own safety read rides in the same commit (README default 5), so safetyOutcomeId is null. Rosie reads it back to Sam next (A3-29, A3-30)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-book-alex",
+      "requestId": "turn-sam-book-alex",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-0301"
+    },
+    "door": "business",
+    "flow": "A",
+    "booker": { "kind": "customer", "customerId": "customer-alex-barbershop" },
+    "safetyOutcomeId": null
+  },
+  "outcome": {
+    "bookingId": "booking-alex-sam-book",
+    "number": "LB-1022-02",
+    "bookerPersonId": "person-alex",
+    "gives": ["request"],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-sam-book", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-alex-sam-book", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
