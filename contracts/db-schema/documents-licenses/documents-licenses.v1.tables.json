@@ -80,6 +80,14 @@
           "source": "FS line 736 (kind); S1-23 ('any license, insurance or document'); S1-61 (registration); S2-28, S2-29 (background check, certificate); A5-19 ('A document is a contract, a written estimate, a proposal or a design'); A4-43 (form); S1-72 (agreement); MC C10"
         },
         {
+          "name": "kind_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The kind of work it is for: the profession file's id, as K-23's company_kinds.kind_id and K-22's staff_skills.kind_id (never the document's own kind, which is kind). Set for a license the plug-in names for that work (S1-60, S2-28) and for an agreement that work needs (S1-71, S1-72), so Go live keeps that kind of work offline while its agreement is unsigned (S1-29, S1-31). Null: not for one kind of work (insurance, a registration, a booking's document).",
+          "source": "S1-60 ('The plug-in names the licenses'); S1-71 ('the plug-in says if the work needs an agreement'); S1-72 ('Not signed now: setup goes on, but that work stays offline, saved'); S1-29; S1-31 ('Keeps that kind of work offline'); S2-28; K-23 v1 company_kinds.kind_id; K-22 v1 rule 3"
+        },
+        {
           "name": "title",
           "type": "text",
           "null": false,
@@ -371,6 +379,12 @@
           "name": "documents_business_owner_idx",
           "columns": ["business_id", "owner_kind"],
           "why": "A business's documents by whose they are: the owner console's Documents page (02-contracts K-21) and Go live's check for an agreement left unsigned (S1-29)."
+        },
+        {
+          "name": "documents_kind_of_work_idx",
+          "columns": ["business_id", "kind_id"],
+          "where": "kind_id is not null",
+          "why": "A kind of work's licenses and agreements: Go live keeps that work offline while an agreement it needs is unsigned (S1-29, S1-31; S1-72)."
         },
         {
           "name": "documents_staff_idx",

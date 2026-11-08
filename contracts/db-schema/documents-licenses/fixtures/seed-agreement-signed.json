@@ -12,6 +12,7 @@
         "owner_kind": "business",
         "person_id": "person-sam",
         "kind": "agreement",
+        "kind_id": "dietitian",
         "title": "Health privacy agreement",
         "shown_on_listing": false,
         "origin": "built",

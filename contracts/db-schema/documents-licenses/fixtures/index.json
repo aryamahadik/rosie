@@ -5,7 +5,7 @@
       "version": "v1",
       "table": "documents",
       "expect": "accept",
-      "shows": "Two licenses kept as given and never checked, each with who gave it, where and when: Sam texts Lee's Barbershop's license number in the chat at S1-23, shown to customers, its number sealed under Sam's key; Riley adds his own barber license number and a photo of it on his secure page after joining (S2-06), kept as added at S2-11, the number and the photo's R2 object key sealed under Riley's key; no column says either was checked",
+      "shows": "Two barber licenses (kind of work barber) kept as given and never checked, each with who gave it, where and when: Sam texts Lee's Barbershop's license number in the chat at S1-23, shown to customers, its number sealed under Sam's key; Riley adds his own barber license number and a photo of it on his secure page after joining (S2-06), kept as added at S2-11, the number and the photo's R2 object key sealed under Riley's key; no column says either was checked",
       "source": "S1-23 ('BS20981'; 'Thanks. It shows as you gave it; Rosie doesn't check it'); S2-06 ('Any license you want shown (optional)'; 'Barber license: as you gave it, not checked'); S2-11 ('Each license stays as the person added it, never checked'); S13-43 ('A license photo goes only on the secure page'); FS line 736; MC C4, C7; D96; arch 01 line 93; K-22 v1 seeds (Riley's staff row and sealing key; Sam's sealing key); SPEC-master 6 (Sam, Lee's Barbershop, Riley)"
     },
     {
@@ -13,7 +13,7 @@
       "version": "v1",
       "table": "document_signatures",
       "expect": "accept",
-      "shows": "S1-72's agreement for Lee Nutrition Clinic, built by Rosie: its words in English with their sha256 and version, Sam asked to sign as the owner, and Sam's signature by typed name on the secure page, written once: who, when, how and the hash of the words signed, the typed name sealed under Sam's key; the document is signed by all, so its work may go live (S1-29); the same yes is K-29's health agreement consent row, with the same words and hash",
+      "shows": "S1-72's agreement for Lee Nutrition Clinic's dietitian work (kind of work dietitian), built by Rosie: its words in English with their sha256 and version, Sam asked to sign as the owner, and Sam's signature by typed name on the secure page, written once: who, when, how and the hash of the words signed, the typed name sealed under Sam's key; the document is signed by all, so its work may go live (S1-29); the same yes is K-29's health agreement consent row, with the same words and hash",
       "source": "S1-72 ('Sam signs the agreement on the secure page before setup goes on'; 'Signed'); S1-71; S13-49; A5-20 ('A signature can be a tap or a typed name'); S1-29 ('1 Nothing left to sign'); FS lines 735, 736; RULES 4.10, 4.11; arch 09 line 492; K-29 v1 seed-consent-health-agreement (Lee Nutrition Clinic, the words shown and their sha256); fixtures/v1/test-kit/shops/dietitian.json"
     },
     {
