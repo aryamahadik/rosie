@@ -1,0 +1,28 @@
+{
+  "after": ["seed-page-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "page_links",
+    "values": {
+      "id": "page-link-sam-registration-4",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-sam",
+      "purpose": "registration",
+      "step_id": "S1-29",
+      "code_sha256": "a0f61728394a5b6c7d8e9fa0b1c2d3e4a0f61728394a5b6c7d8e9fa0b1c2d3e4",
+      "sent_to_handle_id": "handle-sam",
+      "issued_at": "2026-10-19T15:10:00Z",
+      "expires_at": "2026-10-26T15:10:00Z",
+      "ended_at": "2026-10-19T15:10:00Z",
+      "ended_why": "step_done"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

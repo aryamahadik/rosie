@@ -1,0 +1,43 @@
+{
+  "call": "readStaffPage",
+  "given": {
+    "now": "2026-10-20T16:46:00Z",
+    "environment": "staging",
+    "after": ["open-link-signed-in.json"],
+    "note": "S2-06: Riley, signed in on her own staff page link, reads her page. It shows her own things only: her profile still to fill (S2-06 is a page step, so its form has no chat question: the step's title as the master writes it, with the name Sam gave at S2-02 to confirm; the fields are the name (K-04 v1 persons.name) and the languages (K-22 v1 staff.languages), which K-09 v1 SetupS2_06 takes as displayName and languages), no license added (optional and never checked: MC C4), no calendar linked (optional: S1-24, Q-10), and no emergency contact, which her barbering at the shop does not need (no check-out timer: Q-06). The profile's save goes through answerOnPage and confirmOnPage to K-09 v1 setup-s2-06-profile.json."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staff-riley-0000",
+      "traceId": "trace-page-riley-0000",
+      "sessionToken": "placeholder-session-token-riley-0001",
+      "linkCode": "s206-placeholder-riley"
+    }
+  },
+  "outcome": {
+    "result": "staffPage",
+    "businessName": "Lee's Barbershop",
+    "person": {
+      "personId": "person-riley",
+      "displayName": null,
+      "languages": ["en"]
+    },
+    "profile": {
+      "state": "toDo",
+      "question": {
+        "questionId": null,
+        "stepId": "S2-06",
+        "words": "Joins and fills in the secure page",
+        "options": [],
+        "fields": [
+          { "field": { "name": "name", "type": "text" }, "prefill": "Riley" },
+          { "field": { "name": "languages", "type": "text" }, "prefill": null }
+        ],
+        "uploads": []
+      }
+    },
+    "license": { "state": "none", "question": null },
+    "calendar": { "state": "none", "provider": null },
+    "emergencyContact": { "needed": false, "state": "none", "question": null }
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "part": "people-access",
+  "version": "v1.1",
+  "tables": [
+    {
+      "name": "page_links",
+      "description": "Each signed link to a page (K-21 v1 openLink; A4-42: 'links are always the host plus a short code'): the business the page acts in, the person it was made for, what it is for (the page it opens), the step that sent it, its code kept only as its sha256, the contact it went to, when it lapses, and when and why it ended. A link names which page, which business and whose page, never who is at the browser (FS line 701; S13-45: 'Opening a link never counts'): the page acts for that person only when a session of theirs comes with the request (K-21 v1; rule 4). v1.1 only adds this table; v1's ten tables stay as people-access.v1.tables.json gives them, so the part at v1.1 is both lists together.",
+      "source": "A4-42; FS line 701; S13-45 rows 3 and 8; S1-10 ('Checks the owner's mobile and ID, once'); S1-77; S2-06; D75; K-21 v1 openLink, linkPage, signedInLinkPage, linkExpired; BP rule 7; T-030 round 2 (the action-layer engineer's FAIL on 2413b65; DL-109)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link row's id: an opaque string code makes and never parses (CQ-09; rule 3). Never the code, and never built from it.",
+          "source": "CQ-09; README rule 3"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the page acts in: the business being set up (S1-10, S1-77, the registration screens) or the one whose staff page it is (S2-06). Row-level security scopes by it (rule 8).",
+          "source": "K-21 v1 README ('The business is the signed link's own'); arch 10 line 546; FS line 721"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person the link was made for: the owner (S1-10, S1-77, the registration screens) or the team member (S2-06). The page acts for them only when a session of theirs comes with the request (K-21 v1; rule 4), and a sign-in started from the page's own link (K-21 v1 signInStart, account link) sends its code only to this person's own mobile or email on file (accounts).",
+          "source": "K-21 v1 README ('A link is never the proof'; default 8); S13-45; FS line 701; README rule 4"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "What the link is for, which is the page it opens (K-21 v1 pageKind): setup_id_check (setupIdCheck, S1-10's secure page: the ID upload and the owner's email), owner_confirm (ownerConfirm, S1-77's owner link), registration (registration, the owner's registration screens 0 to 24, FS section 6.1) or staff_page (staffPage, S2-06's secure page for a team member).",
+          "source": "K-21 v1 pageKind; S1-10; S1-77; FS section 6.1; S2-06"
+        },
+        {
+          "name": "step_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The step that sent the link (K-21 v1 openLink.stepId): S1-10 for setup_id_check, S1-77 for owner_confirm, S2-06 for staff_page, and for registration the journey 1 step whose message carried it (such as S1-27's Stripe link, S1-29's preview link or S1-79's summary).",
+          "source": "K-21 v1 openLink.response.stepId; K-01 v1 stepId; S1-27; S1-29; S1-79"
+        },
+        {
+          "name": "code_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the link's code in UTF-8, lowercase hex, never the code (BP rule 7). The code is the part after the host (A4-42), made by a cryptographically secure random generator with at least 128 bits (K-21 v1 README default 18), so its plain sha256 cannot be reversed by trying codes, unlike a short proof code, whose hash is keyed (default 7). The page entry finds the link only by it, through page_link_for_code (rule 8); no Tool API column grant reaches it.",
+          "source": "BP rule 7; A4-42; K-21 v1 linkCode; the security reviewer's N4 on T-030; README rule 8"
+        },
+        {
+          "name": "sent_to_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person's own contact the link went to, in the message that carried it (core person_handles, so never someone else's): their chat, or their email on file. A contact change ends every link sent before it (D75; S13-45 row 3).",
+          "source": "S13-45 row 3; D75; RULES 9.1; core person_handles"
+        },
+        {
+          "name": "issued_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the commit that sent the link wrote it (rule 8).",
+          "source": "README rule 8; arch 10 line 508"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the link lapses (K-21 v1 openLink.expiresAt): from then page_link_for_code gives no row and the page shows the expired page. Its length is a setting; the fixtures' 7 days are an example (K-21 v1 open gap 4).",
+          "source": "K-21 v1 openLink.response.expiresAt and open gap 4"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the link was ended before it lapsed, or null while it is live. Set once and never cleared (rule 8's update policy).",
+          "source": "S1-10 ('once'); D75; S13-45 row 3; RULES 8.7; S11-100"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Why it ended: step_done (a setup link once its step has given its keys: S1-10 'Checks the owner's mobile and ID, once'; security note N10 on K-09), contact_changed (a contact change ends every link and page sent before it: D75; S13-45 row 3), left (the person left the team: RULES 8.7; S13-56) or handed_over (the business was handed over: S11-100), as sessions.ended_why names its ends. Null while live.",
+          "source": "S1-10; D75; S13-45 row 3; RULES 8.7; S13-56; S11-100; K-22 v1 sessions.ended_why"
+        },
+        {
+          "name": "ended_by_contact_change_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The contact change that ended it (v1's contact_changes), exactly when ended_why is contact_changed; null otherwise.",
+          "source": "D75; S13-45 row 3; FS line 756"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a link ended from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; README rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "page_links_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] }
+        },
+        {
+          "name": "page_links_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] }
+        },
+        {
+          "name": "page_links_sent_to_fk",
+          "columns": ["person_id", "sent_to_handle_id"],
+          "references": { "table": "person_handles", "columns": ["person_id", "handle_id"] }
+        },
+        {
+          "name": "page_links_contact_change_fk",
+          "columns": ["ended_by_contact_change_id"],
+          "references": { "table": "contact_changes", "columns": ["id"] }
+        }
+      ],
+      "unique": [
+        {
+          "name": "page_links_code_key",
+          "columns": ["code_sha256"],
+          "source": "A4-42 (a short code finds one link); K-21 v1 linkExpired (an unknown code gets one answer)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "page_links_code_hash_form",
+          "expression": "code_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (only a hash is stored); K-22 v1 sessions_token_hash_form"
+        },
+        {
+          "name": "page_links_purpose_known",
+          "expression": "purpose in ('setup_id_check', 'owner_confirm', 'registration', 'staff_page')",
+          "source": "K-21 v1 pageKind (journeys 1 and 2)"
+        },
+        {
+          "name": "page_links_purpose_step",
+          "expression": "(purpose = 'setup_id_check' and step_id = 'S1-10') or (purpose = 'owner_confirm' and step_id = 'S1-77') or (purpose = 'staff_page' and step_id = 'S2-06') or (purpose = 'registration' and step_id ~ '^S1-[0-9]{2}$')",
+          "source": "K-21 v1 pageKind (setupIdCheck S1-10, ownerConfirm S1-77, staffPage S2-06, registration FS section 6.1's journey 1 steps)"
+        },
+        {
+          "name": "page_links_expires_after_issue",
+          "expression": "expires_at > issued_at",
+          "source": "K-21 v1 openLink.response.expiresAt"
+        },
+        {
+          "name": "page_links_end_has_why",
+          "expression": "(ended_at is null) = (ended_why is null)",
+          "source": "S1-10; D75; RULES 8.7; S11-100"
+        },
+        {
+          "name": "page_links_end_why_known",
+          "expression": "ended_why in ('step_done', 'contact_changed', 'left', 'handed_over')",
+          "source": "S1-10 ('once'); D75; S13-45 row 3; RULES 8.7; S11-100"
+        },
+        {
+          "name": "page_links_contact_change_named",
+          "expression": "(ended_why is not distinct from 'contact_changed') = (ended_by_contact_change_id is not null)",
+          "source": "D75; S13-45 row 3; FS line 756"
+        },
+        {
+          "name": "page_links_ended_after_issue",
+          "expression": "ended_at is null or ended_at >= issued_at",
+          "source": "arch 09 line 457 (who, what, when)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "page_links_person_live_idx",
+          "columns": ["person_id"],
+          "where": "ended_at is null",
+          "why": "A contact change, a leaver or a hand-over ends the person's live links in its own commit (D75; S13-45 row 3; RULES 8.7; S11-100)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

@@ -1,0 +1,3143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/page-api/page-api.v1.schema.json",
+  "title": "PageApiV1",
+  "description": "K-21 v1, the page and console calls (02-contracts K-21): the calls the web app (C-185) makes to the action layer's page entry for journeys 1 and 2, the shells of M2 and M3b, and staging's test tools. Each is served by a K-09 v1 Tool API call or by a page-only call of the action layer, and reuses K-09's shapes where it carries them. A request never names the person or the business it acts for: the person is the live session's (K-22 v1 rule 4), found from the session cookie the browser presents; the business is the signed link's or the row's own (arch 10 line 546); opening a link never proves who someone is (FS line 701; S13-45). Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every fixture is and what the Tool API mock answers from (C-186). The root is any one exchange, so the type generator writes a type for every call (ADR-005). contracts/page-api/README.md states, for each call, who may call it, how its person and business are bound, its reads, its repeat rule, its time budget and its errors. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/openLink.exchange" },
+    { "$ref": "#/$defs/signInStart.exchange" },
+    { "$ref": "#/$defs/signInCheck.exchange" },
+    { "$ref": "#/$defs/signOut.exchange" },
+    { "$ref": "#/$defs/codeStart.exchange" },
+    { "$ref": "#/$defs/codeCheck.exchange" },
+    { "$ref": "#/$defs/readRegistration.exchange" },
+    { "$ref": "#/$defs/answerOnPage.exchange" },
+    { "$ref": "#/$defs/confirmOnPage.exchange" },
+    { "$ref": "#/$defs/signedUpload.exchange" },
+    { "$ref": "#/$defs/finishUpload.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingStart.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingReturn.exchange" },
+    { "$ref": "#/$defs/billCard.exchange" },
+    { "$ref": "#/$defs/calendarConnectStart.exchange" },
+    { "$ref": "#/$defs/calendarConnectReturn.exchange" },
+    { "$ref": "#/$defs/readStaffPage.exchange" },
+    { "$ref": "#/$defs/teamConsole.exchange" },
+    { "$ref": "#/$defs/teamAcknowledgePage.exchange" },
+    { "$ref": "#/$defs/teamDecideReviewItem.exchange" },
+    { "$ref": "#/$defs/testRoster.exchange" },
+    { "$ref": "#/$defs/testPhoneSend.exchange" },
+    { "$ref": "#/$defs/testPhoneParts.exchange" },
+    { "$ref": "#/$defs/testClockRows.exchange" },
+    { "$ref": "#/$defs/fireNow.exchange" },
+    { "$ref": "#/$defs/textHoursOverride.exchange" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code makes and never parses (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "title": "NullableId",
+      "description": "An opaque id, or null (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/id" }, { "type": "null" }]
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC ending in Z (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "title": "NullableUtc",
+      "description": "An instant in UTC, or null (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/utc" }, { "type": "null" }]
+    },
+    "version": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/version"
+    },
+    "rowRef": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/rowRef"
+    },
+    "traceId": {
+      "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/traceId"
+    },
+    "stepId": {
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+    },
+    "opaqueToken": {
+      "title": "OpaqueToken",
+      "description": "A random value the server makes and the browser holds in a cookie: a session token or a device token. Never a fingerprint, never parsed, and never logged, put in a span, an event-log row or a message (BP rule 7); the server keeps only its sha256 (K-22 v1 sessions.token_sha256, sessions.device_sha256). Fixtures hold placeholders.",
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 512
+    },
+    "linkCode": {
+      "title": "LinkCode",
+      "description": "The short code of a signed link: the part after the host (A4-42: 'links are always the host plus a short code'; the host is a config value, rosfield.com/test on staging: DL-014, DL-023, Q-51). Unguessable and random: the server makes every code with a cryptographically secure random generator, with at least 128 bits, so at least 22 characters of the URL-safe alphabet A-Z, a-z, 0-9, - and _ (README default 18; the security reviewer's N4), and keeps only its sha256 (K-22 v1.1 page_links.code_sha256), by which the page entry finds the link row (K-22 v1.1 page_link_for_code). The pattern admits shorter strings only so that a stale or mistyped code still gets linkExpired. The master's sample codes (S1-10's rosfield.com/v/s01, S1-77's rosfield.com/v/o02) and the fixtures' codes are illustrations (MC C6). An unknown, expired and ended code all get the same answer (linkExpired), so a guessed code learns nothing.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]{3,64}$"
+    },
+    "httpsUrl": {
+      "title": "HttpsUrl",
+      "description": "An https address.",
+      "type": "string",
+      "pattern": "^https://\\S+$"
+    },
+    "page": {
+      "title": "PageEnvelope",
+      "description": "What every K-21 request carries beside its own fields. The web app's server side (C-185) sends it; the action layer's page entry turns it into K-09 v1's caller (kind page, or console for the team console calls), with requestId and traceId as given and the business and person from the server's own records, never from the browser: the person is the live session's (K-22 v1 rule 4: 'a portal or secure-page call with a session: the session's person'), and the business is the signed link's or the row's own (arch 10 line 546). Opening a link proves nothing about who is at the browser (FS line 701; S13-45: 'Opening a link never counts').",
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "description": "The page's own id for this submit, made once per form by the web app and never reused: the key a repeat is known by (02-contracts section 2 item 2), within the credential it came with (the session; for a call with no session, the link or the sign-in attempt), so the same id from another browser never matches. It becomes K-09 v1 caller.requestId.",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The trace the request opens or joins (the web app's x-trace-id, d000-factory-spec section 6). Each K-21 call adds its pageRequest span (K-08 v1 hop) and passes the id on as K-09 v1 caller.traceId.",
+          "$ref": "#/$defs/traceId"
+        },
+        "sessionToken": {
+          "description": "The session cookie's value as the browser sent it (an HttpOnly, Secure cookie the web app set from signInCheck's answer), or null. The server takes its sha256 and asks K-22 v1 session_for_token for the live session and its person, whom the call then acts for (K-22 v1 rules 4 and 5); an unknown, ended or expired token acts for no one.",
+          "anyOf": [{ "$ref": "#/$defs/opaqueToken" }, { "type": "null" }]
+        },
+        "linkCode": {
+          "description": "The signed link this page was opened from, or null. Its link row (K-22 v1.1 page_links, found by the code's sha256 through page_link_for_code; README 'Links') names the page, its business, its step and the person it was made for, never who is at the browser (FS line 701; S13-45).",
+          "anyOf": [{ "$ref": "#/$defs/linkCode" }, { "type": "null" }]
+        }
+      },
+      "required": ["requestId", "traceId", "sessionToken", "linkCode"],
+      "additionalProperties": false
+    },
+    "linkPage": {
+      "title": "LinkPageEnvelope",
+      "description": "A page envelope from a signed link (page): the link is required; a session may or may not come with it. The link's row is K-22 v1.1 page_links, found by the code's sha256 (README 'Links').",
+      "type": "object",
+      "properties": {
+        "requestId": { "$ref": "#/$defs/id" },
+        "traceId": { "$ref": "#/$defs/traceId" },
+        "sessionToken": {
+          "description": "As page.sessionToken.",
+          "anyOf": [{ "$ref": "#/$defs/opaqueToken" }, { "type": "null" }]
+        },
+        "linkCode": {
+          "description": "As page.linkCode; required.",
+          "$ref": "#/$defs/linkCode"
+        }
+      },
+      "required": ["requestId", "traceId", "sessionToken", "linkCode"],
+      "additionalProperties": false
+    },
+    "signedInPage": {
+      "title": "SignedInPageEnvelope",
+      "description": "A page envelope with a session (page): the call acts for a signed-in person, the live session's (K-22 v1 rule 4). Without a live session the call does nothing and answers signInNeeded.",
+      "type": "object",
+      "properties": {
+        "requestId": { "$ref": "#/$defs/id" },
+        "traceId": { "$ref": "#/$defs/traceId" },
+        "sessionToken": {
+          "description": "As page.sessionToken; required.",
+          "$ref": "#/$defs/opaqueToken"
+        },
+        "linkCode": {
+          "description": "As page.linkCode.",
+          "anyOf": [{ "$ref": "#/$defs/linkCode" }, { "type": "null" }]
+        }
+      },
+      "required": ["requestId", "traceId", "sessionToken", "linkCode"],
+      "additionalProperties": false
+    },
+    "signedInLinkPage": {
+      "title": "SignedInLinkPageEnvelope",
+      "description": "A page envelope with a session and a signed link (page): the call works on the link's page for the session's person, and only when that person is the one the link was made for (K-22 v1.1 page_links.person_id of the live link page_link_for_code finds; else signInNeeded: the page asks for that person's sign-in). The business is the link row's page_links.business_id.",
+      "type": "object",
+      "properties": {
+        "requestId": { "$ref": "#/$defs/id" },
+        "traceId": { "$ref": "#/$defs/traceId" },
+        "sessionToken": {
+          "description": "As page.sessionToken; required.",
+          "$ref": "#/$defs/opaqueToken"
+        },
+        "linkCode": {
+          "description": "As page.linkCode; required.",
+          "$ref": "#/$defs/linkCode"
+        }
+      },
+      "required": ["requestId", "traceId", "sessionToken", "linkCode"],
+      "additionalProperties": false
+    },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, so the Tool API mock (C-186) and QA's contract test (T-098) can set it up. Fixtures only; never sent.",
+      "type": "object",
+      "properties": {
+        "now": {
+          "description": "The time the call reads 'now' at.",
+          "$ref": "#/$defs/utc"
+        },
+        "environment": {
+          "description": "Where the call runs: staging or production (the Worker's ENVIRONMENT, d000-factory-spec section 6). Every staging-only call answers stagingOnly in production and does nothing (BP 9.4: 'Never in production').",
+          "type": "string",
+          "enum": ["staging", "production"]
+        },
+        "after": {
+          "description": "Fixtures whose requests run first, or seeds loaded first, in order: this folder's by file name, or a frozen contract's own by its path inside contracts/, such as tool-api/fixtures/fee-consent.json or db-schema/notifications/fixtures/seed-page-open.json.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(([a-z0-9-]+/)+fixtures/)?[a-z0-9-]+[.]json$" }
+        },
+        "note": {
+          "description": "The case in plain words.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["now", "environment", "after", "note"],
+      "additionalProperties": false
+    },
+
+    "signInNeededError": {
+      "title": "SignInNeededError",
+      "description": "The call needs a signed-in person and none came: no session token, or an unknown, ended or expired one, or, on a link's page, a session of someone other than the person the link was made for. Nothing was read or written; the page offers a sign-in (signInStart). The answer never says whose link it is.",
+      "type": "object",
+      "properties": { "error": { "const": "signInNeeded" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "linkExpiredError": {
+      "title": "LinkExpiredError",
+      "description": "The link cannot open: K-22 v1.1 page_link_for_code gives no row for the code's sha256, because the code is unknown, past page_links.expires_at, or ended (page_links.ended_at and ended_why: a contact change ends every link and page sent before it, D75, S13-45 row 3; the person left the team, RULES 8.7; a hand-over, S11-100); or the link is a setup link (purpose setup_id_check or owner_confirm) whose step has given its keys, its end written or not (S1-10 'Checks the owner's mobile and ID, once'; K-09 v1 readSetup; README default 19). One answer for all of them, so a guessed code learns nothing; the page shows a plain expired page with no field of the old page.",
+      "type": "object",
+      "properties": { "error": { "const": "linkExpired" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "notTeamError": {
+      "title": "NotTeamError",
+      "description": "The session's person is not on Rosie's team: they hold no live row in K-36 v1 team_page_recipients (Q-18: Jay and the CTO until launch; on staging the roster's testers and the test console, BP 9.4). Nothing was read or written. As K-09 v1's notTeam.",
+      "type": "object",
+      "properties": { "error": { "const": "notTeam" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "notTesterError": {
+      "title": "NotTesterError",
+      "description": "The session's person is neither a tester on staging's test-phone roster (Q-53, kept in 08-needs-from-jay.md and loaded into staging's config, never a browser value) nor on Rosie's team. Nothing was read or written.",
+      "type": "object",
+      "properties": { "error": { "const": "notTester" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "stagingOnlyError": {
+      "title": "StagingOnlyError",
+      "description": "A staging-only call reached production: it does nothing, writes nothing and reads nothing (BP 9.4: Fire now, the text-hours override and the test-phone page are 'Never in production'). The web app shows no staging tool in production either (T-522).",
+      "type": "object",
+      "properties": { "error": { "const": "stagingOnly" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "notTestPhoneError": {
+      "title": "NotTestPhoneError",
+      "description": "The test phone named is not on staging's roster (Q-53). Nothing was written.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notTestPhone" },
+        "testPhoneId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["error", "testPhoneId"],
+      "additionalProperties": false
+    },
+    "notTestHandleError": {
+      "title": "NotTestHandleError",
+      "description": "The clock row is not owned by a roster test phone's handle (BP 9.4: 'Fire now on any test handle's clock row'), or no handle owns it. Nothing fired.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notTestHandle" },
+        "clockRowId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["error", "clockRowId"],
+      "additionalProperties": false
+    },
+    "providerUnavailableError": {
+      "title": "ProviderUnavailableError",
+      "description": "The outside service the call needs failed or timed out (a 429 or 5xx from Stripe, Google, Microsoft or the files store): nothing was written; the page may try again after retryAfterSeconds (arch 10 line 542; BP 7.8).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "providerUnavailable" },
+        "provider": {
+          "type": "string",
+          "enum": ["stripe", "google", "microsoft", "files"]
+        },
+        "retryAfterSeconds": {
+          "description": "The provider's Retry-After in whole seconds when it gave one, else null.",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["error", "provider", "retryAfterSeconds"],
+      "additionalProperties": false
+    },
+    "notAllowedError": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/notAllowedError"
+    },
+    "bookingPausedError": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/bookingPausedError"
+    },
+    "transientError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/transientError"
+    },
+    "versionChangedError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/versionChangedError"
+    },
+
+    "pageKind": {
+      "title": "PageKind",
+      "description": "What a signed link opens in v1 (journeys 1 and 2): setupIdCheck, S1-10's secure page (the ID upload and the owner's email; the mobile is proven by the owner's own text, MC C9); ownerConfirm, S1-77's owner link (the owner's own ID check, 'Are you an owner of this business?', the email, the preview and what Rosfield costs, the Stripe account: MASTER-FLOW-A lines 141 to 147); registration, the owner's registration screens 0 to 24 (FS section 6.1); staffPage, S2-06's secure page for a team member. Customer pages come with K-21's journey versions (02-contracts K-21 'Minor versions'). Stored as the link row's K-22 v1.1 page_links.purpose: setup_id_check, owner_confirm, registration and staff_page.",
+      "type": "string",
+      "enum": ["setupIdCheck", "ownerConfirm", "registration", "staffPage"]
+    },
+    "pageSection": {
+      "title": "PageSection",
+      "description": "A section a page may show: idUpload (C10), ownerEmail (FS row B13), confirmOwner (S1-77), preview (S1-29), feeConsent (screen 18, S1-25), stripe (screen 19, S1-27), billCard (screen 20, S1-29), goLive (screens 20 and 22, S1-32, S1-35), registrationScreens (FS section 6.1), profile (S2-06), license (S2-11, S2-29), calendar (screen 16, S1-24; Q-10), emergencyContact (S1-78; S2-06; Q-06).",
+      "type": "string",
+      "enum": [
+        "idUpload",
+        "ownerEmail",
+        "confirmOwner",
+        "preview",
+        "feeConsent",
+        "stripe",
+        "billCard",
+        "goLive",
+        "registrationScreens",
+        "profile",
+        "license",
+        "calendar",
+        "emergencyContact"
+      ]
+    },
+    "pageQuestion": {
+      "title": "PageQuestion",
+      "description": "An open question as a page shows it, to be answered the same way as in the chat: the question, an option, fields (02-contracts K-21: 'answer through a page: the same as a chat answer (question, option, fields)'; arch 03 line 183); or the form of a step done on a page, which asks no question in the chat (the steps whose via is page: S1-24, S1-27, S1-29, S1-72, S2-06; A-S1.md, A-S2.md). Built by the server from the pinned bundle, the open question's row and the person's own record; nothing on it comes from the browser.",
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "description": "The open question (K-04 v1 open_questions.id; K-02 v1 openQuestion.openQuestionId), asked of the session's person; null for a page step's own form.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "stepId": { "$ref": "#/$defs/stepId" },
+        "words": {
+          "description": "The question as the step's card holds it, word for word (K-01 v1 card.question); for a page step's form, the step's title as the master writes it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "description": "Its options with their ids and labels, the branch labels word for word (K-04 open_questions.options; K-02 v1 choice choiceId and label; SPEC-master 5d).",
+          "type": "array",
+          "items": {
+            "title": "PageOption",
+            "type": "object",
+            "properties": {
+              "choiceId": { "$ref": "#/$defs/id" },
+              "label": { "type": "string", "minLength": 1 }
+            },
+            "required": ["choiceId", "label"],
+            "additionalProperties": false
+          }
+        },
+        "fields": {
+          "description": "The fields its answer carries, with their types (K-01 v1 answerField), and a value to show for the owner to confirm where the listing gives one ([G] prefill: FS section 10; B01, B03, B04; hours and categories), else null.",
+          "type": "array",
+          "items": {
+            "title": "PageField",
+            "type": "object",
+            "properties": {
+              "field": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/answerField" },
+              "prefill": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+            },
+            "required": ["field", "prefill"],
+            "additionalProperties": false
+          }
+        },
+        "uploads": {
+          "description": "The uploads its answer may carry, by purpose (signedUpload).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/uploadPurpose" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["questionId", "stepId", "words", "options", "fields", "uploads"],
+      "additionalProperties": false
+    },
+    "readBack": {
+      "title": "ReadBack",
+      "description": "The read-back of a page's answer: the exact words the page shows before the yes, and the rows and versions they show (FS line 630: 'every change is read back and confirmed first'; arch 06 line 303: the yes is bound 'to the read-back's exact text and versions'). The server keeps the words, the versions, the question, the choice, the field words and the uploads under readBackId; confirmOnPage sends only the id and the yes, so nothing of the read-back can change between the two calls. Nothing is written by a read-back.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "readBack" },
+        "readBackId": { "$ref": "#/$defs/id" },
+        "stepId": { "$ref": "#/$defs/stepId" },
+        "questionId": {
+          "description": "The open question answered, or null for a page step's own form.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "words": {
+          "description": "The read-back's exact words, as shown (they become the consent row's exact words where the step keeps them: S1-25's fee_ok, K-29 v1 consents.exact_words).",
+          "type": "string",
+          "minLength": 1
+        },
+        "shown": {
+          "description": "Each row the read-back shows and the version it was read at; the commit compares and sets them (limit 4).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "signature": {
+          "description": "none: the yes alone; typedName: the yes also takes the person's typed name as their signature (01-inventory C-185: 'a typed name signs'; S1-72's agreement).",
+          "type": "string",
+          "enum": ["none", "typedName"]
+        },
+        "expiresAt": {
+          "description": "When the read-back lapses unconfirmed, and confirmOnPage answers readBackExpired: 10 minutes on the page (arch 06 line 307: 'No pick in 10 minutes on the page'; default 6).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "result",
+        "readBackId",
+        "stepId",
+        "questionId",
+        "words",
+        "shown",
+        "signature",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "servedSetupStep": {
+      "title": "ServedSetupStep",
+      "description": "The K-09 v1 call that served the page's write, called alone with caller.kind page (K-09 v1 README 'In a turn or alone'), and its answer as K-09 v1 gives it.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "saveSetupStep" },
+        "response": { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/saveSetupStep.response" }
+      },
+      "required": ["call", "response"],
+      "additionalProperties": false
+    },
+    "uploadPurpose": {
+      "title": "UploadPurpose",
+      "description": "What an upload is for: idDocument, the owner's ID document on the secure page, never in the chat, accepted as given (MC C10; S1-10; S1-77); cardPhoto, a photo of a card or sign to find the listing (S1-09, screen 1); pricePhoto, the price list (S1-12); profilePhoto, a photo for About us (S1-84); schedulePhoto, a schedule or class timetable (S1-24, S1-83); licenseFile, a license, insurance or registration kept as given (S1-23, S1-61, S2-11, S2-29; MC C4, C7). Every upload stays private in R2 (MC 8 'Files'; Q-31).",
+      "type": "string",
+      "enum": ["idDocument", "cardPhoto", "pricePhoto", "profilePhoto", "schedulePhoto", "licenseFile"]
+    },
+    "calendarProvider": {
+      "$ref": "../port-calendar/port-calendar.v1.schema.json#/$defs/provider"
+    },
+    "textHours": {
+      "title": "TextHours",
+      "description": "A business's own text hours (FS line 721 text_hours; FS row H04; RULES 4.3): K-04 v1 businesses.text_hours_start and text_hours_end, read in the business's time_zone. Texts that can wait go to owner and staff inside them; a test phone's override never changes them (01-inventory C-204; the frontend engineer's FAIL 2 on 2413b65).",
+      "type": "object",
+      "properties": {
+        "start": {
+          "description": "K-04 v1 businesses.text_hours_start (default 08:00), as HH:MM.",
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "end": {
+          "description": "K-04 v1 businesses.text_hours_end (default 20:00), as HH:MM.",
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+      },
+      "required": ["start", "end"],
+      "additionalProperties": false
+    },
+    "textHoursOverrideState": {
+      "title": "TextHoursOverrideState",
+      "description": "A roster test phone's text-hours override as it stands (T-527; 01-inventory C-204; the frontend engineer's FAIL 1 on 2413b65): its staging-only K-04 v1 release_flags row, name staging.text-hours-override, scope phone:<number> (K-04 v1 seed-flag.json; K-05 v1.2 default 33). on: the row's enabled, false with no row; version: the row's version, which textHoursOverride sends back as expectVersion, or null while the phone has no row, so after a reload the console shows on or off and sets or clears it with the right version.",
+      "type": "object",
+      "properties": {
+        "on": { "type": "boolean" },
+        "version": { "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }] }
+      },
+      "required": ["on", "version"],
+      "additionalProperties": false,
+      "if": { "properties": { "version": { "type": "null" } }, "required": ["version"] },
+      "then": { "properties": { "on": { "const": false } } }
+    },
+    "shownPhoto": {
+      "title": "ShownPhoto",
+      "description": "One of the business's photos (S1-84; K-23 v1 business_photos, in position order) as a page shows it: a short-lived signed address to read that one private file (MC 8 'Files'; Q-31; K-13, not frozen: an opaque address, README open gap 5). It carries no key the page could reuse, and never enters a span or a log (README 'Never in a span or a log').",
+      "type": "object",
+      "properties": {
+        "photoId": { "$ref": "#/$defs/id" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "expiresAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["photoId", "url", "expiresAt"],
+      "additionalProperties": false
+    },
+    "registrationPreview": {
+      "title": "RegistrationPreview",
+      "description": "Screen 20's preview (FS section 6.1 screen 20: 'Preview (how AI assistants see the business)'; S1-29: 'how AI assistants will see the business ... The page shows the display name, licenses as given, services and prices, places, hours and the money rules. The page shows the About us line and the photos from S1-84'). The server builds it from the business's own rows as they stand, in plain words (README default 22); the exact answer AI assistants get is K-20's, not frozen (open gap 18). Never a license number, an ID detail or a bank detail (S1-79 'Never').",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "K-04 v1 businesses.display_name (B02): the plain name customers see on texts and card statements (S1-29).",
+          "type": "string",
+          "minLength": 1
+        },
+        "parts": {
+          "description": "What the preview shows, in S1-29's order, each as lines of plain words: about (the About us line: K-23 v1 business_setup.about, B06, S1-84), licenses (each as given, never checked: D96; S1-23), services (each service and its price: K-25 v1), places (K-23 v1 locations: the shop, or the travel area), hours (H01: K-27 v1 weekly_hours), moneyRules (the money rules: what is taken at booking and after, the cancel time and any fee: the record's pay lines). A part with nothing to show is left out.",
+          "type": "array",
+          "items": {
+            "title": "PreviewPart",
+            "type": "object",
+            "properties": {
+              "part": {
+                "type": "string",
+                "enum": ["about", "licenses", "services", "places", "hours", "moneyRules"]
+              },
+              "lines": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+            },
+            "required": ["part", "lines"],
+            "additionalProperties": false
+          }
+        },
+        "photos": {
+          "description": "The photos from S1-84, in order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownPhoto" }
+        }
+      },
+      "required": ["displayName", "parts", "photos"],
+      "additionalProperties": false
+    },
+    "registrationSummary": {
+      "title": "RegistrationSummary",
+      "description": "Screen 24's one-page summary (FS section 6.1 screen 24: 'Summary page the owner can keep'; S1-79: 'One secure page the owner can keep: what they set, what was left at its default, and how to change anything ... It can be saved as a PDF'). Secure-page-only: readRegistration gives it only with a session of the link's own person. The server builds it in plain words (README default 22) from the rows of every business the session's person owns, each read under its own business scope (arch 10 line 546), since S1-79's one page names them all ('Lee's Barbershop and Lee Home Services'). Never a license number, an ID detail or a bank detail beyond 'on file' (S1-79 'Never'). Saving it as a PDF is the web app's (C-187).",
+      "type": "object",
+      "properties": {
+        "madeAt": {
+          "description": "When the server built it (S1-79: resent after a big change, S11-56).",
+          "$ref": "#/$defs/utc"
+        },
+        "parts": {
+          "description": "S1-79's parts, in its order, each as lines of plain words: companies (each company and kind of work, and whether it is live), services (services, prices, places, and money before and after), about (About us), faqs, hours, cancelRule (the cancel rule and any fee), rulesKept, rulesAtDefault (those left at their default, like the waitlist off), licenses (as given, never checked: 'on file'), agreements (signed), people (just me, or the team), emergencyContact (the contact, or none: then no safety timer runs while the pro works alone), rosieCost (Rosie's cost) and howToChange (by text or a call, or in the portal). businessName names the business a part is about, and is null for the owner's own parts (emergencyContact, rosieCost, howToChange). A part with nothing to show is left out.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "title": "SummaryPart",
+            "type": "object",
+            "properties": {
+              "part": {
+                "type": "string",
+                "enum": [
+                  "companies",
+                  "services",
+                  "about",
+                  "faqs",
+                  "hours",
+                  "cancelRule",
+                  "rulesKept",
+                  "rulesAtDefault",
+                  "licenses",
+                  "agreements",
+                  "people",
+                  "emergencyContact",
+                  "rosieCost",
+                  "howToChange"
+                ]
+              },
+              "businessName": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+              "lines": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+            },
+            "required": ["part", "businessName", "lines"],
+            "additionalProperties": false
+          }
+        },
+        "photos": {
+          "description": "The photos from S1-84, in order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownPhoto" }
+        }
+      },
+      "required": ["madeAt", "parts", "photos"],
+      "additionalProperties": false
+    },
+
+    "openLink.request": {
+      "title": "OpenLinkRequest",
+      "description": "Open a signed link (A4-42): the host plus a short code. Who may call: anyone holding the link; it reads nothing on file for the browser before a session of the link's own person comes with it. Binds: the business, the step and the person the link was made for come from the link row on the server (K-22 v1.1 page_links, found by the code's sha256 through page_link_for_code; README 'Links'); the call acts for the session's person only when that person is the link's own (K-22 v1 rule 4); otherwise for no one. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/linkPage" }
+      },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "openLink.response": {
+      "title": "LinkOpen",
+      "description": "The page the link opens and what it may show now. Before proof it shows only what the page is for and the business's public name, never a name, a time or anything on file for the person (S13-45: 'Until a code typed back proves the phone, nothing on file for it is used or hinted at'), and offers the sign-in for the link's own account; with a session of the link's own person it may show its secure-page-only sections (02-contracts K-21: 'what it may show (secure-page-only fields included)').",
+      "type": "object",
+      "properties": {
+        "result": { "const": "open" },
+        "pageKind": {
+          "description": "The link row's K-22 v1.1 page_links.purpose.",
+          "$ref": "#/$defs/pageKind"
+        },
+        "stepId": {
+          "description": "The step that sent the link (K-22 v1.1 page_links.step_id), such as S1-10, S1-77 or S2-06.",
+          "$ref": "#/$defs/stepId"
+        },
+        "businessName": {
+          "description": "The business's display name (FS row B02), or its name (B01) before B02 is set: the listing's own public name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "description": "none: no session of the link's own person came with the request (no live session, or K-22 v1 session_for_token's person is not the link row's K-22 v1.1 page_links.person_id), so the call acts for no one; session: it did, and the call acts for that person (K-22 v1 rule 4). A link is never the proof (FS line 701; S13-45).",
+          "type": "string",
+          "enum": ["none", "session"]
+        },
+        "acting": {
+          "description": "The person the call acts for: the session's, when proof is session; null otherwise.",
+          "anyOf": [
+            {
+              "title": "Acting",
+              "type": "object",
+              "properties": { "personId": { "$ref": "#/$defs/id" } },
+              "required": ["personId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "securePageOnly": {
+          "description": "true when the page may show its secure-page-only fields (RULES 4.5; arch 06 line 311), which needs proof session; the page's own reads (readRegistration, readStaffPage) give them only then.",
+          "type": "boolean"
+        },
+        "sections": {
+          "description": "The sections this page has (pageSection). Without proof the page shows their names, never their contents.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/pageSection" },
+          "uniqueItems": true
+        },
+        "signIn": {
+          "description": "With proof none, how the link's own person signs in (signInStart with account from link): both ways are always offered, so the page hints at nothing on file; a way with no contact on file sends nothing and answers the same (S13-45). Null with proof session.",
+          "anyOf": [
+            {
+              "title": "SignInWays",
+              "type": "object",
+              "properties": {
+                "ways": {
+                  "type": "array",
+                  "items": { "type": "string", "enum": ["email", "text"] },
+                  "minItems": 1,
+                  "uniqueItems": true
+                }
+              },
+              "required": ["ways"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "expiresAt": {
+          "description": "When the link lapses (K-22 v1.1 page_links.expires_at); the page shows the expired page after it.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "result",
+        "pageKind",
+        "stepId",
+        "businessName",
+        "proof",
+        "acting",
+        "securePageOnly",
+        "sections",
+        "signIn",
+        "expiresAt"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "proof": { "const": "none" } }, "required": ["proof"] },
+      "then": {
+        "properties": {
+          "acting": { "type": "null" },
+          "securePageOnly": { "const": false },
+          "signIn": { "type": "object" }
+        }
+      },
+      "else": {
+        "properties": {
+          "acting": { "type": "object" },
+          "signIn": { "type": "null" }
+        }
+      }
+    },
+    "openLink.errors": {
+      "title": "OpenLinkErrors",
+      "description": "The link does not open.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "signInStart.request": {
+      "title": "SignInStartRequest",
+      "description": "Start a sign-in by a code (FS section 8; S11-52; S13-45 rows 8 and 9): owners, admins, staff, staging's testers and Rosie's team all sign in this way, with no password. Served by K-09 v1 sendProofCode, purpose signIn: way email is route emailOnFile, a code to the account's email on file, typed back on the page; way text is route textFromMobile, a ready text the person texts from the account's own mobile, since Rosie never texts first (MC C9). Who may call: anyone. Binds: the call acts for no one (K-22 v1 rule 4; caller.personId null). Whose account the code is for (K-09 v1 forPersonId) is set by the server, never by the browser: from the account the typed mobile or email finds on the runtime side, or, with account from link, from the person the page's own signed link was made for. The code goes only to that account's own email or mobile on file (accounts.email, accounts.mobile), never to an email not yet proven (K-22 v1 rule 4; security note N11 on K-09). Reads: the primary, uncached. Repeat: safe: page.requestId is the key; a repeat answers the same attempt and sends no second code (K-09 v1 sendProofCode). Time budget: the code lives 10 minutes (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/page" },
+        "account": {
+          "description": "Whose account: typed, the mobile or email the person typed (S11-52); link, the person the page's own signed link was made for (K-22 v1.1 page_links.person_id of the live link page_link_for_code finds: S1-10's, S1-77's or S2-06's secure page), which needs page.linkCode; with no live link the server sends nothing and answers the same (nothing on file is hinted at).",
+          "oneOf": [
+            {
+              "title": "SignInTypedAccount",
+              "type": "object",
+              "properties": {
+                "from": { "const": "typed" },
+                "kind": { "type": "string", "enum": ["mobile", "email"] },
+                "typed": {
+                  "description": "The mobile or email as typed; the server reads it to a K-04 handle and finds the account on the runtime side (K-22 v1 README 'Every path that binds a person', S11-52).",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 254
+                }
+              },
+              "required": ["from", "kind", "typed"],
+              "additionalProperties": false
+            },
+            {
+              "title": "SignInLinkAccount",
+              "type": "object",
+              "properties": { "from": { "const": "link" } },
+              "required": ["from"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "way": {
+          "description": "email: a code to the account's email on file, typed on the page (K-09 route emailOnFile); text: a ready text with the code, sent by the person from the account's own mobile (K-09 route textFromMobile; MC C9).",
+          "type": "string",
+          "enum": ["email", "text"]
+        },
+        "deviceToken": {
+          "description": "The browser's device cookie (opaqueToken): a random value the web app sets once per browser. The server keeps its sha256 with the attempt and asks K-22 v1 device_known once the code is right (S13-45 row 8: 'A new device needs a code to the owner's email, typed back, or the ID re-check').",
+          "$ref": "#/$defs/opaqueToken"
+        }
+      },
+      "required": ["page", "account", "way", "deviceToken"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "account": { "type": "object", "properties": { "from": { "const": "link" } }, "required": ["from"] }
+        },
+        "required": ["account"]
+      },
+      "then": {
+        "properties": {
+          "page": { "type": "object", "properties": { "linkCode": { "type": "string" } } }
+        }
+      }
+    },
+    "signInStart.response": {
+      "title": "SignInStarted",
+      "description": "The same answer whether or not an account matches and whatever is on file, so the page never learns whether someone has an account or a contact (S13-45: 'Those words are the same whether or not a booking exists'). The page holds only the attempt id: the code's id and the person it is for stay on the server with it (K-22 v1 rule 4; security note N13 on K-09).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "started" },
+        "attemptId": {
+          "description": "An opaque id the server makes for this sign-in, never K-22's code id; the server keeps the code id, the person the code is for and the device's sha256 with it.",
+          "$ref": "#/$defs/id"
+        },
+        "way": { "type": "string", "enum": ["email", "text"] },
+        "expiresAt": {
+          "description": "10 minutes after the code was made (RULES 6.2).",
+          "$ref": "#/$defs/utc"
+        },
+        "readyText": {
+          "description": "Way text only: the words to text from the mobile on file, with the code in them (K-09 v1 sendProofCode.response.readyText); it never enters a span, a trace or the event log. Null for way email, whose code never comes back to the page.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "textLink": {
+          "description": "Way text only: the link that opens Messages to Rosie's number with the ready text (the chat link's form, MC C9; its host and number are config values, Q-51); null for way email.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "attemptId", "way", "expiresAt", "readyText", "textLink"],
+      "additionalProperties": false,
+      "if": { "properties": { "way": { "const": "email" } }, "required": ["way"] },
+      "then": { "properties": { "readyText": { "type": "null" }, "textLink": { "type": "null" } } },
+      "else": { "properties": { "readyText": { "type": "string" }, "textLink": { "type": "string" } } }
+    },
+    "signInStart.errors": {
+      "title": "SignInStartErrors",
+      "description": "Nothing was sent.",
+      "anyOf": [
+        {
+          "title": "SignInPausedError",
+          "description": "Five wrong codes paused sign-in for this contact for 15 minutes (RULES 6.2; FS section 8), or the day's codes to it are used up ('At most a few codes a day per contact': S13-45; K-22 v1 proof_code_limits). Counted per contact typed, so it answers the same for a contact with no account typed as often (no account is hinted at).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "paused" },
+            "until": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "until"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "signInCheck.request": {
+      "title": "SignInCheckRequest",
+      "description": "Check the sign-in: the code typed on the page (way email), or, for way text, whether the person's ready text has come from the account's own mobile (K-09 v1 proveCode with fromHandleId that mobile, run by the turn that carries the text). Served by K-09 v1 proveCode by the code id the server kept with the attempt (K-22 v1 check_proof_code), never one the page sends. Who may call: the browser that started the attempt (the same device token); any other answers attemptNotFound. Binds: no person until the code is right (K-22 v1 rule 4); then the code's person, set in the same transaction, and on a device that person has used before (device_known) the session starts, naming that code (K-22 v1 rule 5; 'Every path that binds a person', S11-52); a person's first session ever starts on the code alone, since there is no known device to compare (README default 4). Reads: the primary, uncached. Repeat: keyed: page.requestId, with the attempt and the device; a repeat answers its first result, except that the session token leaves the server once: a repeat of a signedIn answer, and any later check of an attempt whose code a session already names, answers alreadySignedIn with no token and never starts a second session (the server keeps only the token's sha256: K-22 v1 sessions_token_hash_form, sessions_proof_code_key; the security reviewer's gap 1 on 2413b65); each new request with a code counts a try. K-22 v1 check_proof_code's outcomes answer as README 'Sign-in and sessions' maps them: right gives signedIn or secondProofNeeded, wrong gives wrong, paused gives paused, expired gives expired, used gives alreadySignedIn (or secondProofNeeded again while the attempt waits for its second proof), unknown gives attemptNotFound. Way text: the turn that carries the ready text uses the code (K-09 v1 proveCode); the page's next check finds the attempt's code used and no session naming it, and starts the session then, naming that code, held to that code's person by K-22 v1's session insert policy: the one page step whose person comes from a code checked in an earlier call (README 'Sign-in and sessions'). Time budget: 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/page" },
+        "attemptId": { "$ref": "#/$defs/id" },
+        "code": {
+          "description": "Way email: the code as typed (digits; K-22 v1 keeps only its keyed hash, never the code). Way text: null, asking whether the text has come.",
+          "anyOf": [{ "type": "string", "pattern": "^[0-9]{4,8}$" }, { "type": "null" }]
+        },
+        "deviceToken": {
+          "description": "The same device cookie the attempt started with.",
+          "$ref": "#/$defs/opaqueToken"
+        }
+      },
+      "required": ["page", "attemptId", "code", "deviceToken"],
+      "additionalProperties": false
+    },
+    "signInCheck.response": {
+      "title": "SignInCheckResponse",
+      "description": "Where the sign-in stands.",
+      "oneOf": [
+        {
+          "title": "SignedIn",
+          "description": "The code was right and the session started (K-22 v1 sessions, proven_via code). The token leaves the server this once, in this answer only, for the web app to set as an HttpOnly, Secure, SameSite=Lax cookie (README default 21); the server keeps only its sha256 (K-22 v1 sessions_token_hash_form), so no later answer carries it (alreadySignedIn).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "signedIn" },
+            "sessionToken": { "$ref": "#/$defs/opaqueToken" },
+            "sessionExpiresAt": {
+              "description": "K-22 v1 sessions.expires_at (its length is a setting: K-22 v1 open gaps).",
+              "$ref": "#/$defs/utc"
+            },
+            "person": {
+              "title": "SignedInPerson",
+              "description": "The signed-in person's own id and roles, so the consoles show what is theirs (FS section 8; S13-45 rows 8 and 9).",
+              "type": "object",
+              "properties": {
+                "personId": { "$ref": "#/$defs/id" },
+                "roles": {
+                  "description": "Their roles per business (K-04 v1 person_roles; K-02 v1 person.roles); customers have no sign-in (FS line 701).",
+                  "type": "array",
+                  "items": {
+                    "title": "SignedInRole",
+                    "type": "object",
+                    "properties": {
+                      "role": { "type": "string", "enum": ["owner", "admin", "staff", "ownBusiness"] },
+                      "businessId": { "$ref": "#/$defs/id" }
+                    },
+                    "required": ["role", "businessId"],
+                    "additionalProperties": false
+                  }
+                },
+                "team": {
+                  "description": "true when the person holds a live K-36 v1 team_page_recipients row: Rosie's team (Q-18).",
+                  "type": "boolean"
+                },
+                "tester": {
+                  "description": "true on staging when the person is on the test-phone roster (Q-53); always false in production.",
+                  "type": "boolean"
+                }
+              },
+              "required": ["personId", "roles", "team", "tester"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["result", "sessionToken", "sessionExpiresAt", "person"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInWrong",
+          "description": "A wrong code: one of 5 tries (RULES 6.2; K-09 v1 proveCode wrong).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "wrong" },
+            "triesLeft": { "type": "integer", "minimum": 0, "maximum": 4 }
+          },
+          "required": ["result", "triesLeft"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInPaused",
+          "description": "The fifth wrong code paused sign-in for 15 minutes (RULES 6.2; FS section 8: 'Five wrong codes pause sign-in for 15 minutes'); the page sends no further check until then.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "paused" },
+            "until": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "until"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInExpired",
+          "description": "The code is past its 10 minutes (RULES 6.2); the page starts again.",
+          "type": "object",
+          "properties": { "result": { "const": "expired" } },
+          "required": ["result"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInWaitingForText",
+          "description": "Way text: the ready text has not come from the account's own mobile yet; the page asks again, until expiresAt.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "waitingForText" },
+            "expiresAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "expiresAt"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInAlreadySignedIn",
+          "description": "A repeat of a signedIn answer, or a later check of an attempt whose code a session already names (K-22 v1 check_proof_code used; sessions_proof_code_key): the session started, and its token left the server in that first answer only, so none comes now (the security reviewer's gap 1 on 2413b65). A page with no session starts a new sign-in (signInStart).",
+          "type": "object",
+          "properties": { "result": { "const": "alreadySignedIn" } },
+          "required": ["result"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInSecondProofNeeded",
+          "description": "The code was right, but an account owner or admin is signing in on a device none of their sessions has used (S13-45 row 8: 'A new device needs a code to the owner's email, typed back, or the ID re-check'; K-22 v1 device_known false): no session starts, and the server keeps the used sign-in code and its person (K-22 v1 'Every path that binds a person'). The calls that finish it (a new_device code; the ID re-check) come with the K-09 minor version that adopts K-22's sessions (K-09 v1 open gap 24; README open gaps).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "secondProofNeeded" },
+            "ways": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["emailCode", "idReCheck"] },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": ["result", "ways"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "signInCheck.errors": {
+      "title": "SignInCheckErrors",
+      "description": "Nothing was checked.",
+      "anyOf": [
+        {
+          "title": "AttemptNotFoundError",
+          "description": "No attempt with this id was started by this device: one answer, so another browser learns nothing.",
+          "type": "object",
+          "properties": { "error": { "const": "attemptNotFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "signOut.request": {
+      "title": "SignOutRequest",
+      "description": "Sign out: end this session (K-22 v1 sessions.ended_why signed_out). Who may call: the session's own person. Binds: the session's person; only that person's own live session ends (K-22 v1 rule 5). Reads: the primary, uncached. Repeat: safe: an ended, expired or unknown session answers signedOut with repeated true. Time budget: none.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "signOut.response": {
+      "title": "SignedOut",
+      "description": "Signed out; the web app clears the cookie.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signedOut" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "repeated"],
+      "additionalProperties": false
+    },
+    "signOut.errors": {
+      "title": "SignOutErrors",
+      "description": "Nothing changed.",
+      "anyOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+
+    "codeStart.request": {
+      "title": "CodeStartRequest",
+      "description": "Send a code a setup page has the person type back on the page: the owner's email (registration screen 6; S1-10, S1-77: 'One email, for notices, sign-in help and answers by email. The email is proven with a code sent to it, typed on the page. Until then it isn't used'; FS row B13), or control of the business (screen 7; S1-75: a code to the listing's own email, Q-02). Served by K-09 v1 sendProofCode: ownerEmail is purpose emailCheck, route typedEmail, with forPersonId the person the page's own signed link was made for, set by the server, never by the browser, and caller.personId null (K-09 v1 default 34; K-22 v1 rule 4); control is purpose control, route listingEmail, for no person. Who may call: the person the setupIdCheck or ownerConfirm link was made for (ownerEmail), or the registration link's (control), signed in: a session of the link's own person comes first, so a forwarded link cannot set someone's email. Binds: the person and the business are the link's; the session's person must be the link's own. Reads: the primary, uncached. Repeat: safe: page.requestId is the key; a repeat answers the same attempt and sends no second code. Time budget: the code lives 10 minutes (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInLinkPage" },
+        "purpose": {
+          "description": "ownerEmail: the owner's email at sign-up (K-09 v1 emailCheck); control: S1-75's proof that the business is theirs (K-09 v1 control).",
+          "type": "string",
+          "enum": ["ownerEmail", "control"]
+        },
+        "typedEmail": {
+          "description": "For ownerEmail, the email as typed (K-09 v1 sendProofCode.request.typedEmail); null for control, whose code goes to the listing's email on file (K-23 v1 business_setup.listing_email).",
+          "anyOf": [{ "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/emailAddress" }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "purpose", "typedEmail"],
+      "additionalProperties": false,
+      "if": { "properties": { "purpose": { "const": "ownerEmail" } }, "required": ["purpose"] },
+      "then": { "properties": { "typedEmail": { "type": "string" } } },
+      "else": { "properties": { "typedEmail": { "type": "null" } } }
+    },
+    "codeStart.response": {
+      "title": "CodeSent",
+      "description": "The code went to the address; it never comes back to the page. The page holds only the attempt id; the code's id and the person it is for stay on the server (K-22 v1 rule 4).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "sent" },
+        "attemptId": { "$ref": "#/$defs/id" },
+        "purpose": { "type": "string", "enum": ["ownerEmail", "control"] },
+        "expiresAt": {
+          "description": "10 minutes after the code was made (RULES 6.2).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "attemptId", "purpose", "expiresAt"],
+      "additionalProperties": false
+    },
+    "codeStart.errors": {
+      "title": "CodeStartErrors",
+      "description": "Nothing was sent.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        {
+          "title": "EmailAlreadyProvenError",
+          "description": "ownerEmail only: the account's email is proven already. A new owner email needs a signed-in session plus the ID re-check (S13-45 row 8; K-22 v1 README 'The owner's mobile, email and ID'), which comes with the K-09 minor version that adopts it (security note N10 on K-09).",
+          "type": "object",
+          "properties": { "error": { "const": "emailAlreadyProven" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NoListingEmailError",
+          "description": "control only: the listing has no email, so Rosie's team checks control within 1 business day and that company stays offline with its setup saved (S1-75 safe default; Q-02; K-09 v1 openReviewItem control).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "noListingEmail" },
+            "reviewItemId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "reviewItemId"],
+          "additionalProperties": false
+        },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/sendProofCode.errors" }
+      ]
+    },
+    "codeCheck.request": {
+      "title": "CodeCheckRequest",
+      "description": "The code typed back on the page for a codeStart attempt. Served by K-09 v1 proveCode by the code id the server kept with the attempt, with caller.personId null (K-22 v1 rule 4: S1-10's owner email is checked with no person) and fromHandleId null (a page). Who may call: the session that started the attempt. Binds: as codeStart; the attempt's code id and person never come from the page. Reads: the primary, uncached. Repeat: keyed: page.requestId; a repeat answers its first result, and each new request counts a try (K-09 v1 proveCode). Time budget: 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInLinkPage" },
+        "attemptId": { "$ref": "#/$defs/id" },
+        "code": {
+          "description": "The code as typed.",
+          "type": "string",
+          "pattern": "^[0-9]{4,8}$"
+        }
+      },
+      "required": ["page", "attemptId", "code"],
+      "additionalProperties": false
+    },
+    "codeCheck.response": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/proveCode.response"
+    },
+    "codeCheck.errors": {
+      "title": "CodeCheckErrors",
+      "description": "Nothing was checked.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        {
+          "title": "CodeAttemptNotFoundError",
+          "description": "No attempt with this id was started by this session: one answer.",
+          "type": "object",
+          "properties": { "error": { "const": "attemptNotFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "readRegistration.request": {
+      "title": "ReadRegistrationRequest",
+      "description": "Read the registration screens 0 to 24 (FS section 6.1): what each still needs, so each screen asks only what is missing (S1-37: 'nothing is asked twice'), and the open question each answers. Served by K-09 v1 readSetup and the open questions asked of the person. Who may call: the person the registration or ownerConfirm link was made for, signed in (the owner, or on S1-77's helper path the helper: MASTER-FLOW-A line 182). Binds: the business is the link's; the person the session's, who must be the link's own. Reads: the primary, uncached (a screen acts on it at once: arch 10 line 538). Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInLinkPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "readRegistration.response": {
+      "title": "Registration",
+      "description": "Where the business's setup stands, screen by screen, with screen 20's preview and screen 24's one-page summary (the frontend engineer's FAIL 3 on 2413b65).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "registration" },
+        "business": {
+          "title": "RegistrationBusiness",
+          "type": "object",
+          "properties": {
+            "businessName": {
+              "description": "B02, or B01 before B02 is set (FS line 721).",
+              "type": "string",
+              "minLength": 1
+            },
+            "status": {
+              "description": "K-04 v1 businesses.status (FS line 721).",
+              "type": "string",
+              "enum": ["offline", "saved", "live"]
+            }
+          },
+          "required": ["businessName", "status"],
+          "additionalProperties": false
+        },
+        "screens": {
+          "description": "Every screen of FS section 6.1, 0 to 24, in order.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "title": "RegistrationScreen",
+            "type": "object",
+            "properties": {
+              "screen": {
+                "description": "The screen's number in FS section 6.1 (screen 21 is removed by D102).",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 24
+              },
+              "steps": {
+                "description": "Its master steps (FS section 6.1's last column).",
+                "type": "array",
+                "items": { "$ref": "#/$defs/stepId" }
+              },
+              "state": {
+                "description": "toDo: something it needs is missing; done: nothing is missing; waiting: it waits on Rosie's team or another step (S1-75, S1-76, S1-03: 1 business day), and the business stays offline meanwhile; notNeeded: not for this business (screen 8 only for health care, 13 only where the trade needs it, 19 skipped for no money, 21 removed by D102).",
+                "type": "string",
+                "enum": ["toDo", "done", "waiting", "notNeeded"]
+              },
+              "question": {
+                "description": "The open question this screen answers now, or null (nothing to answer on the page now, or the step asks in the chat only, such as screen 0's first text).",
+                "anyOf": [{ "$ref": "#/$defs/pageQuestion" }, { "type": "null" }]
+              }
+            },
+            "required": ["screen", "steps", "state", "question"],
+            "additionalProperties": false
+          }
+        },
+        "setup": {
+          "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/readSetup.response"
+        },
+        "preview": {
+          "description": "Screen 20's preview, how AI assistants see the business as it stands (S1-29), or null while screen 20 neither asks nor is done.",
+          "anyOf": [{ "$ref": "#/$defs/registrationPreview" }, { "type": "null" }]
+        },
+        "summary": {
+          "description": "Screen 24's one-page summary (S1-79), or null until S1-79 has been sent (it follows S1-50, once a kind of work is live).",
+          "anyOf": [{ "$ref": "#/$defs/registrationSummary" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "business", "screens", "setup", "preview", "summary"],
+      "additionalProperties": false
+    },
+    "readRegistration.errors": {
+      "title": "ReadRegistrationErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/readSetup.errors" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+
+    "answerOnPage.request": {
+      "title": "AnswerOnPageRequest",
+      "description": "Answer an open question through a page, the same way as in the chat: the question, an option, fields (02-contracts K-21; arch 03 line 183). Nothing is written: the answer comes back as its read-back (FS line 630), which confirmOnPage then takes. Free words get the safety read first (arch 02 line 129: 'Free text from them gets the same safety read first'; K-09 v1 recordSafetyOutcome). Who may call: the signed-in person the question is asked of (its handle is one of theirs, K-04 v1 person_handles), or for a page step's form the person the page's link was made for, and only for what they may decide (limit 1: arch 06 line 299; S13-45 rows 8 and 9: the account owner for money, the team and settings; an admin only for what the owner lets them; staff their own day, jobs and page). Binds: the person is the session's; the business is the question's or the link's own. Reads: the primary, uncached. Repeat: safe: page.requestId is the key; a repeat answers the same read-back. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "stepId": {
+          "description": "The step the answer is for (pageQuestion.stepId).",
+          "$ref": "#/$defs/stepId"
+        },
+        "questionId": {
+          "description": "The open question the page answers (pageQuestion.questionId), or null for a page step's own form, which the server finds by the step and the page's link.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "choiceId": {
+          "description": "The option picked (pageQuestion.options), or null when the question takes only fields.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "fields": {
+          "description": "Each field's words as typed: the source words limit 6 re-parses each value from (arch 06 line 309). Code parses them; a value that does not parse answers fieldsInvalid, since no AI reads a page's fields.",
+          "type": "array",
+          "items": {
+            "title": "PageFieldAnswer",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The field's name (K-01 v1 answerField name).",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_.]*$"
+              },
+              "words": { "type": "string", "minLength": 1, "maxLength": 10000 }
+            },
+            "required": ["name", "words"],
+            "additionalProperties": false
+          }
+        },
+        "uploadIds": {
+          "description": "Uploads the answer carries, by the ids signedUpload gave this session; never an object key (the server binds each id to its object key, purpose, person and business).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["page", "stepId", "questionId", "choiceId", "fields", "uploadIds"],
+      "additionalProperties": false
+    },
+    "answerOnPage.response": {
+      "title": "AnswerReadBack",
+      "description": "The answer's read-back; nothing written.",
+      "$ref": "#/$defs/readBack"
+    },
+    "answerOnPage.errors": {
+      "title": "AnswerOnPageErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        {
+          "title": "QuestionClosedError",
+          "description": "The question is no longer open: answered, defaulted or withdrawn (K-04 v1 open_questions status); the page reads again.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "questionClosed" },
+            "questionId": { "$ref": "#/$defs/id" },
+            "state": { "type": "string", "enum": ["answered", "defaulted", "withdrawn"] }
+          },
+          "required": ["error", "questionId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "title": "FieldsInvalidError",
+          "description": "A value does not parse from its words (limit 6: arch 06 line 309), or a field the option needs is missing; the page asks again, naming the fields, never their values.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "fieldsInvalid" },
+            "fields": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+          },
+          "required": ["error", "fields"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SafetyFirstError",
+          "description": "The safety read found danger in the page's free words: the safety message comes back to the page, and nothing books (arch 02 line 129: 'Danger returns the safety message to the caller, and nothing books'; K-09 v1 recordSafetyOutcome, called alone).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "safetyFirst" },
+            "outcomeId": {
+              "description": "The outcome row (K-09 v1 recordSafetyOutcome.response.outcomeId).",
+              "$ref": "#/$defs/id"
+            },
+            "fixedLineId": {
+              "description": "The checked line (K-09 v1 safetyLine.fixedLineId).",
+              "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/fixedLineId"
+            },
+            "words": {
+              "description": "The checked line's words as the pinned bundle holds them, which the page shows first.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["error", "outcomeId", "fixedLineId", "words"],
+          "additionalProperties": false
+        },
+        {
+          "title": "UploadNotFoundError",
+          "description": "An upload id this session was not given, or one whose file never came: one answer for both.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "uploadNotFound" },
+            "uploadId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "uploadId"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "confirmOnPage.request": {
+      "title": "ConfirmOnPageRequest",
+      "description": "The page's yes to a read-back: an exact yes, bound to the read-back's exact words and versions (arch 06 line 303: 'yes on the secure page'), which commits the answer. Served by K-09 v1 saveSetupStep, called alone with caller.kind page and the step's write as the server builds it from the read-back it kept: every id in it comes from the server (the yes event's id, a proven mobile's event, an upload's object key), never from the browser. Who may call: the person the read-back was made for, signed in. Binds: the session's person must be the read-back's; the business is the question's. Reads: the primary, uncached; the rows the read-back showed are compared and set (limit 4). Repeat: safe: readBackId is the key; a repeat writes nothing and answers the first commit with the step's repeated true (K-09 v1 saveSetupStep). Time budget: the read-back lapses after 10 minutes on the page (default 6).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "readBackId": { "$ref": "#/$defs/id" },
+        "typedName": {
+          "description": "The person's name as typed, when the read-back's signature is typedName (01-inventory C-185); else null.",
+          "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 200 }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "readBackId", "typedName"],
+      "additionalProperties": false
+    },
+    "confirmOnPage.response": {
+      "title": "PageAnswerCommitted",
+      "description": "Committed.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "readBackId": { "$ref": "#/$defs/id" },
+        "yesEventId": {
+          "description": "The page's yes as an event: the server makes its id when the yes arrives and records it (K-08 v1 approved_by answer: question, option, event). It is the yesEventId K-09 v1's step takes, as a text's yes is its K-06 event (K-09 v1 open gap 20: how a page gets the event ids it sends).",
+          "$ref": "#/$defs/id"
+        },
+        "served": { "$ref": "#/$defs/servedSetupStep" }
+      },
+      "required": ["result", "readBackId", "yesEventId", "served"],
+      "additionalProperties": false
+    },
+    "confirmOnPage.errors": {
+      "title": "ConfirmOnPageErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        {
+          "title": "ReadBackChangedError",
+          "description": "A row the read-back showed changed (limit 4, after one reload: arch 06 line 305): still possible, so the page shows today's facts in a fresh read-back for a fresh yes; no longer possible answers K-09 v1's error instead.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "readBackChanged" },
+            "readBack": { "$ref": "#/$defs/readBack" }
+          },
+          "required": ["error", "readBack"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ReadBackExpiredError",
+          "description": "The read-back lapsed, or is not this person's: the page answers again.",
+          "type": "object",
+          "properties": { "error": { "const": "readBackExpired" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignatureNeededError",
+          "description": "The read-back asks a typed name and none came.",
+          "type": "object",
+          "properties": { "error": { "const": "signatureNeeded" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/saveSetupStep.errors" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+
+    "signedUpload.request": {
+      "title": "SignedUploadRequest",
+      "description": "Ask for a signed upload: a short-lived address the browser sends one file to, straight to private storage (R2; MC 8 'Files'; K-13, not frozen: the address is opaque). Who may call: the signed-in person whose page asks for that purpose: idDocument only on the person's own setupIdCheck or ownerConfirm page, never in the chat (MC C10); the others on the registration or staff page whose question lists the purpose (pageQuestion.uploads). Binds: the upload id is bound on the server to the session's person, the business and the purpose; the browser never names an object key. Reads: the primary, uncached. Repeat: safe: page.requestId is the key; a repeat answers the same upload. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "purpose": { "$ref": "#/$defs/uploadPurpose" },
+        "mediaType": {
+          "description": "The file's media type as the browser reports it: a photo or a PDF; checked again on the stored file (finishUpload).",
+          "type": "string",
+          "pattern": "^(image/(jpeg|png|heic|heif|webp)|application/pdf)$"
+        },
+        "bytes": {
+          "description": "The file's size as the browser reports it.",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["page", "purpose", "mediaType", "bytes"],
+      "additionalProperties": false
+    },
+    "signedUpload.response": {
+      "title": "UploadReady",
+      "description": "Ready: the browser sends the file to uploadUrl before expiresAt, then calls finishUpload.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "ready" },
+        "uploadId": { "$ref": "#/$defs/id" },
+        "uploadUrl": {
+          "description": "The signed address for one file of at most maxBytes; it carries no key or secret the page could reuse (K-13's form when it freezes).",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "expiresAt": { "$ref": "#/$defs/utc" },
+        "maxBytes": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["result", "uploadId", "uploadUrl", "expiresAt", "maxBytes"],
+      "additionalProperties": false
+    },
+    "uploadRefusedErrors": {
+      "title": "UploadRefusedErrors",
+      "description": "The file is not one the purpose takes.",
+      "anyOf": [
+        {
+          "title": "TooLargeError",
+          "type": "object",
+          "properties": {
+            "error": { "const": "tooLarge" },
+            "maxBytes": { "type": "integer", "minimum": 1 }
+          },
+          "required": ["error", "maxBytes"],
+          "additionalProperties": false
+        },
+        {
+          "title": "WrongTypeError",
+          "type": "object",
+          "properties": {
+            "error": { "const": "wrongType" },
+            "allowed": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+          },
+          "required": ["error", "allowed"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "signedUpload.errors": {
+      "title": "SignedUploadErrors",
+      "description": "No upload was made.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/uploadRefusedErrors" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "finishUpload.request": {
+      "title": "FinishUploadRequest",
+      "description": "Say the file has been sent: the server checks the stored file's size and type and keeps its object key with the upload. For idDocument it also writes S1-10 through K-09 v1 saveSetupStep, called alone: the ID document counts as the ID confirmed, accepted as given, with no face match and no check (MC C10), and the mobile is the one the owner's own text proved (MC C9); there is nothing of it to read back. Who may call: the session's person the upload was made for. Binds: the upload id's own person, business and purpose, all on the server. Reads: the primary, uncached. Repeat: safe: uploadId is the key; a repeat answers the first result. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "uploadId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["page", "uploadId"],
+      "additionalProperties": false
+    },
+    "finishUpload.response": {
+      "title": "UploadStored",
+      "description": "Stored, private (Q-31).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "stored" },
+        "uploadId": { "$ref": "#/$defs/id" },
+        "purpose": { "$ref": "#/$defs/uploadPurpose" },
+        "served": {
+          "description": "For idDocument, S1-10's write (K-09 v1 id-upload-confirmed.json); null for every other purpose, whose upload an answer then carries (answerOnPage.uploadIds).",
+          "anyOf": [{ "$ref": "#/$defs/servedSetupStep" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "uploadId", "purpose", "served"],
+      "additionalProperties": false,
+      "if": { "properties": { "purpose": { "const": "idDocument" } }, "required": ["purpose"] },
+      "then": { "properties": { "served": { "type": "object" } } },
+      "else": { "properties": { "served": { "type": "null" } } }
+    },
+    "finishUpload.errors": {
+      "title": "FinishUploadErrors",
+      "description": "Nothing was kept or written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        {
+          "title": "UploadMissingError",
+          "description": "An upload id this session was not given, or no file came to it before it lapsed: one answer for both.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "uploadNotFound" },
+            "uploadId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "uploadId"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/uploadRefusedErrors" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/saveSetupStep.errors" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+
+    "stripeOnboardingStart.request": {
+      "title": "StripeOnboardingStartRequest",
+      "description": "Registration screen 19 (S1-27): connect Stripe in the business's own name. Served by K-14 v1 onboardingLink, which makes the business's account first when it has none and stores its id at once in K-23 v1 business_setup.stripe_account_id. Who may call: the account owner, signed in, on the business's registration or ownerConfirm page (S13-45 row 8: money is an owner power; S1-77: the owner's confirm covers them). Binds: the business is the link's; the account and its id come only from Rosie's own record, never from the page. Reads: the primary, uncached. Repeat: safe: the account's creation carries one key; each ask gives a fresh single-use link (K-14 v1). Time budget: none in the sources.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInLinkPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingStart.response": {
+      "title": "StripeOnboardingLink",
+      "description": "Stripe's own page, where the owner finishes the account: the browser goes there and comes back to the page (stripeOnboardingReturn). It carries only a link (02-contracts K-21: 'carry only links and object keys').",
+      "type": "object",
+      "properties": {
+        "result": { "const": "link" },
+        "url": {
+          "description": "K-14 v1 onboardingLink's single-use url.",
+          "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/httpsUrl"
+        },
+        "expiresAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "url", "expiresAt"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingStart.errors": {
+      "title": "StripeOnboardingStartErrors",
+      "description": "No link.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        {
+          "title": "NoMoneyError",
+          "description": "The business takes no money through Rosie (K-23 v1 business_setup.no_money; FS row M02), so screen 19 is skipped (FS section 6.1).",
+          "type": "object",
+          "properties": { "error": { "const": "noMoney" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "stripeOnboardingReturn.request": {
+      "title": "StripeOnboardingReturnRequest",
+      "description": "Back from Stripe's page: the server reads the account's status (K-14 v1 accountStatus) on the id Rosie's own record holds; once onboarding is finished it writes S1-27 through K-09 v1 saveSetupStep with that id (gives stripe). Nothing from Stripe's redirect is trusted beyond which address it came back to. Who may call and binds: as stripeOnboardingStart. Reads: the primary, uncached, and Stripe. Repeat: safe: a finished account answers connected again with the step's repeated true. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInLinkPage" },
+        "returned": {
+          "description": "Which address Stripe sent the browser back to: return (the owner finished or left) or refresh (the link lapsed): K-14 v1 onboardingLink returnUrl and refreshUrl.",
+          "type": "string",
+          "enum": ["return", "refresh"]
+        }
+      },
+      "required": ["page", "returned"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingReturn.response": {
+      "title": "StripeOnboardingReturned",
+      "description": "Connected, or not finished yet.",
+      "oneOf": [
+        {
+          "title": "StripeConnected",
+          "type": "object",
+          "properties": {
+            "result": { "const": "connected" },
+            "served": { "$ref": "#/$defs/servedSetupStep" }
+          },
+          "required": ["result", "served"],
+          "additionalProperties": false
+        },
+        {
+          "title": "StripeNotFinished",
+          "description": "Stripe wants more, or the link lapsed: a fresh link.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "notFinished" },
+            "url": { "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/httpsUrl" },
+            "expiresAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "url", "expiresAt"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "stripeOnboardingReturn.errors": {
+      "title": "StripeOnboardingReturnErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/saveSetupStep.errors" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+
+    "billCard.request": {
+      "title": "BillCardRequest",
+      "description": "Registration screen 20 (S1-29; FS row M04): the card for Rosfield's monthly bill, on Rosfield's own account, never a customer's (K-14 v1 'Whose account'). The card is typed into Stripe's own form on the page, so its number never reaches Rosie (RULES 3.12, 4.5). Served by K-14 v1: the bill card's save is a K-07 stripe_save_card effect (saveCard), and the page's server reads it with pageIntent by the effect row's providerObjectId, from Rosie's own record, never from the link or the browser; once saved, savedCard shows it. The terms and the saved card are then confirmed together on S1-29's read-back (answerOnPage, confirmOnPage), which writes S1-29 (gives terms and bill_card). Who may call: the account owner, signed in, on the business's registration page (S13-45 row 8). Binds: the business is the link's. Reads: the primary, uncached, and Stripe. Repeat: safe: one effect row per business's bill card; pageIntent and savedCard are reads. Time budget: none in the sources.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInLinkPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "billCard.response": {
+      "title": "BillCardState",
+      "description": "The form to fill, or the card saved.",
+      "oneOf": [
+        {
+          "title": "BillCardForm",
+          "description": "Stripe's form has something to do: the client secret goes only to that form, with Rosie's publishable key (STRIPE_PUBLISHABLE_KEY, a config value of the web app, named and never in a response), and never into a log, a span, an event-log row, a message or a link (K-14 v1 clientSecret). It is given only while the form has something to do (K-14 v1 pageIntent).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "form" },
+            "state": { "type": "string", "enum": ["needsCard", "needsAuthentication"] },
+            "clientSecret": { "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/clientSecret" }
+          },
+          "required": ["result", "state", "clientSecret"],
+          "additionalProperties": false
+        },
+        {
+          "title": "BillCardSaved",
+          "description": "Saved: shown as its brand and last four only (K-14 v1 cardShown; FS row M04).",
+          "type": "object",
+          "properties": {
+            "result": { "const": "saved" },
+            "card": { "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/cardShown" }
+          },
+          "required": ["result", "card"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "billCard.errors": {
+      "title": "BillCardErrors",
+      "description": "Nothing was made.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "calendarConnectStart.request": {
+      "title": "CalendarConnectStartRequest",
+      "description": "Connect the signed-in person's own calendar on a page they already have open, never through a texted link (MC 8 'Calendars': 'no secure link is sent for this for now'; Q-10: registration screen 16, the owner console, the staff page; S1-24: 'Each person can link their own calendar when they join'). Served by K-16 v1 connectStart: the server writes or reuses the person's link row (K-27, not frozen: an opaque id) and names where it started (K-16 v1 startedOn: registration or staffPage from the link's page, ownerConsole with no link). Who may call: any signed-in owner, admin or staff member, for their own calendar only. Binds: the person is the session's, never one the page names. Reads: the primary, uncached. Repeat: safe: each call gives a fresh start, and only the one the person finishes counts (K-16 v1). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "provider": { "$ref": "#/$defs/calendarProvider" }
+      },
+      "required": ["page", "provider"],
+      "additionalProperties": false
+    },
+    "calendarConnectStart.response": {
+      "title": "CalendarConnectStarted",
+      "description": "The provider's consent page; the browser goes there and comes back (calendarConnectReturn). Only a link (02-contracts K-21).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "started" },
+        "provider": { "$ref": "#/$defs/calendarProvider" },
+        "authorizeUrl": {
+          "description": "K-16 v1 connectStart's authorizeUrl.",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "expiresAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "provider", "authorizeUrl", "expiresAt"],
+      "additionalProperties": false
+    },
+    "calendarConnectStart.errors": {
+      "title": "CalendarConnectStartErrors",
+      "description": "Nothing started.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "calendarConnectReturn.request": {
+      "title": "CalendarConnectReturnRequest",
+      "description": "Back from the provider's consent page, with its redirect's values as received. Served by K-16 v1 connectReturn, which exchanges the code once and keeps the tokens sealed under the person's key, never in an answer (K-16 v1 tokensKept); on registration screen 16 it then writes S1-24 through K-09 v1 saveSetupStep (gives calendar). Who may call: the person who started this connect, signed in: a state started by another person answers connectNotFound. Binds: the person is the session's and must be the state's own. Reads: the primary, uncached. Repeat: safe: a state is used once; a repeat answers the first result. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "provider": { "$ref": "#/$defs/calendarProvider" },
+        "state": {
+          "description": "The provider's state as received (K-16 v1 connectReturn.state).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "code": {
+          "description": "The provider's one-time code as received, or null when it sent an error; used once by K-16 and never logged.",
+          "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 2048 }, { "type": "null" }]
+        },
+        "error": {
+          "description": "The provider's error as received, such as access_denied, or null.",
+          "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 200 }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "provider", "state", "code", "error"],
+      "additionalProperties": false
+    },
+    "calendarConnectReturn.response": {
+      "title": "CalendarConnectReturned",
+      "description": "Linked, declined, or a scope missing (K-16 v1 connectReturn).",
+      "oneOf": [
+        {
+          "title": "CalendarLinked",
+          "type": "object",
+          "properties": {
+            "result": { "const": "linked" },
+            "provider": { "$ref": "#/$defs/calendarProvider" },
+            "served": {
+              "description": "On registration screen 16, S1-24's write (gives calendar); null on the staff page and the owner console, where only K-27's link row changes (not frozen: README open gaps).",
+              "anyOf": [{ "$ref": "#/$defs/servedSetupStep" }, { "type": "null" }]
+            }
+          },
+          "required": ["result", "provider", "served"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CalendarDeclined",
+          "description": "The person said no on the provider's page: nothing is linked, and S1-24's safe default holds.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "declined" },
+            "provider": { "$ref": "#/$defs/calendarProvider" }
+          },
+          "required": ["result", "provider"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CalendarScopesMissing",
+          "description": "A scope K-16 asks was not granted (K-16 v1 connect-return-scopes-missing): nothing is linked; the page asks again.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "scopesMissing" },
+            "provider": { "$ref": "#/$defs/calendarProvider" }
+          },
+          "required": ["result", "provider"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "calendarConnectReturn.errors": {
+      "title": "CalendarConnectReturnErrors",
+      "description": "Nothing was linked.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        {
+          "title": "ConnectNotFoundError",
+          "description": "No connect with this state was started by this person, or it was used: one answer.",
+          "type": "object",
+          "properties": { "error": { "const": "connectNotFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/saveSetupStep.errors" },
+        { "$ref": "#/$defs/bookingPausedError" }
+      ]
+    },
+
+    "readStaffPage.request": {
+      "title": "ReadStaffPageRequest",
+      "description": "The staff page (S2-06: 'Joins and fills in the secure page'): the person's own profile, an optional license kept as given, an optional calendar, and an emergency contact with their own yes where a check-out timer applies (Q-06). Who may call: the team member the staffPage link was made for, signed in. Binds: the business is the link's, the person the session's, who must be the link's own. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources. Writes go through answerOnPage and confirmOnPage (S2-06's profile, S2-11's license), signedUpload (a license file) and calendarConnectStart.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInLinkPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "readStaffPage.response": {
+      "title": "StaffPage",
+      "description": "What the staff page shows the person, about themselves only. The emergency contact's name and mobile are sealed under the pro's key and secure-page-only (K-22 v1 emergency_contacts): the page shows whether a contact is on file, never who.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "staffPage" },
+        "businessName": { "type": "string", "minLength": 1 },
+        "person": {
+          "title": "StaffPagePerson",
+          "type": "object",
+          "properties": {
+            "personId": { "$ref": "#/$defs/id" },
+            "displayName": {
+              "description": "The name the person gave (K-09 v1 SetupS2_06 displayName), or null before S2-06.",
+              "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+            },
+            "languages": {
+              "description": "K-22 v1 staff.languages (FS row T09).",
+              "type": "array",
+              "items": { "$ref": "../model/model.v1.schema.json#/$defs/language" }
+            }
+          },
+          "required": ["personId", "displayName", "languages"],
+          "additionalProperties": false
+        },
+        "profile": {
+          "title": "StaffPageProfile",
+          "type": "object",
+          "properties": {
+            "state": { "type": "string", "enum": ["toDo", "done"] },
+            "question": { "anyOf": [{ "$ref": "#/$defs/pageQuestion" }, { "type": "null" }] }
+          },
+          "required": ["state", "question"],
+          "additionalProperties": false
+        },
+        "license": {
+          "title": "StaffPageLicense",
+          "description": "Optional and never checked (MC C4; S2-11, S2-29).",
+          "type": "object",
+          "properties": {
+            "state": { "type": "string", "enum": ["none", "added"] },
+            "question": { "anyOf": [{ "$ref": "#/$defs/pageQuestion" }, { "type": "null" }] }
+          },
+          "required": ["state", "question"],
+          "additionalProperties": false
+        },
+        "calendar": {
+          "title": "StaffPageCalendar",
+          "description": "Optional (S1-24; Q-10): staff with no calendar block their time by text.",
+          "type": "object",
+          "properties": {
+            "state": { "type": "string", "enum": ["none", "linked"] },
+            "provider": { "anyOf": [{ "$ref": "#/$defs/calendarProvider" }, { "type": "null" }] }
+          },
+          "required": ["state", "provider"],
+          "additionalProperties": false
+        },
+        "emergencyContact": {
+          "title": "StaffPageEmergencyContact",
+          "description": "needed: a check-out timer applies to this person's work (S13-10; Q-06); state: none, waitingForTheirYes (named, but their own yes by texting Rosie has not come: Q-06; MC C9) or onFile (K-22 v1 emergency_contacts.contact_yes_at).",
+          "type": "object",
+          "properties": {
+            "needed": { "type": "boolean" },
+            "state": { "type": "string", "enum": ["none", "waitingForTheirYes", "onFile"] },
+            "question": { "anyOf": [{ "$ref": "#/$defs/pageQuestion" }, { "type": "null" }] }
+          },
+          "required": ["needed", "state", "question"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "businessName", "person", "profile", "license", "calendar", "emergencyContact"],
+      "additionalProperties": false
+    },
+    "readStaffPage.errors": {
+      "title": "ReadStaffPageErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "teamConsole.request": {
+      "title": "TeamConsoleRequest",
+      "description": "The team console's shell (C-194; arch 02 diagram line 105: 'Team console: paging · gap cases · dead letters'): the open pages and their acknowledgement, the review queue (S1-03, S1-75, S1-76, S11-52, S12-28 within 1 business day; A3-49, S11-70 that day), gap cases (arch 03 line 189), dead letters (arch 10 line 540) and parked turns (arch 11 line 576). Who may call: a signed-in person on Rosie's team (a live K-36 v1 team_page_recipients row; Q-18). Binds: the person is the session's; the call runs as the team console, on the runtime side across businesses, since no business scope may read these rows (K-37 v1 rule 2; K-36 v1 rule 2), and K-09's console calls take caller.kind console with that person. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "teamConsole.response": {
+      "title": "TeamConsole",
+      "description": "Each list holds the rows still open (and the pages acknowledged within the last 24 hours), oldest first, each with its id and current version, which the console's writes send back (limit 4; K-09 v1 acknowledgePage, decideReviewItem). Plain columns only: no sealed value, no person's words (K-37 v1 rule 4; K-36 v1 rule 4).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "teamConsole" },
+        "pages": {
+          "description": "Pages to Rosie's team that are open, and those acknowledged within the last 24 hours (K-36 v1 team_pages; README default 17), oldest first.",
+          "type": "array",
+          "items": {
+            "title": "ConsolePage",
+            "type": "object",
+            "properties": {
+              "pageId": { "$ref": "#/$defs/id" },
+              "version": { "$ref": "#/$defs/version" },
+              "reason": {
+                "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/pageTeam.request/properties/reason"
+              },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "summary": {
+                "description": "K-36 v1 team_pages.summary: ids, kinds and plain words, never a person's words.",
+                "type": "string",
+                "minLength": 1
+              },
+              "repeating": {
+                "description": "Paged every 5 minutes until acknowledged (K-36 v1 repeat_minutes 5; arch 06 line 329).",
+                "type": "boolean"
+              },
+              "timesPaged": { "type": "integer", "minimum": 1 },
+              "openedAt": { "$ref": "#/$defs/utc" },
+              "lastPagedAt": { "$ref": "#/$defs/utc" },
+              "state": {
+                "description": "K-36 v1 team_pages.state: open, or acknowledged within the last 24 hours (README default 17), so the console shows both states (T-519).",
+                "type": "string",
+                "enum": ["open", "acknowledged"]
+              },
+              "acknowledgedAt": {
+                "description": "K-36 v1 team_pages.acknowledged_at, or null while open.",
+                "$ref": "#/$defs/nullableUtc"
+              },
+              "acknowledgedVia": {
+                "description": "K-36 v1 team_pages.acknowledged_via (a reply or a console tap), or null while open; never who, whose name the console does not need.",
+                "anyOf": [{ "type": "string", "enum": ["reply", "console_tap"] }, { "type": "null" }]
+              }
+            },
+            "required": [
+              "pageId",
+              "version",
+              "reason",
+              "businessId",
+              "summary",
+              "repeating",
+              "timesPaged",
+              "openedAt",
+              "lastPagedAt",
+              "state",
+              "acknowledgedAt",
+              "acknowledgedVia"
+            ],
+            "additionalProperties": false,
+            "if": { "properties": { "state": { "const": "open" } }, "required": ["state"] },
+            "then": {
+              "properties": { "acknowledgedAt": { "type": "null" }, "acknowledgedVia": { "type": "null" } }
+            },
+            "else": {
+              "properties": {
+                "acknowledgedAt": { "type": "string" },
+                "acknowledgedVia": { "type": "string" }
+              }
+            }
+          }
+        },
+        "reviewItems": {
+          "description": "Open and waiting team review items (K-37 v1 review_items), soonest due first.",
+          "type": "array",
+          "items": {
+            "title": "ConsoleReviewItem",
+            "type": "object",
+            "properties": {
+              "reviewItemId": { "$ref": "#/$defs/id" },
+              "version": { "$ref": "#/$defs/version" },
+              "kind": {
+                "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/openReviewItem.request/properties/kind"
+              },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "subject": {
+                "description": "The row under review (K-37 v1 subject_table, subject_row_id), or null while its part is not frozen.",
+                "anyOf": [
+                  {
+                    "title": "ConsoleReviewSubject",
+                    "type": "object",
+                    "properties": {
+                      "table": { "type": "string", "pattern": "^[a-z_][a-z0-9_]*$" },
+                      "rowId": { "$ref": "#/$defs/id" }
+                    },
+                    "required": ["table", "rowId"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "summary": { "type": "string", "minLength": 1 },
+              "state": { "type": "string", "enum": ["open", "waiting"] },
+              "dueAt": { "$ref": "#/$defs/utc" },
+              "waitUntil": { "$ref": "#/$defs/nullableUtc" }
+            },
+            "required": [
+              "reviewItemId",
+              "version",
+              "kind",
+              "businessId",
+              "subject",
+              "summary",
+              "state",
+              "dueAt",
+              "waitUntil"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "gapCases": {
+          "description": "Gap cases not yet reviewed (K-37 v1 gap_cases, review_state open): the state and the frontier, never the sealed summary.",
+          "type": "array",
+          "items": {
+            "title": "ConsoleGapCase",
+            "type": "object",
+            "properties": {
+              "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+              "version": { "$ref": "#/$defs/version" },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "outcome": {
+                "description": "The planner's verb, or to_person (K-37 v1 gap_cases.outcome; K-02 v1 plannerOutput).",
+                "type": "string",
+                "enum": ["answer", "ask", "pass_on", "hand_off", "log_gap", "to_person"]
+              },
+              "openQuestionIds": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+              "versionsRead": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+              "frontier": {
+                "description": "The choices offered on the last read (K-37 v1 gap_cases.frontier: K-02 v1 choice).",
+                "type": "array",
+                "items": { "$ref": "../model/model.v1.schema.json#/$defs/choice" }
+              },
+              "loggedAt": { "$ref": "#/$defs/utc" }
+            },
+            "required": [
+              "turnId",
+              "version",
+              "businessId",
+              "outcome",
+              "openQuestionIds",
+              "versionsRead",
+              "frontier",
+              "loggedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "deadLetters": {
+          "description": "Open dead letters (K-37 v1 dead_letters, state open): jobs that failed their 5 tries. Never the message as enqueued.",
+          "type": "array",
+          "items": {
+            "title": "ConsoleDeadLetter",
+            "type": "object",
+            "properties": {
+              "deadLetterId": { "$ref": "#/$defs/id" },
+              "version": { "$ref": "#/$defs/version" },
+              "queue": { "type": "string", "minLength": 1 },
+              "jobKind": { "type": "string", "minLength": 1 },
+              "jobId": { "$ref": "#/$defs/id" },
+              "tries": { "type": "integer", "minimum": 5 },
+              "lastError": { "type": "string", "minLength": 1 },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "traceId": { "$ref": "#/$defs/traceId" },
+              "deadAt": { "$ref": "#/$defs/utc" }
+            },
+            "required": [
+              "deadLetterId",
+              "version",
+              "queue",
+              "jobKind",
+              "jobId",
+              "tries",
+              "lastError",
+              "businessId",
+              "traceId",
+              "deadAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "parkedTurns": {
+          "description": "Parked turns waiting for the team's reply (K-37 v1 parked_turns, state open), soonest due first.",
+          "type": "array",
+          "items": {
+            "title": "ConsoleParkedTurn",
+            "type": "object",
+            "properties": {
+              "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+              "version": { "$ref": "#/$defs/version" },
+              "errorSummary": { "type": "string", "minLength": 1 },
+              "personToldAt": { "$ref": "#/$defs/nullableUtc" },
+              "replyDueAt": { "$ref": "#/$defs/utc" }
+            },
+            "required": ["turnId", "version", "errorSummary", "personToldAt", "replyDueAt"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "pages", "reviewItems", "gapCases", "deadLetters", "parkedTurns"],
+      "additionalProperties": false
+    },
+    "teamConsole.errors": {
+      "title": "TeamConsoleErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTeamError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "teamAcknowledgePage.request": {
+      "title": "TeamAcknowledgePageRequest",
+      "description": "A console tap that acknowledges a page: paging stops and the next page's clock row is cancelled. Served by K-09 v1 acknowledgePage with caller.kind console, the session's person and via console_tap (K-36 v1 acknowledged_via). Who may call: a signed-in person on Rosie's team who was paged (K-09 v1 notPaged otherwise). Binds: the person is the session's; the page is the row named, with the version the console read. Reads: the primary, uncached. Repeat: safe: an acknowledged page answers repeated (K-09 v1). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "pageId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" }
+      },
+      "required": ["page", "pageId", "expectVersion"],
+      "additionalProperties": false
+    },
+    "teamAcknowledgePage.response": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/acknowledgePage.response"
+    },
+    "teamAcknowledgePage.errors": {
+      "title": "TeamAcknowledgePageErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTeamError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/acknowledgePage.errors" }
+      ]
+    },
+    "teamDecideReviewItem.request": {
+      "title": "TeamDecideReviewItemRequest",
+      "description": "Decide a review item, or set it waiting, from the console. Served by K-09 v1 decideReviewItem with caller.kind console and the session's person: a done decision writes its typed write-back to the row under review in the same commit (K-23 v1 control_proven_via team_check; K-24 v1 new_work_drafts.state), never read from the outcome's words (arch 02 line 139). The console reads the decision back before it sends it (T-519). Who may call: a signed-in person on Rosie's team (Q-18). Binds: the person is the session's; the item is the row named, with the version the console read. Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision (K-09 v1). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "reviewItemId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "decision": {
+          "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.request/properties/decision"
+        }
+      },
+      "required": ["page", "reviewItemId", "expectVersion", "decision"],
+      "additionalProperties": false
+    },
+    "teamDecideReviewItem.response": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.response"
+    },
+    "teamDecideReviewItem.errors": {
+      "title": "TeamDecideReviewItemErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.errors" }
+      ]
+    },
+
+    "testRoster.request": {
+      "title": "TestRosterRequest",
+      "description": "Staging only (BP 9.4 'Seeded state'; merger question w1-qa-web 6): list staging's seeded test businesses and test phones, each phone with its role and seeded customer, for the test-phone page's picker (T-525, T-574). Read-only. Who may call: a signed-in tester on the roster or a person on Rosie's team, on staging; in production it answers stagingOnly and reads nothing. Binds: the person is the session's; the roster is staging's config and seeded state (Q-53; C-202), never a browser value. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "testRoster.response": {
+      "title": "TestRoster",
+      "description": "The seeded test businesses (fixture set v1's demo shops, signed up, with Stripe test accounts and test calendars linked, in the testers' time zone: BP 9.4; Q-54), each with its own text hours (K-04 v1; FS line 721 H04), which an override never changes, and the roster's test phones, each with its text-hours override as it stands and the version textHoursOverride sends back (the frontend engineer's FAILs 1 and 2 on 2413b65; T-527). A phone shows only its last four digits and what it acts as, never who holds it (rule 9; the holders are 08-needs-from-jay.md's). Before the F14 setup seeds a business shows as not signed up, and before the F15 customer seeds a phone has no seeded customer (CQ-14).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "testRoster" },
+        "businesses": {
+          "type": "array",
+          "items": {
+            "title": "RosterBusiness",
+            "type": "object",
+            "properties": {
+              "businessId": { "$ref": "#/$defs/id" },
+              "name": { "type": "string", "minLength": 1 },
+              "flow": { "type": "string", "enum": ["A", "B"] },
+              "kindIds": {
+                "description": "Its kinds of work (K-24 v1 kinds.id; the demo shop's trade ids).",
+                "type": "array",
+                "items": { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/kindId" }
+              },
+              "signedUp": { "type": "boolean" },
+              "live": { "type": "boolean" },
+              "zone": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" },
+              "textHours": {
+                "description": "The business's own text hours (K-04 v1 businesses.text_hours_start and text_hours_end; FS line 721 H04), read in zone; a test phone's override never changes them (T-527).",
+                "$ref": "#/$defs/textHours"
+              }
+            },
+            "required": ["businessId", "name", "flow", "kindIds", "signedUp", "live", "zone", "textHours"],
+            "additionalProperties": false
+          }
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "title": "RosterPhone",
+            "type": "object",
+            "properties": {
+              "testPhoneId": {
+                "description": "The roster's id for the phone: what the test calls name, never a number.",
+                "$ref": "#/$defs/id"
+              },
+              "last4": { "type": "string", "pattern": "^[0-9]{4}$" },
+              "role": {
+                "description": "Its role in tests (BP 9.4; Q-53; T-525): owner, staff, customer, secondCustomer, or stop (the one phone named for STOP tests).",
+                "type": "string",
+                "enum": ["owner", "staff", "customer", "secondCustomer", "stop"]
+              },
+              "label": {
+                "description": "A plain name for the picker, such as 'Test owner 1'.",
+                "type": "string",
+                "minLength": 1
+              },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "personId": {
+                "description": "The seeded person the phone texts as (owner or staff), or null.",
+                "$ref": "#/$defs/nullableId"
+              },
+              "seededCustomer": {
+                "description": "The phone's seeded customer (K-28 v1 customers; BP 9.4: 'a seeded customer for each test phone'), or null.",
+                "anyOf": [
+                  {
+                    "title": "RosterCustomer",
+                    "type": "object",
+                    "properties": {
+                      "customerId": { "$ref": "#/$defs/id" },
+                      "name": { "type": "string", "minLength": 1 }
+                    },
+                    "required": ["customerId", "name"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "linqContact": {
+                "description": "Whether the phone is a Linq contact (BP 9.4: 'whether it is a Linq contact'; K-04 v1 phones.linq_contact_added_at).",
+                "type": "boolean"
+              },
+              "stopped": {
+                "description": "K-04 v1 phones.stopped.",
+                "type": "boolean"
+              },
+              "textHoursOverride": {
+                "description": "The phone's text-hours override as it stands, with the version textHoursOverride sends back (T-527).",
+                "$ref": "#/$defs/textHoursOverrideState"
+              }
+            },
+            "required": [
+              "testPhoneId",
+              "last4",
+              "role",
+              "label",
+              "businessId",
+              "personId",
+              "seededCustomer",
+              "linqContact",
+              "stopped",
+              "textHoursOverride"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "businesses", "phones"],
+      "additionalProperties": false
+    },
+    "testRoster.errors": {
+      "title": "TestRosterErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "testPhoneSend.request": {
+      "title": "TestPhoneSendRequest",
+      "description": "Staging only (BP 9.4 'The test-phone page'): send a text as a chosen roster test phone. The server builds the K-06 v1 event for that phone's number, asks the Linq double for a signed webhook (K-11 v1 doubleWebhook) and posts it to the gateway, which cannot tell it from a real Linq text (K-06 v1 test-phone-page.json). The page never holds or sees a webhook secret. Who may call: a signed-in tester or a person on Rosie's team, on staging; in production stagingOnly. Binds: the phone is the roster's by testPhoneId; the browser never names a number. Reads: the primary, uncached. Repeat: safe: page.requestId is the key; a repeat answers the first event and sends nothing more (the gateway drops a known event id: arch 02 line 109). Time budget: the gateway's answer in under 1 s (arch 02 line 109).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "testPhoneId": { "$ref": "#/$defs/id" },
+        "words": {
+          "description": "The text as typed. A bare opt-out word stops Rosie's texts to that phone for every business (BP 9.4: only a test about STOP uses one, from the phone named for it).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "threadedReplyTo": {
+          "description": "The Linq message id the text replies under (K-06 v1 threadedReplyTo), or null.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["page", "testPhoneId", "words", "threadedReplyTo"],
+      "additionalProperties": false
+    },
+    "testPhoneSend.response": {
+      "title": "TestPhoneSent",
+      "description": "Sent into the gateway; the page shows the trace id.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "sent" },
+        "eventId": {
+          "description": "The K-06 v1 event's id.",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The trace the gateway opened at receipt (K-06 v1 traceId; K-08 v1).",
+          "$ref": "#/$defs/traceId"
+        },
+        "gatewayStatus": {
+          "description": "The gateway's answer to the signed webhook: 200 accepted (or a known event id, dropped), 401 a bad signature, 503 the write failed (arch 02 line 109).",
+          "type": "integer",
+          "enum": [200, 401, 503]
+        }
+      },
+      "required": ["result", "eventId", "traceId", "gatewayStatus"],
+      "additionalProperties": false
+    },
+    "testPhoneSend.errors": {
+      "title": "TestPhoneSendErrors",
+      "description": "Nothing was sent.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestPhoneError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "testPhoneParts.request": {
+      "title": "TestPhonePartsRequest",
+      "description": "Staging only (BP 9.4: the test-phone page 'shows, in order, each part the Linq double would have sent'): for one roster test phone, each part the Linq double recorded, in order, the email double's output for that phone's own person, the phone's stop state, and its chat link with the ready text. Who may call: a signed-in tester or a person on Rosie's team, on staging; in production stagingOnly. Binds: the phone is the roster's by testPhoneId; only that phone's parts and its own person's emails come back. Reads: the primary, uncached, and the doubles' records. Repeat: safe: a read. Time budget: none.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "testPhoneId": { "$ref": "#/$defs/id" },
+        "since": {
+          "description": "Only parts and emails after this time, or null for all the doubles keep.",
+          "$ref": "#/$defs/nullableUtc"
+        }
+      },
+      "required": ["page", "testPhoneId", "since"],
+      "additionalProperties": false
+    },
+    "testPhoneParts.response": {
+      "title": "TestPhoneParts",
+      "description": "What the phone would have got. The email double's output can hold a sign-in code meant for that test identity: it is shown only on staging, only for the chosen roster phone's own person, and only to a signed-in tester or team member.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "parts" },
+        "phone": {
+          "title": "TestPhoneState",
+          "type": "object",
+          "properties": {
+            "testPhoneId": { "$ref": "#/$defs/id" },
+            "last4": { "type": "string", "pattern": "^[0-9]{4}$" },
+            "chatOpen": {
+              "description": "K-04 v1 phones.chat_open.",
+              "type": "boolean"
+            },
+            "stopped": {
+              "description": "K-04 v1 phones.stopped: Rosie's texts to this phone are off for every business until START (MC C1).",
+              "type": "boolean"
+            },
+            "stoppedAt": { "$ref": "#/$defs/nullableUtc" }
+          },
+          "required": ["testPhoneId", "last4", "chatOpen", "stopped", "stoppedAt"],
+          "additionalProperties": false
+        },
+        "chatLink": {
+          "description": "The phone's chat link and its ready text, as K-09 v1 issueChatLink gave them (MC C9), or null.",
+          "anyOf": [
+            {
+              "title": "TestPhoneChatLink",
+              "type": "object",
+              "properties": {
+                "link": { "type": "string", "minLength": 1 },
+                "readyText": { "type": "string", "minLength": 1 },
+                "shortCode": { "type": "string", "minLength": 1 }
+              },
+              "required": ["link", "readyText", "shortCode"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "parts": {
+          "description": "Each part the Linq double recorded for this phone, in the order it was sent: the request as K-11 v1 sendPart took it, and the outcome the double gave.",
+          "type": "array",
+          "items": {
+            "title": "RecordedPart",
+            "type": "object",
+            "properties": {
+              "at": { "$ref": "#/$defs/utc" },
+              "sent": { "$ref": "../port-linq/port-linq.v1.schema.json#/$defs/sendPart.request" },
+              "outcome": {
+                "anyOf": [
+                  { "$ref": "../port-linq/port-linq.v1.schema.json#/$defs/sendPart.response" },
+                  { "$ref": "../port-linq/port-linq.v1.schema.json#/$defs/sendPart.errors" }
+                ]
+              }
+            },
+            "required": ["at", "sent", "outcome"],
+            "additionalProperties": false
+          }
+        },
+        "emails": {
+          "description": "The email double's output for this phone's own person, in order (K-12, not frozen: these fields are named here until it freezes).",
+          "type": "array",
+          "items": {
+            "title": "RecordedEmail",
+            "type": "object",
+            "properties": {
+              "at": { "$ref": "#/$defs/utc" },
+              "to": { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/emailAddress" },
+              "subject": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 }
+            },
+            "required": ["at", "to", "subject", "text"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "phone", "chatLink", "parts", "emails"],
+      "additionalProperties": false
+    },
+    "testPhoneParts.errors": {
+      "title": "TestPhonePartsErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestPhoneError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "testClockRows.request": {
+      "title": "TestClockRowsRequest",
+      "description": "Staging only (BP 9.4 'A fake clock'): the clock rows of a roster test phone's handle, for staging's team console to show with Fire now (T-526: kind, due time, step). Who may call: a signed-in tester or a person on Rosie's team, on staging; in production stagingOnly. Binds: the phone is the roster's by testPhoneId; only its handle's rows come back. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "testPhoneId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["page", "testPhoneId"],
+      "additionalProperties": false
+    },
+    "testClockRows.response": {
+      "title": "TestClockRows",
+      "description": "The handle's clock rows, soonest due first (K-04 v1 clock_rows).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "clockRows" },
+        "rows": {
+          "type": "array",
+          "items": {
+            "title": "TestClockRow",
+            "type": "object",
+            "properties": {
+              "clockRowId": { "$ref": "#/$defs/id" },
+              "version": { "$ref": "#/$defs/version" },
+              "kind": {
+                "description": "K-04 v1 clock_rows.kind, such as question.",
+                "type": "string",
+                "pattern": "^[a-z_]+$"
+              },
+              "stepId": {
+                "description": "The step whose clock branch it runs (K-04 v1 clock_rows.fires), or null.",
+                "anyOf": [{ "$ref": "#/$defs/stepId" }, { "type": "null" }]
+              },
+              "dueAt": { "$ref": "#/$defs/utc" },
+              "dueZone": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" },
+              "state": {
+                "description": "K-04 v1 clock_rows.state.",
+                "type": "string",
+                "enum": ["waiting", "armed", "fired", "cancelled"]
+              },
+              "businessId": { "$ref": "#/$defs/nullableId" },
+              "fireable": {
+                "description": "true for an armed row: Fire now may fire it (fireNow).",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "clockRowId",
+              "version",
+              "kind",
+              "stepId",
+              "dueAt",
+              "dueZone",
+              "state",
+              "businessId",
+              "fireable"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "rows"],
+      "additionalProperties": false
+    },
+    "testClockRows.errors": {
+      "title": "TestClockRowsErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestPhoneError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "fireNow.request": {
+      "title": "FireNowRequest",
+      "description": "Staging only (BP 9.4: 'Fire now on a test handle's clock row', never in production): fire one armed clock row of a roster test phone's handle now, through the same path the alarm runs: the row's handle actor runs K-09 v1 gateAndCommit with input.kind clock and by fireNow, so notDue never applies (K-05 v1 fireClock; NQ-RT-4). Who may call: a signed-in tester or a person on Rosie's team, on staging; in production stagingOnly. Binds: the row must be owned by a roster test phone's handle (notTestHandle otherwise), at the version the console read. Reads: the primary, uncached. Repeat: safe: one clock row fires once; a second press answers fired with repeated true (K-05 v1 fire-repeat). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" }
+      },
+      "required": ["page", "clockRowId", "expectVersion"],
+      "additionalProperties": false
+    },
+    "fireNow.response": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/gateAndCommit.fired"
+    },
+    "fireNow.errors": {
+      "title": "FireNowErrors",
+      "description": "Nothing fired.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestHandleError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/gateAndCommit.errors/oneOf/4" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "textHoursOverride.request": {
+      "title": "TextHoursOverrideRequest",
+      "description": "Staging only (BP 9.4: 'a text-hours override for test phones. Never in production'): set or clear one roster test phone's override, so limit 8 treats it as inside text hours, without changing the business's hours (01-inventory C-204). Stored as a staging-only K-04 v1 release_flags row, name staging.text-hours-override, scope phone:<number> (K-04 v1 seed-flag.json; QUESTIONS M3-M3b default). Who may call: a signed-in tester or a person on Rosie's team, on staging; in production stagingOnly. Binds: the phone is the roster's by testPhoneId. Reads: the primary, uncached. Repeat: safe: the flag row's version is compared and set (limit 4); asking for what is already set answers repeated true and writes nothing. Time budget: none.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "testPhoneId": { "$ref": "#/$defs/id" },
+        "on": {
+          "description": "true sets the override (any hour), false clears it.",
+          "type": "boolean"
+        },
+        "expectVersion": {
+          "description": "The flag row's version as testRoster gave it (RosterPhone.textHoursOverride.version), or null when the phone has no row yet.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "testPhoneId", "on", "expectVersion"],
+      "additionalProperties": false
+    },
+    "textHoursOverride.response": {
+      "title": "TextHoursOverrideSet",
+      "description": "The override as it now stands.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "set" },
+        "testPhoneId": { "$ref": "#/$defs/id" },
+        "on": { "type": "boolean" },
+        "version": {
+          "description": "The flag row's version after the call.",
+          "$ref": "#/$defs/version"
+        },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "testPhoneId", "on", "version", "repeated"],
+      "additionalProperties": false
+    },
+    "textHoursOverride.errors": {
+      "title": "TextHoursOverrideErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestPhoneError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+
+    "openLink.exchange": {
+      "title": "OpenLinkExchange",
+      "description": "One openLink request with its outcome. A request with no session never gets an answer that acts for someone or shows secure-page-only fields: a link is never the proof (FS line 701; S13-45; refuse-link-as-proof.json).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "openLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/openLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/openLink.response" }, { "$ref": "#/$defs/openLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "object",
+                "properties": { "sessionToken": { "type": "null" } },
+                "required": ["sessionToken"]
+              }
+            },
+            "required": ["page"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "proof": { "const": "none" },
+              "acting": { "type": "null" },
+              "securePageOnly": { "const": false }
+            }
+          }
+        }
+      }
+    },
+    "signInStart.exchange": {
+      "title": "SignInStartExchange",
+      "description": "One signInStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "signInStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/signInStart.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/signInStart.response" }, { "$ref": "#/$defs/signInStart.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "signInCheck.exchange": {
+      "title": "SignInCheckExchange",
+      "description": "One signInCheck request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "signInCheck" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/signInCheck.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/signInCheck.response" }, { "$ref": "#/$defs/signInCheck.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "signOut.exchange": {
+      "title": "SignOutExchange",
+      "description": "One signOut request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "signOut" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/signOut.request" },
+        "outcome": { "anyOf": [{ "$ref": "#/$defs/signOut.response" }, { "$ref": "#/$defs/signOut.errors" }] }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "codeStart.exchange": {
+      "title": "CodeStartExchange",
+      "description": "One codeStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "codeStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/codeStart.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/codeStart.response" }, { "$ref": "#/$defs/codeStart.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "codeCheck.exchange": {
+      "title": "CodeCheckExchange",
+      "description": "One codeCheck request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "codeCheck" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/codeCheck.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/codeCheck.response" }, { "$ref": "#/$defs/codeCheck.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readRegistration.exchange": {
+      "title": "ReadRegistrationExchange",
+      "description": "One readRegistration request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readRegistration" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readRegistration.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readRegistration.response" },
+            { "$ref": "#/$defs/readRegistration.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "answerOnPage.exchange": {
+      "title": "AnswerOnPageExchange",
+      "description": "One answerOnPage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "answerOnPage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/answerOnPage.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/answerOnPage.response" }, { "$ref": "#/$defs/answerOnPage.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "confirmOnPage.exchange": {
+      "title": "ConfirmOnPageExchange",
+      "description": "One confirmOnPage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "confirmOnPage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/confirmOnPage.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/confirmOnPage.response" }, { "$ref": "#/$defs/confirmOnPage.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "signedUpload.exchange": {
+      "title": "SignedUploadExchange",
+      "description": "One signedUpload request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "signedUpload" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/signedUpload.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/signedUpload.response" }, { "$ref": "#/$defs/signedUpload.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "finishUpload.exchange": {
+      "title": "FinishUploadExchange",
+      "description": "One finishUpload request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "finishUpload" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/finishUpload.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/finishUpload.response" }, { "$ref": "#/$defs/finishUpload.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingStart.exchange": {
+      "title": "StripeOnboardingStartExchange",
+      "description": "One stripeOnboardingStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "stripeOnboardingStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/stripeOnboardingStart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/stripeOnboardingStart.response" },
+            { "$ref": "#/$defs/stripeOnboardingStart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingReturn.exchange": {
+      "title": "StripeOnboardingReturnExchange",
+      "description": "One stripeOnboardingReturn request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "stripeOnboardingReturn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/stripeOnboardingReturn.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/stripeOnboardingReturn.response" },
+            { "$ref": "#/$defs/stripeOnboardingReturn.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "billCard.exchange": {
+      "title": "BillCardExchange",
+      "description": "One billCard request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "billCard" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/billCard.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/billCard.response" }, { "$ref": "#/$defs/billCard.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "calendarConnectStart.exchange": {
+      "title": "CalendarConnectStartExchange",
+      "description": "One calendarConnectStart request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarConnectStart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarConnectStart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarConnectStart.response" },
+            { "$ref": "#/$defs/calendarConnectStart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "calendarConnectReturn.exchange": {
+      "title": "CalendarConnectReturnExchange",
+      "description": "One calendarConnectReturn request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "calendarConnectReturn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/calendarConnectReturn.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/calendarConnectReturn.response" },
+            { "$ref": "#/$defs/calendarConnectReturn.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readStaffPage.exchange": {
+      "title": "ReadStaffPageExchange",
+      "description": "One readStaffPage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readStaffPage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readStaffPage.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readStaffPage.response" }, { "$ref": "#/$defs/readStaffPage.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "teamConsole.exchange": {
+      "title": "TeamConsoleExchange",
+      "description": "One teamConsole request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "teamConsole" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/teamConsole.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/teamConsole.response" }, { "$ref": "#/$defs/teamConsole.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "teamAcknowledgePage.exchange": {
+      "title": "TeamAcknowledgePageExchange",
+      "description": "One teamAcknowledgePage request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "teamAcknowledgePage" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/teamAcknowledgePage.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/teamAcknowledgePage.response" },
+            { "$ref": "#/$defs/teamAcknowledgePage.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "teamDecideReviewItem.exchange": {
+      "title": "TeamDecideReviewItemExchange",
+      "description": "One teamDecideReviewItem request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "teamDecideReviewItem" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/teamDecideReviewItem.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/teamDecideReviewItem.response" },
+            { "$ref": "#/$defs/teamDecideReviewItem.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "testRoster.exchange": {
+      "title": "TestRosterExchange",
+      "description": "One testRoster request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testRoster" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testRoster.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/testRoster.response" }, { "$ref": "#/$defs/testRoster.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "testPhoneSend.exchange": {
+      "title": "TestPhoneSendExchange",
+      "description": "One testPhoneSend request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testPhoneSend" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testPhoneSend.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/testPhoneSend.response" }, { "$ref": "#/$defs/testPhoneSend.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "testPhoneParts.exchange": {
+      "title": "TestPhonePartsExchange",
+      "description": "One testPhoneParts request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testPhoneParts" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testPhoneParts.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/testPhoneParts.response" },
+            { "$ref": "#/$defs/testPhoneParts.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "testClockRows.exchange": {
+      "title": "TestClockRowsExchange",
+      "description": "One testClockRows request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testClockRows" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testClockRows.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/testClockRows.response" }, { "$ref": "#/$defs/testClockRows.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "fireNow.exchange": {
+      "title": "FireNowExchange",
+      "description": "One fireNow request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production'; refuse-fire-now-in-production.json).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "fireNow" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/fireNow.request" },
+        "outcome": { "anyOf": [{ "$ref": "#/$defs/fireNow.response" }, { "$ref": "#/$defs/fireNow.errors" }] }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "textHoursOverride.exchange": {
+      "title": "TextHoursOverrideExchange",
+      "description": "One textHoursOverride request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "textHoursOverride" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/textHoursOverride.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/textHoursOverride.response" },
+            { "$ref": "#/$defs/textHoursOverride.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+
+    "callName": {
+      "title": "PageCallName",
+      "description": "Every call v1 holds. Each has <call>.request, <call>.response, <call>.errors and <call>.exchange under $defs (02-contracts section 2 item 2).",
+      "type": "string",
+      "enum": [
+        "openLink",
+        "signInStart",
+        "signInCheck",
+        "signOut",
+        "codeStart",
+        "codeCheck",
+        "readRegistration",
+        "answerOnPage",
+        "confirmOnPage",
+        "signedUpload",
+        "finishUpload",
+        "stripeOnboardingStart",
+        "stripeOnboardingReturn",
+        "billCard",
+        "calendarConnectStart",
+        "calendarConnectReturn",
+        "readStaffPage",
+        "teamConsole",
+        "teamAcknowledgePage",
+        "teamDecideReviewItem",
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride"
+      ]
+    },
+    "stagingOnlyCall": {
+      "title": "StagingOnlyCall",
+      "description": "The calls that exist on staging only and answer stagingOnly in production (BP 9.4).",
+      "type": "string",
+      "enum": [
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride"
+      ]
+    }
+  }
+}

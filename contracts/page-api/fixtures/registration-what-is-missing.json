@@ -1,0 +1,108 @@
+{
+  "call": "readRegistration",
+  "given": {
+    "now": "2026-10-19T14:55:00Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json", "email-code-on-page.json", "upload-id-finished.json", "fee-consent-ok.json"],
+    "note": "Sam opens his registration link, signed in as its own person. Each screen asks only what is missing (FS section 6.1; S1-37). Done: the listing, the kinds, the company, his mobile, ID and email, control, the license as given, services, money, the rules, About us and the fee OK. Still to do: the calendar (screen 16, served by calendarConnectStart), who works with him (screen 17, S1-70's question, card words and labels the master's: MASTER-FLOW-A lines 933 to 947), Stripe (screen 19, served by stripeOnboardingStart) and the preview, terms and bill card (screen 20, whose S1-29 question opens once Stripe is connected). Go live, the team and the summary wait on those (screens 22 to 24). Screen 8 is for health care only, 13 for trades that book spaces or classes, and 21 is removed by D102. setup is K-09 v1 readSetup's answer; the picked kind's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0050",
+      "traceId": "trace-page-sam-0050",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    }
+  },
+  "outcome": {
+    "result": "registration",
+    "business": { "businessName": "Lee's Barbershop", "status": "saved" },
+    "screens": [
+      { "screen": 0, "steps": ["S1-01"], "state": "done", "question": null },
+      { "screen": 1, "steps": ["S1-09"], "state": "done", "question": null },
+      { "screen": 2, "steps": ["S1-09"], "state": "done", "question": null },
+      { "screen": 3, "steps": ["S1-02", "S1-03", "S1-74", "S1-11"], "state": "done", "question": null },
+      { "screen": 4, "steps": ["S1-04"], "state": "done", "question": null },
+      { "screen": 5, "steps": ["S1-08"], "state": "done", "question": null },
+      { "screen": 6, "steps": ["S1-10"], "state": "done", "question": null },
+      { "screen": 7, "steps": ["S1-75", "S1-76"], "state": "done", "question": null },
+      { "screen": 8, "steps": ["S1-71", "S1-72"], "state": "notNeeded", "question": null },
+      { "screen": 9, "steps": ["S1-60", "S1-23", "S1-61"], "state": "done", "question": null },
+      { "screen": 10, "steps": ["S1-12"], "state": "done", "question": null },
+      { "screen": 11, "steps": ["S1-43", "S1-13"], "state": "done", "question": null },
+      { "screen": 12, "steps": ["S1-13", "S1-14"], "state": "done", "question": null },
+      { "screen": 13, "steps": ["S1-80", "S1-81", "S1-82", "S1-83"], "state": "notNeeded", "question": null },
+      { "screen": 14, "steps": ["S1-21"], "state": "done", "question": null },
+      { "screen": 15, "steps": ["S1-84"], "state": "done", "question": null },
+      { "screen": 16, "steps": ["S1-24"], "state": "toDo", "question": null },
+      {
+        "screen": 17,
+        "steps": ["S1-70", "S1-78"],
+        "state": "toDo",
+        "question": {
+          "questionId": "oq-s1-70-sam",
+          "stepId": "S1-70",
+          "words": "Just you, or people to add?",
+          "options": [
+            { "choiceId": "c-01", "label": "1 Just me, for now" },
+            { "choiceId": "c-02", "label": "2 People to add" }
+          ],
+          "fields": [],
+          "uploads": []
+        }
+      },
+      { "screen": 18, "steps": ["S1-25", "S1-62"], "state": "done", "question": null },
+      { "screen": 19, "steps": ["S1-27"], "state": "toDo", "question": null },
+      { "screen": 20, "steps": ["S1-29"], "state": "toDo", "question": null },
+      { "screen": 21, "steps": [], "state": "notNeeded", "question": null },
+      { "screen": 22, "steps": ["S1-32", "S1-35"], "state": "waiting", "question": null },
+      { "screen": 23, "steps": ["S2-02", "S2-05", "S2-06", "S2-15", "S2-21"], "state": "waiting", "question": null },
+      { "screen": 24, "steps": ["S1-79"], "state": "waiting", "question": null }
+    ],
+    "setup": {
+      "status": "saved",
+      "keys": [
+        { "key": "thread", "given": true },
+        { "key": "kinds", "given": true },
+        { "key": "pf.license", "given": true },
+        { "key": "pf.services", "given": true },
+        { "key": "pf.questions", "given": true },
+        { "key": "pf.safety", "given": true },
+        { "key": "pf.first_steps", "given": true },
+        { "key": "pf.visit", "given": true },
+        { "key": "pf.money", "given": true },
+        { "key": "pf.messages", "given": true },
+        { "key": "pf.staff", "given": true },
+        { "key": "pf.rules", "given": true },
+        { "key": "pf.edges", "given": true },
+        { "key": "companies", "given": true },
+        { "key": "business", "given": true },
+        { "key": "id_checked", "given": true },
+        { "key": "mobile", "given": true },
+        { "key": "license", "given": true },
+        { "key": "services", "given": true },
+        { "key": "ways", "given": true },
+        { "key": "stripe", "given": true },
+        { "key": "spaces", "given": false },
+        { "key": "booking_rules", "given": true },
+        { "key": "price_oks", "given": true },
+        { "key": "profile", "given": true },
+        { "key": "calendar", "given": false },
+        { "key": "terms", "given": false },
+        { "key": "bill_card", "given": false },
+        { "key": "live", "given": false },
+        { "key": "added", "given": false },
+        { "key": "license_checked", "given": false },
+        { "key": "team", "given": false },
+        { "key": "on_call", "given": false },
+        { "key": "staff_live", "given": false }
+      ],
+      "kinds": [
+        { "pickedKindId": "picked-sam-barber", "kindId": "barber", "companyId": "company-lees-barbershop", "live": false }
+      ],
+      "team": []
+    },
+    "preview": null,
+    "summary": null
+  }
+}

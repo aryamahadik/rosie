@@ -1,0 +1,24 @@
+{
+  "call": "calendarConnectStart",
+  "given": {
+    "now": "2026-10-19T14:57:00Z",
+    "environment": "staging",
+    "after": ["registration-what-is-missing.json"],
+    "note": "Registration screen 16 (S1-24; Q-10): Sam connects his own Google calendar on the page he already has open; no text is sent for it (MC 8 'Calendars'). The server writes his calendar link row (K-27, not frozen: an opaque id) and calls K-16 v1 connectStart for the session's person, never one the page names, with startedOn registration from the link's page. The calendar double answers with its own consent page until J-13 (Q-56); the address and state are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0016-start",
+      "traceId": "trace-page-sam-0016",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "provider": "google"
+  },
+  "outcome": {
+    "result": "started",
+    "provider": "google",
+    "authorizeUrl": "https://calendar-double.example.com/consent?provider=google&state=state-sam-google-0001",
+    "expiresAt": "2026-10-19T15:12:00Z"
+  }
+}

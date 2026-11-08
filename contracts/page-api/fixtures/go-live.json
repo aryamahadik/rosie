@@ -1,0 +1,42 @@
+{
+  "call": "confirmOnPage",
+  "given": {
+    "now": "2026-10-19T15:01:00Z",
+    "environment": "staging",
+    "after": ["stripe-onboarding-return.json", "bill-card-setup.json"],
+    "note": "Registration screen 20 (S1-29: 'Shows the preview, the terms and Go live', a page step): Sam read the preview, and the read-back of the page's form (rb-sam-s1-29-1) named the terms and the bill card saved on Stripe's form (Card •••• 4242). He presses Go live with his typed name as his signature (01-inventory C-185). The server calls K-09 v1 saveSetupStep alone for Sam with the terms' time and the bill card's two Stripe ids from Rosie's own record (K-33 v1 bill_cards, written from Stripe's webhook), never from the page; nothing is left unsigned, so the branch is '1 Nothing left to sign' (K-09 v1 setup-s1-29-terms.json, whose answer this is). S1-32's checks then come back by themselves and S1-35 goes live (screen 22; K-09 v1 go-live-check.json, setup-s1-35-live.json), which the page reads with readRegistration."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0029-yes",
+      "traceId": "trace-page-sam-0029",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "readBackId": "rb-sam-s1-29-1",
+    "typedName": "Sam Lee"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-sam-s1-29-1",
+    "yesEventId": "pageyes-sam-s1-29-1",
+    "served": {
+      "call": "saveSetupStep",
+      "response": {
+        "step": "S1-29",
+        "gives": ["terms", "bill_card"],
+        "branch": "1 Nothing left to sign",
+        "written": [
+          { "table": "business_setup", "rowId": "biz-lees-barbershop", "version": 5 },
+          { "table": "bill_cards", "rowId": "bill-card-lees-1", "version": 1 }
+        ],
+        "openQuestionId": null,
+        "outboxRowIds": [],
+        "clockRowIds": [],
+        "effects": [],
+        "reviewItemId": null,
+        "repeated": false
+      }
+    }
+  }
+}

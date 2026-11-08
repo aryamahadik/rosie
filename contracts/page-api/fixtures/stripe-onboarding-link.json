@@ -1,0 +1,22 @@
+{
+  "call": "stripeOnboardingStart",
+  "given": {
+    "now": "2026-10-19T14:59:00Z",
+    "environment": "staging",
+    "after": ["registration-what-is-missing.json"],
+    "note": "Registration screen 19 (S1-27): Sam, the account owner, signed in on his registration link, connects Stripe in Lee's Barbershop's own name. Served by K-14 v1 onboardingLink (its onboarding-link.json): the business had no Stripe account, so one is made first and its id goes at once to K-23 v1 business_setup.stripe_account_id, from where every later call reads it; the page gets only Stripe's single-use link, good for 5 minutes (02-contracts K-21: 'carry only links and object keys'). Stripe is in test mode until launch (MC 8 'Payments'); the link is K-14's placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-pay-sam-0000",
+      "traceId": "trace-page-sam-0026",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    }
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://connect.stripe.com/setup/c/demo-lees-barbershop-onboarding",
+    "expiresAt": "2026-10-19T15:04:00Z"
+  }
+}

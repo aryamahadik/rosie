@@ -1,0 +1,34 @@
+{
+  "call": "testClockRows",
+  "given": {
+    "now": "2026-10-23T15:00:00Z",
+    "environment": "staging",
+    "after": ["db-schema/core/fixtures/seed-clock-row.json"],
+    "note": "Staging only (BP 9.4 'A fake clock'): staging's team console lists the clock rows of the first customer's test phone (tp-03, Alex's handle) for Fire now (T-526: kind, due time, step). A7-03's question clock is armed for 24 hours after its first delivery (K-04 v1 seed-clock-row.json; K-05 v1 arm-clock.json), so Fire now may fire it."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-testclock-0001",
+      "traceId": "trace-page-tester-0004",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "testPhoneId": "tp-03"
+  },
+  "outcome": {
+    "result": "clockRows",
+    "rows": [
+      {
+        "clockRowId": "clock-oq-a7-03-alex",
+        "version": 2,
+        "kind": "question",
+        "stepId": "A7-03",
+        "dueAt": "2026-10-24T14:05:04Z",
+        "dueZone": "America/New_York",
+        "state": "armed",
+        "businessId": "biz-lees-barbershop",
+        "fireable": true
+      }
+    ]
+  }
+}

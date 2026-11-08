@@ -1,0 +1,29 @@
+{
+  "call": "openLink",
+  "given": {
+    "now": "2026-10-20T16:45:00Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/staff-join-ready-text.json"],
+    "note": "S2-06: Riley joined by her own ready text, and Rosie's reply in her chat carried her staff page's link (a placeholder code). She signed in on it by the text way, so her session comes with the request: the session's person is the person the link was made for, the call acts for her, and the page may show its secure-page-only sections (02-contracts K-21: 'secure-page-only fields included'). Their contents come from readStaffPage."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-link-riley-s206-1",
+      "traceId": "trace-page-riley-0000",
+      "sessionToken": "placeholder-session-token-riley-0001",
+      "linkCode": "s206-placeholder-riley"
+    }
+  },
+  "outcome": {
+    "result": "open",
+    "pageKind": "staffPage",
+    "stepId": "S2-06",
+    "businessName": "Lee's Barbershop",
+    "proof": "session",
+    "acting": { "personId": "person-riley" },
+    "securePageOnly": true,
+    "sections": ["profile", "license", "calendar", "emergencyContact"],
+    "signIn": null,
+    "expiresAt": "2026-10-27T15:00:00Z"
+  }
+}

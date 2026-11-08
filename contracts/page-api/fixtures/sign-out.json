@@ -1,0 +1,21 @@
+{
+  "call": "signOut",
+  "given": {
+    "now": "2026-10-19T15:10:00Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "Sam signs out of the setup page's session when he is done: only his own live session ends (K-22 v1 rule 5; sessions.ended_why signed_out), and the web app clears the cookie."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-signout-sam-1",
+      "traceId": "trace-page-sam-0040",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "signedOut",
+    "repeated": false
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "call": "finishUpload",
+  "given": {
+    "now": "2026-10-19T14:31:00Z",
+    "environment": "staging",
+    "after": ["upload-id-document.json"],
+    "note": "The photo reached the signed address at 14:30:41. The server checks its size and type and keeps its object key with the upload, then writes S1-10 through K-09 v1 saveSetupStep, called alone with caller.kind page for Sam (K-09 v1 id-upload-confirmed.json, whose answer this is): the ID upload counts as the ID confirmed, accepted as given (MC C10), and the mobile is the one his own text proved (MC C9). The object key and the proving event come from the server's record, never from the page."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0006",
+      "traceId": "trace-page-sam-0006",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "uploadId": "upload-sam-id-1"
+  },
+  "outcome": {
+    "result": "stored",
+    "uploadId": "upload-sam-id-1",
+    "purpose": "idDocument",
+    "served": {
+      "call": "saveSetupStep",
+      "response": {
+        "step": "S1-10",
+        "gives": ["id_checked", "mobile"],
+        "branch": null,
+        "written": [{ "table": "phones", "rowId": "handle-sam", "version": 2 }],
+        "openQuestionId": "oq-s1-75-sam",
+        "outboxRowIds": ["out-s1-75-sam"],
+        "clockRowIds": [],
+        "effects": [],
+        "reviewItemId": null,
+        "repeated": false
+      }
+    }
+  }
+}

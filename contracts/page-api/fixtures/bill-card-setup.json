@@ -1,0 +1,22 @@
+{
+  "call": "billCard",
+  "given": {
+    "now": "2026-10-19T15:00:20Z",
+    "environment": "staging",
+    "after": ["stripe-onboarding-return.json"],
+    "note": "Registration screen 20 (S1-29; FS row M04): the card for Rosfield's monthly bill, on Rosfield's own account, never a customer's (K-14 v1 'Whose account'). The bill card's save is a K-07 stripe_save_card effect (K-14 v1 bill-card.json); the page's server reads it with K-14 v1 pageIntent by the effect row's providerObjectId from Rosie's own record, and since the form has something to do (needsCard), hands the client secret only to the page's Stripe form, with the publishable key from the web app's config (STRIPE_PUBLISHABLE_KEY, named, never in a response). The card is typed into Stripe's own form, so its number never reaches Rosie (RULES 3.12, 4.5). The client secret is K-14's placeholder; it never enters a log, a span or the event log."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0020",
+      "traceId": "trace-page-sam-0028",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    }
+  },
+  "outcome": {
+    "result": "form",
+    "state": "needsCard",
+    "clientSecret": "demo-client-secret-setup-sam-lee-1"
+  }
+}

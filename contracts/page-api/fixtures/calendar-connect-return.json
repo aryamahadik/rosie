@@ -1,0 +1,40 @@
+{
+  "call": "calendarConnectReturn",
+  "given": {
+    "now": "2026-10-19T14:58:00Z",
+    "environment": "staging",
+    "after": ["calendar-connect-start.json"],
+    "note": "Google sends Sam back with the state he started and a one-time code. The state is his own (the session's person), so K-16 v1 connectReturn exchanges the code once and keeps the tokens sealed under Sam's key, never in an answer; on registration screen 16 the server then writes S1-24 through K-09 v1 saveSetupStep, called alone for Sam (gives calendar; K-09 v1 setup-s1-24-calendar.json, whose answer this is). The code is a placeholder and is never logged."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0016",
+      "traceId": "trace-page-sam-0016",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "provider": "google",
+    "state": "state-sam-google-0001",
+    "code": "placeholder-auth-code-sam-google",
+    "error": null
+  },
+  "outcome": {
+    "result": "linked",
+    "provider": "google",
+    "served": {
+      "call": "saveSetupStep",
+      "response": {
+        "step": "S1-24",
+        "gives": ["calendar"],
+        "branch": null,
+        "written": [],
+        "openQuestionId": null,
+        "outboxRowIds": [],
+        "clockRowIds": [],
+        "effects": [],
+        "reviewItemId": null,
+        "repeated": false
+      }
+    }
+  }
+}

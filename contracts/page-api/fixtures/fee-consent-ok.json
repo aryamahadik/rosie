@@ -1,0 +1,39 @@
+{
+  "call": "confirmOnPage",
+  "given": {
+    "now": "2026-10-19T14:52:00Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json", "upload-id-finished.json"],
+    "note": "Registration screen 18 (S1-25, after S1-62 found barbering pays Rosfield's $2): Sam answered S1-25's question on the page, and its read-back (rb-sam-s1-25-1) showed Rosfield's fee terms in their exact words, as K-09 v1 fee-consent.json keeps them. His yes on the page is an exact yes bound to those words (arch 06 line 303). The server makes the yes's event id and calls K-09 v1 saveSetupStep alone, with caller.kind page for Sam, the read-back's words as the consent's exact words (K-29 v1 consents.exact_words; FEES 5.2 to 5.4), that yes event and channel page; the fee_ok consent row is never edited and carries no version, so it is not in written. The answer is K-09 v1 fee-consent.json's."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-reg-sam-0018-yes",
+      "traceId": "trace-page-sam-0031",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "reg-placeholder-lees-barbershop"
+    },
+    "readBackId": "rb-sam-s1-25-1",
+    "typedName": null
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-sam-s1-25-1",
+    "yesEventId": "pageyes-sam-s1-25-1",
+    "served": {
+      "call": "saveSetupStep",
+      "response": {
+        "step": "S1-25",
+        "gives": [],
+        "branch": null,
+        "written": [],
+        "openQuestionId": "oq-s1-27-sam",
+        "outboxRowIds": ["out-s1-27-sam"],
+        "clockRowIds": [],
+        "effects": [],
+        "reviewItemId": null,
+        "repeated": false
+      }
+    }
+  }
+}
