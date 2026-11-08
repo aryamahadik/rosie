@@ -1,0 +1,155 @@
+{
+  "about": "30 sample lines and the grade the master's own lib.js grade() (line 483) gives each, recorded by grade-parity.record.mjs; grade.test.ts holds Rosie's grade() to each within 0.1, null where the master's is null (under 12 words). The lines are the master's sample cast (master-A.json: Rosie's messages, step notes, a layer line and the story), the K-03 v1 check-* and final-two-sends texts, K-01 v1 fixed lines, and four of their own (long words, a long dash and clock forms, a long sentence of commas and words with y, and Spanish).",
+  "lines": [
+    {
+      "source": "master-A.json S1-02 say",
+      "text": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.",
+      "master": 2.7622500000000016
+    },
+    {
+      "source": "master-A.json S1-03 say",
+      "text": "I don't have that kind of work yet, so I'll set it up from your own words and price list. First, a short checklist about your work.",
+      "master": 2.3490740740740783
+    },
+    {
+      "source": "master-A.json S1-74 say",
+      "text": "Thanks for telling me. Rosie books services with a visit, so it can't set this one up. A person on our team will look at it within 1 business day.",
+      "master": 3.2566666666666677
+    },
+    {
+      "source": "master-A.json S1-02 does",
+      "text": "Sam types the kinds of work in any words. Each one brings its own plug-in: its services, its questions for customers and its license rules.",
+      "master": 4.388999999999999
+    },
+    {
+      "source": "master-A.json S1-03 does",
+      "text": "Rosie drafts a plug-in from the owner's own words and price list, asking a fixed checklist. A person on Rosie's team reviews it within 1 business day.",
+      "master": 6.282407407407408
+    },
+    {
+      "source": "master-A.json S1-74 does",
+      "text": "Some work isn't a service Rosie books. That's goods with no visit, delivery only, renting a thing or space alone, or work the law bars. Rosie says so and sets nothing up.",
+      "master": 4.42625
+    },
+    {
+      "source": "master-A.json S1-11 does",
+      "text": "A plug-in holds what one kind of work needs. The steps around it stay the same. Rosie loads the barbershop's now, and plumbing's and electrical's when Sam gets to them.",
+      "master": 3.650000000000002
+    },
+    {
+      "source": "master-A.json S1-03 more",
+      "text": "Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on, so its question is never hidden.",
+      "master": 5.315000000000001
+    },
+    {
+      "source": "master-A.json A8-08 does",
+      "text": "The customer's phone is away, so there's no code. Riley notes it, and DONE at the end of the visit confirms it instead.",
+      "master": 4.286304347826089
+    },
+    {
+      "source": "master-A.json A8-09 does",
+      "text": "At a class, each person booked has their own code. The desk can also tick names on the Today page, which counts as checked in.",
+      "master": 2.5010000000000012
+    },
+    {
+      "source": "master-A.json A8-10 does",
+      "text": "Where the plug-in's visit is a drop-off, the code is given when the item is left. A mail-in has no code: it counts when the item arrives.",
+      "master": 4.971296296296298
+    },
+    {
+      "source": "master-A.json A8-10 more",
+      "text": "Next come the before notes, the price or the OK, and the work, as at the chair. READY and the pick-up come after.",
+      "master": 2.747173913043479
+    },
+    {
+      "source": "master-A.json S1-01 does",
+      "text": "Sam taps a link or scans a QR code on rosfield.com, and a chat with Rosie opens. Sam writes first, since that's how the chat starts.",
+      "master": 3.0953846153846136
+    },
+    {
+      "source": "master-A.json A8-08 layerAdd privatecall line",
+      "text": "On a call: ask for them by first name. If anyone else or a machine answers, give only the plain display name and call back later. No voicemail.",
+      "master": 3.2214285714285715
+    },
+    {
+      "source": "master-A.json story",
+      "text": "Sam Lee signs up two companies by text. Then Alex books Lee's Barbershop with Riley, for Sat Oct 24 at 11:00am. The service depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+      "master": 3.146686046511629
+    },
+    {
+      "source": "K-03 v1 check-pass.json",
+      "text": "Riley says yes.",
+      "master": null
+    },
+    {
+      "source": "K-03 v1 check-two-questions.json",
+      "text": "Your visit is Sat Oct 24 at 11:00am. Does that still work? Or should we find another time?",
+      "master": 0.5166666666666693
+    },
+    {
+      "source": "K-03 v1 check-raw-price.json",
+      "text": "Alex M. booked a Skin fade for Sat Oct 24 at 11:00am. It costs $45.",
+      "master": -0.07833333333333137
+    },
+    {
+      "source": "K-03 v1 check-emoji.json",
+      "text": "You're booked! 🎉 Sat Oct 24 at 11:00am with Riley.",
+      "master": null
+    },
+    {
+      "source": "K-03 v1 check-optout-only-option.json",
+      "text": "Riley can't be in on Sat Oct 24. Avery can do your visit at 11:00am, same price. Please reply by 7pm.",
+      "master": 1.7495238095238115
+    },
+    {
+      "source": "K-03 v1 check-unfilled-slot.json",
+      "text": "A reminder: your {{svc.intext}} at Lee's Barbershop is Sat Oct 24 at 11:00am.",
+      "master": 5.818461538461541
+    },
+    {
+      "source": "K-03 v1 check-passed-on.json",
+      "text": "Sorry, Riley can't be in on Sat Oct 24. {{name.staff}} can come in early to do your visit, same time and price. Please reply by 7pm.",
+      "master": 4.456923076923079
+    },
+    {
+      "source": "K-03 v1 final-two-sends.json, the words",
+      "text": "You're booked at Lee's Barbershop. Give this code at the chair when you arrive: 5160\nHaircut · Sat Oct 24 · 11:00am · Riley\n88 Elm St, Springfield\n$35, paid at the chair · The card is saved for a $20 fee\nFree to cancel until Fri 11am, then a $20 fee may apply\nChange the time or call off the visit: rosfield.com/v/s03",
+      "master": 1.8971428571428568
+    },
+    {
+      "source": "K-01 v1 fixed lines opener (Lee's Barbershop) and optOutLine",
+      "text": "This is Rosie, the automated booking assistant for Lee's Barbershop. Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help.",
+      "master": 4.450000000000003
+    },
+    {
+      "source": "K-01 v1 fixed line safetyCrisis",
+      "text": "If you're thinking about harming yourself, call or text 988 now. If you're in danger right now, call 911.",
+      "master": 3.0202631578947354
+    },
+    {
+      "source": "K-01 v1 fixed line passedOn",
+      "text": "I’ve passed this on. Rosie’s team will reply within 1 business day.",
+      "master": 3.4666666666666686
+    },
+    {
+      "source": "own: long words, well above grade 9.5",
+      "text": "Unfortunately, administrative reconfiguration necessitates additional documentation regarding your prospective appointment's eligibility before confirmation.",
+      "master": 36.68000000000001
+    },
+    {
+      "source": "own: arch 07 line 355's example with a long dash and two clock forms",
+      "text": "Your 2:00pm color with Ana is set — see you at 2:00 PM on Friday, and bring the card you booked with.",
+      "master": 5.5238095238095255
+    },
+    {
+      "source": "own: one long sentence of commas and words with y",
+      "text": "Yes, you can bring your dog, your bag, your coat, your kids and your yellow umbrella, since the shop has room for all of them today.",
+      "master": 8.165384615384614
+    },
+    {
+      "source": "own: Spanish, with accents and an opening question mark",
+      "text": "Su visita es el sábado 24 de octubre a las 11:00am. ¿Le sirve todavía esa hora para usted?",
+      "master": 8.474444444444444
+    }
+  ]
+}
