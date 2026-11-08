@@ -5,15 +5,19 @@
 // and reads the refusal; it never checks for a free slot first, so two parallel calls cannot both pass.
 //
 // Both calls run under the reservation's business (the scope set inside their own transaction), and row-level security
-// (T-191) shows them only that business's rows. Two reads must see every business, so they go through the unscoped
-// database functions of T-191's migration (K-05 item 8; T-1085), which return only ids and ends, or yes or no: a mobile's
-// saved times for the cap of 2 (reservations_saved_times, which also locks its phones row), and whether a booked time
-// covers the asked one for the worker at any business (reservations_booked_overlap). Their transaction is lost-connection
-// safe (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every
-// row update raises the version by one (trigger from 0002).
+// (T-191) shows them only that business's rows. Two reads must see beyond it, so they go through the security-definer
+// database functions of T-191's migration (K-05 item 8; T-1085), narrowed by T-1094's, which return only ids and ends,
+// or yes or no: a mobile's saved times at every business for the cap of 2 (reservations_saved_times, which also locks
+// its phones row), and whether a booked time covers the asked one for the resource at this business or for its worker
+// at any business (reservations_booked_overlap; FS line 743). Their transaction is lost-connection safe
+// (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every row
+// update raises the version by one (trigger from 0002).
 //
-// Left to later tasks, as the card says: the saved-time clock row (no clock_rows table exists yet, so the answer names
-// its id, `<reservation id>/saved-time`, and writes nothing), the one extension (extend) and the commit's confirm.
+// Left to later tasks: the saved-time clock row and the one extension (extend). clock_rows exists (migration 0009), but
+// reserve() writes no clock row yet: the answer names its id, `<reservation id>/saved-time`. That row is owned by the
+// mobile's handle (K-05 item 8), which this call's role (rosie_app) cannot read from handles or phones, so the task that
+// writes it reads the handle's id alone through handles_id_of_mobile (T-1094). The commit confirms a held row
+// (db/repo/commit-turn.ts, T-195).
 import { isLostConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
@@ -519,9 +523,10 @@ async function insertReservation(
 }
 
 /**
- * Whether a booked time already covers the asked one, for the resource or, for a worker, the person at any business:
- * read through reservations_booked_overlap, which runs unscoped (the other businesses' rows are hidden from this
- * transaction's scope) and answers only yes or no.
+ * Whether a booked time already covers the asked one, for the resource at this business or, for a worker, the person at
+ * any business (FS line 743): read through reservations_booked_overlap, a security-definer function (the other
+ * businesses' rows are hidden from this transaction's scope) that matches the resource only within the scope, the
+ * worker anywhere, and answers only yes or no.
  */
 async function bookedOverlap(tx: Conn, request: ReserveRequest, resource: ResourceRow): Promise<boolean> {
   const [row] = await tx<{ overlap: boolean }[]>`

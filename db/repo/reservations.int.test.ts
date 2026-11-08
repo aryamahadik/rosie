@@ -1291,6 +1291,86 @@ describe("under row-level security, the cap and the booked check still see every
     ).toMatchObject({ result: "held", reservationId: "rsv-yoga-riley-free" });
   });
 
+  it("the booked-overlap probe: another business's booked room answers nothing, a worker's booked time answers yes or no from any business, and a saved time never counts (T-1094; FS line 743)", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // The yoga studio's room, booked Nov 30 from 10:00 to 11:00.
+    await db.sql`insert into reservations ${db.sql({
+      id: "rsv-studio-room-booked",
+      business_id: "biz-yoga-studio",
+      resource_id: "res-studio-room",
+      resource_kind: "room",
+      worker_person_id: null,
+      during: "[2026-11-30T10:00:00Z,2026-11-30T11:00:00Z)",
+      state: "booked",
+      for_agent_token: "agent-token-t1094",
+    })}`;
+    const probe = (
+      business: string,
+      resource: string,
+      worker: string | null,
+      during: [string, string],
+    ): Promise<boolean | undefined> =>
+      asToolApi(business, async (tx) => {
+        const [row] = await tx<{ overlap: boolean }[]>`
+          select reservations_booked_overlap(${resource}, ${worker}::text,
+            tstzrange(${during[0]}::timestamptz, ${during[1]}::timestamptz, '[)')) as overlap
+        `;
+        return row?.overlap;
+      });
+    const inRoomTime: [string, string] = ["2026-11-30T10:15:00Z", "2026-11-30T10:45:00Z"];
+    // Another business's room: nothing, from either other business, though it is booked over that time.
+    for (const other of ["biz-lees-barbershop", "biz-movers"]) {
+      expect(await probe(other, "res-studio-room", null, inRoomTime), other).toBe(false);
+    }
+    // The room's own business: yes over its booked time, no after it.
+    expect(await probe("biz-yoga-studio", "res-studio-room", null, inRoomTime)).toBe(true);
+    expect(
+      await probe("biz-yoga-studio", "res-studio-room", null, [
+        "2026-11-30T11:00:00Z",
+        "2026-11-30T11:30:00Z",
+      ]),
+    ).toBe(false);
+    // So reserve() at the room's own business still answers overlap for a booked time, never a waiting row.
+    expect(
+      await asToolApi("biz-yoga-studio", (tx) =>
+        reserveIn(
+          tx,
+          request({
+            reservationId: "rsv-studio-room-ask",
+            businessId: "biz-yoga-studio",
+            resourceId: "res-studio-room",
+            during: { start: inRoomTime[0], end: inRoomTime[1] },
+            waitIfSaved: true,
+          }),
+        ),
+      ),
+    ).toEqual({ error: "overlap", resourceId: "res-studio-room" });
+    expect(await getReservation(db.sql, "rsv-studio-room-ask")).toBeNull();
+    // A worker: Riley's booked haircut at Lee's Barbershop (Oct 24, 15:00 to 15:30) answers yes from the yoga studio,
+    // and no for a time Riley is free.
+    expect(
+      await probe("biz-yoga-studio", "res-maya", "person-riley", [
+        "2026-10-24T15:10:00Z",
+        "2026-10-24T15:20:00Z",
+      ]),
+    ).toBe(true);
+    expect(
+      await probe("biz-yoga-studio", "res-maya", "person-riley", [
+        "2026-10-24T16:00:00Z",
+        "2026-10-24T16:30:00Z",
+      ]),
+    ).toBe(false);
+    // Avery's saved time at Lee's Barbershop (Nov 14, held) is no booked time: only reservations_saved_times reads
+    // saved times across businesses, and it answers ids and ends.
+    expect(
+      await probe("biz-yoga-studio", "res-maya", "person-avery", [
+        "2026-11-14T15:10:00Z",
+        "2026-11-14T15:20:00Z",
+      ]),
+    ).toBe(false);
+  });
+
   it("release() skips a waiting mobile capped by saved times at another business, as the Tool API role", async () => {
     await emptyTables(db.sql);
     await loadFixture(db.sql, "seed-reservation.json");

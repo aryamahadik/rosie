@@ -404,7 +404,7 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
     }
   });
 
-  it("grants: both roles select, insert and update chat_links, and only select and insert consents; PUBLIC holds nothing", async () => {
+  it("grants: both roles select and insert chat_links and update four of its columns only (T-1094), and only select and insert consents; PUBLIC holds nothing", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -418,10 +418,29 @@ describe("the migration against the frozen table list (K-29 v1 conversations and
       ROLES.flatMap((role) => [
         { role, table: "chat_links", privilege: "INSERT" },
         { role, table: "chat_links", privilege: "SELECT" },
-        { role, table: "chat_links", privilege: "UPDATE" },
         { role, table: "consents", privilege: "INSERT" },
         { role, table: "consents", privilege: "SELECT" },
       ]),
+    );
+    // chat_links' UPDATE is on the columns K-29 changes (given_via grows, the owner told again, used, the version), so
+    // the ready text stays as issued (table list line 71); consents takes no update on any column.
+    const updatable = await db.sql<{ role: string; table: string; column: string }[]>`
+      select r.role, c.relname as table, a.attname as column
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_class c
+        join pg_attribute a on a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+      where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)}
+        and has_column_privilege(r.role, c.oid, a.attnum, 'UPDATE')
+      order by 1, 2, 3
+    `;
+    expect(updatable).toEqual(
+      ROLES.flatMap((role) =>
+        ["given_via", "owner_retold_at", "used_at", "version"].map((column) => ({
+          role,
+          table: "chat_links",
+          column,
+        })),
+      ),
     );
     const publicGrants = await db.sql<{ table: string }[]>`
       select c.relname as table from pg_class c cross join lateral aclexplode(c.relacl) a
@@ -1020,6 +1039,36 @@ describe("row-level security on chat_links and consents (K-29 rule 4)", () => {
     const move = (tx: Tx): Promise<unknown> =>
       tx`update chat_links set business_id = ${YOGA}, version = version + 1 where id = 'chatlink-ben-haircut'`;
     expect((await refusal(as(TOOL_API, BARBERSHOP, move))).code).toBe("42501");
+  });
+
+  it("neither role may change a link's ready text, kept as issued, or its code (T-1094; table list line 71); the owner told again and the ready text arriving still update", async () => {
+    const rewrite = (tx: Tx): Promise<unknown> =>
+      tx`update chat_links set ready_text = 'Hey, text me. Ref 4K7Q', version = version + 1
+         where id = 'chatlink-ben-haircut'`;
+    const recode = (tx: Tx): Promise<unknown> =>
+      tx`update chat_links set short_code = '7QK4', ready_text = 'YES. Ref 7QK4', version = version + 1
+         where id = 'chatlink-pat-invite'`;
+    for (const [role, scope] of [
+      [TOOL_API, BARBERSHOP],
+      [RUNTIME, null],
+    ] as const) {
+      for (const change of [rewrite, recode]) {
+        const refused = await refusal(as(role, scope, change));
+        expect(refused.code, role).toBe("42501");
+        expect(refused.message, role).toContain("permission denied for table chat_links");
+      }
+      expect(
+        await as(
+          role,
+          scope,
+          (tx) =>
+            tx`update chat_links set owner_retold_at = '2026-10-21T15:00:00Z', used_at = '2026-10-22T08:00:00Z',
+                 version = version + 1
+               where id = 'chatlink-pat-invite' returning version`,
+        ),
+        role,
+      ).toEqual([{ version: 3 }]);
+    }
   });
 });
 
