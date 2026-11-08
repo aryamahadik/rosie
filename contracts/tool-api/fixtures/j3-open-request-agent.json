@@ -19,7 +19,8 @@
     "door": "ai",
     "flow": "A",
     "booker": { "kind": "new", "name": null },
-    "safetyOutcomeId": "safety-outcome-agent-alex-0001"
+    "safetyOutcomeId": "safety-outcome-agent-alex-0001",
+    "entered": null
   },
   "outcome": {
     "bookingId": "booking-agent-alex-oct21",
@@ -31,6 +32,8 @@
       { "table": "bookings", "rowId": "booking-agent-alex-oct21", "version": 1 },
       { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 1 }
     ],
+    "held": null,
+    "effects": [],
     "repeated": false
   }
 }

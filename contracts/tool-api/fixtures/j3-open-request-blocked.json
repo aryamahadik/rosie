@@ -19,7 +19,8 @@
     "door": "chat",
     "flow": "B",
     "booker": { "kind": "caller" },
-    "safetyOutcomeId": null
+    "safetyOutcomeId": null,
+    "entered": null
   },
   "outcome": { "error": "customerBlocked", "blockId": null }
 }

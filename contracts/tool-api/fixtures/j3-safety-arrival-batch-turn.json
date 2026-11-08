@@ -1,0 +1,95 @@
+{
+  "call": "gateAndCommit",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": ["j3-safety-arrival-emergency.json"],
+    "now": "2026-10-23T14:20:05Z",
+    "stated": null,
+    "note": "A3-24, the batch after the arrival record: danger closed Alex's batch at once (README default 5), so the batch holds only his one text, evt-alex-0202. Its turn id is the hash of its sorted event ids (CQ-09; T-248 builds it; turn-alex-0202 stands for that hash), and the arrival record's was arrivalTurnId('evt-alex-0202'), the SHA-256 of 'arrival:evt-alex-0202' (README default 36), so the two never share an id and K-05 commitTurn writes this turn instead of answering repeated. Its recordSafetyOutcome for the text answers repeated with the arrival record (the event id is the key: K-34 v1 safety_outcomes_event_key), and the commit itself is new (repeated false): whatever else the text holds rides in this core and is written here, at once and past the hold, as a STOP in any words or a protecting change must be (RULES 7.2; MASTER-FLOW-A line 7208: 'stopping or protecting is done at once on anyone's word'; README default 35). Alex's emergency words hold neither, so nothing more is written: the after-safe hold stays open and holds every routine part until a clear 'we're safe' (A3-24). Shown with its core actions only, the shape of stop-recorded.json; a batch on decided texts takes the same id rule, its routine parts answered held."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-0202",
+      "requestId": "turn-alex-0202",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0202"
+    },
+    "turn": {
+      "id": "turn-alex-0202",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0202"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0202",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "input": { "kind": "coreOnly" },
+    "core": [
+      {
+        "call": "recordSafetyOutcome",
+        "request": {
+          "caller": {
+            "kind": "turn",
+            "turnId": "turn-alex-0202",
+            "requestId": "turn-alex-0202",
+            "businessId": "biz-lees-barbershop",
+            "personId": "person-alex",
+            "traceId": "trace-alex-0202"
+          },
+          "safety": {
+            "eventId": "evt-alex-0202",
+            "source": "text",
+            "tries": [{ "model": "haiku", "result": "verdict" }],
+            "read": {
+              "labels": [
+                {
+                  "outcome": "An emergency",
+                  "tense": "now",
+                  "evidence": "my lips are swelling after the beard color and I can't breathe well",
+                  "atRisk": "the writer",
+                  "writer": "the person at the handle"
+                }
+              ]
+            },
+            "timedOut": false,
+            "dangerWords": [{ "words": "lips are swelling", "list": "plugin", "kind": "other" }],
+            "outcomes": ["An emergency"],
+            "liftedToUnsure": false
+          },
+          "handleId": "handle-alex",
+          "bookingId": null,
+          "sentByActor": null
+        }
+      }
+    ],
+    "now": "2026-10-23T14:20:05Z"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-0202",
+    "committedAt": "2026-10-23T14:20:05Z",
+    "repeated": false,
+    "parts": [],
+    "planner": null,
+    "core": [
+      {
+        "call": "recordSafetyOutcome",
+        "response": {
+          "outcomeId": "safety-outcome-alex-0202",
+          "outcomes": ["An emergency"],
+          "hold": { "holdId": "hold-alex-0202", "releaseRule": "after_safe", "blocksBooking": false },
+          "safetyLine": { "fixedLineId": "safetyEmergency", "outboxRowId": "out-alex-emergency-line" },
+          "told": [{ "who": "owner", "via": "handOff", "id": "handoff-alex-emergency" }],
+          "nothingBooks": true,
+          "repeated": true
+        },
+        "error": null
+      }
+    ],
+    "written": { "written": [], "outboxRows": [], "promoted": [] },
+    "effects": [],
+    "openQuestions": { "opened": [], "closed": [] }
+  }
+}

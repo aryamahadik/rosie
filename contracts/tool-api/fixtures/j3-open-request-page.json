@@ -19,7 +19,8 @@
     "door": "page",
     "flow": "B",
     "booker": { "kind": "new", "name": null },
-    "safetyOutcomeId": "safety-outcome-page-home-0001"
+    "safetyOutcomeId": "safety-outcome-page-home-0001",
+    "entered": null
   },
   "outcome": {
     "bookingId": "booking-page-home-oct20",
@@ -31,6 +32,8 @@
       { "table": "bookings", "rowId": "booking-page-home-oct20", "version": 1 },
       { "table": "booking_details", "rowId": "booking-page-home-oct20", "version": 1 }
     ],
+    "held": null,
+    "effects": [],
     "repeated": false
   }
 }

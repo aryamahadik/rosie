@@ -5,19 +5,19 @@
     "after": [],
     "now": "2026-10-23T16:05:03Z",
     "stated": { "step": "A3-22", "gives": ["safe"] },
-    "note": "A3-26: Alex texts 'is the beard color okay if I'm allergic to hair dye?' (contracts/model/fixtures/safety-business-own-line.json, word for word). The read on arrival says Needs the business's own line, so the handle actor records it at once in the text's arrival turn (turn-arrival-alex-0207 stands for the hash of evt-alex-0207): the outcome row, an at-once hold written at version 1, and the shop's own line as an outbox row of send class safety ('That's a question for the barbers themselves ... call Lee's Barbershop at (555) 010-0177. Call 911 if anyone is in danger.'). A barbershop's plug-in lists no words that stop a booking here, so the booking can go on once the line is handed on (j3-safety-arrival-release.json). Nobody is told for this outcome."
+    "note": "A3-26: Alex texts 'is the beard color okay if I'm allergic to hair dye?' (contracts/model/fixtures/safety-business-own-line.json, word for word). The read on arrival says Needs the business's own line, so the handle actor records it at once in the text's arrival turn (its id arrivalTurnId('evt-alex-0207'), the SHA-256 of 'arrival:evt-alex-0207': README default 36): the outcome row, an at-once hold written at version 1, and the shop's own line as an outbox row of send class safety ('That's a question for the barbers themselves ... call Lee's Barbershop at (555) 010-0177. Call 911 if anyone is in danger.'). A barbershop's plug-in lists no words that stop a booking here, so the booking can go on once the line is handed on (j3-safety-arrival-release.json). Nobody is told for this outcome."
   },
   "request": {
     "caller": {
       "kind": "actorOnArrival",
-      "turnId": "turn-arrival-alex-0207",
-      "requestId": "turn-arrival-alex-0207",
+      "turnId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
+      "requestId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
       "businessId": "biz-lees-barbershop",
       "personId": "person-alex",
       "traceId": "trace-alex-0207"
     },
     "turn": {
-      "id": "turn-arrival-alex-0207",
+      "id": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
       "handleId": "handle-alex",
       "eventIds": ["evt-alex-0207"],
       "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },

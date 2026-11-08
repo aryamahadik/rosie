@@ -10,8 +10,8 @@
   "request": {
     "caller": {
       "kind": "actorOnArrival",
-      "turnId": "turn-arrival-alex-0207",
-      "requestId": "turn-arrival-alex-0207",
+      "turnId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
+      "requestId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
       "businessId": "biz-lees-barbershop",
       "personId": "person-alex",
       "traceId": "trace-alex-0207"
@@ -24,7 +24,7 @@
   "outcome": {
     "holdId": "hold-alex-0207",
     "releasedAt": "2026-10-23T16:05:04Z",
-    "redecideTurnId": "turn-arrival-alex-0207",
+    "redecideTurnId": "cbebc564b87a87705d14d6b2a151c6209e1290b05e6fca67753006e5d0eef189",
     "repeated": false
   }
 }

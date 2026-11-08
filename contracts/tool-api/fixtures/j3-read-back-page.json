@@ -1,0 +1,35 @@
+{
+  "call": "readBackBusinessBooking",
+  "given": {
+    "seeds": ["business-setup/seed-company-two-kinds.json", "services-prices/seed-service-money-paths.json"],
+    "after": ["j3-open-request-business-desk.json"],
+    "now": "2026-10-20T14:11:00Z",
+    "stated": null,
+    "note": "B3-08 on the Today page: the page server asks for the read-back of Sam's entry for Tessa and gets code's words, filled from the stored facts (the line's service, the held reservation's day and arrival window in the visit's zone with Casey, the new person's name and her mobile handle, the shop's row for two.count) and the rows and versions they were built from, with their sha256. It keeps them with Sam's page session and shows them; the confirm tap sends them back from the server, never from the browser (j3-confirm-business-booking-not-yet.json). The words are K-28's seed-customer-business-added words for B3-08, word for word, and so is their hash. The 2-hour window from the reserved start is the business's window length (B4-15; K-30 open gap)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0402-read",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0401"
+    },
+    "bookingId": "booking-tessa-desk"
+  },
+  "outcome": {
+    "bookingId": "booking-tessa-desk",
+    "exactWords": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+    "wordsSha256": "12c0637ee3dfa5bfcefd76cc12fe3024556404f59a138b85dbbd7d682969b563",
+    "versionsRead": [
+      { "table": "bookings", "rowId": "booking-tessa-desk", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-tessa-desk-1", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-tessa-desk-casey", "version": 1 },
+      { "table": "persons", "rowId": "person-tessa-desk", "version": 1 },
+      { "table": "phones", "rowId": "handle-tessa-desk", "version": 1 }
+    ],
+    "heldUntil": "2026-10-20T14:20:02Z"
+  }
+}
