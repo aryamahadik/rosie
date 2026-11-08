@@ -23,7 +23,9 @@ import type { FlowLetter } from "../graph/types.ts";
 import type { TradeId } from "../load/trade";
 import type { AppliedFlow, AppliedStep, AppliedTrade } from "../overlay/apply";
 import { c1 } from "./c1";
+import { c10 } from "./c10";
 import { c2 } from "./c2";
+import { c9 } from "./c9";
 
 /** A correction's id: C1 to C10 of Master Corrections section 3. */
 export type CorrectionId = `C${number}`;
@@ -138,7 +140,7 @@ export interface CorrectedTrade extends AppliedTrade {
  * The corrections this build applies, in the order they run (the order of their ids). T-139 to T-141 add C3 to C10
  * here: each is one file beside c1.ts, and each change it makes is tagged by the frame.
  */
-export const CORRECTIONS: readonly Correction[] = [c1, c2];
+export const CORRECTIONS: readonly Correction[] = [c1, c2, c9, c10];
 
 /** The tag of a correction id. */
 export function tagOf(id: CorrectionId): CorrectionTag {
