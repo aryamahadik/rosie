@@ -3,12 +3,15 @@
 // 1), prints the tree's sha256, and refuses a command line it does not take. One trade only: the all-trades build is
 // the card's CLI proof, not a unit test (DL-099).
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { main, type CliIo } from "../cli/index";
-import { STANDIN_BUNDLE_ID, checkBundlePart } from "./index";
+import { STANDIN_BUNDLE_ID, byteLength, checkBundleDir, checkBundlePart, readBundleDir } from "./index";
+
+/** The bundle directory the first test writes; the read-back test reads it. */
+let written = "";
 
 const made: string[] = [];
 afterAll(() => {
@@ -127,8 +130,39 @@ describe("compiler build", () => {
       "stand-in: lists.outOfScope",
     ]);
     expect(run.out).toContain(
-      "validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and 1 trade overlays",
+      `read back from ${out} and validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and 1 trade overlays; each file's size and sha256 as the manifest's storage lists them`,
     );
+    written = out;
+  });
+
+  it("the written directory reads back sound; a changed, a missing or an extra file is found", () => {
+    expect(checkBundleDir(written)).toEqual([]);
+    expect(readBundleDir(written).files.map((file) => file.path)).toEqual([
+      "flow/A.json",
+      "flow/B.json",
+      "manifest.json",
+      "trade/barber.json",
+    ]);
+
+    const changed = join(tempDir(), "changed");
+    cpSync(written, changed, { recursive: true });
+    const barber = join(changed, "trade", "barber.json");
+    const listed = byteLength(readFileSync(barber, "utf8"));
+    writeFileSync(barber, readFileSync(barber, "utf8").replace('"name":"Barber"', '"name":"Barbers"'));
+    expect(checkBundleDir(changed)).toEqual([
+      `trade/barber.json: ${String(listed)} bytes listed, the file has another size`,
+      "trade/barber.json: the sha256 listed is not the file's",
+    ]);
+
+    const missing = join(tempDir(), "missing");
+    cpSync(written, missing, { recursive: true });
+    rmSync(join(missing, "flow", "B.json"));
+    expect(checkBundleDir(missing)).toContainEqual(expect.stringMatching(/flow\/B: no file flow\/B\.json$/));
+
+    const extra = join(tempDir(), "extra");
+    cpSync(written, extra, { recursive: true });
+    writeFileSync(join(extra, "notes.txt"), "not a bundle file");
+    expect(() => checkBundleDir(extra)).toThrow(/notes\.txt is not a bundle file/);
   });
 
   it("reads a relative --out from the folder npm was run in, and refuses a folder that is not empty", async () => {

@@ -22,6 +22,7 @@ export {
   type CompiledFlow,
   type JudgmentRules,
 } from "./flow";
+export { checkBundleDir, readBundleDir } from "./read";
 export {
   SHARED_LIST_FILE,
   SHARED_LIST_NAMES,

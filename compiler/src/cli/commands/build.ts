@@ -154,6 +154,12 @@ async function run(args: string[], io: CliIo): Promise<number> {
   }
   const built = await emit.buildBundle(options);
   emit.writeBundle(out, built.files);
+  const problems = emit.checkBundleDir(out);
+  if (problems.length > 0) {
+    io.err(`the bundle written to ${given["--out"]} is not sound:`);
+    for (const problem of problems.slice(0, 40)) io.err(`  ${problem}`);
+    return 1;
+  }
 
   for (const standIn of built.standIns)
     io.out(`stand-in: ${standIn.what} from ${standIn.from} (the real one: ${standIn.owner})`);
@@ -177,7 +183,7 @@ async function run(args: string[], io: CliIo): Promise<number> {
       .join(", ")}`,
   );
   io.out(
-    `validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and ${String(trades.length)} trade overlays`,
+    `read back from ${given["--out"]} and validated against K-01 v1 (Ajv 2020-12, strict): the manifest, 2 flow graphs and ${String(trades.length)} trade overlays; each file's size and sha256 as the manifest's storage lists them`,
   );
   io.out(
     `tree sha256: ${emit.treeSha256(built.files)} (${String(built.files.length)} files in ${given["--out"]})`,
