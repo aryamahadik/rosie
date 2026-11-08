@@ -1105,3 +1105,159 @@ describe("the round 3 review's N1 to N4 fail at limit 6 and, cut at a joined mar
     },
   );
 });
+
+// Round 5 (DL-209): a bare hour the reader reads beside a day joins the day's phrase whatever other time the text holds
+// (the round 4 review's GAP 4: H1 to H3), and the readers learn a bare hour after a part-of-day word, a currency code
+// beside an amount and "M" as million (its notes N2 and N1).
+
+describe("a bare hour beside a day joins the day's phrase whatever other time the text holds: the round 4 review's H1 to H3 (DL-209)", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const es = { language: "es" } as const;
+  const H1 = "my 2pm doesn't work. can we do Thursday, 3?";
+  const H2 = "can't make my 2pm, 3 tomorrow?";
+  const H3 = "a las 2 no puedo. ¿el jueves, 3?";
+  // [case, the request citing the day alone, read at its start (sent Sat Oct 31 at 10:00am in New York)]
+  const cases: [string, () => GateRequest][] = [
+    [
+      "H1: 'Thursday' (Thu Nov 5 at its start) out of 'my 2pm doesn't work. can we do Thursday, 3?'",
+      () => haircutMoveRequest(ny("2026-11-05T05:00:00Z"), "Thursday", H1),
+    ],
+    [
+      "H2: 'tomorrow' (Sun Nov 1 at its start) out of 'can't make my 2pm, 3 tomorrow?'",
+      () => haircutMoveRequest(ny("2026-11-01T04:00:00Z"), "tomorrow", H2),
+    ],
+    [
+      "H3: 'el jueves' (Thu Nov 5 at its start) out of 'a las 2 no puedo. ¿el jueves, 3?'",
+      () => haircutMoveRequest(ny("2026-11-05T05:00:00Z"), "el jueves", H3, es),
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails it (differs)", async (_case, cut) => {
+    const request = cut();
+    const cited = citedIn(request, "time_saved");
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+    expect(await decision({}, afterReread(request))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read it is refused naming the field, after it one question",
+    async (_case, cut) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it.each([
+    ["3pm", "2026-11-05T20:00:00Z"],
+    ["3am", "2026-11-05T08:00:00Z"],
+  ])(
+    "the whole 'Thursday, 3' passes as %s (CQ-119's default: either reading passes), at limit 6 and the gate",
+    async (_reading, utc) => {
+      const whole = haircutMoveRequest(ny(utc), "Thursday, 3", H1);
+      expect(await decision({}, whole)).toEqual({ result: "pass" });
+      const [passed] = gatedParts(await runGate(whole, contextOf(whole), registryWith(limitIn())));
+      expect(passed?.result).toBe("passed");
+      expect(passed?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+      expect(await decision({}, haircutMoveRequest(ny(utc), "el jueves, 3", H3, { language: "es" }))).toEqual(
+        { result: "pass" },
+      );
+    },
+  );
+
+  it("the whole 'Thursday, 3' read at another hour differs", async () => {
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-05T21:00:00Z"), "Thursday, 3", H1))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+});
+
+describe("the readers learn a bare hour after a part-of-day word, a currency code beside an amount and 'M' as million (DL-209)", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const SUNDAY = ny("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start
+  // [case, the cut request and its fault, the whole request]
+  const cases: [string, () => GateRequest, string, ValueFault, () => GateRequest][] = [
+    [
+      "N2: 'tomorrow morning' out of 'tomorrow morning, 9' (the whole is Sun Nov 1 at 9am)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow morning", "can you do tomorrow morning, 9"),
+      "time_saved",
+      "differs",
+      () =>
+        haircutMoveRequest(
+          ny("2026-11-01T14:00:00Z"),
+          "tomorrow morning, 9",
+          "can you do tomorrow morning, 9",
+        ),
+    ],
+    [
+      "N2: 'tomorrow evening' out of 'tomorrow evening at 7' (the whole is Sun Nov 1 at 7pm)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow evening", "can you do tomorrow evening at 7"),
+      "time_saved",
+      "differs",
+      () =>
+        haircutMoveRequest(
+          ny("2026-11-02T00:00:00Z"),
+          "tomorrow evening at 7",
+          "can you do tomorrow evening at 7",
+        ),
+    ],
+    [
+      "N2 with another time in the text: 'tomorrow morning' out of 'my 2pm is out. tomorrow morning, 9?'",
+      () => haircutMoveRequest(SUNDAY, "tomorrow morning", "my 2pm is out. tomorrow morning, 9?"),
+      "time_saved",
+      "differs",
+      () =>
+        haircutMoveRequest(
+          ny("2026-11-01T14:00:00Z"),
+          "tomorrow morning, 9",
+          "my 2pm is out. tomorrow morning, 9?",
+        ),
+    ],
+    [
+      "N1: '$40' out of 'MXN $40' (the whole is 40 Mexican pesos)",
+      () => priceChangeRequest("raise haircut to MXN $40", usd(4000), "$40"),
+      "price",
+      "differs",
+      () => priceChangeRequest("raise haircut to MXN $40", { cents: 4000, currency: "MXN" }, "MXN $40"),
+    ],
+    [
+      "N1: '40$' out of '40$ CAD' (the whole is 40 Canadian dollars)",
+      () => priceChangeRequest("raise haircut to 40$ CAD", usd(4000), "40$"),
+      "price",
+      "differs",
+      () => priceChangeRequest("raise haircut to 40$ CAD", { cents: 4000, currency: "CAD" }, "40$ CAD"),
+    ],
+    [
+      "N1: '$1M' read as $1 (the whole is $1,000,000)",
+      () => priceChangeRequest("raise haircut to $1M", usd(100), "$1M"),
+      "price",
+      "differs",
+      () => priceChangeRequest("raise haircut to $1M", usd(100_000_000), "$1M"),
+    ],
+  ];
+
+  it.each(cases)("%s: the cut fails at limit 6; the whole passes", async (_case, cut, name, why, whole) => {
+    expect(await decision({}, cut())).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+    expect(await decision({}, whole())).toEqual({ result: "pass" });
+  });
+
+  it("a non-USD reading fails a USD field even cited whole: 'MXN $40' and '40$ CAD' as dollars differ", async () => {
+    for (const [words, cited] of [
+      ["raise haircut to MXN $40", "MXN $40"],
+      ["raise haircut to 40$ CAD", "40$ CAD"],
+    ] as const) {
+      expect(await decision({}, priceChangeRequest(words, usd(4000), cited))).toEqual(
+        failed(oneQuestionOutcome(), [["price", "differs"]]),
+      );
+    }
+  });
+});

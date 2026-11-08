@@ -17,15 +17,24 @@
 //   3. a number the reader did not read belongs to the phrase when a range word joins it to the phrase ("twenty to 3",
 //      "10 - $15", "3 or 4pm"), or when it stands right after a time or an amount with one space between ("at 3 30", "at
 //      three thirty", "$1 200"): a count's reader reads every number that is no amount or time, so a count takes none;
+//   3b. a bare hour the time reader reads beside a day or after a part-of-day word (times.ts bareHours: "Thursday, 3", "3
+//      tomorrow", "tomorrow morning, 9") belongs to the phrase beside it whatever other time the text holds (T-304 round
+//      5, DL-209), so "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3?" differs: the hour joins when the
+//      reader takes it reading that phrase with the hour on its own, as it does unless the phrase already names its time
+//      of day ("2" of "table for 2 tomorrow at 3pm" stays a count, as round 4 holds); the phrases are then joined again
+//      (steps 2 and 3), so a time a comma joins comes in too ("2pm, 3 tomorrow");
 //   4. the phrase that holds the cited words (where they stand whole: words.ts wholeAt) is re-read on its own with the same
 //      re-parse, and the value holds only if it gives the field's value and every number, currency sign and zone word in
 //      it was read. None, or a piece left unread, is noText; another value differs; two are several; a zone word that is
 //      not the value's zone is wrongZone; cited words that touch two phrases are several.
-// The residual (DL-199 item 4; CQ-121): words no reader knows are no value and join nothing, so a cut beside them is not
-// caught here: "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from Friday",
-// "around 3" (the time reader reads no bare hour after "around"), "$40 off", and a sentence mark (". ! ? ;") between a
-// day and its time. Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is
-// open, so neither books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
+// The residual (DL-199 item 4; CQ-121: "a word no reader knows ("next week", "LA time", "UTC") is not read, and a value
+// cut beside it is not caught by limit 6"): words no reader knows are no value and join nothing, so a cut beside them is
+// not caught here: "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from
+// Friday", "around 3" (the time reader reads no bare hour after "around"), "$40 off". The lead added at round 5
+// (DL-209), written into CQ-121 beside those words: a sentence mark between day and time ends the phrase, so a cut beside
+// it is also the residual: "at 3pm" out of "tomorrow. at 3pm" passes as today's 3pm, since ". ! ? ;" join nothing (step
+// 2). Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is open, so neither
+// books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
 
 import { amountsIn } from "./money";
 import { numberPhrasesIn } from "./numbers";
@@ -175,12 +184,54 @@ function grown(
   return { at, end };
 }
 
-/** Steps 1 to 3: every value phrase of the type in folded words, in order. */
+/** What may stand between a phrase and a bare hour beside its day or its part-of-day word: spaces, commas, "at". */
+const BESIDE = /^(?:[ ,]|\bat\b)*$/u;
+
+/** Whether a bare hour stands inside a phrase, or beside it with only spaces, commas or "at" between. */
+function besidePhrase(folded: string, phrase: Span, hour: Span): boolean {
+  if (hour.end <= phrase.at) return BESIDE.test(folded.slice(hour.end, phrase.at));
+  if (hour.at >= phrase.end) return BESIDE.test(folded.slice(phrase.end, hour.at));
+  return true;
+}
+
+/**
+ * Step 3b (DL-209): the bare hours the time reader reads beside a day or after a part-of-day word, whatever other time
+ * the text holds (times.ts bareHours), that belong to a phrase beside them: those the reader takes when it reads that
+ * phrase with the hour on its own ("thursday, 3", "3 tomorrow"), not one beside a phrase that already names its time of
+ * day ("2 tomorrow at 3pm").
+ */
+function hoursBeside(folded: string, phrases: readonly Span[], languages: readonly ValueLanguage[]): Span[] {
+  return timeReadingOf(folded, languages).bareHours.filter((hour) =>
+    phrases.some((phrase) => {
+      if (!besidePhrase(folded, phrase, hour)) return false;
+      const at = Math.min(phrase.at, hour.at);
+      const said = folded.slice(at, Math.max(phrase.end, hour.end));
+      const read = timeReadingOf(said, languages).spans;
+      return read.some((span) => span.at <= hour.at - at && hour.end - at <= span.end);
+    }),
+  );
+}
+
+/** Steps 1 to 3b: every value phrase of the type in folded words, in order. */
 function phrasesIn(type: PhraseType, folded: string, languages: readonly ValueLanguage[]): Span[] {
+  const values = valuesIn(type, folded, languages);
+  const phrases = phrasesOf(type, values, folded, languages);
+  if (type !== "time") return phrases;
+  const hours = hoursBeside(folded, phrases, languages);
+  return hours.length === 0 ? phrases : phrasesOf(type, [...values, ...hours], folded, languages);
+}
+
+/** Steps 2 and 3: the phrases `values` make in folded words, joined and grown until nothing more joins, in order. */
+function phrasesOf(
+  type: PhraseType,
+  values: readonly Span[],
+  folded: string,
+  languages: readonly ValueLanguage[],
+): Span[] {
   const join = type === "time" ? TIME_JOIN : NUMBER_JOIN;
   const range = languages.includes("es") ? SPANISH_RANGE : ENGLISH_RANGE;
   const numbers = wholeNumbersIn(folded, languages);
-  let phrases = joined(valuesIn(type, folded, languages), folded, join);
+  let phrases = joined(values, folded, join);
   for (;;) {
     const next = joined(
       phrases.map((phrase) => grown(type, phrase, numbers, folded, range)),
