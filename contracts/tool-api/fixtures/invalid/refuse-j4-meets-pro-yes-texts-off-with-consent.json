@@ -1,0 +1,13 @@
+{
+  "bookingId": "booking-alex-chat-drain2",
+  "answerIds": [],
+  "meetsPro": "someone_else",
+  "meetsProPersonId": "person-alex-drain2-meets-pro",
+  "handles": ["handle-alex-drain2-meets-pro-mobile"],
+  "effects": [],
+  "consentId": "consent-meets-pro-texts",
+  "textsOff": { "fixedLineId": "stopLaterReply", "outboxRowId": null },
+  "gives": [],
+  "written": [{ "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 6 }],
+  "repeated": false
+}

@@ -1,0 +1,38 @@
+{
+  "call": "joinWaitlist",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "services-prices/seed-services-price-list.json"],
+    "after": [],
+    "now": "2026-10-22T16:20:11Z",
+    "stated": null,
+    "note": "A4-15's 'Joins the waitlist' then A4-60, in Dee's own chat with Lee's Barbershop: no Saturday-morning skin fade fits, and she answers yes to 'Want a text if a spot opens?'. In one commit: a K-30 waitlist_entries row for the skin fade, any barber, Sat Oct 31 10am to noon; her yes to messages about it as a K-29 texts consent bound to the open question's words; and the request ends there (booking_details.request_ended_why waitlist, version 2). Nothing is taken or saved. Gives no key. The booking, service and row ids are examples, after K-30's seed-terms-snapshot."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-dee-waitlist",
+      "requestId": "turn-dee-waitlist",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-dee-0101"
+    },
+    "bookingId": "booking-dee-skin-fade-wait",
+    "serviceId": "svc-lees-skin-fade",
+    "resourceId": null,
+    "wanted": { "start": "2026-10-31T14:00:00Z", "end": "2026-10-31T16:00:00Z" },
+    "yes": { "kind": "openQuestion", "openQuestionId": "oq-dee-waitlist", "yesEventId": "evt-dee-0102" }
+  },
+  "outcome": {
+    "result": "joined",
+    "bookingId": "booking-dee-skin-fade-wait",
+    "waitlistEntryId": "wait-dee-skin-fade",
+    "consentId": "consent-dee-waitlist",
+    "textsOff": null,
+    "requestEnded": true,
+    "written": [
+      { "table": "waitlist_entries", "rowId": "wait-dee-skin-fade", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-dee-skin-fade-wait", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

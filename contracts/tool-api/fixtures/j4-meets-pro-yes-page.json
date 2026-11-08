@@ -1,0 +1,48 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-sealing-key.json"],
+    "after": ["j4-meets-pro-someone-else-page.json", "j4-meets-pro-link-page.json"],
+    "now": "2026-11-02T15:20:05Z",
+    "stated": null,
+    "note": "B4-27 on that adult's own forwarded link: the page server found the link by its code's hash, so the caller's person is that adult, never Alex (K-30 rule 5). They add a mobile and say yes to texts (round 2: DL-162 ruling 3): in one commit their mobile becomes their own K-04 handle with a phones row (named by its handle id: K-08 v1 default 3) and its contacts/add effect (Q-03), their yes is a K-29 consents row of kind texts for that mobile on channel page, with the booking and the words the page server showed and their sha256, bound to their link by its person and booking (README open gap 73: K-29 v1 names no secure link), and booking_details.meets_pro_person_id is set to them (version 6). The mobile is new, in the 555-01xx range; a stopped one would get no yes (refuse-j4-meets-pro-yes-texts-off-with-consent.json shows the rule). No key. The words shown, the handle, effect and consent ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-meets-pro-0001",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex-drain2-meets-pro",
+      "traceId": "trace-page-meets-pro-0001"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "save": {
+      "kind": "meetsProYes",
+      "step": "B4-27",
+      "expectVersion": 5,
+      "mobile": "+15555550147",
+      "yes": {
+        "kind": "page",
+        "exactWords": "Get texts from Rosie about this visit from Lee Home Services, with the check-in code? Reply STOP to opt out. Msg & data rates may apply.",
+        "yesEventId": "evt-page-meets-pro-0001"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "answerIds": [],
+    "meetsPro": "someone_else",
+    "meetsProPersonId": "person-alex-drain2-meets-pro",
+    "handles": ["handle-alex-drain2-meets-pro-mobile"],
+    "effects": [{ "effectId": "effect-contact-add-meets-pro", "kind": "linq_contact_add" }],
+    "consentId": "consent-meets-pro-texts",
+    "textsOff": null,
+    "gives": [],
+    "written": [
+      { "table": "phones", "rowId": "handle-alex-drain2-meets-pro-mobile", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 6 }
+    ],
+    "repeated": false
+  }
+}

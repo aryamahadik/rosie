@@ -1,0 +1,38 @@
+{
+  "call": "setPrice",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "services-prices/seed-price-rule-dates.json"],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json"],
+    "now": "2026-10-21T23:16:15Z",
+    "stated": { "step": "A4-06", "gives": ["price_known"] },
+    "note": "A4-05 then A4-06: the haircut's way is a list path, so the price comes from the shop's board: the $35 rule in force on Oct 21 (K-25's seed: $35 closed at Nov 2, $40 since). The price shown is kept with the token (README default 57) and copied into the K-30 line at the save; nothing is written here."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0007",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "price": {
+      "path": "list",
+      "step": "A4-06",
+      "serviceId": "svc-lees-haircut",
+      "serviceMoneyId": "way-lees-haircut-shop"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "path": "list",
+    "price": { "cents": 3500, "currency": "USD" },
+    "fromPrice": null,
+    "quote": null,
+    "outboxRowIds": [],
+    "gives": ["price_known"],
+    "written": [],
+    "repeated": false
+  }
+}

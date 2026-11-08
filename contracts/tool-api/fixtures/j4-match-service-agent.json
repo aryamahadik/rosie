@@ -1,0 +1,55 @@
+{
+  "call": "matchService",
+  "given": {
+    "seeds": [
+      "core/seed-business-head.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-agent.json"],
+    "now": "2026-10-21T23:15:20Z",
+    "stated": { "step": "A4-81", "gives": ["service"] },
+    "note": "A4-81 through Alex's own AI (door ai), after v1.1's j3-open-request-agent.json opened the request for the token's new nameless person. The AI's words 'a haircut' fit one listed service of Lee's Barbershop, svc-lees-haircut, which Sam offers in both places (K-25's two rows): at the shop (way-lees-haircut-shop, flow A, list|card|counter, the $35 rule in force on Oct 21) and at the customer's home (way-lees-haircut-home, flow B, list|full|none, its own $75 rule), so the answer carries both ways with their prices and A4-01's 'where?' shows both prices first (round 2: B4-02 'at the shop for $35, or at your home for $75'). The token is not bound yet, which CQ-13 allows for matching, prices, times and a saved time. Nothing is written: the matched service's home is the K-30 line the save writes (A4-21), and until then the Agent API keeps it with the token (README default 57)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "words": { "asTyped": "a haircut" }
+  },
+  "outcome": {
+    "result": "matched",
+    "serviceId": "svc-lees-haircut",
+    "serviceVersion": 1,
+    "ways": [
+      {
+        "serviceMoneyId": "way-lees-haircut-shop",
+        "flow": "A",
+        "place": "business",
+        "path": "list|card|counter",
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      },
+      {
+        "serviceMoneyId": "way-lees-haircut-home",
+        "flow": "B",
+        "place": "customer",
+        "path": "list|full|none",
+        "price": { "cents": 7500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      }
+    ],
+    "openQuestionId": null,
+    "gives": ["service"],
+    "written": [],
+    "repeated": false
+  }
+}

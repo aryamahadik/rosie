@@ -1,5 +1,5 @@
-// K-09's named rules (T-018; v1.1's givesJourneyKeys and arrivalTurn added by T-050): what an exchange states that
-// one JSON Schema cannot check across its parts.
+// K-09's named rules (T-018; v1.1's givesJourneyKeys and arrivalTurn added by T-050; v1.2's givesJourneyFourKeys
+// added by T-051): what an exchange states that one JSON Schema cannot check across its parts.
 
 import { createHash } from "node:crypto";
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
@@ -403,6 +403,161 @@ export function arrivalTurn(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.2 (T-051): journey 4. Added beside the rules above, which stay as they are.
+
+/**
+ * The keys each step of journey 4 gives, as the step index prints them (A-J4.md and B-J4.md, the gives column; A-keys.md
+ * and B-keys.md, section 4). A key journey 3 also gives (who_for, reach_by, times, customer) is journey 4's here only
+ * at journey 4's own steps; at A3-30 and B3-08 it stays confirmBusinessBooking's (J3_STEP_GIVES, KEY_CALL).
+ */
+export const J4_STEP_GIVES = Object.freeze({
+  "A4-81": ["service"],
+  "B4-114": ["service"],
+  "A4-80": ["who_for"],
+  "B4-92": ["who_for"],
+  "B4-77": ["place"],
+  "A4-82": ["reach_by"],
+  "B4-93": ["reach_by"],
+  "A4-23": ["customer"],
+  "B4-25": ["customer"],
+  "A4-06": ["price_known"],
+  "A4-12": ["price_known"],
+  "B4-07": ["price_known"],
+  "B4-13": ["price_known"],
+  "A4-13": ["visit_fee"],
+  "B4-14": ["visit_fee"],
+  "B4-09": ["quote"],
+  "A4-14": ["times"],
+  "A4-33": ["times"],
+  "A4-62": ["times"],
+  "A4-68": ["times"],
+  "B4-15": ["times"],
+  "B4-84": ["times"],
+  "B4-85": ["times"],
+  "B4-89": ["times"],
+  "B4-16": ["choice"],
+  "A4-21": ["time_saved"],
+  "B4-23": ["time_saved"],
+  "A4-42": ["contact"],
+  "B4-29": ["link"],
+  "B4-30": ["address"],
+  "A4-65": ["answers"],
+  "B4-34": ["access", "answers"],
+});
+
+/**
+ * The automatic steps one call's own commit passes after the step it answers, whose keys that call gives: the pick
+ * and the save, both saveTime's (A4-15 then A4-21; B4-16 then B4-23).
+ */
+export const J4_CALL_PASSES = Object.freeze({
+  "A4-15": ["A4-21"],
+  "B4-16": ["B4-23"],
+});
+
+/**
+ * The automatic steps a turn's walk may pass right after a step that asks (arch 03 line 191: code walks to the first
+ * step that asks someone), whose keys the same commit may give (round 2: the action-layer engineer's note a, the QA
+ * and eval engineer's note a): after the pick, the save, the who's-who and plan steps, the secure link and its forms
+ * and approval (flow A's A4-21 to A4-42 when the AI's chat is a turn; flow B's B4-23, B4-32, B4-63 to B4-29, as
+ * j4-save-time-turn.json and j4-secure-link-turn.json share one turn); after the owner's '1 Send it' or the read-back's
+ * yes, the quote sent (A4-09, A4-10 to A4-12; B4-10, B4-11 to B4-13, as j4-quote-send-turn.json rides B4-10's answer).
+ * A turn's part gives its step's own keys and may give those of the steps listed here; a call made alone gives only
+ * its own (J4_CALL_PASSES).
+ */
+export const J4_WALK_PASSES = Object.freeze({
+  "A4-15": ["A4-21", "A4-42"],
+  "B4-16": ["B4-23", "B4-29"],
+  "A4-09": ["A4-12"],
+  "A4-10": ["A4-12"],
+  "B4-10": ["B4-13"],
+  "B4-11": ["B4-13"],
+});
+
+/** The one call that writes each key journey 4 gives (README "v1.2", "Each key's one call"; 02-contracts section 8). */
+export const J4_KEY_CALL = Object.freeze({
+  service: "matchService",
+  who_for: "setWhoFor",
+  place: "checkPlace",
+  reach_by: "setReachWay",
+  customer: "addCustomer",
+  price_known: "setPrice",
+  visit_fee: "setPrice",
+  quote: "quoteFromPhotos",
+  times: "showTimes",
+  choice: "saveTime",
+  time_saved: "saveTime",
+  contact: "sendSecureLink",
+  link: "sendSecureLink",
+  address: "checkPlace",
+  access: "saveSecurePage",
+  answers: "saveSecurePage",
+});
+
+/** The keys the given steps give (J4_STEP_GIVES), each once. */
+const keysOfSteps = (steps) => [...new Set(steps.flatMap((step) => J4_STEP_GIVES[step] ?? []))];
+
+/**
+ * givesJourneyFourKeys: an exchange that states a journey 4 step writes the keys that step gives, and its outcome wrote
+ * exactly the stated keys (J4_STEP_GIVES). Made alone, it states exactly its step's keys with those of the automatic
+ * steps its own call passes (J4_CALL_PASSES: the pick then the save), less time_saved for 'Send someone now', which
+ * saves no time (B4-91: saveTime answers choice alone; README open gap 61), and its call is the one call that writes
+ * each key (J4_KEY_CALL; the card's "each key written by exactly one call"). In a turn (gateAndCommit) the committed
+ * parts' gives are the keys written: its step's own keys, and any of those the automatic steps its walk passes give
+ * (J4_WALK_PASSES; arch 03 line 191; round 2: action-layer note a, QA and eval note a), as givesStepKeys allows.
+ */
+export function givesJourneyFourKeys(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const ownKeys = J4_STEP_GIVES[stated.step] ?? [];
+  const inTurn = exchange.call === "gateAndCommit";
+  const passes = (inTurn ? J4_WALK_PASSES : J4_CALL_PASSES)[stated.step] ?? [];
+  const passedKeys = keysOfSteps(passes);
+  if (ownKeys.length === 0 && passedKeys.length === 0) {
+    return [`${stated.step} is no step of journey 4 that gives a key`];
+  }
+  const problems = [];
+  const statedKeys = [...stated.gives].sort();
+  let expected;
+  if (inTurn) {
+    expected = statedKeys;
+    for (const key of ownKeys) {
+      if (!statedKeys.includes(key))
+        problems.push(`${stated.step} gives ${key}, which given.stated.gives leaves out`);
+    }
+    for (const key of statedKeys) {
+      if (!ownKeys.includes(key) && !passedKeys.includes(key)) {
+        problems.push(`${key} is given neither by ${stated.step} nor by a step its walk passes`);
+      }
+    }
+  } else {
+    const sentNow = exchange.call === "saveTime" && exchange.outcome?.timing === "sentnow";
+    const own = [...new Set([...ownKeys, ...passedKeys])].filter((key) => !(sentNow && key === "time_saved"));
+    expected = own.sort();
+    if (JSON.stringify(statedKeys) !== JSON.stringify(expected)) {
+      problems.push(
+        `${stated.step} gives [${expected.join(", ")}], not the stated [${stated.gives.join(", ")}]`,
+      );
+    }
+  }
+  const written = [...keysWritten(exchange)].sort();
+  if (JSON.stringify(written) !== JSON.stringify(expected)) {
+    problems.push(`the outcome wrote [${written.join(", ")}], not [${expected.join(", ")}]`);
+  }
+  if (!inTurn) {
+    for (const key of written) {
+      if (J4_KEY_CALL[key] !== exchange.call) {
+        problems.push(
+          `${key} is written by ${J4_KEY_CALL[key] ?? "no journey 4 call"}, not ${exchange.call}`,
+        );
+      }
+    }
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -410,4 +565,5 @@ export const rules = Object.freeze({
   clockTurn,
   givesJourneyKeys,
   arrivalTurn,
+  givesJourneyFourKeys,
 });

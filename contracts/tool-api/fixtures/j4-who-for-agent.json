@@ -1,0 +1,44 @@
+{
+  "call": "setWhoFor",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json"],
+    "now": "2026-10-21T23:15:31Z",
+    "stated": { "step": "A4-80", "gives": ["who_for"] },
+    "note": "A4-80: Alex's AI asked him who it's for and if he's 18 or older ('Reply 1 Me, and I'm 18 or older, 2 Someone else; I'm 18+, 3 I'm under 18'), and sends 'for me, 18 or older': screen 2's category self (round 2: FS line 652), his own band 18_or_older, which for himself is also the person served's. The head's person served and payer become its booker (the token's person); the head goes to version 2. No K-28 row exists for him at the barbershop yet, so the band is kept as README default 57 says (the Agent API's token session) until addCustomer writes it (A4-23)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "expectVersion": 1,
+    "answer": {
+      "step": "A4-80",
+      "for": "self",
+      "bookerAgeBand": "18_or_older",
+      "under13": null,
+      "parentOrGuardian": null,
+      "name": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "outcome": "goOn",
+    "servedPersonId": "person-agent-alex-0001",
+    "payerPersonId": "person-agent-alex-0001",
+    "private": false,
+    "servedAgeBand": "18_or_older",
+    "ageBandKept": "pending",
+    "parentLink": null,
+    "headVersion": 2,
+    "gives": ["who_for"],
+    "written": [{ "table": "bookings", "rowId": "booking-agent-alex-oct21", "version": 2 }],
+    "repeated": false
+  }
+}

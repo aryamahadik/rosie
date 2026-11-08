@@ -1,0 +1,24 @@
+{
+  "call": "extendTime",
+  "given": {
+    "seeds": ["core/seed-resources.json"],
+    "after": ["j4-save-time-agent.json", "j4-secure-link-agent.json"],
+    "now": "2026-10-21T23:25:00Z",
+    "stated": null,
+    "note": "A4-21's 'The page warns before the saved time ends, and offers more time at least once', asked for a time Alex's AI saved: from his secure page (j4-secure-link-agent.json) more time is asked on Sat 11:00am, held on the standard door (a request Sam OKs: j4-save-time-agent.json), before 23:26:40. The action layer decides from who the time is held for, never from the caller's word (round 3: DL-171 ruling 1; README default 61): K-04 reservations.for_agent_token, since an agent caller's save is held for its agent token on either door. No frozen field records the hold's door (README open gap 85), so this standard save cannot be told from C3's 15 minutes and is refused before K-05 extend: notExtendable, heldFor agentToken, and nothing changes. It fails closed: saveTime answered this time extendable false, so a page built on that answer offers no extension until the door is recorded, and the call refuses it whoever asks; the hold lapses at 23:26:40 as saved."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-agent-alex-0013",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-agent-alex-0013"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "reservationId": "rsv-agent-alex-riley-sat",
+    "expectVersion": 1
+  },
+  "outcome": { "error": "notExtendable", "reservationId": "rsv-agent-alex-riley-sat", "heldFor": "agentToken" }
+}

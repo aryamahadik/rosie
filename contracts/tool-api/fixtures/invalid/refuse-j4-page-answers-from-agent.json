@@ -1,0 +1,16 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0021",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-alex",
+    "traceId": "trace-agent-alex-0020"
+  },
+  "bookingId": "booking-alex-chat-drain2",
+  "save": {
+    "kind": "answers",
+    "step": "B4-34",
+    "answers": [{ "kind": "access", "question": null, "answer": "Side door; the gate latch sticks" }]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j4-secure-link-turn.json", "j4-check-address-page.json"],
+    "now": "2026-11-02T14:07:20Z",
+    "stated": null,
+    "note": "B4-26 on the secure page: '1 Yes, Alex will be there'. booking_details.meets_pro is served, compared and set (version 5). Who meets the pro gives no key."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-drain2-0010",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-drain2-0008"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "save": { "kind": "meetsPro", "step": "B4-26", "expectVersion": 4, "who": "served", "otherName": null }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "answerIds": [],
+    "meetsPro": "served",
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
+    "gives": [],
+    "written": [{ "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 5 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "call": "saveTime",
+  "given": {
+    "seeds": [
+      "core/seed-resources.json",
+      "availability/seed-hours.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json",
+      "rules/seed-rules-tap-list.json"
+    ],
+    "after": ["j3-open-request-agent.json", "j4-match-service-agent.json", "j4-show-times-agent.json"],
+    "now": "2026-10-21T23:16:40Z",
+    "stated": { "step": "A4-21", "gives": ["time_saved"] },
+    "note": "Refused: j4-save-time-agent.json's save through Alex's AI, a request Sam OKs on the standard door, answered extendable true. An agent caller's save is held for its agent token, whose door no frozen field records, so extendTime refuses it and the answer must say extendable false (round 3: DL-171 ruling 1; README default 61, open gap 85). With extendable false it is j4-save-time-agent.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0009",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "pick": {
+      "kind": "offered",
+      "time": {
+        "optionId": "opt-agent-alex-sat-1100",
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      "serviceId": "svc-lees-haircut",
+      "serviceMoneyId": "way-lees-haircut-shop",
+      "quoteOptionId": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "timing": "settime",
+    "reservation": {
+      "reservationId": "rsv-agent-alex-riley-sat",
+      "version": 1,
+      "heldUntil": "2026-10-21T23:26:40Z",
+      "door": "standard",
+      "minutes": 10,
+      "extendable": true
+    },
+    "lineId": "line-agent-alex-1",
+    "linePrice": { "cents": 3500, "currency": "USD" },
+    "gives": ["time_saved"],
+    "written": [
+      { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 3 },
+      { "table": "reservations", "rowId": "rsv-agent-alex-riley-sat", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-agent-alex-1", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "call": "saveSecurePage",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-sealing-key.json"],
+    "after": ["j3-open-request-agent.json", "j4-secure-link-agent.json"],
+    "now": "2026-10-21T23:20:14Z",
+    "stated": { "step": "A4-65", "gives": ["answers"] },
+    "note": "A4-65: Alex opens his secure link and answers the page's question, A4-65's own example 'How would you like it on top?'. The page server found the link by its code's hash and names his person; the answer is a K-30 page_answers row sealed under his key, insert only, and never comes back (answerIds only). The answer's words are an example."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0011",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0011"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "save": {
+      "kind": "answers",
+      "step": "A4-65",
+      "answers": [
+        {
+          "kind": "question",
+          "question": "How would you like it on top?",
+          "answer": "A little shorter, same shape"
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "answerIds": ["answer-agent-alex-1"],
+    "meetsPro": null,
+    "meetsProPersonId": null,
+    "handles": [],
+    "effects": [],
+    "consentId": null,
+    "textsOff": null,
+    "gives": ["answers"],
+    "written": [],
+    "repeated": false
+  }
+}

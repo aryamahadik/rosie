@@ -1,0 +1,10 @@
+{
+  "result": "textsOff",
+  "bookingId": "booking-page-ben-skin-fade",
+  "waitlistEntryId": null,
+  "consentId": "consent-ben-waitlist",
+  "textsOff": { "fixedLineId": "stopLaterReply", "outboxRowId": null },
+  "requestEnded": false,
+  "written": [],
+  "repeated": false
+}

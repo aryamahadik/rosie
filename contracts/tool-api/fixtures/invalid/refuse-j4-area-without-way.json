@@ -1,0 +1,12 @@
+{
+  "caller": {
+    "kind": "turn",
+    "turnId": "turn-alex-drain2-0002",
+    "requestId": "turn-alex-drain2-0002",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-alex",
+    "traceId": "trace-alex-drain2-0001"
+  },
+  "bookingId": "booking-alex-chat-drain2",
+  "check": { "kind": "area", "typed": "town", "text": "Springfield" }
+}

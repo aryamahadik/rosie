@@ -1,0 +1,12 @@
+{
+  "bookingId": "booking-agent-alex-drain3",
+  "check": "area",
+  "result": "inside",
+  "addressRowId": "addr-agent-alex-drain3-1",
+  "zone": null,
+  "matchPrecision": "street",
+  "requestEnded": false,
+  "gives": ["place"],
+  "written": [{ "table": "booking_addresses", "rowId": "addr-agent-alex-drain3-1", "version": 1 }],
+  "repeated": false
+}

@@ -1,0 +1,95 @@
+{
+  "call": "showTimes",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json",
+      "business-setup/seed-location-flow-b.json",
+      "bookings-changes/seed-booking-flow-b.json"
+    ],
+    "after": ["j4-check-place-area-turn.json"],
+    "now": "2026-11-02T14:02:40Z",
+    "stated": { "step": "B4-15", "gives": ["times"] },
+    "note": "B4-83 (arrival windows) then B4-15 in Alex's turn: five 2-hour arrival windows with Jordan, soonest first (his Monday to Wednesday are booked, as an example), each at the list's exact $179. Each reserved time holds the window and the 60-minute job, 8 to 11 for an 8 to 10 window, as K-30's seed-booking-flow-b reserves it; Thu Nov 5 is after the clocks changed, so 8am in New York is 13:00 UTC. booking_details.times is set once to window (version 2), and the card's open question (its options the times; its versions_read the rows it was built from) is written in the same commit (README default 69)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-drain2-0005",
+      "requestId": "turn-alex-drain2-0005",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-alex-drain2-0001"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "serviceId": "svc-lee-plumbing-drain-clearing",
+    "serviceMoneyId": "way-lee-plumbing-drain-home",
+    "quoteOptionId": null,
+    "filter": { "resourceId": null, "fromDay": null, "needBy": null }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "timesKind": "window",
+    "times": [
+      {
+        "optionId": "opt-alex-drain2-thu-0800",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-05T13:00:00Z", "end": "2026-11-05T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-05T13:00:00Z", "end": "2026-11-05T15:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-alex-drain2-thu-1000",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-05T15:00:00Z", "end": "2026-11-05T18:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-05T15:00:00Z", "end": "2026-11-05T17:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-alex-drain2-thu-1200",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-05T17:00:00Z", "end": "2026-11-05T20:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-05T17:00:00Z", "end": "2026-11-05T19:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-alex-drain2-fri-0800",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T15:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      },
+      {
+        "optionId": "opt-alex-drain2-fri-1000",
+        "resourceId": "res-jordan",
+        "during": { "start": "2026-11-06T15:00:00Z", "end": "2026-11-06T18:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-06T15:00:00Z", "end": "2026-11-06T17:00:00Z" },
+        "price": { "cents": 17900, "currency": "USD" },
+        "fromPrice": null,
+        "seatsLeft": null
+      }
+    ],
+    "nobodyFree": false,
+    "sentNowOffered": false,
+    "openQuestionId": "oq-alex-drain2-times",
+    "gives": ["times"],
+    "written": [
+      { "table": "booking_details", "rowId": "booking-alex-chat-drain2", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-alex-drain2-times", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

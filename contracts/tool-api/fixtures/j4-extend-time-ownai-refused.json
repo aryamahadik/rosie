@@ -1,0 +1,24 @@
+{
+  "call": "extendTime",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json"],
+    "after": ["j4-save-time-agent-instant.json"],
+    "now": "2026-11-02T15:22:00Z",
+    "stated": null,
+    "note": "Alex's AI asks for more time on the drain clearing saved on MC C3's ownAi door (j4-save-time-agent-instant.json). The action layer decides from who the time is held for, never from the caller's word (round 3: DL-171 ruling 1; README default 61): K-04 reservations.for_agent_token, an agent caller's save. No frozen field records the hold's door (README open gap 85), so the action layer cannot tell C3's 15 minutes from an AI's standard save, and it refuses every time held for an agent token before K-05 extend is called: notExtendable, heldFor agentToken, and nothing changes. C3's 15 minutes are never extended (MC C3: 'the 15 minutes are never extended'); the hold still lapses at 15:25 and nobody is chased."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-drain3-0010",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-drain3-0001"
+    },
+    "bookingId": "booking-agent-alex-drain3",
+    "reservationId": "rsv-agent-alex-drain3",
+    "expectVersion": 1
+  },
+  "outcome": { "error": "notExtendable", "reservationId": "rsv-agent-alex-drain3", "heldFor": "agentToken" }
+}

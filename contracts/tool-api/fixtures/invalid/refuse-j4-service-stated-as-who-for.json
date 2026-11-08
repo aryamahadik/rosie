@@ -1,0 +1,55 @@
+{
+  "call": "matchService",
+  "given": {
+    "seeds": [
+      "core/seed-business-head.json",
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json"
+    ],
+    "after": ["j3-open-request-agent.json"],
+    "now": "2026-10-21T23:15:20Z",
+    "stated": { "step": "A4-80", "gives": ["who_for"] },
+    "note": "j4-match-service-agent.json with one fault: it states A4-80's who_for, which is setWhoFor's, while the call wrote service. The rule givesJourneyFourKeys refuses it; stating A4-81's service, it is accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "words": { "asTyped": "a haircut" }
+  },
+  "outcome": {
+    "result": "matched",
+    "serviceId": "svc-lees-haircut",
+    "serviceVersion": 1,
+    "ways": [
+      {
+        "serviceMoneyId": "way-lees-haircut-shop",
+        "flow": "A",
+        "place": "business",
+        "path": "list|card|counter",
+        "price": { "cents": 3500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      },
+      {
+        "serviceMoneyId": "way-lees-haircut-home",
+        "flow": "B",
+        "place": "customer",
+        "path": "list|full|none",
+        "price": { "cents": 7500, "currency": "USD" },
+        "fromPrice": null,
+        "version": 1
+      }
+    ],
+    "openQuestionId": null,
+    "gives": ["service"],
+    "written": [],
+    "repeated": false
+  }
+}

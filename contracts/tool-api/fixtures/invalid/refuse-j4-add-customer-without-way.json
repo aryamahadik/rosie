@@ -1,0 +1,13 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0006",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-agent-alex-0001",
+    "traceId": "trace-agent-alex-0001"
+  },
+  "bookingId": "booking-agent-alex-oct21",
+  "name": "Alex M.",
+  "ageBand": "18_or_older"
+}

@@ -1,0 +1,43 @@
+{
+  "call": "extendTime",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json",
+      "business-setup/seed-location-flow-b.json",
+      "bookings-changes/seed-booking-flow-b.json"
+    ],
+    "after": ["j4-save-time-turn.json", "j4-secure-link-turn.json"],
+    "now": "2026-11-02T14:11:40Z",
+    "stated": null,
+    "note": "B4-29's 'The time stays saved while they fill it in, with more time offered before it ends' (MASTER-FLOW-B line 2650; A4-21's 'offers more time at least once'): Alex is on the secure page texted into his open chat (j4-secure-link-turn.json), with Thu Nov 5 8 to 11 held on the standard door for his mobile on file (j4-save-time-turn.json), and taps for more time before 14:13:10. The action layer decides from who the time is held for, never from the caller's word (round 3: DL-171 ruling 1; README default 61): K-04 reservations.for_phone_number, a turn's save, which saveTime holds only on the standard door, so it names standard to K-05 v1 extend, and the answer says heldFor phoneNumber, never the number. In one commit held_until rises 10 minutes to 14:23:10, reservations.extended is set (version 2) and the saved-time clock row on his mobile's handle moves with it (version 2) (round 2: DL-162 ruling 4; Q-12). No extension is left; no key. The clock row's id follows K-05's '<reservation id>/saved-time'; the request id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-drain2-0013",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-drain2-0008"
+    },
+    "bookingId": "booking-alex-chat-drain2",
+    "reservationId": "rsv-alex-drain2",
+    "expectVersion": 1
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-drain2",
+    "reservationId": "rsv-alex-drain2",
+    "version": 2,
+    "heldUntil": "2026-11-02T14:23:10Z",
+    "door": "standard",
+    "heldFor": "phoneNumber",
+    "extendable": false,
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-drain2", "version": 2 },
+      { "table": "clock_rows", "rowId": "rsv-alex-drain2/saved-time", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

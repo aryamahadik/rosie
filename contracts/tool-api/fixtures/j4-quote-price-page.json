@@ -1,0 +1,51 @@
+{
+  "call": "quoteFromPhotos",
+  "given": {
+    "seeds": ["people-access/seed-staff-joined.json", "rules/seed-price-ok-limit.json"],
+    "after": [],
+    "now": "2026-11-03T00:30:04Z",
+    "stated": { "step": "B4-09", "gives": ["quote"] },
+    "note": "B4-08 then B4-09: Alex asked Lee Home Services to replace his water heater; his photos came in on the photos link (the quote quote-alex-heater, pricing, version 1). Jordan prices it at $640 on his signed-in pricing page. Sam OKs any price over $500 made for one customer (K-26's price OK limit), so the quote goes with_owner (version 2) with a K-30 owner_oks ask due in 4 of Sam's text hours, and, since a page's commit writes no outbox row, a clock row due at once on Sam's handle whose clock turn sends him 'Reply 1 Send it, 2 Change it, 3 See it first, 4 Decline' (README default 66). The price cancels the 4-hour pricing clock the photos ask armed (round 2: README default 78), version 2. Nothing goes to Alex until someone OKs it. The booking, quote and row ids and the time are examples, after K-30's seed-quote-owner-ok."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-jordan-0101",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-jordan",
+      "traceId": "trace-page-jordan-0101"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "stage": "price",
+      "step": "B4-09",
+      "quoteId": "quote-alex-heater",
+      "expectVersion": 1,
+      "options": [{ "label": null, "price": { "cents": 64000, "currency": "USD" }, "upTo": null }]
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "quoteId": "quote-alex-heater",
+    "state": "with_owner",
+    "version": 2,
+    "ownerOkId": "ok-alex-heater",
+    "ownerAskClockRowId": "clock-ok-alex-heater-ask",
+    "link": null,
+    "pricingClockRowId": null,
+    "pendingChange": null,
+    "customerClockRowId": null,
+    "requestEnded": false,
+    "gives": ["quote"],
+    "outboxRowIds": [],
+    "written": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 2 },
+      { "table": "quote_options", "rowId": "qopt-alex-heater-1", "version": 1 },
+      { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-ok-alex-heater-ask", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-quote-alex-heater-pricing", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

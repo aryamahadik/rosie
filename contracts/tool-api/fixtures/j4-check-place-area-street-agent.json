@@ -1,0 +1,43 @@
+{
+  "call": "checkPlace",
+  "given": {
+    "seeds": [
+      "business-setup/seed-location-flow-b.json",
+      "business-setup/seed-location-travel-centre.json",
+      "bookings-changes/seed-booking-flow-b.json"
+    ],
+    "after": [],
+    "now": "2026-11-02T15:05:30Z",
+    "stated": null,
+    "note": "B4-77 through Alex's own AI for another drain clearing, a what-if: the AI sends '42 Oak Street, Springfield' as the town. Geocoded, it matches finer than a town or ZIP (K-17 v1 precision street), so it is askZip and nothing is kept: no booking_addresses row, and the words are never stored, returned or logged (round 2: DL-162 ruling 9; security GAP 1; B4-30: 'An address an AI puts in a message is never saved'; A6-14; README defaults 67, 84). The AI is asked for the ZIP; the street address goes only on the secure page. The booking id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-drain3-0004",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-drain3-0001"
+    },
+    "bookingId": "booking-agent-alex-drain3",
+    "check": {
+      "kind": "area",
+      "serviceMoneyId": "way-lee-plumbing-drain-home",
+      "typed": "town",
+      "text": "42 Oak Street, Springfield"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-drain3",
+    "check": "area",
+    "result": "askZip",
+    "addressRowId": null,
+    "zone": null,
+    "matchPrecision": "street",
+    "requestEnded": false,
+    "gives": [],
+    "written": [],
+    "repeated": false
+  }
+}

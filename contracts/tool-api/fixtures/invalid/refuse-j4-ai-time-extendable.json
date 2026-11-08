@@ -1,0 +1,21 @@
+{
+  "bookingId": "booking-agent-alex-oct21",
+  "timing": "settime",
+  "reservation": {
+    "reservationId": "rsv-agent-alex-riley-sat",
+    "version": 1,
+    "heldUntil": "2026-10-21T23:31:40Z",
+    "door": "ownAi",
+    "minutes": 15,
+    "extendable": true
+  },
+  "lineId": "line-agent-alex-1",
+  "linePrice": { "cents": 3500, "currency": "USD" },
+  "gives": ["time_saved"],
+  "written": [
+    { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 3 },
+    { "table": "reservations", "rowId": "rsv-agent-alex-riley-sat", "version": 1 },
+    { "table": "booking_lines", "rowId": "line-agent-alex-1", "version": 1 }
+  ],
+  "repeated": false
+}

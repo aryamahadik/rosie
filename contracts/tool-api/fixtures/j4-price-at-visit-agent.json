@@ -1,0 +1,38 @@
+{
+  "call": "setPrice",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-21T23:40:05Z",
+    "stated": { "step": "A4-13", "gives": ["visit_fee"] },
+    "note": "A4-05 then A4-13: a request opened through an AI at door ai, as j3-open-request-agent.json opens one, for a colour priced at the chair. The way is a visit path, so the call promises only the $25 consult and the price is set at the visit; no 'from' price is shown as a set price (A4-05). Kept with the token until the save copies it (README default 57). The colour service, its visit way and the booking are examples: no frozen seed holds a visit-path way for the barbershop."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-color-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-agent-color-0001"
+    },
+    "bookingId": "booking-agent-color-oct21",
+    "price": {
+      "path": "visit",
+      "step": "A4-13",
+      "serviceId": "svc-lees-color",
+      "serviceMoneyId": "way-lees-color-visit"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-color-oct21",
+    "path": "visit",
+    "price": { "cents": 2500, "currency": "USD" },
+    "fromPrice": null,
+    "quote": null,
+    "outboxRowIds": [],
+    "gives": ["visit_fee"],
+    "written": [],
+    "repeated": false
+  }
+}

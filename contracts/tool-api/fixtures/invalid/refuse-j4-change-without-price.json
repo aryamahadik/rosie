@@ -1,0 +1,21 @@
+{
+  "caller": {
+    "kind": "turn",
+    "turnId": "turn-sam-heater-change",
+    "requestId": "turn-sam-heater-change",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-sam",
+    "traceId": "trace-sam-heater-change"
+  },
+  "bookingId": "booking-alex-chat-heater",
+  "stage": {
+    "stage": "ownerAnswer",
+    "step": "B4-11",
+    "quoteId": "quote-alex-heater",
+    "ownerOkId": "ok-alex-heater",
+    "expectVersion": 2,
+    "answer": "change",
+    "newOptions": null,
+    "yes": { "kind": "openQuestion", "openQuestionId": "oq-ok-alex-heater", "yesEventId": "evt-sam-heater-0002" }
+  }
+}

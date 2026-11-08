@@ -1,0 +1,47 @@
+{
+  "call": "setWhoFor",
+  "given": {
+    "seeds": ["business-setup/seed-company-two-kinds.json"],
+    "after": ["j3-safety-page-request.json", "j3-open-request-page.json"],
+    "now": "2026-10-20T12:16:10Z",
+    "stated": null,
+    "note": "B4-92 on Lee Home Services' booking page, then B4-100 (a what-if): screen 2 answers 'another adult; I'm 18 or older' (round 2: DL-162 ruling 5; FS line 652), and the plug-in in this what-if says only the person served, or someone with legal papers for them, may book this work. The booker named no papers (not actsFor), so it ends here, before any name, number, photo or address (A4-80 line 2129; B4-100): bookerNotAllowed, no key, no person served or payer, no band, the request ended dropped (README default 60; the head cancelled, version 2). The page says plainly who may book. Nothing else is kept."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-home-0003",
+      "businessId": "biz-lee-home-services",
+      "personId": null,
+      "traceId": "trace-page-home-0001"
+    },
+    "bookingId": "booking-page-home-oct20",
+    "expectVersion": 1,
+    "answer": {
+      "step": "B4-92",
+      "for": "otherAdult",
+      "bookerAgeBand": "18_or_older",
+      "under13": null,
+      "parentOrGuardian": null,
+      "name": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-home-oct20",
+    "outcome": "bookerNotAllowed",
+    "servedPersonId": null,
+    "payerPersonId": null,
+    "private": false,
+    "servedAgeBand": null,
+    "ageBandKept": "nothingKept",
+    "parentLink": null,
+    "headVersion": 2,
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-page-home-oct20", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-page-home-oct20", "version": 2 }
+    ],
+    "repeated": false
+  }
+}

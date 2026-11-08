@@ -1,0 +1,55 @@
+{
+  "call": "quoteFromPhotos",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "people-access/seed-staff-joined.json"],
+    "after": ["j3-open-request-agent.json", "j4-who-for-agent.json", "j4-reach-card-agent.json"],
+    "now": "2026-10-21T23:16:20Z",
+    "stated": null,
+    "note": "A4-07 through Alex's own AI, a what-if beside the haircut: the plug-in says a color and cut is priced from photos, so the photos are asked and no time is saved while it's priced. In one commit: the K-30 quote (state pricing, basis photos, version 1), the photos link (K-30 secure_links purpose photos, only its code's hash kept), given to the AI as given_via ai and returned once in url, never logged (round 2: DL-162 ruling 2c; README default 62), since photos never go through the AI and its page takes them (saveSecurePage photos); and the 4-hour pricing clock on Sam's handle, kind step, whose clock turn asks Sam and tells Alex it's with the business (README default 78). The token is bound to Alex (README default 70), which a link for him needs. The link's K-03 slot does not exist yet (README open gap 70: link.photos). The service, quote, link and clock ids and the code are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0011",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-agent-alex-0001"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "stage": "askPhotos",
+      "step": "A4-07",
+      "serviceId": "svc-lees-color-cut",
+      "basis": "photos",
+      "via": "ai"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "quoteId": "quote-agent-alex-color",
+    "state": "pricing",
+    "version": 1,
+    "ownerOkId": null,
+    "ownerAskClockRowId": null,
+    "link": {
+      "kind": "photos",
+      "secureLinkId": "link-agent-alex-photos",
+      "url": "rosfield.com/q/placeholder-photos-code-0007",
+      "outboxRowId": null,
+      "clockRowId": null
+    },
+    "pricingClockRowId": "clock-quote-agent-alex-color-pricing",
+    "pendingChange": null,
+    "customerClockRowId": null,
+    "requestEnded": false,
+    "gives": [],
+    "outboxRowIds": [],
+    "written": [
+      { "table": "quotes", "rowId": "quote-agent-alex-color", "version": 1 },
+      { "table": "secure_links", "rowId": "link-agent-alex-photos", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-quote-agent-alex-color-pricing", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "caller": {
+    "kind": "agent",
+    "turnId": null,
+    "requestId": "req-agent-alex-0030",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-alex",
+    "traceId": "trace-agent-alex-0030"
+  },
+  "bookingId": "booking-alex-chat-heater",
+  "stage": {
+    "stage": "price",
+    "step": "B4-09",
+    "quoteId": "quote-alex-heater",
+    "expectVersion": 1,
+    "options": [{ "label": null, "price": { "cents": 30000, "currency": "USD" }, "upTo": null }]
+  }
+}
