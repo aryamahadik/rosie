@@ -4,13 +4,13 @@
     "now": "2026-10-22T22:01:30Z",
     "environment": "staging",
     "after": ["booking-check-start.json"],
-    "note": "The same browser types a wrong code for check-lees-0001: one of 5 tries (RULES 6.2), through K-09 v1 proveCode by the code id the server kept. Had no booking matched, there would be no code, and the page entry would answer the same wrong itself, counting the try, so the answer never tells whether a booking matched (README default 29). Nothing about a visit is shown. The typed code is a placeholder."
+    "note": "The same browser types a code for check-lees-0001: one of 5 tries (RULES 6.2). K-09 v1.1 checkBookingFirst gave the page server no code id and K-09 v1 proveCode needs one, so until a K-09 minor version gives it (open gap 34) every typed code takes README default 29's no-match path: the page entry answers wrong itself and counts the try, per business, name typed and day typed (Lee's Barbershop, 'Alex M.', Oct 24), the key a live code has under K-09 v1.1 default 51, so a new check for the same name and day goes on counting. It is the same answer a code gets when no booking matched, so it never tells whether a booking matched, and it fails closed: never checked. Nothing about a visit is shown. The typed code is a placeholder."
   },
   "request": {
     "page": {
       "requestId": "req-page-check-0002",
       "traceId": "trace-page-check-0002",
-      "listingCode": "biz-lees-barbershop"
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
     },
     "checkId": "check-lees-0001",
     "code": "000000",

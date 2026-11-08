@@ -5,20 +5,23 @@
     "environment": "staging",
     "after": [
       "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json",
       "db-schema/documents-licenses/fixtures/seed-license-as-given.json"
     ],
-    "note": "Refused: Lee's Barbershop's listing showing its barber license as checked. A document shows only as added by the business, never checked and never a badge (FS 6.3; D96; MC C4, C7). The one fault is documents[0].shownAs; with addedByTheBusiness it is accepted."
+    "note": "Refused: a cut-down listing of Lee's Barbershop's barber listing showing its barber license as checked. A document shows only as added by the business, never checked and never a badge (FS 6.3; D96; MC C4, C7). The one fault is documents[0].shownAs; with addedByTheBusiness it is accepted."
   },
   "request": {
     "page": {
       "requestId": "req-listing-lees-0002",
       "traceId": "trace-listing-lees-0002",
-      "listingCode": "biz-lees-barbershop"
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
     }
   },
   "outcome": {
     "result": "listing",
     "displayName": "Lee's Barbershop",
+    "tradeName": null,
+    "kindName": "Barber",
     "about": "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
     "photos": [],
     "faqs": [],
@@ -28,6 +31,7 @@
         "name": "Haircut",
         "priceKind": "one_price",
         "unit": null,
+        "length": { "words": "30 minutes", "minutes": 30 },
         "ways": [
           {
             "wayId": "way-lees-haircut-shop",
@@ -46,7 +50,6 @@
     "locations": [
       {
         "locationId": "loc-lees-barbershop-shop",
-        "kind": "shop",
         "name": null,
         "address": "88 Elm St, Springfield",
         "travelArea": null,
@@ -58,7 +61,6 @@
         "documentId": "doc-barbershop-license",
         "kind": "license",
         "title": "Barber license",
-        "whose": "business",
         "shownAs": "checkedByRosie"
       }
     ],

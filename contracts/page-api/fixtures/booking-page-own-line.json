@@ -1,0 +1,27 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-23T16:05:03Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json"
+    ],
+    "note": "A3-04 then A3-22 and A3-26: on Lee's Barbershop's booking page someone types 'is the beard color okay if I'm allergic to hair dye?' (contracts/model/fixtures/safety-business-own-line.json's words, word for word, as K-09 v1.1's j3-safety-arrival-own-line.json takes them by text). The page entry swaps first (nothing to swap: README default 39) and checks the code (live, with the barber kind); the read says Needs the business's own line, and K-09 v1.1 recordSafetyOutcome records it alone under the business with source page, its safetyLine naming the shop's own line with no outbox row, since the page shows it. A3-26 lets the booking go on after the line ('Then the booking can go on'; a barbershop's plug-in lists no stop words), but K-09 v1.1 openRequest refuses every read but No, so until a K-09 minor version lets it go on after a line (open gap 32), the page entry answers safetyFirst with the line and opens nothing (README default 37). Nothing books; the person can still text or call the shop. Once that version lands, the same request answers opened with this line in safetyLine. The line is A3-26's (MASTER-FLOW-A line 1768), with the number Sam set for it, the shop's listing number (555) 010-0177 (K-23 seed-business-demo-shop.json). The outcome id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0021",
+      "traceId": "trace-page-lees-0021",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    },
+    "deviceToken": "placeholder-device-token-page-lees-3",
+    "words": "is the beard color okay if I'm allergic to hair dye?"
+  },
+  "outcome": {
+    "error": "safetyFirst",
+    "outcomeId": "safety-outcome-page-lees-0021",
+    "fixedLineId": "safetyOwnLine",
+    "words": "That's a question for the barbers themselves. Riley can go over it at your visit. For anything sooner, call Lee's Barbershop at (555) 010-0177. Call 911 if anyone is in danger."
+  }
+}

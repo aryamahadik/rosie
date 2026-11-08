@@ -3,14 +3,14 @@
   "given": {
     "now": "2026-10-30T16:02:00Z",
     "environment": "staging",
-    "after": [],
-    "note": "A public page address whose code no business has, or whose business is not live yet (S1-32: nothing goes live until the ID, the control proof and the fee OK are in; S1-35): one answer, notListed, so a guessed or stale code learns nothing (README default 24). Nothing is read or written, and the page shows a plain 'not found' page. The code is a placeholder."
+    "after": ["db-schema/business-setup/fixtures/seed-company-two-kinds.json"],
+    "note": "Lee Home Services is one company listed under two kinds of work (S1-04: plumbing and electrical share Lee Home Services LLC as Lee Plumbing and Lee Electric; K-23 seed-company-two-kinds.json), so it has two listing codes, one per kind (README default 40): this one is Lee Plumbing's (kind part e8cb269a3f0cb4b1, from 'biz-lee-home-services:plumber'); Lee Electric's would end fadb68cc3265a381. In its own seed the business is saved, not live (S1-32: nothing goes live until the ID, the control proof and the fee OK are in; S1-35 gives live), so the answer is notListed, the same as for a code no business has or a kind part that matches none of the business's kinds, so a guessed or stale code learns nothing (README default 24). Nothing is read beyond the code's own lookup and nothing is written, and the page shows a plain 'not found' page."
   },
   "request": {
     "page": {
-      "requestId": "req-listing-unknown-0001",
-      "traceId": "trace-listing-unknown-0001",
-      "listingCode": "biz-not-on-rosie"
+      "requestId": "req-listing-home-0001",
+      "traceId": "trace-listing-home-0001",
+      "listingCode": { "business": "biz-lee-home-services", "kind": "e8cb269a3f0cb4b1" }
     }
   },
   "outcome": { "error": "notListed" }

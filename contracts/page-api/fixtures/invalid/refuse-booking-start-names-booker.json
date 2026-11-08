@@ -1,10 +1,10 @@
 {
   "page": {
-    "requestId": "req-page-home-0001",
-    "traceId": "trace-page-home-0001",
-    "listingCode": "biz-lee-home-services"
+    "requestId": "req-page-lees-0011",
+    "traceId": "trace-page-lees-0011",
+    "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
   },
-  "deviceToken": "placeholder-device-token-page-home-1",
-  "words": "My kitchen sink drains slowly. Can a plumber come this week?",
-  "bookerPersonId": "person-page-home-0001"
+  "deviceToken": "placeholder-device-token-page-lees-2",
+  "words": "Book me a haircut at Lee's Barbershop on Saturday.",
+  "bookerPersonId": "person-page-lees-0011"
 }

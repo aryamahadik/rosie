@@ -1,0 +1,29 @@
+{
+  "call": "startBookingRequest",
+  "given": {
+    "now": "2026-10-21T23:15:03Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/business-setup/fixtures/seed-business-demo-shop.json",
+      "db-schema/business-setup/fixtures/seed-company-two-kinds.json"
+    ],
+    "note": "Refused: booking-page-start.json's request answered as opened while carrying A3-24's emergency line. An opened request carries only a line that lets a booking go on after it (A3-23, A3-26, A3-49, A3-50); an emergency, crisis words and an unsure read never open a request (arch 02 line 129; A3-24, A3-25; arch 06 line 323). The one fault is outcome.safetyLine's fixedLineId safetyEmergency; with safetyLine null it is booking-page-start.json and accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0011",
+      "traceId": "trace-page-lees-0011",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    },
+    "deviceToken": "placeholder-device-token-page-lees-2",
+    "words": "Book me a haircut at Lee's Barbershop on Saturday."
+  },
+  "outcome": {
+    "result": "opened",
+    "requestRef": "reqref-page-lees-0011",
+    "safetyLine": {
+      "fixedLineId": "safetyEmergency",
+      "words": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now."
+    }
+  }
+}
