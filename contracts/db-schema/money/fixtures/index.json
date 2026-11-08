@@ -1,0 +1,116 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-payment-deposit.json",
+      "version": "v1",
+      "table": "payments",
+      "expect": "accept",
+      "shows": "A deposit taken at once, never held: Alex books the $140 Groom's package at Lee's Barbershop and saves his card on the secure page (a K-07 stripe_save_card effect, the card kept only as Stripe's ids); as the booking is written, the $40 deposit is charged on that card while he is on the page, through one K-07 stripe_charge effect whose port request is K-14 deposit.json's. Alex pays Lee's Barbershop: one payment (purpose deposit, method card, paid) names the effect and the saved card, one item puts its $40 against the booking line (list|deposit|counter, $140 with the $40 deposit copied in), and one ledger charge line carries the effect id and Stripe's charge id, which the effect row names back (ledger_line_id), so reconciliation matches it one to one",
+      "source": "A5-13 ('The customer pays the deposit on the page, into Lee's Barbershop's own Stripe. It counts toward the price, and the card stays saved'); A5-04; RULES 3.1, 3.2 ('Nothing is ever held on a card'); S13-55 ('What's due now is taken once the booking is written'); arch 09 lines 457, 492; arch 10 lines 508, 550; fixtures/v1/test-kit/shops/barber.json (Groom's package $140, $40 deposit); K-25 v1 seed-service-money-paths (way-lees-grooms-package-shop), seed-price-rule-dates; K-07 v1 fixtures/effect-charge.json (eff-alex-grooms-deposit, turn-alex-grooms-1, ledger-alex-grooms-deposit, trace-alex-0100); K-14 v1 fixtures/deposit.json"
+    },
+    {
+      "file": "seed-refund-new-line.json",
+      "version": "v1",
+      "table": "refunds",
+      "expect": "accept",
+      "shows": "A refund is a new ledger line: Alex pays his $55 Signature cut and hot towel shave in full on the page (K-14 full-price.json's charge, one payment, one item, one charge line). The next day he asks for money back; Sam is asked (A10-09) and answers part of it, $20, by text (A10-12), recorded in K-08's ownerYes shape. The refund (reason owner_part, decided by the owner) runs from its own K-07 stripe_refund effect, K-14 refund-part.json's, refunds the charge's line and writes a new refund line of $20; the $55 charge line is never edited",
+      "source": "A10-09 ('Rosie never decides a refund itself: Sam answers by text or a call, all of it, none, or part of it'); A10-12 ('Sam names the amount by text or a call, and it's read back first'); A10-10 ('The money goes back the way it was paid'); A5-16; arch 09 line 492 ('Ledger lines are never edited; a refund is a new line'); RULES 3.10; FS line 732; K-08 v1 approvalOwnerYes; fixtures/v1/test-kit/shops/barber.json (Signature cut and hot towel shave $55); K-14 v1 fixtures/full-price.json, refund-part.json"
+    },
+    {
+      "file": "seed-fee-rosfield-2.json",
+      "version": "v1",
+      "table": "rosfield_fees",
+      "expect": "accept",
+      "shows": "Rosfield's $2s that Lee's Barbershop pays Rosfield for October, each counted once per booking toward the cap of the person who gave the work, in the month it counts, and named by K-33's October bill lines: Alex M.'s haircut at its first check-in code (Sat Oct 24, toward Riley), Ben T.'s trim at DONE with no code (toward Avery), and Owen H.'s plan visit, paid per visit, at DONE (toward Riley). None is collected out of a payment: under Q-22's default each goes on the monthly bill (K-33 seed-monthly-bill's fee-rosfield2-* lines), whose charge effect is K-33's",
+      "source": "A9-21 ('Rosfield's $2 counts at the visit's first check-in. The business pays it, never the customer'; 'One $2 per booking'; 'A plan paid per visit at the visit pays $2 per visit, at its check-in'; 'A booking with no named person ... counts for the person who gives the work'); S1-25; S11-66; FS line 733 (counted_at, counted_by, person_given_work, month); FEES-TERMS-DRAFT 2.4 to 2.8, 3.3; Q-22; K-33 v1 fixtures/seed-monthly-bill.json; K-30 v1 seed-booking-flow-a (visit-alex-haircut-1); A7-54 (Owen H.'s plan visit Sat Oct 31 with Riley)"
+    },
+    {
+      "file": "seed-pack-credits.json",
+      "version": "v1",
+      "table": "packs",
+      "expect": "accept",
+      "shows": "A pack charged when bought, and a credit against a booking line: Alex buys a pack of 5 visits for $160 on the yoga studio's secure page while booking a $35 Hot Flow class; the pack is charged at once through one K-07 stripe_charge effect (K-14 pack-purchase.json's), one payment (purpose pack, no booking) and one charge line; the pack holds 5 visit credits and its used count is 1, the one credit that pays the class's booking line (paid by credit)",
+      "source": "A5-22 ('A pack, membership or intro offer bought here is charged when bought, into the business's own Stripe'; 'This visit then uses a credit'); A5-03 ('The page shows the credits left after this visit'); A5-01; RULES 3.9; S13-55 ('A pack credit covers its own service only'); FS lines 738, 739; fixtures/v1/test-kit/shops/yoga.json (Hot Flow class $35 with a card saved for the $20 fee); K-14 v1 fixtures/pack-purchase.json; K-28 v1 seed-customer-mobile-email (customer-alex-yoga)"
+    },
+    {
+      "file": "seed-membership.json",
+      "version": "v1",
+      "table": "memberships",
+      "expect": "accept",
+      "shows": "A plan with its own yes, its card, and one charge after its reminder: Owen H.'s haircut plan at Lee's Barbershop with Riley, every 4 weeks on Saturdays, $35 a visit paid by the visit, renewing Sat Dec 26. Owen said yes to its terms on the page before any card (a K-29 plan_terms consent row, named not copied), and his card was saved for its charges. Fri Oct 30 at 10:00am the reminder of Saturday's $35 charge reached him (a delivered outbox row); Sat Oct 31, after the visit, $35 was charged on the saved card without him present: one plan charge for that visit names its reminder and its payment, which names its K-07 effect, and one charge line",
+      "source": "A5-21 ('The plan's terms, before any card'; 'Haircut plan · every 4 weeks'; 'Each visit: $35'); A7-32 ('Say Owen H. has a haircut plan with Riley, every 4 weeks'); A7-54 ('Each charge is told the day before'; 'Your haircut plan with Lee's Barbershop charges $35 to your saved card on Sat Oct 31'; 'Charged Sat Oct 31, after the visit'; Fri Oct 30, 10:00am); A7-91 ('renews on Sat Dec 26'); S13-39 ('No reminder that reached them: no charge'); RULES 3.9; FS line 737; FEES-TERMS-DRAFT 3.3; K-29 v1 consents (plan_terms); K-33 v1 fixtures/seed-monthly-bill.json (Owen H., booking-owen-plan-oct31)"
+    },
+    {
+      "file": "seed-fee-charged-twice.json",
+      "version": "v1",
+      "table": "reconciliation_runs",
+      "expect": "accept",
+      "shows": "A late-cancel fee taken only on the owner's yes, then charged twice and put right by the daily check: Dee cancels Saturday's beard trim after free cancel ended; Sam is asked (S11-25) and answers 1 Charge or keep it; the $20 fee is charged to the card saved for the booking through one K-07 effect, with its payment and charge line. A second charge under the same effect id appears on Stripe (K-14 list-double-charge.json). The check of Mon Nov 9, 03:00 UTC, over the last 48 hours finds it with no line and no agreed booking behind it: it writes its line and refunds it at once through the job's own K-07 stripe_refund effect (reason double_charge, decided at once, no payment named), with a new refund line, and records the finding",
+      "source": "S11-22 to S11-26; S13-55 ('With nothing paid now, it may be charged to the saved card, only with the owner's yes'; 'A charge made twice by mistake is refunded at once, without waiting for Sam'); S12-26; arch 10 line 550; RULES 3.3, 3.10; FS lines 732, 733; fixtures/v1/test-kit/shops/barber.json (Beard trim $20, the $20 fee); K-14 v1 fixtures/list-double-charge.json, refund-double-charge.json; K-07 v1 fixtures/effect-reconciliation-refund.json; K-30 v1 seed-terms-snapshot (Dee)"
+    },
+    {
+      "file": "invalid/refuse-ledger-update.json",
+      "version": "v1",
+      "table": "ledger_lines",
+      "expect": "refuse",
+      "shows": "Rewriting the deposit's ledger line to $140, even on the runtime side that writes lines, is refused (no update privilege on ledger_lines for either application role: SQLSTATE 42501); a new line is inserted instead",
+      "source": "arch 09 line 457 ('Ledger entry never edited'); arch 09 line 492 ('Ledger lines are never edited; a refund is a new line'); 02-contracts section 7 row K-32 (refuse-ledger-update.json)"
+    },
+    {
+      "file": "invalid/refuse-hold-payment.json",
+      "version": "v1",
+      "table": "payments",
+      "expect": "refuse",
+      "shows": "Alex's $40 deposit written as held on his card, to be captured later, instead of charged at once is refused (CHECK payments_state_known, SQLSTATE 23514: there is no held state, purpose or column); the same payment charged at once, state paid with its paid time, passes",
+      "source": "RULES 3.2 ('Nothing is ever held on a card'); S13-55; D65; K-14 v1 refuse-card-hold.json, intentState ('Stripe's requires_capture never comes'); 02-contracts section 7 row K-32 (refuse-hold-payment.json)"
+    },
+    {
+      "file": "invalid/refuse-payment-twice-one-effect.json",
+      "version": "v1",
+      "table": "payments",
+      "expect": "refuse",
+      "shows": "A retried result writing a second payment for the deposit's one effect is refused (unique payments_effect_key, SQLSTATE 23505): a charge maps one to one onto the effect that made it; the same row naming an effect of its own passes",
+      "source": "arch 09 line 457 ('Payment: idempotency key'); arch 10 lines 508, 542 ('A crash or retry never doubles or loses an effect'); K-07 v1 retry rule 8; S12-16 ('Nothing is charged twice')"
+    },
+    {
+      "file": "invalid/refuse-fee-on-silence.json",
+      "version": "v1",
+      "table": "booking_fees",
+      "expect": "refuse",
+      "shows": "Alex misses the Groom's package; Sam is asked about the no-show fee and does not answer by the deadline. Keeping the $40 deposit as the fee on that silence is refused (CHECK booking_fees_only_owner_yes_takes, SQLSTATE 23514); the same row dropped, with no fee, passes",
+      "source": "S11-25 ('Only Sam's yes takes it'; 'No answer in 24 hours: no fee'; RULE: 'only the owner's yes takes a fee, and silence never does'); RULES 3.3, 3.4 ('Silence charges nothing'); S13-26; S13-55"
+    },
+    {
+      "file": "invalid/refuse-cross-business-payment-read.json",
+      "version": "v1",
+      "table": "payments",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio does not see Lee's Barbershop's payment from Alex, though Alex is the yoga studio's customer too (row-level security per business: no row); the barbershop's own scope sees it",
+      "source": "arch 10 line 546; K-04 v1 rule 4; RULES 4.10 ('never joined across businesses'); S13-42"
+    },
+    {
+      "file": "invalid/refuse-card-number-saved.json",
+      "version": "v1",
+      "table": "saved_cards",
+      "expect": "refuse",
+      "shows": "A saved card whose payment-method id is a card number is refused (CHECK saved_cards_no_card_number, SQLSTATE 23514); the same row with Stripe's opaque payment-method id passes",
+      "source": "RULES 4.5 ('Never kept at all: full card numbers outside the card box'); RULES 3.12; BP rule 7; K-33 v1 refuse-card-number-stored.json"
+    },
+    {
+      "file": "invalid/refuse-pack-over-credits.json",
+      "version": "v1",
+      "table": "packs",
+      "expect": "refuse",
+      "shows": "Raising the pack's used count to 6 of its 5 visits is refused (CHECK packs_credits_within_total, SQLSTATE 23514), so two bookings cannot both take its last credit; raising it to 2 passes",
+      "source": "FS line 738 (credits_total, credits_left); A5-03; S13-55 ('A pack of hours or dollars that runs short: the gap shows before the yes'); arch 10 line 510 (a counter with CHECK)"
+    },
+    {
+      "file": "invalid/refuse-rosfield-fee-update.json",
+      "version": "v1",
+      "table": "rosfield_fees",
+      "expect": "refuse",
+      "shows": "Setting Ben T.'s counted $2 to $0, after Sam questioned its bill line, is refused (no update privilege on rosfield_fees: SQLSTATE 42501); a wrong line comes off on the bill instead, as K-33's answer to the question",
+      "source": "S11-66 ('Sam can question a line in the portal before the charge. A person on Rosie's team answers, and a wrong line comes off'); FEES-TERMS-DRAFT 2.12; K-33 v1 monthly_bill_lines (outcome removed); Q-22"
+    }
+  ]
+}

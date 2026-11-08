@@ -1,0 +1,84 @@
+{
+  "after": ["seed-payment-deposit.json"],
+  "rows": [
+    {
+      "table": "booking_visits",
+      "values": {
+        "id": "visit-alex-grooms-1",
+        "booking_id": "booking-alex-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "reservation_id": null,
+        "arrival_window": null,
+        "cutoff_at": null,
+        "check_in_code": null,
+        "code_for_person_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-s11-25-alex-grooms",
+        "turn_id": "turn-alex-grooms-1",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-grooms-package",
+        "step": "S11-25",
+        "options": [
+          { "id": "S11-25/1", "label": "Charge or keep it" },
+          { "id": "S11-25/2", "label": "No fee" }
+        ],
+        "readback": "Alex M. missed the Groom's package and didn't answer. / Charge or keep the no-show fee? / Alex agreed to it when booking / $40 deposit paid / Reply 1 Charge or keep it, 2 No fee.",
+        "versions_read": [{ "table": "bookings", "rowId": "booking-alex-grooms-package", "version": 2 }],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "24 hours",
+        "ask_count": 1,
+        "status": "defaulted",
+        "answered_option_id": null,
+        "closed_at": "2026-11-15T15:30:00Z",
+        "version": 3
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "booking_fees",
+    "values": {
+      "id": "fee-alex-grooms-no-show",
+      "business_id": "biz-lees-barbershop",
+      "booking_id": "booking-alex-grooms-package",
+      "visit_id": "visit-alex-grooms-1",
+      "kind": "no_show",
+      "amount_cents": 4000,
+      "currency": "USD",
+      "comes_from": "payment",
+      "from_payment_id": "pay-alex-grooms-deposit",
+      "saved_card_id": null,
+      "credit_id": null,
+      "open_question_id": "oq-s11-25-alex-grooms",
+      "asked_at": "2026-11-14T15:30:00Z",
+      "answer_by": "2026-11-15T15:30:00Z",
+      "reminded_at": "2026-11-14T16:00:00Z",
+      "answer": "no_answer",
+      "answered_at": "2026-11-15T15:30:00Z",
+      "answered_by_person_id": null,
+      "answered_by_role": null,
+      "option_id": null,
+      "event_id": null,
+      "state": "charged",
+      "ended_at": "2026-11-15T15:30:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["booking_fees_only_owner_yes_takes"]
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "after": ["seed-payment-deposit.json"],
+  "rows": [
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-grooms-save-card-2",
+        "turn_id": "turn-alex-grooms-card",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-grooms-package",
+        "kind": "stripe_save_card",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": null,
+        "currency": null,
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "customerId": "stripe-customer-demo-alex"
+        },
+        "idempotency_key": "eff-alex-grooms-save-card-2",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-07T15:30:01Z",
+        "last_try_at": "2026-11-07T15:30:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-setup-demo-alex-3",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-alex-0099",
+        "created_at": "2026-11-07T15:30:00Z",
+        "version": 3
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "saved_cards",
+    "values": {
+      "id": "card-alex-grooms-package-2",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-alex",
+      "booking_id": "booking-alex-grooms-package",
+      "membership_id": null,
+      "stripe_customer_id": "stripe-customer-demo-alex",
+      "stripe_payment_method_id": "0000 1111 2222 3333",
+      "save_effect_id": "eff-alex-grooms-save-card-2",
+      "saved_from_payment_id": null,
+      "asked_at": "2026-11-07T15:30:00Z",
+      "saved_at": "2026-11-07T15:30:40Z",
+      "replaced_at": null,
+      "removed_at": null,
+      "removed_why": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["saved_cards_no_card_number"]
+    }
+  }
+}

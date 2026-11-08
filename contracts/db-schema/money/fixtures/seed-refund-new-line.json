@@ -1,0 +1,311 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-person-roles.json",
+    "../../services-prices/fixtures/seed-price-rule-dates.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-signature-1",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0110"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0110",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-07T16:10:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-signature-cut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "done",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-signature-cut-1",
+        "booking_id": "booking-alex-signature-cut",
+        "business_id": "biz-lees-barbershop",
+        "position": 1,
+        "service_id": "svc-lees-signature-cut",
+        "service_money_id": "way-lees-signature-cut-shop",
+        "price_rule_id": "price-lees-signature-cut",
+        "quote_option_id": null,
+        "path": "list|full|none",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 5500,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "money",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-signature-cut-full",
+        "turn_id": "turn-alex-signature-1",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "kind": "stripe_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": 5500,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "purpose": "fullPrice",
+          "customerId": "stripe-customer-demo-alex",
+          "paymentMethodId": "stripe-card-demo-alex",
+          "customerPresent": true,
+          "description": "Lee's Barbershop: Signature cut and hot towel shave, paid in full"
+        },
+        "idempotency_key": "eff-alex-signature-cut-full",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-07T16:10:01Z",
+        "last_try_at": "2026-11-07T16:10:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-0003",
+        "error_code": null,
+        "ledger_line_id": "ledger-alex-signature-cut-full",
+        "trace_id": "trace-alex-0110",
+        "created_at": "2026-11-07T16:10:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-alex-signature-cut-full",
+        "business_id": "biz-lees-barbershop",
+        "payer_person_id": "person-alex",
+        "booking_id": "booking-alex-signature-cut",
+        "purpose": "full_price",
+        "method": "card",
+        "amount_cents": 5500,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-alex-signature-cut-full",
+        "saved_card_id": null,
+        "booking_fee_id": null,
+        "recorded_by_person_id": null,
+        "asked_at": "2026-11-07T16:10:00Z",
+        "paid_at": "2026-11-07T16:10:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "payment_items",
+      "values": {
+        "id": "item-alex-signature-cut-full-1",
+        "payment_id": "pay-alex-signature-cut-full",
+        "business_id": "biz-lees-barbershop",
+        "booking_line_id": "line-alex-signature-cut-1",
+        "share": "full",
+        "amount_cents": 5500,
+        "currency": "USD"
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-alex-signature-cut-full",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "kind": "charge",
+        "amount_cents": 5500,
+        "currency": "USD",
+        "payment_id": "pay-alex-signature-cut-full",
+        "refund_id": null,
+        "effect_id": "eff-alex-signature-cut-full",
+        "stripe_object_id": "stripe-charge-demo-0003",
+        "moved_at": "2026-11-07T16:10:02Z",
+        "written_by": "effect_result",
+        "written_at": "2026-11-07T16:10:02Z"
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-money-back",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0111"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0111",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-08T15:00:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a10-09-alex-signature",
+        "turn_id": "turn-alex-money-back",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "step": "A10-09",
+        "options": [
+          { "id": "A10-09/1", "label": "Refund it" },
+          { "id": "A10-09/2", "label": "Keep it" }
+        ],
+        "readback": "Alex M. asked for money back for Saturday's visit. No answer by Mon 10am: one reminder, then the payment stays as it is. / Reply 1 Refund it, 2 Keep it.",
+        "versions_read": [
+          { "table": "bookings", "rowId": "booking-alex-signature-cut", "version": 4 },
+          { "table": "payments", "rowId": "pay-alex-signature-cut-full", "version": 2 }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "1 day",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": null,
+        "closed_at": "2026-11-08T16:59:30Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-refund-part",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0071"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0071",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-08T17:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-signature-cut-part-refund",
+        "turn_id": "turn-sam-refund-part",
+        "job_id": null,
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "kind": "stripe_refund",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": 2000,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+          "paymentId": "stripe-payment-demo-0003",
+          "reason": "requestedByCustomer"
+        },
+        "idempotency_key": "eff-alex-signature-cut-part-refund",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-08T17:00:01Z",
+        "last_try_at": "2026-11-08T17:00:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-refund-demo-0003",
+        "error_code": null,
+        "ledger_line_id": "ledger-alex-signature-cut-part-refund",
+        "trace_id": "trace-sam-0071",
+        "created_at": "2026-11-08T17:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "refunds",
+      "values": {
+        "id": "refund-alex-signature-cut-part",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "booking_line_id": "line-alex-signature-cut-1",
+        "payment_id": "pay-alex-signature-cut-full",
+        "charge_line_id": "ledger-alex-signature-cut-full",
+        "to_person_id": "person-alex",
+        "via": "stripe",
+        "reason": "owner_part",
+        "decided_by": "owner",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "effect_id": "eff-alex-signature-cut-part-refund",
+        "answered_by_person_id": "person-sam",
+        "answered_by_role": "owner",
+        "open_question_id": "oq-a10-09-alex-signature",
+        "option_id": null,
+        "event_id": "evt-sam-0071",
+        "answered_at": "2026-11-08T16:59:30Z",
+        "marked_done_by_person_id": null,
+        "state": "succeeded",
+        "asked_at": "2026-11-08T17:00:00Z",
+        "refunded_at": "2026-11-08T17:00:02Z",
+        "failed_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-alex-signature-cut-part-refund",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-signature-cut",
+        "kind": "refund",
+        "amount_cents": 2000,
+        "currency": "USD",
+        "payment_id": null,
+        "refund_id": "refund-alex-signature-cut-part",
+        "effect_id": "eff-alex-signature-cut-part-refund",
+        "stripe_object_id": "stripe-refund-demo-0003",
+        "moved_at": "2026-11-08T17:00:02Z",
+        "written_by": "effect_result",
+        "written_at": "2026-11-08T17:00:02Z"
+      }
+    }
+  ]
+}

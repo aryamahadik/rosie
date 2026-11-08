@@ -1,0 +1,254 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../customers/fixtures/seed-customer-mobile-email.json",
+    "../../kinds-of-work/fixtures/seed-kinds-sample.json"
+  ],
+  "rows": [
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-yoga-studio",
+        "business_id": "biz-yoga-studio",
+        "kind": "shop",
+        "name": null,
+        "address": "123 Demo St, Anytown",
+        "map_point": null,
+        "end_address": null,
+        "travel_miles": null,
+        "travel_centre": null,
+        "travel_centre_address": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-yoga-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "kind_id": "yoga",
+        "name": "Hot Flow class",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "60 minutes",
+        "position": 1,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-yoga-hot-flow-studio",
+        "service_id": "svc-yoga-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-yoga-studio",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-yoga-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "service_id": "svc-yoga-hot-flow",
+        "price_cents": 3500,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-20T13:00:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-hot-flow-1",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0120"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0120",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-11-05T15:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 2
+      }
+    },
+    {
+      "table": "booking_lines",
+      "values": {
+        "id": "line-alex-hot-flow-1",
+        "booking_id": "booking-alex-hot-flow",
+        "business_id": "biz-yoga-studio",
+        "position": 1,
+        "service_id": "svc-yoga-hot-flow",
+        "service_money_id": "way-yoga-hot-flow-studio",
+        "price_rule_id": "price-yoga-hot-flow",
+        "quote_option_id": null,
+        "path": "list|card|counter",
+        "price_kind": "one_price",
+        "unit": null,
+        "units": 1,
+        "price_cents": 3500,
+        "up_to_cents": null,
+        "from_cents": null,
+        "deposit_cents": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "paid_by": "credit",
+        "state": "open",
+        "removed_at": null,
+        "removed_by_change_id": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "eff-alex-hot-flow-pack",
+        "turn_id": "turn-alex-hot-flow-1",
+        "job_id": null,
+        "business_id": "biz-yoga-studio",
+        "booking_id": null,
+        "kind": "stripe_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-alex",
+        "handle_id": null,
+        "amount_cents": 16000,
+        "currency": "USD",
+        "port_request": {
+          "account": { "kind": "business", "accountId": "stripe-acct-demo-yoga-studio" },
+          "purpose": "pack",
+          "customerId": "stripe-customer-demo-alex-yoga-studio",
+          "paymentMethodId": "stripe-card-demo-alex-yoga-studio",
+          "customerPresent": true,
+          "description": "Yoga studio: pack of 5 visits"
+        },
+        "idempotency_key": "eff-alex-hot-flow-pack",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-05T15:00:01Z",
+        "last_try_at": "2026-11-05T15:00:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-payment-demo-yoga-0002",
+        "error_code": null,
+        "ledger_line_id": "ledger-alex-hot-flow-pack",
+        "trace_id": "trace-alex-0120",
+        "created_at": "2026-11-05T15:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "payments",
+      "values": {
+        "id": "pay-alex-hot-flow-pack",
+        "business_id": "biz-yoga-studio",
+        "payer_person_id": "person-alex",
+        "booking_id": null,
+        "purpose": "pack",
+        "method": "card",
+        "amount_cents": 16000,
+        "currency": "USD",
+        "state": "paid",
+        "effect_id": "eff-alex-hot-flow-pack",
+        "saved_card_id": null,
+        "booking_fee_id": null,
+        "recorded_by_person_id": null,
+        "asked_at": "2026-11-05T15:00:00Z",
+        "paid_at": "2026-11-05T15:00:02Z",
+        "failed_at": null,
+        "failed_why": null,
+        "cancelled_at": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "ledger_lines",
+      "values": {
+        "id": "ledger-alex-hot-flow-pack",
+        "business_id": "biz-yoga-studio",
+        "booking_id": null,
+        "kind": "charge",
+        "amount_cents": 16000,
+        "currency": "USD",
+        "payment_id": "pay-alex-hot-flow-pack",
+        "refund_id": null,
+        "effect_id": "eff-alex-hot-flow-pack",
+        "stripe_object_id": "stripe-charge-demo-yoga-0002",
+        "moved_at": "2026-11-05T15:00:02Z",
+        "written_by": "effect_result",
+        "written_at": "2026-11-05T15:00:02Z"
+      }
+    },
+    {
+      "table": "packs",
+      "values": {
+        "id": "pack-alex-yoga-5-visits",
+        "business_id": "biz-yoga-studio",
+        "person_id": "person-alex",
+        "service_id": "svc-yoga-hot-flow",
+        "name": "Pack of 5 visits",
+        "unit": "visit",
+        "credits_total": 5,
+        "credits_used": 1,
+        "price_cents": 16000,
+        "currency": "USD",
+        "bought_at": "2026-11-05T15:00:02Z",
+        "bought_via": "rosie",
+        "payment_id": "pay-alex-hot-flow-pack",
+        "recorded_by_person_id": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "credits",
+      "values": {
+        "id": "credit-alex-hot-flow-1",
+        "business_id": "biz-yoga-studio",
+        "pack_id": "pack-alex-yoga-5-visits",
+        "membership_id": null,
+        "booking_line_id": "line-alex-hot-flow-1",
+        "units": 1,
+        "used_at": "2026-11-05T15:00:03Z",
+        "returned_at": null,
+        "returned_why": null,
+        "version": 1
+      }
+    }
+  ]
+}
