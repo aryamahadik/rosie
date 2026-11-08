@@ -15,6 +15,8 @@
 // while the flag holds the owner decides that work, so the question goes to the decider's own chat; no other limit runs
 // for it. Reads go through the call's database transaction, under its business scope, only for a part a flag could
 // forbid; what is returned, thrown or logged names flags, limits and row ids, never a number, a name or anyone's words.
+// In the registry, slot 1 is limit 1 whole behind the flags (T-1115; DL-202): it keeps limit 1's decide, which does not
+// look at the flags, so a reader of the slot asks flags first and reads decide only for a part the flags pass.
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   1. K-09 v1 has no outcome of its own for a record flag (partResult names limits 1 to 6), so a part a flag forbids is
@@ -31,7 +33,7 @@ import { getBookingHead } from "../../../../db/repo/bookings-head";
 import { listOpenPausesOfPerson, listOpenPausesOfPhone } from "../../../../db/repo/phones";
 import type { Sql, Tx } from "../../../../db/repo/scope";
 import { holdClassOf } from "../../commit/hold";
-import type { GatePart, GateTurn, Limit, LimitRegistry, LimitVerdict } from "../framework";
+import type { GatePart, GateTurn, Limit, LimitVerdict } from "../framework";
 
 /** A flag that forbids a part's work at the gate. */
 export type GateFlag = "paused" | "deceased";
@@ -170,14 +172,27 @@ export interface GateFlagsDeps {
   readonly reads?: (repo: unknown) => GateFlagReads;
 }
 
-/** Slot 1 of the registry with the flags check before limit 1: the decision the commit's outcome writer may read. */
-export interface FlagsFirstLimit<Repo> extends Limit<1, Repo> {
-  flags(part: GatePart, turn: GateTurn<Repo>): Promise<FlagDecision>;
-}
+/** The members slot 1 sets itself; every other member is the wrapped limit's own, kept as it is. */
+type SetBySlot = "limit" | "flags" | "check";
 
-/** The registry with the flags first: slot 1 checks them before limit 1; slots 2 to 6 are the limits as given. */
-export type FlagsFirstRegistry<Repo> = readonly [
-  FlagsFirstLimit<Repo>,
+/**
+ * Slot 1 of the registry: limit 1 whole, behind the flags check (DL-202). It keeps every member of `One`, the limit it
+ * wraps (limit 1's decide among them, with its own type: the full decision the commit's outcome writer reads), and adds
+ * flags. Its check asks the flags first: a part a flag holds fails with ASKED_DECIDER and limit 1 does not run; any other
+ * part gets limit 1's own verdict. A kept member does not look at the flags, so a reader of the slot asks flags first,
+ * and reads decide only for a part the flags pass, the same order check uses.
+ */
+export type FlagsFirstLimit<One extends Limit<1, Repo>, Repo = unknown> = Omit<One, SetBySlot> & {
+  readonly limit: 1;
+  /** What the flags say about the part: asked first, before anything limit 1 carries. */
+  flags(part: GatePart, turn: GateTurn<Repo>): Promise<FlagDecision>;
+  /** The flags, then limit 1's own check for a part they pass. */
+  check(part: GatePart, turn: GateTurn<Repo>): Promise<LimitVerdict<1>>;
+};
+
+/** The registry with the flags first: slot 1 is `One` whole behind them; slots 2 to 6 are the limits as given. */
+export type FlagsFirstRegistry<One extends Limit<1, Repo>, Repo = unknown> = readonly [
+  FlagsFirstLimit<One, Repo>,
   Limit<2, Repo>,
   Limit<3, Repo>,
   Limit<4, Repo>,
@@ -186,14 +201,16 @@ export type FlagsFirstRegistry<Repo> = readonly [
 ];
 
 /**
- * Limits 1 to 6 with the flags checked first (the module note): slot 1 asks the flags before limit 1, and a part a flag
- * forbids fails there with ASKED_DECIDER, so no limit runs for it; every other part takes limit 1 as it is. Slots 2 to 6
+ * Limits 1 to 6 with the flags checked first (the module note). Slot 1 is limit 1 whole behind the flags: every member
+ * limit 1 carries, its decide among them, plus flags. Its check asks the flags first, and a part a flag forbids fails
+ * there with ASKED_DECIDER, so no limit runs for it; every other part takes limit 1 as it is. Limit 1's decide does not
+ * look at the flags: a reader of the slot asks flags first, and reads decide only for a part the flags pass. Slots 2 to 6
  * are the limits themselves, unchanged.
  */
-export function flagsFirst<Repo>(
-  limits: LimitRegistry<Repo>,
+export function flagsFirst<One extends Limit<1, Repo>, Repo = unknown>(
+  limits: readonly [One, Limit<2, Repo>, Limit<3, Repo>, Limit<4, Repo>, Limit<5, Repo>, Limit<6, Repo>],
   deps: GateFlagsDeps = {},
-): FlagsFirstRegistry<Repo> {
+): FlagsFirstRegistry<One, Repo> {
   const [one, two, three, four, five, six] = limits;
   const readsOf = deps.reads ?? ((repo: unknown) => gateFlagReadsOf(flagsDatabaseOf(repo)));
   const flags = (part: GatePart, turn: GateTurn<Repo>): Promise<FlagDecision> => {
@@ -201,13 +218,10 @@ export function flagsFirst<Repo>(
     return decideFlags(part, turn, () => (made ??= readsOf(turn.repo)));
   };
   const held: LimitVerdict<1> = { result: "fail", outcome: ASKED_DECIDER };
-  const first: FlagsFirstLimit<Repo> = {
-    limit: 1,
-    flags,
-    async check(part, turn) {
-      const decision = await flags(part, turn);
-      return decision.result === "held" ? { ...held, outcome: { ...ASKED_DECIDER } } : one.check(part, turn);
-    },
+  const check = async (part: GatePart, turn: GateTurn<Repo>): Promise<LimitVerdict<1>> => {
+    const decision = await flags(part, turn);
+    return decision.result === "held" ? { ...held, outcome: { ...ASKED_DECIDER } } : one.check(part, turn);
   };
+  const first: FlagsFirstLimit<One, Repo> = { ...one, limit: 1, flags, check };
   return [first, two, three, four, five, six];
 }

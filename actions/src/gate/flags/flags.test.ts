@@ -18,6 +18,7 @@ import {
   type GatePart,
   type GateRequest,
   type GateTurn,
+  type LimitVerdict,
 } from "../framework";
 import {
   callContext,
@@ -135,6 +136,34 @@ describe("the registry checks the flags first, then limits 1 to 6 as they are", 
 
   it("the outcome a flag gives is K-09 v1's limit 1 askedDecider (ask), the one the gate holds limit 1 to", () => {
     expect(ASKED_DECIDER).toEqual({ limit: 1, outcome: "ask", action: "askedDecider" });
+  });
+
+  it("slot 1 keeps every member of the limit it wraps; a part a flag holds still fails with ASKED_DECIDER, its check not run", async () => {
+    const ran: LimitCall[] = [];
+    // A limit 1 double with a member beyond the Limit interface, as the shipped limit 1 carries its decide (T-299).
+    const wrapped = {
+      limit: 1 as const,
+      decide: (): Promise<string> => Promise.resolve("the double's own decision"),
+      check: (part: GatePart): Promise<LimitVerdict<1>> => {
+        ran.push({ limit: 1, part: part.index });
+        return Promise.resolve({ result: "pass" });
+      },
+    };
+    const [, two, three, four, five, six] = scriptedLimits();
+    const slotOver = (reads: GateFlagReads) =>
+      flagsFirst([wrapped, two, three, four, five, six], { reads: () => reads })[0];
+    const slot = slotOver(readsOf({ persons: { "person-alex": [PAUSE_HERE] }, heads: [nov14()] }));
+    // Kept whole, with its own type: the typecheck reads the slot's decide as the double's.
+    const decide: () => Promise<string> = slot.decide;
+    expect(decide).toBe(wrapped.decide);
+    expect(slot.limit).toBe(1);
+    const { part, turn } = partAndTurn(alexOnNov14());
+    expect(await slot.check(part, turn)).toEqual({ result: "fail", outcome: ASKED_DECIDER });
+    expect(ran).toEqual([]);
+    // No flag holds the same part: the slot runs the wrapped check and gives its verdict.
+    const open = slotOver(readsOf({ heads: [nov14()] }));
+    expect(await open.check(part, turn)).toEqual({ result: "pass" });
+    expect(ran).toEqual([{ limit: 1, part: 0 }]);
   });
 });
 
