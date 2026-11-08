@@ -1,0 +1,57 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-flow-b.json"],
+  "rows": [
+    {
+      "table": "visit_marks",
+      "values": {
+        "visit_id": "visit-alex-drain-1",
+        "booking_id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "checked_in_at": "2026-10-22T12:20:00Z",
+        "checked_in_how": "code",
+        "checked_in_by_person_id": "person-jordan",
+        "checked_in_via": "staff_text",
+        "wrong_try_1_at": null,
+        "wrong_try_2_at": null,
+        "wrong_try_3_at": null,
+        "tries_told_at": null,
+        "no_code_at": null,
+        "left_at": null,
+        "ended_at": null,
+        "ended_how": null,
+        "done_by_person_id": null,
+        "done_via": null,
+        "side": null,
+        "customer_state": null,
+        "stopped_why": null,
+        "stopped_found": null,
+        "done_price_id": null,
+        "photo_key": null,
+        "report_by": null,
+        "version": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "update",
+    "table": "visit_marks",
+    "set": {
+      "ended_at": "2026-10-22T12:45:00Z",
+      "ended_how": "stopped",
+      "side": "business",
+      "stopped_why": "first_step",
+      "version": 2
+    },
+    "where": {
+      "visit_id": "visit-alex-drain-1"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_marks_stopped_why_known"]
+    }
+  }
+}

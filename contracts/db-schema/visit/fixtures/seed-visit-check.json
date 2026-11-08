@@ -1,0 +1,159 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-terms-snapshot.json", "../../core/fixtures/seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-clock-night-dee-skin-fade",
+        "handle_id": "handle-sam",
+        "event_ids": ["clock-night-dee-skin-fade"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-clock-night-dee-skin-fade",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-25T00:00:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-a8-47-dee-skin-fade",
+        "turn_id": "turn-clock-night-dee-skin-fade",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-dee-skin-fade",
+        "step": "A8-47",
+        "options": [
+          {
+            "id": "A8-47/1",
+            "label": "Yes, mark it done"
+          },
+          {
+            "id": "A8-47/2",
+            "label": "It didn't happen"
+          }
+        ],
+        "readback": null,
+        "versions_read": [
+          {
+            "table": "bookings",
+            "rowId": "booking-dee-skin-fade",
+            "version": 4
+          },
+          {
+            "table": "booking_visits",
+            "rowId": "visit-dee-skin-fade-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "by the next evening",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "A8-47/1",
+        "closed_at": "2026-10-25T00:12:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "visit_marks",
+      "values": {
+        "visit_id": "visit-dee-skin-fade-1",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "checked_in_at": null,
+        "checked_in_how": null,
+        "checked_in_by_person_id": null,
+        "checked_in_via": null,
+        "wrong_try_1_at": null,
+        "wrong_try_2_at": null,
+        "wrong_try_3_at": null,
+        "tries_told_at": null,
+        "no_code_at": null,
+        "left_at": null,
+        "ended_at": "2026-10-25T00:12:00Z",
+        "ended_how": "done",
+        "done_by_person_id": "person-sam",
+        "done_via": "owner_yes",
+        "side": null,
+        "stopped_why": null,
+        "done_price_id": null,
+        "photo_key": null,
+        "report_by": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-clock-visit-check-dee-skin-fade",
+        "handle_id": "handle-dee",
+        "event_ids": ["clock-visit-check-dee-skin-fade"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-clock-visit-check-dee-skin-fade",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-25T14:00:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-visit-check-dee-skin-fade",
+        "turn_id": "turn-clock-visit-check-dee-skin-fade",
+        "handle_id": "handle-dee",
+        "person_id": "person-dee",
+        "business_id": null,
+        "booking_id": "booking-dee-skin-fade",
+        "step": "A8-47",
+        "options": [
+          {
+            "id": "A8-47/1",
+            "label": "Yes"
+          },
+          {
+            "id": "A8-47/2",
+            "label": "No"
+          }
+        ],
+        "readback": null,
+        "versions_read": [],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": null,
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "A8-47/2",
+        "closed_at": "2026-10-25T14:20:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "visit_checks",
+      "values": {
+        "id": "vcheck-dee-skin-fade",
+        "visit_id": "visit-dee-skin-fade-1",
+        "booking_id": "booking-dee-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-dee",
+        "handle_id": "handle-dee",
+        "channel": "text",
+        "asked_at": "2026-10-25T14:00:02Z",
+        "open_question_id": "oq-visit-check-dee-skin-fade",
+        "answer": "no",
+        "answered_at": "2026-10-25T14:20:00Z",
+        "version": 2
+      }
+    }
+  ]
+}

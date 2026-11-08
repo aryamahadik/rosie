@@ -1,0 +1,43 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-flow-a.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "visit_marks",
+    "values": {
+      "visit_id": "visit-alex-haircut-1",
+      "booking_id": "booking-alex-haircut",
+      "business_id": "biz-lees-barbershop",
+      "checked_in_at": null,
+      "checked_in_how": null,
+      "checked_in_by_person_id": null,
+      "checked_in_via": null,
+      "wrong_try_1_at": null,
+      "wrong_try_2_at": null,
+      "wrong_try_3_at": null,
+      "tries_told_at": null,
+      "no_code_at": null,
+      "left_at": null,
+      "ended_at": "2026-10-24T15:05:00Z",
+      "ended_how": "not_started",
+      "done_by_person_id": null,
+      "done_via": null,
+      "side": "customer_state",
+      "customer_state": null,
+      "stopped_why": null,
+      "stopped_found": null,
+      "done_price_id": null,
+      "photo_key": null,
+      "report_by": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_marks_side_known"]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "after": ["seed-check-in.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "visit_marks",
+    "set": {
+      "checked_in_by_person_id": "person-avery",
+      "version": 4
+    },
+    "where": {
+      "visit_id": "visit-alex-haircut-1"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_marks_set_once"]
+    }
+  }
+}

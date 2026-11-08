@@ -1,0 +1,41 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-terms-snapshot.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "visit_marks",
+    "values": {
+      "visit_id": "visit-dee-skin-fade-1",
+      "booking_id": "booking-dee-skin-fade",
+      "business_id": "biz-lees-barbershop",
+      "checked_in_at": "2026-10-24T14:03:00Z",
+      "checked_in_how": "code",
+      "checked_in_by_person_id": "person-riley",
+      "checked_in_via": "staff_text",
+      "wrong_try_1_at": "2026-10-24T14:01:00Z",
+      "wrong_try_2_at": "2026-10-24T14:01:40Z",
+      "wrong_try_3_at": "2026-10-24T14:02:20Z",
+      "tries_told_at": "2026-10-24T14:02:22Z",
+      "no_code_at": null,
+      "left_at": null,
+      "ended_at": null,
+      "ended_how": null,
+      "done_by_person_id": null,
+      "done_via": null,
+      "side": null,
+      "stopped_why": null,
+      "done_price_id": null,
+      "photo_key": null,
+      "report_by": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["visit_marks_code_before_third"]
+    }
+  }
+}

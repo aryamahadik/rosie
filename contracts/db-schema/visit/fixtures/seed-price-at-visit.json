@@ -1,0 +1,220 @@
+{
+  "after": ["seed-late-fan-out.json"],
+  "rows": [
+    {
+      "table": "visit_marks",
+      "values": {
+        "visit_id": "visit-drew-heater-flush-1",
+        "booking_id": "booking-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "checked_in_at": "2026-10-22T16:35:00Z",
+        "checked_in_how": "code",
+        "checked_in_by_person_id": "person-jordan",
+        "checked_in_via": "staff_text",
+        "wrong_try_1_at": null,
+        "wrong_try_2_at": null,
+        "wrong_try_3_at": null,
+        "tries_told_at": null,
+        "no_code_at": null,
+        "left_at": null,
+        "ended_at": null,
+        "ended_how": null,
+        "done_by_person_id": null,
+        "done_via": null,
+        "side": null,
+        "stopped_why": null,
+        "done_price_id": null,
+        "photo_key": null,
+        "report_by": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-jordan-extra-drew",
+        "handle_id": "handle-jordan",
+        "event_ids": ["evt-jordan-0081"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-jordan-0081",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-22T16:50:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-send-drew-extra",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0081"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0081",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-22T16:55:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-b8-92-drew-extra",
+        "turn_id": "turn-jordan-extra-drew",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-home-services",
+        "booking_id": "booking-drew-heater-flush",
+        "step": "B8-92",
+        "options": [
+          {
+            "id": "B8-92/1",
+            "label": "Send it"
+          },
+          {
+            "id": "B8-92/2",
+            "label": "Change it"
+          }
+        ],
+        "readback": "Jordan's price for extra work at Drew's is $620, over your $500 limit. No answer in 30 minutes: Drew is told it's with you. / Extra work · $620 / Shutoff valve and wall pipe · $540 / Supply line · $80 / Reply 1 Send it, 2 Change it.",
+        "versions_read": [
+          {
+            "table": "booking_visits",
+            "rowId": "visit-drew-heater-flush-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": "30 min",
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "B8-92/1",
+        "closed_at": "2026-10-22T16:55:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-b8-23-drew-extra",
+        "turn_id": "turn-sam-send-drew-extra",
+        "handle_id": "handle-drew",
+        "person_id": "person-drew",
+        "business_id": "biz-lee-home-services",
+        "booking_id": "booking-drew-heater-flush",
+        "step": "B8-23",
+        "options": [
+          {
+            "id": "B8-23/1",
+            "label": "Yes, do it"
+          },
+          {
+            "id": "B8-23/2",
+            "label": "No, just the booked work"
+          },
+          {
+            "id": "B8-23/3",
+            "label": "OK some lines"
+          }
+        ],
+        "readback": "Jordan found more work. Add it today? / Shutoff valve and wall pipe · $540 / Supply line · $80 / Done today, if you say yes / Paid with the rest of your visit / Reply 1 Yes, do it, 2 No, just the booked work, 3 OK some lines.",
+        "versions_read": [
+          {
+            "table": "booking_visits",
+            "rowId": "visit-drew-heater-flush-1",
+            "version": 1
+          }
+        ],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "clock": null,
+        "ask_count": 1,
+        "status": "answered",
+        "answered_option_id": "B8-23/3",
+        "closed_at": "2026-10-22T17:02:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "visit_prices",
+      "values": {
+        "id": "price-drew-extra-valves",
+        "visit_id": "visit-drew-heater-flush-1",
+        "booking_id": "booking-drew-heater-flush",
+        "business_id": "biz-lee-home-services",
+        "kind": "extra",
+        "replaces_price_id": null,
+        "priced_by_person_id": "person-jordan",
+        "priced_at": "2026-10-22T16:50:00Z",
+        "total_cents": 62000,
+        "currency": "USD",
+        "included_cents": null,
+        "price_ok_limit_id": "pok-lee-home-services",
+        "rule_id": null,
+        "owner_asked_at": "2026-10-22T16:50:02Z",
+        "owner_answer_by": "2026-10-22T17:20:02Z",
+        "owner_reminded_at": null,
+        "owner_answer": "send",
+        "owner_answered_at": "2026-10-22T16:55:00Z",
+        "owner_answered_by_person_id": "person-sam",
+        "owner_answered_by_role": "owner",
+        "owner_open_question_id": "oq-b8-92-drew-extra",
+        "owner_option_id": "B8-92/1",
+        "owner_event_id": "evt-sam-0081",
+        "shown_at": "2026-10-22T16:55:02Z",
+        "customer_open_question_id": "oq-b8-23-drew-extra",
+        "customer_reminded_at": null,
+        "customer_answer": "some_lines",
+        "customer_answered_at": "2026-10-22T17:02:00Z",
+        "yes_where": "own_chat",
+        "yes_on_phone_of_person_id": null,
+        "good_until": "2026-10-29",
+        "version": 3
+      }
+    },
+    {
+      "table": "visit_price_lines",
+      "values": {
+        "id": "pline-drew-extra-valves-1",
+        "price_id": "price-drew-extra-valves",
+        "business_id": "biz-lee-home-services",
+        "position": 1,
+        "kind": "work",
+        "words": "Shutoff valve and wall pipe",
+        "amount_cents": 54000,
+        "currency": "USD",
+        "booking_line_id": null,
+        "from_line_id": null,
+        "receipt_key": null,
+        "customer_ok": "yes",
+        "version": 2
+      }
+    },
+    {
+      "table": "visit_price_lines",
+      "values": {
+        "id": "pline-drew-extra-valves-2",
+        "price_id": "price-drew-extra-valves",
+        "business_id": "biz-lee-home-services",
+        "position": 2,
+        "kind": "work",
+        "words": "Supply line",
+        "amount_cents": 8000,
+        "currency": "USD",
+        "booking_line_id": null,
+        "from_line_id": null,
+        "receipt_key": null,
+        "customer_ok": "no",
+        "version": 2
+      }
+    }
+  ]
+}

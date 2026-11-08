@@ -1,0 +1,35 @@
+{
+  "after": ["../../bookings-changes/fixtures/seed-booking-line-price-copied.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "no_shows",
+    "values": {
+      "visit_id": "visit-dee-haircut-1",
+      "booking_id": "booking-dee-haircut",
+      "business_id": "biz-lees-barbershop",
+      "marked_at": "2026-11-07T16:15:00Z",
+      "marked_by_person_id": "person-avery",
+      "marked_via": "staff_text",
+      "welfare_first": true,
+      "found_safe_at": null,
+      "owner_told_at": null,
+      "asked_at": "2026-11-07T16:15:02Z",
+      "reply_by": "2026-11-07T16:45:02Z",
+      "open_question_id": null,
+      "replied_at": null,
+      "reply": null,
+      "outcome": null,
+      "outcome_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["no_shows_asked_after_safe"]
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-check-in.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "accept",
+      "shows": "Check-in with the code at Lee's Barbershop, Sat Oct 24: Riley's day list goes at 8:00am, his own day-list time, for that day's bookings. At 11:00am Alex M. is at the chair and Riley texts the code; the first try is wrong (only its time is kept, never the digits typed), the next try matches at 11:01am, so Alex is checked in by Riley from his own phone, the moment K-32 counts the barbershop's $2. Nothing is billed after (Alex pays at the chair) and no date was promised, so the code marks the visit done at A8-87's 11:40am, with nobody's DONE needed",
+      "source": "A8-01 (Sat Oct 24, 8:00am; 'Your Sat Oct 24 at Lee's Barbershop'); A8-03 ('Sat Oct 24, 11:00am'; 'A code typed with a typo is checked once more, never guessed'); A8-04; A8-05 ('5106'; 'That isn't Alex M.'s code'); A8-06 ('5160'; 'Checked in: Alex M., Sat 11:00am'); A8-87 ('Sat Oct 24, 11:40am'; 'Checked in with the code [when after: At the counter or Nothing more]'); K-22 v1 seed-staff-joined (Riley's day-list time 08:00); K-32 v1 seed-fee-rosfield-2 (the $2 counted at 15:01Z by check-in code toward Riley); FS line 729 (checked_in_at, done_at, done_by)"
+    },
+    {
+      "file": "seed-done.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "accept",
+      "shows": "DONE at a home in flow B, after seed-late-fan-out: Jordan texts OMW at 8:05am Thu Oct 22, so Alex gets the arrival time (about 8:20am) with the code to give at the door; Jordan's own phone enters the code at 8:20am, so the check-in shows who came; at 9:10am Jordan texts DONE 179 drain, so the visit is done by Jordan, and the DONE's total and its one line (the booked kitchen drain clearing, naming K-30's line with its $179 copied in) are what every money message after the visit reads",
+      "source": "B8-02 ('Thu Oct 22, 8:05am'; 'Jordan from Lee Home Services is on the way, about 15 minutes'); B8-04 ('Thu Oct 22, 8:20am'; 'Only the pro's own phone can enter the code'); B8-41 ('Thu Oct 22, 9:10am'; 'DONE 179 drain'; 'Every money message after the visit reads these lines'); B8-40 ('One DONE per visit'); K-30 v1 seed-booking-flow-b (line-alex-drain-1, $179); fixtures/v1/test-kit/shops/plumber.json (Kitchen drain clearing $179); FS line 729 (done_at, done_by)"
+    },
+    {
+      "file": "seed-no-show.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "accept",
+      "shows": "A no-show mark at Lee's Barbershop: Dee's haircut with Avery, moved to Sat Nov 7 at 11:00am (K-30's seed); at 11:15am, 15 minutes after the start, Avery texts NO SHOW Dee. No welfare need (the barbershop has no welfare switch and nobody on the booking is in care), so Dee is asked at once to reply within 30 minutes (Reply 3 I'm here); no reply by 11:45am, so the question defaults and the mark ends no_visit: no visit, any fee is Sam's call through K-32's fee question, and silence charges nothing",
+      "source": "A8-14 ('15 minutes after the start, Riley marks a no-show'; 'NO SHOW Alex M.'; 'If you're here, please reply within 30 minutes'; 'Reply 3 I'm here'); A8-15 ('No reply ... No visit. Any fee is Sam's call; silence charges nothing'); FS line 623 (No-shows); S11-22; K-30 v1 seed-booking-line-price-copied (Dee's haircut moved to Sat Nov 7 11:00am with Avery); SPEC-master 6 (Dee, Avery)"
+    },
+    {
+      "file": "seed-visit-check.json",
+      "version": "v1",
+      "table": "visit_checks",
+      "expect": "accept",
+      "shows": "The visit check (D98) on a booking Rosie brought in: Dee's skin fade with Riley at 10:00am Sat Oct 24, booked in her own chat (K-30's seed), gets no check-in code, no DONE and no no-show mark by night, so Sam is asked once at 8:00pm whether it happened and answers 1 Yes, mark it done at 8:12pm: the visit is done by Sam (owner_yes; Q-13) and the bill goes as booked. The next day in text hours (Sun Oct 25, 10:00am) Dee is asked once, in her own chat, 'Did your visit with Lee's Barbershop happen?', and answers 2 No at 10:20am: recorded only, for Rosie's team, with no charge, refund or fee, and the business never sees it (its question carries no business)",
+      "source": "A8-87 ('Nothing entered by night: no code, no DONE and no no-show mark came in at all'); A8-47 ('the day of A8-01, 8:00pm'; 'Reply 1 Yes, mark it done, 2 It didn't happen'; 'For a booking Rosie made, the next day in text hours, the customer is asked once, their way'; 'Their answer is only recorded for Rosie's team. No charge, refund, fee or other action follows'; 'Did your visit with Lee's Barbershop happen? / Reply 1 Yes, 2 No'); FS lines 624, 670, 740; D98; Q-13; QUESTIONS.md CQ-56; K-30 v1 seed-terms-snapshot (Dee's skin fade, door chat)"
+    },
+    {
+      "file": "seed-late-fan-out.json",
+      "version": "v1",
+      "table": "late_reports",
+      "expect": "accept",
+      "shows": "One event, many bookings, in flow B on Thu Oct 22: Jordan's day list goes at 7:00am, his own day-list time; at 7:55am Jordan texts LATE 20, one late report, which code fans out to his later visits that day, each as its own visit event with its own question: Alex's kitchen drain clearing (arriving 8–10am, now 8:20–10:20am), whose question Alex answers 1 That works at 7:58am, and Drew's water heater flush (arriving 12–2pm, now 12:20–2:20pm), whose question is still open (no reply keeps the later start). Nothing moves in K-04 or K-30: the booked times and windows stay as they were",
+      "source": "arch 09 line 484 ('A worker running late is one row that code fans out to their later visits that day, each with its own question'); B7-18 ('the day of B8-01, 7:55am'; 'LATE 20'; 'New time: arriving 8:20–10:20am. No reply keeps your visit. / Reply 1 That works, 2 Move my visit, 3 Call off, no fee'); B8-01 ('Thu Oct 22, 7:00am'; 'A) 8–10am · Alex M. · Kitchen drain'; 'C) 12–2pm · Drew · Water heater flush'); K-22 v1 seed-staff-joined (Jordan's day-list time 07:00); fixtures/v1/test-kit/shops/plumber.json (Water heater flush $150); 01-inventory any-time table row 16"
+    },
+    {
+      "file": "seed-price-at-visit.json",
+      "version": "v1",
+      "table": "visit_prices",
+      "expect": "accept",
+      "shows": "An extra priced at the visit, over the owner's limit, with some lines OK'd (beyond 02-contracts row K-31's list, so the price path with both answers has a seed): after seed-late-fan-out, Jordan checks in at Drew's at 12:35pm and at 12:50pm texts more work: $620, shutoff valve and wall pipe $540 and supply line $80. Over Sam's $500 limit (K-26), so Sam is asked first, with 30 minutes before Drew hears it is with him; Sam answers 1 Send it at 12:55pm (K-08's ownerYes fields); Drew sees it and at 1:02pm answers 3 OK some lines in his own chat: the valve and wall pipe yes, the supply line no, good until Thu Oct 29",
+      "source": "B8-23 ('Prices the extra first; Alex says yes'; 'A price over Sam's limit goes to Sam first'; 'Several lines get the same answers as a quote: yes, not today, or some lines'); B8-92 ('Say the quote were over Sam's $500 limit, like a $620 repair'; 'Shutoff valve and wall pipe · $540 / Supply line · $80'; 'No answer in 30 minutes'; 'Reply 1 Send it, 2 Change it'); B8-93; B8-48 ('Only those are done and billed today. The rest stays good for 7 days'); B8-25 ('Good until Thu Oct 29'); K-26 v1 seed-price-ok-limit (pok-lee-home-services, $500); K-08 v1 approvalOwnerYes"
+    },
+    {
+      "file": "invalid/refuse-check-in-rewritten.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop rewrites Alex's check-in as entered by Avery, not Riley: refused (a check-in is set once and never changed: trigger visit_marks_set_once, SQLSTATE 23514); the same update naming Riley passes",
+      "source": "B8-04 ('checked in shows who came'); FS line 729 (checked_in_at); README rule 7"
+    },
+    {
+      "file": "invalid/refuse-code-after-third-wrong-try.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "Dee's skin fade checked in with the code after three wrong tries and the owner told: refused (after 3 wrong tries no code is taken: CHECK visit_marks_code_before_third, SQLSTATE 23514); the same row with the three tries and the notice and no check-in (the visit goes on and DONE counts it) passes",
+      "source": "A8-05 ('3 wrong tries: three wrong in a row'); A8-07 ('After 3 wrong tries, Sam is told ... The visit goes on, and Riley's DONE at the end counts it'); FS line 668"
+    },
+    {
+      "file": "invalid/refuse-no-show-asked-before-safe.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "refuse",
+      "shows": "A no-show on Dee's haircut where a safety check comes first, with Dee asked to reply within 30 minutes (the fee words) before she was found safe: refused (CHECK no_shows_asked_after_safe, SQLSTATE 23514); the same row with her found safe first passes",
+      "source": "A8-14 ('Where the welfare switch is on, or someone on the booking is in care: a safety check comes first'; 'No fee words until they're found safe'); B8-10; RULES 4.12; S11-22"
+    },
+    {
+      "file": "invalid/refuse-late-without-question.json",
+      "version": "v1",
+      "table": "visit_events",
+      "expect": "refuse",
+      "shows": "Alex's drain running long makes Jordan 15 minutes later for Drew (a ran_long late report), fanned out to Drew's visit with no question of its own: refused (each visit a late report fans out to gets its own question: CHECK visit_events_late, SQLSTATE 23514); the same event naming Drew's own question passes",
+      "source": "arch 09 line 484 ('each with its own question'); A7-14 ('Also when a visit runs long and the next customer will start late: they're told the same way'); B7-18"
+    },
+    {
+      "file": "invalid/refuse-price-shown-before-owner-ok.json",
+      "version": "v1",
+      "table": "visit_prices",
+      "expect": "refuse",
+      "shows": "Jordan's $620 extra at Drew's, over Sam's $500 limit, shown to Drew before Sam said 1 Send it: refused (nothing goes out until the owner OKs it: CHECK visit_prices_shown_after_ok, SQLSTATE 23514); the same row not yet shown passes",
+      "source": "B8-92 ('Never: send a price made at the visit without Sam's OK, where Sam's rule asks for one'); B8-93 ('once anyone who must OK it first has'); B8-23; A8-26"
+    },
+    {
+      "file": "invalid/refuse-price-line-rewritten.json",
+      "version": "v1",
+      "table": "visit_price_lines",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Home Services sets the DONE's drain line from $179 to $159: refused (a line's words and amount are never changed: no UPDATE privilege on them, SQLSTATE 42501); a new price naming the one it replaces is the way a price changes",
+      "source": "B8-41 ('Every money message after the visit reads these lines'); A8-26 ('Sam types a new price, read back to Sam before it goes'); README rule 6"
+    },
+    {
+      "file": "invalid/refuse-owner-reads-visit-check.json",
+      "version": "v1",
+      "table": "visit_checks",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reads Dee's visit check: refused (recorded only, for Rosie's team: the Tool API role has no grant on the table, SQLSTATE 42501); the runtime side reads it",
+      "source": "FS line 624 ('The answer is recorded only, for Rosie's team ... The business does not see it'); FS line 740; A8-47; D98"
+    },
+    {
+      "file": "invalid/refuse-cross-business-visit-read.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio does not see Lee's Barbershop's marks on Alex's haircut, though Alex is the yoga studio's customer too (row-level security per business: no row); the barbershop's own scope sees them",
+      "source": "arch 10 line 546; K-04 v1 rule 4; RULES 4.10 ('never joined across businesses'); S13-42"
+    },
+    {
+      "file": "invalid/refuse-mark-on-other-business-visit.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop checks in Lee Home Services' visit for Alex's drain, with its own business and Riley: refused (the insert policy requires a booking the call's scope can see: SQLSTATE 42501), though the key to K-30's visit alone would let it through; the same mark on the barbershop's own visit passes",
+      "source": "arch 10 line 546; K-04 v1 rule 4; README rule 5 (a row names a booking of its own business); S13-42 ('Each business's customer data is used only for that business')"
+    },
+    {
+      "file": "invalid/refuse-turned-away-reason-in-side.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "Riley can't start Alex M.'s 11:00am haircut for the customer's own state, and a Tool API call scoped to Lee's Barbershop writes that reason into side, the column owner and staff texts may carry: refused (side holds only the customer's side or the shop's side: CHECK visit_marks_side_known, SQLSTATE 23514), so why a person was turned away can never reach a text; the same row with side customer and customer_state true, which only the secure page shows, passes",
+      "source": "A8-51 ('Never: put why it couldn't start in a text. It goes on the signed-in page'); A8-81 ('Riley couldn't start Alex M.'s 11:00am. The reason is on the secure page'; 'Never: ... tell anyone why'); B8-54; B8-76 ('Texts say only that the visit couldn't start, with details on the secure page'); A8-56; A8-61; RULES 4.5 ('Why a person was turned away'); DL-174 ruling 1"
+    },
+    {
+      "file": "invalid/refuse-first-step-result-in-stopped-why.json",
+      "version": "v1",
+      "table": "visit_marks",
+      "expect": "refuse",
+      "shows": "Jordan checks in at Alex's door at 8:20am Thu Oct 22, and the first step shows the work can't go ahead safely today; a Tool API call scoped to Lee Home Services writes first_step into stopped_why, the column an owner text may carry: refused (stopped_why holds only safety or conduct: CHECK visit_marks_stopped_why_known, SQLSTATE 23514), so a first step's result or a finding never reaches a text; the same update with first_step in stopped_found, which only the secure page shows, passes",
+      "source": "B8-90 ('The text says only result added'; 'Never: put the result in a text'; 'Not OK: it can't go ahead safely today. That's the business's side'); A8-72; A8-35 ('Health details stay on the secure page, never in a text'); B8-04 (8:20am); RULES 4.5 ('test results'); DL-174 ruling 2"
+    },
+    {
+      "file": "invalid/refuse-no-visit-after-reply.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "refuse",
+      "shows": "Avery marked Dee a no-show at 11:15am Sat Nov 7 and Dee replied at 11:31am with an emergency; at 11:45am the 30-minute clock closes the mark as no_visit, which tells Sam she didn't answer: refused (no_visit only follows silence: CHECK no_shows_no_visit_after_silence, SQLSTATE 23514); the same update closing it not_met, heard but not met, with her reply going to Sam's fee question, passes",
+      "source": "A8-14 ('An emergency goes to Sam, in their words only if nothing private'; 'Never: tell Sam didn't answer when the customer replied'); B8-11 ('An emergency reason goes to Sam with the fee question'; 'I cancelled: check the record; no fee until Sam sees it'); B8-10; A8-15; S11-22; DL-174 ruling 3"
+    },
+    {
+      "file": "invalid/refuse-clock-mark-names-person.json",
+      "version": "v1",
+      "table": "no_shows",
+      "expect": "refuse",
+      "shows": "Only a teen is home at Alex's at 8:20am Thu Oct 22, so Jordan waits up to 30 minutes for an adult; none comes, and at 8:50am the clock's silence marks the no-show on the runtime side, naming Jordan as if he had marked it: refused (a clock's mark names no person: CHECK no_shows_marked_by, SQLSTATE 23514), so the commit never invents who marked it; the same mark with no person, Jordan staying the visit event's word, passes",
+      "source": "B8-09 ('Jordan waits up to 30 minutes'; 'No adult in 30 minutes: it's handled like nobody home'; 'Only a teen is home at Alex M.'s'); B8-52 ('Clock: a new code ... by 15 minutes after Jordan's text; silence goes on as nobody home'); B8-10; B8-11 ('or says it was set on silence'); S11-22; NQ-RT-4; DL-174 ruling 4"
+    }
+  ]
+}
