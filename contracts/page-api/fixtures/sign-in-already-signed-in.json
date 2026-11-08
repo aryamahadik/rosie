@@ -1,0 +1,23 @@
+{
+  "call": "signInCheck",
+  "given": {
+    "now": "2026-10-19T14:22:40Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "The page asks again about Sam's attempt after it was signed in (a second poll under a new requestId, or a browser that lost sign-in-done.json's answer). The token left the server once, in that answer, and the server keeps only its sha256 (K-22 v1 sessions_token_hash_form), so it cannot be sent again: the code is used (K-22 v1 check_proof_code answers used) and a session names it (sessions_proof_code_key), so the answer is alreadySignedIn, with no token, and a page with no session starts a new sign-in (the security reviewer's gap 1 on 2413b65). A repeat under sign-in-done.json's own requestId answers the same."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-signin-sam-s01-3",
+      "traceId": "trace-page-sam-0004",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    },
+    "attemptId": "attempt-sam-s01-1",
+    "code": null,
+    "deviceToken": "placeholder-device-token-sam-phone"
+  },
+  "outcome": {
+    "result": "alreadySignedIn"
+  }
+}

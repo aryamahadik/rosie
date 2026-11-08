@@ -73,7 +73,7 @@
     },
     "linkCode": {
       "title": "LinkCode",
-      "description": "The short code of a signed link: the part after the host (A4-42: 'links are always the host plus a short code'; the host is a config value, rosfield.com/test on staging: DL-014, DL-023, Q-51). Unguessable and random; the master's sample codes (S1-10's rosfield.com/v/s01, S1-77's rosfield.com/v/o02) are illustrations (MC C6). An unknown, expired and ended code all get the same answer (linkExpired), so a guessed code learns nothing.",
+      "description": "The short code of a signed link: the part after the host (A4-42: 'links are always the host plus a short code'; the host is a config value, rosfield.com/test on staging: DL-014, DL-023, Q-51). Unguessable and random: the server makes every code with a cryptographically secure random generator, with at least 128 bits, so at least 22 characters of the URL-safe alphabet A-Z, a-z, 0-9, - and _ (README default 18; the security reviewer's N4), and keeps only its sha256 (K-22 v1.1 page_links.code_sha256), by which the page entry finds the link row (K-22 v1.1 page_link_for_code). The pattern admits shorter strings only so that a stale or mistyped code still gets linkExpired. The master's sample codes (S1-10's rosfield.com/v/s01, S1-77's rosfield.com/v/o02) and the fixtures' codes are illustrations (MC C6). An unknown, expired and ended code all get the same answer (linkExpired), so a guessed code learns nothing.",
       "type": "string",
       "pattern": "^[A-Za-z0-9-]{3,64}$"
     },
@@ -101,7 +101,7 @@
           "anyOf": [{ "$ref": "#/$defs/opaqueToken" }, { "type": "null" }]
         },
         "linkCode": {
-          "description": "The signed link this page was opened from, or null. It names the page, its business and the person it was made for, never who is at the browser (FS line 701; S13-45).",
+          "description": "The signed link this page was opened from, or null. Its link row (K-22 v1.1 page_links, found by the code's sha256 through page_link_for_code; README 'Links') names the page, its business, its step and the person it was made for, never who is at the browser (FS line 701; S13-45).",
           "anyOf": [{ "$ref": "#/$defs/linkCode" }, { "type": "null" }]
         }
       },
@@ -110,7 +110,7 @@
     },
     "linkPage": {
       "title": "LinkPageEnvelope",
-      "description": "A page envelope from a signed link (page): the link is required; a session may or may not come with it.",
+      "description": "A page envelope from a signed link (page): the link is required; a session may or may not come with it. The link's row is K-22 v1.1 page_links, found by the code's sha256 (README 'Links').",
       "type": "object",
       "properties": {
         "requestId": { "$ref": "#/$defs/id" },
@@ -148,7 +148,7 @@
     },
     "signedInLinkPage": {
       "title": "SignedInLinkPageEnvelope",
-      "description": "A page envelope with a session and a signed link (page): the call works on the link's page for the session's person, and only when that person is the one the link was made for (else signInNeeded: the page asks for that person's sign-in).",
+      "description": "A page envelope with a session and a signed link (page): the call works on the link's page for the session's person, and only when that person is the one the link was made for (K-22 v1.1 page_links.person_id of the live link page_link_for_code finds; else signInNeeded: the page asks for that person's sign-in). The business is the link row's page_links.business_id.",
       "type": "object",
       "properties": {
         "requestId": { "$ref": "#/$defs/id" },
@@ -204,7 +204,7 @@
     },
     "linkExpiredError": {
       "title": "LinkExpiredError",
-      "description": "The link cannot open: unknown, past its end, or ended (a setup link ends once its step has given its keys: S1-10 'Checks the owner's mobile and ID, once'; a contact change ends every link and page sent before it: D75, S13-45 row 3). One answer for all three, so a guessed code learns nothing; the page shows a plain expired page with no field of the old page.",
+      "description": "The link cannot open: K-22 v1.1 page_link_for_code gives no row for the code's sha256, because the code is unknown, past page_links.expires_at, or ended (page_links.ended_at and ended_why: a contact change ends every link and page sent before it, D75, S13-45 row 3; the person left the team, RULES 8.7; a hand-over, S11-100); or the link is a setup link (purpose setup_id_check or owner_confirm) whose step has given its keys, its end written or not (S1-10 'Checks the owner's mobile and ID, once'; K-09 v1 readSetup; README default 19). One answer for all of them, so a guessed code learns nothing; the page shows a plain expired page with no field of the old page.",
       "type": "object",
       "properties": { "error": { "const": "linkExpired" } },
       "required": ["error"],
@@ -289,7 +289,7 @@
 
     "pageKind": {
       "title": "PageKind",
-      "description": "What a signed link opens in v1 (journeys 1 and 2): setupIdCheck, S1-10's secure page (the ID upload and the owner's email; the mobile is proven by the owner's own text, MC C9); ownerConfirm, S1-77's owner link (the owner's own ID check, 'Are you an owner of this business?', the email, the preview and what Rosfield costs, the Stripe account: MASTER-FLOW-A lines 141 to 147); registration, the owner's registration screens 0 to 24 (FS section 6.1); staffPage, S2-06's secure page for a team member. Customer pages come with K-21's journey versions (02-contracts K-21 'Minor versions').",
+      "description": "What a signed link opens in v1 (journeys 1 and 2): setupIdCheck, S1-10's secure page (the ID upload and the owner's email; the mobile is proven by the owner's own text, MC C9); ownerConfirm, S1-77's owner link (the owner's own ID check, 'Are you an owner of this business?', the email, the preview and what Rosfield costs, the Stripe account: MASTER-FLOW-A lines 141 to 147); registration, the owner's registration screens 0 to 24 (FS section 6.1); staffPage, S2-06's secure page for a team member. Customer pages come with K-21's journey versions (02-contracts K-21 'Minor versions'). Stored as the link row's K-22 v1.1 page_links.purpose: setup_id_check, owner_confirm, registration and staff_page.",
       "type": "string",
       "enum": ["setupIdCheck", "ownerConfirm", "registration", "staffPage"]
     },
@@ -430,10 +430,142 @@
     "calendarProvider": {
       "$ref": "../port-calendar/port-calendar.v1.schema.json#/$defs/provider"
     },
+    "textHours": {
+      "title": "TextHours",
+      "description": "A business's own text hours (FS line 721 text_hours; FS row H04; RULES 4.3): K-04 v1 businesses.text_hours_start and text_hours_end, read in the business's time_zone. Texts that can wait go to owner and staff inside them; a test phone's override never changes them (01-inventory C-204; the frontend engineer's FAIL 2 on 2413b65).",
+      "type": "object",
+      "properties": {
+        "start": {
+          "description": "K-04 v1 businesses.text_hours_start (default 08:00), as HH:MM.",
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "end": {
+          "description": "K-04 v1 businesses.text_hours_end (default 20:00), as HH:MM.",
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+      },
+      "required": ["start", "end"],
+      "additionalProperties": false
+    },
+    "textHoursOverrideState": {
+      "title": "TextHoursOverrideState",
+      "description": "A roster test phone's text-hours override as it stands (T-527; 01-inventory C-204; the frontend engineer's FAIL 1 on 2413b65): its staging-only K-04 v1 release_flags row, name staging.text-hours-override, scope phone:<number> (K-04 v1 seed-flag.json; K-05 v1.2 default 33). on: the row's enabled, false with no row; version: the row's version, which textHoursOverride sends back as expectVersion, or null while the phone has no row, so after a reload the console shows on or off and sets or clears it with the right version.",
+      "type": "object",
+      "properties": {
+        "on": { "type": "boolean" },
+        "version": { "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }] }
+      },
+      "required": ["on", "version"],
+      "additionalProperties": false,
+      "if": { "properties": { "version": { "type": "null" } }, "required": ["version"] },
+      "then": { "properties": { "on": { "const": false } } }
+    },
+    "shownPhoto": {
+      "title": "ShownPhoto",
+      "description": "One of the business's photos (S1-84; K-23 v1 business_photos, in position order) as a page shows it: a short-lived signed address to read that one private file (MC 8 'Files'; Q-31; K-13, not frozen: an opaque address, README open gap 5). It carries no key the page could reuse, and never enters a span or a log (README 'Never in a span or a log').",
+      "type": "object",
+      "properties": {
+        "photoId": { "$ref": "#/$defs/id" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "expiresAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["photoId", "url", "expiresAt"],
+      "additionalProperties": false
+    },
+    "registrationPreview": {
+      "title": "RegistrationPreview",
+      "description": "Screen 20's preview (FS section 6.1 screen 20: 'Preview (how AI assistants see the business)'; S1-29: 'how AI assistants will see the business ... The page shows the display name, licenses as given, services and prices, places, hours and the money rules. The page shows the About us line and the photos from S1-84'). The server builds it from the business's own rows as they stand, in plain words (README default 22); the exact answer AI assistants get is K-20's, not frozen (open gap 18). Never a license number, an ID detail or a bank detail (S1-79 'Never').",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "K-04 v1 businesses.display_name (B02): the plain name customers see on texts and card statements (S1-29).",
+          "type": "string",
+          "minLength": 1
+        },
+        "parts": {
+          "description": "What the preview shows, in S1-29's order, each as lines of plain words: about (the About us line: K-23 v1 business_setup.about, B06, S1-84), licenses (each as given, never checked: D96; S1-23), services (each service and its price: K-25 v1), places (K-23 v1 locations: the shop, or the travel area), hours (H01: K-27 v1 weekly_hours), moneyRules (the money rules: what is taken at booking and after, the cancel time and any fee: the record's pay lines). A part with nothing to show is left out.",
+          "type": "array",
+          "items": {
+            "title": "PreviewPart",
+            "type": "object",
+            "properties": {
+              "part": {
+                "type": "string",
+                "enum": ["about", "licenses", "services", "places", "hours", "moneyRules"]
+              },
+              "lines": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+            },
+            "required": ["part", "lines"],
+            "additionalProperties": false
+          }
+        },
+        "photos": {
+          "description": "The photos from S1-84, in order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownPhoto" }
+        }
+      },
+      "required": ["displayName", "parts", "photos"],
+      "additionalProperties": false
+    },
+    "registrationSummary": {
+      "title": "RegistrationSummary",
+      "description": "Screen 24's one-page summary (FS section 6.1 screen 24: 'Summary page the owner can keep'; S1-79: 'One secure page the owner can keep: what they set, what was left at its default, and how to change anything ... It can be saved as a PDF'). Secure-page-only: readRegistration gives it only with a session of the link's own person. The server builds it in plain words (README default 22) from the rows of every business the session's person owns, each read under its own business scope (arch 10 line 546), since S1-79's one page names them all ('Lee's Barbershop and Lee Home Services'). Never a license number, an ID detail or a bank detail beyond 'on file' (S1-79 'Never'). Saving it as a PDF is the web app's (C-187).",
+      "type": "object",
+      "properties": {
+        "madeAt": {
+          "description": "When the server built it (S1-79: resent after a big change, S11-56).",
+          "$ref": "#/$defs/utc"
+        },
+        "parts": {
+          "description": "S1-79's parts, in its order, each as lines of plain words: companies (each company and kind of work, and whether it is live), services (services, prices, places, and money before and after), about (About us), faqs, hours, cancelRule (the cancel rule and any fee), rulesKept, rulesAtDefault (those left at their default, like the waitlist off), licenses (as given, never checked: 'on file'), agreements (signed), people (just me, or the team), emergencyContact (the contact, or none: then no safety timer runs while the pro works alone), rosieCost (Rosie's cost) and howToChange (by text or a call, or in the portal). businessName names the business a part is about, and is null for the owner's own parts (emergencyContact, rosieCost, howToChange). A part with nothing to show is left out.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "title": "SummaryPart",
+            "type": "object",
+            "properties": {
+              "part": {
+                "type": "string",
+                "enum": [
+                  "companies",
+                  "services",
+                  "about",
+                  "faqs",
+                  "hours",
+                  "cancelRule",
+                  "rulesKept",
+                  "rulesAtDefault",
+                  "licenses",
+                  "agreements",
+                  "people",
+                  "emergencyContact",
+                  "rosieCost",
+                  "howToChange"
+                ]
+              },
+              "businessName": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+              "lines": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+            },
+            "required": ["part", "businessName", "lines"],
+            "additionalProperties": false
+          }
+        },
+        "photos": {
+          "description": "The photos from S1-84, in order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownPhoto" }
+        }
+      },
+      "required": ["madeAt", "parts", "photos"],
+      "additionalProperties": false
+    },
 
     "openLink.request": {
       "title": "OpenLinkRequest",
-      "description": "Open a signed link (A4-42): the host plus a short code. Who may call: anyone holding the link; it reads nothing on file for the browser before a session of the link's own person comes with it. Binds: the business and the person the link was made for come from the link row on the server; the call acts for the session's person only when that person is the link's own (K-22 v1 rule 4); otherwise for no one. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "description": "Open a signed link (A4-42): the host plus a short code. Who may call: anyone holding the link; it reads nothing on file for the browser before a session of the link's own person comes with it. Binds: the business, the step and the person the link was made for come from the link row on the server (K-22 v1.1 page_links, found by the code's sha256 through page_link_for_code; README 'Links'); the call acts for the session's person only when that person is the link's own (K-22 v1 rule 4); otherwise for no one. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "page": { "$ref": "#/$defs/linkPage" }
@@ -447,9 +579,12 @@
       "type": "object",
       "properties": {
         "result": { "const": "open" },
-        "pageKind": { "$ref": "#/$defs/pageKind" },
+        "pageKind": {
+          "description": "The link row's K-22 v1.1 page_links.purpose.",
+          "$ref": "#/$defs/pageKind"
+        },
         "stepId": {
-          "description": "The step the link was made for, such as S1-10, S1-77 or S2-06.",
+          "description": "The step that sent the link (K-22 v1.1 page_links.step_id), such as S1-10, S1-77 or S2-06.",
           "$ref": "#/$defs/stepId"
         },
         "businessName": {
@@ -458,7 +593,7 @@
           "minLength": 1
         },
         "proof": {
-          "description": "none: no session of the link's own person came with the request, so the call acts for no one; session: it did, and the call acts for that person (K-22 v1 rule 4). A link is never the proof (FS line 701; S13-45).",
+          "description": "none: no session of the link's own person came with the request (no live session, or K-22 v1 session_for_token's person is not the link row's K-22 v1.1 page_links.person_id), so the call acts for no one; session: it did, and the call acts for that person (K-22 v1 rule 4). A link is never the proof (FS line 701; S13-45).",
           "type": "string",
           "enum": ["none", "session"]
         },
@@ -506,7 +641,7 @@
           ]
         },
         "expiresAt": {
-          "description": "When the link ends (the page shows the expired page after it).",
+          "description": "When the link lapses (K-22 v1.1 page_links.expires_at); the page shows the expired page after it.",
           "$ref": "#/$defs/utc"
         }
       },
@@ -555,7 +690,7 @@
       "properties": {
         "page": { "$ref": "#/$defs/page" },
         "account": {
-          "description": "Whose account: typed, the mobile or email the person typed (S11-52); link, the person the page's own signed link was made for (S1-10's, S1-77's or S2-06's secure page), which needs page.linkCode.",
+          "description": "Whose account: typed, the mobile or email the person typed (S11-52); link, the person the page's own signed link was made for (K-22 v1.1 page_links.person_id of the live link page_link_for_code finds: S1-10's, S1-77's or S2-06's secure page), which needs page.linkCode; with no live link the server sends nothing and answers the same (nothing on file is hinted at).",
           "oneOf": [
             {
               "title": "SignInTypedAccount",
@@ -658,7 +793,7 @@
 
     "signInCheck.request": {
       "title": "SignInCheckRequest",
-      "description": "Check the sign-in: the code typed on the page (way email), or, for way text, whether the person's ready text has come from the account's own mobile (K-09 v1 proveCode with fromHandleId that mobile, run by the turn that carries the text). Served by K-09 v1 proveCode by the code id the server kept with the attempt (K-22 v1 check_proof_code), never one the page sends. Who may call: the browser that started the attempt (the same device token); any other answers attemptNotFound. Binds: no person until the code is right (K-22 v1 rule 4); then the code's person, set in the same transaction, and on a device that person has used before (device_known) the session starts, naming that code (K-22 v1 rule 5; 'Every path that binds a person', S11-52); a person's first session ever starts on the code alone, since there is no known device to compare (README default 4). Reads: the primary, uncached. Repeat: keyed: page.requestId, with the attempt and the device; a repeat answers its first result, and a signedIn repeat gives the same session, never a second one (K-22 v1 sessions_proof_code_key); each new request with a code counts a try. Time budget: 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "description": "Check the sign-in: the code typed on the page (way email), or, for way text, whether the person's ready text has come from the account's own mobile (K-09 v1 proveCode with fromHandleId that mobile, run by the turn that carries the text). Served by K-09 v1 proveCode by the code id the server kept with the attempt (K-22 v1 check_proof_code), never one the page sends. Who may call: the browser that started the attempt (the same device token); any other answers attemptNotFound. Binds: no person until the code is right (K-22 v1 rule 4); then the code's person, set in the same transaction, and on a device that person has used before (device_known) the session starts, naming that code (K-22 v1 rule 5; 'Every path that binds a person', S11-52); a person's first session ever starts on the code alone, since there is no known device to compare (README default 4). Reads: the primary, uncached. Repeat: keyed: page.requestId, with the attempt and the device; a repeat answers its first result, except that the session token leaves the server once: a repeat of a signedIn answer, and any later check of an attempt whose code a session already names, answers alreadySignedIn with no token and never starts a second session (the server keeps only the token's sha256: K-22 v1 sessions_token_hash_form, sessions_proof_code_key; the security reviewer's gap 1 on 2413b65); each new request with a code counts a try. K-22 v1 check_proof_code's outcomes answer as README 'Sign-in and sessions' maps them: right gives signedIn or secondProofNeeded, wrong gives wrong, paused gives paused, expired gives expired, used gives alreadySignedIn (or secondProofNeeded again while the attempt waits for its second proof), unknown gives attemptNotFound. Way text: the turn that carries the ready text uses the code (K-09 v1 proveCode); the page's next check finds the attempt's code used and no session naming it, and starts the session then, naming that code, held to that code's person by K-22 v1's session insert policy: the one page step whose person comes from a code checked in an earlier call (README 'Sign-in and sessions'). Time budget: 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
       "type": "object",
       "properties": {
         "page": { "$ref": "#/$defs/page" },
@@ -681,7 +816,7 @@
       "oneOf": [
         {
           "title": "SignedIn",
-          "description": "The code was right and the session started (K-22 v1 sessions, proven_via code). The token leaves the server this once, for the web app to set as an HttpOnly, Secure cookie; the server keeps only its sha256 (K-22 v1 sessions_token_hash_form).",
+          "description": "The code was right and the session started (K-22 v1 sessions, proven_via code). The token leaves the server this once, in this answer only, for the web app to set as an HttpOnly, Secure, SameSite=Lax cookie (README default 21); the server keeps only its sha256 (K-22 v1 sessions_token_hash_form), so no later answer carries it (alreadySignedIn).",
           "type": "object",
           "properties": {
             "result": { "const": "signedIn" },
@@ -765,6 +900,14 @@
             "expiresAt": { "$ref": "#/$defs/utc" }
           },
           "required": ["result", "expiresAt"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInAlreadySignedIn",
+          "description": "A repeat of a signedIn answer, or a later check of an attempt whose code a session already names (K-22 v1 check_proof_code used; sessions_proof_code_key): the session started, and its token left the server in that first answer only, so none comes now (the security reviewer's gap 1 on 2413b65). A page with no session starts a new sign-in (signInStart).",
+          "type": "object",
+          "properties": { "result": { "const": "alreadySignedIn" } },
+          "required": ["result"],
           "additionalProperties": false
         },
         {
@@ -940,7 +1083,7 @@
     },
     "readRegistration.response": {
       "title": "Registration",
-      "description": "Where the business's setup stands, screen by screen.",
+      "description": "Where the business's setup stands, screen by screen, with screen 20's preview and screen 24's one-page summary (the frontend engineer's FAIL 3 on 2413b65).",
       "type": "object",
       "properties": {
         "result": { "const": "registration" },
@@ -997,9 +1140,17 @@
         },
         "setup": {
           "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/readSetup.response"
+        },
+        "preview": {
+          "description": "Screen 20's preview, how AI assistants see the business as it stands (S1-29), or null while screen 20 neither asks nor is done.",
+          "anyOf": [{ "$ref": "#/$defs/registrationPreview" }, { "type": "null" }]
+        },
+        "summary": {
+          "description": "Screen 24's one-page summary (S1-79), or null until S1-79 has been sent (it follows S1-50, once a kind of work is live).",
+          "anyOf": [{ "$ref": "#/$defs/registrationSummary" }, { "type": "null" }]
         }
       },
-      "required": ["result", "business", "screens", "setup"],
+      "required": ["result", "business", "screens", "setup", "preview", "summary"],
       "additionalProperties": false
     },
     "readRegistration.errors": {
@@ -1986,7 +2137,7 @@
     },
     "testRoster.response": {
       "title": "TestRoster",
-      "description": "The seeded test businesses (fixture set v1's demo shops, signed up, with Stripe test accounts and test calendars linked, in the testers' time zone: BP 9.4; Q-54) and the roster's test phones. A phone shows only its last four digits and what it acts as, never who holds it (rule 9; the holders are 08-needs-from-jay.md's). Before the F14 setup seeds a business shows as not signed up, and before the F15 customer seeds a phone has no seeded customer (CQ-14).",
+      "description": "The seeded test businesses (fixture set v1's demo shops, signed up, with Stripe test accounts and test calendars linked, in the testers' time zone: BP 9.4; Q-54), each with its own text hours (K-04 v1; FS line 721 H04), which an override never changes, and the roster's test phones, each with its text-hours override as it stands and the version textHoursOverride sends back (the frontend engineer's FAILs 1 and 2 on 2413b65; T-527). A phone shows only its last four digits and what it acts as, never who holds it (rule 9; the holders are 08-needs-from-jay.md's). Before the F14 setup seeds a business shows as not signed up, and before the F15 customer seeds a phone has no seeded customer (CQ-14).",
       "type": "object",
       "properties": {
         "result": { "const": "testRoster" },
@@ -2006,9 +2157,13 @@
               },
               "signedUp": { "type": "boolean" },
               "live": { "type": "boolean" },
-              "zone": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" }
+              "zone": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" },
+              "textHours": {
+                "description": "The business's own text hours (K-04 v1 businesses.text_hours_start and text_hours_end; FS line 721 H04), read in zone; a test phone's override never changes them (T-527).",
+                "$ref": "#/$defs/textHours"
+              }
             },
-            "required": ["businessId", "name", "flow", "kindIds", "signedUp", "live", "zone"],
+            "required": ["businessId", "name", "flow", "kindIds", "signedUp", "live", "zone", "textHours"],
             "additionalProperties": false
           }
         },
@@ -2061,6 +2216,10 @@
               "stopped": {
                 "description": "K-04 v1 phones.stopped.",
                 "type": "boolean"
+              },
+              "textHoursOverride": {
+                "description": "The phone's text-hours override as it stands, with the version textHoursOverride sends back (T-527).",
+                "$ref": "#/$defs/textHoursOverrideState"
               }
             },
             "required": [
@@ -2072,7 +2231,8 @@
               "personId",
               "seededCustomer",
               "linqContact",
-              "stopped"
+              "stopped",
+              "textHoursOverride"
             ],
             "additionalProperties": false
           }
@@ -2376,7 +2536,7 @@
           "type": "boolean"
         },
         "expectVersion": {
-          "description": "The flag row's version as the console read it, or null when the phone has no row yet.",
+          "description": "The flag row's version as testRoster gave it (RosterPhone.textHoursOverride.version), or null when the phone has no row yet.",
           "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
         }
       },

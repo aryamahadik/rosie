@@ -101,6 +101,8 @@
         { "pickedKindId": "picked-sam-barber", "kindId": "barber", "companyId": "company-lees-barbershop", "live": false }
       ],
       "team": []
-    }
+    },
+    "preview": null,
+    "summary": null
   }
 }

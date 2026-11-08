@@ -1,0 +1,27 @@
+{
+  "call": "textHoursOverride",
+  "given": {
+    "now": "2026-10-24T13:05:00Z",
+    "environment": "staging",
+    "after": ["text-hours-override.json"],
+    "note": "Staging only: the next morning the tester reloads the test-phone page. testRoster now lists tp-03 with its override on at version 1 (the release_flags row text-hours-override.json wrote), so the console shows it on and clears it with that version as expectVersion (the frontend engineer's FAIL 1 on 2413b65; T-527: 'clearing it sends the clear call'). The row stays, with enabled false, at version 2; Lee's Barbershop's own text hours never change (01-inventory C-204). Clearing it again answers repeated."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-texthours-0002",
+      "traceId": "trace-page-tester-0007",
+      "sessionToken": "placeholder-session-token-tester-0001",
+      "linkCode": null
+    },
+    "testPhoneId": "tp-03",
+    "on": false,
+    "expectVersion": 1
+  },
+  "outcome": {
+    "result": "set",
+    "testPhoneId": "tp-03",
+    "on": false,
+    "version": 2,
+    "repeated": false
+  }
+}

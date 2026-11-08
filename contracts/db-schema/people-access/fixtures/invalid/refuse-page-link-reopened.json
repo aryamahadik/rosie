@@ -1,0 +1,23 @@
+{
+  "after": ["seed-page-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "page_links",
+    "set": {
+      "ended_at": null,
+      "ended_why": null,
+      "version": 3
+    },
+    "where": {
+      "id": "page-link-sam-s1-10"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

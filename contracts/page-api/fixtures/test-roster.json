@@ -4,7 +4,7 @@
     "now": "2026-10-23T13:00:00Z",
     "environment": "staging",
     "after": [],
-    "note": "Staging only (BP 9.4 'Seeded state'; merger question w1-qa-web 6): a tester signed in on staging opens the test-phone page's picker (T-525, T-574). It lists the seeded test businesses, fixture set v1's barber as Lee's Barbershop (flow A) and plumber and electrician as Lee Home Services (flow B), signed up and live in the testers' time zone (Q-54), and the roster's five test phones (Q-53), each by its last four digits, its role, what it texts as and its seeded customer, never who holds it (rule 9). The second customer's phone has no seeded customer yet: its F15 seed has not landed (CQ-14). Numbers are the fictional 555-01xx; roster ids and labels are placeholders."
+    "note": "Staging only (BP 9.4 'Seeded state'; merger question w1-qa-web 6): a tester signed in on staging opens the test-phone page's picker (T-525, T-574). It lists the seeded test businesses, fixture set v1's barber as Lee's Barbershop (flow A) and plumber and electrician as Lee Home Services (flow B), signed up and live in the testers' time zone (Q-54), each with its own text hours (K-04 v1 businesses.text_hours_start and text_hours_end, here their 8am to 8pm defaults: FS row H04), and the roster's five test phones (Q-53), each by its last four digits, its role, what it texts as, its seeded customer and its text-hours override, never who holds it (rule 9). The staff phone's override was set earlier (on, at version 3); the other phones have no override row yet (off, version null), so textHoursOverride sends expectVersion null for them (text-hours-override.json). The second customer's phone has no seeded customer yet: its F15 seed has not landed (CQ-14). Numbers are the fictional 555-01xx; roster ids and labels are placeholders."
   },
   "request": {
     "page": {
@@ -24,7 +24,8 @@
         "kindIds": ["barber"],
         "signedUp": true,
         "live": true,
-        "zone": "America/New_York"
+        "zone": "America/New_York",
+        "textHours": { "start": "08:00", "end": "20:00" }
       },
       {
         "businessId": "biz-lee-home-services",
@@ -33,7 +34,8 @@
         "kindIds": ["plumber", "electrician"],
         "signedUp": true,
         "live": true,
-        "zone": "America/New_York"
+        "zone": "America/New_York",
+        "textHours": { "start": "08:00", "end": "20:00" }
       }
     ],
     "phones": [
@@ -46,7 +48,8 @@
         "personId": "person-sam",
         "seededCustomer": null,
         "linqContact": true,
-        "stopped": false
+        "stopped": false,
+        "textHoursOverride": { "on": false, "version": null }
       },
       {
         "testPhoneId": "tp-02",
@@ -57,7 +60,8 @@
         "personId": "person-riley",
         "seededCustomer": null,
         "linqContact": true,
-        "stopped": false
+        "stopped": false,
+        "textHoursOverride": { "on": true, "version": 3 }
       },
       {
         "testPhoneId": "tp-03",
@@ -68,7 +72,8 @@
         "personId": null,
         "seededCustomer": { "customerId": "customer-alex-barbershop", "name": "Alex M." },
         "linqContact": true,
-        "stopped": false
+        "stopped": false,
+        "textHoursOverride": { "on": false, "version": null }
       },
       {
         "testPhoneId": "tp-04",
@@ -79,7 +84,8 @@
         "personId": null,
         "seededCustomer": null,
         "linqContact": true,
-        "stopped": false
+        "stopped": false,
+        "textHoursOverride": { "on": false, "version": null }
       },
       {
         "testPhoneId": "tp-05",
@@ -90,7 +96,8 @@
         "personId": null,
         "seededCustomer": null,
         "linqContact": true,
-        "stopped": false
+        "stopped": false,
+        "textHoursOverride": { "on": false, "version": null }
       }
     ]
   }

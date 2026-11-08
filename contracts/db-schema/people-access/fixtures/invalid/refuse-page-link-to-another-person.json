@@ -1,0 +1,25 @@
+{
+  "after": ["seed-page-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "insert",
+    "table": "page_links",
+    "values": {
+      "id": "page-link-sam-registration-3",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-sam",
+      "purpose": "registration",
+      "step_id": "S1-29",
+      "code_sha256": "9ef5061728394a5b6c7d8e9fa0b1c2d39ef5061728394a5b6c7d8e9fa0b1c2d3",
+      "sent_to_handle_id": "handle-riley",
+      "issued_at": "2026-10-19T15:10:00Z",
+      "expires_at": "2026-10-26T15:10:00Z"
+    },
+    "expect": {
+      "sqlstate": "23503",
+      "constraintOneOf": ["page_links_sent_to_fk"]
+    }
+  }
+}

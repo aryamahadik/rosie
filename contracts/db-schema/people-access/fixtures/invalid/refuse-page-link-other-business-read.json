@@ -1,0 +1,32 @@
+{
+  "after": ["seed-page-link.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-yoga-studio"
+    },
+    "action": "select",
+    "table": "page_links",
+    "columns": [
+      "id",
+      "business_id",
+      "person_id",
+      "purpose",
+      "step_id",
+      "sent_to_handle_id",
+      "issued_at",
+      "expires_at",
+      "ended_at",
+      "ended_why",
+      "ended_by_contact_change_id",
+      "version"
+    ],
+    "where": {
+      "id": "page-link-riley-s2-06"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

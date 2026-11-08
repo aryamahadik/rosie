@@ -1,0 +1,24 @@
+{
+  "call": "signInCheck",
+  "given": {
+    "now": "2026-10-19T14:22:40Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "Refused: sign-in-already-signed-in.json's later check of Sam's signed-in attempt, answered with the session token again. The token leaves the server once (sign-in-done.json); without it this exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-signin-sam-s01-3",
+      "traceId": "trace-page-sam-0004",
+      "sessionToken": null,
+      "linkCode": "s01-placeholder-sam"
+    },
+    "attemptId": "attempt-sam-s01-1",
+    "code": null,
+    "deviceToken": "placeholder-device-token-sam-phone"
+  },
+  "outcome": {
+    "result": "alreadySignedIn",
+    "sessionToken": "placeholder-session-token-sam-0001"
+  }
+}

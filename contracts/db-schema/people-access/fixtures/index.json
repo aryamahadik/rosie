@@ -263,6 +263,62 @@
       "expect": "refuse",
       "shows": "Jordan's own call (rosie.person_id Jordan) starting a session that names his used contact-change code (a code to his phone on file, typed back to change his email) is refused by the insert policy (SQLSTATE 42501): a session needs a used sign-in code of its own person (purpose sign_in or new_device), never a code that proved something else; the same insert naming a used sign-in code of Jordan's passes in his own call, and the same row passes on the runtime side",
       "source": "README rule 5; S11-52 ('Sam types his mobile, and a code comes by text'); S13-45 row 8; FS section 8 ('Staff changing their own phone or email'); RULES 6.2"
+    },
+    {
+      "file": "seed-page-link.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "accept",
+      "shows": "Four signed links of Lee's Barbershop, the ones K-21's fixtures open: Sam's S1-10 secure page link, ended once S1-10 gave its keys (step_done); Sam's registration link from S1-27; Sam's live S1-79 summary link; and Riley's S2-06 staff page link; each kept as its code's sha256 only (stand-in hashes), sent to the person's own handle, with a 7-day life (an example)",
+      "source": "README rule 8; K-21 v1 open-link-secure-page, open-link-expired, open-link-signed-in, registration-what-is-missing and registration-preview-summary; A4-42; S1-10; S1-27; S1-79; S2-06; BP rule 7; SPEC-master 6"
+    },
+    {
+      "file": "invalid/refuse-page-link-raw-code.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "A link row holding its raw code instead of the code's sha256 is refused by CHECK page_links_code_hash_form (SQLSTATE 23514); the same row with the sha256 passes",
+      "source": "README rule 8; BP rule 7 (only a hash is stored); A4-42"
+    },
+    {
+      "file": "invalid/refuse-page-link-code-read.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's registration link with every column, code_sha256 included, is refused (SQLSTATE 42501): no column grant reaches the hash; the same read of every column but code_sha256 gives the row",
+      "source": "README rule 8; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-page-link-reopened.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop setting Sam's ended S1-10 link back to live changes no row: the update policy admits only a live link, so an end is never undone; the same update on the runtime side changes the row, and ending a live link passes in the same scope",
+      "source": "README rule 8; S1-10 ('once'); S13-45 row 8; security note N10 on K-09"
+    },
+    {
+      "file": "invalid/refuse-page-link-other-business-read.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio reading Riley's staff page link (every column but the hash) gets no row: row-level security by business; the barbershop's own scope reads it",
+      "source": "README rule 8; arch 10 line 546; K-04 v1 rule 4"
+    },
+    {
+      "file": "invalid/refuse-page-link-to-another-person.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "Sam's registration link sent to Riley's handle is refused by foreign key page_links_sent_to_fk (SQLSTATE 23503): a link goes only to a contact of the person it was made for; the same row sent to Sam's handle passes",
+      "source": "README rule 8; S13-45 row 3; D75; core person_handles"
+    },
+    {
+      "file": "invalid/refuse-page-link-inserted-ended.json",
+      "version": "v1.1",
+      "table": "page_links",
+      "expect": "refuse",
+      "shows": "A Tool API insert, scoped to Lee's Barbershop, of a link that names ended_at and ended_why is refused (SQLSTATE 42501): an issue writes only an issue's columns, so a link always starts live at version 1; the same insert without them passes",
+      "source": "README rule 8"
     }
   ]
 }
