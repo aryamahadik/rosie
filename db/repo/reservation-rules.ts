@@ -25,12 +25,13 @@
 //   1. The row's slot, read without a lock. A row this business cannot see, or that does not exist, is notFound: every
 //      read also names the business, so another business's row answers notFound whichever role runs the call (the
 //      tables' owner, which row-level security does not bind, until T-1093).
-//   2. The locks, in the order every writer of these rows takes them: the reservation's saved-time clock row
-//      (`<id>/saved-time`) FOR UPDATE first, as commitTurn and a clock's firing take a clock row before its reservation
-//      (db/repo/commit-turn.ts); then the slot's advisory locks (the resource, and for a worker the person, sorted: the
-//      keys reservations.ts's lockSlot takes), since the new held_until gives the row new index entries that EXCLUDE
-//      checks, and two such writes on one slot without the lock wait on each other until PostgreSQL fails one (40P01:
-//      T-187's finding); then the row FOR UPDATE.
+//   2. The locks, in commitTurn's order (db/repo/commit-turn.ts): the reservation's saved-time clock row
+//      (`<id>/saved-time`) FOR UPDATE first, as commitTurn and a clock's firing take a clock row before its reservation;
+//      then the slot's advisory locks (the resource, and for a worker the person, sorted: the keys reservations.ts's
+//      lockSlot takes, slot before row as reserve and release take them), since the new held_until gives the row new
+//      index entries that EXCLUDE checks, and two such writes on one slot without the lock wait on each other until
+//      PostgreSQL fails one (40P01: T-187's finding); then the row FOR UPDATE. reserve and release take no clock row
+//      lock yet; once T-1084 has release cancel the row, taking it before the slot keeps this order.
 //   3. The checks, in item 10's order: not held, or its end has passed (held_until <= at, as release counts an ended
 //      time), is notHeld with the row's state; the ownAi door is neverExtended; the extension already given is
 //      alreadyExtended, so the same request again lands here and changes nothing (README: "the one extension is given
