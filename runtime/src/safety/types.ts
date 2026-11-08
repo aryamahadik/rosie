@@ -255,3 +255,14 @@ export interface SafetyDeps {
 export const VERDICT_DEADLINE_MS = 4000;
 /** The checked line goes within 5 s of arrival (arch 04 latency table; K-09 `recordSafetyOutcome` time budget). */
 export const SAFETY_LINE_BUDGET_MS = 5000;
+/**
+ * While a text's safety work runs past its 4 s deadline (its line is being handed on), how often the actor's alarm comes
+ * back until the line's 5 s budget is spent, so an eviction in that time cannot leave the text unread (T-1088).
+ */
+export const SAFETY_RETRY_MS = 1000;
+/**
+ * How often a text with no verdict yet (its unread hold open) is read again, and how often the actor's alarm comes back
+ * for safety work that still hangs once the line's 5 s budget is spent (arch 11 line 564: "The turn retries every 30 s";
+ * T-1088 round 2, DL-127).
+ */
+export const REREAD_MS = 30_000;

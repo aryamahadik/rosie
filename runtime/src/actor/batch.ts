@@ -20,9 +20,10 @@
 // batch from stored state.
 //
 // The hand-off (T-247's security notes c and e): the release entry stays stored while a batch is being handed, so a crash
-// in the middle of a hand-off still hands the batch again after the restart; and nothing polls while a batch waits for a
-// read, because every way a text comes to be read (the read's end, a late verdict, a resumed read) hands the waiting
-// batches on itself, so one unanswered text cannot keep an alarm firing every second.
+// in the middle of a hand-off still hands the batch again after the restart; and nothing here polls while a batch waits
+// for a read, because every way a text comes to be read (the read's end, a late verdict, a resumed read or a re-read)
+// hands the waiting batches on itself, so one unanswered text cannot keep an alarm firing every second. (A text with no
+// verdict is read again every 30 s from the safety read's own schedule entry, DL-127; that is not a poll of this one.)
 //
 // The lease (T-248, lease.ts) takes each closed, released batch once, in order. A hand-off is at least once: one that
 // throws is tried again later with the same batch id, and the lease takes a batch id it has seen as already handed. Never
@@ -96,7 +97,10 @@ export interface BatchEntry {
 /** The schedule's kinds. */
 export const SCHEDULE_BATCH_CLOSE = "batchClose";
 export const SCHEDULE_RELEASE = "batchRelease";
-/** Wakes the actor at a safety read's 4 s deadline, so a read an eviction cut off is resumed (T-1088; handle-actor.ts). */
+/**
+ * Wakes the actor for the safety read's work (T-1088; handle-actor.ts): at a read's 4 s deadline, so a read an eviction
+ * cut off is resumed, and at the 30 s re-read of a text with no verdict yet (DL-127).
+ */
 export const SCHEDULE_SAFETY = "safetyRead";
 
 /** The actor's one stored schedule: one entry per kind, each due at a time on the actor's clock. */
@@ -235,7 +239,10 @@ export class BatchWindow {
     });
   }
 
-  /** Danger in a text of the open batch closes the batch at once (it still waits for the hold before the lease). */
+  /**
+   * Danger in a text of the open batch closes the batch at once. The closed batch goes to the lease once its texts have
+   * been read, with the danger's hold open: the hold binds the turn's commit, not the hand-off (CQ-65 as DL-119 replaced it).
+   */
   afterSafety(eventId: string): void {
     if (!this.host.isDanger(eventId)) return;
     if (this.openItems().some((item) => item.event_id === eventId)) this.close("danger");
@@ -319,7 +326,8 @@ export class BatchWindow {
         )
         .toArray();
       // Held, a text of it not read yet: nothing polls (note e). A text comes to be read only through a call that hands
-      // the waiting batches on itself: the read's end, a late verdict or a resumed read (the actor's safety callbacks).
+      // the waiting batches on itself: the read's end, a late verdict, a resumed read or a re-read (the actor's safety
+      // callbacks).
       if (this.host.held(items.map((item) => item.event_id))) {
         unscheduleEntry(this.sql, SCHEDULE_RELEASE);
         return;

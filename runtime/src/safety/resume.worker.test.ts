@@ -1,12 +1,14 @@
 // A safety read cut off by the actor's eviction, run inside the Workers runtime (T-1088). The actor is the real Durable
 // Object reached through the gateway's door; the safety read, shared core, Linq send and clock are the doubles of
-// src/safety/test-support.ts, and the same fake clock runs the actor's stored schedule. Each test cuts the actor off in
-// the middle of a read and wakes a new instance on the same id: a deploy or a reset does this in production, and the 4 s
-// deadline lived only in memory. The cut is the instance's reset (`ctx.abort`, after its storage is synced, as T-248's
-// crash test does): `evictDurableObject` waits for the work in flight to drain, and a cut-off read's work never ends.
-// The new instance is woken by its stored alarm (`runDurableObjectAlarm`) or by a new text. Before the cut the read
-// never answers and its deadline has no timer; after it, the doubles answer on the fake clock. Test method: T-1128's.
-// Test values only (rule 9).
+// src/safety/test-support.ts, and the same fake clock runs the actor's stored schedule. Each eviction test cuts the actor
+// off in the middle of its safety work and wakes a new instance on the same id: a deploy or a reset does this in
+// production, and what the instance awaited lived only in memory. The cut is the instance's reset (`ctx.abort`, after its
+// storage is synced, as T-248's crash test does): `evictDurableObject` waits for the work in flight to drain, and a
+// cut-off read's work never ends. The new instance is woken by its stored alarm (`runDurableObjectAlarm`) or by a new
+// text. Before a cut the read never answers and nothing waits on a fake-clock timer; after it, the doubles answer on the
+// fake clock. Round 2 (DL-127): a text with no verdict in 4 s (its unread hold open) is read again every 30 s until a
+// verdict lands, from a stored entry, so an eviction cannot leave it held for good. Test method: T-1128's. Test values
+// only (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -32,8 +34,10 @@ import {
   type HoldEntry,
   type SafetyEntry,
 } from "../actor";
+import type { ModelCall } from "../trace/types";
+import { timeoutResult } from "./rules";
 import { harness, type Harness } from "./test-support";
-import type { SafetyReadRequest, SafetyResult } from "./types";
+import type { SafetyDeps, SafetyReadAnswer, SafetyReadPort, SafetyReadRequest, SafetyResult } from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -45,6 +49,8 @@ const keys = fakeKeyStore();
 const EMERGENCY_TEXT = "my lips are swelling after the beard color and I can't breathe well";
 const BLEEDING_TEXT = "Riley's cut won't stop bleeding, please help";
 const PLAIN_TEXT = "Can I get a haircut on Thursday afternoon?";
+/** A danger the bundle's danger-word list does not hold, so a timeout gives it the outage line, not a safety line. */
+const SMOKE_TEXT = "there is smoke pouring out of the dryer in the back room";
 
 type Namespace = DurableObjectNamespace<HandleActor>;
 
@@ -109,14 +115,62 @@ function alarmOf(): Promise<number | null> {
 
 const asResult = (fixture: unknown): SafetyResult => fixture as SafetyResult;
 
+/** The read's own no-verdict answer (K-02 `timedOut`, no read): both models timed out, as in a model outage. */
+function gaveUp(eventId: string): SafetyReadAnswer {
+  const call = (model: string, role: "haiku" | "sonnet"): ModelCall => ({
+    model,
+    role,
+    purpose: "safetyRead",
+    input_tokens: 400,
+    cached_tokens: 0,
+    cache_write_tokens: 0,
+    output_tokens: 0,
+    cost_micro_usd: 400,
+    ms: 2000,
+    outcome: "timedOut",
+  });
+  return {
+    result: timeoutResult(eventId, []),
+    modelCalls: [call("claude-haiku-5-5", "haiku"), call("claude-sonnet-5-5", "sonnet")],
+  };
+}
+
+/** A verdict as the read answers it, with one model call. */
+function verdict(result: SafetyResult): SafetyReadAnswer {
+  return {
+    result,
+    modelCalls: [
+      {
+        model: "claude-haiku-5-5",
+        role: "haiku",
+        purpose: "safetyRead",
+        input_tokens: 400,
+        cached_tokens: 0,
+        cache_write_tokens: 0,
+        output_tokens: 40,
+        cost_micro_usd: 600,
+        ms: 1,
+        outcome: "ok",
+      },
+    ],
+  };
+}
+
+const idsOf = (batch: ClosedBatch): string[] => batch.entries.map((entry) => entry.event.eventId);
+
 interface Run {
   h: Harness;
   /** The reads the actor sent before the eviction (that read never answered). */
   cutOff: SafetyReadRequest[];
   /** Every batch handed to the lease, in order. */
   handed: ClosedBatch[];
-  /** Cuts the actor off in the middle of its read (a new instance follows), then puts the doubles that answer in place. */
-  evict(): Promise<void>;
+  /** What the instance had before the first cut: a read that never answers, and (unless `deadlineRuns`) no 4 s timer. */
+  stalled: SafetyDeps;
+  /**
+   * Cuts the actor off in the middle of its safety work (a new instance follows), then puts `next` in place: by default
+   * the doubles that answer.
+   */
+  evict(next?: SafetyDeps): Promise<void>;
   /**
    * Wakes the actor the way its stored alarm does: the platform runs it at its time, the test now. (A new instance that
    * starts with the fake clock already past an entry sets its alarm for now, and the runtime may run that one first.)
@@ -128,17 +182,18 @@ interface Run {
 
 /**
  * Runs a test body with the doubles set for the isolate and put back after. Until `evict`, the read never answers and the
- * 4 s deadline has no timer; after it, the read answers `answers` after `delayMs` and the deadline runs on the fake clock.
+ * 4 s deadline has no timer (with `deadlineRuns`, it runs on the fake clock, so the timeout rule can apply before a cut);
+ * after it, the read answers `answers` after `delayMs` and the deadline runs on the fake clock.
  */
 async function withEviction(
   answers: Record<string, SafetyResult>,
-  options: { delayMs?: number },
+  options: { delayMs?: number; deadlineRuns?: boolean },
   body: (run: Run) => Promise<void>,
 ): Promise<void> {
   const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
   const cutOff: SafetyReadRequest[] = [];
   const handed: ClosedBatch[] = [];
-  const restoreSafety = setSafetyDeps({
+  const stalled: SafetyDeps = {
     ...h.deps,
     read: {
       read(request) {
@@ -146,24 +201,30 @@ async function withEviction(
         return new Promise(() => undefined);
       },
     },
-    clock: { now: () => h.clock.now(), after: () => new Promise<void>(() => undefined) },
-  });
+    clock:
+      options.deadlineRuns === true
+        ? h.clock
+        : { now: () => h.clock.now(), after: () => new Promise<void>(() => undefined) },
+  };
+  const restoreSafety = setSafetyDeps(stalled);
   const restoreBatch = setBatchHooks({
     clock: h.clock,
     toLease: (batch) => {
       handed.push(batch);
     },
   });
-  let restoreAnswering = (): void => undefined;
+  const restores: (() => void)[] = [];
   const run: Run = {
     h,
     cutOff,
     handed,
-    async evict() {
-      // What outlives the cut: the safety entry stored when the read was queued, and the alarm set for the schedule.
+    stalled,
+    async evict(next = h.deps) {
+      // What outlives the cut: the safety entry stored for the work in flight, and the alarm set for the schedule.
       expect((await scheduleOf()).map((entry) => entry.kind)).toContain("safetyRead");
       expect(await alarmOf()).not.toBeNull();
-      // The instance's memory goes (the read in flight, its 4 s deadline); its storage and its alarm stay.
+      // The instance's memory goes (the read in flight, its 4 s deadline, a late answer awaited); its storage and its
+      // alarm stay.
       const cut = await runInDurableObject(stub(), async (_, state) => {
         await state.storage.sync();
         state.abort("cut off mid-read");
@@ -172,7 +233,7 @@ async function withEviction(
         () => "cut off",
       );
       expect(cut).toBe("cut off");
-      restoreAnswering = setSafetyDeps(h.deps);
+      restores.push(setSafetyDeps(next));
     },
     async wake() {
       await runDurableObjectAlarm(stub());
@@ -185,7 +246,7 @@ async function withEviction(
   try {
     await body(run);
   } finally {
-    restoreAnswering();
+    for (const restore of restores.reverse()) restore();
     restoreBatch();
     restoreSafety();
   }
@@ -241,7 +302,7 @@ describe("the safety alarm", () => {
     }
   });
 
-  it("firing past the deadline while the read's work still runs sends no second read and comes back in 1 s, never in a loop", async () => {
+  it("firing past the deadline while the read's work still runs sends no second read, and comes back in 1 s only until the line's 5 s budget is spent, then every 30 s", async () => {
     const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
     const h = harness(keys, { "evt-1": answer });
     // The shared core takes the record and never answers, so this text's safety work runs on past its 4 s deadline.
@@ -260,9 +321,15 @@ describe("the safety alarm", () => {
       expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-1", state: "reading" }]);
       expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 5000 });
 
+      // 5 s: the line's budget is spent; the hang is looked at every 30 s from now on, never every second (security
+      // note a), and no second read is sent while the work still runs here.
       await h.clock.advance(1000);
       await runDurableObjectAlarm(stub());
-      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 6000 });
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 35_000 });
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 65_000 });
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-1", state: "reading" }]);
       expect(h.read.requests).toHaveLength(1);
     } finally {
       restoreBatch();
@@ -500,12 +567,12 @@ describe("a read cut off by an eviction", () => {
     });
   });
 
-  it("a cut-off read that cannot start again is left unresolved and held, the actor still starts, and nothing polls for it", async () => {
-    await withEviction({}, {}, async (run) => {
+  it("a cut-off read whose key store throws at once still gets the outage line (no verdict can come), keeps its unread hold, and is read again 30 s on (security note d)", async () => {
+    const answer = { ...asResult(safetyNo), eventId: "evt-1" };
+    await withEviction({ "evt-1": answer }, {}, async (run) => {
       await arrive("evt-1", PLAIN_TEXT);
       await run.h.clock.advance(1000);
-      await run.evict();
-      const restore = setSafetyDeps({
+      await run.evict({
         ...run.h.deps,
         keys: {
           getOrCreateKey: () => {
@@ -513,20 +580,39 @@ describe("a read cut off by an eviction", () => {
           },
         },
       });
+
+      // 3 s: woken; the words cannot be opened, so the timeout rule applies at once, as for a read that fails on arrival:
+      // no danger word can be matched, so the outage line goes, and the text stays unread and held.
+      await run.h.clock.advance(2000);
+      await run.wake();
+      await run.settle();
+      expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[3000, "outage"]]);
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-1", state: "done", danger: false, lineId: "outage" },
+      ]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(run.h.read.requests).toEqual([]);
+      await vi.waitFor(async () => {
+        expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
+        expect(await scheduleOf()).toEqual([{ kind: "safetyRead", due_ms: 33_000 }]);
+      });
+
+      // 33 s: the key store answers again; the re-read says No, the hold lifts and the batch goes on.
+      const restore = setSafetyDeps(run.h.deps);
       try {
-        await run.h.clock.advance(2000);
+        await run.h.clock.advance(30_000);
         await run.wake();
-        await actorOf().batchIdle();
-        await vi.waitFor(async () => {
-          expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
-          expect(await scheduleOf()).toEqual([]);
-          expect(await alarmOf()).toBeNull();
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
         });
-        expect(await actorOf().readSafety()).toMatchObject([
-          { eventId: "evt-1", state: "lineFailed", danger: false },
+        expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1"]);
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", rule: "unread", released: true },
         ]);
-        expect(await actorOf().routineHeld()).toBe(true);
-        expect(run.h.read.requests).toEqual([]);
+        expect(run.h.core.fixed).toHaveLength(1);
       } finally {
         restore();
       }
@@ -550,5 +636,314 @@ describe("a read cut off by an eviction", () => {
     expect(lines).not.toContain("lips are swelling");
     expect(lines).not.toContain("breathe");
     expect(lines).not.toContain("+15555550101");
+  });
+});
+
+// Round 2 (DL-127; the security reviewer's gap on 37fc0f6): a text that took the timeout rule with no danger word has its
+// unread hold open until a verdict lands. Its late answer was awaited only in memory, so an eviction could lose it and
+// leave the text unread and held for good, with every later batch of the handle behind it. Now its next re-read is
+// stored and the actor's alarm comes back for it every 30 s until a verdict lands (arch 11 line 564).
+describe("a text with no verdict in 4 s (its unread hold open)", () => {
+  it("an eviction between the timeout rule and the late verdict: the stored re-read wakes a new instance 30 s on, and the text's verdict lifts the hold", async () => {
+    const answer = { ...asResult(safetyNo), eventId: "evt-1" };
+    await withEviction({ "evt-1": answer }, { deadlineRuns: true }, async (run) => {
+      await arrive("evt-1", PLAIN_TEXT);
+      // 4 s: no verdict and no danger word: the outage line once, the unread hold, and the first re-read stored 30 s on.
+      // The late answer is awaited in this instance's memory only.
+      await run.h.clock.advance(4000);
+      await run.settle();
+      expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[4000, "outage"]]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 34_000 });
+      });
+
+      // 5 s: the actor is cut off before the late answer comes; it is lost with the instance.
+      await run.h.clock.advance(1000);
+      await run.evict();
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(run.h.read.requests).toEqual([]);
+
+      // 34 s: the stored entry wakes a new instance; the text is read again, its verdict (No) lifts the unread hold, and
+      // the batch it kept back goes on. The outage line went once.
+      await run.h.clock.advance(29_000);
+      await run.wake();
+      await vi.waitFor(() => {
+        expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+      });
+      expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1"]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(false);
+      expect(run.h.core.fixed).toHaveLength(1);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toEqual([]);
+      });
+    });
+  });
+
+  it("a second cut, between a resumed read's timeout rule and its late verdict, still ends in a re-read 30 s on that lifts the hold", async () => {
+    const answer = { ...asResult(safetyNo), eventId: "evt-1" };
+    await withEviction({ "evt-1": answer }, {}, async (run) => {
+      await arrive("evt-1", PLAIN_TEXT);
+      await run.h.clock.advance(1000);
+      // The first cut; the new instance's read never answers either.
+      await run.evict(run.stalled);
+
+      // 4 s: woken past the deadline: the timeout rule at once (the outage line, the unread hold, its re-read 30 s on),
+      // and the read is sent again for a late verdict.
+      await run.h.clock.advance(3000);
+      await run.wake();
+      await run.settle();
+      expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[4000, "outage"]]);
+      expect(run.cutOff.map((request) => request.eventId)).toEqual(["evt-1", "evt-1"]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+
+      // 4.5 s: the second cut, before that read answers (the case the security reviewer named).
+      await run.h.clock.advance(500);
+      await run.evict();
+
+      // 34 s: the stored re-read wakes the actor; the verdict lifts the hold and the batch goes on.
+      await run.h.clock.advance(29_500);
+      await run.wake();
+      await vi.waitFor(() => {
+        expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+      });
+      expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1"]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+      ]);
+      expect(run.h.core.fixed).toHaveLength(1);
+    });
+  });
+
+  it("a model outage across several re-reads: each timedOut or failed answer keeps the hold and sets the next re-read 30 s after it; the outage line goes once; the first verdict lifts the hold", async () => {
+    const h = harness(keys, {});
+    const calls: SafetyReadRequest[] = [];
+    // The models are down: the late answer (6 s) and the first re-read are the read's own timedOut marker, the second
+    // re-read fails outright; the third comes after the models are back.
+    const read: SafetyReadPort = {
+      async read(request) {
+        calls.push(request);
+        if (calls.length === 1) {
+          await h.clock.after(6000);
+          return gaveUp(request.eventId);
+        }
+        if (calls.length === 2) return gaveUp(request.eventId);
+        if (calls.length === 3) throw new Error("the models are down");
+        return verdict({ ...asResult(safetyNo), eventId: request.eventId });
+      },
+    };
+    const handed: ClosedBatch[] = [];
+    const restoreSafety = setSafetyDeps({ ...h.deps, read });
+    const restoreBatch = setBatchHooks({
+      clock: h.clock,
+      toLease: (batch) => {
+        handed.push(batch);
+      },
+    });
+    const holdOpen = async (): Promise<void> => {
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(handed).toEqual([]);
+    };
+    try {
+      await arrive("evt-1", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+      expect(h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[4000, "outage"]]);
+
+      // 6 s: the late answer is itself timedOut: no verdict. The hold stays and the next re-read is 30 s after it.
+      await h.clock.advance(2000);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 36_000 });
+      });
+      await holdOpen();
+
+      // 36 s: read again: timedOut again. 66 s: read again: the read fails.
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(async () => {
+        expect(calls).toHaveLength(2);
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 66_000 });
+      });
+      await holdOpen();
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(async () => {
+        expect(calls).toHaveLength(3);
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 96_000 });
+      });
+      await holdOpen();
+      // Never lifted without a verdict, and the outage line is never sent again.
+      expect(h.core.fixed).toHaveLength(1);
+      expect(h.direct.sent).toEqual([]);
+
+      // 96 s: the models are back: the verdict (No) lifts the hold, the batch goes on and the re-reads stop.
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(() => {
+        expect(handed.map(idsOf)).toEqual([["evt-1"]]);
+      });
+      expect(calls.map((request) => request.eventId)).toEqual(["evt-1", "evt-1", "evt-1", "evt-1"]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(false);
+      await vi.waitFor(async () => {
+        expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+      });
+      expect(h.core.fixed).toHaveLength(1);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
+
+  it("on return every held text is read again at once, in arrival order: a danger among them gets its line then, not at its own re-read, and the batch goes on once all are read", async () => {
+    const h = harness(keys, {});
+    let modelsBack = false;
+    const answers: Record<string, SafetyResult> = {
+      "evt-1": { ...asResult(safetyNo), eventId: "evt-1" },
+      "evt-2": { ...asResult(safetyEmergencyNow), eventId: "evt-2" },
+    };
+    const calls: SafetyReadRequest[] = [];
+    // Down: each read gives up after both models' 2 s, here late (6 s after it is sent). Back: each read answers at once.
+    const read: SafetyReadPort = {
+      async read(request) {
+        calls.push(request);
+        const answer = answers[request.eventId];
+        if (!modelsBack || answer === undefined) {
+          await h.clock.after(6000);
+          return gaveUp(request.eventId);
+        }
+        return verdict(answer);
+      },
+    };
+    const handed: ClosedBatch[] = [];
+    const restoreSafety = setSafetyDeps({ ...h.deps, read });
+    const restoreBatch = setBatchHooks({
+      clock: h.clock,
+      toLease: (batch) => {
+        handed.push(batch);
+      },
+    });
+    try {
+      // A plain text, then a danger the danger-word list does not hold: each gets the outage line at its own 4 s, and
+      // each late answer (6 s and 7 s) gives up: their re-reads are due at 36 s and 37 s.
+      await arrive("evt-1", PLAIN_TEXT);
+      await h.clock.advance(1000);
+      await arrive("evt-2", SMOKE_TEXT);
+      await h.clock.advance(6000);
+      await actorOf().safetyIdle();
+      expect(h.core.fixed.map((call) => [call.at, call.request.caller.requestId])).toEqual([
+        [4000, "safety:evt-1"],
+        [5000, "safety:evt-2"],
+      ]);
+      expect(h.core.recorded).toEqual([]);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 36_000 });
+      });
+
+      // 36 s: the models are back. evt-1's re-read gives a verdict, so evt-2 (due at 37 s) is read again at once, and its
+      // danger line goes now (the alarm is run until it has: the runtime may also run it on its own).
+      modelsBack = true;
+      await h.clock.advance(29_000);
+      await vi.waitFor(async () => {
+        await runDurableObjectAlarm(stub());
+        expect(h.core.recorded.map((call) => [call.at, call.request.safety.eventId])).toEqual([
+          [36_000, "evt-2"],
+        ]);
+      });
+      expect(calls.slice(2).map((request) => request.eventId)).toEqual(["evt-1", "evt-2"]);
+      expect(h.core.recorded[0]?.response).toMatchObject({ safetyLine: { fixedLineId: "safetyEmergency" } });
+
+      // Both read: the batch they were in goes on, once, with evt-2's danger hold open for its commit.
+      await vi.waitFor(() => {
+        expect(handed.map(idsOf)).toEqual([["evt-1", "evt-2"]]);
+      });
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+        { eventId: "evt-2", rule: "after_safe", released: false },
+      ]);
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-1", state: "done", danger: false },
+        { eventId: "evt-2", state: "done", danger: true, lineId: "safetyEmergency" },
+      ]);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
+
+  it("a throw in the safety part of the alarm still lets the batch and lease handlers run, and moves the safety entry 30 s on (security note c)", async () => {
+    const h = harness(keys, {});
+    let broken = false;
+    let reads = 0;
+    // The first read gives up at once (timedOut): the timeout rule applies at 0 and the re-read is due at 30 s. Later
+    // reads say No.
+    const read: SafetyReadPort = {
+      read(request) {
+        reads += 1;
+        return Promise.resolve(
+          reads === 1
+            ? gaveUp(request.eventId)
+            : verdict({ ...asResult(safetyNo), eventId: request.eventId }),
+        );
+      },
+    };
+    const handed: ClosedBatch[] = [];
+    const restoreSafety = setSafetyDeps({
+      ...h.deps,
+      read,
+      clock: {
+        now: () => {
+          if (broken) throw new Error("the clock broke");
+          return h.clock.now();
+        },
+        after: (ms) => h.clock.after(ms),
+      },
+    });
+    const restoreBatch = setBatchHooks({
+      clock: h.clock,
+      toLease: (batch) => {
+        handed.push(batch);
+      },
+    });
+    try {
+      await arrive("evt-1", PLAIN_TEXT);
+      await actorOf().safetyIdle();
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+
+      // 3 s: the batch's close is due, and the safety read's clock throws inside the alarm.
+      broken = true;
+      await h.clock.advance(3000);
+      await runDurableObjectAlarm(stub());
+      await actorOf().batchIdle();
+      expect(await actorOf().readBatches()).toMatchObject([
+        { reason: "quiet", handed: false, eventIds: ["evt-1"] },
+      ]);
+      expect(await scheduleOf()).toEqual([{ kind: "safetyRead", due_ms: 33_000 }]);
+      expect(await alarmOf()).not.toBeNull();
+
+      // 33 s: the clock answers again; the re-read lifts the hold and the batch goes on.
+      broken = false;
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(() => {
+        expect(handed.map(idsOf)).toEqual([["evt-1"]]);
+      });
+      expect(reads).toBe(2);
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
   });
 });

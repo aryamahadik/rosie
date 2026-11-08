@@ -26,8 +26,9 @@
 // once its texts have been read, even while a hold is open. Each run of a turn is handed the holds open at its start, read
 // after the pin (`LeasedTurn.holds`: the first run, a restart, a lapsed turn's rerun and the next turn after a commit each
 // read them again), and the commit hook is handed the holds open at commit time, so a hold that opened mid-turn binds
-// that commit too. The lease refuses nothing for a hold: T-252's gate commits only protective changes and the safety flow
-// while one is open (arch 06 lines 327 and 329), and until it is wired no turn runs at all.
+// that commit too, with the texts not read yet then (CQ-65's addendum, DL-127: T-252's gate counts each as an open hold).
+// The lease refuses nothing for a hold: T-252's gate commits only protective changes and the safety flow while one is
+// open (arch 06 lines 327 and 329), and until it is wired no turn runs at all.
 //
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks. Unwired, no turn runs and each closed batch stays stored with the batch window (fails
@@ -163,6 +164,13 @@ export interface LeasedTurn {
 export interface CommitContext {
   /** The safety holds open now: a hold that opened mid-turn binds this commit too (DL-119). */
   holds: OpenHold[];
+  /**
+   * The handle's texts not read yet now, by event id in arrival order (QUESTIONS.md CQ-65's addendum, DL-127): a text still
+   * being read, never wired, given up with no hold open, or with no safety row. Arch 02 step S holds routine actions until
+   * a text's outcome, so T-252's gate counts each as an open hold (protective changes only). A text under an open unread
+   * hold (no verdict in 4 s) is among `holds`, with rule `unread`.
+   */
+  unread: string[];
 }
 
 /** Joined at D-017; a test sets doubles. Unwired, no turn runs and no turn commits (fails closed). */
@@ -170,8 +178,8 @@ export interface LeaseHooks {
   /** The turn's work (T-251, T-252). A throw is a crash: the lease lapses and the turn reruns. */
   runTurn?: (turn: LeasedTurn) => void | Promise<void>;
   /**
-   * K-05 v1 commitTurn (C-087, through the Tool API), behind T-252's gate, which reads `at.holds`: the safety holds open at
-   * commit time, so it can refuse a routine commit while one is open.
+   * K-05 v1 commitTurn (C-087, through the Tool API), behind T-252's gate, which reads `at.holds` and `at.unread`: the
+   * safety holds open and the texts not read yet at commit time, so it can refuse a routine commit while either is there.
    */
   commit?: (request: CommitTurnRequest, at: CommitContext) => Promise<CommitTurnAnswer>;
 }
@@ -288,6 +296,8 @@ export interface LeaseHost {
   pin(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null>;
   /** The handle's safety holds open now, in the order they were made (the actor's safety read keeps them). */
   holds(): OpenHold[];
+  /** The handle's texts not read yet now, by event id in arrival order (CommitContext.unread). */
+  unread(): string[];
 }
 
 const bySeq = (items: Item[]): Item[] => [...items].sort((a, b) => a.seq - b.seq);
@@ -475,8 +485,9 @@ export class TurnLease {
   /**
    * The commit, through the lease: a replaced turn never commits; the first commit call of a turn marks it committing, so
    * no later batch restarts it (the call may go through even when its answer is lost). The commit hook is handed the
-   * safety holds open now, read again after the gate, so a hold that opened mid-turn binds this commit (DL-119). Committed
-   * (first or repeat), or parked: the lease is released and the waiting batches open the next turn.
+   * safety holds open now and the texts not read yet, read again after the gate, so a hold that opened mid-turn binds this
+   * commit (DL-119, DL-127). Committed (first or repeat), or parked: the lease is released and the waiting batches open
+   * the next turn.
    */
   private async commit(turnId: string, request: CommitTurnRequest): Promise<CommitAnswer> {
     if (request.turn.id !== turnId) return { error: "wrongTurn" };
@@ -493,7 +504,7 @@ export class TurnLease {
       return null;
     });
     if (gate !== null) return gate;
-    const at: CommitContext = { holds: this.host.holds() };
+    const at: CommitContext = { holds: this.host.holds(), unread: this.host.unread() };
     let answer: CommitTurnAnswer;
     try {
       answer = await port(request, at);

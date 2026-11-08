@@ -10,7 +10,9 @@
 // A safety read lives in memory, so the actor keeps a stored alarm at each read's 4 s deadline (T-1088): if the actor is
 // evicted mid-read (a deploy, a reset), the alarm brings a new instance, which resumes every read cut off, in arrival
 // order, the moment it starts (any request or alarm starts it); a resumed read ends through the same settle path as one
-// on arrival, so its batch is handed on and its danger closes the open batch.
+// on arrival, so its batch is handed on and its danger closes the open batch. The same alarm brings back every text
+// whose unread hold is open (no verdict in 4 s, the outage line sent) for its re-read every 30 s until a verdict lands
+// (DL-127), so a late answer lost with an evicted instance cannot leave a text unread and held for good.
 //
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
 // a sealed box. Never logged: a word, a phone number, a key, a sealed body.
@@ -20,7 +22,14 @@ import { DurableObject } from "cloudflare:workers";
 import { BundlePins, bundleKvOf, type PinEntry } from "../bundle";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
-import { SafetyOnArrival, isReadable, isReadableEvent, type HoldEntry, type SafetyEntry } from "../safety";
+import {
+  REREAD_MS,
+  SafetyOnArrival,
+  isReadable,
+  isReadableEvent,
+  type HoldEntry,
+  type SafetyEntry,
+} from "../safety";
 import { isLabel, logSink, openTrace, type BundleId, type SpanSink } from "../trace";
 import {
   actorClock,
@@ -76,12 +85,6 @@ export function setReceiptHooks(hooks: ReceiptHooks): () => void {
   };
 }
 
-/**
- * While a safety read's work runs past its 4 s deadline (its line is being handed on), how often the alarm comes back, in
- * case the actor is evicted before it ends (T-1088). The safety line's budget is 5 s from arrival (arch 04).
- */
-export const SAFETY_RETRY_MS = 1000;
-
 /** A hand-off the actor cannot read; `code` is a label, and the message never holds words. */
 export class ActorRefusal extends Error {
   readonly code: string;
@@ -117,7 +120,8 @@ export class HandleActor extends DurableObject {
     this.safety = new SafetyOnArrival({
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
-      // A late verdict: danger closes the open batch at once, and a lifted unread hold lets the waiting batches go on.
+      // A late answer or a re-read's: danger closes the open batch at once, a lifted unread hold lets the waiting batches
+      // go on, and a re-read moved 30 s on moves the safety alarm with it.
       afterLate: (eventId) => {
         this.lend(
           Promise.resolve()
@@ -150,25 +154,23 @@ export class HandleActor extends DurableObject {
       },
       pin: (request, signal) => this.pins.pin(request, signal),
       holds: () => this.safety.openHolds(),
+      unread: () => this.unreadTexts(),
     });
-    // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read.
-    // A failure here must not keep the actor from starting: the safety entry stays stored, so its alarm tries again.
-    try {
-      this.resumeSafety();
-    } catch {
-      // Nothing resumed now; the alarm's own call does it.
-    }
+    // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read,
+    // and reads again every text whose re-read is due (DL-127). A failure here must not keep the actor from starting.
+    this.resumeSafetyGuarded();
     // After a restart the alarm is set again from the stored schedule, so a batch open at the restart still closes, a
     // lease that lapsed while the actor was gone still reruns its turn, and a read still unresolved is looked at again.
     ctx.waitUntil(this.batch.arm());
   }
 
   /**
-   * The Durable Object alarm: the stored schedule's due entries (a cut-off safety read first, so its line waits for
-   * nothing; a lapsed lease; the batch close; a batch's hand-off).
+   * The Durable Object alarm: the stored schedule's due entries (the safety work first, so a line waits for nothing: a
+   * cut-off read, a re-read; then a lapsed lease; the batch close; a batch's hand-off). A throw in the safety part never
+   * keeps the lease and batch handlers from running.
    */
   override async alarm(): Promise<void> {
-    this.resumeSafety();
+    this.resumeSafetyGuarded();
     await this.lease.onAlarm();
     await this.batch.onAlarm();
   }
@@ -276,9 +278,32 @@ export class HandleActor extends DurableObject {
    * start failed after the text was stored). Routine work waits, as for a text still unread (T-247 security note d).
    */
   private withoutSafetyRow(eventIds: readonly string[]): boolean {
+    return this.missingSafetyRows(eventIds).length > 0;
+  }
+
+  /** The texts among these that the safety read reads but that have no safety row (their read never started), in arrival order. */
+  private missingSafetyRows(eventIds: readonly string[]): string[] {
     const missing = this.safety.withoutSafetyRow(eventIds);
-    if (missing.length === 0) return false;
-    return readInboxEvents(this.ctx.storage.sql, missing).some((entry) => isReadableEvent(entry.event));
+    if (missing.length === 0) return [];
+    return readInboxEvents(this.ctx.storage.sql, missing)
+      .filter((entry) => isReadableEvent(entry.event))
+      .map((entry) => entry.event.eventId);
+  }
+
+  /**
+   * The handle's texts not read yet, by event id in arrival order (CommitContext.unread; QUESTIONS.md CQ-65's addendum,
+   * DL-127): being read, never wired, given up with no hold open (the safety read's own), or waiting with no safety row (its
+   * read never started). T-252's gate counts each as an open hold; a text under an open unread hold is among the holds.
+   */
+  private unreadTexts(): string[] {
+    const unread = new Set([
+      ...this.safety.unreadTexts(),
+      ...this.missingSafetyRows(this.batch.pendingEventIds()),
+    ]);
+    if (unread.size === 0) return [];
+    const inOrder = readInboxEvents(this.ctx.storage.sql, [...unread]).map((entry) => entry.event.eventId);
+    // A text the inbox does not hold cannot be put in order; it is named all the same (fails closed).
+    return [...inOrder, ...[...unread].filter((eventId) => !inOrder.includes(eventId))];
   }
 
   /** Resolves when the batch work started so far is done (tests). */
@@ -309,29 +334,54 @@ export class HandleActor extends DurableObject {
   }
 
   /**
-   * Resumes every safety read an eviction cut off (T-1088), in arrival order, each through the settle path, and sets the
-   * safety alarm for what is still being read. Nothing is resumed while the safety read is not wired.
+   * Resumes every safety read an eviction cut off (T-1088), in arrival order, each through the settle path; starts the
+   * re-read of every text whose unread hold is open and whose re-read is due (DL-127: its answer is dealt with through
+   * `afterLate`); and sets the safety alarm for what is left. Nothing is read while the safety read is not wired.
    */
   private resumeSafety(): void {
     for (const resumed of this.safety.resumeCutOff()) this.settleAfter(resumed.eventId, resumed.work);
+    this.safety.rereadDue();
     this.syncSafetySchedule();
   }
 
   /**
-   * Keeps the safety entry of the stored schedule in step (T-1088): due at the earliest 4 s deadline of a text still being
-   * read, so that an actor evicted mid-read is woken to resume it; once that deadline has passed and the read's work still
-   * runs, due again in SAFETY_RETRY_MS; none when no text is being read, or when nothing is wired to read it (then nothing
-   * could resume it, and no alarm keeps firing for it). The time left is counted on the safety read's clock and set on
-   * the schedule's.
+   * `resumeSafety` for the constructor and the alarm, which go on whatever it does (T-1088 security note c): on a throw
+   * (the inbox or the safety clock failed) the safety entry is moved 30 s on, so the work is looked at again then and the
+   * alarm never comes straight back to the same failure.
+   */
+  private resumeSafetyGuarded(): void {
+    try {
+      this.resumeSafety();
+    } catch {
+      try {
+        scheduleEntry(this.ctx.storage.sql, SCHEDULE_SAFETY, actorClock().now() + REREAD_MS);
+      } catch {
+        // The storage itself failed: the platform runs the alarm again.
+      }
+    }
+  }
+
+  /**
+   * Keeps the safety entry of the stored schedule in step with the safety read (`nextWakeIn`): at the earliest 4 s deadline
+   * of a text still being read, so an actor evicted mid-read is woken to resume it; while a text's work runs past its
+   * deadline, in 1 s until its line's 5 s budget is spent and every 30 s after; at the next re-read of a text whose unread
+   * hold is open (every 30 s until a verdict lands). None when nothing is left, or when nothing is wired to read (then
+   * nothing could be read, and no alarm keeps firing for it). The time left is counted on the safety read's clock and set
+   * on the schedule's. When the safety read cannot say (its clock or storage failed), it is looked at again in 30 s.
    */
   private syncSafetySchedule(): void {
     const sql = this.ctx.storage.sql;
-    const left = this.safety.nextDeadlineIn();
+    let left: number | null;
+    try {
+      left = this.safety.nextWakeIn();
+    } catch {
+      left = REREAD_MS;
+    }
     if (left === null) {
       unscheduleEntry(sql, SCHEDULE_SAFETY);
       return;
     }
-    scheduleEntry(sql, SCHEDULE_SAFETY, actorClock().now() + (left > 0 ? left : SAFETY_RETRY_MS));
+    scheduleEntry(sql, SCHEDULE_SAFETY, actorClock().now() + Math.max(0, left));
   }
 
   private lend(work: Promise<void>): void {

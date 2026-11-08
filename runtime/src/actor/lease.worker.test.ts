@@ -26,6 +26,7 @@ import {
   type ActorNamespace,
   type HandleActorRpc,
   type InboundEvent,
+  type SealedHandoff,
 } from "../gateway";
 import { fakeKeyStore, present } from "../gateway/test-support";
 import { fakeBundles } from "../bundle/test-support";
@@ -101,7 +102,10 @@ function leaseIn(instance: unknown): LeaseInside {
   return (instance as { lease: LeaseInside }).lease;
 }
 
-async function arrive(eventId: string, options: { body?: string; trace?: string } = {}): Promise<void> {
+async function handoffOf(
+  eventId: string,
+  options: { body?: string; trace?: string } = {},
+): Promise<SealedHandoff> {
   const trace = options.trace ?? TRACE;
   const overrides: Json = { eventId, body: options.body ?? "Can I move my haircut to Friday?" };
   const prepared = await prepareHandoff(
@@ -114,14 +118,21 @@ async function arrive(eventId: string, options: { body?: string; trace?: string 
     keys,
   );
   if (prepared.door !== "actor") throw new Error("not an actor event");
-  expect(await door().accept(prepared.handoff)).toBe("written");
+  return prepared.handoff;
+}
+
+async function arrive(eventId: string, options: { body?: string; trace?: string } = {}): Promise<void> {
+  expect(await door().accept(await handoffOf(eventId, options))).toBe("written");
 }
 
 /** K-05 v1 commitTurn as the fixtures state it: the first commit of a turn id, then the repeat's first result. */
 interface FakeCommits {
   /** Every request, in order. */
   readonly calls: CommitTurnRequest[];
-  /** What the lease handed the commit hook beside each request (the safety holds open at commit time), in order. */
+  /**
+   * What the lease handed the commit hook beside each request (the safety holds open and the texts not read yet at
+   * commit time), in order.
+   */
   readonly contexts: CommitContext[];
   /** Each turn id committed, once, with its first answer. */
   readonly committed: Map<string, CommitTurnAnswer>;
@@ -801,7 +812,7 @@ describe("safety holds bind commits, not hand-offs", () => {
         expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", released: false }]);
 
         expect(await run.commit(turn)).toMatchObject({ result: "committed" });
-        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-1")] }]);
+        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-1")], unread: [] }]);
       },
       { answers: { "evt-1": crisis("evt-1") } },
     );
@@ -835,7 +846,7 @@ describe("safety holds bind commits, not hand-offs", () => {
         expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("neverReleased");
 
         await run.commit(turn);
-        expect(run.k05.contexts).toEqual([{ holds: [threatHold] }]);
+        expect(run.k05.contexts).toEqual([{ holds: [threatHold], unread: [] }]);
       },
       { answers: { "evt-1": threat("evt-1") } },
     );
@@ -861,7 +872,7 @@ describe("safety holds bind commits, not hand-offs", () => {
 
         // The commit is handed the hold open now, not the turn's empty list from its start.
         expect(await run.commit(restarted)).toMatchObject({ result: "committed" });
-        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-3")] }]);
+        expect(run.k05.contexts).toEqual([{ holds: [crisisHold("evt-3")], unread: [] }]);
 
         // The waiting batch opens the next turn, which carries the hold open then.
         await run.settle();
@@ -900,9 +911,69 @@ describe("safety holds bind commits, not hand-offs", () => {
         // Released before the commit (after a clear "we're safe"): the commit is handed no open hold.
         expect(await actorOf().markHoldReleased("hold-evt-3")).toBe("released");
         expect(await run.commit(rerun)).toMatchObject({ result: "committed" });
-        expect(run.k05.contexts).toEqual([{ holds: [] }]);
+        expect(run.k05.contexts).toEqual([{ holds: [], unread: [] }]);
       },
       { answers: { ...ALL_NO, "evt-3": crisis("evt-3") } },
+    );
+  });
+
+  // QUESTIONS.md CQ-65's addendum (DL-127): a text not read yet at commit time counts as an open hold for T-252's gate, so
+  // the commit is handed those texts beside the holds.
+  it("the commit is handed the texts not read yet beside the holds: being read, never wired, or with no safety row; once a text takes the timeout rule it is among the holds instead", async () => {
+    await withLease(
+      async (run) => {
+        await arrive("evt-1");
+        await run.tick(3000);
+        await run.settle();
+        const turn = present(run.turns[0], "the turn");
+
+        // Mid-turn: evt-2's read never answers (being read); evt-3 comes while no safety read is wired; evt-4's read never
+        // starts (the safety clock breaks as it is stored, so it has no safety row; T-247 security note d).
+        await arrive("evt-2");
+        const restoreUnwired = setSafetyDeps(null);
+        try {
+          await arrive("evt-3");
+        } finally {
+          restoreUnwired();
+        }
+        let broken = true;
+        const restoreBroken = setSafetyDeps({
+          ...run.h.deps,
+          clock: {
+            now: () => {
+              if (broken) {
+                broken = false;
+                throw new Error("the clock broke");
+              }
+              return run.h.clock.now();
+            },
+            after: (ms) => run.h.clock.after(ms),
+          },
+        });
+        try {
+          await expect(door().accept(await handoffOf("evt-4"))).rejects.toThrow();
+        } finally {
+          restoreBroken();
+        }
+
+        expect(await run.commit(turn)).toMatchObject({ result: "committed" });
+        expect(run.k05.contexts).toEqual([{ holds: [], unread: ["evt-2", "evt-3", "evt-4"] }]);
+
+        // 7 s: evt-2 has had no verdict in 4 s: the outage line and its unread hold. A commit sent again now is handed
+        // evt-2 among the holds (rule unread) and the two others as not read yet.
+        await run.h.clock.advance(4000);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readHolds()).toMatchObject([
+            { eventId: "evt-2", rule: "unread", released: false },
+          ]);
+        });
+        expect(await run.commit(turn)).toMatchObject({ result: "committed", repeated: true });
+        expect(run.k05.contexts[1]).toEqual({
+          holds: [{ eventId: "evt-2", holdId: null, rule: "unread", outcomes: [], blocksBooking: false }],
+          unread: ["evt-3", "evt-4"],
+        });
+      },
+      { answers: { "evt-1": safetyNo as unknown as SafetyResult } },
     );
   });
 });

@@ -18,8 +18,18 @@
 // A read cut off by the actor's eviction (a deploy or a reset mid-read: the 4 s deadline lived only in memory) is resumed
 // by the next instance (T-1088, `resumeCutOff`): read again with the time left, or, past 4 s, given the timeout rule at
 // once and read again for a late verdict, in arrival order. The actor's stored alarm makes sure that next instance comes.
-// This file keeps the hold's state and says so (`routineHeld`, `readSafety`); it does not batch. Never logged or put in a
-// span: a word, an evidence quote, a number.
+//
+// A text that took the timeout rule with no danger word (the outage line once, and its unread hold) is read again every
+// 30 s until a verdict lands (T-1088 round 2, DL-127, `rereadDue`; arch 11 line 564: "The turn retries every 30 s"). Its
+// next re-read is stored (`safety_reread`) and the actor keeps an alarm for it, so an eviction that loses the late answer
+// awaited in memory cannot leave the text unread and held for good. An answer that is itself timedOut or failed is no
+// verdict: the hold stays and the next re-read is set 30 s on. Only a verdict lifts an unread hold (with danger, the
+// outcome's own hold takes its place). On return (a read gives a verdict again), every other text whose unread hold is
+// open is read again at once, in arrival order: danger among them gets its line as its verdict lands, and the batches they
+// kept back go on in order ("On return: danger first, then stops, then the rest in order").
+//
+// This file keeps the hold's state and says so (`routineHeld`, `readSafety`, `unreadTexts`); it does not batch. Never
+// logged or put in a span: a word, an evidence quote, a number.
 
 import { openWords, sealWords, type SealedWords } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
@@ -35,6 +45,9 @@ import {
   timeoutResult,
 } from "./rules";
 import {
+  REREAD_MS,
+  SAFETY_LINE_BUDGET_MS,
+  SAFETY_RETRY_MS,
   VERDICT_DEADLINE_MS,
   type CheckedLine,
   type CoreCaller,
@@ -127,6 +140,16 @@ interface OpenHoldRow extends HoldRow {
   outcomes: string | null;
 }
 
+/** A text whose unread hold is open (no verdict yet), with when it is next read again (null: at once). */
+interface HeldRow extends Record<string, SqlStorageValue> {
+  event_id: string;
+  arrived_ms: number;
+  due_ms: number | null;
+}
+
+/** What a read gave once the timeout rule had taken its text: a verdict or the read's own no-verdict answer, a failure, or no words. */
+type LateAnswer = SafetyReadAnswer | "failed" | "nothing";
+
 /** What opening the words gave: nothing to read, or the words and the read in flight. */
 type Started =
   | { kind: "nothing" }
@@ -195,6 +218,9 @@ export function createSafetyTables(sql: SqlStorage): void {
   // What the read (or its timeout stand-in) found in each text, as K-02 outcome labels (a JSON list): a turn is handed
   // each open hold with the outcomes that made it (DL-119). Labels only, never the read's evidence words.
   sql.exec("CREATE TABLE IF NOT EXISTS safety_outcomes (event_id TEXT PRIMARY KEY, outcomes TEXT NOT NULL)");
+  // When each text whose unread hold is open is next read again, on the safety clock (DL-127; arch 11 line 564: every
+  // 30 s until a verdict lands). Stored, so an eviction cannot lose it.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_reread (event_id TEXT PRIMARY KEY, due_ms INTEGER NOT NULL)");
 }
 
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
@@ -213,8 +239,9 @@ export interface SafetyHost {
   storage: DurableObjectStorage;
   spanSink: () => SpanSink;
   /**
-   * Called after a verdict that came late (after the 4 s timeout) has been applied: it may have found danger (the open
-   * batch closes at once, as on time) or lifted the unread hold (the batches it kept back go on).
+   * Called once a read's answer after the timeout rule took its text (the late answer, or a re-read's) has been dealt
+   * with: a verdict may have found danger (the open batch closes at once, as on time) or lifted the unread hold (the
+   * batches it kept back go on); an answer with no verdict moved the text's next re-read (the actor's alarm follows it).
    */
   afterLate?: (eventId: string) => void;
   /** The stored texts with these event ids, sealed, in arrival order (the actor's inbox): a resumed read reads them again. */
@@ -235,6 +262,13 @@ export class SafetyOnArrival {
    * instance that read it is gone (an eviction, a deploy, a reset), and with it the 4 s deadline it kept in memory.
    */
   private readonly inFlight = new Set<string>();
+  /**
+   * The texts with a read in flight in this instance after the timeout rule took them (the late read sent on arrival or
+   * on a resume, or a re-read), each with how many. On return, only the held texts not here are read again at once.
+   */
+  private readonly rereading = new Map<string, number>();
+  /** The texts whose late verdict is being applied in this instance now: a second answer for one of them changes nothing. */
+  private readonly landing = new Set<string>();
 
   /** The handle's actor name, from the first hand-off; kept in storage for a restart. */
   private actorName = "";
@@ -295,11 +329,13 @@ export class SafetyOnArrival {
   /**
    * Resumes each read an eviction cut off (T-1088): every text still 'reading' whose work is not running in this instance,
    * in arrival order. Before its 4 s deadline it is read again with the time left; past it, the timeout rule applies at
-   * once (a danger word's line, else the outage line and the unread hold) and the read is sent again so that its late
-   * verdict can lift the unread hold, as on arrival (routine work is never held forever). The deadline still counts from
-   * the text's arrival, so a danger text gets its line no later than the timeout rule allows. A resumed read whose work
-   * fails is left unresolved (`lineFailed`), so routine work stays held and no alarm keeps trying it. Nothing is resumed
-   * while nothing is wired.
+   * once (a danger word's line, else the outage line and the unread hold, whose re-reads then follow every 30 s) and the
+   * read is sent again so that its late verdict can lift the unread hold, as on arrival (routine work is never held for
+   * ever). The deadline still counts from the text's arrival, so a danger text gets its line no later than the timeout rule
+   * allows. A text whose words cannot be opened again (the key store throws, at once or later) has no verdict to wait for:
+   * the timeout rule applies at once, as for a read that fails on arrival. A resumed read whose work fails is left
+   * unresolved (`lineFailed`), so routine work stays held and no alarm keeps trying it. Nothing is resumed while nothing is
+   * wired.
    */
   resumeCutOff(): ResumedRead[] {
     const set = deps;
@@ -325,22 +361,81 @@ export class SafetyOnArrival {
         continue;
       }
       const handoff: SealedHandoff = { ...text, actorName: this.actorName };
-      let settling: Promise<void>;
+      let deadline: Promise<void>;
       try {
         const left = row.arrived_ms + VERDICT_DEADLINE_MS - set.clock.now();
-        const deadline = left > 0 ? set.clock.after(left) : Promise.resolve();
-        const started = this.queueRead(set, handoff);
-        settling = this.settle(set, handoff, row.arrived_ms, deadline, started).finally(() => {
-          this.giveUp(eventId);
-        });
+        deadline = left > 0 ? set.clock.after(left) : Promise.resolve();
       } catch {
-        // Its read could not even start again (the clock or the key store threw): unresolved and held, as above.
-        this.giveUp(eventId);
-        continue;
+        // The clock cannot say how much time is left: the deadline counts as passed, so the line is never later.
+        deadline = Promise.resolve();
       }
+      const started = this.queueRead(set, handoff);
+      const settling = this.settle(set, handoff, row.arrived_ms, deadline, started).finally(() => {
+        this.giveUp(eventId);
+      });
       resumed.push({ eventId, work: this.track(eventId, settling) });
     }
     return resumed;
+  }
+
+  /**
+   * Starts the re-read of every text whose unread hold is open and whose next re-read is due (DL-127; arch 11 line 564),
+   * in arrival order, and sets each one's next re-read 30 s on before its read is sent: a read that never answers is
+   * read again then, and nothing comes due again at once. A text whose timeout work still runs here (its outage line
+   * being handed on) waits for the next one. The hold stays open until a verdict lands (`applyLate`). Nothing is read
+   * while nothing is wired.
+   */
+  rereadDue(): void {
+    const set = deps;
+    if (set === null) return;
+    const held = this.heldUnread();
+    if (held.length === 0) return;
+    const now = set.clock.now();
+    const due = held.filter((row) => row.due_ms === null || row.due_ms <= now);
+    if (due.length === 0) return;
+    for (const row of due) this.setReread(row.event_id, now + REREAD_MS);
+    const ready = due.filter((row) => !this.inFlight.has(row.event_id));
+    if (ready.length === 0) return;
+    const texts = new Map(
+      this.host.storedTexts(ready.map((row) => row.event_id)).map((text) => [text.event.eventId, text]),
+    );
+    for (const row of ready) {
+      // No stored words to read again: the text stays held, and its re-read comes back in 30 s.
+      const text = texts.get(row.event_id);
+      if (text === undefined) continue;
+      const handoff: SealedHandoff = { ...text, actorName: this.actorName };
+      const started = this.queueRead(set, handoff);
+      this.awaitLate(
+        set,
+        handoff,
+        row.arrived_ms,
+        started.then((s): LateAnswer | Promise<LateAnswer> =>
+          s === "unreadable" ? "failed" : s.kind === "nothing" ? "nothing" : s.verdict,
+        ),
+      );
+    }
+  }
+
+  /** Sets when a text is next read again (its unread hold is open). */
+  private setReread(eventId: string, dueMs: number): void {
+    this.host.storage.sql.exec(
+      "INSERT OR REPLACE INTO safety_reread (event_id, due_ms) VALUES (?, ?)",
+      eventId,
+      dueMs,
+    );
+  }
+
+  /** The texts whose unread hold is open (no verdict yet), in arrival order, with when each is next read again. */
+  private heldUnread(): HeldRow[] {
+    return this.host.storage.sql
+      .exec<HeldRow>(
+        `SELECT e.event_id, e.arrived_ms, r.due_ms
+         FROM safety_events e
+         JOIN safety_holds h ON h.event_id = e.event_id AND h.rule = 'unread' AND h.released = 0
+         LEFT JOIN safety_reread r ON r.event_id = e.event_id
+         ORDER BY e.rowid`,
+      )
+      .toArray();
   }
 
   /** Marks a text whose safety work could not end as unresolved: it is no longer read, and routine work for it waits. */
@@ -352,17 +447,32 @@ export class SafetyOnArrival {
   }
 
   /**
-   * Milliseconds, on the safety clock, until the earliest 4 s deadline of a text still being read (zero or less: passed),
-   * or null when no text is being read, or nothing is wired to read it. The actor keeps an alarm for it, so an instance
-   * comes back to resume a read cut off by an eviction.
+   * Milliseconds, on the safety clock, until the actor's alarm must look at the safety work again (zero or less: now), or
+   * null when nothing needs it: no text is being read and none waits for a verdict, or nothing is wired to read. The actor
+   * keeps its alarm there, so an instance always comes back to work an eviction cut off:
+   *   - a text still being read: at its 4 s deadline; past it, at once when its work was cut off; while its work still
+   *     runs here (its line being handed on), in 1 s until the line's 5 s budget is spent, then every 30 s (T-1088 security
+   *     note a: never a 1 s alarm for as long as a hang lasts);
+   *   - a text whose unread hold is open: at its next re-read, every 30 s until a verdict lands (DL-127).
    */
-  nextDeadlineIn(): number | null {
+  nextWakeIn(): number | null {
     const set = deps;
     if (set === null) return null;
-    const row = this.host.storage.sql
-      .exec<{ at: number | null }>("SELECT MIN(arrived_ms) AS at FROM safety_events WHERE state = 'reading'")
-      .one();
-    return row.at === null ? null : row.at + VERDICT_DEADLINE_MS - set.clock.now();
+    const reading = this.host.storage.sql
+      .exec<CutOffRow>("SELECT event_id, arrived_ms FROM safety_events WHERE state = 'reading'")
+      .toArray();
+    const held = this.heldUnread();
+    if (reading.length === 0 && held.length === 0) return null;
+    const now = set.clock.now();
+    const dues: number[] = [];
+    for (const row of reading) {
+      const deadline = row.arrived_ms + VERDICT_DEADLINE_MS;
+      if (deadline > now) dues.push(deadline);
+      else if (!this.inFlight.has(row.event_id)) dues.push(now);
+      else dues.push(now + (now < row.arrived_ms + SAFETY_LINE_BUDGET_MS ? SAFETY_RETRY_MS : REREAD_MS));
+    }
+    for (const row of held) dues.push(row.due_ms ?? now);
+    return Math.min(...dues) - now;
   }
 
   /** Resolves when every text that has arrived so far has been dealt with (tests; a shutdown). */
@@ -413,6 +523,25 @@ export class SafetyOnArrival {
         outcomes: row.outcomes === null ? [] : (JSON.parse(row.outcomes) as SafetyOutcome[]),
         blocksBooking: row.blocks_booking === 1,
       }));
+  }
+
+  /**
+   * The texts not read yet, by event id in arrival order, beside the open holds (QUESTIONS.md CQ-65's addendum, DL-127):
+   * still being read, never wired, or given up with no hold open. A commit is handed them (CommitContext.unread), and
+   * T-252's gate counts each as an open hold. A text under an open unread hold is among `openHolds` instead; a text with no
+   * safety row at all is the actor's to find.
+   */
+  unreadTexts(): string[] {
+    return this.host.storage.sql
+      .exec<{ event_id: string }>(
+        `SELECT e.event_id FROM safety_events e
+         WHERE e.state IN ('reading', 'unwired')
+            OR (e.state = 'lineFailed' AND e.danger = 0
+                AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.released = 0))
+         ORDER BY e.rowid`,
+      )
+      .toArray()
+      .map((row) => row.event_id);
   }
 
   /** True while routine work must wait: a text is unread, or a hold is not released. */
@@ -551,17 +680,23 @@ export class SafetyOnArrival {
     return { kind: this.actorName.slice(0, at), address: this.actorName.slice(at + 1) };
   }
 
-  /** Opens the box and starts the read, behind the earlier texts' starts, so the port is called in arrival order. */
+  /**
+   * Opens the box and starts the read, behind the earlier texts' starts, so the port is called in arrival order. Never
+   * throws: a key store that throws, at once or later, makes the words unreadable (no verdict can come, so the timeout
+   * rule applies at once; T-1088 security note d).
+   */
   private queueRead(set: SafetyDeps, handoff: SealedHandoff): Promise<Started | "unreadable"> {
     const { event } = handoff;
     const sealed = event.sealed;
     const opened: Promise<SealedWords | "unreadable"> =
       sealed === null
         ? Promise.resolve({ body: null, subject: null })
-        : set.keys.getOrCreateKey(event.handle).then(
-            (key) => openWords(sealed, key, this.actorName, event.eventId),
-            () => "unreadable" as const,
-          );
+        : Promise.resolve()
+            .then(() => set.keys.getOrCreateKey(event.handle))
+            .then(
+              (key) => openWords(sealed, key, this.actorName, event.eventId),
+              () => "unreadable" as const,
+            );
     const started = this.launch.then(async (): Promise<Started | "unreadable"> => {
       const words = await opened.catch(() => "unreadable" as const);
       if (words === "unreadable") return "unreadable";
@@ -608,6 +743,7 @@ export class SafetyOnArrival {
     const gaveUp = first !== "failed" && first !== "deadline" && first.result.timedOut;
     if (first !== "failed" && first !== "deadline" && !gaveUp) {
       await this.applyResult(set, handoff, arrivedAt, first.result, first.modelCalls, "verdict");
+      this.onReturn(set, eventId);
       return;
     }
 
@@ -626,22 +762,108 @@ export class SafetyOnArrival {
     await this.applyResult(set, handoff, arrivedAt, stand, timeoutCalls(), first);
 
     // A verdict that arrives late changes a timeout that found no danger word: it is applied then, and the unread hold lifts.
-    // It is not waited for: a read that never answers must not keep the text's work open. The actor is told once it is
-    // applied, so danger closes the open batch at once and a lifted hold lets the waiting batches go on (note e).
+    // It is not waited for: a read that never answers must not keep the text's work open, and the stored re-read (every
+    // 30 s) stands in for it if the answer never comes or is lost with this instance (DL-127). The actor is told once the
+    // answer is dealt with, so danger closes the open batch at once and a lifted hold lets the waiting batches go on (note e).
     if (
       first === "deadline" &&
       matches.length === 0 &&
       opened !== "unreadable" &&
       opened.kind === "reading"
     ) {
-      void opened.verdict
-        .then(async (late) => {
-          if (late !== "failed" && !late.result.timedOut) {
-            await this.applyResult(set, handoff, arrivedAt, late.result, late.modelCalls, "late");
-            this.host.afterLate?.(eventId);
-          }
-        })
-        .catch(() => undefined);
+      this.awaitLate(set, handoff, arrivedAt, opened.verdict);
+    }
+  }
+
+  /**
+   * Waits, in this instance's memory, for a read sent once the timeout rule had taken its text (the late read, or a
+   * re-read), deals with its answer (`applyLate`) and tells the actor. The text counts as being read again here meanwhile.
+   */
+  private awaitLate(
+    set: SafetyDeps,
+    handoff: SealedHandoff,
+    arrivedAt: number,
+    answer: Promise<LateAnswer>,
+  ): void {
+    const eventId = handoff.event.eventId;
+    this.rereading.set(eventId, (this.rereading.get(eventId) ?? 0) + 1);
+    void answer
+      .then((late) => this.applyLate(set, handoff, arrivedAt, late))
+      .then(() => {
+        this.host.afterLate?.(eventId);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        const left = (this.rereading.get(eventId) ?? 1) - 1;
+        if (left > 0) this.rereading.set(eventId, left);
+        else this.rereading.delete(eventId);
+      });
+  }
+
+  /**
+   * A read's answer after the timeout rule took its text (DL-127). Only the first verdict counts: once the text's unread
+   * hold has lifted (or turned into the outcome's hold), a later answer changes nothing. An answer that is itself timedOut
+   * or failed is no verdict: the hold stays open and the next re-read is set 30 s on (arch 11 line 564), never lifted
+   * without a verdict. A verdict is applied as on time (danger gets its line at once, past any opt-out); then the unread
+   * hold lifts (a danger verdict's own hold has taken its place, unless the core made none), the text counts as read and
+   * its re-reads stop. Words that open to nothing hold nothing, as on arrival.
+   */
+  private async applyLate(
+    set: SafetyDeps,
+    handoff: SealedHandoff,
+    arrivedAt: number,
+    answer: LateAnswer,
+  ): Promise<void> {
+    const eventId = handoff.event.eventId;
+    if (this.landing.has(eventId) || !this.unreadHoldOpen(eventId)) return;
+    const { sql } = this.host.storage;
+    if (answer === "failed" || (answer !== "nothing" && answer.result.timedOut)) {
+      this.setReread(eventId, set.clock.now() + REREAD_MS);
+      const gaveUp = answer === "failed" ? timeoutResult(eventId, []) : answer.result;
+      const calls = answer === "failed" ? timeoutCalls() : answer.modelCalls;
+      this.recordSpan(set, handoff, arrivedAt, gaveUp, calls, "reread", "none", null, answer === "failed");
+      return;
+    }
+    this.landing.add(eventId);
+    try {
+      if (answer !== "nothing") {
+        await this.applyResult(set, handoff, arrivedAt, answer.result, answer.modelCalls, "late");
+      }
+      sql.exec("UPDATE safety_holds SET released = 1 WHERE event_id = ? AND rule = 'unread'", eventId);
+      sql.exec(
+        "UPDATE safety_events SET state = 'done' WHERE event_id = ? AND state = 'lineFailed' AND danger = 0",
+        eventId,
+      );
+      sql.exec("DELETE FROM safety_reread WHERE event_id = ?", eventId);
+      if (answer !== "nothing") this.onReturn(set, eventId);
+    } finally {
+      this.landing.delete(eventId);
+    }
+  }
+
+  /** True while this text's unread hold is open: no verdict has landed for it yet. */
+  private unreadHoldOpen(eventId: string): boolean {
+    return (
+      this.host.storage.sql
+        .exec("SELECT 1 FROM safety_holds WHERE event_id = ? AND rule = 'unread' AND released = 0", eventId)
+        .toArray().length > 0
+    );
+  }
+
+  /**
+   * A read gave a verdict: the model is back (arch 11 line 564: "On return: danger first, then stops, then the rest in
+   * order"). Every other text whose unread hold is open, and whose read is not in flight here, is due for its re-read now,
+   * so the actor's alarm reads them at once, in arrival order: danger among them gets its line as its verdict lands, and
+   * the batches they kept back go on in order.
+   */
+  private onReturn(set: SafetyDeps, readNow: string): void {
+    const held = this.heldUnread();
+    if (held.length === 0) return;
+    const now = set.clock.now();
+    for (const row of held) {
+      if (row.event_id === readNow || this.inFlight.has(row.event_id) || this.rereading.has(row.event_id))
+        continue;
+      if (row.due_ms !== null && row.due_ms > now) this.setReread(row.event_id, now);
     }
   }
 
@@ -680,17 +902,18 @@ export class SafetyOnArrival {
         }
       } else if (result.timedOut) {
         // Routine work stays held: no read said it is safe. The hold is made before the outage line is tried, so a send
-        // that throws still leaves the text unread, never read (T-1088: an unread text keeps its batch back).
+        // that throws still leaves the text unread, never read (T-1088: an unread text keeps its batch back), and its
+        // first re-read is set with it, 30 s on: the text is read again until a verdict lands (DL-127). A late verdict
+        // lifts the hold (`applyLate`).
         sql.exec(
           "INSERT OR IGNORE INTO safety_holds (event_id, hold_id, rule, blocks_booking, released) VALUES (?, NULL, 'unread', 0, 0)",
           eventId,
         );
+        this.setReread(eventId, set.clock.now() + REREAD_MS);
         const sent = await this.sendOutage(set, handoff, arrivedAt);
         path = sent.path;
         lineId = sent.lineId;
         handedAfter = sent.handedAfterMs;
-      } else if (via === "late") {
-        sql.exec("UPDATE safety_holds SET released = 1 WHERE event_id = ? AND rule = 'unread'", eventId);
       }
     } catch {
       failure = true;
@@ -946,7 +1169,8 @@ export class SafetyOnArrival {
           danger: dangerOutcomes(result.outcomes).length > 0,
           path: path ?? "none",
           line: lineId ?? null,
-          lineFor: result.timedOut ? timeoutLineId(result.dangerWords) : null,
+          // A re-read with no verdict sends nothing: no line stands in for it (the timeout rule's went once, before).
+          lineFor: result.timedOut && via !== "reread" ? timeoutLineId(result.dangerWords) : null,
         },
       });
     } catch {
