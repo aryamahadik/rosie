@@ -34,6 +34,7 @@ import {
   moneyClaims,
   moneyHome,
   moneyLines,
+  moneyTaken,
   readMoney,
   readMoneyRecord,
   recordReading,
@@ -641,6 +642,208 @@ describe("a message naming a card hold or a charge on silence fails the check", 
     ]);
     expect(checkMoneyLine("Each service's own terms apply.", deposit).refused).toEqual([
       { claim: "feePerService", why: "oneFeePerBooking" },
+    ]);
+  });
+
+  // Round 2 (DL-179, GAP 1): holds and charges on silence read by meaning, after the Values check's apostrophe folding.
+
+  /** The security reviewer's lines (a) to (e) on round 1, each with the claim it makes. */
+  const REVIEWER_LINES = [
+    ["Your card will be held for $40 until the visit.", "cardHold"],
+    ["Your saved card is held for {{deposit}} until Sat 11:00am.", "cardHold"],
+    ["If you don't reply by Fri 11am, we'll charge the $20 fee to your card.", "chargeOnSilence"],
+    [
+      "If you haven't answered within 24 hours, the late-cancel fee is charged to the saved card.",
+      "chargeOnSilence",
+    ],
+    ["If we don't get a reply by 7pm, we'll charge your card.", "chargeOnSilence"],
+  ] as const;
+  const WHY = { cardHold: "neverHold", chargeOnSilence: "neverChargeOnSilence" } as const;
+
+  /** A line with straight apostrophes, then curly ones (’, and ‘ as some keyboards type it). */
+  function apostropheForms(line: string): string[] {
+    return [line, line.replaceAll("'", "’"), line.replaceAll("'", "‘")];
+  }
+
+  it("the security reviewer's lines (a) to (e), with straight or curly apostrophes, each fail on every booking", () => {
+    const all = readings();
+    let curly = 0;
+    for (const [line, claim] of REVIEWER_LINES)
+      for (const text of apostropheForms(line)) {
+        if (text.includes("’")) curly += 1;
+        for (const reading of all) {
+          const check = checkMoneyLine(text, reading);
+          expect(check.ok, text).toBe(false);
+          expect(check.refused, text).toContainEqual({ claim, why: WHY[claim] });
+        }
+      }
+    // Lines (c), (d) and (e) hold apostrophes, so each was also read in its curly form.
+    expect(curly).toBe(3);
+  });
+
+  it("a hold word said of a card or an amount fails in any order and either voice; a charge tied to silence fails in any order", () => {
+    const holdsAnyOrder = [
+      "$40 is held on your card until the visit.",
+      "On your saved card, we'll hold {{deposit}} until Sat 11:00am.",
+      "We'll put a {{deposit}} hold on the card you saved.",
+      "Your card is authorised for $40 before the visit.",
+      "We authorize $40 on your card.",
+      "{{deposit}} is reserved on your card.",
+      "We block $40 on your card until the visit.",
+      "Your saved card will be frozen for {{deposit}}.",
+      "The deposit is held until the visit.",
+    ];
+    const silencesAnyOrder = [
+      "We'll charge your card if you don't reply by 7pm.",
+      "No reply means we charge.",
+      "If there's no response by 7pm, we debit your card.",
+      "We take payment if we don't hear back by Fri 11am.",
+      "Silence means we bill your saved card.",
+      "No reply by 7pm? We'll charge the saved card.",
+      "The $20 fee is charged to your card unless you reply by 7pm.",
+      "If you stay silent, the deposit is kept.",
+      "If you don't reply by 7 p.m. we'll charge your card.",
+    ];
+    for (const reading of readings()) {
+      for (const line of holdsAnyOrder)
+        for (const text of apostropheForms(line))
+          expect(checkMoneyLine(text, reading).refused, text).toContainEqual({
+            claim: "cardHold",
+            why: "neverHold",
+          });
+      for (const line of silencesAnyOrder)
+        for (const text of apostropheForms(line))
+          expect(checkMoneyLine(text, reading).refused, text).toContainEqual({
+            claim: "chargeOnSilence",
+            why: "neverChargeOnSilence",
+          });
+    }
+  });
+
+  it("a denied clause still makes no claim: we never hold, nothing is held, we won't charge, no charge without your yes", () => {
+    const denied = [
+      "We never hold your card.",
+      "Nothing is held on your card.",
+      "No $40 hold is ever placed on your card.",
+      "If you don't reply, we won't charge your card.",
+      "No charge without your yes.",
+      "If you haven't answered within 24 hours, nothing is charged to the saved card.",
+      "If we don't get a reply by 7pm, there's no charge.",
+      // The master's own rule lines (S11-17 more, S13-26 more, S11-25 rule): a denial heading, one denial over a list
+      // of verbs, a silence that is itself denied.
+      "Never: book, charge or decide a fee on silence.",
+      "Silence never books, charges or signs.",
+      "Rosie's rule: only the owner's yes takes a fee, and silence never does.",
+    ];
+    for (const line of denied)
+      for (const text of apostropheForms(line)) {
+        expect(moneyClaims(text), text).not.toContain("cardHold");
+        expect(moneyClaims(text), text).not.toContain("chargeOnSilence");
+      }
+  });
+
+  it("a hold of a time or a place is no card hold; a money word with no silence tied to it is no charge on silence", () => {
+    const words = [
+      "Your spot is held for 15 minutes.",
+      "Pay the $40 deposit to hold your time.",
+      "The page holds your time until {{ask.by}}.",
+      "Hold on to this text: your $40 deposit is paid.",
+      // S13-55 more: "isn't confirmed" is said of the booking, not of a person who did not answer.
+      "The charge fails as the booking is written: it isn't confirmed yet.",
+      "If you don't reply, the bill comes after the visit.",
+    ];
+    for (const text of words) {
+      expect(moneyClaims(text), text).not.toContain("cardHold");
+      expect(moneyClaims(text), text).not.toContain("chargeOnSilence");
+    }
+  });
+
+  it("no message of either master flow names a card hold or a charge on silence: the master never says either", () => {
+    const stringsIn = (value: unknown): string[] => {
+      if (typeof value === "string") return [value];
+      if (Array.isArray(value)) return value.flatMap(stringsIn);
+      if (typeof value === "object" && value !== null) return Object.values(value).flatMap(stringsIn);
+      return [];
+    };
+    const texts = new Set<string>();
+    for (const flow of FLOWS)
+      for (const step of Object.values(objAt(src.flows[flow], ["steps"])))
+        if (typeof step === "object" && step !== null && "say" in step)
+          for (const text of stringsIn(step.say)) texts.add(text);
+    expect(texts.size).toBeGreaterThan(1000);
+    const naming = [...texts].filter((text) => {
+      const claims = moneyClaims(text);
+      return claims.includes("cardHold") || claims.includes("chargeOnSilence");
+    });
+    expect(naming).toEqual([]);
+  });
+});
+
+describe("money taken, not asked: 'charged', 'you paid' and a signed schedule's share need money the booking took", () => {
+  // Round 2 (DL-179, GAP 2): before the money step the record value "paid" only means the money is asked for.
+
+  it("'You were charged $55.' on A list|full|none fails before the money step and before the write, and passes once taken", () => {
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(asked.values).toContain("paid");
+    expect(moneyTaken(asked)).toBe(false);
+    expect(checkMoneyLine("You were charged $55.", asked)).toEqual({
+      ok: false,
+      claims: ["charged"],
+      refused: [{ claim: "charged", why: "notTaken" }],
+    });
+    expect(checkMoneyLine("You’ve been charged $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+    const unwritten = readMoney({ ...oneService("A", "list|full|none"), written: false }, record("A"));
+    expect(moneyTaken(unwritten)).toBe(false);
+    expect(checkMoneyLine("You were charged $55.", unwritten).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+    const taken = readMoney(oneService("A", "list|full|none"), record("A"));
+    expect(moneyTaken(taken)).toBe(true);
+    expect(checkMoneyLine("You were charged $55.", taken)).toEqual({
+      ok: true,
+      claims: ["charged"],
+      refused: [],
+    });
+  });
+
+  it("'You paid $55.' alike; money named in a term or a refund line ('from what you paid') still reads before the money step", () => {
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    const taken = readMoney(oneService("A", "list|full|none"), record("A"));
+    const card = readMoney(oneService("A", "list|card|counter"), record("A"));
+    for (const text of ["You paid $55.", "You’ve already paid {{paidnow}}."]) {
+      expect(checkMoneyLine(text, asked).refused, text).toEqual([{ claim: "youPaid", why: "notTaken" }]);
+      expect(checkMoneyLine(text, card).refused, text).toEqual([{ claim: "youPaid", why: "notTaken" }]);
+      expect(checkMoneyLine(text, taken).ok, text).toBe(true);
+    }
+    // pay.late's row for money paid now, which the master reads before the money step on a deposit booking.
+    const deposit = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    const late = record("A").rows["pay.late"]?.[1]?.text ?? "";
+    expect(moneyClaims(late)).toEqual(["paidNow", "backToCard", "fee"]);
+    expect(moneyLines(deposit, record("A")).find((line) => line.slot === "pay.late")).toMatchObject({
+      ok: true,
+      row: 1,
+      text: late,
+    });
+  });
+
+  it("a signed schedule keeps no share on A list|deposit|counter before the money step or the write: nothing was taken", () => {
+    const home = moneyHome();
+    const asked = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    expect(asked.values).toContain("paid");
+    expect(home.rule("chargeOnSilence", { money: asked, signedSchedule: true })).toBe("none");
+    const unwritten = readMoney({ ...oneService("A", "list|deposit|counter"), written: false }, record("A"));
+    expect(home.rule("chargeOnSilence", { money: unwritten, signedSchedule: true })).toBe("none");
+    const taken = readMoney(oneService("A", "list|deposit|counter"), record("A"));
+    expect(home.rule("chargeOnSilence", { money: taken, signedSchedule: true })).toBe("keepSignedShare");
+    expect([home.rule("charged", { money: asked }), home.rule("youPaid", { money: asked })]).toEqual([
+      "no",
+      "no",
+    ]);
+    expect([home.rule("charged", { money: taken }), home.rule("youPaid", { money: taken })]).toEqual([
+      "yes",
+      "yes",
     ]);
   });
 });

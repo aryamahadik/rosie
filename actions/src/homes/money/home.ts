@@ -6,7 +6,8 @@
 // paid that never was gets the home's value, and the registry logs the difference by label. Its points:
 //   - chargeOnSilence: "none", or "keepSignedShare" where a signed dated schedule keeps its share of money already
 //     taken (S13-55: "Rosie NEVER makes a new charge on silence. Silence: no fee, unless a signed schedule keeps part.
-//     A signed schedule keeps only its share of money already taken. It never makes a new charge."; RULES 3.4);
+//     A signed schedule keeps only its share of money already taken. It never makes a new charge."; RULES 3.4). Money
+//     already taken is moneyTaken: from the money step on and written, never money only asked for (DL-179);
 //   - cardHold: "never" (S13-55: "Nothing is ever held on a card");
 //   - feeFrom: where the booking's one fee would come from: "none", "paidNow" (out of what was paid now, never more) or
 //     "savedCard" (nothing paid now: the saved card, only with the owner's yes, S11-22);
@@ -16,7 +17,7 @@
 import { isLabel } from "../../../../runtime/src/trace";
 import type { HomeModule } from "../registry";
 import { MONEY_CLAIMS, claimHolds, type MoneyClaim } from "./claims";
-import { holds, type MoneyReading } from "./money";
+import { moneyTaken, type MoneyReading } from "./money";
 import { MoneyHomeError } from "./record";
 
 /** What the money home rules by: the booking's money reading, and whether a signed dated schedule is in force. */
@@ -43,7 +44,7 @@ export function moneyRule(point: string, context: MoneyHomeContext): string {
   const { money } = context as Partial<MoneyHomeContext>;
   if (money === undefined) throw new MoneyHomeError("the money home was asked to rule with no money reading");
   if (point === "chargeOnSilence")
-    return context.signedSchedule === true && holds(money, "paid") ? "keepSignedShare" : "none";
+    return context.signedSchedule === true && moneyTaken(money) ? "keepSignedShare" : "none";
   if (point === "cardHold") return "never";
   if (point === "feeFrom") return money.oneFee.from;
   if (isClaimPoint(point)) return claimHolds(point, money) ? "yes" : "no";
