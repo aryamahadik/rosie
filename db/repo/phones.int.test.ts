@@ -238,18 +238,18 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     });
   }
 
-  it("is expand only: the four tables are plain tables, and the table list has no row-level security yet here", async () => {
+  it("is expand only: the four tables are plain tables; row-level security per business on pauses only (T-191)", async () => {
     const rows = await db.sql<{ name: string; kind: string; rls: boolean }[]>`
       select c.relname as name, c.relkind as kind, c.relrowsecurity as rls
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
       where n.nspname = ${db.schema} and c.relname in ('handles', 'person_handles', 'phones', 'pauses')
       order by c.relname
     `;
-    expect(rows.map((row) => [row.name, row.kind])).toEqual([
-      ["handles", "r"],
-      ["pauses", "r"],
-      ["person_handles", "r"],
-      ["phones", "r"],
+    expect(rows.map((row) => [row.name, row.kind, row.rls])).toEqual([
+      ["handles", "r", false],
+      ["pauses", "r", true],
+      ["person_handles", "r", false],
+      ["phones", "r", false],
     ]);
   });
 

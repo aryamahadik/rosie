@@ -200,13 +200,13 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     expect(triggers.map((trigger) => trigger.name)).toEqual(["event_log_never_edited"]);
   });
 
-  it("is expand only: a plain table, no row-level security here (T-191)", async () => {
+  it("is expand only: a plain table, with row-level security per business (T-191)", async () => {
     const rows = await db.sql<{ kind: string; rls: boolean }[]>`
       select c.relkind as kind, c.relrowsecurity as rls
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
       where n.nspname = ${db.schema} and c.relname = 'event_log'
     `;
-    expect(rows).toEqual([{ kind: "r", rls: false }]);
+    expect(rows).toEqual([{ kind: "r", rls: true }]);
   });
 
   it("is recorded in schema_migrations as core_event_log, after core_outbox", async () => {

@@ -4,13 +4,16 @@
 // (EXCLUDE, 23P01), and a class session's seat counter cannot pass its capacity (CHECK, 23514). reserve() writes the row
 // and reads the refusal; it never checks for a free slot first, so two parallel calls cannot both pass.
 //
-// Both calls run under the reservation's business (the scope set inside their own transaction; row-level security itself
-// is T-191's). Their transaction is lost-connection safe (inScopedTransaction): a lost connection answers transient with
-// no rollback written to the dead connection. Every row update raises the version by one (trigger from 0002).
+// Both calls run under the reservation's business (the scope set inside their own transaction), and row-level security
+// (T-191) shows them only that business's rows. Two reads must see every business, so they go through the unscoped
+// database functions of T-191's migration (K-05 item 8; T-1085), which return only ids and ends, or yes or no: a mobile's
+// saved times for the cap of 2 (reservations_saved_times, which also locks its phones row), and whether a booked time
+// covers the asked one for the worker at any business (reservations_booked_overlap). Their transaction is lost-connection
+// safe (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every
+// row update raises the version by one (trigger from 0002).
 //
 // Left to later tasks, as the card says: the saved-time clock row (no clock_rows table exists yet, so the answer names
-// its id, `<reservation id>/saved-time`, and writes nothing), the cap lookup through an unscoped database function (T-191,
-// when row-level security would hide other businesses' rows), the one extension (extend) and the commit's confirm.
+// its id, `<reservation id>/saved-time`, and writes nothing), the one extension (extend) and the commit's confirm.
 import { isLostConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
@@ -398,8 +401,10 @@ async function lockSlot(tx: Conn, resourceId: string, personId: string | null): 
 /**
  * Takes the lock that makes the cap of 2 safe, then lists the saved (held, not yet ended) times of who they are for. A
  * mobile: its phones row FOR UPDATE, so parallel reserves for one mobile run one after the other, counted across every
- * business. An agent token (it has no row): a transaction-level advisory lock on the business and the token, counted at
- * that business. A booking: no cap. Waiting rows never count (A4-18).
+ * business; both happen in reservations_saved_times (K-05 item 8), which runs unscoped, since this transaction's scope
+ * shows only its own business's rows, and returns only the rows' ids and ends. An agent token (it has no row): a
+ * transaction-level advisory lock on the business and the token, counted at that business. A booking: no cap. Waiting
+ * rows never count (A4-18).
  */
 async function lockAndListSaved(
   tx: Conn,
@@ -409,10 +414,8 @@ async function lockAndListSaved(
 ): Promise<SavedRow[]> {
   const columns = savedForColumns(who);
   if (columns.phone !== null) {
-    await tx`select 1 from phones where number = ${columns.phone} for update`;
     return tx<SavedRow[]>`
-      select id, held_until from reservations
-      where for_phone_number = ${columns.phone} and state = 'held' and held_until > ${at}::timestamptz
+      select id, held_until from reservations_saved_times(${columns.phone}, ${at}::timestamptz)
       order by held_until, id
     `;
   }
@@ -515,16 +518,20 @@ async function insertReservation(
   return toReservation(row);
 }
 
-/** Whether a booked time already covers the asked one, for the resource or, for a worker, the person at any business. */
+/**
+ * Whether a booked time already covers the asked one, for the resource or, for a worker, the person at any business:
+ * read through reservations_booked_overlap, which runs unscoped (the other businesses' rows are hidden from this
+ * transaction's scope) and answers only yes or no.
+ */
 async function bookedOverlap(tx: Conn, request: ReserveRequest, resource: ResourceRow): Promise<boolean> {
-  const rows = await tx`
-    select 1 from reservations
-    where state = 'booked'
-      and during && tstzrange(${request.during.start}::timestamptz, ${request.during.end}::timestamptz, '[)')
-      and (resource_id = ${resource.id} or (${resource.person_id}::text is not null and worker_person_id = ${resource.person_id}))
-    limit 1
+  const [row] = await tx<{ overlap: boolean }[]>`
+    select reservations_booked_overlap(
+      ${resource.id},
+      ${resource.person_id}::text,
+      tstzrange(${request.during.start}::timestamptz, ${request.during.end}::timestamptz, '[)')
+    ) as overlap
   `;
-  return rows.length > 0;
+  return row?.overlap === true;
 }
 
 /**
@@ -601,6 +608,11 @@ export async function reserveIn(tx: Conn, request: ReserveRequest): Promise<Rese
       const first = await getReservation(tx, request.reservationId);
       if (first !== null) {
         return repeatOutcome(first, request);
+      }
+      if (code === "23505") {
+        // The id is taken by another business's reservation, which this scope cannot see (row-level security): it is
+        // never this request, so another request with that id.
+        return { error: "idConflict", reservationId: request.reservationId };
       }
     }
     if (code === "23514" && constraint === "class_seats_taken_within_capacity") {
