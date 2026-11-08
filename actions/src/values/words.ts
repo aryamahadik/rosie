@@ -21,8 +21,12 @@ export function languagesOf(language: string | null | undefined): readonly Value
 const INVISIBLE = /\p{Default_Ignorable_Code_Point}/gu;
 /** Every mark read as an apostrophe: ' ’ ‘ ‛ ` ´ ′ ‵ (NFKC makes the fullwidth ＇ one too). */
 const APOSTROPHE = /['’‘‛`´′‵]/gu;
-/** Every dash, by Unicode's Dash property: - ‐ ‑ ‒ – — ― − 〜 and the rest (NFKC makes the fullwidth － one too). */
-const DASH = /\p{Dash}/gu;
+/**
+ * Every dash, by Unicode's Dash property: - ‐ ‑ ‒ – — ― − 〜 and the rest (NFKC makes the fullwidth － one too), and the
+ * tilde: NFKC makes the fullwidth ～ that Japanese keyboards type for a range one, so "3～5pm" is "3-5pm" (T-304 round 4,
+ * DL-199 item 2, N3).
+ */
+const DASH = /[\p{Dash}~]/gu;
 
 /** The words with every character that shows nothing taken out: 1, a zero-width space, then 40 is "140". */
 export function visibleWords(words: string): string {
@@ -32,7 +36,8 @@ export function visibleWords(words: string): string {
 /**
  * Words in one form: invisible characters taken out, every apostrophe straight (before the accents come off, so "can´t"
  * is "can't"), compatibility forms joined (NFKC: "，" is ",", "：" ":", "１" "1"), accents taken off, lower case, every
- * dash one hyphen, "a.m."/"p.m." as "am"/"pm", "o'clock" as "oclock", "@" as "at", spaces collapsed.
+ * dash and tilde one hyphen ("～" is a range mark), "a.m."/"p.m." as "am"/"pm", "o'clock" as "oclock", "@" as "at",
+ * spaces collapsed.
  */
 export function foldWords(words: string): string {
   return visibleWords(words)
@@ -102,8 +107,9 @@ export function overlaps(found: Span, taken: readonly Span[]): boolean {
 //      "no" of "no.reply@example.com"); at the start, none right before words that start with a digit ("200" of
 //      "$1,200", "30" of "10:30"), nor one standing between a letter or digit and words that start with a letter
 //      ("reply" of "no.reply", "com" of "example.com");
-//   3. no hyphen, dash or apostrophe joining them to a letter or digit on either side ("twenty" of "twenty-five", "$12"
-//      of "$12-15", "Thu 2" of "Thu 2-5", "can" of "can't").
+//   3. no hyphen, dash, tilde, apostrophe or underscore joining them to a letter or digit on either side ("twenty" of
+//      "twenty-five", "$12" of "$12-15" or "$12～15", "Thu 2" of "Thu 2-5", "can" of "can't", "no" of
+//      "no_reply@example.com": DL-199 item 2, N3 and N4).
 // Rule 1 and rule 2's end are DL-184's and DL-189's own; rule 2's start and rule 3 are the same edge for a number's own
 // marks and for words joined into one (default, for ops/QUESTIONS.md). Nothing here keeps or logs the words.
 
@@ -114,13 +120,13 @@ const FIRST_IS_LETTER = /^\p{L}/u;
 const LAST_IS_NUMBER_MARK = /[,.:/]$/u;
 const WORD_THEN_NUMBER_MARK = /[\p{L}\p{N}\p{M}][,.:/]$/u;
 const NUMBER_MARK_THEN_WORD = /^[,.:/][\p{L}\p{N}]/u;
-const JOINED_BEFORE = /[\p{L}\p{N}\p{M}]['-]$/u;
-const JOINED_AFTER = /^['-][\p{L}\p{N}]/u;
+const JOINED_BEFORE = /[\p{L}\p{N}\p{M}]['_-]$/u;
+const JOINED_AFTER = /^['_-][\p{L}\p{N}]/u;
 const NOT_SPACE = /\S/u;
 
 /**
  * A text as its word edges are judged: invisible characters out, every apostrophe one, compatibility forms their marks
- * (NFKC), every dash one hyphen. Case, accents and spacing stay as they are.
+ * (NFKC), every dash and tilde one hyphen. Case, accents and spacing stay as they are.
  */
 function edgeForm(text: string): string {
   return visibleWords(text).replace(APOSTROPHE, "'").normalize("NFKC").replace(DASH, "-");

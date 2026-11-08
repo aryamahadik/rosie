@@ -577,8 +577,9 @@ describe("a number's value is re-read from its whole value phrase (DL-189 item 2
     ["'40' out of '40¢'", "money", usd(4000), "raise haircut to 40¢", "40", "differs"],
     ["the whole '40¢' is 40 cents", "money", usd(40), "raise haircut to 40¢", "40¢", null],
     ["the whole '$40/hr' is $40 an hour", "money", usd(4000), "handyman is $40/hr now", "$40/hr", null],
-    ["'$2k', whose k is not read", "money", usd(200), "raise it to $2k", "$2k", "noText"],
-    ["'$40' out of '$40 thousand'", "money", usd(4000), "raise it to $40 thousand", "$40", "noText"],
+    // Round 4 (DL-199 item 2): the reader reads scale words, so these two give another value (differs), not noText.
+    ["'$2k', whose k is read: $2,000, not $2", "money", usd(200), "raise it to $2k", "$2k", "differs"],
+    ["'$40' out of '$40 thousand'", "money", usd(4000), "raise it to $40 thousand", "$40", "differs"],
     ["'$12' out of '$12 to 15'", "money", usd(1200), "tile is $12 to 15 a foot", "$12", "several"],
     [
       "K-02's '$12 a foot', whole",
@@ -598,7 +599,8 @@ describe("a number's value is re-read from its whole value phrase (DL-189 item 2
       "200",
       "differs",
     ],
-    ["'2' out of '2 dozen'", "integer", 2, "2 dozen cupcakes", "2", "noText"],
+    // Round 4 (DL-199 item 2): the count reader reads a dozen, so the whole is 24 (differs), not noText.
+    ["'2' out of '2 dozen'", "integer", 2, "2 dozen cupcakes", "2", "differs"],
     [
       "'35 dólares' out of '35 dólares y 50 centavos'",
       "money",
@@ -749,5 +751,439 @@ describe("a number's value is re-read from its whole value phrase (DL-189 item 2
   it("types not written as numbers have no value phrase; words standing nowhere whole are noText", () => {
     expect(wholePhraseFault("text", "haircut", "raise haircut to 40%", "haircut", context)).toBeNull();
     expect(wholePhraseFault("money", usd(4000), "raise haircut to 140", "40", context)).toBe("noText");
+  });
+});
+
+// ---- round 4 (DL-199): the readers define the phrase -----------------------------------------------------------------
+
+describe("the readers read an amount whole: currency, scale, per-unit and range (DL-199 item 2)", () => {
+  const money = (words: string, languages?: readonly ("en" | "es")[]) =>
+    amountsIn(words, languages).map((amount) => amount.money);
+
+  it.each([
+    ["40 euros", [{ cents: 4000, currency: "EUR" }]],
+    ["40 pesos", [{ cents: 4000, currency: "MXN" }]],
+    ["€40", [{ cents: 4000, currency: "EUR" }]],
+    ["£40", [{ cents: 4000, currency: "GBP" }]],
+    ["₿40", [{ cents: 4000, currency: "XXX" }]],
+    ["40 canadian dollars", [{ cents: 4000, currency: "CAD" }]],
+    ["$40 pesos", [{ cents: 4000, currency: "MXN" }]],
+    ["$1 million", [{ cents: 100_000_000, currency: "USD" }]],
+    ["$2k", [{ cents: 200_000, currency: "USD" }]],
+    ["$1.5k", [{ cents: 150_000, currency: "USD" }]],
+    ["$40 thousand", [{ cents: 4_000_000, currency: "USD" }]],
+    ["2 grand", [{ cents: 200_000, currency: "USD" }]],
+    ["two million dollars", [{ cents: 200_000_000, currency: "USD" }]],
+    [
+      "$12～15 a foot",
+      [
+        { cents: 1200, currency: "USD" },
+        { cents: 1500, currency: "USD" },
+      ],
+    ],
+    [
+      "$12 or 15",
+      [
+        { cents: 1200, currency: "USD" },
+        { cents: 1500, currency: "USD" },
+      ],
+    ],
+  ] as const)("'%s' reads as %j", (words, expected) => {
+    expect(money(words)).toEqual(expected);
+  });
+
+  it("Spanish scale and currency words: '2 mil pesos' is 2,000 pesos, '40 euros' is in euros", () => {
+    expect(money("2 mil pesos", ["es"])).toEqual([{ cents: 200_000, currency: "MXN" }]);
+    expect(money("40 euros", ["es"])).toEqual([{ cents: 4000, currency: "EUR" }]);
+    expect(money("40 quetzales", ["es"])).toEqual([{ cents: 4000, currency: "GTQ" }]);
+  });
+
+  it("more scale and currency words: '40 quid', '$1 billion', and 'mil' as a million in an English text", () => {
+    expect(money("40 quid")).toEqual([{ cents: 4000, currency: "GBP" }]);
+    expect(money("$1 billion")).toEqual([{ cents: 100_000_000_000, currency: "USD" }]);
+    expect(money("$2 mil", ["en"])).toEqual([{ cents: 200_000_000, currency: "USD" }]);
+    expect(money("$2 mil", ["es"])).toEqual([{ cents: 200_000, currency: "USD" }]);
+  });
+
+  it("an amount's span holds its per-unit, which is no part of its value: '$40/hr', '$12 a foot', '$35 each'", () => {
+    for (const [words, end] of [
+      ["$40/hr", 6],
+      ["$12 a foot", 10],
+      ["$35 each", 8],
+      ["40 dolares la hora", 18],
+    ] as const) {
+      const [amount] = amountsIn(words);
+      expect(amount?.at).toBe(0);
+      expect(amount?.end).toBe(end);
+    }
+    expect(money("40 per cent")).toEqual([]);
+  });
+});
+
+describe("the count reader reads a dozen (DL-199 item 2)", () => {
+  it.each([
+    ["2 dozen cupcakes", [24]],
+    ["a dozen roses", [12]],
+    ["half a dozen", [6]],
+    ["one dozen", [12]],
+  ] as const)("'%s' holds %j", (words, expected) => {
+    expect(countsIn(words)).toEqual(expected);
+  });
+
+  it.each([
+    ["dos docenas", [24]],
+    ["una docena", [12]],
+    ["media docena", [6]],
+  ] as const)("Spanish '%s' holds %j", (words, expected) => {
+    expect(countsIn(words, ["es"])).toEqual(expected);
+  });
+});
+
+describe("an underscore and the fullwidth range mark join words (DL-199 item 2, N3 and N4)", () => {
+  it.each([
+    ["no_reply@example.com", "no", "no_reply@example.com"],
+    ["raise it to $40_000", "$40", "$40_000"],
+    ["can you do 3～5pm", "5pm", "3～5pm"],
+    ["can you do 3～5pm", "3", "3～5pm"],
+    ["tile is $12～15 a foot", "$12", "$12～15"],
+  ])("in '%s', '%s' is not found; '%s' is", (text, cut, whole) => {
+    expect(text.includes(cut)).toBe(true);
+    expect(foundAtWordEdges(text, cut)).toBe(false);
+    expect(foundAtWordEdges(text, whole)).toBe(true);
+  });
+
+  it("the time reader reads '3～5pm' as a range, two times, never one", () => {
+    expect(foldWords("3～5pm")).toBe("3-5pm");
+    expect(readTimeWords("3～5pm").kind).toBe("several");
+  });
+});
+
+describe("the zone reader reads a zone after a comma (DL-199 item 2)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const at = (utc: string, zone = NEW_YORK) => ({ utc, zone });
+
+  it("'tomorrow at 3pm, PST' is 3pm Pacific: the wrong zone for New York, right for Los Angeles", () => {
+    const words = "tomorrow at 3pm, PST";
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), words, context)).toEqual({
+      ok: false,
+      why: "wrongZone",
+    });
+    expect(
+      reparse("time", at("2026-11-01T23:00:00Z", LOS_ANGELES), words, { ...context, zones: [LOS_ANGELES] }),
+    ).toEqual({ ok: true });
+    expect(reparse("time", at("2026-11-01T20:00:00Z"), "PST, tomorrow at 3pm", context)).toEqual({
+      ok: false,
+      why: "wrongZone",
+    });
+  });
+});
+
+describe("the whole phrase is the readers' own: G1 to G10 and N1 to N3 of the round 3 review (DL-199)", () => {
+  const SATURDAY = "2026-10-31T14:00:00Z"; // Sat Oct 31 2026, 10:00am in New York (EDT)
+  const FRIDAY = "2026-10-30T14:00:00Z"; // Fri Oct 30 2026, 10:00am in New York (EDT)
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const usd = (amount: number) => ({ cents: amount, currency: "USD" });
+  interface Given {
+    readonly languages?: readonly ("en" | "es")[];
+    readonly sentAt?: string;
+  }
+  const es: Given = { languages: ["es"] };
+  // [case, the field's type, the value, the person's text, the words cited, the fault or null, the reading's context]
+  const cases: [string, FieldType, FieldValue, string, string, string | null, Given][] = [
+    [
+      "G1: 'tomorrow at 3pm' out of 'the day after tomorrow at 3pm'",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "can you move me to the day after tomorrow at 3pm",
+      "tomorrow at 3pm",
+      "differs",
+      {},
+    ],
+    [
+      "G1 whole: the day after tomorrow at 3pm is Mon Nov 2 at 3pm",
+      "time",
+      at("2026-11-02T20:00:00Z"),
+      "can you move me to the day after tomorrow at 3pm",
+      "the day after tomorrow at 3pm",
+      null,
+      {},
+    ],
+    [
+      "G2: 'mañana a las 3' out of 'pasado mañana a las 3'",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "¿me puede cambiar a pasado mañana a las 3?",
+      "mañana a las 3",
+      "differs",
+      es,
+    ],
+    [
+      "G2 whole: pasado mañana a las 3 is Mon Nov 2",
+      "time",
+      at("2026-11-02T20:00:00Z"),
+      "¿me puede cambiar a pasado mañana a las 3?",
+      "pasado mañana a las 3",
+      null,
+      es,
+    ],
+    [
+      "G3: 'at 3' out of 'tomorrow afternoon at 3', as today's 3pm",
+      "time",
+      at("2026-10-31T19:00:00Z"),
+      "can you do tomorrow afternoon at 3",
+      "at 3",
+      "differs",
+      {},
+    ],
+    [
+      "G3 whole: tomorrow afternoon at 3 is Sun Nov 1 at 3pm",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "can you do tomorrow afternoon at 3",
+      "tomorrow afternoon at 3",
+      null,
+      {},
+    ],
+    [
+      "G4: 'a las 3' out of 'mañana en la tarde a las 3'",
+      "time",
+      at("2026-10-31T19:00:00Z"),
+      "mañana en la tarde a las 3",
+      "a las 3",
+      "differs",
+      es,
+    ],
+    [
+      "G4 whole: Sun Nov 1 at 3pm",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "mañana en la tarde a las 3",
+      "mañana en la tarde a las 3",
+      null,
+      es,
+    ],
+    [
+      "G5: 'at 9' out of 'tomorrow night at 9', as tonight's 9pm",
+      "time",
+      at("2026-11-01T01:00:00Z"),
+      "tomorrow night at 9 works",
+      "at 9",
+      "differs",
+      {},
+    ],
+    [
+      "G5 whole: Sun Nov 1 at 9pm",
+      "time",
+      at("2026-11-02T02:00:00Z"),
+      "tomorrow night at 9 works",
+      "tomorrow night at 9",
+      null,
+      {},
+    ],
+    [
+      "G6: 'tomorrow' (its start) out of 'tomorrow at noon'",
+      "time",
+      at("2026-11-01T04:00:00Z"),
+      "can you do tomorrow at noon",
+      "tomorrow",
+      "differs",
+      {},
+    ],
+    [
+      "G6 whole: Sun Nov 1 at noon",
+      "time",
+      at("2026-11-01T17:00:00Z"),
+      "can you do tomorrow at noon",
+      "tomorrow at noon",
+      null,
+      {},
+    ],
+    [
+      "G7: 'mañana' (its start) out of 'mañana al mediodía'",
+      "time",
+      at("2026-11-01T04:00:00Z"),
+      "mañana al mediodía",
+      "mañana",
+      "differs",
+      es,
+    ],
+    [
+      "G7 whole: Sun Nov 1 at noon",
+      "time",
+      at("2026-11-01T17:00:00Z"),
+      "mañana al mediodía",
+      "mañana al mediodía",
+      null,
+      es,
+    ],
+    [
+      "G8: 'tomorrow' (its start) out of 'tomorrow, 3pm'",
+      "time",
+      at("2026-11-01T04:00:00Z"),
+      "tomorrow, 3pm",
+      "tomorrow",
+      "differs",
+      {},
+    ],
+    [
+      "G8 whole: Sun Nov 1 at 3pm",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "tomorrow, 3pm",
+      "tomorrow, 3pm",
+      null,
+      {},
+    ],
+    [
+      "G9: 'tomorrow at 3pm' out of 'tomorrow at 3pm, PST' for a New York visit",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "tomorrow at 3pm, PST",
+      "tomorrow at 3pm",
+      "wrongZone",
+      {},
+    ],
+    [
+      "G9 whole, read for a New York visit, is the wrong zone too",
+      "time",
+      at("2026-11-01T20:00:00Z"),
+      "tomorrow at 3pm, PST",
+      "tomorrow at 3pm, PST",
+      "wrongZone",
+      {},
+    ],
+    [
+      "G10: 'Friday at 3' out of 'next Friday at 3', sent Fri Oct 30",
+      "time",
+      at("2026-10-30T19:00:00Z"),
+      "can you do next Friday at 3",
+      "Friday at 3",
+      "differs",
+      { sentAt: FRIDAY },
+    ],
+    [
+      "G10 whole: next Friday at 3 is Fri Nov 6 at 3pm",
+      "time",
+      at("2026-11-06T20:00:00Z"),
+      "can you do next Friday at 3",
+      "next Friday at 3",
+      null,
+      { sentAt: FRIDAY },
+    ],
+    ["N1: '40' out of '40 euros'", "money", usd(4000), "raise haircut to 40 euros", "40", "differs", {}],
+    [
+      "N1 whole: 40 euros",
+      "money",
+      { cents: 4000, currency: "EUR" },
+      "raise haircut to 40 euros",
+      "40 euros",
+      null,
+      {},
+    ],
+    ["N1: '40' out of '40 pesos'", "money", usd(4000), "raise haircut to 40 pesos", "40", "differs", {}],
+    [
+      "N1 whole: 40 pesos",
+      "money",
+      { cents: 4000, currency: "MXN" },
+      "raise haircut to 40 pesos",
+      "40 pesos",
+      null,
+      {},
+    ],
+    ["N2: '$1' out of '$1 million'", "money", usd(100), "the budget is $1 million", "$1", "differs", {}],
+    ["N2 whole: $1 million", "money", usd(100_000_000), "the budget is $1 million", "$1 million", null, {}],
+    ["N3: '$12' out of '$12～15'", "money", usd(1200), "tile is $12～15 a foot", "$12", "noText", {}],
+    [
+      "N3 whole: '$12～15' is a range, several",
+      "money",
+      usd(1200),
+      "tile is $12～15 a foot",
+      "$12～15",
+      "several",
+      {},
+    ],
+    [
+      "N3: '5pm' out of '3～5pm'",
+      "time",
+      at("2026-10-31T21:00:00Z"),
+      "can you do 3～5pm",
+      "5pm",
+      "noText",
+      {},
+    ],
+    [
+      "N3 whole: '3～5pm' is a range, several",
+      "time",
+      at("2026-10-31T21:00:00Z"),
+      "can you do 3～5pm",
+      "3～5pm",
+      "several",
+      {},
+    ],
+  ];
+
+  it.each(cases)("%s", (_case, type, value, text, words, expected, given) => {
+    const context: ReparseContext = {
+      sentAt: given.sentAt ?? SATURDAY,
+      zones: [NEW_YORK],
+      ...(given.languages === undefined ? {} : { languages: given.languages }),
+    };
+    expect(text.includes(words)).toBe(true);
+    expect(wholePhraseFault(type, value, text, words, context)).toBe(expected);
+  });
+
+  it("G9 whole passes for a Los Angeles visit: 3pm Pacific, read in its zone", () => {
+    const context: ReparseContext = { sentAt: SATURDAY, zones: [LOS_ANGELES] };
+    const value = { utc: "2026-11-01T23:00:00Z", zone: LOS_ANGELES };
+    expect(
+      wholePhraseFault("time", value, "tomorrow at 3pm, PST", "tomorrow at 3pm, PST", context),
+    ).toBeNull();
+    expect(wholePhraseFault("time", value, "tomorrow at 3pm, PST", "tomorrow at 3pm", context)).toBeNull();
+  });
+});
+
+describe("what joins a phrase, and what does not (DL-199 items 1 and 3)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const usd = (amount: number) => ({ cents: amount, currency: "USD" });
+
+  it("a count before a day is no part of its time: 'tomorrow at 3pm' of 'table for 2 tomorrow at 3pm' passes", () => {
+    const text = "table for 2 tomorrow at 3pm";
+    expect(wholePhraseFault("time", at("2026-11-01T20:00:00Z"), text, "tomorrow at 3pm", context)).toBeNull();
+    expect(wholePhraseFault("integer", 2, text, "2", context)).toBeNull();
+  });
+
+  it("a number a range word joins to an amount is part of it: '$15' of '10 - $15' leaves 10 unread", () => {
+    expect(wholePhraseFault("money", usd(1500), "it was 10 - $15 a foot", "$15", context)).toBe("noText");
+    expect(wholePhraseFault("money", usd(1200), "tile is $12 or 15 a foot", "$12", context)).toBe("several");
+  });
+
+  it("a count is read with its unit, and counts a range, choice or hedge joins are several", () => {
+    expect(wholePhraseFault("integer", 2, "2 adults and 1 child", "2 adults", context)).toBe("several");
+    expect(wholePhraseFault("integer", 4, "party of 4, maybe 5", "4", context)).toBe("several");
+    expect(
+      wholePhraseFault("integer", 12, "can you fit 12 people tomorrow", "12 people", context),
+    ).toBeNull();
+  });
+
+  it("words that touch two phrases are several; a bare number apart from a marked amount is none of it", () => {
+    const text = "$40 deposit, $100 after the visit";
+    expect(wholePhraseFault("money", usd(4000), text, "$40 deposit, $100", context)).toBe("several");
+    expect(wholePhraseFault("money", usd(4000), text, "$40", context)).toBeNull();
+    expect(wholePhraseFault("money", usd(200), "$35 for 2", "2", context)).toBe("noText");
+  });
+
+  it("a day and its time joined by the readers' cues are one phrase: the day alone differs", () => {
+    const sunday3pm = at("2026-11-01T20:00:00Z");
+    for (const text of [
+      "tomorrow at around 3pm",
+      "tomorrow, say 3pm",
+      "tomorrow by 3pm",
+      "tomorrow · 3pm",
+      "tomorrow at 3 in the afternoon",
+    ]) {
+      expect(wholePhraseFault("time", sunday3pm, text, text, context)).toBeNull();
+      expect(wholePhraseFault("time", at("2026-11-01T04:00:00Z"), text, "tomorrow", context)).toBe("differs");
+    }
   });
 });
