@@ -1,5 +1,5 @@
-// The money-topic gate (T-593 rounds 3 and 4; DL-182, DL-187; S13-55; card line 9: "A message naming a card hold or a
-// charge on silence fails the check"; RULES 3.2 to 3.4).
+// The money-topic gate (T-593 rounds 3 to 5; DL-182, DL-187, DL-194; S13-55; card line 9: "A message naming a card hold
+// or a charge on silence fails the check"; RULES 3.2 to 3.4).
 //
 // Reading a card hold or a charge on silence from word patterns always left a new wording through, and so did every rule
 // that needs two words to meet in one sentence. So one money word is enough (DL-187): a sentence that holds one passes
@@ -9,10 +9,18 @@
 //     sentence by "hold". It is read after the apostrophe folding the Values check reads with (values.ts: ’ and ‘ as
 //     '), in lower case.
 //   - A money sentence holds one money word: a word that begins with charg, bill, pay, paid, cost, pric, refund,
-//     deposit, debit, authori, hold, held, owe, deduct, invoic, withdraw, fund, dollar, buck, money or amount; the whole
-//     word fee, fees, cent or cents; a word that ends in card or cards (Mastercard, postcard); a $, € or £ anywhere; or a
-//     K-03 money slot. A stem counts only at the start of a word, so "feel", "coffee", "recently" and "percent" are no
-//     money words. Round 3's pairs still make one too (default 4).
+//     deposit, debit, auth (authori, authed, pre-authed: DL-194 2), hold, held, owe, deduct, invoic, withdraw, fund,
+//     dollar, buck, money or amount; the whole word fee, fees, cent or cents; a word that ends in card or cards
+//     (Mastercard, postcard); a currency sign anywhere (every Unicode currency sign: $, €, £, ¢, ¥, ₹, ₩ and ₽ among them)
+//     or a currency code said as a word (USD, EUR, GBP, CHF, CAD, AUD; DL-194 2); or a K-03 money slot. A stem counts
+//     only at the start of a word, so "feel", "coffee", "recently" and "percent" are no money words. Round 3's pairs
+//     still make one too (default 4).
+//   - A money word in either of two forms makes a money sentence (DL-194 1): the folded form (default 8, NFKD) and the
+//     reading form in lower case, before NFKD, so a sign NFKD turns into letters glued to a word never hides it. In both,
+//     trademark and similar marks (™ ℠ ® © ᵀᴹ) end a word and are never letters: "Mastercard™" holds "card", though NFKD
+//     reads it "mastercardtm". Bidi controls (U+202A to U+202E, U+2066 to U+2069) are removed before reading, and a word
+//     split by a hair, thin, narrow no-break or braille-blank space (U+200A, U+2009, U+202F, U+2800) is read joined too
+//     (DL-194 2; defaults 9 and 10).
 //   - A money sentence passes only if it is, word for word, a sentence of an approved line, each slot standing for the
 //     value the slot filler gave it: one of the record's rows (both flows), S13-55's own lines or a message text of
 //     either master flow.
@@ -23,11 +31,12 @@
 // is "holding" falls back to the approved wording, since Rosie's word for a time is "saved". Approved lines then go
 // through the claim check (claims.ts) for the booking at hand. What comes back holds labels only, never the words.
 //
-// Residual risk (DL-187 5; CQ-120): a card hold or a charge on silence worded with no money word, sign or slot at all
-// ("We'll put a stop on your plastic until the visit.", "If we don't hear back by 7pm, it goes through anyway.") is not
-// caught here, nor one spelled with digits or symbols for letters ("h0ld") or with look-alike letters default 8 does not
-// know. The composer prompt rule (STATE note 56: money sentences come from the record's rows, filled by T-310, never the
-// model's own) and the Values check (an amount needs a fact) back it up.
+// Residual risk (DL-187 5, DL-194 2; CQ-120): a card hold or a charge on silence worded with no money word, sign or slot
+// at all ("We'll put a stop on your plastic until the visit.", "If we don't hear back by 7pm, it goes through anyway.")
+// is not caught here, nor one spelled with digits or symbols for letters ("h0ld"), with letter-shaped symbols that have
+// no plain-letter form (🅷🅾🅻🅳) or with look-alike letters default 8 does not know. The composer prompt rule (STATE
+// note 56: money sentences come from the record's rows, filled by T-310, never the model's own) and the Values check (an
+// amount needs a fact) back it up.
 //
 // Defaults (each fail-closed):
 //   1. A sentence ends at . ! ? only before a space or the end of the text, so "$40.00" and "rosfield.com" end none;
@@ -41,15 +50,16 @@
 //      money sentence that holds it is no approved line. A value stands for its slot alone, never for words around it.
 //   4. Forms of the listed money words that do not begin with the stem's letters count too: a stem after un, non, pre,
 //      re, post, over, under, sur, with, co, auto, mis, up, down or e (unauthorized, prepaid, surcharge, withhold, copay,
-//      upcharge), owing, withdrew, cardholder, auth and pre-auth, and a ¢ sign. Round 3's money sentences stay money
-//      sentences: a hold, charge or other money action word (reserve, block, freeze, set or put aside, keep, collect,
-//      take ...) with a money object (an amount also in words, "40 euros"), a card with an amount, a reply, an answer or
-//      silence with a charge or other money action word. Money slots are K-03's money slots, {{keep}} and the money
-//      home's slots (pay.*, clock.pay, link.pay).
-//   5. Hold words, for the label: a word that begins with hold, held or authori (with a prefix of default 4), auth,
-//      pre-auth, reserve, block, freeze, set or put aside. Silence words, for the label: reply, answer, confirm, respond,
-//      response, responsive and silence in any form (unanswered, unconfirmed, unresponsive), hear, heard, ignore, "no
-//      word", and "text back", "write back", "get back" or "call back".
+//      upcharge, pre-authed), owing, withdrew and cardholder. Round 3's money sentences stay money sentences, read in
+//      every form a money word is read in: a hold, charge or other money action word (reserve, block, freeze, set or put
+//      aside, keep, collect, take ...) with a money object (an amount also in words, "40 euros"), a card with an amount,
+//      a reply, an answer or silence with a charge or other money action word. Money slots are K-03's money slots,
+//      {{keep}} and the money home's slots (pay.*, clock.pay, link.pay).
+//   5. Hold words, for the label: a word that begins with hold, held or auth (with a prefix of default 4: authorize,
+//      authed, pre-auth, pre-authed), reserve, block, freeze, set or put aside. Silence words, for the label: reply,
+//      answer, confirm, respond, response, responsive and silence in any form (unanswered, unconfirmed, unresponsive),
+//      hear, heard, ignore, "no word", and "text back", "write back", "get back" or "call back". Both are read in every
+//      form a money word is read in.
 //   6. A sentence that names a reply, an answer or silence and asks or trails off ("No reply by 7pm?") reads with the
 //      sentence after it, as round 2 read it; such a pair passes only when each of its sentences is approved.
 //   7. A message text is every string of a step's say and of its variants' say and addSay (words, plain text and
@@ -58,8 +68,16 @@
 //      (a fullwidth ＄ is $), combining marks and invisible format characters left out (a soft hyphen or a zero-width
 //      space inside "charge"), and Cyrillic and Greek letters that look like Latin ones read as those ("сharge" with a
 //      Cyrillic с). A word that mixes Latin letters with another script's letters counts as a money word (a word all in
-//      one script, such as a Russian one, does not). The claim check reads its claims in the same form. Approved
+//      one script, such as a Russian one, does not). The reading form in lower case is read beside it (DL-194 1), so
+//      a sign NFKD turns into letters (№, 🅪, ₨) hides no word either. The claim check reads its claims in the folded
+//      form of each text defaults 9 and 10 read (foldedForms), where NFKD reads every narrow space as a space. Approved
 //      sentences are still compared as written (default 2).
+//   9. A text that holds a bidi control is also read as a right-to-left override shows it, each run after U+202E (up to
+//      its pop or the line's end) backwards in its place, and backwards whole, its controls removed: an override shows a
+//      run of letters in the other order, so "egrahc" after U+202E reads "charge", and "You were " then U+202E then
+//      "degrahc" reads "You were charged".
+//   10. A word split by a narrow space (DL-194 2) is read both ways: joined ("ch arge" with a hair space reads
+//      "charge"), and split, so two words with such a space between them ("the fee") keep each its own reading.
 
 import { pieces, type Piece } from "../../finalize/slots/syntax";
 import { VOCABULARY } from "../../finalize/slots/vocabulary";
@@ -132,14 +150,42 @@ const LOOKALIKE: ReadonlyMap<string, string> = new Map(
 );
 
 /**
- * The reading form in lower case, compatibility forms as their plain letters and signs (a fullwidth ＄ is $), combining
- * marks and invisible format characters left out (default 8).
+ * Trademark and similar marks (DL-194 1): ᵀᴹ (U+1D40 U+1D39), ™ (U+2122), ℠ (U+2120), ® (U+00AE) and © (U+00A9). Each
+ * ends a word and is never a letter, so "Mastercard™" holds "card".
+ */
+const TRADE_MARKS = /\u{1D40}\u{1D39}|[\u{2122}\u{2120}\u{AE}\u{A9}]/gu;
+
+/** Bidi controls (DL-194 2): the embeddings and overrides U+202A to U+202E, the isolates U+2066 to U+2069. */
+const BIDI = String.raw`[\u{202A}-\u{202E}\u{2066}-\u{2069}]`;
+const BIDI_CONTROL = new RegExp(BIDI, "u");
+const BIDI_CONTROLS = new RegExp(BIDI, "gu");
+
+/** The spaces a word split by one is read joined across too (DL-194 2): hair, thin, narrow no-break, braille blank. */
+const NARROW_SPACES = /[\u{200A}\u{2009}\u{202F}\u{2800}]/gu;
+
+/** A text with its trademark marks read as word ends and its bidi controls removed (DL-194 1 and 2). */
+function unmarked(text: string): string {
+  return text.replace(TRADE_MARKS, " ").replace(BIDI_CONTROLS, "");
+}
+
+/**
+ * The reading form in lower case, its marks read as word ends and its bidi controls removed, compatibility forms as
+ * their plain letters and signs (a fullwidth ＄ is $), combining marks and invisible format characters left out (default
+ * 8).
  */
 function plainForm(text: string): string {
-  return readingForm(text)
+  return unmarked(readingForm(text))
     .normalize("NFKD")
     .replace(/[\p{M}\p{Cf}]/gu, "")
     .toLowerCase();
+}
+
+/**
+ * The reading form in lower case, before NFKD (DL-194 1), its marks read as word ends and its bidi controls removed: a
+ * sign NFKD turns into letters glued to a word ("Fee№" folded is "feeno") leaves the word whole here.
+ */
+function lowerForm(text: string): string {
+  return unmarked(readingForm(text)).toLowerCase();
 }
 
 /** Any one of the look-alike letters. */
@@ -148,6 +194,42 @@ const LOOKALIKE_LETTER = new RegExp(`[${[...LOOKALIKE.keys()].join("")}]`, "gu")
 /** The form money words are found in (default 8): the plain form, with look-alike letters read as Latin ones. */
 export function foldedForm(text: string): string {
   return plainForm(text).replace(LOOKALIKE_LETTER, (letter) => LOOKALIKE.get(letter) ?? letter);
+}
+
+/** A text read backwards, every run of it as an override would show it (default 9). */
+function backwards(text: string): string {
+  return Array.from(text).reverse().join("");
+}
+
+/** The run after a right-to-left override (U+202E), up to its pop (U+202C) or the line's end. */
+const OVERRIDE_RUN = /\u{202E}([^\u{202C}\r\n]*)/gu;
+
+/** A text as a right-to-left override shows it (default 9): each overridden run backwards, in its place. */
+function shown(text: string): string {
+  return text.replace(OVERRIDE_RUN, (_override, run: string) => backwards(run));
+}
+
+/**
+ * The texts a text's words are read from: as written and with the words a narrow space splits joined (default 10), and,
+ * when it holds a bidi control, each of those as an override shows it and backwards whole (default 9).
+ */
+function textsOf(text: string): string[] {
+  const texts = [text, text.replace(NARROW_SPACES, "")];
+  if (BIDI_CONTROL.test(text)) texts.push(...texts.flatMap((one) => [shown(one), backwards(one)]));
+  return texts;
+}
+
+/** The folded forms of a text (defaults 8 to 10): the folded form of each text it is read from. The claim check's forms. */
+export function foldedForms(text: string): string[] {
+  return [...new Set(textsOf(text).map(foldedForm))];
+}
+
+/**
+ * Every form a text's money words are read in (DL-194; defaults 8 to 10): the folded form and the reading form in lower
+ * case of each text it is read from. A money word in any one of them counts.
+ */
+function readForms(text: string): string[] {
+  return [...new Set(textsOf(text).flatMap((one) => [foldedForm(one), lowerForm(one)]))];
 }
 
 /**
@@ -237,7 +319,10 @@ const NOT_AFTER_LETTER = String.raw`(?<![\p{L}\p{M}])`;
 const NOT_BEFORE_LETTER = String.raw`(?![\p{L}\p{M}])`;
 /** A prefix a money stem may carry (default 4): unauthorized, prepaid, surcharge, withhold, copay, upcharge. */
 const STEM_PREFIX = String.raw`(?:(?:un|non|pre|re|post|over|under|sur|with|co|auto|mis|up|down|e)-?)?`;
-/** DL-187's stems, and owing and withdrew (default 4), which do not begin with the letters of owe and withdraw. */
+/**
+ * DL-187's stems, with auth for authori (DL-194 2: authed, pre-authed), and owing and withdrew (default 4), which do not
+ * begin with the letters of owe and withdraw.
+ */
 const MONEY_STEMS = [
   "charg",
   "bill",
@@ -248,7 +333,7 @@ const MONEY_STEMS = [
   "refund",
   "deposit",
   "debit",
-  "authori",
+  "auth",
   "hold",
   "held",
   "owe",
@@ -262,21 +347,23 @@ const MONEY_STEMS = [
   "money",
   "amount",
 ];
-/** One money word: a stem at the start of a word; fee, fees, cent or cents; a word ending in card(s); a money sign. */
+/** The currency codes said as a word that are money signs (DL-194 2). */
+const CURRENCY_CODES = ["usd", "eur", "gbp", "chf", "cad", "aud"];
+/**
+ * One money word: a stem at the start of a word; fee, fees, cent or cents, or a currency code, as a whole word; a word
+ * ending in card(s); a currency sign (Unicode Sc: $ € £ ¢ ¥ ₹ ₩ ₽ and every other; DL-194 2).
+ */
 const ONE_MONEY_WORD = new RegExp(
   [
     `${NOT_AFTER_LETTER}${STEM_PREFIX}(?:${MONEY_STEMS.join("|")})`,
-    `${NOT_AFTER_LETTER}(?:fees?|cents?|(?:pre-?)?auths?)${NOT_BEFORE_LETTER}`,
+    `${NOT_AFTER_LETTER}(?:fees?|cents?|${CURRENCY_CODES.join("|")})${NOT_BEFORE_LETTER}`,
     `card(?:holder)?s?${NOT_BEFORE_LETTER}`,
-    "[$€£¢]",
+    String.raw`\p{Sc}`,
   ].join("|"),
   "iu",
 );
-/** Hold words, for the label (DL-187 4, default 5): a word that begins with hold, held or authori; auth, pre-auth. */
-const HOLD_STEM = new RegExp(
-  `${NOT_AFTER_LETTER}${STEM_PREFIX}(?:hold|held|authori)|${NOT_AFTER_LETTER}(?:pre-?)?auths?${NOT_BEFORE_LETTER}`,
-  "iu",
-);
+/** Hold words, for the label (DL-187 4, default 5): a word that begins with hold, held or auth (authori, pre-auth). */
+const HOLD_STEM = new RegExp(`${NOT_AFTER_LETTER}${STEM_PREFIX}(?:hold|held|auth)`, "iu");
 /** Silence words, for the label (DL-187 4, default 5): reply, answer, confirm, respond and silence, in any form. */
 const SILENCE_STEM = new RegExp(
   `${NOT_AFTER_LETTER}(?:(?:un|non|re)-?)?(?:repl(?:y|ies|ied|ying)|answer|confirm|respon(?:d|se|siv)|silen)`,
@@ -359,6 +446,8 @@ interface ReadSentence {
   readonly text: string;
   /** Folded (default 8), its slots as written (their example words read too). */
   readonly words: string;
+  /** Every form its money words are read in (readForms; DL-194, defaults 8 to 10), its slots as written. */
+  readonly forms: readonly string[];
   /** A word of it mixes Latin letters with another script's (default 8). */
   readonly mixed: boolean;
   /** The compared form (default 2). */
@@ -370,26 +459,43 @@ function readSentences(text: string): ReadSentence[] {
     const form = comparedForm(parts);
     if (form === "") return [];
     const written = sentenceText(parts);
-    return [{ text: written, words: foldedForm(written), mixed: mixesScripts(written), form }];
+    return [
+      {
+        text: written,
+        words: foldedForm(written),
+        forms: readForms(written),
+        mixed: mixesScripts(written),
+        form,
+      },
+    ];
   });
 }
 
 /**
- * The topic of a sentence, or of a question read with the sentence after it: from its words (folded, slots as written),
- * its compared form (slots as {{name}}, read folded for round 3's pairs) and whether a word mixes scripts (default 8).
+ * The topic of a sentence, or of a question read with the sentence after it: from its words in every form they are read
+ * in (folded, joined across the group as round 4 read them, and each sentence's other forms; slots as written), its
+ * compared form (slots as {{name}}, read folded for round 3's pairs) and whether a word mixes scripts (default 8).
  */
 function topicOf(group: readonly ReadSentence[]): Topic {
-  const words = group.map((sentence) => sentence.words).join(" ");
+  const read = [
+    group.map((sentence) => sentence.words).join(" "),
+    ...group.flatMap((sentence) => sentence.forms),
+  ];
   const form = group.map((sentence) => sentence.form).join(" ");
   return {
     money:
-      ONE_MONEY_WORD.test(words) ||
+      read.some((words) => ONE_MONEY_WORD.test(words)) ||
       group.some((sentence) => sentence.mixed) ||
       MONEY_SLOT.test(form) ||
-      pairedMoney(foldedForm(form)),
-    hold: HOLD_STEM.test(words) || HOLD_WORD.test(words),
-    silence: SILENCE_STEM.test(words) || SILENCE_WORD.test(words),
+      [foldedForm(form), ...read].some(pairedMoney),
+    hold: read.some((words) => HOLD_STEM.test(words) || HOLD_WORD.test(words)),
+    silence: read.some((words) => SILENCE_STEM.test(words) || SILENCE_WORD.test(words)),
   };
+}
+
+/** Does a sentence name a reply, an answer or silence (round 2's question, default 6), in any form it is read in? */
+function namesSilence(sentence: ReadSentence): boolean {
+  return [foldedForm(sentence.form), ...sentence.forms].some((words) => SILENCE_WORD.test(words));
 }
 
 /** A unit of a text: one sentence, or a reply, answer or silence question with the sentence after it (default 6). */
@@ -406,7 +512,7 @@ function unitsOf(text: string): Unit[] {
       open = [sentence];
       groups.push(open);
     } else open.push(sentence);
-    if (!(/(?:\?|\.\.\.)$/u.test(sentence.text) && SILENCE_WORD.test(foldedForm(sentence.form)))) open = null;
+    if (!(/(?:\?|\.\.\.)$/u.test(sentence.text) && namesSilence(sentence))) open = null;
   }
   return groups.map((group) => ({ forms: group.map((sentence) => sentence.form), topic: topicOf(group) }));
 }

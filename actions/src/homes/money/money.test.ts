@@ -1677,3 +1677,220 @@ describe("round 4 (DL-187, 3): a past statement is a statement; 'refunded' in an
     ).toEqual(["no", "no", "yes"]);
   });
 });
+
+// Round 5 (DL-194): a money word in either form, the folded one or the reading form in lower case, trademark marks ending
+// a word; bidi controls removed before reading, an override read as it shows; a word a narrow space splits read joined;
+// auth, every currency sign and the currency codes; and a refund said as a noun needs money taken.
+
+/** The security reviewer's round 4 lines (NFKD reads ™ as letters glued to the word), and DL-194 1's ® and ℠ forms. */
+const REVIEWER_ROUND_4: readonly (readonly [string, GateWhy])[] = [
+  ["If you don't reply by 7pm, it goes on your Mastercard™.", "neverChargeOnSilence"],
+  ["We'll freeze your Mastercard™ until the visit.", "neverHold"],
+  ["If you don't reply by 7pm, the No-Show Fee™ applies.", "neverChargeOnSilence"],
+  ["We'll freeze your Mastercard® until the visit.", "neverHold"],
+  ["If you don't reply by 7pm, the No-Show Fee℠ applies.", "neverChargeOnSilence"],
+];
+
+describe("round 5 (DL-194, 1): a money word in either form makes a money sentence, and trademark marks end a word", () => {
+  it("the security reviewer's three ™ lines, 'Mastercard®' and 'Fee℠' fail with their labels, in all three apostrophe forms, on every booking", () => {
+    let checked = 0;
+    for (const [line, why] of REVIEWER_ROUND_4)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, text).toEqual([BY_WHY[why]]);
+        for (const reading of gateReadings()) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, text).toBe(false);
+          expect(check.refused, text).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          expect(checkMoneyLine(text, reading).refused, text).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+      }
+    expect(checked).toBe(REVIEWER_ROUND_4.length * 3 * 6);
+  });
+
+  it("ᵀᴹ and © end a word too, after it or before it; a sign NFKD reads as letters hides no word, read in the reading form", () => {
+    const marked: readonly (readonly [string, GateWhy])[] = [
+      ["We'll freeze your Mastercardᵀᴹ until the visit.", "neverHold"],
+      ["If you don't reply by 7pm, the No-Show Fee© applies.", "neverChargeOnSilence"],
+      ["That is the ™fee.", "moneyNotFromRecord"],
+      // NFKD reads the numero sign as "No", the raised MC sign as "MC" and the rupee sign as "Rs", glued to the word: the
+      // folded form holds no money word, the reading form does.
+      ["That is the fee№ 2.", "moneyNotFromRecord"],
+      ["We'll freeze your Mastercard🅪 until the visit.", "neverHold"],
+      ["That is ₨40.", "moneyNotFromRecord"],
+    ];
+    for (const [line, why] of marked)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([BY_WHY[why]]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(BY_WHY[why]);
+      }
+  });
+});
+
+describe("round 5 (DL-194, 2): bidi controls, narrow spaces, auth, every currency sign and the currency codes", () => {
+  /** The bidi controls: the embeddings and overrides U+202A to U+202E, the isolates U+2066 to U+2069. */
+  const BIDI_CONTROLS = [
+    "\u{202A}",
+    "\u{202B}",
+    "\u{202C}",
+    "\u{202D}",
+    "\u{202E}",
+    "\u{2066}",
+    "\u{2067}",
+    "\u{2068}",
+    "\u{2069}",
+  ];
+  /** The hair, thin, narrow no-break and braille-blank spaces. */
+  const NARROW_SPACES = ["\u{200A}", "\u{2009}", "\u{202F}", "\u{2800}"];
+
+  it("a bidi control is removed before reading, in the reading form too, and a word inside an override is read as it shows", () => {
+    for (const control of BIDI_CONTROLS) {
+      const lines = [
+        [`If you don't reply, we'll ch${control}arge it.`, SILENCE],
+        [`We'll place a ho${control}ld.`, HOLD],
+        // Only the reading form, its control removed, holds "fee": NFKD reads the numero sign as letters.
+        [`That is the f${control}ee№ 2.`, NOT_FROM_RECORD],
+      ] as const;
+      for (const [text, refusal] of lines)
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([refusal]);
+    }
+    // A right-to-left override shows the run after it backwards: "egrahc" after U+202E reads "charge" (default 9).
+    const shown = [
+      ["If you don't reply, we'll \u{202E}egrahc\u{202C} it.", SILENCE],
+      ["We'll place a \u{202E}dloh\u{202C} on it.", HOLD],
+      ["That is the \u{202E}eef\u{202C}.", NOT_FROM_RECORD],
+      ["Thanks! \u{202E}drac ruoy no ti tup ll'eW", NOT_FROM_RECORD],
+    ] as const;
+    for (const [text, refusal] of shown) {
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([refusal]);
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()).refused, JSON.stringify(text)).toContainEqual(refusal);
+    }
+    // The claim check reads it as shown too: "charged" in an override, before the money step.
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine("You were \u{202E}degrahc\u{202C} $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+
+  it("a word split by a hair, thin, narrow no-break or braille-blank space is read joined; two words such a space parts keep theirs", () => {
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    for (const space of NARROW_SPACES) {
+      const lines = [
+        [`If you don't reply, we'll ch${space}arge it.`, SILENCE],
+        [`If you don't re${space}ply, we'll charge it.`, SILENCE],
+        [`We'll place a h${space}old.`, HOLD],
+        [`That is the f${space}ee.`, NOT_FROM_RECORD],
+        [`That is the${space}fee.`, NOT_FROM_RECORD],
+      ] as const;
+      for (const [text, refusal] of lines) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([refusal]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, JSON.stringify(text)).toContainEqual(refusal);
+      }
+      // The claim check reads the joined words too: "charged" split, before the money step.
+      expect(checkMoneyLine(`You were ch${space}arged $55.`, asked).refused, JSON.stringify(space)).toEqual([
+        { claim: "charged", why: "notTaken" },
+      ]);
+    }
+  });
+
+  it("'auth' begins a money stem and a hold word: authed and pre-authed fail with neverHold", () => {
+    for (const text of [
+      "We authed your card.",
+      "We pre-authed $40.",
+      "It was pre-authed.",
+      "That is the authed one.",
+      "The auth went through.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([HOLD]);
+      for (const reading of gateReadings()) {
+        expect(checkMoneyText(text, reading, gate()).refused, text).toContainEqual(HOLD);
+        expect(checkMoneyLine(text, reading).refused, text).toContainEqual(HOLD);
+      }
+    }
+  });
+
+  it("every currency sign and the codes USD, EUR, GBP, CHF, CAD and AUD make a money sentence; a code counts only as a whole word", () => {
+    for (const text of [
+      "That is ¥40.",
+      "That is ₹40.",
+      "That is ₩40.",
+      "That is ₽40.",
+      "That is 40¢.",
+      "That is ₺40.",
+      "That is 40 USD.",
+      "That is EUR 40.",
+      "That is 40 gbp.",
+      "That is CHF 20.",
+      "That is CAD 40.",
+      "That is 40AUD.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([NOT_FROM_RECORD]);
+    const pairs = [
+      ["The audit is done.", "The AUD 40 is done."],
+      ["Our cadence is weekly.", "Our CAD 40 is weekly."],
+      ["We serve all of Europe.", "We serve it all for EUR 40."],
+      ["The Archfield shop is open.", "The CHF 20 shop is open."],
+    ] as const;
+    for (const [none, money] of pairs) {
+      expect(gateMoneyText(none, NOTHING_APPROVED), none).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(none, reading, gate()), none).toEqual({ ok: true, claims: [], refused: [] });
+      expect(gateMoneyText(money, NOTHING_APPROVED).refused, money).toEqual([NOT_FROM_RECORD]);
+    }
+  });
+
+  it("the residual: letter-shaped symbols with no plain-letter form (🅷🅾🅻🅳) are not this check's to catch (CQ-120); ones NFKD reads as letters are", () => {
+    for (const text of ["We'll put a 🅷🅾🅻🅳 on it until the visit.", "If you don't reply, we'll 🅲🅷🅰🆁🅶🅴 it."]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), text).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), text).toEqual({ ok: true, claims: [], refused: [] });
+    }
+    // Squared and circled letters have a plain-letter form, so they are read as those letters.
+    for (const text of ["We'll put a 🄷🄾🄻🄳 on it until the visit.", "We'll put a ⓗⓞⓛⓓ on it until the visit."])
+      expect(gateMoneyText(text, NOTHING_APPROVED).refused, text).toEqual([HOLD]);
+  });
+});
+
+describe("round 5 (DL-194, 3): a refund said as a noun needs money the booking took, as 'refunded' does", () => {
+  it("'We issued your refund.' and 'your refund went through' fail before the money step and before the write, and pass once taken", () => {
+    const asked = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    const unwritten = readMoney({ ...oneService("A", "list|deposit|counter"), written: false }, record("A"));
+    const taken = readMoney(oneService("A", "list|deposit|counter"), record("A"));
+    for (const line of [
+      "We issued your refund.",
+      "Good news: your refund went through.",
+      "Your $40 refund is on its way.",
+      "The refund has been processed.",
+      "Your refunds went through.",
+      "We've issued a refund.",
+      "We sent you a full refund.",
+      "A refund of $40 was sent to your card.",
+      "Refund issued.",
+    ])
+      for (const text of threeForms(line)) {
+        for (const reading of [asked, unwritten])
+          expect(checkMoneyLine(text, reading).refused, text).toEqual([
+            { claim: "backToCard", why: "notTaken" },
+          ]);
+        expect(checkMoneyLine(text, taken).ok, text).toBe(true);
+      }
+  });
+
+  it("a refund named as a term and the verb state none: the master's own term lines and pay.back's row keep their reading", () => {
+    const asked = readMoney(oneService("A", "list|deposit|counter", false), record("A"));
+    const corpus = new Set(FLOWS.flatMap((flow) => stringsOf(src.flows[flow])));
+    for (const text of [
+      "A cancel in time gets a full refund.",
+      "Cancel in time: a full refund",
+      "Paid at the business its own way: the business refunds it its own way.",
+      "Nothing was taken, so there's nothing to refund.",
+    ]) {
+      expect(corpus.has(text), text).toBe(true);
+      expect(checkMoneyLine(text, asked).claims, text).not.toContain("backToCard");
+    }
+  });
+});
