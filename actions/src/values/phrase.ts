@@ -8,9 +8,11 @@
 //   2. the whole phrase is that run of the text, widened on either side over the value's own pieces as long as there are
 //      more: digits and their separators; number words as the reader joins them ("a hundred and forty", "forty one") and
 //      scale words ("thousand", "k"); currency signs and units ("$", "%", "¢", "/hr", "percent", "cents", "dollars"); am
-//      or pm, "o'clock", minutes ("thirty" in "three thirty"), zone words ("PST", "Pacific time"); the readers' own phrase
-//      words ("quarter to", "half past", "y media", "y cuarto", "menos cuarto", "de la tarde"); and the other end of a range
-//      or a choice of two ("$12 to 15", "3 or 4pm", "4-6 people");
+//      or pm, "o'clock", "noon" or "midnight", minutes ("thirty" in "three thirty"), zone words ("PST", "Pacific time");
+//      the day a time is on and the time a day has ("3pm tomorrow", "tomorrow at 3pm", "Fri", "Oct 24"); cents after an
+//      amount ("12 dollars and 50 cents"); the readers' own phrase words ("quarter to", "half past", "y media", "y cuarto",
+//      "menos cuarto", "de la tarde"); and the other end of a range or a choice of two ("$12 to 15", "3 or 4pm", "4-6
+//      people", "today or tomorrow");
 //   3. the whole phrase is re-read, and every piece of it must be part of what the reader read: a piece the reader does
 //      not read ("thirty" in "at three thirty", "k" in "$2k", "twenty" in "twenty to 3") leaves the phrase unread;
 //   4. the value holds only if the whole phrase gives the same value. None, or a piece left unread, is noText; another
@@ -29,7 +31,7 @@ import {
   type ReparseContext,
   type ReparseFault,
 } from "./reparse";
-import { timeReadingOf } from "./times";
+import { DAY_PATTERN, timeReadingOf } from "./times";
 import { BOTH_LANGUAGES, findAll, foldWords, wholeAt, type Span, type ValueLanguage } from "./words";
 
 /** The field types written as numbers, whose values are re-read from their whole value phrase. */
@@ -127,6 +129,10 @@ function wideningFor(type: PhraseType, languages: readonly ValueLanguage[]): Wid
           ),
           new RegExp(String.raw`^ ?(?:-|to|or|o) ?\$? ?${NUMBER}`),
           new RegExp(String.raw`^ (?:to|or|o) (?:${all})\b`),
+          new RegExp(
+            String.raw`^ (?:and|y) (?:\d+ ?(?:cents?\b|centavos?\b|¢)|(?:${all}) (?:cents?|centavos?)\b)`,
+            "u",
+          ),
           SPACED_THOUSANDS,
         ],
       };
@@ -157,8 +163,15 @@ function wideningFor(type: PhraseType, languages: readonly ValueLanguage[]): Wid
             String.raw`\b(?:(?:${all})(?: minutes?)?|\d{1,2} minutes?) (?:to|till|til|of|before|past|after) $`,
           ),
           /\b\d{1,2}(?:[:.]\d{2})?(?: ?(?:am|pm))? ?(?:-|or|o|and|y) ?$/,
+          // The day the time is on, and a time of day before a day ("tomorrow at 3pm", "3pm tomorrow").
+          new RegExp(String.raw`\b${DAY_PATTERN},? (?:at |a las |a la |para las |on )?$`),
+          /\b\d{1,2}(?:(?:[:.]\d{2})? ?(?:am|pm)|[:.]\d{2}) (?:on )?$/,
         ],
         right: [
+          new RegExp(String.raw`^,? (?:on |or |o )?${DAY_PATTERN}(?![\w/])`),
+          new RegExp(String.raw`^ (?:at|a las|a la|para las) (?:\d{1,2}(?:[:.]\d{2})?(?!\d)|(?:${all})\b)`),
+          /^ \d{1,2}(?:(?:[:.]\d{2})? ?(?:am|pm)\b|[:.]\d{2}(?!\d))/,
+          /^ (?:noon|midnight|midday|mediodia|medianoche)\b/,
           /^(?:[:.]\d+)+/,
           /^(?:am|pm|[ap])\b/,
           /^ (?:am|pm|oclock)\b/,
