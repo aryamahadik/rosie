@@ -1,0 +1,56 @@
+{
+  "call": "recordSafetyOutcome",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-10-23T14:10:03Z",
+    "stated": { "step": "A3-22", "gives": ["safe"] },
+    "note": "Refused by the rule arrivalTurn: Alex's text reads No (contracts/model/fixtures/safety-no.json), yet the handle actor records it on arrival in a turn of its own. A No holds nothing and has no line to send first, so it rides in the turn its text joins (README default 5); with a read that holds danger, as j3-safety-arrival-emergency.json, the same record is accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "turn-arrival-alex-0201",
+      "requestId": "turn-arrival-alex-0201",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0201"
+    },
+    "turn": {
+      "id": "turn-arrival-alex-0201",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0201"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0201",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "safety": {
+      "eventId": "evt-alex-0201",
+      "source": "text",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "read": {
+        "labels": [
+          { "outcome": "No", "tense": "now", "evidence": "", "atRisk": "nobody", "writer": "the person at the handle" }
+        ]
+      },
+      "timedOut": false,
+      "dangerWords": [],
+      "outcomes": ["No"],
+      "liftedToUnsure": false
+    },
+    "handleId": "handle-alex",
+    "bookingId": null,
+    "sentByActor": null
+  },
+  "outcome": {
+    "outcomeId": "safety-outcome-alex-0201",
+    "outcomes": ["No"],
+    "hold": null,
+    "safetyLine": null,
+    "told": [],
+    "nothingBooks": false,
+    "repeated": false,
+    "gives": ["safe"]
+  }
+}

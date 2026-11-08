@@ -1,0 +1,35 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-24T13:40:02Z",
+    "stated": { "step": "A3-01", "gives": ["request"] },
+    "note": "A3-01's walk-in, then A3-20: Omar walks in on Sat Oct 24 with no booking and texts 'Walk-in for a haircut' to the number on the door sign at 9:40am. His text reads No and as a new booking, so in his own turn the request opens at door walk_in, flow A, made_by shop (RULES 2.5: a walk-in is the business's own), for the sender himself: caller.personId is the person the actor knows his handle by (K-05 v1.2 handleSealingKey writes one with no name at first sight), never a person his words name. Who it is for comes first (A4-80), then the next free time, never a booked one (A3-20; K-09 v1.2 and v1.4)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-omar-walk-in",
+      "requestId": "turn-omar-walk-in",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-omar",
+      "traceId": "trace-omar-0001"
+    },
+    "door": "walk_in",
+    "flow": "A",
+    "booker": { "kind": "caller" },
+    "safetyOutcomeId": null
+  },
+  "outcome": {
+    "bookingId": "booking-omar-walk-in",
+    "number": "LB-1024-01",
+    "bookerPersonId": "person-omar",
+    "gives": ["request"],
+    "written": [
+      { "table": "bookings", "rowId": "booking-omar-walk-in", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-omar-walk-in", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

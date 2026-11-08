@@ -1,0 +1,28 @@
+{
+  "call": "setCustomerBlock",
+  "given": {
+    "seeds": ["customers/seed-customer-blocked.json"],
+    "after": [],
+    "now": "2026-10-28T13:00:02Z",
+    "stated": null,
+    "note": "S11-62: 'Sam can lift the block at any time.' On the portal's Customers page Sam lifts the block on Kim's number he set on Oct 26 (block-kim-number-oct26, version 1). The row stays, lifted, so Rosie's team still sees it; her address block holds."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0501",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0501"
+    },
+    "action": { "do": "lift", "blockId": "block-kim-number-oct26", "expectVersion": 1 }
+  },
+  "outcome": {
+    "blockId": "block-kim-number-oct26",
+    "version": 2,
+    "state": "lifted",
+    "bookingsAlreadyMade": [],
+    "repeated": false
+  }
+}

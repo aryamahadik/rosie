@@ -1,0 +1,34 @@
+{
+  "call": "findCustomer",
+  "given": {
+    "seeds": ["customers/seed-customer-mobile-email.json"],
+    "after": [],
+    "now": "2026-10-22T14:01:00Z",
+    "stated": null,
+    "note": "Find or add the customer by mobile (02-contracts K-09 v1.1): on the portal's Today page Sam types Alex's mobile, and Lee's Barbershop's own list has Alex M. with a mobile and an email on file, texts, 18 or older, which the read-back shows as 'Alex M. · mobile on file' (A3-30). Row-level security returns only the barbershop's record; Alex's record at the yoga studio is never found (RULES 4.10). Nothing is said about any booking, and the number itself is never returned."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0301",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0301"
+    },
+    "by": { "mobile": "+15555550101" }
+  },
+  "outcome": {
+    "customers": [
+      {
+        "customerId": "customer-alex-barbershop",
+        "name": "Alex M.",
+        "mobileOnFile": true,
+        "emailOnFile": true,
+        "way": "texts",
+        "ageBand": "18_or_older",
+        "version": 1
+      }
+    ]
+  }
+}

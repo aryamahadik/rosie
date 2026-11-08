@@ -1,0 +1,30 @@
+{
+  "caller": {
+    "kind": "page",
+    "turnId": null,
+    "requestId": "req-portal-sam-0402",
+    "businessId": "biz-lee-home-services",
+    "personId": "person-sam",
+    "traceId": "trace-page-sam-0401"
+  },
+  "bookingId": "booking-tessa-desk",
+  "expectVersion": 1,
+  "answer": "yesSendLink",
+  "readBack": {
+    "exactWords": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · no mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+    "yesEventId": "evt-page-sam-0402"
+  },
+  "customer": {
+    "name": "Tessa",
+    "mobile": null,
+    "email": null,
+    "way": null,
+    "ageBand": "18_or_older"
+  },
+  "time": {
+    "resourceId": "res-casey",
+    "during": { "start": "2026-10-22T16:00:00Z", "end": "2026-10-22T19:00:00Z" },
+    "timesRead": "window",
+    "zone": "America/New_York"
+  }
+}

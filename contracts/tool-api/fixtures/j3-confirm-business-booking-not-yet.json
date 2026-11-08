@@ -1,0 +1,59 @@
+{
+  "call": "confirmBusinessBooking",
+  "given": {
+    "seeds": ["business-setup/seed-company-two-kinds.json"],
+    "after": ["j3-open-request-business-desk.json"],
+    "now": "2026-10-20T14:12:02Z",
+    "stated": { "step": "B3-08", "gives": ["who_for", "reach_by", "times", "customer"] },
+    "note": "B3-08 then B3-24: the Today page reads Sam's entry back once and Sam taps '2 Not yet': Tessa did not agree to messages from Rosie. The answer still gives who_for (Tessa, 18 or older, as person served and payer), reach_by (texts, the way her mobile on file implies: K-28 customers_way_fits_contact), times (an arrival window, arriving 12-2pm with Casey, the reserved 12 to 3pm holding the job's length as K-30's flow B seed does) and customer (her new row, with her mobile as a new K-04 handle and phone row and her customer role, in one commit). No consent is written, so Rosie texts Tessa nothing; Sam is told to tell her the details himself (B3-24's row). Her mobile gets its contacts/add effect when saved (Q-03; CQ-04). res-casey stands for Casey's worker resource, which no frozen seed holds yet."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0402",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0401"
+    },
+    "bookingId": "booking-tessa-desk",
+    "expectVersion": 1,
+    "answer": "notYet",
+    "readBack": {
+      "exactWords": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+      "yesEventId": "evt-page-sam-0402"
+    },
+    "customer": {
+      "name": "Tessa",
+      "mobile": "+15555550142",
+      "email": null,
+      "way": "texts",
+      "ageBand": "18_or_older"
+    },
+    "time": {
+      "resourceId": "res-casey",
+      "during": { "start": "2026-10-22T16:00:00Z", "end": "2026-10-22T19:00:00Z" },
+      "timesRead": "window",
+      "zone": "America/New_York"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-tessa-desk",
+    "customerId": "customer-tessa-desk",
+    "gives": ["who_for", "reach_by", "times", "customer"],
+    "answer": "notYet",
+    "consentId": null,
+    "reservationId": "rsv-tessa-desk-casey",
+    "effects": [{ "effectId": "effect-contact-add-tessa-desk", "kind": "linq_contact_add" }],
+    "written": [
+      { "table": "phones", "rowId": "handle-tessa-desk", "version": 1 },
+      { "table": "person_roles", "rowId": "role-tessa-desk-home-services", "version": 1 },
+      { "table": "customers", "rowId": "customer-tessa-desk", "version": 1 },
+      { "table": "bookings", "rowId": "booking-tessa-desk", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 2 },
+      { "table": "reservations", "rowId": "rsv-tessa-desk-casey", "version": 1 }
+    ],
+    "outboxRowIds": ["out-sam-tessa-no-texts"],
+    "repeated": false
+  }
+}

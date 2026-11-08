@@ -1,0 +1,36 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["business-setup/seed-company-two-kinds.json"],
+    "after": [],
+    "now": "2026-10-20T14:10:02Z",
+    "stated": { "step": "B3-01", "gives": ["request"] },
+    "note": "B3-08's what-if on the portal: Tessa calls the office, and Sam enters 'Tessa, drain clearing, Thu 12-2, Casey' on the Today page at 10:10am Tue Oct 20 (A3-19: 'On the portal, the desk types it on the Today page'). Tessa is not on Lee Home Services's list, so the request opens at door business, flow B, made_by shop, for a new person named as typed; her customer row, mobile and role come with the read-back's answer (j3-confirm-business-booking-not-yet.json). The business's own entry is not free text from a customer, so no safety read names it (safetyOutcomeId null). In flow B the request is B3-01's to give."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0401",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-sam",
+      "traceId": "trace-page-sam-0401"
+    },
+    "door": "business",
+    "flow": "B",
+    "booker": { "kind": "new", "name": "Tessa" },
+    "safetyOutcomeId": null
+  },
+  "outcome": {
+    "bookingId": "booking-tessa-desk",
+    "number": "LHS-1020-05",
+    "bookerPersonId": "person-tessa-desk",
+    "gives": ["request"],
+    "written": [
+      { "table": "persons", "rowId": "person-tessa-desk", "version": 1 },
+      { "table": "bookings", "rowId": "booking-tessa-desk", "version": 1 },
+      { "table": "booking_details", "rowId": "booking-tessa-desk", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

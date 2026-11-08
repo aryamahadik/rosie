@@ -1,4 +1,5 @@
-// K-09's named rules (T-018): what an exchange states that one JSON Schema cannot check across its parts.
+// K-09's named rules (T-018; v1.1's givesJourneyKeys and arrivalTurn added by T-050): what an exchange states that
+// one JSON Schema cannot check across its parts.
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
 // passed its schema (contracts/scripts/check-fixtures.mjs). QA's contract test (T-088) and the Tool API mock (C-186)
 // read the same statements. README "Named rules". Rules are only ever added: a later minor version adds a rule under a
@@ -229,4 +230,123 @@ export function givesStepKeys(exchange) {
   return problems;
 }
 
-export const rules = Object.freeze({ statedOutcome, givesStepKeys, rereadBeforeQuestion, clockTurn });
+// ---------------------------------------------------------------------------------------------------------------
+// v1.1 (T-050): journey 3. Added beside the rules above, which stay as they are.
+
+/**
+ * The keys each step of journey 3 gives, as the step index prints them (A-J3.md and B-J3.md, the gives column; the
+ * call-only steps A3-06 and A3-14 are out: C-231). In flow B the door's request is B3-01's (B3-02 and B3-07 give none).
+ */
+export const J3_STEP_GIVES = Object.freeze({
+  "A3-01": ["request"],
+  "A3-02": ["request"],
+  "A3-04": ["request"],
+  "A3-19": ["request"],
+  "A3-22": ["safe"],
+  "A3-30": ["who_for", "reach_by", "times", "customer"],
+  "B3-01": ["request"],
+  "B3-17": ["safe"],
+  "B3-08": ["who_for", "reach_by", "times", "customer"],
+});
+
+/**
+ * The one call that writes each key journey 3 gives (02-contracts section 8 names each key's home; README "v1.1",
+ * "Each key's one call"). In a turn the same write is the chosen choice's effect inside gateAndCommit, whose committed
+ * part names the keys (partResult.gives).
+ */
+export const KEY_CALL = Object.freeze({
+  request: "openRequest",
+  safe: "recordSafetyOutcome",
+  who_for: "confirmBusinessBooking",
+  reach_by: "confirmBusinessBooking",
+  times: "confirmBusinessBooking",
+  customer: "confirmBusinessBooking",
+});
+
+/**
+ * givesJourneyKeys: an exchange that states a journey 3 step writes exactly the keys that step gives (J3_STEP_GIVES),
+ * its outcome wrote exactly the stated keys, and, made alone, its call is the one call that writes each of them
+ * (KEY_CALL; the card's "each key written by exactly one call").
+ */
+export function givesJourneyKeys(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const own = J3_STEP_GIVES[stated.step];
+  if (own === undefined) return [`${stated.step} is no step of journey 3 that gives a key`];
+  const problems = [];
+  const expected = [...own].sort();
+  if (JSON.stringify([...stated.gives].sort()) !== JSON.stringify(expected)) {
+    problems.push(
+      `${stated.step} gives [${expected.join(", ")}], not the stated [${stated.gives.join(", ")}]`,
+    );
+  }
+  const written = [...keysWritten(exchange)].sort();
+  if (JSON.stringify(written) !== JSON.stringify(expected)) {
+    problems.push(`the outcome wrote [${written.join(", ")}], not [${expected.join(", ")}]`);
+  }
+  if (exchange.call !== "gateAndCommit") {
+    for (const key of written) {
+      if (KEY_CALL[key] !== exchange.call) {
+        problems.push(`${key} is written by ${KEY_CALL[key] ?? "no journey 3 call"}, not ${exchange.call}`);
+      }
+    }
+  }
+  return problems;
+}
+
+/** Whether a K-02 safety result holds danger (any outcome but No) or timed out (arch 02 line 111). */
+const dangerOrTimeout = (safety) =>
+  safety?.timedOut === true || (safety?.outcomes ?? []).some((outcome) => outcome !== "No");
+
+/**
+ * arrivalTurn: the handle actor's record on arrival (recordSafetyOutcome, caller.kind actorOnArrival) commits under
+ * the text's own arrival turn: caller.turnId and requestId the turn's id, its one event id the text's, its handle the
+ * text's, its trace id the caller's (CQ-06, CQ-09; K-34 v1 safety_outcomes_text_has_handle_and_turn); only a text
+ * whose read holds danger or timed out has one (a No rides in the turn its text joins: README default 5); a first
+ * record gives safe and writes its hold at version 1 (K-34 v1 rule 2). An at-once release on arrival
+ * (releaseSafetyHold, caller.kind actorOnArrival) runs under the same arrival turn's id.
+ */
+export function arrivalTurn(exchange) {
+  const request = exchange.request ?? {};
+  const caller = request.caller ?? {};
+  if (caller.kind !== "actorOnArrival")
+    return ["arrivalTurn needs a call made by caller.kind actorOnArrival"];
+  const problems = [];
+  if (caller.requestId !== caller.turnId) problems.push("caller.requestId is the arrival turn's id");
+  if (exchange.call === "releaseSafetyHold") return problems;
+  if (exchange.call !== "recordSafetyOutcome")
+    return ["arrivalTurn applies to recordSafetyOutcome and releaseSafetyHold"];
+  const { turn, safety } = request;
+  if (turn?.id !== caller.turnId) problems.push("caller.turnId is the arrival turn's id");
+  if (JSON.stringify(turn?.eventIds) !== JSON.stringify([safety?.eventId])) {
+    problems.push("the arrival turn's one event id is the text's own");
+  }
+  if (turn?.handleId !== request.handleId) problems.push("the arrival turn's handle is the text's");
+  if (turn?.traceId !== caller.traceId)
+    problems.push("the arrival turn's trace id is the text's own (CQ-06)");
+  if (safety?.source !== "text") problems.push("only a text arrives at the handle actor");
+  if (!dangerOrTimeout(safety)) {
+    problems.push(
+      "a read of No has no arrival record: it rides in the turn its text joins (README default 5)",
+    );
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.outcomeId !== undefined) {
+    if (JSON.stringify(outcome.gives) !== JSON.stringify(["safe"])) problems.push("the record gives safe");
+    if (outcome.repeated === false && outcome.hold !== null && outcome.hold?.version !== 1) {
+      problems.push("a hold the record wrote is at version 1 (K-34 v1 rule 2)");
+    }
+  }
+  return problems;
+}
+
+export const rules = Object.freeze({
+  statedOutcome,
+  givesStepKeys,
+  rereadBeforeQuestion,
+  clockTurn,
+  givesJourneyKeys,
+  arrivalTurn,
+});

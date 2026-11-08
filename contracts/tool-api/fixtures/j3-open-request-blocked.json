@@ -1,0 +1,25 @@
+{
+  "call": "openRequest",
+  "given": {
+    "seeds": ["customers/seed-customer-blocked.json"],
+    "after": [],
+    "now": "2026-10-27T13:00:02Z",
+    "stated": null,
+    "note": "S11-62: Kim texts Lee Home Services 'Can someone look at my water heater this week?' on Tue Oct 27, while Sam's block of her number (block-kim-number-oct26) holds. Her text reads No (the safety read runs on every text, blocked or not: judgment rules 9 to 11), but no request opens: she hears only that the business can't take her booking, with no reason given, so the error names no block. Nothing is written."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-kim-water-heater",
+      "requestId": "turn-kim-water-heater",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-kim",
+      "traceId": "trace-kim-0001"
+    },
+    "door": "chat",
+    "flow": "B",
+    "booker": { "kind": "caller" },
+    "safetyOutcomeId": null
+  },
+  "outcome": { "error": "customerBlocked", "blockId": null }
+}
