@@ -1,0 +1,20 @@
+{
+  "call": "bookingCheckCode",
+  "given": {
+    "now": "2026-10-22T22:02:10Z",
+    "environment": "staging",
+    "after": ["booking-check-start.json", "booking-check-code-wrong.json"],
+    "note": "The same browser types a second code for check-lees-0001, one that does not match: the page entry answers wrong itself and counts the try (README default 29), the second for Lee's Barbershop, 'Alex M.' and Oct 24, so 3 are left. The tries are counted per business, name typed and day typed, the key a live code has under K-09 v1.1 default 51, not per checkId, so a new check for the same name and day goes on counting. It is the same answer whether or not a booking matched, so it tells no one whether one exists, and nothing about a visit is shown. K-09 v1.1 checkBookingFirst gives the page server no code id and K-09 v1 proveCode needs one, so no typed code can be checked until a K-09 minor version gives it (open gap 34): the page entry never answers checked (it fails closed), and what a right code answers waits for that version. The typed code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-check-0003",
+      "traceId": "trace-page-check-0003",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" }
+    },
+    "checkId": "check-lees-0001",
+    "code": "482913",
+    "deviceToken": "placeholder-device-token-check-1"
+  },
+  "outcome": { "result": "wrong", "triesLeft": 3 }
+}
