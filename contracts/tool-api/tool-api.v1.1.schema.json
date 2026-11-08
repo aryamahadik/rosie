@@ -621,7 +621,7 @@
     },
     "openRequest.request": {
       "title": "OpenRequestRequest",
-      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, both rows at version 1 (K-04 v1 rule 2; K-30 v1 rule 4). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
+      "description": "Open a booking request at its door; gives request (A3-01, with the ways in A3-02, A3-04, A3-19 and A3-20's walk-in; B3-01, with B3-02, B3-07 and B3-08's BOOK words; K-30 'a booking request in progress', 02-contracts section 8), the one call that writes it. It is written once the door's words read as a new booking (A3-51, B3-40: 'A new booking'), after their danger check (A3-22, B3-17), and writes, in one commit: the K-04 v1 booking head (stage entry, the flow, the booker; person served and payer stay null until who_for, A3-30 or A4-80) and K-30 v1 booking_details (door, made_by from the door: booking_details_made_by_door, and the booking number). In a turn (a text in the person's own chat; the owner's, a barber's or the desk's BOOK text, A3-19, B3-08; a walk-in's text to the door sign, A3-20) the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, and partResult.gives names request; alone it is an outside AI's call (door ai, through the Agent API C-110; K-20) or a page's (door page, the booking page; the portal's Today page for door business or walk_in; K-21). Primary, uncached. Business: caller.businessId; row-level security scopes both rows to it (arch 10 line 546; K-30 v1 rule 5). Person: the booker is named by the server, never by the browser or the AI (booker); at door business, and for the desk's walk_in on the Today page, caller.personId is the owner, an admin or staff of the business (K-04 v1 person_roles: 'Sam, a barber or the desk can book for a customer'), else notAllowed (wrongRole). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first request with repeated true. Version: inserts only, both rows at version 1 (K-04 v1 rule 2; K-30 v1 rule 4). Checks before any write: the business is live (notLive; B3-01 needs live), the request's own safety read holds no danger and no open hold blocks booking (safetyHeld; arch 02 line 129), no pause holds the person or phone (waitsForOwner; A3-48), and a known person or number is under no open block (customerBlocked, no reason given; S11-62). A3-03 and B3-23: an outside AI's call never counts as the customer's own yes (no consent, money or booking yes comes from caller.kind agent), no card passes through it, and it gets the same rules as every way in (A3-01: 'Never: give one way in fewer rights').",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -726,12 +726,32 @@
               }
             },
             {
-              "description": "door walk_in (flow A): the walk-in's own text (a turn, for its sender) or the desk on the Today page (a page).",
+              "description": "door walk_in (flow A): the walk-in's own text (a turn, for its sender) or the desk on the Today page (a page, for a customer on the list or a new one).",
               "if": { "properties": { "door": { "const": "walk_in" } }, "required": ["door"] },
               "then": {
                 "properties": {
                   "caller": { "type": "object", "properties": { "kind": { "enum": ["turn", "page"] } } },
                   "flow": { "const": "A" }
+                },
+                "if": {
+                  "properties": {
+                    "caller": {
+                      "type": "object",
+                      "properties": { "kind": { "const": "turn" } },
+                      "required": ["kind"]
+                    }
+                  },
+                  "required": ["caller"]
+                },
+                "then": {
+                  "properties": {
+                    "booker": { "type": "object", "properties": { "kind": { "const": "caller" } } }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "booker": { "type": "object", "properties": { "kind": { "enum": ["customer", "new"] } } }
+                  }
                 }
               }
             }
@@ -809,7 +829,7 @@
     },
     "confirmBusinessBooking.request": {
       "title": "ConfirmBusinessBookingRequest",
-      "description": "The answer to Rosie's read-back of a booking the business adds; gives who_for, reach_by, times and customer (A3-30, B3-08; 02-contracts section 8: who_for the K-04 head's booker, person served and payer with K-30; reach_by K-28 v1 customers.way; times K-30 booking_details.times with the time chosen; customer the K-28 v1 customers row), the one call that writes them; its '2 Not yet' is A3-40 and B3-24. The read-back carries what, when, who it's for, the age and how they're reached (A3-30: 'Book this for Alex M.? Did Alex agree to messages from Rosie?'), and the reply books it as entered (A4-98: not a request). In a turn (the owner's, a barber's or the desk's reply in their own chat, 'owner → san: 1') the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, limit 3 above all (the exact yes, bound to the read-back's own words and versions: arch 06 line 303), and partResult.gives names the four keys; alone it is the portal's Today page (FS section 6.2; K-21), whose confirm tap is the exact yes. '3 Change it' writes nothing here: the booking is changed and read back again, a new question. Primary, uncached. Business: caller.businessId, the booking's; row-level security scopes every row (K-28 v1, K-30 v1 rule 5). Person: caller.personId is the owner, an admin or staff of this business who answered (K-04 v1 person_roles: 'Sam, a barber or the desk'), else notAllowed (wrongRole); never the customer and never an AI ('Never: take an AI's yes as Alex's', A3-03). The customer is the head's booker, which openRequest named; no person id comes in this request. Repeat: caller.requestId is the key (the turn's id); a repeat writes nothing and answers the first result with repeated true. Version: the head's version is compared and set (expectVersion, limit 4), and an existing customer row's too when its way or age changes (K-28 v1 rule 2). Writes, in one commit: customer, the K-28 row found by (business, booker) or added (K-28 customers_business_person_key) with the name, the contacts as K-04 handles of the booker's own (a new mobile gets its K-04 handle and phone row and a contacts/add effect, Q-03; CQ-04) and the K-04 person_roles customer row in the same commit (K-28 v1 rule 7); reach_by, customers.way; who_for, the head's served_person_id and payer_person_id (the customer it is for) and customers.age_band; times, K-30 booking_details.times (set once) and the time entered held for the booking (K-05 v1 reserve, a K-04 reservation held with booking_id, as K-30 keeps every booked time on K-04's reservations) until the same walk's booking write books it (A6-10, K-09 v1.4); and, for '1 Yes, send the link', the yes to messages for this booking as a K-29 v1 consents row of kind texts naming the customer, the business, the contact, the booking and the read-back's exact words with their sha256 (RULES 2.5; K-28 v1 default 5), whose chat link the owner passes on (issueChatLink, purpose booking, given_via owner, once contacts/add has worked: MC C9; Q-03; C-254). '2 Not yet' writes no consent: Rosie texts the customer nothing ('Never: message the customer on a guess').",
+      "description": "The answer to Rosie's read-back of a booking the business adds; gives who_for, reach_by, times and customer (A3-30, B3-08; 02-contracts section 8: who_for the K-04 head's booker, person served and payer with K-30; reach_by K-28 v1 customers.way; times K-30 booking_details.times with the time chosen; customer the K-28 v1 customers row), the one call that writes them; its '2 Not yet' is A3-40 and B3-24. The read-back carries what, when, who it's for, the age and how they're reached (A3-30: 'Book this for Alex M.? Did Alex agree to messages from Rosie?'), and the reply books it as entered (A4-98: not a request). In a turn (the owner's, a barber's or the desk's reply in their own chat, 'owner → san: 1') the write is the chosen choice's effect inside gateAndCommit, checked by limits 1 to 6, limit 3 above all (the exact yes, bound to the read-back's own words and versions: arch 06 line 303), and partResult.gives names the four keys; alone it is the portal's Today page (FS section 6.2; K-21), whose confirm tap is the exact yes. '3 Change it' writes nothing here: the booking is changed and read back again, a new question. Primary, uncached. Business: caller.businessId, the booking's; row-level security scopes every row (K-28 v1, K-30 v1 rule 5). Person: caller.personId is the owner, an admin or staff of this business who answered (K-04 v1 person_roles: 'Sam, a barber or the desk'), else notAllowed (wrongRole); never the customer and never an AI ('Never: take an AI's yes as Alex's', A3-03). The customer is the head's booker, which openRequest named; no person id comes in this request. Repeat: caller.requestId is the key (the turn's id); a repeat writes nothing and answers the first result with repeated true. Version: the head's version is compared and set (expectVersion, limit 4); a customer already on the list is compared at the version the read-back read (customerVersion) and raised only when the call fills an age band the row lacked (K-28 v1 rule 2); a new customer row is inserted at version 1. A customer already on the list keeps the contacts and the way on file, which the read-back shows ('Alex M. · mobile on file'): another phone or email is a contact change, which waits for the person's own code typed back (S13-45 row 3; D75, D77, D100; K-28 v1 README 'The contact on file and the way'), and a way changes on the person's own word in their own chat (A7-98), so a read-back that differs from the row is refused (notAllowed, notDecider) and nothing is written. Writes, in one commit: customer, the K-28 row found by (business, booker) or added (K-28 customers_business_person_key) with the name, the contacts as K-04 handles of the booker's own (a new mobile gets its K-04 handle and phone row and a contacts/add effect, Q-03; CQ-04) and the K-04 person_roles customer row in the same commit (K-28 v1 rule 7); reach_by, customers.way (a new customer's, or the one on file); who_for, the head's served_person_id and payer_person_id (the customer it is for) and customers.age_band (a new customer's, or one the row lacked); times, K-30 booking_details.times (set once) and the time entered held for the booking (K-05 v1 reserve, a K-04 reservation held with booking_id, as K-30 keeps every booked time on K-04's reservations) until the same walk's booking write books it (A6-10, K-09 v1.4); and, for '1 Yes, send the link', the yes to messages for this booking as a K-29 v1 consents row of kind texts naming the customer, the business, the contact, the booking and the read-back's exact words with their sha256 (RULES 2.5; K-28 v1 default 5), whose chat link the owner passes on (issueChatLink, purpose booking, given_via owner, once contacts/add has worked: MC C9; Q-03; C-254). '2 Not yet' writes no consent: Rosie texts the customer nothing ('Never: message the customer on a guess').",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -820,6 +840,10 @@
         "expectVersion": {
           "description": "The head's version the read-back was built from (limit 4: arch 06 line 305).",
           "$ref": "#/$defs/version"
+        },
+        "customerVersion": {
+          "description": "For a customer already on the list, the version of their K-28 row the read-back was built from (findCustomer, or the frontier's fact), compared and set (limit 4); null for a customer the call adds.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
         },
         "answer": {
           "description": "yesSendLink: '1 Yes, send the link', the customer agreed to messages from Rosie for this booking; notYet: '2 Not yet', no messages, the business tells the customer the details (A3-40, B3-24).",
@@ -902,7 +926,16 @@
           "additionalProperties": false
         }
       },
-      "required": ["caller", "bookingId", "expectVersion", "answer", "readBack", "customer", "time"],
+      "required": [
+        "caller",
+        "bookingId",
+        "expectVersion",
+        "customerVersion",
+        "answer",
+        "readBack",
+        "customer",
+        "time"
+      ],
       "additionalProperties": false,
       "dependentSchemas": {
         "answer": {
