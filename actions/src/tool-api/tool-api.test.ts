@@ -69,6 +69,79 @@ for (const { exchange } of acceptedExchanges()) {
   }
 }
 
+/** The team console, acting for Lee's Barbershop: the caller of the requests built below. */
+const CONSOLE_CALLER = {
+  kind: "console",
+  turnId: null,
+  requestId: "req-console-team-0003",
+  businessId: "biz-lees-barbershop",
+  personId: "person-rosie-team-1",
+  traceId: "trace-console-0003",
+};
+const AT = "2026-10-21T19:40:00Z";
+
+/**
+ * A request for each of the 11 calls that take a caller and have no accepted fixture, built from the sample cast; a test
+ * checks each against the frozen schema first, so each is one the contract accepts.
+ */
+const BUILT: [CallName, Json][] = [
+  [
+    "releaseSafetyHold",
+    {
+      caller: CONSOLE_CALLER,
+      holdId: "hold-alex-1",
+      expectVersion: 1,
+      why: "outcome_message_sent",
+      releasedByOutcomeId: null,
+    },
+  ],
+  [
+    "handOff",
+    {
+      caller: CONSOLE_CALLER,
+      kind: "other",
+      about: "other",
+      safetyOutcomeId: null,
+      bookingId: null,
+      aboutPersonId: null,
+      summary: "Alex M. asked to talk to Sam.",
+    },
+  ],
+  [
+    "answerHandOff",
+    { caller: CONSOLE_CALLER, handOffId: "hand-off-alex-1", expectVersion: 1, via: "console_tap" },
+  ],
+  [
+    "acknowledgePage",
+    { caller: CONSOLE_CALLER, pageId: "page-alex-1", expectVersion: 1, via: "console_tap" },
+  ],
+  ["enterDoor", { caller: CONSOLE_CALLER, door: "S11-12", by: "decide" }],
+  [
+    "sendFixedLine",
+    {
+      caller: CONSOLE_CALLER,
+      fixedLineId: "optOutLine",
+      recipientHandleId: "handle-ben",
+      sendClass: "quick_reply",
+      sentByActor: null,
+    },
+  ],
+  ["sendsFailing", { caller: CONSOLE_CALLER, outboxRowId: "outbox-ben-1", failingSince: AT }],
+  ["textingBack", { caller: CONSOLE_CALLER, recipientHandleId: "handle-ben", outageStartedAt: AT }],
+  [
+    "calendarLinkDropped",
+    {
+      caller: CONSOLE_CALLER,
+      calendarLinkId: "calendar-link-sam-1",
+      personId: "person-sam",
+      why: "tokenRevoked",
+      droppedAt: AT,
+    },
+  ],
+  ["calendarLinkBack", { caller: CONSOLE_CALLER, calendarLinkId: "calendar-link-sam-1", backAt: AT }],
+  ["readSetup", { caller: CONSOLE_CALLER, businessId: "biz-lees-barbershop" }],
+];
+
 /** A page's caller from flag-paused.json: Sam, signed in on the portal. */
 const PAGE_CALLER = callerOf((fixture("flag-paused.json") as Exchange).request) ?? {};
 
@@ -224,6 +297,26 @@ describe("a valid fixture request reaches its handler, inside its business scope
       const code = isError ? (exchange.outcome as { error: string }).error : null;
       expect(span.decided).toEqual({ answered: code ?? "response" });
       expect(span.error_code).toBe(code);
+    });
+  }
+});
+
+describe("every call that takes a caller reaches its handler with a validated request", () => {
+  it("covers every call but plannerVerbs (it has no caller), with the fixtures' requests", () => {
+    const covered = [...Object.keys(VALID), ...BUILT.map(([call]) => call)].sort();
+    expect(covered).toEqual(CALL_NAMES.filter((call) => call !== "plannerVerbs").sort());
+  });
+
+  for (const [call, request] of BUILT) {
+    it(`${call}: a request built from the sample cast passes the schema and reaches the handler, scope first`, async () => {
+      expect(validator.check(call, "request", request)).toEqual([]);
+      const transient = { error: "transient", sqlstate: "40001" };
+      const { api, scope, seen } = setup(call, () => transient);
+      const { trace, spans } = traceFor(request);
+      expect(await api.call(call, structuredClone(request), trace)).toEqual(transient);
+      expect(seen).toEqual([{ call, request, businessId: "biz-lees-barbershop" }]);
+      expect(scope.events.map((event) => event.what)).toEqual(["begin", "scope", "read", "rollback"]);
+      expect(onlySpan(spans)).toMatchObject({ trace_id: "trace-console-0003", error_code: "transient" });
     });
   }
 });
@@ -434,9 +527,9 @@ describe("the handler's answer is held to its call's response and errors", () =>
   it("every call's stub answers notBuilt until its task, inside its scope, rolled back", async () => {
     const scope = recordingScope();
     const api = createToolApi({ validator, scope, handlers: notBuiltHandlers() });
-    for (const call of CALL_NAMES) {
-      const request = VALID[call];
-      if (request === undefined) continue;
+    const requests = [...Object.entries(VALID), ...BUILT] as [CallName, Json][];
+    expect(requests).toHaveLength(28);
+    for (const [call, request] of requests) {
       scope.events.length = 0;
       const { trace, spans } = traceFor(request);
       expect(await api.call(call, request, trace)).toEqual({ error: "notBuilt", call });
