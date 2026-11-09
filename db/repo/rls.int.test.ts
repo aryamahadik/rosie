@@ -206,7 +206,7 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
  * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
  * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
- * (T-206), and K-26 v1 rules (T-207).
+ * (T-206), K-26 v1 rules (T-207), and K-27 v1 availability (T-208).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -299,6 +299,14 @@ const ALL_TABLES = [
   ...(
     JSON.parse(
       readFileSync(new URL("../../contracts/db-schema/rules/rules.v1.tables.json", import.meta.url), "utf8"),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/availability/availability.v1.tables.json", import.meta.url),
+        "utf8",
+      ),
     ) as { tables: ContractTable[] }
   ).tables,
 ];
@@ -911,6 +919,21 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (["trade_facts", "plugin_switches", "rule_kinds"].includes(table.name)) {
         return ["SELECT"];
       }
+      // K-27 v1 README rule 5: the Tool API's grant on calendar_links is a column grant (every column but tokens), so
+      // it holds no privilege on the whole table; on calendar_link_shares it holds SELECT, and its INSERT and UPDATE
+      // are column grants (a share's five columns; ended_at and version).
+      if (role === TOOL_API && table.name === "calendar_links") {
+        return [];
+      }
+      if (role === TOOL_API && table.name === "calendar_link_shares") {
+        return ["SELECT"];
+      }
+      // K-27 v1 README rule 5: busy_blocks (scope none) is both roles' in full, behind its policies: the Tool API reads
+      // through a live share and writes only its own photo rows; the runtime side's sync deletes a block whose event
+      // went, or that ended.
+      if (table.name === "busy_blocks") {
+        return ["DELETE", "INSERT", "SELECT", "UPDATE"];
+      }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
@@ -923,6 +946,8 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         ...(role === RUNTIME && ["person_handles", "outbox_claims"].includes(table.name) ? ["DELETE"] : []),
         // K-25 v1 README rule 6: the Tool API removes a link between a space and a service (S1-81 and Settings).
         ...(role === TOOL_API && table.name === "item_services" ? ["DELETE"] : []),
+        // K-27 v1 README rule 5: the Tool API deletes a span of weekly hours no longer open (S1-21, S11-57).
+        ...(role === TOOL_API && table.name === "weekly_hours" ? ["DELETE"] : []),
       ].sort();
     };
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
