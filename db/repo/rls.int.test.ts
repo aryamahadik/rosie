@@ -229,6 +229,22 @@ const K27_COLUMN_GRANTS: { table: string; privilege: string; columns: readonly s
   },
   { table: "calendar_link_shares", privilege: "UPDATE", columns: ["ended_at", "version"] },
 ];
+// K-33 v1's named exception (T-209; DL-250). Its README's rule 2 gives rosie_app column grants on two tables;
+// platform-billing.int.test.ts checks them against the README too. It adds no policy beyond T-191's pattern and no
+// security-definer call. Every other table and function stays held to this file's generic checks.
+/**
+ * (c) rosie_app's 6 column grants on K-33's tables. K-33 rule 2: it updates only a bill card's removed_at and version
+ * (a card replaced; Stripe's ids are never changed in place), and only a line's questioned_at, questioned_by_person_id,
+ * question and version (the owner questions a line; the answer is the runtime side's).
+ */
+const K33_COLUMN_GRANTS: { table: string; privilege: string; columns: readonly string[] }[] = [
+  { table: "bill_cards", privilege: "UPDATE", columns: ["removed_at", "version"] },
+  {
+    table: "monthly_bill_lines",
+    privilege: "UPDATE",
+    columns: ["questioned_at", "questioned_by_person_id", "question", "version"],
+  },
+];
 const SLOW = { timeout: 60_000 };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -266,7 +282,7 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
  * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
  * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
- * (T-206), K-26 v1 rules (T-207), and K-27 v1 availability (T-208).
+ * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), and K-33 v1 platform billing (T-209).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -365,6 +381,17 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/availability/availability.v1.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL(
+          "../../contracts/db-schema/platform-billing/platform-billing.v1.tables.json",
+          import.meta.url,
+        ),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -1017,6 +1044,14 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (table.name === "busy_blocks") {
         return ["DELETE", "INSERT", "SELECT", "UPDATE"];
       }
+      // K-33 v1 README rule 2: the Tool API selects and inserts a bill card, and its UPDATE of removed_at and version is
+      // a column grant; it only selects bills; it selects lines, and its UPDATE of a line's question is a column grant.
+      if (role === TOOL_API && table.name === "bill_cards") {
+        return ["INSERT", "SELECT"];
+      }
+      if (role === TOOL_API && ["monthly_bills", "monthly_bill_lines"].includes(table.name)) {
+        return ["SELECT"];
+      }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
@@ -1053,7 +1088,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8) and on K-27's calendar_links and calendar_link_shares (K-27 rule 5)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -1096,8 +1131,29 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
       ).sort(),
     );
+    // (c) K-33's named exception (K-33 rule 2; DL-250): rosie_app's 6 UPDATE column grants on bill_cards (removed_at and
+    // version) and monthly_bill_lines (questioned_at, questioned_by_person_id, question and version), every grantee's
+    // on those two tables held to exactly them, so a column grant of a card's Stripe ids or a line's amount or answer
+    // to any role fails here (the runtime side holds the three tables by table grants); platform-billing.int.test.ts
+    // checks them too.
+    const k33Tables = K33_COLUMN_GRANTS.map((grant) => grant.table);
     expect(
-      columnGrants.filter((grant) => !k22Tables.includes(grant.table) && !k27Tables.includes(grant.table)),
+      columnGrants
+        .filter((grant) => k33Tables.includes(grant.table))
+        .map(key)
+        .sort(),
+    ).toEqual(
+      K33_COLUMN_GRANTS.flatMap(({ table, privilege, columns }) =>
+        columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
+      ).sort(),
+    );
+    expect(
+      columnGrants.filter(
+        (grant) =>
+          !k22Tables.includes(grant.table) &&
+          !k27Tables.includes(grant.table) &&
+          !k33Tables.includes(grant.table),
+      ),
     ).toEqual(
       CHAT_LINK_UPDATES.flatMap((column) =>
         [...ROLES].sort().map((grantee) => ({ table: "chat_links", column, grantee, privilege: "UPDATE" })),
