@@ -38,10 +38,10 @@
       "approval": "now"
     },
     "asks": [
-      { "kind": "access", "question": null, "needed": true },
-      { "kind": "entry_code", "question": null, "needed": false },
-      { "kind": "question", "question": "Is the sink still full of water?", "needed": false },
-      { "kind": "note", "question": null, "needed": false }
+      { "kind": "access", "question": null, "needed": true, "authority": null },
+      { "kind": "entry_code", "question": null, "needed": false, "authority": null },
+      { "kind": "question", "question": "Is the sink still full of water?", "needed": false, "authority": null },
+      { "kind": "note", "question": null, "needed": false, "authority": null }
     ],
     "address": [1],
     "meetsPro": true,

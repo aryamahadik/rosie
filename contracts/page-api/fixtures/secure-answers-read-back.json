@@ -15,12 +15,19 @@
     "change": {
       "kind": "answers",
       "answers": [
-        { "kind": "access", "question": null, "words": "Side door; the gate latch sticks", "uploadId": null },
+        {
+          "kind": "access",
+          "question": null,
+          "words": "Side door; the gate latch sticks",
+          "uploadId": null,
+          "authority": null
+        },
         {
           "kind": "question",
           "question": "Is the sink still full of water?",
           "words": "Yes, about half full",
-          "uploadId": null
+          "uploadId": null,
+          "authority": null
         }
       ]
     }

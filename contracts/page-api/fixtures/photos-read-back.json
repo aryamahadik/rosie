@@ -15,12 +15,19 @@
     "change": {
       "kind": "photos",
       "answers": [
-        { "kind": "photo", "question": null, "words": null, "uploadId": "upload-alex-heater-photo-1" },
+        {
+          "kind": "photo",
+          "question": null,
+          "words": null,
+          "uploadId": "upload-alex-heater-photo-1",
+          "authority": null
+        },
         {
           "kind": "note",
           "question": null,
           "words": "It's a 40-gallon gas heater in the basement",
-          "uploadId": null
+          "uploadId": null,
+          "authority": null
         }
       ]
     }

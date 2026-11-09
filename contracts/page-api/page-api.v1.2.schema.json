@@ -395,11 +395,6 @@
       "description": "K-09 v1.2's mobileRequired (MC C2; D103; Q-07): a mobile is required when the customer books, and none was given or is on file to hold a saved time for; nothing was written.",
       "$ref": "../tool-api/tool-api.v1.2.schema.json#/$defs/mobileRequiredError"
     },
-    "savedTimeCapError": {
-      "title": "SavedTimeCapError",
-      "description": "K-09 v1.2's savedTimeCap (arch 05 line 247; K-05 v1 reserve): a third saved time for one mobile, so nothing was held; it names only when the mobile's own two saved times end.",
-      "$ref": "../tool-api/tool-api.v1.2.schema.json#/$defs/savedTimeCapError"
-    },
     "geoUnavailableError": {
       "title": "GeoUnavailableError",
       "description": "K-09 v1.2's geoUnavailable (K-17 v1 geocode.errors): nothing is known about the place and nothing was written; the step's safe default holds (B4-77: ask for the ZIP; B4-30: ask again).",
@@ -689,9 +684,36 @@
       "required": ["url"],
       "additionalProperties": false
     },
+    "authorityKind": {
+      "title": "AuthorityKind",
+      "description": "Which authority a booker acts under for the adult they book for (A4-64 line 2760: 'The page records which authority: a guardian, a health care agent, or a money power of attorney, and what it covers'; its flow B twin B4-74: 'It may be a guardian, a health care agent or a power of attorney'), named in full as README default 52's table names each choice (DL-275's lesson; the frontend engineer's FAIL 2 on 57c4ab2): guardian, label 'A guardian'; healthCareAgent, label 'A health care agent'; moneyPowerOfAttorney, label 'A money power of attorney', each label as A4-64 words it. The web app shows the labels word for word (C-199). A value the page taps, never words to parse.",
+      "type": "string",
+      "enum": ["guardian", "healthCareAgent", "moneyPowerOfAttorney"]
+    },
+    "authorityAsk": {
+      "title": "AuthorityAsk",
+      "description": "A4-64's ask on a secure page (MASTER-FLOW-A lines 2756 to 2763; B4-74, MASTER-FLOW-B lines 2598 to 2604), asked of a booker who acts for the adult served (who is who actsFor: A4-24's and B4-32's branch 'An adult the booker acts for'), its choice and its field named in full (DL-275's lesson; README default 52's table, 'Which authority do you act under, and what does it cover?'; README default 65). Its answer, a pageAnswer of kind authority, carries: which authority, one of choices (pageAnswer.authority; A4-64 line 2760: 'The page records which authority'); the field 'what it covers', the booker's own free words, always asked and required (pageAnswer.words; A4-64 line 2760: 'and what it covers'; B4-74: 'They act only within what the paper covers, like health care or money'); and, where paper is true, the paper that shows it (pageAnswer.uploadId, an upload secureUpload gave this link's page; A4-64 line 2761: 'Where it asks, the page takes the paper that shows it').",
+      "type": "object",
+      "properties": {
+        "choices": {
+          "description": "The authorities the page offers, in README default 52's order, each an authorityKind whose label the web app shows word for word from that table. A4-64 line 2761: 'The plug-in says which it accepts for this work'; no frozen part holds that as values (K-01 v1 keeps the plug-in's pf blocks whole, its 'who may book' in words), so the page entry offers all three until one does (README default 65, open gap 49). An answer whose authority is not among them answers fieldsInvalid.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/authorityKind" },
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "paper": {
+          "description": "true: the page takes the paper that shows the authority, and the answer names its upload (pageAnswer.uploadId), else it answers fieldsInvalid naming the paper; false: the page takes none and the answer's uploadId is null. A4-64 line 2761 ('Where it asks, the page takes the paper that shows it') leaves where to the plug-in, and A4-80 line 2127 ('The paper comes on the page') and B4-74 ('The paper goes on the secure page') take it, so the page entry sets it true until a frozen part says where a plug-in asks (README default 65, open gap 49).",
+          "type": "boolean"
+        }
+      },
+      "required": ["choices", "paper"],
+      "additionalProperties": false
+    },
     "pageAsk": {
       "title": "PageAsk",
-      "description": "One thing a secure link's page asks (FS section 7 screen 11: 'forms and signatures, private details, address (flow B), access notes, who meets the pro, photos'; A4-65: 'The page's questions'; B4-34: 'access, door and job notes'; A4-84 and A4-50: private questions and detail questions go on the page), each answered as a K-30 v1 page_answers row (K-09 v1.2 saveSecurePage). kind is K-30 v1 page_answers.kind; question is, for kind question, the plug-in's question word for word as the pinned bundle's trade overlay holds it for the request's kind of work (K-01 v1 tradeOverlay, its pf blocks kept whole: pf.questions' afterTime and securePage items; K-30 v1 page_answers.question: 'its words are the plug-in's, not private'), and null for the other kinds, whose words the page shows by kind (README default 53). Its answer is free words (or, for kind photo, an upload), so it names no choice: who fills each question is the page entry from the pinned bundle, as default 53 says. Never a question K-30 keeps nothing for, and never one already answered on this request unless a newer answer is allowed (page_answers: the newest wins).",
+      "description": "One thing a secure link's page asks (FS section 7 screen 11: 'forms and signatures, private details, address (flow B), access notes, who meets the pro, photos'; A4-65: 'The page's questions'; B4-34: 'access, door and job notes'; A4-84 and A4-50: private questions and detail questions go on the page), each answered as a K-30 v1 page_answers row (K-09 v1.2 saveSecurePage). kind is K-30 v1 page_answers.kind; question is, for kind question, the plug-in's question word for word as the pinned bundle's trade overlay holds it for the request's kind of work (K-01 v1 tradeOverlay, its pf blocks kept whole: pf.questions' afterTime and securePage items; K-30 v1 page_answers.question: 'its words are the plug-in's, not private'), and null for the other kinds, whose words the page shows by kind (README default 53). Its answer is free words (for kind photo, an upload), so it names no choice, but for kind authority: A4-64's choice of which authority, named in full in authority (authorityAsk; README default 52's table and default 65), with what it covers in free words and, where asked, the paper. Who fills each ask is the page entry from the pinned bundle and the request, as default 53 says. Never a question K-30 keeps nothing for, and never one already answered on this request unless a newer answer is allowed (page_answers: the newest wins).",
       "type": "object",
       "properties": {
         "kind": {
@@ -710,19 +732,32 @@
         },
         "question": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
         "needed": {
-          "description": "true when the request cannot go on without it (B4-34: access for a job at the customer's place; A4-25's child details; A4-64's papers), else false (a note, a reference photo).",
+          "description": "true when the request cannot go on without it (B4-34: access for a job at the customer's place; A4-25's child details; A4-64's authority and its paper), else false (a note, a reference photo).",
           "type": "boolean"
+        },
+        "authority": {
+          "description": "For kind authority, its choices and whether the paper is asked (authorityAsk: A4-64; B4-74; README default 65); null for every other kind.",
+          "anyOf": [{ "$ref": "#/$defs/authorityAsk" }, { "type": "null" }]
         }
       },
-      "required": ["kind", "question", "needed"],
+      "required": ["kind", "question", "needed", "authority"],
       "additionalProperties": false,
-      "if": { "properties": { "kind": { "const": "question" } }, "required": ["kind"] },
-      "then": { "properties": { "question": { "type": "string" } } },
-      "else": { "properties": { "question": { "type": "null" } } }
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "question" } }, "required": ["kind"] },
+          "then": { "properties": { "question": { "type": "string" } } },
+          "else": { "properties": { "question": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "authority" } }, "required": ["kind"] },
+          "then": { "properties": { "authority": { "$ref": "#/$defs/authorityAsk" } } },
+          "else": { "properties": { "authority": { "type": "null" } } }
+        }
+      ]
     },
     "pageAnswer": {
       "title": "PageAnswer",
-      "description": "One answer typed on a secure link's page, for one of its asks (pageAsk), saved as a K-30 v1 page_answers row (K-09 v1.2 saveSecurePage answers or photos), sealed under the key of the link's person, never edited (a newer answer of the same kind and question wins) and never returned. words: the answer as typed (swapped first: README default 50); uploadId: for kind photo, the upload secureUpload gave this link's page, whose stored file the page entry checks and names as K-13 names it (README default 61). Exactly one of the two.",
+      "description": "One answer typed on a secure link's page, for one of its asks (pageAsk), saved as a K-30 v1 page_answers row (K-09 v1.2 saveSecurePage answers or photos), sealed under the key of the link's person, never edited (a newer answer of the same kind and question wins) and never returned. words: the answer as typed (swapped first: README default 50), for kind authority what the authority covers; uploadId: an upload secureUpload gave this link's page, whose stored file the page entry checks and names as K-13 names it (README default 61): for kind photo the photo, and for kind authority the paper that shows the authority, where its ask takes one (authorityAsk.paper; A4-64 line 2761: 'Where it asks, the page takes the paper that shows it'), else null; authority: for kind authority, which authority (an authorityKind among the ask's choices), else null. So a photo carries its upload and no words; an authority its choice, what it covers in words and, where asked, its paper (the frontend engineer's FAILs 1 and 2 on 57c4ab2; README default 65); every other kind its words alone. An upload this link's page was not given, or whose file never came, answers uploadNotFound, one answer for both (README default 61): the schema cannot see the uploads, so the page entry checks it and the contract test proves it.",
       "type": "object",
       "properties": {
         "kind": {
@@ -743,10 +778,20 @@
           "description": "For kind question, the question as the page showed it (pageAsk.question); null otherwise.",
           "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
         },
-        "words": { "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 10000 }, { "type": "null" }] },
-        "uploadId": { "$ref": "#/$defs/nullableId" }
+        "words": {
+          "description": "The answer as typed, swapped first (README default 50); for kind authority, what the authority covers (A4-64 line 2760: 'and what it covers'); null for kind photo.",
+          "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 10000 }, { "type": "null" }]
+        },
+        "uploadId": {
+          "description": "For kind photo, the photo's upload; for kind authority, the paper's upload where the ask's paper is true, else null; null for every other kind.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "authority": {
+          "description": "For kind authority, which authority, one of the ask's choices (authorityKind; README default 52's table); null for every other kind.",
+          "anyOf": [{ "$ref": "#/$defs/authorityKind" }, { "type": "null" }]
+        }
       },
-      "required": ["kind", "question", "words", "uploadId"],
+      "required": ["kind", "question", "words", "uploadId", "authority"],
       "additionalProperties": false,
       "allOf": [
         {
@@ -756,8 +801,32 @@
         },
         {
           "if": { "properties": { "kind": { "const": "photo" } }, "required": ["kind"] },
-          "then": { "properties": { "words": { "type": "null" }, "uploadId": { "$ref": "#/$defs/id" } } },
-          "else": { "properties": { "words": { "type": "string" }, "uploadId": { "type": "null" } } }
+          "then": {
+            "properties": {
+              "words": { "type": "null" },
+              "uploadId": { "$ref": "#/$defs/id" },
+              "authority": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "authority" } }, "required": ["kind"] },
+          "then": {
+            "properties": { "words": { "type": "string" }, "authority": { "$ref": "#/$defs/authorityKind" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "not": { "enum": ["photo", "authority"] } } },
+            "required": ["kind"]
+          },
+          "then": {
+            "properties": {
+              "words": { "type": "string" },
+              "uploadId": { "type": "null" },
+              "authority": { "type": "null" }
+            }
+          }
         }
       ]
     },
@@ -1297,7 +1366,7 @@
     },
     "bookingPick.errors": {
       "title": "BookingPickErrors",
-      "description": "Nothing was held or written. K-09 v1.2 saveTime's errors map so: timeTaken gives timeTaken with a fresh card; versionChanged gives readBackChanged with a fresh card (as v1's readBackChanged, whose readBack is the card's words); wrongDetails, savedTimeCap and mobileRequired as they are; customerBlocked, overBookingLimit, safetyHeld, waitsForOwner and notAllowed give cantTakeIt (no reason, no review item: K-09 v1.2 open gap 83); notFound gives requestNotFound (on a quote link's page, linkExpired); constraint gives transient; bookingPaused and transient as they are. A card past its 10 minutes answers readBackExpired.",
+      "description": "Nothing was held or written. K-09 v1.2 saveTime's errors map so: timeTaken gives timeTaken with a fresh card; versionChanged gives readBackChanged with a fresh card (as v1's readBackChanged, whose readBack is the card's words); wrongDetails and mobileRequired as they are; savedTimeCap gives cantTakeIt, never its endsAt: the time is held for the mobile the reach card took (K-09 v1.2 README default 61), which on a page is typed and unproven, so when that mobile's own saved times end is something on file for it, never told (S13-45: 'Until a code typed back proves the phone, nothing on file for it is used or hinted at'; README default 57; the security reviewer's GAP 1 on 57c4ab2; invalid/refuse-pick-saved-time-cap-ends.json); customerBlocked, overBookingLimit, safetyHeld, waitsForOwner and notAllowed give cantTakeIt (no reason, no review item: K-09 v1.2 open gap 83); notFound gives requestNotFound (on a quote link's page, linkExpired); constraint gives transient; bookingPaused and transient as they are. A card past its 10 minutes answers readBackExpired.",
       "anyOf": [
         { "$ref": "#/$defs/notListedError" },
         { "$ref": "#/$defs/requestNotFoundError" },
@@ -1319,7 +1388,6 @@
         },
         { "$ref": "#/$defs/readBackExpiredError" },
         { "$ref": "#/$defs/wrongDetailsError" },
-        { "$ref": "#/$defs/savedTimeCapError" },
         { "$ref": "#/$defs/mobileRequiredError" },
         { "$ref": "#/$defs/cantTakeItError" },
         { "$ref": "#/$defs/bookingPausedError" },
@@ -1856,7 +1924,7 @@
     },
     "bookingConfirm.errors": {
       "title": "BookingConfirmErrors",
-      "description": "Nothing was written. The K-09 v1.2 call's errors map so: versionChanged gives readBackChanged with a fresh read-back; mobileRequired, wrongDetails, savedTimeCap and geoUnavailable as they are; customerBlocked, overBookingLimit, safetyHeld, waitsForOwner and notAllowed give cantTakeIt; notFound gives requestNotFound; K-05 extend's neverExtended, alreadyExtended and notHeld, and extendTime's notExtendable, give notExtendable (the page offers no more time); constraint gives transient; bookingPaused and transient as they are.",
+      "description": "Nothing was written. The K-09 v1.2 call's errors map so: versionChanged gives readBackChanged with a fresh read-back; mobileRequired, wrongDetails and geoUnavailable as they are; customerBlocked, overBookingLimit, safetyHeld, waitsForOwner and notAllowed give cantTakeIt, and so would savedTimeCap, never its endsAt, as on bookingPick (a page's mobile is typed and unproven: README default 57; the security reviewer's N5 on 57c4ab2); notFound gives requestNotFound; K-05 extend's neverExtended, alreadyExtended and notHeld, and extendTime's notExtendable, give notExtendable (the page offers no more time); constraint gives transient; bookingPaused and transient as they are.",
       "anyOf": [
         { "$ref": "#/$defs/notListedError" },
         { "$ref": "#/$defs/requestNotFoundError" },
@@ -2027,7 +2095,7 @@
       "oneOf": [
         {
           "title": "ChangeAnswers",
-          "description": "The page's questions and notes (A4-65; B4-34: access, door and job notes; A4-25 a child's details; A4-64 the papers; S13-05: 'Private details are typed, read and kept only on the secure page'). Served by K-09 v1.2 saveSecurePage, answers (its step A4-65 or B4-34 by the request's flow), each a K-30 page_answers row sealed under the link's person's key. Gives answers (A4-65); access and answers (B4-34, with at least one access or entry_code answer).",
+          "description": "The page's questions and notes (A4-65; B4-34: access, door and job notes; A4-25 a child's details; A4-64 and B4-74 the authority, with what it covers and the paper that shows it: README default 65; S13-05: 'Private details are typed, read and kept only on the secure page'). Served by K-09 v1.2 saveSecurePage, answers (its step A4-65 or B4-34 by the request's flow), each a K-30 page_answers row sealed under the link's person's key; an authority's row holds its choice, what it covers and its paper's file reference from the upload (README default 65). Gives answers (A4-65); access and answers (B4-34, with at least one access or entry_code answer).",
           "type": "object",
           "properties": {
             "kind": { "const": "answers" },
@@ -2120,7 +2188,7 @@
     },
     "secureReadBack.request": {
       "title": "SecureReadBackRequest",
-      "description": "The read-back of a change on a secure link's page (FS line 630; README default 48): writes nothing and answers v1's readBack, which the page entry keeps with the link under readBackId, with the change, the K-09 v1.2 call that will make it and every value the server takes for it, private words only sealed (open gap 40). Free words get the safety read first (K-09 v1 recordSafetyOutcome alone, source page, for the link's person: arch 02 line 129; README default 50), after the swap; danger answers safetyFirst and nothing goes on. Uploads named by an answer must be this link's and stored (uploadNotFound, tooLarge, wrongType: README default 61). The link's purpose and person decide which changes it takes (notThisPage: README default 49). Served by: page-only, with K-09 v1 recordSafetyOutcome for free words; the change itself is made by secureConfirm. Who may call: anyone with the link, acting for its person. Reads: the primary, uncached. Repeat: safe: a read-back writes nothing. Time budget: none in the sources.",
+      "description": "The read-back of a change on a secure link's page (FS line 630; README default 48): writes nothing and answers v1's readBack, which the page entry keeps with the link under readBackId, with the change, the K-09 v1.2 call that will make it and every value the server takes for it, private words only sealed (open gap 40). Free words get the safety read first (K-09 v1 recordSafetyOutcome alone, source page, for the link's person: arch 02 line 129; README default 50), after the swap; danger answers safetyFirst and nothing goes on. Uploads named by an answer, a photo or the paper that shows an authority, must be this link's and stored (uploadNotFound, tooLarge, wrongType: README default 61); an authority answer must pick one of its ask's choices and name its paper where the ask's paper is true (fieldsInvalid otherwise: README default 65). The page entry keeps each upload's id with the read-back, so secureConfirm writes the file it names. The link's purpose and person decide which changes it takes (notThisPage: README default 49). Served by: page-only, with K-09 v1 recordSafetyOutcome for free words; the change itself is made by secureConfirm. Who may call: anyone with the link, acting for its person. Reads: the primary, uncached. Repeat: safe: a read-back writes nothing. Time budget: none in the sources.",
       "type": "object",
       "properties": {
         "page": { "$ref": "#/$defs/secureLinkPage" },
@@ -2171,7 +2239,7 @@
 
     "secureConfirm.request": {
       "title": "SecureConfirmRequest",
-      "description": "The yes of the link's own person to a secure page's read-back, which makes the change (FS line 630; arch 06 line 303: 'yes on the secure page'; README default 48): it sends only the read-back's id. The page entry makes the yes's event id and records it as the exact yes (K-08 v1 approved_by). Served by the K-09 v1.2 call the read-back names, made alone with caller.kind page for the link's person: answers, saveSecurePage (answers); street, checkPlace (street); meetsPro, saveSecurePage (meetsPro), then for someone else sendSecureLink (for meetsPro, via page); meetsProYes, saveSecurePage (meetsProYes), whose yes is this one (kind page, the read-back's exact words, the yes event), so the K-29 texts consent is bound to the words shown in the same commit; photos, saveSecurePage (photos), each photo's file reference from its upload; moreTime, extendTime. Who may call: anyone with the link, for the read-back of that same link. Reads: the primary, uncached; the read-back's rows are compared and set (limit 4). Repeat: safe: readBackId is the key; a repeat writes nothing and answers the first commit. Time budget: the read-back lapses after 10 minutes (readBackExpired).",
+      "description": "The yes of the link's own person to a secure page's read-back, which makes the change (FS line 630; arch 06 line 303: 'yes on the secure page'; README default 48): it sends only the read-back's id. The page entry makes the yes's event id and records it as the exact yes (K-08 v1 approved_by). Served by the K-09 v1.2 call the read-back names, made alone with caller.kind page for the link's person: answers, saveSecurePage (answers), an authority answer as one page_answers row of kind authority holding its choice, what it covers and its paper's file reference from the upload the read-back kept (README default 65); street, checkPlace (street); meetsPro, saveSecurePage (meetsPro), then for someone else sendSecureLink (for meetsPro, via page); meetsProYes, saveSecurePage (meetsProYes), whose yes is this one (kind page, the read-back's exact words, the yes event), so the K-29 texts consent is bound to the words shown in the same commit; photos, saveSecurePage (photos), each photo's file reference from its upload; moreTime, extendTime. Who may call: anyone with the link, for the read-back of that same link. Reads: the primary, uncached; the read-back's rows are compared and set (limit 4). Repeat: safe: readBackId is the key; a repeat writes nothing and answers the first commit. Time budget: the read-back lapses after 10 minutes (readBackExpired).",
       "type": "object",
       "properties": {
         "page": { "$ref": "#/$defs/secureLinkPage" },

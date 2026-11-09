@@ -1,0 +1,45 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-03T15:08:40Z",
+    "environment": "staging",
+    "after": ["secure-authority-page-read.json", "secure-authority-paper-upload.json"],
+    "note": "B4-34 and A4-64 (B4-74) on Alex's secure page for his father's drain: his access note, and his answer to the authority ask: A money power of attorney, what it covers in his own words, and the paper that shows it by the upload this link gave (secure-authority-paper-upload.json). The page entry checks the upload is this link's and stored, a PDF under its limit (an upload this link's page was not given, or whose file never came, answers uploadNotFound: README default 61), that the authority is one of the ask's choices and that the paper the ask takes is named (else fieldsInvalid: README default 65), swaps the words first (nothing to swap) and reads them for safety (No: README default 50), then answers the read-back: the note, the choice's label, what it covers and that the paper is added, never the file, on this page only. It keeps the change with the read-back, the upload's id with it, sealed under Alex's key (README default 49; open gap 40). Nothing is written. The words are examples; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain3-0003",
+      "traceId": "trace-page-alex-drain3-0001",
+      "linkCode": "placeholder-drain3-secure-link-code"
+    },
+    "change": {
+      "kind": "answers",
+      "answers": [
+        {
+          "kind": "access",
+          "question": null,
+          "words": "Front door; the bell is broken, so knock",
+          "uploadId": null,
+          "authority": null
+        },
+        {
+          "kind": "authority",
+          "question": null,
+          "words": "His home and the bills for it",
+          "uploadId": "upload-alex-drain3-paper-1",
+          "authority": "moneyPowerOfAttorney"
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-drain3-answers-1",
+    "stepId": "B4-34",
+    "questionId": null,
+    "words": "For Jordan, on the day: How to get in: Front door; the bell is broken, so knock. For Lee Home Services: Which authority: A money power of attorney. What it covers: His home and the bills for it. The paper that shows it: 1 file added",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-03T15:18:40Z"
+  }
+}

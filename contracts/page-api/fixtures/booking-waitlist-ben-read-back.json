@@ -8,7 +8,7 @@
       "db-schema/conversations-consent/fixtures/seed-consent-stop-row.json",
       "db-schema/services-prices/fixtures/seed-services-price-list.json"
     ],
-    "note": "A4-60 for Ben T. on Lee's Barbershop's booking page: his request (opened as booking-page-start.json opens one, requestRef reqref-page-lees-0051 and his device token, placeholders) matched the skin fade, its reach card gave the mobile that sent STOP on Oct 20, and no skin fade fits. He taps 'Want a text if a spot opens?' for any time. Nothing is written, and the read-back reads the same as anyone's: nothing on file for the number shows before its yes (S13-45; README default 57). The read-back's id is a placeholder."
+    "note": "A4-60 for Ben T. on Lee's Barbershop's booking page: his request (opened as booking-page-start.json opens one, requestRef reqref-page-lees-0051 and his device token, placeholders) matched the skin fade, its reach card gave the mobile that sent STOP on Oct 20, and no skin fade fits. He taps 'Text me if a spot opens' for any time, as Dee does. Nothing is written, and the read-back's words are booking-waitlist-read-back.json's word for word, STOP line included, since the service, the business and the days are the same: a read-back never hints at a stopped number, so nothing on file for it shows before its yes (S13-45; README default 57; the security reviewer's GAP 2 on 57c4ab2). The read-back's id is a placeholder."
   },
   "request": {
     "page": {
@@ -25,7 +25,7 @@
     "readBackId": "rb-page-ben-waitlist-1",
     "stepId": "A4-60",
     "questionId": null,
-    "words": "Want a text if a spot opens?",
+    "words": "Want a text if a skin fade spot opens at Lee's Barbershop by Thu Oct 29? Reply STOP to opt out. Msg & data rates may apply.",
     "shown": [{ "table": "services", "rowId": "svc-lees-skin-fade", "version": 1 }],
     "signature": "none",
     "expiresAt": "2026-10-22T16:39:55Z"

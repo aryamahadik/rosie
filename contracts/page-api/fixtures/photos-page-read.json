@@ -19,8 +19,8 @@
     "service": "Water heater replacement",
     "basis": "photos",
     "asks": [
-      { "kind": "photo", "question": null, "needed": true },
-      { "kind": "note", "question": null, "needed": false }
+      { "kind": "photo", "question": null, "needed": true, "authority": null },
+      { "kind": "note", "question": null, "needed": false, "authority": null }
     ],
     "quoteState": "pricing"
   }
