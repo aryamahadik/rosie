@@ -250,7 +250,12 @@ describe("the situation tag: the first that fits wins (arch 07 line 357; C-090)"
       factSlots: ["price"],
       situation: { safetyOutcomes: [], about: ["deathReport", "refund"] },
     });
-    expect(await situationOf(row)).toBe("gentle");
+    const input = inputOf(
+      await callComposeInput(requestFor(row.outboxRowId), { row, bundles: fakeBundles(customerBundle()) }),
+    );
+    expect((input.masterText as { text: string }).text).toContain("{{pay.back}}");
+    expect(input.facts).toContainEqual({ slot: "price", value: "$35" });
+    expect(input.situation).toBe("gentle");
   });
 
   it("without the death report, the same row is money or consent", async () => {
