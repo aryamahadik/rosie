@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "types": "node scripts/gen-types.mjs",
-    "check": "node scripts/check-fixtures.mjs && node scripts/structured-subset-lint.mjs && node --test \"scripts/*.test.mjs\""
+    "check": "node scripts/check-fixtures.mjs && node scripts/structured-subset-lint.mjs && node --test \"scripts/*.test.mjs\" \"mock/*.test.mjs\"",
+    "mock": "node mock/generate.mjs"
   }
 }
