@@ -12,15 +12,16 @@
 // The claims are read from the words with the record's own money phrases (record.lint.phrases.money: "deposit paid",
 // "paid in full", "card is saved", "no card saved", "nothing taken", "keep the deposit", "goes back to your card",
 // "refunded to your card", "paid with a credit", "credit from your pack") and the words of S13-55's rules, after the
-// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '), in each folded form gate.ts finds money
-// words in (its defaults 8 to 10 and 12: marks as word ends, DL-204 1c's letters as the letters they show, a word a
-// space separator but U+0020 splits read joined, a text with a bidi control read as its controls show it and backwards
-// too, and a word that mixes letters and digits read with its digits as letters); a claim read in any of them counts.
+// apostrophe folding the Values check reads with (values.ts: ’ and ‘ as '; DL-214 3: the modifier letter apostrophe and
+// the okina too), in each folded form gate.ts finds money words in (its defaults 8 to 10 and 12: marks as word ends,
+// DL-204 1c's letters as the letters they show, a word a space separator but U+0020 or a control character splits read
+// joined and split, a text with a bidi control read as its controls show it and backwards too, and a word that mixes
+// letters and digits read with its digits as letters); a claim read in any of them counts.
 // What comes back holds labels only, never the words read, so a refusal reaches a log or the rewrite as labels.
 //
-// Rounds 3 to 6 (DL-182, DL-187, DL-194, DL-204). Card holds and charges on silence are no longer read by meaning: the
-// money-topic gate (gate.ts) refuses every sentence that holds one money word, sign or slot, or a character that hides a
-// word (DL-204 1), and is not an approved line, a denial included. Two checks:
+// Rounds 3 to 7 (DL-182, DL-187, DL-194, DL-204, DL-214). Card holds and charges on silence are no longer read by
+// meaning: the money-topic gate (gate.ts) refuses every sentence that holds one money word, sign or slot, or a character
+// that hides a word (DL-204 1, DL-214 2), and is not an approved line, a denial included. Two checks:
 //   - checkMoneyText(text, reading, gate): the gate, then the claim check on the booking. For the message checks
 //     (C-092) and the slot filler (C-088): a message goes through this one;
 //   - checkMoneyLine(text, reading): the claim check alone, with the hold and silence topics refused on every booking
@@ -291,9 +292,9 @@ interface ReadClaim {
 
 /**
  * The claims read from a text's words, in each folded form money words are found in (gate.ts foldedForms, defaults 8
- * to 10 and 12: a word a space separator but U+0020 splits read joined, a text with a bidi control read as its controls
- * show it and backwards too, a word that mixes letters and digits read with digits as letters); a claim read in any one
- * of them counts. The words are not kept.
+ * to 10 and 12: a word a space separator but U+0020 or a control character splits read joined and split, a text with a
+ * bidi control read as its controls show it and backwards too, a word that mixes letters and digits read with digits as
+ * letters); a claim read in any one of them counts. The words are not kept.
  */
 function readClaims(text: string): ReadClaim[] {
   return foldedForms(text).flatMap(claimsIn);

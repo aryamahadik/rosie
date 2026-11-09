@@ -2257,3 +2257,313 @@ describe("round 6 (DL-204, 4): the residual is a closed form, and every class is
     }
   });
 });
+
+// Round 7 (DL-214), the last attempt on this check: ruling 1d reads a word as letters and digits together, in every
+// text a sentence is read from (as written, joined and split); a control character other than tab, line feed and
+// carriage return makes a money sentence; the modifier letter apostrophe and the okina fold as apostrophes; the
+// closed-form residual widens (gate.ts header; CQ-120). Every special character below is written as an escape.
+
+/** The security reviewer's round 6 lines (card T-593), each with its label (DL-187 4). */
+const REVIEWER_ROUND_6: readonly (readonly [string, GateWhy])[] = [
+  // An Armenian h (U+0570), then a digit, in "hold". The fold reads no hold word in it, so its label is
+  // moneyNotFromRecord, as round 4's "hold" with an Armenian o.
+  ["We'll put a \u{570}0ld on it until the visit.", "moneyNotFromRecord"],
+  // A Coptic c (U+2CA5), then a digit, in "card".
+  ["It goes on your \u{2CA5}4rd.", "moneyNotFromRecord"],
+  // A Coptic c and an Armenian h, then a digit, in "charge"; the sentence names a reply.
+  ["If you don't reply by 7pm, we'll \u{2CA5}\u{570}4rge you.", "neverChargeOnSilence"],
+  // An Armenian h, then a thin space (U+2009): the joined reading holds the word.
+  ["We'll put a \u{570}\u{2009}old on it until the visit.", "moneyNotFromRecord"],
+];
+
+/** A Cyrillic name (U+0414 U+043C U+0438 U+0442 U+0440 U+0438 U+0439). */
+const CYRILLIC_NAME = "\u{414}\u{43C}\u{438}\u{442}\u{440}\u{438}\u{439}";
+
+describe("round 7 (DL-214, 1): ruling 1d reads a word as letters and digits together, in every text a sentence is read from", () => {
+  it("the security reviewer's round 6 lines fail with their labels: an Armenian h or a Coptic c before a digit, an Armenian h before a thin space", () => {
+    let checked = 0;
+    for (const [line, why] of REVIEWER_ROUND_6)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, JSON.stringify(text)).toEqual([BY_WHY[why]]);
+        for (const reading of gateReadings()) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, JSON.stringify(text)).toBe(false);
+          expect(check.refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          if (why !== "moneyNotFromRecord")
+            expect(checkMoneyLine(text, reading).refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+      }
+    expect(checked).toBe(REVIEWER_ROUND_6.length * 3 * 6);
+  });
+
+  it("a word that mixes Latin letters with another script's makes a money sentence, a digit or sign between or none, wherever they stand", () => {
+    const words = [
+      // An Armenian h (U+0570) with no digit and before one; an Armenian l (U+056C) after one.
+      "\u{570}old",
+      "\u{570}0ld",
+      "h0\u{56C}d",
+      // A Coptic c (U+2CA5) before a digit; a Coptic r (U+2CA3) after one.
+      "\u{2CA5}4rd",
+      "c4\u{2CA3}d",
+      // A Lisu H (U+A4E7) and a Cherokee H (U+13BB) before a digit.
+      "\u{A4E7}0ld",
+      "\u{13BB}0ld",
+      // An @ between (DL-204 2c reads it as a letter), and another script's digit between (a Devanagari zero, U+0966).
+      "\u{570}@ld",
+      "\u{570}\u{966}ld",
+    ];
+    for (const word of words)
+      for (const text of threeForms(`We'll see you at the ${word}.`)) {
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+        for (const reading of gateReadings())
+          expect(checkMoneyText(text, reading, gate()).refused, JSON.stringify(text)).toContainEqual(
+            NOT_FROM_RECORD,
+          );
+      }
+  });
+
+  it("such a word is read joined across a tab, every space separator but U+0020, a line or paragraph separator, the braille blank and the Hangul fillers, and split at them", () => {
+    const joiners = [
+      0x9,
+      0xa0,
+      0x1680,
+      ...range(0x2000, 0x200a),
+      0x202f,
+      0x205f,
+      0x3000,
+      0x2028,
+      0x2029,
+      0x2800,
+      0x115f,
+      0x1160,
+      0x3164,
+      0xffa0,
+    ].map((point) => String.fromCodePoint(point));
+    // A tab, the 16 space separators but U+0020, the line and paragraph separators, the braille blank, 4 Hangul fillers.
+    expect(joiners).toHaveLength(1 + 16 + 2 + 1 + 4);
+    for (const joiner of joiners)
+      for (const text of [
+        `We'll put a \u{570}${joiner}old on it until the visit.`,
+        `We'll put a \u{570}${joiner}0ld on it until the visit.`,
+        `It goes on your \u{2CA5}${joiner}4rd.`,
+      ])
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+    // Split (gate.ts default 10): a Hangul filler (U+115F), a letter that shows as a blank, is read as a space too, so
+    // the Cyrillic letters after it that read "pay" (U+0440 U+0430 U+0443) are a money word of their own.
+    expect(
+      gateMoneyText(`Thanks, ${CYRILLIC_NAME}\u{115F}\u{440}\u{430}\u{443}.`, NOTHING_APPROVED).refused,
+    ).toEqual([NOT_FROM_RECORD]);
+    expect(gateMoneyText(`Thanks, ${CYRILLIC_NAME}, see you soon.`, NOTHING_APPROVED)).toEqual({
+      ok: true,
+      refused: [],
+    });
+  });
+
+  it("a word whose letters are all in one script is none, a digit among them or not: a Greek or a Cyrillic name with a digit", () => {
+    for (const text of [
+      // A Greek capital delta (U+0394) and a digit.
+      "Room \u{394}3 is ready for you.",
+      `Thanks, ${CYRILLIC_NAME}2, see you soon.`,
+      // A Greek name (U+03A3 U+03BF U+03C6 U+03AF U+03B1) beside a time.
+      "Thanks, \u{3A3}\u{3BF}\u{3C6}\u{3AF}\u{3B1}, see you at 7pm.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+    }
+  });
+});
+
+describe("round 7 (DL-214, 2): a control character other than tab, line feed and carriage return makes a money sentence", () => {
+  /** Every C0 and C1 control character but tab, line feed and carriage return, and DEL (gate.ts default 15). */
+  const CONTROLS = [...range(0x0, 0x1f), ...range(0x7f, 0x9f)]
+    .filter((point) => point !== 0x9 && point !== 0xa && point !== 0xd)
+    .map((point) => String.fromCodePoint(point));
+
+  it("these are every control character of Unicode but tab, line feed and carriage return", () => {
+    expect(CONTROLS).toHaveLength(29 + 33);
+    expect(
+      range(0, 0xffff).filter(
+        (point) => ![0x9, 0xa, 0xd].includes(point) && /\p{Cc}/u.test(String.fromCodePoint(point)),
+      ),
+    ).toEqual(CONTROLS.map((control) => control.codePointAt(0)));
+  });
+
+  it("'ch', U+0007, 'arge' fails with its label; its words are read joined across the control, by the claim check too", () => {
+    const lines = [
+      ["If you don't reply by 7pm, we'll ch\u{7}arge you.", SILENCE],
+      ["We'll put a h\u{7}old on it until the visit.", HOLD],
+      ["We'll ch\u{7}arge it.", NOT_FROM_RECORD],
+      ["See you soon\u{7}.", NOT_FROM_RECORD],
+    ] as const;
+    for (const [line, refusal] of lines)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, JSON.stringify(text)).toEqual([refusal]);
+        for (const reading of gateReadings()) {
+          expect(checkMoneyText(text, reading, gate()).refused, JSON.stringify(text)).toContainEqual(refusal);
+          if (refusal !== NOT_FROM_RECORD)
+            expect(checkMoneyLine(text, reading).refused, JSON.stringify(text)).toContainEqual(refusal);
+        }
+      }
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    expect(checkMoneyLine("You were ch\u{7}arged $55.", asked).refused).toEqual([
+      { claim: "charged", why: "notTaken" },
+    ]);
+  });
+
+  it("every such control makes a money sentence wherever it stands, in an approved line too; its words keep their label; tab, line feed and carriage return make none", () => {
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    for (const control of CONTROLS) {
+      const name = JSON.stringify(control);
+      // Inside a sentence, at its edges, after its end mark, between two sentences, alone, and in "7 p.m." (default 15).
+      for (const text of [
+        `See you soon${control}.`,
+        `${control}See you soon.`,
+        `See ${control}you${control} soon.`,
+        `See you soon.${control}`,
+        `See you soon.${control} Thanks!`,
+        `Thanks!\n${control}`,
+        `See you at 7${control}p.m.`,
+      ])
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+      // A control in an approved line's words, or for a space between them, makes it another sentence, which is refused.
+      expect(gateMoneyText(`The card is saved for a {{keep}} fee${control}.`, gate()).refused, name).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      expect(gateMoneyText(`The card is saved for a {{keep}}${control}fee.`, gate()).refused, name).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      // Its words are read joined across it and still give their label; the claim check reads them joined too.
+      expect(gateMoneyText(`We'll place a h${control}old.`, NOTHING_APPROVED).refused, name).toEqual([HOLD]);
+      expect(checkMoneyLine(`You were ch${control}arged $55.`, asked).refused, name).toEqual([
+        { claim: "charged", why: "notTaken" },
+      ]);
+    }
+    for (const text of [
+      "See you\tsoon.",
+      "See you soon.\nThanks!",
+      "See you soon.\r\nThanks!",
+      "See you\rsoon.",
+    ])
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+  });
+
+  it("a slot value that holds such a control stands for no slot (gate.ts default 13); one that holds a tab stands for its slot", () => {
+    expect(
+      gateMoneyText("Paid now: $40, in one payment.", gate([{ slot: "paidnow", value: "$40" }])),
+    ).toEqual({
+      ok: true,
+      refused: [],
+    });
+    for (const control of CONTROLS) {
+      const dirty = `$40${control}`;
+      expect(
+        gateMoneyText(`Paid now: ${dirty}, in one payment.`, gate([{ slot: "paidnow", value: dirty }]))
+          .refused,
+        JSON.stringify(control),
+      ).toEqual([NOT_FROM_RECORD]);
+    }
+    expect(
+      gateMoneyText("Paid now: $40\t, in one payment.", gate([{ slot: "paidnow", value: "$40\t" }])),
+    ).toEqual({ ok: true, refused: [] });
+  });
+});
+
+describe("round 7 (DL-214, 3): the modifier letter apostrophe and the okina fold as apostrophes, as the curly ones do", () => {
+  it("'don', U+02BC, 't' and an okina (U+02BB) make no money sentence; an approved line written with them passes; a refused line stays refused", () => {
+    for (const text of [
+      "We don\u{2BC}t have a 3pm, but 4pm is open.",
+      "See you in Hawai\u{2BB}i.",
+      "We\u{2BC}ll see you at 7pm. Don\u{2BB}t be late!",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings()) {
+        expect(checkMoneyText(text, reading, gate()), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+        expect(checkMoneyLine(text, reading), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+      }
+    }
+    const rows = Object.values(record("A").rows).flatMap((list) => list.map((row) => row.text));
+    const row = "Nothing was charged, and the saved card won't be used.";
+    expect(rows).toContain(row);
+    for (const apostrophe of ["\u{2BC}", "\u{2BB}"]) {
+      const written = row.replaceAll("'", apostrophe);
+      expect(gateMoneyText(written, gate()), JSON.stringify(written)).toEqual({ ok: true, refused: [] });
+      expect(gateMoneyText(written, NOTHING_APPROVED).refused, JSON.stringify(written)).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      for (const [line, why] of REVIEWER_ROUNDS_1_TO_3) {
+        const text = line.replaceAll("'", apostrophe);
+        expect(gateMoneyText(text, gate()).refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+      }
+    }
+  });
+});
+
+describe("round 7 (DL-214, 4): the closed-form residual widens, and the module holds no control character as written", () => {
+  it("a whole word in a script the fold does not read as Latin, a Latin letter NFKD leaves alone and another script's letter-shaped digit are the residual (gate.ts header; CQ-120)", () => {
+    for (const text of [
+      // Lisu letters that show HOLD (U+A4E7 U+A4F3 U+A4E1 U+A4D3), and with a digit among them: no Latin letter.
+      "We'll put a \u{A4E7}\u{A4F3}\u{A4E1}\u{A4D3} on it until the visit.",
+      "We'll put a \u{A4E7}0\u{A4E1}\u{A4D3} on it until the visit.",
+      // Cherokee letters that show CARD (U+13DF U+13AA U+13A1 U+13A0).
+      "It goes on your \u{13DF}\u{13AA}\u{13A1}\u{13A0}.",
+      // Latin letters NFKD leaves alone: an h with a stroke (U+0127), a b with a stroke (U+0180), an l with a bar
+      // (U+019A) and the dental click (U+01C0).
+      "We'll put a \u{127}old on it until the visit.",
+      "We'll \u{180}ill you.",
+      "We'll put a ho\u{19A}d on it until the visit.",
+      "We'll put a ho\u{1C0}d on it until the visit.",
+      // The Arabic-Indic five (U+0665), shaped like an o, read as 5 (gate.ts default 12).
+      "We'll put a h\u{665}ld on it until the visit.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+      for (const reading of gateReadings())
+        expect(checkMoneyText(text, reading, gate()), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+    }
+  });
+
+  it("the module's files and its tests hold no control character but tab, line feed and carriage return: each is written as an escape", () => {
+    const control = /(?![\t\n\r])\p{Cc}/u;
+    for (const file of [
+      "gate.ts",
+      "claims.ts",
+      "home.ts",
+      "index.ts",
+      "lines.ts",
+      "money.ts",
+      "record.ts",
+      "test-support.ts",
+      "money.test.ts",
+    ]) {
+      const source = readFileSync(new URL(`./${file}`, import.meta.url), "utf8");
+      const found = Array.from(source)
+        .filter((char) => control.test(char))
+        .map((char) => char.codePointAt(0)?.toString(16));
+      expect(found, file).toEqual([]);
+    }
+  });
+});
