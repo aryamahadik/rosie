@@ -1,0 +1,1361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/eval-set/eval-set.v1.schema.json",
+  "title": "EvalSetV1",
+  "description": "K-10 v1, the eval-set format (02-contracts K-10; arch 08 lines 419 to 449; arch 10 line 552; arch 12 line 590: 'the eval set, generated from the master's needs and gives keys'; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP starting shape, last paragraph; BP section 10's release card). Two documents: a gold-set item (goldItem), one turn or a whole chat walked from the step graph with its gold label, and an accuracy report (accuracyReport), what one eval run of a bundle at a commit on the gold set or its smoke slice found, per section 08 measure and per journey. The root is either, so the type generator writes a type for each (ADR-005). K-01's, K-02's and K-08's definitions are reused by relative $ref where the meaning is the same. Not model-facing, so number and length limits are schema rules here. The report's arithmetic (each point estimate, its 95% interval, each status, the cost per booking, the changed-effect counts) is the named rule reportNumbers in eval-set.rules.mjs.",
+  "anyOf": [{ "$ref": "#/$defs/goldItem" }, { "$ref": "#/$defs/accuracyReport" }],
+  "$defs": {
+    "id": {
+      "title": "EvalId",
+      "description": "An opaque id (CQ-09; common/formats.v1 id).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "itemId": {
+      "title": "GoldItemId",
+      "description": "A gold-set item's id: lowercase letters, digits, dots, dashes and underscores, so it can name a file and a results folder (QUESTIONS.md M2-qa-frontend.8: per-item results kept under evals/results/<gold-set version>/<bundle id>/). Written once and never reused (02-contracts K-10 'its id').",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "maxLength": 120
+    },
+    "goldSetVersion": {
+      "title": "GoldSetVersion",
+      "description": "A gold-set version: letters, digits, dots, dashes and underscores, never a slash, so it can name a results folder (02-contracts K-10 'set version', 'gold-set version'; QUESTIONS.md M2-qa-frontend.8).",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "maxLength": 60
+    },
+    "journey": {
+      "title": "EvalJourney",
+      "description": "A journey, 1 to 12, as K-01 v1 numbers it (journeyGate.journey; 02-contracts sections 9 and 10).",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/journeyGate/properties/journey"
+    },
+    "bundleId": {
+      "title": "EvalBundleId",
+      "description": "A bundle id as K-01 v1's manifest spells it, as K-08 v1 restates it: the content hash, 64 lowercase hex characters, and the build number from 1 (K-01 v1 manifest.bundleId; K-08 v1 bundleId; CQ-09; tour line 658: every published bundle stays readable for replay).",
+      "type": "object",
+      "properties": {
+        "hash": {
+          "description": "The content hash (K-01 v1 manifest.bundleId.hash; K-01 v1 sha256).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+        },
+        "build": {
+          "description": "The build number, counting publishes from 1 (K-01 v1 manifest.bundleId.build; C-072).",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["hash", "build"],
+      "additionalProperties": false
+    },
+    "commit": {
+      "title": "EvalCommit",
+      "description": "A git commit, 7 to 40 lowercase hex characters, spelled as K-01 v1 spells the compiler's commit (K-01 v1 manifest.compiler.commit; DL-201). A commit may be written short or in full, so two names are the same commit when one begins the other (README 'The accuracy report').",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/manifest/properties/compiler/properties/commit"
+    },
+    "fieldValue": {
+      "title": "EvalValue",
+      "description": "A value as K-02 v1 types a field's value: a string, an integer, a boolean, money or a time as the shared formats write them (K-02 v1 fieldValue; CQ-09).",
+      "$ref": "../model/model.v1.schema.json#/$defs/fieldValue"
+    },
+    "valueName": {
+      "title": "EvalValueName",
+      "description": "A value's name: a gives key, a record value or field, or a message slot of K-01 v1's slot list (K-01 v1 answerField.name; K-01 README 'The slot list'), such as booked, time_saved, svc.intext or price.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.]*$"
+    },
+    "measureName": {
+      "title": "MeasureName",
+      "description": "One of section 08's measures (arch 08 lines 427 to 445), its hard-invariants row aside, which the report gives on its own (hardInvariants): rightStepInChoices (right step is among the choices code builds, at least 99.5%); lowStakesDecisions (right decision on low-stakes turns, at least 97%); highStakesDecisions (right decision on high-stakes turns, at least 99.5%); harmfulWrongActions (at most 0.2% of turns); needlessQuestions (needless extra questions, at most 6.7% of turns); dangerFound (danger found, at least 99%); falseAlarms (at most 5%); wholeChats (whole chats right in 4 runs of 4, at least 90%); fallbackMessages (messages sent as fallback text or 'I've passed this on.', at most 1%, DD); misstatedMessages (messages that misstate the record, show a field past its audience or miss a needed value, at most 0.2%, DD). README 'How each measure is counted'.",
+      "type": "string",
+      "enum": [
+        "rightStepInChoices",
+        "lowStakesDecisions",
+        "highStakesDecisions",
+        "harmfulWrongActions",
+        "needlessQuestions",
+        "dangerFound",
+        "falseAlarms",
+        "wholeChats",
+        "fallbackMessages",
+        "misstatedMessages"
+      ]
+    },
+    "effectClass": {
+      "title": "EffectClass",
+      "description": "The class of a committed effect a harmful wrong action is graded on: money, booking, consent, contact or safety (arch 08 line 447: 'a committed money, booking, consent, contact or safety effect, or a value in one, that the gold label does not contain').",
+      "type": "string",
+      "enum": ["money", "booking", "consent", "contact", "safety"]
+    },
+    "changedEffectClass": {
+      "title": "ChangedEffectClass",
+      "description": "The classes of effect a bundle's replay lists when they differ from the last passing bundle's: money, booking, consent or safety (BP 8 'Bundle': 'every money, booking, consent or safety effect that differs from the last passing bundle on the same replay'; arch 10 line 552; BP section 10's card: 'money 0, booking 0, consent 0, safety 0').",
+      "type": "string",
+      "enum": ["money", "booking", "consent", "safety"]
+    },
+    "audienceKind": {
+      "title": "EvalAudience",
+      "description": "Who may see a field: customer, staff, owner, securePageOnly or never (RULES 4.5; arch 06 line 311, limit 7; 02-contracts section 2 item 3).",
+      "type": "string",
+      "enum": ["customer", "staff", "owner", "securePageOnly", "never"]
+    },
+    "safetyLabel": {
+      "title": "GoldSafetyLabel",
+      "description": "One gold safety label for a raw text: one of the 8 outcomes of A3-22 and B3-17 with its tense (02-contracts K-10 'for danger cases the outcome labels and tense'; K-02 v1 safetyOutcome and tense; arch 06 line 329). Never Unsure: a gold label knows the answer (Unsure is the safety read's own marker, K-02 v1).",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "description": "The outcome, as A3-22's and B3-17's branch labels give it word for word (K-02 v1 safetyOutcome), never Unsure.",
+          "$ref": "../model/model.v1.schema.json#/$defs/safetyOutcome",
+          "not": { "const": "Unsure" }
+        },
+        "tense": {
+          "description": "Its tense: now, could restart, over, joke or unknown; over and joke are not danger (K-02 v1 tense; arch 06 line 329; arch 06 line 283: 'the gas leak was fixed in March' stays No).",
+          "$ref": "../model/model.v1.schema.json#/$defs/tense"
+        }
+      },
+      "required": ["outcome", "tense"],
+      "additionalProperties": false
+    },
+    "goldText": {
+      "title": "GoldText",
+      "description": "One inbound text of a turn, with its variant and its gold safety labels (02-contracts K-10 'the inbound text or texts, with their variant (a paraphrase, a typo, Spanish, several requests in one text: arch 08 line 449), send time and zone'). text is the text exactly as K-02 v1 gives it to decide: event id, kind (a text, a poll vote or a tapback), words after the edge scrub, send time and zone, attachments, poll, tapback (K-02 v1 text; arch 06 line 309: dates resolve from the send time).",
+      "type": "object",
+      "properties": {
+        "text": { "$ref": "../model/model.v1.schema.json#/$defs/text" },
+        "variants": {
+          "description": "How the generator varied the walk's own words: paraphrase, typo, spanish, severalRequests (arch 08 line 449: 'paraphrases, typos, Spanish, several requests in one text'). Empty: the step graph's own words, as the master writes them.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["paraphrase", "typo", "spanish", "severalRequests"]
+          },
+          "uniqueItems": true
+        },
+        "safety": {
+          "description": "The text's gold safety labels, at least one: an ordinary text reads No with tense now, as K-02 v1's safety-no.json does (arch 06 line 283: every raw text is read; 02-contracts K-10). A danger case is a text with a label other than No whose tense is now, could restart or unknown (README 'How each measure is counted').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/safetyLabel" },
+          "minItems": 1
+        }
+      },
+      "required": ["text", "variants", "safety"],
+      "additionalProperties": false
+    },
+    "goldChoice": {
+      "title": "GoldChoice",
+      "description": "The right choice of a part, by what it is, never by the turn's own choice id, which code makes per turn (K-02 v1 choice.choiceId; T-360 finding 3). Its kind and step, then the branch label word for word, the any-time row, the door or the hub, and the booking it acts on, each as K-02 v1's choice fills them (arch 01 line 67; arch 03 lines 159 to 167, 189). The harness matches the decide result's choice to this through the context it built.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "option, hub, anytime, door, searchEntry or whichBooking (K-02 v1 choiceKind; arch 01 line 67).",
+          "$ref": "../model/model.v1.schema.json#/$defs/choiceKind"
+        },
+        "step": {
+          "description": "The step behind the choice: the open question's step, the hub step, the any-time row's handler in this flow, the door step, the entry step, or the booking's hub (K-02 v1 choice.step). With a branch, it is the turn's right step (02-contracts K-10 'the right step').",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "branch": {
+          "description": "The branch label word for word, for an option or a hub case; null otherwise (K-02 v1 choice.branch; SPEC-master 5d).",
+          "$ref": "../model/model.v1.schema.json#/$defs/choice/properties/branch"
+        },
+        "anytimeRow": {
+          "description": "For an any-time row, which of the 21; null otherwise (K-02 v1 choice.anytimeRow; arch 03 line 171).",
+          "$ref": "../model/model.v1.schema.json#/$defs/choice/properties/anytimeRow"
+        },
+        "door": {
+          "description": "For a door, which one; null otherwise (K-02 v1 choice.door; arch 03 line 165).",
+          "$ref": "../model/model.v1.schema.json#/$defs/choice/properties/door"
+        },
+        "hub": {
+          "description": "For a hub case, the stage whose hub it is; null otherwise (K-02 v1 choice.hub; arch 03 line 163).",
+          "$ref": "../model/model.v1.schema.json#/$defs/choice/properties/hub"
+        },
+        "bookingId": {
+          "description": "The booking the choice acts on, from the seed state, or null when it is about no booking yet, such as a door to a new booking (arch 03 line 159: 'Questions about other bookings add only their options, labeled by business, date and time'; K-02 v1 target.bookingId). For whichBooking, the booking it stands for (arch 03 line 167).",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["kind", "step", "branch", "anytimeRow", "door", "hub", "bookingId"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "Each kind fills what it uses and leaves the rest null, as K-02 v1's choice does (arch 01 line 67; arch 03 lines 163 to 167, 189).",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "option" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "string" },
+                  "anytimeRow": { "type": "null" },
+                  "door": { "type": "null" },
+                  "hub": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "hub" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "string" },
+                  "anytimeRow": { "type": "null" },
+                  "door": { "type": "null" },
+                  "hub": { "type": "string" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "anytime" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "null" },
+                  "anytimeRow": { "type": "string" },
+                  "door": { "type": "null" },
+                  "hub": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "door" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "null" },
+                  "anytimeRow": { "type": "null" },
+                  "door": { "type": "string" },
+                  "hub": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "searchEntry" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "null" },
+                  "anytimeRow": { "type": "null" },
+                  "door": { "type": "null" },
+                  "hub": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "whichBooking" } } },
+              "then": {
+                "properties": {
+                  "branch": { "type": "null" },
+                  "anytimeRow": { "type": "null" },
+                  "door": { "type": "null" },
+                  "hub": { "type": "null" },
+                  "bookingId": { "type": "string" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "goldField": {
+      "title": "GoldField",
+      "description": "One field the right choice's answer carries, with its type and its gold value (arch 08 line 447: 'Right decision: the chosen choices and every field value equal the gold label'; K-01 v1 answerField: the branch's fields, from the gives keys and record values). A field without its value is refused (refuse-item-without-field-values.json). A text field's value is the words as written, since code re-parses every value from its words (arch 03 line 185; arch 06 line 309, limit 6).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The field's name (K-01 v1 answerField.name).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/answerField/properties/name"
+        },
+        "type": {
+          "description": "Its type: text, integer, boolean, money, time, zone, id or choice (K-01 v1 answerField.type).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/answerField/properties/type"
+        },
+        "value": {
+          "description": "The gold value, of the field's type: a string for text, zone, id or choice, an integer, a boolean, or money or a time as the shared formats write them (K-02 v1 fieldValue; CQ-09).",
+          "$ref": "#/$defs/fieldValue"
+        }
+      },
+      "required": ["name", "type", "value"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "type": {
+          "description": "The value has the field's type (K-01 v1 answerField.type; CQ-09).",
+          "allOf": [
+            {
+              "if": { "properties": { "type": { "enum": ["text", "choice"] } } },
+              "then": { "properties": { "value": { "type": "string", "pattern": "\\S" } } }
+            },
+            {
+              "if": { "properties": { "type": { "const": "integer" } } },
+              "then": { "properties": { "value": { "type": "integer" } } }
+            },
+            {
+              "if": { "properties": { "type": { "const": "boolean" } } },
+              "then": { "properties": { "value": { "type": "boolean" } } }
+            },
+            {
+              "if": { "properties": { "type": { "const": "money" } } },
+              "then": {
+                "properties": { "value": { "$ref": "../common/formats.v1.schema.json#/$defs/money" } }
+              }
+            },
+            {
+              "if": { "properties": { "type": { "const": "time" } } },
+              "then": {
+                "properties": { "value": { "$ref": "../common/formats.v1.schema.json#/$defs/time" } }
+              }
+            },
+            {
+              "if": { "properties": { "type": { "const": "zone" } } },
+              "then": {
+                "properties": { "value": { "$ref": "../common/formats.v1.schema.json#/$defs/zone" } }
+              }
+            },
+            {
+              "if": { "properties": { "type": { "const": "id" } } },
+              "then": { "properties": { "value": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } } }
+            }
+          ]
+        }
+      }
+    },
+    "goldPart": {
+      "title": "GoldPart",
+      "description": "One part of the gold label: its verb, the right choice and every field value (02-contracts K-10 'per part the verb, choice and every field value'; arch 03 line 183: one verb per part of the text; K-02 v1 decidePart). choose takes an option, a hub case or a which-booking choice; enter takes a door, an any-time row or an entry step; every other verb takes no choice and no fields; hand_off says whom it is about.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "choose, enter, ask, none_fits, pass_on, hand_off, redact or no_op (arch 03 line 183; K-02 v1 decidePart).",
+          "type": "string",
+          "enum": ["choose", "enter", "ask", "none_fits", "pass_on", "hand_off", "redact", "no_op"]
+        },
+        "choice": {
+          "description": "The right choice for choose and enter; null for the other verbs (arch 03 line 183).",
+          "anyOf": [{ "$ref": "#/$defs/goldChoice" }, { "type": "null" }]
+        },
+        "fields": {
+          "description": "Every field the right choice's answer carries, each with its gold value; empty when it carries none, and for the verbs that take no choice (arch 08 line 447).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldField" }
+        },
+        "about": {
+          "description": "For hand_off, whom it is about: ownerOrStaff or other (K-02 v1 handOffAbout; arch 06 line 329); null for the other verbs.",
+          "anyOf": [{ "$ref": "../model/model.v1.schema.json#/$defs/handOffAbout" }, { "type": "null" }]
+        }
+      },
+      "required": ["verb", "choice", "fields", "about"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "verb": {
+          "description": "The verb fixes what the part carries (arch 03 line 183; K-02 v1 README 'Verbs and what code checks').",
+          "allOf": [
+            {
+              "if": { "properties": { "verb": { "const": "choose" } } },
+              "then": {
+                "properties": {
+                  "choice": {
+                    "type": "object",
+                    "properties": { "kind": { "enum": ["option", "hub", "whichBooking"] } }
+                  },
+                  "about": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "verb": { "const": "enter" } } },
+              "then": {
+                "properties": {
+                  "choice": {
+                    "type": "object",
+                    "properties": { "kind": { "enum": ["door", "anytime", "searchEntry"] } }
+                  },
+                  "about": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "verb": { "const": "hand_off" } } },
+              "then": {
+                "properties": {
+                  "choice": { "type": "null" },
+                  "fields": { "type": "array", "maxItems": 0 },
+                  "about": { "type": "string" }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": { "verb": { "enum": ["ask", "none_fits", "pass_on", "redact", "no_op"] } }
+              },
+              "then": {
+                "properties": {
+                  "choice": { "type": "null" },
+                  "fields": { "type": "array", "maxItems": 0 },
+                  "about": { "type": "null" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "namedValue": {
+      "title": "NamedValue",
+      "description": "A name and its value (K-02 v1 fieldValue's types; CQ-09).",
+      "type": "object",
+      "properties": {
+        "name": { "$ref": "#/$defs/valueName" },
+        "value": { "$ref": "#/$defs/fieldValue" }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false
+    },
+    "goldEffect": {
+      "title": "GoldEffect",
+      "description": "One money, booking, consent, contact or safety effect the turn should commit, with the values in it, so a harmful wrong action can be graded: a committed effect of these classes, or a value in one, that the gold label does not contain (arch 08 line 447; 02-contracts K-10 'the effects it should commit'). Written in K-01 v1's effect words, as the walk gives them from each branch's effects (K-01 v1 effect: arch 01 line 77); a message or a clock is no such effect. K-07 v1's effect rows are how charges, refunds and calendar writes run.",
+      "type": "object",
+      "properties": {
+        "class": {
+          "description": "money, booking, consent, contact or safety (arch 08 line 447).",
+          "$ref": "#/$defs/effectClass"
+        },
+        "kind": {
+          "description": "recordWrite (a gives key or record field written), charge, refund, calendarWrite or flag (K-01 v1 effect.kind, its message and clock kinds aside).",
+          "type": "string",
+          "enum": ["recordWrite", "charge", "refund", "calendarWrite", "flag"]
+        },
+        "ref": {
+          "description": "What it acts on: the gives key or record field written, the record amount charged or refunded, the booking a calendar write is for, or the step whose effect sets a flag (K-01 v1 effect.ref).",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "flag": {
+          "description": "For kind flag only: deceased, stopped, private or paused (K-01 v1 effect.flag; arch 03 line 175).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/effect/properties/flag"
+        },
+        "values": {
+          "description": "The values the effect commits, such as the booked time and service, or the amount (arch 08 line 447: 'or a value in one').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/namedValue" }
+        }
+      },
+      "required": ["class", "kind", "ref", "values"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "A flag names its flag; no other kind does (K-01 v1 effect.flag).",
+          "if": { "properties": { "kind": { "const": "flag" } } },
+          "then": { "required": ["flag"] },
+          "else": { "not": { "required": ["flag"] } }
+        }
+      }
+    },
+    "messageValue": {
+      "title": "GoldMessageValue",
+      "description": "A value an outgoing message must carry, and who may see that field (02-contracts K-10 'for each outgoing message the values it must carry and who may see each field'; RULES 4.5).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The slot or field the value fills, such as svc.intext or price (K-01 v1's slot list; K-01 README 'The slot list').",
+          "$ref": "#/$defs/valueName"
+        },
+        "value": {
+          "description": "The value as the record holds it (K-02 v1 fieldValue's types; CQ-09).",
+          "$ref": "#/$defs/fieldValue"
+        },
+        "audience": {
+          "description": "Who may see the field, at least one (RULES 4.5; arch 06 line 311, limit 7; 02-contracts section 2 item 3).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/audienceKind" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["name", "value", "audience"],
+      "additionalProperties": false
+    },
+    "goldMessage": {
+      "title": "GoldMessage",
+      "description": "One outgoing message the turn should cause, with the values it must carry, for the measure of messages that misstate the record, show a field past its audience or miss a needed value (arch 08 line 445; 02-contracts K-10).",
+      "type": "object",
+      "properties": {
+        "step": {
+          "description": "The step whose message it is (K-01 v1 message; SPEC-master 4 'say').",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "to": {
+          "description": "Who gets it, as the bundle's message names the lane (K-01 v1 lane: owner, san, staff, cust, agent, pay, out, other).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/lane"
+        },
+        "values": {
+          "description": "The values it must carry; empty when it carries none, such as a fixed safety line (arch 08 line 445: 'miss a needed value').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/messageValue" }
+        }
+      },
+      "required": ["step", "to", "values"],
+      "additionalProperties": false
+    },
+    "goldLabel": {
+      "title": "GoldLabel",
+      "description": "A turn's gold label: the text's language, its stakes, whether a question is expected, one entry per part (verb, right choice, every field value), the effects it should commit and the messages it should cause (02-contracts K-10 'the gold label'; arch 08 line 447). A turn the safety read alone decides, or a safety-only item, has no parts and null stakes: it is graded on its texts' safety labels, its effects and its messages (README 'The gold label').",
+      "type": "object",
+      "properties": {
+        "language": {
+          "description": "The text's language as decide should report it, a two-letter code such as en or es (K-02 v1 language; CQ-07's default: the decide reads return it and must agree; arch 06 line 341).",
+          "$ref": "../model/model.v1.schema.json#/$defs/language"
+        },
+        "stakes": {
+          "description": "high or low (arch 01 line 79; K-02 v1 stakes, derived by its README's 'Stakes' rule, CQ-20); null when the turn has no parts.",
+          "anyOf": [{ "$ref": "../model/model.v1.schema.json#/$defs/stakes" }, { "type": "null" }]
+        },
+        "questionExpected": {
+          "description": "Whether the right reply asks the writer a question, for needless extra questions (arch 08 line 437; 02-contracts K-10 'whether a question is expected').",
+          "type": "boolean"
+        },
+        "parts": {
+          "description": "One entry per part of the text, in the text's order (arch 03 line 183); empty for a turn the safety read alone decides.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldPart" }
+        },
+        "effects": {
+          "description": "Every money, booking, consent, contact or safety effect the turn should commit; empty when it should commit none (arch 08 line 447).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldEffect" }
+        },
+        "messages": {
+          "description": "The outgoing messages the turn should cause whose values are graded (arch 08 line 445).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldMessage" }
+        }
+      },
+      "required": ["language", "stakes", "questionExpected", "parts", "effects", "messages"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "parts": {
+          "description": "A turn with parts has its stakes; a turn with none has null stakes (arch 01 line 79).",
+          "if": { "properties": { "parts": { "type": "array", "maxItems": 0 } } },
+          "then": { "properties": { "stakes": { "type": "null" } } },
+          "else": { "properties": { "stakes": { "type": "string" } } }
+        }
+      }
+    },
+    "goldTurn": {
+      "title": "GoldTurn",
+      "description": "One turn of an item: the steps walked to it, its inbound texts (one batch: arch 02 line 113) and its gold label (02-contracts K-10).",
+      "type": "object",
+      "properties": {
+        "walk": {
+          "description": "The steps walked, in order, ending at the step whose question or check the turn's texts meet; for a turn that answers a question still open from the turn before, that step alone (02-contracts K-10 'the steps walked'; arch 08 line 449: 'so every item has a known right step').",
+          "type": "array",
+          "items": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId" },
+          "minItems": 1
+        },
+        "texts": {
+          "description": "The turn's inbound texts, in send order (arch 02 line 113: a batch joins texts that come close together).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldText" },
+          "minItems": 1
+        },
+        "label": { "$ref": "#/$defs/goldLabel" }
+      },
+      "required": ["walk", "texts", "label"],
+      "additionalProperties": false
+    },
+    "writer": {
+      "title": "GoldWriter",
+      "description": "Who writes the item's texts: the handle, the person, the role, the stored language and the channel (02-contracts K-10 'the writer's role, language and channel').",
+      "type": "object",
+      "properties": {
+        "handle": {
+          "description": "The handle's id in K-04's handles table, never the raw number or address: an id that cannot read as a phone number, email address or words, as K-08 v1's handle reference is (K-08 v1 handleRef and safeId; arch 01 line 55).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId"
+        },
+        "personId": {
+          "description": "The person behind the handle, or null when none is known yet, such as a new mobile (K-02 v1 person.personId; FS line 743).",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "role": {
+          "description": "The writer's role at the item's business: owner, admin, staff, ownBusiness or customer (K-02 v1 person.roles; FS line 723), or none for a writer with no role there yet.",
+          "type": "string",
+          "enum": ["owner", "admin", "staff", "ownBusiness", "customer", "none"]
+        },
+        "language": {
+          "description": "The writer's stored language, or null (K-02 v1 person.language; arch 06 line 341).",
+          "anyOf": [{ "$ref": "../model/model.v1.schema.json#/$defs/language" }, { "type": "null" }]
+        },
+        "channel": {
+          "description": "Where the texts come from: imessage, rcs or sms through Linq, or email (K-07 v1 port: Linq's imessage, rcs and sms channels and the email channel; DL-012: no SMS provider); page (free text from a secure page) or agent (free text from an outside AI) (K-02 v1 safetyResult.source; arch 02 line 129).",
+          "type": "string",
+          "enum": ["imessage", "rcs", "sms", "email", "page", "agent"]
+        }
+      },
+      "required": ["handle", "personId", "role", "language", "channel"],
+      "additionalProperties": false
+    },
+    "seedOpenQuestion": {
+      "title": "SeedOpenQuestion",
+      "description": "An open question sent to the writer's handle before the turn (02-contracts K-10 'with the open questions ... before the turn'; arch 01 line 63; K-04's open question row). If the named database seeds lack it, the harness writes it from this before the turn.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The open question's row id (arch 01 line 63).",
+          "$ref": "#/$defs/id"
+        },
+        "step": {
+          "description": "The step that asked it (arch 01 line 63).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "status": {
+          "description": "waiting (not delivered yet) or open (arch 09 line 490; arch 02 line 127: its clock arms at the first delivery receipt).",
+          "type": "string",
+          "enum": ["waiting", "open"]
+        },
+        "askCount": {
+          "description": "How many times it has been asked (arch 01 line 63).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "bookingId": {
+          "description": "The booking it is about, or null (arch 03 line 159).",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["id", "step", "status", "askCount", "bookingId"],
+      "additionalProperties": false
+    },
+    "seedBooking": {
+      "title": "SeedBooking",
+      "description": "The booking the turn is about, with its stage before the turn (02-contracts K-10 'booking stage ... before the turn'; arch 03 line 163: hubs follow the booking's stage; K-04 bookings.stage: entry, booked, checked_in, done, cancelled).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The booking's row id.",
+          "$ref": "#/$defs/id"
+        },
+        "stage": {
+          "description": "Its stage before the turn (K-04 v1 bookings_stage_known).",
+          "type": "string",
+          "enum": ["entry", "booked", "checked_in", "done", "cancelled"]
+        }
+      },
+      "required": ["id", "stage"],
+      "additionalProperties": false
+    },
+    "flags": {
+      "title": "SeedFlags",
+      "description": "The record flags in force for the writer and the booking before the turn: deceased, stopped, private, paused (02-contracts K-10 'record flags before the turn'; K-01 v1 effect.flag; arch 03 line 175).",
+      "type": "array",
+      "items": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/effect/properties/flag" },
+      "uniqueItems": true
+    },
+    "fixtureSeed": {
+      "title": "FixtureSeed",
+      "description": "The seed state a walked item runs on: a fixture set v1 demo shop and the database seed fixtures loaded, with the open questions, booking stage and record flags before the first turn (02-contracts K-10 'the seed state it runs on (a fixture set v1 shop and its database seeds)').",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "fixtureSet: a walked item's seed.",
+          "const": "fixtureSet"
+        },
+        "shop": {
+          "description": "The fixture set v1 demo shop, by its file's base name in fixtures/v1/test-kit/shops/, such as barber (MC 5; Q-36: fixture set v1 is checksummed).",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9-]*$"
+        },
+        "business": {
+          "description": "The seeded business the turn is about, by its row id (K-04 businesses), or null when there is none yet.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "rows": {
+          "description": "The database seed fixtures loaded, as paths inside contracts/, such as db-schema/core/fixtures/seed-person-roles.json, each loaded after the ones its own 'after' names (02-contracts section 2 item 3; the database parts' seed rows).",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^db-schema/[a-z0-9-]+/fixtures/[A-Za-z0-9_.-]+[.]json$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "openQuestions": {
+          "description": "The open questions sent to the writer's handle before the first turn (arch 03 line 159).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/seedOpenQuestion" }
+        },
+        "booking": {
+          "description": "The booking the item is about, with its stage, or null for none (arch 03 line 163).",
+          "anyOf": [{ "$ref": "#/$defs/seedBooking" }, { "type": "null" }]
+        },
+        "flags": { "$ref": "#/$defs/flags" }
+      },
+      "required": ["kind", "shop", "business", "rows", "openQuestions", "booking", "flags"],
+      "additionalProperties": false
+    },
+    "liveTurnSeed": {
+      "title": "LiveTurnSeed",
+      "description": "The seed state of a human-labelled live turn: the live turn it replays, with the open questions, booking stage and record flags it found (arch 08 line 449: 300 human-labelled live turns a month; arch 10 line 552: replay of live turns). After launch only; such an item holds a real person's words, so it never enters the repository, a fixture or a test (BP rule 9).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "liveTurn: a human-labelled live turn's seed.",
+          "const": "liveTurn"
+        },
+        "turnId": {
+          "description": "The live turn (K-04 turns.id; CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "business": {
+          "description": "The business the turn was about (K-04 businesses).",
+          "$ref": "#/$defs/id"
+        },
+        "openQuestions": {
+          "description": "The open questions the turn found (arch 03 line 159).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/seedOpenQuestion" }
+        },
+        "booking": {
+          "description": "The booking it was about, with its stage, or null.",
+          "anyOf": [{ "$ref": "#/$defs/seedBooking" }, { "type": "null" }]
+        },
+        "flags": { "$ref": "#/$defs/flags" }
+      },
+      "required": ["kind", "turnId", "business", "openQuestions", "booking", "flags"],
+      "additionalProperties": false
+    },
+    "overlayRef": {
+      "title": "OverlayRef",
+      "description": "An approved overlay the item was labelled with, as the bundle's manifest lists it (K-01 v1 inputFile of kind approvedOverlay: path, sha256 and approval version; arch 12 line 592: 'fixes go in an overlay Jay approves'; Q-17; J-18).",
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "Its path, as the manifest's input gives it (K-01 v1 inputFile.path).",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "sha256": {
+          "description": "The sha256 of its bytes (K-01 v1 sha256; Q-36).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+        },
+        "version": {
+          "description": "Its approval version or date as written (K-01 v1 inputFile.version).",
+          "type": "string",
+          "pattern": "\\S"
+        }
+      },
+      "required": ["path", "sha256", "version"],
+      "additionalProperties": false
+    },
+    "goldItem": {
+      "title": "GoldItem",
+      "description": "One gold-set item: one turn, or a whole chat as a sequence of turns, walked from the step graph with its gold label (02-contracts K-10 'A gold-set item'; arch 08 lines 447 to 449; BP starting shape, last paragraph). Written once and never rewritten (QUESTIONS.md M2-qa-frontend.2: each paraphrase stored, never rewritten). path is the flow, money path, booking values, switches and facts the walk ran, with the trade's full set of switches and facts (K-01 v1 path; Q-35: parity with each trade's full switches and facts).",
+      "type": "object",
+      "properties": {
+        "itemId": { "$ref": "#/$defs/itemId" },
+        "setVersion": {
+          "description": "The gold-set version that added it (02-contracts K-10 'its id and set version').",
+          "$ref": "#/$defs/goldSetVersion"
+        },
+        "kind": {
+          "description": "turn: one turn; wholeChat: a whole chat, a sequence of turns of one handle's chat replayed in order, right only when every turn is right in every run (arch 08 line 441: 'Whole chats right in 4 runs of 4').",
+          "type": "string",
+          "enum": ["turn", "wholeChat"]
+        },
+        "journey": {
+          "description": "The journey the item belongs to, as K-01 v1's journey membership places its step (K-01 v1 journeyGate.steps; BP starting shape: the gold set is made journey by journey).",
+          "$ref": "#/$defs/journey"
+        },
+        "trade": {
+          "description": "The trade whose overlay the walk runs (K-01 v1 tradeId; 02-contracts K-10 'trade'), or null when the walk runs the master itself with no trade's overlay, as K-01 v1's lintFailure.trade allows null: a sign-up turn before any kind of work is chosen (S1-01, S1-02; bundle v0 holds no trade), or a fixture set v1 test shop with no trade file (test-mixed-A, test-mixed-B) (DL-201).",
+          "anyOf": [{ "$ref": "../bundle/bundle.v1.schema.json#/$defs/tradeId" }, { "type": "null" }]
+        },
+        "path": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/path" },
+        "seed": {
+          "description": "The seed state it runs on (02-contracts K-10): a fixture set v1 shop and its database seeds for a walked item, the live turn for a human-labelled one.",
+          "anyOf": [{ "$ref": "#/$defs/fixtureSeed" }, { "$ref": "#/$defs/liveTurnSeed" }]
+        },
+        "labelledFrom": {
+          "description": "The bundle and the approved overlays it was labelled from: a journey's gold set is labelled only from its approved overlays (BP starting shape, last paragraph; J-18; Q-17).",
+          "type": "object",
+          "properties": {
+            "bundleId": { "$ref": "#/$defs/bundleId" },
+            "overlays": {
+              "description": "The approved overlays applied, by their manifest input; empty when none applies.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/overlayRef" }
+            }
+          },
+          "required": ["bundleId", "overlays"],
+          "additionalProperties": false
+        },
+        "labelledBy": {
+          "description": "walk: generated by walking the step graph, so the label is the walk's; human: one of the human-labelled live turns after launch (arch 08 line 449).",
+          "type": "string",
+          "enum": ["walk", "human"]
+        },
+        "writer": { "$ref": "#/$defs/writer" },
+        "turns": {
+          "description": "The turns in order: exactly one for kind turn, two or more for a whole chat (arch 08 line 441).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldTurn" },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "itemId",
+        "setVersion",
+        "kind",
+        "journey",
+        "trade",
+        "path",
+        "seed",
+        "labelledFrom",
+        "labelledBy",
+        "writer",
+        "turns"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "A turn item holds one turn, a whole chat two or more (arch 08 line 441).",
+          "if": { "properties": { "kind": { "const": "turn" } } },
+          "then": { "properties": { "turns": { "type": "array", "maxItems": 1 } } },
+          "else": { "properties": { "turns": { "type": "array", "minItems": 2 } } }
+        },
+        "labelledBy": {
+          "description": "A walked item runs on a fixture set v1 seed; a human-labelled one on its live turn (arch 08 line 449; BP rule 9).",
+          "if": { "properties": { "labelledBy": { "const": "walk" } } },
+          "then": {
+            "properties": {
+              "seed": { "type": "object", "properties": { "kind": { "const": "fixtureSet" } } }
+            }
+          },
+          "else": {
+            "properties": { "seed": { "type": "object", "properties": { "kind": { "const": "liveTurn" } } } }
+          }
+        }
+      }
+    },
+    "interval": {
+      "title": "Interval",
+      "description": "A 95% interval as proportions from 0 to 1, unrounded (BP 8 'Eval gate': 'each reported as right out of total with its 95% interval'; CQ-10's default method; README 'The interval'). A release card shows it in percent to one decimal (BP section 10: 94.6–99.4%).",
+      "type": "object",
+      "properties": {
+        "lower": {
+          "description": "The lower bound (CQ-10).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "upper": {
+          "description": "The upper bound (CQ-10).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": ["lower", "upper"],
+      "additionalProperties": false
+    },
+    "measureResult": {
+      "title": "MeasureResult",
+      "description": "One section 08 measure in a report: its target and direction, the count out of the total, the point estimate, its 95% interval, the sized volume and the status (02-contracts K-10 'per section 08 measure'; BP 8 'Eval gate'). The arithmetic is the named rule reportNumbers.",
+      "type": "object",
+      "properties": {
+        "direction": {
+          "description": "atLeast for a measure whose point estimate must reach its target, atMost for one that must stay at or under it (02-contracts K-10 'its target and direction (at least or at most)'; arch 08's table).",
+          "type": "string",
+          "enum": ["atLeast", "atMost"]
+        },
+        "target": {
+          "description": "The target as a proportion, such as 0.97 for 97% (arch 08 lines 427 to 445; README 'How each measure is counted' lists section 08's).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "count": {
+          "description": "What the measure counts: the right ones for an atLeast measure, the failures (harmful actions, needless questions, false alarms, fallbacks, misstated messages) for an atMost one (BP 8: 'right out of total'; README 'How each measure is counted').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "description": "Out of how many units of the slice: turns, texts, chats or messages, as the measure counts them (README 'How each measure is counted').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "point": {
+          "description": "The point estimate, count divided by total, unrounded; null when total is 0 (BP 8 'Eval gate').",
+          "anyOf": [{ "type": "number", "minimum": 0, "maximum": 1 }, { "type": "null" }]
+        },
+        "interval": {
+          "description": "Its 95% interval; null when total is 0 (BP 8; CQ-10).",
+          "anyOf": [{ "$ref": "#/$defs/interval" }, { "type": "null" }]
+        },
+        "sizedVolume": {
+          "description": "The total at which the bar is proven, as J-19 sizes it; null until J-19 sizes it (Q-16's default). Below it, or with none, the status is never met (BP 8: 'Below a bar's sized volume (J-19), write the interval and \"not yet proven\", never \"met\"').",
+          "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+        },
+        "status": {
+          "description": "met: at or past its sized volume, with the bound facing the target clearing it (the lower bound for atLeast, the upper for atMost: BP 8, the plan's sizing rule); notYetProven: the point estimate meets the target but the bar is not proven, below its volume or unsized (BP 8; Q-16; J-19), or nothing was counted; miss: the point estimate misses the target, a target miss at any volume (BP 8: 'A point estimate below its target is a target miss (rule 7.10)').",
+          "type": "string",
+          "enum": ["met", "notYetProven", "miss"]
+        }
+      },
+      "required": ["direction", "target", "count", "total", "point", "interval", "sizedVolume", "status"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "total": {
+          "description": "With nothing counted there is no estimate and nothing is proven; otherwise the estimate and its interval are given (BP 8).",
+          "if": { "properties": { "total": { "const": 0 } } },
+          "then": {
+            "properties": {
+              "point": { "type": "null" },
+              "interval": { "type": "null" },
+              "status": { "const": "notYetProven" }
+            }
+          },
+          "else": {
+            "properties": {
+              "point": { "type": "number" },
+              "interval": { "type": "object" }
+            }
+          }
+        },
+        "status": {
+          "description": "A bar with no sized volume is never met (BP 8; Q-16; J-19).",
+          "if": { "properties": { "status": { "const": "met" } } },
+          "then": { "properties": { "sizedVolume": { "type": "integer" } } }
+        }
+      }
+    },
+    "measures": {
+      "title": "Measures",
+      "description": "Every section 08 measure, each by its name, with its direction fixed by the measure (arch 08's table; 02-contracts K-10 'per section 08 measure'). A measure the slice has nothing for has total 0.",
+      "type": "object",
+      "properties": {
+        "rightStepInChoices": { "$ref": "#/$defs/measureResult" },
+        "lowStakesDecisions": { "$ref": "#/$defs/measureResult" },
+        "highStakesDecisions": { "$ref": "#/$defs/measureResult" },
+        "harmfulWrongActions": { "$ref": "#/$defs/measureResult" },
+        "needlessQuestions": { "$ref": "#/$defs/measureResult" },
+        "dangerFound": { "$ref": "#/$defs/measureResult" },
+        "falseAlarms": { "$ref": "#/$defs/measureResult" },
+        "wholeChats": { "$ref": "#/$defs/measureResult" },
+        "fallbackMessages": { "$ref": "#/$defs/measureResult" },
+        "misstatedMessages": { "$ref": "#/$defs/measureResult" }
+      },
+      "required": [
+        "rightStepInChoices",
+        "lowStakesDecisions",
+        "highStakesDecisions",
+        "harmfulWrongActions",
+        "needlessQuestions",
+        "dangerFound",
+        "falseAlarms",
+        "wholeChats",
+        "fallbackMessages",
+        "misstatedMessages"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "rightStepInChoices": {
+          "description": "At least 99.5% (arch 08 line 429).",
+          "properties": {
+            "rightStepInChoices": { "type": "object", "properties": { "direction": { "const": "atLeast" } } }
+          }
+        },
+        "lowStakesDecisions": {
+          "description": "At least 97% (arch 08 line 431).",
+          "properties": {
+            "lowStakesDecisions": { "type": "object", "properties": { "direction": { "const": "atLeast" } } }
+          }
+        },
+        "highStakesDecisions": {
+          "description": "At least 99.5% (arch 08 line 433).",
+          "properties": {
+            "highStakesDecisions": { "type": "object", "properties": { "direction": { "const": "atLeast" } } }
+          }
+        },
+        "harmfulWrongActions": {
+          "description": "At most 0.2% of turns (arch 08 line 435).",
+          "properties": {
+            "harmfulWrongActions": { "type": "object", "properties": { "direction": { "const": "atMost" } } }
+          }
+        },
+        "needlessQuestions": {
+          "description": "At most 6.7% of turns (arch 08 line 437).",
+          "properties": {
+            "needlessQuestions": { "type": "object", "properties": { "direction": { "const": "atMost" } } }
+          }
+        },
+        "dangerFound": {
+          "description": "At least 99% (arch 08 line 439).",
+          "properties": {
+            "dangerFound": { "type": "object", "properties": { "direction": { "const": "atLeast" } } }
+          }
+        },
+        "falseAlarms": {
+          "description": "At most 5% (arch 08 line 439).",
+          "properties": {
+            "falseAlarms": { "type": "object", "properties": { "direction": { "const": "atMost" } } }
+          }
+        },
+        "wholeChats": {
+          "description": "At least 90% (arch 08 line 441).",
+          "properties": {
+            "wholeChats": { "type": "object", "properties": { "direction": { "const": "atLeast" } } }
+          }
+        },
+        "fallbackMessages": {
+          "description": "At most 1%, DD (arch 08 line 443).",
+          "properties": {
+            "fallbackMessages": { "type": "object", "properties": { "direction": { "const": "atMost" } } }
+          }
+        },
+        "misstatedMessages": {
+          "description": "At most 0.2%, DD (arch 08 line 445).",
+          "properties": {
+            "misstatedMessages": { "type": "object", "properties": { "direction": { "const": "atMost" } } }
+          }
+        }
+      }
+    },
+    "invariantResult": {
+      "title": "InvariantResult",
+      "description": "One hard invariant on the run: its breaches and the items that breached it (arch 08 line 427: target 100%; BP 8: 'zero hard-invariant breaches').",
+      "type": "object",
+      "properties": {
+        "breaches": {
+          "description": "How many breaches the run found; any one fails the gate (02-contracts K-10).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "items": {
+          "description": "The items that breached it, each once.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/itemId" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["breaches", "items"],
+      "additionalProperties": false
+    },
+    "regression": {
+      "title": "Regression",
+      "description": "An item the last passing run got right that this one gets wrong, with its explanation (BP 8 'Eval gate': 'a list on the card of every item the last passing bundle got right that this one gets wrong, each explained'; DL-201: the last passing run is a bundle and a commit, so a code-only change lists its own).",
+      "type": "object",
+      "properties": {
+        "itemId": { "$ref": "#/$defs/itemId" },
+        "turn": {
+          "description": "The turn, counting from 1 (1 for an item of kind turn).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "measure": {
+          "description": "The measure it went wrong on (arch 08's table).",
+          "$ref": "#/$defs/measureName"
+        },
+        "explanation": {
+          "description": "Why it is now wrong, in plain words (BP 8: 'each explained').",
+          "type": "string",
+          "pattern": "\\S"
+        }
+      },
+      "required": ["itemId", "turn", "measure", "explanation"],
+      "additionalProperties": false
+    },
+    "changedEffect": {
+      "title": "ChangedEffect",
+      "description": "One money, booking, consent or safety effect that differs from the last passing run's on the same replay: what that run committed and what this one commits (BP 8 'Bundle'; arch 10 line 552: 'Rosie's team reviews each changed money, booking, consent or safety effect'; DL-201: the last passing run is a bundle and a commit).",
+      "type": "object",
+      "properties": {
+        "replayed": {
+          "description": "What was replayed: a gold item, a fixture set v1 scenario (before launch: 'the gold set and the fixture set v1 scenarios', BP 8 'Bundle'), or a live turn (from launch: the last 7 days, arch 10 line 552).",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "description": "goldItem, scenario or liveTurn (BP 8 'Bundle').",
+              "type": "string",
+              "enum": ["goldItem", "scenario", "liveTurn"]
+            },
+            "id": {
+              "description": "The gold item's id, the scenario's id in fixture set v1's test-kit, or the live turn's id (CQ-09).",
+              "$ref": "#/$defs/id"
+            },
+            "turn": {
+              "description": "The turn of a gold item, counting from 1; null for a scenario or a live turn.",
+              "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+            }
+          },
+          "required": ["kind", "id", "turn"],
+          "additionalProperties": false
+        },
+        "class": {
+          "description": "money, booking, consent or safety (BP 8 'Bundle').",
+          "$ref": "#/$defs/changedEffectClass"
+        },
+        "last": {
+          "description": "The effects of this class the last passing run committed there (none: empty).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldEffect" }
+        },
+        "now": {
+          "description": "The effects of this class this run commits there (none: empty).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/goldEffect" }
+        }
+      },
+      "required": ["replayed", "class", "last", "now"],
+      "additionalProperties": false
+    },
+    "accuracyReport": {
+      "title": "AccuracyReport",
+      "description": "What one eval run of a bundle, at a commit, found on the gold set or its smoke slice (02-contracts K-10 'An accuracy report'; DL-201; arch 08; arch 10 line 552; BP 8 'Bundle', 'Eval gate', 'Journey milestone'; BP section 10's release card, whose accuracy lines read from it). Before launch the replay is the gold set and fixture set v1's scenarios (BP 8 'Bundle').",
+      "type": "object",
+      "properties": {
+        "reportId": {
+          "description": "The report's id (CQ-09).",
+          "$ref": "#/$defs/itemId"
+        },
+        "bundleId": {
+          "description": "The bundle run (arch 10 line 548: the bundle id on every turn and trace). With commit, it names the run.",
+          "$ref": "#/$defs/bundleId"
+        },
+        "commit": {
+          "description": "The git commit the run evaluated: the code around the bundle. A change to the frontier, the composer or other AI code changes what the AI does but keeps the bundle id (BP 3.5 (f); K-01 v1's manifest holds prompts, models and policy, not code), so the bundle and the commit together name the run (DL-201; BP 6.5 step 2: the smoke slice runs on the rebased result; BP 8 'Eval gate': 'a bundle, or a deployment that changes what the AI does').",
+          "$ref": "#/$defs/commit"
+        },
+        "goldSetVersion": {
+          "description": "The gold-set version run (02-contracts K-10).",
+          "$ref": "#/$defs/goldSetVersion"
+        },
+        "slice": {
+          "description": "smoke: the fixed smoke slice a branch that changes what the AI does runs before its merge; full: the whole gold set, nightly and for each bundle candidate (BP 5.2; Q-20: the smoke slice only until the model budget is set).",
+          "type": "string",
+          "enum": ["smoke", "full"]
+        },
+        "ranAt": {
+          "description": "When the run ended, in UTC (02-contracts K-10 'date'; CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "runs": {
+          "description": "How many times each item ran (arch 08 line 441: whole chats are judged in 4 runs of 4).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "models": {
+          "description": "The model ids the run used (K-01 v1 manifest.models; arch 11 line 564).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/manifest/properties/models"
+        },
+        "modelCalls": {
+          "description": "live: the models were called; recordedDouble: the recorded-model double answered, so the numbers check the code around the models, not the models (Q-20's default; K-02 v1 consumers: C-123).",
+          "type": "string",
+          "enum": ["live", "recordedDouble"]
+        },
+        "journeys": {
+          "description": "The journeys whose items the slice holds, each once (BP 8 'Journey milestone').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/journey" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "items": {
+          "description": "How many gold items the slice held.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "interval": {
+          "description": "How every interval in the report is computed: the two-sided 95% Wilson score interval (CQ-10's default; one-sided or two-sided bounds stay J-19's, Q-16).",
+          "type": "object",
+          "properties": {
+            "method": { "description": "CQ-10.", "const": "wilson" },
+            "level": { "description": "95% (BP 8 'Eval gate').", "const": 0.95 },
+            "sides": { "description": "Two-sided (CQ-10; J-19).", "const": "two" }
+          },
+          "required": ["method", "level", "sides"],
+          "additionalProperties": false
+        },
+        "measures": {
+          "description": "Every section 08 measure over the whole slice (02-contracts K-10).",
+          "$ref": "#/$defs/measures"
+        },
+        "byJourney": {
+          "description": "The same measures on each journey's items, one entry per journey the slice holds (BP 8 'Journey milestone': 'each measure's point estimate at or above its target on that journey's items').",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "journey": { "$ref": "#/$defs/journey" },
+              "measures": { "$ref": "#/$defs/measures" }
+            },
+            "required": ["journey", "measures"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "hardInvariants": {
+          "description": "Each hard invariant's breaches on the run; any one fails the gate (arch 08 line 427; BP 8; K-08 v1 invariantCheck names).",
+          "type": "object",
+          "properties": {
+            "noChargeWithoutBoundYes": { "$ref": "#/$defs/invariantResult" },
+            "noDoubleBooking": { "$ref": "#/$defs/invariantResult" },
+            "noTextAfterStop": { "$ref": "#/$defs/invariantResult" }
+          },
+          "required": ["noChargeWithoutBoundYes", "noDoubleBooking", "noTextAfterStop"],
+          "additionalProperties": false
+        },
+        "cost": {
+          "description": "Cost per completed booking on the gold set, at most $0.16 (arch 10 line 552: '$49 over 300 bookings a month'; BP 8 'Bundle'; CQ-12's definition: a gold chat whose label ends in a committed booking; the cost of every model call in the slice's turns, divided by the number of such chats). In micro-dollars, as K-08 v1 costs model calls.",
+          "type": "object",
+          "properties": {
+            "completedBookings": {
+              "description": "The gold items whose label ends in a committed booking (A6-10's booked) (CQ-12).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "costMicroUsd": {
+              "description": "The cost of every model call in the slice's turns, in millionths of a US dollar (CQ-12; K-08 v1 modelCall.cost_micro_usd).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "perBookingMicroUsd": {
+              "description": "costMicroUsd divided by completedBookings, unrounded; null with no completed booking (CQ-12).",
+              "anyOf": [{ "type": "number", "minimum": 0 }, { "type": "null" }]
+            },
+            "targetMicroUsd": {
+              "description": "The gate: 160000 micro-dollars, $0.16 (arch 10 line 552).",
+              "type": "integer",
+              "minimum": 0
+            },
+            "status": {
+              "description": "met: at or under the target; miss: over it; notMeasured: no completed booking in the slice, so the gate is not shown met (BP 8 'Bundle').",
+              "type": "string",
+              "enum": ["met", "miss", "notMeasured"]
+            }
+          },
+          "required": ["completedBookings", "costMicroUsd", "perBookingMicroUsd", "targetMicroUsd", "status"],
+          "additionalProperties": false,
+          "dependentSchemas": {
+            "completedBookings": {
+              "description": "With no completed booking there is no cost per booking (CQ-12).",
+              "if": { "properties": { "completedBookings": { "const": 0 } } },
+              "then": {
+                "properties": {
+                  "perBookingMicroUsd": { "type": "null" },
+                  "status": { "const": "notMeasured" }
+                }
+              },
+              "else": {
+                "properties": {
+                  "perBookingMicroUsd": { "type": "number" },
+                  "status": { "enum": ["met", "miss"] }
+                }
+              }
+            }
+          }
+        },
+        "replyTime": {
+          "description": "Reply p50 and p95 over the run's turns, from the traces (K-08 v1 replyTime: from the last text's arrival to Linq accepting the first part; arch 04 line 229: p50 at most 10 s, p95 at most 18 s; arch 10 line 552); null when the run measured none.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "turns": {
+                  "description": "How many turns' reply times were read.",
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "p50Ms": {
+                  "description": "The median reply time, in milliseconds (nearest rank; README default 15).",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "p95Ms": {
+                  "description": "The 95th percentile reply time, in milliseconds (nearest rank; README default 15).",
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": ["turns", "p50Ms", "p95Ms"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "lastPassingBundleId": {
+          "description": "The bundle of the last run whose gate passed, the run regressions and changed effects compare with; with lastPassingCommit it names that run. Null, with lastPassingCommit null, for the first gate, which then lists none (BP 8 'Bundle', 'Eval gate'; arch 08 line 447: a breach rolls back to the last passing bundle; DL-201).",
+          "anyOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }]
+        },
+        "lastPassingCommit": {
+          "description": "The git commit of the last run whose gate passed; with lastPassingBundleId it names that run. A code-only change keeps the bundle and changes the commit, so it is compared with the last passing run on the same bundle (BP 3.5 (f); BP 8 'Eval gate'; DL-201). Null exactly when lastPassingBundleId is null.",
+          "anyOf": [{ "$ref": "#/$defs/commit" }, { "type": "null" }]
+        },
+        "regressions": {
+          "description": "Every item the last passing run got right that this one gets wrong, each explained; empty when there is none (BP 8 'Eval gate': 'every item the last passing bundle got right that this one gets wrong'; DL-201: the last passing run is a bundle and a commit).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/regression" }
+        },
+        "changedEffects": {
+          "description": "Every money, booking, consent or safety effect that differs from the last passing run on the same replay, with the count of each class (BP 8 'Bundle'; arch 10 line 552; BP section 10's card: 'Changed effects: none (money 0, booking 0, consent 0, safety 0)'; DL-201).",
+          "type": "object",
+          "properties": {
+            "counts": {
+              "description": "How many changed effects of each class are listed (BP section 10's card).",
+              "type": "object",
+              "properties": {
+                "money": { "type": "integer", "minimum": 0 },
+                "booking": { "type": "integer", "minimum": 0 },
+                "consent": { "type": "integer", "minimum": 0 },
+                "safety": { "type": "integer", "minimum": 0 }
+              },
+              "required": ["money", "booking", "consent", "safety"],
+              "additionalProperties": false
+            },
+            "effects": {
+              "description": "Each changed effect (BP 8 'Bundle').",
+              "type": "array",
+              "items": { "$ref": "#/$defs/changedEffect" }
+            }
+          },
+          "required": ["counts", "effects"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "reportId",
+        "bundleId",
+        "commit",
+        "goldSetVersion",
+        "slice",
+        "ranAt",
+        "runs",
+        "models",
+        "modelCalls",
+        "journeys",
+        "items",
+        "interval",
+        "measures",
+        "byJourney",
+        "hardInvariants",
+        "cost",
+        "replyTime",
+        "lastPassingBundleId",
+        "lastPassingCommit",
+        "regressions",
+        "changedEffects"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "lastPassingBundleId": {
+          "description": "The last passing run is a bundle and a commit, both given or both null. The first gate has no run to compare with, so both are null and it lists no regression and no changed effect (BP 8; DL-201).",
+          "if": { "properties": { "lastPassingBundleId": { "type": "null" } } },
+          "then": {
+            "properties": {
+              "lastPassingCommit": { "type": "null" },
+              "regressions": { "type": "array", "maxItems": 0 },
+              "changedEffects": {
+                "type": "object",
+                "properties": { "effects": { "type": "array", "maxItems": 0 } }
+              }
+            }
+          },
+          "else": { "properties": { "lastPassingCommit": { "type": "string" } } }
+        }
+      }
+    }
+  }
+}

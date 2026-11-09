@@ -1,0 +1,83 @@
+{
+  "itemId": "item-typo-s1-02",
+  "setVersion": "gs-1",
+  "kind": "turn",
+  "journey": 1,
+  "trade": null,
+  "path": {
+    "flow": "A",
+    "price": "list",
+    "before": "card",
+    "after": "counter",
+    "switches": {},
+    "facts": null
+  },
+  "seed": {
+    "kind": "fixtureSet",
+    "shop": "movers",
+    "business": "biz-movers",
+    "rows": [
+      "db-schema/core/fixtures/seed-business-head.json",
+      "db-schema/core/fixtures/seed-person-roles.json",
+      "db-schema/core/fixtures/seed-phone-chat-open.json"
+    ],
+    "openQuestions": [{ "id": "oq-s1-02", "step": "S1-02", "status": "open", "askCount": 1, "bookingId": null }],
+    "booking": null,
+    "flags": []
+  },
+  "labelledFrom": {
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "overlays": []
+  },
+  "labelledBy": "walk",
+  "writer": {
+    "handle": "handle-sam",
+    "personId": "person-sam",
+    "role": "owner",
+    "language": "en",
+    "channel": "imessage"
+  },
+  "turns": [
+    {
+      "walk": ["S1-01", "S1-02"],
+      "texts": [
+        {
+          "text": {
+            "eventId": "evt-gold-0002",
+            "kind": "text",
+            "words": "Movng and junk haulng",
+            "sentAt": { "utc": "2026-10-19T18:05:00Z", "zone": "America/New_York" },
+            "attachments": [],
+            "poll": null,
+            "tapback": null
+          },
+          "variants": ["typo"],
+          "safety": [{ "outcome": "No", "tense": "now" }]
+        }
+      ],
+      "label": {
+        "language": "en",
+        "stakes": "low",
+        "questionExpected": false,
+        "parts": [
+          {
+            "verb": "choose",
+            "choice": {
+              "kind": "option",
+              "step": "S1-02",
+              "branch": "All on the list",
+              "anytimeRow": null,
+              "door": null,
+              "hub": null,
+              "bookingId": null
+            },
+            "fields": [{ "name": "kinds", "type": "text", "value": "Movng and junk haulng" }],
+            "about": null
+          }
+        ],
+        "effects": [],
+        "messages": []
+      }
+    }
+  ]
+}
