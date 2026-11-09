@@ -12,12 +12,15 @@
 //   - Both failed: no verdict (`read` null, `timedOut` true), given when 4 s have passed since the call, however fast
 //     the tries failed: it is the marker of no verdict in 4 s (arch 02 line 111). So the actor's own 4 s deadline,
 //     which started at the text's arrival, comes first, and its no-verdict rule (a danger word from the bundle's list
-//     gets the safety line, any other text the outage line; T-246) is what applies; a marker that carries the danger
-//     words itself is T-366's.
+//     gets the safety line, any other text the outage line; T-246) is what applies. The marker carries the danger words
+//     found itself (T-366, lift.ts `timeoutMarker`): with one, Unsure; with none, the plain marker with no outcome. A
+//     caller with no deadline of its own (a secure page, an outside AI: arch 02 line 129) reads the same marker.
 //   - The outcomes that hold are the labels' danger outcomes, each once, in the labels' order, where a label whose
 //     tense is over or joke is not danger and Unsure always is (arch 06 line 329; A3-22: "Safe default: unsure is read
-//     as danger"); with none, No. Code's danger words are T-366's: this read matches none, so `dangerWords` is empty,
-//     `liftedToUnsure` false, and a no-verdict answer is the plain marker with no outcome.
+//     as danger"); with none, No. Code's danger-word rules then apply (T-366, lift.ts `afterVerdict`): the call's danger
+//     words found in the text and subject are the result's `dangerWords`, and a trade's own danger word that the read
+//     does not place out of danger lifts No to Unsure (`liftedToUnsure`; arch 06 line 283). Given no danger words, a
+//     read finds none and lifts nothing.
 //   - Each model call writes one K-08 v1 span into the text's trace, as the gateway writes its own: a `portCall` to
 //     provider anthropic, call messages, attempt 1 (Haiku) or 2 (Sonnet), with its one model call (purpose safetyRead:
 //     tokens, cached tokens, cache-write tokens, cost and time). A span holds labels and counts only, never the text,
@@ -39,11 +42,13 @@ import {
 } from "../gateway";
 import { messagesParams } from "../cache";
 import { isLabel, type BundleId } from "../../../runtime/src/trace";
+import { afterVerdict, findDangerWords, timeoutMarker } from "./lift";
 import { safetyReadTurn } from "./prompt";
 import { SAFETY_READ_SCHEMA, safetyReadProblems } from "./schema";
 import { exchange, type Exchange } from "./wire";
 import {
   NOT_DANGER_TENSES,
+  type DangerWordMatch,
   type ModelCall,
   type SafetyOutcome,
   type SafetyRead,
@@ -77,9 +82,9 @@ function until(since: number, ms: number): Promise<void> {
 }
 
 /**
- * The outcomes that hold for a read, before code's danger-word rules (T-366): each label's danger outcome, once, in the
- * labels' order. A label whose tense is over or joke is not danger (arch 06 line 329); Unsure is danger whatever its
- * tense (A3-22: "call it a joke when unsure" is never done; "unsure is read as danger"). No danger: No.
+ * The outcomes that hold for a read, before code's danger-word rules (T-366, lift.ts): each label's danger outcome,
+ * once, in the labels' order. A label whose tense is over or joke is not danger (arch 06 line 329); Unsure is danger
+ * whatever its tense (A3-22: "call it a joke when unsure" is never done; "unsure is read as danger"). No danger: No.
  */
 export function heldOutcomes(read: SafetyRead): SafetyOutcome[] {
   const held: SafetyOutcome[] = [];
@@ -91,31 +96,36 @@ export function heldOutcomes(read: SafetyRead): SafetyOutcome[] {
   return held.length > 0 ? held : ["No"];
 }
 
-/** K-02's result for a verdict. Danger words and their lift are T-366's: none here. */
-function verdictResult(input: SafetyReadInput, tries: SafetyTry[], read: SafetyRead): SafetyResult {
+/** K-02's result for a verdict: the read's held outcomes after code's danger-word rules (lift.ts). */
+function verdictResult(
+  input: SafetyReadInput,
+  tries: SafetyTry[],
+  read: SafetyRead,
+  matches: readonly DangerWordMatch[],
+): SafetyResult {
   return {
     eventId: input.eventId,
     source: input.source,
     tries,
     read,
     timedOut: false,
-    dangerWords: [],
-    outcomes: heldOutcomes(read),
-    liftedToUnsure: false,
+    ...afterVerdict(heldOutcomes(read), read, matches),
   };
 }
 
-/** K-02's result with no verdict: the plain marker, no read and no outcome; a danger word's Unsure is T-366's. */
-function noVerdictResult(input: SafetyReadInput, tries: SafetyTry[]): SafetyResult {
+/** K-02's result with no verdict: the timeout marker, no read; Unsure with the danger words found, else plain (lift.ts). */
+function noVerdictResult(
+  input: SafetyReadInput,
+  tries: SafetyTry[],
+  matches: readonly DangerWordMatch[],
+): SafetyResult {
   return {
     eventId: input.eventId,
     source: input.source,
     tries,
     read: null,
     timedOut: true,
-    dangerWords: [],
-    outcomes: [],
-    liftedToUnsure: false,
+    ...timeoutMarker(matches),
   };
 }
 
@@ -153,6 +163,9 @@ export function createSafetyReader(options: SafetyReaderOptions): SafetyReader {
       const key = env[KEY_VARIABLE];
       if (key === undefined || key === "") throw new MissingKeyError(KEY_VARIABLE);
       const calledAt = Date.now();
+      // The call's danger words found in the text and subject, once, before any model call (lift.ts): a verdict's lift
+      // and the no-verdict marker both use them. They hold the person's words, so they go into the answer only.
+      const matches = findDangerWords(input, callOptions.dangerWords ?? []);
 
       // The bundle's safety read prompt as the cached system prompt, the text after it (T-364's layout).
       const prompt = prompts.layout({ purpose: "safetyRead", turn: safetyReadTurn(input) });
@@ -218,12 +231,12 @@ export function createSafetyReader(options: SafetyReaderOptions): SafetyReader {
         }
 
         if (answer.ok) {
-          return { result: verdictResult(input, tries, answer.output as SafetyRead), modelCalls };
+          return { result: verdictResult(input, tries, answer.output as SafetyRead, matches), modelCalls };
         }
       }
       // No verdict: the marker is given at the 4 s mark, never before (see the head of this file).
       await until(calledAt, SAFETY_VERDICT_MS);
-      return { result: noVerdictResult(input, tries), modelCalls };
+      return { result: noVerdictResult(input, tries, matches), modelCalls };
     },
   };
 }

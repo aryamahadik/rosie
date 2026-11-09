@@ -1,7 +1,8 @@
 // The safety read (T-365, C-113): read.ts for the read itself (Haiku, then Sonnet, 2 s each, outside the AI gateway),
 // prompt.ts for its cached system prompt and the per-call part, schema.ts for K-02's model-facing schema and the check
-// of an answer, wire.ts for the one Messages API exchange. The danger-word lift and the 4 s marker's danger words are
-// T-366's; what the actor does with a verdict is T-246's.
+// of an answer, wire.ts for the one Messages API exchange. lift.ts holds code's danger-word rules after the read
+// (T-366): a trade's danger word lifts No to Unsure, and no verdict in 4 s gives K-02's timeout marker with the danger
+// words found. What the actor does with a verdict is T-246's.
 
 export {
   SAFETY_EFFORT,
@@ -11,6 +12,14 @@ export {
   createSafetyReader,
   heldOutcomes,
 } from "./read";
+export {
+  afterVerdict,
+  findDangerWords,
+  outOfDanger,
+  quotes,
+  timeoutMarker,
+  type DangerWordFields,
+} from "./lift";
 export {
   DATA_RULE,
   ESCAPE_NOTE,
@@ -38,6 +47,7 @@ export {
   SAFETY_OUTCOMES,
   SAFETY_SOURCES,
   TENSES,
+  type DangerWordEntry,
   type DangerWordMatch,
   type ModelCall,
   type SafetyLabel,

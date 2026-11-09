@@ -57,7 +57,22 @@ export interface SafetyTry {
   result: "verdict" | "timeout" | "error";
 }
 
-/** K-02 v1 `safetyResult.dangerWords[]`: a danger word code matched. Matching them is T-366's; this read leaves none. */
+/**
+ * One danger word of the bundle's lists, for code to find in a text (T-366): its words; its list (general: the general
+ * danger check, A3-22; plugin: a trade's own danger words, K-01 v1 pf.safety, fixture set v1's safety_stop); and its
+ * kind, the line a timeout gets (selfHarm: 988 and 911; other: 911; arch 02 line 111, CQ-24). It is an entry of the
+ * actor's `BundleSafety.dangerWords()` as it is (runtime/src/safety/types.ts, T-246).
+ */
+export interface DangerWordEntry {
+  words: string;
+  list: "general" | "plugin";
+  kind: "selfHarm" | "other";
+}
+
+/**
+ * K-02 v1 `safetyResult.dangerWords[]`: a danger word code found in the text, as its list entry gives it (lift.ts,
+ * T-366): the entry's words, its list and its kind.
+ */
 export interface DangerWordMatch {
   words: string;
   list: "general" | "plugin";
@@ -112,22 +127,30 @@ export interface SafetyReaderOptions {
   readonly fetch?: FetchLike;
 }
 
-/** Where one read's spans go. */
+/** What one read is given beside its text: where its spans go, and the danger words to find in it. */
 export interface SafetyReadCallOptions {
   /** The text's trace (K-08 v1); its bundle id must be the reader's. No trace: no span is written. */
   readonly trace?: TraceContext;
   /** The business, when known, for the spans. */
   readonly businessId?: string | null;
+  /**
+   * The danger words to find in the text and its subject (T-366, lift.ts): the general check's and the plug-in lists of
+   * the text's business, as the bundle holds them, the entries the actor's `BundleSafety.dangerWords()` gives (T-246).
+   * None given: no word is found, so nothing lifts and an answer with no verdict is the plain marker.
+   */
+  readonly dangerWords?: readonly DangerWordEntry[];
 }
 
 /** The safety read (C-113): Haiku, then Sonnet if Haiku fails or times out, 2 s each, outside the AI gateway. */
 export interface SafetyReader {
   /**
-   * Reads one text. A verdict comes as soon as a try gives one. Never rejects for a failed model call: a read that
-   * gets no verdict answers with no verdict (`read` null, `timedOut` true) 4 s after the call, when both 2 s tries
-   * have timed out, and then too when they failed sooner (no verdict in 4 s: arch 02 line 111). It rejects
-   * only for a call that cannot be made at all, before any model call: no key, or a trace of another bundle (a set-up
-   * fault, loud; the actor then applies its own no-verdict rule).
+   * Reads one text. A verdict comes as soon as a try gives one, after code's danger-word rules (lift.ts: a trade's
+   * danger word lifts No to Unsure when its tense is now, could restart or unknown). Never rejects for a failed model
+   * call: a read that gets no verdict answers with K-02's timeout marker (`read` null, `timedOut` true; Unsure with the
+   * danger words found, else the plain marker) 4 s after the call, when both 2 s tries have timed out, and then too when
+   * they failed sooner (no verdict in 4 s: arch 02 line 111). It rejects only for a call that cannot be made at all,
+   * before any model call: no key, or a trace of another bundle (a set-up fault, loud; the actor then applies its own
+   * no-verdict rule).
    */
   read(input: SafetyReadInput, options?: SafetyReadCallOptions): Promise<SafetyReadAnswer>;
 }
