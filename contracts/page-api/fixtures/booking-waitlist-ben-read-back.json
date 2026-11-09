@@ -1,0 +1,33 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-22T16:29:55Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/core/fixtures/seed-phone-stopped.json",
+      "db-schema/conversations-consent/fixtures/seed-consent-stop-row.json",
+      "db-schema/services-prices/fixtures/seed-services-price-list.json"
+    ],
+    "note": "A4-60 for Ben T. on Lee's Barbershop's booking page: his request (opened as booking-page-start.json opens one, requestRef reqref-page-lees-0051 and his device token, placeholders) matched the skin fade, its reach card gave the mobile that sent STOP on Oct 20, and no skin fade fits. He taps 'Want a text if a spot opens?' for any time. Nothing is written, and the read-back reads the same as anyone's: nothing on file for the number shows before its yes (S13-45; README default 57). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-ben-0003",
+      "traceId": "trace-page-ben-0003",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-ben-1",
+      "requestRef": "reqref-page-lees-0051"
+    },
+    "change": { "kind": "waitlist", "person": null, "wanted": { "anyTime": true } }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-ben-waitlist-1",
+    "stepId": "A4-60",
+    "questionId": null,
+    "words": "Want a text if a spot opens?",
+    "shown": [{ "table": "services", "rowId": "svc-lees-skin-fade", "version": 1 }],
+    "signature": "none",
+    "expiresAt": "2026-10-22T16:39:55Z"
+  }
+}

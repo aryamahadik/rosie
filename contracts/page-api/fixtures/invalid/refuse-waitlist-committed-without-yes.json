@@ -1,0 +1,31 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-22T16:29:50Z",
+    "environment": "staging",
+    "after": ["db-schema/services-prices/fixtures/seed-services-price-list.json"],
+    "note": "Refused: booking-waitlist-read-back.json's request answered as if Dee had joined, a K-29 texts consent written, with no yes: a read-back writes nothing, and a yes to messages is taken only by bookingConfirm, on the read-back's exact words (RULES 2.5; README default 48). With the read-back's outcome the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-dee-0006",
+      "traceId": "trace-page-dee-0006",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-dee-1",
+      "requestRef": "reqref-page-lees-0041"
+    },
+    "change": { "kind": "waitlist", "person": null, "wanted": { "anyTime": true } }
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-dee-waitlist-1",
+    "yesEventId": "pageyes-dee-waitlist-1",
+    "served": {
+      "change": "waitlist",
+      "result": "joined",
+      "consentId": "consent-page-dee-waitlist-texts",
+      "textsOffLine": null,
+      "requestEnded": true
+    }
+  }
+}

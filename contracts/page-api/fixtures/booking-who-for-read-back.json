@@ -1,0 +1,36 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-21T23:15:55Z",
+    "environment": "staging",
+    "after": ["booking-page-start.json", "booking-service-haircut.json", "booking-place-confirm.json"],
+    "note": "Screen 2 (FS section 7: 'Who it is for and age first, before any name, number, photo or address'; A4-80): Alex taps Me and 'I'm 18 or older' (README default 52's labels, from A4-80's own 'Reply 1 Me, and I'm 18 or older'). Nothing is written: the read-back's words are the question and the answers as picked, kept with the change and the head's version under its id (README default 48); shown names no row the page does not hold. The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0015",
+      "traceId": "trace-page-lees-0015",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "change": {
+      "kind": "whoFor",
+      "for": "self",
+      "bookerAgeBand": "18_or_older",
+      "under13": null,
+      "parentOrGuardian": null,
+      "name": null
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-lees-who-for-1",
+    "stepId": "A4-80",
+    "questionId": null,
+    "words": "Who is the haircut for? Me, and I'm 18 or older",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:25:55Z"
+  }
+}

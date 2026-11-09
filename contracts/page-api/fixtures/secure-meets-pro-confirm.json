@@ -1,0 +1,27 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-02T14:07:20Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-street-confirm.json", "secure-meets-pro-read-back.json"],
+    "note": "Alex's yes: the page entry calls K-09 v1.2 saveSecurePage alone, meetsPro someone_else 'My mother' on the details row's version it read, exactly as tool-api/fixtures/j4-meets-pro-someone-else-page.json (meets_pro someone_else, a new person named as typed), then sendSecureLink for meetsPro via page, exactly as tool-api/fixtures/j4-meets-pro-link-page.json: that adult's own link, given once in the answer for Alex to forward, no contact, only its code's hash kept (K-09 v1.2 README default 83). No key; meets_pro_person_id waits for their own yes on their own link (secure-meets-pro-yes-confirm.json). The link is K-09's placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0011",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "readBackId": "rb-page-alex-drain2-meets-pro-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-drain2-meets-pro-1",
+    "yesEventId": "pageyes-alex-drain2-meets-pro-1",
+    "served": {
+      "change": "meetsPro",
+      "meetsPro": "someone_else",
+      "forwardLink": { "url": "rosfield.com/c/placeholder-meets-pro-code-0027" }
+    }
+  }
+}

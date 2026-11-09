@@ -1,0 +1,50 @@
+{
+  "call": "secureRead",
+  "given": {
+    "now": "2026-11-02T14:04:00Z",
+    "environment": "staging",
+    "after": [
+      "tool-api/fixtures/j4-check-place-area-turn.json",
+      "tool-api/fixtures/j4-save-time-turn.json",
+      "tool-api/fixtures/j4-secure-link-turn.json"
+    ],
+    "note": "B4-29: Alex opens the secure link texted into his open chat with Lee Home Services (K-09's j4-secure-link-turn.json; its code a placeholder). The page entry takes the code's sha256 and finds the live K-30 secure_links row on the runtime side (K-30 rule 5): purpose secure_page, Alex's own, for booking-alex-chat-drain2; the call acts for him under the business (README default 49). It shows the request back (the kitchen drain clearing at his place, Thu Nov 5 arriving 8 to 10am with Jordan, held until 9:13am with one extension left, the line's $179 with its words, what is taken now and the cancel line from the way's own 1-hour rule, approval now: K-30 seed-booking-flow-b), and what the page asks (B4-34's access, entry code and note, the plug-in's 'Is the sink still full of water?' word for word: README default 53; B4-30's street address, position 1; B4-26's who meets the pro). Opening it proves nothing and sends nothing (S13-45), and nothing else on file for Alex shows."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0006",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    }
+  },
+  "outcome": {
+    "result": "securePage",
+    "for": "booker",
+    "request": {
+      "businessName": "Lee Home Services",
+      "service": "Kitchen drain clearing",
+      "place": "customer",
+      "timeSaved": {
+        "with": "Jordan",
+        "during": { "start": "2026-11-05T13:00:00Z", "end": "2026-11-05T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-05T13:00:00Z", "end": "2026-11-05T15:00:00Z" },
+        "heldUntil": "2026-11-02T14:13:10Z",
+        "extendable": true
+      },
+      "price": { "words": "$179", "amount": { "cents": 17900, "currency": "USD" } },
+      "takenNow": "A card is saved for the $89 fee; nothing is charged now",
+      "cancelWords": "Free cancel until Thu Nov 5, 7:00am; after that the $89 fee",
+      "approval": "now"
+    },
+    "asks": [
+      { "kind": "access", "question": null, "needed": true },
+      { "kind": "entry_code", "question": null, "needed": false },
+      { "kind": "question", "question": "Is the sink still full of water?", "needed": false },
+      { "kind": "note", "question": null, "needed": false }
+    ],
+    "address": [1],
+    "meetsPro": true,
+    "meetsProYes": false
+  }
+}

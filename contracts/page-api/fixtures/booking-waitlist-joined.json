@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-22T16:30:00Z",
+    "environment": "staging",
+    "after": ["booking-waitlist-read-back.json"],
+    "note": "Dee's own yes on the page (S13-45 row 5's own yes; RULES 2.5): the page entry makes the yes's event and calls K-09 v1.2 joinWaitlist alone (caller.kind page, personId null) for the skin fade, anyone free, wanted from now to the end of Thu Oct 29 in New York (K-09 v1.2 README default 81), and the yes kind page with the read-back's exact words and this yes event, as tool-api/fixtures/j4-join-waitlist-turn.json joins her by text: in one commit the K-29 texts consent bound to those words and their sha256, the K-30 waitlist entry naming it, and the request ended waitlist. The consent's id comes back so the page shows a yes kept to the words it showed; the consent id is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-dee-0007",
+      "traceId": "trace-page-dee-0007",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-dee-1",
+      "requestRef": "reqref-page-lees-0041"
+    },
+    "readBackId": "rb-page-dee-waitlist-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-dee-waitlist-1",
+    "yesEventId": "pageyes-dee-waitlist-1",
+    "served": {
+      "change": "waitlist",
+      "result": "joined",
+      "consentId": "consent-page-dee-waitlist-texts",
+      "textsOffLine": null,
+      "requestEnded": true
+    }
+  }
+}

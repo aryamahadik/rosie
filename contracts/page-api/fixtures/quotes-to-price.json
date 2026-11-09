@@ -1,0 +1,50 @@
+{
+  "call": "readQuotes",
+  "given": {
+    "now": "2026-11-03T00:20:00Z",
+    "environment": "staging",
+    "after": [
+      "photos-confirm.json",
+      "db-schema/people-access/fixtures/seed-staff-joined.json",
+      "db-schema/rules/fixtures/seed-price-ok-limit.json"
+    ],
+    "note": "A4-08 and B4-09 on Jordan's pricing page (C-195; K-09 v1.2 open gap 74: 'the pricing page lists the quotes waiting'): signed in, he may price at Lee Home Services (K-04 person_roles staff; K-22 seed-staff-joined), so the list holds the quotes there in state pricing: Alex's water heater, version 1, from photos, with the town checked, the photo (a short-lived signed read) and his note, opened for staff who may price, as the job page opens page answers (README default 60). The deadline is the 4-hour pricing clock (K-09 v1.2 README default 78), after which Sam is asked; silence never books or charges. The photo address is a placeholder; the times are examples after K-30's seed-quote-owner-ok."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-pricing-jordan-0101",
+      "traceId": "trace-pricing-jordan-0101",
+      "sessionToken": "placeholder-session-token-jordan-0001",
+      "linkCode": null
+    },
+    "list": "toPrice"
+  },
+  "outcome": {
+    "result": "quotes",
+    "list": "toPrice",
+    "quotes": [
+      {
+        "quoteId": "quote-alex-heater",
+        "version": 1,
+        "ownerOkId": null,
+        "businessName": "Lee Home Services",
+        "customerName": "Alex M.",
+        "service": "Water heater replacement",
+        "basis": "photos",
+        "area": "Springfield",
+        "photos": [
+          {
+            "photoId": "answer-alex-heater-photo-1",
+            "url": "https://files.example/placeholder-signed-read-heater-1",
+            "expiresAt": "2026-11-03T00:30:00Z"
+          }
+        ],
+        "answers": [{ "question": null, "words": "It's a 40-gallon gas heater in the basement" }],
+        "priced": [],
+        "askedAt": "2026-11-02T23:44:00Z",
+        "answerBy": "2026-11-03T03:44:00Z",
+        "silence": "Not priced by 10:44pm: Sam is asked to price it, and Alex hears it's with the business. Nothing is booked or charged."
+      }
+    ]
+  }
+}

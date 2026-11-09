@@ -1,0 +1,33 @@
+{
+  "call": "quoteReadBack",
+  "given": {
+    "now": "2026-11-03T00:30:00Z",
+    "environment": "staging",
+    "after": ["quotes-to-price.json"],
+    "note": "B4-09 on Jordan's pricing page: he types $640 for Alex's water heater, on the version the list showed. Nothing is written: the read-back says the price as it will go and what happens next, read from Sam's price OK limit ($500: K-26 seed-price-ok-limit), so Jordan sees before his yes that Sam OKs it before Alex sees it (FS line 630; README default 59). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-pricing-jordan-0102",
+      "traceId": "trace-pricing-jordan-0101",
+      "sessionToken": "placeholder-session-token-jordan-0001",
+      "linkCode": null
+    },
+    "change": {
+      "kind": "price",
+      "quoteId": "quote-alex-heater",
+      "version": 1,
+      "options": [{ "label": null, "price": { "cents": 64000, "currency": "USD" }, "upTo": null }]
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-pricing-jordan-heater-1",
+    "stepId": "B4-09",
+    "questionId": null,
+    "words": "Price Alex M.'s water heater replacement at $640? It's over Sam's $500 limit, so Sam OKs it before Alex sees it.",
+    "shown": [{ "table": "quotes", "rowId": "quote-alex-heater", "version": 1 }],
+    "signature": "none",
+    "expiresAt": "2026-11-03T00:40:00Z"
+  }
+}

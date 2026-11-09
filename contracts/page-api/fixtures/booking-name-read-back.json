@@ -1,0 +1,35 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-21T23:16:12Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json"
+    ],
+    "note": "A4-23 on the page: Alex types his name for the business's list. The page entry swaps first (nothing to swap) and reads the words for safety (No: README default 50). Nothing is written; nothing on file is looked up or hinted at (A4-23: 'Nothing on file is looked up or hinted at yet'). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0019",
+      "traceId": "trace-page-lees-0019",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "change": { "kind": "name", "name": "Alex M." }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-lees-name-1",
+    "stepId": "A4-23",
+    "questionId": null,
+    "words": "Your name for Lee's Barbershop: Alex M.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:26:12Z"
+  }
+}

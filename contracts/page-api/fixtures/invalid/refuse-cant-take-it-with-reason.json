@@ -1,0 +1,21 @@
+{
+  "call": "bookingPick",
+  "given": {
+    "now": "2026-10-21T23:16:40Z",
+    "environment": "staging",
+    "after": ["booking-times-card.json"],
+    "note": "Refused: booking-pick-time.json's request answered cantTakeIt with its reason: the business can't take it with no reason given (S11-62), and the answer never tells a block, a pause, a safety hold or a booking limit apart, or that anything is on file for the number typed (S13-45; README default 57). With the error alone the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0023",
+      "traceId": "trace-page-lees-0023",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "cardId": "card-page-lees-0001",
+    "pick": { "optionId": "opt-page-lees-sat-1100" }
+  },
+  "outcome": { "error": "cantTakeIt", "why": "customerBlocked" }
+}

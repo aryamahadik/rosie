@@ -1,0 +1,29 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-21T23:15:40Z",
+    "environment": "staging",
+    "after": ["booking-page-start.json", "booking-service-haircut.json"],
+    "note": "Screen 4 (FS section 7: 'The place pick with both prices'; A4-01: '1 At the shop, 2 At my home'): Alex taps At the shop. Nothing is written: the page entry checks the way is one bookingService answered and kept with requestRef, and answers the read-back (README default 48), keeping the change, the call that will make it (K-09 v1.2 matchService, place) and the head's version with the read-back under its id. shown names only the way, which the page already holds by id (README default 48; v1.1 default 27). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0013",
+      "traceId": "trace-page-lees-0013",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "change": { "kind": "place", "wayId": "way-lees-haircut-shop" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-lees-place-1",
+    "stepId": "A4-01",
+    "questionId": null,
+    "words": "Haircut at the shop, $35",
+    "shown": [{ "table": "service_money", "rowId": "way-lees-haircut-shop", "version": 1 }],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:25:40Z"
+  }
+}
