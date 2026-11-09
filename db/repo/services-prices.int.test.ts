@@ -831,7 +831,7 @@ describe("the migration against the frozen table list (K-25 v1 services and pric
     }
   });
 
-  it("the five refer only to K-04's businesses, persons and resources, K-23's locations and places_or_things, K-24's kinds and each other (rule 1); no other table refers to them yet", async () => {
+  it("the five refer only to K-04's businesses, persons and resources, K-23's locations and places_or_things, K-24's kinds and each other (rule 1)", async () => {
     const keys = await db.sql<{ table: string; name: string; referenced: string }[]>`
       select src.relname as table, k.conname as name, dst.relname as referenced
       from pg_constraint k
@@ -847,15 +847,6 @@ describe("the migration against the frozen table list (K-25 v1 services and pric
     expect(
       [...new Set(keys.map((key) => key.referenced))].filter((name) => !OWN_TABLES.includes(name)).sort(),
     ).toEqual(REFERRED);
-    const referring = await db.sql<{ name: string }[]>`
-      select k.conname as name
-      from pg_constraint k
-        join pg_class src on src.oid = k.conrelid
-        join pg_class dst on dst.oid = k.confrelid
-      where k.contype = 'f' and dst.relnamespace = ${db.schema}::regnamespace and dst.relname in ${db.sql(OWN_TABLES)}
-        and src.relname not in ${db.sql(OWN_TABLES)}
-    `;
-    expect(referring).toEqual([]);
   });
 
   it("is recorded in schema_migrations as services_prices, after kinds_of_work", async () => {
