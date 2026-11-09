@@ -19,7 +19,9 @@
 //                               slotting with the trade's own sample table), where they sit between the master's steps,
 //                               so `next`, the branches' rejoinAt and the cards read the master steps around them.
 // A words op's `tells` and `why` are left out: K-01's words op does not hold them (fields overlay-core ignores are left
-// out). C8's void offs are kept until T-140's correction drops them.
+// out). C8's void offs are kept until T-140's correction drops them. Each message's opt-out line (its `stop` marker), in a
+// words op and in the steps an op adds, is the one stop-marks.ts placeStops() gives it from the trade's own walks
+// (T-1116; Q-30), not the marker the trade file wrote.
 import type { FlowLetter, MasterGraphs, RecordSlotRow } from "../graph/types.ts";
 import type { LoadedTrade, TradeOp, TradeSettings } from "../load/trade";
 import { applyTrade, type AppliedTrade } from "../overlay/apply";
@@ -27,6 +29,14 @@ import { tradeSwitches } from "../path";
 import { compileTradeBranches } from "../branches";
 import { sampleTable, slotFlow, slotMessage, slotText, type SampleTable } from "../slots";
 import { compileSteps, toBundleMessages, toBundleVary, toScreenRows, type BundleStep } from "./steps";
+import {
+  markSteps,
+  ownStepHolder,
+  placeMarks,
+  wordsOpHolder,
+  type MessageList,
+  type StopMarks,
+} from "./stop-marks";
 
 type Obj = Record<string, unknown>;
 
@@ -90,23 +100,35 @@ function slotRowsOf(trade: LoadedTrade, flow: FlowLetter, table: SampleTable): O
   return out;
 }
 
-/** A words op's messages and variants slotted with the trade's table, then written as K-01 messages. */
-function wordsOp(op: Extract<TradeOp, { op: "words" }>, table: SampleTable, where: string): Obj {
+/**
+ * A words op's messages and variants slotted with the trade's table, each message's opt-out line as `mark` gives it
+ * (its list, variant and index), then written as K-01 messages.
+ */
+function wordsOp(
+  op: Extract<TradeOp, { op: "words" }>,
+  table: SampleTable,
+  where: string,
+  mark: (list: readonly unknown[], kind: MessageList, vary: string | null) => unknown[],
+): Obj {
   const out: Obj = { op: "words", at: op.at };
   const raw = op as unknown as Obj;
   for (const field of ["does", "more", "say", "rule", "t", "form", "table", "title", "who", "to", "vary"]) {
     const value = raw[field];
     if (value === undefined) continue;
     if (field === "say") {
-      const slotted = (value as unknown[]).map((message) => slotMessage(message as unknown[], table));
+      const slotted = mark(value as unknown[], "say", null).map((message) =>
+        slotMessage(message as unknown[], table),
+      );
       out.say = toBundleMessages(slotted, `${where}.say`);
     } else if (field === "vary") {
       const vary: Obj = {};
       for (const [key, patch] of Object.entries(value as Obj)) {
         const copy: Obj = { ...(patch as Obj) };
-        for (const list of ["say", "addSay"]) {
+        for (const list of ["say", "addSay"] as const) {
           if (Array.isArray(copy[list]))
-            copy[list] = (copy[list] as unknown[]).map((message) => slotMessage(message as unknown[], table));
+            copy[list] = mark(copy[list] as unknown[], list === "say" ? "vary.say" : "vary.addSay", key).map(
+              (message) => slotMessage(message as unknown[], table),
+            );
         }
         if (Array.isArray(copy.swap))
           copy.swap = (copy.swap as unknown[]).map((pair) =>
@@ -157,18 +179,34 @@ function stepsOf(ids: readonly string[], compiled: Map<string, BundleStep>, wher
   });
 }
 
-/** One flow of the trade: its applied, slotted flow, and the K-01 tradeFlow. */
+/**
+ * One flow of the trade: its applied, slotted flow, and the K-01 tradeFlow. `stops` is placeStops() of the flow over
+ * the bundle's trades: the messages of the trade's words ops and of the steps its ops add are marked as it gives them.
+ */
 function compileTradeFlow(
   master: MasterGraphs,
   trade: LoadedTrade,
   flow: FlowLetter,
+  stops: StopMarks,
 ): { value: Obj; steps: Map<string, BundleStep> } {
   const where = `${trade.id} flow ${flow}`;
+  if (stops.flow !== flow) throw new Error(`${where}: the opt-out line's marks are flow ${stops.flow}'s`);
+  if (stops.paths[trade.id] === undefined)
+    throw new Error(`${where}: the opt-out line's marks walked no path of ${trade.id}`);
   const applied = applyTrade(master[flow], trade);
   const table = sampleTable(master, flow, trade, applied.flow);
-  const slotted: AppliedTrade = { ...applied, flow: slotFlow(applied.flow, table) };
   const ops = trade.flows[flow].ops;
   const added = addedIds(ops);
+  const slottedFlow = slotFlow(applied.flow, table);
+  const slotted: AppliedTrade = {
+    ...applied,
+    flow: {
+      ...slottedFlow,
+      steps: markSteps(stops, slottedFlow.steps, (step) =>
+        added.has(step.id) ? ownStepHolder(trade.id, step.id) : null,
+      ),
+    },
+  };
   const compiled = compileSteps(slotted, added);
   const branches = compileTradeBranches(slotted);
 
@@ -184,7 +222,9 @@ function compileTradeFlow(
       case "more":
         return { op: "more", at: op.at, more: structuredClone(op.more) };
       case "words":
-        return wordsOp(op, table, at);
+        return wordsOp(op, table, at, (list, kind, vary) =>
+          placeMarks(stops, list, wordsOpHolder(trade.id, n), kind, vary),
+        );
       case "after":
       case "before": {
         const ids = ownIds(op.steps);
@@ -218,12 +258,19 @@ function compileTradeFlow(
   return { value, steps: compiled.steps };
 }
 
-/** Compiles one trade's overlay (K-01 `tradeOverlay`). */
-export function compileTrade(master: MasterGraphs, trade: LoadedTrade): CompiledTrade {
+/**
+ * Compiles one trade's overlay (K-01 `tradeOverlay`). `stops` is placeStops() of each flow over the bundle's trades,
+ * this one among them.
+ */
+export function compileTrade(
+  master: MasterGraphs,
+  trade: LoadedTrade,
+  stops: Readonly<Record<FlowLetter, StopMarks>>,
+): CompiledTrade {
   const flows: Obj = {};
   const steps = {} as Record<FlowLetter, Map<string, BundleStep>>;
   for (const flow of FLOWS) {
-    const part = compileTradeFlow(master, trade, flow);
+    const part = compileTradeFlow(master, trade, flow, stops[flow]);
     flows[flow] = part.value;
     steps[flow] = part.steps;
   }

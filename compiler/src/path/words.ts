@@ -6,7 +6,8 @@
 //                                      (a switch, a booking value), amount, record and time slots, layer lines.
 //   applyStops(step, rec)              the opt-out element ("stop": "first") settled for the walked path.
 //   walkPath(applied, path)            every step the path lights, in page order, with the words each shows and which
-//                                      of its branches are lit.
+//                                      of its branches are lit. Its opt-out line is applyStops' unless the caller gives
+//                                      another rule (`settle`): Master Corrections' is corrections/stops.ts walkStops.
 //
 // All four call the vendored functions (NQ-PB-2: wrap). The vendored tables are module state, so each call that reads
 // them first makes them read `applied` (syncFlow): the money ways, D75 mark and booking record of that trade's flow.
@@ -102,20 +103,36 @@ export interface PathWalk {
   steps: LitStep[];
 }
 
+/** How walkPath() reads a path. */
+export interface WalkOptions {
+  /** false: every step read with the walked path alone, once (step.js --path); default: a branch's `sets` followed. */
+  sets?: boolean;
+  /**
+   * How each lit step's opt-out line is settled: given the words the step shows on its reading (resolveVary) and its
+   * id, the words the walk gives it. Default: the master's applyStops over firstTexts of the walked path, as step.js
+   * settles it. Master Corrections C9 and Q-30 settle it per person instead: corrections/stops.ts walkStops (T-1116).
+   */
+  settle?: (words: AppliedStep, id: string) => AppliedStep;
+}
+
 /**
  * Walks one path over the applied flow as the master's tools do (lib.js litSteps): a step is skipped where it is off or
  * its `when` does not fit; each lit branch's steps follow it; once a branch with `sets` is lit, its steps and the steps
  * after it rejoins read the path with that value. The words of each lit step are picked with resolveVary and its
- * opt-out line settled with applyStops over firstTexts of the walked path.
+ * opt-out line settled with applyStops over firstTexts of the walked path, or by `options.settle` when it is given.
  *
  * `{ sets: false }` reads every step with the walked path alone, one entry per step, as step.js --path prints a step
  * (it ignores `sets`); the default follows `sets`, so a step after such a split can appear once per reading.
  */
-export function walkPath(applied: AppliedTrade, path: TradePath, options: { sets?: boolean } = {}): PathWalk {
+export function walkPath(applied: AppliedTrade, path: TradePath, options: WalkOptions = {}): PathWalk {
   const { core } = loadPathScripts();
   syncFlow(applied.flow);
   const walked = toCorePath(path);
-  const stops = core.firstTexts(applied.flow.steps, walked, { names: applied.flow.names });
+  const stops =
+    options.settle === undefined
+      ? core.firstTexts(applied.flow.steps, walked, { names: applied.flow.names })
+      : null;
+  const settle = options.settle ?? ((words: AppliedStep, id: string) => core.applyStops(words, stops?.[id]));
   const steps: LitStep[] = [];
 
   const visit = (step: AppliedStep, reading: typeof walked, trail: string[]): void => {
@@ -130,7 +147,7 @@ export function walkPath(applied: AppliedTrade, path: TradePath, options: { sets
       trail,
       reading: fromCorePath(reading, path.flow, path.kind),
       step,
-      words: core.applyStops(varied.step, stops[step.id]),
+      words: settle(varied.step, step.id),
       keys: varied.keys,
       choice: varied.choice,
       tie: varied.tie,

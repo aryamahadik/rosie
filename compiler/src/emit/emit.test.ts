@@ -5,18 +5,29 @@
 //
 // The stand-in bundle id here is GIVEN_ID (ab repeated, build 7): a bundle id is T-150's, so the test passes one in,
 // as the build command's --bundle-id does; the emitter's own stand-in (64 zeros, build 1) is checked in cli.test.ts.
+//
+// T-1116 (Q-30; DL-211): in barber's bundle, Rosie's first reply to a staff member (S2-06) and to the emergency contact
+// (S1-78) carries the opt-out line once, with S13-01's word that the opener and the privacy link ride it, and no later
+// reply to them carries it; and every message of the bundle carries the marker walkStops() gives it on barber's paths.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import { beforeAll, describe, expect, it } from "vitest";
+import type { FlowLetter } from "../graph/types.ts";
 import { S13_32_LINES } from "../corrections/c1";
+import { FIRST_REPLY_LINES } from "../corrections/c9";
+import { applyCorrections } from "../corrections/framework";
+import { walkStops } from "../corrections/stops";
 import { buildKeyMap } from "../keymap";
 import { loadMaster } from "../load/flow";
 import { loadTrade } from "../load/trade";
 import { buildKeywords } from "../msgtext";
+import { applyTrade, type AppliedStep } from "../overlay/apply";
+import { tradePaths } from "../path";
 import {
   buildBundle,
   byteLength,
+  correctedFlow,
   markedRules,
   messageTuple,
   settingsFor,
@@ -82,12 +93,15 @@ let again: BuiltBundle;
 let manifest: Manifest;
 let flows: Record<"A" | "B", Flow>;
 
+// The emitter walks every path of each trade to place the opt-out line (T-1116): about 9 s for the first build of these
+// two trades on a quiet build Mac (the second reuses the walks). The hook's own limit is a resource guard, as the
+// project's 30 s is (T-1073), not part of any claim here.
 beforeAll(async () => {
   built = await buildBundle(OPTIONS);
   again = await buildBundle(OPTIONS);
   manifest = built.bundle.manifest as unknown as Manifest;
   flows = built.bundle.flows as unknown as Record<"A" | "B", Flow>;
-});
+}, 120_000);
 
 describe("the bundle validates against K-01 v1 with Ajv", () => {
   // The one validator (contracts file section 2 item 8): Ajv 8, its 2020-12 class, strict mode, as
@@ -465,5 +479,226 @@ describe("the values K-01 v1 writes otherwise than the sources", () => {
     const typed = Object.values(master.B.steps).filter((step) => step.type === "step");
     expect(typed.length).toBeGreaterThan(0);
     for (const step of typed) expect(flows.B.steps[step.id], step.id).not.toHaveProperty("type");
+  });
+});
+
+// ---- T-1116: the opt-out line as corrections/stops.ts walkStops() places it, in the emitted bundle ----
+
+/** A message as the bundle writes it (K-01 message). */
+interface Said {
+  from: string;
+  to: string;
+  text: string;
+  elements?: { as?: unknown; stop?: unknown };
+  plainText: string;
+}
+interface MarkedStep {
+  say?: Said[];
+  vary?: Record<string, { say?: Said[]; addSay?: Said[] }>;
+}
+
+const FIXED = readJson("contracts/bundle/fixtures/fixed-lines.json") as {
+  lines: { id: string; text: string | null; use: string }[];
+};
+const OPT_OUT = FIXED.lines.find((line) => line.id === "optOutLine")?.text ?? "";
+
+type Line = readonly unknown[];
+
+/** The name a message gives its person (`as`), or undefined. */
+function nameOf(message: Line): string | undefined {
+  const elements = message[3];
+  const as =
+    typeof elements === "object" && elements !== null ? (elements as { as?: unknown }).as : undefined;
+  return typeof as === "string" && as !== "" ? as : undefined;
+}
+
+/** How many times `part` is in `text`. */
+function times(text: string, part: string): number {
+  return text.split(part).length - 1;
+}
+
+/** Every step of an applied flow, branch steps too, by id. */
+function stepsById(
+  steps: readonly AppliedStep[],
+  out = new Map<string, AppliedStep>(),
+): Map<string, AppliedStep> {
+  for (const step of steps) {
+    out.set(step.id, step);
+    for (const branch of step.branches ?? []) stepsById(branch.steps, out);
+  }
+  return out;
+}
+
+describe("barber's bundle: Rosie's first reply to staff (S2-06) and to the emergency contact (S1-78) carries the opt-out line and the privacy link once (T-1116; Q-30)", () => {
+  let barber: BuiltBundle;
+  beforeAll(async () => {
+    barber = await buildBundle({ trades: ["barber"], bundleId: GIVEN_ID, builtAt: BUILT_AT });
+  }, 120_000);
+
+  const graphOf = (flow: FlowLetter): Record<string, MarkedStep> =>
+    (barber.bundle.flows[flow] as { steps: Record<string, MarkedStep> }).steps;
+
+  // Who each message goes to is read from the words the emitter compiles, before their sample names are slotted (the
+  // bundle writes every staff member's `as` as {{pro.name}}): the person's own text opens their chat, and Rosie's next
+  // text to the same lane and name is her first reply in it. The bundle holds the same messages at the same places.
+  it.each([
+    ["A", "S2-06", "staff"],
+    ["B", "S2-06", "staff"],
+    ["A", "S1-78", "other"],
+    ["B", "S1-78", "other"],
+  ] as const)(
+    "flow %s %s: the %s's first reply has the line once; no other text to them in the step has it",
+    (flow, id, lane) => {
+      const words = stepsById(correctedFlow(loadMaster(), flow).flow.steps).get(id)?.say ?? [];
+      const opened = words.findIndex((message) => message[0] === lane && message[1] === "san");
+      expect(opened, `${flow} ${id}: the ${lane}'s own text opens their chat`).toBeGreaterThanOrEqual(0);
+      const person = nameOf(words[opened] ?? []);
+      expect(person, `${flow} ${id}: the person is named`).toBeTypeOf("string");
+      const reply = words.findIndex(
+        (message, k) =>
+          k > opened && message[0] === "san" && message[1] === lane && nameOf(message) === person,
+      );
+      expect(reply, `${flow} ${id}: Rosie's first reply to ${String(person)}`).toBeGreaterThan(opened);
+
+      const said = graphOf(flow)[id]?.say ?? [];
+      expect(said).toHaveLength(words.length);
+      const first = said[reply];
+      expect(first?.elements?.stop, `${flow} ${id}: the line on the first reply, on every walk`).toBe(true);
+      expect(times(first?.plainText ?? "", OPT_OUT), `${flow} ${id}: the opt-out line, once`).toBe(1);
+      said.forEach((message, k) => {
+        if (k === reply) return;
+        expect(message.elements?.stop, `${flow} ${id} say[${String(k)}]`).toBeUndefined();
+        expect(times(message.plainText, OPT_OUT), `${flow} ${id} say[${String(k)}]`).toBe(0);
+      });
+      // The opener and the privacy link are fixed lines the run time puts on the message the line renders on (C-089):
+      // S13-01 says that reply carries them, and the bundle's fixed lines hold the opener, with the privacy-notice link.
+      const s1301 = (graphOf(flow)["S13-01"] as { more?: string[] } | undefined)?.more ?? [];
+      for (const line of FIRST_REPLY_LINES) expect(s1301).toContain(line);
+      const lists = (barber.bundle.manifest as { lists: { fixedLines: typeof FIXED } }).lists;
+      expect(lists.fixedLines.lines.find((line) => line.id === "optOutLine")?.text).toBe(OPT_OUT);
+      expect(lists.fixedLines.lines.find((line) => line.id === "opener")?.use).toContain(
+        "privacy-notice link",
+      );
+    },
+  );
+
+  it.each([
+    ["A", "S2-06", "staff"],
+    ["B", "S2-06", "staff"],
+    ["A", "S1-78", "other"],
+    ["B", "S1-78", "other"],
+  ] as const)("flow %s %s: no later text to that %s has the line for sure", (flow, id, lane) => {
+    // A person's texts anywhere in the flow, by the compiled words' own names: a message to the lane names its person
+    // (`as`), or the step's `as` names the step's customer or staff member, or it is the lane's own person (the flow's
+    // names). None but the first reply has `true`: a "first" shows the line only where the message is the first text
+    // that person gets on the walk, which no text after a reply with the line on every walk is.
+    const corrected = correctedFlow(loadMaster(), flow).flow;
+    const steps = stepsById(corrected.steps);
+    const own = steps.get(id)?.say ?? [];
+    const opened = own.findIndex((message) => message[0] === lane && message[1] === "san");
+    const person = nameOf(own[opened] ?? []);
+    const reply = own.findIndex(
+      (message, k) => k > opened && message[0] === "san" && message[1] === lane && nameOf(message) === person,
+    );
+    expect(reply).toBeGreaterThan(opened);
+    const named: readonly string[] = ["cust", "staff"];
+    const stepName = (step: AppliedStep): string | undefined =>
+      typeof step.as === "string" && named.includes(lane) && (step.to === lane || step.who === lane)
+        ? step.as
+        : undefined;
+    const theirs = (step: AppliedStep, message: Line): boolean =>
+      message[0] === "san" &&
+      message[1] === lane &&
+      (nameOf(message) ?? stepName(step) ?? corrected.names[lane]) === person;
+    const graph = graphOf(flow);
+    const sure: string[] = [];
+    let looked = 0;
+    for (const [stepId, step] of steps) {
+      const lists: [readonly Line[] | undefined, Said[] | undefined, string][] = [
+        [step.say, graph[stepId]?.say, "say"],
+      ];
+      for (const [key, patch] of Object.entries(step.vary ?? {})) {
+        const words = patch as { say?: Line[]; addSay?: Line[] };
+        lists.push([words.say, graph[stepId]?.vary?.[key]?.say, `vary ${key} say`]);
+        lists.push([words.addSay, graph[stepId]?.vary?.[key]?.addSay, `vary ${key} addSay`]);
+      }
+      for (const [words, said, where] of lists)
+        (words ?? []).forEach((message, k) => {
+          if (!theirs(step, message)) return;
+          looked += 1;
+          if (said?.[k]?.elements?.stop === true) sure.push(`${stepId} ${where}[${String(k)}]`);
+        });
+    }
+    expect(looked, `${flow}: texts to ${String(person)}`).toBeGreaterThan(0);
+    expect(sure, `${flow}: the line for sure in ${String(person)}'s chat`).toStrictEqual([
+      `${id} say[${String(reply)}]`,
+    ]);
+  });
+
+  it("every message of the bundle carries the marker walkStops() gives it on barber's paths", () => {
+    // An independent walk of the same words: barber applied to the master, then corrected (as stops.test.ts and the
+    // parity sweep walk it), every path, each lit step's settled words read by step and index. Checked on every step
+    // whose words are the same on every path (no variant that writes messages) and that no words op of barber's writes:
+    // the master graph's steps, and the steps barber's ops add. Over the paths, a message is `true` where every path that
+    // shows it gives it the line for sure, "first" where some gives it the line, and has no marker anywhere else.
+    const trade = loadTrade("barber");
+    for (const flow of ["A", "B"] as const) {
+      const done = applyCorrections(applyTrade(loadMaster()[flow], trade));
+      const steps = stepsById(done.flow.steps);
+      const written = new Set(
+        trade.flows[flow].ops.flatMap((op) =>
+          op.op === "words" && (op.say !== undefined || op.vary !== undefined) ? [op.at] : [],
+        ),
+      );
+      const plain = (step: AppliedStep): boolean =>
+        !written.has(step.id) &&
+        Object.values(step.vary ?? {}).every((patch) => {
+          const words = patch as { say?: unknown; addSay?: unknown };
+          return words.say === undefined && words.addSay === undefined;
+        });
+      const seen = new Map<string, { line: boolean; always: boolean }>();
+      for (const path of tradePaths(done, trade)) {
+        for (const entry of walkStops(done, path).steps) {
+          if (!plain(entry.step)) continue;
+          (entry.words.say ?? []).forEach((message, k) => {
+            const stop = ((message as Line)[3] as { stop?: unknown } | undefined)?.stop;
+            const key = `${entry.id} ${String(k)}`;
+            const was = seen.get(key) ?? { line: false, always: true };
+            seen.set(key, {
+              line: was.line || stop === true || stop === "first",
+              always: was.always && stop === true,
+            });
+          });
+        }
+      }
+      const want = (id: string, k: number): unknown => {
+        const what = seen.get(`${id} ${String(k)}`);
+        return what?.line === true ? (what.always ? true : "first") : undefined;
+      };
+      const graph = graphOf(flow);
+      const added = new Map<string, MarkedStep>();
+      const ops =
+        (
+          barber.bundle.trades.barber?.flows as Record<
+            string,
+            { ops: { steps?: (MarkedStep & { id: string })[] }[] }
+          >
+        )[flow]?.ops ?? [];
+      for (const op of ops) for (const step of op.steps ?? []) added.set(step.id, step);
+      let compared = 0;
+      let lines = 0;
+      for (const [id, step] of steps) {
+        if (!plain(step)) continue;
+        const said = (step.own === true ? added.get(id) : graph[id])?.say ?? [];
+        expect(said, `${flow} ${id}`).toHaveLength(step.say?.length ?? 0);
+        said.forEach((message, k) => {
+          compared += 1;
+          if (want(id, k) !== undefined) lines += 1;
+          expect(message.elements?.stop, `${flow} ${id} say[${String(k)}]`).toBe(want(id, k));
+        });
+      }
+      expect(compared, `${flow}: messages compared`).toBeGreaterThan(500);
+      expect(lines, `${flow}: messages with the line`).toBeGreaterThan(10);
+    }
   });
 });

@@ -17,6 +17,7 @@ export {
 export {
   MASTER_TRADE,
   compileFlow,
+  correctedFlow,
   correctedMaster,
   masterShape,
   type CompiledFlow,
@@ -66,6 +67,19 @@ export {
   type BundleStep,
   type CompiledSteps,
 } from "./steps";
+export {
+  TRACE,
+  markOf,
+  masterHolder,
+  messageKey,
+  ownStepHolder,
+  placeStops,
+  withStop,
+  wordsOpHolder,
+  type MessageList,
+  type StopMark,
+  type StopMarks,
+} from "./stop-marks";
 export { compileTrade, settingsFor, type CompiledTrade } from "./trade";
 export {
   BUNDLE_SCHEMA_ID,
