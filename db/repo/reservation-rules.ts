@@ -12,11 +12,15 @@
 //                  through reservations_saved_times, which runs unscoped and gives only ids and ends) or for one agent
 //                  token at one business (a transaction-level advisory lock on the business and the token) is refused
 //                  with savedTimeCap and both ends. Waiting rows never count (A4-18).
-//   next in line   a time someone else saved, asked with waitIfSaved, becomes a waiting row whose place is `at`.
+//   next in line   a time someone else saved, asked with waitIfSaved, becomes a waiting row whose place is `at`. A
+//                  holder (a mobile, or an agent token at one business: the cap's) that already holds or waits on that
+//                  slot writes nothing and gets its own row back, as its first save got it (T-1134 rule (1)).
 //   promotion      release() of a held or booked row holds the first waiting row of the same resource whose time
 //                  overlaps (queued_at, a tie to the lower id) for 10 minutes, passing over a capped one or one EXCLUDE
 //                  refuses. It locks the row first, so of many parallel releases only one releases and promotes; the
-//                  others answer repeated, with no promotion.
+//                  others answer repeated, with no promotion. The released holder's own waiting rows in that line are
+//                  never promoted: they are let go with it (T-1134 rule (2)), so MC C3's 15 minutes are never extended
+//                  through the line.
 //
 // extend() is this file's (item 10): a saved time gets its one extension, 10 more minutes on its old end (arch 05 line
 // 247: "Offered 10 more minutes once, before it ends"; Q-12's default), never on the ownAi door (MC C3: "the 15 minutes

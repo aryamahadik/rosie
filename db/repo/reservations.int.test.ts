@@ -1576,3 +1576,214 @@ describe("a lost connection answers transient, writes nothing, and the same requ
     }
   }, 30_000);
 });
+
+describe("T-1134: one row per holder per slot, in reserve and release themselves (DL-292)", () => {
+  const LEES = "biz-lees-barbershop";
+  const ALEX = "+15555550101";
+
+  /** reserveIn or releaseIn as the Tool API's role, in one transaction on a reserved connection scoped to `businessId`. */
+  async function inToolApiTransaction<T>(businessId: string, fn: (tx: Sql) => Promise<T>): Promise<T> {
+    const reserved = await db.sql.reserve();
+    try {
+      await reserved`begin`;
+      try {
+        await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
+        await reserved.unsafe("set local role rosie_app");
+        const result = await fn(reserved);
+        await reserved`commit`;
+        return result;
+      } catch (error) {
+        await reserved`rollback`;
+        throw error;
+      }
+    } finally {
+      reserved.release();
+    }
+  }
+
+  /** A waiting row written straight into the table, as reserve wrote one before T-1134, for Alex's mobile. */
+  async function alexQueuedAsBefore(
+    id: string,
+    resourceId: string,
+    personId: string,
+    during: string,
+    queuedAt: string,
+  ): Promise<void> {
+    await db.sql`insert into reservations ${db.sql({
+      id,
+      business_id: LEES,
+      resource_id: resourceId,
+      resource_kind: "worker",
+      worker_person_id: personId,
+      during,
+      state: "waiting",
+      queued_at: queuedAt,
+      for_phone_number: ALEX,
+    })}`;
+  }
+
+  it("with waitIfSaved, a holder's second save of the slot it holds writes nothing and answers its row; without waitIfSaved it is still an overlap; another holder waits under its own id", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    const own = { agentToken: "agent-token-t1134" };
+    const first = await reserve(db.sql, request({ reservationId: "own-1", for: own, waitIfSaved: true }));
+    expect(first).toMatchObject({ result: "held", reservationId: "own-1", version: 1, repeated: false });
+    expect(await reserve(db.sql, request({ reservationId: "own-2", for: own, waitIfSaved: true }))).toEqual({
+      ...first,
+      repeated: true,
+    });
+    expect(await reserve(db.sql, request({ reservationId: "own-3", for: own }))).toEqual({
+      error: "overlap",
+      resourceId: "res-riley",
+    });
+    for (const id of ["own-2", "own-3"]) {
+      expect(await getReservation(db.sql, id), id).toBeNull();
+    }
+    expect(await reserve(db.sql, request({ reservationId: "other-1", waitIfSaved: true }))).toMatchObject({
+      result: "waiting",
+      reservationId: "other-1",
+      repeated: false,
+    });
+  });
+
+  it("reserveIn as the Tool API's role: Tomás, waiting on Avery's saved time (reserve-next-in-line.json), asks again and gets his waiting row back, with nothing written", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    const fixture = readJson(new URL("reserve-next-in-line.json", ACCESS_DIR)) as AccessFixture;
+    const asked = fixture.request as ReserveRequest;
+    expect(await inToolApiTransaction(LEES, (tx) => reserveIn(tx, asked))).toEqual(fixture.outcome);
+    const again = { ...asked, reservationId: "rsv-tomas-avery-again", at: "2026-11-07T15:07:00Z" };
+    expect(await inToolApiTransaction(LEES, (tx) => reserveIn(tx, again))).toEqual({
+      ...(fixture.outcome as Record<string, unknown>),
+      repeated: true,
+    });
+    expect(await getReservation(db.sql, "rsv-tomas-avery-again")).toBeNull();
+  });
+
+  it("releaseIn as the Tool API's role lets go every waiting row of the released holder in its line, before and after the one it promotes, and nothing else", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // Alex's mobile holds Avery's Nov 14 time; two agent tokens wait on it (15:02, 15:04). Alex's own waiting rows: one in
+    // that line before everyone (15:01), one after (15:05), and two outside it (Avery another day, Riley that time).
+    await alexQueuedAsBefore(
+      "rsv-alex-wait-first",
+      "res-avery",
+      "person-avery",
+      "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+      "2026-11-07T15:01:00Z",
+    );
+    await alexQueuedAsBefore(
+      "rsv-alex-wait-last",
+      "res-avery",
+      "person-avery",
+      "[2026-11-14T15:15:00Z,2026-11-14T15:45:00Z)",
+      "2026-11-07T15:05:00Z",
+    );
+    await alexQueuedAsBefore(
+      "rsv-alex-wait-later",
+      "res-avery",
+      "person-avery",
+      "[2026-11-21T15:00:00Z,2026-11-21T15:30:00Z)",
+      "2026-11-07T15:01:00Z",
+    );
+    await alexQueuedAsBefore(
+      "rsv-alex-wait-riley",
+      "res-riley",
+      "person-riley",
+      "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+      "2026-11-07T15:01:00Z",
+    );
+    const outcome = await inToolApiTransaction(LEES, (tx) =>
+      releaseIn(tx, {
+        reservationId: "rsv-alex-saved-avery",
+        businessId: LEES,
+        expectVersion: 1,
+        why: "let_go",
+        at: "2026-11-07T15:06:00Z",
+      }),
+    );
+    expect(outcome).toEqual({
+      result: "released",
+      reservationId: "rsv-alex-saved-avery",
+      version: 2,
+      releasedAt: "2026-11-07T15:06:00Z",
+      why: "let_go",
+      promoted: {
+        reservationId: "rsv-agent-waiting-avery",
+        version: 2,
+        heldUntil: "2026-11-07T15:16:00Z",
+        forPhoneNumber: null,
+        forAgentToken: "agent-token-demo-2",
+        bookingId: null,
+        savedTimeClockId: "rsv-agent-waiting-avery/saved-time",
+      },
+      skipped: [],
+      repeated: false,
+    });
+    const rows = await db.sql<
+      { id: string; state: string; why: string | null; at: Date | null; version: number }[]
+    >`
+      select id, state, released_why as why, released_at as at, version from reservations
+      where for_phone_number = ${ALEX} or resource_id = 'res-avery'
+      order by id collate "C"
+    `;
+    const letGo = { state: "released", why: "let_go", at: new Date("2026-11-07T15:06:00Z"), version: 2 };
+    expect(rows.map((row) => ({ ...row }))).toEqual([
+      { id: "rsv-agent-waiting-avery", state: "held", why: null, at: null, version: 2 },
+      { id: "rsv-agent-waiting-avery-second", state: "waiting", why: null, at: null, version: 1 },
+      { id: "rsv-alex-haircut", state: "booked", why: null, at: null, version: 2 },
+      { id: "rsv-alex-saved-avery", ...letGo },
+      { id: "rsv-alex-wait-first", ...letGo },
+      { id: "rsv-alex-wait-last", ...letGo },
+      { id: "rsv-alex-wait-later", state: "waiting", why: null, at: null, version: 1 },
+      { id: "rsv-alex-wait-riley", state: "waiting", why: null, at: null, version: 1 },
+    ]);
+  });
+
+  it("a booked row's release does the same: Alex's cancelled haircut lets his own waiting row go and promotes the agent token in line", async () => {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-reservation.json");
+    // Alex's haircut with Riley is booked for Oct 24, 15:00 to 15:30 (seed-reservation).
+    await alexQueuedAsBefore(
+      "rsv-alex-wait-haircut",
+      "res-riley",
+      "person-riley",
+      "[2026-10-24T15:00:00Z,2026-10-24T15:30:00Z)",
+      "2026-10-20T10:00:00Z",
+    );
+    await db.sql`insert into reservations ${db.sql({
+      id: "rsv-token-wait-haircut",
+      business_id: LEES,
+      resource_id: "res-riley",
+      resource_kind: "worker",
+      worker_person_id: "person-riley",
+      during: "[2026-10-24T15:00:00Z,2026-10-24T15:30:00Z)",
+      state: "waiting",
+      queued_at: "2026-10-20T10:01:00Z",
+      for_agent_token: "agent-token-t1134",
+    })}`;
+    const outcome = await release(db.sql, {
+      reservationId: "rsv-alex-haircut",
+      businessId: LEES,
+      expectVersion: 2,
+      why: "cancelled",
+      at: "2026-10-21T09:00:00Z",
+    });
+    expect(outcome).toMatchObject({
+      result: "released",
+      why: "cancelled",
+      promoted: {
+        reservationId: "rsv-token-wait-haircut",
+        heldUntil: "2026-10-21T09:10:00Z",
+        forAgentToken: "agent-token-t1134",
+      },
+      skipped: [],
+    });
+    expect(await getReservation(db.sql, "rsv-alex-wait-haircut")).toMatchObject({
+      state: "released",
+      releasedAt: "2026-10-21T09:00:00Z",
+      releasedWhy: "let_go",
+      version: 2,
+    });
+  });
+});
