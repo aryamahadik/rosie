@@ -9,17 +9,30 @@
 // automated-assistant opener and the privacy link, and says the same rule renders the flows' stop: "first" markers.
 //
 //   chatTexts(applied, path)   walks one path as overlay-core.js firstTexts() does, and records for each text Rosie
-//                              sends a number whether that number had opened its chat (texted Rosie) before it on the
-//                              walk, and whether it is Rosie's first reply in that chat.
+//                              sends a person whether that person had opened the chat (texted Rosie in it) before it
+//                              on the walk, and whether it is Rosie's first reply in that chat.
 //   settleStops(step, rec)     the override of applyStops() for a walked path: the line (`stop: true`) on Rosie's first
 //                              reply in an opened chat when it is that on every walk, "first" where it depends on the
 //                              walk, and no marker on any other message: never on a text to a chat nobody opened.
 //   walkStops(applied, path)   walkPath() with each lit step's words settled by settleStops() over chatTexts().
 //
+// A chat belongs to a person, not to a role word (DL-211). The person is the lane with the name the message gives
+// (`as`), as overlay-core.js textTo reads it, with two readings of the master's words on top:
+//   - The helper. On S1-09's branch "Helps run it; not an owner", the person who has texted Rosie as the owner since
+//     signup began is a helper, and S1-77 names them (`as`: "Pat" in the master). From S1-77 on, that walk's chat so
+//     far is the helper's, and the owner lane's unnamed messages are the helper's. S1-77's own unnamed messages are the
+//     real owner's: their chat opens with their ready text there (C9). S1-10 says so too: "On the helper path it sets
+//     only the helper's own sign-in. The owner's comes from S1-77's link." A message that names the owner (`as` the
+//     owner's name) is the real owner's on every walk.
+//   - The mobile. S1-10 asks for the one mobile only the person uses and "texts the secure ID check to it", so that
+//     card goes to the chat of that mobile. After C9 the person first texts Rosie from it (FROM_MOBILE), which opens
+//     that chat, and Rosie answers them there from then on; before C9 the card is Rosie writing first.
+//
 // The opener and the privacy link are fixed lines the action layer adds at run time (C-089, not here): the compiled
 // words say only which message carries them, the one the line renders on.
 import type { AppliedStep, AppliedTrade } from "../overlay/apply";
 import { lit, resolveVary, walkPath, type LitStep, type TradePath } from "../path";
+import { FROM_MOBILE } from "./c9";
 
 /** The lanes with a number Rosie can text (overlay-core.js textTo: NUMBER). */
 export const NUMBER_LANES: readonly string[] = ["cust", "owner", "staff", "other"];
@@ -30,16 +43,26 @@ export const TEXT_VIA: readonly string[] = ["msg", "auto", "portal"];
 /** Booking reach values on which the booking customer gets no texts at all (overlay-core.js textTo). */
 const NOT_TEXTED: readonly string[] = ["callsonly", "email", "notsafe"];
 
-/** How many walk states are kept at once (overlay-core.js firstTexts: CAP). */
-const CAP = 48;
+/** The step on S1-09's helper branch that names the helper (`as`) and writes the real owner unnamed. */
+export const HELPER_STEP = "S1-77";
 
-/** One text Rosie sends a number on a walked path. */
+/** The step that asks for the one mobile only the person uses and texts the secure ID check to it. */
+export const MOBILE_STEP = "S1-10";
+
+/** What a chat's key adds for the chat a person's mobile opened (S1-10): `owner@mobile`. */
+export const MOBILE_CHAT = "@mobile";
+
+/** One text Rosie sends a person on a walked path. */
 export interface ChatText {
-  /** The number: the lane, with `:<as>` for a named person on a shared lane (overlay-core.js textTo). */
+  /**
+   * The chat, on the first walk that reaches the text: the person (the lane, with `:<as>` for a named person on a
+   * shared lane, as overlay-core.js textTo reads it; the helper on S1-09's helper branch), with `@mobile` for the chat
+   * their mobile opened at S1-10.
+   */
   to: string;
-  /** On some walk to it, the number had not texted Rosie yet, so Rosie would write first (C9 forbids it). */
+  /** On some walk to it, the person had not texted Rosie in that chat yet, so Rosie would write first (C9 forbids it). */
   unopened: boolean;
-  /** On some walk to it, it is Rosie's first reply in a chat the number opened. */
+  /** On some walk to it, it is Rosie's first reply in a chat the person opened. */
   first: boolean;
   /** On some walk to it, Rosie had already replied in that chat. */
   later: boolean;
@@ -66,24 +89,28 @@ function isTextStep(step: Readonly<AppliedStep>): boolean {
   return TEXT_VIA.includes(step.via) && step.kind !== "rule";
 }
 
-/** The person a message names on `lane`: its own `as`, else the step's `as` for its customer or staff (textTo). */
+/** The name a message gives the person on `lane`: its own `as`, else the step's `as` for its customer or staff (textTo). */
+function nameOf(step: Readonly<AppliedStep>, lane: string, message: Line): string {
+  const own = elementsOf(message)?.as;
+  if (typeof own === "string" && own !== "") return own;
+  if (
+    typeof step.as === "string" &&
+    (lane === step.to || lane === step.who) &&
+    (lane === "cust" || lane === "staff")
+  )
+    return step.as;
+  return "";
+}
+
+/** The person a message names on `lane`: the lane, with `:<as>` for a named person who is not the lane's own (textTo). */
 function personOf(
   step: Readonly<AppliedStep>,
   lane: string,
   message: Line,
   names: Readonly<Record<string, string>>,
 ): string {
-  const own = elementsOf(message)?.as;
-  let as = "";
-  if (typeof own === "string" && own !== "") as = own;
-  else if (
-    typeof step.as === "string" &&
-    (lane === step.to || lane === step.who) &&
-    (lane === "cust" || lane === "staff")
-  )
-    as = step.as;
-  if (as !== "" && names[lane] === as) as = "";
-  return as === "" ? lane : `${lane}:${as}`;
+  const as = nameOf(step, lane, message);
+  return as === "" || names[lane] === as ? lane : `${lane}:${as}`;
 }
 
 /** The number a message from Rosie texts on the path, or null when it texts nobody (overlay-core.js textTo). */
@@ -113,36 +140,112 @@ export function senderNumber(
   return personOf(step, from, message, names);
 }
 
-interface ChatState {
-  /** The numbers that have texted Rosie on this walk. */
-  opened: ReadonlySet<string>;
-  /** The numbers Rosie has replied to in their opened chat on this walk. */
-  replied: ReadonlySet<string>;
+/** Where a chat stands on a walk: nobody has texted Rosie in it, a person has and Rosie has not replied, Rosie has. */
+type Status = "unopened" | "opened" | "replied";
+
+const UNOPENED: ReadonlySet<Status> = new Set<Status>(["unopened"]);
+
+/**
+ * The walks so far that read the people alike (the same signer, the same people texting from their mobile), with the
+ * statuses each chat has on them. A chat's status changes only with the texts in that chat, so the statuses it has on
+ * those walks, step by step and joined where branches rejoin, are exactly the ones some walk gives it: no walk is
+ * dropped and nothing is capped.
+ */
+interface Reading {
+  /** Whom the owner lane's unnamed messages name: the owner, or the helper once S1-77 names them. */
+  signer: string;
+  /** The people who have texted Rosie from their mobile (S1-10): Rosie answers them in that chat. */
+  mobile: ReadonlySet<string>;
+  /** Each chat's statuses on these walks; a chat that is not here is unopened on all of them. */
+  chats: ReadonlyMap<string, ReadonlySet<Status>>;
 }
 
-function keyOf(state: ChatState): string {
-  const opened = [...state.opened].sort().map((number) => `o ${number}`);
-  const replied = [...state.replied].sort().map((number) => `r ${number}`);
-  return [...opened, ...replied].join("|");
+function readingKey(reading: Reading): string {
+  return [reading.signer, ...[...reading.mobile].sort()].join("|");
 }
 
-function dedupe(states: readonly ChatState[]): ChatState[] {
-  const seen = new Set<string>();
-  const out: ChatState[] = [];
-  for (const state of states) {
-    const key = keyOf(state);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(state);
+/** The readings of rejoined branches, those that read the people alike joined into one, each chat's statuses joined. */
+function join(readings: readonly Reading[]): Reading[] {
+  const out = new Map<
+    string,
+    { signer: string; mobile: ReadonlySet<string>; chats: Map<string, ReadonlySet<Status>> }
+  >();
+  for (const reading of readings) {
+    const key = readingKey(reading);
+    const hit = out.get(key);
+    if (hit === undefined) {
+      out.set(key, { signer: reading.signer, mobile: reading.mobile, chats: new Map(reading.chats) });
+      continue;
+    }
+    for (const chat of new Set([...hit.chats.keys(), ...reading.chats.keys()]))
+      hit.chats.set(
+        chat,
+        new Set([...(hit.chats.get(chat) ?? UNOPENED), ...(reading.chats.get(chat) ?? UNOPENED)]),
+      );
   }
-  return out.slice(0, CAP);
+  return [...out.values()];
+}
+
+/** The helper S1-77 names: the person of its first message on the owner lane that names someone other than the owner. */
+function helperOf(
+  step: Readonly<AppliedStep>,
+  say: readonly unknown[],
+  names: Readonly<Record<string, string>>,
+): string | null {
+  for (const raw of say) {
+    const message = raw as Line;
+    const lane = message[0] === "san" ? message[1] : message[1] === "san" ? message[0] : undefined;
+    if (lane !== "owner") continue;
+    const person = personOf(step, lane, message, names);
+    if (person !== lane) return person;
+  }
+  return null;
+}
+
+/**
+ * The reading with the signer's chats (and the chat of their mobile) handed to `helper`, who is now the signer: the
+ * person who texted as the owner so far is the helper. The owner's own chat is then one nobody has opened.
+ */
+function handOver(reading: Reading, helper: string): Reading {
+  const from = reading.signer;
+  const moved = (chat: string): string =>
+    chat === from ? helper : chat === `${from}${MOBILE_CHAT}` ? `${helper}${MOBILE_CHAT}` : chat;
+  const chats = new Map<string, ReadonlySet<Status>>();
+  for (const [chat, statuses] of reading.chats) {
+    const to = moved(chat);
+    const there = chats.get(to);
+    chats.set(to, there === undefined ? statuses : new Set([...there, ...statuses]));
+  }
+  return { signer: helper, mobile: new Set([...reading.mobile].map(moved)), chats };
+}
+
+/**
+ * The person a message to or from `person` reaches on these walks: the owner lane's unnamed messages name the signer
+ * (the helper once S1-77 named them), except in S1-77 itself, whose unnamed messages are the real owner's.
+ */
+function onWalk(step: Readonly<AppliedStep>, message: Line, person: string, signer: string): string {
+  if (person !== "owner" || step.id === HELPER_STEP) return person;
+  const own = elementsOf(message)?.as;
+  return typeof own === "string" && own !== "" ? person : signer;
+}
+
+/** Each status after a text in the chat: a person's text opens it; Rosie's reply in an opened chat makes it replied. */
+function after(statuses: ReadonlySet<Status>, fromPerson: boolean): ReadonlySet<Status> {
+  return new Set(
+    [...statuses].map((status): Status => {
+      if (fromPerson) return status === "unopened" ? "opened" : status;
+      return status === "opened" ? "replied" : status;
+    }),
+  );
 }
 
 /**
  * Walks one path over the applied flow as overlay-core.js firstTexts() does (a rule node is never walked; a step that is
- * off or whose `when` does not fit is skipped; every lit branch is walked from the states before the split, and the
- * branches that rejoin carry their states on), keeping per walk which numbers have texted Rosie and which have had
- * Rosie's first reply. Returns, for each text Rosie sends a number, what it is on the walks that reach it.
+ * off or whose `when` does not fit is skipped; every lit branch is walked from the walks before the split, and the
+ * branches that rejoin carry their walks on), keeping for the walks so far which chats a person has texted Rosie in and
+ * which have had Rosie's first reply, each chat keyed by the person on that walk (the helper, the mobile: see the
+ * header). Unlike firstTexts() it keeps every walk (see Reading). Returns, for each text Rosie sends a person, what it
+ * is on the walks that reach it.
  */
 export function chatTexts(applied: AppliedTrade, path: TradePath): ChatTexts {
   const names = applied.flow.names;
@@ -158,51 +261,60 @@ export function chatTexts(applied: AppliedTrade, path: TradePath): ChatTexts {
       stop: mark === true || mark === false || mark === "first" ? mark : null,
     });
   };
-  const go = (list: readonly AppliedStep[], states: readonly ChatState[]): ChatState[] => {
-    let current = [...states];
+  const go = (list: readonly AppliedStep[], readings: readonly Reading[]): Reading[] => {
+    let current = [...readings];
     for (const step of list) {
       if (step.off !== undefined || step.kind === "rule") continue;
       if (step.when !== undefined && !lit(applied, step.when, path)) continue;
       const say = isTextStep(step) ? resolveVary(applied, step, path).step.say : undefined;
       if (Array.isArray(say)) {
-        current = dedupe(
-          current.map((state) => {
-            let opened = state.opened;
-            let replied = state.replied;
+        const helper = step.id === HELPER_STEP ? helperOf(step, say, names) : null;
+        current = join(
+          current.map((walked) => {
+            const reading = helper !== null && walked.signer !== helper ? handOver(walked, helper) : walked;
+            let mobile = reading.mobile;
+            const chats = new Map(reading.chats);
+            const chatOf = (person: string, toMobile: boolean): string =>
+              toMobile || mobile.has(person) ? `${person}${MOBILE_CHAT}` : person;
             say.forEach((raw, index) => {
               const message = raw as Line;
-              const from = senderNumber(step, message, names);
-              if (from !== null) {
-                if (!opened.has(from)) opened = new Set([...opened, from]);
+              const sender = senderNumber(step, message, names);
+              if (sender !== null) {
+                const from = onWalk(step, message, sender, reading.signer);
+                const fromMobile = step.id === MOBILE_STEP && message[2] === FROM_MOBILE;
+                if (fromMobile && !mobile.has(from)) mobile = new Set([...mobile, from]);
+                const chat = chatOf(from, fromMobile);
+                chats.set(chat, after(chats.get(chat) ?? UNOPENED, true));
                 return;
               }
-              const to = textedNumber(step, message, path, names);
-              if (to === null) return;
+              const person = textedNumber(step, message, path, names);
+              if (person === null) return;
+              const card = step.id === MOBILE_STEP && isObj(elementsOf(message)?.card);
+              const to = chatOf(onWalk(step, message, person, reading.signer), card);
               const rec = recordOf(step.id, index, to, message);
-              if (!opened.has(to)) rec.unopened = true;
-              else if (replied.has(to)) rec.later = true;
-              else {
-                rec.first = true;
-                replied = new Set([...replied, to]);
-              }
+              const now = chats.get(to) ?? UNOPENED;
+              if (now.has("unopened")) rec.unopened = true;
+              if (now.has("opened")) rec.first = true;
+              if (now.has("replied")) rec.later = true;
+              chats.set(to, after(now, false));
             });
-            return { opened, replied };
+            return { signer: reading.signer, mobile, chats };
           }),
         );
       }
       if (step.type !== "split") continue;
-      let merged: ChatState[] = [];
+      let merged: Reading[] = [];
       for (const branch of step.branches ?? []) {
         if (branch.off !== undefined || !lit(applied, branch.when, path)) continue;
-        const after = go(branch.steps, current);
-        if ((branch.end ?? "merge") !== "end") merged = merged.concat(after);
+        const walked = go(branch.steps, current);
+        if ((branch.end ?? "merge") !== "end") merged = merged.concat(walked);
       }
       if (merged.length === 0) return [];
-      current = dedupe(merged);
+      current = join(merged);
     }
     return current;
   };
-  go(applied.flow.steps, [{ opened: new Set(), replied: new Set() }]);
+  go(applied.flow.steps, [{ signer: "owner", mobile: new Set(), chats: new Map() }]);
   return out;
 }
 

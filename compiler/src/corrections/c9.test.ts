@@ -123,18 +123,28 @@ describe("C9: no SMS", () => {
 });
 
 describe("C9: Rosie never writes first", () => {
-  it("texts no number in C9's steps before it texts Rosie, on every money path (and before C9 some step does)", () => {
-    const walked = ["S2-05", "S2-06", "S2-07", "S1-78"];
+  it("texts no number in C9's steps before it texts Rosie, on every money path (and before C9 S2-05, S2-07, S1-77, S1-78 and S1-10 each do)", () => {
+    // The walk keys each chat by its person (DL-211), so it sees S1-77's text to the real owner and S1-10's secure ID
+    // check to the mobile, which CQ-123 (1) proved only by message order inside the step.
+    const walked = ["S2-05", "S2-06", "S2-07", "S1-77", "S1-78", "S1-10"];
     for (const flow of FLOWS) {
       const { before, done } = corrected("barber", flow);
       const trade = loadTrade("barber");
       const paths = tradePaths(done, trade, { booking: false, fixtures: false });
       expect(paths.length).toBeGreaterThan(0);
-      const unopenedBefore = tradePaths(before, trade, { booking: false, fixtures: false }).some((path) => {
+      const wroteFirst = new Set<string>();
+      for (const path of tradePaths(before, trade, { booking: false, fixtures: false })) {
         const texts = chatTexts(before, path);
-        return walked.some((id) => Object.values(texts[id] ?? {}).some((rec) => rec.unopened));
-      });
-      expect(unopenedBefore, `${flow}: before C9 a step of the card texts first`).toBe(true);
+        for (const id of walked)
+          if (Object.values(texts[id] ?? {}).some((rec) => rec.unopened)) wroteFirst.add(id);
+      }
+      expect([...wroteFirst].sort(), `${flow}: before C9 these steps of the card text first`).toStrictEqual([
+        "S1-10",
+        "S1-77",
+        "S1-78",
+        "S2-05",
+        "S2-07",
+      ]);
       for (const path of paths) {
         const texts = chatTexts(done, path);
         for (const id of walked)

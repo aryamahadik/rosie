@@ -93,7 +93,8 @@ export const S2_07_LINES: readonly LineRule[] = [
 
 /** S1-10: Rosie asks for the text from the mobile in place of a code texted to it. */
 export const ASK_FROM_MOBILE = "Please text me from that mobile. Your text proves the phone is yours.";
-const FROM_MOBILE = "Texting you from that mobile now";
+/** The person's text from that mobile: it opens the chat of that mobile, where Rosie's next reply goes (stops.ts). */
+export const FROM_MOBILE = "Texting you from that mobile now";
 const S1_10_LINES: readonly LineRule[] = [
   [
     / and texts the secure ID check to it\. The 4-digit code texted with it, typed on the page, proves the phone; opening it never does\./,
