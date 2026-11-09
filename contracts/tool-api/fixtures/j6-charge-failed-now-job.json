@@ -1,0 +1,52 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T15:30:02Z",
+    "stated": null,
+    "note": "A6-10's 'The charge fails' on a booking made now (K-14 decline-not-retried.json's story): the $40 Groom's package deposit charged as the booking was written is declined by the card's bank, never retried (RULES 3.11; pay-alex-grooms-deposit-declined failed). Alex is still on the booking page, so no pay link: 'Booked now: it shows on the page, as any declined card' (A6-32). C-101's handling of the decline calls writeBooking chargeFailed, whose commit arms the page's own clock (A5-31): one K-04 clock row due at the hold's own end, 3:34:30pm UTC, whose firing, if nothing is paid by then, lets the time go and ends the request let_go, as A5-06 does ('or no card worked for a deposit or the full price'; 'Nothing is saved after it'). The page shows 'Try another card', never the bank's reason (S12-25); another card is v1.3's card stage, then writeBooking write again, a new payment and a new stripe_charge on its own key (README default 121). Nothing new is charged, no key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-eff-alex-grooms-deposit-declined",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-page-alex-grooms-0009"
+    },
+    "bookingId": "booking-alex-grooms-declined",
+    "stage": { "kind": "chargeFailed", "step": "A6-10", "paymentId": "pay-alex-grooms-deposit-declined" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-declined",
+    "stage": "chargeFailed",
+    "result": "tryAnotherCard",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [],
+    "termsSnapshot": null,
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": { "clockRowId": "clock-alex-grooms-declined-page", "dueAt": "2026-11-07T15:34:30Z" },
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      {
+        "slot": "pay.failed",
+        "table": "payments",
+        "column": "state",
+        "rowId": "pay-alex-grooms-deposit-declined"
+      }
+    ],
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-alex-grooms-declined-page", "version": 1 }],
+    "repeated": false
+  }
+}

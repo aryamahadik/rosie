@@ -1,0 +1,38 @@
+{
+  "call": "askAboutClash",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-clash-ask-job.json"],
+    "now": "2026-11-02T17:15:00Z",
+    "stated": null,
+    "note": "S12-33's '1 Keep the visit' in Sam's own turn: he replies '1', which clearly answers that one open question, and decide picks the option choice '1 Keep the visit' (README default 124). In his turn's commit the question is closed answered and nothing else changes: the visit stays as booked, its code, Riley's calendar event and the customer untouched ('The customer hears nothing unless the visit changes'). '2 Move the visit' would walk to journey 7's owner move (K-09 v1.5; open gap 116), and no answer by 8:00am Fri is the question clock's firing: the visit stays and Riley is told (README default 123). No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-keep-ben-nov7",
+      "requestId": "turn-sam-keep-ben-nov7",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-keep-ben-nov7"
+    },
+    "bookingId": "booking-ben-nov7",
+    "stage": {
+      "kind": "answer",
+      "step": "S12-33",
+      "answer": "keep",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-clash-ben-nov7", "yesEventId": "evt-sam-0233" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-ben-nov7",
+    "stage": "answer",
+    "question": null,
+    "answerBy": null,
+    "answer": "keep",
+    "next": "none",
+    "gives": [],
+    "written": [],
+    "repeated": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "call": "recordStaffTold",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-write-booking-after-ok-turn.json"],
+    "now": "2026-10-22T12:06:10Z",
+    "stated": { "step": "A6-14", "gives": ["staff_told"] },
+    "note": "Refused by givesJourneySixKeys alone: the pro's delivery stated as A6-14, the confirmation, whose key is code, not staff_told (A-J6.md: A6-14 gives code; A6-15 gives staff_told). The schema takes it. Stated as A6-15 it is j6-staff-told-job.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-dispatch-out-agent-alex-oct21-job-riley",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "step": "A6-15",
+    "outboxRowId": "out-agent-alex-oct21-job-riley",
+    "deliveredAt": "2026-10-22T12:06:10Z"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "staffToldAt": "2026-10-22T12:06:10Z",
+    "gives": ["staff_told"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 6 }],
+    "repeated": false
+  }
+}

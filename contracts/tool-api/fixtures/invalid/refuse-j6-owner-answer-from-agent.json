@@ -1,0 +1,46 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-ask-owner-page.json"],
+    "now": "2026-10-22T12:05:00Z",
+    "stated": null,
+    "note": "Refused: an outside AI answering A6-02's request for the owner (caller.kind agent). The owner's answer is the owner's own, or a permitted admin's, in their own turn or on Needs you ('The owner names who answers'; A3-03; S13-55: 'Never a yes relayed in a chat by someone else's AI'). From Sam's own turn it is j6-owner-accept-turn.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-0099",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A6-02",
+      "ownerOkId": "ok-agent-alex-oct21-request",
+      "answer": "accept",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-agent-alex-oct21-a6-02", "yesEventId": "evt-sam-0151" },
+      "expectVersion": 2
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "ownerAnswer",
+    "answer": "accept",
+    "ownerOk": null,
+    "questions": [],
+    "told": [],
+    "next": "writeBooking",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "owner_oks", "rowId": "ok-agent-alex-oct21-request", "version": 3 }],
+    "repeated": false
+  }
+}

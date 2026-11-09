@@ -1,0 +1,81 @@
+{
+  "call": "sendToOnCall",
+  "given": {
+    "seeds": ["people-access/seed-on-call.json", "people-access/seed-staff-joined.json"],
+    "after": ["j6-on-call-ask-page.json"],
+    "now": "2026-10-19T22:49:00Z",
+    "stated": null,
+    "note": "B6-16's '2 Can't' in Jordan's own turn, inside his 5 minutes ('A different day or a set time is a Can't'): decide picks the branch '2 Can't, or no reply'. His answer stands for Sam's on a job sent now (S12-17: 'the on-call pro's yes stands for Sam's'), so the request ends declined (K-30's closest why: README default 118, open gap 106), with the head cancelled (K-30 default 7) and the card saved for the $89 call removed at once (S13-55; not_booked). No time was saved for a job sent now, so none is released. Alex and Sam are told at once, as outbox rows of this turn, both send class visit_now, with B6-16's own lines: Alex's 'Sorry, no plumber on call can come tonight, so nothing was booked. {{pay.back}} See the soonest times: rosfield.com/c/r4', whose link is the business's booking page (v1.2 linkIssued bookingPage, no row kept, its url null in a turn: the row carries it), and Sam's 'Nobody on call took Alex M.'s sent-now job, so it wasn't booked.' Nothing was charged. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-jordan-cant-alex-drain",
+      "requestId": "turn-jordan-cant-alex-drain",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-jordan",
+      "traceId": "trace-jordan-cant-alex-drain"
+    },
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": {
+      "kind": "proAnswer",
+      "step": "B6-16",
+      "answer": "cant",
+      "yes": {
+        "kind": "openQuestion",
+        "openQuestionId": "oq-sentnow-alex-drain-offer-jordan",
+        "yesEventId": "evt-jordan-0022"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": "proAnswer",
+    "onCall": { "staffId": "staff-jordan-home-services", "personId": "person-jordan" },
+    "offer": null,
+    "answerBy": null,
+    "answer": "cant",
+    "next": "none",
+    "told": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "B6-16",
+        "via": "chat",
+        "sendClass": "visit_now",
+        "outboxRowId": "out-sentnow-alex-drain-nobody",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "B6-16",
+        "via": "chat",
+        "sendClass": "visit_now",
+        "outboxRowId": "out-sentnow-sam-nobody-took",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "released": null,
+    "requestEnded": "declined",
+    "cardRemoved": "card-sentnow-alex-drain",
+    "soonestTimes": {
+      "kind": "bookingPage",
+      "secureLinkId": null,
+      "url": null,
+      "outboxRowId": "out-sentnow-alex-drain-nobody",
+      "clockRowId": null
+    },
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-sentnow-alex-drain", "version": 3 },
+      { "table": "booking_details", "rowId": "booking-sentnow-alex-drain", "version": 5 },
+      { "table": "saved_cards", "rowId": "card-sentnow-alex-drain", "version": 3 },
+      { "table": "outbox_rows", "rowId": "out-sentnow-alex-drain-nobody", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sentnow-sam-nobody-took", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

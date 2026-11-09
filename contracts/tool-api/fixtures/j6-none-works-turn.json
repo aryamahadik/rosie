@@ -1,0 +1,67 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-28T14:40:00Z",
+    "stated": null,
+    "note": "A6-11's 'C, or no reply', then A6-13, 'Lets it go; tells Alex', after Sam's OK: Dee W.'s request for a haircut was accepted, but her time had just been taken, so A6-11's next times went into her open chat with 2 of her text hours to pick ('After Sam's OK, they aren't on the page'). She replies 'C', which clearly answers that one open question; decide picks its option 'C Neither works' (the split's 'C, or no reply'). In her turn's commit: nothing booked, the request ended let_go (K-30: 'let_go (the page or the saved time ran out, A5-06, A6-13)') with the head cancelled (K-30 default 7), the question closed answered, the card saved for this booking removed at once (S13-55: 'A booking that's declined or never made removes it at once'; removed_why not_booked), and A6-13's line as the reply in her chat ('OK, nothing was booked. {{pay.back}}'), {{pay.back}} reading the card's removal, never a key (README default 125). The hold was let go when the time was taken, so none is released here. No reply by the deadline would be the question clock's firing, never this call. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-dee-neither-works-0003",
+      "requestId": "turn-dee-neither-works-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-dee-neither-works-0001"
+    },
+    "bookingId": "booking-dee-haircut-request",
+    "stage": {
+      "kind": "noneWorks",
+      "step": "A6-11",
+      "answer": { "kind": "openQuestion", "openQuestionId": "oq-dee-next-times", "yesEventId": "evt-dee-0303" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-dee-haircut-request",
+    "stage": "noneWorks",
+    "result": "letGo",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [],
+    "termsSnapshot": null,
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": null,
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-dee",
+        "step": "A6-13",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-dee-nothing-booked",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": "card-dee-haircut-request",
+    "requestEnded": "let_go",
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-dee-haircut-request" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-dee-haircut-request", "version": 4 },
+      { "table": "booking_details", "rowId": "booking-dee-haircut-request", "version": 7 },
+      { "table": "saved_cards", "rowId": "card-dee-haircut-request", "version": 3 },
+      { "table": "outbox_rows", "rowId": "out-dee-nothing-booked", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

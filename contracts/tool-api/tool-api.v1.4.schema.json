@@ -1,0 +1,2730 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.4.schema.json",
+  "title": "ToolApiV1dot4",
+  "description": "K-09 Tool API v1.4, a minor version for journey 6, booked (T-053; 02-contracts K-09 version table, row v1.4; section 9 F16). It only adds to v1.3 (tool-api.v1.3.schema.json, frozen by T-052 and unchanged, referred to here, which refers to v1.2, v1.1 and v1): every v1 to v1.3 definition is here under its own name, the unchanged ones by reference; the changed ones (stepKey, given, partResult, gateAndCommit.committed, gateAndCommit.response, gateAndCommit.exchange, callName) take only new enum values, so every v1 to v1.3 exchange is a v1.4 exchange. Added: the calls of journey 6 (A6-01 to A6-32, B6-01 to B6-35; S12-33 with journey 6): askOwnerFirst (A6-02's request to the owner, the owner's answer, the other time read back and sent, the customer's answer to it, A6-03's fresh yes), sendToOnCall (B6-16: the on-call pro first, and the pro's answer), writeBooking (A6-10, B6-10 and A6-12: the booking written after a fresh free/busy read, charging what is due on the saved card, booked once it is paid; A6-11's next times; A6-32's one pay link after a failed charge; A6-14's confirmation with its new check-in code and chat link; A6-15's job row), recordStaffTold (A6-15, B6-14: the pro's job row delivered) and askAboutClash (S12-33: a personal event over a visit). Each key journey 6 writes is written by exactly one call, named in its request description with its step ids: booked and code by writeBooking, staff_told by recordStaffTold (02-contracts section 8; README 'v1.4', 'Each key's one call'). No call charges on silence or holds money, every charge names its bound yes (the K-29 consent its effect.created row's approved_by names: v1.3 defaults 109, 110), a card is kept only where K-32 says, a pay link reaches only the payer, the check-in code is never in an answer, and every row with words names the step whose line it carries. K-14 v1, K-16 v1, K-30 v1 and K-32 v1 are frozen on main: the calls name their tables, columns, calls and events, never redefine them. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/buildFrontier.exchange" },
+    { "$ref": "#/$defs/closestEntries.exchange" },
+    { "$ref": "#/$defs/gateAndCommit.exchange" },
+    { "$ref": "#/$defs/composeInput.exchange" },
+    { "$ref": "#/$defs/finalizeMessage.exchange" },
+    { "$ref": "#/$defs/recordSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/releaseSafetyHold.exchange" },
+    { "$ref": "#/$defs/recordStopOrStart.exchange" },
+    { "$ref": "#/$defs/setRecordFlag.exchange" },
+    { "$ref": "#/$defs/handOff.exchange" },
+    { "$ref": "#/$defs/answerHandOff.exchange" },
+    { "$ref": "#/$defs/pageTeam.exchange" },
+    { "$ref": "#/$defs/acknowledgePage.exchange" },
+    { "$ref": "#/$defs/openReviewItem.exchange" },
+    { "$ref": "#/$defs/decideReviewItem.exchange" },
+    { "$ref": "#/$defs/enterDoor.exchange" },
+    { "$ref": "#/$defs/sendFixedLine.exchange" },
+    { "$ref": "#/$defs/sendsFailing.exchange" },
+    { "$ref": "#/$defs/textingBack.exchange" },
+    { "$ref": "#/$defs/calendarLinkDropped.exchange" },
+    { "$ref": "#/$defs/calendarLinkBack.exchange" },
+    { "$ref": "#/$defs/sendProofCode.exchange" },
+    { "$ref": "#/$defs/proveCode.exchange" },
+    { "$ref": "#/$defs/issueChatLink.exchange" },
+    { "$ref": "#/$defs/matchKinds.exchange" },
+    { "$ref": "#/$defs/lookupListing.exchange" },
+    { "$ref": "#/$defs/saveSetupStep.exchange" },
+    { "$ref": "#/$defs/readSetup.exchange" },
+    { "$ref": "#/$defs/openRequest.exchange" },
+    { "$ref": "#/$defs/confirmBusinessBooking.exchange" },
+    { "$ref": "#/$defs/readBackBusinessBooking.exchange" },
+    { "$ref": "#/$defs/findCustomer.exchange" },
+    { "$ref": "#/$defs/checkBookingFirst.exchange" },
+    { "$ref": "#/$defs/setCustomerBlock.exchange" },
+    { "$ref": "#/$defs/matchService.exchange" },
+    { "$ref": "#/$defs/setWhoFor.exchange" },
+    { "$ref": "#/$defs/setReachWay.exchange" },
+    { "$ref": "#/$defs/addCustomer.exchange" },
+    { "$ref": "#/$defs/setPrice.exchange" },
+    { "$ref": "#/$defs/quoteFromPhotos.exchange" },
+    { "$ref": "#/$defs/showTimes.exchange" },
+    { "$ref": "#/$defs/saveTime.exchange" },
+    { "$ref": "#/$defs/extendTime.exchange" },
+    { "$ref": "#/$defs/joinWaitlist.exchange" },
+    { "$ref": "#/$defs/sendSecureLink.exchange" },
+    { "$ref": "#/$defs/checkPlace.exchange" },
+    { "$ref": "#/$defs/saveSecurePage.exchange" },
+    { "$ref": "#/$defs/showMoneyBefore.exchange" },
+    { "$ref": "#/$defs/settleOffer.exchange" },
+    { "$ref": "#/$defs/signDocument.exchange" },
+    { "$ref": "#/$defs/takeMoneyBefore.exchange" },
+    { "$ref": "#/$defs/refundAtOnce.exchange" },
+    { "$ref": "#/$defs/askOwnerFirst.exchange" },
+    { "$ref": "#/$defs/sendToOnCall.exchange" },
+    { "$ref": "#/$defs/writeBooking.exchange" },
+    { "$ref": "#/$defs/recordStaffTold.exchange" },
+    { "$ref": "#/$defs/askAboutClash.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "tool-api.v1.3.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "tool-api.v1.3.schema.json#/$defs/nullableId" },
+    "turnId": { "$ref": "tool-api.v1.3.schema.json#/$defs/turnId" },
+    "utc": { "$ref": "tool-api.v1.3.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "tool-api.v1.3.schema.json#/$defs/nullableUtc" },
+    "stepId": { "$ref": "tool-api.v1.3.schema.json#/$defs/stepId" },
+    "fixedLineId": { "$ref": "tool-api.v1.3.schema.json#/$defs/fixedLineId" },
+    "phoneNumber": { "$ref": "tool-api.v1.3.schema.json#/$defs/phoneNumber" },
+    "rowRef": { "$ref": "tool-api.v1.3.schema.json#/$defs/rowRef" },
+    "tableName": { "$ref": "tool-api.v1.3.schema.json#/$defs/tableName" },
+    "version": { "$ref": "tool-api.v1.3.schema.json#/$defs/version" },
+    "caller": { "$ref": "tool-api.v1.3.schema.json#/$defs/caller" },
+    "sentByActor": { "$ref": "tool-api.v1.3.schema.json#/$defs/sentByActor" },
+    "notFoundError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notFoundError" },
+    "transientError": { "$ref": "tool-api.v1.3.schema.json#/$defs/transientError" },
+    "constraintError": { "$ref": "tool-api.v1.3.schema.json#/$defs/constraintError" },
+    "versionChangedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/versionChangedError" },
+    "notAllowedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/bookingPausedError" },
+    "turnParkedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/turnParkedError" },
+    "gateOutcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/gateOutcome" },
+    "limit1Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit1Outcome" },
+    "limit2Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit2Outcome" },
+    "limit3Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit3Outcome" },
+    "limit4Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit4Outcome" },
+    "limit5Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit5Outcome" },
+    "limit6Outcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limit6Outcome" },
+    "limitOutcome": { "$ref": "tool-api.v1.3.schema.json#/$defs/limitOutcome" },
+    "guardTargets": { "$ref": "tool-api.v1.3.schema.json#/$defs/guardTargets" },
+    "buildFrontier.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/buildFrontier.request" },
+    "buildFrontier.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/buildFrontier.response" },
+    "buildFrontier.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/buildFrontier.errors" },
+    "closestEntries.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/closestEntries.request" },
+    "closestEntries.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/closestEntries.response" },
+    "closestEntries.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/closestEntries.errors" },
+    "plannerVerbs.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/plannerVerbs.request" },
+    "plannerVerbs.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/plannerVerbs.response" },
+    "plannerVerbs.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/plannerVerbs.errors" },
+    "coreAction": { "$ref": "tool-api.v1.3.schema.json#/$defs/coreAction" },
+    "coreResult": { "$ref": "tool-api.v1.3.schema.json#/$defs/coreResult" },
+    "partResult": {
+      "title": "PartResult",
+      "description": "What the gate did with one part, as v1.3 (arch 02 line 121; arch 06 lines 295 to 309), with one change: gives may also name the keys journey 6 gives (journeySixKey; v1.4), so a turn that commits a journey 6 step's write names the keys it wrote, those of the steps its walk passes included (README 'v1.4', J6_WALK_PASSES). Every v1 to v1.3 part result is a v1.4 part result.",
+      "type": "object",
+      "properties": {
+        "part": {
+          "description": "The part's index in the decide result's parts (K-02 v1 decideResult.parts).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "choiceId": {
+          "description": "The choice the part chose or entered (K-02 v1 choose or enter), or null for another verb.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "result": {
+          "description": "committed, stopped, dependsOnStopped, held, asked or noAction, as v1 (README 'Limits 1 to 6 at the gate').",
+          "type": "string",
+          "enum": ["committed", "stopped", "dependsOnStopped", "held", "asked", "noAction"]
+        },
+        "limits": {
+          "description": "Each of limits 1 to 6 with its result, as the gate span logs them (K-08 v1 limitResult).",
+          "type": "array",
+          "items": { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/limitResult" }
+        },
+        "stoppedBy": {
+          "description": "For stopped, the limit that failed and its outcome; null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/limitOutcome" }, { "type": "null" }]
+        },
+        "gives": {
+          "description": "For committed, the keys the part's step gives that this commit wrote (A-keys.md, B-keys.md; arch 12 line 590): a key of journeys 1 and 2 (setupKey), 3 (journeyThreeKey), 4 (journeyFourKey), 5 (journeyFiveKey) or 6 (journeySixKey, v1.4: README 'v1.4', 'Each key's one call'), including those of the automatic steps its walk passes (arch 03 line 191); empty otherwise.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/stepKey" },
+          "uniqueItems": true
+        },
+        "dependsOnPart": {
+          "description": "For dependsOnStopped, the part it depends on; null otherwise.",
+          "anyOf": [
+            {
+              "description": "The index of the stopped part it depends on.",
+              "type": "integer",
+              "minimum": 0
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["part", "choiceId", "result", "limits", "stoppedBy", "gives", "dependsOnPart"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/gateAndCommit.request" },
+    "gateAndCommit.response": {
+      "title": "GateAndCommitResponse",
+      "description": "committed for a turn's decided texts or core actions (gateAndCommit.committed, v1.4: its parts may name journey 6's keys); fired for a clock's firing (as v1; K-05 v1 fireClock.response).",
+      "oneOf": [{ "$ref": "#/$defs/gateAndCommit.committed" }, { "$ref": "#/$defs/gateAndCommit.fired" }]
+    },
+    "effectWritten": { "$ref": "tool-api.v1.3.schema.json#/$defs/effectWritten" },
+    "openQuestionsWritten": { "$ref": "tool-api.v1.3.schema.json#/$defs/openQuestionsWritten" },
+    "gateAndCommit.fired": { "$ref": "tool-api.v1.3.schema.json#/$defs/gateAndCommit.fired" },
+    "gateAndCommit.committed": {
+      "title": "GateAndCommitCommitted",
+      "description": "Committed, as v1.3; v1.4 changes only the parts' items, whose gives may name journey 6's keys (partResult).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+        "committedAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+        "repeated": {
+          "description": "true when this turn id had committed before: nothing was written and the first commit comes back (K-05 v1 commitTurn).",
+          "type": "boolean"
+        },
+        "parts": {
+          "description": "One result per decide part, in order; empty for a core-only turn.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/partResult" }
+        },
+        "planner": {
+          "description": "The planner's verb as committed; null when no planner ran, or when code refused its output.",
+          "anyOf": [{ "$ref": "#/$defs/plannerVerbs.response" }, { "type": "null" }]
+        },
+        "core": {
+          "description": "One result per core action, in the request's order (v1.1's coreResult).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/coreResult" }
+        },
+        "written": {
+          "description": "What the commit wrote (K-05 v1 commitResult).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
+        },
+        "effects": {
+          "description": "Effect rows written in the commit, to run after it (K-07 v1; K-05 v1.1).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/effectWritten" }
+        },
+        "openQuestions": { "$ref": "#/$defs/openQuestionsWritten" }
+      },
+      "required": [
+        "result",
+        "turnId",
+        "committedAt",
+        "repeated",
+        "parts",
+        "planner",
+        "core",
+        "written",
+        "effects",
+        "openQuestions"
+      ],
+      "additionalProperties": false
+    },
+    "gateAndCommit.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/gateAndCommit.errors" },
+    "composeInput.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/composeInput.request" },
+    "composeInput.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/composeInput.response" },
+    "composeInput.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/composeInput.errors" },
+    "finalizeMessage.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/finalizeMessage.request" },
+    "finalizeMessage.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/finalizeMessage.response" },
+    "finalizeMessage.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/finalizeMessage.errors" },
+    "recordSafetyOutcome.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordSafetyOutcome.request" },
+    "recordSafetyOutcome.arrival": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordSafetyOutcome.arrival" },
+    "arrivalCaller": { "$ref": "tool-api.v1.3.schema.json#/$defs/arrivalCaller" },
+    "recordSafetyOutcome.response": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/recordSafetyOutcome.response"
+    },
+    "recordSafetyOutcome.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordSafetyOutcome.errors" },
+    "releaseSafetyHold.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/releaseSafetyHold.request" },
+    "releaseSafetyHold.arrival": { "$ref": "tool-api.v1.3.schema.json#/$defs/releaseSafetyHold.arrival" },
+    "releaseSafetyHold.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/releaseSafetyHold.response" },
+    "releaseSafetyHold.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/releaseSafetyHold.errors" },
+    "recordStopOrStart.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordStopOrStart.request" },
+    "recordStopOrStart.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordStopOrStart.response" },
+    "recordStopOrStart.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordStopOrStart.errors" },
+    "setRecordFlag.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/setRecordFlag.request" },
+    "setRecordFlag.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/setRecordFlag.response" },
+    "setRecordFlag.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/setRecordFlag.errors" },
+    "handOff.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/handOff.request" },
+    "handOff.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/handOff.response" },
+    "handOff.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/handOff.errors" },
+    "answerHandOff.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/answerHandOff.request" },
+    "answerHandOff.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/answerHandOff.response" },
+    "answerHandOff.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/answerHandOff.errors" },
+    "pageTeam.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/pageTeam.request" },
+    "pageTeam.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/pageTeam.response" },
+    "pageTeam.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/pageTeam.errors" },
+    "acknowledgePage.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/acknowledgePage.request" },
+    "acknowledgePage.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/acknowledgePage.response" },
+    "acknowledgePage.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/acknowledgePage.errors" },
+    "openReviewItem.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/openReviewItem.request" },
+    "openReviewItem.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/openReviewItem.response" },
+    "openReviewItem.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/openReviewItem.errors" },
+    "decideReviewItem.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/decideReviewItem.request" },
+    "decideReviewItem.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/decideReviewItem.response" },
+    "decideReviewItem.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/decideReviewItem.errors" },
+    "enterDoor.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/enterDoor.request" },
+    "enterDoor.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/enterDoor.response" },
+    "enterDoor.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/enterDoor.errors" },
+    "sendFixedLine.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendFixedLine.request" },
+    "sendFixedLine.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendFixedLine.response" },
+    "sendFixedLine.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendFixedLine.errors" },
+    "sendsFailing.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendsFailing.request" },
+    "sendsFailing.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendsFailing.response" },
+    "sendsFailing.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendsFailing.errors" },
+    "textingBack.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/textingBack.request" },
+    "textingBack.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/textingBack.response" },
+    "textingBack.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/textingBack.errors" },
+    "calendarLinkDropped.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkDropped.request" },
+    "calendarLinkDropped.response": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkDropped.response"
+    },
+    "calendarLinkDropped.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkDropped.errors" },
+    "calendarLinkBack.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkBack.request" },
+    "calendarLinkBack.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkBack.response" },
+    "calendarLinkBack.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkBack.errors" },
+    "sendProofCode.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendProofCode.request" },
+    "sendProofCode.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendProofCode.response" },
+    "sendProofCode.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendProofCode.errors" },
+    "proveCode.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/proveCode.request" },
+    "proveCode.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/proveCode.response" },
+    "proveCode.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/proveCode.errors" },
+    "issueChatLink.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/issueChatLink.request" },
+    "issueChatLink.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/issueChatLink.response" },
+    "issueChatLink.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/issueChatLink.errors" },
+    "setupKey": { "$ref": "tool-api.v1.3.schema.json#/$defs/setupKey" },
+    "journeyThreeKey": { "$ref": "tool-api.v1.3.schema.json#/$defs/journeyThreeKey" },
+    "journeyFourKey": { "$ref": "tool-api.v1.3.schema.json#/$defs/journeyFourKey" },
+    "journeyFiveKey": { "$ref": "tool-api.v1.3.schema.json#/$defs/journeyFiveKey" },
+    "journeySixKey": {
+      "title": "JourneySixKey",
+      "description": "A needs and gives key journey 6 gives, as the step index prints it (A-keys.md and B-keys.md, section 6; A-J6.md and B-J6.md, the gives column), each written by its one call (README 'v1.4', 'Each key's one call'; 02-contracts section 8 its home): booked (A6-10, B6-10, and A6-12 at a new time: K-30 'booking status booked', the K-04 head's stage booked) and code (A6-14, B6-13: K-30 booking_visits.check_in_code, new each visit, sealed under its person's key), both writeBooking's, booked only once what is due now is paid ('The confirmation waits until it's paid': A6-10; README default 111); and staff_told (A6-15, B6-14: K-30 booking_details.staff_told_at, 'when the pro's message was delivered'), recordStaffTold's (README default 120).",
+      "type": "string",
+      "enum": ["booked", "code", "staff_told"]
+    },
+    "stepKey": {
+      "title": "StepKey",
+      "description": "A key a step gives: journeys 1 and 2's (setupKey, v1), journey 3's (journeyThreeKey, v1.1), journey 4's (journeyFourKey, v1.2), journey 5's (journeyFiveKey, v1.3) or journey 6's (journeySixKey, v1.4).",
+      "anyOf": [
+        { "$ref": "#/$defs/setupKey" },
+        { "$ref": "#/$defs/journeyThreeKey" },
+        { "$ref": "#/$defs/journeyFourKey" },
+        { "$ref": "#/$defs/journeyFiveKey" },
+        { "$ref": "#/$defs/journeySixKey" }
+      ]
+    },
+    "kindId": { "$ref": "tool-api.v1.3.schema.json#/$defs/kindId" },
+    "objectKey": { "$ref": "tool-api.v1.3.schema.json#/$defs/objectKey" },
+    "emailAddress": { "$ref": "tool-api.v1.3.schema.json#/$defs/emailAddress" },
+    "localDate": { "$ref": "tool-api.v1.3.schema.json#/$defs/localDate" },
+    "money": { "$ref": "tool-api.v1.3.schema.json#/$defs/money" },
+    "licenseAsGiven": { "$ref": "tool-api.v1.3.schema.json#/$defs/licenseAsGiven" },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, as v1.3 (seeds, the fixtures run first, the clock, what it states), with one change: a stated step may give journey 6's keys (stepKey; v1.4), which the named rule givesJourneySixKeys checks. Every v1 to v1.3 given is a v1.4 given.",
+      "type": "object",
+      "properties": {
+        "seeds": {
+          "description": "Seed fixtures of the frozen table parts, as <folder under contracts/db-schema>/<file>.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z-]+/seed-[a-z0-9-]+[.]json$" }
+        },
+        "after": {
+          "description": "Fixtures of this folder whose requests run first, in order.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+[.]json$" }
+        },
+        "now": {
+          "description": "The time the call reads 'now' at (the fake clock on staging: BP 9.4).",
+          "$ref": "#/$defs/utc"
+        },
+        "stated": {
+          "description": "What the fixture states: for a limit fixture, the limit that fails, the kind of its outcome and its action; for a step's fixture, the step and the keys it gives (A-keys.md, B-keys.md; journey 3's from v1.1, journey 4's from v1.2, journey 5's from v1.3, journey 6's from v1.4); null otherwise.",
+          "anyOf": [
+            {
+              "title": "StatedOutcome",
+              "type": "object",
+              "properties": {
+                "limit": { "type": "integer", "minimum": 1, "maximum": 6 },
+                "outcome": { "$ref": "#/$defs/gateOutcome" },
+                "action": { "type": "string", "minLength": 1 }
+              },
+              "required": ["limit", "outcome", "action"],
+              "additionalProperties": false
+            },
+            {
+              "title": "StatedGives",
+              "type": "object",
+              "properties": {
+                "step": { "$ref": "#/$defs/stepId" },
+                "gives": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/stepKey" },
+                  "uniqueItems": true
+                }
+              },
+              "required": ["step", "gives"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": {
+          "description": "Anything else the exchange assumes, in plain words.",
+          "type": "string"
+        }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "matchKinds.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchKinds.request" },
+    "matchKinds.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchKinds.response" },
+    "matchKinds.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchKinds.errors" },
+    "lookupListing.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/lookupListing.request" },
+    "lookupListing.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/lookupListing.response" },
+    "lookupListing.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/lookupListing.errors" },
+    "saveSetupStep.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSetupStep.request" },
+    "setupStepS2_05": { "$ref": "tool-api.v1.3.schema.json#/$defs/setupStepS2_05" },
+    "saveSetupStepInTurn": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSetupStepInTurn" },
+    "saveSetupStep.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSetupStep.response" },
+    "saveSetupStep.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSetupStep.errors" },
+    "readSetup.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/readSetup.request" },
+    "readSetup.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/readSetup.response" },
+    "readSetup.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/readSetup.errors" },
+    "businessCaller": { "$ref": "tool-api.v1.3.schema.json#/$defs/businessCaller" },
+    "customerBlockedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/customerBlockedError" },
+    "notLiveError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notLiveError" },
+    "safetyHeldError": { "$ref": "tool-api.v1.3.schema.json#/$defs/safetyHeldError" },
+    "waitsForOwnerError": { "$ref": "tool-api.v1.3.schema.json#/$defs/waitsForOwnerError" },
+    "timeEntered": { "$ref": "tool-api.v1.3.schema.json#/$defs/timeEntered" },
+    "serviceEntered": { "$ref": "tool-api.v1.3.schema.json#/$defs/serviceEntered" },
+    "newCustomerEntered": { "$ref": "tool-api.v1.3.schema.json#/$defs/newCustomerEntered" },
+    "enteredBooking": { "$ref": "tool-api.v1.3.schema.json#/$defs/enteredBooking" },
+    "heldTime": { "$ref": "tool-api.v1.3.schema.json#/$defs/heldTime" },
+    "openRequest.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/openRequest.request" },
+    "openRequest.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/openRequest.response" },
+    "openRequest.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/openRequest.errors" },
+    "openRequest.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/openRequest.exchange" },
+    "confirmBusinessBooking.request": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/confirmBusinessBooking.request"
+    },
+    "confirmBusinessBooking.response": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/confirmBusinessBooking.response"
+    },
+    "wrongDoorError": { "$ref": "tool-api.v1.3.schema.json#/$defs/wrongDoorError" },
+    "timeTakenError": { "$ref": "tool-api.v1.3.schema.json#/$defs/timeTakenError" },
+    "confirmBusinessBooking.errors": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/confirmBusinessBooking.errors"
+    },
+    "confirmBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/confirmBusinessBooking.exchange"
+    },
+    "readBackBusinessBooking.request": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/readBackBusinessBooking.request"
+    },
+    "readBackBusinessBooking.response": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/readBackBusinessBooking.response"
+    },
+    "readBackBusinessBooking.errors": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/readBackBusinessBooking.errors"
+    },
+    "readBackBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/readBackBusinessBooking.exchange"
+    },
+    "findCustomer.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/findCustomer.request" },
+    "findCustomer.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/findCustomer.response" },
+    "findCustomer.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/findCustomer.errors" },
+    "findCustomer.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/findCustomer.exchange" },
+    "checkBookingFirst.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkBookingFirst.request" },
+    "checkBookingFirst.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkBookingFirst.response" },
+    "checkBookingFirst.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkBookingFirst.errors" },
+    "checkBookingFirst.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkBookingFirst.exchange" },
+    "setCustomerBlock.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/setCustomerBlock.request" },
+    "setCustomerBlock.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/setCustomerBlock.response" },
+    "setCustomerBlock.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/setCustomerBlock.errors" },
+    "setCustomerBlock.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/setCustomerBlock.exchange" },
+    "customerSideCaller": { "$ref": "tool-api.v1.3.schema.json#/$defs/customerSideCaller" },
+    "wayOffered": { "$ref": "tool-api.v1.3.schema.json#/$defs/wayOffered" },
+    "optionPrice": { "$ref": "tool-api.v1.3.schema.json#/$defs/optionPrice" },
+    "linkIssued": { "$ref": "tool-api.v1.3.schema.json#/$defs/linkIssued" },
+    "textsOffNotice": { "$ref": "tool-api.v1.3.schema.json#/$defs/textsOffNotice" },
+    "savedTimeCapError": { "$ref": "tool-api.v1.3.schema.json#/$defs/savedTimeCapError" },
+    "notExtendableError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notExtendableError" },
+    "timeOffered": { "$ref": "tool-api.v1.3.schema.json#/$defs/timeOffered" },
+    "readBackYes": { "$ref": "tool-api.v1.3.schema.json#/$defs/readBackYes" },
+    "wrongDetailsError": { "$ref": "tool-api.v1.3.schema.json#/$defs/wrongDetailsError" },
+    "overBookingLimitError": { "$ref": "tool-api.v1.3.schema.json#/$defs/overBookingLimitError" },
+    "quoteStateError": { "$ref": "tool-api.v1.3.schema.json#/$defs/quoteStateError" },
+    "notReachableError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notReachableError" },
+    "mobileRequiredError": { "$ref": "tool-api.v1.3.schema.json#/$defs/mobileRequiredError" },
+    "geoUnavailableError": { "$ref": "tool-api.v1.3.schema.json#/$defs/geoUnavailableError" },
+    "matchService.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchService.request" },
+    "matchService.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchService.response" },
+    "matchService.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchService.errors" },
+    "matchService.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchService.exchange" },
+    "setWhoFor.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/setWhoFor.request" },
+    "setWhoFor.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/setWhoFor.response" },
+    "setWhoFor.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/setWhoFor.errors" },
+    "setWhoFor.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/setWhoFor.exchange" },
+    "setReachWay.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/setReachWay.request" },
+    "setReachWay.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/setReachWay.response" },
+    "setReachWay.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/setReachWay.errors" },
+    "setReachWay.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/setReachWay.exchange" },
+    "addCustomer.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/addCustomer.request" },
+    "addCustomer.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/addCustomer.response" },
+    "addCustomer.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/addCustomer.errors" },
+    "addCustomer.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/addCustomer.exchange" },
+    "setPrice.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/setPrice.request" },
+    "setPrice.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/setPrice.response" },
+    "setPrice.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/setPrice.errors" },
+    "setPrice.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/setPrice.exchange" },
+    "quoteFromPhotos.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/quoteFromPhotos.request" },
+    "quoteFromPhotos.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/quoteFromPhotos.response" },
+    "quoteFromPhotos.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/quoteFromPhotos.errors" },
+    "quoteFromPhotos.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/quoteFromPhotos.exchange" },
+    "showTimes.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/showTimes.request" },
+    "showTimes.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/showTimes.response" },
+    "showTimes.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/showTimes.errors" },
+    "showTimes.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/showTimes.exchange" },
+    "saveTime.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveTime.request" },
+    "saveTime.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveTime.response" },
+    "saveTime.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveTime.errors" },
+    "saveTime.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveTime.exchange" },
+    "extendTime.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/extendTime.request" },
+    "extendTime.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/extendTime.response" },
+    "extendTime.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/extendTime.errors" },
+    "extendTime.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/extendTime.exchange" },
+    "joinWaitlist.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/joinWaitlist.request" },
+    "joinWaitlist.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/joinWaitlist.response" },
+    "joinWaitlist.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/joinWaitlist.errors" },
+    "joinWaitlist.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/joinWaitlist.exchange" },
+    "sendSecureLink.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendSecureLink.request" },
+    "sendSecureLink.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendSecureLink.response" },
+    "sendSecureLink.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendSecureLink.errors" },
+    "sendSecureLink.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendSecureLink.exchange" },
+    "checkPlace.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkPlace.request" },
+    "checkPlace.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkPlace.response" },
+    "checkPlace.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkPlace.errors" },
+    "checkPlace.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/checkPlace.exchange" },
+    "saveSecurePage.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSecurePage.request" },
+    "saveSecurePage.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSecurePage.response" },
+    "saveSecurePage.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSecurePage.errors" },
+    "saveSecurePage.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSecurePage.exchange" },
+    "moneyBranch": { "$ref": "tool-api.v1.3.schema.json#/$defs/moneyBranch" },
+    "moneyWord": { "$ref": "tool-api.v1.3.schema.json#/$defs/moneyWord" },
+    "payLinkIssued": { "$ref": "tool-api.v1.3.schema.json#/$defs/payLinkIssued" },
+    "cardNotReadyError": { "$ref": "tool-api.v1.3.schema.json#/$defs/cardNotReadyError" },
+    "documentUnsignedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/documentUnsignedError" },
+    "ownYesNeededError": { "$ref": "tool-api.v1.3.schema.json#/$defs/ownYesNeededError" },
+    "wordsDifferError": { "$ref": "tool-api.v1.3.schema.json#/$defs/wordsDifferError" },
+    "notOfferedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/notOfferedError" },
+    "creditsShortError": { "$ref": "tool-api.v1.3.schema.json#/$defs/creditsShortError" },
+    "holdEndedError": { "$ref": "tool-api.v1.3.schema.json#/$defs/holdEndedError" },
+    "showMoneyBefore.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/showMoneyBefore.request" },
+    "showMoneyBefore.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/showMoneyBefore.response" },
+    "showMoneyBefore.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/showMoneyBefore.errors" },
+    "showMoneyBefore.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/showMoneyBefore.exchange" },
+    "settleOffer.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/settleOffer.request" },
+    "settleOffer.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/settleOffer.response" },
+    "settleOffer.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/settleOffer.errors" },
+    "settleOffer.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/settleOffer.exchange" },
+    "signDocument.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/signDocument.request" },
+    "signDocument.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/signDocument.response" },
+    "signDocument.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/signDocument.errors" },
+    "signDocument.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/signDocument.exchange" },
+    "takeMoneyBefore.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/takeMoneyBefore.request" },
+    "takeMoneyBefore.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/takeMoneyBefore.response" },
+    "takeMoneyBefore.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/takeMoneyBefore.errors" },
+    "takeMoneyBefore.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/takeMoneyBefore.exchange" },
+    "refundAtOnce.request": { "$ref": "tool-api.v1.3.schema.json#/$defs/refundAtOnce.request" },
+    "refundAtOnce.response": { "$ref": "tool-api.v1.3.schema.json#/$defs/refundAtOnce.response" },
+    "refundAtOnce.errors": { "$ref": "tool-api.v1.3.schema.json#/$defs/refundAtOnce.errors" },
+    "refundAtOnce.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/refundAtOnce.exchange" },
+    "messageWritten": {
+      "title": "MessageWritten",
+      "description": "One message a journey 6 commit writes, and how it reaches its reader (README default 112): in a turn, an outbox row of that commit (K-05 v1 commitTurn: a turn may write rows to other recipients, as v1.3's ownerAnswer tells the customer); from a page's, an agent's or a job's commit, which writes no outbox row, a K-04 clock row due at once on the reader's handle whose clock turn writes the row (v1.2 default 72's way; v1.3 default 99's). It names the step whose line the row carries, the composer's master text (K-03 v1 composeInput masterText; arch 07 line 401; where the step prints no line for this reader, README default 123 names the words), the way it goes (into the reader's open chat, or by email: MC C9, Rosie never writes first, and a customer's row goes into an open chat or to their email only), its send class (K-07 v1: only routine waits for text hours, RULES 4.3), and the K-04 open question the row asks, if it asks one (its options as sent, its clock armed at first delivery: arch 02 line 127).",
+      "type": "object",
+      "properties": {
+        "to": {
+          "description": "customer (the person the booking's messages go to: the person served, or whoever meets the pro, S13-31), owner (the owner or an admin the owner lets answer, K-22) or staff (the pro on the job, K-22 staff).",
+          "type": "string",
+          "enum": ["customer", "owner", "staff"]
+        },
+        "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "step": {
+          "description": "The step whose line the row carries (A-J6.md, B-J6.md, A-S12.md; K-01 v1 step lines).",
+          "$ref": "#/$defs/stepId"
+        },
+        "via": {
+          "description": "chat: into the reader's open chat with Rosie's number (K-04 phones.chat_open); email: to their email (RULES 4.1, 4.8; MC C2: 'in full by email').",
+          "type": "string",
+          "enum": ["chat", "email"]
+        },
+        "sendClass": { "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/sendClass" },
+        "outboxRowId": {
+          "description": "In a turn, the outbox row; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "clockRowId": {
+          "description": "From a page's, an agent's or a job's commit, the clock row due at once whose clock turn writes the row; null in a turn.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "openQuestionId": {
+          "description": "The K-04 open question the row asks (written with the row in a turn, by the clock turn otherwise); null for a notice.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": [
+        "to",
+        "personId",
+        "step",
+        "via",
+        "sendClass",
+        "outboxRowId",
+        "clockRowId",
+        "openQuestionId"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "outboxRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+            "clockRowId": { "type": "null" }
+          }
+        },
+        {
+          "properties": {
+            "outboxRowId": { "type": "null" },
+            "clockRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+          }
+        }
+      ]
+    },
+    "journeySixMoneyWord": {
+      "title": "JourneySixMoneyWord",
+      "description": "One money word an answer lets Rosie say, with the record it reads, as v1.3's moneyWord (README v1.3 default 90; S13-55: 'A message never says deposit paid, paid in full, charged or refunded unless the record says it happened'; RULES 3.14), its slot list taking the two record slots journey 6's rows say that v1.3's leaves out: pay.staff (A6-15, B6-14: the pro's money line) and pay.after (K-03 v1 slots.json). A word that says money was taken or given back reads only a K-32 payments row's state, when paid, or a refunds row's, when succeeded, never a gives key.",
+      "type": "object",
+      "properties": {
+        "slot": {
+          "description": "A K-03 v1 record slot (slots.json).",
+          "type": "string",
+          "enum": [
+            "pay.asks",
+            "pay.price",
+            "pay.took",
+            "pay.left",
+            "pay.cancel",
+            "pay.late",
+            "pay.noshow",
+            "pay.back",
+            "pay.after",
+            "pay.staff",
+            "pay.failed",
+            "clock.pay"
+          ]
+        },
+        "table": { "$ref": "#/$defs/tableName" },
+        "column": {
+          "description": "The column read, as its part spells it.",
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]*$"
+        },
+        "rowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+      },
+      "required": ["slot", "table", "column", "rowId"],
+      "additionalProperties": false
+    },
+    "visitWritten": {
+      "title": "VisitWritten",
+      "description": "A K-30 booking_visits row the booking write made (A6-10, B6-10; K-30 README: written when the booking is written): its reservation (K-04 reservations, booked), its place in the booking, and whose key seals its check-in code, new for this visit (A6-14: 'a check-in code that's new for this visit. Only they get the code'). The code itself is never in an answer: it is sealed under code_for_person_id's key (K-30 rule 7) and reaches only that person, through the slot filler at finalize (K-03 visit.code, audience customer); the pro, the owner, the payer and any AI never see it (A6-14, A6-15, B6-14; README default 119). codeForPersonId null: no code (nobody home, B4-105: a photo at DONE confirms the visit).",
+      "type": "object",
+      "properties": {
+        "visitId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "position": { "type": "integer", "minimum": 1 },
+        "reservationId": { "$ref": "#/$defs/nullableId" },
+        "codeForPersonId": { "$ref": "#/$defs/nullableId" }
+      },
+      "required": ["visitId", "position", "reservationId", "codeForPersonId"],
+      "additionalProperties": false
+    },
+    "chargeBound": {
+      "title": "ChargeBound",
+      "description": "A K-32 payment this commit wrote pending, with its one K-07 effect (a stripe_charge on the saved card, or A6-32's stripe_pay_link), and the bound yes behind it (lead's note on T-053; v1.3 defaults 109, 110; K-32 v1 rule 10: a payment with no bound yes behind it is refunded at once): the K-29 consent the effect's effect.created event-log row names as approved_by (K-08 v1 approvalConsentRow, kind consentRow), the same one the booking's terms snapshot names (K-30 booking_terms.terms_consent_id), so C-018's hourly check finds it by either road. It is the money step's ticked_terms consent (v1.3 takeMoneyBefore yes, consentId), or A6-03's fresh yes's (askOwnerFirst customerAnswer, README default 117). Only K-14's result, or paymentSucceeded, makes it paid (K-32 rule 5); nothing is held (RULES 3.2).",
+      "type": "object",
+      "properties": {
+        "paymentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "purpose": {
+          "description": "K-32 payments.purpose: deposit (A5-13, B5-11) or full_price (A5-16, B5-13).",
+          "type": "string",
+          "enum": ["deposit", "full_price"]
+        },
+        "amount": { "$ref": "#/$defs/money" },
+        "effectId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "customerPresent": {
+          "description": "K-14 charge.portRequest customerPresent: true only when the write comes from the customer's own page session (a booking made now, the customer on the page: K-14 deposit.json); false at the owner's OK, in the pro's or the owner's turn and from a job (K-14 charge-at-owner-ok.json; a charge without the person present never answers needsAuthentication). false for a pay link.",
+          "type": "boolean"
+        },
+        "approvedBy": {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "consentRow" },
+            "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+          },
+          "required": ["kind", "consentId"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["paymentId", "purpose", "amount", "effectId", "customerPresent", "approvedBy"],
+      "additionalProperties": false
+    },
+    "requestEndedError": {
+      "title": "RequestEndedError",
+      "description": "The request ended before this call (K-30 booking_details.request_ended_at set, with its why), so nothing was written: an answer after its deadline (A6-02: 'An answer after the deadline: check the time is still free, then ask the customer again'; README open gap 115), a pick after the next times lapsed, a write for a request the owner declined. why is K-30 request_ended_why as stored.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "requestEnded" },
+        "why": {
+          "type": "string",
+          "enum": [
+            "let_go",
+            "declined",
+            "no_answer",
+            "dropped",
+            "not_signed",
+            "not_paid",
+            "outside_area",
+            "not_listed",
+            "waitlist"
+          ]
+        }
+      },
+      "required": ["error", "why"],
+      "additionalProperties": false
+    },
+    "calendarUnreadableError": {
+      "title": "CalendarUnreadableError",
+      "description": "The fresh free/busy read could not be made (K-16 v1 freeBusy errors: rateLimited, linkDropped; error-rate-limited.json, error-link-dropped.json), so nothing was written and nothing charged: A6-10's safe default, 'the booking isn't written until the time is still free'. A dropped link goes to v1's calendarLinkDropped (S12-13); the hold stays as K-05 v1 keeps it, and the caller may write again.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "calendarUnreadable" },
+        "calendarLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+      },
+      "required": ["error", "calendarLinkId"],
+      "additionalProperties": false
+    },
+    "notPaidYetError": {
+      "title": "NotPaidYetError",
+      "description": "writeBooking paid was called for a payment that is not paid (K-32 payments.state pending or failed), so nothing was written: 'Never: confirm, send the code or give the pro the job before it's paid' (A6-32, B6-35).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notPaidYet" },
+        "paymentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+      },
+      "required": ["error", "paymentId"],
+      "additionalProperties": false
+    },
+    "priceDiffersError": {
+      "title": "PriceDiffersError",
+      "description": "An offered or picked time whose exact price for that time and person (K-25 v1 price rules) is not the booking line's copied price, so nothing was written (README default 122, open gap 110): A6-04's other time and A6-11's next times are offered only at the price the customer said yes to, since K-30 v1 never changes a line's copy and no frozen field takes a fresh yes to a new price.",
+      "type": "object",
+      "properties": { "error": { "const": "priceDiffers" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "askOwnerFirst.request": {
+      "title": "AskOwnerFirstRequest",
+      "description": "A6-01's 'Sam's OK first' (B6-03's): the request the owner OKs before it is booked, followed from the choice made on the page (A4-98, B4-115: K-30 booking_details.approval ownerok, 'It is never decided again'), never from the caller; gives no key. Five stages. ask (A6-02, B6-04: 'This booking needs Sam's OK, so Rosie texts Sam the request. The clock runs only in Sam's text hours. Nothing is charged for this visit until the OK'): in one commit a K-30 owner_oks row about request, answer_by 4 of the owner's text hours (the plug-in's shorter clock where it has one, always before the visit; on a job sent now 5 minutes at any hour, B6-04's vary), one question per answerer (the owner and each admin the owner lets answer, K-22: 'The first answer from Sam or Pat counts'), each A6-02's line with its open question, the split's '1 Accept', '2 Another time', '3 Decline' as its options and 'No answer in time' its clock (C-055), and one K-04 clock row due 30 minutes later in the owner's text hours ('No answer in 30 minutes: the customer is told to wait, and Sam gets one reminder'; none on a job sent now), whose firing, while unanswered, writes A6-02's reminder line and the customer's wait line and sets owner_oks.reminded_at (README default 113). No payment and no effect: 'Never: take money or confirm before Sam's yes'. ownerAnswer (A6-02's answers, by the owner or a permitted admin in their own turn or on Needs you, owner_oks compared and set in K-08's ownerYes shape): accept ('1 Accept') walks to A6-03 and A6-10, writeBooking write, in the same turn's commit or from Needs you next, or on a job sent now to B6-16 (sendToOnCall ask: 'Once he accepts, B6-16 texts the on-call pro'), or, after the visit's free-cancel time on a request made before it, to A6-03's fresh yes (customerAnswer: README default 117); another_time ('2 Another time') writes A6-04's 'What time can you offer?' to the owner, except on a job sent now, where it is a decline ('On a job sent now, 2 Another time is a decline': README default 115); decline ('3 Decline') ends the request declined, releases the hold, removes a card saved for this booking at once (S13-55: 'A booking that's declined or never made removes it at once'; v1.3 default 103) and tells the customer A6-05's line, {{pay.back}} reading the record (README default 125). offerTime (A6-04, B6-06): the owner's typed time, decide's fields offered_time and offered_person re-parsed by code under limit 6 into the time and the person (arch 06 line 309), read back with A6-04's line ('Offer Alex M. Sat Oct 24 at 3:00pm with Riley? / Reply 1 Send it, 2 Type another time'), its options as sent (README default 116). sendOffer (A6-04's read-back answered): '1 Send it' writes A6-17's question to the customer word for word from the stored read-back (2 of their text hours, ending before the visit; options '1 Take it', '2 No thanks' as A6-17's split gives them); '2 Type another time' asks 'What time can you offer?' again. customerAnswer (A6-17, B6-29: 'they take it, in any words, in their own chat'; A6-03, B6-05: the fresh yes to today's terms): take walks to writeBooking write at that time ('A late yes after that: check the time is still free'), and at A6-03 writes the fresh yes as a K-29 ticked_terms consent, the charge's bound yes (README default 117); noThanks ends the request dropped, releases the hold, removes the card and tells the customer and the owner. Silence never answers: no value says 'no answer'; the deadline is the question clock's firing (A6-07's 'No answer in time', A6-17's 'or no reply'), never this call (S13-55: 'Rosie NEVER makes a new charge on silence'). Primary, uncached. Business: caller.businessId; row-level security on every K-29, K-30 and K-32 row (arch 10 line 546). Person: the head's booker for ask and customerAnswer; the answerer for the owner's stages (notAllowed for anyone the owner does not let answer), set on the server, never the browser's or an AI's words (K-22 v1 rule 4). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: owner_oks and booking_details compared and set (expectVersion; limit 4); new rows at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "oneOf": [
+            {
+              "title": "AskOwnerToBook",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "ask" },
+                "step": { "type": "string", "enum": ["A6-02", "B6-04"] }
+              },
+              "required": ["kind", "step"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OwnerAnswersRequest",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "ownerAnswer" },
+                "step": { "type": "string", "enum": ["A6-02", "B6-04"] },
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "answer": {
+                  "description": "A6-02's split as the owner answered: accept ('1 Accept'), anotherTime ('2 Another time') or decline ('3 Decline'). There is no value for silence: 'No answer in time' is the question clock's firing, never this call.",
+                  "type": "string",
+                  "enum": ["accept", "anotherTime", "decline"]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" },
+                "expectVersion": {
+                  "description": "The owner_oks row's version the question was asked on (limit 4).",
+                  "$ref": "#/$defs/version"
+                }
+              },
+              "required": ["kind", "step", "ownerOkId", "answer", "yes", "expectVersion"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OwnerOffersTime",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "offerTime" },
+                "step": { "type": "string", "enum": ["A6-04", "B6-06"] },
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "offer": {
+                  "description": "The other time and person as code re-parsed them from the owner's own words under limit 6 (decide's fields offered_time and offered_person in a turn; the typed words on Needs you), never the caller's own value (README default 116).",
+                  "type": "object",
+                  "properties": {
+                    "resourceId": {
+                      "description": "K-04 resources.id of this business: the person offered ('or another person': A6-04).",
+                      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                    },
+                    "during": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/during" },
+                    "words": {
+                      "description": "The owner's own words the time was read from, as typed ('Sat 3pm').",
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["resourceId", "during", "words"],
+                  "additionalProperties": false
+                },
+                "yes": {
+                  "description": "The owner's typed answer: in a turn the open question 'What time can you offer?' and the reply's event; on Needs you the tap with the words shown.",
+                  "$ref": "#/$defs/readBackYes"
+                }
+              },
+              "required": ["kind", "step", "ownerOkId", "offer", "yes"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OwnerSendsOffer",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "sendOffer" },
+                "step": { "type": "string", "enum": ["A6-04", "B6-06"] },
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "answer": {
+                  "description": "A6-04's read-back as the owner answered: sendIt ('1 Send it') or typeAnother ('2 Type another time'), the option choices of README default 116.",
+                  "type": "string",
+                  "enum": ["sendIt", "typeAnother"]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": ["kind", "step", "ownerOkId", "answer", "yes"],
+              "additionalProperties": false
+            },
+            {
+              "title": "CustomerAnswersOffer",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "customerAnswer" },
+                "step": {
+                  "description": "A6-17 (B6-29): Sam's other time; A6-03 (B6-05): the fresh yes to today's terms after free cancel ended (README default 117).",
+                  "type": "string",
+                  "enum": ["A6-17", "B6-29", "A6-03", "B6-05"]
+                },
+                "answer": {
+                  "description": "take ('1 Take it': in any words, in their own chat) or noThanks ('2 No thanks'). No value for no reply: that is the question clock's firing.",
+                  "type": "string",
+                  "enum": ["take", "noThanks"]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": ["kind", "step", "answer", "yes"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "stage"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stage": {
+          "allOf": [
+            {
+              "description": "Every stage acts for a known person, from their own turn or their own page: the customer's side after their yes, the owner's on Needs you; never an AI, a job or the console (A3-03; S13-55: 'Never a yes relayed in a chat by someone else's AI').",
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "enum": ["turn", "page"] },
+                    "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                  }
+                }
+              }
+            },
+            {
+              "description": "The customer answers Sam's other time, and gives A6-03's fresh yes, in their own chat (A6-17: 'in their own chat').",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "customerAnswer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "const": "turn" } } },
+                  "stage": {
+                    "type": "object",
+                    "properties": {
+                      "yes": {
+                        "type": "object",
+                        "properties": { "kind": { "const": "openQuestion" } },
+                        "required": ["kind"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "askOwnerFirst.response": {
+      "title": "AskOwnerFirstResponse",
+      "description": "What the stage wrote: the owner's ask and its deadline, the answer recorded, the questions and notices written, the walk's next call, the hold released, the request ended, the card removed, a fresh yes's consent, the money words' sources; no key (README 'v1.4', 'Each key's one call').",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "type": "string",
+          "enum": ["ask", "ownerAnswer", "offerTime", "sendOffer", "customerAnswer"]
+        },
+        "answer": {
+          "description": "The answer this commit recorded: for ownerAnswer K-30 owner_oks.answer (accept, another_time, decline); for sendOffer send_it or type_another; for customerAnswer take or no_thanks; null for ask and offerTime.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["accept", "another_time", "decline", "send_it", "type_another", "take", "no_thanks"]
+            },
+            { "type": "null" }
+          ]
+        },
+        "ownerOk": {
+          "description": "The K-30 owner_oks row about request: its deadline (answer_by) and the 30-minute reminder's clock row (null on a job sent now, and for every stage but ask).",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "ownerOkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "answerBy": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "reminderClockRowId": { "$ref": "#/$defs/nullableId" }
+              },
+              "required": ["ownerOkId", "answerBy", "reminderClockRowId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "questions": {
+          "description": "The questions this commit writes: A6-02's to the owner and each permitted admin (ask); 'What time can you offer?' (another_time, type_another); A6-04's read-back (offerTime); A6-17's to the customer (send_it); A6-03's fresh-yes question (accept after free cancel ended).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/messageWritten" }
+        },
+        "told": {
+          "description": "The notices this commit writes: A6-05's to the customer on a decline (B6-07's on a job sent now's '2 Another time'); A6-17's end to the customer and the owner on '2 No thanks' (README default 123).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/messageWritten" }
+        },
+        "next": {
+          "description": "The call the walk goes on to in the same turn's commit, or that the page server makes next: writeBooking (an accept, '1 Take it'), sendToOnCall (an accept on a job sent now), customerAnswer (an accept that needs A6-03's fresh yes: its question is in questions), or none.",
+          "type": "string",
+          "enum": ["writeBooking", "sendToOnCall", "customerAnswer", "none"]
+        },
+        "released": {
+          "description": "The hold released now (K-05 v1 release, why let_go), when one is still held; null otherwise.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "why": { "const": "let_go" }
+              },
+              "required": ["reservationId", "why"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "requestEnded": {
+          "description": "K-30 booking_details.request_ended_why as this commit set it: declined (the owner's '3 Decline'; '2 Another time' on a job sent now), dropped (the customer's '2 No thanks'); null otherwise.",
+          "anyOf": [{ "type": "string", "enum": ["declined", "dropped"] }, { "type": "null" }]
+        },
+        "cardRemoved": {
+          "description": "The K-32 saved_cards row of this booking removed at once (removed_why not_booked; K-14 removeCard by this deciding turn or job: K-14 open gap 2), when the request ends with a card saved for it; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "consentId": {
+          "description": "For A6-03's '1 Take it', the K-29 ticked_terms consent of the fresh yes to today's terms, with the question's exact words and their sha256 (README default 117), which the booking's terms snapshot and its charge's approved_by name; null otherwise. A consent row carries no version, so written never lists it (K-29 v1 rule 2).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "moneyWords": { "type": "array", "items": { "$ref": "#/$defs/journeySixMoneyWord" } },
+        "gives": { "type": "array", "maxItems": 0 },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "stage",
+        "answer",
+        "ownerOk",
+        "questions",
+        "told",
+        "next",
+        "released",
+        "requestEnded",
+        "cardRemoved",
+        "consentId",
+        "moneyWords",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "The ask writes the owner_oks row and at least one question to an answerer, records no answer and walks nowhere.",
+          "if": { "properties": { "stage": { "const": "ask" } }, "required": ["stage"] },
+          "then": {
+            "properties": {
+              "answer": { "type": "null" },
+              "ownerOk": { "type": "object" },
+              "questions": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "object", "properties": { "to": { "const": "owner" } } }
+              },
+              "next": { "const": "none" },
+              "requestEnded": { "type": "null" }
+            }
+          },
+          "else": { "properties": { "ownerOk": { "type": "null" } } }
+        },
+        {
+          "description": "The owner's accept records accept and walks on; it ends nothing.",
+          "if": {
+            "properties": { "stage": { "const": "ownerAnswer" }, "answer": { "const": "accept" } },
+            "required": ["stage", "answer"]
+          },
+          "then": {
+            "properties": {
+              "next": { "enum": ["writeBooking", "sendToOnCall", "customerAnswer"] },
+              "requestEnded": { "type": "null" },
+              "told": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "description": "The owner's decline ends the request declined and tells the customer.",
+          "if": {
+            "properties": { "stage": { "const": "ownerAnswer" }, "answer": { "const": "decline" } },
+            "required": ["stage", "answer"]
+          },
+          "then": {
+            "properties": {
+              "requestEnded": { "const": "declined" },
+              "next": { "const": "none" },
+              "told": { "type": "array", "minItems": 1 }
+            }
+          }
+        },
+        {
+          "description": "Each stage records its own kind of answer.",
+          "allOf": [
+            {
+              "if": { "properties": { "stage": { "const": "ownerAnswer" } }, "required": ["stage"] },
+              "then": { "properties": { "answer": { "enum": ["accept", "another_time", "decline"] } } }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "offerTime" } }, "required": ["stage"] },
+              "then": {
+                "properties": {
+                  "answer": { "type": "null" },
+                  "next": { "const": "none" },
+                  "questions": { "type": "array", "minItems": 1 }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "sendOffer" } }, "required": ["stage"] },
+              "then": {
+                "properties": {
+                  "answer": { "enum": ["send_it", "type_another"] },
+                  "next": { "const": "none" },
+                  "questions": { "type": "array", "minItems": 1 }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "customerAnswer" } }, "required": ["stage"] },
+              "then": { "properties": { "answer": { "enum": ["take", "no_thanks"] } } }
+            }
+          ]
+        },
+        {
+          "description": "The customer's '1 Take it' walks to the booking write; '2 No thanks' ends the request dropped and tells the customer and the owner.",
+          "allOf": [
+            {
+              "if": { "properties": { "answer": { "const": "take" } }, "required": ["answer"] },
+              "then": {
+                "properties": { "next": { "const": "writeBooking" }, "requestEnded": { "type": "null" } }
+              }
+            },
+            {
+              "if": { "properties": { "answer": { "const": "no_thanks" } }, "required": ["answer"] },
+              "then": {
+                "properties": {
+                  "next": { "const": "none" },
+                  "requestEnded": { "const": "dropped" },
+                  "told": { "type": "array", "minItems": 2 }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "description": "Only A6-03's '1 Take it' writes a consent (README default 117).",
+          "if": {
+            "properties": { "stage": { "const": "customerAnswer" }, "answer": { "const": "take" } },
+            "required": ["stage", "answer"]
+          },
+          "else": { "properties": { "consentId": { "type": "null" } } }
+        }
+      ]
+    },
+    "askOwnerFirst.errors": {
+      "title": "AskOwnerFirstErrors",
+      "description": "Refused, nothing written: requestEnded (an answer after the request ended, a late answer included: README open gap 115), priceDiffers (an offered time not at the line's price: README default 122), wordsDiffer (a page's words that are not the stored ones), notAllowed (not the booker; not the owner or an admin the owner lets answer), notFound, versionChanged, constraint (a second waiting ask about one request: K-30 owner_oks partial unique key), bookingPaused, transient.",
+      "oneOf": [
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/priceDiffersError" },
+        { "$ref": "#/$defs/wordsDifferError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "askOwnerFirst.exchange": {
+      "title": "AskOwnerFirstExchange",
+      "description": "One askOwnerFirst request with its outcome: a response answers the stage it was sent, and the owner's answer the answer it was sent with.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "ask" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "stage": { "const": "ask" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "ownerAnswer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "ownerAnswer" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "offerTime" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "offerTime" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "sendOffer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "sendOffer" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "customerAnswer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "customerAnswer" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "answer": { "const": "accept" } },
+                    "required": ["answer"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "answer": { "const": "accept" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "answer": { "const": "decline" } },
+                    "required": ["answer"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "answer": { "const": "decline" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "answer": { "const": "take" } },
+                    "required": ["answer"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "answer": { "const": "take" } } } }
+          }
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "call": { "const": "askOwnerFirst" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/askOwnerFirst.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/askOwnerFirst.response" }, { "$ref": "#/$defs/askOwnerFirst.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sendToOnCall.request": {
+      "title": "SendToOnCallRequest",
+      "description": "B6-16, 'Texts the on-call plumber first' (only when booking: Sent now): 'A sent-now job goes first to whoever is on call ... has 5 minutes to take it. Nothing is charged until someone takes it'; gives no key. Followed from the choice made at the pick (K-30 booking_details.timing sentnow, B4-91: 'That one mark decides the rest'), after B6-03's 'Sent now' or, for a job sent now the owner must OK, after his accept (askOwnerFirst next sendToOnCall). Two stages. ask: in one commit, whoever is on call for the booking's kind of work now (K-22 v1 on_call: its days, hours and staff), one offer to that person, B6-16's line with its open question, '1 Take it' and '2 Can't' as its split gives them, its clock 5 minutes ('Clock: Jordan takes it within 5 minutes; silence means not booked'), send class visit_now ('Urgent texts go at once, even at night'), and only the kind of job and the area until Take it ('Never: send the name or the address before someone takes the job'; with the sensitive switch only times and initials); nobody on call is B6-16's 'Can't, or no reply' at once (README default 118). proAnswer (the pro's own answer in their own turn, 'in any words, within 5 minutes'): take walks to B6-10, writeBooking write, in the same turn's commit (the name and address open in the job after, and where a deposit or the full price is due now only once it's charged); cant ('A different day or a set time is a Can't') ends the request declined, the pro's answer standing for the owner's (S12-17: 'Work sent now: the on-call pro's yes stands for Sam's'), releases the hold, removes a card saved for it and tells Alex and Sam at once with B6-16's lines, Alex's with the soonest set times' link ('See the soonest times': v1.2 linkIssued bookingPage). A take with a later arrival ('I'll take it but I'm 2 hours out') is no option of the question and books nothing until a K-01 minor version gives its walk (README open gap 117). No reply in 5 minutes is the question clock's firing, never this call: not booked, and Alex and Sam are told at once. Primary, uncached. Business: caller.businessId. Person: the booker for ask, the pro for proAnswer (notAllowed for anyone but the person offered), set on the server. Repeat: caller.requestId is the key; a repeat answers the first result. Version: booking_details compared and set; new rows at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "oneOf": [
+            {
+              "title": "OfferToOnCall",
+              "type": "object",
+              "properties": { "kind": { "const": "ask" }, "step": { "const": "B6-16" } },
+              "required": ["kind", "step"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OnCallAnswers",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "proAnswer" },
+                "step": { "const": "B6-16" },
+                "answer": {
+                  "description": "B6-16's split: take ('1 Take it') or cant ('2 Can't'). No value for no reply.",
+                  "type": "string",
+                  "enum": ["take", "cant"]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": ["kind", "step", "answer", "yes"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "stage"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stage": {
+          "allOf": [
+            {
+              "description": "The offer follows the customer's own page or turn, or the owner's accept in his turn or on Needs you; never an AI, a job or the console.",
+              "properties": {
+                "caller": {
+                  "type": "object",
+                  "properties": {
+                    "kind": { "enum": ["turn", "page"] },
+                    "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                  }
+                }
+              }
+            },
+            {
+              "description": "The pro takes it, or can't, in their own turn.",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "proAnswer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": { "type": "object", "properties": { "kind": { "const": "turn" } } },
+                  "stage": {
+                    "type": "object",
+                    "properties": {
+                      "yes": {
+                        "type": "object",
+                        "properties": { "kind": { "const": "openQuestion" } },
+                        "required": ["kind"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sendToOnCall.response": {
+      "title": "SendToOnCallResponse",
+      "description": "What the stage wrote: who is on call and the offer to them with its deadline, or the pro's answer, the walk's next call, the notices, the hold released, the request ended, the card removed, the soonest times' link; no key.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": { "type": "string", "enum": ["ask", "proAnswer"] },
+        "onCall": {
+          "description": "Who is on call now for the booking's kind of work (K-22 v1 on_call: staff_id and the person), or null when nobody is.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "staffId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+              },
+              "required": ["staffId", "personId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "offer": {
+          "description": "B6-16's offer to the pro on call, with its open question, send class visit_now; null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/messageWritten" }, { "type": "null" }]
+        },
+        "answerBy": {
+          "description": "The offer's deadline, 5 minutes after it is sent (its question clock, C-055); null otherwise.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "answer": { "anyOf": [{ "type": "string", "enum": ["take", "cant"] }, { "type": "null" }] },
+        "next": { "type": "string", "enum": ["writeBooking", "none"] },
+        "told": {
+          "description": "On a 'Can't' or nobody on call, B6-16's lines to Alex and to the owner, send class visit_now ('Alex and Sam are told at once').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/messageWritten" }
+        },
+        "released": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "why": { "const": "let_go" }
+              },
+              "required": ["reservationId", "why"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "requestEnded": { "anyOf": [{ "type": "string", "const": "declined" }, { "type": "null" }] },
+        "cardRemoved": { "$ref": "#/$defs/nullableId" },
+        "soonestTimes": {
+          "description": "On a 'Can't', the business's booking page link for Alex's row ('See the soonest times: rosfield.com/c/r4'): v1.2 linkIssued kind bookingPage, no row kept (v1.2 default 73); null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/linkIssued" }, { "type": "null" }]
+        },
+        "gives": { "type": "array", "maxItems": 0 },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "stage",
+        "onCall",
+        "offer",
+        "answerBy",
+        "answer",
+        "next",
+        "told",
+        "released",
+        "requestEnded",
+        "cardRemoved",
+        "soonestTimes",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "An offer to someone on call has its deadline and asks the pro, visit_now; nobody on call is a 'Can't' at once.",
+          "if": {
+            "properties": { "stage": { "const": "ask" }, "onCall": { "type": "object" } },
+            "required": ["stage", "onCall"]
+          },
+          "then": {
+            "properties": {
+              "offer": {
+                "type": "object",
+                "properties": { "to": { "const": "staff" }, "sendClass": { "const": "visit_now" } }
+              },
+              "answerBy": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+              "answer": { "type": "null" },
+              "next": { "const": "none" },
+              "requestEnded": { "type": "null" },
+              "told": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "description": "The pro's take walks to the booking write; a 'Can't', or nobody on call, ends the request declined and tells Alex and Sam at once.",
+          "allOf": [
+            {
+              "if": { "properties": { "answer": { "const": "take" } }, "required": ["answer"] },
+              "then": {
+                "properties": {
+                  "stage": { "const": "proAnswer" },
+                  "next": { "const": "writeBooking" },
+                  "requestEnded": { "type": "null" },
+                  "told": { "type": "array", "maxItems": 0 }
+                }
+              }
+            },
+            {
+              "if": {
+                "anyOf": [
+                  { "properties": { "answer": { "const": "cant" } }, "required": ["answer"] },
+                  { "properties": { "onCall": { "type": "null" } }, "required": ["onCall"] }
+                ]
+              },
+              "then": {
+                "properties": {
+                  "next": { "const": "none" },
+                  "requestEnded": { "const": "declined" },
+                  "offer": { "type": "null" },
+                  "told": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": { "type": "object", "properties": { "sendClass": { "const": "visit_now" } } }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": { "properties": { "stage": { "const": "proAnswer" } }, "required": ["stage"] },
+          "then": { "properties": { "answer": { "enum": ["take", "cant"] }, "offer": { "type": "null" } } }
+        }
+      ]
+    },
+    "sendToOnCall.errors": {
+      "title": "SendToOnCallErrors",
+      "description": "Refused, nothing written: requestEnded (the 5 minutes ran out first: 'silence means not booked'), notAllowed (not a job sent now; not the person offered), notFound, versionChanged, constraint, bookingPaused, transient.",
+      "oneOf": [
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "sendToOnCall.exchange": {
+      "title": "SendToOnCallExchange",
+      "description": "One sendToOnCall request with its outcome: a response answers the stage, and the pro's answer, it was sent.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "ask" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "stage": { "const": "ask" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "proAnswer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "proAnswer" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "answer": { "const": "take" } },
+                    "required": ["answer"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "answer": { "const": "take" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "answer": { "const": "cant" } },
+                    "required": ["answer"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "answer": { "const": "cant" } } } }
+          }
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendToOnCall" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendToOnCall.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendToOnCall.response" }, { "$ref": "#/$defs/sendToOnCall.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "writeBooking.request": {
+      "title": "WriteBookingRequest",
+      "description": "A6-10, B6-10, 'Writes the booking' ('Rosie checks the calendars once more, then saves the booking. Anything due now is charged as it's written. It shows on Riley's phone calendar too'), and A6-12 at a new time ('The same steps, at the new time'); gives booked (A6-10, B6-10; A6-12; once what is due now is paid: A6-10's 'Yes' after the charge, A6-32's and B6-35's 'Paid in time') and code (A6-14, B6-13, the confirmation the same commit writes, with the visit's new check-in code), the one call that writes each (02-contracts section 8; README 'v1.4', 'Each key's one call'; default 111 says when). Four stages. write: the fresh free/busy read first (K-16 v1 freeBusy, purpose bookingWrite, on each booked person's calendar link over the visit's time: arch 05 line 259; on the calendar double, Q-56), then, in one commit: the time still free and nothing due now on a card (nothing taken; a card saved only; a line paid by credit; C3's pay link already paid, v1.3 default 104's step 6): the reservation confirmed booked (K-05 v1 commitTurn, its saved-time clock row cancelled), the head booked (K-04 bookings.stage), each visit with its new check-in code sealed under its person's key (K-30 booking_visits), the terms snapshot naming the money step's yes (K-30 booking_terms.terms_consent_id: the money step's ticked_terms consent, never a pack's, v1.3 default 109; booking_terms_rules), one K-07 calendar_write effect per visit per booked person with a calendar link (K-16 calendarWrite; 'A team member's own booking blocks their work calendar'), A6-14's confirmation to the code's person (into their open chat, else by email; on the page; to the customer's own AI only the booking number and the chat link, never the code: MC C2, C9; README default 119), and A6-15's job row to the pro (README default 120): result booked. The time still free and a deposit or the full price due now on the saved card (the standard door: a booking made now on the page, or the owner's OK, A6-03): the reservation confirmed booked ('so a time lost in that moment costs nothing': S13-55), the terms snapshot, and the K-32 payment pending with its payment_items and one K-07 stripe_charge effect on the saved card (K-14 charge, purpose deposit or fullPrice), approved by the money step's consent (chargeBound): result charging, no key, no visit, no code and no message, since 'The confirmation waits until it's paid' (A6-10) and K-30 never updates a visit's code (README default 111). The time taken a moment ago (the fresh read finds it busy, or the hold is gone and K-05 reserve finds it taken): nothing written but the hold released and A6-11's next open times, soonest first, the same person, at the line's price (README default 122), with A6-11's question (10 minutes on the page; after an OK 2 of their text hours, ending before the visit): result takenMomentAgo, 'Nothing was charged'. A pick of one of them (A6-12; B6-10 after B6-11's 'A or B': the customer's own answer and the option, whose time code reads from the stored question, never the caller's) reserves that time (K-05 v1 reserve) and writes as above. paid (a job only: C-101's handling of the charge's result charged, or of paymentSucceeded for a charge that needed the bank's check or for A6-32's pay link): the payment paid (K-32 rule 5: the runtime side only), then in one commit the head booked, each visit with its code, the calendar writes, and the confirmation and the job row through clock rows due at once (a job's commit writes no outbox row): result booked; on A6-32's paid link, 'that card is the one saved for it' (K-32 saved_cards.saved_from_payment_id) and the declined card is removed (nothing_needs_it). chargeFailed (a job only: C-101's handling of a decline, never retried, RULES 3.11): a booking made now on the page shows it as any declined card, 'Try another card' (S12-25), and its own clock runs (A5-31: a K-04 clock row at the hold's held_until, whose firing lets the time go and ends the request let_go, A5-06; 'Nothing is saved after it'): result tryAnotherCard; another card is v1.3's card stage, then write again; after an OK, or on a job sent now after one, A6-32's one pay link (K-32 payment pending with its K-07 stripe_pay_link, K-14 payLink with saveCardForLater where the booking keeps its card; its pay_links row due by {{clock.pay}}, the request's latest answer time, 'The time stays saved until then'), only to the payer's own ways (their open chat, else their email: never the AI, the owner or the pro), and 'Anyone already told hears it at once': on a job sent now the pro, 'Payment didn't go through yet. Don't set out.' (README default 121): result payLinkSent. Not paid by the deadline is the pay link's clock firing (closePayLink: not booked, the time goes back, any card saved for it removed, request ended not_paid), never this call. noneWorks (A6-11's 'C Neither works', B6-11's): A6-13, nothing booked, the request ended let_go, the hold released, a card saved for it removed, the customer told A6-13's line: result letGo; no pick by the deadline is the question clock's firing. Silence never books and never charges: every stage is an act a person or a result asked for. Primary, uncached. Business: caller.businessId; row-level security on every K-04, K-30 and K-32 row (arch 10 line 546; K-30 rule 5). Person: the head's booker, set on the server; none for a job. Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: the head, booking_details and the reservation compared and set (limits 4 and 5); new rows at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "oneOf": [
+            {
+              "title": "WriteTheBooking",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "write" },
+                "step": {
+                  "description": "A6-10 (B6-10): the booking written; A6-12: at a new time picked from A6-11's next times (flow B's pick rejoins B6-10).",
+                  "type": "string",
+                  "enum": ["A6-10", "A6-12", "B6-10"]
+                },
+                "pick": {
+                  "description": "For A6-12, and B6-10 after B6-11: the customer's own answer to the next times' question (in a turn the open question and the reply's event; on the page the tap) and the option picked, whose time code reads from the stored question (K-04 open_questions.options), never from the caller; null for the first write.",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "answer": { "$ref": "#/$defs/readBackYes" },
+                        "optionId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                      },
+                      "required": ["answer", "optionId"],
+                      "additionalProperties": false
+                    },
+                    { "type": "null" }
+                  ]
+                }
+              },
+              "required": ["kind", "step", "pick"],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": { "properties": { "step": { "const": "A6-12" } }, "required": ["step"] },
+                  "then": { "properties": { "pick": { "type": "object" } } }
+                },
+                {
+                  "if": { "properties": { "step": { "const": "A6-10" } }, "required": ["step"] },
+                  "then": { "properties": { "pick": { "type": "null" } } }
+                }
+              ]
+            },
+            {
+              "title": "BookOncePaid",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "paid" },
+                "step": {
+                  "description": "A6-10 (B6-10): the charge as the booking was written succeeded; A6-32 (B6-35): its pay link was paid in time.",
+                  "type": "string",
+                  "enum": ["A6-10", "A6-32", "B6-10", "B6-35"]
+                },
+                "paymentId": {
+                  "description": "The K-32 payment that is now paid (its state set by the runtime side: K-32 rule 5).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "step", "paymentId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ChargeFailed",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "chargeFailed" },
+                "step": { "type": "string", "enum": ["A6-10", "B6-10"] },
+                "paymentId": {
+                  "description": "The K-32 payment the decline failed (state failed, failed_why declined: K-32), never charged again.",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "step", "paymentId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "NoneWorks",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "noneWorks" },
+                "step": { "type": "string", "enum": ["A6-11", "B6-11"] },
+                "answer": {
+                  "description": "The customer's own 'C Neither works': in a turn the open question and the reply's event; on the page the tap.",
+                  "$ref": "#/$defs/readBackYes"
+                }
+              },
+              "required": ["kind", "step", "answer"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "stage"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stage": {
+          "allOf": [
+            {
+              "description": "The write follows the customer's own page or turn, the owner's accept (his turn or Needs you), the pro's take (their turn), the customer's own AI on D104's door (nothing to pay or save, booked at once on its request: MC C3), or C-101's job after C3's pay link was paid; a job and an AI act for the record, an AI only for the person its token is bound to (v1.2 default 70).",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "write" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "enum": ["turn", "page", "agent", "job"] } }
+                  }
+                },
+                "anyOf": [
+                  {
+                    "properties": {
+                      "caller": {
+                        "type": "object",
+                        "properties": {
+                          "kind": { "enum": ["turn", "page", "agent"] },
+                          "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "caller": {
+                        "type": "object",
+                        "properties": { "kind": { "const": "job" }, "personId": { "type": "null" } }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "description": "A charge's result, and a decline, come to C-101's job alone, acting for no person.",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "enum": ["paid", "chargeFailed"] } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "job" }, "personId": { "type": "null" } }
+                  }
+                }
+              }
+            },
+            {
+              "description": "'C Neither works' is the customer's own, in their chat or on their page.",
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "noneWorks" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "enum": ["turn", "page"] },
+                      "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "writeBooking.response": {
+      "title": "WriteBookingResponse",
+      "description": "What the stage wrote: the fresh read, the reservation, the visits (never a code), the terms snapshot, the charge and its bound yes, A6-32's pay link, A6-11's next times, the page's own clock, the booking number and chat link, the messages, the card removed, the request ended, the effects, each money word's source, and the keys it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": { "type": "string", "enum": ["write", "paid", "chargeFailed", "noneWorks"] },
+        "result": {
+          "description": "booked (A6-10's 'Yes'; A6-32's 'Paid in time'), charging (what is due now is being charged; the confirmation waits), takenMomentAgo (A6-10's 'Taken a moment ago'), payLinkSent (A6-32's one pay link), tryAnotherCard (a booking made now: the decline shows on the page) or letGo (A6-13).",
+          "type": "string",
+          "enum": ["booked", "charging", "takenMomentAgo", "payLinkSent", "tryAnotherCard", "letGo"]
+        },
+        "freshRead": {
+          "description": "For write, the K-16 freeBusy read made before the commit (purpose bookingWrite) and the links it read; empty links when no booked person has one. null for every other stage.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "at": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "calendarLinkIds": {
+                  "type": "array",
+                  "items": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                  "uniqueItems": true
+                }
+              },
+              "required": ["at", "calendarLinkIds"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "reservation": {
+          "description": "The visit's reservation as this commit left it: booked (confirmed for the booking), or released (the hold let go); null when this commit did not move it.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reservationId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "state": { "type": "string", "enum": ["booked", "released"] }
+              },
+              "required": ["reservationId", "state"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "visits": {
+          "description": "For booked, each K-30 booking_visits row written, with whose key seals its code; empty otherwise.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/visitWritten" }
+        },
+        "termsSnapshot": {
+          "description": "The K-30 booking_terms row written once in this commit (with its booking_terms_rules), and the K-29 ticked_terms consent it names (null for a nothing-taken yes, which ticks no words: K-30 booking_terms.terms_consent_id); null when this commit wrote none (written before, at charging, or not booked).",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": { "termsConsentId": { "$ref": "#/$defs/nullableId" } },
+              "required": ["termsConsentId"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "payment": {
+          "description": "For charging, the deposit's or the full price's payment and its stripe_charge; for payLinkSent, A6-32's pay link's payment and its stripe_pay_link; each with its bound yes (chargeBound). null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/chargeBound" }, { "type": "null" }]
+        },
+        "payLink": {
+          "description": "For payLinkSent, A6-32's one pay link (v1.3 payLinkIssued): url null, since it goes only to the payer's own ways through its clock rows (link.pay), never to an AI; null otherwise.",
+          "anyOf": [{ "$ref": "#/$defs/payLinkIssued" }, { "type": "null" }]
+        },
+        "nextTimes": {
+          "description": "For takenMomentAgo, A6-11's next open times, soonest first, the same person, each at the line's price (README default 122), as its options A and B, with the question's deadline and its row (null on the page, which shows them; 'C Neither works' is its third option).",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "times": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "items": { "$ref": "#/$defs/timeOffered" }
+                },
+                "answerBy": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+                "question": { "anyOf": [{ "$ref": "#/$defs/messageWritten" }, { "type": "null" }] }
+              },
+              "required": ["times", "answerBy", "question"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "pageClock": {
+          "description": "For tryAnotherCard, the page's own clock (A5-31): a K-04 clock row due at the hold's held_until, whose firing lets the time go if nothing is paid by then (A5-06); null otherwise.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "clockRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "dueAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" }
+              },
+              "required": ["clockRowId", "dueAt"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "bookingNumber": {
+          "description": "For booked, K-30 booking_details.number: what the customer's own AI gets ('The AI gets a booking number, but not the code': A6-14); null otherwise.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "chatLink": {
+          "description": "For booked, the booking's K-29 chat_links row with its ready text and short code, when the mobile's chat is not open and the mobile is a Linq contact (MC C9: 'each new booking's confirmation carries the link again'; Q-03), its QR beside it on the page and in the email (K-03 link.chat, link.chatqr, never in a text); url to a page or an AI caller once, never logged, null in a turn or a job (the email row's slot fills it). null when the chat is open or the mobile is no contact.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "chatLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "url": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }
+              },
+              "required": ["chatLinkId", "url"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "messages": {
+          "description": "The rows this commit writes or arms: A6-14's confirmation and A6-15's job row (booked); A6-11's question is nextTimes.question; A6-32's link rows are payLink's clock rows, and on a job sent now the pro's line (payLinkSent); A6-13's notice (letGo).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/messageWritten" }
+        },
+        "cardRemoved": {
+          "description": "A K-32 saved_cards row removed by this commit (K-14 removeCard after it): the declined card once A6-32's paid link's card is the one saved for it (nothing_needs_it), or a card saved for a request that ends here (not_booked); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "requestEnded": {
+          "description": "K-30 booking_details.request_ended_why as this commit set it: let_go (A6-13); null otherwise.",
+          "anyOf": [{ "type": "string", "const": "let_go" }, { "type": "null" }]
+        },
+        "effects": {
+          "description": "The K-07 effects written: calendar_write per visit per booked person with a link (booked); one stripe_charge (charging); one stripe_pay_link (payLinkSent); none otherwise.",
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/effectWritten" },
+              {
+                "type": "object",
+                "properties": { "kind": { "enum": ["calendar_write", "stripe_charge", "stripe_pay_link"] } }
+              }
+            ]
+          }
+        },
+        "moneyWords": {
+          "description": "Each money word Rosie may say after this commit, with its source (README v1.3 default 90).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/journeySixMoneyWord" }
+        },
+        "gives": {
+          "description": "For booked, booked and, for every visit with a code, code (A6-10 then A6-14; B6-10 then B6-13: J6_CALL_PASSES); none otherwise.",
+          "type": "array",
+          "items": { "type": "string", "enum": ["booked", "code"] },
+          "uniqueItems": true
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "stage",
+        "result",
+        "freshRead",
+        "reservation",
+        "visits",
+        "termsSnapshot",
+        "payment",
+        "payLink",
+        "nextTimes",
+        "pageClock",
+        "bookingNumber",
+        "chatLink",
+        "messages",
+        "cardRemoved",
+        "requestEnded",
+        "effects",
+        "moneyWords",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "Each stage's results: write books, charges or finds the time taken; paid books; a decline sends a pay link or shows on the page; 'C Neither works' lets it go.",
+          "allOf": [
+            {
+              "if": { "properties": { "stage": { "const": "write" } }, "required": ["stage"] },
+              "then": {
+                "properties": {
+                  "result": { "enum": ["booked", "charging", "takenMomentAgo"] },
+                  "freshRead": { "type": "object" }
+                }
+              },
+              "else": { "properties": { "freshRead": { "type": "null" } } }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "paid" } }, "required": ["stage"] },
+              "then": { "properties": { "result": { "const": "booked" } } }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "chargeFailed" } }, "required": ["stage"] },
+              "then": { "properties": { "result": { "enum": ["payLinkSent", "tryAnotherCard"] } } }
+            },
+            {
+              "if": { "properties": { "stage": { "const": "noneWorks" } }, "required": ["stage"] },
+              "then": { "properties": { "result": { "const": "letGo" } } }
+            }
+          ]
+        },
+        {
+          "description": "Booked: the time confirmed, at least one visit, the booking number, the confirmation and the job row; booked given, and code for every visit with a code; no charge, pay link, next times or page clock.",
+          "if": { "properties": { "result": { "const": "booked" } }, "required": ["result"] },
+          "then": {
+            "properties": {
+              "visits": { "type": "array", "minItems": 1 },
+              "bookingNumber": { "type": "string" },
+              "messages": { "type": "array", "minItems": 1 },
+              "payment": { "type": "null" },
+              "payLink": { "type": "null" },
+              "nextTimes": { "type": "null" },
+              "pageClock": { "type": "null" },
+              "requestEnded": { "type": "null" },
+              "gives": { "type": "array", "minItems": 1, "contains": { "const": "booked" } },
+              "effects": {
+                "type": "array",
+                "items": { "type": "object", "properties": { "kind": { "const": "calendar_write" } } }
+              }
+            }
+          }
+        },
+        {
+          "description": "Charging: the time confirmed (by this commit, or by the first write when this is a new card after a decline on the page), one charge with its bound yes, and nothing else: no visit, code, message or key until it is paid ('The confirmation waits until it's paid').",
+          "if": { "properties": { "result": { "const": "charging" } }, "required": ["result"] },
+          "then": {
+            "properties": {
+              "reservation": {
+                "anyOf": [
+                  { "type": "object", "properties": { "state": { "const": "booked" } } },
+                  { "type": "null" }
+                ]
+              },
+              "payment": { "type": "object" },
+              "visits": { "type": "array", "maxItems": 0 },
+              "messages": { "type": "array", "maxItems": 0 },
+              "bookingNumber": { "type": "null" },
+              "chatLink": { "type": "null" },
+              "payLink": { "type": "null" },
+              "nextTimes": { "type": "null" },
+              "pageClock": { "type": "null" },
+              "gives": { "type": "array", "maxItems": 0 },
+              "effects": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": { "type": "object", "properties": { "kind": { "const": "stripe_charge" } } }
+              }
+            }
+          }
+        },
+        {
+          "description": "A pay link after a failed charge: its payment with its bound yes, its one stripe_pay_link, no url (only the payer's own ways), no key.",
+          "if": { "properties": { "result": { "const": "payLinkSent" } }, "required": ["result"] },
+          "then": {
+            "properties": {
+              "payment": { "type": "object", "properties": { "customerPresent": { "const": false } } },
+              "payLink": { "type": "object", "properties": { "url": { "type": "null" } } },
+              "visits": { "type": "array", "maxItems": 0 },
+              "gives": { "type": "array", "maxItems": 0 },
+              "effects": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": { "type": "object", "properties": { "kind": { "const": "stripe_pay_link" } } }
+              }
+            }
+          }
+        },
+        {
+          "description": "Every result but booked, charging and payLinkSent writes no payment, no effect, no visit and no key: nothing is charged when the time was taken, on the page's own decline or when nothing works.",
+          "if": {
+            "properties": { "result": { "enum": ["takenMomentAgo", "tryAnotherCard", "letGo"] } },
+            "required": ["result"]
+          },
+          "then": {
+            "properties": {
+              "payment": { "type": "null" },
+              "payLink": { "type": "null" },
+              "visits": { "type": "array", "maxItems": 0 },
+              "bookingNumber": { "type": "null" },
+              "chatLink": { "type": "null" },
+              "gives": { "type": "array", "maxItems": 0 },
+              "effects": { "type": "array", "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "description": "The time taken a moment ago: the next times, never a snapshot.",
+          "if": { "properties": { "result": { "const": "takenMomentAgo" } }, "required": ["result"] },
+          "then": {
+            "properties": { "nextTimes": { "type": "object" }, "termsSnapshot": { "type": "null" } }
+          },
+          "else": { "properties": { "nextTimes": { "type": "null" } } }
+        },
+        {
+          "description": "A booking made now, declined on the page: its own clock.",
+          "if": { "properties": { "result": { "const": "tryAnotherCard" } }, "required": ["result"] },
+          "then": { "properties": { "pageClock": { "type": "object" } } },
+          "else": { "properties": { "pageClock": { "type": "null" } } }
+        },
+        {
+          "description": "'C Neither works': the request ended let_go and the customer told.",
+          "if": { "properties": { "result": { "const": "letGo" } }, "required": ["result"] },
+          "then": {
+            "properties": {
+              "requestEnded": { "const": "let_go" },
+              "messages": { "type": "array", "minItems": 1 }
+            }
+          },
+          "else": { "properties": { "requestEnded": { "type": "null" } } }
+        }
+      ]
+    },
+    "writeBooking.errors": {
+      "title": "WriteBookingErrors",
+      "description": "Refused, nothing written and nothing charged: calendarUnreadable (the fresh read failed: A6-10's safe default), notPaidYet (paid for a payment not paid), requestEnded (the request ended before: the owner declined, a lapsed hold's request ended), priceDiffers (a pick not at the line's price), ownYesNeeded (an AI's write off D104's door), safetyHeld, customerBlocked, notAllowed, notFound, versionChanged, constraint, bookingPaused, transient.",
+      "oneOf": [
+        { "$ref": "#/$defs/calendarUnreadableError" },
+        { "$ref": "#/$defs/notPaidYetError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/priceDiffersError" },
+        { "$ref": "#/$defs/ownYesNeededError" },
+        { "$ref": "#/$defs/safetyHeldError" },
+        { "$ref": "#/$defs/customerBlockedError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "writeBooking.exchange": {
+      "title": "WriteBookingExchange",
+      "description": "One writeBooking request with its outcome: a response answers the stage it was sent; an AI's write (D104's door) is answered with the booking number and chat link, never a code, which no answer carries.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "write" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "stage": { "const": "write" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "paid" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "stage": { "const": "paid" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "chargeFailed" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "chargeFailed" } } }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "noneWorks" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "noneWorks" } } }
+            }
+          }
+        },
+        {
+          "description": "An AI's write is D104's door only: booked at once with nothing to charge (MC C3), so it is never answered charging.",
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "agent" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["caller"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "type": "object",
+                "properties": { "result": { "enum": ["booked", "takenMomentAgo"] } }
+              }
+            }
+          }
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "call": { "const": "writeBooking" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/writeBooking.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/writeBooking.response" }, { "$ref": "#/$defs/writeBooking.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "recordStaffTold.request": {
+      "title": "RecordStaffToldRequest",
+      "description": "A6-15, B6-14, 'Tells the pro about the job': gives staff_told (A6-15, B6-14), the one call that writes it (02-contracts section 8: 'when the pro's message was delivered'; README 'v1.4', 'Each key's one call'; default 120). The job row itself (the job, the time and the money line {{pay.staff}}, never the code: 'Riley gets the job, the time and the money line, but not the code') is written by writeBooking's booked commit; this call, made by the outbox dispatcher (C-124) when that row's first part is delivered (K-05 v1 markPart delivered, firstDelivery; K-30 README: 'C-124 outbox dispatcher (staff_told_at on the pro's delivery)'), sets K-30 booking_details.staff_told_at once (rule 6's trigger: set once). A row that is never delivered (dropped, failed) gives no staff_told; its next way is S12-09's and S12-10's (v1 sendsFailing). Primary, uncached. Business: caller.businessId. Person: none (a job). Repeat: caller.requestId is the key; a time already set answers the first, repeated. Version: booking_details compared and set.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "step": { "type": "string", "enum": ["A6-15", "B6-14"] },
+        "outboxRowId": {
+          "description": "The pro's job row that was delivered (the outbox row writeBooking's commit, or its clock turn, wrote for A6-15 or B6-14).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "deliveredAt": {
+          "description": "The first delivery receipt's time (K-05 v1 markPart delivered_at).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "bookingId", "step", "outboxRowId", "deliveredAt"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "outboxRowId": {
+          "description": "Only the dispatcher's job marks it, acting for no person.",
+          "properties": {
+            "caller": {
+              "type": "object",
+              "properties": { "kind": { "const": "job" }, "personId": { "type": "null" } }
+            }
+          }
+        }
+      }
+    },
+    "recordStaffTold.response": {
+      "title": "RecordStaffToldResponse",
+      "description": "K-30 booking_details.staff_told_at as set once, and the key it gave.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "staffToldAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+        "gives": {
+          "type": "array",
+          "items": { "const": "staff_told" },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["bookingId", "staffToldAt", "gives", "written", "repeated"],
+      "additionalProperties": false
+    },
+    "recordStaffTold.errors": {
+      "title": "RecordStaffToldErrors",
+      "description": "Refused, nothing written: notAllowed (not the dispatcher's job; not this booking's job row to its pro), notFound, transient.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "recordStaffTold.exchange": {
+      "title": "RecordStaffToldExchange",
+      "description": "One recordStaffTold request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "recordStaffTold" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/recordStaffTold.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/recordStaffTold.response" },
+            { "$ref": "#/$defs/recordStaffTold.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "askAboutClash.request": {
+      "title": "AskAboutClashRequest",
+      "description": "S12-33, 'Asks Sam about a clash on the calendar' (S12-11's 'A personal event over a visit'): 'Riley adds a personal event to the phone calendar, over Ben T.'s booked visit. Sam is told at once and asked. The visit stays until he answers'; gives no key. Two stages. ask (a job only: C-136's read of a calendar change into busy blocks, K-16 readChanges, finds a busy block of a booked person's own calendar over a booked visit of theirs, never one of Rosie's own events): one commit writes S12-33's question to the owner through a clock row due at once on his handle (a job's commit writes no outbox row), S12-33's line ('Riley added a personal event over Ben T.'s visit on Sat Nov 7 at 2:00pm. The visit stays until you answer. No answer by 8:00am Fri: it stays. / Reply 1 Keep the visit, 2 Move the visit'), its options as sent (README default 124), its clock 8:00am the day before the visit in the business's zone, send class routine; 'The event's title is never shown to Sam or anyone' (K-16 busy blocks carry none, so no request field holds one), and 'The customer hears nothing unless the visit changes'. answer (the owner or a permitted admin in their own turn or on Needs you): keep ('1 Keep the visit') changes nothing; move ('2 Move the visit') walks to the owner's move of journey 7 (K-09 v1.5's 'the owner moves it'), and until then the visit stays as booked (S12-33's safe default: 'the visit stays'; README open gap 116). No answer by the deadline is the question clock's firing: the visit stays as booked, and the pro is told (README default 123), never this call. Nothing is booked, moved or charged here. Primary, uncached. Business: caller.businessId. Person: none for ask (a job); the answerer for answer, set on the server. Repeat: caller.requestId is the key; a repeat answers the first. Version: new rows at version 1.",
+      "type": "object",
+      "properties": {
+        "caller": { "$ref": "#/$defs/businessCaller" },
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": {
+          "oneOf": [
+            {
+              "title": "AskOwnerAboutClash",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "ask" },
+                "step": { "const": "S12-33" },
+                "visitId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+                "personId": {
+                  "description": "The booked person whose own calendar holds the event (K-27 calendar link's person).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "busyBlockKey": {
+                  "description": "The K-16 busy block's key (its event key, never its title: K-16 readChanges; refuse-busy-block-with-title.json).",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": ["kind", "step", "visitId", "personId", "busyBlockKey"],
+              "additionalProperties": false
+            },
+            {
+              "title": "OwnerAnswersClash",
+              "type": "object",
+              "properties": {
+                "kind": { "const": "answer" },
+                "step": { "const": "S12-33" },
+                "answer": {
+                  "description": "keep ('1 Keep the visit') or move ('2 Move the visit'), the option choices of README default 124. No value for no answer.",
+                  "type": "string",
+                  "enum": ["keep", "move"]
+                },
+                "yes": { "$ref": "#/$defs/readBackYes" }
+              },
+              "required": ["kind", "step", "answer", "yes"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "bookingId", "stage"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stage": {
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "ask" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              },
+              "then": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "job" }, "personId": { "type": "null" } }
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "caller": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "enum": ["turn", "page"] },
+                      "personId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "askAboutClash.response": {
+      "title": "AskAboutClashResponse",
+      "description": "The question to the owner and its deadline (ask), or the answer recorded and the walk (answer); no key.",
+      "type": "object",
+      "properties": {
+        "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
+        "stage": { "type": "string", "enum": ["ask", "answer"] },
+        "question": { "anyOf": [{ "$ref": "#/$defs/messageWritten" }, { "type": "null" }] },
+        "answerBy": { "$ref": "#/$defs/nullableUtc" },
+        "answer": { "anyOf": [{ "type": "string", "enum": ["keep", "move"] }, { "type": "null" }] },
+        "next": {
+          "description": "none, or ownerMove (journey 7's owner move, K-09 v1.5) for '2 Move the visit'.",
+          "type": "string",
+          "enum": ["none", "ownerMove"]
+        },
+        "gives": { "type": "array", "maxItems": 0 },
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "bookingId",
+        "stage",
+        "question",
+        "answerBy",
+        "answer",
+        "next",
+        "gives",
+        "written",
+        "repeated"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "stage": { "const": "ask" } }, "required": ["stage"] },
+          "then": {
+            "properties": {
+              "question": {
+                "type": "object",
+                "properties": { "to": { "const": "owner" }, "step": { "const": "S12-33" } }
+              },
+              "answerBy": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
+              "answer": { "type": "null" },
+              "next": { "const": "none" }
+            }
+          },
+          "else": { "properties": { "question": { "type": "null" }, "answer": { "enum": ["keep", "move"] } } }
+        },
+        {
+          "if": { "properties": { "answer": { "const": "move" } }, "required": ["answer"] },
+          "then": { "properties": { "next": { "const": "ownerMove" } } },
+          "else": { "properties": { "next": { "const": "none" } } }
+        }
+      ]
+    },
+    "askAboutClash.errors": {
+      "title": "AskAboutClashErrors",
+      "description": "Refused, nothing written: notAllowed (not C-136's job; not the owner or a permitted admin), notFound (no such booked visit), versionChanged, constraint, transient.",
+      "oneOf": [
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "askAboutClash.exchange": {
+      "title": "AskAboutClashExchange",
+      "description": "One askAboutClash request with its outcome: a response answers the stage it was sent.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "ask" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "stage": { "const": "ask" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "answer" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "stage": { "const": "answer" } } }
+            }
+          }
+        }
+      ],
+      "type": "object",
+      "properties": {
+        "call": { "const": "askAboutClash" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/askAboutClash.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/askAboutClash.response" }, { "$ref": "#/$defs/askAboutClash.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "buildFrontier.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/buildFrontier.exchange" },
+    "closestEntries.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/closestEntries.exchange" },
+    "gateAndCommit.exchange": {
+      "title": "GateAndCommitExchange",
+      "description": "One gateAndCommit request with its outcome, as v1.3, its committed answer's parts able to name journey 6's keys and its given able to state a journey 6 step (v1.4).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "gateAndCommit" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/gateAndCommit.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "composeInput.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/composeInput.exchange" },
+    "finalizeMessage.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/finalizeMessage.exchange" },
+    "recordSafetyOutcome.exchange": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/recordSafetyOutcome.exchange"
+    },
+    "releaseSafetyHold.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/releaseSafetyHold.exchange" },
+    "recordStopOrStart.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/recordStopOrStart.exchange" },
+    "setRecordFlag.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/setRecordFlag.exchange" },
+    "handOff.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/handOff.exchange" },
+    "answerHandOff.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/answerHandOff.exchange" },
+    "pageTeam.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/pageTeam.exchange" },
+    "acknowledgePage.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/acknowledgePage.exchange" },
+    "openReviewItem.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/openReviewItem.exchange" },
+    "decideReviewItem.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/decideReviewItem.exchange" },
+    "enterDoor.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/enterDoor.exchange" },
+    "sendFixedLine.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendFixedLine.exchange" },
+    "sendsFailing.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendsFailing.exchange" },
+    "textingBack.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/textingBack.exchange" },
+    "calendarLinkDropped.exchange": {
+      "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkDropped.exchange"
+    },
+    "calendarLinkBack.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/calendarLinkBack.exchange" },
+    "sendProofCode.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/sendProofCode.exchange" },
+    "proveCode.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/proveCode.exchange" },
+    "issueChatLink.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/issueChatLink.exchange" },
+    "matchKinds.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/matchKinds.exchange" },
+    "lookupListing.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/lookupListing.exchange" },
+    "saveSetupStep.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/saveSetupStep.exchange" },
+    "readSetup.exchange": { "$ref": "tool-api.v1.3.schema.json#/$defs/readSetup.exchange" },
+    "callName": {
+      "description": "Every call v1.4 holds: v1.3's and journey 6's (askOwnerFirst, sendToOnCall, writeBooking, recordStaffTold, askAboutClash). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2), and each but plannerVerbs a <call>.exchange.",
+      "type": "string",
+      "enum": [
+        "buildFrontier",
+        "closestEntries",
+        "gateAndCommit",
+        "composeInput",
+        "finalizeMessage",
+        "recordSafetyOutcome",
+        "releaseSafetyHold",
+        "recordStopOrStart",
+        "setRecordFlag",
+        "handOff",
+        "answerHandOff",
+        "pageTeam",
+        "acknowledgePage",
+        "openReviewItem",
+        "decideReviewItem",
+        "enterDoor",
+        "sendFixedLine",
+        "sendsFailing",
+        "textingBack",
+        "calendarLinkDropped",
+        "calendarLinkBack",
+        "sendProofCode",
+        "proveCode",
+        "issueChatLink",
+        "plannerVerbs",
+        "matchKinds",
+        "lookupListing",
+        "saveSetupStep",
+        "readSetup",
+        "openRequest",
+        "confirmBusinessBooking",
+        "readBackBusinessBooking",
+        "findCustomer",
+        "checkBookingFirst",
+        "setCustomerBlock",
+        "matchService",
+        "setWhoFor",
+        "setReachWay",
+        "addCustomer",
+        "setPrice",
+        "quoteFromPhotos",
+        "showTimes",
+        "saveTime",
+        "extendTime",
+        "joinWaitlist",
+        "sendSecureLink",
+        "checkPlace",
+        "saveSecurePage",
+        "showMoneyBefore",
+        "settleOffer",
+        "signDocument",
+        "takeMoneyBefore",
+        "refundAtOnce",
+        "askOwnerFirst",
+        "sendToOnCall",
+        "writeBooking",
+        "recordStaffTold",
+        "askAboutClash"
+      ]
+    }
+  }
+}

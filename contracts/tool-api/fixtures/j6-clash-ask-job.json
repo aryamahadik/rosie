@@ -1,0 +1,48 @@
+{
+  "call": "askAboutClash",
+  "given": {
+    "seeds": ["availability/seed-calendar-link.json", "availability/seed-busy-block.json"],
+    "after": [],
+    "now": "2026-11-02T16:00:00Z",
+    "stated": null,
+    "note": "S12-11's 'A personal event over a visit', then S12-33: Riley adds a personal event to his phone calendar over Ben T.'s booked visit, Sat Nov 7 at 2:00pm. The calendar push and C-136's read of it into busy blocks (K-16 readChanges, on the calendar double: Q-56) find a busy block of Riley's own over that booked visit, not one of Rosie's own events, so C-136's job calls askAboutClash ask. In one commit: one clock row due at once on Sam's handle, whose clock turn writes S12-33's line ('Riley added a personal event over Ben T.'s visit on Sat Nov 7 at 2:00pm. The visit stays until you answer. No answer by 8:00am Fri: it stays. / Reply 1 Keep the visit, 2 Move the visit.') with its open question, its two options as sent (README default 124), send class routine, its clock 8:00am the day before the visit in New York, Fri Nov 6 at 13:00 UTC. The event's title is never shown to Sam or anyone: the busy block carries none, so nothing here holds one. The customer hears nothing unless the visit changes, and nothing is moved, booked or charged. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c136-busy-riley-nov7-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-calendar-riley-push-0007"
+    },
+    "bookingId": "booking-ben-nov7",
+    "stage": {
+      "kind": "ask",
+      "step": "S12-33",
+      "visitId": "visit-ben-nov7-1",
+      "personId": "person-riley",
+      "busyBlockKey": "busy-riley-google-nov7-0001"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-ben-nov7",
+    "stage": "ask",
+    "question": {
+      "to": "owner",
+      "personId": "person-sam",
+      "step": "S12-33",
+      "via": "chat",
+      "sendClass": "routine",
+      "outboxRowId": null,
+      "clockRowId": "clock-clash-ben-nov7-ask-sam",
+      "openQuestionId": null
+    },
+    "answerBy": "2026-11-06T13:00:00Z",
+    "answer": null,
+    "next": "none",
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-clash-ben-nov7-ask-sam", "version": 1 }],
+    "repeated": false
+  }
+}

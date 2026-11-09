@@ -1,0 +1,70 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-11-02T15:06:00Z",
+    "stated": null,
+    "note": "A6-02's '3 Decline' on Needs you: Ben T. asked for a skin fade with Riley on Sat Nov 7 at 2:00pm, a request Sam OKs first, and 5 minutes later Sam taps Decline on the portal (the words shown are the question's, as the page server keeps them with its session: K-21). In one commit: owner_oks answered decline in K-08's ownerYes shape (version 2), the request ended declined (K-30: 'the owner said no'), the hold still held let go (K-05 v1 release, let_go), the card saved for this request removed at once ('A booking that's declined or never made removes it at once': S13-55; v1.3 default 103), and A6-05's line to Ben ('Sorry, Lee's Barbershop can't take this booking. {{pay.back}} You can pick another time: rosfield.com/v/a1') through a clock row due at once into his open chat (a page's commit writes no outbox row), {{pay.back}} reading the card's removal (README default 125). 'The reason is Sam's. Rosie gives none it doesn't have.' Nothing was charged, so nothing is refunded. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-sam-0207",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-portal-sam-0207"
+    },
+    "bookingId": "booking-request-ben-nov7",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A6-02",
+      "ownerOkId": "ok-request-ben-nov7",
+      "answer": "decline",
+      "yes": {
+        "kind": "page",
+        "exactWords": "New request from Ben T. Please answer within 4 of your text hours, or it isn't booked. / Skin fade / Sat Nov 7 · 2:00pm · Riley / Nothing is charged for this visit until you accept / Accept, Another time, Decline.",
+        "yesEventId": "evt-portal-sam-0207"
+      },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-ben-nov7",
+    "stage": "ownerAnswer",
+    "answer": "decline",
+    "ownerOk": null,
+    "questions": [],
+    "told": [
+      {
+        "to": "customer",
+        "personId": "person-ben",
+        "step": "A6-05",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-ben-request-declined",
+        "openQuestionId": null
+      }
+    ],
+    "next": "none",
+    "released": { "reservationId": "rsv-request-ben-nov7", "why": "let_go" },
+    "requestEnded": "declined",
+    "cardRemoved": "card-request-ben-nov7",
+    "consentId": null,
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-request-ben-nov7" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-request-ben-nov7", "version": 2 },
+      { "table": "bookings", "rowId": "booking-request-ben-nov7", "version": 4 },
+      { "table": "booking_details", "rowId": "booking-request-ben-nov7", "version": 6 },
+      { "table": "reservations", "rowId": "rsv-request-ben-nov7", "version": 2 },
+      { "table": "saved_cards", "rowId": "card-request-ben-nov7", "version": 3 },
+      { "table": "clock_rows", "rowId": "clock-ben-request-declined", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-ask-owner-page.json"],
+    "now": "2026-10-22T15:20:00Z",
+    "stated": null,
+    "note": "Refused: the 4-text-hour deadline passing sent as the owner's answer (answer noAnswer). Silence never says yes (A6-02: 'Never: take money or confirm before Sam's yes'; S13-55: 'Rosie NEVER makes a new charge on silence'): 'No answer in time' is the question clock's firing, A6-07's path, never a call, so ownerAnswer has no value for it. With Sam's own '1 Accept' it is j6-owner-accept-turn.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-accept-agent-alex",
+      "requestId": "turn-sam-accept-agent-alex",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A6-02",
+      "ownerOkId": "ok-agent-alex-oct21-request",
+      "answer": "noAnswer",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-agent-alex-oct21-a6-02", "yesEventId": "evt-sam-0151" },
+      "expectVersion": 2
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "ownerAnswer",
+    "answer": "accept",
+    "ownerOk": null,
+    "questions": [],
+    "told": [],
+    "next": "writeBooking",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "owner_oks", "rowId": "ok-agent-alex-oct21-request", "version": 3 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": ["j5-deposit-yes-page.json"],
+    "now": "2026-11-07T15:20:00Z",
+    "stated": null,
+    "note": "Refused: j6-write-booking-charging-page.json's answer giving booked while the deposit's charge is still pending. 'The confirmation waits until it's paid' (A6-10) and 'Never: confirm, send the code or give the pro the job before it's paid' (A6-32), so a charging answer gives no key; booked comes from writeBooking paid once the payment is paid (README default 111). With gives empty it is j6-write-booking-charging-page.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "write",
+    "result": "charging",
+    "freshRead": { "at": "2026-11-07T15:20:00Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-alex-grooms-package", "state": "booked" },
+    "visits": [],
+    "termsSnapshot": { "termsConsentId": "consent-alex-grooms-terms" },
+    "payment": {
+      "paymentId": "pay-alex-grooms-deposit",
+      "purpose": "deposit",
+      "amount": { "cents": 4000, "currency": "USD" },
+      "effectId": "eff-alex-grooms-deposit",
+      "customerPresent": true,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-grooms-terms" }
+    },
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": null,
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-grooms-deposit", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-grooms-deposit" }
+    ],
+    "gives": ["booked"],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-grooms-package", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-grooms-deposit", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

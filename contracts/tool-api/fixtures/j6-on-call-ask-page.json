@@ -1,0 +1,52 @@
+{
+  "call": "sendToOnCall",
+  "given": {
+    "seeds": [
+      "people-access/seed-on-call.json",
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json"
+    ],
+    "after": [],
+    "now": "2026-10-19T22:47:00Z",
+    "stated": null,
+    "note": "B6-03's 'Sent now: the on-call pro', then B6-16, from Lee Home Services' secure page after Alex's yes: an overflowing kitchen drain, 'Send someone now' marked at the pick (booking_details.timing sentnow), a card saved for the $89 call (list|card|bill), no OK needed, so the page server calls sendToOnCall ask. At 6:47pm Monday in New York, Jordan is on call (K-22 seed-on-call: weeknights 5:30pm to 7:30am). In one commit: one clock row due at once on Jordan's handle, whose clock turn writes B6-16's offer ('Sent-now job, Jordan. You're on call tonight. If you're driving, reply when you've stopped. / Sent now · Overflowing kitchen drain / Springfield · arrive in about 60 to 90 minutes / Name and address open in the job once you take it / Reply 1 Take it, 2 Can't.') with its open question, the split's two answers as its options, send class visit_now ('Urgent texts go at once, even at night'), and its 5-minute clock: only the kind of job and the area, never the name or the address before he takes it (README default 118). 'Nothing is charged until someone takes it.' No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-sentnow-0009",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-sentnow-0001"
+    },
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": { "kind": "ask", "step": "B6-16" }
+  },
+  "outcome": {
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": "ask",
+    "onCall": { "staffId": "staff-jordan-home-services", "personId": "person-jordan" },
+    "offer": {
+      "to": "staff",
+      "personId": "person-jordan",
+      "step": "B6-16",
+      "via": "chat",
+      "sendClass": "visit_now",
+      "outboxRowId": null,
+      "clockRowId": "clock-sentnow-alex-drain-offer-jordan",
+      "openQuestionId": null
+    },
+    "answerBy": "2026-10-19T22:52:00Z",
+    "answer": null,
+    "next": "none",
+    "told": [],
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "soonestTimes": null,
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-sentnow-alex-drain-offer-jordan", "version": 1 }],
+    "repeated": false
+  }
+}

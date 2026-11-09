@@ -1,0 +1,60 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-owner-offer-read-back-turn.json"],
+    "now": "2026-10-22T12:32:00Z",
+    "stated": null,
+    "note": "A6-04's read-back answered '1 Send it' in Sam's turn; decide picks that option choice (README default 116). Then A6-17: Alex gets Sam's other time, word for word from the stored read-back ('Lee's Barbershop can't do Sat 11:00am as asked. They offered this instead: / Haircut / Sat Oct 24 · 3:00pm · Riley / Please reply by Thu 11:20am / No reply by then: it's dropped / Reply 1 Take it, 2 No thanks.'), into his open chat as an outbox row of Sam's turn, routine, with its open question, A6-17's split '1 Take it' and '2 No thanks, or no reply' as its options, its clock 2 of his text hours, ending before the visit (C-055, armed at its first delivery: arch 02 line 127). Silence never takes it: no reply is the clock's 'or no reply'. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-send-offer-alex-oct24",
+      "requestId": "turn-sam-send-offer-alex-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-another-time-alex-oct24"
+    },
+    "bookingId": "booking-request-alex-oct24",
+    "stage": {
+      "kind": "sendOffer",
+      "step": "A6-04",
+      "ownerOkId": "ok-request-alex-oct24",
+      "answer": "sendIt",
+      "yes": {
+        "kind": "openQuestion",
+        "openQuestionId": "oq-sam-offer-readback-alex-oct24",
+        "yesEventId": "evt-sam-0162"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-alex-oct24",
+    "stage": "sendOffer",
+    "answer": "send_it",
+    "ownerOk": null,
+    "questions": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-17",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-alex-offer-oct24",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-offer-oct24"
+      }
+    ],
+    "told": [],
+    "next": "none",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "outbox_rows", "rowId": "out-alex-offer-oct24", "version": 1 }],
+    "repeated": false
+  }
+}

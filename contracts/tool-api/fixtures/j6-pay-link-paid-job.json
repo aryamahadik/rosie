@@ -1,0 +1,84 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-charge-failed-pay-link-job.json"],
+    "now": "2026-11-06T15:42:05Z",
+    "stated": { "step": "A6-32", "gives": ["booked", "code"] },
+    "note": "A6-32's 'Paid in time': Alex paid the link at 3:42pm UTC, before its 5:00pm deadline. K-14's paymentSucceeded, stored by the gateway and applied by the runtime side (K-32 rule 5), made the link's payment paid, ended the link paid, and, with saveCardForLater, wrote the K-32 saved_cards row of the card that paid (saved_from_payment_id): 'that card is the one saved for it'. C-101's handling of that event calls writeBooking paid. In one commit: the head booked, the visit with its new check-in code (never in this answer), the calendar write, A6-14's confirmation and A6-15's job row through clock rows due at once, and the declined card removed (nothing_needs_it), since only the card that paid is the booking's now (K-14 'Pay links': 'never another card of the same customer, such as the one declined before'). Gives booked and code: A6-10's booked, which waited for the payment, and A6-14's code (J6_CALL_PASSES; README default 121). The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-evt-alex-color-correction-paid",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-stripe-alex-color-paid-0001"
+    },
+    "bookingId": "booking-alex-color-correction",
+    "stage": { "kind": "paid", "step": "A6-32", "paymentId": "pay-alex-color-correction-link" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-color-correction",
+    "stage": "paid",
+    "result": "booked",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [
+      {
+        "visitId": "visit-alex-color-correction-1",
+        "position": 1,
+        "reservationId": "rsv-alex-color-correction",
+        "codeForPersonId": "person-alex"
+      }
+    ],
+    "termsSnapshot": null,
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": null,
+    "bookingNumber": "LB1098",
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-14",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-color-correction-confirm",
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A6-15",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-color-correction-job-riley",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": "card-alex-color-correction",
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-color-correction-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-color-correction-link" },
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-color-correction-1" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-alex-color-correction-1" },
+      { "slot": "pay.staff", "table": "payments", "column": "state", "rowId": "pay-alex-color-correction-link" }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-color-correction", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-alex-color-correction-1", "version": 1 },
+      { "table": "saved_cards", "rowId": "card-alex-color-correction", "version": 3 },
+      { "table": "clock_rows", "rowId": "clock-alex-color-correction-confirm", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-color-correction-job-riley", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

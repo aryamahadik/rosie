@@ -1,0 +1,31 @@
+{
+  "call": "recordStaffTold",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-write-booking-after-ok-turn.json"],
+    "now": "2026-10-22T12:06:10Z",
+    "stated": { "step": "A6-15", "gives": ["staff_told"] },
+    "note": "A6-15, 'Tells the pro about the job': Riley's job row (out-agent-alex-oct21-job-riley, written by the booking write's turn) is delivered at 8:06:10am. The outbox dispatcher (C-124), on that row's first delivery receipt (K-05 v1 markPart delivered, firstDelivery), calls recordStaffTold, which sets K-30 booking_details.staff_told_at once (set once by rule 6's trigger), as K-30's seed-booking-flow-a holds it. Gives staff_told, written by this call alone (02-contracts section 8: 'when the pro's message was delivered'; README default 120). A repeat answers the first time, repeated. The job id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-dispatch-out-agent-alex-oct21-job-riley",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "step": "A6-15",
+    "outboxRowId": "out-agent-alex-oct21-job-riley",
+    "deliveredAt": "2026-10-22T12:06:10Z"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "staffToldAt": "2026-10-22T12:06:10Z",
+    "gives": ["staff_told"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 6 }],
+    "repeated": false
+  }
+}

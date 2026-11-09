@@ -1,0 +1,31 @@
+{
+  "call": "recordStaffTold",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-write-booking-after-ok-turn.json"],
+    "now": "2026-10-22T12:06:10Z",
+    "stated": null,
+    "note": "Refused: staff_told marked from a page (caller.kind page). staff_told is when the pro's message was delivered (02-contracts section 8), which only the outbox dispatcher's delivery receipt shows (K-05 v1 markPart delivered; K-30 README: C-124 sets staff_told_at on the pro's delivery), so only that job marks it (README default 120). From the dispatcher's job it is j6-staff-told-job.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-portal-riley-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "step": "A6-15",
+    "outboxRowId": "out-agent-alex-oct21-job-riley",
+    "deliveredAt": "2026-10-22T12:06:10Z"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "staffToldAt": "2026-10-22T12:06:10Z",
+    "gives": ["staff_told"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 6 }],
+    "repeated": false
+  }
+}

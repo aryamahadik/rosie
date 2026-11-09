@@ -1,0 +1,48 @@
+{
+  "call": "sendToOnCall",
+  "given": {
+    "seeds": ["people-access/seed-on-call.json", "people-access/seed-staff-joined.json"],
+    "after": [],
+    "now": "2026-10-19T22:47:00Z",
+    "stated": null,
+    "note": "Refused: B6-16's offer to the on-call pro written as a routine row, which limit 8 holds for text hours (K-07 v1: only routine waits). 'Urgent texts go at once, even at night', and Jordan has 5 minutes, so the offer is visit_now (README default 118). With sendClass visit_now it is j6-on-call-ask-page.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-sentnow-0009",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-sentnow-0001"
+    },
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": { "kind": "ask", "step": "B6-16" }
+  },
+  "outcome": {
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": "ask",
+    "onCall": { "staffId": "staff-jordan-home-services", "personId": "person-jordan" },
+    "offer": {
+      "to": "staff",
+      "personId": "person-jordan",
+      "step": "B6-16",
+      "via": "chat",
+      "sendClass": "routine",
+      "outboxRowId": null,
+      "clockRowId": "clock-sentnow-alex-drain-offer-jordan",
+      "openQuestionId": null
+    },
+    "answerBy": "2026-10-19T22:52:00Z",
+    "answer": null,
+    "next": "none",
+    "told": [],
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "soonestTimes": null,
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-sentnow-alex-drain-offer-jordan", "version": 1 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-22T12:30:00Z",
+    "stated": null,
+    "note": "A6-02's '2 Another time' in Sam's own turn ('Means 2 Another time: Sam offers another time, read back first'): Alex's request for a haircut with Riley, Sat Oct 24 at 11:00am, waits for Sam's OK (its reminder went at 7:50pm, so owner_oks is at version 2). Sam replies '2'; decide picks A6-02's branch '2 Another time'. In his turn's commit: owner_oks answered another_time in K-08's ownerYes shape (version 3), the question closed answered, and A6-04's first line, 'What time can you offer?', as the reply in his chat (quick_reply), with its open question that takes his typed answer (README default 116). Nothing goes to Alex until Sam confirms the read-back (A6-04's safe default). No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-another-time-alex-oct24",
+      "requestId": "turn-sam-another-time-alex-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-another-time-alex-oct24"
+    },
+    "bookingId": "booking-request-alex-oct24",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A6-02",
+      "ownerOkId": "ok-request-alex-oct24",
+      "answer": "anotherTime",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-request-alex-oct24-a6-02", "yesEventId": "evt-sam-0160" },
+      "expectVersion": 2
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-alex-oct24",
+    "stage": "ownerAnswer",
+    "answer": "another_time",
+    "ownerOk": null,
+    "questions": [
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A6-04",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-sam-what-time-alex-oct24",
+        "clockRowId": null,
+        "openQuestionId": "oq-sam-what-time-alex-oct24"
+      }
+    ],
+    "told": [],
+    "next": "none",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-request-alex-oct24", "version": 3 },
+      { "table": "outbox_rows", "rowId": "out-sam-what-time-alex-oct24", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

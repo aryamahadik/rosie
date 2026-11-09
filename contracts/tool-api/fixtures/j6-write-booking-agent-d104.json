@@ -1,0 +1,91 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "core/seed-business-head.json",
+      "availability/seed-calendar-link.json"
+    ],
+    "after": ["j5-nothing-yes-agent.json"],
+    "now": "2026-11-03T17:02:12Z",
+    "stated": { "step": "A6-10", "gives": ["booked", "code"] },
+    "note": "D104's door (MC C3: 'Nothing to pay or save before the visit: booked at once on the AI's request'): right after the yes of j5-nothing-yes-agent.json, Dee's own AI, bound to her, calls writeBooking write for the style consult (way list|none|none), approval now, the time held for its agent token, nothing to charge. Riley's calendar is read once more and the time is free. In one commit: the reservation confirmed booked, the head booked, the visit with its new check-in code sealed under Dee's key, the terms snapshot naming no consent (nothing was ticked, and D104's request records none: v1.3 default 92), Riley's calendar write, and A6-14's confirmation and A6-15's job row through clock rows due at once. Dee's chat is not open, so the confirmation goes to her email, and the booking's chat link (K-29 chat_links, her mobile a Linq contact: Q-03) goes in url to her AI once, never logged, for it to pass on with the booking number: 'The AI gets a booking number, but not the code', and no street address, card or private detail passes through it (A6-14; MC C9; README default 119). The answer carries no code. Gives booked and code. The ids and the link's placeholder code are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-dee-consult-0007",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-agent-dee-consult-0001"
+    },
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-11-03T17:02:12Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-agent-dee-style-consult", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-agent-dee-style-consult-1",
+        "position": 1,
+        "reservationId": "rsv-agent-dee-style-consult",
+        "codeForPersonId": "person-dee"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": null },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": null,
+    "bookingNumber": "LB1103",
+    "chatLink": { "chatLinkId": "chatlink-agent-dee-style-consult", "url": "rosfield.com/t/placeholder-chat-code-0002" },
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-dee",
+        "step": "A6-14",
+        "via": "email",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-agent-dee-consult-confirm-email",
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A6-15",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-agent-dee-consult-job-riley",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-dee-consult-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [
+      {
+        "slot": "pay.price",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-agent-dee-style-consult-1"
+      },
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-agent-dee-style-consult" }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-agent-dee-style-consult", "version": 2 },
+      { "table": "bookings", "rowId": "booking-agent-dee-style-consult", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-agent-dee-style-consult-1", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-agent-dee-consult-confirm-email", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-agent-dee-consult-job-riley", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

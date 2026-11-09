@@ -1,0 +1,63 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j6-owner-accept-turn.json"],
+    "now": "2026-10-22T12:05:01Z",
+    "stated": { "step": "A6-10", "gives": ["booked", "code"] },
+    "note": "Refused by givesJourneySixKeys alone: a booking write whose visit has a check-in code, answered as giving booked alone. The same commit writes A6-14's confirmation with the visit's new code, so it gives A6-10's booked and A6-14's code (J6_CALL_PASSES); only a visit with no code (nobody home, B4-105) leaves code out. The schema takes it. With outcome.gives booked and code it is j6-write-booking-after-ok-turn.json's answer, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-accept-agent-alex",
+      "requestId": "turn-sam-accept-agent-alex",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-10-22T12:05:01Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-agent-alex-oct21-booked", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-agent-alex-oct21-1",
+        "position": 1,
+        "reservationId": "rsv-agent-alex-oct21-booked",
+        "codeForPersonId": "person-agent-alex-0001"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": "consent-agent-alex-haircut-terms" },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "pageClock": null,
+    "bookingNumber": "LB1031",
+    "chatLink": { "chatLinkId": "chatlink-agent-alex-oct21", "url": null },
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-agent-alex-0001",
+        "step": "A6-14",
+        "via": "email",
+        "sendClass": "routine",
+        "outboxRowId": "out-agent-alex-oct21-confirm-email",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-alex-oct21-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [],
+    "gives": ["booked"],
+    "written": [{ "table": "bookings", "rowId": "booking-agent-alex-oct21", "version": 3 }],
+    "repeated": false
+  }
+}

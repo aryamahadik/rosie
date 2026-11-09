@@ -1,0 +1,58 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "rules/seed-rules-tap-list.json"],
+    "after": ["j5-card-saved-yes-page.json"],
+    "now": "2026-10-21T23:23:00Z",
+    "stated": null,
+    "note": "A6-01's 'Sam's OK first', then A6-02 on Lee's Barbershop's secure page, right after Alex's yes (j5-card-saved-yes-page.json: A5-31's 'Done: the yes'). Alex is new at the shop, so K-26's OK rules made it a request at A4-98 (booking_details.approval ownerok), followed here, never decided again (A6-01). The page server calls askOwnerFirst ask next. In one commit: a K-30 owner_oks row about request, answer_by 11:20am Thu in New York, 4 of Sam's text hours (A6-02's own sample: 'You'll hear by Thu 11:20am'); one clock row due at once on Sam's handle, whose clock turn writes A6-02's line ('New request from Alex M. Please answer within 4 of your text hours, or it isn't booked. / Haircut / Sat Oct 24 · 11:00am · Riley / Nothing is charged for this visit until you accept / Reply 1 Accept, 2 Another time, 3 Decline.') with its open question, the split's three answers as its options (a page's commit writes no outbox row: v1.2 default 72's way); and one clock row due 30 minutes later, whose firing, if Sam has not answered, sends his one reminder and tells Alex to wait (A6-02's second and third lines; README default 113). No payment, no effect, no key: 'Nothing is charged for this visit until the OK' (A6-02). K-30's seed-booking-flow-a shows such a request at its end; these ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0015",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0014"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": { "kind": "ask", "step": "A6-02" }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "ask",
+    "answer": null,
+    "ownerOk": {
+      "ownerOkId": "ok-agent-alex-oct21-request",
+      "answerBy": "2026-10-22T15:20:00Z",
+      "reminderClockRowId": "clock-ok-agent-alex-oct21-reminder"
+    },
+    "questions": [
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A6-02",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-ok-agent-alex-oct21-ask-sam",
+        "openQuestionId": null
+      }
+    ],
+    "told": [],
+    "next": "none",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-agent-alex-oct21-request", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-ok-agent-alex-oct21-ask-sam", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-ok-agent-alex-oct21-reminder", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
