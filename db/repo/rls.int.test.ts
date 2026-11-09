@@ -205,7 +205,8 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
  * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
- * (T-204: v1's ten tables and v1.1's page_links), and K-24 v1 kinds of work (T-205).
+ * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), and K-25 v1 services and prices
+ * (T-206).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -283,6 +284,14 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/kinds-of-work/kinds-of-work.v1.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/services-prices/services-prices.v1.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -902,6 +911,8 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         ...(table.versioned && table.name !== "chat_links" ? ["UPDATE"] : []),
         // K-05 item 29 removes a person's handle link; K-07 deletes a claim at a row's move to waiting_chat.
         ...(role === RUNTIME && ["person_handles", "outbox_claims"].includes(table.name) ? ["DELETE"] : []),
+        // K-25 v1 README rule 6: the Tool API removes a link between a space and a service (S1-81 and Settings).
+        ...(role === TOOL_API && table.name === "item_services" ? ["DELETE"] : []),
       ].sort();
     };
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
