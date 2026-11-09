@@ -7,6 +7,7 @@
 import type { PromptCache } from "../cache";
 import type { AttemptFailure, CallOptions, FetchLike, GatewayBundle, ModelCall, ModelRole } from "../gateway";
 import type { ComposeInput, MessagePlan } from "./prompt";
+import type { RewriteAnswer, RewriteRequest } from "./rewrite/types";
 
 export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
 
@@ -101,7 +102,7 @@ export interface ComposeDown {
 
 export type ComposeAnswer = ComposeOk | ComposeRefused | ComposeDown;
 
-/** The composer (C-118): one Haiku call per outbox row, the row's message plan out. */
+/** The composer (C-118): one Haiku call per outbox row, the row's message plan out, and its one rewrite (T-374). */
 export interface Composer {
   /**
    * Composes one outbox row's message plan. Never rejects for a failed model call or a bad answer: those are
@@ -109,4 +110,11 @@ export interface Composer {
    * (MissingKeyError), a trace of another bundle (GatewayConfigError).
    */
   compose(input: ComposeInput, options?: ComposeCallOptions): Promise<ComposeAnswer>;
+  /**
+   * The one rewrite of a composed plan, told what failed (rewriteTold's shape): one call, purpose `rewrite`. A told from
+   * the rewrite's own failure, or a rewrite whose answer the AI layer refuses, is 'use the fallback' (the action layer's
+   * path), never a second rewrite. Never rejects for a failed model call or a bad answer or request; rejects, before any
+   * call, only as compose does (no key, a trace of another bundle).
+   */
+  rewrite(request: RewriteRequest, options?: ComposeCallOptions): Promise<RewriteAnswer>;
 }

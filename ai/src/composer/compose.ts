@@ -16,8 +16,9 @@
 //      that no fact of the row, a slot fact or a term fact, holds. Any failure is a typed refusal, never a plan.
 //
 // Rows of one turn are composed side by side by calling compose once per row (each call is independent). An email copy
-// takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines, the message checks and the
-// one rewrite are the action layer's (C-088, C-089, C-091 to C-093).
+// takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines and the message checks are
+// the action layer's (C-088, C-089, C-091, C-092). The one rewrite, told what failed, is the composer's `rewrite`
+// (./rewrite, T-374), on the same gateway and layout; what follows a second failure is the action layer's (C-093).
 //
 // Each gateway attempt writes its own K-08 portCall span (labels and counts only); the composer writes none of its own,
 // and nothing here logs. A refusal names checks and places, never words (K-08 README line 75). The key is read from the
@@ -28,6 +29,7 @@ import { sameBundleId } from "../cache/bundle";
 import { GatewayConfigError, type GatewayEffort, type ModelRole } from "../gateway";
 import { inputProblems, planAgainstInput } from "./check";
 import { composeInputText } from "./prompt";
+import { createRewrite } from "./rewrite/rewrite";
 import { PLAN_SCHEMA } from "./schema";
 import type {
   ComposeAnswer,
@@ -56,8 +58,10 @@ export function createComposer(options: ComposerOptions): Composer {
   });
   if (!sameBundleId(prompts.bundleId, bundle.bundleId))
     throw new GatewayConfigError("the composer's prompts are of another bundle than its models");
+  const rewrite = createRewrite({ gateway, prompts, role: COMPOSE_ROLE, effort: COMPOSE_EFFORT });
 
   return {
+    rewrite,
     async compose(input: ComposeInput, callOptions: ComposeCallOptions = {}): Promise<ComposeAnswer> {
       // The types say K-03's input; a caller that casts is still refused before any call.
       const before = inputProblems(input);
