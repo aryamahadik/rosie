@@ -1431,7 +1431,7 @@ describe("row-level security and privileges on the stored rows", () => {
   }, 60_000);
 
   afterAll(async () => {
-    await db.sql`truncate provider_events, effects, outbox_claims`;
+    await db.sql`truncate provider_events, effects, outbox_claims, monthly_bills, monthly_bill_lines`;
   });
 
   it("the rows: Lee's Barbershop's effects and events, the Linq contact effect and one event with no business", async () => {
