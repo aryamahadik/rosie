@@ -1,0 +1,60 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T16:05:30Z",
+    "stated": { "step": "A5-16", "gives": ["money_before", "paid_full"] },
+    "note": "A5-16 on Lee's Barbershop's booking page: the $55 Signature cut and hot towel shave, way list|full|none. Alex typed his card on the page through the card stage with keep false: a card typed for a payment now keeps no saved card row (K-32 default 15), and its stripe_save_card effect has succeeded. He ticks the words shown and taps Book it. In one commit: booking_details.taken 'asked' and his ticked words as a K-29 ticked_terms consent. Gives money_before and paid_full. No card_saved: the full price needs none, and any fee comes out of what was paid now (S13-55). The $55 is charged as the booking is written (A6-10; K-14 v1 full-price.json; K-09 v1.4; README default 87), and no word says paid in full until that payment is paid (README default 90). The booking, line and consent ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-sig-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-sig-0001"
+    },
+    "bookingId": "booking-page-alex-signature-cut",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-16",
+      "branch": "full",
+      "amountNow": { "cents": 5500, "currency": "USD" },
+      "yes": {
+        "kind": "page",
+        "exactWords": "Signature cut and hot towel shave, Sat Nov 7 at 11:10am, $55, paid in full now into Lee's Barbershop's own Stripe. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+        "yesEventId": "evt-page-alex-sig-0004"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-signature-cut",
+    "stage": "yes",
+    "branch": "full",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": "consent-alex-signature-cut-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-page-alex-signature-cut" },
+      {
+        "slot": "pay.took",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-page-alex-signature-1"
+      },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-page-alex-signature-1" }
+    ],
+    "gives": ["money_before", "paid_full"],
+    "written": [{ "table": "booking_details", "rowId": "booking-page-alex-signature-cut", "version": 5 }],
+    "repeated": false
+  }
+}

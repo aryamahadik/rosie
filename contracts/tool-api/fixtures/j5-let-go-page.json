@@ -1,0 +1,52 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-22T18:05:00Z",
+    "stated": null,
+    "note": "A5-05: 'A no lets the time go now.' On Lee's Barbershop's booking page Alex reads the style consult's read-back and taps No thanks instead of Book it. In one commit: his saved time released (K-05 v1 release, why let_go, which promotes anyone next in line) and the request ended dropped (K-30 booking_details.request_ended_why: 'the customer said no or went quiet'). No key; nothing was taken. The booking and reservation ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-consult-0005",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-consult-0001"
+    },
+    "bookingId": "booking-page-alex-style-consult",
+    "stage": {
+      "kind": "letGo",
+      "step": "A5-05",
+      "no": {
+        "kind": "page",
+        "exactWords": "Book this style consult? Lee's Barbershop · Style consult · Fri Oct 23 · 3:00pm · Riley. Nothing is charged.",
+        "yesEventId": "evt-page-alex-consult-0005"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-style-consult",
+    "stage": "letGo",
+    "branch": null,
+    "took": null,
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": { "reservationId": "rsv-page-alex-style-consult", "why": "let_go" },
+    "requestEnded": "dropped",
+    "effects": [],
+    "moneyWords": [],
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-page-alex-style-consult", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-page-alex-style-consult", "version": 5 }
+    ],
+    "repeated": false
+  }
+}

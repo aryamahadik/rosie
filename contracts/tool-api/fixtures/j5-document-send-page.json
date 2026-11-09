@@ -1,0 +1,33 @@
+{
+  "call": "signDocument",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-sealing-key.json"],
+    "after": [],
+    "now": "2026-11-03T19:20:00Z",
+    "stated": null,
+    "note": "B5-34's 'Yes: a signed contract first': at Lee Home Services, jobs over the plug-in's amount need a written estimate, and the $640 water heater replacement is over it (the $179 drain needs none). On Alex's secure page, before any money step, in one commit: Rosie builds the contract from the price and the parts the plug-in and the owner require (K-35 documents, origin built, kind contract, of this booking), its English words from a checked text with their sha256 (K-35 document_texts), and one signer, Alex (K-35 document_signers, signs_as Customer). The plug-in names no other signer for this work, so no co-signer's link is made; with one, each would get their own secure link for Alex to forward, never texted (MC C9). 'The business sending it is its signature.' No key; the money step waits until everyone has signed (README default 97). The document and signer ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-heater-0021",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-heater-0021"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": { "kind": "send", "step": "B5-34", "coSigners": [], "via": "page" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "documentId": "doc-alex-heater-contract",
+    "signerIds": ["signer-alex-heater-contract"],
+    "links": [],
+    "signatureId": null,
+    "signedByAll": false,
+    "gives": [],
+    "written": [{ "table": "documents", "rowId": "doc-alex-heater-contract", "version": 1 }],
+    "repeated": false
+  }
+}

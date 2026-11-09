@@ -1,0 +1,49 @@
+{
+  "call": "refundAtOnce",
+  "given": {
+    "seeds": [],
+    "after": [],
+    "now": "2026-11-09T03:00:05Z",
+    "stated": null,
+    "note": "S12-26 as K-32 v1 seed-fee-charged-twice holds it: Dee W.'s $20 late-cancel fee at Lee's Barbershop was charged to her saved card, then Stripe showed a second charge under the same effect id. The 3:00am UTC reconciliation (C-112's job) finds it with no ledger line and no agreed booking behind it, writes its line (ledger-dee-second-charge), and refunds it at once, without waiting for Sam. In one commit: the K-32 refunds row (double_charge, decided at once, via stripe, the whole $20, to Dee, no payment, no booking), its K-07 stripe_refund effect (K-07's effect-reconciliation-refund.json; K-14 v1 refund-double-charge.json, reason duplicate), and two clock rows due at once, one on Dee's email handle (her chat with Rosie is not open) and one on Sam's handle. Their clock turns write S12-26's two rows, and each row's pay.back reads the refund's own state, so 'is refunded' is said only once it succeeded (S13-55; README default 101). Stripe's result moves the refund to succeeded at 3:00:07am. No key. The clock row ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-recon-lees-barbershop-2026-11-09-refund-1",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-recon-lees-barbershop-2026-11-09"
+    },
+    "bookingId": null,
+    "refund": {
+      "reason": "double_charge",
+      "paymentId": null,
+      "chargeLineId": "ledger-dee-second-charge",
+      "toPersonId": "person-dee",
+      "amount": { "cents": 2000, "currency": "USD" }
+    }
+  },
+  "outcome": {
+    "refundId": "refund-dee-second-charge",
+    "state": "pending",
+    "decidedBy": "at_once",
+    "effects": [{ "effectId": "eff-reconcile-dee-second-charge-refund", "kind": "stripe_refund" }],
+    "told": {
+      "customerClockRowId": "clock-refund-dee-second-charge-customer",
+      "ownerClockRowId": "clock-refund-dee-second-charge-owner"
+    },
+    "moneyWords": [
+      { "slot": "pay.back", "table": "refunds", "column": "state", "rowId": "refund-dee-second-charge" },
+      { "slot": "pay.back", "table": "refunds", "column": "amount_cents", "rowId": "refund-dee-second-charge" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "refunds", "rowId": "refund-dee-second-charge", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-refund-dee-second-charge-customer", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-refund-dee-second-charge-owner", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

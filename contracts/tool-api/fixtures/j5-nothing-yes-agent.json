@@ -1,0 +1,53 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": [],
+    "now": "2026-11-03T17:02:10Z",
+    "stated": { "step": "A5-05", "gives": ["money_before"] },
+    "note": "D104's door (MC C3: 'Nothing to pay or save before the visit: booked at once on the AI's request, in place of the own-yes rule of A3-03, S12-05 and S13-31'): Dee's own AI, bound to her, books Lee's Barbershop's style consult, way list|none|none. She is the shop's customer already, so K-26's OK rules book it on the yes (booking_details.approval now), and its time is held for the AI's agent token. A5-04's branch is nothing, and the AI's request is the yes (README default 91, from those stored facts, never the AI's word). In one commit: booking_details.taken 'asked', set once. Gives money_before. No consent: no own yes was given, so no OK to messages is recorded (README default 92); the confirmation's chat link opens her chat (MC C9; v1.4). pay.took reads what the booking took. The booking id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-dee-consult-0006",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-agent-dee-consult-0001"
+    },
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-05",
+      "branch": "nothing",
+      "amountNow": null,
+      "yes": { "kind": "aiRequest" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": "yes",
+    "branch": "nothing",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-agent-dee-style-consult" }
+    ],
+    "gives": ["money_before"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-dee-style-consult", "version": 5 }],
+    "repeated": false
+  }
+}

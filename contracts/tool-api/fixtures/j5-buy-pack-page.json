@@ -1,0 +1,60 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-05T15:00:00Z",
+    "stated": null,
+    "note": "A5-22 on the yoga studio's secure page: booking a $35 Hot Flow class, Alex buys the pack of 5 visits for $160 that the studio sells on its page ('This visit then uses a credit from it'). The card was typed on the page through the card stage, keep false (its stripe_save_card effect eff-alex-hot-flow-card succeeded; no saved card row: K-32 default 15). In one commit (the rows K-32 v1 seed-pack-credits holds): the pack (bought_via rosie, first credit counted, version 2 as that seed keeps it); its payment of purpose pack, no booking, method card, pending ('If the booking isn't confirmed, the pack stays bought'); the K-07 stripe_charge effect eff-alex-hot-flow-pack, which K-14 v1 pack-purchase.json runs with the customer present; the visit's credit; and the class's line, copied at the save with paid_by money, replaced before the booking is written by a copy paid by credit, which the credit names (README defaults 94, 95). Only K-14's result makes the payment paid (K-32 rule 5): charged at 3:00:02pm. No key. The pack's terms come from the page server, built from the studio's settings (README open gap 92). The replaced line's and the card effect's ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-yoga-0003",
+      "businessId": "biz-yoga-studio",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-yoga-0001"
+    },
+    "bookingId": "booking-alex-hot-flow",
+    "offer": {
+      "kind": "buy",
+      "step": "A5-22",
+      "item": {
+        "kind": "pack",
+        "serviceId": "svc-yoga-hot-flow",
+        "name": "Pack of 5 visits",
+        "unit": "visit",
+        "creditsTotal": 5,
+        "price": { "cents": 16000, "currency": "USD" }
+      },
+      "cardEffectId": "eff-alex-hot-flow-card",
+      "lineId": "line-alex-hot-flow-1-saved"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-hot-flow",
+    "offer": "buy",
+    "creditId": "credit-alex-hot-flow-1",
+    "packId": "pack-alex-yoga-5-visits",
+    "membershipId": null,
+    "planChargeId": null,
+    "paymentId": "pay-alex-hot-flow-pack",
+    "consentId": null,
+    "line": { "lineId": "line-alex-hot-flow-1", "replacedLineId": "line-alex-hot-flow-1-saved" },
+    "effects": [{ "effectId": "eff-alex-hot-flow-pack", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-hot-flow-pack" },
+      { "slot": "pay.price", "table": "packs", "column": "price_cents", "rowId": "pack-alex-yoga-5-visits" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "packs", "rowId": "pack-alex-yoga-5-visits", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-hot-flow-pack", "version": 1 },
+      { "table": "credits", "rowId": "credit-alex-hot-flow-1", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-1-saved", "version": 2 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-1", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T15:19:40Z",
+    "stated": null,
+    "note": "Refused (README default 91; A3-03; A5-04; S13-55: 'Never a yes relayed in a chat by someone else's AI'): Alex's own AI sends its request as the yes to the Groom's package's $40 deposit. An AI's request books only nothing taken, on D104's door; a deposit needs the customer's own yes on the page (MoneyYes: a deposit's yes is the page's). Put right, the yes is Alex's own tap on the page with the words shown, from the page, as j5-deposit-yes-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-grooms-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-13",
+      "branch": "deposit",
+      "amountNow": { "cents": 4000, "currency": "USD" },
+      "yes": { "kind": "aiRequest" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "yes",
+    "branch": "deposit",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": ["money_before", "card_saved", "deposit_paid"],
+    "written": [{ "table": "booking_details", "rowId": "booking-alex-grooms-package", "version": 5 }],
+    "repeated": false
+  }
+}

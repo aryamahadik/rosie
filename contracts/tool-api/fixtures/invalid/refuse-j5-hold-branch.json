@@ -1,0 +1,44 @@
+{
+  "call": "showMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T15:18:30Z",
+    "stated": null,
+    "note": "Refused (RULES 3.2: 'Nothing is ever held on a card'; D65; S13-55; K-32 v1 refuse-hold-payment): the money step shows a hold of the Groom's package's $40 on the card in place of a deposit. moneyBranch has no hold: exactly one of nothing, a card saved, a deposit or the full price. Put right, the branch is deposit, with the same amount."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package"
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "branch": "hold",
+    "amountNow": { "cents": 4000, "currency": "USD" },
+    "fee": { "cents": 4000, "currency": "USD" },
+    "lines": [
+      {
+        "lineId": "line-alex-grooms-1",
+        "before": "deposit",
+        "paidBy": "money",
+        "dueNow": { "cents": 4000, "currency": "USD" }
+      }
+    ],
+    "offers": { "credits": [], "packs": false, "memberships": false, "plan": false, "discountCodes": false },
+    "document": null,
+    "stripeDown": false,
+    "yesBy": "ownYes",
+    "payBy": "cardOnPage",
+    "words": "Groom's package, Sat Nov 7 at 10:20am, $140. $40 is held on your card.",
+    "versionsRead": [{ "table": "booking_lines", "rowId": "line-alex-grooms-1", "version": 1 }],
+    "heldUntil": "2026-11-07T15:27:00Z",
+    "moneyWords": []
+  }
+}

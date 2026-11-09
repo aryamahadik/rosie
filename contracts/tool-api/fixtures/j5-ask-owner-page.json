@@ -1,0 +1,54 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "core/seed-business-head.json",
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json"
+    ],
+    "after": [],
+    "now": "2026-10-21T23:25:00Z",
+    "stated": null,
+    "note": "A5-31's 'Ask Sam first' on Lee's Barbershop's booking page. Alex's skin fade (way list|card|counter) asks a card saved for its $20 fee, but no card he tried could be saved ('Try another card', never the bank's reason), so the page asks the owner (why noCardWorks). In one commit: a K-30 owner_oks row about nothing_taken, answer_by 30 minutes of Sam's text hours (7:55pm in New York, A5-08's own sample), and one K-04 clock row due at once on Sam's handle. A page's commit writes no outbox row (v1.2 default 66's way), so that clock row's clock turn writes A5-08's question, 'Alex M. can't pay what this booking asks now ... Book it anyway? Then no fee can be charged. No answer by 7:55pm: the time is let go', with its open question and A5-08's two branches as its options. Alex hears when he'll know on the page itself (customerTold with no row). No key (README default 99). The time stays held only as K-05 v1 allows: open gap 93. The booking, row and clock ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-fade-0009",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-fade-0001"
+    },
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": { "kind": "askOwner", "step": "A5-08", "why": "noCardWorks" }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": "askOwner",
+    "branch": null,
+    "took": null,
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": {
+      "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+      "answerBy": "2026-10-21T23:55:00Z",
+      "clockRowId": "clock-ok-alex-skin-fade-ask"
+    },
+    "customerTold": { "outboxRowId": null, "clockRowId": null },
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.asks", "table": "booking_lines", "column": "path", "rowId": "line-page-alex-skin-fade-1" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-alex-skin-fade-nothing-taken", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-ok-alex-skin-fade-ask", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

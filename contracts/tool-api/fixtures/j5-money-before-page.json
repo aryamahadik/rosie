@@ -1,0 +1,54 @@
+{
+  "call": "showMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "services-prices/seed-price-rule-dates.json",
+      "rules/seed-rules-tap-list.json"
+    ],
+    "after": [
+      "j3-open-request-agent.json",
+      "j4-save-time-agent.json",
+      "j4-secure-link-agent.json",
+      "j4-page-answers-flow-a.json"
+    ],
+    "now": "2026-10-21T23:21:00Z",
+    "stated": null,
+    "note": "A5-01, A5-19 and A5-04 on Alex's secure page, opened from the link his own AI passed on (j4-secure-link-agent.json). The haircut's way list|card|counter asks a card saved for the shop's $20 fee and takes nothing now, so the branch is card (A5-07). Lee's Barbershop sells its packages only at the shop and offers no plan here, discount codes stay off (K-32 v1 default 19; README default 102), and a barbershop's services need no document (A5-19). It is a request Sam OKs first (approval ownerok), so Alex's own yes books it and the card is typed on the page. The page's one clock is the time his AI saved, until 7:26:40pm in New York (j4-save-time-agent.json). The words shown are code's, built from the versions read (README default 91), and each money word names its row (default 90). Nothing is written. The words are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0012",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0012"
+    },
+    "bookingId": "booking-agent-alex-oct21"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "branch": "card",
+    "amountNow": null,
+    "fee": { "cents": 2000, "currency": "USD" },
+    "lines": [{ "lineId": "line-agent-alex-1", "before": "card", "paidBy": "money", "dueNow": null }],
+    "offers": { "credits": [], "packs": false, "memberships": false, "plan": false, "discountCodes": false },
+    "document": null,
+    "stripeDown": false,
+    "yesBy": "ownYes",
+    "payBy": "cardOnPage",
+    "words": "Haircut with Riley, Sat Oct 24 at 11:00am, $35, paid at Lee's Barbershop. Your card is saved only for the $20 late-cancel or no-show fee, which Lee's Barbershop confirms first. Nothing is charged now.",
+    "versionsRead": [
+      { "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 4 },
+      { "table": "booking_lines", "rowId": "line-agent-alex-1", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-agent-alex-riley-sat", "version": 1 }
+    ],
+    "heldUntil": "2026-10-21T23:26:40Z",
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-agent-alex-1" },
+      { "slot": "pay.took", "table": "booking_lines", "column": "path", "rowId": "line-agent-alex-1" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-agent-alex-1" }
+    ]
+  }
+}

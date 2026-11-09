@@ -1,0 +1,51 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-03T13:04:00Z",
+    "stated": null,
+    "note": "Refused (A5-21: 'Repeat charges need this yes of their own' and 'Never: start repeat charges on a booking yes alone'; S13-55: 'A new or higher amount, an extra or a plan needs the customer's own yes, in their own chat' and 'Never a yes relayed in a chat by someone else's AI'; README default 96): Owen's own AI says '1 I agree' to the haircut plan for him. A plan's yes is the customer's own, in their chat or on their page. Put right, the caller is Owen's own turn, as j5-plan-agree-turn.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-owen-plan-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-owen",
+      "traceId": "trace-agent-owen-plan-0001"
+    },
+    "bookingId": "booking-owen-haircut-oct3",
+    "offer": {
+      "kind": "plan",
+      "step": "A5-21",
+      "answer": "agree",
+      "plan": {
+        "serviceId": "svc-lees-haircut",
+        "name": "Haircut plan · every 4 weeks",
+        "price": { "cents": 3500, "currency": "USD" },
+        "period": "28 days",
+        "billed": "per_visit",
+        "visitsPerPeriod": null
+      },
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-owen-plan-terms", "yesEventId": "evt-owen-plan-0001" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-owen-haircut-oct3",
+    "offer": "plan",
+    "creditId": null,
+    "packId": null,
+    "membershipId": "plan-owen-haircut",
+    "planChargeId": null,
+    "paymentId": null,
+    "consentId": "consent-owen-plan-terms",
+    "line": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "memberships", "rowId": "plan-owen-haircut", "version": 1 }],
+    "repeated": false
+  }
+}

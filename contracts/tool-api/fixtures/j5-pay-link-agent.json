@@ -1,0 +1,60 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": [],
+    "now": "2026-11-03T16:00:30Z",
+    "stated": null,
+    "note": "MC C3 (D104): Dee's own AI, bound to her (README default 70), books the $55 Signature cut and hot towel shave, way list|full|none, at Lee's Barbershop. She is the shop's customer already, so K-26's OK rules book it on the yes (booking_details.approval now), and the full price is due now. Her AI's saveTime held the time on the ownAi door for its agent token, 15 minutes, until 4:13pm UTC, never extended. So the money step gives the pay link, decided from those stored facts, never the AI's word (README default 88). In one commit: the K-32 payment of purpose full_price, method card, pending, with its K-07 stripe_pay_link effect (K-14 v1 payLink); its pay_links row, given_via ai and email, due at the hold's own end, keeping only its code's sha256 (K-32 default 21); and one clock row due at once on Dee's email handle, whose clock turn writes the link's email, since her chat with Rosie is not open (MC C9). The url goes to the AI once, never logged. Paid within the 15 minutes: booked (A6-10, v1.4). Not paid: closePayLink cancels it at the deadline, the time is let go, nothing is booked or charged, and nobody is chased (MC C3). No key: the yes on the pay page gives them. pay.took reads the payment's own state, pending, so no word says paid. Every id and the code are examples or placeholders (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-dee-sig-0007",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-agent-dee-sig-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": { "kind": "payLink", "step": "A5-16" }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": "payLink",
+    "branch": null,
+    "took": null,
+    "card": null,
+    "payLink": {
+      "payLinkId": "paylink-agent-dee-signature-cut",
+      "paymentId": "pay-agent-dee-signature-cut",
+      "dueAt": "2026-11-03T16:13:00Z",
+      "url": "rosfield.com/p/placeholder-pay-code-0001",
+      "clockRowIds": ["clock-agent-dee-pay-link-email"],
+      "slot": "link.pay"
+    },
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-dee-signature-pay-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-agent-dee-signature-cut" },
+      { "slot": "pay.price", "table": "payments", "column": "amount_cents", "rowId": "pay-agent-dee-signature-cut" },
+      { "slot": "clock.pay", "table": "pay_links", "column": "due_at", "rowId": "paylink-agent-dee-signature-cut" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "payments", "rowId": "pay-agent-dee-signature-cut", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-agent-dee-signature-cut", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-agent-dee-pay-link-email", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

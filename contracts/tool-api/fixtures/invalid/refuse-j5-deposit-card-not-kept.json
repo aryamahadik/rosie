@@ -1,0 +1,41 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T15:18:00Z",
+    "stated": null,
+    "note": "Refused (A5-13: 'It counts toward the price, and the card stays saved'; A-J5.md: A5-13 gives card_saved; K-32 default 15): the Groom's package's deposit card form is made with keep false, so no saved card row would name it. A deposit's and a card-saved service's card is kept for later (CardForm). Put right, keep is true, with its K-32 saved_cards row card-alex-grooms-package."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": { "kind": "card", "step": "A5-13", "keep": false }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "card",
+    "branch": null,
+    "took": null,
+    "card": { "savedCardId": "card-alex-grooms-package", "effectId": "eff-alex-grooms-save-card", "kept": true },
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-grooms-save-card", "kind": "stripe_save_card" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "saved_cards", "rowId": "card-alex-grooms-package", "version": 1 }],
+    "repeated": false
+  }
+}

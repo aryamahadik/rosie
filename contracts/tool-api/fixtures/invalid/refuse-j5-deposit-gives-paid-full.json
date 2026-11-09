@@ -1,0 +1,51 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-07T15:19:40Z",
+    "stated": null,
+    "note": "Refused (A-J5.md: A5-13 gives money_before, card_saved, deposit_paid; S13-55: 'A message never says deposit paid, paid in full ... unless the record says it happened'): the yes to the Groom's package's $40 deposit answers paid_full in place of deposit_paid. A deposit's yes gives exactly its branch's keys (takeMoneyBefore.response). Put right, it gives money_before, card_saved and deposit_paid, as j5-deposit-yes-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-13",
+      "branch": "deposit",
+      "amountNow": { "cents": 4000, "currency": "USD" },
+      "yes": {
+        "kind": "page",
+        "exactWords": "Groom's package, Sat Nov 7 at 10:20am, $140. A $40 deposit is taken now, into Lee's Barbershop's own Stripe, and counts toward the price; the rest is paid at the shop. Your card stays saved for the $40 late-cancel or no-show fee, which Lee's Barbershop confirms first.",
+        "yesEventId": "evt-page-alex-grooms-0003"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "yes",
+    "branch": "deposit",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": "consent-alex-grooms-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": ["money_before", "card_saved", "paid_full"],
+    "written": [{ "table": "booking_details", "rowId": "booking-alex-grooms-package", "version": 5 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": ["j4-secure-link-agent.json", "j5-money-before-page.json"],
+    "now": "2026-10-21T23:21:20Z",
+    "stated": null,
+    "note": "A5-07's card form on Alex's secure page (keep true: the booking keeps the card for the fee). In one commit: the K-07 stripe_save_card effect, K-14 v1 save-card.json's eff-alex-haircut-save-card (Alex has no customer on the shop's own Stripe yet, so the adapter makes one, then the SetupIntent the page's Stripe form finishes; its client secret is read by the page server with pageIntent and never stored), and the K-32 saved_cards row naming it, saved_at null until cardSaved comes (the runtime side). Nothing is charged; no key. The saved card's id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0013",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0013"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": { "kind": "card", "step": "A5-07", "keep": true }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "card",
+    "branch": null,
+    "took": null,
+    "card": { "savedCardId": "card-agent-alex-haircut", "effectId": "eff-alex-haircut-save-card", "kept": true },
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-haircut-save-card", "kind": "stripe_save_card" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "saved_cards", "rowId": "card-agent-alex-haircut", "version": 1 }],
+    "repeated": false
+  }
+}
