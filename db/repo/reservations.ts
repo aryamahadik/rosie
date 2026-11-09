@@ -13,11 +13,32 @@
 // (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every row
 // update raises the version by one (trigger from 0002).
 //
+// One row per holder per slot (T-1134, from T-744 round 1's security review, GAP 1; DL-292). A holder is who the cap of
+// 2 counts (holderOf, the one definition): a mobile, the same at every business, or an agent token at one business; a
+// time saved for a booking has no holder. A slot is a resource's time that overlaps the asked or released one, as EXCLUDE
+// and the line read it. Both rules run inside the call's one transaction, under the slot's lock:
+//   (1) reserve() with waitIfSaved, for a holder that already holds or waits on the slot, writes nothing and answers its
+//       own row as its first save got it (held with its end, or waiting with its place in line), repeated, under that
+//       row's id. So a save never waits behind its own holder's saved time, and one holder saving one slot twice at once
+//       gets one row: the second save waits on the slot's lock, then finds the first.
+//   (2) release() of a held or booked row lets go every waiting row of the released holder in its line (released,
+//       let_go, at `at`) and promotes the first waiting row of another holder, or nobody. So no holder holds one slot
+//       twice in a row through the line, and MC C3's 15 minutes ("never extended", line 35) are never extended that way.
+// Defaults used (for ops/QUESTIONS.md; each where no source decides):
+//   1. (1)'s answer says repeated: the call wrote nothing, as a repeat of the same request answers (K-05 README,
+//      "Repeating it"); its reservationId is the holder's own row's, not the asked one.
+//   2. (1) is read before the cap of 2: asking again for the slot it holds or waits on is no third saved time.
+//   3. A held row whose end has passed counts as held until its release lets it go: EXCLUDE still covers it.
+//   4. A class session has no line (reserve answers seatsFull, K-05 README item 9), so neither rule applies to it.
+//   5. (2)'s rows are released with why let_go (the card's "let go with it"); release's answer names none of them, since
+//      K-05 v1's skipped has no reason for them.
+//
 // Left to later tasks: the saved-time clock row and the one extension (extend). clock_rows exists (migration 0009), but
 // reserve() writes no clock row yet: the answer names its id, `<reservation id>/saved-time`. That row is owned by the
 // mobile's handle (K-05 item 8), which this call's role (rosie_app) cannot read from handles or phones, so the task that
 // writes it reads the handle's id alone through handles_id_of_mobile (T-1094). The commit confirms a held row
 // (db/repo/commit-turn.ts, T-195).
+import type postgres from "postgres";
 import { isLostConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
@@ -245,6 +266,55 @@ function savedForColumns(who: SavedFor): {
   };
 }
 
+/**
+ * Who holds a saved time, as the cap of 2 counts it (arch 05 line 247; K-05 README item 8): a mobile, the same at every
+ * business, or an agent token at one business. A time saved for a booking has no holder (no cap, and neither of
+ * T-1134's rules). The one definition the cap, reserve's own row and release's let-go read (T-1134).
+ */
+type Holder = { phone: string } | { agentToken: string; businessId: string };
+
+function holderOf(who: SavedFor, businessId: string): Holder | null {
+  const columns = savedForColumns(who);
+  if (columns.phone !== null) {
+    return { phone: columns.phone };
+  }
+  if (columns.token !== null) {
+    return { agentToken: columns.token, businessId };
+  }
+  return null;
+}
+
+/** Who a row is saved for, as a promotion counts it: its mobile, else its agent token, else its booking. */
+function savedForOf(row: Reservation): SavedFor {
+  if (row.forPhoneNumber !== null) {
+    return { phoneNumber: row.forPhoneNumber };
+  }
+  if (row.forAgentToken !== null) {
+    return { agentToken: row.forAgentToken };
+  }
+  return { bookingId: row.bookingId ?? "" };
+}
+
+const holderOfRow = (row: Reservation): Holder | null => holderOf(savedForOf(row), row.businessId);
+
+/** Whether two holders are one: the same mobile, or the same agent token at the same business. No holder is nobody's. */
+function sameHolder(a: Holder | null, b: Holder | null): boolean {
+  if (a === null || b === null) {
+    return false;
+  }
+  if ("phone" in a) {
+    return "phone" in b && a.phone === b.phone;
+  }
+  return "agentToken" in b && a.agentToken === b.agentToken && a.businessId === b.businessId;
+}
+
+/** The rows of `holder`, as a condition on reservations: its mobile's at any business, or its token's at its business. */
+function ofHolder(tx: Conn, holder: Holder): postgres.Fragment {
+  return "phone" in holder
+    ? tx`for_phone_number = ${holder.phone}`
+    : tx`for_agent_token = ${holder.agentToken} and business_id = ${holder.businessId}`;
+}
+
 const transientCodes = new Set(["40001", "40P01"]);
 const LOST_CONNECTION_SQLSTATE = "08006";
 
@@ -407,32 +477,43 @@ async function lockSlot(tx: Conn, resourceId: string, personId: string | null): 
  * mobile: its phones row FOR UPDATE, so parallel reserves for one mobile run one after the other, counted across every
  * business; both happen in reservations_saved_times (K-05 item 8), which runs unscoped, since this transaction's scope
  * shows only its own business's rows, and returns only the rows' ids and ends. An agent token (it has no row): a
- * transaction-level advisory lock on the business and the token, counted at that business. A booking: no cap. Waiting
- * rows never count (A4-18).
+ * transaction-level advisory lock on the business and the token, counted at that business. A booking (no holder): no cap.
+ * Waiting rows never count (A4-18).
  */
-async function lockAndListSaved(
-  tx: Conn,
-  who: SavedFor,
-  businessId: string,
-  at: string,
-): Promise<SavedRow[]> {
-  const columns = savedForColumns(who);
-  if (columns.phone !== null) {
+async function lockAndListSaved(tx: Conn, holder: Holder | null, at: string): Promise<SavedRow[]> {
+  if (holder === null) {
+    return [];
+  }
+  if ("phone" in holder) {
     return tx<SavedRow[]>`
-      select id, held_until from reservations_saved_times(${columns.phone}, ${at}::timestamptz)
+      select id, held_until from reservations_saved_times(${holder.phone}, ${at}::timestamptz)
       order by held_until, id
     `;
   }
-  if (columns.token !== null) {
-    await tx`select pg_advisory_xact_lock(hashtextextended(${`token:${businessId}:${columns.token}`}, 0))`;
-    return tx<SavedRow[]>`
-      select id, held_until from reservations
-      where for_agent_token = ${columns.token} and business_id = ${businessId} and state = 'held'
-        and held_until > ${at}::timestamptz
-      order by held_until, id
-    `;
-  }
-  return [];
+  await tx`select pg_advisory_xact_lock(hashtextextended(${`token:${holder.businessId}:${holder.agentToken}`}, 0))`;
+  return tx<SavedRow[]>`
+    select id, held_until from reservations
+    where ${ofHolder(tx, holder)} and state = 'held' and held_until > ${at}::timestamptz
+    order by held_until, id
+  `;
+}
+
+/**
+ * T-1134 rule (1): the holder's own row on the asked slot, when it already holds or waits on it: its held or waiting row
+ * of the same resource whose time overlaps the asked one (as EXCLUDE and the line read a slot), a held one first, then
+ * the earliest in line. Read under the slot's lock, which every save, promotion and let-go of the slot takes first, so a
+ * parallel save of the same slot by the same holder is seen once it commits.
+ */
+async function ownRowOnSlot(tx: Conn, request: ReserveRequest, holder: Holder): Promise<Reservation | null> {
+  const [row] = await tx<ReservationRow[]>`
+    select ${tx.unsafe(RESERVATION_COLUMNS)} from reservations
+    where resource_id = ${request.resourceId} and state in ('held', 'waiting')
+      and during && tstzrange(${request.during.start}::timestamptz, ${request.during.end}::timestamptz, '[)')
+      and ${ofHolder(tx, holder)}
+    order by state = 'held' desc, queued_at, id
+    limit 1
+  `;
+  return row === undefined ? null : toReservation(row);
 }
 
 const sameRequest = (row: Reservation, request: ReserveRequest): boolean => {
@@ -458,6 +539,14 @@ function repeatOutcome(row: Reservation, request: ReserveRequest): ReserveOutcom
   if (!sameRequest(row, request) || (row.state !== "held" && row.state !== "waiting")) {
     return { error: "idConflict", reservationId: request.reservationId };
   }
+  return answeredAgain(row);
+}
+
+/**
+ * A held or waiting row's save, answered again with nothing written (`repeated`): held with its end, or waiting with its
+ * place in line, as it stands now. A repeat of the same request answers this way, and so does T-1134's rule (1).
+ */
+function answeredAgain(row: Reservation): ReserveOutcome {
   if (row.state === "held" && row.heldUntil !== null) {
     return heldOutcome(row, true);
   }
@@ -569,11 +658,20 @@ export async function reserveIn(tx: Conn, request: ReserveRequest): Promise<Rese
     return repeatOutcome(existing, request);
   }
 
-  const saved = await lockAndListSaved(tx, request.for, request.businessId, request.at);
+  const holder = holderOf(request.for, request.businessId);
+  const saved = await lockAndListSaved(tx, holder, request.at);
   // A parallel call with the same id may have committed while this one waited for the lock: answer as its repeat.
   const writtenMeanwhile = await getReservation(tx, request.reservationId);
   if (writtenMeanwhile !== null) {
     return repeatOutcome(writtenMeanwhile, request);
+  }
+  // T-1134 rule (1): a holder that already holds or waits on this slot, asking to wait if it is saved, gets its own row
+  // back as its first save got it, and nothing is written: a save never waits behind its own holder's saved time.
+  if (request.waitIfSaved && holder !== null && resource.kind !== "class_session") {
+    const own = await ownRowOnSlot(tx, request, holder);
+    if (own !== null) {
+      return answeredAgain(own);
+    }
   }
   if (saved.length >= SAVED_TIME_CAP) {
     return {
@@ -633,7 +731,8 @@ export async function reserveIn(tx: Conn, request: ReserveRequest): Promise<Rese
       if (!request.waitIfSaved || (await bookedOverlap(tx, request, resource))) {
         return { error: "overlap", resourceId: request.resourceId };
       }
-      // Someone has saved the time: wait next in line (A4-18), place in line is `at`.
+      // Someone has saved the time (never this holder: rule (1) answered that above): wait next in line (A4-18), place
+      // in line is `at`.
       const waiting = await inSavepoint(tx, () => insertReservation(tx, request, resource, "waiting", 0));
       return {
         result: "waiting",
@@ -665,7 +764,8 @@ export async function reserve(sql: Sql, request: ReserveRequest): Promise<Reserv
  * Releases a reservation inside the transaction `tx`, which the caller scoped to the request's business: expired (its
  * saved time ended; needs a held row past its held_until), let go or cancelled. A held or booked row promotes the next in
  * line (K-05 README item 9): the waiting rows of the same resource whose time overlaps, earliest queued_at first, a tie to
- * the lower id; the first one that can be held is promoted, and the ones passed over are named.
+ * the lower id; the first one that can be held is promoted, and the ones passed over are named. The released holder's
+ * own waiting rows in that line are never promoted: they are let go with it (T-1134 rule (2)).
  */
 export async function releaseIn(tx: Conn, request: ReleaseRequest): Promise<ReleaseOutcome> {
   assertUtc(request.at, "at");
@@ -752,21 +852,29 @@ export async function releaseIn(tx: Conn, request: ReleaseRequest): Promise<Rele
   let promoted: Promotion | null = null;
   const skipped: { reservationId: string; reason: "overlap" | "savedTimeCap" }[] = [];
   if (tookTime && before.resourceKind !== "class_session") {
-    const line = await tx<ReservationRow[]>`
-      select ${tx.unsafe(RESERVATION_COLUMNS)} from reservations
-      where state = 'waiting' and resource_id = ${before.resourceId}
-        and during && tstzrange(${before.during.start}::timestamptz, ${before.during.end}::timestamptz, '[)')
-      order by queued_at, id
-      for update
-    `;
-    for (const waiting of line.map(toReservation)) {
-      const who: SavedFor =
-        waiting.forPhoneNumber !== null
-          ? { phoneNumber: waiting.forPhoneNumber }
-          : waiting.forAgentToken !== null
-            ? { agentToken: waiting.forAgentToken }
-            : { bookingId: waiting.bookingId ?? "" };
-      const saved = await lockAndListSaved(tx, who, waiting.businessId, request.at);
+    const line = (
+      await tx<ReservationRow[]>`
+        select ${tx.unsafe(RESERVATION_COLUMNS)} from reservations
+        where state = 'waiting' and resource_id = ${before.resourceId}
+          and during && tstzrange(${before.during.start}::timestamptz, ${before.during.end}::timestamptz, '[)')
+        order by queued_at, id
+        for update
+      `
+    ).map(toReservation);
+    // T-1134 rule (2): the released holder's own waiting rows, wherever they stand in the line, are let go with it and
+    // never promoted, so its time never passes back to it through the line.
+    const releasedHolder = holderOfRow(before);
+    const own = line.filter((waiting) => sameHolder(holderOfRow(waiting), releasedHolder));
+    if (own.length > 0) {
+      await tx`
+        update reservations
+        set state = 'released', released_at = ${request.at}::timestamptz, released_why = 'let_go',
+            version = version + 1
+        where id in ${tx(own.map((waiting) => waiting.id))} and state = 'waiting'
+      `;
+    }
+    for (const waiting of line.filter((row) => !own.includes(row))) {
+      const saved = await lockAndListSaved(tx, holderOfRow(waiting), request.at);
       if (saved.length >= SAVED_TIME_CAP) {
         skipped.push({ reservationId: waiting.id, reason: "savedTimeCap" });
         continue;
