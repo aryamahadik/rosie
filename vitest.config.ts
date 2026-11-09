@@ -35,6 +35,11 @@ export default defineConfig({
   test: {
     passWithNoTests: true,
     maxWorkers: MAX_WORKERS,
+    // The 30 s resource guard for every project with no limit of its own: workers, contract, scenario and e2e (T-1131,
+    // DL-236: an e2e test timed out at Vitest's 5 s default while three builders ran on the build Mac). Not part of any
+    // test's claim. A project's own limits and a test's own longer limit still win.
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     projects: [
       {
         // Unit tests beside the code: each workspace's src/, plus db/repo/ and db/seeds/ (db's layout).
