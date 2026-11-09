@@ -558,6 +558,95 @@ export function givesJourneyFourKeys(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.3 (T-052): journey 5. Added beside the rules above, which stay as they are.
+
+/**
+ * The keys each step of journey 5 gives, as the step index prints them (A-J5.md and B-J5.md, the gives column; A-keys.md
+ * and B-keys.md, section 5): every branch of A5-04 (B5-02) gives money_before; a card saved and a deposit give
+ * card_saved; a deposit gives deposit_paid; the full price gives paid_full (SPEC-master section 5, "Keys the money path
+ * gives"). No other step of journey 5 gives a key.
+ */
+export const J5_STEP_GIVES = Object.freeze({
+  "A5-05": ["money_before"],
+  "A5-07": ["money_before", "card_saved"],
+  "A5-13": ["money_before", "card_saved", "deposit_paid"],
+  "A5-16": ["money_before", "paid_full"],
+  "B5-03": ["money_before"],
+  "B5-05": ["money_before", "card_saved"],
+  "B5-11": ["money_before", "card_saved", "deposit_paid"],
+  "B5-13": ["money_before", "paid_full"],
+});
+
+/**
+ * The owner's '1 Book it' (A5-08, B5-06) books it with nothing taken (K-30 booking_details.taken 'nothing'; SPEC-master
+ * 5e), A5-04's 'Nothing taken', so its commit gives that branch's key, money_before (README "v1.3" default 99); its
+ * '2 Let it go' gives none and states no step. Card_saved, deposit_paid and paid_full are never owed after a booking
+ * that took nothing (SPEC-master line 291).
+ */
+export const J5_OWNER_BOOKS = Object.freeze({
+  "A5-08": "A5-05",
+  "B5-06": "B5-03",
+});
+
+/**
+ * The keys a step gives that, on C3's door, come from the payment's success, never from the yes (README "v1.3" default
+ * 104; round 2, DL-252 ruling 2): a yes on the pay page (takeMoneyBefore yes with payBy payLink) comes before Stripe's
+ * form confirms the payment, and K-14's paymentSucceeded with saveCardForLater writes the deposit's K-32 saved_cards row
+ * (saved_from_payment_id), so that yes gives its step's other keys.
+ */
+export const J5_PAY_LINK_LATER = Object.freeze(["card_saved"]);
+
+/** The one call that writes each key journey 5 gives (README "v1.3", "Each key's one call"; 02-contracts section 8). */
+export const J5_KEY_CALL = Object.freeze({
+  money_before: "takeMoneyBefore",
+  card_saved: "takeMoneyBefore",
+  deposit_paid: "takeMoneyBefore",
+  paid_full: "takeMoneyBefore",
+});
+
+/**
+ * givesJourneyFiveKeys: an exchange that states a journey 5 step states exactly the keys that step gives (J5_STEP_GIVES;
+ * for the owner's '1 Book it', the 'Nothing taken' branch's: J5_OWNER_BOOKS), less, for a yes on C3's pay page, those
+ * the payment's success writes (J5_PAY_LINK_LATER), and its outcome wrote exactly those keys. Made alone, its call is the
+ * one call that writes each key (J5_KEY_CALL; the card's "each key written by exactly one call"). In a turn
+ * (gateAndCommit) the committed parts' gives are the keys written; no automatic step of journey 5 gives a key, so a part
+ * gives exactly its step's.
+ */
+export function givesJourneyFiveKeys(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const keyStep = J5_OWNER_BOOKS[stated.step] ?? stated.step;
+  const ownKeys = J5_STEP_GIVES[keyStep] ?? [];
+  if (ownKeys.length === 0) return [`${stated.step} is no step of journey 5 that gives a key`];
+  const problems = [];
+  const stage = exchange.call === "takeMoneyBefore" ? exchange.request?.stage : undefined;
+  const onPayPage = stage?.kind === "yes" && stage.payBy === "payLink";
+  const expected = ownKeys.filter((key) => !(onPayPage && J5_PAY_LINK_LATER.includes(key))).sort();
+  const statedKeys = [...stated.gives].sort();
+  if (JSON.stringify(statedKeys) !== JSON.stringify(expected)) {
+    problems.push(
+      `${stated.step} gives [${expected.join(", ")}], not the stated [${stated.gives.join(", ")}]`,
+    );
+  }
+  const written = [...keysWritten(exchange)].sort();
+  if (JSON.stringify(written) !== JSON.stringify(expected)) {
+    problems.push(`the outcome wrote [${written.join(", ")}], not [${expected.join(", ")}]`);
+  }
+  if (exchange.call !== "gateAndCommit") {
+    for (const key of written) {
+      if (J5_KEY_CALL[key] !== exchange.call) {
+        problems.push(
+          `${key} is written by ${J5_KEY_CALL[key] ?? "no journey 5 call"}, not ${exchange.call}`,
+        );
+      }
+    }
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -566,4 +655,5 @@ export const rules = Object.freeze({
   givesJourneyKeys,
   arrivalTurn,
   givesJourneyFourKeys,
+  givesJourneyFiveKeys,
 });

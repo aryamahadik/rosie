@@ -1,0 +1,51 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-11-03T16:00:30Z",
+    "stated": null,
+    "note": "Refused (MC C3; README default 88): the booking page asks for C3's pay link. The pay link is C3's door only, the customer's own AI booking at once with money due now; on the page the card is typed into Stripe's form there (the card stage). Put right, the caller is Dee's own AI, as j5-pay-link-agent.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-dee-sig-0007",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-page-dee-sig-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": { "kind": "payLink", "step": "A5-16" }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": "payLink",
+    "branch": null,
+    "took": null,
+    "card": null,
+    "payLink": {
+      "payLinkId": "paylink-agent-dee-signature-cut",
+      "paymentId": "pay-agent-dee-signature-cut",
+      "dueAt": "2026-11-03T16:13:00Z",
+      "url": "rosfield.com/p/placeholder-pay-code-0001",
+      "clockRowIds": ["clock-agent-dee-pay-link-email"],
+      "slot": "link.pay"
+    },
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-dee-signature-pay-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [
+      { "table": "payments", "rowId": "pay-agent-dee-signature-cut", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-agent-dee-signature-cut", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

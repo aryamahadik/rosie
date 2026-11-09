@@ -1,0 +1,54 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j5-buy-pack-page.json"],
+    "now": "2026-11-12T14:10:00Z",
+    "stated": null,
+    "note": "A5-03 on the yoga studio's secure page a week later: Alex books another $35 Hot Flow class, and showMoneyBefore offered his pack of 5 visits (4 left). He taps Use a credit. In one commit: a K-32 credits row of 1 visit from pack-alex-yoga-5-visits, its credits_used raised to 2 under its CHECK (compared on the pack's version 2, now 3: K-32 rule 10), and the class's line, copied at the save with paid_by money, replaced before the booking is written by a copy paid by credit with the same way and price (the old line removed with no change row: K-30 booking_lines.state; v1.1 open gap 46's default), which the credit names (README default 94; open gap 91). The page shows 3 credits left after this visit. The booking now takes nothing now for the class (A5-04: a credit for the only service is Nothing taken), so its yes is A5-05's. No key. The booking, line and credit ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-yoga-0011",
+      "businessId": "biz-yoga-studio",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-yoga-0002"
+    },
+    "bookingId": "booking-alex-hot-flow-2",
+    "offer": {
+      "kind": "credit",
+      "step": "A5-03",
+      "lineId": "line-alex-hot-flow-2-saved",
+      "from": { "packId": "pack-alex-yoga-5-visits" },
+      "units": 1,
+      "expectVersion": 2
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-hot-flow-2",
+    "offer": "credit",
+    "creditId": "credit-alex-hot-flow-2",
+    "packId": "pack-alex-yoga-5-visits",
+    "membershipId": null,
+    "planChargeId": null,
+    "paymentId": null,
+    "consentId": null,
+    "savedCardId": null,
+    "line": { "lineId": "line-alex-hot-flow-2", "replacedLineId": "line-alex-hot-flow-2-saved" },
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "credits", "column": "units", "rowId": "credit-alex-hot-flow-2" },
+      { "slot": "pay.left", "table": "packs", "column": "credits_used", "rowId": "pack-alex-yoga-5-visits" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "packs", "rowId": "pack-alex-yoga-5-visits", "version": 3 },
+      { "table": "credits", "rowId": "credit-alex-hot-flow-2", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-2-saved", "version": 2 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-2", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

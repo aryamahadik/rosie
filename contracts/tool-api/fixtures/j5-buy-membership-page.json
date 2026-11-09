@@ -1,0 +1,74 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-05T15:10:00Z",
+    "stated": null,
+    "note": "A5-22 on the yoga studio's secure page (round 2, DL-252 ruling 3; README default 105): booking a $35 Hot Flow class, Alex buys the monthly membership the studio sells on its page, with its own yes to its terms ('A membership's repeat charges need their own yes, with its terms: the price, when it's charged, and how to pause or end'). The card was typed on the page through the card stage, keep false: its stripe_save_card effect eff-alex-yoga-membership-card succeeded with its cardSaved event, and that stage wrote no saved card row. In one commit: his K-29 plan_terms consent bound to the terms' exact words; the K-32 memberships row, kind membership, $120 every 1 month, billed monthly, 8 classes a month, naming that consent; its first plan charge, for its first month, made with Alex present (customer_present, due, no reminder, no booking: K-32 rule 10, default 28) and that charge's payment of purpose plan_charge, pending, naming it and the saved card, with its K-07 stripe_charge effect (K-14 charge, purpose pack, customerPresent true); the K-32 saved_cards row the membership's later charges go on, naming the membership and the card stage's effect (membership_id, booking_id null, save_effect_id eff-alex-yoga-membership-card), its Stripe ids and saved time copied from that save's result and cardSaved event; the visit's credit; and the class's line replaced before the booking is written by a copy paid by credit (README defaults 94, 95). Only K-14's result makes the payment paid (K-32 rule 5). If no card on the page pays it, the membership ends not_paid, the credit goes back and this saved card is removed (K-32 rule 10). No key. The terms come from the page server, built from the studio's settings (README open gap 92). Every id, the price, the allowance and the words are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-yoga-0012",
+      "businessId": "biz-yoga-studio",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-yoga-0010"
+    },
+    "bookingId": "booking-alex-hot-flow-3",
+    "offer": {
+      "kind": "buy",
+      "step": "A5-22",
+      "item": {
+        "kind": "membership",
+        "serviceId": "svc-yoga-hot-flow",
+        "name": "Monthly membership",
+        "price": { "cents": 12000, "currency": "USD" },
+        "period": "1 month",
+        "visitsPerPeriod": 8,
+        "billed": "monthly",
+        "termsYes": {
+          "kind": "page",
+          "exactWords": "Monthly membership · Hot Flow · 8 classes a month / $120 charged today, then on the 5th of each month to the card you typed here / Each charge is texted the day before / Pause or end any time, by text",
+          "yesEventId": "evt-page-alex-yoga-0012"
+        }
+      },
+      "cardEffectId": "eff-alex-yoga-membership-card",
+      "lineId": "line-alex-hot-flow-3-saved"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-hot-flow-3",
+    "offer": "buy",
+    "creditId": "credit-alex-hot-flow-3",
+    "packId": null,
+    "membershipId": "membership-alex-yoga-monthly",
+    "planChargeId": "plancharge-alex-yoga-2026-11-05",
+    "paymentId": "pay-alex-yoga-membership-first",
+    "consentId": "consent-alex-yoga-membership-terms",
+    "savedCardId": "card-alex-yoga-membership",
+    "line": { "lineId": "line-alex-hot-flow-3", "replacedLineId": "line-alex-hot-flow-3-saved" },
+    "effects": [{ "effectId": "eff-alex-yoga-membership-first-charge", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-yoga-membership-first" },
+      {
+        "slot": "pay.price",
+        "table": "memberships",
+        "column": "price_cents",
+        "rowId": "membership-alex-yoga-monthly"
+      }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "memberships", "rowId": "membership-alex-yoga-monthly", "version": 1 },
+      { "table": "plan_charges", "rowId": "plancharge-alex-yoga-2026-11-05", "version": 1 },
+      { "table": "payments", "rowId": "pay-alex-yoga-membership-first", "version": 1 },
+      { "table": "saved_cards", "rowId": "card-alex-yoga-membership", "version": 1 },
+      { "table": "credits", "rowId": "credit-alex-hot-flow-3", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-3-saved", "version": 2 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-3", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

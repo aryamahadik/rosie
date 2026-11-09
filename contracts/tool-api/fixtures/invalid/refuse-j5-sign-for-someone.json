@@ -1,0 +1,40 @@
+{
+  "call": "signDocument",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-sealing-key.json"],
+    "after": ["j5-document-send-page.json"],
+    "now": "2026-11-03T19:31:00Z",
+    "stated": null,
+    "note": "Refused (A5-20, B5-35: 'Never: sign for someone'; 'Each signer signs or OKs it on the secure page'; README default 97): Alex's own AI taps to sign the water heater contract for him. A signature is only the secure page's, by the link's own person. Put right, the caller is Alex's secure page, as j5-document-sign-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-alex-heater-0022",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-agent-alex-heater-0022"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "kind": "sign",
+      "step": "B5-35",
+      "documentId": "doc-alex-heater-contract",
+      "language": "en",
+      "how": "tap",
+      "typedName": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "documentId": "doc-alex-heater-contract",
+    "signerIds": [],
+    "links": [],
+    "signatureId": "sig-alex-heater-contract",
+    "signedByAll": true,
+    "gives": [],
+    "written": [{ "table": "documents", "rowId": "doc-alex-heater-contract", "version": 2 }],
+    "repeated": false
+  }
+}

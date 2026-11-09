@@ -1,0 +1,51 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j5-ask-owner-page.json"],
+    "now": "2026-10-21T23:55:00Z",
+    "stated": null,
+    "note": "Refused (A5-08: 'Never: book it with no money taken on silence'; S13-55: 'Rosie NEVER makes a new charge on silence'; README default 99): Sam's 30 minutes pass with no answer, and the deadline is sent as his answer, booking it with nothing taken. OwnerAnswer's answer has no value for silence (book or letGo only): no answer by the deadline is the question clock's firing, with the step's safe default, not booked. Put right, the answer is Sam's own '1', as j5-owner-book-turn.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-fade-ok-0002",
+      "requestId": "turn-sam-fade-ok-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-fade-ok-0001"
+    },
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A5-08",
+      "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+      "answer": "noAnswer",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-ok-alex-skin-fade", "yesEventId": "evt-sam-fade-ok-0002" },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": "ownerAnswer",
+    "branch": null,
+    "took": "nothing",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": { "ownerOkId": "ok-alex-skin-fade-nothing-taken", "answerBy": "2026-10-21T23:55:00Z", "clockRowId": null },
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": ["money_before"],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-alex-skin-fade-nothing-taken", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-page-alex-skin-fade", "version": 5 }
+    ],
+    "repeated": false
+  }
+}

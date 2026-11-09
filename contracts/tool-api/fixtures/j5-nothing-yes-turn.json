@@ -1,0 +1,55 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "core/seed-phone-chat-open.json",
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json"
+    ],
+    "after": [],
+    "now": "2026-10-22T14:41:05Z",
+    "stated": { "step": "A5-05", "gives": ["money_before"] },
+    "note": "A5-05 in Alex's own chat with Rosie's number (door chat): Lee's Barbershop's style consult, way list|none|none, takes nothing. The read-back row 'Book this style consult? ... Reply 1 Book it.' went out with its open question, whose one option is '1 Book it' as sent (README default 93). Alex replies '1', which clearly answers that one open question (arch 03 line 187), and decide picks it. In his turn's commit: booking_details.taken 'asked', set once, and his OK to messages about this booking, a K-29 texts consent bound to the read-back's words and their sha256 (A5-05: 'The yes records their OK to messages about this booking'; README default 92). Gives money_before. pay.took reads what the booking took. The booking, question, event and consent ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-consult-0004",
+      "requestId": "turn-alex-consult-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-consult-0001"
+    },
+    "bookingId": "booking-alex-chat-style-consult",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-05",
+      "branch": "nothing",
+      "amountNow": null,
+      "payBy": "none",
+      "payLinkId": null,
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-consult-book-it", "yesEventId": "evt-alex-consult-0004" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-style-consult",
+    "stage": "yes",
+    "branch": "nothing",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": "consent-alex-consult-texts",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-alex-chat-style-consult" }
+    ],
+    "gives": ["money_before"],
+    "written": [{ "table": "booking_details", "rowId": "booking-alex-chat-style-consult", "version": 5 }],
+    "repeated": false
+  }
+}

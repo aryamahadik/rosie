@@ -1,0 +1,59 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "core/seed-phone-stopped.json",
+      "conversations-consent/seed-consent-stop-row.json",
+      "services-prices/seed-service-money-paths.json"
+    ],
+    "after": [],
+    "now": "2026-10-22T16:41:00Z",
+    "stated": { "step": "A5-05", "gives": ["money_before"] },
+    "note": "A5-05 on Lee's Barbershop's booking page for Ben T., whose mobile sent STOP on Oct 20 (K-04 phones.stopped; K-29's stop row): the style consult takes nothing, and his 'Book it' tap books it. In one commit: booking_details.taken 'asked', set once. Gives money_before. A tap on a page is neither START nor a fresh yes sent from that number (RULES 7.5; MC C1), so no texts consent is written (consentId null: STATE note 9), and the page shows K-01's stopLaterReply itself (no row: a page's commit writes none). This is v1.2 default 82's rule (README default 92). The booking id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-ben-0006",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-ben",
+      "traceId": "trace-page-ben-0002"
+    },
+    "bookingId": "booking-page-ben-style-consult",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-05",
+      "branch": "nothing",
+      "amountNow": null,
+      "payBy": "none",
+      "payLinkId": null,
+      "yes": {
+        "kind": "page",
+        "exactWords": "Book this style consult? Lee's Barbershop · Style consult · Fri Oct 23 · 2:00pm · Riley. Nothing is charged. You told us you're 18 or older.",
+        "yesEventId": "evt-page-ben-0006"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-ben-style-consult",
+    "stage": "yes",
+    "branch": "nothing",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": { "fixedLineId": "stopLaterReply", "outboxRowId": null },
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-page-ben-style-consult" }
+    ],
+    "gives": ["money_before"],
+    "written": [{ "table": "booking_details", "rowId": "booking-page-ben-style-consult", "version": 5 }],
+    "repeated": false
+  }
+}

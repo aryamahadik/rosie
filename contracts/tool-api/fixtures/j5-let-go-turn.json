@@ -1,0 +1,56 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "core/seed-phone-chat-open.json",
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json"
+    ],
+    "after": [],
+    "now": "2026-10-22T15:12:30Z",
+    "stated": null,
+    "note": "A5-05's 'no' in Alex's own chat with Rosie's number (round 2, DL-252 ruling 4; README defaults 93, 107): Lee's Barbershop's style consult, way list|none|none, takes nothing. Its read-back row went out with its open question, whose options as sent are '1 Book it' and '2 No thanks'. Alex replies 'No thanks', which clearly answers that one open question, and decide picks the option choice '2 No thanks' (its definition from A5-05: 'A no lets the time go now'), which carries no field. In his turn's commit: the question closed answered, his saved time released (K-05 v1 release, why let_go, which promotes anyone next in line) and the request ended dropped (K-30 request_ended_why: 'the customer said no or went quiet'). No key, and nothing was taken. The booking, question, event and reservation ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-consult-0102",
+      "requestId": "turn-alex-consult-0102",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-consult-0102"
+    },
+    "bookingId": "booking-alex-chat-style-consult-2",
+    "stage": {
+      "kind": "letGo",
+      "step": "A5-05",
+      "no": {
+        "kind": "openQuestion",
+        "openQuestionId": "oq-alex-consult-2-book-it",
+        "yesEventId": "evt-alex-consult-0102"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-style-consult-2",
+    "stage": "letGo",
+    "branch": null,
+    "took": null,
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": { "reservationId": "rsv-alex-chat-style-consult-2", "why": "let_go" },
+    "requestEnded": "dropped",
+    "effects": [],
+    "moneyWords": [],
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-chat-style-consult-2", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-alex-chat-style-consult-2", "version": 5 }
+    ],
+    "repeated": false
+  }
+}

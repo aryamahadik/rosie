@@ -1,0 +1,57 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": ["j5-money-before-page.json", "j5-card-form-page.json"],
+    "now": "2026-10-21T23:22:40Z",
+    "stated": { "step": "A5-07", "gives": ["money_before", "card_saved"] },
+    "note": "A5-07's yes: Stripe's form saved Alex's card (cardSaved set saved_at on card-agent-alex-haircut, the runtime side), and he ticks the words the page server showed from showMoneyBefore and taps Book it. Code builds the words again from the versions read, and they match. In one commit: booking_details.taken 'asked', set once (version 5), and the exact words he ticked as a K-29 ticked_terms consent with their sha256, which the booking write's terms snapshot will name (K-30 booking_terms.terms_consent_id, K-09 v1.4). Gives money_before and card_saved. Nothing is charged: only the fee Sam confirms first can ever go on the card (A5-07's rule). The approval is ownerok, so A5-31's 'Done: the yes' leads to A6-01's request to Sam (v1.4). The money words read what the booking took, the saved card and the line, never the keys (README default 90). The consent id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0014",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0014"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-07",
+      "branch": "card",
+      "amountNow": null,
+      "payBy": "cardOnPage",
+      "payLinkId": null,
+      "yes": {
+        "kind": "page",
+        "exactWords": "Haircut with Riley, Sat Oct 24 at 11:00am, $35, paid at Lee's Barbershop. Your card is saved only for the $20 late-cancel or no-show fee, which Lee's Barbershop confirms first. Nothing is charged now.",
+        "yesEventId": "evt-page-alex-0014"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "yes",
+    "branch": "card",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": "consent-agent-alex-haircut-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-agent-alex-oct21" },
+      { "slot": "pay.took", "table": "saved_cards", "column": "saved_at", "rowId": "card-agent-alex-haircut" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-agent-alex-1" }
+    ],
+    "gives": ["money_before", "card_saved"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 5 }],
+    "repeated": false
+  }
+}

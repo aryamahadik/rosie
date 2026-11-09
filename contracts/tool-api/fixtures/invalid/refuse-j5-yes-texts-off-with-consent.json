@@ -1,0 +1,57 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "core/seed-phone-stopped.json",
+      "conversations-consent/seed-consent-stop-row.json",
+      "services-prices/seed-service-money-paths.json"
+    ],
+    "after": [],
+    "now": "2026-10-22T16:41:00Z",
+    "stated": null,
+    "note": "Refused (RULES 7.5: 'Only START, or a fresh yes on a new booking from that number, turns texts back on'; MC C1; STATE note 9: no answer holds textsOff with a consentId; README default 92): Ben T.'s 'Book it' tap answers both the texts-off line and a texts consent for his stopped mobile. Put right, consentId is null, as j5-nothing-yes-texts-off-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-ben-0006",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-ben",
+      "traceId": "trace-page-ben-0002"
+    },
+    "bookingId": "booking-page-ben-style-consult",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-05",
+      "branch": "nothing",
+      "amountNow": null,
+      "payBy": "none",
+      "payLinkId": null,
+      "yes": {
+        "kind": "page",
+        "exactWords": "Book this style consult? Lee's Barbershop · Style consult · Fri Oct 23 · 2:00pm · Riley. Nothing is charged. You told us you're 18 or older.",
+        "yesEventId": "evt-page-ben-0006"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-ben-style-consult",
+    "stage": "yes",
+    "branch": "nothing",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": "consent-ben-style-consult-texts",
+    "textsOff": { "fixedLineId": "stopLaterReply", "outboxRowId": null },
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": ["money_before"],
+    "written": [{ "table": "booking_details", "rowId": "booking-page-ben-style-consult", "version": 5 }],
+    "repeated": false
+  }
+}

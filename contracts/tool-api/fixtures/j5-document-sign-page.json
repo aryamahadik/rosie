@@ -1,0 +1,40 @@
+{
+  "call": "signDocument",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-sealing-key.json"],
+    "after": ["j5-document-send-page.json"],
+    "now": "2026-11-03T19:31:00Z",
+    "stated": null,
+    "note": "B5-35 on Alex's own secure page, opened from his link (the page server found it by its code's hash, so the signer is Alex, never named in the request: 'Never: sign for someone'). He reads the contract in English and signs with a tap. In one commit: his K-35 document_signatures row (how tap, the hash of the exact words he read, channel the secure page), and, since he is the last signer, documents.signed_by_all_at, raising the document's version to 2 (K-35 rule 9). 'All signed': the money step can come now (B5-02). Each signer gets a copy. No key. The signature id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-heater-0022",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-heater-0022"
+    },
+    "bookingId": "booking-alex-chat-heater",
+    "stage": {
+      "kind": "sign",
+      "step": "B5-35",
+      "documentId": "doc-alex-heater-contract",
+      "language": "en",
+      "how": "tap",
+      "typedName": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-chat-heater",
+    "documentId": "doc-alex-heater-contract",
+    "signerIds": [],
+    "links": [],
+    "signatureId": "sig-alex-heater-contract",
+    "signedByAll": true,
+    "gives": [],
+    "written": [{ "table": "documents", "rowId": "doc-alex-heater-contract", "version": 2 }],
+    "repeated": false
+  }
+}

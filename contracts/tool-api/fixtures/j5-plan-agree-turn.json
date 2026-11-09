@@ -1,0 +1,54 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-03T13:04:00Z",
+    "stated": null,
+    "note": "A5-21 in Owen H.'s own chat with Rosie's number: the plan's terms came before any card, 'Haircut plan · every 4 weeks / Saturdays · 11:00am · Riley / Each visit: $35 / Each visit is booked and paid like this one / Skip, pause or end any time, by text / Reply 1 I agree, 2 Just this visit.' Owen replies '1 I agree', a clear yes to the plan's terms from him, never a yes to the visit alone; decide picks A5-21's branch. In his turn's commit (the rows K-32 v1 seed-membership holds): his K-29 plan_terms consent bound to those exact words and their sha256, and the K-32 memberships row, kind plan, $35 a visit every 28 days, billed per_visit, naming that consent (README default 96). A copy of the terms goes back the way he picked, his own chat. No key; the visit's own money step follows (A5-04). The booking, question and event ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-owen-plan-yes",
+      "requestId": "turn-owen-plan-yes",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-owen",
+      "traceId": "trace-owen-plan-0001"
+    },
+    "bookingId": "booking-owen-haircut-oct3",
+    "offer": {
+      "kind": "plan",
+      "step": "A5-21",
+      "answer": "agree",
+      "plan": {
+        "serviceId": "svc-lees-haircut",
+        "name": "Haircut plan · every 4 weeks",
+        "price": { "cents": 3500, "currency": "USD" },
+        "period": "28 days",
+        "billed": "per_visit",
+        "visitsPerPeriod": null
+      },
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-owen-plan-terms", "yesEventId": "evt-owen-plan-0001" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-owen-haircut-oct3",
+    "offer": "plan",
+    "creditId": null,
+    "packId": null,
+    "membershipId": "plan-owen-haircut",
+    "planChargeId": null,
+    "paymentId": null,
+    "consentId": "consent-owen-plan-terms",
+    "savedCardId": null,
+    "line": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.price", "table": "memberships", "column": "price_cents", "rowId": "plan-owen-haircut" }
+    ],
+    "gives": [],
+    "written": [{ "table": "memberships", "rowId": "plan-owen-haircut", "version": 1 }],
+    "repeated": false
+  }
+}

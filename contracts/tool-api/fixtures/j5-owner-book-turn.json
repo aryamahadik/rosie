@@ -1,0 +1,53 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j5-ask-owner-page.json"],
+    "now": "2026-10-21T23:31:20Z",
+    "stated": { "step": "A5-08", "gives": ["money_before"] },
+    "note": "A5-08's '1 Book it' in Sam's own turn: the question went out by the clock turn of j5-ask-owner-page.json, and Sam replies '1', which clearly answers that one open question; decide picks A5-08's branch '1 Book it'. In his turn's commit: owner_oks answered book in K-08's ownerYes shape (Sam, owner, the question, the option, his reply's event; version 2, compared on version 1), and booking_details.taken 'nothing', set once: 'booked with no money taken, so no fee can be charged'. That is A5-04's 'Nothing taken', so it gives money_before (J5_OWNER_BOOKS; README default 99). Card_saved is not owed after a booking that took nothing (SPEC-master line 291). Alex hears it's booked in the booking write's confirmation (A6-14, v1.4). Silence would never get here: no answer by 7:55pm is the question clock's firing (C-055) with the step's safe default, not booked, and no call answers for the owner. The question and event ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-fade-ok-0002",
+      "requestId": "turn-sam-fade-ok-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-fade-ok-0001"
+    },
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A5-08",
+      "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+      "answer": "book",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-ok-alex-skin-fade", "yesEventId": "evt-sam-fade-ok-0002" },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-skin-fade",
+    "stage": "ownerAnswer",
+    "branch": null,
+    "took": "nothing",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": { "ownerOkId": "ok-alex-skin-fade-nothing-taken", "answerBy": "2026-10-21T23:55:00Z", "clockRowId": null },
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-page-alex-skin-fade" }
+    ],
+    "gives": ["money_before"],
+    "written": [
+      { "table": "owner_oks", "rowId": "ok-alex-skin-fade-nothing-taken", "version": 2 },
+      { "table": "booking_details", "rowId": "booking-page-alex-skin-fade", "version": 5 }
+    ],
+    "repeated": false
+  }
+}
