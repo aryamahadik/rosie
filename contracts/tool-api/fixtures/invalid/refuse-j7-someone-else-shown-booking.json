@@ -1,0 +1,38 @@
+{
+  "call": "someoneElseAsks",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-23T22:00:00Z",
+    "stated": { "step": "A7-80", "gives": [] },
+    "note": "Refused: the reply to someone who is not Alex answered with the booking's id, which tells the asker a booking exists ('Never: confirm a name, a date, an address or that a booking exists'; README default 148). Without bookingId it is j7-someone-else-asks-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-unknown-asks-alex-oct23",
+      "requestId": "turn-unknown-asks-alex-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-unknown-asks-alex-oct23"
+    },
+    "stage": { "kind": "asks", "step": "A7-80" }
+  },
+  "outcome": {
+    "stage": "asks",
+    "step": "A7-80",
+    "bookingId": "booking-alex-haircut",
+    "reply": {
+      "to": "other",
+      "personId": null,
+      "step": "A7-80",
+      "via": "chat",
+      "sendClass": "quick_reply",
+      "outboxRowId": "out-unknown-share-nothing-oct23",
+      "clockRowId": null,
+      "openQuestionId": null
+    },
+    "gives": [],
+    "repeated": false
+  }
+}

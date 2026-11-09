@@ -1,0 +1,58 @@
+{
+  "call": "remindBeforeVisit",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-22T22:00:00Z",
+    "stated": { "step": "A7-01", "gives": [] },
+    "note": "A7-01: Alex M.'s haircut with Riley, Sat Oct 24 at 11:00am, free cancel until Fri at 11am (K-30 booking_visits.cutoff_at, seed-booking-flow-a). The reminder job sends one reminder at least 3 hours before free cancel ends, inside text hours: Thu Oct 22 at 6pm in New York. One clock row due at once on Alex's handle, whose clock turn writes A7-01's line ('Reminder: your visit is Sat at 11:00am with Riley. {{pay.cancel}}. Give this code at the chair. ... Reply 1 Change the time, 2 Call off the visit.') into his open chat, routine. The check-in code is not in this answer: only the slot filler puts it into Alex's own row (K-03 visit.code; README default 131). No plan charge rides on it. No key. The ids are examples (v1.3 default 48's rule)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-reminders-alex-haircut-oct22",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-reminders-oct22-0001"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": { "kind": "remind", "step": "A7-01", "visitId": "visit-alex-haircut-1" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "remind",
+    "step": "A7-01",
+    "result": "reminded",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-01",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-reminder-alex-haircut",
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-23T15:00:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.cancel", "table": "booking_visits", "column": "cutoff_at", "rowId": "visit-alex-haircut-1" },
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-haircut-1" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-reminder-alex-haircut", "version": 1 }],
+    "repeated": false
+  }
+}

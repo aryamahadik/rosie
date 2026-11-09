@@ -1,0 +1,82 @@
+{
+  "call": "proCantCome",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json", "people-access/seed-staff-joined.json"],
+    "after": ["j7-pro-out-turn.json"],
+    "now": "2026-10-23T15:10:00Z",
+    "stated": { "step": "A7-17", "gives": [] },
+    "note": "Refused: Alex moved to the stand-in with no yes of his own ('Never: move the customer to someone else without their own yes'). With his answer to oq-alex-stand-in-oct23 it is j7-stand-in-take-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-avery-instead-oct23",
+      "requestId": "turn-alex-avery-instead-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-avery-instead-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": { "kind": "customerAnswer", "step": "A7-17", "answer": "standIn" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "customerAnswer",
+    "step": "A7-18",
+    "result": "standIn",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-18",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-with-avery-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-avery",
+        "step": "A7-18",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-avery-alex-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-stand-in-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "stand_in",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-avery-oct23" }
+      }
+    ],
+    "consentId": "consent-alex-avery-oct23",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-avery", "kind": "calendar_update" }],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-haircut-avery", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-alex-haircut-1", "version": 2 },
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "outbox_rows", "rowId": "out-alex-with-avery-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-avery-alex-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

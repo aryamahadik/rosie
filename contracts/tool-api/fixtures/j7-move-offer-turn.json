@@ -1,0 +1,73 @@
+{
+  "call": "moveBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-reminder-job.json"],
+    "now": "2026-10-23T14:05:00Z",
+    "stated": { "step": "A7-03", "gives": [] },
+    "note": "A7-03: Fri Oct 23 at 10:05am, before free cancel ends (Fri 11am), Alex answers the reminder '1' in his own chat; decide picks '1 Change the time'. In his turn's commit: Riley's next open times that keep the plug-in's gap, at the line's $35 ('Only Riley's times are offered'; README default 132), as the options of one question, and the reply 'Sure. Pick a new time: / A) Sat Oct 24 · 3:00pm · Riley / B) Sun Oct 25 · 11:00am · Riley / Reply A or B.', quick_reply, with its clock: 24 hours ('silence keeps the time as booked'). Nothing moves yet. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-change-time-oct23",
+      "requestId": "turn-alex-change-time-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-change-time-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": { "kind": "offer", "step": "A7-03", "visitId": "visit-alex-haircut-1", "cause": "customer" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "offer",
+    "step": "A7-03",
+    "result": "offered",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-new-times-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-new-times-oct23"
+      }
+    ],
+    "timesOffered": [
+      {
+        "optionId": "A7-03/A",
+        "label": "A",
+        "startsAt": "2026-10-24T19:00:00Z",
+        "endsAt": "2026-10-24T19:30:00Z",
+        "resourceId": "res-riley"
+      },
+      {
+        "optionId": "A7-03/B",
+        "label": "B",
+        "startsAt": "2026-10-25T15:00:00Z",
+        "endsAt": "2026-10-25T15:30:00Z",
+        "resourceId": "res-riley"
+      }
+    ],
+    "deadline": "2026-10-24T14:05:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-alex-new-times-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-alex-new-times-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-late-cancel-confirm-turn.json"],
+    "now": "2026-10-24T13:00:00Z",
+    "stated": { "step": "S11-25", "gives": [] },
+    "note": "S11-25's '1 Charge or keep it': Sat Oct 24 at 9:00am, before his deadline (Sat 2:05pm), Sam replies '1' in his own chat to the question the late cancel's commit wrote. 'Only Sam's yes takes it, from what this booking took.' Nothing was paid now, so the fee comes from the card saved for it (K-32 booking_fees comes_from card): S11-26 in Sam's turn's commit: the fee answered charge in K-08's ownerYes shape (owner_yes); one K-32 payment of purpose fee, $20, pending, naming that fee, with one K-07 stripe_charge on the saved card, customer not present. The charge is bound to Alex's own yes to the fee: its effect.created row's approved_by names consent-alex-ticked-terms-haircut, the words he ticked when booking ('Free to cancel until Fri 11am, then a $20 fee may apply'), which the terms snapshot names (README default 135). The receipt waits for the charge's result. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-fee-charge-oct24",
+      "requestId": "turn-sam-fee-charge-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-fee-charge-oct24"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "S11-25",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "answer": "charge",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-sam-fee-alex-oct23", "yesEventId": "evt-sam-0702" },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "ownerAnswer",
+    "step": "S11-26",
+    "result": "charging",
+    "messages": [],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": {
+      "paymentId": "pay-alex-haircut-late-fee",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "effectId": "eff-alex-haircut-late-fee",
+      "customerPresent": false,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-ticked-terms-haircut" }
+    },
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-late-fee", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.late", "table": "booking_fees", "column": "amount_cents", "rowId": "fee-alex-haircut-late-cancel" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "booking_fees", "rowId": "fee-alex-haircut-late-cancel", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-sam-fee-alex-oct23", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-haircut-late-fee", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

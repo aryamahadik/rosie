@@ -1,0 +1,58 @@
+{
+  "call": "cancelBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-reminder-job.json"],
+    "now": "2026-10-23T13:30:00Z",
+    "stated": { "step": "A7-05", "gives": [] },
+    "note": "A7-05: Fri Oct 23 at 9:30am, before free cancel ends (Fri 11am), Alex answers the reminder '2' in his own chat; decide picks '2 Call off the visit'. The cancel is in time, so Rosie asks once more ('so one slip never cancels a visit'): 'Cancel your Sat 11:00am visit with Riley? It's free. / Reply 1 Keep it, 2 Call it off.', quick_reply, its clock one more ask before free cancel ends ('silence keeps the visit'). Nothing is cancelled yet. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-call-off-oct23",
+      "requestId": "turn-alex-call-off-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-call-off-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": { "kind": "ask", "step": "A7-05", "visitId": "visit-alex-haircut-1" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "ask",
+    "step": "A7-05",
+    "result": "askedOnce",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-05",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-cancel-ask-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-cancel-ask-oct23"
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-23T15:00:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-alex-cancel-ask-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-alex-cancel-ask-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

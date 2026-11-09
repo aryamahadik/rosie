@@ -1,0 +1,87 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-fee-owner-charge-turn.json"],
+    "now": "2026-10-24T13:00:20Z",
+    "stated": { "step": "S11-26", "gives": [] },
+    "note": "Refused: the fee's one pay link answered with its url for the caller to hand on: the link goes only to the payer's own ways through its clock rows, never an AI, the owner or a pro (README default 134). Without payLinkUrl it is j7-fee-charge-declined-job, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-fee-alex-declined-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-c101-fee-alex-0002"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "chargeResult",
+      "step": "S11-26",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "paymentId": "pay-alex-haircut-late-fee",
+      "result": "declined"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "chargeResult",
+    "step": "S11-26",
+    "result": "payLinkSent",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "S11-26",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-alex-pay-link",
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "S11-26",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-alex-declined-sam",
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-27T13:00:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": {
+      "paymentId": "pay-alex-haircut-late-fee-link",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "effectId": "eff-alex-haircut-late-fee-link",
+      "customerPresent": false,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-ticked-terms-haircut" }
+    },
+    "payLinkId": "paylink-alex-haircut-late-fee",
+    "payLinkUrl": "https://rosfield.example/p/k7",
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-late-fee-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [
+      { "slot": "pay.failed", "table": "payments", "column": "state", "rowId": "pay-alex-haircut-late-fee" },
+      { "slot": "clock.pay", "table": "pay_links", "column": "due_at", "rowId": "paylink-alex-haircut-late-fee" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "payments", "rowId": "pay-alex-haircut-late-fee-link", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-alex-haircut-late-fee", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-pay-link", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-declined-sam", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

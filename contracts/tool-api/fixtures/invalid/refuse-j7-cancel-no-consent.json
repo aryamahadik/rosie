@@ -1,0 +1,88 @@
+{
+  "call": "cancelBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-cancel-ask-turn.json"],
+    "now": "2026-10-23T13:32:00Z",
+    "stated": { "step": "A7-05", "gives": [] },
+    "note": "Refused: A7-05's cancel answered with no consent written from Alex's yes (consentId null), so the commit binds no words shown to the change (README default 129). With consentId consent-alex-cancel-oct23 it is j7-cancel-confirm-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-call-off-yes-oct23",
+      "requestId": "turn-alex-call-off-yes-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-call-off-yes-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "confirm",
+      "step": "A7-05",
+      "visitId": "visit-alex-haircut-1",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-cancel-ask-oct23", "yesEventId": "evt-alex-0520" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "confirm",
+    "step": "A7-05",
+    "result": "cancelled",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-05",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-cancelled-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-05",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-alex-cancelled-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-cancelled-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "cancelled",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-cancel-oct23" }
+      }
+    ],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-delete", "kind": "calendar_delete" }],
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-alex-haircut-fee" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "saved_cards", "rowId": "card-alex-haircut-fee", "version": 2 },
+      { "table": "outbox_rows", "rowId": "out-alex-cancelled-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-alex-cancelled-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

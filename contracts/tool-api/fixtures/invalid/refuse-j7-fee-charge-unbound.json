@@ -1,0 +1,63 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-late-cancel-confirm-turn.json"],
+    "now": "2026-10-24T13:00:00Z",
+    "stated": { "step": "S11-25", "gives": [] },
+    "note": "Refused: S11-26's $20 fee charged to the saved card with no bound yes behind it (no approvedBy), an unbound charge (K-32 v1 rule 10; README default 135). With approvedBy naming consent-alex-ticked-terms-haircut it is j7-fee-owner-charge-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-fee-charge-oct24",
+      "requestId": "turn-sam-fee-charge-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-fee-charge-oct24"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "S11-25",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "answer": "charge",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-sam-fee-alex-oct23", "yesEventId": "evt-sam-0702" },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "ownerAnswer",
+    "step": "S11-26",
+    "result": "charging",
+    "messages": [],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": {
+      "paymentId": "pay-alex-haircut-late-fee",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "effectId": "eff-alex-haircut-late-fee",
+      "customerPresent": false
+    },
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-late-fee", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.late", "table": "booking_fees", "column": "amount_cents", "rowId": "fee-alex-haircut-late-cancel" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "booking_fees", "rowId": "fee-alex-haircut-late-cancel", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-sam-fee-alex-oct23", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-haircut-late-fee", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

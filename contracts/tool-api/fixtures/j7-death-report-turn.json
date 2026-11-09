@@ -1,0 +1,37 @@
+{
+  "call": "someoneElseAsks",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-23T22:30:00Z",
+    "stated": { "step": "A7-81", "gives": [] },
+    "note": "A7-81: someone texts that Alex M. has died. 'On anyone's word, reminders and sales texts about that person stop for that booking, and Sam is told. Sam cancels and refunds.' In the turn's commit, since a booking of Alex's exists at this business: its deceased flag set (K-04 bookings.deceased, as v1's setRecordFlag), so no reminder, rating or offer goes, nothing new is charged and a bill for work given waits for Sam; Sam told. The reply to the sender uses the same words whether or not a booking exists ('These replies use the same words whether or not a booking exists'), so the answer is only that reply, naming nothing (README default 148). No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-unknown-death-alex-oct23",
+      "requestId": "turn-unknown-death-alex-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-unknown-death-alex-oct23"
+    },
+    "stage": { "kind": "death", "step": "A7-81" }
+  },
+  "outcome": {
+    "stage": "death",
+    "step": "A7-81",
+    "reply": {
+      "to": "other",
+      "personId": null,
+      "step": "A7-81",
+      "via": "chat",
+      "sendClass": "quick_reply",
+      "outboxRowId": "out-unknown-death-reply-oct23",
+      "clockRowId": null,
+      "openQuestionId": null
+    },
+    "gives": [],
+    "repeated": false
+  }
+}

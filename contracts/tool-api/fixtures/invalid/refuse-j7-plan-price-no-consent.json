@@ -1,0 +1,64 @@
+{
+  "call": "changePlan",
+  "given": {
+    "seeds": ["money/seed-membership.json"],
+    "after": [],
+    "now": "2026-10-26T13:30:00Z",
+    "stated": { "step": "A7-55", "gives": [] },
+    "note": "Refused: Owen's plan kept at the new price with no consent written from his own yes ('A plan's new price needs the customer's yes'; README default 129). With consentId consent-owen-plan-price-oct26 it is j7-plan-price-keep-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-owen-keep-plan-oct26",
+      "requestId": "turn-owen-keep-plan-oct26",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-owen",
+      "traceId": "trace-owen-keep-plan-oct26"
+    },
+    "bookingId": null,
+    "stage": {
+      "kind": "priceAnswer",
+      "step": "A7-55",
+      "membershipId": "membership-owen-haircut",
+      "answer": "keep",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-owen-plan-price-oct26", "yesEventId": "evt-owen-0201" }
+    }
+  },
+  "outcome": {
+    "bookingId": null,
+    "stage": "priceAnswer",
+    "step": "A7-55",
+    "result": "newPriceAgreed",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-owen",
+        "step": "A7-55",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-owen-plan-kept-oct26",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-owen-plan-price-oct26", "version": 2 },
+      { "table": "outbox_rows", "rowId": "out-owen-plan-kept-oct26", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "call": "ownerChangesIt",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-23T19:02:00Z",
+    "stated": { "step": "A7-66", "gives": [] },
+    "note": "A7-66: Fri Oct 23 at 3:00pm Sam texts 'CALL OFF Alex Sat' and hears the read-back 'Call off Alex M.'s Sat 11:00am? There's no fee. They get it all back. / Reply 1 Yes, call it off, 2 Keep it.'; he replies '1'. In Sam's turn's commit: the head cancelled, the hold released, one booking_changes row cancelled, asked by the owner, approved by his own yes (K-08 ownerYes); nothing was paid, so nothing is refunded, and the card saved only for this booking is removed; a calendar_delete effect; Alex told ('Sorry, Lee's Barbershop had to call off your Sat Oct 24 visit. There's no fee. {{pay.back}} Pick another time whenever you like. ... Reply 1 See other dates.'), routine; Riley told ('Called off by Sam: Alex M., Sat 11:00am.'). The reason is not said: Sam wrote none. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-call-off-yes-oct23",
+      "requestId": "turn-sam-call-off-yes-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-call-off-yes-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "callOffYes",
+      "step": "A7-66",
+      "answer": "callOff",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-sam-call-off-read-back-oct23", "yesEventId": "evt-sam-0744" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "callOffYes",
+    "step": "A7-66",
+    "result": "cancelled",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-66",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-alex-called-off-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-other-dates-oct23"
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-66",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-called-off-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-called-off-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "cancelled",
+        "askedBy": "owner",
+        "afterFreeCancel": true,
+        "approvedBy": {
+          "kind": "ownerYes",
+          "personId": "person-sam",
+          "role": "owner",
+          "openQuestionId": "oq-sam-call-off-read-back-oct23",
+          "eventId": "evt-sam-0744"
+        }
+      }
+    ],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-called-off", "kind": "calendar_delete" }],
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-alex-haircut-fee" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "saved_cards", "rowId": "card-alex-haircut-fee", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-sam-call-off-read-back-oct23", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-alex-other-dates-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-alex-called-off-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-called-off-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "call": "changePlan",
+  "given": {
+    "seeds": ["money/seed-membership.json"],
+    "after": [],
+    "now": "2026-10-26T13:30:00Z",
+    "stated": { "step": "A7-55", "gives": [] },
+    "note": "A7-55: Sam raised the price of Owen H.'s haircut plan on Mon Oct 26: $40 a visit from Wed Nov 25. Owen was texted that day ('Lee's Barbershop is changing the price of your haircut plan from Wed Nov 25. Reply 1 to keep it at $40 a visit. ... Reply 1 Keep it at the new price, 2 No thanks.'), and replies '1' in his own chat. In his turn's commit: his yes written as a K-29 plan_terms consent with those words shown and their sha256 ('A plan's new price needs the customer's yes'; README defaults 129, 142), and his reply. Visits before Nov 25 keep the old price. K-32 v1 writes a plan's price once, so the new price's charges wait for a K-32 minor version (README open gap 125): until then nothing is charged at the new price. bookingId is null: no visit is named. Owen's ids are examples; the seed is K-32's membership seed."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-owen-keep-plan-oct26",
+      "requestId": "turn-owen-keep-plan-oct26",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-owen",
+      "traceId": "trace-owen-keep-plan-oct26"
+    },
+    "bookingId": null,
+    "stage": {
+      "kind": "priceAnswer",
+      "step": "A7-55",
+      "membershipId": "membership-owen-haircut",
+      "answer": "keep",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-owen-plan-price-oct26", "yesEventId": "evt-owen-0201" }
+    }
+  },
+  "outcome": {
+    "bookingId": null,
+    "stage": "priceAnswer",
+    "step": "A7-55",
+    "result": "newPriceAgreed",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-owen",
+        "step": "A7-55",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-owen-plan-kept-oct26",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": "consent-owen-plan-price-oct26",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-owen-plan-price-oct26", "version": 2 },
+      { "table": "outbox_rows", "rowId": "out-owen-plan-kept-oct26", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
