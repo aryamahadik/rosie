@@ -59,8 +59,12 @@ const FRIDAY_2PM = ny("2026-11-06T19:00:00Z");
 const FRIDAY_6PM = ny("2026-11-06T23:00:00Z");
 const FRIDAY_7PM = ny("2026-11-07T00:00:00Z");
 
-/** Main's outcome for the cut (the re-judge's run of 6335016): refused as several or differs, or passed (GAPs 1, 2). */
-type MainOutcome = "several" | "differs" | "pass";
+/**
+ * Main's outcome for the cut, before T-1130 (the re-judge's run of 6335016; for the class probes, main's readers read the
+ * same way): refused as several, differs or noText, or passed (round 2's GAPs 1 and 2, already on main, which had no step
+ * 2b, so every count between a day and a time ended the day's phrase there).
+ */
+type MainOutcome = "several" | "differs" | "noText" | "pass";
 
 /** One probe: the cut, its field, main's outcome, its fault here, and its whole with what the whole gives here. */
 interface Probe {
@@ -92,7 +96,7 @@ const count = (
   wholeFault: "several",
 });
 
-/** A time cut out of `words` and its whole. */
+/** A time cut out of `words` and its whole, which passes unless `wholeFault` says it is several. */
 const time = (
   name: string,
   words: string,
@@ -101,16 +105,19 @@ const time = (
   fault: ValueFault,
   main: MainOutcome,
   whole: readonly [string, ReturnType<typeof ny>] | null,
-  options: { readonly language?: string } = {},
-): Probe => ({
-  name,
-  cut: () => haircutMoveRequest(cutValue, cut, words, options),
-  field: "time_saved",
-  main,
-  fault,
-  whole: whole === null ? null : () => haircutMoveRequest(whole[1], whole[0], words, options),
-  wholeFault: null,
-});
+  options: { readonly language?: string; readonly wholeFault?: ValueFault } = {},
+): Probe => {
+  const sent = options.language === undefined ? {} : { language: options.language };
+  return {
+    name,
+    cut: () => haircutMoveRequest(cutValue, cut, words, sent),
+    field: "time_saved",
+    main,
+    fault,
+    whole: whole === null ? null : () => haircutMoveRequest(whole[1], whole[0], words, sent),
+    wholeFault: options.wholeFault ?? null,
+  };
+};
 
 // Item 1 of the re-judge's security report: T-1130's reach (an approximate word or a mark after a cue, or three digits
 // after one) took a number from the count reader, so the last count of a choice passed alone. Main gives several.
@@ -191,7 +198,9 @@ const ITEM_1B: readonly Probe[] = [
     SUNDAY_1220,
     "differs",
     "differs",
-    null,
+    // The whole, meant as Sun 3pm, touches the day's phrase and the time's, an address no reader reads between: several.
+    ["tomorrow at 120 Oak St at 3pm", SUNDAY_3PM],
+    { wholeFault: "several" },
   ),
 ];
 
@@ -304,7 +313,8 @@ const ITEM_2: readonly Probe[] = [
     "tomorrow - 12",
     SUNDAY,
     "differs",
-    "differs",
+    // Main reads "tomorrow - 12" as Sun 00:00 with its 12 unread.
+    "noText",
     ["tomorrow - 12 guests - noon", SUNDAY_NOON],
   ),
   // The cut's own reading takes the party for an hour where the whole text holds none, so it is no reading of the text,
@@ -422,7 +432,8 @@ const GAP_1: readonly Probe[] = [
     "tomorrow",
     SUNDAY,
     "differs",
-    "differs",
+    // The controls differ on T-1130's code; main, with no step 2b, passed them too.
+    "pass",
     ["tomorrow for 4 or 5 at 7pm", SUNDAY_7PM],
   ),
   time(
@@ -431,7 +442,7 @@ const GAP_1: readonly Probe[] = [
     "tomorrow",
     SUNDAY,
     "differs",
-    "differs",
+    "pass",
     ["tomorrow for 4-5 at 7pm", SUNDAY_7PM],
   ),
   time(
@@ -440,7 +451,7 @@ const GAP_1: readonly Probe[] = [
     "tomorrow",
     SUNDAY,
     "differs",
-    "differs",
+    "pass",
     ["tomorrow for 4 maybe 5 at 7pm", SUNDAY_7PM],
   ),
 ];
@@ -565,14 +576,15 @@ describe("T-1133: every probe of the re-judge's items 1, 1b and 2 and of round 2
 });
 
 describe("T-1133's comparison: the same requests against main's readers, before T-1130 (the re-judge's run of 6335016)", () => {
-  it("nothing main refused passes here, and every cut main refused is refused with main's own fault but where the cut's own reading is no reading of the text (noText)", async () => {
+  it("nothing main refused passes here: every cut main refused is refused, before and after the re-read and at the gate", async () => {
     const refusedOnMain = PROBES.filter((probe) => probe.main !== "pass");
     expect(refusedOnMain.length).toBeGreaterThan(0);
     for (const probe of refusedOnMain) {
-      const here = await decision(probe.cut());
-      expect(here.result, probe.name).toBe("fail");
-      const why = here.result === "fail" ? here.faults[0]?.why : null;
-      expect([probe.main, "noText"], probe.name).toContain(why);
+      expect((await decision(probe.cut())).result, probe.name).toBe("fail");
+      expect((await decision(afterReread(probe.cut()))).result, probe.name).toBe("fail");
+      const request = probe.cut();
+      const verdict = await runGate(request, contextOf(request), registryWith(limitIn()));
+      expect(verdict.verdict, probe.name).toBe("refused");
     }
   });
 

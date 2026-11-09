@@ -168,7 +168,7 @@ const TIME_JOIN = new RegExp(String.raw`^(?:${TIME_MARK}|${asWords(TIME_CUES)})*
  * Step 2 for money and counts: a range or choice word between two values ("$12 to $15", "4 or 5", "4, maybe 5", "35
  * dólares y 50 centavos"), or any mark but a sentence mark: "+" joins them as "&" does ("2 adults + 1 child": T-304
  * round 7, DL-228 item 2c), and so does a bracket or any other mark ("$40 (or $50)", "4 (maybe 5)", "$40 [or $50]":
- * T-1130, DL-238, by construction as the time's join, from the same definition: times.ts NUMBER_JOINING_MARK).
+ * T-1130, DL-238, by construction as the time's join, from the same definition: numbers.ts NUMBER_JOINING_MARK).
  */
 const NUMBER_MARK = NUMBER_JOINING_MARK;
 /** The count join's words: the range or choice words ("to", "or", "maybe", "tal vez") and the adding words ("and", "y"). */
