@@ -314,9 +314,10 @@ describe("the setup seed, loaded from fixture set v1 after the core seed", () =>
     seededAt = await fixtureSetMade(db.sql);
   }, 120_000);
 
+  // Dropping a schema can pass the 10 s hook default while other builders load the database (a resource guard only).
   afterAll(async () => {
     await db.drop();
-  });
+  }, 120_000);
 
   it("seeds 245 shops: the 243 demo shops and test-mixed-A and -B, each with one company, one location, the owner's staff row and ID upload", () => {
     expect(SHOP_FILES.size).toBe(245);
@@ -790,9 +791,10 @@ describe("before the setup seed writes a row", () => {
     db = await createTestDatabase({ name: "seeds_setup_checks" });
   }, 120_000);
 
+  // Dropping a schema can pass the 10 s hook default while other builders load the database (a resource guard only).
   afterAll(async () => {
     await db.drop();
-  });
+  }, 120_000);
 
   it("refuses to run before the core seed, naming it, and writes nothing", SLOW, async () => {
     const error = await refusal(seedSetupBusiness(db.sql, { wrappingKeys: KEYS }));
