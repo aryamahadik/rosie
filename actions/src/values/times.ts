@@ -21,9 +21,13 @@
 // "Thursday, 3", "3 tomorrow") or right after a part-of-day word ("tomorrow morning, 9" is 9am, "tomorrow night, 9"
 // 9pm: T-304 round 5, DL-209), and the reading takes one only when the words name no other time of day; bareHours gives
 // every such number whatever else the words hold, so the whole value phrase takes the hour beside its day even when
-// another time stands elsewhere in the text ("my 2pm doesn't work. can we do Thursday, 3?"). A sentence mark with no
-// digit right after it ends an hour, as a comma does (T-304 round 6, DL-217): "tomorrow at 3." and "Thursday, 3." read
-// their hour, while "3.30" and "3.5" keep their readings (no hour 3). Nothing here keeps or logs words.
+// another time stands elsewhere in the text ("my 2pm doesn't work. can we do Thursday, 3?"). The number edge is built
+// once, for every mark (T-304 round 7, DL-228 item 1; NUMBER_START and NUMBER_END below): a mark is part of a number
+// only with a digit right before it and right after it, so "tomorrow at 3.", "see you tomorrow at 3:)", "Thursday, 3:)"
+// and "Update:3pm tomorrow" read their hour, while "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their readings.
+// Round 7 also reads a weekday's short form with its period ("Thurs. 3pm", DL-228 item 2a) and an hour, a period and
+// two minute digits as hours and minutes when am or pm follows or a cue comes before ("3.30pm", "at 3.30"; item 2b);
+// with neither, "3.30" stays a number. Nothing here keeps or logs words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
@@ -182,8 +186,28 @@ const RELATIVE: readonly [RegExp, number, "pm" | null][] = [
   [/\b(?:yesterday|ayer)\b/g, -1, null],
 ];
 
+/**
+ * A weekday's short forms, which take their period as MONTH_FIRST takes "Oct.": "Mon.", "Tue.", "Tues.", "Wed.", "Thu.",
+ * "Thur.", "Thurs.", "Fri.", "Sat.", "Sun." (T-304 round 7, DL-228 item 2a), so "Thurs. 3pm" is one phrase.
+ */
+const WEEKDAY_SHORT_FORMS = [
+  "sun",
+  "mon",
+  "tues",
+  "tue",
+  "weds",
+  "wed",
+  "thurs",
+  "thur",
+  "thu",
+  "fri",
+  "sat",
+];
+/** The period right after a weekday's short form, read with it (DL-228 item 2a); none after a full name ("Thursday."). */
+const WEEKDAY_PERIOD = String.raw`(?:(?<=(?<![a-z])(?:${WEEKDAY_SHORT_FORMS.join("|")}))\.)?`;
+
 const WEEKDAY = new RegExp(
-  String.raw`\b(?:(this|next|este|el proximo|proximo|el) )?(${WEEKDAY_NAMES})\b(?: (que viene|proximo))?`,
+  String.raw`\b(?:(this|next|este|el proximo|proximo|el) )?(${WEEKDAY_NAMES})\b${WEEKDAY_PERIOD}(?: (que viene|proximo))?`,
   "g",
 );
 
@@ -195,35 +219,69 @@ const DAY_FIRST = new RegExp(
   String.raw`\b(\d{1,2})${ORDINAL}? (?:of |de )?(${MONTH_NAMES})\b(?:,? (?:de )?(\d{4})(?!\d))?`,
   "g",
 );
-// A period (and, for a bare number, a comma) is part of a number only between two digits: "3.30", "3.5", "1,200",
-// "1.30pm" (T-304 round 6, DL-217 item 1). Anywhere else it is a mark. A sentence mark with no digit right after it ends
-// a cued or bare hour, as a comma does (round 5's default b): "tomorrow at 3.", "tomorrow at 3…" (NFKC folds "…" to
-// "..."), "Thursday, 3." and "tomorrow morning, 9." read their hour, as "at 3;", "at 3!" and "at 3?" already did. The
-// same mark right before a time, with no digit before it, does not hide the time either ("hmm...3pm tomorrow", "out.3pm",
-// "2pm,3 tomorrow": a default, for ops/QUESTIONS.md). So a period stops the patterns below only as part of a number:
-// before a number only right after a digit ("<digit>.", for a bare number also "<digit>,"), and after a cued or bare
-// hour only right before a digit (".<digit>", for a bare hour also ",<digit>").
-const NUMERIC_DATE = /(?<![\d/]|\d\.)(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?(?![\d/])/g;
-const DAY_OF_MONTH = new RegExp(String.raw`(?<![\d/]|\d\.)(\d{1,2})${ORDINAL}\b`, "g");
+// The number edge, by construction (T-304 round 7, DL-228 item 1): a mark (any character that is neither a digit nor a
+// letter) is part of a number only when a digit stands right before it and right after it; anywhere else it ends the
+// number, before it and after it. Rounds 5 and 6 (DL-209, DL-217) let the comma and then the period end an hour one mark
+// at a time, which left the colon hiding one ("see you tomorrow at 3:)"); here no mark is listed as an end. Between two
+// digits the readers read the period, the colon and the slash as part of the number ("3.30", "3.5", "3:30", "10/24"),
+// and the comma as part of it where it marks thousands, three digits after it ("1,200"); any other mark between two
+// digits joins two numbers, as before ("2-5pm" is a range, so several; "3:30,4:30" two times). So every pattern below
+// starts a number only where neither a digit nor a digit and such a mark stands right before it (NUMBER_START), and ends
+// one only where neither a digit nor such a mark and a digit stands right after it (NUMBER_END): "see you tomorrow at
+// 3:)", "tomorrow at 3:", "tomorrow at 3.", "Thursday, 3:)", "tomorrow morning, 9:)", "Update:3pm tomorrow" and
+// "hmm...3pm tomorrow" read their hour, while "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their readings (no hour 3,
+// 10, 1 or 50 in them). A unit glued to a number is no edge but what the number is, as before: a "%" right after it (a
+// share) or a "$" beside it (money) makes it no hour, and a letter glued to a bare number makes it no bare number ("3rd").
+// An underscore is a mark, never a letter.
+const NUMBER_START = String.raw`(?<!\d|\d[.:/]|\d,(?=\d{3}(?!\d)))`;
+const NUMBER_END = String.raw`(?!\d|[.:/]\d|,\d{3}(?!\d))`;
+/** A letter or digit of the folded words: \w without the underscore, which is a mark. */
+const LETTER_OR_DIGIT = String.raw`[^\W_]`;
+
+const NUMERIC_DATE = new RegExp(
+  String.raw`${NUMBER_START}(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?${NUMBER_END}`,
+  "g",
+);
+const DAY_OF_MONTH = new RegExp(String.raw`${NUMBER_START}(\d{1,2})${ORDINAL}\b`, "g");
 
 const NOON = /\b(?:noon|midday|mediodia)\b/g;
 const MIDNIGHT = /\b(?:midnight|medianoche)\b/g;
 // An am or pm right after an hour, with a space or a period between, is that hour's ("3pm", "3 pm", "3.pm", "3:30.pm"),
 // so a period read as a sentence mark never drops the am or pm a person put after it (a default, for ops/QUESTIONS.md).
-const COLON_TIME = /(?<![\d:/$]|\d\.)(\d{1,2}):(\d{2})(?!\d)(?:(?: ?|\.)(am|pm)\b|([ap])\b)?/g;
-const MERIDIEM_TIME = /(?<![\d:/$]|\d\.)(\d{1,2})(?:(?: ?|\.)(am|pm)\b|([ap])\b)/g;
-const OCLOCK_TIME = /(?<![\d:/$]|\d\.)(\d{1,2}) ?oclock\b/g;
-const CUE = String.raw`(?:at|a las|a la|para las)`;
-/** A cued hour ("at 3", "a las 3"); a sentence mark may end it unless a digit follows ("at 3."; never "at 3.30"). */
-const CUED_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})(?![\d:/%]|\.\d)`, "g");
+const MERIDIEM = String.raw`(?:(?: ?|\.)(am|pm)\b|([ap])\b)`;
+/** An hour and minutes with a colon ("3:30", "10:30am"); ":00" seconds after them are read with them ("3:30:00"). */
+const COLON_TIME = new RegExp(
+  String.raw`${NUMBER_START}(?<!\$)(\d{1,2}):(\d{2})(?::00)?${NUMBER_END}${MERIDIEM}?`,
+  "g",
+);
 /**
- * A bare number of one or two digits; a comma or a sentence mark may end it unless a digit follows ("3, tomorrow",
- * "Thursday, 3."; never "1,200" or "3.30"), and may stand right before it unless a digit precedes ("2pm,3 tomorrow").
+ * An hour, a period and two minute digits, read as hours and minutes when am or pm follows ("3.30pm", "3.30 pm") or a
+ * time cue comes before ("at 3.30", "a las 3.30"); with neither, "3.30" stays a number (DL-228 item 2b; CQ-121).
  */
-const BARE_NUMBER = /(?<![\w:/$]|\d[.,])(\d{1,2})(?![\w:/%$]|[.,]\d)/g;
+const DOT_MERIDIEM_TIME = new RegExp(
+  String.raw`${NUMBER_START}(?<!\$)(\d{1,2})\.([0-5]\d)${NUMBER_END}${MERIDIEM}`,
+  "g",
+);
+const MERIDIEM_TIME = new RegExp(String.raw`${NUMBER_START}(?<!\$)(\d{1,2})${MERIDIEM}`, "g");
+const OCLOCK_TIME = new RegExp(String.raw`${NUMBER_START}(?<!\$)(\d{1,2}) ?oclock\b`, "g");
+const CUE = String.raw`(?:at|a las|a la|para las)`;
+/** A cued hour, a period and two minute digits (DL-228 item 2b): "at 3.30", "a las 3.30", "at 3.30pm". */
+const CUED_DOT_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})\.([0-5]\d)${NUMBER_END}${MERIDIEM}?`, "g");
+/** A cued hour ("at 3", "a las 3"), ended by any mark with no digit after it ("at 3.", "at 3:)"; never "at 3.30"). */
+const CUED_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})${NUMBER_END}(?!%)`, "g");
+/**
+ * A bare number of one or two digits, ended by any mark with no digit after it and started after any mark with no digit
+ * before it ("3, tomorrow", "Thursday, 3.", "Thursday, 3:)", "2pm,3 tomorrow"; never "1,200", "3.30" or "3:30").
+ */
+const BARE_NUMBER = new RegExp(
+  String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)(\d{1,2})${NUMBER_END}(?!${LETTER_OR_DIGIT}|[%$])`,
+  "g",
+);
 
 /** A number joined to a time of day by "or", "to", a dash or "and" ("3 or 4pm", "2-5pm"): the words name two. */
-const JOINED_BEFORE = /(?<![\w.,:/$])\d{1,2}(?::\d{2})? ?(?:or|o|to|-|and|y|a) ?$/;
+const JOINED_BEFORE = new RegExp(
+  String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)\d{1,2}(?::\d{2})? ?(?:or|o|to|-|and|y|a) ?$`,
+);
 const JOINED_AFTER = /^ ?(?:or|o|to|-|and|y|a) ?\d{1,2}(?!\d)/;
 /** What stands between two times the words name when they offer either: "tomorrow or Friday". */
 const EITHER = /^ ?,? ?(?:or|o) ?$/;
@@ -246,9 +304,12 @@ interface Counted extends Span {
   readonly value: number;
 }
 
+/** A whole number in digits, at the number edges (NUMBER_START, NUMBER_END). */
+const DIGITS = new RegExp(String.raw`${NUMBER_START}(\d+)${NUMBER_END}`, "g");
+
 /** Every whole number in the folded words: digits, number words, and "a", "an", "un", "una" as one. */
 function countedIn(folded: string, languages: readonly ValueLanguage[]): Counted[] {
-  const digits = findAll(folded, /(?<![\d.,:/])(\d+)(?![\d.,:/])/g).map((each) => ({
+  const digits = findAll(folded, DIGITS).map((each) => ({
     value: Number(each.groups[0]),
     at: each.at,
     end: each.end,
@@ -351,8 +412,11 @@ function hourPhrasesIn(
 ): HourPhrase[] {
   const hour = hourNames === "" ? String.raw`(\d{1,2})` : String.raw`(\d{1,2}|${hourNames})`;
   const meridiem = String.raw`(?:(?: ?|\.)(am|pm)\b)?`;
-  // The hour ends there: am or pm may follow it, never another digit, letter or a colon's minutes.
-  const after = String.raw`(?= ?(?:am|pm)\b|[^\w:]|$)`;
+  // The hour ends there (DL-228 item 1): am or pm may follow it, never a letter, a digit, or a mark with a digit right
+  // after it ("quarter to 3:)" and "quarter to 3:" read 3; "quarter to 3:30" does not).
+  const after = String.raw`(?= ?(?:am|pm)\b|(?!${LETTER_OR_DIGIT})${NUMBER_END})`;
+  // The hour starts there: no letter, digit or "$", nor a mark with a digit right before it, right before it.
+  const before = String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)`;
   const patterns: readonly [RegExp, number, boolean][] = [
     [new RegExp(String.raw`\b(?:a )?quarter (?:past|after) ${hour}${after}${meridiem}`, "g"), 15, false],
     [
@@ -361,9 +425,9 @@ function hourPhrasesIn(
       true,
     ],
     [new RegExp(String.raw`\bhalf past ${hour}${after}${meridiem}`, "g"), 30, false],
-    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} y media\b`, "g"), 30, false],
-    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} y cuarto\b`, "g"), 15, false],
-    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} menos cuarto\b`, "g"), 45, true],
+    [new RegExp(String.raw`${before}${hour}${after}${meridiem} y media\b`, "g"), 30, false],
+    [new RegExp(String.raw`${before}${hour}${after}${meridiem} y cuarto\b`, "g"), 15, false],
+    [new RegExp(String.raw`${before}${hour}${after}${meridiem} menos cuarto\b`, "g"), 45, true],
   ];
   const phrases: HourPhrase[] = [];
   for (const [pattern, minute, before] of patterns) {
@@ -503,10 +567,17 @@ function readFolded(
   }
   for (const found of findAll(folded, NOON)) if (takeClock(found)) clocks.push({ kind: "noon" });
   for (const found of findAll(folded, MIDNIGHT)) if (takeClock(found)) clocks.push({ kind: "midnight" });
-  for (const found of findAll(folded, COLON_TIME)) {
-    if (!takeClock(found)) continue;
-    const meridiem = meridiemOf(found.groups[2], found.groups[3]);
-    clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: Number(found.groups[1]), meridiem });
+  for (const pattern of [COLON_TIME, DOT_MERIDIEM_TIME, CUED_DOT_TIME]) {
+    for (const found of findAll(folded, pattern)) {
+      if (!takeClock(found)) continue;
+      const meridiem = meridiemOf(found.groups[2], found.groups[3]);
+      clocks.push({
+        kind: "clock",
+        hour: Number(found.groups[0]),
+        minute: Number(found.groups[1]),
+        meridiem,
+      });
+    }
   }
   for (const found of findAll(folded, MERIDIEM_TIME)) {
     if (!takeClock(found)) continue;
@@ -599,6 +670,8 @@ export function timeSpansIn(folded: string): Span[] {
     NUMERIC_DATE,
     DAY_OF_MONTH,
     COLON_TIME,
+    DOT_MERIDIEM_TIME,
+    CUED_DOT_TIME,
     MERIDIEM_TIME,
     OCLOCK_TIME,
     CUED_TIME,

@@ -36,11 +36,15 @@
 // 2). The lead added at round 6 (DL-217 item 3), beside CQ-121's words, the round 5 review's N-b: an hour written in
 // words beside a day ("Thursday, three") and an hour before "on" and its day ("3 on Thursday") are not read, so
 // "Thursday" out of either is the residual too. A sentence mark right after an hour is not between day and time: it ends
-// the hour, which stays in its day's phrase (DL-217 item 1: "Thursday" out of "Thursday, 3." differs). "3.30" and "3.5"
-// keep their readings (DL-217 item 1: a period with a digit right after it is part of the number), so the time reader
-// reads no hour in them and "tomorrow" out of "tomorrow at 3.30" is not caught here either (for the lead to confirm
-// beside CQ-121). Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is open,
-// so neither books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
+// the hour, which stays in its day's phrase (DL-217 item 1: "Thursday" out of "Thursday, 3." differs). Round 7 builds
+// that edge once for every mark (DL-228 item 1: times.ts NUMBER_START and NUMBER_END), so a colon or any other mark with
+// no digit after it ends an hour too ("tomorrow" out of "see you tomorrow at 3:)" differs), and step 3 takes a number
+// glued to the phrase's first or last digit by one mark ("30" of "at 3;30", "4" of "Thursday, 3,4"), which must be read.
+// An hour, a period and two minute digits is hours and minutes only with am or pm after it or a cue before it ("3.30pm",
+// "at 3.30": DL-228 item 2b); with neither ("Thursday, 3.30") it stays a number and the time reader reads no hour in it,
+// so "Thursday" out of "Thursday, 3.30" is CQ-121's residual, as is "tomorrow" out of "tomorrow at 3.5". Limit 3's
+// read-back shows the person the value before any commit, and limit 5 checks the time is open, so neither books on one.
+// Nothing here keeps or logs a value or the words; what it returns is a label.
 
 import { amountsIn } from "./money";
 import { numberPhrasesIn } from "./numbers";
@@ -136,10 +140,10 @@ const TIME_CUES: readonly string[] = [
 const TIME_JOIN = new RegExp(String.raw`^(?:[\s,:·•|()/&-]|\b(?:${TIME_CUES.join("|")})\b)*$`, "u");
 /**
  * Step 2 for money and counts: a range or choice word between two values ("$12 to $15", "4 or 5", "4, maybe 5", "35
- * dólares y 50 centavos").
+ * dólares y 50 centavos"); "+" joins them as "&" does ("2 adults + 1 child": T-304 round 7, DL-228 item 2c).
  */
 const NUMBER_JOIN =
-  /^(?:[\s,/&-]|\b(?:to|or|and|maybe|perhaps|possibly|probably|o|y|a|quizas|quiza|tal vez)\b)*$/u;
+  /^(?:[\s,/&+-]|\b(?:to|or|and|maybe|perhaps|possibly|probably|o|y|a|quizas|quiza|tal vez)\b)*$/u;
 /**
  * Step 3: a range word or a joining mark between a number and the phrase ("twenty to 3", "10 - $15", "$40_000"); Spanish
  * "y", "o", "a" too.
@@ -168,7 +172,28 @@ function joined(spans: readonly Span[], folded: string, join: RegExp): Span[] {
   return phrases;
 }
 
-/** Step 3: a phrase with the numbers the reader did not read that belong to it. */
+/** A mark: a character that is neither a letter, a digit nor a space. */
+const MARK = /^[^\p{L}\p{N}\s]$/u;
+const DIGIT = /^\d$/u;
+
+/**
+ * Whether the one character at `index` is a mark with a digit right before it and right after it, which joins the two
+ * into one number (DL-228 item 1's number edge, as the time reader builds it).
+ */
+function gluedByMark(folded: string, index: number): boolean {
+  return (
+    MARK.test(folded.charAt(index)) &&
+    DIGIT.test(folded.charAt(index - 1)) &&
+    DIGIT.test(folded.charAt(index + 1))
+  );
+}
+
+/**
+ * Step 3: a phrase with the numbers the reader did not read that belong to it: joined to it by a range word, standing
+ * right after it with one space between, partly inside it, or glued to its first or last digit by one mark (T-304 round
+ * 7, DL-228 item 1: a mark between two digits is part of the number, so "at 3;30" and "Thursday, 3,4" hold "30" and "4",
+ * which must be read).
+ */
 function grown(
   type: PhraseType,
   phrase: Span,
@@ -179,12 +204,19 @@ function grown(
   if (type === "integer") return phrase;
   let { at, end } = phrase;
   for (const number of numbers) {
-    if (number.end <= phrase.at && range.test(folded.slice(number.end, phrase.at))) {
+    if (number.at < phrase.end && phrase.at < number.end) {
+      at = Math.min(at, number.at);
+      end = Math.max(end, number.end);
+    } else if (number.end <= phrase.at && range.test(folded.slice(number.end, phrase.at))) {
       at = Math.min(at, number.at);
     } else if (number.at >= phrase.end && range.test(folded.slice(phrase.end, number.at))) {
       end = Math.max(end, number.end);
     } else if (number.at === phrase.end + 1 && folded.charAt(phrase.end) === " ") {
       end = Math.max(end, number.end);
+    } else if (number.at === phrase.end + 1 && gluedByMark(folded, phrase.end)) {
+      end = Math.max(end, number.end);
+    } else if (number.end === phrase.at - 1 && gluedByMark(folded, number.end)) {
+      at = Math.min(at, number.at);
     }
   }
   return { at, end };

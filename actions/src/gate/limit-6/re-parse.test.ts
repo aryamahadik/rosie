@@ -1364,3 +1364,191 @@ describe("a sentence mark right after a cued or bare hour ends the hour, which s
     }
   });
 });
+
+// Round 7 (DL-228): the number edge by construction. A mark (any character that is neither a digit nor a letter) is
+// part of a number only with a digit right before it and right after it; anywhere else it ends the number, before and
+// after it. So a colon right after an hour ends it as a period does (the round 6 review's GAP 6: Q1 to Q4), and so does
+// a colon glued before a time ("Update:3pm tomorrow"); the reader also learns a weekday's short form with its period,
+// an hour with a period and two minute digits after a cue or before am or pm, and "+" between counts (DL-228 item 2).
+
+describe("the number edge by construction: a colon right after an hour ends it, and the hour stays in the day's phrase: the round 6 review's Q1 to Q4 (DL-228 item 1)", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const es = { language: "es" } as const;
+  const SUNDAY = ny("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+  const THURSDAY = ny("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const Q1 = "see you tomorrow at 3:)";
+  const Q2 = "puedo mañana a las 3:)";
+  const Q3 = "my 2pm doesn't work. can we do Thursday, 3:)";
+  const Q4 = "can you do tomorrow morning, 9:)";
+  const COLON = "can you do tomorrow at 3:";
+  const UPDATE = "Update:3pm tomorrow";
+  // [case, the request citing the day alone, read at its start (sent Sat Oct 31 at 10:00am in New York), the whole]
+  const cases: [string, () => GateRequest, () => GateRequest][] = [
+    [
+      "Q1: 'tomorrow' out of 'see you tomorrow at 3:)' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow", Q1),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3", Q1),
+    ],
+    [
+      "Q2: 'mañana' out of 'puedo mañana a las 3:)' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "mañana", Q2, es),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "mañana a las 3", Q2, es),
+    ],
+    [
+      "Q3: 'Thursday' out of 'my 2pm doesn't work. can we do Thursday, 3:)' (the whole is Thu Nov 5 at 3pm)",
+      () => haircutMoveRequest(THURSDAY, "Thursday", Q3),
+      () => haircutMoveRequest(ny("2026-11-05T20:00:00Z"), "Thursday, 3", Q3),
+    ],
+    [
+      "Q4: 'tomorrow morning' out of 'can you do tomorrow morning, 9:)' (the whole is Sun Nov 1 at 9am)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow morning", Q4),
+      () => haircutMoveRequest(ny("2026-11-01T14:00:00Z"), "tomorrow morning, 9", Q4),
+    ],
+    [
+      "'tomorrow' out of 'can you do tomorrow at 3:' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow", COLON),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3", COLON),
+    ],
+    [
+      "'tomorrow' out of 'Update:3pm tomorrow' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow", UPDATE),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), UPDATE, UPDATE),
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut (differs), before and after the re-read", async (_case, cut) => {
+    const request = cut();
+    const cited = citedIn(request, "time_saved");
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+    expect(await decision({}, afterReread(request))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read the cut is refused naming the field, after it one question",
+    async (_case, cut) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it.each(cases)("%s: the whole passes at limit 6 and the gate", async (_case, _cut, whole) => {
+    const request = whole();
+    expect(await decision({}, request)).toEqual({ result: "pass" });
+    const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+    expect(passed?.result).toBe("passed");
+    expect(passed?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+  });
+
+  it("each whole passes cited with its mark too, and as 3am (CQ-119's default); read at another hour it differs", async () => {
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3:)", Q1))).toEqual(
+      {
+        result: "pass",
+      },
+    );
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-05T20:00:00Z"), "Thursday, 3:)", Q3))).toEqual({
+      result: "pass",
+    });
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-01T08:00:00Z"), "tomorrow at 3", Q1))).toEqual({
+      result: "pass",
+    });
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-01T21:00:00Z"), "tomorrow at 3", Q1))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it("'3:30' keeps its reading: the whole 'tomorrow at 3:30' passes as 3:30pm, and as 3pm it differs", async () => {
+    const words = "can you do tomorrow at 3:30";
+    expect(
+      await decision({}, haircutMoveRequest(ny("2026-11-01T20:30:00Z"), "tomorrow at 3:30", words)),
+    ).toEqual({ result: "pass" });
+    expect(
+      await decision({}, haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3:30", words)),
+    ).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+  });
+});
+
+describe("three readings the reader learns: a weekday's short form with its period, '3.30' after a cue or before am or pm, and '+' between counts (DL-228 item 2)", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const SUNDAY = ny("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start
+  const THURSDAY = ny("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start
+  const THURS = "can you do Thurs. 3pm";
+  const DOTTED = "can you do tomorrow at 3.30";
+  const PLUS = "booking for 2 adults + 1 child";
+  // [case, the cut request, its field and fault]
+  const cases: [string, () => GateRequest, string, ValueFault][] = [
+    [
+      "2a: 'Thurs' out of 'Thurs. 3pm' (the whole is Thu Nov 5 at 3pm)",
+      () => haircutMoveRequest(THURSDAY, "Thurs", THURS),
+      "time_saved",
+      "differs",
+    ],
+    [
+      "2b: 'tomorrow' out of 'tomorrow at 3.30' (the whole is Sun Nov 1 at 3:30)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow", DOTTED),
+      "time_saved",
+      "differs",
+    ],
+    [
+      "2c: '2 adults' out of 'booking for 2 adults + 1 child' (two counts, so several)",
+      () => groupRequest(2, "2 adults", PLUS),
+      "people",
+      "several",
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut, before and after the re-read", async (_case, cut, name, why) => {
+    expect(await decision({}, cut())).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+    expect(await decision({}, afterReread(cut()))).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+  });
+
+  it.each(cases)(
+    "%s: at the gate the cut is refused naming the field before the re-read, and one question after it",
+    async (_case, cut, name) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: [name] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it("each whole passes at limit 6 and the gate: 'Thurs. 3pm', 'tomorrow at 3.30' (3:30pm or 3:30am), '2 adults' alone", async () => {
+    const wholes = [
+      haircutMoveRequest(ny("2026-11-05T20:00:00Z"), "Thurs. 3pm", THURS),
+      haircutMoveRequest(ny("2026-11-01T20:30:00Z"), "tomorrow at 3.30", DOTTED),
+      haircutMoveRequest(ny("2026-11-01T08:30:00Z"), "tomorrow at 3.30", DOTTED),
+      groupRequest(2, "2 adults", "booking for 2 adults"),
+    ];
+    for (const request of wholes) {
+      expect(await decision({}, request)).toEqual({ result: "pass" });
+      const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+      expect(passed?.result).toBe("passed");
+    }
+  });
+
+  it("'tomorrow at 3.30' read as 3pm differs, and the whole 'tomorrow 3.30pm' (pm after it) passes as 3:30pm", async () => {
+    expect(
+      await decision({}, haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3.30", DOTTED)),
+    ).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+    expect(
+      await decision(
+        {},
+        haircutMoveRequest(ny("2026-11-01T20:30:00Z"), "tomorrow 3.30pm", "tomorrow 3.30pm"),
+      ),
+    ).toEqual({ result: "pass" });
+  });
+});

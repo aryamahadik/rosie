@@ -27,7 +27,12 @@
 //      the text holds (DL-209): "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3?" differs, as do
 //      "tomorrow morning" out of "tomorrow morning, 9", "$40" out of "MXN $40" and "$1M" read as $1. A sentence mark
 //      with no digit right after it ends an hour, as a comma does (DL-217): "tomorrow" out of "can you do tomorrow at 3."
-//      differs, and so does "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3.";
+//      differs, and so does "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3.". Round 7 builds the number
+//      edge once for every mark (DL-228 item 1: a mark is part of a number only with a digit right before and after it):
+//      "tomorrow" out of "see you tomorrow at 3:)", "tomorrow at 3:" or "Update:3pm tomorrow", and "Thursday" out of
+//      "my 2pm doesn't work. can we do Thursday, 3:)", differ; a weekday's short form takes its period ("Thurs" out of
+//      "Thurs. 3pm" differs), "at 3.30" and "3.30pm" are hours and minutes ("tomorrow" out of "tomorrow at 3.30"
+//      differs), and "+" joins counts ("2 adults" out of "2 adults + 1 child" is several) (DL-228 item 2);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -39,8 +44,9 @@
 // cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time ("at 3pm" out of
 // "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts), and an
 // hour in words beside a day or before "on" and its day ("Thursday, three", "3 on Thursday"), which the lead added at
-// round 6 (DL-217 item 3). "3.30" and "3.5" keep their readings (DL-217 item 1), so "tomorrow" out of "tomorrow at
-// 3.30" is not caught here either (for the lead to confirm beside CQ-121).
+// round 6 (DL-217 item 3). An hour, a period and two minute digits with no am or pm after them and no cue before them
+// stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of "Thursday, 3.30" is not caught here, nor is
+// "tomorrow" out of "tomorrow at 3.5"; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their readings (DL-228 item 1).
 // Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
 // so neither books on such a cut.
 //
