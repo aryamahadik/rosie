@@ -32,7 +32,32 @@
 //      "tomorrow" out of "see you tomorrow at 3:)", "tomorrow at 3:" or "Update:3pm tomorrow", and "Thursday" out of
 //      "my 2pm doesn't work. can we do Thursday, 3:)", differ; a weekday's short form takes its period ("Thurs" out of
 //      "Thurs. 3pm" differs), "at 3.30" and "3.30pm" are hours and minutes ("tomorrow" out of "tomorrow at 3.30"
-//      differs), and "+" joins counts ("2 adults" out of "2 adults + 1 child" is several) (DL-228 item 2);
+//      differs), and "+" joins counts ("2 adults" out of "2 adults + 1 child" is several) (DL-228 item 2). T-1130 adds
+//      the forms T-304's last review found (CQ-121's default; DL-236, DL-238): the count reader starts and ends a count
+//      at the same number edge, so a count glued to a mark is read ("4" out of "table for 4 or 5:)", "1 child" out of
+//      "Update:2 adults + 1 child" and "5" out of "re:4 or 5" are several, "4" out of "table for 4 or 5/6" noText); the
+//      time reader reads "at 3.5", "3:30:15", "at 1530", "around 3.30", "at ~3", 'at "3"', "at (3)", "tmrw. 3pm" and
+//      "Thursday: 3"; what joins is built, not listed (as round 7 built the number edge): every mark but a sentence mark
+//      joins a time's values, a day and its bare hour, and amounts or counts, and an arrow joins no time (it reads as
+//      "to"); and a count between day and time ends no phrase. So "tomorrow" out of each of those, or out of "*3pm*
+//      tomorrow", "_3pm_ tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm" or "table tomorrow for 2 at
+//      7pm", and "Thursday" out of "Thursday - 3", differ; and "$40" out of "raise haircut to $40 (or $50)" and "4" out
+//      of "party of 4 (maybe 5)" are several. T-1130 round 2 (DL-251) builds each fix from one definition, never a list
+//      of marks: a cue's opening marks are the joining marks (values times.ts JOINING_MARK), any number of them, with or
+//      without a space, so "tomorrow" out of "tomorrow at »3«", "at ›3‹", "at ‚3‘", "at 「3」", "at ≈3", "at ±3", "at
+//      #3", "at ⏰3", "at: 3" or "at:3", and "mañana" out of "a las »3«", differ; the time reader and the phrase builder
+//      share that one definition, so a letter of any script is a letter in both; and every count between a day and a
+//      time keeps the day's phrase whole, whatever its digits, only a count written as a party counting as read, so
+//      "tomorrow" out of "tomorrow for 120 at 7pm", "catering tomorrow for 150 at noon", "tomorrow for 1,200 at noon"
+//      or "mañana para 120 a las 7" differs, while "Friday the 13 at 7pm" is refused (noText), never Fri Nov 6. T-1133
+//      (DL-259) gives the count reader and the time reader one precedence rule, so they agree on which number is which
+//      and nothing main refused passes: a counted party (a count with its unit or party lead words, or joined to one by
+//      a range or choice word) is never an hour, so "150 guests" out of "we're at 120, maybe 150 guests" is several and
+//      "tomorrow: 4" out of "can we do tomorrow: 4 people at 7pm" differs; an hour only T-1130's reach finds is one only
+//      with its own time evidence, so "tomorrow at 120" out of "tomorrow at 120 Oak St at 3pm" differs; a count range
+//      between a day and a time is blanked whole with its joining words, so "tomorrow" out of "tomorrow for 4 to 6 people
+//      at 7pm" differs (round 2's GAP 1); and no reading of the cited words or the phrase takes an hour the whole text
+//      does not, so "tomorrow 4" out of "tomorrow 4 people" is refused (GAP 2);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -41,14 +66,22 @@
 //
 // The residual (DL-199 item 4; CQ-121): words no reader knows are not read, so a cut beside them is not caught here:
 // "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from", "around 3" with no
-// cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time ("at 3pm" out of
-// "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts), and an
-// hour in words beside a day or before "on" and its day ("Thursday, three", "3 on Thursday"), which the lead added at
-// round 6 (DL-217 item 3). An hour, a period and two minute digits with no am or pm after them and no cue before them
-// stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of "Thursday, 3.30" is not caught here, nor is
-// "tomorrow" out of "tomorrow at 3.5"; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their readings (DL-228 item 1).
-// Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
-// so neither books on such a cut.
+// cue the time reader knows ("at around 3" and "around 3.30" are read: T-1130), "$40 off", and a sentence mark (". ! ?
+// ;") between a day and its time ("at 3pm" out of "tomorrow. at 3pm"), which the lead confirmed as part of the residual
+// at round 5 (DL-209; values/phrase.ts), and an hour in words beside a day or before "on" and its day ("Thursday,
+// three", "3 on Thursday"), which the lead added at round 6 (DL-217 item 3). An hour, a period and digits with no am or
+// pm after them and no cue before them stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of
+// "Thursday, 3.30" or "Thursday, 3.5" is not caught here; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their
+// readings (DL-228 item 1). The forms T-1130 adds (step 3) are no longer the residual. What T-1130 round 2 learns
+// (DL-251), as words no reader knows: a word or a letter of a script the readers do not read between a day and a
+// number is a letter for the time reader and the phrase builder alike, so neither reads an hour there and "Thursday"
+// out of "Thursday ー 3" or "Thursday 下午 3" passes as out of "Thursday x 3" (the whole read as 3pm is refused); and
+// a word no reader knows before a count between day and time ("tomorrow with 12 at 7pm") joins nothing. N2's class
+// joins the residual as its own (the lead, DL-251): an arrow read as "to" ("tomorrow" out of "tomorrow → 3pm" or
+// "tomorrow -> 3pm"), "5ish" ("4" out of "table for 4 or 5ish"), "tomorrow around 3.5", "tomorrow at 3.75", and a
+// count with a unit no reader knows before a time ("tomorrow for 2 dogs at 3pm"). Limit 3's read-back shows the
+// person every value before any commit, and limit 5 checks a time against the open times, so neither books on such a
+// cut.
 //
 // Nothing here logs. What it returns names fields, labels and limits: never a value or a person's words.
 //
@@ -85,6 +118,37 @@
 //      after an amount is a million and "B" or "bn" a billion, glued to the number only ("$1M"; "$1 M" is not read); a
 //      currency code right before a sign names its currency ("MXN $40"), as does a currency word right after a sign
 //      ("40$ CAD") (values/times.ts, values/money.ts).
+//  11. T-1130: an hour, a period and one digit after a cue or before am or pm is that many tenths of an hour after the
+//      hour ("at 3.5" and "3.5pm" are 3:30); seconds after the minutes are read with them and the time is its minute
+//      ("3:30:15" and "3.30.15pm" are 3:30); three or four digits after a cue or before am or pm are an hour of the day
+//      and two minute digits, read as the same with a colon would be ("at 1530" is 15:30, "at 930" 9:30 either, "330pm"
+//      3:30pm), so a house number after "at" reads as a time too (a possible false refusal, never a pass); an approximate
+//      word ("around", "about", "approximately", "approx", "roughly") is read after a cue ("at around 3") and, as a "~"
+//      with no digit before it is, before an hour and two minute digits ("around 3.30", "~3.30"), never before a bare
+//      number ("around 4 people" stays a count); any joining marks may stand between a cue and its hour, with or
+//      without a space, never a "$" right before the hour (round 2); what joins is built, not listed, in one definition
+//      the time reader and the phrase builder share: every mark but a sentence mark (". ! ? ; ¿ ¡") joins
+//      a time's values, a day or part-of-day word and its bare hour ("Thursday - 3", "Thursday (3)"), and amounts or
+//      counts ("$40 [or $50]"), but an arrow ("->", "=>", "→") joins no time, as "to" joins none (round 3's default), so
+//      "4pm" out of "move my 3pm -> 4pm" passes as the 4pm said; an underscore is read as a space by the time reader
+//      ("_tomorrow_ at 3pm"); a count takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one
+//      "and" joins ("table for 4 and 7:30" keeps its count); every count between two of a time's values ends no phrase,
+//      whatever its digits (round 2), never a bare hour beside a day, and only a count written as a party counts as read:
+//      a whole number with its unit, with "for", "para" or the words that name what it counts before it ("for 120",
+//      "party of 4", "mesa para 4"), or in words; any other ("tomorrow 120 at 7pm", "Friday the 13 at 7pm", "tomorrow
+//      3.30 at 7pm") is refused; and "ppl" and "pax" are a count's units (values/times.ts, values/phrase.ts,
+//      values/reparse.ts).
+//  12. T-1133 (DL-259): T-1130's reach is an approximate word or any mark but one space between a cue and its hour,
+//      three or four digits or tenths of an hour after a cue, and any mark but spaces and commas (or the period a day's
+//      short form takes: "tmrw. 3", "Thurs. 3") between a day or part-of-day word and its bare hour; main's reach is the
+//      rest. An hour's time evidence is am or pm, or after it, past spaces, joining marks and the time cues, the end of
+//      the words, a sentence mark, or a day, part-of-day word, elapsed time or time of day the reader reads with no
+//      evidence of its own (a zone word is none: "at 1530 PST" stays unread, as on main). A counted party where main's
+//      reach read an hour is declined there and kept a piece of the day's phrase, unread ("tomorrow, 4 people" refuses
+//      "tomorrow" as main did); a unit carries across a range or choice word ("4 or 5 people"), never across a mark alone
+//      or an adding word ("at 3, 4 people" and "at 3 and 4 people" keep "at 3"). A reading of the cited words or the
+//      phrase that takes an hour the whole text does not is noText (values/parties.ts, values/times.ts,
+//      values/phrase.ts).
 
 import {
   foundAtWordEdges,

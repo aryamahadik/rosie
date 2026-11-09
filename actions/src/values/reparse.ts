@@ -17,6 +17,7 @@
 
 import { amountsIn, distinctMoney, sameMoney, type Money } from "./money";
 import { numberPhrasesIn } from "./numbers";
+import { COUNT_UNIT, NUMERAL } from "./parties";
 import { instantsFor, timeReadingOf, timeSpansIn } from "./times";
 import {
   BOTH_LANGUAGES,
@@ -119,8 +120,8 @@ function theOne<T>(found: readonly T[], same: (a: T, b: T) => boolean, value: T)
 
 // ---- counts, yes or no, zones, options --------------------------------------------------------------------------------
 
-/** A count in digits: "4", "1,200", "2.5"; a comma right after it is no thousands mark unless a digit follows ("4, 5"). */
-const NUMERAL = /(?<![\w.,:/$])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w:/%$]|[.,]\d)/g;
+// A count in digits is parties.ts NUMERAL (at the number edge, T-1130), and a count's unit after it parties.ts
+// COUNT_UNIT ("2 people", "4 pax"): one definition the time reader and the phrase builder share (T-1133).
 const NONE = /\b(?:none|ninguno|ninguna)\b/g;
 /** Dozens in words (T-304 round 4, DL-199 item 2: a count is read with its scale): half a dozen is 6, a dozen 12. */
 const DOZENS: readonly (readonly [RegExp, number])[] = [
@@ -129,9 +130,6 @@ const DOZENS: readonly (readonly [RegExp, number])[] = [
 ];
 /** A dozen after a count: "2 dozen" is 24, "dos docenas" 24. */
 const DOZEN_AFTER = /^ (?:dozens?|docenas?)\b/;
-/** A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"). */
-const COUNT_UNIT =
-  /^ (?:people|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?)\b/;
 
 /** One count and where it stands in the folded words. */
 export interface FoundCount extends Span {
@@ -141,7 +139,8 @@ export interface FoundCount extends Span {
 /**
  * Every count in the words, with where it stands in their folded form: digits and number words, with a dozen after them
  * ("2 dozen" is 24; "a dozen" 12, "half a dozen" 6), "none" as 0. Amounts of money, dates and times of day stand apart:
- * "a table for 4 at 7pm" holds the count 4.
+ * "a table for 4 at 7pm" holds the count 4. A time of day is one the time reader takes (times.ts timeSpansIn), so a
+ * counted party is never taken from the count reader ("we're at ~6, maybe 8 people" holds 6 and 8: T-1133).
  */
 export function countSpansIn(
   words: string,
@@ -150,7 +149,7 @@ export function countSpansIn(
   const folded = foldWords(words);
   const apart: Span[] = [
     ...amountsIn(words, languages).filter((amount) => amount.marked),
-    ...timeSpansIn(folded),
+    ...timeSpansIn(folded, languages),
   ];
   const counts: FoundCount[] = [];
   const withUnit = (count: FoundCount): FoundCount => {
