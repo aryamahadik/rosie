@@ -93,7 +93,7 @@ export default defineConfig({
         // Needs PostgreSQL: `npm run db:up` locally, a service container in CI.
         test: {
           name: "integration",
-          include: ["db/**/*.int.test.ts", "actions/**/*.int.test.ts"],
+          include: ["db/**/*.int.test.ts", "actions/**/*.int.test.ts", "compiler/**/*.int.test.ts"],
           env: databaseUrl === undefined ? {} : { DATABASE_URL: databaseUrl },
           // One file at a time in every run (T-1113, DL-106, DL-196): each file opens its own pools, and
           // files side by side on a many-core Mac passed PostgreSQL's 100 connections. Tests inside a file
