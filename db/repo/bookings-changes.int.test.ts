@@ -2216,3 +2216,325 @@ describe("rule 7: the check-in code is new each visit and sealed under its perso
     ).toHaveLength(1);
   });
 });
+
+describe("probes: each breaks one rule of the table list and is refused by the constraint it names; the rows without the fault pass (the card's four seeds loaded, and a second drain job of Alex's that Lee Home Services adds, made here)", () => {
+  const PROBE_BOOKING = "booking-probe-alex-drain-2";
+  /** The head of a second drain job of Alex's (K-04's row from flow B's seed under a new id), with none of the five. */
+  const HEAD: Values = {
+    ...valuesOf("seed-booking-flow-b.json", "bookings", ALEX_DRAIN),
+    id: PROBE_BOOKING,
+    version: 1,
+  };
+  /** Its rows: Alex's drain's under new ids, the business adding it (B3-08: door business, made by the shop). */
+  const DETAILS: Values = {
+    ...valuesOf("seed-booking-flow-b.json", "booking_details", ALEX_DRAIN, "booking_id"),
+    booking_id: PROBE_BOOKING,
+    number: "LH2202",
+    door: "business",
+    made_by: "shop",
+    approval: "now",
+    staff_told_at: null,
+    version: 1,
+  };
+  const VISIT: Values = {
+    ...ALEX_DRAIN_VISIT,
+    id: "visit-probe-alex-drain-2-1",
+    booking_id: PROBE_BOOKING,
+    reservation_id: null,
+  };
+  const LINE: Values = {
+    ...valuesOf("seed-booking-flow-b.json", "booking_lines", "line-alex-drain-1"),
+    id: "line-probe-alex-drain-2-1",
+    booking_id: PROBE_BOOKING,
+  };
+  const TERMS: Values = {
+    ...valuesOf("seed-booking-flow-b.json", "booking_terms", ALEX_DRAIN, "booking_id"),
+    booking_id: PROBE_BOOKING,
+    terms_consent_id: null,
+  };
+  const TERMS_RULE: Values = {
+    ...valuesOf("seed-booking-flow-b.json", "booking_terms_rules", "btr-alex-drain-price-oks"),
+    id: "btr-probe-alex-drain-2-price-oks",
+    booking_id: PROBE_BOOKING,
+  };
+  const HAIRCUT_RULE = valuesOf(
+    "seed-booking-flow-a.json",
+    "booking_terms_rules",
+    "btr-alex-haircut-ok-same-day",
+  );
+
+  interface Probe {
+    breaks: string;
+    /** Inserted in order, as the runtime side with no scope; the last row holds the fault. */
+    rows: [string, Values][];
+    code: string;
+    constraint?: string;
+  }
+
+  const PROBES: Probe[] = [
+    {
+      breaks: "a call door (Q-05: calls and voicemails are out)",
+      rows: [["booking_details", { ...DETAILS, door: "call", made_by: "customer" }]],
+      code: "23514",
+      constraint: "booking_details_door_known",
+    },
+    {
+      breaks: "a walk-in made by the customer (RULES 2.5: a walk-in is the business's own)",
+      rows: [["booking_details", { ...DETAILS, door: "walk_in", made_by: "customer" }]],
+      code: "23514",
+      constraint: "booking_details_made_by_door",
+    },
+    {
+      breaks: "a booking the business adds made a request (A4-98: it books on the owner's reply)",
+      rows: [["booking_details", { ...DETAILS, approval: "ownerok" }]],
+      code: "23514",
+      constraint: "booking_details_shop_books_now",
+    },
+    {
+      breaks: "a second booking numbered LH2201 at Lee Home Services",
+      rows: [["booking_details", { ...DETAILS, number: "LH2201" }]],
+      code: "23505",
+      constraint: "booking_details_number_key",
+    },
+    {
+      breaks: "a booking number with a space in it",
+      rows: [["booking_details", { ...DETAILS, number: "LH 2202" }]],
+      code: "23514",
+      constraint: "booking_details_number_form",
+    },
+    {
+      breaks: "a person named while the person served meets the pro (B4-26)",
+      rows: [["booking_details", { ...DETAILS, meets_pro_person_id: SAM }]],
+      code: "23514",
+      constraint: "booking_details_meets_pro_known",
+    },
+    {
+      breaks: "a request ended with no reason",
+      rows: [["booking_details", { ...DETAILS, request_ended_at: "2026-10-20T15:00:00Z" }]],
+      code: "23514",
+      constraint: "booking_details_request_end",
+    },
+    {
+      breaks: "an open-ended arrival window",
+      rows: [["booking_visits", { ...VISIT, arrival_window: "[2026-10-22T12:00:00Z,)" }]],
+      code: "23514",
+      constraint: "booking_visits_window_bounded",
+    },
+    {
+      breaks: "one reservation for two visits (Alex's drain's)",
+      rows: [["booking_visits", { ...VISIT, reservation_id: "rsv-alex-drain" }]],
+      code: "23505",
+      constraint: "booking_visits_reservation_key",
+    },
+    {
+      breaks: "a second first visit of one booking",
+      rows: [
+        ["booking_visits", VISIT],
+        ["booking_visits", { ...VISIT, id: "visit-probe-tessa-again" }],
+      ],
+      code: "23505",
+      constraint: "booking_visits_position_key",
+    },
+    {
+      breaks: "a visit at position 0",
+      rows: [["booking_visits", { ...VISIT, position: 0 }]],
+      code: "23514",
+      constraint: "booking_visits_position_from_one",
+    },
+    {
+      breaks: "a hold path (SPEC-master D66: no hold)",
+      rows: [["booking_lines", { ...LINE, path: "list|hold|bill" }]],
+      code: "23514",
+      constraint: "booking_lines_path_form",
+    },
+    {
+      breaks: "a photos line with no quote option, priced by no rule",
+      rows: [["booking_lines", { ...LINE, path: "photos|card|bill", price_rule_id: null }]],
+      code: "23514",
+      constraint: "booking_lines_price_source",
+    },
+    {
+      breaks: "a deposit over the price (S1-13)",
+      rows: [["booking_lines", { ...LINE, path: "list|deposit|bill", deposit_cents: 20000 }]],
+      code: "23514",
+      constraint: "booking_lines_deposit_with_deposit_path",
+    },
+    {
+      breaks: "a fee on a nothing-taken path (FS section 4)",
+      rows: [["booking_lines", { ...LINE, path: "list|none|bill" }]],
+      code: "23514",
+      constraint: "booking_lines_fee_needs_money_before",
+    },
+    {
+      breaks: "one price for two units",
+      rows: [["booking_lines", { ...LINE, units: 2 }]],
+      code: "23514",
+      constraint: "booking_lines_units",
+    },
+    {
+      breaks: "a lower-case currency",
+      rows: [["booking_lines", { ...LINE, currency: "usd" }]],
+      code: "23514",
+      constraint: "booking_lines_money",
+    },
+    {
+      breaks: "a removed line with no time it was removed",
+      rows: [["booking_lines", { ...LINE, state: "removed" }]],
+      code: "23514",
+      constraint: "booking_lines_state",
+    },
+    {
+      breaks: "'179.00' as cents: a decimal, never integer minor units (CQ-09)",
+      rows: [["booking_lines", { ...LINE, price_cents: "179.00" }]],
+      code: "22P02",
+    },
+    {
+      breaks: "the way of another service (the barbershop's haircut way)",
+      rows: [["booking_lines", { ...LINE, service_money_id: "way-lees-haircut-shop" }]],
+      code: "23503",
+      constraint: "booking_lines_way_fk",
+    },
+    {
+      breaks: "the price rule of another service (the haircut's $35)",
+      rows: [["booking_lines", { ...LINE, price_rule_id: "price-lees-haircut-35" }]],
+      code: "23503",
+      constraint: "booking_lines_price_rule_fk",
+    },
+    {
+      breaks: "a service of another business (the barbershop's haircut, with its own way and rule)",
+      rows: [
+        [
+          "booking_lines",
+          {
+            ...LINE,
+            service_id: "svc-lees-haircut",
+            service_money_id: "way-lees-haircut-shop",
+            price_rule_id: "price-lees-haircut-35",
+          },
+        ],
+      ],
+      code: "23503",
+      constraint: "booking_lines_service_fk",
+    },
+    {
+      breaks: "both cancel rules at once",
+      rows: [["booking_terms", { ...TERMS, cutoff_day_before_at: "19:00", cutoff_zone: "America/Chicago" }]],
+      code: "23514",
+      constraint: "booking_terms_one_cutoff",
+    },
+    {
+      breaks: "a day-before cancel time with no zone (S13-03)",
+      rows: [["booking_terms", { ...TERMS, cutoff_before: null, cutoff_day_before_at: "19:00" }]],
+      code: "23514",
+      constraint: "booking_terms_zone_with_clock",
+    },
+    {
+      breaks: "a terms language that is not a BCP 47 tag",
+      rows: [["booking_terms", { ...TERMS, terms_language: "English" }]],
+      code: "23514",
+      constraint: "booking_terms_version_given",
+    },
+    {
+      breaks: "a second snapshot naming the words Alex ticked for the drain",
+      rows: [["booking_terms", { ...TERMS, terms_consent_id: "consent-alex-ticked-terms-drain" }]],
+      code: "23505",
+      constraint: "booking_terms_consent_key",
+    },
+    {
+      breaks: "a terms rule row naming both a rule and a limit",
+      rows: [
+        ["booking_terms", TERMS],
+        ["booking_terms_rules", { ...TERMS_RULE, rule_id: textOf(HAIRCUT_RULE.rule_id) }],
+      ],
+      code: "23514",
+      constraint: "booking_terms_rules_one_ref",
+    },
+    {
+      breaks: "a rule named twice in one snapshot (Alex's haircut's same-day OK)",
+      rows: [["booking_terms_rules", { ...HAIRCUT_RULE, id: "btr-probe-alex-haircut-again" }]],
+      code: "23505",
+      constraint: "booking_terms_rules_rule_key",
+    },
+    {
+      breaks: "a terms rule row with no snapshot",
+      rows: [["booking_terms_rules", TERMS_RULE]],
+      code: "23503",
+      constraint: "booking_terms_rules_terms_fk",
+    },
+  ];
+
+  /** The same rows without a fault: each passes. */
+  const PASSES: { shows: string; rows: [string, Values][] }[] = [
+    {
+      shows: "a booking the business adds, made by the shop, booked now (B3-08)",
+      rows: [["booking_details", DETAILS]],
+    },
+    {
+      shows: "two visits of the job, each its own position and code",
+      rows: [
+        ["booking_visits", VISIT],
+        [
+          "booking_visits",
+          {
+            ...VISIT,
+            id: "visit-probe-alex-drain-2-2",
+            position: 2,
+            check_in_code: "\\x6b33302d7365616c2d636f64652d36",
+          },
+        ],
+      ],
+    },
+    { shows: "the drain line copied at $179 with its $89 fee", rows: [["booking_lines", LINE]] },
+    {
+      shows: "a snapshot with a day-before cancel time in its zone and a notice shown",
+      rows: [
+        [
+          "booking_terms",
+          {
+            ...TERMS,
+            cutoff_before: null,
+            cutoff_day_before_at: "19:00",
+            cutoff_zone: "America/Chicago",
+            notices_shown: ["a stand-in notice shown at booking, not from the sources"],
+          },
+        ],
+      ],
+    },
+    {
+      shows: "a snapshot naming the price OK limit in force",
+      rows: [
+        ["booking_terms", TERMS],
+        ["booking_terms_rules", TERMS_RULE],
+      ],
+    },
+  ];
+
+  beforeAll(async () => {
+    await reset();
+    await loadFixtures(CARD_SEEDS);
+  }, 120_000);
+
+  /** Inserts the probe booking's head, then each row in order; gives back how many of the rows were inserted. */
+  const insertAll =
+    (rows: [string, Values][]) =>
+    async (tx: Tx): Promise<number> => {
+      await insertRow(tx, "bookings", HEAD);
+      for (const [table, values] of rows) {
+        await insertRow(tx, table, values);
+      }
+      return rows.length;
+    };
+
+  for (const probe of PROBES) {
+    it(`refused: ${probe.breaks} (${probe.constraint ?? probe.code})`, async () => {
+      const outcome = await refusal(as(RUNTIME, null, insertAll(probe.rows)));
+      expect([outcome.code, outcome.constraint]).toEqual([probe.code, probe.constraint]);
+    });
+  }
+
+  for (const pass of PASSES) {
+    it(`passes: ${pass.shows}`, async () => {
+      expect(await as(RUNTIME, null, insertAll(pass.rows))).toBe(pass.rows.length);
+    });
+  }
+});
