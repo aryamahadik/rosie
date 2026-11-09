@@ -28,7 +28,9 @@
 //      or the words that name what it counts before it ("for 2", "party of 4", "mesa para 4"), or in words ("for
 //      twelve"), is the count reader's and counts as read; any other ("tomorrow 120 at 7pm", "Friday the 13 at 7pm",
 //      "tomorrow 3.30 at 7pm") stays a piece of the time that must be read, so its whole is refused. A bare hour beside a
-//      day stays an hour ("tomorrow 3 at 7pm", step 3b);
+//      day stays an hour ("tomorrow 3 at 7pm", step 3b). Each count is taken whole as the count join builds its phrase,
+//      its range, choice and adding words with it (T-1133's GAP 1: "for 4 to 6 people", "for 4 perhaps 5", "para 4 tal
+//      vez 5"), and a counted party is never a bare hour (GAP 2: "tomorrow 4 people at 7pm" holds one count);
 //   3. a number the reader did not read belongs to the phrase when a range word joins it to the phrase ("twenty to 3",
 //      "10 - $15", "3 or 4pm"), or when it stands right after a time or an amount with one space between ("at 3 30", "at
 //      three thirty", "$1 200"); a count takes one a range or choice word ("or", "to", "-", "/") joins to it, since the
@@ -39,11 +41,15 @@
 //      5, DL-209), so "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3?" differs: the hour joins when the
 //      reader takes it reading that phrase with the hour on its own, as it does unless the phrase already names its time
 //      of day ("2" of "table for 2 tomorrow at 3pm" stays a count, as round 4 holds); the phrases are then joined again
-//      (steps 2 and 3), so a time a comma joins comes in too ("2pm, 3 tomorrow");
+//      (steps 2 and 3), so a time a comma joins comes in too ("2pm, 3 tomorrow"). A counted party where main read an hour
+//      (times.ts declined, T-1133: "tomorrow, 4 people", "tomorrow at 4 people") joins the same way, as a piece left
+//      unread, so the day alone is refused there as main refused it;
 //   4. the phrase that holds the cited words (where they stand whole: words.ts wholeAt) is re-read on its own with the same
 //      re-parse, and the value holds only if it gives the field's value and every number, currency sign and zone word in
 //      it was read. None, or a piece left unread, is noText; another value differs; two are several; a zone word that is
-//      not the value's zone is wrongZone; cited words that touch two phrases are several.
+//      not the value's zone is wrongZone; cited words that touch two phrases are several. For a time, the cited words and
+//      the phrase, each read on its own, take no hour the whole text does not (T-1133's agreement, hoursAgree): "tomorrow
+//      - 4" alone reads 4 for an hour, "tomorrow - 4 people" holds a party, so the cut is noText.
 // The residual (DL-199 item 4; CQ-121: "a word no reader knows ("next week", "LA time", "UTC") is not read, and a value
 // cut beside it is not caught by limit 6"): words no reader knows are no value and join nothing, so a cut beside them is
 // not caught here: "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from
@@ -74,6 +80,9 @@
 // "at: 3" or "a las »3«" differs); the time reader's joining mark is this builder's, so a letter of any script is a
 // letter in both; and every count between a day and a time keeps the phrase whole, only a party counting as read
 // ("tomorrow" out of "tomorrow for 120 at 7pm" differs, and "Friday the 13 at 7pm" is refused, never read as Fri Nov 6).
+// T-1133 (DL-259) gives the readers one precedence rule (times.ts), so none of the cuts main refused passes: "150 guests"
+// out of "we're at 120, maybe 150 guests" is several, "tomorrow at 120" out of "tomorrow at 120 Oak St at 3pm" differs,
+// and "tomorrow: 4" out of "tomorrow: 4 people at 7pm" differs; round 2's GAPs 1 and 2 close with them (steps 2b, 3b, 4).
 // Still the residual, with words no reader knows and a sentence mark between day and time: "3.5", "3.30" and "1530"
 // with no cue before them and no am or pm after them ("Thursday, 3.5"), "around 3" with no cue, "~3" with neither a cue
 // nor a day beside it ("tomorrow ~3" is read: a joining mark stands between), words before a count that no reader knows
@@ -87,9 +96,16 @@
 // what it returns is a label.
 
 import { amountsIn } from "./money";
-import { numberPhrasesIn } from "./numbers";
+import { NUMBER_JOINING_MARK, numberPhrasesIn } from "./numbers";
 import {
+  ADDING_WORDS,
+  COUNT_LEAD,
   ENDS_WITH_COUNT_UNIT,
+  RANGE_OR_CHOICE_WORDS,
+  asWords,
+  partiesIn,
+} from "./parties";
+import {
   countSpansIn,
   reparse,
   zoneWordSpansIn,
@@ -100,7 +116,7 @@ import {
   type ReparseContext,
   type ReparseFault,
 } from "./reparse";
-import { JOINING_MARK, NUMBER_JOINING_MARK, timeReadingOf } from "./times";
+import { JOINING_MARK, TIME_CUES, timeReadingOf } from "./times";
 import {
   BOTH_LANGUAGES,
   findAll,
@@ -136,57 +152,8 @@ function valuesIn(type: PhraseType, folded: string, languages: readonly ValueLan
   }
 }
 
-/**
- * Step 2: the cues that may stand between the values of one time ("tomorrow at 3pm", "tomorrow afternoon at 3", "3pm on
- * Friday", "at 3 in the afternoon", "mañana a las 3", "mañana al mediodía", "a eso de las 3"), with "or" and "and" (the
- * time reader reads two times so joined as several).
- */
-const TIME_CUES: readonly string[] = [
-  "at",
-  "on",
-  "by",
-  "around",
-  "about",
-  "approximately",
-  "approx",
-  "roughly",
-  "say",
-  "like",
-  "maybe",
-  "from",
-  "after",
-  "before",
-  "till",
-  "til",
-  "until",
-  "between",
-  "the",
-  "this",
-  "in",
-  "of",
-  "for",
-  "or",
-  "and",
-  "either",
-  "a",
-  "al",
-  "el",
-  "la",
-  "las",
-  "los",
-  "de",
-  "del",
-  "en",
-  "por",
-  "para",
-  "como",
-  "sobre",
-  "hacia",
-  "eso",
-  "tipo",
-  "o",
-  "y",
-];
+// Step 2's cues between the values of one time are the time reader's own (times.ts TIME_CUES: "at", "on", "in the", "a
+// las", "de", "or", "and" and the rest), which it also reads between an hour and the time words that are its evidence.
 /**
  * The marks that join a time's values besides the cues, by construction (T-1130, the round 7 review's N2): spaces and
  * every mark but a sentence mark, which ends the phrase (CQ-121: "tomorrow. at 3pm"), and an arrow, which reads as "to"
@@ -196,9 +163,6 @@ const TIME_CUES: readonly string[] = [
  * DL-251), so the two never disagree on what is a mark: a letter of any script is a letter in both ("Thursday ー 3").
  */
 const TIME_MARK = JOINING_MARK;
-/** Words joined at their edges: no letter or digit right before or after them (an underscore is a mark: "_or_"). */
-const asWords = (words: readonly string[]): string =>
-  String.raw`(?<![\p{L}\p{N}])(?:${words.join("|")})(?![\p{L}\p{N}])`;
 const TIME_JOIN = new RegExp(String.raw`^(?:${TIME_MARK}|${asWords(TIME_CUES)})*$`, "u");
 /**
  * Step 2 for money and counts: a range or choice word between two values ("$12 to $15", "4 or 5", "4, maybe 5", "35
@@ -207,21 +171,8 @@ const TIME_JOIN = new RegExp(String.raw`^(?:${TIME_MARK}|${asWords(TIME_CUES)})*
  * T-1130, DL-238, by construction as the time's join, from the same definition: times.ts NUMBER_JOINING_MARK).
  */
 const NUMBER_MARK = NUMBER_JOINING_MARK;
-const NUMBER_WORDS = [
-  "to",
-  "or",
-  "and",
-  "maybe",
-  "perhaps",
-  "possibly",
-  "probably",
-  "o",
-  "y",
-  "a",
-  "quizas",
-  "quiza",
-  "tal vez",
-];
+/** The count join's words: the range or choice words ("to", "or", "maybe", "tal vez") and the adding words ("and", "y"). */
+const NUMBER_WORDS: readonly string[] = [...RANGE_OR_CHOICE_WORDS, ...ADDING_WORDS];
 const NUMBER_JOIN = new RegExp(String.raw`^(?:${NUMBER_MARK}|${asWords(NUMBER_WORDS)})*$`, "u");
 /**
  * Step 3: a range word or a joining mark between a number and the phrase ("twenty to 3", "10 - $15", "$40_000"); Spanish
@@ -326,10 +277,13 @@ function besidePhrase(folded: string, phrase: Span, hour: Span): boolean {
  * Step 3b (DL-209): the bare hours the time reader reads beside a day or after a part-of-day word, whatever other time
  * the text holds (times.ts bareHours), that belong to a phrase beside them: those the reader takes when it reads that
  * phrase with the hour on its own ("thursday, 3", "3 tomorrow"), not one beside a phrase that already names its time of
- * day ("2 tomorrow at 3pm").
+ * day ("2 tomorrow at 3pm"). An hour main's reach reads that the reader declines for a counted party (times.ts declined,
+ * T-1133: "tomorrow, 4 people", "tomorrow at 4 people") belongs to the phrase the same way, as a piece the reader leaves
+ * unread, so the day alone is refused there as main refused it, and no reading takes it for an hour (step 4).
  */
 function hoursBeside(folded: string, phrases: readonly Span[], languages: readonly ValueLanguage[]): Span[] {
-  return timeReadingOf(folded, languages).bareHours.filter((hour) =>
+  const reading = timeReadingOf(folded, languages);
+  return [...reading.bareHours, ...reading.declined].filter((hour) =>
     phrases.some((phrase) => {
       if (!besidePhrase(folded, phrase, hour)) return false;
       const at = Math.min(phrase.at, hour.at);
@@ -356,44 +310,45 @@ function rangeOf(type: PhraseType, languages: readonly ValueLanguage[]): RegExp 
   return spanish ? SPANISH_RANGE : ENGLISH_RANGE;
 }
 
-/**
- * The words before a count that write it as a party (T-1130): "for" and "para", or the words that name what it counts,
- * "party of", "table for", "group of", "mesa para", "somos".
- */
-const COUNT_LEAD =
-  /(?<![\p{L}\p{N}])(?:(?:an? )?(?:party|table|group|reservation|booking) (?:of|for) |(?:una? )?(?:mesa|reserva|reservacion|grupo) (?:para|de) |somos |for |para )$/u;
 /** A digit: a count written with none is written in words ("two", "twelve", "a dozen"). */
 const ANY_DIGIT = /\d/u;
 
 /**
  * Whether a count is written as a party, so it counts as read between a day and its time (step 2b; T-1130 round 2,
  * DL-251): a whole number with its unit ("2 people", "100 guests"), with the words before it that write it as a party
- * ("for 2", "for 120", "party of 4", "mesa para 4"), or in words ("two", "twelve"). Digits alone ("tomorrow 120 at 7pm",
- * "Friday the 13 at 7pm") or a number that is no whole number ("tomorrow 3.30 at 7pm") are none, so they stay a piece of
- * the time's phrase that must be read, and the whole is refused.
+ * ("for 2", "for 120", "party of 4", "mesa para 4"), joined to one of those by a range or choice word ("4 or 5 people":
+ * parties.ts, T-1133), or in words ("two", "twelve"). Digits alone ("tomorrow 120 at 7pm", "Friday the 13 at 7pm") or a
+ * number that is no whole number ("tomorrow 3.30 at 7pm") are none, so they stay a piece of the time's phrase that must
+ * be read, and the whole is refused.
  */
-function isParty(count: FoundCount, folded: string): boolean {
+function isParty(count: FoundCount, folded: string, parties: readonly Span[]): boolean {
   if (!Number.isInteger(count.value)) return false;
   const said = folded.slice(count.at, count.end);
   return (
-    ENDS_WITH_COUNT_UNIT.test(said) || COUNT_LEAD.test(folded.slice(0, count.at)) || !ANY_DIGIT.test(said)
+    ENDS_WITH_COUNT_UNIT.test(said) ||
+    COUNT_LEAD.test(folded.slice(0, count.at)) ||
+    overlaps(count, parties) ||
+    !ANY_DIGIT.test(said)
   );
 }
 
-/** A count between two of a time's values, from its lead words (COUNT_LEAD) to its end, and whether it is a party. */
+/** A count phrase between two of a time's values, from its lead words (COUNT_LEAD) to its end, and whether it is a party. */
 interface CountBetween extends Span {
   readonly party: boolean;
 }
 
 /**
- * Step 2b (T-1130, the round 7 review's N3; round 2, DL-251): the counts that stand between two of a time's values, such
- * as the party in "table tomorrow for 2 at 7pm": every count the count reader reads, whatever its digits ("tomorrow for
- * 120 at 7pm", "tomorrow for 1,200 at noon", "Friday the 13 at 7pm"), with its unit ("for 2 people"), that no value of
- * the time overlaps and that is no bare hour the time reader reads beside a day or a part-of-day word ("tomorrow 3 at
- * 7pm" keeps its hour, DL-209), with a value of the time before it and one after it. Every such count ends no phrase:
- * the day and the time around it are one, so "tomorrow" alone differs. Only a count written as a party (isParty) is the
- * count reader's and counts as read; any other stays a piece of the time left unread. The words before it that write it
- * as a party go with it ("tomorrow, party of 4, at 7pm", "mañana, mesa para 4, a las 7": COUNT_LEAD).
+ * Step 2b (T-1130, the round 7 review's N3; round 2, DL-251; T-1133's GAP 1): the count phrases that stand between two
+ * of a time's values, such as the party in "table tomorrow for 2 at 7pm". Every count the count reader reads, whatever
+ * its digits ("tomorrow for 120 at 7pm", "tomorrow for 1,200 at noon", "Friday the 13 at 7pm"), with its unit ("for 2
+ * people"), that no value of the time overlaps and that is no bare hour the time reader reads beside a day or a
+ * part-of-day word ("tomorrow 3 at 7pm" keeps its hour, DL-209), is taken whole as the count join builds its phrase
+ * (step 2's NUMBER_JOIN), its range, choice and adding words with it ("for 4 to 6 people", "for 4 perhaps 5", "para 4 tal
+ * vez 5", "2 adults and 1 child": GAP 1), with a value of the time before it and one after it. Every such phrase ends no
+ * time's phrase: the day and the time around it are one, so "tomorrow" alone differs. A count phrase whose every count
+ * is written as a party (isParty) is the count reader's and counts as read; any other stays a piece of the time left
+ * unread. The words before it that write it as a party go with it ("tomorrow, party of 4, at 7pm", "mañana, mesa para 4,
+ * a las 7": COUNT_LEAD). A counted party is never a bare hour (times.ts, GAP 2), so "tomorrow 4 people at 7pm" holds one.
  */
 function countsBetween(
   folded: string,
@@ -401,19 +356,22 @@ function countsBetween(
   languages: readonly ValueLanguage[],
 ): CountBetween[] {
   const hours = timeReadingOf(folded, languages).bareHours;
-  return countSpansIn(folded, languages)
+  const parties = partiesIn(folded, languages);
+  const counts = countSpansIn(folded, languages).filter(
+    (count) => !overlaps(count, times) && !overlaps(count, hours),
+  );
+  return joined(counts, folded, NUMBER_JOIN)
     .filter(
-      (count) =>
-        !overlaps(count, times) &&
-        !overlaps(count, hours) &&
-        times.some((time) => time.end <= count.at) &&
-        times.some((time) => count.end <= time.at),
+      (phrase) => times.some((time) => time.end <= phrase.at) && times.some((time) => phrase.end <= time.at),
     )
-    .map((count) => ({
-      at: count.at - (COUNT_LEAD.exec(folded.slice(0, count.at))?.[0].length ?? 0),
-      end: count.end,
-      party: isParty(count, folded),
-    }));
+    .map((phrase) => {
+      const members = counts.filter((count) => phrase.at <= count.at && count.end <= phrase.end);
+      return {
+        at: phrase.at - (COUNT_LEAD.exec(folded.slice(0, phrase.at))?.[0].length ?? 0),
+        end: phrase.end,
+        party: members.every((count) => isParty(count, folded, parties)),
+      };
+    });
 }
 
 /** The folded words with each span in `spans` blanked to spaces, every other character where it stands. */
@@ -492,6 +450,29 @@ function within(piece: Span, read: readonly Span[]): boolean {
   return read.some((span) => span.at <= piece.at && piece.end <= span.end);
 }
 
+/** A run of digits. */
+const DIGITS = /\d+/g;
+
+/**
+ * Step 4's agreement (T-1133): whether every hour the time reader takes in `said`, read on its own where it stands at
+ * `at` in the folded text, is an hour it takes there in the whole text (a time of day or a bare hour), digit for digit.
+ * Words read on their own lose what stands after them, so "tomorrow - 4" alone takes 4 for an hour where the whole text
+ * "tomorrow - 4 people" holds a counted party, and "tomorrow at 120" alone takes 1:20 where "tomorrow at 120 Oak St"
+ * holds no time: such a reading is not the text's (noText).
+ */
+function hoursAgree(
+  said: string,
+  at: number,
+  hours: readonly Span[],
+  languages: readonly ValueLanguage[],
+): boolean {
+  return timeReadingOf(said, languages).clocks.every((clock) =>
+    findAll(said.slice(clock.at, clock.end), DIGITS).every((digits) =>
+      within({ at: at + clock.at + digits.at, end: at + clock.at + digits.end }, hours),
+    ),
+  );
+}
+
 /**
  * Whether `value`, of `type`, holds on the whole value phrase its `words` stand in, in `text` (steps 1 to 4): null when
  * it does, else the fault as a label. Types not written as numbers have no value phrase: null. `context` is reparse's.
@@ -510,6 +491,8 @@ export function wholePhraseFault(
   const places = wholeAt(folded, cited);
   if (places.length === 0) return "noText";
   const phrases = phrasesIn(type, folded, languages);
+  const whole = type === "time" ? timeReadingOf(folded, languages) : null;
+  const hours = whole === null ? [] : [...whole.clocks, ...whole.bareHours];
   for (const place of places) {
     const end = place + cited.length;
     const [phrase, ...more] = phrases.filter((each) => each.at < end && place < each.end);
@@ -518,6 +501,12 @@ export function wholePhraseFault(
     const said = folded.slice(phrase.at, phrase.end);
     const result = reparse(type, value, said, context);
     if (!result.ok) return result.why === "noValue" ? "noText" : result.why;
+    if (
+      whole !== null &&
+      !(hoursAgree(cited, place, hours, languages) && hoursAgree(said, phrase.at, hours, languages))
+    ) {
+      return "noText";
+    }
     const read = readOf(type, said, languages);
     if (piecesOf(type, said, languages).some((piece) => !within(piece, read))) return "noText";
   }

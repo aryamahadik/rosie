@@ -1,9 +1,39 @@
 // Numbers written as words, in English and Spanish (T-304; A3-07: "By default: English and Spanish"), read from folded
 // words (words.ts): "twenty-five", "a hundred and five", "fifteen hundred", "treinta y cinco", "veintidós", "doscientos",
 // "dos mil". A run that cannot be one number ("five twenty") is two. "once" is Spanish eleven only when the text is
-// Spanish, since in English it means one time; "un" and "una" are Spanish one.
+// Spanish, since in English it means one time; "un" and "una" are Spanish one. The number edge and the mark that joins
+// numbers live here too (moved from times.ts by T-1133), below every reader, so the time reader, the count reader and
+// the party reading (parties.ts) share one definition of each with no import between them going round.
 
 import { BOTH_LANGUAGES, type ValueLanguage } from "./words";
+
+// The number edge, by construction (T-304 round 7, DL-228 item 1): a mark (any character that is neither a digit nor a
+// letter) is part of a number only when a digit stands right before it and right after it; anywhere else it ends the
+// number, before it and after it. Rounds 5 and 6 (DL-209, DL-217) let the comma and then the period end an hour one mark
+// at a time, which left the colon hiding one ("see you tomorrow at 3:)"); here no mark is listed as an end. Between two
+// digits the readers read the period, the colon and the slash as part of the number ("3.30", "3.5", "3:30", "10/24"),
+// and the comma as part of it where it marks thousands, three digits after it ("1,200"); any other mark between two
+// digits joins two numbers, as before ("2-5pm" is a range, so several; "3:30,4:30" two times). So every pattern of the
+// time reader starts a number only where neither a digit nor a digit and such a mark stands right before it
+// (NUMBER_START), and ends one only where neither a digit nor such a mark and a digit stands right after it (NUMBER_END):
+// "see you tomorrow at 3:)", "tomorrow at 3:", "tomorrow at 3.", "Thursday, 3:)", "tomorrow morning, 9:)", "Update:3pm
+// tomorrow" and "hmm...3pm tomorrow" read their hour, while "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their
+// readings (no hour 3, 10, 1 or 50 in them). A unit glued to a number is no edge but what the number is, as before: a
+// "%" right after it (a share) or a "$" beside it (money) makes it no hour, and a letter glued to a bare number makes it
+// no bare number ("3rd"). An underscore is a mark, never a letter. The count reader starts and ends its counts at the
+// same edges (T-1130: parties.ts NUMERAL), so a count glued to a mark ("table for 4 or 5:)", "re:4 or 5") is read as one.
+export const NUMBER_START = String.raw`(?<!\d|\d[.:/]|\d,(?=\d{3}(?!\d)))`;
+export const NUMBER_END = String.raw`(?!\d|[.:/]\d|,\d{3}(?!\d))`;
+/** A letter or digit of the folded words: \w without the underscore, which is a mark. */
+export const LETTER_OR_DIGIT = String.raw`[^\W_]`;
+/** The sentence marks, as characters of a pattern's character class: ". ! ? ;" and Spanish "¿ ¡" ("…" folds to "..."). */
+export const SENTENCE_MARKS = ".!?;¿¡";
+/**
+ * One mark that joins amounts or counts (values/phrase.ts), and the ground of a time's joining mark (times.ts
+ * JOINING_MARK): any character but a letter or a digit of any script (\p{L}\p{N}) or a sentence mark. A pattern using it
+ * takes the "u" flag.
+ */
+export const NUMBER_JOINING_MARK = String.raw`[^\p{L}\p{N}${SENTENCE_MARKS}]`;
 
 type WordKind = "zero" | "unit" | "teen" | "ten" | "hundred" | "hundreds" | "thousand";
 

@@ -49,7 +49,15 @@
 //      share that one definition, so a letter of any script is a letter in both; and every count between a day and a
 //      time keeps the day's phrase whole, whatever its digits, only a count written as a party counting as read, so
 //      "tomorrow" out of "tomorrow for 120 at 7pm", "catering tomorrow for 150 at noon", "tomorrow for 1,200 at noon"
-//      or "mañana para 120 a las 7" differs, while "Friday the 13 at 7pm" is refused (noText), never Fri Nov 6;
+//      or "mañana para 120 a las 7" differs, while "Friday the 13 at 7pm" is refused (noText), never Fri Nov 6. T-1133
+//      (DL-259) gives the count reader and the time reader one precedence rule, so they agree on which number is which
+//      and nothing main refused passes: a counted party (a count with its unit or party lead words, or joined to one by
+//      a range or choice word) is never an hour, so "150 guests" out of "we're at 120, maybe 150 guests" is several and
+//      "tomorrow: 4" out of "can we do tomorrow: 4 people at 7pm" differs; an hour only T-1130's reach finds is one only
+//      with its own time evidence, so "tomorrow at 120" out of "tomorrow at 120 Oak St at 3pm" differs; a count range
+//      between a day and a time is blanked whole with its joining words, so "tomorrow" out of "tomorrow for 4 to 6 people
+//      at 7pm" differs (round 2's GAP 1); and no reading of the cited words or the phrase takes an hour the whole text
+//      does not, so "tomorrow 4" out of "tomorrow 4 people" is refused (GAP 2);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -130,6 +138,17 @@
 //      "party of 4", "mesa para 4"), or in words; any other ("tomorrow 120 at 7pm", "Friday the 13 at 7pm", "tomorrow
 //      3.30 at 7pm") is refused; and "ppl" and "pax" are a count's units (values/times.ts, values/phrase.ts,
 //      values/reparse.ts).
+//  12. T-1133 (DL-259): T-1130's reach is an approximate word or any mark but one space between a cue and its hour,
+//      three or four digits or tenths of an hour after a cue, and any mark but spaces and commas (or the period a day's
+//      short form takes: "tmrw. 3", "Thurs. 3") between a day or part-of-day word and its bare hour; main's reach is the
+//      rest. An hour's time evidence is am or pm, or after it, past spaces, joining marks and the time cues, the end of
+//      the words, a sentence mark, or a day, part-of-day word, elapsed time or time of day the reader reads with no
+//      evidence of its own (a zone word is none: "at 1530 PST" stays unread, as on main). A counted party where main's
+//      reach read an hour is declined there and kept a piece of the day's phrase, unread ("tomorrow, 4 people" refuses
+//      "tomorrow" as main did); a unit carries across a range or choice word ("4 or 5 people"), never across a mark alone
+//      or an adding word ("at 3, 4 people" and "at 3 and 4 people" keep "at 3"). A reading of the cited words or the
+//      phrase that takes an hour the whole text does not is noText (values/parties.ts, values/times.ts,
+//      values/phrase.ts).
 
 import {
   foundAtWordEdges,

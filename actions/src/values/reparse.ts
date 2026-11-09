@@ -17,7 +17,8 @@
 
 import { amountsIn, distinctMoney, sameMoney, type Money } from "./money";
 import { numberPhrasesIn } from "./numbers";
-import { LETTER_OR_DIGIT, NUMBER_END, NUMBER_START, instantsFor, timeReadingOf, timeSpansIn } from "./times";
+import { COUNT_UNIT, NUMERAL } from "./parties";
+import { instantsFor, timeReadingOf, timeSpansIn } from "./times";
 import {
   BOTH_LANGUAGES,
   findAll,
@@ -119,17 +120,8 @@ function theOne<T>(found: readonly T[], same: (a: T, b: T) => boolean, value: T)
 
 // ---- counts, yes or no, zones, options --------------------------------------------------------------------------------
 
-/**
- * A count in digits: "4", "1,200", "2.5". It starts and ends at the time reader's number edge (T-1130; times.ts
- * NUMBER_START and NUMBER_END, DL-228 item 1): a mark is part of the number only with a digit right before it and right
- * after it, and a comma only as a thousands mark, so a count glued to a mark is read ("table for 4 or 5:)", "re:4 or 5",
- * "Update:2 adults + 1 child") and "4, 5" or "3,4" are two. A letter glued to it ("3rd", "4pm"), a "$" beside it or a
- * "%" after it makes it no count, as before.
- */
-const NUMERAL = new RegExp(
-  String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?${NUMBER_END}(?!${LETTER_OR_DIGIT}|[%$])`,
-  "g",
-);
+// A count in digits is parties.ts NUMERAL (at the number edge, T-1130), and a count's unit after it parties.ts
+// COUNT_UNIT ("2 people", "4 pax"): one definition the time reader and the phrase builder share (T-1133).
 const NONE = /\b(?:none|ninguno|ninguna)\b/g;
 /** Dozens in words (T-304 round 4, DL-199 item 2: a count is read with its scale): half a dozen is 6, a dozen 12. */
 const DOZENS: readonly (readonly [RegExp, number])[] = [
@@ -138,14 +130,6 @@ const DOZENS: readonly (readonly [RegExp, number])[] = [
 ];
 /** A dozen after a count: "2 dozen" is 24, "dos docenas" 24. */
 const DOZEN_AFTER = /^ (?:dozens?|docenas?)\b/;
-/**
- * A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"); "ppl" and
- * "pax" as people write them in a booking (T-1130).
- */
-const COUNT_UNITS = String.raw`people|ppl|pax|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?`;
-const COUNT_UNIT = new RegExp(String.raw`^ (?:${COUNT_UNITS})\b`);
-/** Whether a count's folded words end with its unit ("2 people", "two adults", "4 pax"). */
-export const ENDS_WITH_COUNT_UNIT = new RegExp(String.raw` (?:${COUNT_UNITS})$`);
 
 /** One count and where it stands in the folded words. */
 export interface FoundCount extends Span {
@@ -155,7 +139,8 @@ export interface FoundCount extends Span {
 /**
  * Every count in the words, with where it stands in their folded form: digits and number words, with a dozen after them
  * ("2 dozen" is 24; "a dozen" 12, "half a dozen" 6), "none" as 0. Amounts of money, dates and times of day stand apart:
- * "a table for 4 at 7pm" holds the count 4.
+ * "a table for 4 at 7pm" holds the count 4. A time of day is one the time reader takes (times.ts timeSpansIn), so a
+ * counted party is never taken from the count reader ("we're at ~6, maybe 8 people" holds 6 and 8: T-1133).
  */
 export function countSpansIn(
   words: string,
@@ -164,7 +149,7 @@ export function countSpansIn(
   const folded = foldWords(words);
   const apart: Span[] = [
     ...amountsIn(words, languages).filter((amount) => amount.marked),
-    ...timeSpansIn(folded),
+    ...timeSpansIn(folded, languages),
   ];
   const counts: FoundCount[] = [];
   const withUnit = (count: FoundCount): FoundCount => {
