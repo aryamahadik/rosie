@@ -299,8 +299,8 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
  * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
  * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
- * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), and K-35 v1
- * documents and licenses (T-210).
+ * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), K-35 v1
+ * documents and licenses (T-210), and K-28 v1 customers (T-211).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -421,6 +421,14 @@ const ALL_TABLES = [
           "../../contracts/db-schema/documents-licenses/documents-licenses.v1.tables.json",
           import.meta.url,
         ),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/customers/customers.v1.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -1087,6 +1095,8 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (table.name === "documents") {
         return ["INSERT", "SELECT"];
       }
+      // K-28 v1 README rule 5: both roles select, insert and update customers and customer_blocks (business-scoped and
+      // versioned), as table grants, and never delete: the generic rule below, with no exception.
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
