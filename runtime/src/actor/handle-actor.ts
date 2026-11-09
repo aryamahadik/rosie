@@ -25,17 +25,27 @@
 // checked safety lines, copied from the safety read's bundle each time a text is written; each live safety timer's due
 // time, address (as K-34 seals it) and emergency contact, reloaded after a commit that wrote a timer row; and the queue of
 // writes to replay when PostgreSQL returns (danger, stops, then the rest, each once), where the safety read's records
-// wait. Sending from the copies while PostgreSQL is down, and replaying on return, are T-270's.
+// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270).
 //
-// Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
-// a sealed box. Never logged: a word, a phone number, a key, a sealed body.
+// PostgreSQL down (T-270, ../outage/db): the actor follows each text until a commit takes it. While PostgreSQL is known
+// down, closed batches stay with the batch window, in order, and the lease holds its turn as it is (a lapse is no crash);
+// a text waiting 20 s gets the outage line once, never to a stopped number; a STOP or a START is taken at once (the flag
+// copied, its reply straight through Linq, its record queued for the return, and it joins no turn); a running safety
+// timer due fires from the copy. On return the write-on-return queue replays danger, then stops, then the rest (the STOP
+// and START records through `recordStopOrStart`), and only then does the lease resume and the queued batches go on. Every
+// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)).
+//
+// Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). This file opens no
+// sealed box: the safety read does, and the PostgreSQL-down path, to read a STOP or a START, each with the handle's key.
+// Never logged: a word, a phone number, a key, a sealed body.
 
 import { DurableObject } from "cloudflare:workers";
 
-import { BundlePins, bundleKvOf, type PinEntry } from "../bundle";
+import { BundlePins, bundleKvOf, type PinEntry, type PinRequest, type TurnPin } from "../bundle";
 import { ActorClocks, type DueClock, type FireBy, type FireReport } from "../clocks";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
+import { DbOutage, STOP_OR_START_CALL, type OutageView } from "../outage/db";
 import {
   REREAD_MS,
   SAFETY_RETURN_CALLS,
@@ -53,6 +63,7 @@ import {
   SCHEDULE_SAFETY,
   unscheduleEntry,
   type BatchEntry,
+  type ClosedBatch,
 } from "./batch";
 import {
   ActorCopies,
@@ -160,6 +171,7 @@ export class HandleActor extends DurableObject {
   private readonly clocks: ActorClocks;
   private readonly copies: ActorCopies;
   private readonly returns: ReturnQueue;
+  private readonly outage: DbOutage;
   private readonly batchWork = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
@@ -170,7 +182,8 @@ export class HandleActor extends DurableObject {
     this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
     this.safety = new SafetyOnArrival({
       returns: this.returns,
-      stopped: () => this.copies.readStopped()?.stopped === true,
+      // The copy of the stopped flag (T-269), or a STOP no commit has taken that the actor has not taken either (T-270).
+      stopped: () => this.copies.readStopped()?.stopped === true || this.outage.stopPending(),
       storage: ctx.storage,
       spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
       // A late answer or a re-read's: danger closes the open batch at once, a lifted unread hold lets the waiting batches
@@ -191,7 +204,7 @@ export class HandleActor extends DurableObject {
       held: (eventIds) => this.unreadAmong(eventIds),
       isDanger: (eventId) =>
         this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
-      lease: (batch) => this.lease.take(batch),
+      lease: (batch) => this.handOff(batch),
     });
     this.pins = new BundlePins({
       storage: ctx.storage,
@@ -205,13 +218,16 @@ export class HandleActor extends DurableObject {
       lend: (work) => {
         this.lend(work);
       },
-      pin: (request, signal) => this.pins.pin(request, signal),
+      pin: (request, signal) => this.pinAndCopy(request, signal),
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
       parkTrace: (request) => this.parkTrace(request),
       committed: (turn, answer) => {
         this.afterCommit(turn, answer);
       },
+      // PostgreSQL down (T-270): the lease holds its turn as it is, and the queue is replayed before any commit.
+      held: () => this.outage.isDown(),
+      beforeCommit: () => this.outage.beforeCommit(),
     });
     // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
     // armed row; a clock turn's commit is handed the holds open and the texts not read yet, read at commit time.
@@ -222,6 +238,27 @@ export class HandleActor extends DurableObject {
       context: () => ({ holds: this.safety.openHolds(), unread: this.unreadTexts() }),
       logContext: () => ({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
       staging: () => this.env.ENVIRONMENT === "staging",
+    });
+    // The PostgreSQL-down path (T-270), on the actor's own storage, copies and write-on-return queue.
+    this.outage = new DbOutage({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      copies: this.copies,
+      returns: this.returns,
+      replay: () => this.writeOnReturn(),
+      texts: (eventIds) => readInboxEvents(ctx.storage.sql, eventIds),
+      pending: () => ({ window: this.batch.pendingEventIds(), lease: this.lease.pendingEventIds() }),
+      safetyEntry: (eventId) => this.safety.readSafety().find((entry) => entry.eventId === eventId),
+      resume: () => {
+        this.lend(this.resumeAfterOutage());
+      },
+      release: () => {
+        this.lend(this.batch.release().then(() => this.batch.arm()));
+      },
+      arm: () => this.batch.arm(),
+      lend: (work) => {
+        this.lend(work);
+      },
     });
     // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read,
     // and reads again every text whose re-read is due (DL-127). A failure here must not keep the actor from starting.
@@ -239,6 +276,9 @@ export class HandleActor extends DurableObject {
    */
   override async alarm(): Promise<void> {
     this.resumeSafetyGuarded();
+    // The PostgreSQL-down path's due work (T-270: a safety timer due, a text waiting 20 s, the next ask), lent: it never
+    // holds the lease and batch handlers back.
+    this.outage.wake();
     await this.lease.onAlarm();
     await this.batch.onAlarm();
     await this.clocks.onAlarm();
@@ -287,6 +327,8 @@ export class HandleActor extends DurableObject {
       }
       if (answer === "written") {
         this.refreshLines();
+        // Followed by the PostgreSQL-down path until a commit takes it (T-270).
+        if (startsTurn(handoff.event)) this.outage.arrive(handoff.event, this.seqOf(handoff.event.eventId));
         await this.batch.arm();
       }
     } else {
@@ -534,13 +576,56 @@ export class HandleActor extends DurableObject {
     };
   }
 
+  /** The PostgreSQL-down path's state, as labels and times only (T-270). */
+  readOutage(): OutageView {
+    return this.outage.read();
+  }
+
+  /** Resolves when the PostgreSQL-down path's work started so far is done (tests). */
+  outageIdle(): Promise<void> {
+    return this.outage.idle();
+  }
+
   /**
-   * Sends one queued write: the safety read's records through the safety read. A write of a call no sender is wired for
-   * yet (T-270's stop and start records) waits, and nothing queued after it goes before it.
+   * Sends one queued write: the safety read's records through the safety read, a STOP or START the actor took while
+   * PostgreSQL was down through the down path (T-270). A write of any other call waits, and nothing queued after it goes
+   * before it.
    */
   private replayWrite(write: QueuedWrite): Promise<ReplayStep> {
     if (SAFETY_RETURN_CALLS.includes(write.call)) return this.safety.replayOnReturn(write);
+    if (write.call === STOP_OR_START_CALL) return this.outage.replayStopOrStart(write);
     return Promise.resolve("notBack");
+  }
+
+  /**
+   * The batch window's hand-off to the lease (T-270): kept back (as for no turn able to run, so the batch stays stored, in
+   * order) while PostgreSQL is known down or one of its texts is a STOP or START not decided on; otherwise taken, without
+   * the STOP and START texts the actor took while it was down.
+   */
+  private async handOff(batch: ClosedBatch): Promise<"taken" | "unwired"> {
+    const kept = this.outage.handOff(batch);
+    if (kept === null) return "unwired";
+    return this.lease.take(kept);
+  }
+
+  /** Pins a run's bundle (T-249), and copies its keyword list and stop and start replies (T-270); a copy that fails changes nothing. */
+  private async pinAndCopy(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null> {
+    const pinned = await this.pins.pin(request, signal);
+    if (pinned !== null) {
+      try {
+        this.copies.refreshKeywords(pinned.bundle.manifest);
+      } catch {
+        // The copy keeps the list it had.
+      }
+    }
+    return pinned;
+  }
+
+  /** PostgreSQL is back and the queue's danger and stop writes are in (T-270): the held turn runs again, then the batches go on. */
+  private async resumeAfterOutage(): Promise<void> {
+    await this.lease.resume();
+    await this.batch.release();
+    await this.batch.arm();
   }
 
   /**
@@ -553,7 +638,12 @@ export class HandleActor extends DurableObject {
     const read = readCommit(answer.committed);
     if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
     if (read.timersWritten || this.copies.timersStale()) {
-      this.lend(this.copies.refreshTimers(turn.handleId).then(() => undefined));
+      // The PostgreSQL-down path's alarm follows the copy's earliest timer due (T-270).
+      this.lend(
+        this.copies.refreshTimers(turn.handleId).then(() => {
+          this.outage.timersChanged();
+        }),
+      );
     }
   }
 

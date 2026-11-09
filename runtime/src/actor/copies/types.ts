@@ -8,6 +8,25 @@
 //
 // Never logged, put in a span or an error: a number, an address (sealed or not), a contact's name, a text's words. The ids,
 // kinds and codes here are labels.
+//
+// T-270 adds one copy: the pinned bundle's keyword list (K-01 v1 `lists.keywords`) and the stop and start replies' words
+// (K-01 v1 fixed lines `stopReply` and `startReply`), copied from each bundle a turn pins, so the actor can read a STOP or
+// a START, and reply to it, while PostgreSQL is down.
+
+import type { KeywordList } from "../../guard/keywords";
+
+/**
+ * The keyword list and the stop and start replies, as the actor last copied them from a pinned bundle (T-270): what it reads
+ * a STOP or a START by, and replies with, while PostgreSQL is down. The words are the sources' fixed words, never a person's.
+ */
+export interface KeywordCopy {
+  /** K-01 v1 `lists.keywords`, as the guard reads it (runtime/src/guard/keywords.ts). */
+  readonly list: KeywordList;
+  /** `stopReply` and `startReply` (K-01 ids), each with the bundle's words, or null while they wait for Jay (Q-01). */
+  readonly replies: ReadonlyMap<string, string | null>;
+  /** When they were copied, on the actor's clock. */
+  readonly refreshedAt: number;
+}
 
 /**
  * The handle's stopped flag as the actor last saw it written (K-04 v1 `phones.stopped`: one flag for every business), or

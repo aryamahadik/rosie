@@ -19,16 +19,24 @@
 //     yes (their person and handle). A commit that wrote a timer row reloads them all (`refreshTimers`); a reload that
 //     fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds.
 //
-// The queue of writes to replay when PostgreSQL returns is ./return-queue.ts. Not here: sending from the copies while
-// PostgreSQL is down, and firing a timer from its copy (T-270). Never logged, put in a span or an error: a number, an
-// address, a contact's name, a line's or a text's words.
+// T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
+// `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
+// a START by the bundle's own words, and replies with the bundle's words (or Q-01's drafted ones while Jay's wait), while
+// PostgreSQL is down. A list the guard could not read is never copied: the copy keeps the list it had.
+//
+// The queue of writes to replay when PostgreSQL returns is ./return-queue.ts. Sending from the copies while PostgreSQL is
+// down, and firing a timer from its copy, are runtime/src/outage/db's (T-270). Never logged, put in a span or an error: a
+// number, an address, a contact's name, a line's or a text's words.
 
+import { keywordsOf } from "../../guard/keywords";
+import { fixedLinesOf, START_REPLY, STOP_REPLY } from "../../guard/replies/words";
 import { isLabel } from "../../trace";
 import { createReturnTables, readHeld } from "./return-queue";
 import type {
   CheckedLineCopy,
   CommitCopies,
   CopyDeps,
+  KeywordCopy,
   LineRead,
   SafetyTimerCopy,
   StoppedCopy,
@@ -161,7 +169,25 @@ export function createCopyTables(sql: SqlStorage): void {
   );
   // Since when the timers' copy is behind a write it was told of (its reload failed): absent when it is not.
   sql.exec("CREATE TABLE IF NOT EXISTS copy_meta (k TEXT PRIMARY KEY, v INTEGER NOT NULL)");
+  // The pinned bundle's keyword list and the stop and start replies (T-270): one row at most, the sources' words only.
+  sql.exec(
+    `CREATE TABLE IF NOT EXISTS copy_keywords (
+       one INTEGER PRIMARY KEY CHECK (one = 1),
+       keywords TEXT NOT NULL,
+       replies TEXT NOT NULL,
+       refreshed_ms INTEGER NOT NULL
+     )`,
+  );
 }
+
+interface KeywordRow extends Record<string, SqlStorageValue> {
+  keywords: string;
+  replies: string;
+  refreshed_ms: number;
+}
+
+/** The replies the copy keeps beside the keyword list: the stop and start replies (K-01 ids). */
+const KEYWORD_REPLIES = [STOP_REPLY, START_REPLY] as const;
 
 /** K-34's form of a zone name (`safety_timers_due_zone_form`). */
 const ZONE_FORM = /^[A-Za-z][A-Za-z0-9_+-]*(\/[A-Za-z0-9_+-]+)*$/u;
@@ -349,6 +375,58 @@ export class ActorCopies {
       }
     });
     return changed.length;
+  }
+
+  // ---- the keyword list and the stop and start replies (T-270) ------------------------------------------------------
+
+  /**
+   * Copies a pinned bundle's keyword list and its stop and start replies (K-01 v1 `lists.keywords`, and the fixed lines
+   * `stopReply` and `startReply`, null while their words wait for Jay); true when the copy changed. A manifest whose list
+   * the guard cannot read changes nothing: the copy keeps the list it had (`keywordsOf` refuses it, fails closed).
+   */
+  refreshKeywords(manifest: Readonly<Record<string, unknown>>): boolean {
+    try {
+      keywordsOf(manifest);
+    } catch {
+      return false;
+    }
+    const lists = manifest.lists as Record<string, unknown>;
+    const lines = fixedLinesOf(manifest);
+    const keywords = JSON.stringify(lists.keywords);
+    const replies = JSON.stringify(
+      Object.fromEntries(KEYWORD_REPLIES.map((id) => [id, lines.get(id) ?? null])),
+    );
+    const held = this.sql
+      .exec<KeywordRow>("SELECT keywords, replies, refreshed_ms FROM copy_keywords WHERE one = 1")
+      .toArray()[0];
+    if (held?.keywords === keywords && held.replies === replies) return false;
+    this.sql.exec(
+      "INSERT OR REPLACE INTO copy_keywords (one, keywords, replies, refreshed_ms) VALUES (1, ?, ?, ?)",
+      keywords,
+      replies,
+      this.host.now(),
+    );
+    return true;
+  }
+
+  /** The keyword list and the stop and start replies as last copied, or null when none was copied (or it cannot be read). */
+  readKeywords(): KeywordCopy | null {
+    const row = this.sql
+      .exec<KeywordRow>("SELECT keywords, replies, refreshed_ms FROM copy_keywords WHERE one = 1")
+      .toArray()[0];
+    if (row === undefined) return null;
+    try {
+      const list = keywordsOf({ lists: { keywords: JSON.parse(row.keywords) as unknown } });
+      const parsed = JSON.parse(row.replies) as Record<string, unknown>;
+      const replies = new Map<string, string | null>();
+      for (const id of KEYWORD_REPLIES) {
+        const text = parsed[id];
+        replies.set(id, typeof text === "string" ? text : null);
+      }
+      return { list, replies, refreshedAt: row.refreshed_ms };
+    } catch {
+      return null;
+    }
   }
 
   // ---- the safety timers --------------------------------------------------------------------------------------------
