@@ -2567,3 +2567,269 @@ describe("round 7 (DL-214, 4): the closed-form residual widens, and the module h
     }
   });
 });
+
+// Round 8 (DL-224), the last build: every class of DL-204 1 is judged on the text as written, before any fold, in
+// every reading (as written, joined, split), as well as on the folded forms, so no fold erases a character a class
+// looks for; every default-ignorable code point is a hidden character of 1a; a word that mixes two scripts other than
+// Latin joins the closed-form residual (gate.ts header; CQ-120). Every special character below is written as an escape.
+
+/** The Arabic isolated forms U+FE70 to U+FE7E, every other one: the eight with no tatweel in their NFKD. */
+const ARABIC_ISOLATED = range(0xfe70, 0xfe7e).filter((point) => point % 2 === 0);
+
+/**
+ * The security reviewer's 15 letters (round 7, card T-593): the Greek ypogegrammeni (U+037A), the eight Arabic isolated
+ * forms and the six Arabic ligatures U+FC5E to U+FC63. The NFKD of each is a space and marks, so round 7's fold read a
+ * word with one of them inside as two Latin words.
+ */
+const ERASED_LETTERS = [0x37a, ...ARABIC_ISOLATED, ...range(0xfc5e, 0xfc63)].map((point) =>
+  String.fromCodePoint(point),
+);
+
+/** A letter of a script other than Latin, as gate.ts reads one for 1d. */
+const OTHER_SCRIPT_LETTER = /[^\P{L}\p{Script=Latin}]/u;
+
+/** A letter of any script. */
+const ANY_LETTER = /\p{L}/u;
+
+/** A code point by its number, for a failure message. */
+function pointName(char: string): string {
+  return (char.codePointAt(0) ?? 0).toString(16);
+}
+
+/** The security reviewer's round 7 lines (card T-593), each with its label (DL-187 4). */
+const REVIEWER_ROUND_7: readonly (readonly [string, GateWhy])[] = [
+  // The Greek ypogegrammeni (U+037A) after the h of "hold": no form reads a hold word in it, so its label is
+  // moneyNotFromRecord, as round 7's "hold" with an Armenian h.
+  ["We'll put a h\u{37A}old on it until the visit.", "moneyNotFromRecord"],
+  // After the h of "charge"; the sentence names a reply.
+  ["If you don't reply by 7pm, we'll ch\u{37A}arge you.", "neverChargeOnSilence"],
+  // After the c of "card".
+  ["It goes on your c\u{37A}ard.", "moneyNotFromRecord"],
+  // The Arabic fathatan isolated form (U+FE70) after the h of "hold".
+  ["We'll put a h\u{FE70}old on it until the visit.", "moneyNotFromRecord"],
+];
+
+describe("round 8 (DL-224, 1): every class is judged on the text as written, before any fold, in every reading, and on the folded forms", () => {
+  it("the security reviewer's round 7 lines fail with their labels: the Greek ypogegrammeni in hold, charge and card, an Arabic isolated form in hold", () => {
+    const readings = gateReadings();
+    let checked = 0;
+    for (const [line, why] of REVIEWER_ROUND_7)
+      for (const text of threeForms(line)) {
+        expect(gateMoneyText(text, gate()).refused, JSON.stringify(text)).toEqual([BY_WHY[why]]);
+        for (const reading of readings) {
+          const check = checkMoneyText(text, reading, gate());
+          expect(check.ok, JSON.stringify(text)).toBe(false);
+          expect(check.refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          // The claim check alone refuses the hold and the silence topics too, with no line approved.
+          if (why !== "moneyNotFromRecord")
+            expect(checkMoneyLine(text, reading).refused, JSON.stringify(text)).toContainEqual(BY_WHY[why]);
+          checked += 1;
+        }
+      }
+    expect(checked).toBe(REVIEWER_ROUND_7.length * 3 * 6);
+  });
+
+  it("each of the 15 is another script's letter that NFKD reads as a space and marks, and no compatibility letter; in a Latin money word it fails with the word's label", () => {
+    expect(ERASED_LETTERS).toHaveLength(15);
+    const readings = gateReadings();
+    let checked = 0;
+    for (const letter of ERASED_LETTERS) {
+      const name = pointName(letter);
+      expect(OTHER_SCRIPT_LETTER.test(letter), name).toBe(true);
+      // The fold left a space where it stood, where rounds 6 and 7 judged 1d, and its NFKC holds no letter for 1b.
+      expect(letter.normalize("NFKD"), name).toMatch(/^ \p{M}+$/u);
+      expect(letter.normalize("NFKC"), name).not.toMatch(/\p{L}/u);
+      const lines = [
+        [`We'll put a h${letter}old on it until the visit.`, NOT_FROM_RECORD],
+        [`If you don't reply by 7pm, we'll ch${letter}arge you.`, SILENCE],
+        [`It goes on your c${letter}ard.`, NOT_FROM_RECORD],
+        [`That is the f${letter}ee.`, NOT_FROM_RECORD],
+      ] as const;
+      for (const [text, refusal] of lines) {
+        expect(gateMoneyText(text, gate()).refused, name).toEqual([refusal]);
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, name).toEqual([refusal]);
+        for (const reading of readings) {
+          expect(checkMoneyText(text, reading, gate()).refused, name).toContainEqual(refusal);
+          if (refusal === SILENCE)
+            expect(checkMoneyLine(text, reading).refused, name).toContainEqual(SILENCE);
+        }
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(15 * 4);
+  });
+
+  it("a word one of them stands in is read joined across every space separator but U+0020, and split at them", () => {
+    const spaces = [0xa0, 0x1680, ...range(0x2000, 0x200a), 0x202f, 0x205f, 0x3000].map((point) =>
+      String.fromCodePoint(point),
+    );
+    for (const space of spaces)
+      for (const letter of ["\u{37A}", "\u{FE70}"]) {
+        // The letter stands between two such spaces: only the joined reading has it inside a Latin word.
+        const text = `We'll put a h${space}${letter}${space}old on it until the visit.`;
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+      }
+  });
+
+  it("every letter of another script whose NFKD holds no letter, scanned over all of Unicode, makes a money sentence in a Latin word: the 15 among them", () => {
+    const erased: string[] = [];
+    for (let point = 0; point <= 0x10ffff; point += 1) {
+      if (point >= 0xd800 && point <= 0xdfff) continue;
+      const char = String.fromCodePoint(point);
+      if (OTHER_SCRIPT_LETTER.test(char) && !ANY_LETTER.test(char.normalize("NFKD"))) erased.push(char);
+    }
+    for (const letter of ERASED_LETTERS) expect(erased, pointName(letter)).toContain(letter);
+    for (const char of erased)
+      expect(gateMoneyText(`See y${char}ou soon.`, NOTHING_APPROVED).refused, pointName(char)).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+  });
+
+  it("whole words of another script and Latin words with marks stay plain, judged before NFKD too, as round 6's 3b lines do", () => {
+    const readings = gateReadings();
+    for (const text of [
+      // A Vietnamese name in NFD (two marks on its e), a Greek name with its tonos in NFD.
+      "See you soon, Nguye\u{302}\u{303}n.",
+      "Thanks, \u{3A3}\u{3BF}\u{3C6}\u{3B9}\u{301}\u{3B1}, see you soon.",
+      // An Arabic, a Japanese and a Korean name.
+      "Thanks, \u{645}\u{62D}\u{645}\u{62F}, see you soon.",
+      "Thanks, \u{3055}\u{304F}\u{3089}, see you soon.",
+      "Thanks, \u{AE40}\u{BBFC}\u{C900}, see you soon.",
+    ]) {
+      expect(gateMoneyText(text, NOTHING_APPROVED), JSON.stringify(text)).toEqual({ ok: true, refused: [] });
+      for (const reading of readings) {
+        expect(checkMoneyText(text, reading, gate()), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+        expect(checkMoneyLine(text, reading), JSON.stringify(text)).toEqual({
+          ok: true,
+          claims: [],
+          refused: [],
+        });
+      }
+    }
+  });
+});
+
+/** Unicode's default-ignorable code points (DerivedCoreProperties.txt), as runs: 4174 in all. */
+const DEFAULT_IGNORABLE_RUNS: readonly (readonly [number, number])[] = [
+  [0xad, 0xad],
+  [0x34f, 0x34f],
+  [0x61c, 0x61c],
+  [0x115f, 0x1160],
+  [0x17b4, 0x17b5],
+  [0x180b, 0x180f],
+  [0x200b, 0x200f],
+  [0x202a, 0x202e],
+  [0x2060, 0x206f],
+  [0x3164, 0x3164],
+  [0xfe00, 0xfe0f],
+  [0xfeff, 0xfeff],
+  [0xffa0, 0xffa0],
+  [0xfff0, 0xfff8],
+  [0x1bca0, 0x1bca3],
+  [0x1d173, 0x1d17a],
+  [0xe0000, 0xe0fff],
+];
+const IGNORABLE_POINTS = DEFAULT_IGNORABLE_RUNS.flatMap(([start, end]) => range(start, end));
+
+describe("round 8 (DL-224, 2): a default-ignorable code point is a hidden character of 1a: one anywhere makes a money sentence", () => {
+  it("these are every default-ignorable code point of Unicode, 4174, the Hangul fillers among them", () => {
+    expect(IGNORABLE_POINTS).toHaveLength(4174);
+    const ignorable = /\p{Default_Ignorable_Code_Point}/u;
+    const found: number[] = [];
+    for (let point = 0; point <= 0x10ffff; point += 1)
+      if (ignorable.test(String.fromCodePoint(point))) found.push(point);
+    expect(found).toEqual(IGNORABLE_POINTS);
+    for (const filler of [0x115f, 0x1160, 0x3164, 0xffa0]) expect(IGNORABLE_POINTS).toContain(filler);
+  });
+
+  it("U+2065, U+FFF0 and U+E0001 inside 'charge' fail with their labels; the fold reads the words they part joined, the claim check too", () => {
+    const readings = gateReadings();
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    for (const hidden of ["\u{2065}", "\u{FFF0}", "\u{E0001}"]) {
+      const name = pointName(hidden);
+      const lines = [
+        [`If you don't reply by 7pm, we'll ch${hidden}arge you.`, SILENCE],
+        [`We'll ch${hidden}arge it.`, NOT_FROM_RECORD],
+        [`We'll put a h${hidden}old on it until the visit.`, HOLD],
+        [`See you ${hidden}soon.`, NOT_FROM_RECORD],
+      ] as const;
+      for (const [line, refusal] of lines)
+        for (const text of threeForms(line)) {
+          expect(gateMoneyText(text, gate()).refused, name).toEqual([refusal]);
+          for (const reading of readings) {
+            expect(checkMoneyText(text, reading, gate()).refused, name).toContainEqual(refusal);
+            if (refusal !== NOT_FROM_RECORD)
+              expect(checkMoneyLine(text, reading).refused, name).toContainEqual(refusal);
+          }
+        }
+      expect(checkMoneyLine(`You were ch${hidden}arged $55.`, asked).refused, name).toEqual([
+        { claim: "charged", why: "notTaken" },
+      ]);
+    }
+  });
+
+  it("every one of them makes a money sentence of a plain one, the Hangul fillers too", () => {
+    for (const point of IGNORABLE_POINTS)
+      expect(
+        gateMoneyText(`See yo${String.fromCodePoint(point)}u soon.`, NOTHING_APPROVED).refused,
+        point.toString(16),
+      ).toEqual([NOT_FROM_RECORD]);
+  });
+
+  it("one makes a money sentence wherever it stands, in an approved line too, and the words it parts keep their label", () => {
+    const asked = readMoney(oneService("A", "list|full|none", false), record("A"));
+    // Every one in the Basic Multilingual Plane, and the first and last of each run beyond it.
+    const beyond = [0x1bca0, 0x1bca3, 0x1d173, 0x1d17a, 0xe0000, 0xe0001, 0xe0002, 0xe001f];
+    const tags = [0xe0020, 0xe007f, 0xe0080, 0xe00ff, 0xe0100, 0xe01ef, 0xe01f0, 0xe0fff];
+    const sample = [...IGNORABLE_POINTS.filter((point) => point <= 0xffff), ...beyond, ...tags];
+    for (const point of sample) {
+      const hidden = String.fromCodePoint(point);
+      const name = point.toString(16);
+      // Inside a sentence, at its edges, after its end mark, between two sentences, alone, and in "7 p.m." (the
+      // zero-width no-break space too, though JavaScript's white space holds it: gate.ts default 15).
+      for (const text of [
+        `See you soon${hidden}.`,
+        `${hidden}See you soon.`,
+        `See ${hidden}you${hidden} soon.`,
+        `See you soon.${hidden}`,
+        `See you soon.${hidden} Thanks!`,
+        `Thanks!\n${hidden}`,
+        `See you at 7${hidden}p.m.`,
+      ])
+        expect(gateMoneyText(text, NOTHING_APPROVED).refused, JSON.stringify(text)).toEqual([
+          NOT_FROM_RECORD,
+        ]);
+      // In an approved line's words, or for a space between them, it makes another sentence, which is refused.
+      expect(gateMoneyText(`The card is saved for a {{keep}} fee${hidden}.`, gate()).refused, name).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      expect(gateMoneyText(`The card is saved for a {{keep}}${hidden}fee.`, gate()).refused, name).toEqual([
+        NOT_FROM_RECORD,
+      ]);
+      // The fold reads the words it parts joined: the hold label, and "charged" before the money step.
+      expect(gateMoneyText(`We'll place a h${hidden}old.`, NOTHING_APPROVED).refused, name).toEqual([HOLD]);
+      expect(checkMoneyLine(`You were ch${hidden}arged $55.`, asked).refused, name).toEqual([
+        { claim: "charged", why: "notTaken" },
+      ]);
+    }
+  });
+});
+
+describe("round 8 (DL-224, 3): a word that mixes two scripts other than Latin joins the closed-form residual", () => {
+  it("'hold' in Armenian and Cyrillic letters (U+0570 U+0585 U+04CF U+0501) is not this check's to catch (gate.ts header; CQ-120)", () => {
+    const text = "We'll put a \u{570}\u{585}\u{4CF}\u{501} on it until the visit.";
+    expect(gateMoneyText(text, NOTHING_APPROVED)).toEqual({ ok: true, refused: [] });
+    for (const reading of gateReadings())
+      expect(checkMoneyText(text, reading, gate())).toEqual({ ok: true, claims: [], refused: [] });
+    // With a Latin letter in the word, 1d refuses it: a Latin o for the Armenian one.
+    expect(
+      gateMoneyText("We'll put a \u{570}o\u{4CF}\u{501} on it until the visit.", NOTHING_APPROVED).refused,
+    ).toEqual([NOT_FROM_RECORD]);
+  });
+});

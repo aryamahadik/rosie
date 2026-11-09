@@ -1,10 +1,12 @@
-// The money-topic gate (T-593 rounds 3 to 7; DL-182, DL-187, DL-194, DL-204, DL-214; S13-55; card line 9: "A message
-// naming a card hold or a charge on silence fails the check"; RULES 3.2 to 3.4).
+// The money-topic gate (T-593 rounds 3 to 8; DL-182, DL-187, DL-194, DL-204, DL-214, DL-224; S13-55; card line 9: "A
+// message naming a card hold or a charge on silence fails the check"; RULES 3.2 to 3.4).
 //
 // Reading a card hold or a charge on silence from word patterns always left a new wording through, and so did every rule
 // that needs two words to meet in one sentence. So one money word is enough (DL-187): a sentence that holds one passes
 // only as words the record or the master already wrote. Listing the ways to hide a word one by one did not end either
-// (rounds 4 and 5), so a character of a class that hides a word makes a money sentence too (DL-204 1).
+// (rounds 4 and 5), so a character of a class that hides a word makes a money sentence too (DL-204 1). A class judged
+// only on a folded form let the fold erase the very letter the class looks for (rounds 6 and 7), so every class is
+// judged on the text as written, before any fold, as well as on the folded forms (DL-224 1).
 //   - A sentence ends only at . ! ? or a line break; commas, dashes, parentheses, quotes and semicolons stay inside it.
 //     Each sentence is judged alone, so a hold is never split away from its card: "We'll place a hold." is a money
 //     sentence by "hold". It is read after the apostrophe folding the Values check reads with (values.ts: ’ and ‘ as
@@ -18,8 +20,13 @@
 //     DL-204 2a, default 14); or a K-03 money slot. A stem counts only at the start of a word, so "feel", "coffee",
 //     "recently" and "percent" are no money words. Round 3's pairs still make one too (default 4).
 //   - A money sentence is also one that holds, anywhere, a character that hides a word (DL-204 1), whatever closes or
-//     follows it:
-//       a. a bidi control: U+061C, U+200E, U+200F, U+202A to U+202E or U+2066 to U+2069;
+//     follows it. Each class is judged in every text the sentence is read from (as written, joined and split), as
+//     written before any fold and after the folds (DL-224 1, default 16), so no fold erases what a class looks for:
+//       a. a bidi control: U+061C, U+200E, U+200F, U+202A to U+202E or U+2066 to U+2069; or any other default-ignorable
+//          code point (DL-224 2, default 16): the soft hyphen, the combining grapheme joiner, the zero-width space,
+//          non-joiner and joiner, the word joiner and the invisible operators, the variation selectors, the zero-width
+//          no-break space, the tags, the Hangul fillers, and the code points Unicode keeps default-ignorable while it
+//          assigns them nothing (U+2065, U+FFF0 to U+FFF8 and most of U+E0000 to U+E0FFF);
 //       b. a compatibility letter: a character whose NFKC form differs from its NFC form and holds a letter (fullwidth,
 //          mathematical, circled, squared, parenthesized, modifier, superscript and subscript letters, ligatures, and
 //          ™ ℠ ᵗᵐ ˢᴹ ᴹᴰ); a compatibility character that holds no letter ("…", a no-break space, "½") is none;
@@ -28,15 +35,17 @@
 //       d. a word that mixes Latin letters with letters of another script (Cyrillic, Greek or any other), digits between
 //          or not (DL-214 1): a word is read as letters, marks, digits, @ and $ together, in every text the sentence is
 //          read from (as written, joined and split: default 10), so "h0ld" with an Armenian h (U+0570) or "c4rd" with a
-//          Coptic c (U+2CA5) is one; a word whose letters are all in one script, such as a Greek or Cyrillic name, is
-//          none;
+//          Coptic c (U+2CA5) is one; before NFKD as well as after it (DL-224 1), so "hold" with the Greek ypogegrammeni
+//          (U+037A) or an Arabic isolated form (U+FE70) after its h is one too, though NFKD reads each of those letters
+//          as a space and marks; a word whose letters are all in one script, such as a Greek or Cyrillic name, is none,
+//          and so is a Latin word with marks, since a mark is no letter;
 //       e. a control character other than tab, line feed and carriage return: C0 (U+0000 to U+0008, U+000B, U+000C,
 //          U+000E to U+001F) or C1 (U+0080 to U+009F; DL-214 2), and DEL (U+007F; default 15).
 //   - Money words, and the hold and silence words of the labels, are found in every reading form of a sentence, and one
 //     in any form counts (DL-194, DL-204 2):
-//       - the folded form (default 8: NFKD, marks and invisible format characters left out, look-alike letters read as
-//         Latin ones, 1c's letters read as the letters they show) and the reading form in lower case (DL-194 1), both
-//         with trademark marks (™ ℠ ® © ᵀᴹ) read as word ends and bidi controls left out;
+//       - the folded form (default 8: NFKD, marks, invisible format characters and default-ignorable code points left
+//         out, look-alike letters read as Latin ones, 1c's letters read as the letters they show) and the reading form
+//         in lower case (DL-194 1), both with trademark marks (™ ℠ ® © ᵀᴹ) read as word ends and bidi controls left out;
 //       - of the sentence as written, where every space separator splits words; with every space separator but U+0020,
 //         and every control character but line feed and carriage return, left out, so the words it splits read
 //         joined; and with each of those read as a space, so it splits words (DL-204 2b, DL-214 2, default 10); and,
@@ -53,12 +62,12 @@
 // is "holding" falls back to the approved wording, since Rosie's word for a time is "saved". Approved lines then go
 // through the claim check (claims.ts) for the booking at hand. What comes back holds labels only, never the words.
 //
-// Residual risk, a closed form (DL-204 4, widened by DL-214 4; CQ-120): a wording with no money word, sign or slot in
-// any reading form above and none of DL-204 1's characters (a to e) is not caught here. That is a card hold or a charge
-// on silence said in other words ("We'll put a temporary stop on your plastic until the visit.", "If we don't hear back
-// by 7pm, it goes through anyway."), a word parted by a plain space or a mark a reader sees ("ch arge", "ch-arge"), a
-// digit or sign DL-204 2c does not read as a letter ("char9e"), a letter-shaped symbol outside 1c's two lists (○ for o,
-// ℮ for e, regional indicator letters), and, by DL-214 4:
+// Residual risk, a closed form (DL-204 4, widened by DL-214 4 and DL-224 3; CQ-120): a wording with no money word, sign
+// or slot in any reading form above and none of DL-204 1's characters (a to e) in any form a class is judged in is not
+// caught here. That is a card hold or a charge on silence said in other words ("We'll put a temporary stop on your
+// plastic until the visit.", "If we don't hear back by 7pm, it goes through anyway."), a word parted by a plain space or
+// a mark a reader sees ("ch arge", "ch-arge"), a digit or sign DL-204 2c does not read as a letter ("char9e"), a
+// letter-shaped symbol outside 1c's two lists (○ for o, ℮ for e, regional indicator letters), and, by DL-214 4:
 //   - a whole word in a script the fold does not read as Latin: Lisu letters that show HOLD (U+A4E7 U+A4F3 U+A4E1
 //     U+A4D3), Cherokee letters that show CARD (U+13DF U+13AA U+13A1 U+13A0); a word whose letters are all in such a
 //     script is one with a digit among them too (those Lisu letters with a 0 for the O), since 1d needs a Latin letter
@@ -66,7 +75,10 @@
 //   - a Latin letter NFKD leaves alone, standing for a plain one: h, b, l with a stroke or bar and the dental click
 //     (U+0127, U+0180, U+019A, U+01C0) in "hold" or "bill";
 //   - another script's digit shaped like a letter: the Arabic-Indic five (U+0665), shaped like an o, which default 12
-//     reads as 5 ("h", U+0665, "ld").
+//     reads as 5 ("h", U+0665, "ld");
+//   - and, by DL-224 3, a word that mixes two scripts other than Latin: Armenian letters with Cyrillic ones that show
+//     "hold" ("հօӏԁ": U+0570 U+0585 U+04CF U+0501), since 1d needs a Latin letter in the word and only the folded
+//     form, which 1d is never judged on (default 16), reads the Cyrillic look-alikes as Latin ("հօld").
 // The composer prompt rule (STATE note 56: money sentences come from the record's rows, filled by T-310, never the
 // model's own) and the Values check (an amount needs a fact) back it up.
 //
@@ -97,12 +109,13 @@
 //   7. A message text is every string of a step's say and of its variants' say and addSay (words, plain text and
 //      elements), and the step's fallback text; S13-55's own lines are the money home step's does, more and rule.
 //   8. Money words are found as a person reads them (foldedForm): compatibility forms as their plain letters and signs
-//      (a fullwidth ＄ is $), combining marks and invisible format characters left out (a soft hyphen or a zero-width
-//      space inside "charge"), Cyrillic and Greek letters that look like Latin ones read as those ("сharge" with a
-//      Cyrillic с), and 1c's letters as the letters they show (default 11). The reading form in lower case is read
-//      beside it (DL-194 1), so a sign NFKD turns into letters (№, 🅪, ₨) hides no word either. The claim check reads
-//      its claims in the folded form of each text the gate reads (foldedForms: defaults 9, 10 and 12), where NFKD reads
-//      most space separators as a space. Approved sentences are still compared as written (default 2).
+//      (a fullwidth ＄ is $), combining marks, invisible format characters and default-ignorable code points left out
+//      (a soft hyphen, a zero-width space or an unassigned default-ignorable code point such as U+2065 inside "charge";
+//      DL-224 2), Cyrillic and Greek letters that look like Latin ones read as those ("сharge" with a Cyrillic с),
+//      and 1c's letters as the letters they show (default 11). The reading form in lower case is read beside it
+//      (DL-194 1), so a sign NFKD turns into letters (№, 🅪, ₨) hides no word either. The claim check reads its claims
+//      in the folded form of each text the gate reads (foldedForms: defaults 9, 10 and 12), where NFKD reads most
+//      space separators as a space. Approved sentences are still compared as written (default 2).
 //   9. A text that holds a bidi control is also read as its controls show it (UAX #9, simplified): embeddings, overrides
 //      and isolates nest and set each character's level; a pop (U+202C) ends the latest embedding or override, an
 //      isolate's end (U+2069) ends the isolate and every one opened inside it, and a line break ends them all; an
@@ -124,13 +137,26 @@
 //       word whose 1s stand for both letters ("b1l1") reads as one of them.
 //   13. A slot value that holds a bidi control, or a control character of DL-214 2 (1e), is refused, as one that holds
 //       a sentence end is (default 3): a control reorders or changes what follows it, past the value. A value with
-//       DL-204 1b to 1d's characters stands for its slot ("Acme™"), since what such a character hides ends with the
-//       value.
+//       DL-204 1b to 1d's characters, or a default-ignorable code point that is no bidi control (DL-224 2: a variation
+//       selector after an emoji, a joiner inside one), stands for its slot ("Acme™"), since what such a character hides
+//       ends with the value; the sentence that holds it is a money sentence, which passes only as an approved line
+//       with the value standing for its slot.
 //   14. The money emoji are U+1F4B0 to U+1F4B8 (DL-204 2a's eight there, and 💱) and 🤑 (U+1F911).
 //   15. DEL (U+007F), a control character between C0 and C1, counts with DL-214 2's (1e). None of them is read as a
-//       space where a sentence is cut out and compared, VT and FF (U+000B, U+000C) included: they never end a sentence,
-//       are never trimmed from one, never fold away in "7 p.m." and stay in its compared form. So each is always inside
-//       a sentence, and an approved line with one in it is another sentence.
+//       space where a sentence is cut out and compared, VT and FF (U+000B, U+000C) included, and neither is the
+//       zero-width no-break space (U+FEFF), a default-ignorable code point of DL-224 2 that JavaScript's white space
+//       holds: they never end a sentence, are never trimmed from one, never fold away in "7 p.m." and stay in its
+//       compared form. So each is always inside a sentence, and an approved line with one in it is another sentence.
+//   16. DL-224's forms and characters. Each class of DL-204 1 is judged in each text a sentence is read from (as
+//       written, joined, split, and as its bidi controls show it and backwards: defaults 9 and 10), in four forms: the
+//       reading form as written and in lower case (its apostrophes and "7 p.m." folded as defaults 1 and 8 read them,
+//       which folds no character of a class), the reading form in lower case with its trademark marks read as word
+//       ends and its bidi controls left out (lowerForm), and the plain form after NFKD (plainForm, the form round 7
+//       judged 1d on). 1d is never judged on the folded form, which reads look-alike letters as Latin ones, so a Greek
+//       or Cyrillic name stays none. Every default-ignorable code point counts in 1a: DL-224 2 names those other than
+//       the joiners rounds 5 to 7 read, and the Hangul fillers (U+115F, U+1160, U+3164, U+FFA0), the joiners among
+//       them, count as well, so the class is the property whole, whichever characters "the joiners" names; they are
+//       still read joined and split too (default 10).
 
 import { pieces, type Piece } from "../../finalize/slots/syntax";
 import { VOCABULARY } from "../../finalize/slots/vocabulary";
@@ -145,9 +171,10 @@ function isObj(value: unknown): value is Obj {
 
 /**
  * White space read as a space where a sentence is cut out and compared: every kind but VT and FF (U+000B, U+000C),
- * which are DL-214 2's control characters and stay in the sentence as written (default 15).
+ * which are DL-214 2's control characters, and the zero-width no-break space (U+FEFF), a default-ignorable code point of
+ * DL-224 2 that JavaScript's white space holds: each stays in the sentence as written (default 15).
  */
-const SPACE = String.raw`[^\S\v\f]`;
+const SPACE = String.raw`[^\S\v\f\u{FEFF}]`;
 
 /**
  * The apostrophes read as ' (DL-214 3): ’ and ‘ (U+2019, U+2018), as values.ts wordForm and matchForm read them, and the
@@ -240,6 +267,14 @@ const BIDI_CONTROLS = new RegExp(BIDI, "gu");
 const CONTROL = /(?![\t\n\r])\p{Cc}/u;
 
 /**
+ * DL-224 2 (1a): a default-ignorable code point, Unicode's Default_Ignorable_Code_Point, every one (default 16). A
+ * sentence that holds one is a money sentence, wherever it stands; the plain form leaves each out, so the words one
+ * parts read joined (default 8).
+ */
+const DEFAULT_IGNORABLE = /\p{Default_Ignorable_Code_Point}/u;
+const DEFAULT_IGNORABLES = /\p{Default_Ignorable_Code_Point}/gu;
+
+/**
  * What a word split by one is read joined across, and split at, too (DL-204 2b, DL-214 2, default 10): every space
  * separator but U+0020, every control character but line feed and carriage return (a tab, vertical tab and form feed
  * among them), a line or paragraph separator, the braille blank and the Hangul fillers.
@@ -253,13 +288,14 @@ function unmarked(text: string): string {
 
 /**
  * The reading form in lower case, its marks read as word ends and its bidi controls removed, compatibility forms as
- * their plain letters and signs (a fullwidth ＄ is $), combining marks and invisible format characters left out (default
- * 8).
+ * their plain letters and signs (a fullwidth ＄ is $), combining marks, invisible format characters and default-ignorable
+ * code points left out (default 8; DL-224 2).
  */
 function plainForm(text: string): string {
   return unmarked(readingForm(text))
     .normalize("NFKD")
     .replace(/[\p{M}\p{Cf}]/gu, "")
+    .replace(DEFAULT_IGNORABLES, "")
     .toLowerCase();
 }
 
@@ -345,37 +381,59 @@ const LATIN_LETTER = /\p{Script=Latin}/u;
 const OTHER_LETTER = /[^\P{L}\p{Script=Latin}]/u;
 
 /**
- * DL-204 1d: does a word of the text mix Latin letters with letters of another script, digits between or not? A word
- * is read as DIGIT_WORD reads it, letters, marks, digits, @ and $ together (DL-214 1), in every text the text is read
- * from (textsOf: as written, joined and split; default 10). Each is read on the plain form, before look-alike letters
- * are read as Latin ones, so a word whose letters are all in one script (a Greek or Cyrillic name) is none.
+ * DL-204 1d: does a word of a form mix Latin letters with letters of another script, digits between or not? A word is
+ * read as DIGIT_WORD reads it, letters, marks, digits, @ and $ together (DL-214 1). A word whose letters are all in one
+ * script (a Greek or Cyrillic name) is none, and so is a Latin word with marks: a mark is no letter.
  */
-function mixesScripts(text: string): boolean {
-  return textsOf(text).some((one) =>
-    (plainForm(one).match(DIGIT_WORD) ?? []).some(
-      (word) => LATIN_LETTER.test(word) && OTHER_LETTER.test(word),
-    ),
+function mixesScripts(form: string): boolean {
+  return (form.match(DIGIT_WORD) ?? []).some((word) => LATIN_LETTER.test(word) && OTHER_LETTER.test(word));
+}
+
+/**
+ * Does a form hold a character of DL-204 1a to 1c or of DL-214 2 (1e): a bidi control or another default-ignorable code
+ * point (a; DL-224 2), a compatibility letter (b), a letter-shaped character with no plain form (c) or a control
+ * character other than tab, line feed and carriage return (e)?
+ */
+function holdsHidingCharacter(form: string): boolean {
+  return (
+    BIDI_CONTROL.test(form) ||
+    DEFAULT_IGNORABLE.test(form) ||
+    CONTROL.test(form) ||
+    Array.from(form).some((char) => isCompatibilityLetter(char)) ||
+    NO_PLAIN_LETTER.test(form)
   );
+}
+
+/**
+ * The forms DL-204 1's classes are judged in (DL-224 1, default 16): each text a sentence is read from (textsOf: as
+ * written, joined and split, and as its bidi controls show it and backwards), in the reading form as written and in
+ * lower case, before any fold; in lower case with its trademark marks read as word ends and its bidi controls left out
+ * (lowerForm); and after NFKD (plainForm). The form before each fold is judged as well as the fold, so no fold erases a
+ * character a class looks for. None reads look-alike letters as Latin ones, so a Greek or Cyrillic name mixes nothing.
+ */
+function classForms(text: string): string[] {
+  return [
+    ...new Set(
+      textsOf(text).flatMap((one) => {
+        const written = readingForm(one);
+        return [written, written.toLowerCase(), lowerForm(one), plainForm(one)];
+      }),
+    ),
+  ];
 }
 
 /** A character beyond printable ASCII: a text of printable ASCII alone holds none of DL-204 1's characters. */
 const BEYOND_ASCII = /[^\u{20}-\u{7E}]/u;
 
 /**
- * Does a text hold a character that hides a word (DL-204 1, DL-214 2): a bidi control (a), a compatibility letter (b),
- * a letter-shaped character with no plain form (c, in lower case too: default 11), a word that mixes Latin letters with
- * another script's (d) or a control character other than tab, line feed and carriage return (e)?
+ * Does a text hold a character that hides a word (DL-204 1, DL-214 2, DL-224): a bidi control or another
+ * default-ignorable code point (a), a compatibility letter (b), a letter-shaped character with no plain form (c, in
+ * lower case too: default 11), a word that mixes Latin letters with another script's (d) or a control character other
+ * than tab, line feed and carriage return (e), in any form a class is judged in (classForms)?
  */
 function hidesWord(text: string): boolean {
   if (!BEYOND_ASCII.test(text)) return false;
-  return (
-    BIDI_CONTROL.test(text) ||
-    CONTROL.test(text) ||
-    Array.from(text).some((char) => isCompatibilityLetter(char)) ||
-    NO_PLAIN_LETTER.test(text) ||
-    NO_PLAIN_LETTER.test(text.toLowerCase()) ||
-    mixesScripts(text)
-  );
+  return classForms(text).some((form) => holdsHidingCharacter(form) || mixesScripts(form));
 }
 
 /** The letter each digit or sign is also read as in a word that mixes letters and digits (DL-204 2c); 1 is l and i. */
