@@ -760,7 +760,7 @@ describe("the migration against the frozen table list (K-28 v1 customers)", () =
     }
   });
 
-  it("the two refer only to K-04's businesses, persons, phones, person_handles and turns (rule 1): none to K-23 or K-29, a block never to a customer row (default 11), and no other part's table refers to these", async () => {
+  it("the two refer only to K-04's businesses, persons, phones, person_handles and turns (rule 1): none to K-23 or K-29, a block never to a customer row (default 11), and of other parts' tables only K-32's memberships and packs refer to these, a customer of their own business by (business_id, person_id) (migration 0031)", async () => {
     const keys = await db.sql<{ table: string; name: string; referenced: string }[]>`
       select src.relname as table, k.conname as name, dst.relname as referenced
       from pg_constraint k
@@ -782,8 +782,11 @@ describe("the migration against the frozen table list (K-28 v1 customers)", () =
         join pg_class src on src.oid = k.conrelid
         join pg_class dst on dst.oid = k.confrelid
       where k.contype = 'f' and dst.relnamespace = ${db.schema}::regnamespace and dst.relname in ${db.sql(OWN_TABLES)}
+      order by 1
     `;
-    expect(into).toEqual([]);
+    // DL-225 (T-723, DL-306): the list gains K-32's memberships and packs (memberships_customer_fk, packs_customer_fk,
+    // to customers (business_id, person_id); 0031), ordered by name now that it holds rows, and stays exact.
+    expect(into).toEqual([{ table: "memberships" }, { table: "packs" }]);
   });
 
   it("is recorded in schema_migrations as customers, after core_rls, consent, business_setup and documents_licenses", async () => {

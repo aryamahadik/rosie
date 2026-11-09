@@ -1449,9 +1449,12 @@ describe("row-level security and privileges on the stored rows", () => {
   afterAll(async () => {
     // DL-225 (T-722, DL-297): the list gains K-32 part 1's five tables, whose keys name effects (0030), and stays exact
     // with no CASCADE.
+    // DL-225 (T-723, DL-306): it gains K-32 part 2's five whose keys name a table above (0031): booking_fees (a
+    // payment, a saved card), packs and pay_links (a payment), credits (a pack, which booking_fees names) and
+    // reconciliation_findings (a line, a refund); and stays exact with no CASCADE.
     await db.sql`
       truncate provider_events, effects, outbox_claims, monthly_bills, monthly_bill_lines, saved_cards, payments,
-        payment_items, ledger_lines, refunds
+        payment_items, ledger_lines, refunds, booking_fees, credits, packs, pay_links, reconciliation_findings
     `;
   });
 

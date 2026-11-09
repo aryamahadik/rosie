@@ -393,12 +393,69 @@ const K30_LINK_SELECTS = [
 // function stays held to this file's generic checks.
 /** K-32's tables migration 0030 makes (part 1, T-722). */
 const K32_PART_1 = ["ledger_lines", "payment_items", "payments", "refunds", "saved_cards"];
+// K-32 v1's named exceptions extended to part 2's nine tables (T-723; DL-306), exactly as its README's rules 5 to 7 state
+// them: (1) rule 5's cross-part checks in the Tool API's insert and update WITH CHECK only, never in USING; (2) rule 6's
+// UPDATE of named columns only on memberships, packs, credits, booking_fees, plan_charges and pay_links (both roles) and
+// reconciliation_runs (the runtime side, which alone writes a run); (3) rosfield_fees insert only, the Tool API's SELECT
+// only on reconciliation_runs and reconciliation_findings, no DELETE or TRUNCATE, neither role owning a money table, and
+// pay_links.code_sha256 outside the Tool API's SELECT; (4) rule 7's set-once triggers with 0030's money_set_once(),
+// which part 2 does not make again, so the function checks stand. (5) gains nothing: rosie_app already reads every table
+// part 2's checks read (consents, booking_lines, bookings, booking_visits, open_questions, outbox_rows) whole, so no
+// two-column grant was needed (money-2.int.test.ts checks each by name), and effects' stays DL-298's two columns.
+// money-2.int.test.ts checks each against the README word for word.
+/** K-32's tables migration 0031 makes (part 2, T-723). */
+const K32_PART_2 = [
+  "booking_fees",
+  "credits",
+  "memberships",
+  "packs",
+  "pay_links",
+  "plan_charges",
+  "reconciliation_findings",
+  "reconciliation_runs",
+  "rosfield_fees",
+];
 /**
- * (1) The policies on K-32's part 1 tables, by table, in name order (K-32 rule 5; DL-297): 0012's <table>_runtime beside
- * one Tool API policy per command its grants allow: ledger_lines select only, payment_items no update.
+ * (1) The policies on K-32's tables, by table, in name order (K-32 rule 5; DL-297 for part 1, DL-306 for part 2): 0012's
+ * <table>_runtime beside one Tool API policy per command its grants allow: ledger_lines, reconciliation_runs and
+ * reconciliation_findings select only, payment_items and rosfield_fees no update.
  */
 const K32_POLICIES: Record<string, readonly string[]> = {
+  booking_fees: [
+    "booking_fees_runtime",
+    "booking_fees_tool_api_insert",
+    "booking_fees_tool_api_select",
+    "booking_fees_tool_api_update",
+  ],
+  credits: [
+    "credits_runtime",
+    "credits_tool_api_insert",
+    "credits_tool_api_select",
+    "credits_tool_api_update",
+  ],
   ledger_lines: ["ledger_lines_runtime", "ledger_lines_tool_api_select"],
+  memberships: [
+    "memberships_runtime",
+    "memberships_tool_api_insert",
+    "memberships_tool_api_select",
+    "memberships_tool_api_update",
+  ],
+  packs: ["packs_runtime", "packs_tool_api_insert", "packs_tool_api_select", "packs_tool_api_update"],
+  pay_links: [
+    "pay_links_runtime",
+    "pay_links_tool_api_insert",
+    "pay_links_tool_api_select",
+    "pay_links_tool_api_update",
+  ],
+  plan_charges: [
+    "plan_charges_runtime",
+    "plan_charges_tool_api_insert",
+    "plan_charges_tool_api_select",
+    "plan_charges_tool_api_update",
+  ],
+  reconciliation_findings: ["reconciliation_findings_runtime", "reconciliation_findings_tool_api_select"],
+  reconciliation_runs: ["reconciliation_runs_runtime", "reconciliation_runs_tool_api_select"],
+  rosfield_fees: ["rosfield_fees_runtime", "rosfield_fees_tool_api_insert", "rosfield_fees_tool_api_select"],
   payment_items: ["payment_items_runtime", "payment_items_tool_api_insert", "payment_items_tool_api_select"],
   payments: [
     "payments_runtime",
@@ -420,12 +477,32 @@ const K32_POLICIES: Record<string, readonly string[]> = {
   ],
 };
 /**
- * (1) Rule 5's cross-part columns each of K-32's part 1 tables carries, with the table its check reads, in rule 5's
- * order: `(<col> is null or exists (select 1 from <table> r where r.id = <row>.<col> and r.business_id =
- * <row>.business_id))` in the Tool API's insert and update WITH CHECK. ledger_lines has no such policy.
+ * (1) Rule 5's cross-part columns each of K-32's tables carries, with the table its check reads, in rule 5's order:
+ * `(<col> is null or exists (select 1 from <table> r where r.id = <row>.<col> and r.business_id = <row>.business_id))`
+ * in the Tool API's insert and update WITH CHECK. ledger_lines, reconciliation_runs and reconciliation_findings have no
+ * such policy (DL-297, DL-306); packs and pay_links carry no such column.
  */
 const K32_CROSS_PART: Record<string, readonly (readonly [string, string])[]> = {
+  booking_fees: [
+    ["booking_id", "bookings"],
+    ["visit_id", "booking_visits"],
+    ["open_question_id", "open_questions"],
+  ],
+  credits: [["booking_line_id", "booking_lines"]],
   ledger_lines: [],
+  memberships: [["terms_consent_id", "consents"]],
+  packs: [],
+  pay_links: [],
+  plan_charges: [
+    ["booking_id", "bookings"],
+    ["reminder_outbox_row_id", "outbox_rows"],
+  ],
+  reconciliation_findings: [],
+  reconciliation_runs: [],
+  rosfield_fees: [
+    ["booking_id", "bookings"],
+    ["visit_id", "booking_visits"],
+  ],
   payment_items: [["booking_line_id", "booking_lines"]],
   payments: [
     ["booking_id", "bookings"],
@@ -445,11 +522,39 @@ const K32_CROSS_PART: Record<string, readonly (readonly [string, string])[]> = {
 /** (1) Rule 5's paid check on payments, as PostgreSQL prints it: a Tool API write never makes a card payment paid. */
 const K32_PAID_CHECK = "((method = ANY (ARRAY['cash'::text, 'own_way'::text])) OR (state <> 'paid'::text))";
 /**
- * (2) Both roles' 18 UPDATE column grants on K-32's saved_cards, payments and refunds (K-32 rule 6; DL-297), each in the
- * README's order: no amount, payer, purpose, method, effect, fee, reason or decider is ever changed in place.
+ * (2) Both roles' UPDATE column grants on K-32's tables, each in the README's order (K-32 rule 6): 18 on part 1's
+ * saved_cards, payments and refunds (DL-297), and 33 on part 2's memberships, pay_links, packs, credits, booking_fees and
+ * plan_charges (DL-306). No amount, payer, purpose, method, effect, fee, reason, decider, price, period, terms, count
+ * total, source, pay link code or plan charge's customer_present is ever changed in place.
  */
 const K32_COLUMN_UPDATES: Record<string, readonly string[]> = {
+  booking_fees: [
+    "reminded_at",
+    "answer",
+    "answered_at",
+    "answered_by_person_id",
+    "answered_by_role",
+    "option_id",
+    "event_id",
+    "state",
+    "charged_at",
+    "dropped_at",
+    "version",
+  ],
+  credits: ["returned_at", "returned_why", "version"],
+  memberships: ["next_charge_on", "status", "paused_at", "ended_at", "ended_why", "version"],
+  packs: ["credits_used", "version"],
+  pay_links: ["given_via", "ended_at", "ended_why", "version"],
   payments: ["state", "paid_at", "failed_at", "failed_why", "cancelled_at", "version"],
+  plan_charges: [
+    "reminder_outbox_row_id",
+    "state",
+    "skipped_why",
+    "charged_at",
+    "failed_at",
+    "skipped_at",
+    "version",
+  ],
   refunds: ["state", "refunded_at", "failed_at", "marked_done_by_person_id", "version"],
   saved_cards: [
     "stripe_customer_id",
@@ -461,6 +566,30 @@ const K32_COLUMN_UPDATES: Record<string, readonly string[]> = {
     "version",
   ],
 };
+/**
+ * (2) The runtime side's 4 UPDATE column grants on K-32's reconciliation_runs (K-32 rule 6; DL-306): a run is updated
+ * only in its finish, and only by the runtime side, which alone writes reconciliation; the Tool API may only SELECT it.
+ */
+const K32_RUNTIME_UPDATES: Record<string, readonly string[]> = {
+  reconciliation_runs: ["finished_at", "charges_listed", "refunds_listed", "version"],
+};
+/**
+ * (3) rosie_app's 10 SELECT column grants on K-32's pay_links: every column but code_sha256, checked by name (K-32 rule
+ * 6; DL-306): a Tool API read of the whole row is refused (refuse-pay-link-code-read, 42501); the runtime side reads the
+ * whole row by its table grant, to find a link by its code's hash.
+ */
+const K32_PAY_LINK_SELECTS = [
+  "id",
+  "business_id",
+  "payment_id",
+  "person_id",
+  "given_via",
+  "due_at",
+  "sent_at",
+  "ended_at",
+  "ended_why",
+  "version",
+];
 /** (5) rosie_app's SELECT of effects.id and effects.business_id alone, which rule 5's effect checks read (DL-298). */
 const K32_EFFECT_SELECTS = ["id", "business_id"];
 const SLOW = { timeout: 60_000 };
@@ -503,7 +632,7 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), K-35 v1
  * documents and licenses (T-210), K-28 v1 customers (T-211), K-30 v1 bookings and changes, part 1 (T-720: the five
  * tables of K30_PART_1) and part 2 (T-721: the eight of K30_PART_2), and K-32 v1 money, part 1 (T-722: the five of
- * K32_PART_1).
+ * K32_PART_1) and part 2 (T-723: the nine of K32_PART_2).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -651,7 +780,7 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(new URL("../../contracts/db-schema/money/money.v1.tables.json", import.meta.url), "utf8"),
     ) as { tables: ContractTable[] }
-  ).tables.filter((table) => K32_PART_1.includes(table.name)),
+  ).tables.filter((table) => [...K32_PART_1, ...K32_PART_2].includes(table.name)),
 ];
 /** The business-scoped tables, each with the column its policies key on and whether that column may be null. */
 const scopedOf = (tables: readonly ContractTable[]): { name: string; column: string; nullable: boolean }[] =>
@@ -866,7 +995,7 @@ describe("the migration: row-level security on every business-scoped core table 
     expect(forced).toEqual([]);
   });
 
-  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 tables of its rule 5)", async () => {
+  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 and part 2 tables of its rule 5)", async () => {
     const policies = await db.sql<
       {
         table: string;
@@ -929,6 +1058,9 @@ describe("the migration: row-level security on every business-scoped core table 
     // 5's cross-part check for each of booking_id, booking_line_id, effect_id, save_effect_id and open_question_id the
     // table carries, each by name, and payments' the paid check, in WITH CHECK only; no USING holds any of them, so the
     // Tool API still reads a paid payment and locks it. money.int.test.ts checks each word for word against the README.
+    // Part 2 (K-32 rule 5; DL-306) extends it to its nine tables, with the check for each of booking_id,
+    // booking_line_id, visit_id, open_question_id, reminder_outbox_row_id and terms_consent_id the table carries, each
+    // by name, in WITH CHECK only; money-2.int.test.ts checks each word for word against the README.
     for (const [table, names] of Object.entries(K32_POLICIES)) {
       const own = policies.filter((policy) => policy.table === table);
       expect(
@@ -1038,10 +1170,12 @@ describe("the two roles", () => {
     }
     // (3), (4) K-32's named exceptions (K-32 rules 6 and 7; DL-297): neither role owns a money table or
     // money_set_once(), so neither can drop, alter or disable a table, its policy or its trigger; the function runs as
-    // the calling role (security invoker), so the definer checks below stand.
+    // the calling role (security invoker), so the definer checks below stand. Part 2 (DL-306) adds its nine tables to
+    // the list, and no function: its set-once triggers run 0030's money_set_once().
     const money = await db.sql<{ name: string; owner: string; me: string; definer: boolean | null }[]>`
       select c.relname as name, pg_get_userbyid(c.relowner) as owner, current_user as me, null::boolean as definer
-      from pg_class c where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(K32_PART_1)}
+      from pg_class c
+      where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql([...K32_PART_1, ...K32_PART_2])}
       union all
       select p.proname, pg_get_userbyid(p.proowner), current_user, p.prosecdef from pg_proc p
       where p.pronamespace = ${db.schema}::regnamespace and p.proname = 'money_set_once'
@@ -1051,11 +1185,20 @@ describe("the two roles", () => {
         .sort((a, b) => (a.name < b.name ? -1 : 1))
         .map((row) => [row.name, row.owner === row.me, row.definer]),
     ).toEqual([
+      ["booking_fees", true, null],
+      ["credits", true, null],
       ["ledger_lines", true, null],
+      ["memberships", true, null],
       ["money_set_once", true, false],
+      ["packs", true, null],
+      ["pay_links", true, null],
       ["payment_items", true, null],
       ["payments", true, null],
+      ["plan_charges", true, null],
+      ["reconciliation_findings", true, null],
+      ["reconciliation_runs", true, null],
       ["refunds", true, null],
+      ["rosfield_fees", true, null],
       ["saved_cards", true, null],
     ]);
   });
@@ -1087,7 +1230,8 @@ describe("the two roles", () => {
           // where the generic count gave 0012's two each: 8 more. Part 2 (DL-278): its seven tables with booking_id
           // hold their own 26, where the generic count gave 14: 12 more; quote_options holds 0012's two.
           // (1) K-32's named exception (K-32 rule 5; DL-297): its five tables of part 1 hold their own 17 policies,
-          // where the generic count gave 10: 7 more.
+          // where the generic count gave 10: 7 more. Part 2 (DL-306): its nine tables hold their own 31, where the
+          // generic count gave 18: 13 more.
           policies: POLICY_TABLES.reduce(
             (sum, name) =>
               sum +
@@ -1421,6 +1565,20 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (table.name === "ledger_lines") {
         return role === TOOL_API ? ["SELECT"] : ["INSERT", "SELECT"];
       }
+      // K-32 v1 README rule 6, part 2 (DL-306): the Tool API's read of pay_links is a column grant (every column but
+      // code_sha256, exception (3)), so on the whole table it holds INSERT alone; the runtime side reads the whole row.
+      if (role === TOOL_API && table.name === "pay_links") {
+        return ["INSERT"];
+      }
+      // reconciliation_runs and reconciliation_findings are the Tool API's to select only and the runtime side's to
+      // select and insert (exception (3)); its UPDATE of a run's finish is a column grant (exception (2)), and a finding
+      // is never updated. rosfield_fees, not versioned, is insert only by the generic rule below.
+      if (["reconciliation_runs", "reconciliation_findings"].includes(table.name)) {
+        return role === TOOL_API ? ["SELECT"] : ["INSERT", "SELECT"];
+      }
+      // memberships, pay_links (the runtime side's), packs, credits, booking_fees and plan_charges take select and
+      // insert like part 1's three, and their UPDATE of rule 6's named columns is a column grant (exception (2)). No
+      // role deletes or truncates any of the fourteen.
       if (Object.keys(K32_COLUMN_UPDATES).includes(table.name)) {
         return ["INSERT", "SELECT"];
       }
@@ -1462,7 +1620,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, with rosie_app's read of every secure_links column but its code hash (K-30 rule 6), both roles' on K-32's saved_cards, payments and refunds (K-32 rule 6), and rosie_app's read of effects' id and business_id alone (K-32 rule 5; DL-298)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, with rosie_app's read of every secure_links column but its code hash (K-30 rule 6), both roles' on K-32's saved_cards, payments, refunds, memberships, pay_links, packs, credits, booking_fees and plan_charges and the runtime side's on reconciliation_runs, with rosie_app's read of every pay_links column but its code hash (K-32 rule 6), and rosie_app's read of effects' id and business_id alone (K-32 rule 5; DL-298)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -1621,22 +1779,76 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     // saved_cards', payments' and refunds' named columns only, every grantee's on those three tables held to exactly
     // them, so a column grant of an amount, a payer, a purpose, a method, an effect, a reason or a decider to any role
     // fails here; ledger_lines and payment_items stay under the generic check below, so they hold no column grant;
-    // money.int.test.ts checks them too.
-    const k32Tables = Object.keys(K32_COLUMN_UPDATES);
+    // money.int.test.ts checks them too. Part 2 (DL-306) adds both roles' UPDATE of memberships', pay_links', packs',
+    // credits', booking_fees' and plan_charges' named columns, the runtime side's of reconciliation_runs' finish, and
+    // (3) rosie_app's SELECT of every pay_links column but code_sha256, every grantee's on those seven tables held to
+    // exactly them, so a column grant of a price, a period, a count total, an amount, a source, a pay link's code hash
+    // or a plan charge's customer_present to any role fails here; rosfield_fees and reconciliation_findings stay under
+    // the generic check below, so they hold no column grant; money-2.int.test.ts checks them too.
+    const k32Tables = [...Object.keys(K32_COLUMN_UPDATES), ...Object.keys(K32_RUNTIME_UPDATES)];
     expect(
       columnGrants
         .filter((grant) => k32Tables.includes(grant.table))
         .map(key)
         .sort(),
     ).toEqual(
-      Object.entries(K32_COLUMN_UPDATES)
-        .flatMap(([table, columns]) =>
+      [
+        ...Object.entries(K32_COLUMN_UPDATES).flatMap(([table, columns]) =>
           columns.flatMap((column) =>
             [...ROLES].map((grantee) => key({ table, column, grantee, privilege: "UPDATE" })),
           ),
-        )
-        .sort(),
+        ),
+        ...Object.entries(K32_RUNTIME_UPDATES).flatMap(([table, columns]) =>
+          columns.map((column) => key({ table, column, grantee: RUNTIME, privilege: "UPDATE" })),
+        ),
+        ...K32_PAY_LINK_SELECTS.map((column) =>
+          key({ table: "pay_links", column, grantee: TOOL_API, privilege: "SELECT" }),
+        ),
+      ].sort(),
     );
+    // (3) has_column_privilege agrees, by name: the Tool API reads every pay_links column but code_sha256, and the
+    // runtime side every column, the hash included.
+    const payLinkReadable = await db.sql<{ role: string; column: string }[]>`
+      select r.role, a.attname as column
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_attribute a
+      where a.attrelid = ${`${db.schema}.pay_links`}::regclass and a.attnum > 0 and not a.attisdropped
+        and has_column_privilege(r.role, a.attrelid, a.attnum, 'SELECT')
+      order by 1, a.attnum
+    `;
+    expect(payLinkReadable.filter((row) => row.role === TOOL_API).map((row) => row.column)).toEqual(
+      K32_PAY_LINK_SELECTS,
+    );
+    expect(payLinkReadable.filter((row) => row.role === RUNTIME).map((row) => row.column)).toEqual([
+      "id",
+      "business_id",
+      "payment_id",
+      "person_id",
+      "given_via",
+      "code_sha256",
+      "due_at",
+      "sent_at",
+      "ended_at",
+      "ended_why",
+      "version",
+    ]);
+    // (2) has_column_privilege agrees for reconciliation_runs: the runtime side updates its finish only, column by
+    // column in the table's order, and the Tool API no column.
+    for (const [table, columns] of Object.entries(K32_RUNTIME_UPDATES)) {
+      const runUpdatable = await db.sql<{ role: string; column: string }[]>`
+        select r.role, a.attname as column
+        from unnest(${[...ROLES]}::text[]) as r(role)
+          cross join pg_attribute a
+        where a.attrelid = ${`${db.schema}.${table}`}::regclass and a.attnum > 0 and not a.attisdropped
+          and has_column_privilege(r.role, a.attrelid, a.attnum, 'UPDATE')
+        order by 1, a.attnum
+      `;
+      const ordered = (ALL_TABLES.find((candidate) => candidate.name === table)?.columns ?? [])
+        .map((column) => column.name)
+        .filter((column) => columns.includes(column));
+      expect(ordered, table).toHaveLength(columns.length);
+      expect(runUpdatable, table).toEqual(ordered.map((column) => ({ role: RUNTIME, column })));
+    }
     // has_column_privilege agrees for both, column by column, in each table's column order.
     for (const [table, columns] of Object.entries(K32_COLUMN_UPDATES)) {
       const k32Updatable = await db.sql<{ role: string; column: string }[]>`
