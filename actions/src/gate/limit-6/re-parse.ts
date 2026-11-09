@@ -37,10 +37,12 @@
 //      at the same number edge, so a count glued to a mark is read ("4" out of "table for 4 or 5:)", "1 child" out of
 //      "Update:2 adults + 1 child" and "5" out of "re:4 or 5" are several, "4" out of "table for 4 or 5/6" noText); the
 //      time reader reads "at 3.5", "3:30:15", "at 1530", "around 3.30", "at ~3", 'at "3"', "at (3)", "tmrw. 3pm" and
-//      "Thursday: 3", a time's phrase is joined across an asterisk, a square bracket, a quote mark, an emoji or a count
-//      between day and time, so "tomorrow" out of each of those, or out of "*3pm* tomorrow", "tomorrow [3pm]", 'tomorrow
-//      at "3pm"', "tomorrow 👍 3pm" or "table tomorrow for 2 at 7pm", differs; and a bracket joins amounts and counts
-//      ("$40" out of "raise haircut to $40 (or $50)" and "4" out of "party of 4 (maybe 5)" are several);
+//      "Thursday: 3"; what joins is built, not listed (as round 7 built the number edge): every mark but a sentence mark
+//      joins a time's values, a day and its bare hour, and amounts or counts, and an arrow joins no time (it reads as
+//      "to"); and a count between day and time ends no phrase. So "tomorrow" out of each of those, or out of "*3pm*
+//      tomorrow", "_3pm_ tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm" or "table tomorrow for 2 at
+//      7pm", and "Thursday" out of "Thursday - 3", differ; and "$40" out of "raise haircut to $40 (or $50)" and "4" out
+//      of "party of 4 (maybe 5)" are several;
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -96,15 +98,20 @@
 //      ("40$ CAD") (values/times.ts, values/money.ts).
 //  11. T-1130: an hour, a period and one digit after a cue or before am or pm is that many tenths of an hour after the
 //      hour ("at 3.5" and "3.5pm" are 3:30); seconds after the minutes are read with them and the time is its minute
-//      ("3:30:15" is 3:30); three or four digits after a cue are an hour of the day and two minute digits, read as the
-//      same with a colon would be ("at 1530" is 15:30, "at 930" 9:30 either, "at 330pm" 3:30pm), so a house number after
-//      "at" reads as a time too (a possible false refusal, never a pass); an approximate word ("around", "about",
-//      "approximately", "approx", "roughly") is read after a cue ("at around 3") and before an hour and two minute
-//      digits ("around 3.30"), never before a bare number ("around 4 people" stays a count); a quote, a bracket or "~"
-//      may stand between a cue and its hour; every quote mark (also "'", "“" and "«") joins a time as '"' does; a count
-//      takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one "and" joins ("table for 4 and
-//      7:30" keeps its count); a count between two of a time's values that is no bare hour ends no phrase (values/times.ts,
-//      values/phrase.ts).
+//      ("3:30:15" and "3.30.15pm" are 3:30); three or four digits after a cue or before am or pm are an hour of the day
+//      and two minute digits, read as the same with a colon would be ("at 1530" is 15:30, "at 930" 9:30 either, "330pm"
+//      3:30pm), so a house number after "at" reads as a time too (a possible false refusal, never a pass); an approximate
+//      word ("around", "about", "approximately", "approx", "roughly") is read after a cue ("at around 3") and, as a "~"
+//      with no digit before it is, before an hour and two minute digits ("around 3.30", "~3.30"), never before a bare
+//      number ("around 4 people" stays a count); any opening marks (a quote, a bracket, an asterisk, a "~") may stand
+//      between a cue and its hour; what joins is built, not listed: every mark but a sentence mark (". ! ? ; ¿ ¡") joins
+//      a time's values, a day or part-of-day word and its bare hour ("Thursday - 3", "Thursday (3)"), and amounts or
+//      counts ("$40 [or $50]"), but an arrow ("->", "=>", "→") joins no time, as "to" joins none (round 3's default), so
+//      "4pm" out of "move my 3pm -> 4pm" passes as the 4pm said; an underscore is read as a space by the time reader
+//      ("_tomorrow_ at 3pm"); a count takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one
+//      "and" joins ("table for 4 and 7:30" keeps its count); a count between two of a time's values that is no bare hour
+//      ends no phrase, with the words before it that name what it counts ("party of 4", "table for 4", "mesa para 4"); and
+//      "ppl" and "pax" are a count's units (values/times.ts, values/phrase.ts, values/reparse.ts).
 
 import {
   foundAtWordEdges,

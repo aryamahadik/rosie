@@ -2224,3 +2224,219 @@ describe("T-1130: the number join takes a bracket (the re-review's note, DL-238)
     expect(wholePhraseFault("integer", 4, "party of 4 (just us)", "4", context)).toBeNull();
   });
 });
+
+// T-1130 builds what joins by construction, as round 7 built the number edge (DL-228 item 1), not mark by mark (T-304's
+// stop report: "Do not try again: listing the marks ... one at a time"): every mark joins but a sentence mark, which ends
+// a phrase (CQ-121), and, for a time, an arrow, which reads as "to" (round 3's default: "move my 3pm to 4pm" passes 4pm).
+
+describe("T-1130 by construction: every mark but a sentence mark joins a time, stands beside a day or opens a cued hour; an arrow joins no time", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] }; // Sat Oct 31, 10:00am EDT
+  const spanish: ReparseContext = { ...context, languages: ["es"] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const SUNDAY = at("2026-11-01T04:00:00Z");
+  const THURSDAY = at("2026-11-05T05:00:00Z");
+  const SUNDAY_3PM = at("2026-11-01T20:00:00Z");
+  const SUNDAY_7PM = at("2026-11-02T00:00:00Z");
+  const SUNDAY_AT_3 = ["2026-11-01T08:00:00Z", "2026-11-01T20:00:00Z"];
+  const SUNDAY_AT_330 = ["2026-11-01T08:30:00Z", "2026-11-01T20:30:00Z"];
+  const THURSDAY_AT_3 = ["2026-11-05T08:00:00Z", "2026-11-05T20:00:00Z"];
+
+  it.each([
+    "_3pm_ tomorrow",
+    "~3pm~ tomorrow",
+    "{3pm} tomorrow",
+    "<3pm> tomorrow",
+    "'3pm' tomorrow",
+    "`3pm` tomorrow",
+    "«3pm» tomorrow",
+    "tomorrow + 3pm",
+    "tomorrow = 3pm",
+    "tomorrow # 3pm",
+    "tomorrow ♥ 3pm",
+    "tomorrow 👍🏽 3pm",
+    "tomorrow 🇺🇸 3pm",
+    "tomorrow 👨‍👩‍👧 3pm",
+    "tomorrow\n3pm",
+  ])("the time join: in 'can you do %s', 'tomorrow' alone differs and the whole passes", (whole) => {
+    const text = `can you do ${whole}`;
+    expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+    expect(wholePhraseFault("time", SUNDAY_3PM, text, whole, context)).toBeNull();
+  });
+
+  it("an arrow joins no time, as 'to' does not (round 3's default): '4pm' out of 'move my 3pm -> 4pm' passes as the 4pm said", () => {
+    const fourPm = at("2026-10-31T20:00:00Z"); // Sat Oct 31 at 4pm EDT, the next 4pm after the send
+    for (const arrow of [" to ", " -> ", " --> ", " => ", " → ", " ⇒ ", " ➡️ ", "->"]) {
+      expect(wholePhraseFault("time", fourPm, `can you move my 3pm${arrow}4pm`, "4pm", context)).toBeNull();
+    }
+    expect(wholePhraseFault("time", fourPm, "can you move my 3pm - 4pm", "4pm", context)).toBe("several");
+  });
+
+  it.each([
+    [
+      "the number join: '$40' out of 'raise haircut to $40 [or $50]'",
+      "money",
+      "raise haircut to $40 [or $50]",
+      "$40",
+    ],
+    [
+      "the number join: '$40' out of 'raise haircut to $40 {or $50}'",
+      "money",
+      "raise haircut to $40 {or $50}",
+      "$40",
+    ],
+    ["the number join: '4' out of 'party of 4 *or* 5'", "integer", "party of 4 *or* 5", "4"],
+    ["the number join: '4' out of 'party of 4 _or_ 5'", "integer", "party of 4 _or_ 5", "4"],
+    ["the number join: '4' out of 'party of 4 \"or\" 5'", "integer", 'party of 4 "or" 5', "4"],
+    ["the number join: '2 adults' out of '2 adults | 1 child'", "integer", "2 adults | 1 child", "2 adults"],
+  ] as const)("%s is several", (_case, type, text, cut) => {
+    const value = type === "money" ? { cents: 4000, currency: "USD" } : cut === "2 adults" ? 2 : 4;
+    expect(reparse(type, value, cut, context)).toEqual({ ok: true });
+    expect(wholePhraseFault(type, value, text, cut, context)).toBe("several");
+  });
+
+  it.each([
+    ["Thursday - 3", THURSDAY_AT_3],
+    ["Thursday (3)", THURSDAY_AT_3],
+    ['Thursday "3"', THURSDAY_AT_3],
+    ["Thursday / 3", THURSDAY_AT_3],
+    ["Thursday · 3", THURSDAY_AT_3],
+    ["3 - Thursday", THURSDAY_AT_3],
+    ["tomorrow ~3", SUNDAY_AT_3],
+    ["tomorrow morning - 9", ["2026-11-01T14:00:00Z"]],
+    ["tomorrow at {3}", SUNDAY_AT_3],
+    ["tomorrow at <3>", SUNDAY_AT_3],
+    ["tomorrow at *3*", SUNDAY_AT_3],
+    ["tomorrow at _3_", SUNDAY_AT_3],
+    ["tomorrow at '3'", SUNDAY_AT_3],
+    ["tomorrow at «3»", SUNDAY_AT_3],
+    ['tomorrow at ("3")', SUNDAY_AT_3],
+    ["tomorrow at about 3", SUNDAY_AT_3],
+    ["tomorrow at approx. 3", SUNDAY_AT_3],
+    ["tomorrow ~3.30", SUNDAY_AT_330],
+    ["tomorrow - 3.30", SUNDAY_AT_330],
+    ["tomorrow at 3.30.15", SUNDAY_AT_330],
+    ["tomorrow 3.30.15pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow 330pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow 1030am", ["2026-11-01T15:30:00Z"]],
+    ["tomorrow 1030 am", ["2026-11-01T15:30:00Z"]],
+  ] as const)("the reader reads '%s' as %j", (words, expected) => {
+    expect(readings(words, context.sentAt, NEW_YORK)).toEqual(expected);
+  });
+
+  it("a sentence mark or an arrow between a day and a number stands it beside nothing; a range stays two", () => {
+    for (const words of ["Thursday; 3", "Thursday. 3", "Thursday -> 3", "Thursday → 3"]) {
+      expect(timeReadingOf(words).bareHours).toEqual([]);
+    }
+    // A "~" (a hyphen once folded) stands for a cue only with no digit before it, so a range stays two times.
+    expect(readTimeWords("Thu 2 - 3.30").kind).toBe("several");
+    expect(readTimeWords("tomorrow at 3.00-3.30").kind).toBe("several");
+  });
+
+  // [case, text, the cut, its value (the day at its start), the whole, the whole's value, context]
+  it.each([
+    [
+      "'Thursday' out of 'Thursday - 3'",
+      "can you do Thursday - 3",
+      "Thursday",
+      THURSDAY,
+      "Thursday - 3",
+      at("2026-11-05T20:00:00Z"),
+      context,
+    ],
+    [
+      "'Thursday' out of 'Thursday (3)'",
+      "can you do Thursday (3)",
+      "Thursday",
+      THURSDAY,
+      "Thursday (3)",
+      at("2026-11-05T20:00:00Z"),
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow at *3*'",
+      "can you do tomorrow at *3*",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at *3*",
+      SUNDAY_3PM,
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow ~3.30'",
+      "can you do tomorrow ~3.30",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow ~3.30",
+      at("2026-11-01T20:30:00Z"),
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow 330pm'",
+      "can you do tomorrow 330pm",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow 330pm",
+      at("2026-11-01T20:30:00Z"),
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow at 3.30.15'",
+      "can you do tomorrow at 3.30.15",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at 3.30.15",
+      at("2026-11-01T20:30:00Z"),
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow, party of 4, at 7pm'",
+      "table tomorrow, party of 4, at 7pm",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow, party of 4, at 7pm",
+      SUNDAY_7PM,
+      context,
+    ],
+    [
+      "'tomorrow' out of 'tomorrow for 2 ppl at 7pm'",
+      "table tomorrow for 2 ppl at 7pm",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow for 2 ppl at 7pm",
+      SUNDAY_7PM,
+      context,
+    ],
+    [
+      "'mañana' out of 'mañana, mesa para 4, a las 7'",
+      "mañana, mesa para 4, a las 7",
+      "mañana",
+      SUNDAY,
+      "mañana, mesa para 4, a las 7",
+      SUNDAY_7PM,
+      spanish,
+    ],
+  ] as const)(
+    "%s: the cut re-parses on its own but differs on the day's phrase; the whole passes",
+    (_case, text, cut, value, whole, wholeValue, given) => {
+      expect(reparse("time", value, cut, given)).toEqual({ ok: true });
+      expect(wholePhraseFault("time", value, text, cut, given)).toBe("differs");
+      expect(wholePhraseFault("time", wholeValue, text, whole, given)).toBeNull();
+    },
+  );
+
+  it("an underscore is a mark, never a letter (round 7's default), so the time reader reads a word or time set in underscores", () => {
+    expect(readings("_3pm_ tomorrow", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T20:00:00Z"]);
+    expect(readings("_tomorrow_ at 3pm", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T20:00:00Z"]);
+    expect(readings("tomorrow at 3pm_", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T20:00:00Z"]);
+    const text = "can you do _tomorrow_ at 3pm";
+    expect(wholePhraseFault("time", at("2026-10-31T19:00:00Z"), text, "at 3pm", context)).toBe("differs");
+    expect(wholePhraseFault("time", SUNDAY_3PM, text, "_tomorrow_ at 3pm", context)).toBeNull();
+  });
+
+  it("'ppl' and 'pax' are a count's units, and the party's lead words go with it between day and time, never into a count's value", () => {
+    expect(countsIn("2 ppl")).toEqual([2]);
+    expect(countsIn("4 pax")).toEqual([4]);
+    expect(wholePhraseFault("integer", 4, "table tomorrow, party of 4, at 7pm", "4", context)).toBeNull();
+    expect(wholePhraseFault("integer", 2, "table tomorrow for 2 ppl at 7pm", "2 ppl", context)).toBeNull();
+  });
+});

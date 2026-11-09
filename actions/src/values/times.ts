@@ -29,13 +29,16 @@
 // two minute digits as hours and minutes when am or pm follows or a cue comes before ("3.30pm", "at 3.30"; item 2b);
 // with neither, "3.30" stays a number. T-1130 (CQ-121's default: each form found later is added to the readers; DL-236)
 // reads the forms T-304's last review found: an hour, a period and one digit after a cue or before am or pm is that many
-// tenths of an hour ("at 3.5" is 3:30, half past, as the count reader reads 3.5 as three and a half); seconds after the
-// minutes are read with them ("3:30:15" is 3:30, as "3:30:00" is); three or four digits after a cue are hours and minutes
-// ("at 1530" is 15:30, "at 930" 9:30, as "at 15:30" and "at 9:30" are); an approximate word may stand between a cue and
-// its hour ("at around 3", "at about 3.30"), and "around", "about" and the like stand for the cue before an hour and two
-// minute digits ("around 3.30"); a quote, a bracket or "~" (folded to "-") may stand between a cue and its hour ('at "3"',
-// "at (3)", "at ~3"); "tmrw." and "tmr." take their period, as "Thurs." does; and a colon may stand between a day or a
-// part-of-day word and the bare hour beside it ("Thursday: 3"). Nothing here keeps or logs words.
+// tenths of an hour ("at 3.5" and "3.5pm" are 3:30, half past, as the count reader reads 3.5 as three and a half);
+// seconds after the minutes are read with them ("3:30:15" and "3.30.15pm" are 3:30, as "3:30:00" is); three or four
+// digits after a cue or before am or pm are hours and minutes ("at 1530" is 15:30, "at 930" 9:30, "330pm" 3:30pm, as "at
+// 15:30", "at 9:30" and "3:30pm" are); an approximate word may stand between a cue and its hour ("at around 3", "at
+// about 3.30"), and "around", "about" and the like, or a "~" with no digit before it, stand for the cue before an hour
+// and two minute digits ("around 3.30", "~3.30"); any opening marks, a quote, a bracket, an asterisk or a "~" (folded to
+// "-"), may stand between a cue and its hour ('at "3"', "at (3)", "at ~3"); "tmrw." and "tmr." take their period, as
+// "Thurs." does; any joining mark (every mark but a sentence mark or an arrow, by construction: JOINING_MARK) may stand
+// between a day or a part-of-day word and the bare hour beside it ("Thursday: 3", "Thursday - 3", "Thursday (3)"); and
+// an underscore is read as a space ("_tomorrow_ at 3pm"). Nothing here keeps or logs words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
@@ -247,6 +250,21 @@ export const NUMBER_START = String.raw`(?<!\d|\d[.:/]|\d,(?=\d{3}(?!\d)))`;
 export const NUMBER_END = String.raw`(?!\d|[.:/]\d|,\d{3}(?!\d))`;
 /** A letter or digit of the folded words: \w without the underscore, which is a mark. */
 export const LETTER_OR_DIGIT = String.raw`[^\W_]`;
+// What joins by construction (T-1130), as the number edge is built (DL-228 item 1), rather than mark by mark: between a
+// day and its bare hour, and between a time's values (values/phrase.ts), every mark joins but a sentence mark, which ends
+// the phrase (CQ-121's residual: "tomorrow. at 3pm"), and an arrow, which reads as "to" and so joins no time ("move my
+// 3pm to 4pm" passes "4pm", T-304 round 3's default; "3pm -> 4pm" alike). Every quote, bracket, asterisk, underscore,
+// dash, colon or emoji joins ("Thursday: 3", "*3pm* tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm").
+/** The sentence marks, as characters of a pattern's character class: ". ! ? ;" and Spanish "¿ ¡" ("…" folds to "..."). */
+export const SENTENCE_MARKS = ".!?;¿¡";
+/** Unicode's arrows, as characters of a pattern's character class: "→", "⇒", "⟶", "⤏", "➡", "⬅" and the rest. */
+export const ARROWS = String.raw`←-⇿➡⟵-⟿⤀-⥿⬅-⬇`;
+/** An arrow typed with dashes or equals signs ("->", "-->", "=>", "<-"); "<" or ">" alone is a bracket ("<3pm>"). */
+export const ASCII_ARROW = String.raw`[-=]+>|<[-=]+`;
+/** One joining mark of the folded words: any character but a letter, a digit, a sentence mark or an arrow. */
+const JOINING_MARK = String.raw`(?!${ASCII_ARROW})[^a-z0-9${SENTENCE_MARKS}${ARROWS}]`;
+/** Whether only spaces and joining marks stand between a day or a part-of-day word and the bare hour beside it. */
+const BESIDE_ONLY = new RegExp(String.raw`^(?:${JOINING_MARK})*$`);
 
 const NUMERIC_DATE = new RegExp(
   String.raw`${NUMBER_START}(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?${NUMBER_END}`,
@@ -269,10 +287,19 @@ const COLON_TIME = new RegExp(
 );
 /**
  * An hour, a period and two minute digits, read as hours and minutes when am or pm follows ("3.30pm", "3.30 pm") or a
- * time cue comes before ("at 3.30", "a las 3.30"); with neither, "3.30" stays a number (DL-228 item 2b; CQ-121).
+ * time cue comes before ("at 3.30", "a las 3.30"); with neither, "3.30" stays a number (DL-228 item 2b; CQ-121). Seconds
+ * after them are read with them, as with a colon ("3.30.15pm" is 3:30pm: T-1130).
  */
 const DOT_MERIDIEM_TIME = new RegExp(
-  String.raw`${NUMBER_START}(?<!\$)(\d{1,2})\.([0-5]\d)${NUMBER_END}${MERIDIEM}`,
+  String.raw`${NUMBER_START}(?<!\$)(\d{1,2})\.([0-5]\d)(?:\.[0-5]\d)?${NUMBER_END}${MERIDIEM}`,
+  "g",
+);
+/**
+ * Three or four digits with am or pm after them, an hour and two minute digits: "330pm" is 3:30pm, "1030am" 10:30am
+ * (T-1130), as an hour and minutes are with am or pm after them (DOT_MERIDIEM_TIME).
+ */
+const DIGITS_MERIDIEM_TIME = new RegExp(
+  String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)([01]?\d|2[0-3])([0-5]\d)${NUMBER_END}${MERIDIEM}`,
   "g",
 );
 /**
@@ -289,16 +316,18 @@ const CUE = String.raw`(?:at|a las|a la|para las)`;
 /** Words that make an hour approximate (T-1130): after a cue ("at around 3"), or for one before "3.30" ("around 3.30"). */
 const APPROX = String.raw`(?:around|about|approximately|approx\.?|roughly)`;
 /**
- * What may stand between a cue and its hour (T-1130, the round 7 review's N1 and N3): an approximate word, then a quote,
- * a bracket or a "~", which the fold makes a hyphen ("at around 3", 'at "3"', "at (3)", "at [3]", "at ~3").
+ * What may stand between a cue and its hour (T-1130, the round 7 review's N1 and N3): an approximate word, then any
+ * opening marks and spaces, a quote, a bracket, an asterisk, an underscore (read as a space) or a "~", which the fold
+ * makes a hyphen ("at around 3", 'at "3"', "at (3)", "at [3]", "at *3*", "at _3_", "at ~3").
  */
-const CUED = String.raw`\b${CUE} (?:${APPROX} )?(?:[-*"“”„‟«'(\[] ?)?`;
+const CUED = String.raw`\b${CUE} (?:${APPROX} )?(?:[-*"“”„‟«‹'(\[{<]| )*`;
 /**
  * A cued hour, a period and two minute digits (DL-228 item 2b): "at 3.30", "a las 3.30", "at 3.30pm"; an approximate
- * word stands for the cue there ("around 3.30", "about 3.30": T-1130).
+ * word, or a "~" (a hyphen once folded) with no digit before it, stands for the cue there ("around 3.30", "about 3.30",
+ * "~3.30": T-1130); seconds after them are read with them ("at 3.30.15").
  */
 const CUED_DOT_TIME = new RegExp(
-  String.raw`(?:${CUED}|\b${APPROX} )(\d{1,2})\.([0-5]\d)${NUMBER_END}${MERIDIEM}?`,
+  String.raw`(?:${CUED}|\b${APPROX} |(?<!\d ?)- ?)(\d{1,2})\.([0-5]\d)(?:\.[0-5]\d)?${NUMBER_END}${MERIDIEM}?`,
   "g",
 );
 /** A cued hour, a period and one digit: that many tenths of an hour after the hour ("at 3.5" is 3:30; T-1130). */
@@ -406,18 +435,21 @@ function distinct<T>(items: readonly T[]): T[] {
 }
 
 /**
- * Whether only spaces, commas and colons stand between two spans of the folded words, in either order ("Thursday, 3";
- * "Thursday: 3": T-1130, the round 7 review's N3).
+ * Whether only spaces and joining marks stand between two spans of the folded words, in either order: commas ("Thursday,
+ * 3"), and since T-1130 every mark but a sentence mark or an arrow ("Thursday: 3", "Thursday - 3", "Thursday (3)").
  */
 function besideOnly(folded: string, a: Span, b: Span): boolean {
   const between = a.end <= b.at ? folded.slice(a.end, b.at) : folded.slice(b.end, a.at);
-  return /^[ ,:]*$/.test(between);
+  return BESIDE_ONLY.test(between);
 }
 
-/** What may stand between a part-of-day word and the bare hour after it: spaces, commas, colons and "at" (DL-209). */
-const AFTER_PART_OF_DAY = /^(?:[ ,:]|\bat\b)*$/;
+/**
+ * What may stand between a part-of-day word and the bare hour after it (DL-209): spaces, "at" and the marks that join
+ * (T-1130: "tomorrow morning: 9").
+ */
+const AFTER_PART_OF_DAY = new RegExp(String.raw`^(?:${JOINING_MARK}|(?<![a-z0-9])at(?![a-z0-9]))*$`);
 
-/** Whether `found` stands right after a part-of-day word of `hints`, with only spaces, commas, colons or "at" between. */
+/** Whether `found` stands right after a part-of-day word of `hints`, with only spaces, joining marks or "at" between. */
 function afterPartOfDay(folded: string, hints: readonly Span[], found: Span): boolean {
   return hints.some(
     (hint) => hint.end <= found.at && AFTER_PART_OF_DAY.test(folded.slice(hint.end, found.at)),
@@ -426,8 +458,8 @@ function afterPartOfDay(folded: string, hints: readonly Span[], found: Span): bo
 
 /**
  * Every bare number the reader reads as an hour where it stands, whatever other time the words name (T-304 round 5,
- * DL-209): right beside a day, only spaces, commas or colons between, on either side ("Thu 2", "Thursday, 3", "Thursday:
- * 3", "3 tomorrow", "3, tomorrow", "Sat Oct 24, 11"), or right after a part-of-day word, only spaces, commas, colons or
+ * DL-209): right beside a day, only spaces or joining marks between, on either side ("Thu 2", "Thursday, 3", "Thursday:
+ * 3", "3 tomorrow", "3, tomorrow", "Sat Oct 24, 11"), or right after a part-of-day word, only spaces, joining marks or
  * "at" between ("tomorrow morning, 9", "tomorrow night 9"), whose morning or afternoon it takes.
  */
 function bareHoursIn(folded: string, days: readonly Span[], hints: readonly Span[]): Found[] {
@@ -533,12 +565,19 @@ export function readTimeWords(words: string, languages: readonly ValueLanguage[]
   return timeReadingOf(words, languages).read;
 }
 
+/**
+ * Folded words as the time reader reads them: an underscore is a mark, never a letter (T-304 round 7's default), so it is
+ * read as a space, one character for one, and spans still stand where they do in the folded words ("_3pm_ tomorrow" and
+ * "_tomorrow_ at 3pm" read their time, as "*3pm* tomorrow" does: T-1130).
+ */
+const readable = (folded: string): string => folded.replaceAll("_", " ");
+
 /** Reads what the words say about one time, with the spans of their folded form it read. */
 export function timeReadingOf(
   words: string,
   languages: readonly ValueLanguage[] = BOTH_LANGUAGES,
 ): TimeReading {
-  const folded = foldWords(words);
+  const folded = readable(foldWords(words));
   const hints: Span[] = [
     ...findAll(folded, AM_HINTS).map(({ at, end }) => ({ at, end })),
     ...findAll(folded, PM_HINTS).map(({ at, end }) => ({ at, end })),
@@ -614,7 +653,13 @@ function readFolded(
   }
   for (const found of findAll(folded, NOON)) if (takeClock(found)) clocks.push({ kind: "noon" });
   for (const found of findAll(folded, MIDNIGHT)) if (takeClock(found)) clocks.push({ kind: "midnight" });
-  for (const pattern of [COLON_TIME, DOT_MERIDIEM_TIME, CUED_DOT_TIME, CUED_DIGITS_TIME]) {
+  for (const pattern of [
+    COLON_TIME,
+    DOT_MERIDIEM_TIME,
+    CUED_DOT_TIME,
+    CUED_DIGITS_TIME,
+    DIGITS_MERIDIEM_TIME,
+  ]) {
     for (const found of findAll(folded, pattern)) {
       if (!takeClock(found)) continue;
       const meridiem = meridiemOf(found.groups[2], found.groups[3]);
@@ -734,13 +779,15 @@ export function timeSpansIn(folded: string): Span[] {
     DOT_MERIDIEM_TIME,
     CUED_DOT_TIME,
     CUED_DIGITS_TIME,
+    DIGITS_MERIDIEM_TIME,
     CUED_DECIMAL_TIME,
     DECIMAL_MERIDIEM_TIME,
     MERIDIEM_TIME,
     OCLOCK_TIME,
     CUED_TIME,
   ];
-  return patterns.flatMap((pattern) => findAll(folded, pattern).map(({ at, end }) => ({ at, end })));
+  const text = readable(folded);
+  return patterns.flatMap((pattern) => findAll(text, pattern).map(({ at, end }) => ({ at, end })));
 }
 
 /** One way to read the time of day: the hour and minute, and a day later for a midnight read as the day's end. */

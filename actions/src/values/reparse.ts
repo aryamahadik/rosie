@@ -138,9 +138,12 @@ const DOZENS: readonly (readonly [RegExp, number])[] = [
 ];
 /** A dozen after a count: "2 dozen" is 24, "dos docenas" 24. */
 const DOZEN_AFTER = /^ (?:dozens?|docenas?)\b/;
-/** A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"). */
+/**
+ * A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"); "ppl" and
+ * "pax" as people write them in a booking (T-1130).
+ */
 const COUNT_UNIT =
-  /^ (?:people|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?)\b/;
+  /^ (?:people|ppl|pax|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?)\b/;
 
 /** One count and where it stands in the folded words. */
 export interface FoundCount extends Span {
