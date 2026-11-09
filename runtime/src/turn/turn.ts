@@ -39,6 +39,14 @@
 // only the rows with no plan (K-05 unplannedRows), from today's record; the dispatcher sends unsent parts under their
 // stored keys (K-07), never a new key for a part it has.
 //
+// The AI provider down (T-271; C-174; arch 11 line 564; ../outage/ai): when decide or the one re-read answers that the
+// models are down (the AI gateway's `modelsDown`, after its own retry and the other model, T-361) and nothing has
+// committed, the run ends saying who waits (`aiDown`), and the lease's `runTurn` runs the turn through the AI-down path:
+// each waiting text gets the outage line once, never to a stopped number, and the turn runs again every 30 s until it
+// commits. Its one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger
+// texts' first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
+// outage line goes: a model call that fails then takes step 7's path for its row (./compose.ts).
+//
 // Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
 // API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
 
@@ -64,7 +72,14 @@ import {
   type RepliesResult,
   type ReplyCoreResult,
 } from "../guard";
-import { isReadableEvent } from "../safety";
+import {
+  inReturnOrder,
+  MODELS_DOWN,
+  runThroughOutage,
+  type OutageReport,
+  type WaitingTurn,
+} from "../outage/ai";
+import { dangerOutcomes, isReadableEvent } from "../safety";
 import type { SafetyResult } from "../safety/types";
 import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../trace";
 import type { LimitResult, ModelCall, RowRef } from "../trace/types";
@@ -137,6 +152,11 @@ export interface TurnNotCommitted {
   readonly why: string;
   readonly gateCalls: number;
   readonly replies: RepliesResult<OpenedText> | null;
+  /**
+   * Set when the AI gateway reported the models down (decide or the one re-read answered `modelsDown`) and nothing
+   * committed: who waits, for the AI-down path's outage line and retries (T-271, ../outage/ai).
+   */
+  readonly aiDown?: WaitingTurn;
 }
 
 export type TurnOutcome = TurnCommitted | TurnNotCommitted;
@@ -242,6 +262,10 @@ interface Run {
   committed: GateCommitted | null;
   /** The caller that commit went under (a turn of keyword texts alone covers every business): the second half's too. */
   committedCaller: TurnCaller | null;
+  /** True once decide or the re-read answered that the models are down (`modelsDown`, T-271). */
+  modelsDown: boolean;
+  /** True when one of the turn's keyword texts is a stop word: no outage line goes to the handle (T-271). */
+  readonly stopAsked: boolean;
 }
 
 /**
@@ -257,7 +281,45 @@ function notCommitted(
   why: string,
   replies: RepliesResult<OpenedText> | null = null,
 ): TurnNotCommitted {
-  return { result: "notCommitted", why, gateCalls: run?.gateCalls ?? 0, replies };
+  const ended: TurnNotCommitted = { result: "notCommitted", why, gateCalls: run?.gateCalls ?? 0, replies };
+  // The models were down and nothing committed: the AI-down path tells the waiting texts and runs the turn again (T-271).
+  if (run !== null && run.modelsDown && run.committed === null) return { ...ended, aiDown: waitingOf(run) };
+  return ended;
+}
+
+/**
+ * The run's texts as the AI-down path reads them (T-271): the handle, and each text the person wrote (the kinds the safety
+ * read reads), with its own trace id and whether the safety read's timeout rule gave it the outage line already.
+ */
+function waitingOf(run: Run): WaitingTurn {
+  const traces = new Map(run.turn.entries.map((entry) => [entry.event.eventId, entry.traceId]));
+  return {
+    actorName: actorNameOf(run.handle),
+    handleId: run.party.handleId,
+    businessId: run.party.businessId,
+    personId: run.party.personId,
+    texts: run.opened
+      .filter((text) => text.readable)
+      .map((text) => ({
+        eventId: text.eventId,
+        traceId: traces.get(text.eventId) ?? run.turn.traceId,
+        lined: outageLineWent(run.safety.get(text.eventId)),
+      })),
+    stopAsked: run.stopAsked,
+  };
+}
+
+/**
+ * True when a text's safety result is the timeout marker with no danger word (K-02 v1: `timedOut`, no read): the safety
+ * read's timeout rule sent it the outage line (arch 02 line 111: "otherwise the outage line").
+ */
+function outageLineWent(result: SafetyResult | undefined): boolean {
+  return result !== undefined && result.timedOut && result.dangerWords.length === 0;
+}
+
+/** Notes a decide stage's answer that the AI gateway gave up on both models (T-361's typed `modelsDown`). */
+function noteModelsDown(run: Run, answer: DecideAnswer): void {
+  if (!("result" in answer) && answer.error === MODELS_DOWN) run.modelsDown = true;
 }
 
 /**
@@ -341,6 +403,8 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
     keywordCommits: 0,
     committed: null,
     committedCaller: null,
+    modelsDown: false,
+    stopAsked: guarded.keywords.some((found) => found.keyword.kind === "stop"),
   };
 
   const { keywords, onward } = guarded;
@@ -369,9 +433,18 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
   return outcomeOf(run, await commitDecided(run, prepared, []), null);
 }
 
-/** The lease's `runTurn`: one run of a turn (its outcome is the lease's to act on: committed, or a rerun at its lapse). */
+/**
+ * One run of a turn through the AI-down path (T-271, ../outage/ai): the turn loop, and while it ends with the models down
+ * and nothing committed, the outage line once to each waiting text (never to a stopped number) and the turn again every
+ * 30 s, for as long as its lease holds; the lease's lapse reruns it then. With the AI-down path unwired, one run.
+ */
+export function runTurnThroughOutage(turn: LeasedTurn): Promise<OutageReport<TurnOutcome>> {
+  return runThroughOutage(turn, () => runTurnLoop(turn));
+}
+
+/** The lease's `runTurn`: a run of a turn (its outcome is the lease's to act on: committed, or a rerun at its lapse). */
 export async function runTurn(turn: LeasedTurn): Promise<void> {
-  await runTurnLoop(turn);
+  await runTurnThroughOutage(turn);
 }
 
 /**
@@ -476,7 +549,10 @@ async function safetyOf(set: TurnDeps, opened: readonly OpenedText[]): Promise<M
   return found;
 }
 
-/** Each text's recordSafetyOutcome, in arrival order, under `caller` (K-09 README default 5); a text with none is left out. */
+/**
+ * Each text's recordSafetyOutcome under `caller` (K-09 README default 5), the danger texts' first, then the others, each
+ * in arrival order (the return order: "danger words are read first", S12-12; T-271); a text with none is left out.
+ */
 function safetyRecords(run: Run, caller: TurnCaller): RecordSafetyOutcomeAction[] {
   const records: RecordSafetyOutcomeAction[] = [];
   for (const text of run.opened) {
@@ -493,7 +569,23 @@ function safetyRecords(run: Run, caller: TurnCaller): RecordSafetyOutcomeAction[
       },
     });
   }
-  return records;
+  return inReturnOrder(records, (record) => (isDanger(record.request.safety) ? "danger" : "rest"));
+}
+
+/** True when a text's safety result found danger: an outcome other than No (a danger word's Unsure included). */
+function isDanger(result: SafetyResult): boolean {
+  const outcomes: unknown = result.outcomes;
+  return Array.isArray(outcomes) && dangerOutcomes(outcomes as SafetyResult["outcomes"]).length > 0;
+}
+
+/**
+ * The turn's core actions in the return order (arch 11 line 564; T-271): every text's safety record, the danger texts'
+ * first; then the keyword texts' actions, the stop and start records first ("stops next", S12-12), each in its order. The
+ * records always come first (K-09 README default 5), and the commit writes the decided parts after the core (C-087).
+ */
+function coreOf(run: Run, caller: TurnCaller, actions: readonly CoreAction[]): CoreAction[] {
+  const keyword = inReturnOrder(actions, (action) => (action.call === "recordStopOrStart" ? "stop" : "rest"));
+  return [...safetyRecords(run, caller), ...keyword];
 }
 
 // ---- 3. keyword texts ---------------------------------------------------------------------------------------------
@@ -562,8 +654,11 @@ async function commitKeywords(
       ? await commitCoreOnly(run, { ...request.caller }, request.actions)
       : await commitDecided(run, decided, request.actions);
   if (sent.kind === "refused") return { error: sent.error };
-  const records = sent.request.core.length - request.actions.length;
-  const core = sent.answer.core.slice(records).filter(isReplyResult);
+  // K-09 answers each core action's result at its place in the request (the return order: `coreOf`), and the replies
+  // read them in the order of their own actions.
+  const core = request.actions
+    .map((action) => sent.answer.core[sent.request.core.indexOf(action)])
+    .filter(isReplyResult);
   return { result: "committed", turnId: sent.answer.turnId, repeated: sent.answer.repeated, core };
 }
 
@@ -714,6 +809,7 @@ async function decideOnce(run: Run, context: DecideContext): Promise<DecideResul
     finish(span, { outcome: "failed", ...businessOf(run), got, errorCode: "noAnswer" });
     return "noAnswer";
   }
+  noteModelsDown(run, answer);
   const decided = decidedOf(run, span, got, answer, null);
   // A decide stage that ran the re-read itself has used the turn's one re-read.
   if (!isText(decided) && decided.reread) run.rereadRan = true;
@@ -743,6 +839,7 @@ async function rereadOnce(
     finish(span, { outcome: "failed", ...businessOf(run), got, errorCode: "noAnswer" });
     return "noAnswer";
   }
+  noteModelsDown(run, answer);
   return decidedOf(run, span, got, answer, true);
 }
 
@@ -822,13 +919,13 @@ type Sent =
       readonly request: GateAndCommitRequest;
     };
 
-/** A core-only commit: each text's safety record under `caller`, then the keyword texts' core actions. */
+/** A core-only commit: each text's safety record under `caller`, then the keyword texts' core actions (`coreOf`). */
 function commitCoreOnly(run: Run, caller: TurnCaller, actions: readonly CoreAction[]): Promise<Sent> {
   return sendWithResend(run, {
     caller,
     turn: run.ref,
     input: { kind: "coreOnly" },
-    core: [...safetyRecords(run, caller), ...actions],
+    core: coreOf(run, caller, actions),
     now: run.set.now(),
   });
 }
@@ -844,7 +941,7 @@ async function commitDecided(run: Run, input: DecidedInput, actions: readonly Co
       caller: { ...run.caller },
       turn: run.ref,
       input: current,
-      core: [...safetyRecords(run, run.caller), ...actions],
+      core: coreOf(run, run.caller, actions),
       now: run.set.now(),
     });
     if (sent.kind === "committed" || sent.error !== "valueFailsWords") return sent;
