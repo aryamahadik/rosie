@@ -6,11 +6,11 @@
 -- 0002, T-181) on the two versioned ones; grants to the two roles 0012 made (never created or altered here); row-level
 -- security switched on with 0012's two policies on the two business-scoped tables; and the closed registries' seed.
 -- Nothing is dropped, renamed or retyped, and no row is removed; no K-04 or K-23 table is altered. Not here: applying
--- the rules in the gate (the action layer's C-081) and limit 2's one rule evaluator (C-082, T-300); the checks README
--- "Which part owns what" leaves to code (a rule's kind_id is one of the business's kinds; set_by_person_id may change
--- settings, K-22; K-23's pf_facts, pf_switches_a and pf_switches_b name only registry entries, since an array carries
--- no foreign key; the most specific scope wins); the migration-side contract test (QA's
--- tests/contract/db-schema.rules.v1.test.ts, T-103).
+-- the rules in the gate (the action layer's C-081) and limit 2's one rule evaluator (C-082, T-300); the checks the
+-- README leaves to code ("Which part owns what": a rule's kind_id is one of the business's kinds; whether
+-- set_by_person_id may change settings is K-22's; K-23's pf_facts, pf_switches_a and pf_switches_b name only registry
+-- entries, since an array carries no foreign key. "Effective dates and scope": the most specific scope wins); the
+-- migration-side contract test (QA's tests/contract/db-schema.rules.v1.test.ts, T-103).
 --
 -- The five tables live beside K-04's and K-23's tables (rule 1), and their foreign keys name K-04's tables by their keys
 -- (businesses.id, persons.id), with no schema prefix, all on delete restrict. No foreign key names a K-23 or K-24 table:
@@ -56,8 +56,8 @@
 --     application role writes them).
 --     rosie_job, the runtime side: limit 2's one rule evaluator reads each rule's kind and type (C-082, T-300; arch 06
 --       line 301); the context bundle (C-114: the notes and rules the planner answers from); K-09 saveSetupStep in a
---       turn (S1-21's tap list: a kind is offered once the business's kinds list its needs_fact; S1-04 and S11-58
---       check K-23's fact and switch names at each write) and readTurnState (item 26).
+--       turn (S1-21's tap list offers a kind once the business's kinds list its needs_fact; the company kinds S1-04
+--       writes have their fact and switch names checked against them, K-23 README) and readTurnState (item 26).
 --     rosie_app, the Tool API, under one business's scope: S1-21's call that writes booking_rules and price_oks and
 --       S1-79's summary that reads them (C-074); registration screen 14's tap list (C-187) and the owner console's
 --       Settings (C-192, S11-57), through K-21; search's owner-rule filter (C-097; arch 05 line 237); K-09
