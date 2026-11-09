@@ -21,8 +21,9 @@
 // "Thursday, 3", "3 tomorrow") or right after a part-of-day word ("tomorrow morning, 9" is 9am, "tomorrow night, 9"
 // 9pm: T-304 round 5, DL-209), and the reading takes one only when the words name no other time of day; bareHours gives
 // every such number whatever else the words hold, so the whole value phrase takes the hour beside its day even when
-// another time stands elsewhere in the text ("my 2pm doesn't work. can we do Thursday, 3?"). Nothing here keeps or logs
-// words.
+// another time stands elsewhere in the text ("my 2pm doesn't work. can we do Thursday, 3?"). A sentence mark with no
+// digit right after it ends an hour, as a comma does (T-304 round 6, DL-217): "tomorrow at 3." and "Thursday, 3." read
+// their hour, while "3.30" and "3.5" keep their readings (no hour 3). Nothing here keeps or logs words.
 
 import { numberPhrasesIn, numberWordsOf } from "./numbers";
 import {
@@ -194,18 +195,32 @@ const DAY_FIRST = new RegExp(
   String.raw`\b(\d{1,2})${ORDINAL}? (?:of |de )?(${MONTH_NAMES})\b(?:,? (?:de )?(\d{4})(?!\d))?`,
   "g",
 );
-const NUMERIC_DATE = /(?<![\d/.])(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?(?![\d/])/g;
-const DAY_OF_MONTH = new RegExp(String.raw`(?<![\d/.])(\d{1,2})${ORDINAL}\b`, "g");
+// A period (and, for a bare number, a comma) is part of a number only between two digits: "3.30", "3.5", "1,200",
+// "1.30pm" (T-304 round 6, DL-217 item 1). Anywhere else it is a mark. A sentence mark with no digit right after it ends
+// a cued or bare hour, as a comma does (round 5's default b): "tomorrow at 3.", "tomorrow at 3…" (NFKC folds "…" to
+// "..."), "Thursday, 3." and "tomorrow morning, 9." read their hour, as "at 3;", "at 3!" and "at 3?" already did. The
+// same mark right before a time, with no digit before it, does not hide the time either ("hmm...3pm tomorrow", "out.3pm",
+// "2pm,3 tomorrow": a default, for ops/QUESTIONS.md). So a period stops the patterns below only as part of a number:
+// before a number only right after a digit ("<digit>.", for a bare number also "<digit>,"), and after a cued or bare
+// hour only right before a digit (".<digit>", for a bare hour also ",<digit>").
+const NUMERIC_DATE = /(?<![\d/]|\d\.)(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?(?![\d/])/g;
+const DAY_OF_MONTH = new RegExp(String.raw`(?<![\d/]|\d\.)(\d{1,2})${ORDINAL}\b`, "g");
 
 const NOON = /\b(?:noon|midday|mediodia)\b/g;
 const MIDNIGHT = /\b(?:midnight|medianoche)\b/g;
-const COLON_TIME = /(?<![\d:/.$])(\d{1,2}):(\d{2})(?!\d)(?: ?(am|pm)\b|([ap])\b)?/g;
-const MERIDIEM_TIME = /(?<![\d:/.$])(\d{1,2})(?: ?(am|pm)\b|([ap])\b)/g;
-const OCLOCK_TIME = /(?<![\d:/.$])(\d{1,2}) ?oclock\b/g;
+// An am or pm right after an hour, with a space or a period between, is that hour's ("3pm", "3 pm", "3.pm", "3:30.pm"),
+// so a period read as a sentence mark never drops the am or pm a person put after it (a default, for ops/QUESTIONS.md).
+const COLON_TIME = /(?<![\d:/$]|\d\.)(\d{1,2}):(\d{2})(?!\d)(?:(?: ?|\.)(am|pm)\b|([ap])\b)?/g;
+const MERIDIEM_TIME = /(?<![\d:/$]|\d\.)(\d{1,2})(?:(?: ?|\.)(am|pm)\b|([ap])\b)/g;
+const OCLOCK_TIME = /(?<![\d:/$]|\d\.)(\d{1,2}) ?oclock\b/g;
 const CUE = String.raw`(?:at|a las|a la|para las)`;
-const CUED_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})(?![\d:/.%])`, "g");
-/** A bare number of one or two digits; a comma may end it unless a digit follows ("3, tomorrow"; never "1,200"). */
-const BARE_NUMBER = /(?<![\w.,:/$])(\d{1,2})(?![\w.:/%$]|,\d)/g;
+/** A cued hour ("at 3", "a las 3"); a sentence mark may end it unless a digit follows ("at 3."; never "at 3.30"). */
+const CUED_TIME = new RegExp(String.raw`\b${CUE} (\d{1,2})(?![\d:/%]|\.\d)`, "g");
+/**
+ * A bare number of one or two digits; a comma or a sentence mark may end it unless a digit follows ("3, tomorrow",
+ * "Thursday, 3."; never "1,200" or "3.30"), and may stand right before it unless a digit precedes ("2pm,3 tomorrow").
+ */
+const BARE_NUMBER = /(?<![\w:/$]|\d[.,])(\d{1,2})(?![\w:/%$]|[.,]\d)/g;
 
 /** A number joined to a time of day by "or", "to", a dash or "and" ("3 or 4pm", "2-5pm"): the words name two. */
 const JOINED_BEFORE = /(?<![\w.,:/$])\d{1,2}(?::\d{2})? ?(?:or|o|to|-|and|y|a) ?$/;
@@ -335,7 +350,7 @@ function hourPhrasesIn(
   hourNames: string,
 ): HourPhrase[] {
   const hour = hourNames === "" ? String.raw`(\d{1,2})` : String.raw`(\d{1,2}|${hourNames})`;
-  const meridiem = String.raw`(?: ?(am|pm)\b)?`;
+  const meridiem = String.raw`(?:(?: ?|\.)(am|pm)\b)?`;
   // The hour ends there: am or pm may follow it, never another digit, letter or a colon's minutes.
   const after = String.raw`(?= ?(?:am|pm)\b|[^\w:]|$)`;
   const patterns: readonly [RegExp, number, boolean][] = [
@@ -346,9 +361,9 @@ function hourPhrasesIn(
       true,
     ],
     [new RegExp(String.raw`\bhalf past ${hour}${after}${meridiem}`, "g"), 30, false],
-    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} y media\b`, "g"), 30, false],
-    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} y cuarto\b`, "g"), 15, false],
-    [new RegExp(String.raw`(?<![\w:/.$])${hour}${after}${meridiem} menos cuarto\b`, "g"), 45, true],
+    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} y media\b`, "g"), 30, false],
+    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} y cuarto\b`, "g"), 15, false],
+    [new RegExp(String.raw`(?<![\w:/$]|\d\.)${hour}${after}${meridiem} menos cuarto\b`, "g"), 45, true],
   ];
   const phrases: HourPhrase[] = [];
   for (const [pattern, minute, before] of patterns) {
@@ -507,11 +522,17 @@ function readFolded(
       clocks.push({ kind: "clock", hour: Number(found.groups[0]), minute: 0, meridiem: null });
   }
   if (hourNames !== "") {
-    const worded = new RegExp(String.raw`\b(?:${CUE} (${hourNames})\b|(${hourNames}) ?(am|pm)\b)`, "g");
+    // An hour in words after a cue, with its am or pm when one follows ("at three pm" is 3pm, never either), or before
+    // its am or pm ("three pm").
+    const worded = new RegExp(
+      String.raw`\b(?:${CUE} (${hourNames})(?:(?: ?|\.)(am|pm))?\b|(${hourNames})(?: ?|\.)(am|pm)\b)`,
+      "g",
+    );
     for (const found of findAll(folded, worded)) {
-      const hour = hourWords.get(found.groups[0] ?? found.groups[1] ?? "");
+      const hour = hourWords.get(found.groups[0] ?? found.groups[2] ?? "");
       if (hour === undefined || !takeClock(found)) continue;
-      const meridiem = found.groups[2] === "am" ? "am" : found.groups[2] === "pm" ? "pm" : null;
+      const said = found.groups[1] ?? found.groups[3];
+      const meridiem = said === "am" ? "am" : said === "pm" ? "pm" : null;
       clocks.push({ kind: "clock", hour, minute: 0, meridiem });
     }
   }
