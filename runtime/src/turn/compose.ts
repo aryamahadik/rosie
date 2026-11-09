@@ -17,7 +17,9 @@
 //          rewrite, told only each failed check and its detail, then finalizeMessage with attempt rewrite, which runs the
 //          step's fallback and then the passed-on line itself (K-09 README default 11) and answers send, sendAndLog or
 //          passedOn (the passed-on line written, the question withdrawn so no clock arms, the team paged). Never a second
-//          rewrite.
+//          rewrite. A rewrite the models cannot make (the AI gateway's `modelsDown`: T-271, arch 06 line 293) sends the
+//          composed plan as the rewrite attempt, unchanged, so its miss stands and the step's fallback runs; never the
+//          outage line, which is only for a text whose turn has not committed.
 //        - emailCopy: no composer call and no finalize call. Once its text row's final parts are written in this run, the
 //          copy takes that row's plan (copyOf the text row, its own row, channel email: plan-email-copy.json) and its final
 //          parts (its own row and channel) through K-05 v1 `writePlan`. The email's own parts (the automated-assistant
@@ -35,6 +37,7 @@
 // Not here: the step's fallback text and the passed-on line (the action layer's C-093, inside finalizeMessage), the
 // composer itself (T-373 to T-375), paging the team (T-319), the crash path (T-253).
 
+import { MODELS_DOWN } from "../outage/ai";
 import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../trace";
 import type { ModelCall, RowRef } from "../trace/types";
 import type {
@@ -518,12 +521,17 @@ async function composeAndFinalize(
     turn.set.composer.rewrite({ input, plan: composed, failed }, turn.trace),
   );
   const facts: RowFacts = { composerCalls: 2, rewrite: true };
-  if (rewritten.plan === null) {
+  // The models are down after the commit (T-271; arch 06 line 293: "after it, step 7's fallback for that row"): no
+  // rewrite can be made, so the composed plan goes as the rewrite attempt, unchanged. Its blocking miss stands, and
+  // finalize fills the step's fallback text, or the passed-on line, in the same call (K-09 README default 11). Never the
+  // outage line: that is for a text whose turn has not committed.
+  const modelsDown = rewritten.plan === null && rewritten.code === MODELS_DOWN;
+  if (rewritten.plan === null && !modelsDown) {
     const refused: Refused = { refused: rewritten.code ?? "badAnswer", answer: null };
     recordRewrite(turn, rewriteSpan, row, failed, rewritten, refused, 0);
     return ended(row, "left", refused.refused, { ...facts, finalizeCalls });
   }
-  const rewrittenPlan: RowPlan = { ...plan, plan: rewritten.plan };
+  const rewrittenPlan: RowPlan = rewritten.plan === null ? plan : { ...plan, plan: rewritten.plan };
   const second = await finalize(turn, row, "rewrite", rewrittenPlan);
   finalizeCalls += second.calls;
   // Never a second rewrite: a rewrite answered "rewrite" again is not K-09's (the fallback is code's, in the same call).

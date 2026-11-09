@@ -1,0 +1,269 @@
+// The AI provider down (T-271; C-174; S12-12; arch 11 'AI provider down or slow', architecture.txt line 564: "One retry,
+// then the other model once ... Still failing: each text whose turn has not committed gets 'Rosie is down for a few
+// minutes. If anyone is in danger, call 911.' once, never to a stopped number. The turn retries every 30 s. On return:
+// danger first, then stops, then the rest in order"; arch 06 'A model call fails', line 293: "before the commit, section
+// 11's outage rows; after it, step 7's fallback for that row").
+//
+// The one retry and the other model are the AI gateway's (T-361): what reaches the turn is its typed `modelsDown`, through
+// decide or the one re-read (`MODELS_DOWN`). This file is what the handle actor does with it, inside the turn's lease:
+//
+//   1. A run of the turn ends with nothing committed and the models down (the turn says who waits: `WaitingTurn`).
+//   2. Each of its texts gets the outage line once (K-01 fixed line `outage`, K-09 v1 sendFixedLine, send class
+//      quick_reply), never to a stopped number: not when one of the turn's own texts is a stop word, not when the
+//      handle's stopped flag says stopped, not after the core answers `phoneStopped`; and limit 8 drops the row at send for
+//      a stopped phone (T-259). The request is the one the safety read's timeout rule sends for the same text (kind job,
+//      request id `safety:<event id>`: runtime/src/safety), and K-09 sends a fixed line once per request id, so a text gets
+//      the line once whichever path asks first, a rerun of the turn included (it asks again and is answered `repeated`). A
+//      text the safety read already gave the line is not asked for at all. A line the core does not answer for now is
+//      asked for again on the next retry.
+//   3. The turn runs again 30 s after the last try began, and every 30 s while the models are down, until it commits (a
+//      try the gateway's own timeouts made slow does not push the next one back). The retry its lease would not outlast
+//      is not run: the lease's lapse reruns the turn then (T-248; its 60 s lease is two tries), 30 s after the last try
+//      began, and the rerun goes on the same way. A run no longer the turn's stops at once.
+//   4. On return the turn commits once, its core actions in the return order (`inReturnOrder`, in the turn's commit):
+//      every text's safety record first, the danger texts' leading ("danger words are read first": S12-12), then the
+//      stop and start records ("and stops next"), then the rest of the keyword texts' actions; the decided parts follow
+//      the core actions in the commit (C-087: "the turn's core actions, then the parts"), so the routine texts come last.
+//
+// After the commit nothing here runs: a model call that fails then takes step 7's path for its row (the turn's compose,
+// ../../turn/compose.ts), never the outage line. Unwired (no `setOutageDeps`), a run whose models are down ends as it did
+// before: nothing is sent, and the lease's lapse reruns the turn. Never logged or put in a span: a text's words, a number.
+//
+// Not here: the AI gateway's retry and other model (T-361); the database-down path (T-270); the outage state pages and AIs
+// read (T-608); pausing customer deadlines (T-272).
+
+import { RETURN_RANKS, type ReturnRank } from "../../actor/copies/return-queue";
+import type { SendFixedLineRequest, SendFixedLineResponse } from "../../safety/types";
+import type {
+  OutageClock,
+  OutageDeps,
+  OutageEnd,
+  OutageLineSent,
+  OutageReport,
+  WaitingText,
+  WaitingTurn,
+} from "./types";
+
+/** How often the turn runs again while the models are down (arch 11 line 564: "The turn retries every 30 s"). */
+export const RETRY_MS = 30_000;
+
+/** The K-01 v1 fixed line the outage path sends (contracts/bundle fixed-lines.json `outage`). */
+export const OUTAGE_LINE_ID = "outage";
+
+/**
+ * The code a decide stage answers when the AI gateway gave up on both models (T-361's typed `modelsDown`, after its one
+ * retry and the other model once): the turn's `DecideFailed.error`, and the composer's after the commit.
+ */
+export const MODELS_DOWN = "modelsDown";
+
+let deps: OutageDeps | null = null;
+
+/** Sets what the AI-down path reaches for this Worker isolate; returns the function that puts the earlier one back. */
+export function setOutageDeps(next: OutageDeps | null): () => void {
+  const before = deps;
+  deps = next;
+  return () => {
+    deps = before;
+  };
+}
+
+/** How one run of a turn ended, as far as the AI-down path reads it. */
+export type RunEnd =
+  { readonly result: "committed" } | { readonly result: "notCommitted"; readonly aiDown?: WaitingTurn };
+
+/** What the lease handed the run, as far as the AI-down path reads it (`LeasedTurn`). */
+export interface LeaseView {
+  /** Aborted once the run is no longer the turn's. */
+  readonly signal: AbortSignal;
+  /** When the lease lapses, on the actor's clock (the outage clock in a joined isolate: both are the Workers clock). */
+  readonly leaseUntil: number;
+}
+
+// ---- the outage line ----------------------------------------------------------------------------------------------
+
+/**
+ * K-09 v1 sendFixedLine's request for one waiting text: the outage line to the turn's handle, send class quick_reply (a
+ * reply to the person's own text, which limit 8 drops for a stopped phone: QUESTIONS.md, T-246's default), sent by the
+ * actor alone (kind job, no turn), under the request id the safety read's timeout rule sends the same line under, so the
+ * line goes once per text whichever path asks.
+ */
+export function outageLineRequest(waiting: WaitingTurn, text: WaitingText): SendFixedLineRequest {
+  return {
+    caller: {
+      kind: "job",
+      turnId: null,
+      requestId: `safety:${text.eventId}`,
+      businessId: waiting.businessId,
+      personId: waiting.personId,
+      traceId: text.traceId,
+    },
+    fixedLineId: OUTAGE_LINE_ID,
+    recipientHandleId: waiting.handleId,
+    sendClass: "quick_reply",
+    sentByActor: null,
+  };
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** The core's answer as K-09's written response, or null when it is not one. */
+function writtenOf(answer: unknown): SendFixedLineResponse | null {
+  if (!isRecord(answer) || "error" in answer || typeof answer.repeated !== "boolean") return null;
+  const row = answer.outboxRowId;
+  return row === null || (typeof row === "string" && row !== "")
+    ? { outboxRowId: row, repeated: answer.repeated }
+    : null;
+}
+
+/** A K-09 error's code (`phoneStopped`, `notFound`, `transient`), or null when the answer is not an error. */
+const errorOf = (answer: unknown): string | null =>
+  isRecord(answer) && typeof answer.error === "string" ? answer.error : null;
+
+/**
+ * True when the handle's stopped flag says stopped; null when it cannot be read now (nothing is sent then, and the next
+ * retry asks again). False when no read is wired: the core and limit 8 check it.
+ */
+async function stoppedNow(set: OutageDeps, actorName: string): Promise<boolean | null> {
+  if (set.isStopped === undefined) return false;
+  try {
+    return await set.isStopped(actorName);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Sends the outage line to each waiting text that has not had it (`done` holds the texts this run is finished with: the
+ * line went, or it never will). Never throws.
+ */
+async function sendLines(
+  set: OutageDeps,
+  waiting: WaitingTurn,
+  done: Set<string>,
+  lines: OutageLineSent[],
+): Promise<void> {
+  const pending = waiting.texts.filter((text) => !text.lined && !done.has(text.eventId));
+  if (pending.length === 0) return;
+  // Never to a stopped number: a stop word among the turn's own texts, or the stopped flag.
+  const stopped = waiting.stopAsked ? true : await stoppedNow(set, waiting.actorName);
+  if (stopped === null) return;
+  if (stopped) {
+    for (const text of pending) done.add(text.eventId);
+    return;
+  }
+  const rows: string[] = [];
+  for (const text of pending) {
+    let answer: unknown;
+    try {
+      answer = await set.lines.sendFixedLine(outageLineRequest(waiting, text));
+    } catch {
+      // The core is not answering: the line is asked for again on the next retry.
+      continue;
+    }
+    const written = writtenOf(answer);
+    if (written !== null) {
+      done.add(text.eventId);
+      lines.push({ eventId: text.eventId, outboxRowId: written.outboxRowId, repeated: written.repeated });
+      if (written.outboxRowId !== null && !written.repeated) rows.push(written.outboxRowId);
+      continue;
+    }
+    const code = errorOf(answer);
+    if (code === "phoneStopped") {
+      // The number is stopped: none of the turn's texts gets the line.
+      for (const other of pending) done.add(other.eventId);
+      break;
+    }
+    // No such handle: nothing to send to. Anything else (transient, a bad answer): asked for again on the next retry.
+    if (code === "notFound") done.add(text.eventId);
+  }
+  if (rows.length > 0 && set.wake !== undefined) {
+    try {
+      await set.wake({ handleId: waiting.handleId, outboxRowIds: rows });
+    } catch {
+      // Not woken: the dispatcher's minute sweep sends the rows.
+    }
+  }
+}
+
+// ---- the retries ----------------------------------------------------------------------------------------------------
+
+/**
+ * True once the run is no longer the turn's: a restart replaced the turn, or its lapse started a rerun (the lease aborts
+ * the run's signal). Read through a call, so it is read afresh after every wait.
+ */
+function replaced(lease: LeaseView): boolean {
+  return lease.signal.aborted;
+}
+
+/** Resolves after `ms` on the clock, or at once when the run stops being the turn's. */
+function waitOrStop(clock: OutageClock, ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    const stop = (): void => {
+      resolve();
+    };
+    signal.addEventListener("abort", stop, { once: true });
+    clock.after(ms).then(
+      () => {
+        signal.removeEventListener("abort", stop);
+        resolve();
+      },
+      () => {
+        signal.removeEventListener("abort", stop);
+        resolve();
+      },
+    );
+  });
+}
+
+/**
+ * Runs a turn through the AI-down path inside its lease: `once` is one run of the turn (the turn loop's steps 1 to 7).
+ * While a run ends with the models down and nothing committed, each waiting text gets the outage line once (never to a
+ * stopped number) and the turn runs again 30 s after that try began, until it commits, ends for another reason, stops
+ * being the turn's, or the next retry would not come before its lease lapses. Never throws for an outside failure.
+ */
+export async function runThroughOutage<T extends RunEnd>(
+  lease: LeaseView,
+  once: () => Promise<T>,
+): Promise<OutageReport<T>> {
+  const lines: OutageLineSent[] = [];
+  const triedAt: number[] = [];
+  const done = new Set<string>();
+  const report = (outcome: T, end: OutageEnd): OutageReport<T> => ({
+    outcome,
+    tries: Math.max(1, triedAt.length),
+    triedAt,
+    lines,
+    end,
+  });
+  for (;;) {
+    const began = deps?.clock.now() ?? null;
+    if (began !== null) triedAt.push(began);
+    const outcome = await once();
+    if (outcome.result === "committed") return report(outcome, "committed");
+    const waiting = outcome.aiDown;
+    if (waiting === undefined) return report(outcome, "notDown");
+    const set = deps;
+    if (set === null) return report(outcome, "unwired");
+    if (replaced(lease)) return report(outcome, "replaced");
+    await sendLines(set, waiting, done, lines);
+    if (replaced(lease)) return report(outcome, "replaced");
+    // The next try comes 30 s after this one began; the one the lease would not outlast is the lease's own rerun, at its
+    // lapse, which comes then (a run starts with a 60 s lease: two tries).
+    const next = (began ?? set.clock.now()) + RETRY_MS;
+    if (next >= lease.leaseUntil) return report(outcome, "leaseEnds");
+    await waitOrStop(set.clock, Math.max(0, next - set.clock.now()), lease.signal);
+    if (replaced(lease)) return report(outcome, "replaced");
+  }
+}
+
+// ---- the return order ---------------------------------------------------------------------------------------------
+
+/**
+ * The given items in the return order (arch 11 lines 564 and 566: "danger first, then stops, then the rest in order"; the
+ * actor's write-on-return queue's ranks, RETURN_RANKS): each rank in turn, each item keeping its place within its rank.
+ */
+export function inReturnOrder<T>(items: readonly T[], rankOf: (item: T) => ReturnRank): T[] {
+  return RETURN_RANKS.flatMap((rank) => items.filter((item) => rankOf(item) === rank));
+}

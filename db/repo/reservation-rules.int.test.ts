@@ -1631,3 +1631,656 @@ describe("a lost connection: extend answers transient, writes nothing, and the s
     },
   );
 });
+
+// ---- one row per holder per slot (T-1134) --------------------------------------------------------------------------
+
+describe("T-1134: one row per holder per slot: a save never waits behind its own holder's saved time, and a let-go never promotes the released holder's own waiting row (T-744 round 1's security GAP 1; DL-292; MC C3)", () => {
+  const TOKEN_A = "agent-token-t1134-a";
+  const TOKEN_B = "agent-token-t1134-b";
+  const TOKEN_C = "agent-token-t1134-c";
+  /** The movers' 20-ft truck for Nov 27, a vehicle: its slot's one lock is the resource's. */
+  const TRUCK = "res-truck-20";
+  const TRUCK_DAY = { start: "2026-11-27T13:00:00Z", end: "2026-11-27T21:00:00Z" };
+  const TRUCK_SLOT_KEY = `resource:${TRUCK}`;
+  /** Riley at Lee's Barbershop, Dec 3 and Dec 4 at 10:00. */
+  const RILEY_DEC3 = { start: "2026-12-03T10:00:00Z", end: "2026-12-03T10:30:00Z" };
+  const RILEY_DEC4 = { start: "2026-12-04T10:00:00Z", end: "2026-12-04T10:30:00Z" };
+
+  /** A save of the truck's day for `agentToken` through C3's door (ownAi: 15 minutes, never extended), with nextInLine. */
+  function c3Save(reservationId: string, agentToken: string, at: string): ReserveRequest {
+    return reserveRequest({
+      reservationId,
+      businessId: MOVERS,
+      resourceId: TRUCK,
+      during: TRUCK_DAY,
+      for: { agentToken },
+      door: "ownAi",
+      waitIfSaved: true,
+      at,
+    });
+  }
+
+  /** rsv-1 as TOKEN_A's first save got it at 09:50: held through C3's door until 10:05. */
+  const RSV_1_HELD = {
+    result: "held",
+    reservationId: "rsv-1",
+    version: 1,
+    resourceId: TRUCK,
+    during: TRUCK_DAY,
+    heldUntil: "2026-11-09T10:05:00Z",
+    savedTimeClockId: "rsv-1/saved-time",
+  };
+
+  /** The clock's let-go of rsv-1 at 10:05: release, expired, with no version (K-05 README item 9). */
+  const lapseOfRsv1 = (): Promise<ReleaseOutcome> =>
+    release(toolApi, {
+      reservationId: "rsv-1",
+      businessId: MOVERS,
+      expectVersion: null,
+      why: "expired",
+      at: "2026-11-09T10:05:00Z",
+    });
+
+  /** A promotion's answer: held for the standard 10 minutes from `at` (K-05 README item 9), for an agent token. */
+  function promotedFor(reservationId: string, agentToken: string, at: string): Record<string, unknown> {
+    return {
+      reservationId,
+      version: 2,
+      heldUntil: plus(at, STANDARD_HOLD_MINUTES),
+      forPhoneNumber: null,
+      forAgentToken: agentToken,
+      bookingId: null,
+      savedTimeClockId: `${reservationId}/saved-time`,
+    };
+  }
+
+  interface SlotRow {
+    id: string;
+    state: string;
+    holder: string | null;
+    version: number;
+  }
+
+  /** Every row of `resourceId` whose time overlaps `during`, in line order, with who it is saved for (the tables' owner reads). */
+  async function rowsOnSlot(resourceId: string, during: { start: string; end: string }): Promise<SlotRow[]> {
+    const rows = await db.sql<SlotRow[]>`
+      select id, state, coalesce(for_agent_token, for_phone_number, booking_id) as holder, version
+      from reservations
+      where resource_id = ${resourceId}
+        and during && tstzrange(${during.start}::timestamptz, ${during.end}::timestamptz, '[)')
+      order by queued_at, id collate "C"
+    `;
+    return rows.map((row) => ({ ...row }));
+  }
+
+  /**
+   * A waiting row written straight into the table, as T-187's reserve wrote one before T-1134 (round 1's GAP 1: a holder
+   * queued behind its own saved time). Rule (1) never writes one now, but rule (2) must still let it go.
+   */
+  async function queuedAsBefore(row: {
+    id: string;
+    businessId: string;
+    resourceId: string;
+    kind: "worker" | "vehicle";
+    personId: string | null;
+    during: { start: string; end: string };
+    queuedAt: string;
+    for: { agentToken: string } | { phoneNumber: string };
+  }): Promise<void> {
+    await db.sql`insert into reservations ${db.sql({
+      id: row.id,
+      business_id: row.businessId,
+      resource_id: row.resourceId,
+      resource_kind: row.kind,
+      worker_person_id: row.personId,
+      during: `[${row.during.start},${row.during.end})`,
+      state: "waiting",
+      queued_at: row.queuedAt,
+      for_agent_token: "agentToken" in row.for ? row.for.agentToken : null,
+      for_phone_number: "phoneNumber" in row.for ? row.for.phoneNumber : null,
+    })}`;
+  }
+
+  /** A waiting row TOKEN_A had behind its own rsv-1 on the truck's day, queued at `queuedAt`. */
+  const tokenAQueuedOnTruck = (id: string, queuedAt: string): Promise<void> =>
+    queuedAsBefore({
+      id,
+      businessId: MOVERS,
+      resourceId: TRUCK,
+      kind: "vehicle",
+      personId: null,
+      during: TRUCK_DAY,
+      queuedAt,
+      for: { agentToken: TOKEN_A },
+    });
+
+  /**
+   * Starts `attempts` on the Tool API's client while the tables' owner holds the slot's advisory lock (`slotKey`, the
+   * key lockSlot takes), waits until `waiters` of that client's connections wait on a lock at once (each inside reserve,
+   * at the slot's lock, before it reads the slot), then lets the lock go and returns every answer.
+   */
+  async function raceAtTheSlotLock(
+    slotKey: string,
+    waiters: number,
+    attempts: (sql: Sql) => Promise<ReserveOutcome>[],
+  ): Promise<ReserveOutcome[]> {
+    const letGo = await holdLock((tx) => tx`select pg_advisory_xact_lock(hashtextextended(${slotKey}, 0))`);
+    try {
+      const racing = Promise.all(attempts(toolApi));
+      expect(await lockWaiters(toolApiName, waiters)).toBe(true);
+      await letGo();
+      return await racing;
+    } finally {
+      await letGo();
+    }
+  }
+
+  it("(a) the reviewer's scenario: TOKEN_A saves rsv-1 on C3's door at 09:50, held to 10:05, then asks for the same slot with waitIfSaved at 09:51 to 09:54: nothing is written and each answer is rsv-1 as held; at 10:05 the let-go promotes nobody, and the slot opens again", async () => {
+    await freshSeed();
+    expect(await reserve(toolApi, c3Save("rsv-1", TOKEN_A, "2026-11-09T09:50:00Z"))).toEqual({
+      ...RSV_1_HELD,
+      repeated: false,
+    });
+    for (const [i, minute] of ["51", "52", "53", "54"].entries()) {
+      const id = `rsv-${String(i + 2)}`;
+      const again = await reserve(toolApi, c3Save(id, TOKEN_A, `2026-11-09T09:${minute}:00Z`));
+      expect(again, id).toEqual({ ...RSV_1_HELD, repeated: true });
+      expectContractAnswer("reserve", again);
+      expect(await getReservation(db.sql, id), id).toBeNull();
+    }
+    expect(await rowsOnSlot(TRUCK, TRUCK_DAY)).toEqual([
+      { id: "rsv-1", state: "held", holder: TOKEN_A, version: 1 },
+    ]);
+    const lapse = await lapseOfRsv1();
+    expect(lapse).toEqual({
+      result: "released",
+      reservationId: "rsv-1",
+      version: 2,
+      releasedAt: "2026-11-09T10:05:00Z",
+      why: "expired",
+      promoted: null,
+      skipped: [],
+      repeated: false,
+    });
+    expectContractAnswer("release", lapse);
+    // The time is let go and the slot opens again (MC C3): the first to ask saves it.
+    expect(await reserve(toolApi, c3Save("rsv-b", TOKEN_B, "2026-11-09T10:06:00Z"))).toMatchObject({
+      result: "held",
+      reservationId: "rsv-b",
+      heldUntil: "2026-11-09T10:21:00Z",
+      repeated: false,
+    });
+  });
+
+  it("(a) with TOKEN_B in line from 09:52, TOKEN_A's asks at 09:51 and 09:53 still write nothing; at 10:05 the let-go promotes TOKEN_B, the first other holder", async () => {
+    await freshSeed();
+    expect(await reserve(toolApi, c3Save("rsv-1", TOKEN_A, "2026-11-09T09:50:00Z"))).toEqual({
+      ...RSV_1_HELD,
+      repeated: false,
+    });
+    expect(await reserve(toolApi, c3Save("rsv-2", TOKEN_A, "2026-11-09T09:51:00Z"))).toEqual({
+      ...RSV_1_HELD,
+      repeated: true,
+    });
+    expect(await reserve(toolApi, c3Save("rsv-b", TOKEN_B, "2026-11-09T09:52:00Z"))).toEqual({
+      result: "waiting",
+      reservationId: "rsv-b",
+      version: 1,
+      resourceId: TRUCK,
+      during: TRUCK_DAY,
+      queuedAt: "2026-11-09T09:52:00Z",
+      repeated: false,
+    });
+    expect(await reserve(toolApi, c3Save("rsv-3", TOKEN_A, "2026-11-09T09:53:00Z"))).toEqual({
+      ...RSV_1_HELD,
+      repeated: true,
+    });
+    expect(await rowsOnSlot(TRUCK, TRUCK_DAY)).toEqual([
+      { id: "rsv-1", state: "held", holder: TOKEN_A, version: 1 },
+      { id: "rsv-b", state: "waiting", holder: TOKEN_B, version: 1 },
+    ]);
+    const lapse = await lapseOfRsv1();
+    expect(lapse).toEqual({
+      result: "released",
+      reservationId: "rsv-1",
+      version: 2,
+      releasedAt: "2026-11-09T10:05:00Z",
+      why: "expired",
+      promoted: promotedFor("rsv-b", TOKEN_B, "2026-11-09T10:05:00Z"),
+      skipped: [],
+      repeated: false,
+    });
+    expect(await rowsOnSlot(TRUCK, TRUCK_DAY)).toEqual([
+      { id: "rsv-1", state: "released", holder: TOKEN_A, version: 2 },
+      { id: "rsv-b", state: "held", holder: TOKEN_B, version: 2 },
+    ]);
+  });
+
+  it("(a) waiting rows TOKEN_A already had behind rsv-1, as round 1's reserve wrote them at 09:51 and 09:53, are let go with rsv-1 at 10:05 and never promoted: TOKEN_B, in line between them, is promoted, or with nobody else in line, nobody", async () => {
+    for (const othersInLine of [[], ["rsv-b"]]) {
+      await freshSeed();
+      expect(await reserve(toolApi, c3Save("rsv-1", TOKEN_A, "2026-11-09T09:50:00Z"))).toEqual({
+        ...RSV_1_HELD,
+        repeated: false,
+      });
+      await tokenAQueuedOnTruck("rsv-2", "2026-11-09T09:51:00Z");
+      for (const id of othersInLine) {
+        expect(await reserve(toolApi, c3Save(id, TOKEN_B, "2026-11-09T09:52:00Z"))).toMatchObject({
+          result: "waiting",
+          reservationId: id,
+          repeated: false,
+        });
+      }
+      await tokenAQueuedOnTruck("rsv-3", "2026-11-09T09:53:00Z");
+      const lapse = await lapseOfRsv1();
+      expect(lapse, othersInLine.join()).toEqual({
+        result: "released",
+        reservationId: "rsv-1",
+        version: 2,
+        releasedAt: "2026-11-09T10:05:00Z",
+        why: "expired",
+        promoted: othersInLine.length === 0 ? null : promotedFor("rsv-b", TOKEN_B, "2026-11-09T10:05:00Z"),
+        skipped: [],
+        repeated: false,
+      });
+      expectContractAnswer("release", lapse);
+      for (const id of ["rsv-2", "rsv-3"]) {
+        expect(await getReservation(db.sql, id), id).toMatchObject({
+          state: "released",
+          heldUntil: null,
+          releasedAt: "2026-11-09T10:05:00Z",
+          releasedWhy: "let_go",
+          version: 2,
+        });
+      }
+      // TOKEN_A holds and waits on nothing there now; whoever was promoted holds it alone.
+      const left = (await rowsOnSlot(TRUCK, TRUCK_DAY)).filter((row) => row.state !== "released");
+      expect(left, othersInLine.join()).toEqual(
+        othersInLine.length === 0 ? [] : [{ id: "rsv-b", state: "held", holder: TOKEN_B, version: 2 }],
+      );
+    }
+  });
+
+  it("(b) one mobile after its one extension: its asks for the same slot write nothing and answer its row as held to the new end; a waiting row it had there (as round 1 wrote it) is let go at that end, and the first other holder is promoted", async () => {
+    await freshSeed();
+    const tomas = (reservationId: string, at: string): ReserveRequest =>
+      reserveRequest({
+        reservationId,
+        during: RILEY_DEC3,
+        for: { phoneNumber: TOMAS },
+        waitIfSaved: true,
+        at,
+      });
+    expect(await reserve(toolApi, tomas("rsv-tomas-1", "2026-11-09T10:00:00Z"))).toMatchObject({
+      result: "held",
+      reservationId: "rsv-tomas-1",
+      heldUntil: "2026-11-09T10:10:00Z",
+      repeated: false,
+    });
+    // Its one extension (Q-12: "once"), before it ends.
+    expect(
+      await extend(toolApi, extendRequest({ reservationId: "rsv-tomas-1", at: "2026-11-09T10:08:00Z" })),
+    ).toEqual({
+      result: "extended",
+      reservationId: "rsv-tomas-1",
+      version: 2,
+      heldUntil: "2026-11-09T10:20:00Z",
+    });
+    const heldAgain = {
+      result: "held",
+      reservationId: "rsv-tomas-1",
+      version: 2,
+      resourceId: "res-riley",
+      during: RILEY_DEC3,
+      heldUntil: "2026-11-09T10:20:00Z",
+      savedTimeClockId: "rsv-tomas-1/saved-time",
+      repeated: true,
+    };
+    expect(await reserve(toolApi, tomas("rsv-tomas-2", "2026-11-09T10:09:00Z"))).toEqual(heldAgain);
+    await queuedAsBefore({
+      id: "rsv-tomas-queued",
+      businessId: LEES,
+      resourceId: "res-riley",
+      kind: "worker",
+      personId: "person-riley",
+      during: RILEY_DEC3,
+      queuedAt: "2026-11-09T10:11:00Z",
+      for: { phoneNumber: TOMAS },
+    });
+    expect(
+      await reserve(
+        toolApi,
+        reserveRequest({
+          reservationId: "rsv-c",
+          during: RILEY_DEC3,
+          for: { agentToken: TOKEN_C },
+          waitIfSaved: true,
+          at: "2026-11-09T10:12:00Z",
+        }),
+      ),
+    ).toEqual({
+      result: "waiting",
+      reservationId: "rsv-c",
+      version: 1,
+      resourceId: "res-riley",
+      during: RILEY_DEC3,
+      queuedAt: "2026-11-09T10:12:00Z",
+      repeated: false,
+    });
+    // The row it holds answers, not the one it waits on.
+    const again = await reserve(toolApi, tomas("rsv-tomas-3", "2026-11-09T10:15:00Z"));
+    expect(again).toEqual(heldAgain);
+    expectContractAnswer("reserve", again);
+    // The one extension is spent.
+    expect(
+      await extend(
+        toolApi,
+        extendRequest({ reservationId: "rsv-tomas-1", expectVersion: 2, at: "2026-11-09T10:16:00Z" }),
+      ),
+    ).toEqual({ error: "alreadyExtended", reservationId: "rsv-tomas-1", heldUntil: "2026-11-09T10:20:00Z" });
+    for (const id of ["rsv-tomas-2", "rsv-tomas-3"]) {
+      expect(await getReservation(db.sql, id), id).toBeNull();
+    }
+    const lapse = await release(toolApi, {
+      reservationId: "rsv-tomas-1",
+      businessId: LEES,
+      expectVersion: null,
+      why: "expired",
+      at: "2026-11-09T10:20:00Z",
+    });
+    expect(lapse).toEqual({
+      result: "released",
+      reservationId: "rsv-tomas-1",
+      version: 3,
+      releasedAt: "2026-11-09T10:20:00Z",
+      why: "expired",
+      promoted: promotedFor("rsv-c", TOKEN_C, "2026-11-09T10:20:00Z"),
+      skipped: [],
+      repeated: false,
+    });
+    expect(await getReservation(db.sql, "rsv-tomas-queued")).toMatchObject({
+      state: "released",
+      releasedAt: "2026-11-09T10:20:00Z",
+      releasedWhy: "let_go",
+      version: 2,
+    });
+    expect(await rowsOnSlot("res-riley", RILEY_DEC3)).toEqual([
+      { id: "rsv-tomas-1", state: "released", holder: TOMAS, version: 3 },
+      { id: "rsv-tomas-queued", state: "released", holder: TOMAS, version: 2 },
+      { id: "rsv-c", state: "held", holder: TOKEN_C, version: 2 },
+    ]);
+  });
+
+  it(
+    "(c) TOKEN_A waits behind TOKEN_B; a second wait by TOKEN_A, for the same time or one that overlaps it, writes nothing; when TOKEN_B lets go (20 times at once) TOKEN_A is promoted once, and TOKEN_A's own let-go promotes the next other holder",
+    SLOW,
+    async () => {
+      await freshSeed();
+      const ask = (
+        reservationId: string,
+        agentToken: string,
+        at: string,
+        during = RILEY_DEC4,
+      ): ReserveRequest =>
+        reserveRequest({ reservationId, during, for: { agentToken }, waitIfSaved: true, at });
+      expect(await reserve(toolApi, ask("rsv-b", TOKEN_B, "2026-11-09T10:00:00Z"))).toMatchObject({
+        result: "held",
+        reservationId: "rsv-b",
+        heldUntil: "2026-11-09T10:10:00Z",
+      });
+      const aWaits = {
+        result: "waiting",
+        reservationId: "rsv-a1",
+        version: 1,
+        resourceId: "res-riley",
+        during: RILEY_DEC4,
+        queuedAt: "2026-11-09T10:01:00Z",
+      };
+      expect(await reserve(toolApi, ask("rsv-a1", TOKEN_A, "2026-11-09T10:01:00Z"))).toEqual({
+        ...aWaits,
+        repeated: false,
+      });
+      // Another holder never gets another's row: TOKEN_C waits under its own id.
+      expect(await reserve(toolApi, ask("rsv-c", TOKEN_C, "2026-11-09T10:02:00Z"))).toEqual({
+        result: "waiting",
+        reservationId: "rsv-c",
+        version: 1,
+        resourceId: "res-riley",
+        during: RILEY_DEC4,
+        queuedAt: "2026-11-09T10:02:00Z",
+        repeated: false,
+      });
+      const overlapping = { start: "2026-12-04T10:15:00Z", end: "2026-12-04T10:45:00Z" };
+      for (const [id, during] of [
+        ["rsv-a2", RILEY_DEC4],
+        ["rsv-a3", overlapping],
+      ] as const) {
+        const again = await reserve(toolApi, ask(id, TOKEN_A, "2026-11-09T10:03:00Z", during));
+        expect(again, id).toEqual({ ...aWaits, repeated: true });
+        expectContractAnswer("reserve", again);
+        expect(await getReservation(db.sql, id), id).toBeNull();
+      }
+      const letGos = await Promise.all(
+        Array.from({ length: 20 }, () =>
+          release(toolApi, {
+            reservationId: "rsv-b",
+            businessId: LEES,
+            expectVersion: 1,
+            why: "let_go",
+            at: "2026-11-09T10:05:00Z",
+          }),
+        ),
+      );
+      const released = {
+        result: "released",
+        reservationId: "rsv-b",
+        version: 2,
+        releasedAt: "2026-11-09T10:05:00Z",
+        why: "let_go",
+        skipped: [],
+      };
+      expect(letGos.filter((outcome) => "result" in outcome && !outcome.repeated)).toEqual([
+        { ...released, promoted: promotedFor("rsv-a1", TOKEN_A, "2026-11-09T10:05:00Z"), repeated: false },
+      ]);
+      expect(letGos.filter((outcome) => "result" in outcome && outcome.repeated)).toEqual(
+        Array.from({ length: 19 }, () => ({ ...released, promoted: null, repeated: true })),
+      );
+      expect(await rowsOnSlot("res-riley", RILEY_DEC4)).toEqual([
+        { id: "rsv-b", state: "released", holder: TOKEN_B, version: 2 },
+        { id: "rsv-a1", state: "held", holder: TOKEN_A, version: 2 },
+        { id: "rsv-c", state: "waiting", holder: TOKEN_C, version: 1 },
+      ]);
+      // Holding it now, TOKEN_A's next ask answers that row, as held.
+      expect(await reserve(toolApi, ask("rsv-a4", TOKEN_A, "2026-11-09T10:06:00Z"))).toEqual({
+        result: "held",
+        reservationId: "rsv-a1",
+        version: 2,
+        resourceId: "res-riley",
+        during: RILEY_DEC4,
+        heldUntil: "2026-11-09T10:15:00Z",
+        savedTimeClockId: "rsv-a1/saved-time",
+        repeated: true,
+      });
+      expect(
+        await release(toolApi, {
+          reservationId: "rsv-a1",
+          businessId: LEES,
+          expectVersion: 2,
+          why: "let_go",
+          at: "2026-11-09T10:07:00Z",
+        }),
+      ).toEqual({
+        result: "released",
+        reservationId: "rsv-a1",
+        version: 3,
+        releasedAt: "2026-11-09T10:07:00Z",
+        why: "let_go",
+        promoted: promotedFor("rsv-c", TOKEN_C, "2026-11-09T10:07:00Z"),
+        skipped: [],
+        repeated: false,
+      });
+    },
+  );
+
+  it("(c) a second waiting row TOKEN_A had in that line (as round 1 wrote it) is never promoted: TOKEN_B's let-go promotes TOKEN_A's first, and TOKEN_A's let-go lets the other go and promotes TOKEN_C", async () => {
+    await freshSeed();
+    const ask = (reservationId: string, agentToken: string, at: string): ReserveRequest =>
+      reserveRequest({ reservationId, during: RILEY_DEC4, for: { agentToken }, waitIfSaved: true, at });
+    expect(await reserve(toolApi, ask("rsv-b", TOKEN_B, "2026-11-09T10:00:00Z"))).toMatchObject({
+      result: "held",
+    });
+    expect(await reserve(toolApi, ask("rsv-a1", TOKEN_A, "2026-11-09T10:01:00Z"))).toMatchObject({
+      result: "waiting",
+      reservationId: "rsv-a1",
+    });
+    await queuedAsBefore({
+      id: "rsv-a-queued",
+      businessId: LEES,
+      resourceId: "res-riley",
+      kind: "worker",
+      personId: "person-riley",
+      during: RILEY_DEC4,
+      queuedAt: "2026-11-09T10:01:30Z",
+      for: { agentToken: TOKEN_A },
+    });
+    expect(await reserve(toolApi, ask("rsv-c", TOKEN_C, "2026-11-09T10:02:00Z"))).toMatchObject({
+      result: "waiting",
+      reservationId: "rsv-c",
+    });
+    expect(
+      await release(toolApi, {
+        reservationId: "rsv-b",
+        businessId: LEES,
+        expectVersion: 1,
+        why: "let_go",
+        at: "2026-11-09T10:05:00Z",
+      }),
+    ).toMatchObject({ promoted: promotedFor("rsv-a1", TOKEN_A, "2026-11-09T10:05:00Z"), skipped: [] });
+    const aLetsGo = await release(toolApi, {
+      reservationId: "rsv-a1",
+      businessId: LEES,
+      expectVersion: 2,
+      why: "let_go",
+      at: "2026-11-09T10:07:00Z",
+    });
+    expect(aLetsGo).toEqual({
+      result: "released",
+      reservationId: "rsv-a1",
+      version: 3,
+      releasedAt: "2026-11-09T10:07:00Z",
+      why: "let_go",
+      promoted: promotedFor("rsv-c", TOKEN_C, "2026-11-09T10:07:00Z"),
+      skipped: [],
+      repeated: false,
+    });
+    expectContractAnswer("release", aLetsGo);
+    expect(await rowsOnSlot("res-riley", RILEY_DEC4)).toEqual([
+      { id: "rsv-b", state: "released", holder: TOKEN_B, version: 2 },
+      { id: "rsv-a1", state: "released", holder: TOKEN_A, version: 3 },
+      { id: "rsv-a-queued", state: "released", holder: TOKEN_A, version: 2 },
+      { id: "rsv-c", state: "held", holder: TOKEN_C, version: 2 },
+    ]);
+    expect(await getReservation(db.sql, "rsv-a-queued")).toMatchObject({
+      releasedAt: "2026-11-09T10:07:00Z",
+      releasedWhy: "let_go",
+    });
+  });
+
+  for (const [who, holder, holderKey] of [
+    ["one token", { agentToken: TOKEN_A }, TOKEN_A],
+    ["one mobile", { phoneNumber: ALEX }, ALEX],
+  ] as const) {
+    it(
+      `(d) ${who} saving one slot twice at once, both at the slot's lock: one held row, no waiting row, and both answers name it`,
+      SLOW,
+      async () => {
+        await freshSeed();
+        const at = "2026-11-09T09:50:00Z";
+        const twice = (reservationId: string): ReserveRequest => ({
+          ...c3Save(reservationId, TOKEN_A, at),
+          for: holder,
+          door: "standard",
+        });
+        const outcomes = await raceAtTheSlotLock(TRUCK_SLOT_KEY, 2, (sql) => [
+          reserve(sql, twice("rsv-twice-1")),
+          reserve(sql, twice("rsv-twice-2")),
+        ]);
+        expect(tally(outcomes)).toEqual({ held: 2 });
+        const wrote = outcomes.filter((outcome) => "result" in outcome && !outcome.repeated);
+        expect(wrote).toHaveLength(1);
+        const [first] = wrote;
+        if (first === undefined || !("result" in first)) {
+          throw new Error("no save wrote the slot");
+        }
+        const won = first.reservationId;
+        expect(["rsv-twice-1", "rsv-twice-2"]).toContain(won);
+        for (const outcome of outcomes) {
+          expect(outcome).toEqual({
+            result: "held",
+            reservationId: won,
+            version: 1,
+            resourceId: TRUCK,
+            during: TRUCK_DAY,
+            heldUntil: "2026-11-09T10:00:00Z",
+            savedTimeClockId: `${won}/saved-time`,
+            repeated: outcome !== first,
+          });
+        }
+        expect(await rowsOnSlot(TRUCK, TRUCK_DAY)).toEqual([
+          { id: won, state: "held", holder: holderKey, version: 1 },
+        ]);
+      },
+    );
+  }
+
+  it(
+    "(d) 200 parallel saves of one slot by 200 holders, asking to wait if it is saved: one held row, and every other holder waits once under its own id",
+    HEAVY,
+    async () => {
+      await freshSeed();
+      const at = "2026-11-09T09:50:00Z";
+      const outcomes = await raceAtTheSlotLock(TRUCK_SLOT_KEY, TOOL_API_POOL, (sql) =>
+        Array.from({ length: 200 }, (_, i) =>
+          reserve(sql, c3Save(`rsv-many-${String(i)}`, `agent-token-t1134-${String(i)}`, at)),
+        ),
+      );
+      expect(tally(outcomes)).toEqual({ held: 1, waiting: 199 });
+      for (const [i, outcome] of outcomes.entries()) {
+        expect(outcome).toMatchObject({ reservationId: `rsv-many-${String(i)}`, repeated: false });
+      }
+      const rows = await rowsOnSlot(TRUCK, TRUCK_DAY);
+      expect(rows.filter((row) => row.state === "held")).toHaveLength(1);
+      expect(rows.filter((row) => row.state === "waiting")).toHaveLength(199);
+      expect(new Set(rows.map((row) => row.holder)).size).toBe(200);
+    },
+  );
+
+  it(
+    "(d) 200 parallel saves of one slot by 100 holders, each saving it twice: one held row, each other holder waits once, and a holder's two answers name its one row",
+    HEAVY,
+    async () => {
+      await freshSeed();
+      const at = "2026-11-09T09:50:00Z";
+      const tokenOf = (i: number): string => `agent-token-t1134-${String(i % 100)}`;
+      const outcomes = await raceAtTheSlotLock(TRUCK_SLOT_KEY, TOOL_API_POOL, (sql) =>
+        Array.from({ length: 200 }, (_, i) => reserve(sql, c3Save(`rsv-pair-${String(i)}`, tokenOf(i), at))),
+      );
+      expect(tally(outcomes)).toEqual({ held: 2, waiting: 198 });
+      const rows = await rowsOnSlot(TRUCK, TRUCK_DAY);
+      expect(rows).toHaveLength(100);
+      expect(rows.filter((row) => row.state === "held")).toHaveLength(1);
+      expect(new Set(rows.map((row) => row.holder)).size).toBe(100);
+      const rowOf = new Map(rows.map((row) => [row.holder, row.id]));
+      for (let i = 0; i < 100; i += 1) {
+        const pair = [outcomes[i], outcomes[i + 100]];
+        for (const outcome of pair) {
+          expect(outcome, tokenOf(i)).toMatchObject({ reservationId: rowOf.get(tokenOf(i)) });
+        }
+        expect(
+          pair.filter((outcome) => outcome !== undefined && "result" in outcome && !outcome.repeated),
+          tokenOf(i),
+        ).toHaveLength(1);
+      }
+    },
+  );
+});
