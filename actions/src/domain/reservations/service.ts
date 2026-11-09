@@ -21,11 +21,29 @@
 //               Nothing is booked or charged when a saved time lapses (S12-03: "Nothing is booked or charged while the
 //               AI is quiet"; S12-04; the money home, S13-55: never a charge on silence), so a lapse writes no money row.
 //
+// The saved-time clock rows are K-05's to write (item 8 for a held time, item 9 for a promoted one), and this service
+// writes none of its own: on the database, db/repo/reservations.ts's reserve and release write them once lead card
+// T-1084 lands (until then a time saved on the database has no clock row, so nothing fires its lapse); the K-05 double
+// in test-support.ts writes them as the contract says. The firing that calls lapse may instead carry the same release
+// in K-05 fireClock's writes.reservations.release, in the firing's own transaction (db/repo/clocks.ts, T-197).
+//
 // Not here: the page's countdown (the frontend), and the let-go message and the next-in-line link (the next task); the
 // firing itself (the actor's alarm, the minute sweep and Fire now: runtime/src/clocks, through K-09 gateAndCommit).
 //
 // Nothing here logs. What it throws names a field or a fault, never a value; what it answers names ids, states, times
 // and labels, never a mobile number, an agent token, or who else holds a time.
+//
+// Defaults used (for ops/QUESTIONS.md; beside doors.ts's, each where no source decides):
+//   4. Next in line is asked for (nextInLine): S12-02's other customer "hears right away that 2:00pm was just taken" and
+//      "can ask to be next"; without it a time someone else has saved is timeTaken, as a booked one always is.
+//   5. A time held for another mobile, or at another business, answers extendTime as one that does not exist (notFound,
+//      K-05's shape), so the answer never confirms someone else's saved time; a token's and a booking's holds answer
+//      notExtendable first, as K-09 v1.2 decides them from the stored holder alone.
+//   6. A lapse runs K-05 release with why expired and no version (K-05 item 9: "null for the clock's expiry"), so the one
+//      extension, which moves the clock row, is never undone by a firing at the old end (notExpired: notYet); a time
+//      booked or still in line answers notSaved and nothing is released.
+//   7. A repeated save answers its first save's end and version, with extendable read from the row (its one extension
+//      may have been used since).
 
 import { EXTEND_MINUTES, STANDARD_HOLD_MINUTES } from "../../../../db/repo/reservation-rules";
 import {
@@ -97,7 +115,7 @@ function checkSave(request: SaveRequest): void {
     throw new ReservationRequestError("seats is not a positive whole number");
   }
   checkAsker(request);
-  checkDoorFacts(request.door as unknown);
+  checkDoorFacts(request.door);
 }
 
 const LONGER_DOORS: ReadonlySet<unknown> = new Set(["planCheck", "document", "ownerOk"]);

@@ -97,7 +97,7 @@ export type HoldLength =
 /**
  * The minutes a save on `door` holds when saved at `at` for a visit starting at `visitStartsAt` (both UTC): the door's
  * own (K-05 doorMinutes, which refuses minutes the door does not allow with a TypeError), cut to end by the visit's start
- * for a door that saves up to its limit, or nothing for a fixed door that would run past it (defaults 3).
+ * for a door that saves up to its limit, or nothing for a fixed door that would run past it (default 3).
  */
 export function holdLengthOf(
   door: Door,
