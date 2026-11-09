@@ -102,8 +102,21 @@ const TOOL_API_COMMANDS: Record<string, readonly string[]> = {
 const PART_2_KEYS = ["payments_booking_fee_fk", "payments_plan_charge_fk", "saved_cards_membership_fk"];
 /** The two keys rule 1 names in a circle, added by ALTER TABLE once both tables exist. */
 const CIRCLE_KEYS = ["ledger_lines_refund_fk", "saved_cards_from_payment_fk"];
-/** The other tables the five refer to by their keys (rule 1), in code-unit order. */
-const REFERRED = ["booking_lines", "bookings", "businesses", "effects", "open_questions", "persons"];
+/**
+ * The other tables the five refer to by their keys (rule 1), in code-unit order: other parts', and part 2's
+ * booking_fees, memberships and plan_charges, which PART_2_KEYS name (migration 0031, T-723; DL-225, DL-306).
+ */
+const REFERRED = [
+  "booking_fees",
+  "booking_lines",
+  "bookings",
+  "businesses",
+  "effects",
+  "memberships",
+  "open_questions",
+  "persons",
+  "plan_charges",
+];
 const DEPOSIT_SEED = "seed-payment-deposit.json";
 const REFUND_SEED = "seed-refund-new-line.json";
 /** The card's two seeds. */
@@ -720,7 +733,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
   /** The table list's types as format_type prints them; the others print as the list writes them. */
   const typeNames: Record<string, string> = { timestamptz: "timestamp with time zone" };
 
-  it("the table list names 14 tables, each scoped by business on business_id with no effective dates: part 1's five are in the schema and part 2's nine are not yet; rule 4's three of the five are versioned, and ledger_lines and payment_items carry no version", async () => {
+  it("the table list names 14 tables, each scoped by business on business_id with no effective dates: part 1's five are in the schema and part 2's nine are migration 0031's (T-723); rule 4's three of the five are versioned, and ledger_lines and payment_items carry no version", async () => {
     expect(TABLES.map((table) => table.name).sort()).toEqual([...OWN_TABLES, ...PART_2_TABLES].sort());
     for (const table of TABLES) {
       expect(
@@ -743,13 +756,15 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
       where c.relnamespace = ${db.schema}::regnamespace and c.relkind = 'r'
         and c.relname in ${db.sql([...OWN_TABLES, ...PART_2_TABLES])}
     `;
-    expect(found.map((row) => row.name).sort()).toEqual(OWN_TABLES);
+    // DL-225 (T-723, DL-306): the list gains part 2's nine, made by migration 0031, and stays exact.
+    expect(found.map((row) => row.name).sort()).toEqual([...OWN_TABLES, ...PART_2_TABLES].sort());
   });
 
-  it("is recorded in schema_migrations as money_payments_ledger, the last file, after effects_provider_events (K-07), core_rls_narrow (T-1094), customers (K-28) and both K-30 parts", async () => {
+  it("is recorded in schema_migrations as money_payments_ledger, followed only by part 2's money_fees_packs (T-723), after effects_provider_events (K-07), core_rls_narrow (T-1094), customers (K-28) and both K-30 parts", async () => {
     const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
     const names = rows.map((row) => row.name);
-    expect(names.at(-1)).toBe("money_payments_ledger");
+    // DL-225 (T-723, DL-306): the files after this part's gain part 2's money_fees_packs (0031), and stay exact.
+    expect(names.slice(-2)).toEqual(["money_payments_ledger", "money_fees_packs"]);
     for (const before of [
       "effects_provider_events",
       "core_rls_narrow",
@@ -786,7 +801,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
       }
     });
 
-    it(`${table.name}: primary key, foreign keys with no schema prefix and their on delete (but part 2's), unique rules (one with a where as a partial unique index) and index names are the table list's`, async () => {
+    it(`${table.name}: primary key, foreign keys with no schema prefix and their on delete (part 2's three among them, migration 0031's), unique rules (one with a where as a partial unique index) and index names are the table list's`, async () => {
       const constraints = await db.sql<{ name: string; kind: string; definition: string }[]>`
         select conname as name, contype as kind, pg_get_constraintdef(oid) as definition
         from pg_constraint where conrelid = ${`${db.schema}.${table.name}`}::regclass
@@ -803,7 +818,9 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
           .filter((constraint) => constraint.kind === kind)
           .map((constraint) => constraint.name)
           .sort();
-      const keys = table.foreignKeys.filter((key) => !PART_2_KEYS.includes(key.name));
+      // DL-225 (T-723, DL-306): saved_cards' and payments' lists gain part 2's three keys, which migration 0031 adds,
+      // and stay exact.
+      const keys = table.foreignKeys;
       const unique = table.unique ?? [];
       const plain = unique.filter((rule) => rule.where === undefined);
       expect(named("c")).toEqual((table.checks ?? []).map((check) => check.name).sort());
@@ -875,7 +892,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
     });
   }
 
-  it("rule 1's order: the two keys named in a circle (saved_cards and payments, ledger_lines and refunds) are added once both tables exist, as the table list writes them, and every key of the five is checked against every row (none NOT VALID); the three that name part 2's memberships, booking_fees and plan_charges are left for part 2's ALTER TABLE (DL-278's way; DL-298), so none exists yet", async () => {
+  it("rule 1's order: the two keys named in a circle (saved_cards and payments, ledger_lines and refunds) are added once both tables exist, as the table list writes them, and every key of the five is checked against every row (none NOT VALID); the three that name part 2's memberships, booking_fees and plan_charges are left for part 2's ALTER TABLE (DL-278's way; DL-298), which migration 0031 adds (T-723)", async () => {
     const keys = await db.sql<{ table: string; name: string; definition: string; validated: boolean }[]>`
       select c.relname as table, k.conname as name, pg_get_constraintdef(k.oid) as definition,
              k.convalidated as validated
@@ -883,7 +900,13 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
       where k.contype = 'f' and c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)}
     `;
     expect(keys.filter((key) => !key.validated).map((key) => key.name)).toEqual([]);
-    expect(keys.filter((key) => PART_2_KEYS.includes(key.name))).toEqual([]);
+    // DL-225 (T-723, DL-306): the list gains the three keys migration 0031 adds, and stays exact.
+    expect(
+      keys
+        .filter((key) => PART_2_KEYS.includes(key.name))
+        .map((key) => key.name)
+        .sort(),
+    ).toEqual(PART_2_KEYS);
     expect(
       OWN.flatMap((table) => table.foreignKeys.map((key) => key.name))
         .filter((name) => PART_2_KEYS.includes(name))
@@ -900,7 +923,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
     ]);
   });
 
-  it("the five refer to other tables only by their keys (rule 1): K-04's businesses, persons, bookings and open_questions, K-07's effects and K-30's booking_lines by id; among themselves by (id, business_id), so a row names only its own business's payment, card, line or refund; no other table refers to them yet", async () => {
+  it("the five refer to other tables only by their keys (rule 1): K-04's businesses, persons, bookings and open_questions, K-07's effects and K-30's booking_lines by id, and part 2's memberships, booking_fees and plan_charges by (id, business_id) (migration 0031's three keys); among themselves by (id, business_id), so a row names only its own business's payment, card, line or refund; of every other table only part 2's booking_fees, packs, pay_links and reconciliation_findings refer to them (migration 0031)", async () => {
     const keys = await db.sql<{ table: string; name: string; referenced: string; definition: string }[]>`
       select src.relname as table, k.conname as name, dst.relname as referenced,
              pg_get_constraintdef(k.oid) as definition
@@ -909,11 +932,10 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
         join pg_class dst on dst.oid = k.confrelid
       where k.contype = 'f' and src.relnamespace = ${db.schema}::regnamespace and src.relname in ${db.sql(OWN_TABLES)}
     `;
+    // DL-225 (T-723, DL-306): the list gains part 2's three keys (migration 0031), and stays exact.
     expect(keys.map((key) => `${key.table} ${key.name} ${key.referenced}`).sort()).toEqual(
       OWN.flatMap((table) =>
-        table.foreignKeys
-          .filter((key) => !PART_2_KEYS.includes(key.name))
-          .map((key) => `${table.name} ${key.name} ${key.references.table}`),
+        table.foreignKeys.map((key) => `${table.name} ${key.name} ${key.references.table}`),
       ).sort(),
     );
     expect(
@@ -940,8 +962,19 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
         join pg_class dst on dst.oid = k.confrelid
       where k.contype = 'f' and dst.relnamespace = ${db.schema}::regnamespace and dst.relname in ${db.sql(OWN_TABLES)}
         and src.relname not in ${db.sql(OWN_TABLES)}
+      order by 1
     `;
-    expect(into).toEqual([]);
+    // DL-225 (T-723, DL-306): the list gains part 2's six keys into the five (migration 0031): booking_fees' to a
+    // payment and a saved card, packs' and pay_links' to a payment, and reconciliation_findings' to a line and a
+    // refund; ordered by name now that it holds rows, and stays exact.
+    expect(into).toEqual([
+      { table: "booking_fees" },
+      { table: "booking_fees" },
+      { table: "packs" },
+      { table: "pay_links" },
+      { table: "reconciliation_findings" },
+      { table: "reconciliation_findings" },
+    ]);
   });
 
   it("versions and set once (rules 4 and 7): <table>_version_raised and <table>_set_once, BEFORE UPDATE FOR EACH ROW, on the three versioned tables, each set-once trigger with rule 7's list in the README's order; ledger_lines and payment_items hold no trigger", async () => {

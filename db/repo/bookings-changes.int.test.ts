@@ -829,7 +829,16 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
     // DL-225 (T-721, DL-278): the list gains part 2's booking_changes (booking_changes_visit_fk), and stays exact.
     // DL-225 (T-722, DL-297): it gains K-32's payment_items and refunds (payment_items_line_fk, refunds_line_fk, to
     // booking_lines; 0030), ordered by name now that it holds more than one, and stays exact.
-    expect(into).toEqual([{ table: "booking_changes" }, { table: "payment_items" }, { table: "refunds" }]);
+    // DL-225 (T-723, DL-306): it gains K-32 part 2's booking_fees and rosfield_fees (booking_fees_visit_fk,
+    // rosfield_fees_visit_fk, to booking_visits) and credits (credits_line_fk, to booking_lines; 0031), and stays exact.
+    expect(into).toEqual([
+      { table: "booking_changes" },
+      { table: "booking_fees" },
+      { table: "credits" },
+      { table: "payment_items" },
+      { table: "refunds" },
+      { table: "rosfield_fees" },
+    ]);
   });
 
   it("each versioned table raises its version on every update (0002's rule; rule 4): <table>_version_raised, BEFORE UPDATE FOR EACH ROW; booking_details also holds rule 6's booking_details_set_once; the snapshot's two tables hold no trigger", async () => {
