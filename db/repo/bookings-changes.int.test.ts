@@ -824,9 +824,12 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
         join pg_class dst on dst.oid = k.confrelid
       where k.contype = 'f' and dst.relnamespace = ${db.schema}::regnamespace and dst.relname in ${db.sql(OWN_TABLES)}
         and src.relname not in ${db.sql(OWN_TABLES)}
+      order by 1
     `;
     // DL-225 (T-721, DL-278): the list gains part 2's booking_changes (booking_changes_visit_fk), and stays exact.
-    expect(into).toEqual([{ table: "booking_changes" }]);
+    // DL-225 (T-722, DL-297): it gains K-32's payment_items and refunds (payment_items_line_fk, refunds_line_fk, to
+    // booking_lines; 0030), ordered by name now that it holds more than one, and stays exact.
+    expect(into).toEqual([{ table: "booking_changes" }, { table: "payment_items" }, { table: "refunds" }]);
   });
 
   it("each versioned table raises its version on every update (0002's rule; rule 4): <table>_version_raised, BEFORE UPDATE FOR EACH ROW; booking_details also holds rule 6's booking_details_set_once; the snapshot's two tables hold no trigger", async () => {
@@ -867,9 +870,13 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
              current_user as me, p.proconfig as config, p.prosrc as body
       from pg_proc p join pg_language l on l.oid = p.prolang
       where p.pronamespace = ${db.schema}::regnamespace and (p.proname like 'booking%' or p.proname like '%set_once%')
+      order by p.proname
     `;
+    // DL-225 (T-722, DL-297): the list gains K-32's money_set_once() (0030, the money part's own, by its README rule 7),
+    // ordered by name so this part's function stays first, and stays exact.
     expect(functions.map((fn) => [fn.name, fn.language, fn.definer, fn.owner === fn.me, fn.config])).toEqual([
       ["booking_details_set_once", "plpgsql", false, true, null],
+      ["money_set_once", "plpgsql", false, true, null],
     ]);
     const body = oneLine(functions[0]?.body);
     for (const column of ["booking_id", "business_id", "number", "door", "made_by"]) {

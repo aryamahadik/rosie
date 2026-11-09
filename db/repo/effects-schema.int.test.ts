@@ -713,7 +713,7 @@ describe("the migration against the frozen table list (K-07 v1 schema addition)"
     }
   });
 
-  it("grants: select, insert and update to rosie_job alone on effects and provider_events (T-1094), and on outbox_claims with delete; the Tool API holds none", async () => {
+  it("grants: select, insert and update to rosie_job alone on effects and provider_events (T-1094), and on outbox_claims with delete; the Tool API holds none on any of the three tables, and of their columns only effects' id and business_id to select (DL-298)", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -748,6 +748,22 @@ describe("the migration against the frozen table list (K-07 v1 schema addition)"
         and a.grantee = ${TOOL_API}::regrole
     `;
     expect(toolApi).toEqual([]);
+    // DL-225 (T-722, DL-298): the column grants on the three gain rosie_app's SELECT of effects.id and
+    // effects.business_id, which K-32 rule 5's checks read, and stay exact: no other column, grantee or privilege.
+    const columns = await db.sql<{ table: string; column: string; grantee: string; privilege: string }[]>`
+      select c.relname as table, a.attname as column,
+             case when g.grantee = 0 then 'PUBLIC' else pg_get_userbyid(g.grantee) end as grantee,
+             g.privilege_type as privilege
+      from pg_attribute a
+        join pg_class c on c.oid = a.attrelid
+        cross join lateral aclexplode(a.attacl) g
+      where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql(OWN_TABLES)} and a.attacl is not null
+      order by c.relname, a.attnum
+    `;
+    expect(columns).toEqual([
+      { table: "effects", column: "id", grantee: TOOL_API, privilege: "SELECT" },
+      { table: "effects", column: "business_id", grantee: TOOL_API, privilege: "SELECT" },
+    ]);
   });
 
   it("neither role owns a table: they stay the migrations' role's", async () => {
@@ -1431,7 +1447,12 @@ describe("row-level security and privileges on the stored rows", () => {
   }, 60_000);
 
   afterAll(async () => {
-    await db.sql`truncate provider_events, effects, outbox_claims, monthly_bills, monthly_bill_lines`;
+    // DL-225 (T-722, DL-297): the list gains K-32 part 1's five tables, whose keys name effects (0030), and stays exact
+    // with no CASCADE.
+    await db.sql`
+      truncate provider_events, effects, outbox_claims, monthly_bills, monthly_bill_lines, saved_cards, payments,
+        payment_items, ledger_lines, refunds
+    `;
   });
 
   it("the rows: Lee's Barbershop's effects and events, the Linq contact effect and one event with no business", async () => {
@@ -1443,20 +1464,38 @@ describe("row-level security and privileges on the stored rows", () => {
     expect(await ownerCount("effects", YOGA_STUDIO)).toBe(0);
   });
 
-  it("the Tool API with no scope reads no effect and no provider event: refused by privilege (42501; T-1094)", async () => {
+  it("the Tool API with no scope reads no effect and no provider event: refused by privilege (42501; T-1094), but for effects' id and business_id (DL-298), where its policy finds no row", async () => {
     for (const table of SCOPED_TABLES) {
       expect(await countRows(db.sql, table), table).toBeGreaterThan(0);
-      const outcome = await refusal(as(TOOL_API, null, (tx) => countRows(tx, table)));
+      // DL-225 (T-722, DL-298): rosie_app may SELECT effects.id and effects.business_id alone, the columns K-32 rule 5's
+      // checks read, so a count of effects (which names no other column) passes and, with no scope, finds no row; the
+      // whole row stays refused by privilege, as every read of provider_events.
+      if (table === "effects") {
+        expect(await as(TOOL_API, null, (tx) => countRows(tx, table)), table).toBe(0);
+      }
+      const outcome = await refusal(
+        as(TOOL_API, null, (tx) =>
+          table === "effects" ? tx`select * from effects`.then((rows) => rows.length) : countRows(tx, table),
+        ),
+      );
       expect(outcome.code, table).toBe("42501");
       expect(outcome.message, table).toContain(`permission denied for table ${table}`);
     }
   });
 
-  it("the Tool API scoped to a business reads none of their rows either, its own business's included: refused by privilege (42501; T-1094)", async () => {
+  it("the Tool API scoped to a business reads none of their rows either, its own business's included: refused by privilege (42501; T-1094), but for effects' id and business_id, of its own business's rows only (DL-298)", async () => {
     for (const table of SCOPED_TABLES) {
       expect(await ownerCount(table, BARBERSHOP), table).toBeGreaterThan(0);
       for (const business of [BARBERSHOP, YOGA_STUDIO]) {
         for (const read of [countRows, countWithNoBusiness]) {
+          // DL-225 (T-722, DL-298): these counts of effects name no column but business_id, which rosie_app may now
+          // read: it finds its own business's rows (none with no business), exactly as the runtime side scoped to it.
+          if (table === "effects") {
+            expect(await as(TOOL_API, business, (tx) => read(tx, table)), `${table} ${business}`).toBe(
+              await as(RUNTIME, business, (tx) => read(tx, table)),
+            );
+            continue;
+          }
           const outcome = await refusal(as(TOOL_API, business, (tx) => read(tx, table)));
           expect(outcome.code, `${table} ${business}`).toBe("42501");
           expect(outcome.message, `${table} ${business}`).toContain(`permission denied for table ${table}`);
@@ -1465,9 +1504,25 @@ describe("row-level security and privileges on the stored rows", () => {
     }
     // Lee's Barbershop's deposit, read by the Tool API from its own scope or the yoga studio's: refused. The runtime
     // side reads it under its business's scope, and from the yoga studio's finds no row.
+    // DL-225 (T-722, DL-298): refused whole, and by every column but id and business_id; by its id alone the Tool API
+    // finds it from its own business's scope only, as the runtime side does.
     const read = (tx: Tx) => tx`select id from effects where id = ${textOf(CHARGE.id)}`;
+    const others = tableOf("effects")
+      .columns.map((column) => column.name)
+      .filter((name) => !["id", "business_id"].includes(name));
     for (const scope of [YOGA_STUDIO, BARBERSHOP]) {
-      expect((await refusal(as(TOOL_API, scope, read))).code, scope).toBe("42501");
+      for (const column of ["*", ...others.map((name) => `"${name}"`)]) {
+        const outcome = await refusal(
+          as(TOOL_API, scope, (tx) =>
+            tx.unsafe(`select ${column} from effects where id = $1`, [textOf(CHARGE.id)]),
+          ),
+        );
+        expect([outcome.code, outcome.message], `${scope} ${column}`).toEqual([
+          "42501",
+          "permission denied for table effects",
+        ]);
+      }
+      expect(await as(TOOL_API, scope, read), scope).toEqual(await as(RUNTIME, scope, read));
     }
     expect(await as(RUNTIME, YOGA_STUDIO, read)).toHaveLength(0);
     expect(await as(RUNTIME, BARBERSHOP, read)).toHaveLength(1);

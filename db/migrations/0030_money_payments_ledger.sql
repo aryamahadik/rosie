@@ -8,7 +8,9 @@
 -- row (no NOT VALID); rule 7's set-once function money_set_once() and its trigger on the three tables rule 7 lists here;
 -- the version trigger (enforce_version_raise() from 0002, T-181) on the three versioned tables; grants to the two roles
 -- 0012 made (never created or altered here); row-level security switched on for all five, with rule 5's policies.
--- Nothing is dropped, renamed or retyped, no row is written or removed, and no other part's table is altered.
+-- Nothing is dropped, renamed or retyped, no row is written or removed, and no other part's table is altered. One
+-- grant reaches outside the part: rosie_app's SELECT of effects.id and effects.business_id alone, which rule 5's
+-- effect checks read (DL-298; the grants below).
 --
 -- Part 1 takes the tables this card names (payments, refunds, the ledger) with what rule 1's order and the card's two
 -- seeds need first: payment_items (each seed's item against its line) and saved_cards (payments_saved_card_fk, and
@@ -439,6 +441,15 @@ grant update (state, paid_at, failed_at, failed_why, cancelled_at, version) on p
 grant update (state, refunded_at, failed_at, marked_done_by_person_id, version) on refunds to rosie_app, rosie_job;
 grant select on ledger_lines to rosie_app;
 grant select, insert on ledger_lines to rosie_job;
+
+-- K-32 rule 5's effect_id and save_effect_id checks read effects as the Tool API, and PostgreSQL checks the caller's
+-- SELECT on every table a policy names when the statement starts, even when the column is null. 0018 (T-1094, DL-149)
+-- revoked every grant rosie_app held on effects, its SELECT "unless a named reader needs it": rule 5's two checks are
+-- that named reader, and they read effects.id and effects.business_id only (DL-298). So rosie_app may SELECT those two
+-- columns and no other, still only its scope's rows (0015's effects_tool_api); no INSERT, UPDATE, DELETE or TRUNCATE,
+-- and provider_events keeps no grant. Without it every Tool API write on saved_cards, payments and refunds is refused
+-- (42501), cash recorded paid included.
+grant select (id, business_id) on effects to rosie_app;
 
 -- Row-level security on the five business-scoped tables (rule 5): rosie_app sees only its scope, and writes a row only
 -- in its scope's business, naming only its business's bookings, lines, effects and questions, never a card or bank
