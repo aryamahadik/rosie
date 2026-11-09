@@ -19,10 +19,11 @@
 //      passes "4pm", as round 3's default holds for "to"). The words are for a time the cues ("at", "on", "in the", "a
 //      las", "al", "de", "around" and the like, TIME_CUES) and "or" or "and"; for money and counts a range or choice word
 //      ("to", "or", "and", "maybe", "y", "o", "a"), so "$40 (or $50)" and "4 (maybe 5)" are several (DL-238);
-//   2b. a count between two of a time's values (the party in "table tomorrow for 2 at 7pm", with the words that name what
-//      it counts: "tomorrow, party of 4, at 7pm") ends no phrase: the day and the time around it are one, and the count is
-//      the count reader's, not a piece of the time left unread (T-1130); a bare hour beside a day stays an hour
-//      ("tomorrow 3 at 7pm", step 3b), never such a count;
+//   2b. a count written as a party between two of a time's values (the party in "table tomorrow for 2 at 7pm", with the
+//      words that name what it counts: "tomorrow, party of 4, at 7pm") ends no phrase: the day and the time around it are
+//      one, and the count is the count reader's, not a piece of the time left unread (T-1130); a bare hour beside a day
+//      stays an hour ("tomorrow 3 at 7pm", step 3b), and a number the time reader leaves unread as a time stays a piece
+//      that must be read ("tomorrow 3.30 at 7pm", "tomorrow 1530 at 7pm"), never such a count;
 //   3. a number the reader did not read belongs to the phrase when a range word joins it to the phrase ("twenty to 3",
 //      "10 - $15", "3 or 4pm"), or when it stands right after a time or an amount with one space between ("at 3 30", "at
 //      three thirty", "$1 200"); a count takes one a range or choice word ("or", "to", "-", "/") joins to it, since the
@@ -73,12 +74,14 @@
 import { amountsIn } from "./money";
 import { numberPhrasesIn } from "./numbers";
 import {
+  ENDS_WITH_COUNT_UNIT,
   countSpansIn,
   reparse,
   zoneWordSpansIn,
   zoneWordsOfTime,
   type FieldType,
   type FieldValue,
+  type FoundCount,
   type ReparseContext,
   type ReparseFault,
 } from "./reparse";
@@ -340,6 +343,21 @@ function rangeOf(type: PhraseType, languages: readonly ValueLanguage[]): RegExp 
 /** The words that name what a count counts right before it: "party of", "table for", "group of", "mesa para" (T-1130). */
 const COUNT_LEAD =
   /(?<![\p{L}\p{N}])(?:(?:an? )?(?:party|table|group|reservation|booking) (?:of|for) |(?:una? )?(?:mesa|reserva|reservacion|grupo) (?:para|de) |somos )$/u;
+/** A number the time reader may leave unread as a time: three digits or more, or a mark between digits ("1530", "3.30"). */
+const TIME_LIKE_DIGITS = /\d{3}|\d[.,]\d/u;
+
+/**
+ * Whether a count is written as a party, so it may stand between a day and its time (step 2b): a whole number with its
+ * unit ("2 people") or the words that name what it counts ("party of 4"), or else one of at most two digits or in words
+ * ("for 2", "for two"). A number the time reader leaves unread as a time ("tomorrow 3.30 at 7pm", "tomorrow 1530 at
+ * 7pm") is none, so it stays a piece of the time's phrase that must be read, as before.
+ */
+function isParty(count: FoundCount, folded: string): boolean {
+  if (!Number.isInteger(count.value)) return false;
+  const said = folded.slice(count.at, count.end);
+  if (ENDS_WITH_COUNT_UNIT.test(said) || COUNT_LEAD.test(folded.slice(0, count.at))) return true;
+  return !TIME_LIKE_DIGITS.test(said);
+}
 
 /**
  * Step 2b (T-1130, the round 7 review's N3): the counts that stand between two of a time's values, such as the party
@@ -355,6 +373,7 @@ function countsBetween(folded: string, times: readonly Span[], languages: readon
   return countSpansIn(folded, languages)
     .filter(
       (count) =>
+        isParty(count, folded) &&
         !overlaps(count, times) &&
         !overlaps(count, hours) &&
         times.some((time) => time.end <= count.at) &&

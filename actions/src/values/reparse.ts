@@ -142,8 +142,10 @@ const DOZEN_AFTER = /^ (?:dozens?|docenas?)\b/;
  * A count's unit after it, part of its words and not its value (DL-199 item 1: "the number with its unit"); "ppl" and
  * "pax" as people write them in a booking (T-1130).
  */
-const COUNT_UNIT =
-  /^ (?:people|ppl|pax|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?)\b/;
+const COUNT_UNITS = String.raw`people|ppl|pax|persons?|adults?|kids?|children|child|guests?|of us|personas?|adultos?|ninos?|ninas?|invitados?`;
+const COUNT_UNIT = new RegExp(String.raw`^ (?:${COUNT_UNITS})\b`);
+/** Whether a count's folded words end with its unit ("2 people", "two adults", "4 pax"). */
+export const ENDS_WITH_COUNT_UNIT = new RegExp(String.raw` (?:${COUNT_UNITS})$`);
 
 /** One count and where it stands in the folded words. */
 export interface FoundCount extends Span {

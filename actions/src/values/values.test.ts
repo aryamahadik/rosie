@@ -2433,6 +2433,16 @@ describe("T-1130 by construction: every mark but a sentence mark joins a time, s
     expect(wholePhraseFault("time", SUNDAY_3PM, text, "_tomorrow_ at 3pm", context)).toBeNull();
   });
 
+  it("a number the time reader leaves unread as a time is no party between day and time: each whole is refused, as before T-1130", () => {
+    for (const text of ["tomorrow 3.30 at 7pm", "tomorrow 1530 at 7pm", "tomorrow 330 at 7pm"]) {
+      expect(wholePhraseFault("time", SUNDAY_7PM, text, text, context)).toBe("noText");
+      expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+    }
+    // With its unit or lead words it is a party, whatever its digits: "tomorrow, party of 120, at 7pm" passes as 7pm.
+    const big = "tomorrow, party of 120, at 7pm";
+    expect(wholePhraseFault("time", SUNDAY_7PM, big, big, context)).toBeNull();
+  });
+
   it("'ppl' and 'pax' are a count's units, and the party's lead words go with it between day and time, never into a count's value", () => {
     expect(countsIn("2 ppl")).toEqual([2]);
     expect(countsIn("4 pax")).toEqual([4]);

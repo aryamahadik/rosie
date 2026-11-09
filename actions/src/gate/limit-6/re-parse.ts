@@ -109,9 +109,11 @@
 //      counts ("$40 [or $50]"), but an arrow ("->", "=>", "→") joins no time, as "to" joins none (round 3's default), so
 //      "4pm" out of "move my 3pm -> 4pm" passes as the 4pm said; an underscore is read as a space by the time reader
 //      ("_tomorrow_ at 3pm"); a count takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one
-//      "and" joins ("table for 4 and 7:30" keeps its count); a count between two of a time's values that is no bare hour
-//      ends no phrase, with the words before it that name what it counts ("party of 4", "table for 4", "mesa para 4"); and
-//      "ppl" and "pax" are a count's units (values/times.ts, values/phrase.ts, values/reparse.ts).
+//      "and" joins ("table for 4 and 7:30" keeps its count); a count written as a party between two of a time's values
+//      ends no phrase, with the words before it that name what it counts ("party of 4", "table for 4", "mesa para 4"): a
+//      whole number with its unit or those words, or else of at most two digits or in words, never a bare hour beside a
+//      day nor a number the time reader leaves unread as a time ("tomorrow 3.30 at 7pm" is refused, as before); and "ppl"
+//      and "pax" are a count's units (values/times.ts, values/phrase.ts, values/reparse.ts).
 
 import {
   foundAtWordEdges,
