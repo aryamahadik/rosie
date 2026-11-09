@@ -22,13 +22,18 @@
 // What the emitter writes and no stage computes: the manifest's storage table, and its lint summary of the marks the
 // steps carry (validate.ts lintMarksOf). The journeys' ship list is T-160's, so `journeys` is empty here; the
 // bundle id is T-150's, taken as given.
+//
+// Where the opt-out line goes (T-1116; Q-30): before either flow or any trade is compiled, stop-marks.ts placeStops()
+// walks every path of every trade given, with corrections/stops.ts walkStops(), over each flow; every message the
+// master graphs and the overlays hold then carries the marker those walks give it (true, "first" or none), so the line
+// renders once in each person's chat, on Rosie's first reply in a chat the person opened.
 import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { FlowLetter, MasterGraphs } from "../graph/types.ts";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeId } from "../load/trade";
-import { compileFlow, type JudgmentRules } from "./flow";
+import { compileFlow, correctedFlow, type JudgmentRules } from "./flow";
 import { collectSharedLists, SHARED_LIST_NAMES, type SharedListName } from "./shared-lists";
 import {
   PROMPT_KINDS,
@@ -47,6 +52,7 @@ import {
   type StandInValue,
 } from "./standins";
 import type { BundleStep } from "./steps";
+import { placeStops, type StopMarks } from "./stop-marks";
 import { compileTrade } from "./trade";
 import { BundleValidationError, checkBundlePart, lintRuleOrder, stepSchemaChecks } from "./validate";
 
@@ -162,20 +168,29 @@ function kvKey(id: BundleId, part: string): string {
  * against K-01 v1 (BundleValidationError when it is refused) and serializes each stored value.
  */
 export function emitBundle(input: EmitInputs): EmittedBundle {
+  const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
+  if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
+  const sorted = [...byId].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  const stops = {} as Record<FlowLetter, StopMarks>;
+  for (const flow of FLOWS)
+    stops[flow] = placeStops(
+      input.master[flow],
+      correctedFlow(input.master, flow),
+      sorted.map(([, trade]) => trade),
+    );
+
   const failures: Failure[] = [];
   const flows: Record<string, Obj> = {};
   for (const flow of FLOWS) {
-    const compiled = compileFlow(input.master, flow, input.judgmentRules);
+    const compiled = compileFlow(input.master, flow, input.judgmentRules, stops[flow]);
     flows[flow] = compiled.graph;
     failures.push(...failuresOf(compiled.steps, flow, null));
   }
 
   const trades: Record<string, Obj> = {};
-  const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
-  if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
   const ids = [...byId.keys()].sort();
-  for (const [id, trade] of [...byId].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
-    const compiled = compileTrade(input.master, trade);
+  for (const [id, trade] of sorted) {
+    const compiled = compileTrade(input.master, trade, stops);
     trades[id] = compiled.overlay;
     for (const flow of FLOWS) failures.push(...failuresOf(compiled.steps[flow], flow, id));
   }

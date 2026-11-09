@@ -15,15 +15,19 @@
 //   - S1-10's first reply in the chat the person's mobile opens (their text from that mobile) carries it;
 //   - over the swept trades (every money path of 17 trades, and every path of barber), both flows, each person's chat
 //     carries the line exactly once, on Rosie's first reply in it, on every walk: the test walks the flow itself, every
-//     walk with no cap, and names each message's person by its own rule.
+//     walk with no cap, and names each message's person by its own rule. The same sweep over all 243 trades (every money
+//     path, both flows) is parity.shard-9.test.ts, in the parity project (T-1116; T-1067), outside `npm test`.
+// T-1116: the lint's walk (lint/runner.ts) places the line with walkStops, a branch's `sets` followed, not with the
+// master's applyStops.
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter, Message } from "../graph/types.ts";
+import { lintContext, tradeInput } from "../lint/runner";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade } from "../load/trade";
 import { plainText } from "../msgtext";
 import { applyTrade, type AppliedStep } from "../overlay/apply";
-import { tradePaths, type TradePath } from "../path";
+import { tradePaths, walkPath, type TradePath } from "../path";
 import { FIRST_REPLY_LINES, FROM_MOBILE } from "./c9";
 import { applyCorrections, type CorrectedTrade } from "./framework";
 import { placedStops, settleStops, stopFor, walkStops, type ChatText, type StopWalk } from "./stops";
@@ -320,8 +324,8 @@ const NO_TEXTS: readonly string[] = ["callsonly", "email", "notsafe"];
 
 /**
  * The trades the sweep walks: the three above, and every 16th trade of the sorted list. It walks every money path of
- * each, and every booking and fixture path of barber too. All of them, on all 243 trades, take minutes: that sweep
- * belongs in the parity shards, outside `npm test` (T-1067).
+ * each, and every booking and fixture path of barber too. All of them, on all 243 trades, take minutes: that sweep is
+ * parity.shard-9.test.ts, in the parity project, outside `npm test` (T-1067, T-1116).
  */
 const SWEPT: readonly string[] = [...new Set([...TRADES, ...listTradeIds().filter((_, k) => k % 16 === 0)])];
 /** The trades whose booking and fixture paths the sweep walks as well. */
@@ -503,4 +507,48 @@ describe(`the line once per person's chat, over the paths of ${String(SWEPT.leng
       }
     });
   }
+});
+
+describe("the lint walks with walkStops (T-1116)", () => {
+  it("a trade's lint walk is walkStops' with a branch's sets followed: staff's first reply in S2-06 has the line, where the master's applyStops leaves it none", () => {
+    const trade = loadTrade("barber");
+    for (const flow of FLOWS) {
+      const done = corrected("barber", flow);
+      const ctx = lintContext(tradeInput(done, trade));
+      const money = ctx.paths().filter((path) => path.kind === "money");
+      expect(money.length).toBeGreaterThan(0);
+      for (const path of money) {
+        const where = `${flow} ${path.price}|${path.before}|${path.after}`;
+        const linted = ctx.walk(path).steps;
+        // The steps the lint reads are walkPath's, a branch's `sets` followed (one entry per reading), ...
+        expect(
+          linted.map((entry) => entry.id),
+          where,
+        ).toStrictEqual(walkPath(done, path).steps.map((entry) => entry.id));
+        // ... with the words walkStops settles on them.
+        expect(
+          linted.map((entry) => entry.words),
+          where,
+        ).toStrictEqual(walkStops(done, path, { sets: true }).steps.map((entry) => entry.words));
+        // S2-06, from its words: the staff member's text opens their chat, and Rosie's next text to them is her first
+        // reply there. The lint's walk gives it the line; the master's applyStops (walkPath) gives it none, since C9 took
+        // the marked invite that was the first text away.
+        const s206 = linted.find((entry) => entry.id === "S2-06")?.words.say ?? [];
+        const opened = s206.findIndex((message) => message[0] === "staff" && message[1] === "san");
+        const reply = s206.findIndex(
+          (message, k) =>
+            k > opened &&
+            message[0] === "san" &&
+            message[1] === "staff" &&
+            nameIn(message) === nameIn(s206[opened]),
+        );
+        expect(opened, where).toBeGreaterThanOrEqual(0);
+        expect(reply, where).toBeGreaterThan(opened);
+        expect(elementsOf(s206[reply])?.stop, `${where}: the lint's walk`).toBe(true);
+        expect(rendered(s206[reply]), where).toContain(OPT_OUT);
+        const master = walkPath(done, path).steps.find((entry) => entry.id === "S2-06")?.words.say ?? [];
+        expect(elementsOf(master[reply])?.stop, `${where}: the master's applyStops`).toBeUndefined();
+      }
+    }
+  });
 });

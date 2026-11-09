@@ -7,6 +7,8 @@
 //   3. sample-value slotting (T-142: slotFlow with the master's own sample table, C6);
 //   4. the steps (steps.ts: cards T-144, branches T-145, messages T-134), the record (T-137: compileRecord on the record
 //      as corrected and slotted), the routing tables (T-146: compileTradeRouting on the same flow) and the layer lines.
+//      Each message's opt-out line (its `stop` marker) is the one stop-marks.ts placeStops() gives it: walkStops() over
+//      every path of every trade the bundle holds (T-1116; Q-30), not the marker the master wrote.
 // What K-01 holds and no merged stage makes is given to the emitter: the 67 judgment rules (T-1050; until then a
 // stand-in, standins.ts).
 //
@@ -20,6 +22,7 @@ import { compileRecord } from "../record";
 import { compileTradeRouting } from "../routing";
 import { sampleTable, slotFlow } from "../slots";
 import { compileSteps, type BundleStep } from "./steps";
+import { markSteps, masterHolder, type StopMarks } from "./stop-marks";
 
 type Obj = Record<string, unknown>;
 
@@ -76,6 +79,22 @@ export function masterShape(graph: FlowGraph): AppliedFlow {
 }
 
 /**
+ * The master's own flow after the corrections (T-138), before the slotting: the flow the opt-out line's walks read
+ * (stop-marks.ts placeStops), where the sample names in `as` still name the people the chats belong to.
+ */
+export function correctedFlow(
+  master: MasterGraphs,
+  flow: FlowLetter,
+  corrections: readonly Correction[] = CORRECTIONS,
+): AppliedTrade {
+  const corrected = applyCorrections(
+    { trade: MASTER_TRADE, flow: masterShape(master[flow]), slotProblems: [] },
+    corrections,
+  );
+  return { trade: MASTER_TRADE, flow: corrected.flow, slotProblems: [] };
+}
+
+/**
  * The master's own flow after the corrections (T-138) and the slotting (T-142): an applied flow with no trade, which
  * the step, routing and record stages read.
  */
@@ -84,24 +103,33 @@ export function correctedMaster(
   flow: FlowLetter,
   corrections: readonly Correction[] = CORRECTIONS,
 ): AppliedTrade {
-  const graph = master[flow];
-  const corrected = applyCorrections(
-    { trade: MASTER_TRADE, flow: masterShape(graph), slotProblems: [] },
-    corrections,
-  );
-  const table = sampleTable(master, flow, null, graph);
+  const corrected = correctedFlow(master, flow, corrections);
+  const table = sampleTable(master, flow, null, master[flow]);
   return { trade: MASTER_TRADE, flow: slotFlow(corrected.flow, table), slotProblems: [] };
 }
 
-/** Compiles one flow's master graph (K-01 `flowGraph`). */
+/**
+ * Compiles one flow's master graph (K-01 `flowGraph`). `stops` is placeStops() of the flow over the bundle's trades:
+ * each message's opt-out line is the one it gives (none where the walks show no line).
+ */
 export function compileFlow(
   master: MasterGraphs,
   flow: FlowLetter,
   judgmentRules: JudgmentRules,
+  stops: StopMarks,
   corrections: readonly Correction[] = CORRECTIONS,
 ): CompiledFlow {
   const graph = master[flow];
-  const applied = correctedMaster(master, flow, corrections);
+  if (stops.flow !== flow)
+    throw new Error(`the opt-out line's marks are flow ${stops.flow}'s, not flow ${flow}'s`);
+  const corrected = correctedMaster(master, flow, corrections);
+  const applied: AppliedTrade = {
+    ...corrected,
+    flow: {
+      ...corrected.flow,
+      steps: markSteps(stops, corrected.flow.steps, (step) => () => masterHolder(step.id)),
+    },
+  };
   const compiled = compileSteps(applied);
   const sections = graph.sections.map((section) => ({
     n: section.n,

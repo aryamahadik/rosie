@@ -14,7 +14,9 @@
 //   settleStops(step, rec)     the override of applyStops() for a walked path: the line (`stop: true`) on Rosie's first
 //                              reply in an opened chat when it is that on every walk, "first" where it depends on the
 //                              walk, and no marker on any other message: never on a text to a chat nobody opened.
-//   walkStops(applied, path)   walkPath() with each lit step's words settled by settleStops() over chatTexts().
+//   walkStops(applied, path)   walkPath() with each lit step's words settled by settleStops() over chatTexts(). The
+//                              emitted bundle (emit/stop-marks.ts) and the lint's walk (lint/runner.ts) place the
+//                              line with it (T-1116).
 //
 // A chat belongs to a person, not to a role word (DL-211). The person is the lane with the name the message gives
 // (`as`), as overlay-core.js textTo reads it, with two readings of the master's words on top:
@@ -31,7 +33,8 @@
 // The opener and the privacy link are fixed lines the action layer adds at run time (C-089, not here): the compiled
 // words say only which message carries them, the one the line renders on.
 import type { AppliedStep, AppliedTrade } from "../overlay/apply";
-import { lit, resolveVary, walkPath, type LitStep, type TradePath } from "../path";
+import { syncFlow, toCorePath, walkPath, type LitStep, type TradePath } from "../path";
+import { loadPathScripts } from "../path/core";
 import { FROM_MOBILE } from "./c9";
 
 /** The lanes with a number Rosie can text (overlay-core.js textTo: NUMBER). */
@@ -249,6 +252,11 @@ function after(statuses: ReadonlySet<Status>, fromPerson: boolean): ReadonlySet<
  */
 export function chatTexts(applied: AppliedTrade, path: TradePath): ChatTexts {
   const names = applied.flow.names;
+  // The vendored tables read this flow once, and one core path serves every step, as walkPath() reads a path
+  // (path/words.ts): the lit() and resolveVary() wrappers would sync the tables and copy the path again at each step.
+  const { core } = loadPathScripts();
+  syncFlow(applied.flow);
+  const onPath = toCorePath(path);
   const out: ChatTexts = {};
   const recordOf = (id: string, index: number, to: string, message: Line): ChatText => {
     const byIndex = (out[id] ??= {});
@@ -265,8 +273,8 @@ export function chatTexts(applied: AppliedTrade, path: TradePath): ChatTexts {
     let current = [...readings];
     for (const step of list) {
       if (step.off !== undefined || step.kind === "rule") continue;
-      if (step.when !== undefined && !lit(applied, step.when, path)) continue;
-      const say = isTextStep(step) ? resolveVary(applied, step, path).step.say : undefined;
+      if (step.when !== undefined && !core.lit(step.when, onPath)) continue;
+      const say = isTextStep(step) ? core.resolveVary(step, onPath).step.say : undefined;
       if (Array.isArray(say)) {
         const helper = step.id === HELPER_STEP ? helperOf(step, say, names) : null;
         current = join(
@@ -305,7 +313,7 @@ export function chatTexts(applied: AppliedTrade, path: TradePath): ChatTexts {
       if (step.type !== "split") continue;
       let merged: Reading[] = [];
       for (const branch of step.branches ?? []) {
-        if (branch.off !== undefined || !lit(applied, branch.when, path)) continue;
+        if (branch.off !== undefined || !core.lit(branch.when, onPath)) continue;
         const walked = go(branch.steps, current);
         if ((branch.end ?? "merge") !== "end") merged = merged.concat(walked);
       }
@@ -356,18 +364,29 @@ export function settleStops(
 export interface StopWalk {
   path: TradePath;
   texts: ChatTexts;
-  /** As walkPath() with `{ sets: false }` gives them (each step once, read with the walked path), words settled. */
+  /**
+   * As walkPath() gives them, words settled: with `{ sets: false }` by default (each step once, read with the walked
+   * path), or following a branch's `sets` with `{ sets: true }` (a step after such a split once per reading).
+   */
   steps: LitStep[];
 }
 
-/** walkPath() of the path, each lit step's opt-out line placed by settleStops() over chatTexts() (Q-30). */
-export function walkStops(applied: AppliedTrade, path: TradePath): StopWalk {
+/**
+ * walkPath() of the path, each lit step's opt-out line placed by settleStops() over chatTexts() (Q-30), in place of the
+ * master's applyStops (T-1116: path/words.ts walkPath's `settle`). The texts are those of the walked path, as
+ * firstTexts() reads it for applyStops, also where a step reads the path after a branch's `sets`.
+ */
+export function walkStops(
+  applied: AppliedTrade,
+  path: TradePath,
+  options: { sets?: boolean } = {},
+): StopWalk {
   const texts = chatTexts(applied, path);
-  const steps = walkPath(applied, path, { sets: false }).steps.map((entry) => ({
-    ...entry,
-    words: settleStops(resolveVary(applied, entry.step, path).step, texts[entry.id]),
-  }));
-  return { path, texts, steps };
+  const walk = walkPath(applied, path, {
+    sets: options.sets ?? false,
+    settle: (words, id) => settleStops(words, texts[id]),
+  });
+  return { path, texts, steps: walk.steps };
 }
 
 /** Every message a settled walk gives the opt-out line (`stop: true`) or the line on some walks (`"first"`). */

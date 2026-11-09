@@ -20,14 +20,17 @@
 // money step (lintSteps' zone and early, lines 1911-1913). A rule that reads a trade path by path (T-157's lookup
 // field) has the path model (T-136): paths() gives the trade's paths (path/model.ts tradePaths: its listed money paths,
 // its booking values and the record's fixtures, with its own switches and facts) and walk(path) what one path lights
-// (path/words.ts walkPath). The master is linted as a whole flow, as lintSteps lints it: it has no trade paths.
+// (path/words.ts walkPath, following a branch's `sets`), each step's opt-out line placed per person as Master
+// Corrections C9 and Q-30 place it (corrections/stops.ts walkStops, T-1116), not by the master's applyStops. The
+// master is linted as a whole flow, as lintSteps lints it: it has no trade paths.
 //
 // K-01 v1 names every hit of the master's own rules L1 to L8 `record-lint` (the record's own lint tables); the report
 // that K-01 holds (rules with their failure counts, and each failing step) is written from this result by T-160.
+import { walkStops } from "../corrections/stops";
 import type { FlowGraph, FlowLetter, StepId } from "../graph/types.ts";
 import type { LoadedTrade, TradeId } from "../load/trade";
 import type { AppliedTrade } from "../overlay/apply";
-import { tradePaths, walkPath, type PathWalk, type TradePath } from "../path";
+import { tradePaths, type PathWalk, type TradePath } from "../path";
 import {
   compileRecord,
   compileTradeRecord,
@@ -133,7 +136,10 @@ export interface LintContext extends LintInput {
    * fixtures on them), made on the first call; none for the master, which is linted as one whole flow.
    */
   paths(): readonly TradePath[];
-  /** What one of the trade's paths lights, in page order, with each step's words on it (path/words.ts walkPath). */
+  /**
+   * What one of the trade's paths lights, in page order, with each step's words on it (path/words.ts walkPath, a
+   * branch's `sets` followed), the opt-out line placed per person (corrections/stops.ts walkStops).
+   */
   walk(path: TradePath): PathWalk;
 }
 
@@ -270,7 +276,7 @@ export function lintContext(input: LintInput): LintContext {
       throw new LintError(
         "the master is linted as one whole flow: only a trade's applied flow has paths to walk",
       );
-    return walkPath(overlay.applied, path);
+    return walkStops(overlay.applied, path, { sets: true });
   };
 
   return { ...input, pageOrder, homes, place, paths, walk };
