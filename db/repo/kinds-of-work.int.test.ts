@@ -827,7 +827,11 @@ describe("the migration against the frozen table list (K-24 v1 kinds of work)", 
       select conname as name from pg_constraint
       where contype = 'f' and confrelid = ${`${db.schema}.kinds`}::regclass
     `;
-    expect(referring.map((key) => key.name).sort()).toEqual(["kind_flows_kind_fk", "picked_kinds_kind_fk"]);
+    expect(referring.map((key) => key.name).sort()).toEqual([
+      "kind_flows_kind_fk",
+      "picked_kinds_kind_fk",
+      "services_kind_fk",
+    ]);
   });
 
   it("is recorded in schema_migrations as kinds_of_work, after business_setup and people_access", async () => {
