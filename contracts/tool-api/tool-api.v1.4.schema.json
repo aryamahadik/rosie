@@ -640,7 +640,7 @@
     },
     "chargeBound": {
       "title": "ChargeBound",
-      "description": "A K-32 payment this commit wrote pending, with its one K-07 effect (a stripe_charge on the saved card, or A6-32's stripe_pay_link), and the bound yes behind it (lead's note on T-053; v1.3 defaults 109, 110; K-32 v1 rule 10: a payment with no bound yes behind it is refunded at once): the K-29 consent the effect's effect.created event-log row names as approved_by (K-08 v1 approvalConsentRow, kind consentRow), the same one the booking's terms snapshot names (K-30 booking_terms.terms_consent_id), so C-018's hourly check finds it by either road. It is the money step's ticked_terms consent (v1.3 takeMoneyBefore yes, consentId), or A6-03's fresh yes's (askOwnerFirst customerAnswer, README default 117). Only K-14's result, or paymentSucceeded, makes it paid (K-32 rule 5); nothing is held (RULES 3.2).",
+      "description": "A K-32 payment this commit wrote pending, with its one K-07 effect (a stripe_charge on the saved card, or A6-32's stripe_pay_link), and the bound yes behind it (lead's note on T-053; README default 127; v1.3 defaults 109, 110; K-32 v1 rule 10: a payment with no bound yes behind it is refunded at once): the K-29 consent the effect's effect.created event-log row names as approved_by (K-08 v1 approvalConsentRow, kind consentRow), the same one the booking's terms snapshot names (K-30 booking_terms.terms_consent_id), so C-018's hourly check finds it by either road. It is the money step's ticked_terms consent (v1.3 takeMoneyBefore yes, consentId), or A6-03's fresh yes's (askOwnerFirst customerAnswer, README default 117). Only K-14's result, or paymentSucceeded, makes it paid (K-32 rule 5); nothing is held (RULES 3.2).",
       "type": "object",
       "properties": {
         "paymentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
@@ -1652,7 +1652,7 @@
     },
     "writeBooking.request": {
       "title": "WriteBookingRequest",
-      "description": "A6-10, B6-10, 'Writes the booking' ('Rosie checks the calendars once more, then saves the booking. Anything due now is charged as it's written. It shows on Riley's phone calendar too'), and A6-12 at a new time ('The same steps, at the new time'); gives booked (A6-10, B6-10; A6-12; once what is due now is paid: A6-10's 'Yes' after the charge, A6-32's and B6-35's 'Paid in time') and code (A6-14, B6-13, the confirmation the same commit writes, with the visit's new check-in code), the one call that writes each (02-contracts section 8; README 'v1.4', 'Each key's one call'; default 111 says when). Four stages. write: the fresh free/busy read first (K-16 v1 freeBusy, purpose bookingWrite, on each booked person's calendar link over the visit's time: arch 05 line 259; on the calendar double, Q-56), then, in one commit: the time still free and nothing due now on a card (nothing taken; a card saved only; a line paid by credit; C3's pay link already paid, v1.3 default 104's step 6): the reservation confirmed booked (K-05 v1 commitTurn, its saved-time clock row cancelled), the head booked (K-04 bookings.stage), each visit with its new check-in code sealed under its person's key (K-30 booking_visits), the terms snapshot naming the money step's yes (K-30 booking_terms.terms_consent_id: the money step's ticked_terms consent, never a pack's, v1.3 default 109; booking_terms_rules), one K-07 calendar_write effect per visit per booked person with a calendar link (K-16 calendarWrite; 'A team member's own booking blocks their work calendar'), A6-14's confirmation to the code's person (into their open chat, else by email; on the page; to the customer's own AI only the booking number and the chat link, never the code: MC C2, C9; README default 119), and A6-15's job row to the pro (README default 120): result booked. The time still free and a deposit or the full price due now on the saved card (the standard door: a booking made now on the page, or the owner's OK, A6-03): the reservation confirmed booked ('so a time lost in that moment costs nothing': S13-55), the terms snapshot, and the K-32 payment pending with its payment_items and one K-07 stripe_charge effect on the saved card (K-14 charge, purpose deposit or fullPrice), approved by the money step's consent (chargeBound): result charging, no key, no visit, no code and no message, since 'The confirmation waits until it's paid' (A6-10) and K-30 never updates a visit's code (README default 111). The time taken a moment ago (the fresh read finds it busy, or the hold is gone and K-05 reserve finds it taken): nothing written but the hold released and A6-11's next open times, soonest first, the same person, at the line's price (README default 122), with A6-11's question (10 minutes on the page; after an OK 2 of their text hours, ending before the visit): result takenMomentAgo, 'Nothing was charged'. A pick of one of them (A6-12; B6-10 after B6-11's 'A or B': the customer's own answer and the option, whose time code reads from the stored question, never the caller's) reserves that time (K-05 v1 reserve) and writes as above. paid (a job only: C-101's handling of the charge's result charged, or of paymentSucceeded for a charge that needed the bank's check or for A6-32's pay link): the payment paid (K-32 rule 5: the runtime side only), then in one commit the head booked, each visit with its code, the calendar writes, and the confirmation and the job row through clock rows due at once (a job's commit writes no outbox row): result booked; on A6-32's paid link, 'that card is the one saved for it' (K-32 saved_cards.saved_from_payment_id) and the declined card is removed (nothing_needs_it). chargeFailed (a job only: C-101's handling of a decline, never retried, RULES 3.11): a booking made now on the page shows it as any declined card, 'Try another card' (S12-25), and its own clock runs (A5-31: a K-04 clock row at the hold's held_until, whose firing lets the time go and ends the request let_go, A5-06; 'Nothing is saved after it'): result tryAnotherCard; another card is v1.3's card stage, then write again; after an OK, or on a job sent now after one, A6-32's one pay link (K-32 payment pending with its K-07 stripe_pay_link, K-14 payLink with saveCardForLater where the booking keeps its card; its pay_links row due by {{clock.pay}}, the request's latest answer time, 'The time stays saved until then'), only to the payer's own ways (their open chat, else their email: never the AI, the owner or the pro), and 'Anyone already told hears it at once': on a job sent now the pro, 'Payment didn't go through yet. Don't set out.' (README default 121): result payLinkSent. Not paid by the deadline is the pay link's clock firing (closePayLink: not booked, the time goes back, any card saved for it removed, request ended not_paid), never this call. noneWorks (A6-11's 'C Neither works', B6-11's): A6-13, nothing booked, the request ended let_go, the hold released, a card saved for it removed, the customer told A6-13's line: result letGo; no pick by the deadline is the question clock's firing. Silence never books and never charges: every stage is an act a person or a result asked for. Primary, uncached. Business: caller.businessId; row-level security on every K-04, K-30 and K-32 row (arch 10 line 546; K-30 rule 5). Person: the head's booker, set on the server; none for a job. Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: the head, booking_details and the reservation compared and set (limits 4 and 5); new rows at version 1.",
+      "description": "A6-10, B6-10, 'Writes the booking' ('Rosie checks the calendars once more, then saves the booking. Anything due now is charged as it's written. It shows on Riley's phone calendar too'), and A6-12 at a new time ('The same steps, at the new time'); gives booked (A6-10, B6-10; A6-12; once what is due now is paid: A6-10's 'Yes' after the charge, A6-32's and B6-35's 'Paid in time') and code (A6-14, B6-13, the confirmation the same commit writes, with the visit's new check-in code), the one call that writes each (02-contracts section 8; README 'v1.4', 'Each key's one call'; default 111 says when). Four stages. write: the fresh free/busy read first (K-16 v1 freeBusy, purpose bookingWrite, on each booked person's calendar link over the visit's time: arch 05 line 259; on the calendar double, Q-56), then, in one commit: the time still free and nothing due now on a card (nothing taken; a card saved only; a line paid by credit; C3's pay link already paid, v1.3 default 104's step 6): the reservation confirmed booked (K-05 v1 commitTurn, its saved-time clock row cancelled), the head booked (K-04 bookings.stage), each visit with its new check-in code sealed under its person's key (K-30 booking_visits), the terms snapshot naming the money step's yes (K-30 booking_terms.terms_consent_id: the money step's ticked_terms consent, never a pack's, v1.3 default 109; booking_terms_rules), one K-07 calendar_write effect per visit per booked person with a calendar link (K-16 calendarWrite; 'A team member's own booking blocks their work calendar'), A6-14's confirmation to the code's person (into their open chat, else by email; on the page; to the customer's own AI only the booking number and the chat link, never the code: MC C2, C9; README default 119), and A6-15's job row to the pro (README default 120): result booked. The time still free and a deposit or the full price due now on the saved card (the standard door: a booking made now on the page, or the owner's OK, A6-03): the reservation confirmed booked ('so a time lost in that moment costs nothing': S13-55), the terms snapshot, and the K-32 payment pending with its payment_items and one K-07 stripe_charge effect on the saved card (K-14 charge, purpose deposit or fullPrice), approved by the money step's consent (chargeBound): result charging, no key, no visit, no code and no message, since 'The confirmation waits until it's paid' (A6-10) and K-30 never updates a visit's code (README default 111). The time taken a moment ago (the fresh read finds it busy, or the hold is gone and K-05 reserve finds it taken): nothing written but the hold released and A6-11's next open times, soonest first, the same person, at the line's price (README default 122), with A6-11's question and its deadline's clock row (10 minutes on the page; after an OK 2 of their text hours, ending before the visit, armed at the question's first delivery): result takenMomentAgo, 'Nothing was charged'. A pick of one of them (A6-12; B6-10 after B6-11's 'A or B': the customer's own answer and the option, whose time code reads from the stored question, never the caller's) reserves that time (K-05 v1 reserve) and writes as above. paid (a job only: C-101's handling of the charge's result charged, or of paymentSucceeded for a charge that needed the bank's check or for A6-32's pay link): the payment paid (K-32 rule 5: the runtime side only), then in one commit the head booked, each visit with its code, the calendar writes, and the confirmation and the job row through clock rows due at once (a job's commit writes no outbox row): result booked; on A6-32's paid link, 'that card is the one saved for it' (K-32 saved_cards.saved_from_payment_id) and the declined card is removed (nothing_needs_it). chargeFailed (a job only: C-101's handling of a decline, never retried, RULES 3.11): a booking made now on the page shows it as any declined card, 'Try another card' (S12-25), and its own clock runs (A5-31: a K-04 clock row at the hold's held_until, whose firing lets the time go and ends the request let_go, A5-06; 'Nothing is saved after it'): result tryAnotherCard; another card is v1.3's card stage, then write again; after an OK, or on a job sent now after one, A6-32's one pay link (K-32 payment pending with its K-07 stripe_pay_link, K-14 payLink with saveCardForLater where the booking keeps its card; its pay_links row due by {{clock.pay}}, the request's latest answer time, 'The time stays saved until then', and one K-04 clock row at that deadline, its lapse: deadline), only to the payer's own ways (their open chat, else their email: never the AI, the owner or the pro), and 'Anyone already told hears it at once': on a job sent now the pro, 'Payment didn't go through yet. Don't set out.' (README default 121): result payLinkSent. Not paid by the deadline is the pay link's clock firing (closePayLink: not booked, the time goes back, any card saved for it removed, request ended not_paid), never this call. noneWorks (A6-11's 'C Neither works', B6-11's): A6-13, nothing booked, the request ended let_go, the hold released, a card saved for it removed, the customer told A6-13's line: result letGo; no pick by the deadline is the question clock's firing. Silence never books and never charges: every stage is an act a person or a result asked for. Primary, uncached. Business: caller.businessId; row-level security on every K-04, K-30 and K-32 row (arch 10 line 546; K-30 rule 5). Person: the head's booker, set on the server; none for a job. Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: the head, booking_details and the reservation compared and set (limits 4 and 5); new rows at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1915,7 +1915,7 @@
           "anyOf": [{ "$ref": "#/$defs/payLinkIssued" }, { "type": "null" }]
         },
         "nextTimes": {
-          "description": "For takenMomentAgo, A6-11's next open times, soonest first, the same person, each at the line's price (README default 122), as its options A and B, with the question's deadline and its row (null on the page, which shows them; 'C Neither works' is its third option).",
+          "description": "For takenMomentAgo, A6-11's next open times, soonest first, the same person, each at the line's price (README default 122), as its options A and B ('C Neither works' is its third option), and the question's row (null on the page, which shows them); its deadline is `deadline`.",
           "anyOf": [
             {
               "type": "object",
@@ -1926,26 +1926,28 @@
                   "maxItems": 2,
                   "items": { "$ref": "#/$defs/timeOffered" }
                 },
-                "answerBy": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" },
                 "question": { "anyOf": [{ "$ref": "#/$defs/messageWritten" }, { "type": "null" }] }
               },
-              "required": ["times", "answerBy", "question"],
+              "required": ["times", "question"],
               "additionalProperties": false
             },
             { "type": "null" }
           ]
         },
-        "pageClock": {
-          "description": "For tryAnotherCard, the page's own clock (A5-31): a K-04 clock row due at the hold's held_until, whose firing lets the time go if nothing is paid by then (A5-06); null otherwise.",
+        "deadline": {
+          "description": "The K-04 clock row this commit writes whose firing is the lapse, never a call (README default 121): pageClock, for tryAnotherCard, the page's own clock (A5-31) due at the hold's held_until, whose firing lets the time go and ends the request let_go if nothing is paid by then (A5-06); payLink, for payLinkSent, due at the pay link's due_at, whose firing closes it (K-14 closePayLink), lets the time go, removes any card saved for it and ends the request not_paid ('Not paid in time'), and on its way tells anyone already told; nextTimes, for takenMomentAgo, A6-11's 'C, or no reply': on the page due 10 minutes on, in a turn the question's own clock row, whose due time is set when it is armed at its first delivery (dueAt null; arch 02 line 127), 2 of their text hours ending before the visit; its firing lets it go as A6-13 does. null otherwise.",
           "anyOf": [
             {
               "type": "object",
               "properties": {
+                "kind": { "type": "string", "enum": ["pageClock", "payLink", "nextTimes"] },
                 "clockRowId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
-                "dueAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" }
+                "dueAt": { "$ref": "#/$defs/nullableUtc" }
               },
-              "required": ["clockRowId", "dueAt"],
-              "additionalProperties": false
+              "required": ["kind", "clockRowId", "dueAt"],
+              "additionalProperties": false,
+              "if": { "properties": { "kind": { "enum": ["pageClock", "payLink"] } }, "required": ["kind"] },
+              "then": { "properties": { "dueAt": { "$ref": "../common/formats.v1.schema.json#/$defs/utc" } } }
             },
             { "type": "null" }
           ]
@@ -2020,7 +2022,7 @@
         "payment",
         "payLink",
         "nextTimes",
-        "pageClock",
+        "deadline",
         "bookingNumber",
         "chatLink",
         "messages",
@@ -2062,7 +2064,7 @@
           ]
         },
         {
-          "description": "Booked: the time confirmed, at least one visit, the booking number, the confirmation and the job row; booked given, and code for every visit with a code; no charge, pay link, next times or page clock.",
+          "description": "Booked: the time confirmed, at least one visit, the booking number, the confirmation and the job row; booked given, and code for every visit with a code; no charge, pay link, next times or deadline.",
           "if": { "properties": { "result": { "const": "booked" } }, "required": ["result"] },
           "then": {
             "properties": {
@@ -2072,7 +2074,7 @@
               "payment": { "type": "null" },
               "payLink": { "type": "null" },
               "nextTimes": { "type": "null" },
-              "pageClock": { "type": "null" },
+              "deadline": { "type": "null" },
               "requestEnded": { "type": "null" },
               "gives": { "type": "array", "minItems": 1, "contains": { "const": "booked" } },
               "effects": {
@@ -2100,7 +2102,7 @@
               "chatLink": { "type": "null" },
               "payLink": { "type": "null" },
               "nextTimes": { "type": "null" },
-              "pageClock": { "type": "null" },
+              "deadline": { "type": "null" },
               "gives": { "type": "array", "maxItems": 0 },
               "effects": {
                 "type": "array",
@@ -2112,12 +2114,13 @@
           }
         },
         {
-          "description": "A pay link after a failed charge: its payment with its bound yes, its one stripe_pay_link, no url (only the payer's own ways), no key.",
+          "description": "A pay link after a failed charge: its payment with its bound yes, its one stripe_pay_link, no url (only the payer's own ways), its deadline's clock row, no key.",
           "if": { "properties": { "result": { "const": "payLinkSent" } }, "required": ["result"] },
           "then": {
             "properties": {
               "payment": { "type": "object", "properties": { "customerPresent": { "const": false } } },
               "payLink": { "type": "object", "properties": { "url": { "type": "null" } } },
+              "deadline": { "type": "object", "properties": { "kind": { "const": "payLink" } } },
               "visits": { "type": "array", "maxItems": 0 },
               "gives": { "type": "array", "maxItems": 0 },
               "effects": {
@@ -2148,26 +2151,34 @@
           }
         },
         {
-          "description": "The time taken a moment ago: the next times, never a snapshot.",
+          "description": "The time taken a moment ago: the next times and their deadline, never a snapshot.",
           "if": { "properties": { "result": { "const": "takenMomentAgo" } }, "required": ["result"] },
           "then": {
-            "properties": { "nextTimes": { "type": "object" }, "termsSnapshot": { "type": "null" } }
+            "properties": {
+              "nextTimes": { "type": "object" },
+              "termsSnapshot": { "type": "null" },
+              "deadline": { "type": "object", "properties": { "kind": { "const": "nextTimes" } } }
+            }
           },
           "else": { "properties": { "nextTimes": { "type": "null" } } }
         },
         {
           "description": "A booking made now, declined on the page: its own clock.",
           "if": { "properties": { "result": { "const": "tryAnotherCard" } }, "required": ["result"] },
-          "then": { "properties": { "pageClock": { "type": "object" } } },
-          "else": { "properties": { "pageClock": { "type": "null" } } }
+          "then": {
+            "properties": {
+              "deadline": { "type": "object", "properties": { "kind": { "const": "pageClock" } } }
+            }
+          }
         },
         {
-          "description": "'C Neither works': the request ended let_go and the customer told.",
+          "description": "'C Neither works': the request ended let_go and the customer told; no deadline is left.",
           "if": { "properties": { "result": { "const": "letGo" } }, "required": ["result"] },
           "then": {
             "properties": {
               "requestEnded": { "const": "let_go" },
-              "messages": { "type": "array", "minItems": 1 }
+              "messages": { "type": "array", "minItems": 1 },
+              "deadline": { "type": "null" }
             }
           },
           "else": { "properties": { "requestEnded": { "type": "null" } } }

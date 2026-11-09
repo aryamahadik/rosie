@@ -41,7 +41,7 @@
     "payment": null,
     "payLink": null,
     "nextTimes": null,
-    "pageClock": null,
+    "deadline": null,
     "bookingNumber": "LB1103",
     "chatLink": { "chatLinkId": "chatlink-agent-dee-style-consult", "url": "rosfield.com/t/placeholder-chat-code-0002" },
     "messages": [

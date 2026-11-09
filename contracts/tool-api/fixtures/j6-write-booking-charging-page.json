@@ -37,7 +37,7 @@
     },
     "payLink": null,
     "nextTimes": null,
-    "pageClock": null,
+    "deadline": null,
     "bookingNumber": null,
     "chatLink": null,
     "messages": [],

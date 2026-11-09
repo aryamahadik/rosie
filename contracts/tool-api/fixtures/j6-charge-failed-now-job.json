@@ -30,7 +30,7 @@
     "payment": null,
     "payLink": null,
     "nextTimes": null,
-    "pageClock": { "clockRowId": "clock-alex-grooms-declined-page", "dueAt": "2026-11-07T15:34:30Z" },
+    "deadline": { "kind": "pageClock", "clockRowId": "clock-alex-grooms-declined-page", "dueAt": "2026-11-07T15:34:30Z" },
     "bookingNumber": null,
     "chatLink": null,
     "messages": [],

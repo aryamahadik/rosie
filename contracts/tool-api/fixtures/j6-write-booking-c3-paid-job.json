@@ -41,7 +41,7 @@
     "payment": null,
     "payLink": null,
     "nextTimes": null,
-    "pageClock": null,
+    "deadline": null,
     "bookingNumber": "LB1102",
     "chatLink": { "chatLinkId": "chatlink-agent-dee-signature-cut", "url": null },
     "messages": [

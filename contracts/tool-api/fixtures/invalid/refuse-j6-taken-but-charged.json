@@ -42,10 +42,9 @@
           "seatsLeft": null
         }
       ],
-      "answerBy": "2026-10-21T23:32:00Z",
       "question": null
     },
-    "pageClock": null,
+    "deadline": { "kind": "nextTimes", "clockRowId": "clock-page-alex-oct24-next-times", "dueAt": "2026-10-21T23:32:00Z" },
     "bookingNumber": null,
     "chatLink": null,
     "messages": [],

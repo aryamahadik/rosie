@@ -44,7 +44,11 @@
       "slot": "link.pay"
     },
     "nextTimes": null,
-    "pageClock": null,
+    "deadline": {
+      "kind": "payLink",
+      "clockRowId": "clock-alex-color-correction-pay-deadline",
+      "dueAt": "2026-11-06T17:00:00Z"
+    },
     "bookingNumber": null,
     "chatLink": null,
     "messages": [],

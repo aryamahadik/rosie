@@ -41,7 +41,7 @@
     "payment": null,
     "payLink": null,
     "nextTimes": null,
-    "pageClock": null,
+    "deadline": null,
     "bookingNumber": "LH1019",
     "chatLink": null,
     "messages": [

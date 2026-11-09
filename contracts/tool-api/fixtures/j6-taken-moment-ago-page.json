@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-21T23:22:00Z",
     "stated": null,
-    "note": "A6-10's 'Taken a moment ago', then A6-11, on Lee's Barbershop's booking page: Alex's haircut with Riley, Sat Oct 24 at 11:00am, booked now with a card saved for the $20 fee (list|card|counter), his yes given. The page server calls writeBooking write, and the fresh read of Riley's calendar (K-16 freeBusy, bookingWrite) finds a busy block over 11:00am, added a moment ago. So nothing is booked and nothing is charged ('Nothing was charged'): the hold is let go (K-05 v1 release, let_go), and A6-11's next open times show, soonest first, Riley's only ('Alex picked Riley, so Riley's next times show'), each at the line's own $35, so the money he said yes to stands (README default 122): A) Sat Oct 24 at 2:00pm, B) Tue Oct 27 at 11:00am, and 'C Neither works'. He is on the page, so the page shows them (question null) with its 10 minutes, to 7:32pm in New York ('10 minutes only while they're on the page'); his saved card stays as it was while he picks ('Any money stays as it was'). No key. The option and reservation ids are examples (README default 48)."
+    "note": "A6-10's 'Taken a moment ago', then A6-11, on Lee's Barbershop's booking page: Alex's haircut with Riley, Sat Oct 24 at 11:00am, booked now with a card saved for the $20 fee (list|card|counter), his yes given. The page server calls writeBooking write, and the fresh read of Riley's calendar (K-16 freeBusy, bookingWrite) finds a busy block over 11:00am, added a moment ago. So nothing is booked and nothing is charged ('Nothing was charged'): the hold is let go (K-05 v1 release, let_go), and A6-11's next open times show, soonest first, Riley's only ('Alex picked Riley, so Riley's next times show'), each at the line's own $35, so the money he said yes to stands (README default 122): A) Sat Oct 24 at 2:00pm, B) Tue Oct 27 at 11:00am, and 'C Neither works'. He is on the page, so the page shows them (question null) with its 10 minutes, to 7:32pm in New York ('10 minutes only while they're on the page'), and one clock row due then is its 'C, or no reply' (deadline): its firing lets it go as A6-13 does, never a call; his saved card stays as it was while he picks ('Any money stays as it was'). No key. The option and reservation ids are examples (README default 48)."
   },
   "request": {
     "caller": {
@@ -52,10 +52,9 @@
           "seatsLeft": null
         }
       ],
-      "answerBy": "2026-10-21T23:32:00Z",
       "question": null
     },
-    "pageClock": null,
+    "deadline": { "kind": "nextTimes", "clockRowId": "clock-page-alex-oct24-next-times", "dueAt": "2026-10-21T23:32:00Z" },
     "bookingNumber": null,
     "chatLink": null,
     "messages": [],
@@ -66,7 +65,10 @@
       { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-page-alex-oct24-1" }
     ],
     "gives": [],
-    "written": [{ "table": "reservations", "rowId": "rsv-page-alex-oct24-riley", "version": 2 }],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-page-alex-oct24-riley", "version": 2 },
+      { "table": "clock_rows", "rowId": "clock-page-alex-oct24-next-times", "version": 1 }
+    ],
     "repeated": false
   }
 }
