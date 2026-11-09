@@ -11,7 +11,7 @@ import { unescapeData } from "../context/tags";
 import type { FetchLike, GatewayBundle } from "../gateway";
 import type { RecordedModel } from "../recorded-double";
 import { SAFETY_READ_PROMPT } from "./prompt";
-import type { SafetyResult } from "./types";
+import type { DangerWordEntry, SafetyResult } from "./types";
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
@@ -57,6 +57,31 @@ export const CARD_FIXTURES = [
 /** A K-02 v1 fixture of `safetyResult`. */
 export const k02 = (file: string): SafetyResult =>
   readJson(`contracts/model/fixtures/${file}`) as SafetyResult;
+
+/** Every K-02 v1 fixture of `safetyResult` that K-02 accepts, in its index's order (contracts/model/fixtures/index.json). */
+export const SAFETY_RESULT_FIXTURES: readonly string[] = (
+  readJson("contracts/model/fixtures/index.json") as {
+    fixtures: { file: string; version: string; def?: string; expect: string }[];
+  }
+).fixtures
+  .filter((entry) => entry.version === "v1" && entry.def === "safetyResult" && entry.expect === "accept")
+  .map((entry) => entry.file);
+
+/**
+ * The danger words K-02 v1's own safety fixtures show, each once, in the index's order, with their list and kind. No
+ * source lists the words themselves (K-02 README, open gaps; CQ-24), so these are the only ones written down; the
+ * actor's tests match the same fixture words (T-246). Read with them, each fixture's text finds its fixture's words.
+ */
+export const K02_DANGER_WORDS: readonly DangerWordEntry[] = (() => {
+  const seen = new Map<string, DangerWordEntry>();
+  for (const file of SAFETY_RESULT_FIXTURES) {
+    for (const { words, list, kind } of k02(file).dangerWords) {
+      const key = JSON.stringify([words, list, kind]);
+      if (!seen.has(key)) seen.set(key, { words, list, kind });
+    }
+  }
+  return [...seen.values()];
+})();
 
 interface RecordingSpec {
   id: string;
