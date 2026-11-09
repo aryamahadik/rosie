@@ -24,7 +24,8 @@
 -- business_id), customers (business_id, person_id), booking_lines.id, booking_visits (id, booking_id)), all on delete
 -- restrict, so a pack and a membership name a customer and a service of their own business. Inside the part, composite
 -- keys hold every row to its own business ((x_id, business_id) to (id, business_id)). K-04's, K-29's and K-30's rows are
--- keyed by id alone, so a row's business is held to theirs by rule 5's policies below, not by a key. MATCH SIMPLE: a row
+-- keyed without their business (by id, a visit by (id, booking_id)), so a row's business is held to theirs by rule 5's
+-- policies below, not by a key. MATCH SIMPLE: a row
 -- with no booking, visit, payment, card, credit, plan charge, line, refund, reminder, yes or person leaves that key
 -- unchecked. The tables follow the table list's order, each after every table it names (rule 1). Ids are text, opaque
 -- strings code makes and never parses (rule 3; CQ-09). No extension beyond K-04's (rule 2).
@@ -38,9 +39,10 @@
 -- rosfield_fees and reconciliation_findings are only inserted and carry none.
 --
 -- Set once (rule 7): 0030's money_set_once() refuses any change to a listed column once it is not null (23514, the
--- trigger's name as the constraint), and a listed array (pay_links.given_via) may only gain items: a membership once
--- ended, a pay link once ended, a credit once given back, a fee once answered, charged or dropped, a plan charge once
--- reminded, charged, failed or skipped, and a finished run never change.
+-- trigger's name as the constraint), and a listed array (pay_links.given_via) may only gain items. With the CHECKs that
+-- hold each state to its times, a membership once ended, a pay link once ended, a credit once given back, a fee once
+-- charged or dropped (its answer once given), a plan charge once charged or skipped (one that failed only goes on to
+-- charged, keeping failed_at) and a finished run never change.
 --
 -- What may be written (rule 6), by privilege: no DELETE and no TRUNCATE on any of the nine (42501; rule 9 keeps money
 -- records 7 years), and neither application role owns a table. reconciliation_runs and reconciliation_findings: the
