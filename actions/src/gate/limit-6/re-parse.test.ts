@@ -1552,3 +1552,265 @@ describe("three readings the reader learns: a weekday's short form with its peri
     ).toEqual({ result: "pass" });
   });
 });
+
+// T-1130 (CQ-121's default: each form found later is added to the readers; DL-236, DL-238): the readers learn the forms
+// T-304's last review found. The count reader starts and ends a count at round 7's number edge, so a count glued to a
+// mark joins its phrase (the round 7 review's GAP 7); the time reader learns the round 7 review's N1 to N3; and the
+// number join takes a bracket (the re-review's note). Each cut fails at limit 6 and at the gate; each whole passes.
+
+describe("T-1130 item 1: a count glued to a mark joins its phrase, so a cut of it fails (the round 7 review's GAP 7)", () => {
+  const C1 = "can we get a table for 4 or 5:)";
+  const C2 = "party of 4, maybe 5:)";
+  const C4 = "Update:2 adults + 1 child";
+  // [case, the request citing the cut, its fault]
+  const cases: [string, () => GateRequest, ValueFault][] = [
+    [
+      "C1: '4' out of 'can we get a table for 4 or 5:)' (two counts)",
+      () => groupRequest(4, "4", C1),
+      "several",
+    ],
+    ["C2: '4' out of 'party of 4, maybe 5:)' (two counts)", () => groupRequest(4, "4", C2), "several"],
+    [
+      "C4: '1 child' out of 'Update:2 adults + 1 child' (two counts)",
+      () => groupRequest(1, "1 child", C4),
+      "several",
+    ],
+    ["'5' out of 're:4 or 5' (two counts)", () => groupRequest(5, "5", "re:4 or 5"), "several"],
+    [
+      "'4' out of 'table for 4 or 5/6' ('5/6' joins by 'or' and is no count)",
+      () => groupRequest(4, "4", "table for 4 or 5/6"),
+      "noText",
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut, before and after the re-read", async (_case, cut, why) => {
+    const request = cut();
+    const cited = citedIn(request, "people");
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["people", why]]));
+    expect(await decision({}, afterReread(request))).toEqual(failed(oneQuestionOutcome(), [["people", why]]));
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read the cut is refused naming the field, after it one question",
+    async (_case, cut) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["people"] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it("each whole passes at limit 6 and the gate with its own reading: a count glued to a mark alone is that count", async () => {
+    const wholes = [
+      groupRequest(5, "5", "can we get a table for 5:)"),
+      groupRequest(5, "5", "table for 5:"),
+      groupRequest(2, "Update:2 adults", "Update:2 adults"),
+      groupRequest(4, "re:4", "re:4"),
+    ];
+    for (const request of wholes) {
+      expect(await decision({}, request)).toEqual({ result: "pass" });
+      const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+      expect(passed?.result).toBe("passed");
+      expect(passed?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+    }
+  });
+});
+
+describe("T-1130 item 2: the time reader learns the round 7 review's N1 to N3, so the day's phrase holds its time", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const es = { language: "es" } as const;
+  const SUNDAY = ny("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+  const THURSDAY = ny("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const SUNDAY_3PM = ny("2026-11-01T20:00:00Z");
+  const SUNDAY_330PM = ny("2026-11-01T20:30:00Z");
+  const SUNDAY_7PM = ny("2026-11-02T00:00:00Z");
+  /** The day cut alone (read at its start) and the whole, both cited out of `words`, sent Sat Oct 31 at 10:00am. */
+  const pair = (
+    words: string,
+    cut: string,
+    day: ReturnType<typeof ny>,
+    whole: string,
+    value: ReturnType<typeof ny>,
+    options: { readonly language?: string } = {},
+  ): [() => GateRequest, () => GateRequest] => [
+    () => haircutMoveRequest(day, cut, words, options),
+    () => haircutMoveRequest(value, whole, words, options),
+  ];
+  // [case, the request citing the day alone, the request citing the whole]
+  const cases: [string, () => GateRequest, () => GateRequest][] = [
+    [
+      "N1: 'tomorrow' out of 'can you do tomorrow at 3.5' (the whole is Sun Nov 1 at 3:30)",
+      ...pair("can you do tomorrow at 3.5", "tomorrow", SUNDAY, "tomorrow at 3.5", SUNDAY_330PM),
+    ],
+    [
+      "N1: 'tomorrow' out of 'can you do tomorrow at 3:30:15' (the whole is Sun Nov 1 at 3:30)",
+      ...pair("can you do tomorrow at 3:30:15", "tomorrow", SUNDAY, "tomorrow at 3:30:15", SUNDAY_330PM),
+    ],
+    [
+      "N1: 'tomorrow' out of 'can you do tomorrow at 1530' (the whole is Sun Nov 1 at 15:30)",
+      ...pair("can you do tomorrow at 1530", "tomorrow", SUNDAY, "tomorrow at 1530", SUNDAY_330PM),
+    ],
+    [
+      "N1: 'tomorrow' out of 'can you do tomorrow around 3.30' (the whole is Sun Nov 1 at 3:30)",
+      ...pair("can you do tomorrow around 3.30", "tomorrow", SUNDAY, "tomorrow around 3.30", SUNDAY_330PM),
+    ],
+    [
+      "N1: 'tomorrow' out of 'can you do tomorrow at ~3' (the whole is Sun Nov 1 at 3)",
+      ...pair("can you do tomorrow at ~3", "tomorrow", SUNDAY, "tomorrow at ~3", SUNDAY_3PM),
+    ],
+    [
+      "N2: 'tomorrow' out of 'can you do *3pm* tomorrow' (the whole is Sun Nov 1 at 3pm)",
+      ...pair("can you do *3pm* tomorrow", "tomorrow", SUNDAY, "*3pm* tomorrow", SUNDAY_3PM),
+    ],
+    [
+      "N2: 'tomorrow' out of 'can you do tomorrow [3pm]' (the whole is Sun Nov 1 at 3pm)",
+      ...pair("can you do tomorrow [3pm]", "tomorrow", SUNDAY, "tomorrow [3pm]", SUNDAY_3PM),
+    ],
+    [
+      "N2: 'tomorrow' out of 'can you do tomorrow at \"3pm\"' (the whole is Sun Nov 1 at 3pm)",
+      ...pair('can you do tomorrow at "3pm"', "tomorrow", SUNDAY, 'tomorrow at "3pm"', SUNDAY_3PM),
+    ],
+    [
+      "N2: 'tomorrow' out of 'can you do tomorrow 👍 3pm' (the whole is Sun Nov 1 at 3pm)",
+      ...pair("can you do tomorrow 👍 3pm", "tomorrow", SUNDAY, "tomorrow 👍 3pm", SUNDAY_3PM),
+    ],
+    [
+      "N3: 'tomorrow' out of 'table tomorrow for 2 at 7pm' (the whole is Sun Nov 1 at 7pm)",
+      ...pair("table tomorrow for 2 at 7pm", "tomorrow", SUNDAY, "tomorrow for 2 at 7pm", SUNDAY_7PM),
+    ],
+    [
+      "N3: 'tmrw' out of 'can you do tmrw. 3pm' (the whole is Sun Nov 1 at 3pm)",
+      ...pair("can you do tmrw. 3pm", "tmrw", SUNDAY, "tmrw. 3pm", SUNDAY_3PM),
+    ],
+    [
+      "N3: 'Thursday' out of 'can you do Thursday: 3' (the whole is Thu Nov 5 at 3)",
+      ...pair("can you do Thursday: 3", "Thursday", THURSDAY, "Thursday: 3", ny("2026-11-05T20:00:00Z")),
+    ],
+    [
+      "N3: 'tomorrow' out of 'can you do tomorrow at \"3\"' (the whole is Sun Nov 1 at 3)",
+      ...pair('can you do tomorrow at "3"', "tomorrow", SUNDAY, 'tomorrow at "3"', SUNDAY_3PM),
+    ],
+    [
+      "N3: 'tomorrow' out of 'can you do tomorrow at (3)' (the whole is Sun Nov 1 at 3)",
+      ...pair("can you do tomorrow at (3)", "tomorrow", SUNDAY, "tomorrow at (3)", SUNDAY_3PM),
+    ],
+    [
+      "Spanish: 'mañana' out of 'puedo mañana a las 1530' (the whole is Sun Nov 1 at 15:30)",
+      ...pair("puedo mañana a las 1530", "mañana", SUNDAY, "mañana a las 1530", SUNDAY_330PM, es),
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut (differs), before and after the re-read", async (_case, cut) => {
+    const request = cut();
+    const cited = citedIn(request, "time_saved");
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+    expect(await decision({}, afterReread(request))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read the cut is refused naming the field, after it one question",
+    async (_case, cut) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it.each(cases)("%s: the whole passes at limit 6 and the gate", async (_case, _cut, whole) => {
+    const request = whole();
+    expect(await decision({}, request)).toEqual({ result: "pass" });
+    const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+    expect(passed?.result).toBe("passed");
+    expect(passed?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+  });
+
+  it("each whole read at another time differs: 'at 3.5' is half past, never 3:00; '1530' is 3:30pm, never 3:30am", async () => {
+    const half = "can you do tomorrow at 3.5";
+    expect(
+      await decision({}, haircutMoveRequest(ny("2026-11-01T08:30:00Z"), "tomorrow at 3.5", half)),
+    ).toEqual({
+      result: "pass",
+    });
+    expect(await decision({}, haircutMoveRequest(SUNDAY_3PM, "tomorrow at 3.5", half))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+    const military = "can you do tomorrow at 1530";
+    expect(
+      await decision({}, haircutMoveRequest(ny("2026-11-01T08:30:00Z"), "tomorrow at 1530", military)),
+    ).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+  });
+
+  it("the party between the day and the time is the count's: '2' out of 'table tomorrow for 2 at 7pm' passes as the count", async () => {
+    const request = groupRequest(2, "2", "table tomorrow for 2 at 7pm");
+    expect(await decision({}, request)).toEqual({ result: "pass" });
+    const [passed] = gatedParts(
+      await runGate(request, callContext(turnOf(request).businessId), registryWith(limitIn())),
+    );
+    expect(passed?.result).toBe("passed");
+  });
+});
+
+describe("T-1130: the number join takes a bracket, so '$40' out of 'raise haircut to $40 (or $50)' fails (the re-review's note, DL-238)", () => {
+  // [case, the request citing the cut, its field, its fault]
+  const cases: [string, () => GateRequest, string, ValueFault][] = [
+    [
+      "'$40' out of 'raise haircut to $40 (or $50)' (two amounts)",
+      () => priceChangeRequest("raise haircut to $40 (or $50)", usd(4000), "$40"),
+      "price",
+      "several",
+    ],
+    [
+      "'4' out of 'party of 4 (maybe 5)' (two counts)",
+      () => groupRequest(4, "4", "party of 4 (maybe 5)"),
+      "people",
+      "several",
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut, before and after the re-read", async (_case, cut, name, why) => {
+    expect(await decision({}, cut())).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+    expect(await decision({}, afterReread(cut()))).toEqual(failed(oneQuestionOutcome(), [[name, why]]));
+  });
+
+  it.each(cases)(
+    "%s: at the gate the cut is refused naming the field before the re-read, and one question after it",
+    async (_case, cut, name) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: [name] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it("a bracket with no number beside it joins nothing: '$40' out of 'raise haircut to $40 (firm)' and '4' out of 'party of 4 (just us)' pass", async () => {
+    const wholes = [
+      priceChangeRequest("raise haircut to $40 (firm)", usd(4000), "$40"),
+      groupRequest(4, "4", "party of 4 (just us)"),
+    ];
+    for (const request of wholes) {
+      expect(await decision({}, request)).toEqual({ result: "pass" });
+      const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+      expect(passed?.result).toBe("passed");
+    }
+  });
+});

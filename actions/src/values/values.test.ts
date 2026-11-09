@@ -1455,12 +1455,14 @@ describe("a sentence mark with no digit right after it ends a cued or bare hour:
   it("a period with a digit right after it ends no hour: '3.30' and '3.5' keep their readings (no hour 3)", () => {
     // Round 7 (DL-228 item 2b) reads "tomorrow at 3.30" (a cue before it) and "tomorrow 1.30pm" (pm after it) as hours
     // and minutes, so those two moved out of this no-clock list into the round 7 tests below; neither reads a bare hour.
-    for (const words of ["tomorrow at 3.5", "Thursday, 3.30", "Thursday 3.5"]) {
+    // T-1130 (the round 7 review's N1) reads "tomorrow at 3.5" (a cue before it) as 3:30, so it moved out too, into the
+    // T-1130 tests below; it reads no bare hour either.
+    for (const words of ["Thursday, 3.30", "Thursday 3.5"]) {
       const read = readTimeWords(words);
       expect(read.kind === "time" ? read.time.clock : read.kind).toBeNull();
       expect(timeReadingOf(words).bareHours).toEqual([]);
     }
-    for (const words of ["tomorrow at 3.30", "tomorrow 1.30pm"]) {
+    for (const words of ["tomorrow at 3.30", "tomorrow 1.30pm", "tomorrow at 3.5"]) {
       expect(timeReadingOf(words).bareHours).toEqual([]);
     }
     expect(cents("$3.5")).toEqual([350]);
@@ -1679,9 +1681,10 @@ describe("the number edge by construction: a mark is part of a number only with 
       clock: null,
       hint: null,
     });
+    // T-1130 (the round 7 review's N1) reads "tomorrow at 3.5" (a cue before it) as 3:30, so it left this list for the
+    // T-1130 tests below; "3.5" with no cue before it and no am or pm after it keeps its reading ("Thursday, 3.5").
     for (const words of [
       "Thursday, 3.5",
-      "tomorrow at 3.5",
       "Thursday 1,200",
       "tomorrow at 1,200",
       "Thursday $3.50",
@@ -1692,6 +1695,7 @@ describe("the number edge by construction: a mark is part of a number only with 
       expect(read.kind === "time" ? read.time.clock : read.kind).toBeNull();
       expect(timeReadingOf(words).bareHours).toEqual([]);
     }
+    expect(timeReadingOf("tomorrow at 3.5").bareHours).toEqual([]);
     expect(countsIn("3.5")).toEqual([3.5]);
     expect(countsIn("1,200")).toEqual([1200]);
     expect(cents("1,200")).toEqual([120000]);
@@ -1769,13 +1773,9 @@ describe("three readings the reader learns (DL-228 item 2)", () => {
       "2026-11-01T08:30:00Z",
       "2026-11-01T20:30:00Z",
     ]);
-    for (const words of [
-      "Thursday, 3.30",
-      "Thursday 3.30",
-      "3.30 tomorrow",
-      "tomorrow at 3.75",
-      "tomorrow at 3.5",
-    ]) {
+    // T-1130 (the round 7 review's N1) reads "tomorrow at 3.5" (a cue, an hour, a period and one digit) as 3:30, so it
+    // left this list for the T-1130 tests below; "tomorrow at 3.75" (two digits past 59) stays a number.
+    for (const words of ["Thursday, 3.30", "Thursday 3.30", "3.30 tomorrow", "tomorrow at 3.75"]) {
       const read = readTimeWords(words);
       expect(read.kind === "time" ? read.time.clock : read.kind).toBeNull();
     }
@@ -1809,5 +1809,418 @@ describe("three readings the reader learns (DL-228 item 2)", () => {
       );
     }
     expect(wholePhraseFault("integer", 2, "booking for 2 adults", "2 adults", context)).toBeNull();
+  });
+});
+
+// ---- T-1130 (CQ-121's default, DL-236, DL-238): the readers learn the forms T-304's last review found -----------------
+
+describe("T-1130 item 1: the count reader starts and ends a count at the number edge, so a count glued to a mark is read (the round 7 review's GAP 7)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-19T14:05:00Z", zones: [NEW_YORK] };
+  const spanish: ReparseContext = { ...context, languages: ["es"] };
+
+  it.each([
+    ["can we get a table for 5:)", [5]],
+    ["table for 5:", [5]],
+    ["table for 5:-)", [5]],
+    ["Update:2 adults", [2]],
+    ["re:4", [4]],
+    ["table for 5/", [5]],
+    ["can we get a table for 4 or 5:)", [4, 5]],
+    ["Update:2 adults + 1 child", [2, 1]],
+    ["re:4 or 5", [4, 5]],
+    ["3,4 people", [3, 4]],
+  ] as const)("'%s' holds %j", (words, expected) => {
+    expect(countsIn(words)).toEqual(expected);
+  });
+
+  it("'3.5', '1,200' and '$3.50' keep their readings, and a mark between two digits still makes one number: '5/6' and '9:30' hold no count", () => {
+    expect(countsIn("3.5")).toEqual([3.5]);
+    expect(countsIn("2.5 hours")).toEqual([2.5]);
+    expect(countsIn("1,200")).toEqual([1200]);
+    expect(cents("$3.50")).toEqual([350]);
+    expect(cents("1,200")).toEqual([120000]);
+    for (const words of ["5/6", "table for 9:30", "$40", "40%", "the 3rd", "at 4pm", "10/24"]) {
+      expect(countsIn(words)).toEqual([]);
+    }
+    expect(countsIn("mesa para 5:)", ["es"])).toEqual([5]);
+  });
+
+  // [case, the person's text, the words cited, their count, the fault on the whole phrase, the reading's context]
+  it.each([
+    [
+      "C1: '4' out of 'can we get a table for 4 or 5:)'",
+      "can we get a table for 4 or 5:)",
+      "4",
+      4,
+      "several",
+      context,
+    ],
+    ["C2: '4' out of 'party of 4, maybe 5:)'", "party of 4, maybe 5:)", "4", 4, "several", context],
+    [
+      "C4: '1 child' out of 'Update:2 adults + 1 child'",
+      "Update:2 adults + 1 child",
+      "1 child",
+      1,
+      "several",
+      context,
+    ],
+    ["'5' out of 're:4 or 5'", "re:4 or 5", "5", 5, "several", context],
+    [
+      "'2 adults' out of 'booking for 2 adults + 1:)'",
+      "booking for 2 adults + 1:)",
+      "2 adults",
+      2,
+      "several",
+      context,
+    ],
+    ["'4' out of 'mesa para 4 o 5:)'", "mesa para 4 o 5:)", "4", 4, "several", spanish],
+    ["'4' out of 'table for 4 or 5:'", "table for 4 or 5:", "4", 4, "several", context],
+    ["'4' out of 'table for 4 or 5:-)'", "table for 4 or 5:-)", "4", 4, "several", context],
+    [
+      "'4' out of 'table for 4 or 5/6' ('5/6' joins by 'or' and is no count)",
+      "table for 4 or 5/6",
+      "4",
+      4,
+      "noText",
+      context,
+    ],
+  ] as const)(
+    "%s: the cut re-parses on its own but fails on its whole phrase",
+    (_case, text, cut, count, why, given) => {
+      expect(reparse("integer", count, cut, given)).toEqual({ ok: true });
+      expect(wholePhraseFault("integer", count, text, cut, given)).toBe(why);
+    },
+  );
+
+  it("each whole passes with its own reading: a count glued to a mark alone is that count; two counts are several", () => {
+    expect(wholePhraseFault("integer", 5, "can we get a table for 5:)", "5", context)).toBeNull();
+    expect(wholePhraseFault("integer", 5, "table for 5:", "5", context)).toBeNull();
+    expect(reparse("integer", 2, "Update:2 adults", context)).toEqual({ ok: true });
+    expect(wholePhraseFault("integer", 2, "Update:2 adults", "Update:2 adults", context)).toBeNull();
+    expect(reparse("integer", 4, "re:4", context)).toEqual({ ok: true });
+    expect(wholePhraseFault("integer", 4, "re:4", "re:4", context)).toBeNull();
+    expect(wholePhraseFault("integer", 5, "mesa para 5:)", "5", spanish)).toBeNull();
+    expect(wholePhraseFault("integer", 4, "can we get a table for 4 or 5:)", "4 or 5:)", context)).toBe(
+      "several",
+    );
+    expect(
+      wholePhraseFault("integer", 2, "Update:2 adults + 1 child", "Update:2 adults + 1 child", context),
+    ).toBe("several");
+    // Cited from its first digit right after the mark, the count stands at no word edge (words.ts, unchanged): a refusal.
+    expect(wholePhraseFault("integer", 2, "Update:2 adults + 1 child", "2 adults + 1 child", context)).toBe(
+      "noText",
+    );
+  });
+
+  it("a count's phrase takes a number a range or choice word joins to it, never one 'and' or one space joins (default)", () => {
+    expect(wholePhraseFault("integer", 4, "can you do 4 to 7:30", "4", context)).toBe("noText");
+    expect(wholePhraseFault("integer", 4, "table for 4 and 7:30 works", "4", context)).toBeNull();
+    expect(wholePhraseFault("integer", 4, "table for 4 7:30 tomorrow", "4", context)).toBeNull();
+    expect(wholePhraseFault("integer", 4, "a table for 4 at 7pm", "4", context)).toBeNull();
+  });
+});
+
+describe("T-1130 item 2: the time reader learns the round 7 review's N1 to N3", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] }; // Sat Oct 31, 10:00am EDT
+  const spanish: ReparseContext = { ...context, languages: ["es"] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const SUNDAY = at("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+  const THURSDAY = at("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const SUNDAY_AT_3 = ["2026-11-01T08:00:00Z", "2026-11-01T20:00:00Z"]; // 3am or 3pm EST (CQ-119's default)
+  const SUNDAY_AT_330 = ["2026-11-01T08:30:00Z", "2026-11-01T20:30:00Z"];
+
+  it.each([
+    ["tomorrow at 3.5", SUNDAY_AT_330],
+    ["tomorrow at 3.5pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow 3.5pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow at 3:30:15", SUNDAY_AT_330],
+    ["tomorrow at 3:30:15pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow at 1530", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow at 930", ["2026-11-01T14:30:00Z", "2026-11-02T02:30:00Z"]],
+    ["tomorrow at 0930", ["2026-11-01T14:30:00Z", "2026-11-02T02:30:00Z"]],
+    ["tomorrow at 330pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow around 3.30", SUNDAY_AT_330],
+    ["tomorrow about 3.30", SUNDAY_AT_330],
+    ["tomorrow at around 3", SUNDAY_AT_3],
+    ["tomorrow at ~3", SUNDAY_AT_3],
+    ["tomorrow at ～3", SUNDAY_AT_3],
+    ['tomorrow at "3"', SUNDAY_AT_3],
+    ["tomorrow at “3”", SUNDAY_AT_3],
+    ["tomorrow at (3)", SUNDAY_AT_3],
+    ["tomorrow at [3]", SUNDAY_AT_3],
+    ["tmrw. 3pm", ["2026-11-01T20:00:00Z"]],
+    ["tmr. 3pm", ["2026-11-01T20:00:00Z"]],
+    ["*3pm* tomorrow", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow [3pm]", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow 👍 3pm", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow for 2 at 7pm", ["2026-11-02T00:00:00Z"]],
+  ] as const)("'%s' is %j", (words, expected) => {
+    expect(readings(words, context.sentAt, NEW_YORK)).toEqual(expected);
+  });
+
+  it("'Thursday: 3' and 'Thursday:3' read their hour beside the day, as 'Thursday, 3' does; Spanish reads the new cued forms", () => {
+    for (const words of ["Thursday: 3", "Thursday:3", "my 2pm is out. Thursday: 3?"]) {
+      expect(timeReadingOf(words).bareHours).toHaveLength(1);
+    }
+    expect(readings("Thursday: 3", context.sentAt, NEW_YORK)).toEqual([
+      "2026-11-05T08:00:00Z",
+      "2026-11-05T20:00:00Z",
+    ]);
+    expect(readings("tomorrow morning: 9", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T14:00:00Z"]);
+    expect(readings("mañana a las 1530", context.sentAt, NEW_YORK, ["es"])).toEqual(["2026-11-01T20:30:00Z"]);
+    expect(readings("mañana a las 3.5", context.sentAt, NEW_YORK, ["es"])).toEqual(SUNDAY_AT_330);
+    expect(readings('mañana a las "3"', context.sentAt, NEW_YORK, ["es"])).toEqual(SUNDAY_AT_3);
+  });
+
+  it("'3:30', '3.5', '10/24', '1,200' and '$3.50' keep their readings, and an approximate word alone makes no bare number a time", () => {
+    expect(readings("tomorrow at 3:30", context.sentAt, NEW_YORK)).toEqual(SUNDAY_AT_330);
+    expect(timeIn("10/24").day).toEqual({ kind: "date", month: 10, day: 24, year: null });
+    for (const words of [
+      "Thursday, 3.5",
+      "Thursday 3.5",
+      "3.5 tomorrow",
+      "tomorrow at 3.75",
+      "tomorrow at 2400",
+      "tomorrow at 1,200",
+      "tomorrow at $3.50",
+      "tomorrow around 3",
+      "tomorrow around 1530",
+    ]) {
+      const read = readTimeWords(words);
+      expect(read.kind === "time" ? read.time.clock : read.kind).toBeNull();
+    }
+    expect(countsIn("3.5")).toEqual([3.5]);
+    expect(countsIn("1,200")).toEqual([1200]);
+    expect(cents("$3.50")).toEqual([350]);
+    expect(cents("$3.5")).toEqual([350]);
+    expect(countsIn("a table for around 4 people")).toEqual([4]);
+    expect(countsIn("about 1500 people")).toEqual([1500]);
+    expect(countsIn("table for 4 at 1530")).toEqual([4]);
+    expect(countsIn("table for 4 at 3.5")).toEqual([4]);
+  });
+
+  // [case, text, the cut, its value (the day at its start), the whole, the whole's value (UTC), context]
+  it.each([
+    [
+      "N1: 'tomorrow' out of 'tomorrow at 3.5'",
+      "can you do tomorrow at 3.5",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at 3.5",
+      "2026-11-01T20:30:00Z",
+      context,
+    ],
+    [
+      "N1: 'tomorrow' out of 'tomorrow at 3:30:15'",
+      "can you do tomorrow at 3:30:15",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at 3:30:15",
+      "2026-11-01T20:30:00Z",
+      context,
+    ],
+    [
+      "N1: 'tomorrow' out of 'tomorrow at 1530'",
+      "can you do tomorrow at 1530",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at 1530",
+      "2026-11-01T20:30:00Z",
+      context,
+    ],
+    [
+      "N1: 'tomorrow' out of 'tomorrow around 3.30'",
+      "can you do tomorrow around 3.30",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow around 3.30",
+      "2026-11-01T20:30:00Z",
+      context,
+    ],
+    [
+      "N1: 'tomorrow' out of 'tomorrow at ~3'",
+      "can you do tomorrow at ~3",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at ~3",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N2: 'tomorrow' out of '*3pm* tomorrow'",
+      "can you do *3pm* tomorrow",
+      "tomorrow",
+      SUNDAY,
+      "*3pm* tomorrow",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N2: 'tomorrow' out of 'tomorrow [3pm]'",
+      "can you do tomorrow [3pm]",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow [3pm]",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N2: 'tomorrow' out of 'tomorrow at \"3pm\"'",
+      'can you do tomorrow at "3pm"',
+      "tomorrow",
+      SUNDAY,
+      'tomorrow at "3pm"',
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N2: 'tomorrow' out of 'tomorrow 👍 3pm'",
+      "can you do tomorrow 👍 3pm",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow 👍 3pm",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N3: 'tomorrow' out of 'table tomorrow for 2 at 7pm'",
+      "table tomorrow for 2 at 7pm",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow for 2 at 7pm",
+      "2026-11-02T00:00:00Z",
+      context,
+    ],
+    [
+      "N3: 'tmrw' out of 'tmrw. 3pm'",
+      "can you do tmrw. 3pm",
+      "tmrw",
+      SUNDAY,
+      "tmrw. 3pm",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N3: 'Thursday' out of 'Thursday: 3'",
+      "can you do Thursday: 3",
+      "Thursday",
+      THURSDAY,
+      "Thursday: 3",
+      "2026-11-05T20:00:00Z",
+      context,
+    ],
+    [
+      "N3: 'tomorrow' out of 'tomorrow at \"3\"'",
+      'can you do tomorrow at "3"',
+      "tomorrow",
+      SUNDAY,
+      'tomorrow at "3"',
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "N3: 'tomorrow' out of 'tomorrow at (3)'",
+      "can you do tomorrow at (3)",
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at (3)",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "'mañana' out of 'mañana a las 1530'",
+      "puedo mañana a las 1530",
+      "mañana",
+      SUNDAY,
+      "mañana a las 1530",
+      "2026-11-01T20:30:00Z",
+      spanish,
+    ],
+    [
+      "'mañana' out of 'mañana para 2 a las 7'",
+      "mesa mañana para 2 a las 7",
+      "mañana",
+      SUNDAY,
+      "mañana para 2 a las 7",
+      "2026-11-02T00:00:00Z",
+      spanish,
+    ],
+  ] as const)(
+    "%s: the cut re-parses on its own but differs on the day's phrase; the whole passes",
+    (_case, text, cut, value, whole, utc, given) => {
+      expect(reparse("time", value, cut, given)).toEqual({ ok: true });
+      expect(wholePhraseFault("time", value, text, cut, given)).toBe("differs");
+      expect(wholePhraseFault("time", at(utc), text, whole, given)).toBeNull();
+    },
+  );
+
+  it("each whole read at another time differs: 'at 3.5' is 3:30, never 3:00 or 3:50; '1530' is 3:30pm, never am", () => {
+    const half = "can you do tomorrow at 3.5";
+    expect(wholePhraseFault("time", at("2026-11-01T08:30:00Z"), half, "tomorrow at 3.5", context)).toBeNull();
+    for (const utc of ["2026-11-01T20:00:00Z", "2026-11-01T20:50:00Z", "2026-11-01T20:05:00Z"]) {
+      expect(wholePhraseFault("time", at(utc), half, "tomorrow at 3.5", context)).toBe("differs");
+    }
+    const military = "can you do tomorrow at 1530";
+    expect(wholePhraseFault("time", at("2026-11-01T08:30:00Z"), military, "tomorrow at 1530", context)).toBe(
+      "differs",
+    );
+    // A time to the second is read to its minute ("3:30:15" is 3:30, as "3:30:00" is: default).
+    const seconds = "can you do tomorrow at 3:30:15";
+    expect(
+      wholePhraseFault("time", at("2026-11-01T20:30:15Z"), seconds, "tomorrow at 3:30:15", context),
+    ).toBe("differs");
+  });
+
+  it("a cut of the time out of a marked or counted phrase differs too: '3pm' out of '*3pm* tomorrow' and '7pm' out of 'tomorrow for 2 at 7pm', as today's", () => {
+    expect(
+      wholePhraseFault("time", at("2026-10-31T19:00:00Z"), "can you do *3pm* tomorrow", "3pm", context),
+    ).toBe("differs");
+    expect(
+      wholePhraseFault("time", at("2026-10-31T23:00:00Z"), "table tomorrow for 2 at 7pm", "at 7pm", context),
+    ).toBe("differs");
+  });
+
+  it("the count between the day and the time stays the count reader's: '2' passes as the party, with its unit or in words too", () => {
+    expect(wholePhraseFault("integer", 2, "table tomorrow for 2 at 7pm", "2", context)).toBeNull();
+    for (const [text, whole] of [
+      ["table tomorrow for 2 people at 7pm", "tomorrow for 2 people at 7pm"],
+      ["table tomorrow for two at 7pm", "tomorrow for two at 7pm"],
+      ["7pm for 2 people tomorrow?", "7pm for 2 people tomorrow"],
+    ] as const) {
+      expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+      expect(wholePhraseFault("time", at("2026-11-02T00:00:00Z"), text, whole, context)).toBeNull();
+    }
+  });
+
+  it("an hour beside its day is no count between: 'tomorrow 3 at 7pm' keeps its hour, unread beside 7pm (DL-209), so the whole is refused", () => {
+    const text = "tomorrow 3 at 7pm";
+    expect(wholePhraseFault("time", at("2026-11-02T00:00:00Z"), text, text, context)).toBe("noText");
+    expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+  });
+});
+
+describe("T-1130: the number join takes a bracket (the re-review's note, DL-238)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-26T15:40:00Z", zones: [NEW_YORK] };
+  const usd = (amount: number) => ({ cents: amount, currency: "USD" });
+
+  it("'$40' out of 'raise haircut to $40 (or $50)' and '4' out of 'party of 4 (maybe 5)' are several", () => {
+    expect(reparse("money", usd(4000), "$40", context)).toEqual({ ok: true });
+    expect(wholePhraseFault("money", usd(4000), "raise haircut to $40 (or $50)", "$40", context)).toBe(
+      "several",
+    );
+    expect(wholePhraseFault("money", usd(5000), "raise haircut to $40 (or $50)", "$50", context)).toBe(
+      "several",
+    );
+    expect(wholePhraseFault("integer", 4, "party of 4 (maybe 5)", "4", context)).toBe("several");
+    expect(wholePhraseFault("integer", 4, "party of (4) or 5", "4", context)).toBe("several");
+  });
+
+  it("each whole gives its own reading: two amounts or two counts are several; a bracket with no number beside joins nothing", () => {
+    expect(
+      wholePhraseFault("money", usd(4000), "raise haircut to $40 (or $50)", "$40 (or $50)", context),
+    ).toBe("several");
+    expect(wholePhraseFault("integer", 4, "party of 4 (maybe 5)", "4 (maybe 5)", context)).toBe("several");
+    expect(wholePhraseFault("money", usd(4000), "raise haircut to $40 (firm)", "$40", context)).toBeNull();
+    expect(wholePhraseFault("integer", 4, "party of 4 (just us)", "4", context)).toBeNull();
   });
 });
