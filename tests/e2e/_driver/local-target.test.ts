@@ -141,7 +141,7 @@ describe("the local target", () => {
 
     const trace = traceOf(await target.collect(sent.traceId));
     expect(trace.trace_id).toBe(sent.traceId);
-    expect(checkHops(trace, ["receive"]).problems).toEqual([]);
+    expect(checkHops(trace, ["receive", "scrub"]).problems).toEqual([]);
     expect(readReceipt(trace)).toMatchObject({
       eventId: "evt-alex-0001",
       outcome: "ok",
@@ -195,7 +195,7 @@ describe("the local target", () => {
     ]);
     expect(collected.outbox?.problems).toEqual([]);
     expect(collected.outbox?.rows.map((life) => life.row.traceId)).toEqual([sent.traceId]);
-    const report = checkRun(collected, ["receive"]);
+    const report = checkRun(collected, ["receive", "scrub"]);
     expect(report.problems).toEqual([]);
     expect([report.outboxRows, report.parts.sends]).toEqual([1, 1]);
   });
@@ -265,7 +265,7 @@ describe("no key is read by the local target", () => {
       expect(sent.gatewayStatus).toBe(200);
       await target.sendEvent(text);
       target.linq.sendPart(sendTextRequest);
-      expect(checkRun(await target.collect(sent.traceId), ["receive"]).problems).toEqual([]);
+      expect(checkRun(await target.collect(sent.traceId), ["receive", "scrub"]).problems).toEqual([]);
     } finally {
       process.env = environment;
     }

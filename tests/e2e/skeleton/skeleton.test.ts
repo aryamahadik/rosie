@@ -13,7 +13,8 @@
 // - SKELETON_UPTO unset (`npm run test:e2e`, as the merge check runs it): checkSkeletonRun is T-465's full check,
 //   checkRun's own report. Only the gateway is joined on today's main, so the file asserts only what T-465's driver
 //   already proves there (local-target.test.ts): the gateway answers the signed text 200, and checkRun finds its
-//   receive hop once, under one trace id and one bundle id, with no part sent twice. Nothing is skipped.
+//   receive and scrub hops once each, in order (T-1096 writes the scrub span), under one trace id and one bundle id,
+//   with no part sent twice. Nothing is skipped.
 //
 // T-466 completes this same file (D-017's automated tests): the JOIN gives exactly 1 outbox row and 1 send to the Linq
 // double, carrying S1-02's question; every hop of section 11 runs once, in order, under one trace id and one bundle id;
@@ -185,10 +186,11 @@ describe(`the walking skeleton end to end (${mode})`, () => {
 
     if (prefix === null) {
       // T-465's full check: checkRun's own report (T-551 default 5). Only the gateway is joined on today's main, so
-      // this asserts only what T-465's checkRun already proves there: the receive hop once, under one trace id and one
-      // bundle id, with no part sent twice. T-466 completes the file with the full check: no problem at all.
+      // this asserts only what T-465's checkRun already proves there: the receive and scrub hops once each, in order,
+      // under one trace id and one bundle id, with no part sent twice. T-466 completes the file with the full check: no
+      // problem at all.
       expect(report).toStrictEqual(checkRun(collected));
-      expect(checkRun(collected, ["receive"]).problems).toEqual([]);
+      expect(checkRun(collected, ["receive", "scrub"]).problems).toEqual([]);
       return;
     }
     expect(report.problems, prefixHint(prefix, env)).toEqual([]);
