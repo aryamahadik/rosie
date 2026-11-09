@@ -169,6 +169,66 @@ const K22_FUNCTIONS = [
   "proof_code_limits",
   "session_for_token",
 ];
+// K-27 v1's three named exceptions (T-208; DL-247). Its README's rule 5 (with rule 6 for the sealed tokens) gives three
+// tables policies other than 0012's pair, row-level security on two tables scoped none, and rosie_app column grants on
+// two of them; availability.int.test.ts checks each against the README word for word. It adds no security-definer call.
+// Every other table and function stays held to this file's generic checks.
+/**
+ * (a), (b) The policies on K-27's three excepted tables, by table, in name order. K-27 rule 5: calendar_link_shares
+ * (scope business) holds 0012's <table>_runtime beside one Tool API policy per command; calendar_links and busy_blocks
+ * (scope none, row-level security on) hold a runtime policy on every row beside the Tool API's own, which reads them
+ * only through its business's live share.
+ */
+const K27_POLICIES: Record<string, readonly string[]> = {
+  busy_blocks: [
+    "busy_blocks_runtime",
+    "busy_blocks_tool_api_delete",
+    "busy_blocks_tool_api_insert",
+    "busy_blocks_tool_api_select",
+    "busy_blocks_tool_api_update",
+  ],
+  calendar_link_shares: [
+    "calendar_link_shares_runtime",
+    "calendar_link_shares_tool_api_insert",
+    "calendar_link_shares_tool_api_select",
+    "calendar_link_shares_tool_api_update",
+  ],
+  calendar_links: ["calendar_links_runtime", "calendar_links_tool_api_select"],
+};
+/**
+ * (c) rosie_app's 23 column grants on K-27's tables, never tokens. K-27 rule 5 (rule 6 seals the tokens): it reads
+ * every calendar_links column but tokens (16), inserts a share's five columns and updates its end and version.
+ */
+const K27_COLUMN_GRANTS: { table: string; privilege: string; columns: readonly string[] }[] = [
+  {
+    table: "calendar_links",
+    privilege: "SELECT",
+    columns: [
+      "id",
+      "person_id",
+      "provider",
+      "state",
+      "linked_at",
+      "sync_cursor",
+      "synced_at",
+      "subscription_id",
+      "subscription_resource_id",
+      "subscribed_at",
+      "subscription_expires_at",
+      "dropped_at",
+      "dropped_why",
+      "drop_reminded_at",
+      "unlinked_at",
+      "version",
+    ],
+  },
+  {
+    table: "calendar_link_shares",
+    privilege: "INSERT",
+    columns: ["id", "calendar_link_id", "person_id", "business_id", "shared_at"],
+  },
+  { table: "calendar_link_shares", privilege: "UPDATE", columns: ["ended_at", "version"] },
+];
 const SLOW = { timeout: 60_000 };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -325,11 +385,16 @@ const SCOPED = scopedOf(TABLES);
 /** Every business-scoped table in the schema, for the catalog's lists. */
 const ALL_SCOPED = scopedOf(ALL_TABLES);
 /**
- * (a), (b) The tables with row-level security on and policies, in name order: every business-scoped table, and K-22's
- * proof_codes and sessions, scoped none (README rule 5).
+ * (a), (b) The tables with row-level security on and policies, in name order: every business-scoped table, K-22's
+ * proof_codes and sessions, scoped none (README rule 5), and K-27's calendar_links and busy_blocks, scoped none (K-27
+ * rule 5; DL-247).
  */
 const POLICY_TABLES = [
-  ...new Set([...ALL_SCOPED.map((table) => table.name), ...Object.keys(K22_POLICIES)]),
+  ...new Set([
+    ...ALL_SCOPED.map((table) => table.name),
+    ...Object.keys(K22_POLICIES),
+    ...Object.keys(K27_POLICIES),
+  ]),
 ].sort();
 /** The tables that span businesses (scope none). */
 const SPANNING = TABLES.filter((table) => table.rowLevelSecurity.scope === "none").map((table) => table.name);
@@ -518,7 +583,7 @@ describe("the migration: row-level security on every business-scoped core table 
     expect(forced).toEqual([]);
   });
 
-  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8)", async () => {
+  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8, and K-27's three of its rule 5)", async () => {
     const policies = await db.sql<
       {
         table: string;
@@ -544,8 +609,19 @@ describe("the migration: row-level security on every business-scoped core table 
         table,
       ).toEqual(names);
     }
+    // (a) K-27's named exceptions (K-27 rule 5; DL-247): calendar_link_shares holds 0012's runtime policy beside one
+    // Tool API policy per command, and calendar_links and busy_blocks (scope none) hold their own, by name here;
+    // availability.int.test.ts checks each word for word against the README.
+    for (const [table, names] of Object.entries(K27_POLICIES)) {
+      expect(
+        policies.filter((policy) => policy.table === table).map((policy) => policy.name),
+        table,
+      ).toEqual(names);
+    }
     for (const table of ALL_SCOPED.filter(
-      (candidate) => !Object.keys(K22_POLICIES).includes(candidate.name),
+      (candidate) =>
+        !Object.keys(K22_POLICIES).includes(candidate.name) &&
+        !Object.keys(K27_POLICIES).includes(candidate.name),
     )) {
       const own = policies.filter((policy) => policy.table === table.name);
       expect(own.map((policy) => [policy.name, policy.permissive, policy.roles, policy.command])).toEqual([
@@ -646,8 +722,15 @@ describe("the two roles", () => {
         // (b) K-22's named exceptions: row-level security is on for proof_codes and sessions as well (README rule 5),
         // and its four excepted tables hold their own policies (rules 4, 5 and 8) in place of 0012's two.
         expect(row).toEqual({
+          // (b) K-27's named exception (K-27 rule 5; DL-247): row-level security is on for calendar_links and
+          // busy_blocks, scoped none, as well: 2 more (56 to 58 with K-27).
           on: POLICY_TABLES.length,
-          policies: POLICY_TABLES.reduce((sum, name) => sum + (K22_POLICIES[name]?.length ?? 2), 0),
+          // (b) K-27's named exception (K-27 rule 5; DL-247): its three excepted tables hold their own 11 policies,
+          // where the generic count gave only the shares 0012's two: 9 more (118 to 127 with K-27).
+          policies: POLICY_TABLES.reduce(
+            (sum, name) => sum + (K22_POLICIES[name]?.length ?? K27_POLICIES[name]?.length ?? 2),
+            0,
+          ),
           usage: true,
         });
       } finally {
@@ -970,7 +1053,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8) and on K-27's calendar_links and calendar_link_shares (K-27 rule 5)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -998,7 +1081,24 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
       ).sort(),
     );
-    expect(columnGrants.filter((grant) => !k22Tables.includes(grant.table))).toEqual(
+    // (c) K-27's named exception (K-27 rule 5, with rule 6 for the sealed tokens; DL-247): rosie_app's 23 column grants
+    // on calendar_links (every column but tokens) and calendar_link_shares (a share's five, and ended_at and version),
+    // every grantee's on those two tables held to exactly them, so a column grant of tokens to any role fails here (the
+    // runtime side holds the link by table grants); availability.int.test.ts checks them too.
+    const k27Tables = K27_COLUMN_GRANTS.map((grant) => grant.table);
+    expect(
+      columnGrants
+        .filter((grant) => k27Tables.includes(grant.table))
+        .map(key)
+        .sort(),
+    ).toEqual(
+      K27_COLUMN_GRANTS.flatMap(({ table, privilege, columns }) =>
+        columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
+      ).sort(),
+    );
+    expect(
+      columnGrants.filter((grant) => !k22Tables.includes(grant.table) && !k27Tables.includes(grant.table)),
+    ).toEqual(
       CHAT_LINK_UPDATES.flatMap((column) =>
         [...ROLES].sort().map((grantee) => ({ table: "chat_links", column, grantee, privilege: "UPDATE" })),
       ),
