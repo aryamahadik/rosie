@@ -1,0 +1,103 @@
+{
+  "note": "K-09 v1 buildFrontier's rule, mirrored (arch 02 line 117; S13-30): 'Each fact comes once from its one home; a second value for one key is refused, the home's value goes in and the step is flagged for a fix.' Sam's turn on Alex M.'s haircut request: A6-02 ('Texts Sam the request', K-01 v1 bundle-mini-a) reads the haircut's price. Its home is the booking line, where the price was copied in at the saved time (S13-55, the money home; RULES 3.7: a booking keeps the price it was made with; K-30 v1 booking_lines: the price copied in, in integer minor units): $35, fixture set v1's barber haircut. A source says A6-02 reads the price from the service's row instead, which holds a later list price: two homes, two values, one key. The request names the key once, from its home, so the second value is never read and never reaches decide; A6-02 gets the home's $35 and is flagged with the home's row and version. Its other read, the booking's private flag, names the key's own home (K-04 v1 bookings.private, seed-booking-head.json, version 7): read once, nothing flagged.",
+  "homes": [
+    {
+      "name": "price",
+      "home": "money",
+      "table": "booking_lines",
+      "column": "price",
+      "row": { "of": "row", "rowId": "line-alex-haircut" }
+    },
+    {
+      "name": "booking.private",
+      "home": "record",
+      "table": "bookings",
+      "column": "private",
+      "row": { "of": "booking" }
+    }
+  ],
+  "places": [
+    { "name": "price", "step": "A6-02", "table": "services", "rowId": "svc-barber-haircut", "column": "price" },
+    {
+      "name": "booking.private",
+      "step": "A6-02",
+      "table": "bookings",
+      "rowId": "booking-alex-haircut",
+      "column": "private"
+    }
+  ],
+  "openQuestion": {
+    "id": "oq-a6-02-alex",
+    "step": "A6-02",
+    "bookingId": "booking-alex-haircut",
+    "sentAt": "2026-10-22T15:02:00Z"
+  },
+  "visits": {
+    "booking-alex-haircut": { "utc": "2026-10-24T15:00:00Z", "zone": "America/New_York" }
+  },
+  "rows": {
+    "booking_lines": {
+      "line-alex-haircut": {
+        "id": "line-alex-haircut",
+        "booking_id": "booking-alex-haircut",
+        "price": 3500,
+        "version": 2
+      }
+    },
+    "services": {
+      "svc-barber-haircut": {
+        "id": "svc-barber-haircut",
+        "business_id": "biz-lees-barbershop",
+        "price": 4000,
+        "version": 5
+      }
+    },
+    "bookings": {
+      "booking-alex-haircut": {
+        "id": "booking-alex-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      }
+    }
+  },
+  "outcome": {
+    "read": [
+      { "key": "price", "table": "booking_lines", "rowId": "line-alex-haircut", "column": "price" },
+      { "key": "booking.private", "table": "bookings", "rowId": "booking-alex-haircut", "column": "private" }
+    ],
+    "facts": [
+      {
+        "name": "price",
+        "value": 3500,
+        "home": "money",
+        "table": "booking_lines",
+        "rowId": "line-alex-haircut",
+        "version": 2,
+        "forSteps": ["A6-02"]
+      },
+      {
+        "name": "booking.private",
+        "value": false,
+        "home": "record",
+        "table": "bookings",
+        "rowId": "booking-alex-haircut",
+        "version": 7,
+        "forSteps": ["A6-02"]
+      }
+    ],
+    "flagged": [
+      {
+        "stepId": "A6-02",
+        "key": "price",
+        "kept": { "table": "booking_lines", "rowId": "line-alex-haircut", "version": 2 }
+      }
+    ]
+  }
+}
