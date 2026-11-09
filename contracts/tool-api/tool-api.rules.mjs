@@ -589,6 +589,14 @@ export const J5_OWNER_BOOKS = Object.freeze({
   "B5-06": "B5-03",
 });
 
+/**
+ * The keys a step gives that, on C3's door, come from the payment's success, never from the yes (README "v1.3" default
+ * 104; round 2, DL-252 ruling 2): a yes on the pay page (takeMoneyBefore yes with payBy payLink) comes before Stripe's
+ * form confirms the payment, and K-14's paymentSucceeded with saveCardForLater writes the deposit's K-32 saved_cards row
+ * (saved_from_payment_id), so that yes gives its step's other keys.
+ */
+export const J5_PAY_LINK_LATER = Object.freeze(["card_saved"]);
+
 /** The one call that writes each key journey 5 gives (README "v1.3", "Each key's one call"; 02-contracts section 8). */
 export const J5_KEY_CALL = Object.freeze({
   money_before: "takeMoneyBefore",
@@ -599,10 +607,11 @@ export const J5_KEY_CALL = Object.freeze({
 
 /**
  * givesJourneyFiveKeys: an exchange that states a journey 5 step states exactly the keys that step gives (J5_STEP_GIVES;
- * for the owner's '1 Book it', the 'Nothing taken' branch's: J5_OWNER_BOOKS), and its outcome wrote exactly those keys.
- * Made alone, its call is the one call that writes each key (J5_KEY_CALL; the card's "each key written by exactly one
- * call"). In a turn (gateAndCommit) the committed parts' gives are the keys written; no automatic step of journey 5
- * gives a key, so a part gives exactly its step's.
+ * for the owner's '1 Book it', the 'Nothing taken' branch's: J5_OWNER_BOOKS), less, for a yes on C3's pay page, those
+ * the payment's success writes (J5_PAY_LINK_LATER), and its outcome wrote exactly those keys. Made alone, its call is the
+ * one call that writes each key (J5_KEY_CALL; the card's "each key written by exactly one call"). In a turn
+ * (gateAndCommit) the committed parts' gives are the keys written; no automatic step of journey 5 gives a key, so a part
+ * gives exactly its step's.
  */
 export function givesJourneyFiveKeys(exchange) {
   const stated = exchange.given?.stated;
@@ -613,7 +622,9 @@ export function givesJourneyFiveKeys(exchange) {
   const ownKeys = J5_STEP_GIVES[keyStep] ?? [];
   if (ownKeys.length === 0) return [`${stated.step} is no step of journey 5 that gives a key`];
   const problems = [];
-  const expected = [...ownKeys].sort();
+  const stage = exchange.call === "takeMoneyBefore" ? exchange.request?.stage : undefined;
+  const onPayPage = stage?.kind === "yes" && stage.payBy === "payLink";
+  const expected = ownKeys.filter((key) => !(onPayPage && J5_PAY_LINK_LATER.includes(key))).sort();
   const statedKeys = [...stated.gives].sort();
   if (JSON.stringify(statedKeys) !== JSON.stringify(expected)) {
     problems.push(

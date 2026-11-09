@@ -1,0 +1,78 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": ["j5-pay-link-agent.json", "j5-pay-page-money-before-page.json"],
+    "now": "2026-11-03T16:03:20Z",
+    "stated": { "step": "A5-16", "gives": ["money_before", "paid_full"] },
+    "note": "C3's pay page, the yes (round 2, DL-252 ruling 2; README default 104): Dee ticks the words the page server showed from showMoneyBefore and taps Pay and book. The yes comes before Stripe's form confirms the payment ('Never: take money before the price and the yes to it': A5-04), so no card is ready yet: the yes names the booking's live pay link in its place (payBy payLink, payLinkId), and cardNotReady does not apply. Code builds the words again from the versions read, and they match. In one commit: booking_details.taken 'asked', set once, and her ticked words as a K-29 ticked_terms consent (README default 92). Gives money_before and paid_full. The answer names the live pay link with no url and no clock row, since nothing is given or armed again; next, Stripe's form on this page takes her card for that payment (K-14 pageIntent), and only paymentSucceeded makes it paid (K-32 rule 5), within the 15 minutes and before the booking write (A6-10, K-09 v1.4; MC C3: 'Paid or card saved within 15 minutes: booked'). Not paid by 11:13am: closePayLink cancels it at the deadline, the time goes back, and nothing is booked or charged. pay.took reads the payment's state, pending, so no word says paid in full. The consent id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-paypage-dee-sig-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-paypage-dee-sig-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-16",
+      "branch": "full",
+      "amountNow": { "cents": 5500, "currency": "USD" },
+      "payBy": "payLink",
+      "payLinkId": "paylink-agent-dee-signature-cut",
+      "yes": {
+        "kind": "page",
+        "exactWords": "Signature cut and hot towel shave, Sat Nov 7 at 2:00pm, $55, paid in full now into Lee's Barbershop's own Stripe. Pay by 11:13am today to book it. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+        "yesEventId": "evt-paypage-dee-sig-0002"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": "yes",
+    "branch": "full",
+    "took": "asked",
+    "card": null,
+    "payLink": {
+      "payLinkId": "paylink-agent-dee-signature-cut",
+      "paymentId": "pay-agent-dee-signature-cut",
+      "dueAt": "2026-11-03T16:13:00Z",
+      "url": null,
+      "clockRowIds": [],
+      "slot": "link.pay"
+    },
+    "consentId": "consent-dee-signature-cut-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-agent-dee-signature-cut" },
+      {
+        "slot": "pay.price",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-agent-dee-signature-1"
+      },
+      {
+        "slot": "pay.cancel",
+        "table": "booking_lines",
+        "column": "fee_cents",
+        "rowId": "line-agent-dee-signature-1"
+      }
+    ],
+    "gives": ["money_before", "paid_full"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-dee-signature-cut", "version": 5 }],
+    "repeated": false
+  }
+}

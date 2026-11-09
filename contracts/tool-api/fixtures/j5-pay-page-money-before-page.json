@@ -1,0 +1,68 @@
+{
+  "call": "showMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": ["j5-pay-link-agent.json"],
+    "now": "2026-11-03T16:02:40Z",
+    "stated": null,
+    "note": "C3's pay page, the first call after the pay link (round 2, DL-252 ruling 2; README default 104): Dee opens the link her own AI passed her. The pay page's server finds the link by its code's sha256 on the runtime side (K-32 default 21), live (not ended, due at 11:13am in New York), and calls with the link's person, Dee (K-32 pay_links.person_id), never a person the browser names. The branch is full: the $55 Signature cut and hot towel shave, way list|full|none, all due now in one payment (RULES 3.2). payBy is payLink, decided from the stored facts the pay link was made from (the hold held for her AI's agent token, booking_details.approval now, the line's before full: README default 88), and yesBy ownYes: her own tap on this page comes first, then Stripe's form on it takes the card for the payment (K-14 pageIntent). The page's one clock is the pay link's deadline, the hold's own end, never extended (MC C3). Nothing is written. The words are code's, built from the versions read (README default 91), and each money word names its row (default 90): pay.took reads the payment's state, pending, so no word says paid. Every id, time of day and word is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-paypage-dee-sig-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-paypage-dee-sig-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut"
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "branch": "full",
+    "amountNow": { "cents": 5500, "currency": "USD" },
+    "fee": { "cents": 2000, "currency": "USD" },
+    "lines": [
+      {
+        "lineId": "line-agent-dee-signature-1",
+        "before": "full",
+        "paidBy": "money",
+        "dueNow": { "cents": 5500, "currency": "USD" }
+      }
+    ],
+    "offers": { "credits": [], "packs": false, "memberships": false, "plan": false, "discountCodes": false },
+    "document": null,
+    "stripeDown": false,
+    "yesBy": "ownYes",
+    "payBy": "payLink",
+    "words": "Signature cut and hot towel shave, Sat Nov 7 at 2:00pm, $55, paid in full now into Lee's Barbershop's own Stripe. Pay by 11:13am today to book it. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+    "versionsRead": [
+      { "table": "booking_details", "rowId": "booking-agent-dee-signature-cut", "version": 4 },
+      { "table": "booking_lines", "rowId": "line-agent-dee-signature-1", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-agent-dee-signature-cut", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-agent-dee-signature-cut", "version": 1 }
+    ],
+    "heldUntil": "2026-11-03T16:13:00Z",
+    "moneyWords": [
+      {
+        "slot": "pay.price",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-agent-dee-signature-1"
+      },
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-agent-dee-signature-cut" },
+      {
+        "slot": "pay.cancel",
+        "table": "booking_lines",
+        "column": "fee_cents",
+        "rowId": "line-agent-dee-signature-1"
+      },
+      { "slot": "clock.pay", "table": "pay_links", "column": "due_at", "rowId": "paylink-agent-dee-signature-cut" }
+    ]
+  }
+}

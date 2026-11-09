@@ -1,0 +1,64 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": ["j5-pay-link-agent.json", "j5-pay-page-money-before-page.json"],
+    "now": "2026-11-03T16:03:20Z",
+    "stated": null,
+    "note": "Refused (round 2, DL-252 ruling 2: 'The yes on payBy payLink needs a live pay link in place of a ready card'; README default 104): Dee's yes on C3's pay page names no live pay link (payLinkId null), so it would stand on neither a ready card nor a live link. A yes with payBy payLink names the booking's live pay link (MoneyYes). Put right, payLinkId is paylink-agent-dee-signature-cut, as j5-pay-page-yes-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-paypage-dee-sig-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-paypage-dee-sig-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-16",
+      "branch": "full",
+      "amountNow": { "cents": 5500, "currency": "USD" },
+      "payBy": "payLink",
+      "payLinkId": null,
+      "yes": {
+        "kind": "page",
+        "exactWords": "Signature cut and hot towel shave, Sat Nov 7 at 2:00pm, $55, paid in full now into Lee's Barbershop's own Stripe. Pay by 11:13am today to book it. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+        "yesEventId": "evt-paypage-dee-sig-0002"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": "yes",
+    "branch": "full",
+    "took": "asked",
+    "card": null,
+    "payLink": {
+      "payLinkId": "paylink-agent-dee-signature-cut",
+      "paymentId": "pay-agent-dee-signature-cut",
+      "dueAt": "2026-11-03T16:13:00Z",
+      "url": null,
+      "clockRowIds": [],
+      "slot": "link.pay"
+    },
+    "consentId": "consent-dee-signature-cut-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [],
+    "gives": ["money_before", "paid_full"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-dee-signature-cut", "version": 5 }],
+    "repeated": false
+  }
+}

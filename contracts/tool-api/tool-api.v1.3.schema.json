@@ -558,7 +558,7 @@
     },
     "cardNotReadyError": {
       "title": "CardNotReadyError",
-      "description": "The card the money step needs is not ready, so nothing was written (A5-07: 'The card goes on file through Stripe'; RULES 3.12: the card is typed into Stripe's own form): the card stage's K-32 saved_cards row is not saved yet (saved_at null until cardSaved: K-32 v1 'K-14's results and events, row by row'), or, for a card typed for a payment now, its K-07 stripe_save_card effect has not succeeded with its cardSaved event (K-32 default 15). The page waits for Stripe's form; a card that can't be saved is 'Try another card' (A5-31; S12-25: never the bank's reason), and a card-saved service with no card that works is A5-31's 'Ask Sam first' (takeMoneyBefore askOwner).",
+      "description": "The card the money step needs is not ready, so nothing was written (A5-07: 'The card goes on file through Stripe'; RULES 3.12: the card is typed into Stripe's own form). It holds on the standard door; a yes on C3's pay page (payBy payLink) takes a live pay link in place of a ready card, so it never answers this (round 2, DL-252 ruling 2; README default 104). Not ready: the card stage's K-32 saved_cards row is not saved yet (saved_at null until cardSaved: K-32 v1 'K-14's results and events, row by row'), or, for a card typed for a payment now, its K-07 stripe_save_card effect has not succeeded with its cardSaved event (K-32 default 15). The page waits for Stripe's form; a card that can't be saved is 'Try another card' (A5-31; S12-25: never the bank's reason), and a card-saved service with no card that works is A5-31's 'Ask Sam first' (takeMoneyBefore askOwner).",
       "type": "object",
       "properties": { "error": { "const": "cardNotReady" } },
       "required": ["error"],
@@ -633,7 +633,7 @@
       "additionalProperties": false,
       "dependentSchemas": {
         "bookingId": {
-          "description": "A page or the customer's own AI, acting for a known person: the page session's, or the person the agent token is bound to (CQ-13: a bound token reads that customer's bookings; v1.2 default 70).",
+          "description": "A page or the customer's own AI, acting for a known person: the page session's (on C3's pay page the pay link's person, K-32 pay_links.person_id, set by its server from the link found by its code's sha256: README defaults 88, 104), or the person the agent token is bound to (CQ-13: a bound token reads that customer's bookings; v1.2 default 70).",
           "properties": {
             "caller": {
               "type": "object",
@@ -698,7 +698,10 @@
             },
             "packs": { "description": "A pack sold on this page (A5-22).", "type": "boolean" },
             "memberships": { "description": "A membership sold on this page (A5-22).", "type": "boolean" },
-            "plan": { "description": "A repeat plan with its own yes (A5-21).", "type": "boolean" },
+            "plan": {
+              "description": "A repeat plan with its own yes (A5-21), billed per visit; a plan billed monthly is not offered until its card has a stage after its yes (round 2, README default 106).",
+              "type": "boolean"
+            },
             "discountCodes": {
               "description": "Never, until K-23 holds codes (K-32 v1 default 19; README default 102).",
               "const": false
@@ -825,7 +828,7 @@
     },
     "settleOffer.request": {
       "title": "SettleOfferRequest",
-      "description": "A5-01 and B5-01's offers, each settled before anything is taken; gives no key. credit (A5-03, B5-31: 'This booking uses one of them. The page shows the credits left after this visit'): in one commit a K-32 v1 credits row from the person's own pack or membership for the line's service (units: 1 visit, or the minutes or cents a pack of hours or dollars draws down), the pack's credits_used raised under its CHECK (K-32 rule 10), and, since K-30 v1 copies booking_lines.paid_by at the save, before A5-01 (K-30 README writer table: A4-21, B4-23), the open line replaced, before the booking is written, by a copy paid by credit with the same way and price (the old line removed with no change row: K-30 booking_lines.state 'replaced before the booking was written'; v1.1 open gap 46's default), which the credit names (README default 94; open gap 91). buy (A5-22, B5-32: 'the customer buys one on the secure page. This visit then uses a credit from it'; 'charged when bought, into the business's own Stripe'; 'The card is typed on the page'): a pack (K-32 packs, bought_via rosie, with its payment of purpose pack, booking_id null, method card, pending: 'If the booking isn't confirmed, the pack stays bought') or a membership with its own yes to its terms (K-29 v1 consents kind plan_terms, the exact words and their sha256; K-32 memberships, terms_consent_id; its first plan charge made with the customer present, plan_charges.customer_present, and that charge's payment of purpose plan_charge: K-32 default 28), charged at once on the card the takeMoneyBefore card stage readied (cardEffectId; K-14 v1 charge, purpose pack, customerPresent true; K-07 stripe_charge), and the visit's credit in the same commit (paid_by credit as above); only K-14's result or paymentSucceeded makes the payment paid (K-32 rule 5), a decline is 'Try another card' (RULES 3.11), and a membership no card pays ends not_paid with its credit given back (K-32 default 28; README default 95). plan (A5-21, B5-21: 'Its terms show with their own yes, before any card. The customer says yes to them on their own, in their own chat or on their page'): '1 I agree' writes the K-29 plan_terms consent bound to the terms' exact words and the K-32 memberships row (kind plan, billed per_visit or monthly, terms_consent_id); '2 Just this visit' writes nothing and the visit still books (A5-21's safe default; README default 96). Never in a text for a credit or a buy ('Never: offer a package, plan or membership in a text': A5-01), and never an AI's yes ('Never: start repeat charges on a booking yes alone'; S13-55: 'Never a yes relayed in a chat by someone else's AI'). Primary, uncached. Business: caller.businessId; every K-32 row of this business (K-32 rule 5). Person: the head's booker, set on the server, never the browser's. Repeat: caller.requestId is the key; a repeat writes nothing and answers the first result. Version: the pack or membership compared and set (expectVersion, limit 4); new rows at version 1.",
+      "description": "A5-01 and B5-01's offers, each settled before anything is taken; gives no key. credit (A5-03, B5-31: 'This booking uses one of them. The page shows the credits left after this visit'): in one commit a K-32 v1 credits row from the person's own pack or membership for the line's service (units: 1 visit, or the minutes or cents a pack of hours or dollars draws down), the pack's credits_used raised under its CHECK (K-32 rule 10), and, since K-30 v1 copies booking_lines.paid_by at the save, before A5-01 (K-30 README writer table: A4-21, B4-23), the open line replaced, before the booking is written, by a copy paid by credit with the same way and price (the old line removed with no change row: K-30 booking_lines.state 'replaced before the booking was written'; v1.1 open gap 46's default), which the credit names (README default 94; open gap 91). buy (A5-22, B5-32: 'the customer buys one on the secure page. This visit then uses a credit from it'; 'charged when bought, into the business's own Stripe'; 'The card is typed on the page'): a pack (K-32 packs, bought_via rosie, with its payment of purpose pack, booking_id null, method card, pending: 'If the booking isn't confirmed, the pack stays bought') or a membership with its own yes to its terms (K-29 v1 consents kind plan_terms, the exact words and their sha256; K-32 memberships, terms_consent_id; its first plan charge made with the customer present, plan_charges.customer_present, and that charge's payment of purpose plan_charge: K-32 default 28; billed monthly, K-32 memberships.billed; and the card kept for its later charges, a K-32 saved_cards row naming the membership and cardEffectId, answered as savedCardId: round 2, README default 105), charged at once on the card the takeMoneyBefore card stage readied (cardEffectId; K-14 v1 charge, purpose pack, customerPresent true; K-07 stripe_charge), and the visit's credit in the same commit (paid_by credit as above); only K-14's result or paymentSucceeded makes the payment paid (K-32 rule 5), a decline is 'Try another card' (RULES 3.11), and a membership no card pays ends not_paid with its credit given back (K-32 default 28; README default 95). plan (A5-21, B5-21: 'Its terms show with their own yes, before any card. The customer says yes to them on their own, in their own chat or on their page'): '1 I agree' writes the K-29 plan_terms consent bound to the terms' exact words and the K-32 memberships row (kind plan, billed per_visit, terms_consent_id); '2 Just this visit' writes nothing and the visit still books (A5-21's safe default; README default 96). A plan billed monthly needs a card for its charges, which its own yes, given 'before any card' (A5-21; S13-39), cannot carry, so until a K-09 minor version gives that card a stage after the yes it is not offered (notOffered, what plan; round 2, README default 106, open gap 102). Never in a text for a credit or a buy ('Never: offer a package, plan or membership in a text': A5-01), and never an AI's yes ('Never: start repeat charges on a booking yes alone'; S13-55: 'Never a yes relayed in a chat by someone else's AI'). Primary, uncached. Business: caller.businessId; every K-32 row of this business (K-32 rule 5). Person: the head's booker, set on the server, never the browser's. Repeat: caller.requestId is the key; a repeat writes nothing and answers the first result. Version: the pack or membership compared and set (expectVersion, limit 4); new rows at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -913,6 +916,10 @@
                         "visitsPerPeriod": {
                           "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
                         },
+                        "billed": {
+                          "description": "How it is paid (K-32 v1 memberships.billed, not null): monthly, charged each period through Rosie into the business's own Stripe, the first period charged as it is bought, with the customer present, and each next period by the plan charge job on the card saved for it (K-32 v1 rule 10: 'written in that commit with its first plan charge, for its first period'; default 28; memberships_next_charge; A5-22: 'A membership's repeat charges need their own yes, with its terms: the price, when it's charged'). Never per_visit or outside: a membership bought on the page is charged when bought (round 2, DL-252 ruling 3; README default 105).",
+                          "const": "monthly"
+                        },
                         "termsYes": {
                           "description": "Its own yes to its terms on the page, the words the page server showed (A5-22: 'A membership's repeat charges need their own yes, with its terms').",
                           "$ref": "#/$defs/readBackYes"
@@ -925,6 +932,7 @@
                         "price",
                         "period",
                         "visitsPerPeriod",
+                        "billed",
                         "termsYes"
                       ],
                       "additionalProperties": false
@@ -932,7 +940,7 @@
                   ]
                 },
                 "cardEffectId": {
-                  "description": "The K-07 stripe_save_card effect of the takeMoneyBefore card stage whose card pays it (keep false: K-32 default 15).",
+                  "description": "The K-07 stripe_save_card effect of the takeMoneyBefore card stage whose card pays it (keep false, so that stage wrote no saved card row: K-32 default 15). For a membership the buy itself keeps that card for its later charges: its K-32 saved_cards row names the membership and this effect (save_effect_id), as README default 105 says.",
                   "$ref": "../common/formats.v1.schema.json#/$defs/id"
                 },
                 "lineId": {
@@ -1023,7 +1031,7 @@
     },
     "settleOffer.response": {
       "title": "SettleOfferResponse",
-      "description": "What the offer wrote: the credit, the pack or membership and its payment, the plan and its consent, the line paid by credit, the charge's effect, the money words' sources; no key.",
+      "description": "What the offer wrote: the credit, the pack or membership and its payment, a membership's saved card (round 2), the plan and its consent, the line paid by credit, the charge's effect, the money words' sources; no key.",
       "type": "object",
       "properties": {
         "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
@@ -1038,6 +1046,10 @@
         },
         "consentId": {
           "description": "The K-29 plan_terms consent of a plan's '1 I agree' or a membership's terms; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "savedCardId": {
+          "description": "For a membership bought on the page, the K-32 saved_cards row its later charges go on (K-32 v1 memberships: 'A card saved for its charges is a saved_cards row'; saved_cards.membership_id, booking_id null by saved_cards_for_one; save_effect_id the request's cardEffectId, saved_cards_save_effect_key), written in the buy's commit with its Stripe ids and saved time from that save's result and cardSaved event, since the card is ready before the buy (cardNotReady otherwise) and the card stage kept no row (round 2, DL-252 ruling 3; README default 105). null for a pack, a credit and a plan's yes (README default 106).",
           "$ref": "#/$defs/nullableId"
         },
         "line": {
@@ -1080,6 +1092,7 @@
         "planChargeId",
         "paymentId",
         "consentId",
+        "savedCardId",
         "line",
         "effects",
         "moneyWords",
@@ -1087,7 +1100,20 @@
         "written",
         "repeated"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "A membership bought on the page answers the saved card its later charges go on; every other answer names none (round 2, DL-252 ruling 3).",
+          "if": {
+            "properties": { "offer": { "const": "buy" }, "membershipId": { "type": "string" } },
+            "required": ["offer", "membershipId"]
+          },
+          "then": {
+            "properties": { "savedCardId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+          },
+          "else": { "properties": { "savedCardId": { "type": "null" } } }
+        }
+      ]
     },
     "settleOffer.errors": {
       "title": "SettleOfferErrors",
@@ -1173,6 +1199,41 @@
           },
           "then": {
             "properties": { "outcome": { "type": "object", "properties": { "offer": { "const": "plan" } } } }
+          }
+        },
+        {
+          "description": "A plan billed monthly is not offered in v1.3: its card has no stage after its yes yet (round 2, DL-252 ruling 3; README default 106, open gap 102).",
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "offer": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "const": "plan" },
+                      "plan": {
+                        "type": "object",
+                        "properties": { "billed": { "const": "monthly" } },
+                        "required": ["billed"]
+                      }
+                    },
+                    "required": ["kind", "plan"]
+                  }
+                },
+                "required": ["offer"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "properties": {
+              "outcome": {
+                "type": "object",
+                "properties": { "error": { "const": "notOffered" }, "what": { "const": "plan" } },
+                "required": ["error", "what"]
+              }
+            }
           }
         }
       ],
@@ -1408,7 +1469,7 @@
     },
     "takeMoneyBefore.request": {
       "title": "TakeMoneyBeforeRequest",
-      "description": "What's taken now (A5-04, B5-02: 'This is the one place that sets what this booking took'); gives money_before (A5-05, A5-07, A5-13, A5-16; B5-03, B5-05, B5-11, B5-13; and the owner's '1 Book it' at A5-08 and B5-06, which books it with nothing taken, A5-04's 'Nothing taken': README default 99), card_saved (A5-07, A5-13; B5-05, B5-11), deposit_paid (A5-13; B5-11) and paid_full (A5-16; B5-13), the one call that writes each in journey 5 (02-contracts section 8; README 'v1.3', 'Each key's one call'; default 89 says what each holds). Six stages. card (A5-07, A5-13, A5-16, A5-22: 'The card goes on file through Stripe, in Lee's Barbershop's own account'): the card made ready for Stripe's form on the page, the K-07 stripe_save_card effect (K-14 v1 saveCard, a SetupIntent with the effect id, its client secret read by the page server with pageIntent and never stored: K-14 'Money and cards'), and for a card the booking keeps for later (a card saved, a deposit: keep true) the K-32 v1 saved_cards row naming it, saved_at null until cardSaved (the runtime side); a card typed for a payment now (the full price, a pack: keep false) keeps no saved card row (K-32 default 15). Nothing is charged (K-14 saveCard). payLink (MC C3): on C3's door only, the customer's own AI's booking that books at once with a deposit or the full price due now, decided from stored facts (the hold held for the AI's agent token, K-04 reservations.for_agent_token; K-30 booking_details.approval now; the lines' before deposit or full), the K-32 payment pending with its K-07 stripe_pay_link effect (K-14 payLink, saveCardForLater for a deposit, since 'the card stays saved'), its pay_links row (due_at the hold's own end, 15 minutes, never extended) and the link: to the AI in url, once, and to the customer's email and open chat through clock rows due at once (README default 88). yes (A5-05, A5-07, A5-13, A5-16; A5-31's 'Done: the yes'): the branch showMoneyBefore answered, the amount taken now and the yes: the customer's own on the page with the words the page server showed, refilled by code from the rows read and compared (wordsDiffer otherwise), or for nothing taken a '1' in their own chat answering the read-back's open question (README default 93), or, only for nothing taken on D104's door (approval now and a hold held for the AI's agent token), the AI's request itself (MC C3: 'booked at once on the AI's request, in place of the own-yes rule'), never an AI's yes otherwise (ownYesNeeded; README default 91). In one commit: K-30 booking_details.taken 'asked', set once (README default 89); for nothing taken the customer's OK to messages about this booking, a K-29 texts consent bound to the yes's words (A5-05: 'The yes records their OK to messages about this booking'), or for a stopped mobile none, only the texts-off line (RULES 7.5; v1.2 default 82's rule); for a card, a deposit or the full price the exact words ticked, a K-29 ticked_terms consent with their sha256 (A5-07: 'The exact words the customer ticked are stored with the booking'), which the booking write's terms snapshot names (K-30 booking_terms.terms_consent_id, K-09 v1.4; README default 92). The card must be ready first (cardNotReady), every document signed (documentUnsigned), the time still held (holdEnded; A5-05: 'A late yes is checked first'). No charge is written here: on the standard door the deposit or full price is charged on the saved card as the booking is written (A6-10) or at the owner's OK (A6-03), both K-09 v1.4's ('What's due now is taken once the booking is written, so a time lost in that moment costs nothing': S13-55, the home step, over A5-13's own words; K-14 v1 charge, deposit.json; K-32 v1 seed-payment-deposit), and on C3's door by the pay link already written (README default 87). letGo (A5-05: 'A no lets the time go now'): the customer's own no on the page or in their chat; the hold released (K-05 v1 release, why let_go) and the request ended dropped (K-30 request_ended_why: 'the customer said no'). askOwner (A5-31's 'Ask Sam first'; A5-08, B5-06: 'The service asks money before, but this booking can take none. Sam is asked once, with the deadline and what silence does. The customer hears when they'll know'): from the page when no card works for a card-saved service (why noCardWorks) or Stripe is down (why stripeDown: S12-17, 'Sam is asked at once'), never on C3's door ('Sam's OK up to 30 minutes, A5-08 and B5-06, do not apply to this door': MC C3); a K-30 owner_oks row about nothing_taken, answer_by 30 minutes of the owner's text hours, or 5 minutes at any hour for a job sent now (B5-06), and the owner's question through a clock row due at once on the owner's handle (a page's commit writes no outbox row: v1.2 default 66's way), whose clock turn writes A5-08's question and its open question with A5-08's two branches as options; the customer hears when they'll know on the page itself (README default 99). ownerAnswer (A5-08's '1 Book it', '2 Let it go'): the owner's or a permitted admin's own answer, in their turn (the open question and the reply's event) or on Needs you (the tap with the words the page server showed), owner_oks compared and set (expectVersion) in K-08's ownerYes shape: book sets taken 'nothing' ('booked with no money taken, so no fee can be charged') and gives money_before; letGo ends the request declined, releases the hold and tells the customer. Silence never books (A5-08: 'Never: book it with no money taken on silence'; S13-55: 'Rosie NEVER makes a new charge on silence'): no answer by the deadline is the question clock's firing (C-055), with the step's safe default, never this call (README default 99). Primary, uncached. Business: caller.businessId; every row this business's (K-30, K-32 rule 5). Person: the head's booker, set on the server; for ownerAnswer the owner or admin who answered (notAllowed otherwise). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: booking_details compared and set; owner_oks compared and set; new rows at version 1.",
+      "description": "What's taken now (A5-04, B5-02: 'This is the one place that sets what this booking took'); gives money_before (A5-05, A5-07, A5-13, A5-16; B5-03, B5-05, B5-11, B5-13; and the owner's '1 Book it' at A5-08 and B5-06, which books it with nothing taken, A5-04's 'Nothing taken': README default 99), card_saved (A5-07, A5-13; B5-05, B5-11; on C3's door its row is the payment's success, never this call: README default 104), deposit_paid (A5-13; B5-11) and paid_full (A5-16; B5-13), the one call that writes each in journey 5 (02-contracts section 8; README 'v1.3', 'Each key's one call'; default 89 says what each holds). Six stages. card (A5-07, A5-13, A5-16, A5-22: 'The card goes on file through Stripe, in Lee's Barbershop's own account'): the card made ready for Stripe's form on the page, the K-07 stripe_save_card effect (K-14 v1 saveCard, a SetupIntent with the effect id, its client secret read by the page server with pageIntent and never stored: K-14 'Money and cards'), and for a card the booking keeps for later (a card saved, a deposit: keep true; the full price on a request the owner OKs, whose keep the call takes from the stored approval, K-30 booking_details.approval ownerok, never from the caller: keep null, round 2, README default 103) the K-32 v1 saved_cards row naming it, saved_at null until cardSaved (the runtime side); a card typed for a payment now (the full price booked now; a pack or a membership bought on the page, keep false, whose membership keeps its card through settleOffer buy: README default 105) keeps no saved card row from this stage (K-32 default 15). Nothing is charged (K-14 saveCard). payLink (MC C3): on C3's door only, the customer's own AI's booking that books at once with a deposit or the full price due now, decided from stored facts (the hold held for the AI's agent token, K-04 reservations.for_agent_token; K-30 booking_details.approval now; the lines' before deposit or full), the K-32 payment pending with its K-07 stripe_pay_link effect (K-14 payLink, saveCardForLater for a deposit, since 'the card stays saved'), its pay_links row (due_at the hold's own end, 15 minutes, never extended) and the link: to the AI in url, once, and to the customer's email and open chat through clock rows due at once (README default 88). yes (A5-05, A5-07, A5-13, A5-16; A5-31's 'Done: the yes'): the branch showMoneyBefore answered, the amount taken now and the yes: the customer's own on the page with the words the page server showed, refilled by code from the rows read and compared (wordsDiffer otherwise), or for nothing taken a '1' in their own chat answering the read-back's open question (README default 93), or, only for nothing taken on D104's door (approval now and a hold held for the AI's agent token), the AI's request itself (MC C3: 'booked at once on the AI's request, in place of the own-yes rule'), never an AI's yes otherwise (ownYesNeeded; README default 91). In one commit: K-30 booking_details.taken 'asked', set once (README default 89); for nothing taken the customer's OK to messages about this booking, a K-29 texts consent bound to the yes's words (A5-05: 'The yes records their OK to messages about this booking'), or for a stopped mobile none, only the texts-off line (RULES 7.5; v1.2 default 82's rule); for a card, a deposit or the full price the exact words ticked, a K-29 ticked_terms consent with their sha256 (A5-07: 'The exact words the customer ticked are stored with the booking'), which the booking write's terms snapshot names (K-30 booking_terms.terms_consent_id, K-09 v1.4; README default 92). On the standard door (payBy cardOnPage) the card must be ready first (cardNotReady). On C3's door (payBy payLink) the yes comes before Stripe's form confirms the payment ('Never: take money before the price and the yes to it': A5-04), so the booking's live pay link stands in place of a ready card (payLinkId) and cardNotReady does not apply; the order is payLink (the AI), showMoneyBefore on the pay page (payBy payLink), this yes, then Stripe's form on that page confirms the payment (K-14 pageIntent), then K-14's paymentSucceeded makes it paid and, for a deposit's card kept (saveCardForLater), writes its K-32 saved_cards row (saved_from_payment_id), so on that door card_saved comes from the payment's success, never from the yes, and a deposit's yes gives money_before and deposit_paid (round 2, DL-252 ruling 2; MC C3: 'Paid or card saved within 15 minutes: booked'; README default 104). Every document signed (documentUnsigned), the time still held (holdEnded; A5-05: 'A late yes is checked first'). No charge is written here: on the standard door the deposit or full price is charged on the saved card as the booking is written (A6-10) or at the owner's OK (A6-03), both K-09 v1.4's ('What's due now is taken once the booking is written, so a time lost in that moment costs nothing': S13-55, the home step, over A5-13's own words; K-14 v1 charge, deposit.json; K-32 v1 seed-payment-deposit), and on C3's door by the pay link already written (README default 87). letGo (A5-05: 'A no lets the time go now'): the customer's own no on the page or in their chat; the hold released (K-05 v1 release, why let_go) and the request ended dropped (K-30 request_ended_why: 'the customer said no'). askOwner (A5-31's 'Ask Sam first'; A5-08, B5-06: 'The service asks money before, but this booking can take none. Sam is asked once, with the deadline and what silence does. The customer hears when they'll know'): from the page when no card works for a card-saved service (why noCardWorks) or Stripe is down (why stripeDown: S12-17, 'Sam is asked at once'), never on C3's door ('Sam's OK up to 30 minutes, A5-08 and B5-06, do not apply to this door': MC C3); a K-30 owner_oks row about nothing_taken, answer_by 30 minutes of the owner's text hours, or 5 minutes at any hour for a job sent now (B5-06), and the owner's question through a clock row due at once on the owner's handle (a page's commit writes no outbox row: v1.2 default 66's way), whose clock turn writes A5-08's question and its open question with A5-08's two branches as options; the customer hears when they'll know on the page itself (README default 99). ownerAnswer (A5-08's '1 Book it', '2 Let it go'): the owner's or a permitted admin's own answer, in their turn (the open question and the reply's event) or on Needs you (the tap with the words the page server showed), owner_oks compared and set (expectVersion) in K-08's ownerYes shape: book sets taken 'nothing' ('booked with no money taken, so no fee can be charged') and gives money_before; letGo ends the request declined, releases the hold and tells the customer. Silence never books (A5-08: 'Never: book it with no money taken on silence'; S13-55: 'Rosie NEVER makes a new charge on silence'): no answer by the deadline is the question clock's firing (C-055), with the step's safe default, never this call (README default 99). Primary, uncached. Business: caller.businessId; every row this business's (K-30, K-32 rule 5). Person: the head's booker, set on the server; for ownerAnswer the owner or admin who answered (notAllowed otherwise). Repeat: caller.requestId is the key (a turn's id in a turn); a repeat writes nothing and answers the first result. Version: booking_details compared and set; owner_oks compared and set; new rows at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -1426,20 +1487,25 @@
                   "enum": ["A5-07", "A5-13", "A5-16", "A5-22", "B5-05", "B5-11", "B5-13", "B5-32"]
                 },
                 "keep": {
-                  "description": "true: the booking keeps the card for later (a card saved, a deposit: 'the card stays saved'), so a K-32 saved_cards row names it; false: a card typed for a payment now (the full price, a pack), with no saved card row (K-32 default 15).",
-                  "type": "boolean"
+                  "description": "true: the booking keeps the card for later (a card saved, a deposit: 'the card stays saved'), so a K-32 saved_cards row names it; false: a card typed for a pack or a membership bought on the page, with no saved card row from this stage (K-32 default 15; a membership's own card is settleOffer buy's: README default 105). null at A5-16 and B5-13 (round 2, DL-252 ruling 1): the full price's card is kept or not by the stored approval, never by the caller: the call reads K-30 booking_details.approval, set at A4-98 and never decided again (A6-01), and on a request the owner OKs (ownerok) keeps the card, since nothing is charged while the OK is pending and the full price is charged on that saved card at the owner's OK (S13-55, MASTER-FLOW-A line 7325: 'On a request, nothing is charged for this visit while the OK is pending. The card is saved'; A6-01 line 3151; A6-03 line 3183; K-32 v1 saved_cards: 'a deposit or full price at the owner's OK'; K-32 default 15: 'unless the booking keeps it for later'), while a booking made now (now) keeps none; the answer's card.kept says which (README default 103).",
+                  "anyOf": [{ "type": "boolean" }, { "type": "null" }]
                 }
               },
               "required": ["kind", "step", "keep"],
               "additionalProperties": false,
               "allOf": [
                 {
+                  "description": "A card saved and a deposit keep the card; the full price's keep is the stored approval's (null here); a pack's or membership's card stage keeps none.",
                   "if": {
                     "properties": { "step": { "enum": ["A5-07", "A5-13", "B5-05", "B5-11"] } },
                     "required": ["step"]
                   },
                   "then": { "properties": { "keep": { "const": true } } },
-                  "else": { "properties": { "keep": { "const": false } } }
+                  "else": {
+                    "if": { "properties": { "step": { "enum": ["A5-16", "B5-13"] } }, "required": ["step"] },
+                    "then": { "properties": { "keep": { "type": "null" } } },
+                    "else": { "properties": { "keep": { "const": false } } }
+                  }
                 }
               ]
             },
@@ -1467,6 +1533,15 @@
                   "description": "What is taken now as showMoneyBefore answered it (null for nothing and a card saved), compared again: never more than the terms say (A5-04; A5-13: 'Never: take more than the deposit now').",
                   "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
                 },
+                "payBy": {
+                  "description": "How money is taken, as showMoneyBefore answered it (its payBy), compared again by the call against the stored facts it was decided from (the hold's holder, K-04 reservations.for_agent_token; K-30 booking_details.approval; the lines' before: README default 88), never the caller's word: none for nothing; cardOnPage, the standard door, where the card must be ready first (cardNotReady); payLink, C3's door, where the yes comes before Stripe's form confirms the payment, so a live pay link stands in place of a ready card (round 2, DL-252 ruling 2; README default 104).",
+                  "type": "string",
+                  "enum": ["none", "cardOnPage", "payLink"]
+                },
+                "payLinkId": {
+                  "description": "For payBy payLink, the booking's live pay link the yes is given against (K-32 v1 pay_links.id: ended_at null, its payment pending, for this booking and the caller's person), which the pay page's server found by its code's sha256 (K-32 default 21), never the browser's; the call refuses one that is not live (holdEnded once it closed at its deadline, the hold's own end; notFound when it is not this booking's). null for none and cardOnPage.",
+                  "$ref": "#/$defs/nullableId"
+                },
                 "yes": {
                   "description": "The customer's own yes (readBackYes: in a turn the open question and the reply's event; on the page the tap, with the words the page server showed), or, only for nothing taken on D104's door, the AI's request (aiRequest).",
                   "oneOf": [
@@ -1481,9 +1556,27 @@
                   ]
                 }
               },
-              "required": ["kind", "step", "branch", "amountNow", "yes"],
+              "required": ["kind", "step", "branch", "amountNow", "payBy", "payLinkId", "yes"],
               "additionalProperties": false,
               "allOf": [
+                {
+                  "description": "Nothing taken takes no card and no pay link; a card saved is always typed on the page; C3's pay link is for a deposit or the full price (showMoneyBefore.response's own rules).",
+                  "if": { "properties": { "branch": { "const": "nothing" } }, "required": ["branch"] },
+                  "then": { "properties": { "payBy": { "const": "none" } } },
+                  "else": {
+                    "if": { "properties": { "branch": { "const": "card" } }, "required": ["branch"] },
+                    "then": { "properties": { "payBy": { "const": "cardOnPage" } } },
+                    "else": { "properties": { "payBy": { "enum": ["cardOnPage", "payLink"] } } }
+                  }
+                },
+                {
+                  "description": "The yes on C3's pay page names the live pay link it is given against, in place of a ready card; every other yes names none.",
+                  "if": { "properties": { "payBy": { "const": "payLink" } }, "required": ["payBy"] },
+                  "then": {
+                    "properties": { "payLinkId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+                  },
+                  "else": { "properties": { "payLinkId": { "type": "null" } } }
+                },
                 {
                   "description": "Each step is its branch's.",
                   "if": { "properties": { "step": { "enum": ["A5-05", "B5-03"] } }, "required": ["step"] },
@@ -1749,7 +1842,7 @@
           "anyOf": [{ "type": "string", "enum": ["asked", "nothing"] }, { "type": "null" }]
         },
         "card": {
-          "description": "For card, the card made ready: the K-32 saved_cards row (keep true; null for keep false) and the K-07 stripe_save_card effect; null otherwise.",
+          "description": "For card, the card made ready: the K-32 saved_cards row when it is kept (keep true, or at A5-16 and B5-13 a request the owner OKs, as the stored approval decides: README default 103; null when not kept) and the K-07 stripe_save_card effect; null otherwise.",
           "anyOf": [
             {
               "type": "object",
@@ -1770,7 +1863,7 @@
           ]
         },
         "payLink": {
-          "description": "For payLink, the pay link (README default 88); null otherwise.",
+          "description": "For payLink, the pay link made (README default 88). For a yes on C3's pay page (payBy payLink), the live pay link the yes was given against, whose payment Stripe's form on that page confirms next, with url null and no clock row, since nothing is given or armed again (round 2, DL-252 ruling 2; README default 104). null otherwise.",
           "anyOf": [{ "$ref": "#/$defs/payLinkIssued" }, { "type": "null" }]
         },
         "consentId": {
@@ -1851,7 +1944,7 @@
           "items": { "$ref": "#/$defs/moneyWord" }
         },
         "gives": {
-          "description": "The journey 5 keys written: at the yes the branch's (nothing: money_before; card: money_before, card_saved; deposit: money_before, card_saved, deposit_paid; full: money_before, paid_full: A-J5.md, B-J5.md), at the owner's '1 Book it' money_before; none at every other stage.",
+          "description": "The journey 5 keys written: at the yes the branch's (nothing: money_before; card: money_before, card_saved; deposit: money_before, card_saved, deposit_paid; full: money_before, paid_full: A-J5.md, B-J5.md), except that on C3's pay page a deposit's yes gives money_before and deposit_paid, its card_saved coming from the payment's success (README default 104); at the owner's '1 Book it' money_before; none at every other stage.",
           "type": "array",
           "items": { "$ref": "#/$defs/journeyFiveKey" },
           "uniqueItems": true
@@ -1888,64 +1981,108 @@
       },
       "allOf": [
         {
-          "description": "The yes sets taken 'asked' and gives its branch's keys.",
+          "description": "The yes sets taken 'asked' and gives its branch's keys; on C3's pay page (a yes answered with its live pay link) card_saved comes from the payment's success, never from the yes (round 2, DL-252 ruling 2).",
           "if": { "properties": { "stage": { "const": "yes" } }, "required": ["stage"] },
           "then": {
             "properties": { "took": { "const": "asked" }, "branch": { "$ref": "#/$defs/moneyBranch" } },
-            "allOf": [
-              {
-                "if": { "properties": { "branch": { "const": "nothing" } }, "required": ["branch"] },
-                "then": {
+            "if": { "properties": { "payLink": { "type": "object" } }, "required": ["payLink"] },
+            "then": {
+              "description": "C3's door: a deposit or the full price, its live pay link answered with nothing given again; a deposit's card is saved by paymentSucceeded (K-14 payLink saveCardForLater; K-32 saved_cards.saved_from_payment_id), so its yes gives money_before and deposit_paid.",
+              "properties": {
+                "branch": { "enum": ["deposit", "full"] },
+                "payLink": {
+                  "type": "object",
                   "properties": {
-                    "gives": {
-                      "type": "array",
-                      "items": { "const": "money_before" },
-                      "minItems": 1,
-                      "maxItems": 1
-                    }
+                    "url": { "type": "null" },
+                    "clockRowIds": { "type": "array", "maxItems": 0 }
                   }
                 }
               },
-              {
-                "if": { "properties": { "branch": { "const": "card" } }, "required": ["branch"] },
-                "then": {
-                  "properties": {
-                    "gives": {
-                      "type": "array",
-                      "items": { "enum": ["money_before", "card_saved"] },
-                      "minItems": 2,
-                      "maxItems": 2
+              "allOf": [
+                {
+                  "if": { "properties": { "branch": { "const": "deposit" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "enum": ["money_before", "deposit_paid"] },
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": { "properties": { "branch": { "const": "full" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "enum": ["money_before", "paid_full"] },
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
                     }
                   }
                 }
-              },
-              {
-                "if": { "properties": { "branch": { "const": "deposit" } }, "required": ["branch"] },
-                "then": {
-                  "properties": {
-                    "gives": {
-                      "type": "array",
-                      "items": { "enum": ["money_before", "card_saved", "deposit_paid"] },
-                      "minItems": 3,
-                      "maxItems": 3
+              ]
+            },
+            "else": {
+              "allOf": [
+                {
+                  "if": { "properties": { "branch": { "const": "nothing" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "const": "money_before" },
+                        "minItems": 1,
+                        "maxItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": { "properties": { "branch": { "const": "card" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "enum": ["money_before", "card_saved"] },
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": { "properties": { "branch": { "const": "deposit" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "enum": ["money_before", "card_saved", "deposit_paid"] },
+                        "minItems": 3,
+                        "maxItems": 3
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": { "properties": { "branch": { "const": "full" } }, "required": ["branch"] },
+                  "then": {
+                    "properties": {
+                      "gives": {
+                        "type": "array",
+                        "items": { "enum": ["money_before", "paid_full"] },
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
                     }
                   }
                 }
-              },
-              {
-                "if": { "properties": { "branch": { "const": "full" } }, "required": ["branch"] },
-                "then": {
-                  "properties": {
-                    "gives": {
-                      "type": "array",
-                      "items": { "enum": ["money_before", "paid_full"] },
-                      "minItems": 2,
-                      "maxItems": 2
-                    }
-                  }
-                }
-              }
-            ]
+              ]
+            }
           },
           "else": { "properties": { "branch": { "type": "null" } } }
         },
@@ -1995,9 +2132,14 @@
               "else": { "properties": { "card": { "type": "null" } } }
             },
             {
+              "description": "The pay link stage answers its link, and a yes on C3's pay page the live link it was given against (round 2); every other stage none.",
               "if": { "properties": { "stage": { "const": "payLink" } }, "required": ["stage"] },
               "then": { "properties": { "payLink": { "type": "object" } } },
-              "else": { "properties": { "payLink": { "type": "null" } } }
+              "else": {
+                "if": { "properties": { "stage": { "const": "yes" } }, "required": ["stage"] },
+                "then": true,
+                "else": { "properties": { "payLink": { "type": "null" } } }
+              }
             },
             {
               "if": { "properties": { "stage": { "const": "letGo" } }, "required": ["stage"] },
@@ -2256,6 +2398,53 @@
           "then": {
             "properties": { "outcome": { "type": "object", "properties": { "branch": { "const": "full" } } } }
           }
+        },
+        {
+          "description": "A yes on C3's pay page (payBy payLink) is answered with the live pay link it was given against; any other yes with none (round 2, DL-252 ruling 2).",
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": {
+                  "stage": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "yes" } },
+                    "required": ["kind"]
+                  }
+                },
+                "required": ["stage"]
+              }
+            },
+            "required": ["request"]
+          },
+          "then": {
+            "if": {
+              "properties": {
+                "request": {
+                  "type": "object",
+                  "properties": {
+                    "stage": {
+                      "type": "object",
+                      "properties": { "payBy": { "const": "payLink" } },
+                      "required": ["payBy"]
+                    }
+                  },
+                  "required": ["stage"]
+                }
+              },
+              "required": ["request"]
+            },
+            "then": {
+              "properties": {
+                "outcome": { "type": "object", "properties": { "payLink": { "type": "object" } } }
+              }
+            },
+            "else": {
+              "properties": {
+                "outcome": { "type": "object", "properties": { "payLink": { "type": "null" } } }
+              }
+            }
+          }
         }
       ],
       "type": "object",
@@ -2275,7 +2464,7 @@
     },
     "refundAtOnce.request": {
       "title": "RefundAtOnceRequest",
-      "description": "S12-26, 'Refunds the second charge at once': 'A charge went through twice for the same thing. Rosfield refunds the second one at once, and tells the customer and Sam' ('Any payment through Rosie counts: a deposit, a full price, a fee, an extra, a tip or a bill's pay link'; 'Rosie's rule: a customer pays only what they agreed to, once. A charge made twice by mistake is refunded at once, without waiting for Sam'); gives no key. In one commit: a K-32 v1 refunds row, decided_by at_once, via stripe, for the whole of the second charge (double_charge: the second Stripe charge under one effect id, which no payment asked for, so paymentId is null and its charge line is the one reconciliation wrote, K-32 refunds_double_charge_unasked; second_payment: the later of two paid payments for one thing, naming it), to the person who paid, with its one K-07 stripe_refund effect (K-14 v1 refund, reason duplicate); and both told through K-04 clock rows due at once (a job's commit writes no outbox row: v1.2 default 72's way), on the customer's open chat, else their email, and on the owner's handle, whose clock turns write S12-26's two rows, their pay.back reading the refund's own state (README default 101). A cash or own-way payment never goes through Rosie and is not refunded here (S12-26). Callers: a job only: C-112's daily reconciliation for a double charge (arch 10 line 550; K-14 'Reconciliation's listing') and C-101's provider-event handling for a second payment (K-32 'How the tables are written and read'); never the owner, a page or a turn, since nobody waits to decide it. A double charge's refund commits through K-05 v1.1 reconciliationRefund, the writer K-07 v1 names for it; a second payment's, written when the later payment's result or paymentSucceeded comes, has no listed writer yet, so it waits for the K-05 and K-07 minor versions K-32 v1's open gap on refunds at once names (README open gap 96). Primary, uncached. Business: caller.businessId; K-32 rule 5. Person: none (a job). Repeat: caller.requestId is the key; a payment has one refund at once that has not failed (K-32 refunds_one_at_once_per_payment), and a repeat answers the first. Version: new rows at version 1.",
+      "description": "S12-26, 'Refunds the second charge at once': 'A charge went through twice for the same thing. Rosfield refunds the second one at once, and tells the customer and Sam' ('Any payment through Rosie counts: a deposit, a full price, a fee, an extra, a tip or a bill's pay link'; 'Rosie's rule: a customer pays only what they agreed to, once. A charge made twice by mistake is refunded at once, without waiting for Sam'); gives no key. In one commit: a K-32 v1 refunds row, decided_by at_once, via stripe, for the whole of the second charge (double_charge: the second Stripe charge under one effect id, which no payment asked for, so paymentId is null and its charge line is the one reconciliation wrote, K-32 refunds_double_charge_unasked; second_payment: the later of two paid payments for one thing, naming it), to the person who paid, with its one K-07 stripe_refund effect (K-14 v1 refund, reason duplicate); and both told through K-04 clock rows due at once (a job's commit writes no outbox row: v1.2 default 72's way), on the customer's open chat, else their email, and on the owner's handle, whose clock turns write S12-26's two rows, their pay.back reading the refund's own state (README default 101). A cash or own-way payment never goes through Rosie and is not refunded here (S12-26). Callers: a job only: C-112's daily reconciliation for a double charge (arch 10 line 550; K-14 'Reconciliation's listing') and C-101's provider-event handling for a second payment (K-32 'How the tables are written and read'); never the owner, a page or a turn, since nobody waits to decide it. A double charge's stripe_refund effect is K-05 v1.1 reconciliationRefund's, the writer K-07 v1 names for it, which writes only the effect and its log entries, so its refunds row and the two clock rows wait for the commit with no turn (README open gap 99; CQ-44); a second payment's, written when the later payment's result or paymentSucceeded comes, has no listed effect writer yet either, so it also waits for the K-05 and K-07 minor versions K-32 v1's open gap on refunds at once names (README open gap 96; round 2: the action-layer and runtime engineers' note a). Primary, uncached. Business: caller.businessId; K-32 rule 5. Person: none (a job). Repeat: caller.requestId is the key; a payment has one refund at once that has not failed (K-32 refunds_one_at_once_per_payment), and a repeat answers the first. Version: new rows at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },

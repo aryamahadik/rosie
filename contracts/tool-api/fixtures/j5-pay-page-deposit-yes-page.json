@@ -1,0 +1,73 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "rules/seed-rules-tap-list.json",
+      "core/seed-business-head.json"
+    ],
+    "after": [],
+    "now": "2026-11-04T16:16:30Z",
+    "stated": { "step": "A5-13", "gives": ["money_before", "deposit_paid"] },
+    "note": "C3's pay page for a deposit (round 2, DL-252 ruling 2; README default 104): Dee's own AI booked the $140 Groom's package, way list|deposit|counter ($40 deposit), which books at once (booking_details.approval now), so its time is held 15 minutes for the AI's agent token and the money step gave the pay link, as j5-pay-link-agent.json does for the full price: the $40 payment pending with its stripe_pay_link effect, saveCardForLater set ('the card stays saved': A5-13; K-14 payLink), and the live pay_links row due at the hold's own end, 11:28am in New York. On the pay page Dee ticks the words shown and taps Pay and book, naming that live link in place of a ready card (payBy payLink). In one commit: booking_details.taken 'asked' and her ticked words as a K-29 ticked_terms consent. Gives money_before and deposit_paid, never card_saved: on C3's door the card is typed into Stripe's form after this yes, and paymentSucceeded, which makes the payment paid, also saves the card that paid as the K-32 saved_cards row for the booking (saved_from_payment_id: K-32 'K-14's results and events, row by row'), so card_saved comes from the payment's success, before the booking write (A6-10, K-09 v1.4). Not paid by the deadline: closePayLink cancels it, the time goes back, nothing is booked or charged, and no card is saved. pay.took reads the payment's state, pending. Every id, time of day and word is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-paypage-dee-grooms-0002",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-paypage-dee-grooms-0001"
+    },
+    "bookingId": "booking-agent-dee-grooms-package",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-13",
+      "branch": "deposit",
+      "amountNow": { "cents": 4000, "currency": "USD" },
+      "payBy": "payLink",
+      "payLinkId": "paylink-agent-dee-grooms-deposit",
+      "yes": {
+        "kind": "page",
+        "exactWords": "Groom's package, Sat Nov 7 at 3:00pm, $140. A $40 deposit is paid now, into Lee's Barbershop's own Stripe, and counts toward the price; the rest is paid at the shop. Pay by 11:28am today to book it. The card you pay with stays saved for the $40 late-cancel or no-show fee, which Lee's Barbershop confirms first.",
+        "yesEventId": "evt-paypage-dee-grooms-0002"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-grooms-package",
+    "stage": "yes",
+    "branch": "deposit",
+    "took": "asked",
+    "card": null,
+    "payLink": {
+      "payLinkId": "paylink-agent-dee-grooms-deposit",
+      "paymentId": "pay-agent-dee-grooms-deposit",
+      "dueAt": "2026-11-04T16:28:00Z",
+      "url": null,
+      "clockRowIds": [],
+      "slot": "link.pay"
+    },
+    "consentId": "consent-dee-grooms-terms",
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-agent-dee-grooms-deposit" },
+      {
+        "slot": "pay.left",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-agent-dee-grooms-1"
+      },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-agent-dee-grooms-1" }
+    ],
+    "gives": ["money_before", "deposit_paid"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-dee-grooms-package", "version": 5 }],
+    "repeated": false
+  }
+}

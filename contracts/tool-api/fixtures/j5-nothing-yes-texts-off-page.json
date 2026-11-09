@@ -26,6 +26,8 @@
       "step": "A5-05",
       "branch": "nothing",
       "amountNow": null,
+      "payBy": "none",
+      "payLinkId": null,
       "yes": {
         "kind": "page",
         "exactWords": "Book this style consult? Lee's Barbershop · Style consult · Fri Oct 23 · 2:00pm · Riley. Nothing is charged. You told us you're 18 or older.",

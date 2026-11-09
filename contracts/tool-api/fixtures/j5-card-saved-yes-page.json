@@ -22,6 +22,8 @@
       "step": "A5-07",
       "branch": "card",
       "amountNow": null,
+      "payBy": "cardOnPage",
+      "payLinkId": null,
       "yes": {
         "kind": "page",
         "exactWords": "Haircut with Riley, Sat Oct 24 at 11:00am, $35, paid at Lee's Barbershop. Your card is saved only for the $20 late-cancel or no-show fee, which Lee's Barbershop confirms first. Nothing is charged now.",

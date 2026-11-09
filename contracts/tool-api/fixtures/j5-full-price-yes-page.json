@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-11-07T16:05:30Z",
     "stated": { "step": "A5-16", "gives": ["money_before", "paid_full"] },
-    "note": "A5-16 on Lee's Barbershop's booking page: the $55 Signature cut and hot towel shave, way list|full|none. Alex typed his card on the page through the card stage with keep false: a card typed for a payment now keeps no saved card row (K-32 default 15), and its stripe_save_card effect has succeeded. He ticks the words shown and taps Book it. In one commit: booking_details.taken 'asked' and his ticked words as a K-29 ticked_terms consent. Gives money_before and paid_full. No card_saved: the full price needs none, and any fee comes out of what was paid now (S13-55). The $55 is charged as the booking is written (A6-10; K-14 v1 full-price.json; K-09 v1.4; README default 87), and no word says paid in full until that payment is paid (README default 90). The booking, line and consent ids are examples (README default 48)."
+    "note": "A5-16 on Lee's Barbershop's booking page: the $55 Signature cut and hot towel shave, way list|full|none. Alex typed his card on the page through the card stage, its keep null: the booking is made now (booking_details.approval now), so the call kept no card, and a card typed for a payment now keeps no saved card row (K-32 default 15; README default 103); its stripe_save_card effect has succeeded. The card stood ready before the yes (payBy cardOnPage). He ticks the words shown and taps Book it. In one commit: booking_details.taken 'asked' and his ticked words as a K-29 ticked_terms consent. Gives money_before and paid_full. No card_saved: the full price needs none, and any fee comes out of what was paid now (S13-55). The $55 is charged as the booking is written (A6-10; K-14 v1 full-price.json; K-09 v1.4; README default 87), and no word says paid in full until that payment is paid (README default 90). The booking, line and consent ids are examples (README default 48)."
   },
   "request": {
     "caller": {
@@ -22,6 +22,8 @@
       "step": "A5-16",
       "branch": "full",
       "amountNow": { "cents": 5500, "currency": "USD" },
+      "payBy": "cardOnPage",
+      "payLinkId": null,
       "yes": {
         "kind": "page",
         "exactWords": "Signature cut and hot towel shave, Sat Nov 7 at 11:10am, $55, paid in full now into Lee's Barbershop's own Stripe. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",

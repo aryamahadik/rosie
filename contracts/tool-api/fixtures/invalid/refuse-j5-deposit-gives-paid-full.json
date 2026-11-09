@@ -22,6 +22,8 @@
       "step": "A5-13",
       "branch": "deposit",
       "amountNow": { "cents": 4000, "currency": "USD" },
+      "payBy": "cardOnPage",
+      "payLinkId": null,
       "yes": {
         "kind": "page",
         "exactWords": "Groom's package, Sat Nov 7 at 10:20am, $140. A $40 deposit is taken now, into Lee's Barbershop's own Stripe, and counts toward the price; the rest is paid at the shop. Your card stays saved for the $40 late-cancel or no-show fee, which Lee's Barbershop confirms first.",

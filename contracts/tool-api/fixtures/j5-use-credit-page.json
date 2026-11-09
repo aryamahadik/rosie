@@ -35,6 +35,7 @@
     "planChargeId": null,
     "paymentId": null,
     "consentId": null,
+    "savedCardId": null,
     "line": { "lineId": "line-alex-hot-flow-2", "replacedLineId": "line-alex-hot-flow-2-saved" },
     "effects": [],
     "moneyWords": [

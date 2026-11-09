@@ -1,0 +1,45 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "rules/seed-rules-tap-list.json"],
+    "after": [],
+    "now": "2026-11-07T16:20:10Z",
+    "stated": null,
+    "note": "A5-16's card form on a request Sam OKs first (round 2, DL-252 ruling 1; README default 103): on Lee's Barbershop's booking page Alex asks for the $55 Signature cut and hot towel shave, way list|full|none, and the OK rules A4-98 read send it to Sam first, so booking_details.approval is ownerok, never decided again (A6-01). Nothing is charged for this visit while the OK is pending; the card is saved, and the full price is charged on it at Sam's OK (S13-55, MASTER-FLOW-A line 7325; A6-01 line 3151; A6-03 line 3183, K-09 v1.4). The page server sends keep null, since the stored approval decides it, never the caller: the call reads booking_details.approval and keeps the card. In one commit: the K-07 stripe_save_card effect and the K-32 saved_cards row naming it for this booking (K-32 saved_cards_booking_idx: the card a charge at the owner's OK names), saved_at null until cardSaved (the runtime side). Nothing is charged, and no key: A5-16 gives money_before and paid_full at its yes, never card_saved. If Sam declines (A6-02's '3 Decline', K-09 v1.4) or the request is never made, the card is removed at once (S13-55: 'A booking that's declined or never made removes it at once'; K-14 removeCard; K-32 saved_cards.removed_why not_booked). Every id is an example (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-sig-req-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-sig-req-0001"
+    },
+    "bookingId": "booking-page-alex-signature-request",
+    "stage": { "kind": "card", "step": "A5-16", "keep": null }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-signature-request",
+    "stage": "card",
+    "branch": null,
+    "took": null,
+    "card": {
+      "savedCardId": "card-alex-signature-request",
+      "effectId": "eff-alex-signature-request-save-card",
+      "kept": true
+    },
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-signature-request-save-card", "kind": "stripe_save_card" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "saved_cards", "rowId": "card-alex-signature-request", "version": 1 }],
+    "repeated": false
+  }
+}

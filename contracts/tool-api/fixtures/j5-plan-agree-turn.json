@@ -41,6 +41,7 @@
     "planChargeId": null,
     "paymentId": null,
     "consentId": "consent-owen-plan-terms",
+    "savedCardId": null,
     "line": null,
     "effects": [],
     "moneyWords": [

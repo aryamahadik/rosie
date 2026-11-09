@@ -1,0 +1,45 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "rules/seed-rules-tap-list.json"],
+    "after": [],
+    "now": "2026-11-07T16:20:10Z",
+    "stated": null,
+    "note": "Refused (round 2, DL-252 ruling 1: 'keep is true when the stored approval is ownerok, decided from stored facts, never from the caller'; README default 103): A5-16's card form on Alex's request Sam OKs first sends keep true, so the caller would decide whether the full price's card is kept. At A5-16 and B5-13 the stored approval decides it (K-30 booking_details.approval), so keep is null (CardForm). Put right, keep is null, as j5-full-price-card-request-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-sig-req-0003",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-sig-req-0001"
+    },
+    "bookingId": "booking-page-alex-signature-request",
+    "stage": { "kind": "card", "step": "A5-16", "keep": true }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-signature-request",
+    "stage": "card",
+    "branch": null,
+    "took": null,
+    "card": {
+      "savedCardId": "card-alex-signature-request",
+      "effectId": "eff-alex-signature-request-save-card",
+      "kept": true
+    },
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-signature-request-save-card", "kind": "stripe_save_card" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "saved_cards", "rowId": "card-alex-signature-request", "version": 1 }],
+    "repeated": false
+  }
+}

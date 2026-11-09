@@ -26,6 +26,8 @@
       "step": "A5-05",
       "branch": "nothing",
       "amountNow": null,
+      "payBy": "none",
+      "payLinkId": null,
       "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-consult-book-it", "yesEventId": "evt-alex-consult-0004" }
     }
   },

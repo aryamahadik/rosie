@@ -41,6 +41,7 @@
     "planChargeId": null,
     "paymentId": "pay-alex-hot-flow-pack",
     "consentId": null,
+    "savedCardId": null,
     "line": { "lineId": "line-alex-hot-flow-1", "replacedLineId": "line-alex-hot-flow-1-saved" },
     "effects": [{ "effectId": "eff-alex-hot-flow-pack", "kind": "stripe_charge" }],
     "moneyWords": [
