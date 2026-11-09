@@ -776,7 +776,7 @@ describe("the migration against the frozen table list (K-28 v1 customers)", () =
     expect([...new Set(keys.map((key) => key.referenced))].sort()).toEqual(REFERRED);
     // A block names the business and the person, never a customer row (default 11): no key between the two.
     expect(keys.filter((key) => OWN_TABLES.includes(key.referenced))).toEqual([]);
-    // No table of another part refers to these (README rule 1).
+    // No table of another part refers to these (README rule 1), but K-32's two that name a customer (K-32 rule 1).
     const into = await db.sql<{ table: string }[]>`
       select src.relname as table from pg_constraint k
         join pg_class src on src.oid = k.conrelid
