@@ -221,7 +221,7 @@ describe("every reference resolves", () => {
   const of = (name: string): FoundReference[] => found.get(name) ?? [];
   const r6 = (name: string): FoundReference[] => of(name).filter((reference) => reference.form !== "home");
 
-  it("every 'judgment rule N' or 'rule N' reference in both flow files and the 243 trade files resolves to its rule: 0 unresolved", () => {
+  it("every 'judgment rule N' or 'rule N' reference by R6's numbers (a pointer, a bare 'rule N', '<one of the nine> rule N') in both flow files and the 243 trade files resolves to its rule: 0 unresolved", () => {
     expect(files).toHaveLength(245);
     const unresolved = files.flatMap(([name]) =>
       r6(name)
@@ -268,6 +268,13 @@ describe("every reference resolves", () => {
       pointers(name).reduce((total, reference) => total + reference.rules.length, 0);
     expect(named("master-A.json")).toBe(77);
     expect(named("master-B.json")).toBe(88);
+    // Read either way, the card's 87 is all here: the pointers of both flow files (39 + 48), or the rule numbers
+    // master-A.json writes (77 by its 39 pointers, lists and ranges spread out, and 10 by its record's 'rule N' cites).
+    const cites = of("master-A.json").filter(
+      (reference) => reference.form === "bare" || reference.form === "home",
+    );
+    expect(cites.flatMap((reference) => reference.runs)).toHaveLength(10);
+    expect(named("master-A.json") + cites.length).toBe(87);
     // Every rule number D3's templates use is there: 6 to 8, 9 to 11, 16 to 24, 25, 45 and 46, 53 to 58.
     const words = new Set(pointers("master-A.json").map((reference) => reference.words));
     for (const template of [
@@ -299,9 +306,9 @@ describe("every reference resolves", () => {
     expect(trades.map(([name]) => name)).toEqual([]);
   });
 
-  it("the 9 home cites of each record's lint table ('S13-55 rule 7') name their own home step, never a judgment rule", () => {
-    // A step outside the nine numbers no rules (phase 5 HUB-READ.md 2.2), so these resolve to no judgment rule; they are
-    // the lint table's notes (record.lint.banned.phrases[].now), in no step.
+  it("the 9 home cites of each record's lint table ('S13-55 rule 7') cite a rule of their own home step, never a judgment rule, and stand in no step", () => {
+    // A step outside the nine numbers no rules (phase 5 HUB-READ.md 2.2), so these name no judgment rule: they are the
+    // lint table's notes (record.lint.banned.phrases[].now, which L8 prints as "the rule now"), in no step.
     for (const name of ["master-A.json", "master-B.json"]) {
       const homes = of(name).filter((reference) => reference.form === "home");
       expect(homes.map((reference) => reference.words)).toEqual([
@@ -356,13 +363,14 @@ describe("the reference forms", () => {
   it("names the form and the step of each", () => {
     expect(
       ruleReferences(
-        "Danger and welfare: S13-10 (judgment rules 9 to 11). (S13-35, rule 49) (D83, S13-19 rule 4) S13-28 rule 51",
+        "Danger and welfare: S13-10 (judgment rules 9 to 11). (S13-35, rule 49) (D83, S13-19 rule 4) S13-28 rule 51, S13-55's rule 7",
       ).map(({ words, form, step }) => ({ words, form, step })),
     ).toEqual([
       { words: "judgment rules 9 to 11", form: "judgment", step: null },
       { words: "rule 49", form: "bare", step: null },
       { words: "S13-19 rule 4", form: "home", step: "S13-19" },
       { words: "S13-28 rule 51", form: "step", step: "S13-28" },
+      { words: "S13-55's rule 7", form: "home", step: "S13-55" },
     ]);
   });
 

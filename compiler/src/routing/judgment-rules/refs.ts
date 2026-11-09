@@ -7,7 +7,8 @@
 //             D3's pointer lines, the form every step uses (D2: "Every other step points to it by number").
 //   step      "S13-28 rule 48", "S13-27 rules 35 and 36": R6's numbers with the step that holds them, as RULES.md cites
 //             them (MC C6 cites "S13-28 rule 51", the cards "S13-54 rule 67"). The step id stands right before "rule",
-//             with only spaces between; after a comma it is a cite of its own ("(S13-35, rule 49)" is a bare rule 49).
+//             with only spaces (or 's) between; after a comma it is a cite of its own ("(S13-35, rule 49)" is a bare
+//             rule 49).
 //   bare      "rule 49", "rules 6 to 8": R6's numbers alone.
 //   home      "S13-55 rule 7": a step that is not one of the nine, with a number of that step's own. The master numbers no
 //             other step's rules (phase 5 HUB-READ.md 2.2: "S13-32 has no numbered rules", so A7-11's "S13-32 rule 3" was
@@ -70,7 +71,7 @@ export interface FoundReference extends ResolvedReference {
 const NUMBER = String.raw`\d+(?!\w)`;
 const JOIN = String.raw`(?:\s*,\s*(?:(?:and|or)\s+)?|\s+(?:and|or|to)\s+|\s*[-–]\s*)`;
 const REFERENCE = new RegExp(
-  String.raw`(?<![\w-])(?:(judgment)\s+|([SAB]\d{1,2}-\d{2,3})\s+)?rules?\s+(${NUMBER}(?:${JOIN}${NUMBER})*)`,
+  String.raw`(?<![\w-])(?:(judgment)\s+|([SAB]\d{1,2}-\d{2,3})(?:['’]s)?\s+)?rules?\s+(${NUMBER}(?:${JOIN}${NUMBER})*)`,
   "gi",
 );
 
