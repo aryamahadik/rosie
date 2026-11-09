@@ -12,6 +12,7 @@ export {
   type BuiltBundle,
   type BundleFile,
   type EmitInputs,
+  type EmitResult,
   type EmittedBundle,
 } from "./emit";
 export {
@@ -93,3 +94,11 @@ export {
   lintRuleOrder,
   stepSchemaChecks,
 } from "./validate";
+export {
+  WordsOpCorrectionError,
+  assertWordsKeepCorrections,
+  correctWordsOps,
+  writtenBy,
+  type CorrectedOps,
+  type CorrectedWordsOp,
+} from "./words-corrections";

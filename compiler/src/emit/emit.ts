@@ -27,6 +27,12 @@
 // walks every path of every trade given, with corrections/stops.ts walkStops(), over each flow; every message the
 // master graphs and the overlays hold then carries the marker those walks give it (true, "first" or none), so the line
 // renders once in each person's chat, on Rosie's first reply in a chat the person opened.
+//
+// What a trade's words ops keep (T-1132): a run lays a trade's ops over the corrected master graph with apply(), so a
+// words op at a step a Master Correction changed would put back the words it replaced. First of all, each trade's words
+// ops go through words-corrections.ts correctWordsOps(): such an op is emitted with the corrections applied, and the
+// stop walks and the overlay read the trade so corrected. `corrected` lists each such op with its changes, each tagged
+// MC:<id> (K-01 v1's words op holds no tag, so the tags ride beside the bundle, as the framework's diff lines do).
 import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -55,6 +61,7 @@ import type { BundleStep } from "./steps";
 import { placeStops, type StopMarks } from "./stop-marks";
 import { compileTrade } from "./trade";
 import { BundleValidationError, checkBundlePart, lintRuleOrder, stepSchemaChecks } from "./validate";
+import { correctWordsOps, type CorrectedWordsOp } from "./words-corrections";
 
 type Obj = Record<string, unknown>;
 
@@ -84,15 +91,21 @@ export interface BundleFile {
   text: string;
 }
 
-/** What emitBundle() gives: the bundle as one K-01 document, and its files in path order. */
+/** A bundle as one K-01 document, and its files in path order. */
 export interface EmittedBundle {
   /** The K-01 root: { manifest, flows, trades }. */
   bundle: { manifest: Obj; flows: Record<string, Obj>; trades: Record<string, Obj> };
   files: BundleFile[];
 }
 
+/** What emitBundle() gives: the bundle and its files, and each trade words op it emitted with a correction applied. */
+export interface EmitResult extends EmittedBundle {
+  /** By trade id, then flow A before B, then op order: each op's changes, each tagged MC:<id> (T-1132). */
+  corrected: CorrectedWordsOp[];
+}
+
 /** What buildBundle() gives besides the bundle: the stand-ins it took, and where each shared list came from. */
-export interface BuiltBundle extends EmittedBundle {
+export interface BuiltBundle extends EmitResult {
   standIns: StandIn[];
   listSources: Partial<Record<SharedListName, string[]>>;
 }
@@ -164,19 +177,22 @@ function kvKey(id: BundleId, part: string): string {
 }
 
 /**
- * Packs the inputs into a bundle: compiles both flows and each trade, writes the manifest, checks the whole bundle
- * against K-01 v1 (BundleValidationError when it is refused) and serializes each stored value.
+ * Packs the inputs into a bundle: corrects each trade's words ops that would put back words a Master Correction replaced
+ * (correctWordsOps), compiles both flows and each trade, writes the manifest, checks the whole bundle against K-01 v1
+ * (BundleValidationError when it is refused) and serializes each stored value.
  */
-export function emitBundle(input: EmitInputs): EmittedBundle {
+export function emitBundle(input: EmitInputs): EmitResult {
   const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
   if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
-  const sorted = [...byId].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  const sorted = [...byId]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([, trade]) => correctWordsOps(input.master, trade));
   const stops = {} as Record<FlowLetter, StopMarks>;
   for (const flow of FLOWS)
     stops[flow] = placeStops(
       input.master[flow],
       correctedFlow(input.master, flow),
-      sorted.map(([, trade]) => trade),
+      sorted.map((done) => done.trade),
     );
 
   const failures: Failure[] = [];
@@ -189,10 +205,10 @@ export function emitBundle(input: EmitInputs): EmittedBundle {
 
   const trades: Record<string, Obj> = {};
   const ids = [...byId.keys()].sort();
-  for (const [id, trade] of sorted) {
+  for (const { trade } of sorted) {
     const compiled = compileTrade(input.master, trade, stops);
-    trades[id] = compiled.overlay;
-    for (const flow of FLOWS) failures.push(...failuresOf(compiled.steps[flow], flow, id));
+    trades[trade.id] = compiled.overlay;
+    for (const flow of FLOWS) failures.push(...failuresOf(compiled.steps[flow], flow, trade.id));
   }
 
   const values: { part: string; kind: "flow" | "trade"; flow?: FlowLetter; trade?: string; text: string }[] =
@@ -244,7 +260,7 @@ export function emitBundle(input: EmitInputs): EmittedBundle {
     ...values.map((value) => ({ path: `${value.part}.json`, text: value.text })),
   ];
   files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
-  return { bundle, files };
+  return { bundle, files, corrected: sorted.flatMap((done) => done.corrected) };
 }
 
 /** What buildBundle() may be given; anything left out is loaded (the stages' inputs) or a named stand-in. */

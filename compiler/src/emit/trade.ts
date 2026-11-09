@@ -22,6 +22,11 @@
 // out). C8's void offs are kept until T-140's correction drops them. Each message's opt-out line (its `stop` marker), in a
 // words op and in the steps an op adds, is the one stop-marks.ts placeStops() gives it from the trade's own walks
 // (T-1116; Q-30), not the marker the trade file wrote.
+//
+// A words op is compiled as the trade it is given holds it: the emitter gives the trade with each words op that would
+// put back words a Master Correction replaced already corrected (words-corrections.ts correctWordsOps, T-1132). Before it
+// compiles a flow, compileTrade() checks that none is left (assertWordsKeepCorrections), and stops the build naming the
+// trade, the flow, the step and the correction when one is.
 import type { FlowLetter, MasterGraphs, RecordSlotRow } from "../graph/types.ts";
 import type { LoadedTrade, TradeId, TradeOp, TradeSettings } from "../load/trade";
 import { applyTrade, type AppliedTrade } from "../overlay/apply";
@@ -37,6 +42,7 @@ import {
   type MessageList,
   type StopMarks,
 } from "./stop-marks";
+import { assertWordsKeepCorrections } from "./words-corrections";
 
 type Obj = Record<string, unknown>;
 
@@ -219,6 +225,7 @@ function compileTradeFlow(
   if (stops.paths[trade.id] === undefined)
     throw new Error(`${where}: the opt-out line's marks walked no path of ${trade.id}`);
   const applied = applyTrade(master[flow], trade);
+  assertWordsKeepCorrections(applied, trade, flow);
   const table = sampleTable(master, flow, trade, applied.flow);
   const ops = trade.flows[flow].ops;
   const added = addedIds(ops);

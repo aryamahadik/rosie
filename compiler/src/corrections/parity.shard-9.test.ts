@@ -24,14 +24,31 @@
 // One trade is about a second on the build Mac (applyTrade and the corrections for both flows, then each money path
 // walked twice: by walkStops and by this file's own walk), so the whole sweep takes about 5 minutes: each trade is its
 // own test.
+//
+// T-1132 (DL-245; T-1116's security review, N1 and new tasks 1 and 3): the same 243 trades x both flows x every money
+// path, in the run's order. A run lays the trade's ops, as the bundle holds them, over the bundle's corrected master with
+// apply() (Q-35), while the sweep above walks the compiler's corrected build (the corrections applied after the trade,
+// framework.ts). So, for each trade and flow: the ops as the emitter emits them (emit/words-corrections.ts
+// correctWordsOps: a words op that would put back words a correction replaced is emitted with the correction applied)
+// are applied with applyTrade() (overlay-core.js apply(), unchanged) over the corrected master flow the bundle holds
+// (emit/flow.ts correctedFlow, before its sample values are slotted: the flow stop-marks.ts placeStops walks). Then
+// every step a correction changes, in the master or in the trade's build, is the corrected build's step, deep for deep;
+// and every money path walked with walkStops() over each lights the same steps with the same settled words, so every
+// message carries the same stop marker on every walk: the markers stop-marks.ts places from the run's walks are the
+// corrected build's. The emitter's own guard (assertWordsKeepCorrections, which compileTrade() runs) passes on the ops
+// it emits, so the full build goes on for every trade. A trade is about 2 seconds more (three applyTrade() and two
+// walks of each money path per flow).
+import { isDeepStrictEqual } from "node:util";
 import { describe, expect, it } from "vitest";
-import type { FlowLetter } from "../graph/types.ts";
+import type { FlowGraph, FlowLetter, Step } from "../graph/types.ts";
+import { MASTER_TRADE, correctedFlow, masterShape } from "../emit/flow";
+import { assertWordsKeepCorrections, correctWordsOps } from "../emit/words-corrections";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade } from "../load/trade";
 import { applyTrade, type AppliedStep } from "../overlay/apply";
 import { tradePaths, type TradePath } from "../path";
 import { FROM_MOBILE } from "./c9";
-import { applyCorrections, type CorrectedTrade } from "./framework";
+import { applyCorrections, tagOf, type CorrectedTrade } from "./framework";
 import { walkStops } from "./stops";
 
 const FLOWS: readonly FlowLetter[] = ["A", "B"];
@@ -265,6 +282,114 @@ describe(`the line once per person's chat: all ${String(ALL.length)} trades x bo
           const where = `${id} ${flow} ${path.price}|${path.before}|${path.after}`;
           expect([...new Set(problems)], where).toStrictEqual([]);
           expect(firsts, `${where}: first replies`).toBeGreaterThan(0);
+        }
+      }
+    }, 300_000);
+  }
+});
+
+// ---- T-1132: the run's order (the bundle's ops over the bundle's corrected master) against the corrected build ----
+
+/** The corrected master flow as the bundle holds it, in the loaded flow's header: what apply() lays a run's ops over. */
+function runMaster(flow: FlowLetter): FlowGraph {
+  return { ...master[flow], path: correctedFlow(master, flow).flow.steps as unknown as Step[] };
+}
+
+const RUN_MASTER: Record<FlowLetter, FlowGraph> = { A: runMaster("A"), B: runMaster("B") };
+
+/** The steps the corrections change in the master's own flow. */
+const MASTER_CHANGED: Record<FlowLetter, ReadonlySet<string>> = {
+  A: changedIn("A"),
+  B: changedIn("B"),
+};
+
+function changedIn(flow: FlowLetter): ReadonlySet<string> {
+  const done = applyCorrections({ trade: MASTER_TRADE, flow: masterShape(master[flow]), slotProblems: [] });
+  return new Set(done.changes.map((change) => change.step));
+}
+
+/** Every step of a flow, branch steps too, by id. */
+function stepsById(
+  steps: readonly AppliedStep[],
+  out = new Map<string, AppliedStep>(),
+): Map<string, AppliedStep> {
+  for (const step of steps) {
+    out.set(step.id, step);
+    for (const branch of step.branches ?? []) stepsById(branch.steps, out);
+  }
+  return out;
+}
+
+/** A step as one value, its branches' steps by id only (each of them is a step of its own). */
+function stepValue(step: AppliedStep | undefined): unknown {
+  if (step === undefined) return undefined;
+  return step.branches === undefined
+    ? step
+    : {
+        ...step,
+        branches: step.branches.map((branch) => ({ ...branch, steps: branch.steps.map((one) => one.id) })),
+      };
+}
+
+/** The fields of two values of a step that differ. */
+function fieldsThatDiffer(a: unknown, b: unknown): string[] {
+  const left = (a ?? {}) as Record<string, unknown>;
+  const right = (b ?? {}) as Record<string, unknown>;
+  return [...new Set([...Object.keys(left), ...Object.keys(right)])].filter(
+    (key) => !isDeepStrictEqual(left[key], right[key]),
+  );
+}
+
+describe(`the bundle in the run's order: all ${String(ALL.length)} trades x both flows x every money path (T-1132)`, () => {
+  for (const id of ALL) {
+    it(`${id}: the bundle's ops over its corrected master give the corrected build at every step a correction changes, and every message's stop marker, on every walk of every money path`, () => {
+      const trade = loadTrade(id);
+      const held = correctWordsOps(master, trade);
+      for (const entry of held.corrected)
+        for (const change of entry.changes) {
+          expect(change.tag, `${id} ${entry.flow} op ${String(entry.op + 1)}`).toBe(tagOf(change.correction));
+          expect(change.step).toBe(entry.at);
+        }
+      for (const flow of FLOWS) {
+        const built = applyCorrections(applyTrade(master[flow], trade));
+        const run = applyTrade(RUN_MASTER[flow], held.trade);
+        const where = `${id} ${flow}`;
+
+        // compileTrade() runs this guard on every trade it compiles: on the ops as emitted, the full build goes on.
+        expect(() => {
+          assertWordsKeepCorrections(applyTrade(master[flow], held.trade), held.trade, flow);
+        }, `${where}: the emitter's guard on the ops it emits`).not.toThrow();
+
+        const steps = new Set([...MASTER_CHANGED[flow], ...built.changes.map((change) => change.step)]);
+        const runSteps = stepsById(run.flow.steps);
+        const builtSteps = stepsById(built.flow.steps);
+        const differ: string[] = [];
+        for (const step of steps) {
+          const fields = fieldsThatDiffer(stepValue(runSteps.get(step)), stepValue(builtSteps.get(step)));
+          if (fields.length > 0) differ.push(`${step} [${fields.join(", ")}]`);
+        }
+        expect(
+          differ,
+          `${where}: steps a correction changes whose run differs from the corrected build`,
+        ).toStrictEqual([]);
+
+        const paths = tradePaths(built, trade, { booking: false, fixtures: false });
+        expect(paths.length, `${where}: money paths`).toBeGreaterThan(0);
+        for (const path of paths) {
+          const at = `${where} ${path.price}|${path.before}|${path.after}`;
+          const ran = walkStops(run, path).steps;
+          const want = walkStops(built, path).steps;
+          expect(
+            ran.map((entry) => entry.id),
+            `${at}: the steps lit`,
+          ).toStrictEqual(want.map((entry) => entry.id));
+          const words = ran
+            .filter((entry, k) => !isDeepStrictEqual(entry.words, want[k]?.words))
+            .map((entry) => entry.id);
+          expect(
+            words,
+            `${at}: lit steps whose settled words (each message's stop marker too) differ`,
+          ).toStrictEqual([]);
         }
       }
     }, 300_000);
