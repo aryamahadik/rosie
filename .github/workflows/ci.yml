@@ -25,6 +25,22 @@ jobs:
     name: checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # T-1119: merge-check.yml's postgis service, so the CI script tests below find a PostgreSQL here as they do in
+    # the merge-check (T-1111's local-merge-check tests make and drop databases of their own on it).
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: rosie
+          POSTGRES_PASSWORD: rosie
+          POSTGRES_DB: rosie
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rosie -d rosie"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
     steps:
       - name: Check out (full history, so the guards can compare with origin/main)
         uses: actions/checkout@v7
@@ -62,6 +78,9 @@ jobs:
       # T-1078: the parity shards (the "parity" Vitest project, outside `npm test`) never run here; merge-check.yml
       # runs them, in parallel jobs, when a parity input changed.
       - name: CI script tests (the guards and the PreToolUse hook)
+        env:
+          # The throwaway CI database (factory spec section 4: rosie/rosie is local only, not a secret).
+          DATABASE_URL: postgres://rosie:rosie@localhost:5432/rosie
         run: node --test "infra/ci/*.test.mjs"
 
       - name: Test guard (no fewer tests, no new skip, todo or only)
