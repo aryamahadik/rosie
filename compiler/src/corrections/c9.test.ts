@@ -2,7 +2,7 @@
 // aba and deck rename the business; both flows each):
 //   - no compiled message says it goes by SMS;
 //   - no Rosie text in C9's steps goes to a number that has not texted in, on every money path of the trade (and before
-//     C9 some does, so the check can fail);
+//     C9 each of S2-05, S2-07, S1-77, S1-78 and S1-10 does, so the check can fail; the walk keys chats by person);
 //   - S2-05 has no invite text: the owner gets each person's link and QR, and the person's ready text is their yes;
 //     S2-07 texts nobody but the owner and gives the link again;
 //   - S1-10 and S13-45 ask the person to text from that mobile (S13-45: or by email for a booking with one);
