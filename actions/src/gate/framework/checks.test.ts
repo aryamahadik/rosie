@@ -221,6 +221,124 @@ describe("every value has its source words", () => {
   });
 });
 
+describe("the quote and the words stand whole in a text, at word edges (T-304 round 2, DL-184)", () => {
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function bareTwoSaying(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'yes' cut out of 'yesterday'", "2, like yesterday", "yes", "yesterday"],
+    ["'no' cut out of 'know'", "2, you know", "no", "know"],
+  ])("a quote %s is refused (quoteNotInText); the whole word is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = bareTwoSaying(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(bareTwoSaying(words, whole))).toBeNull();
+    expect(checkDecideOutput(bareTwoSaying(words, words))).toBeNull();
+  });
+
+  it("a value's words cut out of a longer number are refused (valueNotInText): '$1' out of Sam's '$12'", () => {
+    const decided = samsSecondPart((part) => {
+      const [, price] = asChoose(part).fields;
+      if (price !== undefined) price.words = "$1";
+    });
+    expect(checkDecideOutput(decided)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+    expect(onlyProblem(decided, 1)).toEqual({ check: "valueWords", why: "valueNotInText" });
+  });
+
+  it("pass_on's and redact's words cut out of a longer number are refused (wordsNotInText)", () => {
+    for (const verb of ["pass_on", "redact"] as const) {
+      const refused = changePart(twoRequests(), 1, (part) => {
+        becomes(part, { verb, quote: "tile is $12 a foot from now on", words: "tile is $1" });
+      });
+      expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+      expect(onlyProblem(refused, 1)).toEqual({ check: "quote", why: "wordsNotInText" });
+    }
+  });
+});
+
+describe("the edges are judged on the folded text the readers read (T-304 round 3, DL-189)", () => {
+  const ZERO_WIDTH_SPACE = "​";
+
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function saying(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'I can' out of 'I can´t make it'", "2, I can´t make it", "I can", "I can´t make it"],
+    ["'no' out of 'no.reply@example.com'", "2, no.reply@example.com", "no", "no.reply@example.com"],
+    [
+      "'40' out of '1​40' (a zero-width space inside)",
+      `2, raise it to 1${ZERO_WIDTH_SPACE}40`,
+      "40",
+      `1${ZERO_WIDTH_SPACE}40`,
+    ],
+    ["'$1' out of '$1，200'", "2, raise it to $1，200", "$1", "$1，200"],
+    [
+      "'tomorrow at 10' out of 'tomorrow at 10：30'",
+      "2, tomorrow at 10：30",
+      "tomorrow at 10",
+      "tomorrow at 10：30",
+    ],
+    ["'$12' out of '$12．50'", "2, $12．50 a foot", "$12", "$12．50"],
+    ["'9' out of 'table for 9：30 tomorrow'", "2, table for 9：30 tomorrow", "9", "table for 9：30"],
+  ])("a quote %s is refused (quoteNotInText); the whole is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = saying(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(saying(words, whole))).toBeNull();
+    expect(checkDecideOutput(saying(words, words))).toBeNull();
+  });
+
+  it("a value's words cut out of a number behind a fullwidth mark are refused (valueNotInText): '$12' of '$12．50'", () => {
+    const text = "block thursday afternoon and also tile is $12．50 a foot from now on";
+    const decided = samsSecondPart((part) => {
+      part.quote = "tile is $12．50 a foot from now on";
+      const [, price] = asChoose(part).fields;
+      if (price !== undefined) price.words = "$12";
+    });
+    decided.context.texts[0].words = text;
+    expect(checkDecideOutput(decided)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [1] });
+    expect(onlyProblem(decided, 1)).toEqual({ check: "valueWords", why: "valueNotInText" });
+  });
+});
+
+describe("an underscore and the fullwidth range mark join words in a quote (T-304 round 4, DL-199 N3 and N4)", () => {
+  /** Alex's bare "2" (decide-bare-2) with his text's words `words` and part 0's quote `quote`. */
+  function quoting(words: string, quote: string): Decided {
+    const decided = changePart(bareTwo(), 0, (part) => {
+      part.quote = quote;
+    });
+    decided.context.texts[0].words = words;
+    return decided;
+  }
+
+  it.each([
+    ["'no' out of 'no_reply@example.com'", "2, no_reply@example.com", "no", "no_reply@example.com"],
+    ["'5pm' out of '3～5pm'", "2, at 3～5pm", "5pm", "3～5pm"],
+    ["'$12' out of '$12～15'", "2, tile is $12～15", "$12", "$12～15"],
+  ])("a quote %s is refused (quoteNotInText); the whole is a quote", (_name, words, cut, whole) => {
+    expect(words.includes(cut)).toBe(true);
+    const refused = quoting(words, cut);
+    expect(checkDecideOutput(refused)).toEqual({ error: "decideRefused", rule: "quoteInText", parts: [0] });
+    expect(onlyProblem(refused, 0)).toEqual({ check: "quote", why: "quoteNotInText" });
+    expect(checkDecideOutput(quoting(words, whole))).toBeNull();
+    expect(checkDecideOutput(quoting(words, words))).toBeNull();
+  });
+});
+
 describe("the order of the checks and what is refused", () => {
   it("a part takes its verb, quote, option and value words in that order: its first failing check is its problem", () => {
     const quoteAndOption = samsSecondPart((part) => {
