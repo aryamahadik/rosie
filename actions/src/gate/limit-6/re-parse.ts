@@ -42,7 +42,14 @@
 //      "to"); and a count between day and time ends no phrase. So "tomorrow" out of each of those, or out of "*3pm*
 //      tomorrow", "_3pm_ tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm" or "table tomorrow for 2 at
 //      7pm", and "Thursday" out of "Thursday - 3", differ; and "$40" out of "raise haircut to $40 (or $50)" and "4" out
-//      of "party of 4 (maybe 5)" are several;
+//      of "party of 4 (maybe 5)" are several. T-1130 round 2 (DL-251) builds each fix from one definition, never a list
+//      of marks: a cue's opening marks are the joining marks (values times.ts JOINING_MARK), any number of them, with or
+//      without a space, so "tomorrow" out of "tomorrow at »3«", "at ›3‹", "at ‚3‘", "at 「3」", "at ≈3", "at ±3", "at
+//      #3", "at ⏰3", "at: 3" or "at:3", and "mañana" out of "a las »3«", differ; the time reader and the phrase builder
+//      share that one definition, so a letter of any script is a letter in both; and every count between a day and a
+//      time keeps the day's phrase whole, whatever its digits, only a count written as a party counting as read, so
+//      "tomorrow" out of "tomorrow for 120 at 7pm", "catering tomorrow for 150 at noon", "tomorrow for 1,200 at noon"
+//      or "mañana para 120 a las 7" differs, while "Friday the 13 at 7pm" is refused (noText), never Fri Nov 6;
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -57,7 +64,14 @@
 // three", "3 on Thursday"), which the lead added at round 6 (DL-217 item 3). An hour, a period and digits with no am or
 // pm after them and no cue before them stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of
 // "Thursday, 3.30" or "Thursday, 3.5" is not caught here; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their
-// readings (DL-228 item 1). The forms T-1130 adds (step 3) are no longer the residual. Limit 3's read-back shows the
+// readings (DL-228 item 1). The forms T-1130 adds (step 3) are no longer the residual. What T-1130 round 2 learns
+// (DL-251), as words no reader knows: a word or a letter of a script the readers do not read between a day and a
+// number is a letter for the time reader and the phrase builder alike, so neither reads an hour there and "Thursday"
+// out of "Thursday ー 3" or "Thursday 下午 3" passes as out of "Thursday x 3" (the whole read as 3pm is refused); and
+// a word no reader knows before a count between day and time ("tomorrow with 12 at 7pm") joins nothing. N2's class
+// joins the residual as its own (the lead, DL-251): an arrow read as "to" ("tomorrow" out of "tomorrow → 3pm" or
+// "tomorrow -> 3pm"), "5ish" ("4" out of "table for 4 or 5ish"), "tomorrow around 3.5", "tomorrow at 3.75", and a
+// count with a unit no reader knows before a time ("tomorrow for 2 dogs at 3pm"). Limit 3's read-back shows the
 // person every value before any commit, and limit 5 checks a time against the open times, so neither books on such a
 // cut.
 //
@@ -103,17 +117,19 @@
 //      3:30pm), so a house number after "at" reads as a time too (a possible false refusal, never a pass); an approximate
 //      word ("around", "about", "approximately", "approx", "roughly") is read after a cue ("at around 3") and, as a "~"
 //      with no digit before it is, before an hour and two minute digits ("around 3.30", "~3.30"), never before a bare
-//      number ("around 4 people" stays a count); any opening marks (a quote, a bracket, an asterisk, a "~") may stand
-//      between a cue and its hour; what joins is built, not listed: every mark but a sentence mark (". ! ? ; ¿ ¡") joins
+//      number ("around 4 people" stays a count); any joining marks may stand between a cue and its hour, with or
+//      without a space, never a "$" right before the hour (round 2); what joins is built, not listed, in one definition
+//      the time reader and the phrase builder share: every mark but a sentence mark (". ! ? ; ¿ ¡") joins
 //      a time's values, a day or part-of-day word and its bare hour ("Thursday - 3", "Thursday (3)"), and amounts or
 //      counts ("$40 [or $50]"), but an arrow ("->", "=>", "→") joins no time, as "to" joins none (round 3's default), so
 //      "4pm" out of "move my 3pm -> 4pm" passes as the 4pm said; an underscore is read as a space by the time reader
 //      ("_tomorrow_ at 3pm"); a count takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one
-//      "and" joins ("table for 4 and 7:30" keeps its count); a count written as a party between two of a time's values
-//      ends no phrase, with the words before it that name what it counts ("party of 4", "table for 4", "mesa para 4"): a
-//      whole number with its unit or those words, or else of at most two digits or in words, never a bare hour beside a
-//      day nor a number the time reader leaves unread as a time ("tomorrow 3.30 at 7pm" is refused, as before); and "ppl"
-//      and "pax" are a count's units (values/times.ts, values/phrase.ts, values/reparse.ts).
+//      "and" joins ("table for 4 and 7:30" keeps its count); every count between two of a time's values ends no phrase,
+//      whatever its digits (round 2), never a bare hour beside a day, and only a count written as a party counts as read:
+//      a whole number with its unit, with "for", "para" or the words that name what it counts before it ("for 120",
+//      "party of 4", "mesa para 4"), or in words; any other ("tomorrow 120 at 7pm", "Friday the 13 at 7pm", "tomorrow
+//      3.30 at 7pm") is refused; and "ppl" and "pax" are a count's units (values/times.ts, values/phrase.ts,
+//      values/reparse.ts).
 
 import {
   foundAtWordEdges,

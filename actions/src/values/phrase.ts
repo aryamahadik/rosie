@@ -16,14 +16,19 @@
 //      which ends a phrase (CQ-121), joins, so a comma, a colon, a bracket, an asterisk, an underscore, a quote mark or an
 //      emoji does ("*3pm* tomorrow", "_3pm_ tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm"); for a
 //      time an arrow does not either ("->", "=>", "→"), since it reads as "to", which joins no time ("move my 3pm -> 4pm"
-//      passes "4pm", as round 3's default holds for "to"). The words are for a time the cues ("at", "on", "in the", "a
-//      las", "al", "de", "around" and the like, TIME_CUES) and "or" or "and"; for money and counts a range or choice word
-//      ("to", "or", "and", "maybe", "y", "o", "a"), so "$40 (or $50)" and "4 (maybe 5)" are several (DL-238);
-//   2b. a count written as a party between two of a time's values (the party in "table tomorrow for 2 at 7pm", with the
-//      words that name what it counts: "tomorrow, party of 4, at 7pm") ends no phrase: the day and the time around it are
-//      one, and the count is the count reader's, not a piece of the time left unread (T-1130); a bare hour beside a day
-//      stays an hour ("tomorrow 3 at 7pm", step 3b), and a number the time reader leaves unread as a time stays a piece
-//      that must be read ("tomorrow 3.30 at 7pm", "tomorrow 1530 at 7pm"), never such a count;
+//      passes "4pm", as round 3's default holds for "to"). A mark is the time reader's own definition (times.ts
+//      JOINING_MARK; T-1130 round 2, DL-251): neither a letter nor a digit of any script, so the reader and this builder
+//      never disagree on what is a mark ("Thursday ー 3" stands a letter between, as "Thursday x 3" does). The words are
+//      for a time the cues ("at", "on", "in the", "a las", "al", "de", "around" and the like, TIME_CUES) and "or" or
+//      "and"; for money and counts a range or choice word ("to", "or", "and", "maybe", "y", "o", "a"), so "$40 (or $50)"
+//      and "4 (maybe 5)" are several (DL-238);
+//   2b. every count the count reader reads between two of a time's values ends no phrase, whatever its digits (T-1130
+//      round 2, DL-251: "table tomorrow for 2 at 7pm", "tomorrow for 120 at 7pm", "tomorrow for 1,200 at noon"): the day
+//      and the time around it are one. Only a count written as a party, with its unit ("100 people"), with "for", "para"
+//      or the words that name what it counts before it ("for 2", "party of 4", "mesa para 4"), or in words ("for
+//      twelve"), is the count reader's and counts as read; any other ("tomorrow 120 at 7pm", "Friday the 13 at 7pm",
+//      "tomorrow 3.30 at 7pm") stays a piece of the time that must be read, so its whole is refused. A bare hour beside a
+//      day stays an hour ("tomorrow 3 at 7pm", step 3b);
 //   3. a number the reader did not read belongs to the phrase when a range word joins it to the phrase ("twenty to 3",
 //      "10 - $15", "3 or 4pm"), or when it stands right after a time or an amount with one space between ("at 3 30", "at
 //      three thirty", "$1 200"); a count takes one a range or choice word ("or", "to", "-", "/") joins to it, since the
@@ -63,11 +68,21 @@
 // them, as the same forms, "3.5pm", "3.30.15", "330pm", "~3.30", "at around 3", any opening mark between a cue and its
 // hour, any joining mark between a day and its bare hour ("Thursday - 3", "Thursday (3)") and an underscore as a mark
 // ("_tomorrow_ at 3pm"); every joining mark joins a time (step 2), a count between day and time ends no phrase (step
-// 2b), and every joining mark joins money and counts ("$40" out of "$40 (or $50)" or "$40 [or $50]" is several). Still
-// the residual, with words no reader knows and a sentence mark between day and time: "3.5", "3.30" and "1530" with no cue
-// before them and no am or pm after them ("Thursday, 3.5"), "around 3" with no cue, "~3" with neither a cue nor a day
-// beside it ("tomorrow ~3" is read: a joining mark stands between), and words before a count that no reader knows
-// ("tomorrow, crew of 4, at 7pm"). Limit 3's read-back shows the person the value before any
+// 2b), and every joining mark joins money and counts ("$40" out of "$40 (or $50)" or "$40 [or $50]" is several). Round 2
+// (DL-251) builds each fix from one definition, never a list of marks: a cue's opening marks are the joining marks, any
+// number of them, with or without a space ("tomorrow" out of "tomorrow at »3«", "at ›3‹", "at 「3」", "at ≈3", "at #3",
+// "at: 3" or "a las »3«" differs); the time reader's joining mark is this builder's, so a letter of any script is a
+// letter in both; and every count between a day and a time keeps the phrase whole, only a party counting as read
+// ("tomorrow" out of "tomorrow for 120 at 7pm" differs, and "Friday the 13 at 7pm" is refused, never read as Fri Nov 6).
+// Still the residual, with words no reader knows and a sentence mark between day and time: "3.5", "3.30" and "1530"
+// with no cue before them and no am or pm after them ("Thursday, 3.5"), "around 3" with no cue, "~3" with neither a cue
+// nor a day beside it ("tomorrow ~3" is read: a joining mark stands between), words before a count that no reader knows
+// ("tomorrow, crew of 4, at 7pm", "tomorrow with 12 at 7pm"), and, as words no reader knows, a word or letter of a script
+// the readers do not read between a day and a number ("Thursday" out of "Thursday ー 3" or "Thursday 下午 3" passes as
+// "Thursday x 3" does, since neither reader reads an hour there; the whole read as 3pm is refused). N2's class joins the
+// residual as its own (the lead, DL-251): an arrow read as "to" ("tomorrow" out of "tomorrow → 3pm" or "tomorrow ->
+// 3pm"), "5ish" ("4" out of "table for 4 or 5ish"), "tomorrow around 3.5", "tomorrow at 3.75", and a count with a unit no
+// reader knows before a time ("tomorrow for 2 dogs at 3pm"). Limit 3's read-back shows the person the value before any
 // commit, and limit 5 checks the time is open, so neither books on one. Nothing here keeps or logs a value or the words;
 // what it returns is a label.
 
@@ -85,7 +100,7 @@ import {
   type ReparseContext,
   type ReparseFault,
 } from "./reparse";
-import { ARROWS, ASCII_ARROW, SENTENCE_MARKS, timeReadingOf } from "./times";
+import { JOINING_MARK, NUMBER_JOINING_MARK, timeReadingOf } from "./times";
 import {
   BOTH_LANGUAGES,
   findAll,
@@ -173,13 +188,14 @@ const TIME_CUES: readonly string[] = [
   "y",
 ];
 /**
- * The marks that join a time's values besides the cues, by construction (T-1130, the round 7 review's N2; times.ts
- * SENTENCE_MARKS and ARROWS): spaces and every mark but a sentence mark, which ends the phrase (CQ-121: "tomorrow. at
- * 3pm"), and an arrow, which reads as "to" and so joins no time ("move my 3pm -> 4pm" passes "4pm", as "move my 3pm to
- * 4pm" does). So commas, colons, brackets, slashes, an asterisk, a quote mark or an emoji join ("*3pm* tomorrow",
- * "tomorrow [3pm]", 'tomorrow at "3pm"', "tomorrow 👍 3pm", "_3pm_ tomorrow").
+ * The marks that join a time's values besides the cues, by construction (T-1130, the round 7 review's N2): spaces and
+ * every mark but a sentence mark, which ends the phrase (CQ-121: "tomorrow. at 3pm"), and an arrow, which reads as "to"
+ * and so joins no time ("move my 3pm -> 4pm" passes "4pm", as "move my 3pm to 4pm" does). So commas, colons, brackets,
+ * slashes, an asterisk, a quote mark or an emoji join ("*3pm* tomorrow", "tomorrow [3pm]", 'tomorrow at "3pm"',
+ * "tomorrow 👍 3pm", "_3pm_ tomorrow"). It is the time reader's own definition (times.ts JOINING_MARK; T-1130 round 2,
+ * DL-251), so the two never disagree on what is a mark: a letter of any script is a letter in both ("Thursday ー 3").
  */
-const TIME_MARK = String.raw`(?!${ASCII_ARROW})[^\p{L}\p{N}${SENTENCE_MARKS}${ARROWS}]`;
+const TIME_MARK = JOINING_MARK;
 /** Words joined at their edges: no letter or digit right before or after them (an underscore is a mark: "_or_"). */
 const asWords = (words: readonly string[]): string =>
   String.raw`(?<![\p{L}\p{N}])(?:${words.join("|")})(?![\p{L}\p{N}])`;
@@ -188,9 +204,9 @@ const TIME_JOIN = new RegExp(String.raw`^(?:${TIME_MARK}|${asWords(TIME_CUES)})*
  * Step 2 for money and counts: a range or choice word between two values ("$12 to $15", "4 or 5", "4, maybe 5", "35
  * dólares y 50 centavos"), or any mark but a sentence mark: "+" joins them as "&" does ("2 adults + 1 child": T-304
  * round 7, DL-228 item 2c), and so does a bracket or any other mark ("$40 (or $50)", "4 (maybe 5)", "$40 [or $50]":
- * T-1130, DL-238, by construction as the time's join).
+ * T-1130, DL-238, by construction as the time's join, from the same definition: times.ts NUMBER_JOINING_MARK).
  */
-const NUMBER_MARK = String.raw`[^\p{L}\p{N}${SENTENCE_MARKS}]`;
+const NUMBER_MARK = NUMBER_JOINING_MARK;
 const NUMBER_WORDS = [
   "to",
   "or",
@@ -340,46 +356,64 @@ function rangeOf(type: PhraseType, languages: readonly ValueLanguage[]): RegExp 
   return spanish ? SPANISH_RANGE : ENGLISH_RANGE;
 }
 
-/** The words that name what a count counts right before it: "party of", "table for", "group of", "mesa para" (T-1130). */
+/**
+ * The words before a count that write it as a party (T-1130): "for" and "para", or the words that name what it counts,
+ * "party of", "table for", "group of", "mesa para", "somos".
+ */
 const COUNT_LEAD =
-  /(?<![\p{L}\p{N}])(?:(?:an? )?(?:party|table|group|reservation|booking) (?:of|for) |(?:una? )?(?:mesa|reserva|reservacion|grupo) (?:para|de) |somos )$/u;
-/** A number the time reader may leave unread as a time: three digits or more, or a mark between digits ("1530", "3.30"). */
-const TIME_LIKE_DIGITS = /\d{3}|\d[.,]\d/u;
+  /(?<![\p{L}\p{N}])(?:(?:an? )?(?:party|table|group|reservation|booking) (?:of|for) |(?:una? )?(?:mesa|reserva|reservacion|grupo) (?:para|de) |somos |for |para )$/u;
+/** A digit: a count written with none is written in words ("two", "twelve", "a dozen"). */
+const ANY_DIGIT = /\d/u;
 
 /**
- * Whether a count is written as a party, so it may stand between a day and its time (step 2b): a whole number with its
- * unit ("2 people") or the words that name what it counts ("party of 4"), or else one of at most two digits or in words
- * ("for 2", "for two"). A number the time reader leaves unread as a time ("tomorrow 3.30 at 7pm", "tomorrow 1530 at
- * 7pm") is none, so it stays a piece of the time's phrase that must be read, as before.
+ * Whether a count is written as a party, so it counts as read between a day and its time (step 2b; T-1130 round 2,
+ * DL-251): a whole number with its unit ("2 people", "100 guests"), with the words before it that write it as a party
+ * ("for 2", "for 120", "party of 4", "mesa para 4"), or in words ("two", "twelve"). Digits alone ("tomorrow 120 at 7pm",
+ * "Friday the 13 at 7pm") or a number that is no whole number ("tomorrow 3.30 at 7pm") are none, so they stay a piece of
+ * the time's phrase that must be read, and the whole is refused.
  */
 function isParty(count: FoundCount, folded: string): boolean {
   if (!Number.isInteger(count.value)) return false;
   const said = folded.slice(count.at, count.end);
-  if (ENDS_WITH_COUNT_UNIT.test(said) || COUNT_LEAD.test(folded.slice(0, count.at))) return true;
-  return !TIME_LIKE_DIGITS.test(said);
+  return (
+    ENDS_WITH_COUNT_UNIT.test(said) || COUNT_LEAD.test(folded.slice(0, count.at)) || !ANY_DIGIT.test(said)
+  );
+}
+
+/** A count between two of a time's values, from its lead words (COUNT_LEAD) to its end, and whether it is a party. */
+interface CountBetween extends Span {
+  readonly party: boolean;
 }
 
 /**
- * Step 2b (T-1130, the round 7 review's N3): the counts that stand between two of a time's values, such as the party
- * in "table tomorrow for 2 at 7pm": every count the count reader reads, with its unit ("for 2 people"), that no value
- * of the time overlaps and that is no bare hour the time reader reads beside a day or a part-of-day word ("tomorrow 3 at
- * 7pm" keeps its hour, DL-209), with a value of the time before it and one after it. Such a count ends no phrase: the
- * day and the time around it are one, so "tomorrow" alone differs, and the count is the count reader's, not a piece of
- * the time left unread. The words that name what is counted right before it go with it ("tomorrow, party of 4, at 7pm",
- * "mañana, mesa para 4, a las 7": COUNT_LEAD).
+ * Step 2b (T-1130, the round 7 review's N3; round 2, DL-251): the counts that stand between two of a time's values, such
+ * as the party in "table tomorrow for 2 at 7pm": every count the count reader reads, whatever its digits ("tomorrow for
+ * 120 at 7pm", "tomorrow for 1,200 at noon", "Friday the 13 at 7pm"), with its unit ("for 2 people"), that no value of
+ * the time overlaps and that is no bare hour the time reader reads beside a day or a part-of-day word ("tomorrow 3 at
+ * 7pm" keeps its hour, DL-209), with a value of the time before it and one after it. Every such count ends no phrase:
+ * the day and the time around it are one, so "tomorrow" alone differs. Only a count written as a party (isParty) is the
+ * count reader's and counts as read; any other stays a piece of the time left unread. The words before it that write it
+ * as a party go with it ("tomorrow, party of 4, at 7pm", "mañana, mesa para 4, a las 7": COUNT_LEAD).
  */
-function countsBetween(folded: string, times: readonly Span[], languages: readonly ValueLanguage[]): Span[] {
+function countsBetween(
+  folded: string,
+  times: readonly Span[],
+  languages: readonly ValueLanguage[],
+): CountBetween[] {
   const hours = timeReadingOf(folded, languages).bareHours;
   return countSpansIn(folded, languages)
     .filter(
       (count) =>
-        isParty(count, folded) &&
         !overlaps(count, times) &&
         !overlaps(count, hours) &&
         times.some((time) => time.end <= count.at) &&
         times.some((time) => count.end <= time.at),
     )
-    .map(({ at, end }) => ({ at: at - (COUNT_LEAD.exec(folded.slice(0, at))?.[0].length ?? 0), end }));
+    .map((count) => ({
+      at: count.at - (COUNT_LEAD.exec(folded.slice(0, count.at))?.[0].length ?? 0),
+      end: count.end,
+      party: isParty(count, folded),
+    }));
 }
 
 /** The folded words with each span in `spans` blanked to spaces, every other character where it stands. */
@@ -399,7 +433,7 @@ function phrasesOf(
   const join = type === "time" ? TIME_JOIN : NUMBER_JOIN;
   const range = rangeOf(type, languages);
   const numbers = wholeNumbersIn(folded, languages);
-  // Step 2b: a count between two of a time's values is blanked where the join is judged, so it ends no phrase.
+  // Step 2b: every count between two of a time's values is blanked where the join is judged, so it ends no phrase.
   const joinable = type === "time" ? blanked(folded, countsBetween(folded, values, languages)) : folded;
   let phrases = joined(values, joinable, join);
   for (;;) {
@@ -423,7 +457,7 @@ function sameSpan(a: Span, b: Span | undefined): boolean {
 
 /**
  * What the type's reader reads of a phrase on its own: its spans, and for a time the zone words beside it and the counts
- * between its values (step 2b), which the count reader reads.
+ * written as a party between its values (step 2b), which the count reader reads.
  */
 function readOf(type: PhraseType, said: string, languages: readonly ValueLanguage[]): Span[] {
   switch (type) {
@@ -434,7 +468,8 @@ function readOf(type: PhraseType, said: string, languages: readonly ValueLanguag
     case "time": {
       const spans = timeReadingOf(said, languages).spans.map(spanOf);
       const read = [...spans, ...zoneWordsOfTime(said, spans).map(spanOf)];
-      return [...read, ...countsBetween(said, read, languages)];
+      const parties = countsBetween(said, read, languages).filter((count) => count.party);
+      return [...read, ...parties.map(spanOf)];
     }
   }
 }
