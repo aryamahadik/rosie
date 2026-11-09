@@ -25,9 +25,16 @@ const PARITY_GLOB = "compiler/src/**/parity.shard-*.test.ts";
 const LOCAL_DATABASE_URL = "postgres://rosie:rosie@127.0.0.1:54329/rosie";
 const databaseUrl = process.env.DATABASE_URL ?? (process.env.CI ? undefined : LOCAL_DATABASE_URL);
 
+// At most this many test workers in every run, shared by every project (T-1117, DL-215): a resource guard on the build
+// Mac, not part of any test's claim, so several suites at once fit its CPUs and memory. VITEST_MAX_WORKERS sets it
+// when it is a positive whole number; unset or anything else gives 3.
+const workersSetting = Number(process.env.VITEST_MAX_WORKERS?.match(/^\d+$/)?.[0]);
+const MAX_WORKERS = Number.isSafeInteger(workersSetting) && workersSetting >= 1 ? workersSetting : 3;
+
 export default defineConfig({
   test: {
     passWithNoTests: true,
+    maxWorkers: MAX_WORKERS,
     projects: [
       {
         // Unit tests beside the code: each workspace's src/, plus db/repo/ and db/seeds/ (db's layout).

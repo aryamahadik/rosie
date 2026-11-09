@@ -2,13 +2,17 @@
 // (Vitest's default is 5 s). T-1114: the parity project has the same limits (DL-200: routing parity tests timed out
 // at 5 s beside builders). No project lowers a limit below that default. T-1113: the integration project runs its
 // files one after another (fileParallelism: false; DL-106, DL-196), so files that share one PostgreSQL never pass its
-// 100 connections; the root and the other projects leave file parallelism on. No TypeScript parser: this reads the
-// few lines it needs as text, like parity-placement.test.mjs.
+// 100 connections; the root and the other projects leave file parallelism on. T-1117: every run uses at most
+// VITEST_MAX_WORKERS workers when it is a positive whole number, and 3 otherwise, set once in the root options so
+// every project shares it (DL-215: a resource guard on the build Mac). No TypeScript parser: this reads the few lines
+// it needs as text, like parity-placement.test.mjs; only the cap, a value, is read by loading the config in a child
+// Node that strips its types.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const vitestConfig = readFileSync(path.join(root, "vitest.config.ts"), "utf8");
@@ -65,4 +69,52 @@ test("only the integration project sets fileParallelism; the root and every othe
   for (const name of PROJECTS.filter((p) => p !== "integration")) {
     assert.ok(!setsFileParallelism(project(name)), `${name} sets fileParallelism`);
   }
+});
+
+// For each setting of VITEST_MAX_WORKERS (null: unset), the root options' maxWorkers (null: none) and the projects
+// that set their own, from vitest.config.ts loaded in one child Node. Each import has its own query, so the config is
+// evaluated afresh and reads the variable again.
+function workerCaps(settings) {
+  const configUrl = pathToFileURL(path.join(root, "vitest.config.ts")).href;
+  const script = `
+    const caps = [];
+    for (const [i, setting] of ${JSON.stringify(settings)}.entries()) {
+      if (setting === null) delete process.env.VITEST_MAX_WORKERS;
+      else process.env.VITEST_MAX_WORKERS = setting;
+      const { default: config } = await import(${JSON.stringify(configUrl)} + "?setting=" + i);
+      caps.push({
+        root: config.test.maxWorkers ?? null,
+        projects: config.test.projects.filter((p) => p.test.maxWorkers !== undefined).map((p) => p.test.name),
+      });
+    }
+    console.log(JSON.stringify(caps));
+  `;
+  const child = spawnSync(
+    process.execPath,
+    ["--experimental-strip-types", "--no-warnings", "--input-type=module", "--eval", script],
+    { cwd: root, encoding: "utf8" },
+  );
+  assert.equal(child.status, 0, child.stderr);
+  return JSON.parse(child.stdout.trim().split("\n").at(-1));
+}
+
+test("every run uses at most VITEST_MAX_WORKERS workers when it is a positive whole number, else 3", () => {
+  const cases = [
+    [null, 3],
+    ["1", 1],
+    ["5", 5],
+    ["12", 12],
+    ["0", 3],
+    ["-2", 3],
+    ["2.5", 3],
+    ["3x", 3],
+    ["many", 3],
+    ["", 3],
+  ];
+  const caps = workerCaps(cases.map(([setting]) => setting));
+  cases.forEach(([setting, workers], i) => {
+    const label = `VITEST_MAX_WORKERS=${JSON.stringify(setting)}`;
+    assert.equal(caps[i].root, workers, `${label}: the root options' maxWorkers`);
+    assert.deepEqual(caps[i].projects, [], `${label}: projects with a maxWorkers of their own`);
+  });
 });
