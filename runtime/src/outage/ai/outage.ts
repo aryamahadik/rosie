@@ -16,9 +16,10 @@
 //      the line once whichever path asks first, a rerun of the turn included (it asks again and is answered `repeated`). A
 //      text the safety read already gave the line is not asked for at all. A line the core does not answer for now is
 //      asked for again on the next retry.
-//   3. The turn runs again 30 s later, and every 30 s while the models are down, until it commits. The retry its lease
-//      would not outlast is not run: the lease's lapse reruns the turn then (T-248), 30 s after the last try, and the rerun
-//      goes on the same way. A run no longer the turn's stops at once.
+//   3. The turn runs again 30 s after the last try began, and every 30 s while the models are down, until it commits (a
+//      try the gateway's own timeouts made slow does not push the next one back). The retry its lease would not outlast
+//      is not run: the lease's lapse reruns the turn then (T-248; its 60 s lease is two tries), 30 s after the last try
+//      began, and the rerun goes on the same way. A run no longer the turn's stops at once.
 //   4. On return the turn commits once, its core actions in the return order (`inReturnOrder`, in the turn's commit):
 //      every text's safety record first, the danger texts' leading ("danger words are read first": S12-12), then the
 //      stop and start records ("and stops next"), then the rest of the keyword texts' actions; the decided parts follow
@@ -219,8 +220,8 @@ function waitOrStop(clock: OutageClock, ms: number, signal: AbortSignal): Promis
 /**
  * Runs a turn through the AI-down path inside its lease: `once` is one run of the turn (the turn loop's steps 1 to 7).
  * While a run ends with the models down and nothing committed, each waiting text gets the outage line once (never to a
- * stopped number) and the turn runs again 30 s later, until it commits, ends for another reason, stops being the turn's,
- * or the next retry would not come before its lease lapses. Never throws for an outside failure.
+ * stopped number) and the turn runs again 30 s after that try began, until it commits, ends for another reason, stops
+ * being the turn's, or the next retry would not come before its lease lapses. Never throws for an outside failure.
  */
 export async function runThroughOutage<T extends RunEnd>(
   lease: LeaseView,
@@ -237,8 +238,8 @@ export async function runThroughOutage<T extends RunEnd>(
     end,
   });
   for (;;) {
-    const started = deps;
-    if (started !== null) triedAt.push(started.clock.now());
+    const began = deps?.clock.now() ?? null;
+    if (began !== null) triedAt.push(began);
     const outcome = await once();
     if (outcome.result === "committed") return report(outcome, "committed");
     const waiting = outcome.aiDown;
@@ -248,9 +249,11 @@ export async function runThroughOutage<T extends RunEnd>(
     if (replaced(lease)) return report(outcome, "replaced");
     await sendLines(set, waiting, done, lines);
     if (replaced(lease)) return report(outcome, "replaced");
-    // The retry the lease would not outlast is the lease's own rerun, at its lapse (30 s after this try).
-    if (set.clock.now() + RETRY_MS >= lease.leaseUntil) return report(outcome, "leaseEnds");
-    await waitOrStop(set.clock, RETRY_MS, lease.signal);
+    // The next try comes 30 s after this one began; the one the lease would not outlast is the lease's own rerun, at its
+    // lapse, which comes then (a run starts with a 60 s lease: two tries).
+    const next = (began ?? set.clock.now()) + RETRY_MS;
+    if (next >= lease.leaseUntil) return report(outcome, "leaseEnds");
+    await waitOrStop(set.clock, Math.max(0, next - set.clock.now()), lease.signal);
     if (replaced(lease)) return report(outcome, "replaced");
   }
 }

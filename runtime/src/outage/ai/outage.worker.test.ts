@@ -280,6 +280,7 @@ describe("a decide fake returning provider-down: the outage line once per waitin
     await until(() => first.o.lines.requests.length === 4, "the rerun's lines");
     first.t.abort();
     const report = await again;
+    await first.o.clock.advance(RETRY_MS);
 
     expect(first.o.lines.requests.map((sent) => sent.request)).toEqual([
       samLine("evt-sam-0001"),
@@ -358,6 +359,7 @@ describe("never to a stopped phone", () => {
     await until(() => s.o.waits.length === 2, "the second wait");
     s.t.abort();
     const report = await running;
+    await s.o.clock.advance(RETRY_MS);
 
     expect(s.o.lines.requests).toEqual([]);
     expect(s.o.stoppedReads).toEqual([]);
@@ -457,9 +459,34 @@ describe("the turn runs again every 30 s until the models are back, then commits
     await until(() => s.o.waits.length === 1, "the first wait");
     s.t.abort();
     const report = await running;
+    // The time it would have run again passes, and nothing runs.
+    await s.o.clock.advance(RETRY_MS);
 
     expect(report).toMatchObject({ end: "replaced", tries: 1 });
     expect(s.decidedAt).toEqual([0]);
+  });
+
+  it("a slow try (the gateway's own timeouts) does not push the next one back: it still begins 30 s after the last one began", async () => {
+    const s = await samTurn([S1_02_TEXT]);
+    s.ai.decide = async () => {
+      s.decidedAt.push(s.o.clock.now());
+      // Each try takes 10 s on the clock before it answers, as the gateway's attempts timing out would.
+      await s.o.clock.after(10_000);
+      return s.decidedAt.length <= 1 ? { error: MODELS_DOWN } : decided(decideS102);
+    };
+
+    const running = runTurnThroughOutage(s.turn);
+    await until(() => s.decidedAt.length === 1, "the first try");
+    await s.o.clock.advance(10_000);
+    await until(() => s.o.waits.length === 1, "the first wait");
+    expect(s.o.waits).toEqual([{ at: 10_000, ms: RETRY_MS - 10_000 }]);
+    await s.o.clock.advance(RETRY_MS - 10_000);
+    await until(() => s.decidedAt.length === 2, "the second try");
+    await s.o.clock.advance(10_000);
+    const report = await running;
+
+    expect(s.decidedAt).toEqual([0, RETRY_MS]);
+    expect(report).toMatchObject({ end: "committed", tries: 2, triedAt: [0, RETRY_MS] });
   });
 
   it("a run that fails for another reason (the frontier transient) is not the AI-down path: no line, no retry, the lease reruns it", async () => {
