@@ -25,7 +25,9 @@
 //      of "tomorrow afternoon at 3", "tomorrow" out of "tomorrow at noon" (differs), "tomorrow at 3pm" out of "tomorrow
 //      at 3pm, PST" for a New York visit (wrongZone). A bare hour beside a day joins the day's phrase whatever other time
 //      the text holds (DL-209): "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3?" differs, as do
-//      "tomorrow morning" out of "tomorrow morning, 9", "$40" out of "MXN $40" and "$1M" read as $1;
+//      "tomorrow morning" out of "tomorrow morning, 9", "$40" out of "MXN $40" and "$1M" read as $1. A sentence mark
+//      with no digit right after it ends an hour, as a comma does (DL-217): "tomorrow" out of "can you do tomorrow at 3."
+//      differs, and so does "Thursday" out of "my 2pm doesn't work. can we do Thursday, 3.";
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -35,7 +37,10 @@
 // The residual (DL-199 item 4; CQ-121): words no reader knows are not read, so a cut beside them is not caught here:
 // "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from", "around 3" with no
 // cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time ("at 3pm" out of
-// "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts).
+// "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts), and an
+// hour in words beside a day or before "on" and its day ("Thursday, three", "3 on Thursday"), which the lead added at
+// round 6 (DL-217 item 3). "3.30" and "3.5" keep their readings (DL-217 item 1), so "tomorrow" out of "tomorrow at
+// 3.30" is not caught here either (for the lead to confirm beside CQ-121).
 // Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
 // so neither books on such a cut.
 //

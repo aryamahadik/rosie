@@ -1261,3 +1261,106 @@ describe("the readers learn a bare hour after a part-of-day word, a currency cod
     }
   });
 });
+
+// Round 6 (DL-217): a sentence mark with no digit right after it ends a cued or bare hour, as a comma does (round 5's
+// default b), so the hour stays in its day's phrase and a cut that drops it differs (the round 5 review's GAP 5: P1 to
+// P4); "3.30" and "3.5" keep their readings.
+
+describe("a sentence mark right after a cued or bare hour ends the hour, which stays in the day's phrase: the round 5 review's P1 to P4 (DL-217)", () => {
+  const ny = (utc: string) => at(utc, NEW_YORK);
+  const es = { language: "es" } as const;
+  const SUNDAY = ny("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+  const THURSDAY = ny("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const P1 = "can you do tomorrow at 3.";
+  const P2 = "puedo mañana a las 3.";
+  const P3 = "my 2pm doesn't work. can we do Thursday, 3.";
+  const P4 = "can you do tomorrow morning, 9.";
+  // [case, the request citing the day alone, read at its start (sent Sat Oct 31 at 10:00am in New York), the whole]
+  const cases: [string, () => GateRequest, () => GateRequest][] = [
+    [
+      "P1: 'tomorrow' out of 'can you do tomorrow at 3.' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow", P1),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3", P1),
+    ],
+    [
+      "P2: 'mañana' out of 'puedo mañana a las 3.' (the whole is Sun Nov 1 at 3pm)",
+      () => haircutMoveRequest(SUNDAY, "mañana", P2, es),
+      () => haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "mañana a las 3", P2, es),
+    ],
+    [
+      "P3: 'Thursday' out of 'my 2pm doesn't work. can we do Thursday, 3.' (the whole is Thu Nov 5 at 3pm)",
+      () => haircutMoveRequest(THURSDAY, "Thursday", P3),
+      () => haircutMoveRequest(ny("2026-11-05T20:00:00Z"), "Thursday, 3", P3),
+    ],
+    [
+      "P4: 'tomorrow morning' out of 'can you do tomorrow morning, 9.' (the whole is Sun Nov 1 at 9am)",
+      () => haircutMoveRequest(SUNDAY, "tomorrow morning", P4),
+      () => haircutMoveRequest(ny("2026-11-01T14:00:00Z"), "tomorrow morning, 9", P4),
+    ],
+  ];
+  /** The call context of a request's own business. */
+  const contextOf = (request: GateRequest) => callContext(turnOf(request).businessId);
+
+  it.each(cases)("%s: limit 6 fails the cut (differs), before and after the re-read", async (_case, cut) => {
+    const request = cut();
+    const cited = citedIn(request, "time_saved");
+    expect(decidedIn(request).context.texts.some((text) => text.words.includes(cited))).toBe(true);
+    expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+    expect(await decision({}, afterReread(request))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it.each(cases)(
+    "%s: at the gate the quote check passes; before the re-read the cut is refused naming the field, after it one question",
+    async (_case, cut) => {
+      expect(await runGate(cut(), contextOf(cut()), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+      });
+      const [part] = gatedParts(await runGate(afterReread(cut()), contextOf(cut()), registryWith(limitIn())));
+      expect(part?.result).toBe("stopped");
+      expect(part?.stoppedBy).toEqual(oneQuestionOutcome());
+    },
+  );
+
+  it.each(cases)("%s: the whole passes at limit 6 and the gate", async (_case, _cut, whole) => {
+    const request = whole();
+    expect(await decision({}, request)).toEqual({ result: "pass" });
+    const [passed] = gatedParts(await runGate(request, contextOf(request), registryWith(limitIn())));
+    expect(passed?.result).toBe("passed");
+    expect(passed?.limits[5]).toEqual({ limit: 6, result: "pass", outcome: null });
+  });
+
+  it("the whole 'tomorrow at 3.' passes as 3am too (CQ-119's default) and, read at another hour, differs", async () => {
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-01T08:00:00Z"), "tomorrow at 3.", P1))).toEqual({
+      result: "pass",
+    });
+    expect(await decision({}, haircutMoveRequest(ny("2026-11-01T21:00:00Z"), "tomorrow at 3", P1))).toEqual(
+      failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+    );
+  });
+
+  it("each other sentence mark after the hour gives the same: '…', ';', '!', '?', a fullwidth '．'", async () => {
+    for (const mark of ["…", ";", "!", "?", "．"]) {
+      const words = `can you do tomorrow at 3${mark}`;
+      expect(await decision({}, haircutMoveRequest(SUNDAY, "tomorrow", words))).toEqual(
+        failed(oneQuestionOutcome(), [["time_saved", "differs"]]),
+      );
+      expect(
+        await decision({}, haircutMoveRequest(ny("2026-11-01T20:00:00Z"), "tomorrow at 3", words)),
+      ).toEqual({ result: "pass" });
+    }
+  });
+
+  it("a mark glued before the hour hides it no more (default): 'tomorrow' out of 'can't make my 2pm,3 tomorrow?' and 'hmm...3pm tomorrow?' differs", async () => {
+    for (const words of ["can't make my 2pm,3 tomorrow?", "hmm...3pm tomorrow?"]) {
+      const request = haircutMoveRequest(SUNDAY, "tomorrow", words);
+      expect(await decision({}, request)).toEqual(failed(oneQuestionOutcome(), [["time_saved", "differs"]]));
+      expect(await runGate(request, contextOf(request), registryWith(limitIn()))).toEqual({
+        verdict: "refused",
+        error: { error: "valueFailsWords", parts: [{ part: 0, fields: ["time_saved"] }] },
+      });
+    }
+  });
+});

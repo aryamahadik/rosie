@@ -33,8 +33,14 @@
 // Friday", "around 3" (the time reader reads no bare hour after "around"), "$40 off". The lead added at round 5
 // (DL-209), written into CQ-121 beside those words: a sentence mark between day and time ends the phrase, so a cut beside
 // it is also the residual: "at 3pm" out of "tomorrow. at 3pm" passes as today's 3pm, since ". ! ? ;" join nothing (step
-// 2). Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is open, so neither
-// books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
+// 2). The lead added at round 6 (DL-217 item 3), beside CQ-121's words, the round 5 review's N-b: an hour written in
+// words beside a day ("Thursday, three") and an hour before "on" and its day ("3 on Thursday") are not read, so
+// "Thursday" out of either is the residual too. A sentence mark right after an hour is not between day and time: it ends
+// the hour, which stays in its day's phrase (DL-217 item 1: "Thursday" out of "Thursday, 3." differs). "3.30" and "3.5"
+// keep their readings (DL-217 item 1: a period with a digit right after it is part of the number), so the time reader
+// reads no hour in them and "tomorrow" out of "tomorrow at 3.30" is not caught here either (for the lead to confirm
+// beside CQ-121). Limit 3's read-back shows the person the value before any commit, and limit 5 checks the time is open,
+// so neither books on one. Nothing here keeps or logs a value or the words; what it returns is a label.
 
 import { amountsIn } from "./money";
 import { numberPhrasesIn } from "./numbers";

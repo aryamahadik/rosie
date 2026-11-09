@@ -1350,3 +1350,186 @@ describe("the money reader learns a currency code beside an amount and 'M' as mi
     expect(wholePhraseFault("money", usd(100_000_000), text, "$1M", context)).toBeNull();
   });
 });
+
+// ---- round 6 (DL-217): a sentence mark with no digit right after it ends a cued or bare hour --------------------------
+
+describe("a sentence mark with no digit right after it ends a cued or bare hour: the round 5 review's P1 to P4 (DL-217)", () => {
+  const context: ReparseContext = { sentAt: "2026-10-31T14:00:00Z", zones: [NEW_YORK] }; // Sat Oct 31, 10:00am EDT
+  const spanish: ReparseContext = { ...context, languages: ["es"] };
+  const at = (utc: string) => ({ utc, zone: NEW_YORK });
+  const SUNDAY = at("2026-11-01T04:00:00Z"); // Sun Nov 1 at its start (still EDT)
+  const THURSDAY = at("2026-11-05T05:00:00Z"); // Thu Nov 5 at its start (EST)
+  const SUNDAY_AT_3 = ["2026-11-01T08:00:00Z", "2026-11-01T20:00:00Z"]; // 3am or 3pm EST (CQ-119's default)
+  const P1 = "can you do tomorrow at 3.";
+  const P2 = "puedo mañana a las 3.";
+  const P3 = "my 2pm doesn't work. can we do Thursday, 3.";
+  const P4 = "can you do tomorrow morning, 9.";
+
+  it.each([
+    "tomorrow at 3",
+    "tomorrow at 3.",
+    "tomorrow at 3…",
+    "tomorrow at 3...",
+    "tomorrow at 3;",
+    "tomorrow at 3!",
+    "tomorrow at 3?",
+    "tomorrow at 3．",
+    "tomorrow at 3. thanks",
+    "tomorrow at 3.Thanks",
+    "tomorrow, 3.",
+    "tomorrow 3…",
+  ])("'%s' reads its hour: Sun Nov 1 at 3am or 3pm", (words) => {
+    expect(readings(words, context.sentAt, NEW_YORK)).toEqual(SUNDAY_AT_3);
+  });
+
+  it("Spanish, a part of the day, and a bare hour beside a day after another time read their hour with a mark after it", () => {
+    expect(readings("mañana a las 3.", context.sentAt, NEW_YORK, ["es"])).toEqual(SUNDAY_AT_3);
+    expect(readings("el jueves, 3.", context.sentAt, NEW_YORK, ["es"])).toEqual([
+      "2026-11-05T08:00:00Z",
+      "2026-11-05T20:00:00Z",
+    ]);
+    expect(readings("tomorrow morning, 9.", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T14:00:00Z"]);
+    expect(readings("tomorrow evening at 7.", context.sentAt, NEW_YORK)).toEqual(["2026-11-02T00:00:00Z"]);
+    const hour = foldWords(P3).lastIndexOf("3.");
+    expect(timeReadingOf(P3).bareHours).toEqual([{ at: hour, end: hour + 1 }]);
+  });
+
+  it.each([
+    [
+      "P1: 'tomorrow' out of 'can you do tomorrow at 3.'",
+      P1,
+      "tomorrow",
+      SUNDAY,
+      "tomorrow at 3",
+      "2026-11-01T20:00:00Z",
+      context,
+    ],
+    [
+      "P2: 'mañana' out of 'puedo mañana a las 3.'",
+      P2,
+      "mañana",
+      SUNDAY,
+      "mañana a las 3",
+      "2026-11-01T20:00:00Z",
+      spanish,
+    ],
+    [
+      "P3: 'Thursday' out of 'my 2pm doesn't work. can we do Thursday, 3.'",
+      P3,
+      "Thursday",
+      THURSDAY,
+      "Thursday, 3",
+      "2026-11-05T20:00:00Z",
+      context,
+    ],
+    [
+      "P4: 'tomorrow morning' out of 'can you do tomorrow morning, 9.'",
+      P4,
+      "tomorrow morning",
+      SUNDAY,
+      "tomorrow morning, 9",
+      "2026-11-01T14:00:00Z",
+      context,
+    ],
+  ] as const)(
+    "%s: the cut re-parses on its own but differs on the day's phrase; the whole passes",
+    (_case, text, cut, value, whole, utc, given) => {
+      expect(reparse("time", value, cut, given)).toEqual({ ok: true });
+      expect(wholePhraseFault("time", value, text, cut, given)).toBe("differs");
+      expect(wholePhraseFault("time", at(utc), text, whole, given)).toBeNull();
+      expect(wholePhraseFault("time", at(utc), text, `${whole}.`, given)).toBeNull();
+    },
+  );
+
+  it("after every sentence mark the cut of the day differs: '…', '...', ';', '!', '?', a fullwidth '．', more words", () => {
+    for (const mark of ["…", "...", ";", "!", "?", "．", ". thanks", ".Thanks"]) {
+      expect(wholePhraseFault("time", SUNDAY, `can you do tomorrow at 3${mark}`, "tomorrow", context)).toBe(
+        "differs",
+      );
+      expect(
+        wholePhraseFault("time", THURSDAY, `my 2pm is out. Thursday, 3${mark}`, "Thursday", context),
+      ).toBe("differs");
+    }
+  });
+
+  it("a period with a digit right after it ends no hour: '3.30' and '3.5' keep their readings (no hour 3)", () => {
+    for (const words of [
+      "tomorrow at 3.30",
+      "tomorrow at 3.5",
+      "Thursday, 3.30",
+      "Thursday 3.5",
+      "tomorrow 1.30pm",
+    ]) {
+      const read = readTimeWords(words);
+      expect(read.kind === "time" ? read.time.clock : read.kind).toBeNull();
+      expect(timeReadingOf(words).bareHours).toEqual([]);
+    }
+    expect(cents("$3.5")).toEqual([350]);
+    expect(cents("$3.30")).toEqual([330]);
+    expect(countsIn("3.5")).toEqual([3.5]);
+  });
+
+  it("the same mark right before a time, with no digit before it, hides it no more (default): the cut of the day differs", () => {
+    expect(readings("hmm...3pm tomorrow", context.sentAt, NEW_YORK)).toEqual(["2026-11-01T20:00:00Z"]);
+    expect(readings("hmm...3:30 tomorrow", context.sentAt, NEW_YORK)).toEqual([
+      "2026-11-01T08:30:00Z",
+      "2026-11-01T20:30:00Z",
+    ]);
+    expect(readings("hmm...3 oclock tomorrow", context.sentAt, NEW_YORK)).toEqual(SUNDAY_AT_3);
+    expect(readings("hmm...3 y media mañana", context.sentAt, NEW_YORK, ["es"])).toEqual([
+      "2026-11-01T08:30:00Z",
+      "2026-11-01T20:30:00Z",
+    ]);
+    for (const text of [
+      "hmm...3pm tomorrow?",
+      "out.3pm tomorrow?",
+      "hmm...3:30 tomorrow?",
+      "can't make my 2pm,3 tomorrow?",
+      "my 2pm is out.3 tomorrow?",
+      "my 2pm is out...3 tomorrow?",
+    ]) {
+      expect(wholePhraseFault("time", SUNDAY, text, "tomorrow", context)).toBe("differs");
+    }
+    const dated = "hmm...10/24 at 3pm?";
+    expect(wholePhraseFault("time", at("2026-10-31T19:00:00Z"), dated, "at 3pm", context)).toBe("differs");
+    // The whole, cited from the word before the mark, passes. Cited from its first digit it stands at no word edge
+    // (words.ts: a mark right before words that start with a digit), a refusal, never a pass.
+    expect(
+      wholePhraseFault("time", at("2027-10-24T19:00:00Z"), dated, "hmm...10/24 at 3pm", context),
+    ).toBeNull();
+    const pm = "hmm...3pm tomorrow?";
+    expect(
+      wholePhraseFault("time", at("2026-11-01T20:00:00Z"), pm, "hmm...3pm tomorrow", context),
+    ).toBeNull();
+    expect(wholePhraseFault("time", at("2026-11-01T20:00:00Z"), pm, "3pm tomorrow", context)).toBe("noText");
+  });
+
+  it.each([
+    ["tomorrow at three pm", ["2026-11-01T20:00:00Z"]],
+    ["mañana a las tres pm", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow at three.pm", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow at 3.pm", ["2026-11-01T20:00:00Z"]],
+    ["tomorrow at 3.am", ["2026-11-01T08:00:00Z"]],
+    ["tomorrow at 3:30.pm", ["2026-11-01T20:30:00Z"]],
+    ["tomorrow at quarter to 3.pm", ["2026-11-01T19:45:00Z"]],
+    ["tomorrow at three", SUNDAY_AT_3],
+  ] as const)(
+    "an am or pm right after the hour, a space or a period between, is read with it (default): '%s' is %j",
+    (words, expected) => {
+      expect(readings(words, context.sentAt, NEW_YORK)).toEqual(expected);
+    },
+  );
+
+  it("so a 3am cut out of 'tomorrow at three pm' or a 3am read of 'tomorrow at 3.pm' differs; 3pm passes", () => {
+    const am = at("2026-11-01T08:00:00Z");
+    const pm = at("2026-11-01T20:00:00Z");
+    const worded = "can you do tomorrow at three pm";
+    expect(reparse("time", am, "tomorrow at three", context)).toEqual({ ok: true });
+    expect(wholePhraseFault("time", am, worded, "tomorrow at three", context)).toBe("differs");
+    expect(wholePhraseFault("time", pm, worded, "tomorrow at three pm", context)).toBeNull();
+    expect(reparse("time", am, "tomorrow at 3.pm", context)).toEqual({ ok: false, why: "differs" });
+    expect(
+      wholePhraseFault("time", pm, "can you do tomorrow at 3.pm", "tomorrow at 3.pm", context),
+    ).toBeNull();
+  });
+});
