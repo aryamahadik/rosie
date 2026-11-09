@@ -1,0 +1,25 @@
+{
+  "call": "secureUpload",
+  "given": {
+    "now": "2026-11-03T15:06:00Z",
+    "environment": "staging",
+    "after": ["secure-authority-page-read.json"],
+    "note": "On his secure page Alex adds the paper that shows his authority (A4-64 line 2761: 'Where it asks, the page takes the paper that shows it'; B4-74: 'The paper goes on the secure page'): a signed upload for one PDF, bound on the server to the link's booking, Alex and the link's purpose; the page never names an object key (README defaults 61, 65; K-13 not frozen: the address is opaque, as v1's signedUpload). The 10 MiB limit is v1 default 12's example; the upload id and address are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain3-0002",
+      "traceId": "trace-page-alex-drain3-0001",
+      "linkCode": "placeholder-drain3-secure-link-code"
+    },
+    "mediaType": "application/pdf",
+    "bytes": 860000
+  },
+  "outcome": {
+    "result": "ready",
+    "uploadId": "upload-alex-drain3-paper-1",
+    "uploadUrl": "https://files.example/placeholder-signed-upload-drain3-paper-1",
+    "expiresAt": "2026-11-03T15:16:00Z",
+    "maxBytes": 10485760
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-03T15:08:50Z",
+    "environment": "staging",
+    "after": ["secure-authority-page-read.json", "secure-authority-paper-upload.json", "secure-authority-read-back.json"],
+    "note": "Alex's yes: the page entry calls K-09 v1.2 saveSecurePage alone, answers, step B4-34 (which carries an access answer, as K-09's saveSecurePage asks), caller.kind page with Alex from the link, as tool-api/fixtures/j4-page-answers-access.json saves his own drain's: two K-30 page_answers rows sealed under his key, insert only. One is the access note as typed; the other is of kind authority, question null, its answer README default 65's JSON text: authority moneyPowerOfAttorney, covers as typed, and paper the stored PDF's file reference as K-13 names it, from the upload id the read-back kept, never one the browser sends with the yes. Gives access and answers. The job page opens them for Jordan, never a text. The answer says how many were saved, never their ids, their words or the file."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain3-0004",
+      "traceId": "trace-page-alex-drain3-0001",
+      "linkCode": "placeholder-drain3-secure-link-code"
+    },
+    "readBackId": "rb-page-alex-drain3-answers-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-drain3-answers-1",
+    "yesEventId": "pageyes-alex-drain3-answers-1",
+    "served": { "change": "answers", "saved": 2 }
+  }
+}

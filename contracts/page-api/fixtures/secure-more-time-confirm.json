@@ -1,0 +1,23 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-02T14:11:40Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-answers-confirm.json", "secure-more-time-read-back.json"],
+    "note": "Alex's yes: the page entry calls K-09 v1.2 extendTime alone, caller.kind page with his person from the link, on the reservation and version it kept, exactly as tool-api/fixtures/j4-extend-time-page.json: the time is held for his mobile on file, a turn's save on the standard door, so held_until rises 10 minutes to 9:23:10am and no extension is left (Q-12; K-09 v1.2 README default 61). No key."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0015",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "readBackId": "rb-page-alex-drain2-more-time-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-drain2-more-time-1",
+    "yesEventId": "pageyes-alex-drain2-more-time-1",
+    "served": { "change": "moreTime", "heldUntil": "2026-11-02T14:23:10Z", "extendable": false }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-03T00:12:40Z",
+    "environment": "staging",
+    "after": ["photos-page-read.json", "photos-upload.json", "photos-read-back.json"],
+    "note": "Alex's yes: the page entry names the stored photo by its file reference as K-13 names it and calls K-09 v1.2 saveSecurePage alone, photos, step B4-08, on the link's quote, caller.kind page with his person from the link, exactly as tool-api/fixtures/j4-photos-page.json: two K-30 page_answers rows sealed under his key, never in a text and never through an AI. The quote stays pricing for Jordan's price (quote-price-confirm.json); no key. The answer says how many were saved, never their ids or the file."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0004",
+      "traceId": "trace-page-alex-heater-0003",
+      "linkCode": "placeholder-heater-photos-link-code"
+    },
+    "readBackId": "rb-page-alex-heater-photos-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-heater-photos-1",
+    "yesEventId": "pageyes-alex-heater-photos-1",
+    "served": { "change": "photos", "saved": 2 }
+  }
+}

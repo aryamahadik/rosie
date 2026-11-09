@@ -1,0 +1,23 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-02T14:07:45Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-street-confirm.json", "secure-answers-read-back.json"],
+    "note": "Alex's yes: the page entry calls K-09 v1.2 saveSecurePage alone, answers, step B4-34, caller.kind page with his person from the link, exactly as tool-api/fixtures/j4-page-answers-access.json: two K-30 page_answers rows sealed under his key, insert only; the job page opens them for Jordan, never a text. Gives access and answers. The answer says how many were saved, never their ids or words."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0013",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "readBackId": "rb-page-alex-drain2-answers-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-drain2-answers-1",
+    "yesEventId": "pageyes-alex-drain2-answers-1",
+    "served": { "change": "answers", "saved": 2 }
+  }
+}

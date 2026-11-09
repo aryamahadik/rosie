@@ -1,0 +1,24 @@
+{
+  "call": "quoteConfirm",
+  "given": {
+    "now": "2026-11-03T00:41:15Z",
+    "environment": "staging",
+    "after": ["quotes-to-ok.json", "quote-owner-send-read-back.json", "db-schema/core/fixtures/seed-phone-chat-open.json"],
+    "note": "Sam's yes on Needs you: the page entry makes the yes's event and calls K-09 v1.2 quoteFromPhotos alone, stage ownerAnswer, answer send, its yes kind page with the read-back's exact words and this event (the owner_oks answer with who gave it), whose walk goes on to setPrice photos (B4-13), as tool-api/fixtures/j4-quote-send-page.json shows from the portal: the quote is sent (version 3), good for 7 days, and its link reaches Alex through a clock row due at once on his mobile's handle, whose chat is open. The link never comes back to the portal (K-09 v1.2 setPrice.response.quote.link: url null)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0003",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-heater-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-portal-sam-heater-1",
+    "yesEventId": "pageyes-sam-heater-send-1",
+    "served": { "change": "ownerAnswer", "answer": "send", "state": "sent", "requestEnded": false }
+  }
+}

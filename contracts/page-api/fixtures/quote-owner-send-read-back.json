@@ -1,0 +1,38 @@
+{
+  "call": "quoteReadBack",
+  "given": {
+    "now": "2026-11-03T00:41:10Z",
+    "environment": "staging",
+    "after": ["quotes-to-ok.json"],
+    "note": "B4-10 on Needs you: Sam picks '1 Send it' for Alex's $640. Nothing is written: the read-back is B4-10's own question as asked with the answer picked, on the quote's and the ask's versions (FS line 630; README default 59), and its words become the exact words of Sam's yes (K-08 approvalOwnerYes). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0002",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "change": {
+      "kind": "ownerAnswer",
+      "quoteId": "quote-alex-heater",
+      "ownerOkId": "ok-alex-heater",
+      "version": 2,
+      "answer": "send",
+      "newOptions": null
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-portal-sam-heater-1",
+    "stepId": "B4-10",
+    "questionId": null,
+    "words": "Send Alex M. $640 for the water heater replacement? 1 Send it",
+    "shown": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 2 },
+      { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 1 }
+    ],
+    "signature": "none",
+    "expiresAt": "2026-11-03T00:51:10Z"
+  }
+}

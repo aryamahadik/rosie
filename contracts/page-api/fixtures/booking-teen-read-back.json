@@ -1,0 +1,36 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-21T22:40:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A4-96 on Lee's Barbershop's booking page: a teen of 13 to 17 opened a request as booking-page-start.json opens one (requestRef reqref-page-lees-0031 and the teen's own device token, placeholders) and matched the haircut. On screen 2 they tap Me and 'I'm under 18', and the page's own 'Are you under 13?' No (README default 52: no AI reads a page, so the page asks it, never an exact age). Nothing is written. The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-teen-0003",
+      "traceId": "trace-page-teen-0003",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-teen-1",
+      "requestRef": "reqref-page-lees-0031"
+    },
+    "change": {
+      "kind": "whoFor",
+      "for": "self",
+      "bookerAgeBand": "under_18",
+      "under13": false,
+      "parentOrGuardian": null,
+      "name": null
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-teen-who-for-1",
+    "stepId": "A4-80",
+    "questionId": null,
+    "words": "Who is the haircut for? Me, and I'm under 18 (13 or older)",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-21T22:50:00Z"
+  }
+}

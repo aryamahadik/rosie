@@ -1,0 +1,36 @@
+{
+  "call": "bookingPick",
+  "given": {
+    "now": "2026-10-21T23:16:40Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json",
+      "booking-name-confirm.json",
+      "booking-price-list.json",
+      "booking-times-card.json"
+    ],
+    "note": "Screen 9 (FS section 7: 'The pick is saved for 10 minutes'; A4-15 then A4-21): Alex taps Sat 11:00am with Riley. The pick is the confirm of the card's read-back (README default 48): only the card's id and the option go up. The page entry rebuilds the time from the card it kept and calls K-09 v1.2 saveTime alone (caller.kind page, personId null), pick offered with the service and the way, as tool-api/fixtures/j4-save-time-agent.json saves an AI's: a page's save is on the standard door, 10 minutes with one extension, held for Alex's mobile on file (K-09 v1.2 README default 61), and the K-30 line copies the card's $35 (S11-54). Gives time_saved (flow A). No reservation id, line id or door reaches the page."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0023",
+      "traceId": "trace-page-lees-0023",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "cardId": "card-page-lees-0001",
+    "pick": { "optionId": "opt-page-lees-sat-1100" }
+  },
+  "outcome": {
+    "result": "saved",
+    "heldUntil": "2026-10-21T23:26:40Z",
+    "minutes": 10,
+    "extendable": true,
+    "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } }
+  }
+}

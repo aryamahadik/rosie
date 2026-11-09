@@ -1,0 +1,31 @@
+{
+  "call": "bookingPrice",
+  "given": {
+    "now": "2026-10-21T23:16:20Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json",
+      "booking-name-confirm.json"
+    ],
+    "note": "A4-05 then A4-06 (FS section 7 screen 6): the shop way's path is list|card|counter, so the page entry calls K-09 v1.2 setPrice alone (caller.kind page, personId null), path list, step A4-06, with the service and the way it keeps, as tool-api/fixtures/j4-price-list-agent.json does: the $35 rule in force on Oct 21, a set price, never needing Sam's OK. Gives price_known, kept with requestRef until the save copies it (K-09 v1.2 README default 57). An automatic step, made on no one's word: nothing is read back here (README default 48)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0021",
+      "traceId": "trace-page-lees-0021",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    }
+  },
+  "outcome": {
+    "result": "priced",
+    "path": "list",
+    "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+    "fromPrice": null
+  }
+}

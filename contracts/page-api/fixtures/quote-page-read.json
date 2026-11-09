@@ -1,0 +1,31 @@
+{
+  "call": "secureRead",
+  "given": {
+    "now": "2026-11-03T01:05:00Z",
+    "environment": "staging",
+    "after": ["quote-owner-send-confirm.json"],
+    "note": "B4-13: Alex opens the quote link that came with the price in his open chat (K-09's j4-quote-send-page.json: the clock row's message, the link filled at finalize). The page entry finds the K-30 link by its code's hash, purpose quote, Alex's own (README default 49), and shows the quote as sent: one option, $640, good for 7 days, until Mon Nov 9, 7:41pm. He OKs the price by picking a time (bookingTimes with quoteOptionId on this page, then bookingPick: A4-12). The code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0010",
+      "traceId": "trace-page-alex-heater-0010",
+      "linkCode": "placeholder-heater-quote-link-code"
+    }
+  },
+  "outcome": {
+    "result": "quotePage",
+    "businessName": "Lee Home Services",
+    "service": "Water heater replacement",
+    "state": "sent",
+    "options": [
+      {
+        "quoteOptionId": "qopt-alex-heater-1",
+        "label": null,
+        "price": { "words": "$640", "amount": { "cents": 64000, "currency": "USD" } }
+      }
+    ],
+    "goodUntil": "2026-11-10T00:41:15Z",
+    "visit": null
+  }
+}

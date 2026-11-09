@@ -1,0 +1,27 @@
+{
+  "page": {
+    "requestId": "req-page-alex-drain2-0012",
+    "traceId": "trace-page-alex-drain2-0008",
+    "linkCode": "placeholder-drain2-secure-link-code",
+    "personId": "person-alex"
+  },
+  "change": {
+    "kind": "answers",
+    "answers": [
+      {
+        "kind": "access",
+        "question": null,
+        "words": "Side door; the gate latch sticks",
+        "uploadId": null,
+        "authority": null
+      },
+      {
+        "kind": "question",
+        "question": "Is the sink still full of water?",
+        "words": "Yes, about half full",
+        "uploadId": null,
+        "authority": null
+      }
+    ]
+  }
+}

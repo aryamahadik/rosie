@@ -1,0 +1,18 @@
+{
+  "page": {
+    "requestId": "req-page-lees-0015",
+    "traceId": "trace-page-lees-0015",
+    "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+    "deviceToken": "placeholder-device-token-page-lees-2",
+    "requestRef": "reqref-page-lees-0011"
+  },
+  "personId": "person-page-alex-0001",
+  "change": {
+    "kind": "whoFor",
+    "for": "self",
+    "bookerAgeBand": "18_or_older",
+    "under13": null,
+    "parentOrGuardian": null,
+    "name": null
+  }
+}

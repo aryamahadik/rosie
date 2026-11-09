@@ -1,0 +1,27 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-02T14:11:35Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-answers-confirm.json"],
+    "note": "B4-29's 'more time offered before it ends': the page warns that Alex's saved time ends at 9:13am and he taps More time. Nothing is written; the page entry keeps the reservation and its version with the read-back (README default 48). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0014",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "change": { "kind": "moreTime" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-drain2-more-time-1",
+    "stepId": "B4-29",
+    "questionId": null,
+    "words": "Keep Thu Nov 5, arriving 8 to 10am with Jordan, saved 10 more minutes, until 9:23am? This is the one extension.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-02T14:21:35Z"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-02T15:20:05Z",
+    "environment": "staging",
+    "after": ["secure-meets-pro-confirm.json", "secure-meets-pro-yes-read-back.json"],
+    "note": "That adult's own yes on their own link: the page entry makes the yes's event and calls K-09 v1.2 saveSecurePage alone, meetsProYes, step B4-27, with their mobile and the yes kind page carrying the read-back's exact words and this event, exactly as tool-api/fixtures/j4-meets-pro-yes-page.json: in one commit their mobile becomes their own handle (contacts/add, Q-03), their K-29 texts consent for that mobile on channel page with the booking and those words and their sha256, and meets_pro_person_id set to them (K-09 v1.2 README default 85). The consent's id comes back so the page shows the yes kept to the words it showed; the handle and the effect never do. No key."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-meets-pro-0002",
+      "traceId": "trace-page-meets-pro-0001",
+      "linkCode": "placeholder-meets-pro-code-0027"
+    },
+    "readBackId": "rb-page-meets-pro-yes-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-meets-pro-yes-1",
+    "yesEventId": "evt-page-meets-pro-0001",
+    "served": {
+      "change": "meetsProYes",
+      "result": "textsYes",
+      "consentId": "consent-meets-pro-texts",
+      "textsOffLine": null
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-03T00:12:35Z",
+    "environment": "staging",
+    "after": ["photos-page-read.json", "photos-upload.json"],
+    "note": "Alex sends the photo he uploaded and a note. The page entry checks the upload is this link's and stored, a JPEG under its limit (README default 61), swaps the note first and reads it for safety (No: README default 50), then answers the read-back, keeping the change sealed under Alex's key with it. Nothing is written. The note's words are K-09's j4-photos-page.json example; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0003",
+      "traceId": "trace-page-alex-heater-0003",
+      "linkCode": "placeholder-heater-photos-link-code"
+    },
+    "change": {
+      "kind": "photos",
+      "answers": [
+        {
+          "kind": "photo",
+          "question": null,
+          "words": null,
+          "uploadId": "upload-alex-heater-photo-1",
+          "authority": null
+        },
+        {
+          "kind": "note",
+          "question": null,
+          "words": "It's a 40-gallon gas heater in the basement",
+          "uploadId": null,
+          "authority": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-heater-photos-1",
+    "stepId": "B4-08",
+    "questionId": null,
+    "words": "Send these to Lee Home Services to price your water heater replacement: 1 photo, and your note: It's a 40-gallon gas heater in the basement",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-03T00:22:35Z"
+  }
+}

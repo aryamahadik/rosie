@@ -1,0 +1,21 @@
+{
+  "call": "bookingPick",
+  "given": {
+    "now": "2026-10-21T23:16:40Z",
+    "environment": "staging",
+    "after": ["booking-times-card.json"],
+    "note": "Refused: booking-pick-time.json's request answered with K-09 v1.2's savedTimeCap as it is, its endsAt naming when two saved times end, as if the mobile typed on the reach card already held two. On a page that mobile is typed and unproven, so when its own saved times end is something on file for it, which is never told: on a page savedTimeCap answers cantTakeIt, with no reason and no end time (S13-45: 'Until a code typed back proves the phone, nothing on file for it is used or hinted at'; README default 57; the security reviewer's GAP 1 on 57c4ab2). The two end times are examples. With the error cantTakeIt alone in its place the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0023",
+      "traceId": "trace-page-lees-0023",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "cardId": "card-page-lees-0001",
+    "pick": { "optionId": "opt-page-lees-sat-1100" }
+  },
+  "outcome": { "error": "savedTimeCap", "endsAt": ["2026-10-21T23:19:05Z", "2026-10-21T23:24:30Z"] }
+}

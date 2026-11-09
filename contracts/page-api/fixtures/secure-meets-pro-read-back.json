@@ -1,0 +1,27 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-02T14:07:15Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-street-confirm.json"],
+    "note": "B4-26 on Alex's secure page: who meets the pro? He taps 'Someone else' and types 'My mother' (B4-27's what-if: a parent's home). The page entry swaps the name first (nothing to swap) and reads it for safety (No: README default 50). Nothing is written. The read-back says what the yes does: that adult gets their own link for Alex to forward, and Rosie never texts them (B4-27). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0010",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "change": { "kind": "meetsPro", "who": "someone_else", "otherName": "My mother" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-drain2-meets-pro-1",
+    "stepId": "B4-26",
+    "questionId": null,
+    "words": "Who meets Jordan? Someone else: My mother. You get a link to forward to them; Rosie never texts them.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-02T14:17:15Z"
+  }
+}

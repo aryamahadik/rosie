@@ -1,0 +1,34 @@
+{
+  "call": "bookingReadBack",
+  "given": {
+    "now": "2026-10-21T23:16:05Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json"
+    ],
+    "note": "Screen 3 (FS section 7: 'A mobile (required, D103) and an email if they have one; the way'; A4-82: 'How should Lee's Barbershop reach you about this visit, and at what number or email? Reply 1 Text me, 2 Calls only, 3 Texts, never calls, 4 Email'): calls only is not offered (Q-07), and no line check runs on the page (README default 54). Alex picks Text me and types his mobile, with no email. Nothing is written; nothing on file for the number is looked up for the answer, so it reads the same whether or not Rosie knows it (S13-45; README default 57). The mobile is an example in the 555-01xx range; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0017",
+      "traceId": "trace-page-lees-0017",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "change": { "kind": "reach", "way": "texts", "mobile": "+15555550148", "email": null }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-lees-reach-1",
+    "stepId": "A4-82",
+    "questionId": null,
+    "words": "How should Lee's Barbershop reach you about this visit? Text me at (555) 555-0148",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:26:05Z"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "call": "bookingTimes",
+  "given": {
+    "now": "2026-10-21T23:16:30Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json",
+      "booking-name-confirm.json",
+      "booking-price-list.json",
+      "db-schema/availability/fixtures/seed-hours.json"
+    ],
+    "note": "Screen 7 (FS section 7: 'Time with the person, price, how it is paid, what is taken now, and the cancel line, all before the yes'; A4-66 then A4-14): Alex asked for Saturday, so the filter starts on Sat Oct 24. The page entry calls K-09 v1.2 showTimes alone (caller.kind page, personId null) with the service and the shop way it keeps, as tool-api/fixtures/j4-show-times-agent.json does: five set starts with Riley, 10am to noon in New York, each at the exact $35. It adds the words K-09 v1.2 open gap 82 leaves to K-21 (README default 55): Riley by K-04 resources.name, the price's words, what is taken now and how the rest is paid from the way's path list|card|counter, and each time's cancel line from K-23's 24-hour flow default with the $20 fee. showTimes sets the times kind once (setstart, from the plug-in) on no one's word. The card is the pick's read-back, kept under cardId for 10 minutes (README default 48). The card's id and the option ids are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0022",
+      "traceId": "trace-page-lees-0022",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "quoteOptionId": null,
+    "filter": { "person": null, "fromDay": "2026-10-24", "needBy": null }
+  },
+  "outcome": {
+    "result": "card",
+    "cardId": "card-page-lees-0001",
+    "timesKind": "setstart",
+    "times": [
+      {
+        "optionId": "opt-page-lees-sat-1000",
+        "with": "Riley",
+        "during": { "start": "2026-10-24T14:00:00Z", "end": "2026-10-24T14:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "seatsLeft": null,
+        "freeCancelUntil": "2026-10-23T14:00:00Z",
+        "cancelWords": "Free cancel until Fri Oct 23, 10:00am; after that the $20 fee"
+      },
+      {
+        "optionId": "opt-page-lees-sat-1030",
+        "with": "Riley",
+        "during": { "start": "2026-10-24T14:30:00Z", "end": "2026-10-24T15:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "seatsLeft": null,
+        "freeCancelUntil": "2026-10-23T14:30:00Z",
+        "cancelWords": "Free cancel until Fri Oct 23, 10:30am; after that the $20 fee"
+      },
+      {
+        "optionId": "opt-page-lees-sat-1100",
+        "with": "Riley",
+        "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "seatsLeft": null,
+        "freeCancelUntil": "2026-10-23T15:00:00Z",
+        "cancelWords": "Free cancel until Fri Oct 23, 11:00am; after that the $20 fee"
+      },
+      {
+        "optionId": "opt-page-lees-sat-1130",
+        "with": "Riley",
+        "during": { "start": "2026-10-24T15:30:00Z", "end": "2026-10-24T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "seatsLeft": null,
+        "freeCancelUntil": "2026-10-23T15:30:00Z",
+        "cancelWords": "Free cancel until Fri Oct 23, 11:30am; after that the $20 fee"
+      },
+      {
+        "optionId": "opt-page-lees-sat-1200",
+        "with": "Riley",
+        "during": { "start": "2026-10-24T16:00:00Z", "end": "2026-10-24T16:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "seatsLeft": null,
+        "freeCancelUntil": "2026-10-23T16:00:00Z",
+        "cancelWords": "Free cancel until Fri Oct 23, 12:00pm; after that the $20 fee"
+      }
+    ],
+    "nobodyFree": false,
+    "sentNowOffered": false,
+    "takenNow": "A card is saved for the $20 fee; nothing is charged now",
+    "howPaid": "Paid at the counter after the visit",
+    "filter": { "with": null, "fromDay": "2026-10-24", "needBy": null },
+    "expiresAt": "2026-10-21T23:26:30Z"
+  }
+}

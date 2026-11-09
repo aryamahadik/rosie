@@ -1,0 +1,52 @@
+{
+  "call": "secureRead",
+  "given": {
+    "now": "2026-11-03T15:04:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A4-64, flow B's B4-74: Alex books a kitchen drain clearing with Lee Home Services at his father's home, for his father, whom he acts for under legal papers (who is who 'An adult the booker acts for': B4-32's branch; the plumber's plug-in: 'A person the owner of the home names may book for them'). His request was walked as K-09's flow B fixtures walk his own drain's (j4-check-place-area-turn.json, j4-save-time-turn.json, j4-secure-link-turn.json: the town checked, Fri Nov 6 arriving 8 to 10am with Jordan saved, the secure link texted to his own mobile), here with placeholders. He opens the link: the page entry finds the K-30 secure_links row by its code's sha256, purpose secure_page, Alex's own, and acts for him (README default 49). It shows the request back and what the page asks: B4-34's access, entry code and note, the plug-in's question word for word (README default 53), and A4-64's authority ask, needed, its choice named in full (all three, in README default 52's order) with what it covers and the paper that shows it (paper true: A4-80 line 2127, 'The paper comes on the page'; README default 65). Nothing else on file for Alex or his father shows; the code is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain3-0001",
+      "traceId": "trace-page-alex-drain3-0001",
+      "linkCode": "placeholder-drain3-secure-link-code"
+    }
+  },
+  "outcome": {
+    "result": "securePage",
+    "for": "booker",
+    "request": {
+      "businessName": "Lee Home Services",
+      "service": "Kitchen drain clearing",
+      "place": "customer",
+      "timeSaved": {
+        "with": "Jordan",
+        "during": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T16:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T15:00:00Z" },
+        "heldUntil": "2026-11-03T15:13:10Z",
+        "extendable": true
+      },
+      "price": { "words": "$179", "amount": { "cents": 17900, "currency": "USD" } },
+      "takenNow": "A card is saved for the $89 fee; nothing is charged now",
+      "cancelWords": "Free cancel until Fri Nov 6, 7:00am; after that the $89 fee",
+      "approval": "now"
+    },
+    "asks": [
+      { "kind": "access", "question": null, "needed": true, "authority": null },
+      { "kind": "entry_code", "question": null, "needed": false, "authority": null },
+      { "kind": "question", "question": "Is the sink still full of water?", "needed": false, "authority": null },
+      { "kind": "note", "question": null, "needed": false, "authority": null },
+      {
+        "kind": "authority",
+        "question": null,
+        "needed": true,
+        "authority": { "choices": ["guardian", "healthCareAgent", "moneyPowerOfAttorney"], "paper": true }
+      }
+    ],
+    "address": [1],
+    "meetsPro": true,
+    "meetsProYes": false
+  }
+}

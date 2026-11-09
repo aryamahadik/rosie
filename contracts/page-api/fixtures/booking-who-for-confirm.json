@@ -1,0 +1,30 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T23:15:58Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-read-back.json"
+    ],
+    "note": "Alex's yes to A4-80's read-back: the page entry calls K-09 v1.2 setWhoFor alone (caller.kind page, personId null), A4-80's answer self, 18_or_older, on the head's version kept with the read-back, as tool-api/fixtures/j4-who-for-agent.json does for his AI: goOn, gives who_for; the head's person served and payer become its booker, and with no K-28 row yet the band is kept with requestRef (K-09 v1.2 README default 57). The answer names no person and no band (README default 48)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0016",
+      "traceId": "trace-page-lees-0016",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "readBackId": "rb-page-lees-who-for-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-lees-who-for-1",
+    "yesEventId": "pageyes-lees-who-for-1",
+    "served": { "change": "whoFor", "outcome": "goOn", "private": false, "parentLink": null, "requestEnded": false }
+  }
+}

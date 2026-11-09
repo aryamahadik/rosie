@@ -1,0 +1,38 @@
+{
+  "call": "quoteReadBack",
+  "given": {
+    "now": "2026-11-03T00:45:00Z",
+    "environment": "staging",
+    "after": ["quotes-to-ok.json"],
+    "note": "B4-10's '2 Change it' on Needs you, a what-if beside quote-owner-send-read-back.json: Sam types $600 for Alex's water heater. Nothing is written and nothing is stored: the read-back is B4-11's own, in K-09 v1.2 README default 80's fixed wording ('Send <customer> <new> for <service>, not <old>?'), its words the ones Sam's yes binds to, with the new price kept with the read-back on the quote's and the ask's versions (README default 59; K-09 v1.2 open gap 82: the read-back's words on Needs you are K-21's). Another price would be another read-back. The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0004",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "change": {
+      "kind": "ownerAnswer",
+      "quoteId": "quote-alex-heater",
+      "ownerOkId": "ok-alex-heater",
+      "version": 2,
+      "answer": "change",
+      "newOptions": [{ "label": null, "price": { "cents": 60000, "currency": "USD" }, "upTo": null }]
+    }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-portal-sam-heater-change-1",
+    "stepId": "B4-11",
+    "questionId": null,
+    "words": "Send Alex M. $600 for the water heater replacement, not $640?",
+    "shown": [
+      { "table": "quotes", "rowId": "quote-alex-heater", "version": 2 },
+      { "table": "owner_oks", "rowId": "ok-alex-heater", "version": 1 }
+    ],
+    "signature": "none",
+    "expiresAt": "2026-11-03T00:55:00Z"
+  }
+}
