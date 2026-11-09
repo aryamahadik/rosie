@@ -23,7 +23,7 @@
 // words op and in the steps an op adds, is the one stop-marks.ts placeStops() gives it from the trade's own walks
 // (T-1116; Q-30), not the marker the trade file wrote.
 import type { FlowLetter, MasterGraphs, RecordSlotRow } from "../graph/types.ts";
-import type { LoadedTrade, TradeOp, TradeSettings } from "../load/trade";
+import type { LoadedTrade, TradeId, TradeOp, TradeSettings } from "../load/trade";
 import { applyTrade, type AppliedTrade } from "../overlay/apply";
 import { tradeSwitches } from "../path";
 import { compileTradeBranches } from "../branches";
@@ -180,6 +180,31 @@ function stepsOf(ids: readonly string[], compiled: Map<string, BundleStep>, wher
 }
 
 /**
+ * Who holds one list of a step the trade's ops add, as apply() lays its words ops over it (overlay-core.js apply: a words
+ * op's `say` replaces the step's, and each variant it writes is merged field by field): the last words op at that step
+ * that writes the list, else the step itself. The overlay compiles the step with those ops already laid over it.
+ */
+export function ownListHolder(
+  trade: TradeId,
+  ops: readonly TradeOp[],
+  step: string,
+  kind: MessageList,
+  vary: string | null,
+): string {
+  let holder = ownStepHolder(trade, step);
+  ops.forEach((op, n) => {
+    if (op.op !== "words" || op.at !== step) return;
+    const patch = vary === null ? undefined : op.vary?.[vary];
+    const writes =
+      kind === "say"
+        ? op.say !== undefined
+        : (kind === "vary.say" ? patch?.say : patch?.addSay) !== undefined;
+    if (writes) holder = wordsOpHolder(trade, n);
+  });
+  return holder;
+}
+
+/**
  * One flow of the trade: its applied, slotted flow, and the K-01 tradeFlow. `stops` is placeStops() of the flow over
  * the bundle's trades: the messages of the trade's words ops and of the steps its ops add are marked as it gives them.
  */
@@ -203,7 +228,7 @@ function compileTradeFlow(
     flow: {
       ...slottedFlow,
       steps: markSteps(stops, slottedFlow.steps, (step) =>
-        added.has(step.id) ? ownStepHolder(trade.id, step.id) : null,
+        added.has(step.id) ? (kind, vary) => ownListHolder(trade.id, ops, step.id, kind, vary) : null,
       ),
     },
   };

@@ -306,11 +306,21 @@ export function placeMarks(
   return list.map((raw, index) => withStop(raw, markOf(stops, holder, kind, vary, index)));
 }
 
-/** The step (not its branch steps) with every message of its `say` and its variants' marked as the walks give them. */
-export function markStep<S extends AppliedStep | Obj>(stops: StopMarks, step: S, holder: string): S {
+/** Who holds one list of a step's messages in the bundle (a holder), or null to leave the list as it is. */
+export type ListHolder = (kind: MessageList, vary: string | null) => string | null;
+
+/**
+ * The step (not its branch steps) with every message of its `say` and its variants' marked as the walks give them, each
+ * list as its holder holds it.
+ */
+export function markStep<S extends AppliedStep | Obj>(stops: StopMarks, step: S, holder: ListHolder): S {
   const raw = step as Obj;
   const out: Obj = { ...raw };
-  if (Array.isArray(raw.say)) out.say = placeMarks(stops, raw.say as unknown[], holder, "say", null);
+  const mark = (list: unknown, kind: MessageList, vary: string | null): unknown => {
+    const at = Array.isArray(list) ? holder(kind, vary) : null;
+    return at === null ? list : placeMarks(stops, list as unknown[], at, kind, vary);
+  };
+  if (Array.isArray(raw.say)) out.say = mark(raw.say, "say", null);
   if (isObj(raw.vary)) {
     const vary: Obj = {};
     for (const [key, patch] of Object.entries(raw.vary)) {
@@ -319,10 +329,8 @@ export function markStep<S extends AppliedStep | Obj>(stops: StopMarks, step: S,
         continue;
       }
       const copy: Obj = { ...patch };
-      if (Array.isArray(patch.say))
-        copy.say = placeMarks(stops, patch.say as unknown[], holder, "vary.say", key);
-      if (Array.isArray(patch.addSay))
-        copy.addSay = placeMarks(stops, patch.addSay as unknown[], holder, "vary.addSay", key);
+      if (Array.isArray(patch.say)) copy.say = mark(patch.say, "vary.say", key);
+      if (Array.isArray(patch.addSay)) copy.addSay = mark(patch.addSay, "vary.addSay", key);
       vary[key] = copy;
     }
     out.vary = vary;
@@ -330,15 +338,15 @@ export function markStep<S extends AppliedStep | Obj>(stops: StopMarks, step: S,
   return out as S;
 }
 
-/** The steps (branch steps too) with each step's messages marked, the step held as `holder(id)` says, or as it is. */
+/** The steps (branch steps too) with each step's messages marked, each list as `holder(step)` says, or as it is. */
 export function markSteps(
   stops: StopMarks,
   steps: readonly AppliedStep[],
-  holder: (step: AppliedStep) => string | null,
+  holder: (step: AppliedStep) => ListHolder | null,
 ): AppliedStep[] {
   return steps.map((step) => {
-    const at = holder(step);
-    const out = at === null ? { ...step } : markStep(stops, step, at);
+    const lists = holder(step);
+    const out = lists === null ? { ...step } : markStep(stops, step, lists);
     if (step.branches !== undefined)
       out.branches = step.branches.map((branch) => ({
         ...branch,

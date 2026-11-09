@@ -1,8 +1,19 @@
 // T-1116: how stop-marks.ts writes the markers the walks give (the walks themselves, and barber's bundle, are proved in
 // emit.test.ts): a message gets exactly the marker it is given, a marker it is not given goes, and a list the walks did
-// not trace as it is stops the build.
+// not trace as it is stops the build. And who holds each list of a step a trade adds, once its words ops are laid over
+// it (auto-body's words ops rewrite variants of its own steps A8-x01 to A8-x09).
 import { describe, expect, it } from "vitest";
-import { masterHolder, messageKey, placeMarks, withStop, type StopMarks } from "./stop-marks";
+import { loadTrade, type TradeOp } from "../load/trade";
+import {
+  masterHolder,
+  messageKey,
+  ownStepHolder,
+  placeMarks,
+  withStop,
+  wordsOpHolder,
+  type StopMarks,
+} from "./stop-marks";
+import { ownListHolder } from "./trade";
 
 const STOPS: StopMarks = {
   flow: "A",
@@ -79,5 +90,39 @@ describe("placeMarks: a list marked as the walks give it", () => {
     expect(() => placeMarks(STOPS, [["san", "cust", "Hi"]], masterHolder("S9-01"), "say", null)).toThrow(
       /1 messages, but the walks traced 3/,
     );
+  });
+});
+
+describe("ownListHolder: who holds a list of a step the trade adds, its words ops laid over it", () => {
+  const ops = [
+    { op: "after", at: "A8-24", steps: [{ id: "A8-x01" }] },
+    { op: "words", at: "A8-x01", vary: { "price:list": { does: "Skipped" } } },
+    { op: "words", at: "A8-x01", say: [], vary: { "price:list": { say: [] } } },
+    { op: "words", at: "A8-x01", vary: { "price:list": { addSay: [] } } },
+    { op: "words", at: "A8-x02", say: [] },
+  ] as unknown as TradeOp[];
+
+  it("is the last words op at the step that writes the list, else the step itself", () => {
+    const holder = (kind: "say" | "vary.say" | "vary.addSay", vary: string | null) =>
+      ownListHolder("t", ops, "A8-x01", kind, vary);
+    expect(holder("say", null)).toBe(wordsOpHolder("t", 2));
+    expect(holder("vary.say", "price:list")).toBe(wordsOpHolder("t", 2));
+    expect(holder("vary.addSay", "price:list")).toBe(wordsOpHolder("t", 3));
+    expect(holder("vary.say", "pf:other")).toBe(ownStepHolder("t", "A8-x01"));
+    expect(ownListHolder("t", ops.slice(0, 2), "A8-x01", "say", null)).toBe(ownStepHolder("t", "A8-x01"));
+  });
+
+  it("finds auto-body's words ops on its own step A8-x01's variant", () => {
+    const own = loadTrade("auto-body").flows.A.ops;
+    const at = own.findIndex(
+      (op) =>
+        op.op === "words" &&
+        op.at === "A8-x01" &&
+        op.vary?.["price:list+before:none+after:counter"] !== undefined,
+    );
+    expect(at).toBeGreaterThanOrEqual(0);
+    expect(
+      ownListHolder("auto-body", own, "A8-x01", "vary.say", "price:list+before:none+after:counter"),
+    ).toBe(wordsOpHolder("auto-body", at));
   });
 });

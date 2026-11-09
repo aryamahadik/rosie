@@ -127,7 +127,7 @@ export function compileFlow(
     ...corrected,
     flow: {
       ...corrected.flow,
-      steps: markSteps(stops, corrected.flow.steps, (step) => masterHolder(step.id)),
+      steps: markSteps(stops, corrected.flow.steps, (step) => () => masterHolder(step.id)),
     },
   };
   const compiled = compileSteps(applied);

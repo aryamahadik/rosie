@@ -700,5 +700,7 @@ describe("barber's bundle: Rosie's first reply to staff (S2-06) and to the emerg
       expect(compared, `${flow}: messages compared`).toBeGreaterThan(500);
       expect(lines, `${flow}: messages with the line`).toBeGreaterThan(10);
     }
-  });
+    // About 10 s on the build Mac (every path of barber walked in both flows): its own limit is a resource guard, as the
+    // hooks' are, not part of the claim.
+  }, 120_000);
 });
