@@ -1,12 +1,13 @@
 // T-1073: the unit project's per-test and per-hook time limits are 30 s, sized for the build Mac under parallel load
 // (Vitest's default is 5 s). T-1114: the parity project has the same limits (DL-200: routing parity tests timed out
-// at 5 s beside builders). No project lowers a limit below that default. T-1113: the integration project runs its
-// files one after another (fileParallelism: false; DL-106, DL-196), so files that share one PostgreSQL never pass its
-// 100 connections; the root and the other projects leave file parallelism on. T-1117: every run uses at most
-// VITEST_MAX_WORKERS workers when it is a positive whole number, and 3 otherwise, set once in the root options so
-// every project shares it (DL-215: a resource guard on the build Mac). No TypeScript parser: this reads the few lines
-// it needs as text, like parity-placement.test.mjs; only the cap, a value, is read by loading the config in a child
-// Node that strips its types.
+// at 5 s beside builders). T-1118: so does the integration project (DL-227: a test that made two test databases on
+// the build Mac's emulated PostgreSQL timed out at 5 s). No project lowers a limit below that default. T-1113: the
+// integration project runs its files one after another (fileParallelism: false; DL-106, DL-196), so files that share
+// one PostgreSQL never pass its 100 connections; the root and the other projects leave file parallelism on. T-1117:
+// every run uses at most VITEST_MAX_WORKERS workers when it is a positive whole number, and 3 otherwise, set once in
+// the root options so every project shares it (DL-215: a resource guard on the build Mac). No TypeScript parser: this
+// reads the few lines it needs as text, like parity-placement.test.mjs; only the cap, a value, is read by loading the
+// config in a child Node that strips its types.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -44,6 +45,12 @@ test("the parity project's testTimeout and hookTimeout are 30000", () => {
   const parity = project("parity");
   assert.equal(limit(parity, "testTimeout"), 30000);
   assert.equal(limit(parity, "hookTimeout"), 30000);
+});
+
+test("the integration project's testTimeout and hookTimeout are 30000", () => {
+  const integration = project("integration");
+  assert.equal(limit(integration, "testTimeout"), 30000);
+  assert.equal(limit(integration, "hookTimeout"), 30000);
 });
 
 test("no project lowers a time limit below Vitest's default", () => {
