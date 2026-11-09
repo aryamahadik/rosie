@@ -262,12 +262,15 @@ const K35_DOCUMENT_UPDATES = [
   "withdrawn_by_person_id",
   "version",
 ];
-// K-30 v1's two named exceptions (T-720; DL-271). Its README's rule 5 adds an exists clause to the Tool API's insert and
-// update policies on every table with booking_id, beyond T-191's pattern, and its rule 6 gives both application roles
-// UPDATE column grants on two tables; bookings-changes.int.test.ts checks each against the README word for word. Rule
-// 6's trigger function, booking_details_set_once(), runs as the calling role, not as definer, so the function checks
-// stand. Every other table and function stays held to this file's generic checks.
-/** K-30's tables migration 0028 makes (part 1, T-720); part 2 (T-721) makes the other eight. */
+// K-30 v1's named exceptions (T-720, DL-271: (1) and (2) on part 1's tables; T-721, DL-278: (1) and (2) extended to
+// part 2's tables, and (3)). Its README's rule 5 adds an exists clause to the Tool API's insert and update policies on
+// every table with booking_id, beyond T-191's pattern, and its rule 6 gives both application roles UPDATE column grants
+// on four tables and keeps secure_links.code_sha256 out of the Tool API's SELECT; bookings-changes.int.test.ts and
+// bookings-changes-2.int.test.ts check each against the README word for word. Rule 6's trigger function,
+// booking_details_set_once(), runs as the calling role, not as definer, and part 2 makes no function, so the function
+// checks stand. quote_options, K-30's one table with no booking_id, keeps T-191's pattern. Every other table and
+// function stays held to this file's generic checks.
+/** K-30's tables migration 0028 makes (part 1, T-720). */
 const K30_PART_1 = [
   "booking_details",
   "booking_lines",
@@ -275,12 +278,35 @@ const K30_PART_1 = [
   "booking_terms_rules",
   "booking_visits",
 ];
+/** K-30's tables migration 0029 makes (part 2, T-721). */
+const K30_PART_2 = [
+  "booking_addresses",
+  "booking_changes",
+  "owner_oks",
+  "page_answers",
+  "quote_options",
+  "quotes",
+  "secure_links",
+  "waitlist_entries",
+];
 /**
- * (1) The policies on K-30's tables with booking_id, by table, in name order. K-30 rule 5: 0012's <table>_runtime
- * beside one Tool API policy per command its grants allow; its insert and update policies carry rule 5's clause
- * `exists (select 1 from bookings b where b.id = <table>.booking_id and b.business_id = <table>.business_id)`.
+ * (1) The policies on K-30's tables with booking_id, by table, in name order (K-30 rule 5; DL-271, DL-278): 0012's
+ * <table>_runtime beside one Tool API policy per command its grants allow; its insert and update policies carry rule
+ * 5's clause `exists (select 1 from bookings b where b.id = <table>.booking_id and b.business_id = <table>.business_id)`.
+ * booking_changes and page_answers are insert only (rule 6), so they hold no update policy.
  */
 const K30_POLICIES: Record<string, readonly string[]> = {
+  booking_addresses: [
+    "booking_addresses_runtime",
+    "booking_addresses_tool_api_insert",
+    "booking_addresses_tool_api_select",
+    "booking_addresses_tool_api_update",
+  ],
+  booking_changes: [
+    "booking_changes_runtime",
+    "booking_changes_tool_api_insert",
+    "booking_changes_tool_api_select",
+  ],
   booking_details: [
     "booking_details_runtime",
     "booking_details_tool_api_insert",
@@ -305,16 +331,58 @@ const K30_POLICIES: Record<string, readonly string[]> = {
     "booking_visits_tool_api_select",
     "booking_visits_tool_api_update",
   ],
+  owner_oks: [
+    "owner_oks_runtime",
+    "owner_oks_tool_api_insert",
+    "owner_oks_tool_api_select",
+    "owner_oks_tool_api_update",
+  ],
+  page_answers: ["page_answers_runtime", "page_answers_tool_api_insert", "page_answers_tool_api_select"],
+  quotes: ["quotes_runtime", "quotes_tool_api_insert", "quotes_tool_api_select", "quotes_tool_api_update"],
+  secure_links: [
+    "secure_links_runtime",
+    "secure_links_tool_api_insert",
+    "secure_links_tool_api_select",
+    "secure_links_tool_api_update",
+  ],
+  waitlist_entries: [
+    "waitlist_entries_runtime",
+    "waitlist_entries_tool_api_insert",
+    "waitlist_entries_tool_api_select",
+    "waitlist_entries_tool_api_update",
+  ],
 };
 /**
- * (2) Both roles' 8 UPDATE column grants on K-30's booking_lines and booking_visits, in chat_links' both-roles form.
- * K-30 rule 6: a line's state, removed_at, removed_by_change_id and version only (the copied price is never changed),
- * and a visit's reservation_id, arrival_window, cutoff_at and version only (its check-in code never changes).
+ * (2) Both roles' 14 UPDATE column grants on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, in
+ * chat_links' both-roles form. K-30 rule 6 (DL-271, DL-278): a line's state, removed_at, removed_by_change_id and
+ * version only (the copied price is never changed), a visit's reservation_id, arrival_window, cutoff_at and version only
+ * (its check-in code never changes), and a link's and a waitlist entry's ended_at, ended_why and version only (only the
+ * end moves: a link's code hash, person and contact, and who waits for what and since when, never change).
  */
 const K30_COLUMN_UPDATES: Record<string, readonly string[]> = {
   booking_lines: ["state", "removed_at", "removed_by_change_id", "version"],
   booking_visits: ["reservation_id", "arrival_window", "cutoff_at", "version"],
+  secure_links: ["ended_at", "ended_why", "version"],
+  waitlist_entries: ["ended_at", "ended_why", "version"],
 };
+/**
+ * (3) rosie_app's 11 SELECT column grants on K-30's secure_links: every column but code_sha256, checked by name. K-30
+ * rule 6 (DL-278): the code's hash is outside the Tool API's SELECT (a whole-row read is refused, refuse-link-code-read,
+ * 42501); the runtime side reads the whole row by its table grant, to find a link by its code's hash.
+ */
+const K30_LINK_SELECTS = [
+  "id",
+  "booking_id",
+  "business_id",
+  "purpose",
+  "person_id",
+  "handle_id",
+  "given_via",
+  "issued_at",
+  "ended_at",
+  "ended_why",
+  "version",
+];
 const SLOW = { timeout: 60_000 };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -354,7 +422,7 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
  * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), K-35 v1
  * documents and licenses (T-210), K-28 v1 customers (T-211), and K-30 v1 bookings and changes, part 1 (T-720: the five
- * tables of K30_PART_1; part 2's eight join with T-721).
+ * tables of K30_PART_1) and part 2 (T-721: the eight of K30_PART_2).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -497,7 +565,7 @@ const ALL_TABLES = [
         "utf8",
       ),
     ) as { tables: ContractTable[] }
-  ).tables.filter((table) => K30_PART_1.includes(table.name)),
+  ).tables.filter((table) => [...K30_PART_1, ...K30_PART_2].includes(table.name)),
 ];
 /** The business-scoped tables, each with the column its policies key on and whether that column may be null. */
 const scopedOf = (tables: readonly ContractTable[]): { name: string; column: string; nullable: boolean }[] =>
@@ -748,10 +816,11 @@ describe("the migration: row-level security on every business-scoped core table 
         table,
       ).toEqual(names);
     }
-    // (1) K-30's named exception (K-30 rule 5; DL-271): each of its tables with booking_id holds 0012's runtime policy
-    // beside one Tool API policy per command, by name here, and the Tool API's insert and update policies carry rule
-    // 5's clause on the new row, so a call can never attach a row to another business's booking; no other of its
-    // policies does. bookings-changes.int.test.ts checks each word for word against the README.
+    // (1) K-30's named exception (K-30 rule 5; DL-271, DL-278): each of its tables with booking_id holds 0012's runtime
+    // policy beside one Tool API policy per command, by name here, and the Tool API's insert and update policies carry
+    // rule 5's clause on the new row, so a call can never attach a row to another business's booking; no other of its
+    // policies does. bookings-changes.int.test.ts and bookings-changes-2.int.test.ts check each word for word against
+    // the README. quote_options, with no booking_id, stays under the generic check below.
     for (const [table, names] of Object.entries(K30_POLICIES)) {
       const own = policies.filter((policy) => policy.table === table);
       expect(
@@ -880,7 +949,8 @@ describe("the two roles", () => {
           // (b) K-27's named exception (K-27 rule 5; DL-247): its three excepted tables hold their own 11 policies,
           // where the generic count gave only the shares 0012's two: 9 more (118 to 127 with K-27).
           // (1) K-30's named exception (K-30 rule 5; DL-271): its five tables of part 1 hold their own 18 policies,
-          // where the generic count gave 0012's two each: 8 more.
+          // where the generic count gave 0012's two each: 8 more. Part 2 (DL-278): its seven tables with booking_id
+          // hold their own 26, where the generic count gave 14: 12 more; quote_options holds 0012's two.
           policies: POLICY_TABLES.reduce(
             (sum, name) =>
               sum +
@@ -1187,10 +1257,17 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       if (table.name === "documents") {
         return ["INSERT", "SELECT"];
       }
-      // K-30 v1 README rule 6: both roles select and insert booking_lines and booking_visits, and their UPDATE of rule
-      // 6's named columns is a column grant (the column-grant check); booking_details (versioned) takes the generic
-      // UPDATE, its written-once values held by its trigger, and the snapshot's two tables (written once, not
-      // versioned) the generic select and insert. No role deletes any of the five.
+      // K-30 v1 README rule 6 (DL-278): the Tool API's read of secure_links is a column grant (every column but
+      // code_sha256, exception (3)), so on the whole table it holds INSERT alone; the runtime side reads the whole row.
+      if (role === TOOL_API && table.name === "secure_links") {
+        return ["INSERT"];
+      }
+      // K-30 v1 README rule 6: both roles select and insert booking_lines, booking_visits, secure_links (the Tool API's
+      // select apart, above) and waitlist_entries, and their UPDATE of rule 6's named columns is a column grant (the
+      // column-grant check); booking_details, quotes, quote_options, owner_oks and booking_addresses (versioned) take
+      // the generic UPDATE, booking_details' written-once values held by its trigger; the snapshot's two tables,
+      // booking_changes and page_answers (written once, not versioned) the generic select and insert. No role deletes
+      // any of the thirteen.
       if (Object.keys(K30_COLUMN_UPDATES).includes(table.name)) {
         return ["INSERT", "SELECT"];
       }
@@ -1232,7 +1309,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines and booking_visits (K-30 rule 6)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, with rosie_app's read of every secure_links column but its code hash (K-30 rule 6)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -1319,11 +1396,13 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(documentUpdatable).toEqual(
       ROLES.flatMap((role) => K35_DOCUMENT_UPDATES.map((column) => ({ role, column }))),
     );
-    // (2) K-30's named exception (K-30 rule 6; DL-271), in chat_links' both-roles form: both roles' UPDATE of
-    // booking_lines' state, removed_at, removed_by_change_id and version and of booking_visits' reservation_id,
-    // arrival_window, cutoff_at and version only, every grantee's on those two tables held to exactly them, so a column
-    // grant of a copied price or of a visit's check-in code to any role fails here; K-30's other three tables of part 1
-    // stay under the generic check below, so they hold no column grant; bookings-changes.int.test.ts checks them too.
+    // (2) K-30's named exception (K-30 rule 6; DL-271, DL-278), in chat_links' both-roles form: both roles' UPDATE of
+    // booking_lines' state, removed_at, removed_by_change_id and version, of booking_visits' reservation_id,
+    // arrival_window, cutoff_at and version, and of secure_links' and waitlist_entries' ended_at, ended_why and version
+    // only, every grantee's on those four tables held to exactly them (with (3) below), so a column grant of a copied
+    // price, a visit's check-in code, a link's code hash or what orders the waitlist to any role fails here; K-30's
+    // other nine tables stay under the generic check below, so they hold no column grant;
+    // bookings-changes.int.test.ts and bookings-changes-2.int.test.ts check them too.
     const k30Tables = Object.keys(K30_COLUMN_UPDATES);
     expect(
       columnGrants
@@ -1331,14 +1410,46 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         .map(key)
         .sort(),
     ).toEqual(
-      Object.entries(K30_COLUMN_UPDATES)
-        .flatMap(([table, columns]) =>
+      [
+        ...Object.entries(K30_COLUMN_UPDATES).flatMap(([table, columns]) =>
           columns.flatMap((column) =>
             [...ROLES].map((grantee) => key({ table, column, grantee, privilege: "UPDATE" })),
           ),
-        )
-        .sort(),
+        ),
+        // (3) K-30's named exception (K-30 rule 6; DL-278): rosie_app's SELECT of every secure_links column but
+        // code_sha256, by name, the only SELECT column grants on K-30's tables.
+        ...K30_LINK_SELECTS.map((column) =>
+          key({ table: "secure_links", column, grantee: TOOL_API, privilege: "SELECT" }),
+        ),
+      ].sort(),
     );
+    // (3) has_column_privilege agrees, by name: the Tool API reads every secure_links column but code_sha256, and the
+    // runtime side every column, the hash included.
+    const linkReadable = await db.sql<{ role: string; column: string }[]>`
+      select r.role, a.attname as column
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_attribute a
+      where a.attrelid = ${`${db.schema}.secure_links`}::regclass and a.attnum > 0 and not a.attisdropped
+        and has_column_privilege(r.role, a.attrelid, a.attnum, 'SELECT')
+      order by 1, a.attnum
+    `;
+    expect(linkReadable.filter((row) => row.role === TOOL_API).map((row) => row.column)).toEqual(
+      K30_LINK_SELECTS,
+    );
+    expect(linkReadable.filter((row) => row.role === RUNTIME).map((row) => row.column)).toEqual([
+      "id",
+      "booking_id",
+      "business_id",
+      "purpose",
+      "person_id",
+      "handle_id",
+      "given_via",
+      "code_sha256",
+      "issued_at",
+      "ended_at",
+      "ended_why",
+      "version",
+    ]);
     // has_column_privilege agrees for both, column by column, in each table's column order.
     for (const [table, columns] of Object.entries(K30_COLUMN_UPDATES)) {
       const k30Updatable = await db.sql<{ role: string; column: string }[]>`

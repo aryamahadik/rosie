@@ -80,14 +80,19 @@ const REFUSED_PART_2 = [
   "invalid/refuse-link-code-read.json",
   "invalid/refuse-owner-ok-without-who.json",
 ];
-/** The other parts' tables the five refer to by their keys (README rule 1), in code-unit order. */
+/**
+ * The other tables the five refer to by their keys (README rule 1), in code-unit order: other parts', and part 2's
+ * booking_changes and quote_options, which booking_lines' two keys name (migration 0029, T-721; DL-225, DL-278).
+ */
 const REFERRED = [
+  "booking_changes",
   "bookings",
   "businesses",
   "consents",
   "persons",
   "price_ok_limits",
   "price_rules",
+  "quote_options",
   "reservations",
   "rules",
   "service_money",
@@ -620,7 +625,7 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
     time: "time without time zone",
   };
 
-  it("the table list names 13 tables, each scoped by business on business_id with no effective dates; part 1 makes the card's five, and part 2's eight are not in the schema yet (T-721)", async () => {
+  it("the table list names 13 tables, each scoped by business on business_id with no effective dates; part 1 makes the card's five, and part 2's eight are migration 0029's (T-721)", async () => {
     expect(TABLES.map((table) => table.name).sort()).toEqual([...OWN_TABLES, ...PART_2_TABLES].sort());
     for (const table of TABLES) {
       expect(
@@ -639,7 +644,12 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
       where c.relnamespace = ${db.schema}::regnamespace and c.relname in ${db.sql([...OWN_TABLES, ...PART_2_TABLES])}
       order by 1
     `;
-    expect(found).toEqual(OWN_TABLES.map((name) => ({ name, part: "one" })));
+    // DL-225 (T-721, DL-278): the list gains part 2's eight, made by migration 0029, and stays exact.
+    expect(found).toEqual(
+      [...OWN_TABLES, ...PART_2_TABLES]
+        .sort()
+        .map((name) => ({ name, part: OWN_TABLES.includes(name) ? "one" : "two" })),
+    );
   });
 
   for (const table of OWN) {
@@ -666,7 +676,7 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
       }
     });
 
-    it(`${table.name}: primary key, foreign keys with no schema prefix and their on delete (but part 2's two), unique rules and index names are the table list's`, async () => {
+    it(`${table.name}: primary key, foreign keys with no schema prefix and their on delete (part 2's two among them, migration 0029's), unique rules and index names are the table list's`, async () => {
       const constraints = await db.sql<{ name: string; kind: string; definition: string }[]>`
         select conname as name, contype as kind, pg_get_constraintdef(oid) as definition
         from pg_constraint where conrelid = ${`${db.schema}.${table.name}`}::regclass
@@ -683,7 +693,8 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
           .filter((constraint) => constraint.kind === kind)
           .map((constraint) => constraint.name)
           .sort();
-      const keys = table.foreignKeys.filter((key) => !PART_2_KEYS.includes(key.name));
+      // DL-225 (T-721, DL-278): booking_lines' list gains part 2's two keys, which migration 0029 adds, and stays exact.
+      const keys = table.foreignKeys;
       const unique = table.unique ?? [];
       // No unique rule of the five has a where: each is a constraint row.
       expect(unique.filter((rule) => rule.where !== undefined)).toEqual([]);
@@ -746,7 +757,7 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
     });
   }
 
-  it("booking_lines holds five of its seven foreign keys: booking_lines_quote_option_fk and booking_lines_removed_by_fk name part 2's quote_options and booking_changes, which rule 1 makes before them, so part 2 adds them; no seed row of part 1 names either column", async () => {
+  it("booking_lines holds all seven of its foreign keys: booking_lines_quote_option_fk and booking_lines_removed_by_fk name part 2's quote_options and booking_changes, which rule 1 makes before them, so part 2 adds them (migration 0029); no seed row of part 1 names either column", async () => {
     const lines = tableOf("booking_lines");
     expect(
       lines.foreignKeys
@@ -777,7 +788,8 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
       select conname as name from pg_constraint where conname in ${db.sql(PART_2_KEYS)}
         and connamespace = ${db.schema}::regnamespace
     `;
-    expect(held).toEqual([]);
+    // DL-225 (T-721, DL-278): the list gains the two keys migration 0029 adds, and stays exact.
+    expect(held.map((key) => key.name).sort()).toEqual(PART_2_KEYS);
     for (const row of SEED_ROWS.filter((candidate) => candidate.table === "booking_lines")) {
       expect([row.values.quote_option_id, row.values.removed_by_change_id], textOf(row.values.id)).toEqual([
         null,
@@ -786,7 +798,7 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
     }
   });
 
-  it("the five refer only to other parts' tables by their keys (rule 1): K-04's bookings, businesses, persons and reservations, K-25's services, service_money and price_rules, K-26's rules and price_ok_limits, and K-29's consents; a terms rule names its snapshot; no other part's table refers to these", async () => {
+  it("the five refer only to other tables by their keys (rule 1): K-04's bookings, businesses, persons and reservations, K-25's services, service_money and price_rules, K-26's rules and price_ok_limits, K-29's consents, and part 2's booking_changes and quote_options (booking_lines' two keys, migration 0029's); a terms rule names its snapshot; of every other table only part 2's booking_changes refers to these (a change names its visit)", async () => {
     const keys = await db.sql<{ table: string; name: string; referenced: string }[]>`
       select src.relname as table, k.conname as name, dst.relname as referenced
       from pg_constraint k
@@ -794,11 +806,10 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
         join pg_class dst on dst.oid = k.confrelid
       where k.contype = 'f' and src.relnamespace = ${db.schema}::regnamespace and src.relname in ${db.sql(OWN_TABLES)}
     `;
+    // DL-225 (T-721, DL-278): the list gains booking_lines' two keys to part 2's tables, and stays exact.
     expect(keys.map((key) => `${key.table} ${key.name} ${key.referenced}`).sort()).toEqual(
       OWN.flatMap((table) =>
-        table.foreignKeys
-          .filter((key) => !PART_2_KEYS.includes(key.name))
-          .map((key) => `${table.name} ${key.name} ${key.references.table}`),
+        table.foreignKeys.map((key) => `${table.name} ${key.name} ${key.references.table}`),
       ).sort(),
     );
     expect(
@@ -814,7 +825,8 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
       where k.contype = 'f' and dst.relnamespace = ${db.schema}::regnamespace and dst.relname in ${db.sql(OWN_TABLES)}
         and src.relname not in ${db.sql(OWN_TABLES)}
     `;
-    expect(into).toEqual([]);
+    // DL-225 (T-721, DL-278): the list gains part 2's booking_changes (booking_changes_visit_fk), and stays exact.
+    expect(into).toEqual([{ table: "booking_changes" }]);
   });
 
   it("each versioned table raises its version on every update (0002's rule; rule 4): <table>_version_raised, BEFORE UPDATE FOR EACH ROW; booking_details also holds rule 6's booking_details_set_once; the snapshot's two tables hold no trigger", async () => {
