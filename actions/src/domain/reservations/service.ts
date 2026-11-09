@@ -9,7 +9,11 @@
 //               mobile, or for one agent token at one business (the cap: K-05 item 8; arch 05 line 247), and gives the
 //               held time its saved-time clock row, armed at its end (item 8). A time someone else has saved: next in
 //               line when asked (A4-18; S12-02), else timeTaken; a booked one is always timeTaken. The cap's refusal names
-//               only when the asker's own two saved times end (K-09 v1.2 savedTimeCapError; RULES 4.10).
+//               only when the asker's own two saved times end (K-09 v1.2 savedTimeCapError; RULES 4.10). A holder that
+//               already holds or waits on the slot and asks to wait gets its own row back from K-05, nothing written
+//               (T-1134 rule (1); DL-292, DL-294): saved with that row's id and end, or next in line with that row. The
+//               rule is K-05's, inside its one transaction under the slot's lock, never a check here (a check here alone
+//               races: one holder saving one slot twice at once).
 //   extendTime  Q-12: the one 10-minute extension, through K-05 extend, only for a time held for the asker's own mobile
 //               (ownership is this service's: T-198's security note c); a time held for an agent token, C3's door
 //               among them, or for a booking is notExtendable before K-05 is called (K-09 v1.2 extendTime; DL-171).
@@ -18,6 +22,8 @@
 //               the lower id; a capped one or one EXCLUDE refuses passed over), with its own saved-time clock row. K-05's
 //               release is the one place a promotion happens and it happens once: a second firing (the alarm and the
 //               sweep race by design, arch 10 line 540) finds the row released and answers repeated, promoting nobody.
+//               K-05 never promotes the released holder's own waiting rows: it lets them go with it and promotes the
+//               first other holder, or nobody (T-1134 rule (2)), so MC C3's 15 minutes are never extended through the line.
 //               Nothing is booked or charged when a saved time lapses (S12-03: "Nothing is booked or charged while the
 //               AI is quiet"; S12-04; the money home, S13-55: never a charge on silence), so a lapse writes no money row.
 //
@@ -44,6 +50,12 @@
 //      booked or still in line answers notSaved and nothing is released.
 //   7. A repeated save answers its first save's end and version, with extendable read from the row (its one extension
 //      may have been used since).
+//   8. A save K-05 answers with a held row whose end has passed (a repeat, or the asker's own row of T-1134 rule (1),
+//      whose lapse has not fired yet: T-1084) answers timeTaken, as a hold that lapsed answers on the page (K-09 README
+//      default 43: "on the page timeTaken"): a past end is never shown as a live hold, and nothing is extended.
+//   9. A save answered with the asker's own row (T-1134 rule (1)) names the door and minutes this save asked for beside
+//      that row's id, version and end, since K-04 keeps no door on the row (K-09 README open gap 85); its end is never
+//      moved, and extendable is read from the row.
 
 import { EXTEND_MINUTES, STANDARD_HOLD_MINUTES } from "../../../../db/repo/reservation-rules";
 import {
@@ -147,9 +159,15 @@ export function createReservations(deps: ReservationsDeps): Reservations {
   const { data, now } = deps;
 
   /** Whether a repeated save's held time may still take its one extension: read from the row, which knows. */
-  async function stillExtendable(businessId: string, reservationId: string): Promise<boolean> {
+  async function stillExtendable(businessId: string, reservationId: string, at: string): Promise<boolean> {
     const row = await data.reservation(businessId, reservationId);
-    return row !== null && row.state === "held" && !row.extended;
+    return (
+      row !== null &&
+      row.state === "held" &&
+      !row.extended &&
+      row.heldUntil !== null &&
+      Date.parse(row.heldUntil) > Date.parse(at)
+    );
   }
 
   async function savedOf(
@@ -159,6 +177,7 @@ export function createReservations(deps: ReservationsDeps): Reservations {
     minutes: number,
     extendable: boolean,
     lapsesBy: Saved["lapsesBy"],
+    at: string,
   ): Promise<Saved> {
     return {
       result: "saved",
@@ -168,7 +187,7 @@ export function createReservations(deps: ReservationsDeps): Reservations {
       door,
       minutes,
       extendable:
-        extendable && (!held.repeated || (await stillExtendable(request.businessId, held.reservationId))),
+        extendable && (!held.repeated || (await stillExtendable(request.businessId, held.reservationId, at))),
       savedTimeClockId: held.savedTimeClockId,
       lapsesBy,
       repeated: held.repeated,
@@ -198,6 +217,9 @@ export function createReservations(deps: ReservationsDeps): Reservations {
     });
     if ("result" in outcome) {
       if (outcome.result === "held") {
+        // A held row whose end has passed, its lapse not fired yet (a repeat, or T-1134's own row): never a live hold,
+        // and never extended (default 8).
+        if (!(Date.parse(outcome.heldUntil) > Date.parse(at))) return { error: "timeTaken" };
         return savedOf(
           request,
           outcome,
@@ -205,6 +227,7 @@ export function createReservations(deps: ReservationsDeps): Reservations {
           length.minutes,
           extendableOn(asked.door, heldFor),
           lapsesByOf(heldFor),
+          at,
         );
       }
       return {

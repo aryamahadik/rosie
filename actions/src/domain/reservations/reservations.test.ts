@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ExtendRequest, ReleaseRequest, ReserveRequest } from "../../../../db/repo/reservation-rules";
 import { ReservationRequestError } from "./doors";
+import { createReservations } from "./service";
 import { accessExchange, fireDue, ReservationsDouble, serviceOn, type AccessExchange } from "./test-support";
 import type { Asker, DoorFacts, LapseOutcome, SaveRequest } from "./types";
 
@@ -753,6 +754,331 @@ describe("two agent tokens saving one time at once: exactly one gets it, the oth
       await service.save(saveRequest({ reservationId: "rsv-dee", asker: agent(TOKEN_B), nextInLine: true })),
     ).toEqual({ error: "timeTaken" });
     expect(double.stored("rsv-dee")).toBeUndefined();
+  });
+});
+
+// ---- one row per holder per slot (T-1134; round 1 GAP 1; DL-292, DL-294) ---------------------------------------------
+
+describe("one row per holder per slot: the reviewer's C3 scenario (T-1134 rules (1) and (2); MC C3)", () => {
+  it("TOKEN_A's later saves of its own C3 slot get rsv-1 back and write nothing; at 10:05 the first other holder is promoted", async () => {
+    const { double, clock, service } = serviceOn(SEEDS, AT);
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-1", asker: agent(TOKEN_A), door: C3 })),
+    ).toMatchObject({
+      result: "saved",
+      reservationId: "rsv-1",
+      heldUntil: at("10:05:00"),
+      door: "ownAi",
+      minutes: 15,
+      extendable: false,
+      repeated: false,
+    });
+
+    // Its later saves of the same slot, asked to wait, at once: rsv-1 back, never a place in line behind itself.
+    clock.set(at("09:51:00"));
+    const again = await Promise.all(
+      ["rsv-2", "rsv-3", "rsv-4"].map((reservationId) =>
+        service.save(saveRequest({ reservationId, asker: agent(TOKEN_A), door: C3, nextInLine: true })),
+      ),
+    );
+    for (const answer of again) {
+      expect(answer).toEqual({
+        result: "saved",
+        reservationId: "rsv-1",
+        version: 1,
+        heldUntil: at("10:05:00"),
+        door: "ownAi",
+        minutes: 15,
+        extendable: false,
+        savedTimeClockId: "rsv-1/saved-time",
+        lapsesBy: "sweep",
+        repeated: true,
+      });
+    }
+    expect(double.onSlot("res-riley", SAT_RILEY).map((row) => [row.id, row.state])).toEqual([
+      ["rsv-1", "held"],
+    ]);
+
+    // Another holder waits next in line (A4-18); TOKEN_A asking again still gets rsv-1, never a row behind it.
+    clock.set(at("09:52:00"));
+    expect(
+      await service.save(
+        saveRequest({ reservationId: "rsv-b", asker: agent(TOKEN_B), door: C3, nextInLine: true }),
+      ),
+    ).toEqual({
+      result: "nextInLine",
+      reservationId: "rsv-b",
+      version: 1,
+      queuedAt: at("09:52:00"),
+      repeated: false,
+    });
+    clock.set(at("09:53:00"));
+    expect(
+      await service.save(
+        saveRequest({ reservationId: "rsv-5", asker: agent(TOKEN_A), door: C3, nextInLine: true }),
+      ),
+    ).toMatchObject({ result: "saved", reservationId: "rsv-1", heldUntil: at("10:05:00"), repeated: true });
+    for (const id of ["rsv-2", "rsv-3", "rsv-4", "rsv-5"]) expect(double.stored(id)).toBeUndefined();
+
+    // The 15 minutes are never extended: at 10:05 rsv-1 is let go and the first other holder is held 10 minutes.
+    clock.set(at("10:04:59"));
+    expect(await fireDue(double, clock, service)).toEqual([]);
+    clock.set(at("10:05:00"));
+    const lapsed = await fireDue(double, clock, service);
+    expect(lapsed).toEqual([
+      {
+        result: "letGo",
+        reservationId: "rsv-1",
+        releasedAt: at("10:05:00"),
+        why: "expired",
+        heldFor: "agentToken",
+        promoted: {
+          reservationId: "rsv-b",
+          version: 2,
+          heldUntil: at("10:15:00"),
+          heldFor: "agentToken",
+          savedTimeClockId: "rsv-b/saved-time",
+        },
+        repeated: false,
+      },
+    ]);
+    expectNothingPrivate(lapsed);
+    expect(
+      double.onSlot("res-riley", SAT_RILEY).map((row) => [row.id, row.state, row.forAgentToken]),
+    ).toEqual([
+      ["rsv-1", "released", TOKEN_A],
+      ["rsv-b", "held", TOKEN_B],
+    ]);
+  });
+
+  it("with no other holder in line, at 10:05 the let-go promotes nobody and the slot opens again", async () => {
+    const { double, clock, service } = serviceOn(SEEDS, AT);
+    await service.save(saveRequest({ reservationId: "rsv-1", asker: agent(TOKEN_A), door: C3 }));
+    clock.set(at("09:51:00"));
+    expect(
+      await service.save(
+        saveRequest({ reservationId: "rsv-2", asker: agent(TOKEN_A), door: C3, nextInLine: true }),
+      ),
+    ).toMatchObject({ result: "saved", reservationId: "rsv-1", heldUntil: at("10:05:00"), repeated: true });
+    clock.set(at("10:05:00"));
+    expect(await fireDue(double, clock, service)).toEqual([
+      {
+        result: "letGo",
+        reservationId: "rsv-1",
+        releasedAt: at("10:05:00"),
+        why: "expired",
+        heldFor: "agentToken",
+        promoted: null,
+        repeated: false,
+      },
+    ]);
+    expect(double.onSlot("res-riley", SAT_RILEY).map((row) => [row.id, row.state])).toEqual([
+      ["rsv-1", "released"],
+    ]);
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-b", asker: agent(TOKEN_B), door: C3 })),
+    ).toMatchObject({ result: "saved", reservationId: "rsv-b", heldUntil: at("10:20:00") });
+  });
+
+  it("a held row whose end has passed, its lapse not fired yet, is never shown as a live hold and never extended", async () => {
+    const { double, clock, service } = serviceOn(SEEDS, AT);
+    await service.save(saveRequest({ reservationId: "rsv-1", asker: agent(TOKEN_A), door: C3 }));
+    await service.save(saveRequest({ reservationId: "rsv-alex-sun", asker: turn(ALEX), during: SUN_RILEY }));
+    // Past both ends (10:05 and 10:00), and nothing has fired yet (a late sweep; on the database, T-1084).
+    clock.set(at("10:06:00"));
+    const asks = [
+      saveRequest({ reservationId: "rsv-2", asker: agent(TOKEN_A), door: C3, nextInLine: true }),
+      saveRequest({ reservationId: "rsv-1", asker: agent(TOKEN_A), door: C3 }),
+      saveRequest({ reservationId: "rsv-alex-2", asker: page(ALEX), during: SUN_RILEY, nextInLine: true }),
+      saveRequest({ reservationId: "rsv-alex-sun", asker: turn(ALEX), during: SUN_RILEY }),
+    ];
+    for (const request of asks) {
+      expect(await service.save(request), request.reservationId).toEqual({ error: "timeTaken" });
+    }
+    expect(double.stored("rsv-2")).toBeUndefined();
+    expect(double.stored("rsv-alex-2")).toBeUndefined();
+    expect(
+      await service.extendTime({
+        reservationId: "rsv-1",
+        businessId: LEES,
+        expectVersion: 1,
+        asker: agent(TOKEN_A),
+      }),
+    ).toEqual({ error: "notExtendable", reservationId: "rsv-1", heldFor: "agentToken" });
+    expect(
+      await service.extendTime({
+        reservationId: "rsv-alex-sun",
+        businessId: LEES,
+        expectVersion: 1,
+        asker: turn(ALEX),
+      }),
+    ).toEqual({ error: "notHeld", reservationId: "rsv-alex-sun", state: "held" });
+    expect(double.stored("rsv-1")).toMatchObject({ heldUntil: at("10:05:00"), extended: false, version: 1 });
+    expect(double.stored("rsv-alex-sun")).toMatchObject({
+      heldUntil: at("10:00:00"),
+      extended: false,
+      version: 1,
+    });
+    // The late firing lets both go, and promotes nobody.
+    expect(await fireDue(double, clock, service)).toMatchObject([
+      { result: "letGo", reservationId: "rsv-alex-sun", promoted: null },
+      { result: "letGo", reservationId: "rsv-1", promoted: null },
+    ]);
+  });
+
+  it("a mobile after its one extension gets its own row back, not a place in line; its let-go promotes another holder", async () => {
+    const { double, clock, service } = serviceOn(SEEDS, AT);
+    await service.save(saveRequest({ reservationId: "rsv-alex-1", asker: turn(ALEX) }));
+    clock.set(at("09:58:00"));
+    expect(
+      await service.extendTime({
+        reservationId: "rsv-alex-1",
+        businessId: LEES,
+        expectVersion: 1,
+        asker: turn(ALEX),
+      }),
+    ).toMatchObject({ result: "extended", heldUntil: at("10:10:00") });
+    clock.set(at("09:59:00"));
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-alex-2", asker: page(ALEX), nextInLine: true })),
+    ).toEqual({
+      result: "saved",
+      reservationId: "rsv-alex-1",
+      version: 2,
+      heldUntil: at("10:10:00"),
+      door: "standard",
+      minutes: 10,
+      extendable: false,
+      savedTimeClockId: "rsv-alex-1/saved-time",
+      lapsesBy: "holdersHandle",
+      repeated: true,
+    });
+    expect(double.stored("rsv-alex-2")).toBeUndefined();
+    clock.set(at("10:00:00"));
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-tomas", asker: page(TOMAS), nextInLine: true })),
+    ).toMatchObject({ result: "nextInLine", reservationId: "rsv-tomas" });
+    clock.set(at("10:10:00"));
+    expect(await fireDue(double, clock, service)).toMatchObject([
+      {
+        result: "letGo",
+        reservationId: "rsv-alex-1",
+        heldFor: "phoneNumber",
+        promoted: { reservationId: "rsv-tomas", heldUntil: at("10:20:00"), heldFor: "phoneNumber" },
+      },
+    ]);
+  });
+
+  it("a let-go never promotes the released holder's own waiting row: it is let go with it, and the next holder is held", async () => {
+    const { double, clock, service } = serviceOn(SEEDS, AT);
+    await service.save(saveRequest({ reservationId: "rsv-b", asker: agent(TOKEN_B) }));
+    clock.set(at("09:51:00"));
+    expect(
+      await service.save(
+        saveRequest({ reservationId: "rsv-alex-wait", asker: turn(ALEX), nextInLine: true }),
+      ),
+    ).toMatchObject({ result: "nextInLine", reservationId: "rsv-alex-wait" });
+    // Alex's two saved times elsewhere make the cap pass over its place in line when rsv-b ends at 10:00.
+    clock.set(at("09:52:00"));
+    await service.save(saveRequest({ reservationId: "rsv-alex-sun", asker: turn(ALEX), during: SUN_RILEY }));
+    await service.save(
+      saveRequest({
+        reservationId: "rsv-alex-avery",
+        asker: turn(ALEX),
+        resourceId: "res-avery",
+        during: SAT_AVERY,
+      }),
+    );
+    clock.set(at("10:00:00"));
+    expect(await fireDue(double, clock, service)).toMatchObject([
+      { result: "letGo", reservationId: "rsv-b", promoted: null },
+    ]);
+    clock.set(at("10:02:00"));
+    await fireDue(double, clock, service);
+    // The slot is free with Alex's row still in line; Alex saves it outright, then Tomas waits behind it.
+    clock.set(at("10:03:00"));
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-alex-again", asker: turn(ALEX) })),
+    ).toMatchObject({ result: "saved", reservationId: "rsv-alex-again", heldUntil: at("10:13:00") });
+    clock.set(at("10:04:00"));
+    expect(
+      await service.save(saveRequest({ reservationId: "rsv-tomas", asker: page(TOMAS), nextInLine: true })),
+    ).toMatchObject({ result: "nextInLine", reservationId: "rsv-tomas" });
+
+    clock.set(at("10:13:00"));
+    expect(await fireDue(double, clock, service)).toEqual([
+      {
+        result: "letGo",
+        reservationId: "rsv-alex-again",
+        releasedAt: at("10:13:00"),
+        why: "expired",
+        heldFor: "phoneNumber",
+        promoted: {
+          reservationId: "rsv-tomas",
+          version: 2,
+          heldUntil: at("10:23:00"),
+          heldFor: "phoneNumber",
+          savedTimeClockId: "rsv-tomas/saved-time",
+        },
+        repeated: false,
+      },
+    ]);
+    expect(double.stored("rsv-alex-wait")).toMatchObject({
+      state: "released",
+      releasedWhy: "let_go",
+      releasedAt: at("10:13:00"),
+      heldUntil: null,
+      version: 2,
+    });
+  });
+});
+
+describe("C3's saves are token holds, never a booking's hold (T-1134 security note 2)", () => {
+  it("every save on C3's door is held for the asking AI's own token, and no save is ever held for a booking", async () => {
+    const askers = [agent(TOKEN_A), agent(TOKEN_B), turn(ALEX), page(TOMAS)];
+    const facts: DoorFacts[] = [
+      C3,
+      { ...C3, longer: { door: "planCheck", minutes: 60 } },
+      STANDARD,
+      { booksAtOnce: true, moneyBefore: false, longer: null },
+      { booksAtOnce: false, moneyBefore: true, longer: null },
+    ];
+    let ownAi = 0;
+    for (const asker of askers) {
+      for (const [i, door] of facts.entries()) {
+        const { double, clock } = serviceOn(SEEDS, AT);
+        const sent: ReserveRequest[] = [];
+        const service = createReservations({
+          data: {
+            ...double.data,
+            reserve: (request) => {
+              sent.push(request);
+              return double.data.reserve(request);
+            },
+          },
+          now: clock.now,
+        });
+        const reservationId = `rsv-door-${String(i)}`;
+        expect(await service.save(saveRequest({ reservationId, asker, door }))).toMatchObject({
+          result: "saved",
+        });
+        expect(sent).toHaveLength(1);
+        const [request] = sent;
+        expect(request?.for, reservationId).not.toHaveProperty("bookingId");
+        expect(double.stored(reservationId)).toMatchObject({ bookingId: null });
+        if (request?.door !== "ownAi") continue;
+        ownAi += 1;
+        expect(asker.kind).toBe("agent");
+        expect(request.for).toEqual({ agentToken: asker.kind === "agent" ? asker.agentToken : "" });
+        expect(double.stored(reservationId)).toMatchObject({
+          forAgentToken: asker.kind === "agent" ? asker.agentToken : "",
+          forPhoneNumber: null,
+          bookingId: null,
+        });
+      }
+    }
+    // Both AIs on both C3 facts took the ownAi door; nobody else did.
+    expect(ownAi).toBe(4);
   });
 });
 

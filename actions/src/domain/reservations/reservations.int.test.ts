@@ -166,6 +166,129 @@ describe("200 parallel saves on one slot give one success (EXCLUDE; S12-01)", ()
   );
 });
 
+describe("one row per holder per slot on the database: the reviewer's C3 scenario (T-1134; round 1 GAP 1)", () => {
+  const C3 = { booksAtOnce: true, moneyBefore: true, longer: null };
+  const c3Save = (
+    reservationId: string,
+    agentToken: string,
+    slot: SaveRequest["during"],
+    nextInLine: boolean,
+  ): SaveRequest => ({
+    reservationId,
+    businessId: LEES,
+    resourceId: "res-riley",
+    during: slot,
+    seats: 1,
+    asker: { kind: "agent", agentToken },
+    door: C3,
+    nextInLine,
+  });
+
+  async function countOf(ids: readonly string[]): Promise<number> {
+    const [row] = await db.sql<{ count: number }[]>`
+      select count(*)::int as count from reservations where id in ${db.sql(ids)}
+    `;
+    return row?.count ?? -1;
+  }
+
+  it("TOKEN_A's later saves of its own C3 slot get rsv-1 back and write nothing; at its end the first other holder is promoted", async () => {
+    const slot = { start: "2026-12-10T15:00:00Z", end: "2026-12-10T15:30:00Z" };
+    const tokenA = "agent-token-t744-c3-a";
+    const { clock, service } = serviceAt(AT);
+    expect(await service.save(c3Save("rsv-t744-c3-1", tokenA, slot, false))).toMatchObject({
+      result: "saved",
+      reservationId: "rsv-t744-c3-1",
+      heldUntil: "2026-11-07T16:15:00Z",
+      door: "ownAi",
+      minutes: 15,
+      extendable: false,
+      repeated: false,
+    });
+
+    // Its later saves of the slot, asked to wait, at once: the slot's lock runs them one after the other.
+    clock.set("2026-11-07T16:01:00Z");
+    const again = await Promise.all(
+      ["rsv-t744-c3-2", "rsv-t744-c3-3", "rsv-t744-c3-4"].map((id) =>
+        service.save(c3Save(id, tokenA, slot, true)),
+      ),
+    );
+    for (const answer of again) {
+      expect(answer).toEqual({
+        result: "saved",
+        reservationId: "rsv-t744-c3-1",
+        version: 1,
+        heldUntil: "2026-11-07T16:15:00Z",
+        door: "ownAi",
+        minutes: 15,
+        extendable: false,
+        savedTimeClockId: "rsv-t744-c3-1/saved-time",
+        lapsesBy: "sweep",
+        repeated: true,
+      });
+    }
+    expect(await countOf(["rsv-t744-c3-2", "rsv-t744-c3-3", "rsv-t744-c3-4"])).toBe(0);
+
+    clock.set("2026-11-07T16:02:00Z");
+    expect(await service.save(c3Save("rsv-t744-c3-b", "agent-token-t744-c3-b", slot, true))).toEqual({
+      result: "nextInLine",
+      reservationId: "rsv-t744-c3-b",
+      version: 1,
+      queuedAt: "2026-11-07T16:02:00Z",
+      repeated: false,
+    });
+
+    // At its end, its lapse not fired yet: the past end is never a live hold, and nothing is written.
+    clock.set("2026-11-07T16:15:00Z");
+    expect(await service.save(c3Save("rsv-t744-c3-5", tokenA, slot, true))).toEqual({ error: "timeTaken" });
+    expect(await countOf(["rsv-t744-c3-5"])).toBe(0);
+
+    expect(await service.lapse({ reservationId: "rsv-t744-c3-1", businessId: LEES })).toEqual({
+      result: "letGo",
+      reservationId: "rsv-t744-c3-1",
+      releasedAt: "2026-11-07T16:15:00Z",
+      why: "expired",
+      heldFor: "agentToken",
+      promoted: {
+        reservationId: "rsv-t744-c3-b",
+        version: 2,
+        heldUntil: "2026-11-07T16:25:00Z",
+        heldFor: "agentToken",
+        savedTimeClockId: "rsv-t744-c3-b/saved-time",
+      },
+      repeated: false,
+    });
+    expect(await slotRows(slot)).toEqual([
+      { id: "rsv-t744-c3-1", state: "released" },
+      { id: "rsv-t744-c3-b", state: "held" },
+    ]);
+  });
+
+  it("with no other holder in line, at its end the let-go promotes nobody", async () => {
+    const slot = { start: "2026-12-11T15:00:00Z", end: "2026-12-11T15:30:00Z" };
+    const tokenA = "agent-token-t744-c3-alone";
+    const { clock, service } = serviceAt(AT);
+    await service.save(c3Save("rsv-t744-alone-1", tokenA, slot, false));
+    clock.set("2026-11-07T16:01:00Z");
+    expect(await service.save(c3Save("rsv-t744-alone-2", tokenA, slot, true))).toMatchObject({
+      result: "saved",
+      reservationId: "rsv-t744-alone-1",
+      heldUntil: "2026-11-07T16:15:00Z",
+      repeated: true,
+    });
+    clock.set("2026-11-07T16:15:00Z");
+    expect(await service.lapse({ reservationId: "rsv-t744-alone-1", businessId: LEES })).toEqual({
+      result: "letGo",
+      reservationId: "rsv-t744-alone-1",
+      releasedAt: "2026-11-07T16:15:00Z",
+      why: "expired",
+      heldFor: "agentToken",
+      promoted: null,
+      repeated: false,
+    });
+    expect(await slotRows(slot)).toEqual([{ id: "rsv-t744-alone-1", state: "released" }]);
+  });
+});
+
 describe("on the database, as the Tool API's role", () => {
   it("two agent tokens saving one time at once: exactly one gets it, the other next in line (S12-02)", async () => {
     const slot = { start: "2026-12-06T15:00:00Z", end: "2026-12-06T15:30:00Z" };

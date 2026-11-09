@@ -3,7 +3,9 @@
 // with item 8's saved-time clock rows and their firing, loaded from K-04 v1's seed fixtures, and a fake clock.
 //
 // The double answers each of K-05's item 6 fixtures exactly as the contract does (reservations.test.ts proves it), so
-// the service's tests stand on the contract, not on the double's own word. Its calls are atomic between their awaits, as
+// the service's tests stand on the contract, not on the double's own word. It keeps T-1134's two rules, as K-05 keeps
+// them (db/repo/reservations.ts): one row per holder per slot, so a save never waits behind its own holder's saved time,
+// and a let-go lets the released holder's own waiting rows go and promotes the first other holder, or nobody. Its calls are atomic between their awaits, as
 // the database's locks make reserve, release and extend on one slot or one holder run one after the other; the database
 // itself (EXCLUDE, the cap's locks) is proven in reservations.int.test.ts and in db/repo's own integration tests.
 //
@@ -196,6 +198,27 @@ function savedForOf(row: Row): SavedFor {
   return { bookingId: row.bookingId ?? "" };
 }
 
+/**
+ * Who holds a saved time, as K-05's cap counts it (T-1134's holderOf): a mobile, the same at every business, or an agent
+ * token at one business. A time saved for a booking has no holder, so neither of T-1134's rules applies to it.
+ */
+type Holder = { readonly phone: string } | { readonly agentToken: string; readonly businessId: string };
+
+function holderOf(who: SavedFor, businessId: string): Holder | null {
+  if ("phoneNumber" in who) return { phone: who.phoneNumber };
+  if ("agentToken" in who) return { agentToken: who.agentToken, businessId };
+  return null;
+}
+
+const holderOfRow = (row: Row): Holder | null => holderOf(savedForOf(row), row.businessId);
+
+/** Whether two holders are one: the same mobile, or the same agent token at the same business. No holder is nobody's. */
+function sameHolder(a: Holder | null, b: Holder | null): boolean {
+  if (a === null || b === null) return false;
+  if ("phone" in a) return "phone" in b && a.phone === b.phone;
+  return "agentToken" in b && a.agentToken === b.agentToken && a.businessId === b.businessId;
+}
+
 function assertUtc(value: unknown, what: string): void {
   if (typeof value !== "string" || !UTC.test(value) || Number.isNaN(Date.parse(value))) {
     throw new TypeError(`${what} must be a UTC time such as 2026-11-07T15:05:00Z`);
@@ -373,14 +396,22 @@ export class ReservationsDouble {
     if (!same || (row.state !== "held" && row.state !== "waiting")) {
       return { error: "idConflict", reservationId: request.reservationId };
     }
-    if (row.state === "held") {
+    return this.answeredAgain(row);
+  }
+
+  /**
+   * A held or waiting row's save, answered again with nothing written (repeated): held with its end, or waiting with its
+   * place in line, as it stands now. A repeat of the same request answers this way, and so does T-1134's rule (1).
+   */
+  private answeredAgain(row: Row): ReserveOutcome {
+    if (row.state === "held" && row.heldUntil !== null) {
       return {
         result: "held",
         reservationId: row.id,
         version: row.version,
         resourceId: row.resourceId,
         during: { ...row.during },
-        heldUntil: row.heldUntil ?? "",
+        heldUntil: row.heldUntil,
         savedTimeClockId: `${row.id}/saved-time`,
         repeated: true,
       };
@@ -394,6 +425,28 @@ export class ReservationsDouble {
       queuedAt: row.queuedAt,
       repeated: true,
     };
+  }
+
+  /**
+   * T-1134 rule (1): the holder's own row on the asked slot, when it already holds or waits on it: its held or waiting row
+   * of the same resource whose time overlaps the asked one, a held one first, then the earliest in line, a tie to the
+   * lower id (K-05 ownRowOnSlot).
+   */
+  private ownRowOnSlot(request: ReserveRequest, holder: Holder): Row | undefined {
+    return [...this.rows.values()]
+      .filter(
+        (row) =>
+          row.resourceId === request.resourceId &&
+          (row.state === "held" || row.state === "waiting") &&
+          overlaps(row.during, request.during) &&
+          sameHolder(holderOfRow(row), holder),
+      )
+      .sort(
+        (a, b) =>
+          Number(b.state === "held") - Number(a.state === "held") ||
+          Date.parse(a.queuedAt) - Date.parse(b.queuedAt) ||
+          byText(a.id, b.id),
+      )[0];
   }
 
   private async reserve(request: ReserveRequest): Promise<ReserveOutcome> {
@@ -417,6 +470,13 @@ export class ReservationsDouble {
     }
     if (resource.kind === "class_session") throw new Error("the reservations double keeps no class seats");
 
+    // T-1134 rule (1), read before the cap: a holder that already holds or waits on this slot, asking to wait if it is
+    // saved, gets its own row back as its first save got it, and nothing is written.
+    const holder = holderOf(request.for, request.businessId);
+    if (request.waitIfSaved && holder !== null) {
+      const own = this.ownRowOnSlot(request, holder);
+      if (own !== undefined) return this.answeredAgain(own);
+    }
     const saved = this.savedTimes(request.for, request.businessId, request.at);
     if (saved.length >= SAVED_TIME_CAP) {
       return {
@@ -540,7 +600,17 @@ export class ReservationsDouble {
             overlaps(other.during, row.during),
         )
         .sort((a, b) => Date.parse(a.queuedAt) - Date.parse(b.queuedAt) || byText(a.id, b.id));
-      for (const waiting of line) {
+      // T-1134 rule (2): the released holder's own waiting rows, wherever they stand in the line, are let go with it and
+      // never promoted; the first other holder is promoted, or nobody.
+      const releasedHolder = holderOfRow(row);
+      const own = line.filter((waiting) => sameHolder(holderOfRow(waiting), releasedHolder));
+      for (const waiting of own) {
+        waiting.state = "released";
+        waiting.releasedAt = request.at;
+        waiting.releasedWhy = "let_go";
+        waiting.version += 1;
+      }
+      for (const waiting of line.filter((other) => !own.includes(other))) {
         if (this.savedTimes(savedForOf(waiting), waiting.businessId, request.at).length >= SAVED_TIME_CAP) {
           skipped.push({ reservationId: waiting.id, reason: "savedTimeCap" });
           continue;
