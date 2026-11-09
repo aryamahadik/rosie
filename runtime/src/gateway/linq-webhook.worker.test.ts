@@ -385,12 +385,12 @@ describe("the Worker's webhook route", () => {
     expect(response.status).toBe(405);
   });
 
-  it("answers 503 while the Linq adapter and the actor are not connected", async () => {
+  it("answers 404 while the skeleton flag is off: the Worker's route is the composition root's, and no release flags are bound to it (T-553)", async () => {
     captureLogLines();
 
     const response = await worker.fetch(webhookOf(verifyOk), env, context);
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(404);
     expect(response.headers.get("x-trace-id")).toMatch(UUID);
   });
 });

@@ -6,7 +6,7 @@
 // Each webhook opens its own id at receipt (runtime/src/gateway).
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
 // The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
-// for the Worker's environment.
+// for the Worker's environment. The Worker's Linq route is the root's, behind the skeleton flag (T-552, T-553).
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
@@ -71,14 +71,22 @@ export interface RosieWorker {
   queue(batch: MessageBatch, env: Cloudflare.Env): Promise<void>;
 }
 
+/** The Worker's answer to one POST on the Linq webhook path. */
+export type LinqWebhookRoute = (request: Request, env: Cloudflare.Env) => Promise<Response>;
+
 /**
  * The Worker with the gateway's doors (the Linq adapter, the handle actor, and the Stripe and calendar doors' ports and
- * store) supplied by `gatewayDeps`, and the sweep's HandleActor namespace by `clockActors` (the HANDLE_ACTOR binding by
- * default).
+ * store) supplied by `gatewayDeps`, the sweep's HandleActor namespace by `clockActors` (the HANDLE_ACTOR binding by
+ * default), and the Linq webhook POST answered by `linqWebhook` (by default the gateway's Linq entry with those doors).
  */
 export function createWorker(
   gatewayDeps: (env: Cloudflare.Env) => GatewayDeps,
   clockActors: (env: Cloudflare.Env) => ClockActors | null = clockActorsOf,
+  linqWebhook: LinqWebhookRoute = (request, env) =>
+    handleLinqWebhook(request, gatewayDeps(env), {
+      environment: env.ENVIRONMENT,
+      version: env.GIT_SHA ?? "unknown",
+    }),
 ): RosieWorker {
   const scheduled = (
     controller: ScheduledController,
@@ -109,7 +117,7 @@ export function createWorker(
       if (request.method !== "POST") {
         return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
       }
-      return handleLinqWebhook(request, gatewayDeps(env), { environment, version });
+      return linqWebhook(request, env);
     }
 
     const route = pathname.startsWith(basePath) ? providerRouteOf(pathname.slice(basePath.length)) : null;
@@ -138,7 +146,12 @@ export function createWorker(
   return { fetch: fetch as RosieWorker["fetch"], scheduled, queue: retryQueueHandler };
 }
 
-// The composition root's gateway for the Worker's environment (T-550). Until its joins land (T-552 to T-564) every port is
-// closed there, so the gateway's doors fail and each webhook route answers 503 (a Stripe request with an unreadable
-// signature header, 401); the provider doors stay unconfigured (T-275).
-export default createWorker((env) => workerRoot(env).gateway);
+// The composition root's gateway for the Worker's environment (T-550). Until its joins land (T-552 to T-564) every port not
+// joined is closed there, so its doors fail and each provider route answers 503 (a Stripe request with an unreadable
+// signature header, 401); the provider doors stay unconfigured (T-275). The Linq route is the root's (T-552's security
+// review): 404 while the skeleton flag is off, which it is wherever no release flags are bound (D-017's rollback).
+export default createWorker(
+  (env) => workerRoot(env).gateway,
+  clockActorsOf,
+  (request, env) => workerRoot(env).linqWebhook(request),
+);
