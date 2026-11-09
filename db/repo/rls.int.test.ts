@@ -205,8 +205,8 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
  * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
  * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
- * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), and K-25 v1 services and prices
- * (T-206).
+ * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
+ * (T-206), and K-26 v1 rules (T-207).
  */
 const ALL_TABLES = [
   ...TABLES,
@@ -294,6 +294,11 @@ const ALL_TABLES = [
         new URL("../../contracts/db-schema/services-prices/services-prices.v1.tables.json", import.meta.url),
         "utf8",
       ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(new URL("../../contracts/db-schema/rules/rules.v1.tables.json", import.meta.url), "utf8"),
     ) as { tables: ContractTable[] }
   ).tables,
 ];
@@ -899,6 +904,11 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       // K-24 v1 README rule 2: kinds and kind_flows are the shared catalog (scope none); the Tool API may select them
       // and never insert, update or delete (refused 42501).
       if (role === TOOL_API && ["kinds", "kind_flows"].includes(table.name)) {
+        return ["SELECT"];
+      }
+      // K-26 v1 README rule 5: the closed registries (scope none) are every role's to read and no application role's
+      // to write (refused 42501); only a migration's seed writes them.
+      if (["trade_facts", "plugin_switches", "rule_kinds"].includes(table.name)) {
         return ["SELECT"];
       }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
