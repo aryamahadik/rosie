@@ -51,12 +51,12 @@ function listOf(text, key) {
   return m[1];
 }
 
-test("every parity shard on disk is found: overlay, slots and corrections, 8 each", () => {
-  for (const folder of ["overlay", "slots", "corrections"]) {
+test("every parity shard on disk is found: overlay and slots hold shards 1 to 8, corrections 1 to 9", () => {
+  for (const [folder, last] of Object.entries({ overlay: 8, slots: 8, corrections: 9 })) {
     const own = SHARDS.filter((s) => s.startsWith(`compiler/src/${folder}/`));
     assert.deepEqual(
       own,
-      [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `compiler/src/${folder}/parity.shard-${n}.test.ts`).sort(),
+      Array.from({ length: last }, (_, i) => `compiler/src/${folder}/parity.shard-${i + 1}.test.ts`).sort(),
     );
   }
   assert.ok(SHARDS.length >= 24, `${SHARDS.length} shards found`);
