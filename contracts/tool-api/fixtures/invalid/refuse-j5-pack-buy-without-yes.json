@@ -1,0 +1,61 @@
+{
+  "call": "settleOffer",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-05T15:00:00Z",
+    "stated": null,
+    "note": "Refused (round 3, DL-257; the security reviewer's FAIL 1; K-32 v1 rule 10: a payment 'with no bound yes behind it' is refunded at once, unbound_charge; A5-04: 'Never: take money before the price and the yes to it'; S13-55: 'A new or higher amount, an extra or a plan needs the customer's own yes'; README defaults 109, 110): Alex's pack of 5 visits for $160 is bought on the yoga studio's page with no yes of his own to it, so the charge would have no words he saw and no consent behind it. A pack carries the customer's own yes, the page's tap with the words shown, as a membership's terms do. Put right, the item carries his termsYes, as j5-buy-pack-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-yoga-0003",
+      "businessId": "biz-yoga-studio",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-yoga-0001"
+    },
+    "bookingId": "booking-alex-hot-flow",
+    "offer": {
+      "kind": "buy",
+      "step": "A5-22",
+      "item": {
+        "kind": "pack",
+        "serviceId": "svc-yoga-hot-flow",
+        "name": "Pack of 5 visits",
+        "unit": "visit",
+        "creditsTotal": 5,
+        "price": { "cents": 16000, "currency": "USD" }
+      },
+      "cardEffectId": "eff-alex-hot-flow-card",
+      "lineId": "line-alex-hot-flow-1-saved"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-hot-flow",
+    "offer": "buy",
+    "creditId": "credit-alex-hot-flow-1",
+    "packId": "pack-alex-yoga-5-visits",
+    "membershipId": null,
+    "planChargeId": null,
+    "paymentId": "pay-alex-hot-flow-pack",
+    "consentId": "consent-alex-yoga-pack-terms",
+    "savedCardId": null,
+    "line": { "lineId": "line-alex-hot-flow-1", "replacedLineId": "line-alex-hot-flow-1-saved" },
+    "effects": [{ "effectId": "eff-alex-hot-flow-pack", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-hot-flow-pack" },
+      { "slot": "pay.price", "table": "packs", "column": "price_cents", "rowId": "pack-alex-yoga-5-visits" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "packs", "rowId": "pack-alex-yoga-5-visits", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-hot-flow-pack", "version": 1 },
+      { "table": "credits", "rowId": "credit-alex-hot-flow-1", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-1-saved", "version": 2 },
+      { "table": "booking_lines", "rowId": "line-alex-hot-flow-1", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

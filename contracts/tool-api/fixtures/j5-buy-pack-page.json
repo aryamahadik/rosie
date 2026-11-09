@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-11-05T15:00:00Z",
     "stated": null,
-    "note": "A5-22 on the yoga studio's secure page: booking a $35 Hot Flow class, Alex buys the pack of 5 visits for $160 that the studio sells on its page ('This visit then uses a credit from it'). The card was typed on the page through the card stage, keep false (its stripe_save_card effect eff-alex-hot-flow-card succeeded; no saved card row: K-32 default 15). In one commit (the rows K-32 v1 seed-pack-credits holds): the pack (bought_via rosie, first credit counted, version 2 as that seed keeps it); its payment of purpose pack, no booking, method card, pending ('If the booking isn't confirmed, the pack stays bought'); the K-07 stripe_charge effect eff-alex-hot-flow-pack, which K-14 v1 pack-purchase.json runs with the customer present; the visit's credit; and the class's line, copied at the save with paid_by money, replaced before the booking is written by a copy paid by credit, which the credit names (README defaults 94, 95). Only K-14's result makes the payment paid (K-32 rule 5): charged at 3:00:02pm. No key. The pack's terms come from the page server, built from the studio's settings (README open gap 92). The replaced line's and the card effect's ids are examples (README default 48)."
+    "note": "A5-22 on the yoga studio's secure page: booking a $35 Hot Flow class, Alex buys the pack of 5 visits for $160 that the studio sells on its page ('This visit then uses a credit from it'), with his own yes to it (round 3, DL-257): he taps to buy under the words the page server showed for the pack, its service, its credits and its price charged now, and code builds those words again from the item and they match (wordsDiffer otherwise). The card was typed on the page through the card stage, keep false (its stripe_save_card effect eff-alex-hot-flow-card succeeded; no saved card row: K-32 default 15). In one commit (the rows K-32 v1 seed-pack-credits holds): his yes as a K-29 ticked_terms consent with those exact words and their sha256, naming this booking, channel page (README default 109); the pack (bought_via rosie, first credit counted, version 2 as that seed keeps it); its payment of purpose pack, no booking, method card, pending ('If the booking isn't confirmed, the pack stays bought'); the K-07 stripe_charge effect eff-alex-hot-flow-pack, which K-14 v1 pack-purchase.json runs with the customer present, and whose effect.created event-log row is approved by that consent, so C-018's hourly check finds the charge bound though the payment names no booking (README default 110); the visit's credit; and the class's line, copied at the save with paid_by money, replaced before the booking is written by a copy paid by credit, which the credit names (README defaults 94, 95). The consent carries no version, so written does not list it; consentId names it. Only K-14's result makes the payment paid (K-32 rule 5): charged at 3:00:02pm. No key. The pack's terms come from the page server, built from the studio's settings (README open gap 92). The words shown, the consent, the replaced line's and the card effect's ids are examples (README default 48)."
   },
   "request": {
     "caller": {
@@ -26,7 +26,12 @@
         "name": "Pack of 5 visits",
         "unit": "visit",
         "creditsTotal": 5,
-        "price": { "cents": 16000, "currency": "USD" }
+        "price": { "cents": 16000, "currency": "USD" },
+        "termsYes": {
+          "kind": "page",
+          "exactWords": "Pack of 5 visits · Hot Flow / $160 charged today to the card you typed here / This class uses 1 of the 5 visits / If this booking isn't confirmed, the pack stays yours",
+          "yesEventId": "evt-page-alex-yoga-0003"
+        }
       },
       "cardEffectId": "eff-alex-hot-flow-card",
       "lineId": "line-alex-hot-flow-1-saved"
@@ -40,7 +45,7 @@
     "membershipId": null,
     "planChargeId": null,
     "paymentId": "pay-alex-hot-flow-pack",
-    "consentId": null,
+    "consentId": "consent-alex-yoga-pack-terms",
     "savedCardId": null,
     "line": { "lineId": "line-alex-hot-flow-1", "replacedLineId": "line-alex-hot-flow-1-saved" },
     "effects": [{ "effectId": "eff-alex-hot-flow-pack", "kind": "stripe_charge" }],

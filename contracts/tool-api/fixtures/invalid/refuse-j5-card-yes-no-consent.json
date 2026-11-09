@@ -1,0 +1,57 @@
+{
+  "call": "takeMoneyBefore",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": ["j5-money-before-page.json", "j5-card-form-page.json"],
+    "now": "2026-10-21T23:22:40Z",
+    "stated": { "step": "A5-07", "gives": ["money_before", "card_saved"] },
+    "note": "Refused (round 3, DL-257, the security reviewer's note a; A5-07: 'The exact words the customer ticked are stored with the booking'; README default 92): A5-07's yes on the page, Alex's tap under the words he ticked, answered with no consent, so the words he agreed to are tied to nothing the booking write's terms snapshot can name. A yes to a card, a deposit or the full price always writes a K-29 ticked_terms consent and answers it (takeMoneyBefore.response). Put right, consentId is consent-agent-alex-haircut-terms, as j5-card-saved-yes-page.json."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-0014",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-agent-alex-0001",
+      "traceId": "trace-page-alex-0014"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "kind": "yes",
+      "step": "A5-07",
+      "branch": "card",
+      "amountNow": null,
+      "payBy": "cardOnPage",
+      "payLinkId": null,
+      "yes": {
+        "kind": "page",
+        "exactWords": "Haircut with Riley, Sat Oct 24 at 11:00am, $35, paid at Lee's Barbershop. Your card is saved only for the $20 late-cancel or no-show fee, which Lee's Barbershop confirms first. Nothing is charged now.",
+        "yesEventId": "evt-page-alex-0014"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "yes",
+    "branch": "card",
+    "took": "asked",
+    "card": null,
+    "payLink": null,
+    "consentId": null,
+    "textsOff": null,
+    "ownerOk": null,
+    "customerTold": null,
+    "released": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-agent-alex-oct21" },
+      { "slot": "pay.took", "table": "saved_cards", "column": "saved_at", "rowId": "card-agent-alex-haircut" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-agent-alex-1" }
+    ],
+    "gives": ["money_before", "card_saved"],
+    "written": [{ "table": "booking_details", "rowId": "booking-agent-alex-oct21", "version": 5 }],
+    "repeated": false
+  }
+}

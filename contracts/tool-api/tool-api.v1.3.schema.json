@@ -828,7 +828,7 @@
     },
     "settleOffer.request": {
       "title": "SettleOfferRequest",
-      "description": "A5-01 and B5-01's offers, each settled before anything is taken; gives no key. credit (A5-03, B5-31: 'This booking uses one of them. The page shows the credits left after this visit'): in one commit a K-32 v1 credits row from the person's own pack or membership for the line's service (units: 1 visit, or the minutes or cents a pack of hours or dollars draws down), the pack's credits_used raised under its CHECK (K-32 rule 10), and, since K-30 v1 copies booking_lines.paid_by at the save, before A5-01 (K-30 README writer table: A4-21, B4-23), the open line replaced, before the booking is written, by a copy paid by credit with the same way and price (the old line removed with no change row: K-30 booking_lines.state 'replaced before the booking was written'; v1.1 open gap 46's default), which the credit names (README default 94; open gap 91). buy (A5-22, B5-32: 'the customer buys one on the secure page. This visit then uses a credit from it'; 'charged when bought, into the business's own Stripe'; 'The card is typed on the page'): a pack (K-32 packs, bought_via rosie, with its payment of purpose pack, booking_id null, method card, pending: 'If the booking isn't confirmed, the pack stays bought') or a membership with its own yes to its terms (K-29 v1 consents kind plan_terms, the exact words and their sha256; K-32 memberships, terms_consent_id; its first plan charge made with the customer present, plan_charges.customer_present, and that charge's payment of purpose plan_charge: K-32 default 28; billed monthly, K-32 memberships.billed; and the card kept for its later charges, a K-32 saved_cards row naming the membership and cardEffectId, answered as savedCardId: round 2, README default 105), charged at once on the card the takeMoneyBefore card stage readied (cardEffectId; K-14 v1 charge, purpose pack, customerPresent true; K-07 stripe_charge), and the visit's credit in the same commit (paid_by credit as above); only K-14's result or paymentSucceeded makes the payment paid (K-32 rule 5), a decline is 'Try another card' (RULES 3.11), and a membership no card pays ends not_paid with its credit given back (K-32 default 28; README default 95). plan (A5-21, B5-21: 'Its terms show with their own yes, before any card. The customer says yes to them on their own, in their own chat or on their page'): '1 I agree' writes the K-29 plan_terms consent bound to the terms' exact words and the K-32 memberships row (kind plan, billed per_visit, terms_consent_id); '2 Just this visit' writes nothing and the visit still books (A5-21's safe default; README default 96). A plan billed monthly needs a card for its charges, which its own yes, given 'before any card' (A5-21; S13-39), cannot carry, so until a K-09 minor version gives that card a stage after the yes it is not offered (notOffered, what plan; round 2, README default 106, open gap 102). Never in a text for a credit or a buy ('Never: offer a package, plan or membership in a text': A5-01), and never an AI's yes ('Never: start repeat charges on a booking yes alone'; S13-55: 'Never a yes relayed in a chat by someone else's AI'). Primary, uncached. Business: caller.businessId; every K-32 row of this business (K-32 rule 5). Person: the head's booker, set on the server, never the browser's. Repeat: caller.requestId is the key; a repeat writes nothing and answers the first result. Version: the pack or membership compared and set (expectVersion, limit 4); new rows at version 1.",
+      "description": "A5-01 and B5-01's offers, each settled before anything is taken; gives no key. credit (A5-03, B5-31: 'This booking uses one of them. The page shows the credits left after this visit'): in one commit a K-32 v1 credits row from the person's own pack or membership for the line's service (units: 1 visit, or the minutes or cents a pack of hours or dollars draws down), the pack's credits_used raised under its CHECK (K-32 rule 10), and, since K-30 v1 copies booking_lines.paid_by at the save, before A5-01 (K-30 README writer table: A4-21, B4-23), the open line replaced, before the booking is written, by a copy paid by credit with the same way and price (the old line removed with no change row: K-30 booking_lines.state 'replaced before the booking was written'; v1.1 open gap 46's default), which the credit names (README default 94; open gap 91). buy (A5-22, B5-32: 'the customer buys one on the secure page. This visit then uses a credit from it'; 'charged when bought, into the business's own Stripe'; 'The card is typed on the page'): a pack (K-32 packs, bought_via rosie, with its payment of purpose pack, booking_id null, method card, pending: 'If the booking isn't confirmed, the pack stays bought') with its own yes to it on the page (termsYes, the words shown, compared by code; a K-29 v1 consents row of kind ticked_terms, the exact words and their sha256, naming this booking, written in the buy's commit and answered as consentId, the bound yes C-018's hourly check finds behind the pack's charge: round 3, DL-257, README defaults 109 and 110) or a membership with its own yes to its terms (K-29 v1 consents kind plan_terms, the exact words and their sha256; K-32 memberships, terms_consent_id; its first plan charge made with the customer present, plan_charges.customer_present, and that charge's payment of purpose plan_charge: K-32 default 28; billed monthly, K-32 memberships.billed; and the card kept for its later charges, a K-32 saved_cards row naming the membership and cardEffectId, answered as savedCardId: round 2, README default 105), charged at once on the card the takeMoneyBefore card stage readied (cardEffectId; K-14 v1 charge, purpose pack, customerPresent true; K-07 stripe_charge), and the visit's credit in the same commit (paid_by credit as above); only K-14's result or paymentSucceeded makes the payment paid (K-32 rule 5), a decline is 'Try another card' (RULES 3.11), and a membership no card pays ends not_paid with its credit given back (K-32 default 28; README default 95). plan (A5-21, B5-21: 'Its terms show with their own yes, before any card. The customer says yes to them on their own, in their own chat or on their page'): '1 I agree' writes the K-29 plan_terms consent bound to the terms' exact words and the K-32 memberships row (kind plan, billed per_visit, terms_consent_id); '2 Just this visit' writes nothing and the visit still books (A5-21's safe default; README default 96). A plan billed monthly needs a card for its charges, which its own yes, given 'before any card' (A5-21; S13-39), cannot carry, so until a K-09 minor version gives that card a stage after the yes it is not offered (notOffered, what plan; round 2, README default 106, open gap 102). Never in a text for a credit or a buy ('Never: offer a package, plan or membership in a text': A5-01), and never an AI's yes ('Never: start repeat charges on a booking yes alone'; S13-55: 'Never a yes relayed in a chat by someone else's AI'). Primary, uncached. Business: caller.businessId; every K-32 row of this business (K-32 rule 5). Person: the head's booker, set on the server, never the browser's. Repeat: caller.requestId is the key; a repeat writes nothing and answers the first result. Version: the pack or membership compared and set (expectVersion, limit 4); new rows at version 1.",
       "type": "object",
       "properties": {
         "caller": { "$ref": "#/$defs/businessCaller" },
@@ -895,9 +895,13 @@
                         "name": { "type": "string", "minLength": 1 },
                         "unit": { "type": "string", "enum": ["visit", "minute", "cent"] },
                         "creditsTotal": { "type": "integer", "minimum": 1 },
-                        "price": { "$ref": "#/$defs/money" }
+                        "price": { "$ref": "#/$defs/money" },
+                        "termsYes": {
+                          "description": "Its own yes on the page, in MembershipItem's form: the tap, with the words the page server showed (the pack, its service, its credits and its price charged now), which code builds again from this item and compares (wordsDiffer otherwise; v1.1 default 52's rule), never an AI's (ownYesNeeded). The buy's commit writes it as a K-29 v1 consent of kind ticked_terms (A5-07: 'The exact words the customer ticked are stored with the booking'), with those words and their sha256, naming this booking, and answers it as consentId: the bound yes behind the pack's charge (round 3, DL-257; A5-04: 'Never: take money before the price and the yes to it, or more than the terms say'; S13-55: 'A new or higher amount, an extra or a plan needs the customer's own yes'; K-32 v1 rule 10, unbound_charge; README defaults 109, 110).",
+                          "$ref": "#/$defs/readBackYes"
+                        }
                       },
-                      "required": ["kind", "serviceId", "name", "unit", "creditsTotal", "price"],
+                      "required": ["kind", "serviceId", "name", "unit", "creditsTotal", "price", "termsYes"],
                       "additionalProperties": false
                     },
                     {
@@ -1031,7 +1035,7 @@
     },
     "settleOffer.response": {
       "title": "SettleOfferResponse",
-      "description": "What the offer wrote: the credit, the pack or membership and its payment, a membership's saved card (round 2), the plan and its consent, the line paid by credit, the charge's effect, the money words' sources; no key.",
+      "description": "What the offer wrote: the credit, the pack or membership and its payment, a membership's saved card (round 2), the consent of a buy's own yes (round 3), the plan and its consent, the line paid by credit, the charge's effect, the money words' sources; no key.",
       "type": "object",
       "properties": {
         "bookingId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" },
@@ -1045,7 +1049,7 @@
           "$ref": "#/$defs/nullableId"
         },
         "consentId": {
-          "description": "The K-29 plan_terms consent of a plan's '1 I agree' or a membership's terms; null otherwise.",
+          "description": "The K-29 consent of the offer's own yes, written in its commit: for a buy always one, a pack's ticked_terms (round 3, DL-257; README default 109) or a membership's terms (plan_terms); a plan's '1 I agree' (plan_terms); null for a credit and '2 Just this visit'. A consent row carries no version, so written never lists it (K-29 v1 rule 2; README 'Round 3').",
           "$ref": "#/$defs/nullableId"
         },
         "savedCardId": {
@@ -1112,6 +1116,13 @@
             "properties": { "savedCardId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
           },
           "else": { "properties": { "savedCardId": { "type": "null" } } }
+        },
+        {
+          "description": "A buy is charged only on the customer's own yes to it, so its answer names that yes's K-29 consent, written in the buy's commit: a pack's ticked_terms, a membership's plan_terms (round 3, DL-257; K-32 v1 rule 10: no charge without a bound yes; README defaults 109, 110).",
+          "if": { "properties": { "offer": { "const": "buy" } }, "required": ["offer"] },
+          "then": {
+            "properties": { "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+          }
         }
       ]
     },
@@ -1867,7 +1878,7 @@
           "anyOf": [{ "$ref": "#/$defs/payLinkIssued" }, { "type": "null" }]
         },
         "consentId": {
-          "description": "For yes, the K-29 consent the yes wrote: texts for nothing taken, ticked_terms for a card, a deposit or the full price (README default 92); null for the AI's request, a stopped mobile's texts and every other stage.",
+          "description": "For yes, the K-29 consent the yes wrote: texts for nothing taken, ticked_terms for a card, a deposit or the full price, which the answer always names (README default 92; round 3); null for the AI's request, a stopped mobile's texts and every other stage. A consent row carries no version, so written never lists it (K-29 v1 rule 2; README 'Round 3').",
           "$ref": "#/$defs/nullableId"
         },
         "textsOff": {
@@ -2152,6 +2163,16 @@
               "then": { "properties": { "ownerOk": { "type": "object" } } }
             }
           ]
+        },
+        {
+          "description": "A yes to a card, a deposit or the full price always writes the exact words ticked as a K-29 ticked_terms consent, so its answer names it (A5-07; README default 92; round 3, DL-257, the security reviewer's note a); only a yes to nothing taken may name none (the AI's request on D104's door, a stopped mobile).",
+          "if": {
+            "properties": { "stage": { "const": "yes" }, "branch": { "enum": ["card", "deposit", "full"] } },
+            "required": ["stage", "branch"]
+          },
+          "then": {
+            "properties": { "consentId": { "$ref": "../common/formats.v1.schema.json#/$defs/id" } }
+          }
         }
       ]
     },
