@@ -1,15 +1,18 @@
 // Which implementation each port takes in each environment (T-550): the one table the composition root reads and each
 // join (T-552 to T-564) edits, one line per port, in D-017's turn order (./ports.ts).
 //
-//   test        Vitest and CI: every port on its fake, the doubles the runtime's own tests use (./test-support.ts).
+//   test        Vitest and CI: every port on its fake, the doubles the runtime's own tests use (./test-support.ts), but a
+//               joined port on its real package, fed by those doubles.
 //   staging     the Worker under env.staging (wrangler.jsonc vars: ENVIRONMENT "staging", BASE_PATH "/test").
 //   production  the Worker anywhere else (ENVIRONMENT "production", or a value the root does not know).
 //
-// No join has landed, so the Worker's environments keep every port closed: each call fails, as `unconfiguredGateway` did
-// before, and every webhook route still answers 503. The fakes never reach a Worker bundle: they are test code (the
-// runtime's test-support files are "Not imported by the Worker"; the Linq double is "test code only, never in a Worker
-// bundle"), so only a test hands the root its fake set. A join swaps one line's staging (later production) pick for the
-// real package's implementation, and adds that implementation's set to the root's.
+// A join swaps one line's test and staging picks for the real package's implementation (./real.ts, the set the root
+// builds itself); production's waits for the release that takes it there. Joined so far: linqVerify (T-552), the Linq
+// adapter's verify, fed by the Linq double's signer in a test and by LINQ_WEBHOOK_SECRET on staging, behind the skeleton
+// flag (./skeleton.ts). Every other port of the Worker's environments stays closed: each call fails, as
+// `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
+// Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
+// "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
 
 import type { PortName } from "./ports";
 
@@ -17,8 +20,11 @@ export const ENVIRONMENTS = ["test", "staging", "production"] as const;
 
 export type Environment = (typeof ENVIRONMENTS)[number];
 
-/** fake: the test doubles. closed: not joined in this environment, so every call fails (./closed.ts). */
-export type ImplementationName = "fake" | "closed";
+/**
+ * fake: the test doubles. real: the real package, joined (./real.ts). closed: not joined in this environment, so every
+ * call fails (./closed.ts).
+ */
+export type ImplementationName = "fake" | "real" | "closed";
 
 /** One port's implementation in each environment. */
 export interface PortPick {
@@ -30,7 +36,7 @@ export interface PortPick {
 
 /** One line per port, in D-017's turn order; the join that swaps it is named beside it. */
 export const PICKS: readonly PortPick[] = [
-  { port: "linqVerify", test: "fake", staging: "closed", production: "closed" }, // T-552
+  { port: "linqVerify", test: "real", staging: "real", production: "closed" }, // T-552
   { port: "sealing", test: "fake", staging: "closed", production: "closed" }, // T-553
   { port: "safetyRead", test: "fake", staging: "closed", production: "closed" }, // T-554
   { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-555 to T-557, T-562, T-564

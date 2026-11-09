@@ -1,9 +1,11 @@
 // The composition root in the Workers runtime (T-550; C-046, C-044; build prompt section 10, D-017: "the trace shows every
 // hop once, in order"; "a repeated webhook sends nothing twice"). The root is composed for the test environment, every
-// port on its fake (./test-support.ts), with the HandleActor namespace and one test clock; `install()` puts the actor's
-// ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts createWorker),
-// with the root's gateway. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's
-// dispatcher, and the root's receipt door marks the part delivered and arms its clock.
+// port not joined yet on its fake (./test-support.ts), with the HandleActor namespace and one test clock; `install()` puts
+// the actor's ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts
+// createWorker), with the root's gateway. Since T-552 joined the Linq verify, each webhook is signed by the Linq double
+// (T-412) under the run's made-up secret and verified by the root's real verify (T-413), which is fed the same secret.
+// Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
+// receipt door marks the part delivered and arms its clock.
 //
 // The trace is judged as T-260's runtime trace test judges it (runtime/test/trace-e2e.worker.test.ts, which passes
 // unchanged beside this file), with T-260's hop check (runtime/src/trace/hop-check.ts) against K-08 v1's
@@ -26,13 +28,20 @@ import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 import type { HandleActor } from "../actor";
 import { BUNDLE_A } from "../bundle/test-support";
 import { A7_03_DELIVERED } from "../clocks/arming-support";
-import { actorNameOf, type InboundEvent } from "../gateway";
+import { actorNameOf } from "../gateway";
 import { createWorker } from "../index";
 import { spanProblems, type Hop, type Span, type Trace } from "../trace";
 import { checkHops, hopsOfTrace, leaks, spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import { SAM, until } from "../turn/test-support";
 import { composeRoot, type HandleActors, type Root } from "./index";
-import { SAM_CHAT, SKELETON_ROW, skeletonFakes, type FakeWebhook, type SkeletonFakes } from "./test-support";
+import {
+  SAM_CHAT,
+  SKELETON_ROW,
+  skeletonFakes,
+  type LinqInboundEvent,
+  type SignedWebhook,
+  type SkeletonFakes,
+} from "./test-support";
 
 type Json = Record<string, unknown>;
 
@@ -97,7 +106,7 @@ const SAM_ACTOR = actorNameOf(SAM.handle);
 // ---- the texts ------------------------------------------------------------------------------------------------------
 
 /** A text of Sam's: K-06's text-imessage.json with his handle, this event id and these words. */
-function samText(eventId: string, body: string): InboundEvent {
+function samText(eventId: string, body: string): LinqInboundEvent {
   return {
     ...(structuredClone(textFixture) as Json),
     eventId,
@@ -105,11 +114,11 @@ function samText(eventId: string, body: string): InboundEvent {
     body,
     chatId: SAM_CHAT,
     messageId: `linq-msg-demo-in-${eventId}`,
-  } as unknown as InboundEvent;
+  } as unknown as LinqInboundEvent;
 }
 
 /** The webhook request as it reaches the Worker's Linq route under BASE_PATH. */
-function webhookRequest(webhook: FakeWebhook): Request {
+function webhookRequest(webhook: SignedWebhook): Request {
   return new Request(`https://rosie.test${env.BASE_PATH}/webhooks/linq`, {
     method: "POST",
     headers: {
@@ -127,8 +136,8 @@ function webhookRequest(webhook: FakeWebhook): Request {
 interface Run {
   readonly fakes: SkeletonFakes;
   readonly root: Root;
-  /** Signs one K-06 event with the verify fake and posts it to the Worker's route; answers the trace id the gateway opened. */
-  post(event: InboundEvent, partKey?: string | null): Promise<string>;
+  /** Signs one K-06 event with the Linq double and posts it to the Worker's route; answers the trace id the gateway opened. */
+  post(event: LinqInboundEvent, partKey?: string | null): Promise<string>;
   /** The spans logged so far. */
   spans(): Span[];
   /** Waits until the trace shows this hop; on a timeout, says which hops it shows and which calls the turn made. */
@@ -144,6 +153,7 @@ function rig(log: MockInstance): Run {
     actors: handleActors(),
     vars: env,
     clock: fakes.clock,
+    linq: fakes.linqInputs,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);
@@ -153,7 +163,7 @@ function rig(log: MockInstance): Run {
     root,
     async post(event, partKey = null) {
       const response = await worker.fetch(
-        webhookRequest(fakes.verify.sign(event, partKey)),
+        webhookRequest(await fakes.sign(event, partKey)),
         env,
         createExecutionContext(),
       );
@@ -227,7 +237,7 @@ describe("through the composition root, every port on its fake: a text's webhook
           handle: { ...SAM.handle },
           chatId: SAM_CHAT,
           status: { messageId: accepted.providerMessageId, at: A7_03_DELIVERED.deliveredAt, failure: null },
-        } as unknown as InboundEvent;
+        } as unknown as LinqInboundEvent;
         const receiptTraceId = await run.post(receipt, `${SKELETON_ROW}/1/1`);
 
         const spans = run.spans();
@@ -291,8 +301,8 @@ describe("through the composition root, a repeated webhook (trace-duplicate-webh
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const run = rig(log);
     try {
-      const first = structuredClone(textFixture) as unknown as InboundEvent;
-      const again = structuredClone(duplicateFixture) as unknown as InboundEvent;
+      const first = structuredClone(textFixture) as unknown as LinqInboundEvent;
+      const again = structuredClone(duplicateFixture) as unknown as LinqInboundEvent;
       expect(again.eventId).toBe(first.eventId);
       run.fakes.known(first.eventId);
       const firstTrace = await run.post(first);

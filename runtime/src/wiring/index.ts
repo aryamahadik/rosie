@@ -22,6 +22,13 @@ export {
   type TurnFacePort,
 } from "./ports";
 export {
+  LINQ_WEBHOOK_SECRET,
+  MissingSecretError,
+  realPorts,
+  type LinqVerifyInputs,
+  type RealInputs,
+} from "./real";
+export {
   composeRoot,
   WORKER_CLOCK,
   workerRoot,
@@ -29,5 +36,7 @@ export {
   type Root,
   type RootClock,
   type RootOptions,
+  type WorkerSecrets,
 } from "./root";
 export { ROW_MEMORY, RowTraces } from "./row-traces";
+export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";

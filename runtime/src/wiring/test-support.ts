@@ -1,11 +1,14 @@
-// Doubles for the composition root's tests (T-550): the fake set the test environment binds (./picks.ts), every port on
-// the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's runtime trace test
-// does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's frontier, decide and commit retargeted to the running
-// turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit wrote, the dispatcher's K-05
-// store holding that row, and a delivery receipt that arms A7-03's clock. Not imported by the Worker.
+// Doubles for the composition root's tests (T-550, T-552): the fake set the test environment binds (./picks.ts), every
+// port not joined yet on the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's
+// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's frontier, decide and commit
+// retargeted to the running turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit
+// wrote, the dispatcher's K-05 store holding that row, and a delivery receipt that arms A7-03's clock. Not imported by the
+// Worker.
 //
-//   linqVerify   a K-11 verify fake in the gateway tests' manner (T-241's K-11 double: it checks no HMAC, which is the
-//                adapter's): a webhook it signed, unchanged, verifies back to its K-06 event and part key
+//   linqVerify   joined (T-552): the root binds the Linq adapter's verify (./real.ts). What it is fed comes from here:
+//                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
+//                webhook secret made up for the run, never Linq's, and the root's verify gets the same secret, with the
+//                chat lookup a receipt needs (Sam's chat is Sam's number)
 //   sealing      gateway/test-support fakeKeyStore
 //   safetyRead   safety/test-support fakeRead, answering safety-no.json for each text the test names (`known`)
 //   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
@@ -20,21 +23,23 @@
 //                clocks/arming-support's K-05 armClock and cancelClock
 //   linqSend     dispatch/test-support FakeLinq and safety/test-support fakeDirect
 //
-// One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures come through
-// npm's workspace link (@rosie/contracts). Test values only: the master's sample cast, the frozen fixtures' ids and the
-// fictional 555-01xx numbers (rule 9).
+// One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures and the Linq
+// double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
+// cast, the frozen fixtures' ids, the fictional 555-01xx numbers (rule 9) and a webhook secret made up for each run.
 
+import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
+import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import buildFrontierS102 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
+import type { FlagSubject } from "@rosie/db/repo/flags";
 
 import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
 import { fakeKeyStore, type FakeKeyStore } from "../gateway/test-support";
-import type { InboundEvent, LinqPort, VerifyWebhookRequest } from "../gateway/types";
 import { fakeTargets, type FakeTargets } from "../guard/test-support";
 import { fakeCore, fakeDirect, fakeRead, fixtureBundle } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
@@ -57,7 +62,9 @@ import {
   type FakeTurnFace,
 } from "../turn/test-support";
 import type { Ports } from "./ports";
+import type { LinqVerifyInputs } from "./real";
 import type { RootClock } from "./root";
+import type { ReleaseFlags } from "./skeleton";
 
 // ---- one clock for every fake ------------------------------------------------------------------------------------
 
@@ -89,61 +96,70 @@ export function testClock(): TestClock {
   };
 }
 
-// ---- K-11 verifyWebhook, as a fake ---------------------------------------------------------------------------------
+// ---- K-11: webhooks signed by the Linq double, for the root's real verify ------------------------------------------
 
-/** A webhook as it reaches the gateway: the three header values and the raw body. */
-export interface FakeWebhook {
-  readonly webhookId: string;
-  readonly timestamp: string;
-  readonly signature: string;
-  readonly raw: string;
+/** A K-06 v1 event of Linq's, as the Linq double signs it and the adapter's verify gives it back. */
+export type LinqInboundEvent = LinqEvent;
+
+/** A webhook as the Linq double signs it: the three header values, the raw body, and its receipt time and trace. */
+export type SignedWebhook = VerifyWebhookRequest;
+
+/** A webhook secret made up for one run, in Linq's form ("whsec_" and 32 random bytes in base64): never Linq's, never kept. */
+export function testWebhookSecret(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return `whsec_${btoa(String.fromCharCode(...bytes))}`;
 }
 
-export interface FakeLinqVerify extends LinqPort {
-  /** The webhook for one K-06 event and the part key a receipt echoes: the fake verifies it back to both. */
-  sign(event: InboundEvent, partKey?: string | null): FakeWebhook;
-  /** Every verify request, in order. */
-  readonly requests: VerifyWebhookRequest[];
+/** An instant as K-06 writes it: UTC, whole seconds, ending in Z. */
+function utcSeconds(ms: number): string {
+  return new Date(ms).toISOString().replace(/[.][0-9]+Z$/, "Z");
 }
 
 /**
- * K-11 verifyWebhook as a fake: a webhook it signed, with its id, timestamp, body and signature unchanged, verifies to its
- * K-06 event under the gateway's trace id, with its part key; anything else is rejected as badSignature. The signature is
- * a made-up token, never a secret.
+ * The same webhook with one byte of its signature's MAC changed (K-11 `oneByteChanged`): the first base64 letter after
+ * "v1," carries the first byte's high bits, so the MAC no longer matches.
  */
-export function fakeLinqVerify(clock: RootClock): FakeLinqVerify {
-  const signed = new Map<string, { webhook: FakeWebhook; event: InboundEvent; partKey: string | null }>();
-  const requests: VerifyWebhookRequest[] = [];
+export function withSignatureChanged(webhook: SignedWebhook): SignedWebhook {
+  const prefix = "v1,";
+  if (!webhook.signature.startsWith(prefix)) throw new Error("the double signs v1,<base64>");
+  const changed = webhook.signature.charAt(prefix.length) === "A" ? "B" : "A";
   return {
-    requests,
-    sign(event, partKey = null) {
-      const webhook: FakeWebhook = {
-        webhookId: `msg_fake_${String(signed.size + 1)}`,
-        timestamp: String(Math.floor(clock.now() / 1000)),
-        signature: `v1,fake-${crypto.randomUUID()}`,
-        raw: JSON.stringify(event),
-      };
-      signed.set(webhook.webhookId, { webhook, event: structuredClone(event), partKey });
-      return webhook;
+    ...webhook,
+    signature: `${prefix}${changed}${webhook.signature.slice(prefix.length + 1)}`,
+  };
+}
+
+// ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
+
+export interface FakeFlags extends ReleaseFlags {
+  /** Turns a flag on or off for the global scope. */
+  set(name: string, enabled: boolean): void;
+  /** Every read, in order: the flag's name and the subject it was read for. */
+  readonly reads: { readonly name: string; readonly subject: FlagSubject | undefined }[];
+  /** When set, every read throws it, as a database that cannot answer. */
+  failWith: Error | null;
+}
+
+/**
+ * T-185's readFlag as a fake, for the global scope only: a flag set on reads on; one set off, or never set, reads off (no
+ * row at all is off).
+ */
+export function fakeFlags(on: readonly string[] = []): FakeFlags {
+  const enabled = new Map<string, boolean>(on.map((name) => [name, true]));
+  const reads: { name: string; subject: FlagSubject | undefined }[] = [];
+  const flags: FakeFlags = {
+    reads,
+    failWith: null,
+    set(name, value) {
+      enabled.set(name, value);
     },
-    verifyWebhook(request) {
-      requests.push(request);
-      const known = signed.get(request.webhookId);
-      if (
-        known?.webhook.timestamp !== request.timestamp ||
-        known.webhook.raw !== request.raw ||
-        known.webhook.signature !== request.signature
-      ) {
-        return Promise.resolve({ result: "rejected", httpStatus: 401, reason: "badSignature" });
-      }
-      return Promise.resolve({
-        result: "event",
-        httpStatus: 200,
-        event: { ...structuredClone(known.event), traceId: request.traceId },
-        partKey: known.partKey,
-      });
+    readFlag(name, subject) {
+      reads.push({ name, subject });
+      if (flags.failWith !== null) return Promise.reject(flags.failWith);
+      return Promise.resolve({ enabled: enabled.get(name) ?? false });
     },
   };
+  return flags;
 }
 
 // ---- the walking skeleton's turn -----------------------------------------------------------------------------------
@@ -173,10 +189,18 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 export interface SkeletonFakes {
-  /** The fake set the test environment binds. */
-  readonly ports: Ports;
+  /** The fake set the test environment binds: every port but the joined Linq verify, which the root builds (./real.ts). */
+  readonly ports: Omit<Ports, "linqVerify">;
   readonly clock: TestClock;
-  readonly verify: FakeLinqVerify;
+  /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
+  readonly linqInputs: LinqVerifyInputs;
+  /** The Linq double's signer (T-412), under the same made-up secret. */
+  readonly webhooks: LinqWebhookDouble;
+  /**
+   * The webhook the Linq double signs for one K-06 event (and the part key a receipt echoes), received now on the test
+   * clock (whole seconds), so it is inside the 300 s window of the gateway's receipt time.
+   */
+  sign(event: LinqInboundEvent, partKey?: string | null): Promise<SignedWebhook>;
   readonly keys: FakeKeyStore;
   readonly face: FakeTurnFace;
   readonly targets: FakeTargets;
@@ -233,10 +257,14 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   ]);
   const linq = new FakeLinq(() => clock.utc());
   const arming = wireArming();
-  const verify = fakeLinqVerify(clock);
+  const secret = testWebhookSecret();
+  const webhooks = createLinqWebhookDouble({ secret });
+  const linqInputs: LinqVerifyInputs = {
+    webhookSecret: () => secret,
+    chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
+  };
 
-  const ports: Ports = {
-    linqVerify: verify,
+  const ports: Omit<Ports, "linqVerify"> = {
     sealing: keys,
     safetyRead: fakeRead(clock, answers),
     stateReads: {
@@ -284,7 +312,10 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   return {
     ports,
     clock,
-    verify,
+    linqInputs,
+    webhooks,
+    sign: (event, partKey = null) =>
+      webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
     keys,
     face,
     targets,
