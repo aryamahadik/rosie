@@ -647,6 +647,132 @@ export function givesJourneyFiveKeys(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.4 (T-053): journey 6. Added beside the rules above, which stay as they are.
+
+/**
+ * The keys each step of journey 6 gives, as the step index prints them (A-J6.md and B-J6.md, the gives column; A-keys.md
+ * and B-keys.md, section 6): the booking written gives booked (A6-10, B6-10), the confirmation with its new check-in
+ * code gives code (A6-14, B6-13), and the pro's job row, once delivered, gives staff_told (A6-15, B6-14). No other step
+ * of journey 6 gives a key.
+ */
+export const J6_STEP_GIVES = Object.freeze({
+  "A6-10": ["booked"],
+  "B6-10": ["booked"],
+  "A6-14": ["code"],
+  "B6-13": ["code"],
+  "A6-15": ["staff_told"],
+  "B6-14": ["staff_told"],
+});
+
+/**
+ * The steps whose keys one call's own commit gives beside its stated step (README "v1.4", default 111): the booking
+ * written then its confirmation (A6-10 then A6-14; B6-10 then B6-13), A6-12's write at a new time ("The same steps, at
+ * the new time"), and A6-32's (B6-35's) 'Paid in time', which gives A6-10's booked that waited for the payment and the
+ * confirmation's code.
+ */
+export const J6_CALL_PASSES = Object.freeze({
+  "A6-10": ["A6-14"],
+  "A6-12": ["A6-10", "A6-14"],
+  "A6-32": ["A6-10", "A6-14"],
+  "B6-10": ["B6-13"],
+  "B6-35": ["B6-10", "B6-13"],
+});
+
+/**
+ * In a turn (gateAndCommit), the steps a part's walk may pass right after a step that asks (arch 03 line 191), whose
+ * keys the same commit may give: the owner's '1 Accept' (A6-02 to A6-03, A6-10 and A6-14), the customer's '1 Take it'
+ * (A6-17), a pick of the next times (A6-11 to A6-12), and the on-call pro's '1 Take it' (B6-16 to B6-10 and B6-13).
+ */
+export const J6_WALK_PASSES = Object.freeze({
+  "A6-02": ["A6-10", "A6-14"],
+  "B6-04": ["B6-10", "B6-13"],
+  "A6-17": ["A6-10", "A6-14"],
+  "B6-29": ["B6-10", "B6-13"],
+  "A6-11": ["A6-10", "A6-14"],
+  "B6-11": ["B6-10", "B6-13"],
+  "B6-16": ["B6-10", "B6-13"],
+});
+
+/** The one call that writes each key journey 6 gives (README "v1.4", "Each key's one call"; 02-contracts section 8). */
+export const J6_KEY_CALL = Object.freeze({
+  booked: "writeBooking",
+  code: "writeBooking",
+  staff_told: "recordStaffTold",
+});
+
+/** The confirmation steps, whose key code no visit gives when none has a code (nobody home: B4-105). */
+const J6_CODE_STEPS = new Set(["A6-14", "B6-13"]);
+
+/** Whether an outcome wrote visits and none of them has a check-in code (K-30 booking_visits.code_for_person_id null). */
+function visitsWithoutCode(exchange) {
+  const visits = exchange.outcome?.visits;
+  return (
+    Array.isArray(visits) && visits.length > 0 && visits.every((visit) => visit.codeForPersonId === null)
+  );
+}
+
+/**
+ * givesJourneySixKeys: an exchange that states a journey 6 step writes the keys that step gives (J6_STEP_GIVES), and
+ * its outcome wrote exactly the stated keys. Made alone, it states exactly its step's keys with those of the steps its
+ * own commit passes (J6_CALL_PASSES), less code when no visit it wrote has a code, and its call is the one call that
+ * writes each key (J6_KEY_CALL; the card's "each key written by exactly one call"). In a turn (gateAndCommit) the
+ * committed parts' gives are the keys written: its step's own keys, and any of those the steps its walk passes give
+ * (J6_WALK_PASSES; arch 03 line 191), as givesJourneyFourKeys allows.
+ */
+export function givesJourneySixKeys(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const inTurn = exchange.call === "gateAndCommit";
+  const noCode = visitsWithoutCode(exchange);
+  const ownKeys = J6_STEP_GIVES[stated.step] ?? [];
+  const passes = ((inTurn ? J6_WALK_PASSES : J6_CALL_PASSES)[stated.step] ?? []).filter(
+    (step) => !(noCode && J6_CODE_STEPS.has(step)),
+  );
+  const passedKeys = [...new Set(passes.flatMap((step) => J6_STEP_GIVES[step] ?? []))];
+  if (ownKeys.length === 0 && passedKeys.length === 0) {
+    return [`${stated.step} is no step of journey 6 that gives a key`];
+  }
+  const problems = [];
+  const statedKeys = [...stated.gives].sort();
+  let expected;
+  if (inTurn) {
+    expected = statedKeys;
+    for (const key of ownKeys) {
+      if (!statedKeys.includes(key))
+        problems.push(`${stated.step} gives ${key}, which given.stated.gives leaves out`);
+    }
+    for (const key of statedKeys) {
+      if (!ownKeys.includes(key) && !passedKeys.includes(key)) {
+        problems.push(`${key} is given neither by ${stated.step} nor by a step its walk passes`);
+      }
+    }
+  } else {
+    expected = [...new Set([...ownKeys, ...passedKeys])].sort();
+    if (JSON.stringify(statedKeys) !== JSON.stringify(expected)) {
+      problems.push(
+        `${stated.step} gives [${expected.join(", ")}], not the stated [${stated.gives.join(", ")}]`,
+      );
+    }
+  }
+  const written = [...keysWritten(exchange)].sort();
+  if (JSON.stringify(written) !== JSON.stringify(expected)) {
+    problems.push(`the outcome wrote [${written.join(", ")}], not [${expected.join(", ")}]`);
+  }
+  if (!inTurn) {
+    for (const key of written) {
+      if (J6_KEY_CALL[key] !== exchange.call) {
+        problems.push(
+          `${key} is written by ${J6_KEY_CALL[key] ?? "no journey 6 call"}, not ${exchange.call}`,
+        );
+      }
+    }
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -656,4 +782,5 @@ export const rules = Object.freeze({
   arrivalTurn,
   givesJourneyFourKeys,
   givesJourneyFiveKeys,
+  givesJourneySixKeys,
 });

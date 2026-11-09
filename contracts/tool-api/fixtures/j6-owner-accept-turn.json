@@ -1,0 +1,46 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-ask-owner-page.json"],
+    "now": "2026-10-22T12:05:00Z",
+    "stated": null,
+    "note": "A6-02's '1 Accept' in Sam's own turn at 8:05am Thu, before the 11:20am deadline. The question went out by the clock turn of j6-ask-owner-page.json; its reminder fired at 7:53pm with no answer (owner_oks.reminded_at, version 2). Sam replies '1', which clearly answers that one open question, and decide picks A6-02's branch '1 Accept'. The commit records owner_oks answered accept in K-08's ownerYes shape (Sam, owner, the question, the option, his reply's event), compared on version 2 and set to 3, and closes the question answered. Nothing is charged by this answer: the walk goes on in the same turn's commit to A6-03 and A6-10, writeBooking write (j6-write-booking-after-ok-turn.json), which reads the time again and books it (next writeBooking). No key here; the booking write gives booked and code. The question and event ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-accept-agent-alex",
+      "requestId": "turn-sam-accept-agent-alex",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-accept-agent-alex"
+    },
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "A6-02",
+      "ownerOkId": "ok-agent-alex-oct21-request",
+      "answer": "accept",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-agent-alex-oct21-a6-02", "yesEventId": "evt-sam-0151" },
+      "expectVersion": 2
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-alex-oct21",
+    "stage": "ownerAnswer",
+    "answer": "accept",
+    "ownerOk": null,
+    "questions": [],
+    "told": [],
+    "next": "writeBooking",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "owner_oks", "rowId": "ok-agent-alex-oct21-request", "version": 3 }],
+    "repeated": false
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": [
+      "people-access/seed-staff-joined.json",
+      "services-prices/seed-service-money-paths.json",
+      "core/seed-phone-chat-open.json"
+    ],
+    "after": ["j6-on-call-take-turn.json"],
+    "now": "2026-10-19T22:48:01Z",
+    "stated": { "step": "B6-10", "gives": ["booked", "code"] },
+    "note": "B6-10 in Jordan's same turn, after his '1 Take it' (j6-on-call-take-turn.json). A job sent now saved no time at the pick (B4-91; v1.2 open gap 61), so the write reserves Jordan's arrival estimate now, 60 to 90 minutes out with the job's 60 minutes (K-05 v1 reserve), and confirms it booked; Jordan has no calendar link, so the fresh read reads none (calendarLinkIds empty) and K-04's EXCLUDE is the check. The drain's way is list|card|bill, a card saved for the $89 call, nothing due now, so in one commit: the head booked, the visit with its arrival estimate and its new check-in code sealed under Alex's key (never in this answer: 'The code comes again in Jordan's on-my-way text'), the terms snapshot naming Alex's ticked words, and, as outbox rows of this turn, both send class visit_now: B6-13's confirmation into Alex's open chat ('arriving in about 60 to 90 minutes'; 'Give this code at the door') and B6-14's job row to Jordan, 'the pro who took it is told at once' (B6-10), with the address, answers and notes in the job, never in the text (README default 120). Gives booked and code (B6-10, then B6-13). The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-jordan-take-alex-drain",
+      "requestId": "turn-jordan-take-alex-drain",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-jordan",
+      "traceId": "trace-jordan-take-alex-drain"
+    },
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": { "kind": "write", "step": "B6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-10-19T22:48:01Z", "calendarLinkIds": [] },
+    "reservation": { "reservationId": "rsv-sentnow-alex-drain-jordan", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-sentnow-alex-drain-1",
+        "position": 1,
+        "reservationId": "rsv-sentnow-alex-drain-jordan",
+        "codeForPersonId": "person-alex"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": "consent-sentnow-alex-drain-terms" },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": "LH1019",
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "B6-13",
+        "via": "chat",
+        "sendClass": "visit_now",
+        "outboxRowId": "out-sentnow-alex-drain-confirm",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-jordan",
+        "step": "B6-14",
+        "via": "chat",
+        "sendClass": "visit_now",
+        "outboxRowId": "out-sentnow-alex-drain-job-jordan",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [],
+    "moneyWords": [
+      {
+        "slot": "pay.price",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-sentnow-alex-drain-1"
+      },
+      { "slot": "pay.took", "table": "saved_cards", "column": "saved_at", "rowId": "card-sentnow-alex-drain" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-sentnow-alex-drain-1" },
+      {
+        "slot": "pay.staff",
+        "table": "booking_lines",
+        "column": "price_cents",
+        "rowId": "line-sentnow-alex-drain-1"
+      }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-sentnow-alex-drain-jordan", "version": 2 },
+      { "table": "bookings", "rowId": "booking-sentnow-alex-drain", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-sentnow-alex-drain-1", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sentnow-alex-drain-confirm", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sentnow-alex-drain-job-jordan", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

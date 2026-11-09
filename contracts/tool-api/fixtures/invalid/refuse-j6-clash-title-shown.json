@@ -1,0 +1,49 @@
+{
+  "call": "askAboutClash",
+  "given": {
+    "seeds": ["availability/seed-calendar-link.json", "availability/seed-busy-block.json"],
+    "after": [],
+    "now": "2026-11-02T16:00:00Z",
+    "stated": null,
+    "note": "Refused: S12-33's ask carrying the personal event's title (eventTitle). 'The event's title is never shown to Sam or anyone. It may be private' (S12-33); K-16 busy blocks carry no title (refuse-busy-block-with-title.json), so no request field holds one. Without eventTitle it is j6-clash-ask-job.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c136-busy-riley-nov7-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-calendar-riley-push-0007"
+    },
+    "bookingId": "booking-ben-nov7",
+    "stage": {
+      "kind": "ask",
+      "step": "S12-33",
+      "visitId": "visit-ben-nov7-1",
+      "personId": "person-riley",
+      "busyBlockKey": "busy-riley-google-nov7-0001",
+      "eventTitle": "Dentist"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-ben-nov7",
+    "stage": "ask",
+    "question": {
+      "to": "owner",
+      "personId": "person-sam",
+      "step": "S12-33",
+      "via": "chat",
+      "sendClass": "routine",
+      "outboxRowId": null,
+      "clockRowId": "clock-clash-ben-nov7-ask-sam",
+      "openQuestionId": null
+    },
+    "answerBy": "2026-11-06T13:00:00Z",
+    "answer": null,
+    "next": "none",
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-clash-ben-nov7-ask-sam", "version": 1 }],
+    "repeated": false
+  }
+}

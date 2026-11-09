@@ -1,0 +1,23 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["money/seed-payment-deposit.json"],
+    "after": ["j6-write-booking-charging-page.json"],
+    "now": "2026-11-07T15:20:03Z",
+    "stated": null,
+    "note": "Refused: a booking page saying the deposit is paid and booking it (writeBooking paid with caller.kind page, acting for no one). Only the charge's result or K-14's paymentSucceeded makes a payment paid (K-32 rule 5: the runtime side only), so paid comes from C-101's job alone, never from a browser or an AI (README default 111). From C-101's job it is j6-booking-paid-job.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0005",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": { "kind": "paid", "step": "A6-10", "paymentId": "pay-alex-grooms-deposit" }
+  },
+  "outcome": { "error": "notAllowed", "why": "wrongRole" }
+}

@@ -1,0 +1,84 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["money/seed-payment-deposit.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-write-booking-charging-page.json"],
+    "now": "2026-11-07T15:20:03Z",
+    "stated": { "step": "A6-10", "gives": ["booked", "code"] },
+    "note": "A6-10's 'Yes' once the deposit is paid: K-14's charge answered charged at 3:20:02pm (K-14 deposit.json), and the runtime side recorded the result (K-05 v1.1 recordEffectResult: the payment paid and its ledger line, K-32 rule 5, as seed-payment-deposit holds it). C-101's handling of that result, a job acting for no one, calls writeBooking paid. In one commit: the head booked, the visit with its new check-in code sealed under Alex's key (never in this answer), one calendar_write for Riley, and A6-14's confirmation and A6-15's job row through clock rows due at once (a job's commit writes no outbox row: v1.2 default 72's way); Alex's chat is open, so his confirmation goes there, and the page he is still on shows it too (K-21, T-063). The reservation and the terms snapshot were written at the charge (j6-write-booking-charging-page.json), so neither moves here. Gives booked and code (README default 111). pay.took now reads the paid payment; the rest is paid at the counter (pay.left). The visit, clock and effect ids and the booking number are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-eff-alex-grooms-deposit",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": { "kind": "paid", "step": "A6-10", "paymentId": "pay-alex-grooms-deposit" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "paid",
+    "result": "booked",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [
+      {
+        "visitId": "visit-alex-grooms-package-1",
+        "position": 1,
+        "reservationId": "rsv-alex-grooms-package",
+        "codeForPersonId": "person-alex"
+      }
+    ],
+    "termsSnapshot": null,
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": "LB1107",
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-14",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-grooms-confirm",
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A6-15",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-grooms-job-riley",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-grooms-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-grooms-deposit" },
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-grooms-1" },
+      { "slot": "pay.left", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-grooms-1" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-alex-grooms-1" },
+      { "slot": "pay.staff", "table": "payments", "column": "state", "rowId": "pay-alex-grooms-deposit" }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-grooms-package", "version": 2 },
+      { "table": "booking_visits", "rowId": "visit-alex-grooms-package-1", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-grooms-confirm", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-grooms-job-riley", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

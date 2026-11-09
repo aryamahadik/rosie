@@ -1,0 +1,96 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-taken-moment-ago-page.json"],
+    "now": "2026-10-21T23:24:10Z",
+    "stated": { "step": "A6-12", "gives": ["booked", "code"] },
+    "note": "A6-11's 'A or B', then A6-12, 'Writes the new time' ('The same steps, at the new time'): Alex taps A) Sat Oct 24 at 2:00pm on the page, inside his 10 minutes. The time code reads from the stored question's option, never from the page (pick.optionId). Riley's calendar is read once more and the time is free, so the time is reserved (K-05 v1 reserve), and in one commit: the time confirmed booked, the next times' deadline row cancelled (K-05 v1 cancelClock), the head booked, the visit with its new check-in code (never in this answer), the terms snapshot naming the words Alex ticked at the money step (the price is the line's own $35, so that yes stands: README default 122), the calendar write, and A6-14's confirmation at the new time ('anything set by date moves with it') and A6-15's job row through clock rows due at once. Nothing is due now (a card saved), so it books at once. Gives booked and code (A6-12 is A6-10's write at a new time, then A6-14: J6_CALL_PASSES). The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-oct24-0012",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-oct24-0001"
+    },
+    "bookingId": "booking-page-alex-oct24",
+    "stage": {
+      "kind": "write",
+      "step": "A6-12",
+      "pick": {
+        "answer": {
+          "kind": "page",
+          "exactWords": "A) Sat Oct 24 · 2:00pm · Riley · $35",
+          "yesEventId": "evt-page-alex-oct24-0012"
+        },
+        "optionId": "nt-page-alex-oct24-a"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-oct24",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-10-21T23:24:10Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-page-alex-oct24-riley-2pm", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-page-alex-oct24-1",
+        "position": 1,
+        "reservationId": "rsv-page-alex-oct24-riley-2pm",
+        "codeForPersonId": "person-alex"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": "consent-page-alex-oct24-terms" },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": "LB1029",
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-14",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-page-alex-oct24-confirm",
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A6-15",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-page-alex-oct24-job-riley",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-page-alex-oct24-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-page-alex-oct24-1" },
+      { "slot": "pay.took", "table": "booking_details", "column": "taken", "rowId": "booking-page-alex-oct24" },
+      { "slot": "pay.cancel", "table": "booking_visits", "column": "cutoff_at", "rowId": "visit-page-alex-oct24-1" },
+      { "slot": "pay.staff", "table": "booking_lines", "column": "price_cents", "rowId": "line-page-alex-oct24-1" }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-page-alex-oct24-riley-2pm", "version": 2 },
+      { "table": "clock_rows", "rowId": "clock-page-alex-oct24-next-times", "version": 2 },
+      { "table": "bookings", "rowId": "booking-page-alex-oct24", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-page-alex-oct24-1", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-page-alex-oct24-confirm", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-page-alex-oct24-job-riley", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": [
+      "services-prices/seed-service-money-paths.json",
+      "core/seed-business-head.json",
+      "availability/seed-calendar-link.json"
+    ],
+    "after": ["j5-pay-link-agent.json", "j5-pay-page-money-before-page.json", "j5-pay-page-yes-page.json"],
+    "now": "2026-11-03T16:05:12Z",
+    "stated": { "step": "A6-10", "gives": ["booked", "code"] },
+    "note": "C3's door, v1.3 default 104's step 6: Dee paid the $55 on the pay page at 11:05am New York time, inside the 15 minutes. K-14's paymentSucceeded, stored by the gateway and applied by the runtime side, made pay-agent-dee-signature-cut paid and ended its link paid (K-32 rule 5). C-101's handling of that event, a job acting for no one, calls writeBooking write. Nothing is due on a card (the full price is paid), so after the fresh read of Riley's calendar, one commit: the hold confirmed booked before its 11:13am end, the head booked, the visit with its new check-in code, the terms snapshot naming the words Dee ticked on the pay page (consent-dee-signature-cut-terms), Riley's calendar write, and A6-14's confirmation (to her email, with the booking's chat link and its QR, her chat not being open: MC C9) and A6-15's job row through clock rows due at once. Her AI reads the booking number, never the code, through the Agent API (README defaults 119, 126). Gives booked and code. 'Paid or card saved within 15 minutes: booked' (MC C3). The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-evt-dee-signature-paid",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-stripe-dee-signature-paid-0001"
+    },
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-signature-cut",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-11-03T16:05:12Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-agent-dee-signature-cut", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-agent-dee-signature-cut-1",
+        "position": 1,
+        "reservationId": "rsv-agent-dee-signature-cut",
+        "codeForPersonId": "person-dee"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": "consent-dee-signature-cut-terms" },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": "LB1102",
+    "chatLink": { "chatLinkId": "chatlink-agent-dee-signature-cut", "url": null },
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-dee",
+        "step": "A6-14",
+        "via": "email",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-agent-dee-signature-confirm-email",
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A6-15",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-agent-dee-signature-job-riley",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-dee-signature-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-agent-dee-signature-cut" },
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-agent-dee-signature-1" },
+      { "slot": "pay.cancel", "table": "booking_lines", "column": "fee_cents", "rowId": "line-agent-dee-signature-1" },
+      { "slot": "pay.staff", "table": "payments", "column": "state", "rowId": "pay-agent-dee-signature-cut" }
+    ],
+    "gives": ["booked", "code"],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-agent-dee-signature-cut", "version": 2 },
+      { "table": "bookings", "rowId": "booking-agent-dee-signature-cut", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-agent-dee-signature-cut-1", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-agent-dee-signature-confirm-email", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-agent-dee-signature-job-riley", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

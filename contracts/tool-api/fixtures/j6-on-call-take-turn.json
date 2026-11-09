@@ -1,0 +1,48 @@
+{
+  "call": "sendToOnCall",
+  "given": {
+    "seeds": ["people-access/seed-on-call.json", "people-access/seed-staff-joined.json"],
+    "after": ["j6-on-call-ask-page.json"],
+    "now": "2026-10-19T22:48:00Z",
+    "stated": null,
+    "note": "B6-16's '1 Take it' in Jordan's own turn, inside his 5 minutes ('Jordan takes the job, in any words, within 5 minutes'): he replies '1', and decide picks the branch '1 Take it'. In his turn's commit the offer's question is closed answered, and the walk goes on to B6-10, writeBooking write (j6-write-booking-sent-now-turn.json), in the same commit: his take stands for Sam's yes on a job sent now (S12-17). The name and address open in the job after (K-21's job page, T-063). No key here. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-jordan-take-alex-drain",
+      "requestId": "turn-jordan-take-alex-drain",
+      "businessId": "biz-lee-home-services",
+      "personId": "person-jordan",
+      "traceId": "trace-jordan-take-alex-drain"
+    },
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": {
+      "kind": "proAnswer",
+      "step": "B6-16",
+      "answer": "take",
+      "yes": {
+        "kind": "openQuestion",
+        "openQuestionId": "oq-sentnow-alex-drain-offer-jordan",
+        "yesEventId": "evt-jordan-0021"
+      }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-sentnow-alex-drain",
+    "stage": "proAnswer",
+    "onCall": { "staffId": "staff-jordan-home-services", "personId": "person-jordan" },
+    "offer": null,
+    "answerBy": null,
+    "answer": "take",
+    "next": "writeBooking",
+    "told": [],
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "soonestTimes": null,
+    "gives": [],
+    "written": [],
+    "repeated": false
+  }
+}

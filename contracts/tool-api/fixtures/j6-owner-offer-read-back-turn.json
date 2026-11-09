@@ -1,0 +1,62 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-owner-another-time-turn.json"],
+    "now": "2026-10-22T12:31:00Z",
+    "stated": null,
+    "note": "A6-04: Sam answers 'What time can you offer?' with 'Sat 3pm'. Decide gives the open question's typed answer as its fields offered_time ('Sat 3pm') and offered_person (none named, so Riley stays), names K-01's answerField pattern admits; code re-parses them under limit 6 into Sat Oct 24, 3:00 to 3:30pm in New York, with Riley (README default 116). The other time is at the line's own $35, so no new price needs a yes (README default 122). In his turn's commit: A6-04's read-back as the reply, word for word ('Offer Alex M. Sat Oct 24 at 3:00pm with Riley? / Reply 1 Send it, 2 Type another time.'), with its open question, whose options '1 Send it' and '2 Type another time' are option choices as sent, and whose stored words hold the other time (v1.2 default 80's form; open gap 87). The time is not held: K-05 v1 holds 10 minutes at most (open gap 109), so Alex's later yes is checked against the times again. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-sam-offer-alex-oct24",
+      "requestId": "turn-sam-offer-alex-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-sam-another-time-alex-oct24"
+    },
+    "bookingId": "booking-request-alex-oct24",
+    "stage": {
+      "kind": "offerTime",
+      "step": "A6-04",
+      "ownerOkId": "ok-request-alex-oct24",
+      "offer": {
+        "resourceId": "res-riley",
+        "during": { "start": "2026-10-24T19:00:00Z", "end": "2026-10-24T19:30:00Z" },
+        "words": "Sat 3pm"
+      },
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-sam-what-time-alex-oct24", "yesEventId": "evt-sam-0161" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-alex-oct24",
+    "stage": "offerTime",
+    "answer": null,
+    "ownerOk": null,
+    "questions": [
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A6-04",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-sam-offer-readback-alex-oct24",
+        "clockRowId": null,
+        "openQuestionId": "oq-sam-offer-readback-alex-oct24"
+      }
+    ],
+    "told": [],
+    "next": "none",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-request-alex-oct24-1" }
+    ],
+    "gives": [],
+    "written": [{ "table": "outbox_rows", "rowId": "out-sam-offer-readback-alex-oct24", "version": 1 }],
+    "repeated": false
+  }
+}

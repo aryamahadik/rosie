@@ -1,0 +1,59 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-21T23:22:00Z",
+    "stated": null,
+    "note": "Refused: A6-10's 'Taken a moment ago' answered with a stripe_charge written. The time is read before anything is charged ('What's due now is taken once the booking is written, so a time lost in that moment costs nothing': S13-55), and A6-10 says 'Taken a moment ago ... Nothing was charged', so that answer writes no effect. With effects empty it is j6-taken-moment-ago-page.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-oct24-0011",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-oct24-0001"
+    },
+    "bookingId": "booking-page-alex-oct24",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-page-alex-oct24",
+    "stage": "write",
+    "result": "takenMomentAgo",
+    "freshRead": { "at": "2026-10-21T23:22:00Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-page-alex-oct24-riley", "state": "released" },
+    "visits": [],
+    "termsSnapshot": null,
+    "payment": null,
+    "payLink": null,
+    "nextTimes": {
+      "times": [
+        {
+          "optionId": "nt-page-alex-oct24-a",
+          "resourceId": "res-riley",
+          "during": { "start": "2026-10-24T18:00:00Z", "end": "2026-10-24T18:30:00Z" },
+          "zone": "America/New_York",
+          "arrivalWindow": null,
+          "price": { "cents": 3500, "currency": "USD" },
+          "fromPrice": null,
+          "seatsLeft": null
+        }
+      ],
+      "question": null
+    },
+    "deadline": { "kind": "nextTimes", "clockRowId": "clock-page-alex-oct24-next-times", "dueAt": "2026-10-21T23:32:00Z" },
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-page-alex-oct24-charge", "kind": "stripe_charge" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "reservations", "rowId": "rsv-page-alex-oct24-riley", "version": 2 }],
+    "repeated": false
+  }
+}

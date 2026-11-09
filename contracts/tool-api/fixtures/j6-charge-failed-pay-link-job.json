@@ -1,0 +1,99 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-11-06T15:00:01Z",
+    "stated": null,
+    "note": "A6-10's 'The charge fails', then A6-32, after Sam's OK (K-14 charge-failed-pay-link.json's story): Sam accepted Alex's request for a Color correction, and the $25 deposit charged on his saved card as the booking was written was declined (pay-alex-color-correction-deposit failed, never charged again: RULES 3.11). C-101's handling of that decline, a job acting for no one, calls writeBooking chargeFailed. Alex is not on a page after an OK, so in one commit: one pay link to pay what's due, a new K-32 payment of purpose deposit, pending, with its K-07 stripe_pay_link (K-14 payLink, saveCardForLater, since the booking keeps its card: 'that card is the one saved for it'), its pay_links row due by {{clock.pay}}, the request's latest answer time, 5:00pm UTC ('The time stays saved until then': the reservation stays the booking's), and two clock rows due at once that carry A6-32's line ('{{pay.failed}}: rosfield.com/p/f4') to Alex's open chat and his email, the payer's own ways only: never an AI, Sam or a pro (README default 121). The link's payment is bound to the same yes, consent-alex-color-correction-terms (README default 127). Not booked yet, no key: 'Never: confirm, send the code or give the pro the job before it's paid'. One more clock row, due at 5:00pm UTC, is the link's deadline: its firing, never this call, closes the link (K-14 closePayLink), lets the time go, removes the card saved for it and ends the request not_paid ('Not paid in time'). The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-eff-alex-color-correction-deposit",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-sam-ok-alex-color-0001"
+    },
+    "bookingId": "booking-alex-color-correction",
+    "stage": { "kind": "chargeFailed", "step": "A6-10", "paymentId": "pay-alex-color-correction-deposit" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-color-correction",
+    "stage": "chargeFailed",
+    "result": "payLinkSent",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [],
+    "termsSnapshot": null,
+    "payment": {
+      "paymentId": "pay-alex-color-correction-link",
+      "purpose": "deposit",
+      "amount": { "cents": 2500, "currency": "USD" },
+      "effectId": "eff-alex-color-correction-pay-link",
+      "customerPresent": false,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-color-correction-terms" }
+    },
+    "payLink": {
+      "payLinkId": "paylink-alex-color-correction",
+      "paymentId": "pay-alex-color-correction-link",
+      "dueAt": "2026-11-06T17:00:00Z",
+      "url": null,
+      "clockRowIds": ["clock-alex-color-correction-pay-chat", "clock-alex-color-correction-pay-email"],
+      "slot": "link.pay"
+    },
+    "nextTimes": null,
+    "deadline": {
+      "kind": "payLink",
+      "clockRowId": "clock-alex-color-correction-pay-deadline",
+      "dueAt": "2026-11-06T17:00:00Z"
+    },
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-32",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-color-correction-pay-chat",
+        "openQuestionId": null
+      },
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-32",
+        "via": "email",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-alex-color-correction-pay-email",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-color-correction-pay-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [
+      {
+        "slot": "pay.failed",
+        "table": "payments",
+        "column": "state",
+        "rowId": "pay-alex-color-correction-deposit"
+      },
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-color-correction-link" },
+      { "slot": "clock.pay", "table": "pay_links", "column": "due_at", "rowId": "paylink-alex-color-correction" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "payments", "rowId": "pay-alex-color-correction-link", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-alex-color-correction", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-color-correction-pay-chat", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-color-correction-pay-email", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-alex-color-correction-pay-deadline", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

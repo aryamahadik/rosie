@@ -1,0 +1,44 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-owner-offer-sent-turn.json"],
+    "now": "2026-10-22T13:10:00Z",
+    "stated": null,
+    "note": "A6-17's '1 Take it' in Alex's own chat, inside his 2 text hours ('they take it, in any words, in their own chat'): he replies 'yes 3pm works', which clearly answers that one open question, and decide picks the branch '1 Take it'. In his turn's commit the question is closed answered and the walk goes on to A6-10, writeBooking write at Sat Oct 24, 3:00pm with Riley, which checks the time is still free ('A late yes after that: check the time is still free'). The time and the price are the read-back's, at the line's own $35, so the words he ticked at the money step stand and no consent is written here (README defaults 117, 122). No key: the booking write gives booked and code. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-take-offer-oct24",
+      "requestId": "turn-alex-take-offer-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-take-offer-oct24"
+    },
+    "bookingId": "booking-request-alex-oct24",
+    "stage": {
+      "kind": "customerAnswer",
+      "step": "A6-17",
+      "answer": "take",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-offer-oct24", "yesEventId": "evt-alex-0410" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-alex-oct24",
+    "stage": "customerAnswer",
+    "answer": "take",
+    "ownerOk": null,
+    "questions": [],
+    "told": [],
+    "next": "writeBooking",
+    "released": null,
+    "requestEnded": null,
+    "cardRemoved": null,
+    "consentId": null,
+    "moneyWords": [],
+    "gives": [],
+    "written": [],
+    "repeated": false
+  }
+}

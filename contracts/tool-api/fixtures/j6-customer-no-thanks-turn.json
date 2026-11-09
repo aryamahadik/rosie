@@ -1,0 +1,73 @@
+{
+  "call": "askOwnerFirst",
+  "given": {
+    "seeds": ["core/seed-business-head.json", "core/seed-phone-chat-open.json"],
+    "after": ["j6-owner-offer-sent-turn.json"],
+    "now": "2026-10-22T13:10:00Z",
+    "stated": null,
+    "note": "A6-17's '2 No thanks' in Alex's own chat ('A no thanks drops the request: {{pay.back}}'): decide picks the branch '2 No thanks, or no reply'. In his turn's commit: the question closed answered, the request ended dropped (K-30: 'the customer said no'), with the head cancelled (K-30 default 7); the card saved for this request removed at once (S13-55; removed_why not_booked); and the branch's end, 'The request is dropped and nothing is booked. The customer and Sam are told.': Alex's reply in his chat (quick_reply) and Sam's notice (routine), each with the step's own words, which print no line for them (README default 123), {{pay.back}} reading the card's removal. The saved time had lapsed overnight under K-05 v1's 10 minutes (open gap 109), so no hold is released here. No key. The ids are examples (README default 48)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-no-thanks-oct24",
+      "requestId": "turn-alex-no-thanks-oct24",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-no-thanks-oct24"
+    },
+    "bookingId": "booking-request-alex-oct24",
+    "stage": {
+      "kind": "customerAnswer",
+      "step": "A6-17",
+      "answer": "noThanks",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-offer-oct24", "yesEventId": "evt-alex-0411" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-request-alex-oct24",
+    "stage": "customerAnswer",
+    "answer": "no_thanks",
+    "ownerOk": null,
+    "questions": [],
+    "told": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A6-17",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-dropped-oct24",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A6-17",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-sam-dropped-alex-oct24",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "next": "none",
+    "released": null,
+    "requestEnded": "dropped",
+    "cardRemoved": "card-request-alex-oct24",
+    "consentId": null,
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-request-alex-oct24" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-request-alex-oct24", "version": 4 },
+      { "table": "booking_details", "rowId": "booking-request-alex-oct24", "version": 6 },
+      { "table": "saved_cards", "rowId": "card-request-alex-oct24", "version": 3 },
+      { "table": "outbox_rows", "rowId": "out-alex-dropped-oct24", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sam-dropped-alex-oct24", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

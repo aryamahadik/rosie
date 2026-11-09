@@ -1,0 +1,63 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-06T15:00:01Z",
+    "stated": null,
+    "note": "Refused: A6-32's pay link answered with its url, to be handed to whoever called. After an OK the one link goes only to the payer's own ways, their open chat and their email, through its clock rows (A6-32: 'one link to pay, with one deadline'; the lead's note on T-053: a pay link reaches only the payer), never to an AI, the owner or a pro (README default 121); C3's own pay link to the customer's AI is v1.3's, another door. With url null it is j6-charge-failed-pay-link-job.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-eff-alex-color-correction-deposit",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-sam-ok-alex-color-0001"
+    },
+    "bookingId": "booking-alex-color-correction",
+    "stage": { "kind": "chargeFailed", "step": "A6-10", "paymentId": "pay-alex-color-correction-deposit" }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-color-correction",
+    "stage": "chargeFailed",
+    "result": "payLinkSent",
+    "freshRead": null,
+    "reservation": null,
+    "visits": [],
+    "termsSnapshot": null,
+    "payment": {
+      "paymentId": "pay-alex-color-correction-link",
+      "purpose": "deposit",
+      "amount": { "cents": 2500, "currency": "USD" },
+      "effectId": "eff-alex-color-correction-pay-link",
+      "customerPresent": false,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-color-correction-terms" }
+    },
+    "payLink": {
+      "payLinkId": "paylink-alex-color-correction",
+      "paymentId": "pay-alex-color-correction-link",
+      "dueAt": "2026-11-06T17:00:00Z",
+      "url": "rosfield.com/p/placeholder-pay-code-0007",
+      "clockRowIds": ["clock-alex-color-correction-pay-chat", "clock-alex-color-correction-pay-email"],
+      "slot": "link.pay"
+    },
+    "nextTimes": null,
+    "deadline": {
+      "kind": "payLink",
+      "clockRowId": "clock-alex-color-correction-pay-deadline",
+      "dueAt": "2026-11-06T17:00:00Z"
+    },
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-color-correction-pay-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [],
+    "gives": [],
+    "written": [{ "table": "payments", "rowId": "pay-alex-color-correction-link", "version": 1 }],
+    "repeated": false
+  }
+}

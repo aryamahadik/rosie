@@ -1,0 +1,64 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "core/seed-business-head.json"],
+    "after": ["j5-nothing-yes-agent.json"],
+    "now": "2026-11-03T17:02:12Z",
+    "stated": { "step": "A6-10", "gives": ["booked", "code"] },
+    "note": "Refused: j6-write-booking-agent-d104.json's answer to Dee's own AI with the visit's check-in code in it (checkInCode). 'The AI gets a booking number, but not the code' (A6-14); the code is sealed under its person's key and reaches only that person through the slot filler (K-30 rule 7; K-03 visit.code, audience customer), so no answer has a field for it (README default 119). Without checkInCode it is j6-write-booking-agent-d104.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "agent",
+      "turnId": null,
+      "requestId": "req-agent-dee-consult-0007",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-dee",
+      "traceId": "trace-agent-dee-consult-0001"
+    },
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-agent-dee-style-consult",
+    "stage": "write",
+    "result": "booked",
+    "freshRead": { "at": "2026-11-03T17:02:12Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-agent-dee-style-consult", "state": "booked" },
+    "visits": [
+      {
+        "visitId": "visit-agent-dee-style-consult-1",
+        "position": 1,
+        "reservationId": "rsv-agent-dee-style-consult",
+        "codeForPersonId": "person-dee",
+        "checkInCode": "4417"
+      }
+    ],
+    "termsSnapshot": { "termsConsentId": null },
+    "payment": null,
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": "LB1103",
+    "chatLink": { "chatLinkId": "chatlink-agent-dee-style-consult", "url": "rosfield.com/t/placeholder-chat-code-0002" },
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-dee",
+        "step": "A6-14",
+        "via": "email",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-agent-dee-consult-confirm-email",
+        "openQuestionId": null
+      }
+    ],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-agent-dee-consult-calendar-riley", "kind": "calendar_write" }],
+    "moneyWords": [],
+    "gives": ["booked", "code"],
+    "written": [{ "table": "bookings", "rowId": "booking-agent-dee-style-consult", "version": 3 }],
+    "repeated": false
+  }
+}

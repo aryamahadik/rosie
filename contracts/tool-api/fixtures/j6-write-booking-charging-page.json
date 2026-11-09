@@ -1,0 +1,58 @@
+{
+  "call": "writeBooking",
+  "given": {
+    "seeds": ["services-prices/seed-service-money-paths.json", "availability/seed-calendar-link.json"],
+    "after": ["j5-deposit-yes-page.json"],
+    "now": "2026-11-07T15:20:00Z",
+    "stated": null,
+    "note": "A6-10 on Lee's Barbershop's booking page, right after Alex's yes to the Groom's package's $40 deposit (j5-deposit-yes-page.json; the card saved at 3:19:10pm). The booking is made now (approval now), so A6-01 goes 'Right away' and the page server calls writeBooking write. Riley's calendar is read once more (K-16 freeBusy, bookingWrite) and Sat Nov 7 at 10:20am is still free. A deposit is due now, so in one commit: the reservation confirmed booked ('What's due now is taken once the booking is written, so a time lost in that moment costs nothing': S13-55), the terms snapshot naming Alex's ticked words, and the K-32 payment of purpose deposit, pending, with its payment item and one K-07 stripe_charge on the saved card, customer present (K-14 deposit.json; K-32 seed-payment-deposit's pay-alex-grooms-deposit and eff-alex-grooms-deposit). The charge is bound to his yes: its effect.created row's approved_by names consent-alex-grooms-terms, the same consent the snapshot names (README default 127). No visit, no code, no message and no key yet: 'The confirmation waits until it's paid' (A6-10), and a visit's code is never updated after it is written (K-30 rule 6), so the visit is written when it is booked (README default 111). pay.took reads the payment's own state, pending."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-grooms-0004",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-page-alex-grooms-0001"
+    },
+    "bookingId": "booking-alex-grooms-package",
+    "stage": { "kind": "write", "step": "A6-10", "pick": null }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-grooms-package",
+    "stage": "write",
+    "result": "charging",
+    "freshRead": { "at": "2026-11-07T15:20:00Z", "calendarLinkIds": ["callink-riley-google"] },
+    "reservation": { "reservationId": "rsv-alex-grooms-package", "state": "booked" },
+    "visits": [],
+    "termsSnapshot": { "termsConsentId": "consent-alex-grooms-terms" },
+    "payment": {
+      "paymentId": "pay-alex-grooms-deposit",
+      "purpose": "deposit",
+      "amount": { "cents": 4000, "currency": "USD" },
+      "effectId": "eff-alex-grooms-deposit",
+      "customerPresent": true,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-grooms-terms" }
+    },
+    "payLink": null,
+    "nextTimes": null,
+    "deadline": null,
+    "bookingNumber": null,
+    "chatLink": null,
+    "messages": [],
+    "cardRemoved": null,
+    "requestEnded": null,
+    "effects": [{ "effectId": "eff-alex-grooms-deposit", "kind": "stripe_charge" }],
+    "moneyWords": [
+      { "slot": "pay.took", "table": "payments", "column": "state", "rowId": "pay-alex-grooms-deposit" },
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-grooms-1" }
+    ],
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-grooms-package", "version": 2 },
+      { "table": "payments", "rowId": "pay-alex-grooms-deposit", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
