@@ -17,7 +17,7 @@
 
 import { amountsIn, distinctMoney, sameMoney, type Money } from "./money";
 import { numberPhrasesIn } from "./numbers";
-import { instantsFor, timeReadingOf, timeSpansIn } from "./times";
+import { LETTER_OR_DIGIT, NUMBER_END, NUMBER_START, instantsFor, timeReadingOf, timeSpansIn } from "./times";
 import {
   BOTH_LANGUAGES,
   findAll,
@@ -119,8 +119,17 @@ function theOne<T>(found: readonly T[], same: (a: T, b: T) => boolean, value: T)
 
 // ---- counts, yes or no, zones, options --------------------------------------------------------------------------------
 
-/** A count in digits: "4", "1,200", "2.5"; a comma right after it is no thousands mark unless a digit follows ("4, 5"). */
-const NUMERAL = /(?<![\w.,:/$])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w:/%$]|[.,]\d)/g;
+/**
+ * A count in digits: "4", "1,200", "2.5". It starts and ends at the time reader's number edge (T-1130; times.ts
+ * NUMBER_START and NUMBER_END, DL-228 item 1): a mark is part of the number only with a digit right before it and right
+ * after it, and a comma only as a thousands mark, so a count glued to a mark is read ("table for 4 or 5:)", "re:4 or 5",
+ * "Update:2 adults + 1 child") and "4, 5" or "3,4" are two. A letter glued to it ("3rd", "4pm"), a "$" beside it or a
+ * "%" after it makes it no count, as before.
+ */
+const NUMERAL = new RegExp(
+  String.raw`${NUMBER_START}(?<!${LETTER_OR_DIGIT}|\$)(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?${NUMBER_END}(?!${LETTER_OR_DIGIT}|[%$])`,
+  "g",
+);
 const NONE = /\b(?:none|ninguno|ninguna)\b/g;
 /** Dozens in words (T-304 round 4, DL-199 item 2: a count is read with its scale): half a dozen is 6, a dozen 12. */
 const DOZENS: readonly (readonly [RegExp, number])[] = [

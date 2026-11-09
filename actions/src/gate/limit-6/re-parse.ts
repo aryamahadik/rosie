@@ -32,7 +32,15 @@
 //      "tomorrow" out of "see you tomorrow at 3:)", "tomorrow at 3:" or "Update:3pm tomorrow", and "Thursday" out of
 //      "my 2pm doesn't work. can we do Thursday, 3:)", differ; a weekday's short form takes its period ("Thurs" out of
 //      "Thurs. 3pm" differs), "at 3.30" and "3.30pm" are hours and minutes ("tomorrow" out of "tomorrow at 3.30"
-//      differs), and "+" joins counts ("2 adults" out of "2 adults + 1 child" is several) (DL-228 item 2);
+//      differs), and "+" joins counts ("2 adults" out of "2 adults + 1 child" is several) (DL-228 item 2). T-1130 adds
+//      the forms T-304's last review found (CQ-121's default; DL-236, DL-238): the count reader starts and ends a count
+//      at the same number edge, so a count glued to a mark is read ("4" out of "table for 4 or 5:)", "1 child" out of
+//      "Update:2 adults + 1 child" and "5" out of "re:4 or 5" are several, "4" out of "table for 4 or 5/6" noText); the
+//      time reader reads "at 3.5", "3:30:15", "at 1530", "around 3.30", "at ~3", 'at "3"', "at (3)", "tmrw. 3pm" and
+//      "Thursday: 3", a time's phrase is joined across an asterisk, a square bracket, a quote mark, an emoji or a count
+//      between day and time, so "tomorrow" out of each of those, or out of "*3pm* tomorrow", "tomorrow [3pm]", 'tomorrow
+//      at "3pm"', "tomorrow 👍 3pm" or "table tomorrow for 2 at 7pm", differs; and a bracket joins amounts and counts
+//      ("$40" out of "raise haircut to $40 (or $50)" and "4" out of "party of 4 (maybe 5)" are several);
 //   4. a date or time resolves from that text's send time in the visit's zone (visitZonesOf): the booking's own zone
 //      (K-02 v1 target.visitAt, which the frontier fills from the record), else the business's in flow A (K-04 v1
 //      business head), else the visit address's in flow B (CQ-08), else the business's (CQ-05); for a video or phone
@@ -41,14 +49,15 @@
 //
 // The residual (DL-199 item 4; CQ-121): words no reader knows are not read, so a cut beside them is not caught here:
 // "next week" ("Friday" out of "Friday next week"), "LA time", "UTC", "after next", "a week from", "around 3" with no
-// cue the time reader knows, "$40 off", and a sentence mark (". ! ? ;") between a day and its time ("at 3pm" out of
-// "tomorrow. at 3pm"), which the lead confirmed as part of the residual at round 5 (DL-209; values/phrase.ts), and an
-// hour in words beside a day or before "on" and its day ("Thursday, three", "3 on Thursday"), which the lead added at
-// round 6 (DL-217 item 3). An hour, a period and two minute digits with no am or pm after them and no cue before them
-// stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of "Thursday, 3.30" is not caught here, nor is
-// "tomorrow" out of "tomorrow at 3.5"; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their readings (DL-228 item 1).
-// Limit 3's read-back shows the person every value before any commit, and limit 5 checks a time against the open times,
-// so neither books on such a cut.
+// cue the time reader knows ("at around 3" and "around 3.30" are read: T-1130), "$40 off", and a sentence mark (". ! ?
+// ;") between a day and its time ("at 3pm" out of "tomorrow. at 3pm"), which the lead confirmed as part of the residual
+// at round 5 (DL-209; values/phrase.ts), and an hour in words beside a day or before "on" and its day ("Thursday,
+// three", "3 on Thursday"), which the lead added at round 6 (DL-217 item 3). An hour, a period and digits with no am or
+// pm after them and no cue before them stays a number (DL-228 item 2b: CQ-121's residual), so "Thursday" out of
+// "Thursday, 3.30" or "Thursday, 3.5" is not caught here; "3:30", "3.5", "10/24", "1,200" and "$3.50" keep their
+// readings (DL-228 item 1). The forms T-1130 adds (step 3) are no longer the residual. Limit 3's read-back shows the
+// person every value before any commit, and limit 5 checks a time against the open times, so neither books on such a
+// cut.
 //
 // Nothing here logs. What it returns names fields, labels and limits: never a value or a person's words.
 //
@@ -85,6 +94,17 @@
 //      after an amount is a million and "B" or "bn" a billion, glued to the number only ("$1M"; "$1 M" is not read); a
 //      currency code right before a sign names its currency ("MXN $40"), as does a currency word right after a sign
 //      ("40$ CAD") (values/times.ts, values/money.ts).
+//  11. T-1130: an hour, a period and one digit after a cue or before am or pm is that many tenths of an hour after the
+//      hour ("at 3.5" and "3.5pm" are 3:30); seconds after the minutes are read with them and the time is its minute
+//      ("3:30:15" is 3:30); three or four digits after a cue are an hour of the day and two minute digits, read as the
+//      same with a colon would be ("at 1530" is 15:30, "at 930" 9:30 either, "at 330pm" 3:30pm), so a house number after
+//      "at" reads as a time too (a possible false refusal, never a pass); an approximate word ("around", "about",
+//      "approximately", "approx", "roughly") is read after a cue ("at around 3") and before an hour and two minute
+//      digits ("around 3.30"), never before a bare number ("around 4 people" stays a count); a quote, a bracket or "~"
+//      may stand between a cue and its hour; every quote mark (also "'", "“" and "«") joins a time as '"' does; a count
+//      takes a number a range or choice word ("or", "to", "-", "/") joins to it, never one "and" joins ("table for 4 and
+//      7:30" keeps its count); a count between two of a time's values that is no bare hour ends no phrase (values/times.ts,
+//      values/phrase.ts).
 
 import {
   foundAtWordEdges,
