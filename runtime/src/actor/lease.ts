@@ -49,6 +49,14 @@
 // Each commit that comes back committed, first or repeated, is handed to the host before the run is answered (T-269,
 // `committed`): the actor copies the stopped flag a STOP or START wrote, so the copy is set before that turn's reply can go.
 //
+// PostgreSQL down (T-270; arch 11 line 566: "Turns queue in order in each handle's actor"): while the host says so
+// (`held`), a lapse is no crash. The lease holds the turn as it is: it reruns nothing, counts no try and parks nothing, the
+// lease is renewed for LEASE_MS and the turn noted held, and no batch opens or restarts a turn. On return the host calls
+// `resume`: a held turn runs again with the tries it had (or goes on parking, or its reply is given up, as its lapse would
+// have it), then the waiting batches open the next turn. Before a commit is sent the host replays its write-on-return queue
+// (`beforeCommit`; QUESTIONS.md CQ-104 (f)'s default): while that queue still holds a danger or stop write the core is not
+// answering for, the commit is not sent (`transient`, nothing written), so no live turn's word lands before an older stop.
+//
 // Not here: what runs inside a turn (the guard and frontier, T-251; decide, gate and commit, T-252), joined through the
 // `runTurn` and `commit` hooks, and the park's request (T-253, ../turn/park.ts), joined through `park`. Unwired, no turn
 // runs and each closed batch stays stored with the batch window (fails closed); with no park wired, a third lapse is left
@@ -370,6 +378,8 @@ export function createLeaseTables(sql: SqlStorage): void {
        until_ms INTEGER NOT NULL
      )`,
   );
+  // A turn whose lease lapsed while PostgreSQL was down (T-270): held as it was, until `resume`.
+  sql.exec("CREATE TABLE IF NOT EXISTS lease_held (turn_id TEXT PRIMARY KEY)");
   createScheduleTable(sql);
 }
 
@@ -412,6 +422,17 @@ export interface LeaseHost {
    * wrote can go. Optional; a throw changes nothing for the commit.
    */
   committed?(turn: CommitTurnRef, answer: CommitTurnCommitted): void;
+  /**
+   * True while PostgreSQL is down (T-270): a lapse is no crash, so the lease holds the turn as it is (no rerun, no try, no
+   * park), and no batch opens or restarts a turn, until `resume`. Optional: left out (or a throw), never held.
+   */
+  held?(): boolean;
+  /**
+   * Replays the host's write-on-return queue before a commit is sent (T-270; QUESTIONS.md CQ-104 (f)): false while it still
+   * holds a danger or stop write the core is not answering for, and the commit is then not sent (`transient`). Optional:
+   * left out, every commit is sent; a throw sends nothing (fails closed).
+   */
+  beforeCommit?(): Promise<boolean>;
 }
 
 /** What the park's trace is opened from (T-253). */
@@ -471,7 +492,8 @@ export class TurnLease {
    */
   private async advance(): Promise<void> {
     for (;;) {
-      if (leaseHooks.runTurn === undefined) return;
+      // While PostgreSQL is down (T-270) the waiting batches wait: no turn opens or restarts until `resume`.
+      if (leaseHooks.runTurn === undefined || this.isHeld()) return;
       const plan = planOf(this.snapshot(), actorClock().now());
       if (plan === null) return;
       const turnId = await turnIdOf(plan.items.map((item) => item.eventId));
@@ -619,6 +641,9 @@ export class TurnLease {
     if (request.turn.id !== turnId) return { error: "wrongTurn" };
     const port = leaseHooks.commit;
     if (port === undefined) return { error: "unwired" };
+    // The write-on-return queue goes first (T-270; CQ-104 (f)): a danger or stop write the core is not answering for yet
+    // keeps this commit back, with nothing sent and the turn's state as it was.
+    if (!(await this.readyToCommit())) return { error: "transient" };
     const gate = this.host.storage.transactionSync((): LeaseRefusal | null => {
       const turn = this.turnRow(turnId);
       if (turn === undefined) return { error: "unknownTurn" };
@@ -742,39 +767,113 @@ export class TurnLease {
    */
   async onAlarm(): Promise<void> {
     const now = actorClock().now();
+    const held = this.isHeld();
     const due = this.host.storage.transactionSync((): { act: Lapse; turnId: string } | null => {
       const lease = this.leaseRow();
       if (lease === undefined || lease.until_ms > now) {
         this.syncSchedule();
         return null;
       }
-      const turn = this.turnRow(lease.turn_id);
-      const act = turn === undefined ? null : lapseOf(turn);
-      if (turn === undefined || act === null || leaseHooks.runTurn === undefined) {
+      const act = this.lapseFor(lease.turn_id);
+      if (act === null) return null;
+      if (held) {
+        // PostgreSQL is down (T-270): no crash. The turn is held as it is, its lease renewed, until `resume`.
+        this.sql.exec("INSERT OR IGNORE INTO lease_held (turn_id) VALUES (?)", lease.turn_id);
+        this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
         this.syncSchedule();
         return null;
       }
-      if (act === "park") {
-        if (leaseHooks.park === undefined) {
-          this.syncSchedule();
-          return null;
-        }
-        // Marked first, so no run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails.
-        this.sql.exec("UPDATE lease_turns SET state = 'parking' WHERE turn_id = ?", lease.turn_id);
-        this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + PARK_RETRY_MS);
-      } else if (act === "giveUp") {
-        this.sql.exec("DELETE FROM turn_lease WHERE one = 1");
-      } else {
-        this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", lease.turn_id);
-        this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
-      }
-      this.syncSchedule();
-      return { act, turnId: lease.turn_id };
+      return this.lapse(lease.turn_id, act, now, true);
     });
+    await this.act(due);
+    await this.advance();
+  }
+
+  /**
+   * PostgreSQL is back (T-270): a turn held while it was down runs again now with the tries it had (the outage was no
+   * crash), or goes on parking, or has its reply given up, as its lapse would have it; then the waiting batches open the
+   * next turn. A turn whose lease did not lapse meanwhile is left to its lapse.
+   */
+  async resume(): Promise<void> {
+    const now = actorClock().now();
+    const due = this.host.storage.transactionSync((): { act: Lapse; turnId: string } | null => {
+      const held = this.sql
+        .exec<{ turn_id: string }>("SELECT turn_id FROM lease_held")
+        .toArray()
+        .map((row) => row.turn_id);
+      this.sql.exec("DELETE FROM lease_held");
+      const lease = this.leaseRow();
+      if (lease === undefined || !held.includes(lease.turn_id)) {
+        this.syncSchedule();
+        return null;
+      }
+      const act = this.lapseFor(lease.turn_id);
+      return act === null ? null : this.lapse(lease.turn_id, act, now, false);
+    });
+    await this.act(due);
+    await this.advance();
+    await this.host.arm();
+  }
+
+  /**
+   * What a lapse does to the turn holding the lease, inside the caller's transaction; null, with the schedule put in step,
+   * when nothing can be done (no such turn, no turn can run, or a third lapse with no park wired: no fourth try).
+   */
+  private lapseFor(turnId: string): Lapse | null {
+    const turn = this.turnRow(turnId);
+    const act = turn === undefined ? null : lapseOf(turn);
+    if (
+      act === null ||
+      leaseHooks.runTurn === undefined ||
+      (act === "park" && leaseHooks.park === undefined)
+    ) {
+      this.syncSchedule();
+      return null;
+    }
+    return act;
+  }
+
+  /**
+   * Applies a lapse inside the caller's transaction: a rerun (one more try when `countTry`), a park (marked first, so no
+   * run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails) or a reply given up.
+   */
+  private lapse(turnId: string, act: Lapse, now: number, countTry: boolean): { act: Lapse; turnId: string } {
+    if (act === "park") {
+      this.sql.exec("UPDATE lease_turns SET state = 'parking' WHERE turn_id = ?", turnId);
+      this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + PARK_RETRY_MS);
+    } else if (act === "giveUp") {
+      this.sql.exec("DELETE FROM turn_lease WHERE one = 1");
+    } else {
+      if (countTry) this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", turnId);
+      this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
+    }
+    this.syncSchedule();
+    return { act, turnId };
+  }
+
+  /** Runs what a lapse decided, once its transaction is over. */
+  private async act(due: { act: Lapse; turnId: string } | null): Promise<void> {
     if (due?.act === "rerun") this.start(due.turnId);
     else if (due?.act === "park") await this.park(due.turnId);
     else if (due?.act === "giveUp") this.stop(due.turnId);
-    await this.advance();
+  }
+
+  /** True while the host says PostgreSQL is down (T-270); a host that cannot say holds nothing. */
+  private isHeld(): boolean {
+    try {
+      return this.host.held?.() === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** The host's write-on-return queue, replayed before a commit (T-270; CQ-104 (f)): false keeps the commit back. */
+  private async readyToCommit(): Promise<boolean> {
+    try {
+      return (await this.host.beforeCommit?.()) ?? true;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -878,6 +977,24 @@ export class TurnLease {
         leaseUntil: lease?.turn_id === row.turn_id ? lease.until_ms : null,
         committedAt: row.committed_at,
       }));
+  }
+
+  /**
+   * The event ids, in arrival order, of the texts the lease has that no commit has taken yet (T-270): those of a turn
+   * leased, committing or being parked, and of the batches waiting for the next turn.
+   */
+  pendingEventIds(): string[] {
+    const items: Item[] = [];
+    const turns = this.sql
+      .exec<{ items: string }>(
+        "SELECT items FROM lease_turns WHERE state IN ('leased', 'committing', 'parking') ORDER BY seq",
+      )
+      .toArray();
+    const waiting = this.sql
+      .exec<{ items: string }>("SELECT items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
+      .toArray();
+    for (const row of [...turns, ...waiting]) items.push(...(JSON.parse(row.items) as Item[]));
+    return [...new Set(bySeq(items).map((item) => item.eventId))];
   }
 
   /** The batch ids that wait for the next turn, in order. */
