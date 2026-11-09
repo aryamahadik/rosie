@@ -94,6 +94,10 @@ export default defineConfig({
           // files side by side on a many-core Mac passed PostgreSQL's 100 connections. Tests inside a file
           // keep their own concurrency.
           fileParallelism: false,
+          // The unit project's resource guard, not part of any test's claim (T-1073; T-1118, DL-227): on the build
+          // Mac's emulated PostgreSQL, a test that made two test databases timed out at Vitest's 5 s default.
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
         },
       },
       {
