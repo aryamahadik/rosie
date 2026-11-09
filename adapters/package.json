@@ -5,6 +5,9 @@
   "description": "One adapter per port, each with its test double first.",
   "type": "module",
   "exports": {
-    "./shared": "./src/shared/index.ts"
+    "./shared": "./src/shared/index.ts",
+    "./linq/webhook": "./src/linq/webhook/index.ts",
+    "./linq/double": "./src/linq/double/index.ts",
+    "./linq/double-webhooks": "./src/linq/double-webhooks/index.ts"
   }
 }

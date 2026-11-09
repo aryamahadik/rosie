@@ -2,7 +2,7 @@
 // every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the ten ports
 // the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls it
 // (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
-// T-564) swaps one port's implementation in one environment (./picks.ts) for the real package:
+// T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
 //
 //   port         what it carries                                                   joined by
 //   linqVerify   K-11 verifyWebhook: the gateway's signature check and parse       T-552

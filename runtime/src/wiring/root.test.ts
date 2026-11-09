@@ -1,6 +1,7 @@
-// The composition root's bindings (T-550), under Node (Vitest project "unit"): the ports the root binds in each
+// The composition root's bindings (T-550, T-552), under Node (Vitest project "unit"): the ports the root binds in each
 // environment, each once and none left unbound; the check that refuses a port bound twice or left unbound; each bound port
-// handed to the part that calls it; and the closed implementation the Worker's environments still bind everywhere.
+// handed to the part that calls it; and the closed implementation the Worker's environments still bind for every port no
+// join has reached (T-552 joined the Linq verify on staging; production takes no join yet).
 import { describe, expect, it } from "vitest";
 
 import {
@@ -8,11 +9,16 @@ import {
   closedPorts,
   composeRoot,
   environmentOf,
+  LINQ_WEBHOOK_SECRET,
+  MissingSecretError,
   NotJoinedError,
   PICKS,
   PORTS,
+  realPorts,
   WiringError,
   workerRoot,
+  type ImplementationSets,
+  type PortName,
   type PortPick,
   type Ports,
 } from "./index";
@@ -24,6 +30,12 @@ const VARS = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
 function workerEnv(environment: string): Cloudflare.Env {
   return { ENVIRONMENT: environment, BASE_PATH: "", DB_SCHEMA: "" };
 }
+
+/** The ports joined so far on each of the Worker's environments (./picks.ts): their real package; every other closed. */
+const JOINED: Readonly<Record<"staging" | "production", readonly PortName[]>> = {
+  staging: ["linqVerify"],
+  production: [],
+};
 
 describe("the ports the root binds", () => {
   it("names D-017's ten ports in its turn order", () => {
@@ -45,7 +57,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test, each to its fake", () => {
+  it("binds every port once under test: the joined Linq verify to its real package, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -53,16 +65,21 @@ describe("the ports the root binds", () => {
       vars: VARS,
     });
 
-    expect(root.bindings).toEqual(PORTS.map((port) => ({ port, implementation: "fake" })));
+    expect(root.bindings).toEqual(
+      PORTS.map((port) => ({ port, implementation: port === "linqVerify" ? "real" : "fake" })),
+    );
   });
 
   it.each(["staging", "production"] as const)(
-    "binds every port once on the Worker's %s, each still closed: no join has landed",
+    "binds every port once on the Worker's %s: each port joined there to its real package, every other still closed",
     (environment) => {
       const root = workerRoot(workerEnv(environment));
+      const joined = JOINED[environment];
 
       expect(root.environment).toBe(environment);
-      expect(root.bindings).toEqual(PORTS.map((port) => ({ port, implementation: "closed" })));
+      expect(root.bindings).toEqual(
+        PORTS.map((port) => ({ port, implementation: joined.includes(port) ? "real" : "closed" })),
+      );
     },
   );
 
@@ -70,8 +87,8 @@ describe("the ports the root binds", () => {
     const fakes = skeletonFakes();
     const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
 
-    for (const port of PORTS) expect(root.ports[port]).toBe(fakes.ports[port]);
-    expect(root.gateway.linq).toBe(fakes.ports.linqVerify);
+    for (const port of PORTS) if (port !== "linqVerify") expect(root.ports[port]).toBe(fakes.ports[port]);
+    expect(root.gateway.linq).toBe(root.ports.linqVerify);
     expect(root.gateway.keys).toBe(fakes.ports.sealing);
     expect(root.safety.keys).toBe(fakes.ports.sealing);
     expect(root.turn.keys).toBe(fakes.ports.sealing);
@@ -123,7 +140,11 @@ describe("the ports the root binds", () => {
 });
 
 describe("a port bound twice or left unbound is refused, naming the port", () => {
-  const sets = { fake: skeletonFakes().ports };
+  const fakes = skeletonFakes();
+  const sets: ImplementationSets = {
+    fake: fakes.ports,
+    real: realPorts({ linq: fakes.linqInputs, now: () => fakes.clock.now() }),
+  };
 
   it("refuses a port picked twice", () => {
     const twice: PortPick[] = [
@@ -149,13 +170,15 @@ describe("a port bound twice or left unbound is refused, naming the port", () =>
       Object.entries(skeletonFakes().ports).filter(([port]) => port !== "decide"),
     ) as Partial<Ports>;
 
-    expect(() => bindPorts(PICKS, "test", { fake: partial })).toThrow(
+    expect(() => bindPorts(PICKS, "test", { ...sets, fake: partial })).toThrow(
       new WiringError("left unbound in test: decide (no fake implementation)"),
     );
   });
 
   it("leaves every port unbound where the environment picks a set the root was not handed: no Worker takes the fakes", () => {
-    const unbound = PORTS.map((port) => `${port} (no fake implementation)`).join(", ");
+    const unbound = PORTS.filter((port) => port !== "linqVerify")
+      .map((port) => `${port} (no fake implementation)`)
+      .join(", ");
 
     expect(() => composeRoot({ environment: "test", actors: null, vars: VARS })).toThrow(
       new WiringError(`left unbound in test: ${unbound}`),
@@ -176,7 +199,7 @@ describe("the Worker's environments", () => {
     expect(workerRoot(env)).toBe(workerRoot(env));
   });
 
-  it("keeps the gateway's doors closed while no port is joined: verify, the seal and the actor all fail", async () => {
+  it("keeps the gateway's doors closed: with no Linq webhook secret set the joined verify fails, and the seal and the actor fail", async () => {
     const { gateway } = workerRoot(workerEnv("staging"));
     const handle = { kind: "phone", address: "+15555550100" };
 
@@ -189,7 +212,7 @@ describe("the Worker's environments", () => {
         receivedAt: "2026-10-12T16:20:01.000Z",
         traceId: "4f1c2b7a-9d3e-4c5f-8a6b-1e2d3c4b5a69",
       }),
-    ).rejects.toThrow(new NotJoinedError("linqVerify"));
+    ).rejects.toThrow(new MissingSecretError(LINQ_WEBHOOK_SECRET));
     await expect(gateway.keys.getOrCreateKey(handle)).rejects.toThrow(new NotJoinedError("sealing"));
     // No HandleActor namespace is handed to the Worker's root yet (T-553): the door to the actor is closed.
     await expect(gateway.actor.accept({} as never)).rejects.toThrow(

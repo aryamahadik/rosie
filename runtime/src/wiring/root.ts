@@ -9,6 +9,8 @@
 //   - the gateway's doors (runtime/src/gateway GatewayDeps): the Linq verify port, the sealing key store, the door to the
 //     handle's actor (the HandleActor namespace it is handed; closed when it is handed none), the receipt door, and the
 //     active bundle id each webhook's trace names (K-08 v1 README default 1);
+//   - the Linq webhook route behind the skeleton flag (T-552, ./skeleton.ts): while the flag is on, the gateway's Linq
+//     entry with those doors; while it is off (or no flags are bound), 404 with nothing read, verified or reached;
 //   - the handle actor's ports, put in place for the isolate by `install()`: the safety read on arrival (T-246), the
 //     batch clock (T-247), the bundle pin's reads (T-249), the guard's targets (T-250), the turn loop as the lease's hooks
 //     (T-248, T-251 to T-253) and the turn's ports (`TurnDeps`), the Durable Object reading each of them at use;
@@ -17,10 +19,11 @@
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
 //     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own.
 //
-// The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: only the closed set is at hand there, so
-// until a join lands every door fails and each webhook route answers 503, as before. A test composes the root with
-// environment "test" and the fakes (./test-support.ts), the HandleActor namespace and its own clock. Never logged by the
-// root: a word, a number, a key.
+// The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name) and the closed set are at hand there, so every door not
+// joined fails and a webhook that gets past the verify answers 503, as before. A test composes the root with environment
+// "test", the fakes (./test-support.ts), what the joined ports are fed (the Linq double's made-up webhook secret), the
+// HandleActor namespace, its flags and its own clock. Never logged by the root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -30,6 +33,7 @@ import { ArmingMemory, clockArming } from "../clocks/arming";
 import type { ClockActorRpc } from "../clocks/types";
 import { handleDeliveryReceipt, runDispatch } from "../dispatch/dispatcher";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
+import type { WebhookEnvironment } from "../gateway/answer";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setGuardDeps } from "../guard/targets";
 import { setSafetyDeps } from "../safety";
@@ -41,7 +45,9 @@ import { bindPorts, WiringError, type Binding, type ImplementationSets } from ".
 import { closedPorts } from "./closed";
 import { environmentOf, PICKS, type Environment } from "./picks";
 import type { Ports } from "./ports";
+import { realPorts, type LinqVerifyInputs } from "./real";
 import { RowTraces } from "./row-traces";
+import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 
 /** The HandleActor namespace as the root uses it: the gateway's door to each handle's actor, and the clock arming's way to it. */
 export interface HandleActors<Id = unknown> {
@@ -67,7 +73,7 @@ export const WORKER_CLOCK: RootClock = {
 export interface RootOptions {
   /** Picks each port's implementation (./picks.ts). */
   readonly environment: Environment;
-  /** The implementation sets the picks may name besides the root's own closed set: a test's fakes. */
+  /** The implementation sets the picks may name besides the root's own real and closed sets: a test's fakes. */
   readonly sets?: ImplementationSets;
   /** The HandleActor namespace; null where none is bound, so the gateway's door to the actor is closed. */
   readonly actors: HandleActors | null;
@@ -75,6 +81,10 @@ export interface RootOptions {
   readonly vars: { readonly ENVIRONMENT: string; readonly GIT_SHA?: string | undefined };
   /** The clock; the Workers clock when left out. */
   readonly clock?: RootClock;
+  /** What the real Linq verify is fed (./real.ts): its webhook secret and lookups. Left out, no secret is set. */
+  readonly linq?: LinqVerifyInputs;
+  /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
+  readonly flags?: ReleaseFlags | null;
 }
 
 export interface Root {
@@ -84,6 +94,11 @@ export interface Root {
   readonly ports: Ports;
   /** The gateway's doors, for the Worker's webhook routes. */
   readonly gateway: GatewayDeps;
+  /**
+   * The Linq webhook route behind the skeleton flag (./skeleton.ts): one POST to {BASE_PATH}/webhooks/linq, answered by
+   * the gateway's Linq entry with the doors above while the flag is on, and 404 while it is off.
+   */
+  linqWebhook(request: Request): Promise<Response>;
   /** What the turn reaches outside the actor (`setTurnDeps`). */
   readonly turn: TurnDeps;
   /** What the safety read on arrival reaches (`setSafetyDeps`). */
@@ -96,17 +111,19 @@ export interface Root {
 
 /** Builds the gateway, the actor's ports and the dispatcher, each port bound once in the environment. */
 export function composeRoot(options: RootOptions): Root {
-  const { ports, bindings } = bindPorts(PICKS, options.environment, {
-    ...options.sets,
-    closed: closedPorts(),
-  });
   const clock = options.clock ?? WORKER_CLOCK;
   const now = (): number => clock.now();
+  const { ports, bindings } = bindPorts(PICKS, options.environment, {
+    ...options.sets,
+    real: realPorts({ linq: options.linq, now }),
+    closed: closedPorts(),
+  });
   const utc = (): string => new Date(clock.now()).toISOString();
   const log: LogContext = {
     environment: options.vars.ENVIRONMENT,
     version: options.vars.GIT_SHA ?? "unknown",
   };
+  const where: WebhookEnvironment = { environment: log.environment, version: log.version };
   const rowTraces = new RowTraces();
   const armings = new ArmingMemory();
   const claimer = `dispatcher-${crypto.randomUUID()}`;
@@ -199,11 +216,14 @@ export function composeRoot(options: RootOptions): Root {
     now,
   };
 
+  const flags = options.flags ?? null;
+
   return {
     environment: options.environment,
     bindings,
     ports,
     gateway,
+    linqWebhook: (request) => skeletonLinqRoute(request, { gateway, flags, where }),
     turn,
     safety,
     dispatcher,
@@ -225,15 +245,29 @@ export function composeRoot(options: RootOptions): Root {
 
 const workerRoots = new WeakMap<Cloudflare.Env, Root>();
 
+/** The Worker's secrets the root reads, by name: none is in a file here; staging's are set by name (T-568). */
+export interface WorkerSecrets {
+  /** K-11's webhook secret (K-11 README default 1), read at each verify; missing until it is set. */
+  readonly LINQ_WEBHOOK_SECRET?: string;
+}
+
 /**
- * The Worker's root for its environment (ENVIRONMENT; ./picks.ts): the closed set is the only one at hand in a Worker, and
- * no HandleActor namespace is handed to the gateway until its join (T-553, with env.staging's binding from T-566). One
- * root per env object, so its memories (rows' traces, armed parts) last as long as the isolate does.
+ * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
+ * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
+ * so the gateway answers 503). No HandleActor namespace is handed to the gateway until its join (T-553, with env.staging's
+ * binding from T-566), and no release flags until staging has its database and the flag's deploy step (T-567, T-569), so
+ * the skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
+ * parts) last as long as the isolate does.
  */
-export function workerRoot(env: Cloudflare.Env): Root {
+export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);
   if (known !== undefined) return known;
-  const root = composeRoot({ environment: environmentOf(env), actors: null, vars: env });
+  const root = composeRoot({
+    environment: environmentOf(env),
+    actors: null,
+    vars: env,
+    linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
+  });
   workerRoots.set(env, root);
   return root;
 }
