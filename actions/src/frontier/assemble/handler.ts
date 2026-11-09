@@ -12,16 +12,22 @@
 //      asked under;
 //   5. every source in its slot (registry.ts), assembled (assemble.ts): a source not built, throwing or refused offers
 //      nothing and is logged;
-//   6. the context, checked against K-02 v1 as a whole. Over 60 choices: tooManyChoices until T-295 collapses other
-//      bookings; no choice at all, or a context K-02 refuses: a FrontierError, which the base records as a failed span
-//      and passes on, so the turn takes the outage path (arch 06 line 293) and decide never sees a frontier that is not
-//      closed and valid.
+//   6. the cap (T-295, cap/): over 60 choices, each booking other than the target collapses to one 'which booking?'
+//      choice (arch 03 line 167), named in `collapsedBookingIds`; still over 60: tooManyChoices with the count;
+//   7. the facts the choices' steps need, each once from its one home with its row and version, read strong: the
+//      primary, uncached (T-295, facts/; arch 02 line 117; arch 10 line 538); a second value for one key is refused, the
+//      home's value goes in and the step is named in `flagged`. The read's notFound and transient are buildFrontier's
+//      own errors;
+//   8. the context, checked against K-02 v1 as a whole. No choice at all, or a context K-02 refuses: a FrontierError,
+//      which the base records as a failed span and passes on, so the turn takes the outage path (arch 06 line 293) and
+//      decide never sees a frontier that is not closed and valid.
 //
-// Reads only: nothing is written, so a repeat is safe (K-09 README). No model is called (arch 03 line 153). The facts
-// for decide, the flagged steps and the collapse are T-295's: until then `facts`, `flagged` and `collapsedBookingIds`
-// are empty, and `recentMessages` is empty while no frozen call reads them (K-05 v1.2 open gap 20).
+// Reads only: nothing is written, so a repeat is safe (K-09 README). No model is called (arch 03 line 153).
+// `recentMessages` is empty while no frozen call reads them (K-05 v1.2 open gap 20).
 
 import { notBuiltHandlers, type Handler, type Handlers } from "../../tool-api/tool-api";
+import { MAX_CHOICES, capChoices } from "../cap";
+import { factsFor, type FrontierFactsOptions } from "../facts";
 import { assemble } from "./assemble";
 import { readBundle, readManifest, flowOfStep, type ManifestView } from "./bundle";
 import { defaultChecker, type FrontierChecker } from "./check";
@@ -43,8 +49,8 @@ import {
   type Time,
 } from "./types";
 
-/** The most choices a frontier holds (arch 01 line 69; K-02 v1 context.choices maxItems). */
-export const MAX_CHOICES = 60;
+/** The most choices a frontier holds (arch 01 line 69; K-02 v1 context.choices maxItems): the cap's (cap/). */
+export { MAX_CHOICES };
 
 /** Why the frontier cannot answer within K-09 v1: a builder fault, never a refusal of the caller. */
 export type FrontierFault = "noChoices" | "noWriter" | "unknownFact" | "badState" | "invalidContext";
@@ -69,6 +75,8 @@ export interface FrontierOptions {
   log?: FrontierLogSink;
   /** The K-02 v1 checks. Default: one checker per isolate. */
   checker?: FrontierChecker;
+  /** The facts' homes, sources and read port (facts/). Default: no home listed yet, so no fact; K-05 readTurnState. */
+  facts?: FrontierFactsOptions;
 }
 
 /** buildFrontier's handler on the Tool API base: its repo is the call's scoped transaction. */
@@ -191,15 +199,34 @@ async function buildFrontier(
     log,
   };
   const assembled = await assemble(options.sources ?? FRONTIER_SOURCES, input, checker);
-  const [first, ...rest] = assembled.choices;
-  if (first === undefined) throw new FrontierError("noChoices");
-  if (assembled.choices.length > MAX_CHOICES) {
-    return { error: "tooManyChoices", count: assembled.choices.length };
-  }
+  if (assembled.choices.length === 0) throw new FrontierError("noChoices");
 
-  // 6. The context.
+  // 6. The cap.
+  const capped = capChoices(assembled.choices, assembled.openQuestions, MAX_CHOICES);
+  if (capped.result === "tooMany") return { error: "tooManyChoices", count: capped.count };
+  const [first, ...rest] = capped.choices;
+  if (first === undefined) throw new FrontierError("noChoices");
+
+  // 7. The facts.
   const writer = writerOf(request, read, names);
   if (writer === null) throw new FrontierError("noWriter");
+  const found = await factsFor(
+    {
+      choices: capped.choices,
+      target: { businessId, bookingId: capped.target },
+      handleId: request.turn.handleId,
+      askedUnder: new Map(read.openQuestions.map((row) => [row.id, row.bundleId])),
+      pinned: pinnedId,
+      flow,
+      bundles: options.bundles,
+      repo,
+    },
+    options.facts,
+  );
+  if ("fault" in found) throw new FrontierError(found.fault);
+  if ("error" in found) return found;
+
+  // 8. The context.
   const context: Context = {
     turnId: request.turn.id,
     bundleId: { hash: pinnedId.hash, build: pinnedId.build },
@@ -210,11 +237,11 @@ async function buildFrontier(
     openQuestions: assembled.openQuestions,
     choices: [first, ...rest],
     cards: assembled.cards,
-    facts: [],
+    facts: found.facts,
     alwaysOn: { flow, prefixSha256: alwaysOn },
     recentMessages: [],
     meaningSearch: null,
   };
   if (checker.check("context", context).length > 0) throw new FrontierError("invalidContext");
-  return { context, flagged: [], collapsedBookingIds: [] };
+  return { context, flagged: found.flagged, collapsedBookingIds: capped.collapsedBookingIds };
 }

@@ -212,7 +212,7 @@ describe("what buildFrontier answers when it cannot build the frontier", () => {
     expect(onlySpan(called.spans)).toMatchObject({ outcome: "failed", error_code: "FrontierError" });
   });
 
-  it("over 60 choices: tooManyChoices with the count (the collapse of other bookings is T-295's)", async () => {
+  it("still over 60 choices once every other booking collapsed (these rows are about no booking): tooManyChoices with the count", async () => {
     const exchange = s102Exchange();
     const danger = exchange.outcome.context.choices.filter((choice) => choice.kind === "anytime");
     const many = Array.from({ length: MAX_CHOICES }, () => danger).flat();
