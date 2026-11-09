@@ -13,8 +13,9 @@
 //     writes unnamed, after the owner's ready text) carries the opt-out line and the privacy link, and the helper's chat
 //     (the signup chat, with S1-77's messages named for the helper) carries the line exactly once;
 //   - S1-10's first reply in the chat the person's mobile opens (their text from that mobile) carries it;
-//   - over every path of the swept trades, both flows, each person's chat carries the line exactly once, on Rosie's
-//     first reply in it, on every walk: the test walks the flow itself and names each message's person by its own rule.
+//   - over the swept trades (every money path of 17 trades, and every path of barber), both flows, each person's chat
+//     carries the line exactly once, on Rosie's first reply in it, on every walk: the test walks the flow itself, every
+//     walk with no cap, and names each message's person by its own rule.
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter, Message } from "../graph/types.ts";
