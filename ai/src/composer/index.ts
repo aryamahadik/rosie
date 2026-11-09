@@ -1,8 +1,37 @@
 // The composer (C-118, T-373): one Haiku call per outbox row, its K-03 v1.1 input in (slot facts and term facts), the
 // row's K-03 message plan out (compose.ts), checked before it leaves the AI layer (check.ts), in K-03's own plan schema
-// (schema.ts). Its system prompt is T-372's (prompt/).
+// (schema.ts). Its system prompt is T-372's (prompt/). Its one rewrite, told what failed, then 'use the fallback', is
+// T-374's (rewrite/).
 
 export { COMPOSE_EFFORT, COMPOSE_ROLE, createComposer } from "./compose";
+export {
+  CHECK_WORDS,
+  FIXED_LINES_RULE,
+  MONEY_RULE,
+  REWRITE_REFUSALS,
+  REWRITE_TAGS,
+  REWRITE_TASK,
+  checkRequest,
+  createRewrite,
+  failedChecksText,
+  planToFixProblems,
+  rewriteTurnText,
+  toldProblems,
+  type CheckName,
+  type FailedAttempt,
+  type RequestChecked,
+  type Rewrite,
+  type RewriteAnswer,
+  type RewriteDeps,
+  type RewriteDown,
+  type RewriteOk,
+  type RewriteProblem,
+  type RewriteRefusal,
+  type RewriteRefused,
+  type RewriteRequest,
+  type RewriteUseFallback,
+  type Told,
+} from "./rewrite";
 export {
   allowedFormatProblems,
   inputProblems,
@@ -12,6 +41,7 @@ export {
 } from "./check";
 export {
   CHANNELS,
+  CHECK_NAMES,
   FORMATS,
   INPUT_FILE,
   LANGUAGE,

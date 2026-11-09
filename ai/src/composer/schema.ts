@@ -130,6 +130,8 @@ export const CHANNELS = enumOf("channel");
 export const SITUATIONS = enumOf("situation");
 /** K-03 `reach`. */
 export const REACHES = enumOf("reach");
+/** K-03 `checkName`: the seven checks on every message, in K-03's order (arch 07 lines 405 to 417); the rewrite's told. */
+export const CHECK_NAMES = enumOf("checkName");
 /** K-03 `slottedText`: every {{ opens a slot of the vocabulary. */
 export const SLOTTED_TEXT = patternOf("slottedText");
 /** K-03 `language`: a two-letter code. */
