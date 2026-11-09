@@ -1,5 +1,5 @@
-// The money-topic gate (T-593 rounds 3 to 6; DL-182, DL-187, DL-194, DL-204; S13-55; card line 9: "A message naming a
-// card hold or a charge on silence fails the check"; RULES 3.2 to 3.4).
+// The money-topic gate (T-593 rounds 3 to 7; DL-182, DL-187, DL-194, DL-204, DL-214; S13-55; card line 9: "A message
+// naming a card hold or a charge on silence fails the check"; RULES 3.2 to 3.4).
 //
 // Reading a card hold or a charge on silence from word patterns always left a new wording through, and so did every rule
 // that needs two words to meet in one sentence. So one money word is enough (DL-187): a sentence that holds one passes
@@ -8,7 +8,8 @@
 //   - A sentence ends only at . ! ? or a line break; commas, dashes, parentheses, quotes and semicolons stay inside it.
 //     Each sentence is judged alone, so a hold is never split away from its card: "We'll place a hold." is a money
 //     sentence by "hold". It is read after the apostrophe folding the Values check reads with (values.ts: ’ and ‘ as
-//     '), in lower case.
+//     '), with the modifier letter apostrophe and the okina (U+02BC, U+02BB) folded the same way (DL-214 3), in lower
+//     case.
 //   - A money sentence holds one money word: a word that begins with charg, bill, pay, paid, cost, pric, refund,
 //     deposit, debit, auth (authori, authed, pre-authed: DL-194 2), hold, held, owe, deduct, invoic, withdraw, fund,
 //     dollar, buck, money or amount; the whole word fee, fees, cent or cents; a word that ends in card or cards
@@ -24,16 +25,22 @@
 //          ™ ℠ ᵗᵐ ˢᴹ ᴹᴰ); a compatibility character that holds no letter ("…", a no-break space, "½") is none;
 //       c. a letter-shaped character with no plain form: a Latin small capital (U+1D00 to U+1D22, and ʙ ɢ ʜ ɪ ʟ ɴ ʀ ʏ ɶ;
 //          default 11) or a negative circled or negative squared letter (U+1F150 to U+1F169, U+1F170 to U+1F189);
-//       d. a word that mixes Latin letters with letters of another script (Cyrillic, Greek or any other); a word all in
-//          one script, such as a Greek or Cyrillic name, is none.
+//       d. a word that mixes Latin letters with letters of another script (Cyrillic, Greek or any other), digits between
+//          or not (DL-214 1): a word is read as letters, marks, digits, @ and $ together, in every text the sentence is
+//          read from (as written, joined and split: default 10), so "h0ld" with an Armenian h (U+0570) or "c4rd" with a
+//          Coptic c (U+2CA5) is one; a word whose letters are all in one script, such as a Greek or Cyrillic name, is
+//          none;
+//       e. a control character other than tab, line feed and carriage return: C0 (U+0000 to U+0008, U+000B, U+000C,
+//          U+000E to U+001F) or C1 (U+0080 to U+009F; DL-214 2), and DEL (U+007F; default 15).
 //   - Money words, and the hold and silence words of the labels, are found in every reading form of a sentence, and one
 //     in any form counts (DL-194, DL-204 2):
 //       - the folded form (default 8: NFKD, marks and invisible format characters left out, look-alike letters read as
 //         Latin ones, 1c's letters read as the letters they show) and the reading form in lower case (DL-194 1), both
 //         with trademark marks (™ ℠ ® © ᵀᴹ) read as word ends and bidi controls left out;
-//       - of the sentence as written, where every space separator splits words, and with every space separator but
-//         U+0020 left out, so the words it splits read joined (DL-204 2b, default 10); and, when it holds a bidi
-//         control, as the controls show it and backwards whole (default 9);
+//       - of the sentence as written, where every space separator splits words; with every space separator but U+0020,
+//         and every control character but line feed and carriage return, left out, so the words it splits read
+//         joined; and with each of those read as a space, so it splits words (DL-204 2b, DL-214 2, default 10); and,
+//         when it holds a bidi control, as the controls show it and backwards whole (default 9);
 //       - and each of those with every word that mixes letters and digits read with its digits as letters (DL-204 2c:
 //         0 as o, 1 as l and as i, 3 as e, 4 as a, 5 as s, 7 as t, 8 as b, @ as a, $ as s; default 12).
 //   - A money sentence passes only if it is, word for word, a sentence of an approved line, each slot standing for the
@@ -46,13 +53,22 @@
 // is "holding" falls back to the approved wording, since Rosie's word for a time is "saved". Approved lines then go
 // through the claim check (claims.ts) for the booking at hand. What comes back holds labels only, never the words.
 //
-// Residual risk, a closed form (DL-204 4; CQ-120): a wording with no money word, sign or slot in any reading form above
-// and none of DL-204 1's characters is not caught here. That is a card hold or a charge on silence said in other words
-// ("We'll put a temporary stop on your plastic until the visit.", "If we don't hear back by 7pm, it goes through
-// anyway."), a word parted by a plain space or a mark a reader sees ("ch arge", "ch-arge"), a digit or sign DL-204 2c
-// does not read as a letter ("char9e"), and a letter-shaped symbol outside 1c's two lists (○ for o, ℮ for e, regional
-// indicator letters). The composer prompt rule (STATE note 56: money sentences come from the record's rows, filled by
-// T-310, never the model's own) and the Values check (an amount needs a fact) back it up.
+// Residual risk, a closed form (DL-204 4, widened by DL-214 4; CQ-120): a wording with no money word, sign or slot in
+// any reading form above and none of DL-204 1's characters (a to e) is not caught here. That is a card hold or a charge
+// on silence said in other words ("We'll put a temporary stop on your plastic until the visit.", "If we don't hear back
+// by 7pm, it goes through anyway."), a word parted by a plain space or a mark a reader sees ("ch arge", "ch-arge"), a
+// digit or sign DL-204 2c does not read as a letter ("char9e"), a letter-shaped symbol outside 1c's two lists (○ for o,
+// ℮ for e, regional indicator letters), and, by DL-214 4:
+//   - a whole word in a script the fold does not read as Latin: Lisu letters that show HOLD (U+A4E7 U+A4F3 U+A4E1
+//     U+A4D3), Cherokee letters that show CARD (U+13DF U+13AA U+13A1 U+13A0); a word whose letters are all in such a
+//     script is one with a digit among them too (those Lisu letters with a 0 for the O), since 1d needs a Latin letter
+//     in the word;
+//   - a Latin letter NFKD leaves alone, standing for a plain one: h, b, l with a stroke or bar and the dental click
+//     (U+0127, U+0180, U+019A, U+01C0) in "hold" or "bill";
+//   - another script's digit shaped like a letter: the Arabic-Indic five (U+0665), shaped like an o, which default 12
+//     reads as 5 ("h", U+0665, "ld").
+// The composer prompt rule (STATE note 56: money sentences come from the record's rows, filled by T-310, never the
+// model's own) and the Values check (an amount needs a fact) back it up.
 //
 // Defaults (each fail-closed):
 //   1. A sentence ends at . ! ? only before a space or the end of the text, so "$40.00" and "rosfield.com" end none;
@@ -95,9 +111,10 @@
 //      U+202E reads "charge" whether U+202C, U+2069 or the line's end closes it, and an override nested in another
 //      shows its own run in its own place. The text is also read backwards whole, its controls left out.
 //   10. A word split by a space separator other than U+0020 (DL-204 2b), a tab, vertical tab, form feed, line or
-//       paragraph separator, the braille blank (DL-194 2) or a Hangul filler (letters that show as a blank) is read both
-//       ways: joined ("ch arge" with a hair space reads "charge"), and split, so two words with such a space between them
-//       ("the fee") keep each its own reading.
+//       paragraph separator, the braille blank (DL-194 2), a Hangul filler (letters that show as a blank) or any other
+//       control character but line feed and carriage return (DL-214 2) is read both ways: joined ("ch arge" with a hair
+//       space reads "charge"), and split, each of them read as a space, so two words with such a space between them
+//       ("the fee") keep each its own reading, a Hangul filler's too.
 //   11. The other letters Unicode names Latin small capitals (U+0281, U+029B, U+1D7B, U+1D7E, U+A730, U+A731, U+A7AE,
 //       U+A7AF, U+A7FA: ʁ ʛ ᵻ ᵾ ꜰ ꜱ Ɪ ꞯ ꟺ) are 1c's too, and a capital whose small letter is one of them (U+01A6) is read
 //       in lower case. Each of 1c's letters is read as the letter it shows (🅷🅾🅻🅳 reads "hold", ᴄʜᴀʀɢᴇ "charge"), so
@@ -105,10 +122,15 @@
 //   12. A decimal digit of any script is read by its value (a Devanagari zero as 0, so as o). A word that mixes letters
 //       and digits is also read with every 1, i and l as l, against money and label words read the same way, so a
 //       word whose 1s stand for both letters ("b1l1") reads as one of them.
-//   13. A slot value that holds a bidi control is refused, as one that holds a sentence end is (default 3): a control
-//       reorders what follows it, past the value. A value with DL-204 1b to 1d's characters stands for its slot ("Acme™"),
-//       since what such a character hides ends with the value.
+//   13. A slot value that holds a bidi control, or a control character of DL-214 2 (1e), is refused, as one that holds
+//       a sentence end is (default 3): a control reorders or changes what follows it, past the value. A value with
+//       DL-204 1b to 1d's characters stands for its slot ("Acme™"), since what such a character hides ends with the
+//       value.
 //   14. The money emoji are U+1F4B0 to U+1F4B8 (DL-204 2a's eight there, and 💱) and 🤑 (U+1F911).
+//   15. DEL (U+007F), a control character between C0 and C1, counts with DL-214 2's (1e). None of them is read as a
+//       space where a sentence is cut out and compared, VT and FF (U+000B, U+000C) included: they never end a sentence,
+//       are never trimmed from one, never fold away in "7 p.m." and stay in its compared form. So each is always inside
+//       a sentence, and an approved line with one in it is another sentence.
 
 import { pieces, type Piece } from "../../finalize/slots/syntax";
 import { VOCABULARY } from "../../finalize/slots/vocabulary";
@@ -122,11 +144,28 @@ function isObj(value: unknown): value is Obj {
 }
 
 /**
+ * White space read as a space where a sentence is cut out and compared: every kind but VT and FF (U+000B, U+000C),
+ * which are DL-214 2's control characters and stay in the sentence as written (default 15).
+ */
+const SPACE = String.raw`[^\S\v\f]`;
+
+/**
+ * The apostrophes read as ' (DL-214 3): ’ and ‘ (U+2019, U+2018), as values.ts wordForm and matchForm read them, and the
+ * modifier letter apostrophe and the okina (U+02BC, U+02BB), letters of the Common script that 1d would otherwise read
+ * as another script's ("don" U+02BC "t").
+ */
+const APOSTROPHES = /[\u{2019}\u{2018}\u{2BC}\u{2BB}]/gu;
+
+/** "7 p.m." and "7 a.m.", with no control character between (default 15). */
+const POINTED_TIME = new RegExp(String.raw`(\d)${SPACE}*([ap])\.m\.?`, "giu");
+
+/**
  * The form money words are read in: the apostrophe folding the Values check reads with (values.ts wordForm and
- * matchForm: ’ and ‘ read as '), so "don’t" is "don't"; and "7 p.m." read as "7pm", so its points end no sentence.
+ * matchForm: ’ and ‘ read as '), so "don’t" is "don't", with the modifier letter apostrophe and the okina folded the
+ * same way (DL-214 3); and "7 p.m." read as "7pm", so its points end no sentence.
  */
 export function readingForm(text: string): string {
-  return text.replace(/[’‘]/gu, "'").replace(/(\d)\s*([ap])\.m\.?/giu, "$1$2m");
+  return text.replace(APOSTROPHES, "'").replace(POINTED_TIME, "$1$2m");
 }
 
 /**
@@ -195,10 +234,17 @@ const BIDI_CONTROL = new RegExp(BIDI, "u");
 const BIDI_CONTROLS = new RegExp(BIDI, "gu");
 
 /**
- * What a word split by one is read joined across too (DL-204 2b, default 10): every space separator but U+0020, a
- * tab, vertical tab, form feed, line or paragraph separator, the braille blank and the Hangul fillers.
+ * DL-214 2 (1e): a control character other than tab, line feed and carriage return, C0 or C1, and DEL between them
+ * (default 15). A sentence that holds one is a money sentence, wherever it stands.
  */
-const JOINING = /(?!\u{20})[\p{Zs}\t\v\f\u{2028}\u{2029}\u{2800}\u{115F}\u{1160}\u{3164}\u{FFA0}]/gu;
+const CONTROL = /(?![\t\n\r])\p{Cc}/u;
+
+/**
+ * What a word split by one is read joined across, and split at, too (DL-204 2b, DL-214 2, default 10): every space
+ * separator but U+0020, every control character but line feed and carriage return (a tab, vertical tab and form feed
+ * among them), a line or paragraph separator, the braille blank and the Hangul fillers.
+ */
+const JOINING = /(?![\n\r\u{20}])[\p{Zs}\p{Cc}\u{2028}\u{2029}\u{2800}\u{115F}\u{1160}\u{3164}\u{FFA0}]/gu;
 
 /** A text with its trademark marks read as word ends and its bidi controls removed (DL-194 1 and 2). */
 function unmarked(text: string): string {
@@ -294,13 +340,21 @@ function isCompatibilityLetter(char: string): boolean {
   return compatible !== char.normalize("NFC") && LETTER.test(compatible);
 }
 
+/** A Latin letter, and a letter of any other script, or of none (DL-204 1d). */
+const LATIN_LETTER = /\p{Script=Latin}/u;
+const OTHER_LETTER = /[^\P{L}\p{Script=Latin}]/u;
+
 /**
- * DL-204 1d: does a word of the text mix Latin letters with letters of another script? Read on the plain form, before
- * look-alike letters are read as Latin ones, so a word all in one script (a Greek or Cyrillic name) is none.
+ * DL-204 1d: does a word of the text mix Latin letters with letters of another script, digits between or not? A word
+ * is read as DIGIT_WORD reads it, letters, marks, digits, @ and $ together (DL-214 1), in every text the text is read
+ * from (textsOf: as written, joined and split; default 10). Each is read on the plain form, before look-alike letters
+ * are read as Latin ones, so a word whose letters are all in one script (a Greek or Cyrillic name) is none.
  */
 function mixesScripts(text: string): boolean {
-  return (plainForm(text).match(/\p{L}+/gu) ?? []).some(
-    (word) => /\p{Script=Latin}/u.test(word) && /[^\P{L}\p{Script=Latin}]/u.test(word),
+  return textsOf(text).some((one) =>
+    (plainForm(one).match(DIGIT_WORD) ?? []).some(
+      (word) => LATIN_LETTER.test(word) && OTHER_LETTER.test(word),
+    ),
   );
 }
 
@@ -308,14 +362,15 @@ function mixesScripts(text: string): boolean {
 const BEYOND_ASCII = /[^\u{20}-\u{7E}]/u;
 
 /**
- * Does a text hold a character that hides a word (DL-204 1): a bidi control (a), a compatibility letter (b), a
- * letter-shaped character with no plain form (c, in lower case too: default 11) or a word that mixes Latin letters with
- * another script's (d)?
+ * Does a text hold a character that hides a word (DL-204 1, DL-214 2): a bidi control (a), a compatibility letter (b),
+ * a letter-shaped character with no plain form (c, in lower case too: default 11), a word that mixes Latin letters with
+ * another script's (d) or a control character other than tab, line feed and carriage return (e)?
  */
 function hidesWord(text: string): boolean {
   if (!BEYOND_ASCII.test(text)) return false;
   return (
     BIDI_CONTROL.test(text) ||
+    CONTROL.test(text) ||
     Array.from(text).some((char) => isCompatibilityLetter(char)) ||
     NO_PLAIN_LETTER.test(text) ||
     NO_PLAIN_LETTER.test(text.toLowerCase()) ||
@@ -531,11 +586,13 @@ function shown(text: string): string {
 }
 
 /**
- * The texts a text's words are read from: as written and with the words a space separator but U+0020 splits joined
- * (default 10), and, when it holds a bidi control, each of those as its controls show it and backwards whole (default 9).
+ * The texts a text's words are read from: as written; with the words a space separator but U+0020, or a control
+ * character but line feed and carriage return, splits joined; and with each of those read as a space, so it splits
+ * words, a Hangul filler (a letter) too (DL-204 2b, DL-214 2, default 10); and, when it holds a bidi control, each of
+ * those as its controls show it and backwards whole (default 9).
  */
 function textsOf(text: string): string[] {
-  const texts = [...new Set([text, text.replace(JOINING, "")])];
+  const texts = [...new Set([text, text.replace(JOINING, ""), text.replace(JOINING, " ")])];
   return BIDI_CONTROL.test(text)
     ? [...texts, ...texts.flatMap((one) => [shown(one), backwards(one)])]
     : texts;
@@ -563,8 +620,19 @@ function readForms(base: readonly string[]): string[] {
   return [...new Set([...base, ...base.flatMap(digitForms)])];
 }
 
-/** Where a sentence ends inside plain words: after . ! ? before a space, or at a line break (default 1). */
-const SENTENCE_END = /(?<=[.!?])\s+|[\r\n]+/u;
+/**
+ * Where a sentence ends inside plain words: after . ! ? before a space, or at a line break (default 1); never at a
+ * control character (default 15).
+ */
+const SENTENCE_END = new RegExp(String.raw`(?<=[.!?])${SPACE}+|[\r\n]+`, "u");
+
+/** Spaces at either edge of a text, never a control character (default 15). */
+const EDGE_SPACES = new RegExp(`^${SPACE}+|${SPACE}+$`, "gu");
+
+/** A text with the spaces at its edges left out, its control characters kept (default 15). */
+function trimmed(text: string): string {
+  return text.replace(EDGE_SPACES, "");
+}
 
 /** A text's sentences, in the reading form, each as its pieces: a slot is read whole, never cut by a sentence end. */
 function sentencePieces(text: string): Piece[][] {
@@ -588,12 +656,9 @@ function sentencePieces(text: string): Piece[][] {
   return sentences;
 }
 
-/** A sentence as written, its slots whole, trimmed. */
+/** A sentence as written, its slots whole, trimmed (its control characters kept: default 15). */
 function sentenceText(parts: readonly Piece[]): string {
-  return parts
-    .map((piece) => (piece.kind === "slot" ? piece.ref.raw : piece.text))
-    .join("")
-    .trim();
+  return trimmed(parts.map((piece) => (piece.kind === "slot" ? piece.ref.raw : piece.text)).join(""));
 }
 
 /** A text's sentences, in the reading form: one ends only at . ! ? (before a space or the end) or at a line break. */
@@ -610,12 +675,13 @@ function formParts(parts: readonly Piece[]): FormPart[] {
   return parts.map((piece) => (piece.kind === "slot" ? { slot: piece.ref.name } : piece.text.toLowerCase()));
 }
 
-/** Runs of spaces as one, trimmed, the end marks left out. */
+/** Runs of spaces in a compared form, and its end marks, never a control character (default 15). */
+const SPACES = new RegExp(`${SPACE}+`, "gu");
+const END_MARKS = new RegExp(String.raw`(?:${SPACE}|[.!?])+$`, "u");
+
+/** Runs of spaces as one, trimmed, the end marks left out; a control character stays as written (default 15). */
 function compared(words: string): string {
-  return words
-    .replace(/\s+/gu, " ")
-    .trim()
-    .replace(/[\s.!?]+$/u, "");
+  return trimmed(words.replace(SPACES, " ")).replace(END_MARKS, "");
 }
 
 /** Joins a compared form's parts, each slot given a value written as that value, any other as {{name}}. */
@@ -949,10 +1015,10 @@ export function approvedMoneyLines(lines: Iterable<string>): ApprovedMoneyLines 
 
 /**
  * Does a slot value stand for no slot: does it hold a sentence end (default 3: . ! ? before a space or its end, or a
- * line break), or a bidi control (default 13)?
+ * line break), a bidi control or a control character of DL-214 2 (default 13)?
  */
 function standsForNoSlot(value: string): boolean {
-  return /[.!?](?:\s|$)|[\r\n]/u.test(readingForm(value)) || BIDI_CONTROL.test(value);
+  return /[.!?](?:\s|$)|[\r\n]/u.test(readingForm(value)) || BIDI_CONTROL.test(value) || CONTROL.test(value);
 }
 
 /**
