@@ -1,0 +1,24 @@
+{
+  "call": "quoteConfirm",
+  "given": {
+    "now": "2026-11-03T00:45:10Z",
+    "environment": "staging",
+    "after": ["quotes-to-ok.json", "quote-owner-change-read-back.json", "db-schema/core/fixtures/seed-phone-chat-open.json"],
+    "note": "Sam's yes to B4-11's read-back on Needs you: the page entry makes the yes's event and calls K-09 v1.2 quoteFromPhotos alone twice, each with its own caller.requestId and the yes kind page with the read-back's exact words: stage ownerAnswer, answer change with the new $600 (the pending change stored with its version, as tool-api/fixtures/j4-quote-change-turn.json stores it in a turn), then stage changeReadBack, answer send, with the pending options kept with the read-back (from the portal, the page server's: K-09 v1.2 quoteFromPhotos.request pendingOptions), which applies them to the quote's options and goes on to setPrice photos, as tool-api/fixtures/j4-quote-change-confirm-turn.json does in a turn (README default 59). The quote is sent at $600 with its link to Alex through a clock row; nothing reached him before this yes (A4-10). The link never comes back to the portal."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0005",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-heater-change-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-portal-sam-heater-change-1",
+    "yesEventId": "pageyes-sam-heater-change-1",
+    "served": { "change": "ownerAnswer", "answer": "change", "state": "sent", "requestEnded": false }
+  }
+}

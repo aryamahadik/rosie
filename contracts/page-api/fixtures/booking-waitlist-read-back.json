@@ -3,8 +3,8 @@
   "given": {
     "now": "2026-10-22T16:29:50Z",
     "environment": "staging",
-    "after": ["db-schema/services-prices/fixtures/seed-services-price-list.json"],
-    "note": "A4-60 on Lee's Barbershop's booking page (FS section 7 screen 9: 'waitlist if full'): Dee's request (opened as booking-page-start.json opens one, requestRef reqref-page-lees-0041 and her device token, placeholders) matched the skin fade, its reach card gave her mobile, and the card for this week answered nobody free. She taps 'Text me if a spot opens' for any time. Nothing is written: the read-back's words are the yes she is asked to give, which become the K-29 texts consent's exact words if she says yes (RULES 2.5; README default 48), and the times wanted are README default 56's bounded range for any time. The read-back's id is a placeholder."
+    "after": ["booking-times-nobody-free.json"],
+    "note": "A4-60 on Lee's Barbershop's booking page (FS section 7 screen 9: 'waitlist if full'): Dee's request matched the skin fade, its reach card gave her mobile, and the card for this week answered nobody free (booking-times-nobody-free.json). She taps 'Text me if a spot opens' for any time. Nothing is written: the read-back's words are the yes she is asked to give, which become the K-29 texts consent's exact words if she says yes (RULES 2.5; README default 48), and the times wanted are README default 56's bounded range for any time. The read-back's id is a placeholder."
   },
   "request": {
     "page": {
