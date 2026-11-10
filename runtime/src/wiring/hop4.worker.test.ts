@@ -6,8 +6,9 @@
 // and park-turn.json). Each text goes in through root.linqWebhook and through every joined hop once, in order: signed by
 // the Linq double and verified (hop 1), sealed under K-05's key into its handle's ordered inbox (hop 2), read for danger
 // on arrival over the recorded-model double (hop 3), then into its handle's batch window and turn lease (this hop), under
-// its own K-06 event id. The Tool API's gate and commit is stood in until T-559 (./test-support.ts gateThroughCommit): the
-// turn's one commit goes to K-05 through the root's turn-row port, which the turn's own park (T-253) writes through too.
+// its own K-06 event id. The Tool API's gate and commit is the joined one since T-559 (./real.ts realGate, fed its reads'
+// doubles): the turn's one commit goes to K-05 through the root's turn-row port, which the turn's own park (T-253) writes
+// through too.
 //
 //   - Two texts 2 s apart: one batch and one turn, whose id is T-248's hash of the two event ids (ADR-013; CQ-09), and
 //     K-05's commit writes that turn's one row under it, with the first text's trace id and the second's joined.
@@ -36,7 +37,6 @@ import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./inde
 import {
   BUNDLE_V0,
   fakeFlags,
-  gateThroughCommit,
   JOIN_TEXT,
   SAM_CHAT,
   SAM_TRADES_TEXT,
@@ -145,11 +145,11 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on and K-05's turn-row calls (the double), its
- * actor ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port. The
- * bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle v0 as bundles/v0 publishes it;
- * and so is the frontier's scope (joined by T-557), so each turn's frontier answers; and decide (joined by T-558) is fed
- * @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads, so the turn goes on to its
- * commit.
+ * actor ports installed. The bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle
+ * v0 as bundles/v0 publishes it; and so is the frontier's scope (joined by T-557), so each turn's frontier answers; decide
+ * (joined by T-558) is fed @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads; and
+ * the gate (joined by T-559) is fed its reads' doubles, its one commit through the root's turn-row port, so the turn goes
+ * on to its commit.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -167,9 +167,9 @@ function rig(log: MockInstance): Rig {
     handleTargets: fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
     deciders: fakes.decide.deciders,
+    gateReads: fakes.gate.reads,
     flags: fakeFlags([SKELETON_FLAG]),
   });
-  fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
   const restore = root.install();
   return {
     fakes,

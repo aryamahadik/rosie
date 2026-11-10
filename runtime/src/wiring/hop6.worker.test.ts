@@ -1,7 +1,7 @@
 // T-557's join, hop 6 of D-017 (C-050, C-046; build prompt section 10, D-017; 02-contracts section 11, 'Frontier from the
 // Tool API': K-09 buildFrontier, K-02 context, K-01 bundle v0; ADR-013 sections 2, 3 and 6), in the Workers runtime. The
 // composition root is composed for the test environment as hop 5's tests compose it (the HandleActor namespace, the
-// skeleton flag on, the actor's ports installed, the joined ports fed their K-05 doubles, the Tool API's gate stood in),
+// skeleton flag on, the actor's ports installed, the joined ports fed their K-05 doubles, the gate among them since T-559),
 // now with the frontier port this hop joins: @rosie/actions' turn face (the Tool API base with K-09 v1.5's checks, the
 // call's business scope and its one frontier span; the frontier with main's sources, T-1147's sign-up door among them),
 // fed the frontier's scope over a K-05 v1.2 readTurnState double holding test owner 1's seeded rows (T-1148; T-315's
@@ -23,7 +23,8 @@
 // One frontier span per turn (CQ-159): the Tool API base's span is the one kept, and each test judges that last. The
 // root tells the turn that the real frontier port records it (TurnFace.recordsFrontierSpan), so the turn records none.
 // The spans after hop 6 belong to later hops (decide, joined by T-558 over the recorded-model double and judged in
-// ./hop7.worker.test.ts; the gate onward, on the fakes) and are not judged. The Durable
+// ./hop7.worker.test.ts; the gate and commit, joined by T-559 and judged in ./hop8.worker.test.ts; the composer onward, on
+// the fakes) and are not judged. The Durable
 // Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test uses.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
@@ -44,7 +45,6 @@ import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./inde
 import {
   BUNDLE_V0,
   fakeFlags,
-  gateThroughCommit,
   JOIN_TEXT,
   SAM_CHAT,
   skeletonFakes,
@@ -180,7 +180,7 @@ interface Rig {
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on, every joined port fed its K-05 double, the
  * frontier's scope among them unless a test leaves it out (as the Worker does until T-567); its actor ports installed;
- * the Tool API's gate and commit stood in, its one commit through the root's turn-row port.
+ * the gate (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port.
  */
 function rig(log: MockInstance, fed: { frontier?: boolean } = {}): Rig {
   const fakes = skeletonFakes();
@@ -198,9 +198,9 @@ function rig(log: MockInstance, fed: { frontier?: boolean } = {}): Rig {
     handleTargets: fakes.handleTargets.call,
     frontierScope: fed.frontier === false ? null : fakes.frontier.scope,
     deciders: fakes.decide.deciders,
+    gateReads: fakes.gate.reads,
     flags: fakeFlags([SKELETON_FLAG]),
   });
-  fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
   const restore = root.install();
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
@@ -481,6 +481,8 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
         expect(run.fakes.frontier.reads).toEqual([]);
         expect(run.fakes.decide.decideCalls).toEqual([]);
         expect(run.fakes.face.log.filter((entry) => ["decide", "gate"].includes(entry))).toEqual([]);
+        // No gateAndCommit reached the joined gate (T-559): it opened no scope and read nothing.
+        expect(run.fakes.gate.scopes).toEqual([]);
         expect(run.fakes.turnRows.commits).toEqual([]);
         expect(leaks(run.spans(), CAST_NUMBERS)).toEqual([]);
         expectOneFrontierSpan(trace);
