@@ -120,6 +120,24 @@ export default defineConfig({
         test: {
           name: "e2e",
           include: ["tests/e2e/**/*.test.ts"],
+          // The e2e files that run inside the Workers runtime are the next project's (T-1149).
+          exclude: ["**/node_modules/**", "**/*.worker.test.ts"],
+        },
+      },
+      {
+        // The walking skeleton's end-to-end test inside the Workers runtime (T-1149, DL-332): the local target posts
+        // through runtime/src/wiring's composition root with the HandleActor installed, as the workers project runs it.
+        plugins: [
+          cloudflareTest({
+            wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
+            miniflare: { bindings: { GIT_SHA: "test-sha" } },
+          }),
+        ],
+        test: {
+          name: "e2e-workers",
+          include: ["tests/e2e/**/*.worker.test.ts"],
+          // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md).
+          globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts"],
         },
       },
     ],

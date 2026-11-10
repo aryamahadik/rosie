@@ -77,10 +77,12 @@ export {
 export {
   asTrace,
   captureConsoleLog,
+  k08TraceCheck,
   spansOfLogLines,
   traceOf,
   type CollectedTrace,
   type LogCapture,
   type LogLine,
   type SpanReader,
+  type TraceCheck,
 } from "./trace";
