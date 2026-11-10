@@ -8,8 +8,17 @@
 // scrubbed to the dispatcher's door (hand-off.ts). The trace id opens at receipt, one K-08 `receive` span ends every answer,
 // and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret. The answer rules it shares
 // with the Stripe and calendar doors are answer.ts's.
+//
+// The scrub span (K-08 v1 hop `scrub`, T-1096): an event its actor wrote ("Sealed event", 02-contracts section 11) shows
+// its scrub as the trace's second hop, after receive, as trace-skeleton.json does. The context numbers a span when it is
+// recorded, and receive ends only with the answer, so the scrub's own start and time are kept and its span is recorded
+// right after receive's: receive is seq 1 and starts first, scrub is seq 2 and lies between receive's start and the
+// hand-off. It holds counts only (how many card numbers and Social Security numbers were swapped), never a word or a
+// digit. Every other answer ends the trace at receive: a known event id is dropped at receipt with nothing after it
+// (trace-duplicate-webhook.json), a receipt goes to the dispatcher's door with no words (its own trace is its receive),
+// and a failure (503) or a refusal stores nothing.
 
-import { isLabel } from "../trace";
+import { isLabel, type TraceContext } from "../trace";
 import {
   labelFacts,
   logFailure,
@@ -19,7 +28,7 @@ import {
   type Answer,
   type WebhookEnvironment,
 } from "./answer";
-import { HandoffError, prepareHandoff } from "./hand-off";
+import { HandoffError, prepareHandoff, type Prepared, type ScrubDone } from "./hand-off";
 import type { GatewayDeps, StoreAnswer, VerifyWebhookResult } from "./types";
 
 // The webhook's headers by Linq's standard names (K-11 README spike row 2). The adapter's wire format is T-413's; these
@@ -49,6 +58,8 @@ export async function handleLinqWebhook(
   let outcome: "ok" | "dropped" | "refused" | "failed" = "failed";
   let decided: Record<string, boolean | number> = {};
   let errorCode: string | null = null;
+  /** The scrub of an event its actor wrote: its span follows receive's. Undefined for every other answer. */
+  let scrubbed: ScrubDone | undefined;
 
   const fail = (status: 400 | 503, error: string, code: string): void => {
     answer = { status, error };
@@ -101,13 +112,14 @@ export async function handleLinqWebhook(
       const { event, partKey } = verified;
       eventId = event.eventId;
       got = { kind: event.kind, service: event.service };
+      let prepared: Prepared | undefined;
       let stored: StoreAnswer | undefined;
       let stage = "prepare";
       let code = "handoffFailed";
       try {
         // Scrub, then seal (actor kinds), then write: the door never gets an unscrubbed or an unsealed body.
-        const prepared = await prepareHandoff(
-          { event, partKey, traceId: context.traceId, bundleId },
+        prepared = await prepareHandoff(
+          { event, partKey, traceId: context.traceId, bundleId, now },
           deps.keys,
         );
         stage = "handoff";
@@ -128,6 +140,7 @@ export async function handleLinqWebhook(
         answer = { status: 200 };
         outcome = "ok";
         decided = { signatureValid: true, knownEventId: false, answered: 200 };
+        if (prepared?.door === "actor") scrubbed = prepared.scrub;
       } else {
         decided = { signatureValid: true, answered: 503 };
         fail(503, "unavailable", code);
@@ -135,6 +148,7 @@ export async function handleLinqWebhook(
     }
   }
 
+  let received = false;
   try {
     timing.finish({
       outcome: outcome,
@@ -144,11 +158,35 @@ export async function handleLinqWebhook(
       decided,
       errorCode,
     });
+    received = true;
   } catch (error) {
     // A span the contract refuses is never logged; the answer does not change for it.
     logFailure(context.traceId, "span", error);
   }
+  // Only after a kept receive span: a scrub span alone would stand first in a trace that has no receive.
+  if (received && scrubbed !== undefined) recordScrub(context, scrubbed, eventId);
   return respond(answer, context.traceId);
+}
+
+/**
+ * Records K-08's scrub span for an event its actor wrote, after receive's: its own start and time, the event id, and
+ * how many card numbers and Social Security numbers the scrub swapped (`cardNumbersTagged`, `ssnsTagged`, as
+ * trace-skeleton.json names them). A span the contract refuses is never logged, and the answer does not change for it.
+ */
+function recordScrub(context: TraceContext, scrub: ScrubDone, eventId: string | undefined): void {
+  try {
+    context.record({
+      hop: "scrub",
+      at: new Date(scrub.startedAt).toISOString(),
+      ms: scrub.ms,
+      outcome: "ok",
+      ...(eventId !== undefined && isLabel(eventId) ? { eventId } : {}),
+      decided: { cardNumbersTagged: scrub.cards, ssnsTagged: scrub.ssns },
+      errorCode: null,
+    });
+  } catch (error) {
+    logFailure(context.traceId, "span", error);
+  }
 }
 
 /** The positive check: the verify result is an event, by its own word. The type holds three results; a later one reads as not an event. */

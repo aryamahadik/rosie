@@ -8,7 +8,14 @@ import type { GatewayDeps } from "./types";
 export { DEFAULT_BUNDLE_ID, type WebhookEnvironment } from "./answer";
 export { handleLinqWebhook } from "./linq-webhook";
 export { durableObjectActor, type ActorNamespace, type HandleActorRpc } from "./actor-door";
-export { ACTOR_KINDS, HandoffError, RECEIPT_KINDS, prepareHandoff, type Prepared } from "./hand-off";
+export {
+  ACTOR_KINDS,
+  HandoffError,
+  RECEIPT_KINDS,
+  prepareHandoff,
+  type Prepared,
+  type ScrubDone,
+} from "./hand-off";
 export {
   CALENDAR_WEBHOOK_PATHS,
   STRIPE_WEBHOOK_PATHS,

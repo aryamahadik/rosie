@@ -186,9 +186,9 @@ describe("hop 1 joined: the Linq double's signed webhook verified at the gateway
     expect(await response.json()).toEqual({ ok: true, trace_id: traceId });
     expect(run.flags.reads).toEqual([{ name: SKELETON_FLAG, subject: undefined }]);
 
-    // One gateway span: the receive hop, verified, a new event id, answered 200.
+    // Two gateway spans, in that order: the receive hop (verified, a new event id, answered 200), then the scrub hop.
     const spans = run.spans();
-    expect(spans).toHaveLength(1);
+    expect(spans.map((span) => span.hop)).toEqual(["receive", "scrub"]);
     expect(spans[0]).toMatchObject({
       trace_id: traceId,
       hop: "receive",
@@ -198,6 +198,7 @@ describe("hop 1 joined: the Linq double's signed webhook verified at the gateway
       got: { kind: "text", service: "imessage" },
       decided: { signatureValid: true, knownEventId: false, answered: 200 },
     });
+    expect(spans[1]).toMatchObject({ trace_id: traceId, hop: "scrub", outcome: "ok" });
 
     // The adapter's parse gave the fixture's event back, which the gateway sealed and handed to Maya's actor once.
     expect(run.actors.opened).toEqual([MAYA_ACTOR]);
@@ -264,7 +265,7 @@ describe("hop 1 joined: the Linq double's signed webhook verified at the gateway
       EVENT.eventId,
       EVENT.eventId,
     ]);
-    expect(run.spans().map((span) => span.outcome)).toEqual(["ok", "dropped"]);
+    expect(run.spans().map((span) => span.outcome)).toEqual(["ok", "ok", "dropped"]);
   });
 
   it("with no webhook secret set: 503 so Linq sends it again, nothing verified or written, the secret named only", async () => {
