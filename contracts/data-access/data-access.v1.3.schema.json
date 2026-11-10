@@ -1308,7 +1308,7 @@
           "additionalProperties": false
         },
         "slotSource": {
-          "description": "The record the row's slots are filled from, as far as K-04 v1 holds it (SlotSource: actions/src/finalize/slots/types.ts; T-310): the business head (null for a row with no business), the booking head with its flags (null for a row about no booking; v1.2 bookingHead) and the question the row asks with its clock row (null when it asks none). A slot whose home is not here is left out, so the slots that read it stay unfilled (SlotFacts: 'A fact left out leaves the slots that read it unfilled'), and the Values check refuses a message that needs it (arch 07 line 409).",
+          "description": "The record the row's slots are filled from, as far as K-04 v1 holds it (SlotSource: actions/src/finalize/slots/types.ts; T-310): the business head (null for a row with no business), the booking head with its flags (null for a row about no booking; v1.2 bookingHead) and the question the row asks with its clock row (null when it asks none). A slot whose home is not here is left out, so the slots that read it stay unfilled (SlotFacts: 'A fact left out leaves the slots that read it unfilled'), and the Values check refuses a message that needs it (arch 07 line 409). The sensitive switch is not read here (README open gap 30): a row about a booking is filled as if it were on, the stricter (RULES 4.6).",
           "type": "object",
           "properties": {
             "business": {
