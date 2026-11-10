@@ -11,6 +11,10 @@
 // task's four calls run for real in every chain. The plan, claim and mark calls are other tasks', so each of those steps
 // writes, as the owner, the rows its exchange states in its request and its outcome: what the call that follows sees.
 // Each answer is checked against data-access v1.1 with Ajv 2020-12, strict, as contracts:check runs it.
+//
+// T-1185: a firing's state write gives a bytea column in K-04's text form ("\x" and hex), written as the bytes it
+// spells; a sealed value opens with its person's key (sealing.ts, under a wrapping key made here from random bytes for
+// the run and never written to a file), and any other form is thrown with nothing written.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -31,6 +35,7 @@ import {
 } from "./clocks";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
 import type { Sql, Tx } from "./scope";
+import { DEFAULT_WRAPPING_KEY_NAME, seal, unsealText, type WrappingKeys } from "./sealing";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 type Db = Sql | Tx;
@@ -87,6 +92,30 @@ const CLOCK_FIXTURES = INDEX.filter((entry) => CLOCK_DEFS.includes(entry.def ?? 
 
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
+
+/** One wrapping key per run (T-1185's test): random, in memory only, named like the Workers secret. */
+const WRAP_KEY = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+const KEYS: WrappingKeys = {
+  resolve: (name) => (name === DEFAULT_WRAPPING_KEY_NAME ? WRAP_KEY : undefined),
+};
+const PAUSE_ID = "pause-alex-address-t1185";
+
+/** Bytes in K-04's text form, "\x" and lower-case hex: how actions' byteaText puts a sealed value into a write. */
+const byteaText = (bytes: Uint8Array): string =>
+  `\\x${[...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+
+const sameBytes = (a: Uint8Array, b: Uint8Array): boolean =>
+  a.length === b.length && a.every((byte, index) => byte === b[index]);
+
+/** What a promise was rejected with, or null when it was not. */
+async function thrownBy(promise: Promise<unknown>): Promise<unknown> {
+  try {
+    await promise;
+  } catch (error) {
+    return error;
+  }
+  return null;
+}
 
 // ---- the contract's own schema, for every request and answer (Ajv 2020-12, strict, as contracts:check runs it) ------
 
@@ -1163,6 +1192,67 @@ describe("fireClock: fire a row exactly once (K-05 item 7)", () => {
         table: "clock_rows",
         rowId: "clock-unknown",
       });
+    },
+  );
+
+  it(
+    "a firing's state write gives a bytea column the bytes of its hex form, and refuses any other form (T-1185)",
+    SLOW,
+    async () => {
+      await given("fire-once.json");
+      const address = "A stand-in address for Alex, not real";
+      const sealed = await seal(db.sql, KEYS, "person-alex", address);
+      const text = byteaText(sealed);
+      const pausing = (value: unknown): FireClockRequest => {
+        const request = fireRequest();
+        request.writes.state = [
+          {
+            op: "insert",
+            table: "pauses",
+            values: {
+              id: PAUSE_ID,
+              business_id: "biz-lees-barbershop",
+              target: "address",
+              address: value,
+              sealed_for_person_id: "person-alex",
+              set_at: request.firedAt,
+            },
+          },
+        ];
+        return request;
+      };
+      const pauseRows = async (): Promise<Uint8Array[]> => {
+        const rows = await db.sql<{ address: Uint8Array }[]>`
+          select address from pauses where id = ${PAUSE_ID}
+        `;
+        return rows.map((row) => new Uint8Array(row.address));
+      };
+
+      const before = await snapshot();
+      const notTextForm: [string, unknown][] = [
+        ["hex with no \\x", text.slice(2)],
+        ["an odd number of hex digits", `${text}0`],
+        ["a character that is not hex", `${text.slice(0, -1)}g`],
+        ["bytes already made", sealed],
+      ];
+      for (const [what, value] of notTextForm) {
+        const error = await thrownBy(fireClock(runtime, pausing(value)));
+        expect(error, what).toBeInstanceOf(TypeError);
+        expect((error as Error).message, what).toBe(
+          'fireClock: a state insert into pauses gives pauses.address a value that is not "\\x" and hex digit pairs',
+        );
+        expect(await snapshot(), what).toEqual(before);
+        expect((await pauseRows()).length, what).toBe(0);
+        expect(await clockRow(CLOCK_ROW), what).toMatchObject({ state: "armed", version: 2, fired_at: null });
+      }
+
+      const outcome = fired(await fireClock(runtime, pausing(text)));
+      expect(outcome.committed.written).toContainEqual({ table: "pauses", rowId: PAUSE_ID, version: 1 });
+      const stored = await pauseRows();
+      expect(stored.length).toBe(1);
+      const [bytes = new Uint8Array(0)] = stored;
+      expect(sameBytes(bytes, sealed), "the stored address is the sealed address's bytes").toBe(true);
+      expect(await unsealText(db.sql, KEYS, "person-alex", bytes)).toBe(address);
     },
   );
 });
