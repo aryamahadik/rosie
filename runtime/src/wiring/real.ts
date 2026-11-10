@@ -16,11 +16,11 @@
 //   safetyRead   T-554: @rosie/ai's safety read (T-365 createSafetyReader, with T-366's danger-word rules; C-113) for
 //                the bundle each text names, handed in by the root (RootOptions.safetyReaders): in a test, over a fake
 //                Messages API answered by the recorded-model double (T-004); in the Worker, none until the bundle's
-//                manifest (its two models and its safety read prompt) can be read there (the bundle reads are not joined
-//                yet; staging's BUNDLES binding is T-566) and the model key is set by name (J-02; smoke-size calls only,
-//                DL-027), so every read there fails closed and the actor applies its no-verdict rule (T-246). Each read
-//                gets the pinned bundle's danger words from the actor's own bundle port, and writes its model-call spans
-//                into the text's trace.
+//                manifest (its two models and its safety read prompt) can be read there (the bundle reads are joined by
+//                T-556 but fed no database there until T-567; staging's BUNDLES binding is T-566) and the model key is
+//                set by name (J-02; smoke-size calls only, DL-027), so every read there fails closed and the actor
+//                applies its no-verdict rule (T-246). Each read gets the pinned bundle's danger words from the actor's
+//                own bundle port, and writes its model-call spans into the text's trace.
 //   turnRow      T-555: K-05 v1.1 commitTurn (T-195, db/repo/commit-turn.ts) and K-05 v1 parkTurn (T-197, db/repo/park.ts),
 //                the two calls that write a turn's one row (K-04 turns), with their database bound, handed in by the root
 //                (RootOptions.turnRows): the K-05 double in a test; nothing in the Worker until T-567 binds its database,
@@ -28,6 +28,17 @@
 //                as the lease's rules say). Each request's turn id must be T-248's hash of its own event ids (CQ-09;
 //                ADR-013), the id the lease took the batch under, so one batch is one turn row. The park is the turn's
 //                own (T-253); the commit is the Tool API's gate and commit's, behind the lease (C-087; T-559).
+//   bundles      T-556: K-05 v1 item 7's readActiveBundle and readBundleValue (T-185, db/repo/bundles.ts), PostgreSQL's
+//                bundle registry and copy, with their database bound, handed in by the root (RootOptions.bundleReads):
+//                in a test, the K-05 double holding bundle v0 as bundles/v0 publishes it; nothing in the Worker until
+//                T-567 binds its database, so every pin there fails closed and no turn's work starts. The pin (T-249)
+//                reads the active id at each turn's start and the bundle's manifest under it, KV first from the actor's
+//                own BUNDLES binding (none on staging until T-566) and PostgreSQL's copy on a miss; the guard's keyword
+//                list is that pinned manifest's (K-01 v1 lists.keywords: START, HELP and the 16 opt-out words).
+//   targets      T-556: K-05 v1.2 handleTargets (T-220, db/repo/targets.ts; NQ-RT-2), the guard's targets across every
+//                business, with its database bound, handed in by the root (RootOptions.handleTargets): in a test, the
+//                K-05 double answering for test owner 1's seeded rows (T-1148) as targets-first-text.json; nothing in the
+//                Worker until T-567, so every read there fails closed and no text reaches the frontier or decide.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read only, never into a span, a log or an error.
@@ -38,13 +49,24 @@ import {
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
 import type { SafetyReader } from "@rosie/ai/src/safety/types";
+import type {
+  ReadActiveBundleResult,
+  ReadBundleValueRequest,
+  ReadBundleValueResult,
+} from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import type {
+  HandleTargetsOutcome,
+  HandleTargetsRequest as K05HandleTargetsRequest,
+} from "@rosie/db/repo/targets";
 
 import { turnIdOf } from "../actor/lease";
+import type { BundleDeps } from "../bundle/types";
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
+import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
 import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
 import { openTrace, type BundleId, type SpanSink } from "../trace";
 import type { ParkTurnAnswer } from "../turn/types";
@@ -94,6 +116,16 @@ export interface RealInputs {
    * Worker until T-567), so every commit and park fails closed.
    */
   readonly turnRows?: TurnRowCalls | null | undefined;
+  /**
+   * K-05 v1 item 7's readActiveBundle and readBundleValue with their database bound (T-556); null or left out where no
+   * database is bound (the Worker until T-567), so every pin and every active-id read fails closed.
+   */
+  readonly bundleReads?: BundleReadCalls | null | undefined;
+  /**
+   * K-05 v1.2 handleTargets with its database bound (T-556); null or left out where no database is bound (the Worker until
+   * T-567), so every targets read fails closed.
+   */
+  readonly handleTargets?: HandleTargetsCall | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -107,6 +139,8 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
         : { ...inputs.safetyRead, now: inputs.now },
     ),
     turnRow: realTurnRow({ calls: inputs.turnRows ?? null }),
+    bundles: realBundles({ calls: inputs.bundleReads ?? null }),
+    targets: realTargets({ call: inputs.handleTargets ?? null }),
   };
 }
 
@@ -350,6 +384,76 @@ export function realTurnRow(inputs: { readonly calls: TurnRowCalls | null }): Tu
       // builds and reads) and the generated one db/repo/park.ts takes and answers.
       const answer = await calls.parkTurn(request as unknown as K05ParkTurnRequest);
       return answer as unknown as ParkTurnAnswer;
+    },
+  };
+}
+
+// ---- bundles: K-05 v1 item 7's bundle reads, the turn's pin (T-556; C-050, C-033) --------------------------------------
+
+/** K-05 v1 readActiveBundle (T-185, db/repo/bundles.ts) with its database bound (the primary, uncached). */
+export type ReadActiveBundleCall = () => Promise<ReadActiveBundleResult>;
+
+/** K-05 v1 readBundleValue (T-185, db/repo/bundles.ts) with its database bound (the primary, uncached). */
+export type ReadBundleValueCall = (request: ReadBundleValueRequest) => Promise<ReadBundleValueResult>;
+
+/** K-05 v1 item 7's two bundle reads with their database bound: what the root is handed (RootOptions.bundleReads). */
+export interface BundleReadCalls {
+  readonly readActiveBundle: ReadActiveBundleCall;
+  readonly readBundleValue: ReadBundleValueCall;
+}
+
+/**
+ * The bundle port (T-556): K-05 v1 item 7's readActiveBundle and readBundleValue, PostgreSQL's registry and its copy of
+ * every published bundle (arch 10 line 536), the reads the actor's pin makes at each turn's start (T-249) and the gateway
+ * makes for each webhook's trace (K-08 v1 README default 1). The port carries no KV of its own: the pin reads KV first
+ * from the actor's own BUNDLES binding (none on staging until T-566) and PostgreSQL's copy on a miss. With no database
+ * bound (the Worker until T-567) every read fails closed before any call: no turn's bundle is pinned, so no turn's work
+ * starts (the lease lapses into a rerun), and the gateway's trace names bundle v0's stand-in. K-05's answer comes back as
+ * it is; the pin checks it (the active id's form, each value's key, size and sha256, the manifest against its id), and
+ * the guard reads its keyword list from the manifest so pinned (K-01 v1 lists.keywords). Nothing here logs.
+ */
+export function realBundles(inputs: { readonly calls: BundleReadCalls | null }): BundleDeps {
+  return {
+    registry: {
+      readActiveBundle() {
+        const calls = inputs.calls;
+        if (calls === null) return Promise.reject(new NoDatabaseError("readActiveBundle"));
+        return calls.readActiveBundle();
+      },
+      readBundleValue(request) {
+        const calls = inputs.calls;
+        if (calls === null) return Promise.reject(new NoDatabaseError("readBundleValue"));
+        return calls.readBundleValue({ key: request.key });
+      },
+    },
+  };
+}
+
+// ---- targets: K-05 v1.2 handleTargets, the guard's targets (T-556; C-051) ----------------------------------------------
+
+/**
+ * K-05 v1.2 handleTargets (item 27; T-220, db/repo/targets.ts) with its database bound: the primary, as rosie_job, with no
+ * business scope (the runtime side, across every business: K-04 v1 rule 4).
+ */
+export type HandleTargetsCall = (request: K05HandleTargetsRequest) => Promise<HandleTargetsOutcome>;
+
+/**
+ * The targets port (T-556): K-05 v1.2 handleTargets (QUESTIONS.md NQ-RT-2's default, "a handle's targets"), the guard's
+ * read of the handle's people and their live roles, every live open question sent to it and the bookings its people
+ * booked or are served by, across every business, primary and uncached (arch 02 line 115). It is asked only for a turn
+ * with a text that is not a keyword: a keyword text alone reads nothing (T-250). With no database bound (the Worker until
+ * T-567) every read fails closed before any call: the guard's span says so (noAnswer), and none of the turn's texts
+ * reaches the frontier or decide on that run, while its keyword texts still take their path. K-05's answer comes back as
+ * it is; the guard checks it (`targetsOf`: K-05's shape, for the handle asked about, or `badAnswer`). Nothing here logs.
+ */
+export function realTargets(inputs: { readonly call: HandleTargetsCall | null }): HandleTargetsPort {
+  return {
+    handleTargets(request) {
+      const call = inputs.call;
+      if (call === null) return Promise.reject(new NoDatabaseError("handleTargets"));
+      // The same K-05 v1.2 handleTargets answer in two hand-written forms: db/repo/targets.ts's, and the guard's
+      // (../guard/types.ts), which names only the fields it reads and checks each of them (../guard/targets.ts).
+      return call({ handleId: request.handleId }) as unknown as Promise<HandleTargetsAnswer>;
     },
   };
 }

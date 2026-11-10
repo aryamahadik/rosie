@@ -29,13 +29,14 @@ export function closedPorts(): Ports {
     sealing: { getOrCreateKey: () => fail("sealing") },
     safetyRead: { read: () => fail("safetyRead") },
     turnRow: { commitTurn: () => fail("turnRow"), parkTurn: () => fail("turnRow") },
-    stateReads: {
-      bundles: {
-        registry: {
-          readActiveBundle: () => fail("stateReads"),
-          readBundleValue: () => fail("stateReads"),
-        },
+    bundles: {
+      registry: {
+        readActiveBundle: () => fail("bundles"),
+        readBundleValue: () => fail("bundles"),
       },
+    },
+    targets: { handleTargets: () => fail("targets") },
+    stateReads: {
       safety: {
         directory: { idsOf: () => fail("stateReads") },
         bundle: {
@@ -45,7 +46,6 @@ export function closedPorts(): Ports {
         },
         isStopped: () => fail("stateReads"),
       },
-      targets: { handleTargets: () => fail("stateReads") },
       turn: {
         directory: { partyOf: () => fail("stateReads") },
         safety: { resultsOf: () => fail("stateReads") },

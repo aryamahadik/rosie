@@ -1,8 +1,8 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555), under Node (Vitest project "unit"): the ports the
-// root binds in each environment, each once and none left unbound; the check that refuses a port bound twice or left
-// unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's environments still
-// bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the safety
-// read, T-555 the turn-row calls; production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556), under Node (Vitest project "unit"): the
+// ports the root binds in each environment, each once and none left unbound; the check that refuses a port bound twice or
+// left unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's environments
+// still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the
+// safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets; production takes no join yet).
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import { describe, expect, it } from "vitest";
 
@@ -41,8 +41,8 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing", "safetyRead", "turnRow"],
-  staging: ["linqVerify", "sealing", "safetyRead", "turnRow"],
+  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets"],
+  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets"],
   production: [],
 };
 
@@ -53,12 +53,14 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's eleven ports in its turn order", () => {
+  it("names D-017's thirteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
       "safetyRead",
       "turnRow",
+      "bundles",
+      "targets",
       "stateReads",
       "turnFace",
       "decide",
@@ -73,7 +75,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read and turn-row calls to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads and targets read to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -232,7 +234,7 @@ describe("the Worker's environments", () => {
     expect(workerRoot(env)).toBe(workerRoot(env));
   });
 
-  it("keeps the gateway's doors closed: with no Linq webhook secret set the joined verify fails, the joined seal fails with no database bound (until T-567), and the actor fails", async () => {
+  it("keeps the gateway's doors closed: with no Linq webhook secret set the joined verify fails, the joined seal and active bundle read fail with no database bound (until T-567), and the actor fails", async () => {
     const { gateway } = workerRoot(workerEnv("staging"));
     const handle = { kind: "phone", address: "+15555550100" };
 
@@ -253,8 +255,11 @@ describe("the Worker's environments", () => {
     await expect(gateway.actor.accept({} as never)).rejects.toThrow(
       new WiringError("no HandleActor namespace is bound here"),
     );
-    // The active bundle id cannot be read: the gateway's answer rules then use bundle v0's stand-in (answer.ts).
-    await expect(Promise.resolve(gateway.bundleId())).rejects.toThrow(new NotJoinedError("stateReads"));
+    // The active bundle id cannot be read: the bundle port is joined (T-556) but fed no database until T-567, so the
+    // gateway's answer rules use bundle v0's stand-in (answer.ts).
+    await expect(Promise.resolve(gateway.bundleId())).rejects.toThrow(
+      new NoDatabaseError("readActiveBundle"),
+    );
   });
 });
 
@@ -265,6 +270,13 @@ describe("a closed port", () => {
     await expect(closed.safetyRead.read({} as never)).rejects.toThrow(new NotJoinedError("safetyRead"));
     await expect(closed.turnRow.commitTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));
     await expect(closed.turnRow.parkTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));
+    await expect(closed.bundles.registry.readActiveBundle({})).rejects.toThrow(new NotJoinedError("bundles"));
+    await expect(closed.bundles.registry.readBundleValue({ key: "bundle/x/1/manifest" })).rejects.toThrow(
+      new NotJoinedError("bundles"),
+    );
+    await expect(closed.targets.handleTargets({ handleId: "handle-sam" })).rejects.toThrow(
+      new NotJoinedError("targets"),
+    );
     await expect(closed.decide.decide({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("decide"),
     );
