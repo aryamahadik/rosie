@@ -32,7 +32,9 @@
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   4. How Rosie addresses the reader (K-03 audience.name; finalize's readerName) is the first word of the stored name
-//      ("Sam Lee" gives "Sam", as K-09's compose-input-s1-02.json shows), or null when none is stored.
+//      ("Sam Lee" gives "Sam", as K-09's compose-input-s1-02.json shows), or null when none is stored. Since T-1174,
+//      compose input addresses ComposeRow.name itself (compose-input addressedAs), so the binding hands it the name as
+//      the row read gives it, and finalize's readerName the same first word.
 //   5. The reader's language is the turn's (decide's agreed language, held with its words), else the stored one, else
 //      "en", the language every bundle line has (K-01 fixedLines' fallback; CQ-171 (c)).
 //   6. What the phone allows (C-128, not built) is text alone, the one format every channel takes (fail closed).
@@ -49,11 +51,15 @@
 //      row's index is written to (S13-31: "the role comes from what the message is about"). When none is (every role reads
 //      as no one, or as a reader the line is not written to), no role the recipient holds reads the row: it is refused as
 //      roleReadsAsNoOne, the one refusal K-05 v1.5's rules give a recipient who holds a role, who is never read by the line.
+//  11. A row K-05's readOutboxRow answers fixedLineRow (a safety row: K-05 v1.3) is refused here, thrown (fixedLineRow):
+//      K-09 v1.6's fixedLineRow answer names the row's fixed line by its id, which K-05's error does not give, so it is
+//      never guessed. A row whose bundle or step is missing is refused before a reader is looked for (K-05 v1.5
+//      rowReader.errors; bundleMissing, stepMissing), so compose input never reaches its masterLineMissing for it.
 
 import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.5";
 import { NotBuiltError } from "../errors";
 import {
-  ComposeInputRefusedError,
+  addressedAs,
   slotsIn,
   type ComposeBundles,
   type ComposeInputDeps,
@@ -356,12 +362,6 @@ function roleOfReading(read: OutboxRowRead, outcome: K05.RowReaderResponse): Rol
   return held.role;
 }
 
-/** Default 4: how Rosie addresses the reader, the first word of the stored name. */
-export function addressedAs(name: string | null): string | null {
-  const first = name?.trim().split(/\s+/u)[0] ?? "";
-  return first === "" ? null : first;
-}
-
 /** The link slots of the vocabulary (K-03 slots.json kind link). */
 const LINK_SLOTS: ReadonlySet<string> = new Set(
   VOCABULARY.filter((slot) => slot.kind === "link").map((slot) => slot.name),
@@ -387,6 +387,9 @@ interface RowView {
   readonly optOutLines: readonly string[];
   readonly source: SlotSource;
   readonly language: string;
+  /** The reader's name as the row read gives it (K-04 persons.name): ComposeRow.name, which compose input addresses. */
+  readonly storedName: string | null;
+  /** Default 4: the name Rosie addresses the reader by, its first word (finalize's readerName). */
   readonly name: string | null;
 }
 
@@ -439,6 +442,7 @@ async function viewOf(
       facts: { business: { name: business.name, displayName: business.displayName }, ...askBy },
     },
     language: held?.language ?? read.recipient.storedLanguage ?? "en",
+    storedName: read.recipient.name,
     name: addressedAs(read.recipient.name),
   };
 }
@@ -483,7 +487,8 @@ export async function composeRowOf(binding: RowBinding, read: OutboxRowRead): Pr
     step: view.stepId,
     line: view.index,
     role: view.role,
-    name: view.name,
+    // The name as the row read gives it: compose input addresses the reader by its first word (T-1174; default 4).
+    name: view.storedName,
     way: read.recipient.kind === "email" ? "email" : "texts",
     handlingLine: null,
     language: view.language,
@@ -522,7 +527,8 @@ export function composeInputDeps<Repo>(binding: RowBinding): ComposeInputDeps<Re
       async readRow(outboxRowId, call): Promise<ComposeRowRead> {
         const read = await binding.data.readOutboxRow({ outboxRowId, businessId: call.businessId });
         if ("error" in read) {
-          if (read.error === "fixedLineRow") throw new ComposeInputRefusedError("fixedLineRow");
+          // Default 11: K-05's fixedLineRow names no fixed line, so K-09 v1.6's fixedLineRow cannot be given: refused.
+          if (read.error === "fixedLineRow") throw new TurnFaceRefusedError("fixedLineRow");
           return rowErrorOf(read);
         }
         return composeRowOf(binding, read);

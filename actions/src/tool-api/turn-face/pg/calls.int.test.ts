@@ -57,25 +57,6 @@ const NO_KEY = "person-t1141-no-key";
 
 const { validator, checker } = checks();
 
-/**
- * What main's commit cannot give yet, named and never faked (DL-364 ruling 3: kept, asserted, until T-1185 merges): the
- * safety service writes a sealed value in K-04's bytea text form ("\x" and hex: domain/safety/record.ts default 8), and
- * K-05's commitTurn passes it to postgres.js as it is (db/repo/commit-turn.ts columnValues), whose bytea serializer takes a
- * string's own bytes (node_modules/postgres/src/types.js: '\\x' + Buffer.from(x)). So safety_outcomes.sealed_words holds
- * the text's bytes, not the sealed value, and does not open. Emptied once T-1185 merges; the test then says so.
- */
-const SEALED_WAITING: readonly { readonly task: "T-1185"; readonly waitsFor: string }[] = [
-  {
-    task: "T-1185",
-    waitsFor:
-      "T-1185: commitTurn writes a bytea column given in K-04's text form as its bytes (the database engineer's, with the security reviewer)",
-  },
-];
-
-/** The bytes of a hex string. */
-const fromHex = (hex: string): Uint8Array =>
-  Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
-
 /** A wrapping key made for this run alone (never a real key: it wraps only this schema's test keys). */
 const WRAP_BYTES = crypto.getRandomValues(new Uint8Array(32));
 const KEYS: WrappingKeys = { resolve: () => WRAP_BYTES };
@@ -159,20 +140,11 @@ describe("gateAndCommit for turn 1 on local PostgreSQL (T-1141)", () => {
       >`select id, turn_id, outcomes, sealed_words from safety_outcomes where event_id = 'evt-sam-s1-01'`;
       expect(record).toMatchObject({ id: "safety-outcome-sam-s1-01", turn_id: TURN, outcomes: ["No"] });
       if (record?.sealed_words == null) throw new Error("the read's words are sealed");
+      // Since T-1185 the commit stores the sealed value's own bytes (SEALED_WAITING is gone, DL-364 ruling 3): they open
+      // under Sam's own key, and nothing of them reads as K-04's text form.
       const stored = new Uint8Array(record.sealed_words);
-      let sealedValue: Uint8Array = stored;
-      for (const waiting of SEALED_WAITING) {
-        // Main stores the text form's own bytes ("\x01..."), which do not open (SEALED_WAITING); the sealed value inside
-        // them is the sealer's, under Sam's own key. Once T-1185 stores the bytes, take SEALED_WAITING away.
-        const asText = new TextDecoder().decode(stored);
-        expect(asText, `the commit now stores the bytes: ${waiting.waitsFor}`).toMatch(/^\\x01[0-9a-f]+$/);
-        await expect(unsealText(cdb.runtime, KEYS, SAM, stored)).rejects.toMatchObject({
-          code: "bad_format",
-        });
-        sealedValue = fromHex(asText.slice(2));
-      }
-      expect(SEALED_WAITING.map((waiting) => waiting.task)).toEqual(["T-1185"]);
-      const words = JSON.parse(await unsealText(cdb.runtime, KEYS, SAM, sealedValue)) as {
+      expect(new TextDecoder().decode(stored.slice(0, 2))).not.toBe("\\x");
+      const words = JSON.parse(await unsealText(cdb.runtime, KEYS, SAM, stored)) as {
         labels: unknown[];
       };
       expect(words.labels).toHaveLength(1);

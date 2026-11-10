@@ -29,6 +29,7 @@ import {
   callDoubles,
   commitRequestAfter,
   commitS101,
+  composeS102,
   firstTextFacts,
   outboxRowTurnOne,
   publishedBundleV0,
@@ -140,7 +141,8 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
   it("build-frontier-s1-01, then commit-s1-01, then compose input and finalize on the commit's row: on the turn's pin, finalize ends the chain at lineNotInBundle", async () => {
     const row = outboxRowTurnOne();
     const chain = chainOf(row, sampleBundle("bundle-v0-skeleton.json"));
-    const compose = fixture("compose-input-s1-02.json") as { request: Json; outcome: { input: Json } };
+    // compose-input-s1-02.json's request, answered as its K-09 v1.6 twin states it since T-1174 (composeS102).
+    const compose = composeS102();
 
     // Before the commit, the row is not there: compose input on it answers notFound.
     expect(
@@ -151,8 +153,8 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     expectReadOfCommit(chain, row);
 
     // 3. Compose input on that commit's row (compose-input-s1-02.json's request names it): Sam, with no role, read as the
-    // owner by S1-02's sign-up line and addressed as Sam; the words he sent, handed in by gateAndCommit; gentle while the
-    // sensitive switch is treated as on (DL-326 note b).
+    // owner by S1-02's sign-up line and addressed as Sam; the words he sent, handed in by gateAndCommit; S1-02's card
+    // lines as term facts (K-09 v1.6, T-1174); gentle while the sensitive switch is treated as on (DL-326 note b).
     expect(compose.request.outboxRowId).toBe(ROW);
     const composed = await chain.face.composeInput(
       structuredClone(compose.request),
@@ -178,7 +180,7 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     await frontierThenCommit(chain);
     expectReadOfCommit(chain, row);
 
-    const compose = fixture("compose-input-s1-02.json") as { request: Json };
+    const compose = composeS102();
     const composed = await chain.face.composeInput(
       structuredClone(compose.request),
       traceFor(compose.request).trace,

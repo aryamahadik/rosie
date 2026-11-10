@@ -33,6 +33,11 @@ export type TurnFaceFault =
   | "noReader"
   /** The row asks no question, so it names no step or line (K-05 v1.3 default 48): never guessed. */
   | "noLine"
+  /**
+   * K-05 answers the row is a fixed-line row (a safety row) without naming its fixed line, which K-09 v1.6's
+   * fixedLineRow answer needs: never composed, never guessed.
+   */
+  | "fixedLineRow"
   /** The row's question has no clock row, which the passed-on path withdraws with it (K-05 v1.3 default 54). */
   | "noClockRow"
   /** A sealer asked for a person who has no sealing key: the turn face never makes one. */

@@ -8,8 +8,9 @@
 // readOutboxRow and readFixedLineFacts and finalize's writePlan on rosie_job, each its own transaction. Given: bundle v0
 // (K-01 v1's bundle-v0-skeleton.json, which the row pins) through the frontier's fake bundles.
 //
-// The proofs: compose input gives K-09's compose-input-s1-02.json's input for the row (gentle while the sensitive switch
-// is treated as on: DL-326 note b), with the inbound words only once the runtime handed them through gateAndCommit;
+// The proofs: compose input gives K-09's compose-input-s1-02.json's request the input K-09 v1.6's twin states (T-1174:
+// S1-02's card lines as term facts), gentle while the sensitive switch is treated as on (DL-326 note b), with the
+// inbound words only once the runtime handed them through gateAndCommit;
 // finalize with finalize-pass.json's plan refuses Rosie's first text whole on bundle v0, lineNotInBundle for privacyLink
 // (K-09 v1.5 open gap 121), and writes nothing; on bundle v0 as published (T-1146) it writes the row's final parts.
 
@@ -31,7 +32,7 @@ import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../../domain/safety
 import { FixedLineRefusedError } from "../../../finalize/fixed-lines";
 import { captureLog, checks, fakeBundles, sampleBundle } from "../../../frontier/assemble/test-support";
 import { fixture, traceFor } from "../../test-support";
-import { SAM_KEY, commitRequestAfter, publishedBundleV0 } from "../calls-test-support";
+import { SAM_KEY, commitRequestAfter, composeS102, publishedBundleV0 } from "../calls-test-support";
 import { NOTHING_OPEN_AT } from "../commit";
 import type { TurnFace } from "../turn-face";
 import { pgTurnCalls, pgTurnFace } from "./index";
@@ -96,12 +97,12 @@ afterAll(async () => {
   await cdb.close();
 });
 
-const compose = (): { request: Json; outcome: { input: Json } } =>
-  fixture("compose-input-s1-02.json") as { request: Json; outcome: { input: Json } };
+/** compose-input-s1-02.json's request, answered as its K-09 v1.6 twin states it since T-1174 (composeS102). */
+const compose = (): { request: Json; outcome: { input: Json } } => composeS102();
 
 describe("compose input and finalize on PostgreSQL, on the row turn 1's commit wrote (T-1141)", () => {
   it(
-    "compose input gives compose-input-s1-02.json's input (gentle: DL-326 note b), its inbound words only once the runtime handed them through gateAndCommit",
+    "compose input gives compose-input-s1-02-v1.6.json's input for compose-input-s1-02.json's request (gentle: DL-326 note b), its inbound words only once the runtime handed them through gateAndCommit",
     SLOW,
     async () => {
       const { request, outcome } = compose();

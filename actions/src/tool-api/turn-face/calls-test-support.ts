@@ -314,6 +314,26 @@ export function commitContextOf(request: GateAndCommitRequest): CommitTurnContex
 // ---------------------------------------------------------------------------------------------------------------
 // Compose input and finalize: K-05 v1.3's row reads as doubles, the bundles the row was committed under
 
+/** A K-09 composeInput exchange: its request and its compose answer's input. */
+export interface ComposeS102 {
+  readonly request: Json;
+  readonly outcome: { readonly input: Json };
+}
+
+/**
+ * Compose input on outbox-s1-02-sam-1: the card's K-09 v1 compose-input-s1-02.json request, answered since T-1174 as
+ * K-09 v1.6's compose-input-s1-02-v1.6.json states it (the same request; v1's input with S1-02's card lines as K-03 v1.1
+ * term facts: "its answer changes, not the port", DL-355). Refused when the two requests differ.
+ */
+export function composeS102(): ComposeS102 {
+  const v1 = fixture("compose-input-s1-02.json") as ComposeS102;
+  const v16 = fixture("compose-input-s1-02-v1.6.json") as ComposeS102;
+  if (JSON.stringify(v1.request) !== JSON.stringify(v16.request)) {
+    throw new Error("compose-input-s1-02.json and its v1.6 twin ask different requests");
+  }
+  return { request: v1.request, outcome: v16.outcome };
+}
+
 /** K-05 v1.3's read-outbox-row-s1-02.json answer (S1-02's row to Sam, the owner, after commit-s1-01-sam.json). */
 export function outboxRowS102(): OutboxRowRead {
   return (contractFile("data-access/fixtures/read-outbox-row-s1-02.json") as { outcome: OutboxRowRead })

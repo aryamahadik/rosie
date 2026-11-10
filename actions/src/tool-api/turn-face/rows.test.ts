@@ -7,10 +7,13 @@
 //
 // Round 2 (DL-364, DL-370): the reader is K-05 v1.5's rowReader (README item 44), proven on its 3 accepted fixtures, its
 // 2 refused ones, the three security cases (no person, lineTo null, a cust line: never read as the owner), the by-role
-// branch, and turn 1's row as it runs, to Sam with no role, read as the owner and addressed as "Sam".
+// branch, and turn 1's row as it runs, to Sam with no role, read as the owner and addressed as "Sam". Since T-1174,
+// compose input answers compose-input-s1-02.json's request as K-09 v1.6's compose-input-s1-02-v1.6.json states it
+// (calls-test-support.ts composeS102).
 
 import { describe, expect, it } from "vitest";
 
+import { addressedAs } from "../../compose-input";
 import type { Role } from "../../domain/identity-access";
 import { readerOf } from "../../finalize/claim-check";
 import { FixedLineRefusedError } from "../../finalize/fixed-lines";
@@ -22,6 +25,7 @@ import {
   ROW_READER_REFUSED,
   bundleOfRequest,
   commitRequestAfter,
+  composeS102,
   firstTextFacts,
   outboxRowS102,
   outboxRowTurnOne,
@@ -36,15 +40,14 @@ import {
 } from "./calls-test-support";
 import { NOTHING_OPEN_AT } from "./commit";
 import { TurnFaceRefusedError } from "./errors";
-import { addressedAs, composeRowOf, lineToOf, readerOfRow, safetyLinesFor, type OutboxRowRead } from "./rows";
+import { composeRowOf, lineToOf, readerOfRow, safetyLinesFor, type OutboxRowRead } from "./rows";
 import { createTurnFace, type TurnFace } from "./turn-face";
 
 type Json = Record<string, unknown>;
 
 const validator = createToolApiValidator();
 
-const composeExchange = (): { request: Json; outcome: { input: Json } } =>
-  fixture("compose-input-s1-02.json") as { request: Json; outcome: { input: Json } };
+const composeExchange = (): { request: Json; outcome: { input: Json } } => composeS102();
 const finalizeExchange = (): { request: Json } => fixture("finalize-pass.json") as { request: Json };
 
 /** The face over the row doubles (its frontier is not called here). */
@@ -231,7 +234,7 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     }
   });
 
-  it("addresses the reader by the first word of the stored name", () => {
+  it("addresses the reader by the first word of the stored name (default 4, compose input's since T-1174)", () => {
     expect(addressedAs("Sam Lee")).toBe("Sam");
     expect(addressedAs(null)).toBeNull();
     expect(addressedAs("  ")).toBeNull();
@@ -357,7 +360,9 @@ describe("the reader, mapped exactly as K-05 v1.5's rowReader (README item 44; D
     const doubles = rowDoubles({ row: read });
     const row = await composeRowOf(doubles.binding, structuredClone(read));
     expect(row.role).toBe("owner");
-    expect(row.name).toBe("Sam");
+    // The name as the row read gives it; compose input addresses it by its first word (T-1174), "Sam".
+    expect(row.name).toBe("Sam Lee");
+    expect(addressedAs(row.name)).toBe("Sam");
     expect(read.recipient.roles).toEqual([]);
     expect(doubles.plans).toEqual([]);
     // lineToOf alone: S1-02's one line from Rosie, to the owner, at index 0; none at index 1.
