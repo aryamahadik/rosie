@@ -1,0 +1,20 @@
+{
+  "result": "openHolds",
+  "handleId": "handle-alex",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-27T09:00:04Z",
+  "holds": [
+    {
+      "holdId": "hold-alex-0203",
+      "releaseRule": "after_safe",
+      "blocksBooking": false,
+      "safetyOutcomeId": "safety-alex-0203",
+      "bookingId": "booking-alex-haircut",
+      "turnId": "turn-alex-0203",
+      "heldAt": "2026-10-25T23:10:02Z",
+      "version": 1,
+      "sealedWords": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c"
+    }
+  ],
+  "unreadEventIds": []
+}

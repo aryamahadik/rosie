@@ -1,0 +1,83 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-opens-question.json"],
+    "now": "2026-10-23T14:05:02Z",
+    "note": "Compose input reads the tour's A7-03 row to Alex right after its commit (tour lines 423 to 427): A7-03's line 0 from the question it asks; Alex, a customer of the barbershop, as limit 7's reader; the haircut's booking head at v7 with its private and deceased flags, and the question with its three options as sent, its 24-hour Clock line and its clock row waiting for the first delivery, as the slot source. Alex's phone row is not among this chain's seeds, so phone is null; evt-alex-0007 has no safety row here, so its outcomes are null."
+  },
+  "request": {
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-23T14:05:02Z",
+    "row": {
+      "turnId": "turn-alex-move-1",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": "booking-alex-haircut",
+      "openQuestionId": "oq-a7-03-alex",
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": { "step": "A7-03", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "handleId": "handle-alex",
+      "kind": "phone",
+      "personId": "person-alex",
+      "name": "Alex M.",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-alex-barber", "role": "customer", "version": 1 }],
+      "phone": null
+    },
+    "answers": {
+      "handleId": "handle-alex",
+      "texts": [{ "eventId": "evt-alex-0007", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": {
+        "id": "booking-alex-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "bookerPersonId": "person-alex",
+        "servedPersonId": "person-alex",
+        "payerPersonId": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 7
+      },
+      "question": {
+        "id": "oq-a7-03-alex",
+        "step": "A7-03",
+        "status": "waiting",
+        "options": [
+          { "id": "A7-03/1", "label": "Sat 12:00pm" },
+          { "id": "A7-03/2", "label": "Sat 2:00pm" },
+          { "id": "A7-03/3", "label": "Sat 3:30pm" }
+        ],
+        "readback": null,
+        "clock": "24 h",
+        "askCount": 1,
+        "version": 1,
+        "clockRow": { "id": "clock-oq-a7-03-alex", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+      }
+    },
+    "openQuestions": []
+  }
+}

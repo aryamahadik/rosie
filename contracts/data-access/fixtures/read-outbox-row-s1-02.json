@@ -1,0 +1,68 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "Compose input reads S1-02's question to Sam (K-09 v1 compose-input-s1-02.json) under the barbershop's scope: the row, unplanned at version 1 (finalize-pass.json's expectVersion), its turn and bundle; S1-02's line 0, from the question it asks; Sam, the owner, as limit 7's reader, with the name and language K-04 stores and his phone's flags; the one text it answers, by event id only, whose words the runtime caller hands in; the business head and the question with its waiting clock row as the slot source; and no other question open with him. The turn's text has no safety row in this chain (commit-s1-01-sam.json's note), so its outcomes are null and the tone stays routine. How Rosie addresses him ('Sam' in K-09's fixture) is the caller's, from the stored name."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:05:05Z",
+    "row": {
+      "turnId": "turn-s1-01-sam",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": "oq-s1-02",
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "handleId": "handle-sam",
+      "kind": "phone",
+      "personId": "person-sam",
+      "name": "Sam Lee",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }],
+      "phone": { "stopped": false, "chatOpen": true, "chatWay": "imessage", "pollVotedAt": null, "version": 2 }
+    },
+    "answers": {
+      "handleId": "handle-sam",
+      "texts": [{ "eventId": "evt-sam-0000", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": null,
+      "question": {
+        "id": "oq-s1-02",
+        "step": "S1-02",
+        "status": "waiting",
+        "options": [],
+        "readback": null,
+        "clock": null,
+        "askCount": 1,
+        "version": 1,
+        "clockRow": { "id": "clock-oq-s1-02", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+      }
+    },
+    "openQuestions": []
+  }
+}

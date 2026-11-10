@@ -1,0 +1,23 @@
+{
+  "call": "readFixedLineFacts",
+  "given": {
+    "k04Seeds": ["seed-thread-messages.json", "seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-23T14:05:03Z",
+    "note": "Finalize reads the fixed-line facts of A7-03's row to Alex: the opener mark for his handle at the barbershop names his first reply (out-alex-first, K-04's seed-thread-messages), another row, so Rosie has texted him about the barbershop before and this row carries no opener; his number's opt-out line was delivered at that first text."
+  },
+  "request": {
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "fixedLineFacts",
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-lees-barbershop",
+    "recipientHandleId": "handle-alex",
+    "readAt": "2026-10-23T14:05:03Z",
+    "textedAboutBusiness": true,
+    "openerRowId": "out-alex-first",
+    "optOutLineDeliveredAt": "2026-10-12T16:20:00Z"
+  }
+}

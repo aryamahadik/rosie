@@ -1,0 +1,70 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-thread-messages.json", "seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-23T14:07:00Z",
+    "note": "A row that asks no question: Alex's first reply from the barbershop (out-alex-first, K-04's seed). K-04 v1 stores no step or line on a row, so with no question to read them from the read answers line null (README open gap 29), and compose input and finalize refuse such a row rather than guess its line. The questions still open with Alex at the barbershop are listed with their words as sent: A7-03, whose row to his handle has gone, with the words part of its final parts. His phone's flags are K-04's seed values."
+  },
+  "request": {
+    "outboxRowId": "out-alex-first",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "out-alex-first",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-23T14:07:00Z",
+    "row": {
+      "turnId": "turn-alex-first",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "delivered",
+      "version": 6,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": null,
+    "recipient": {
+      "handleId": "handle-alex",
+      "kind": "phone",
+      "personId": "person-alex",
+      "name": "Alex M.",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-alex-barber", "role": "customer", "version": 1 }],
+      "phone": {
+        "stopped": false,
+        "chatOpen": true,
+        "chatWay": "imessage",
+        "pollVotedAt": "2026-10-23T14:06:10Z",
+        "version": 3
+      }
+    },
+    "answers": {
+      "handleId": "handle-alex",
+      "texts": [{ "eventId": "evt-alex-0001", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": null,
+      "question": null
+    },
+    "openQuestions": [
+      {
+        "id": "oq-a7-03-alex",
+        "step": "A7-03",
+        "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?"
+      }
+    ]
+  }
+}

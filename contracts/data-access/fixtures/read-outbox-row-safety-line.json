@@ -1,0 +1,18 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-alex-safety.json"],
+    "now": "2026-11-07T15:59:59Z",
+    "note": "The safety line the commit wrote for Alex's emergency (K-07 outbox-safety-retry; v1.1's commit-alex-safety) is a fixed line, word for word (arch 07 line 347: 'Safety lines stay fixed text'), so compose input and finalize get no view of it: the read answers fixedLineRow and nothing else (STATE note 17)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "error": "fixedLineRow",
+    "outboxRowId": "out-alex-safety-emergency",
+    "sendClass": "safety"
+  }
+}
