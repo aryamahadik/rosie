@@ -24,66 +24,32 @@
 // model that answered, the read's answer says `fallback`, and the comparison keeps the turn's stakes, so on high stakes
 // any difference still ends in one question.
 //
-// Not here: the re-read (T-370); re-checking quotes and re-parsing values (the gate, C-080, and limit 6). Nothing here
-// logs: each gateway attempt writes its own portCall span, and the span facts handed on are the reads' seeds and the
-// context's counts, never words.
+// The result is never final while agreed is false: the turn's one re-read (T-370, reread.ts) runs before the gate, and a
+// turn decide answers unmapped is re-read inside the AI layer (CQ-162 (a)). Each decide of a turn is a new run of it,
+// so its one re-read is not yet used (the decider's ledger, reread.ts).
+//
+// Not here: re-checking quotes and re-parsing values (the gate, C-080, and limit 6). Nothing here logs: each gateway
+// attempt writes its own portCall span, and the span facts handed on are the reads' seeds and the context's counts,
+// never words.
 
-import { createRouter, type TurnRoute } from "../routing";
+import { createRouter } from "../routing";
 import { agreeReads } from "./agree";
 import { createDecideReader } from "./read";
+import { createRereadLedger, rereadTurn } from "./reread";
+import { twoReadResult } from "./result";
 import type {
-  Agreement,
   DecideContext,
-  DecidePart,
-  DecideResult,
   Decider,
   DeciderOptions,
   DecideReadAnswer,
   DecideTurnAnswer,
   DecideTurnOptions,
-  PartAgreement,
-  Read,
   ReadRole,
-  ResultPart,
+  RereadAnswer,
+  RereadRequest,
 } from "./types";
 
-/** The part a part that differs holds: the last read's part there (K-02 `resultPart`), the first's when only it has one. */
-function lastPart(entry: PartAgreement): DecidePart {
-  const part = entry.check ?? entry.first;
-  // agreeReads gives an entry only where one of the reads has a part.
-  if (part === null) throw new Error("a compared part holds a part of one read at least");
-  return part;
-}
-
-/**
- * K-02 v1's `decideResult` for a turn's first and check reads, before any re-read (reread false, two reads): each part
- * agreed is the first read's part and goes; each part not agreed, or marked for one question, is the last read's part
- * there (K-02: "kept for the trace and the question"), and nothing changes for it. agreed and language are the
- * comparison's.
- */
-export function twoReadResult(
-  route: TurnRoute,
-  first: Read,
-  check: Read,
-  agreement: Agreement,
-): DecideResult {
-  const parts = agreement.parts.map((entry): ResultPart =>
-    entry.mark === "agreed" && entry.first !== null
-      ? Object.freeze({ part: entry.first, outcome: "go" })
-      : Object.freeze({ part: lastPart(entry), outcome: "oneQuestion" }),
-  );
-  return Object.freeze({
-    turnId: route.turnId,
-    bundleId: route.bundleId,
-    stakes: route.stakes,
-    routing: route.routing,
-    reads: Object.freeze([first, check]),
-    agreed: agreement.agreed,
-    reread: false,
-    language: agreement.language,
-    parts: Object.freeze(parts),
-  });
-}
+export { twoReadResult };
 
 /** The roles of the reads in `answers` with `status`, first before check. */
 function rolesWith(answers: readonly DecideReadAnswer[], status: DecideReadAnswer["status"]): ReadRole[] {
@@ -95,10 +61,10 @@ function rolesWith(answers: readonly DecideReadAnswer[], status: DecideReadAnswe
 }
 
 /**
- * Builds decide's two reads for one bundle: its router (its id, its two model ids and its K-01 v1 routing policy) and
- * decide's one read on the same id and models with the bundle's prompts. Refuses, before any call, a bundle the router
- * refuses (GatewayConfigError for an id or model ids the AI gateway refuses, RoutingPolicyError for a policy that is not
- * K-01 v1's) and prompts of another bundle (GatewayConfigError).
+ * Builds decide for one bundle: its router (its id, its two model ids and its K-01 v1 routing policy), decide's one read
+ * on the same id and models with the bundle's prompts, and the ledger of its turns' one re-read. Refuses, before any
+ * call, a bundle the router refuses (GatewayConfigError for an id or model ids the AI gateway refuses,
+ * RoutingPolicyError for a policy that is not K-01 v1's) and prompts of another bundle (GatewayConfigError).
  */
 export function createDecider(options: DeciderOptions): Decider {
   const router = createRouter(options.bundle);
@@ -109,6 +75,7 @@ export function createDecider(options: DeciderOptions): Decider {
     env: options.env,
     ...(options.fetch !== undefined && { fetch: options.fetch }),
   });
+  const ledger = createRereadLedger();
 
   return Object.freeze({
     bundleId: router.bundleId,
@@ -116,6 +83,8 @@ export function createDecider(options: DeciderOptions): Decider {
       const { draw, ...callOptions } = turnOptions;
       // Refuses, before any call, a turn of another bundle, with no choice or with stakes K-02 does not have.
       const route = router.route(context, draw === undefined ? {} : { draw });
+      // A new run of the turn: its one re-read is not yet used.
+      ledger.open(route.turnId);
       const [firstRead, checkRead] = route.reads;
       // Side by side: each read is decide's one read with the route's purpose, model and seed.
       const answers = await Promise.all([
@@ -149,6 +118,9 @@ export function createDecider(options: DeciderOptions): Decider {
         agreement,
         result: twoReadResult(route, first.read, check.read, agreement),
       });
+    },
+    reread(request: RereadRequest, turnOptions: DecideTurnOptions = {}): Promise<RereadAnswer> {
+      return rereadTurn({ router, reader, ledger }, request, turnOptions);
     },
   });
 }

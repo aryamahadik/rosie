@@ -28,13 +28,15 @@ export function closedPorts(): Ports {
     linqVerify: { verifyWebhook: () => fail("linqVerify") },
     sealing: { getOrCreateKey: () => fail("sealing") },
     safetyRead: { read: () => fail("safetyRead") },
-    stateReads: {
-      bundles: {
-        registry: {
-          readActiveBundle: () => fail("stateReads"),
-          readBundleValue: () => fail("stateReads"),
-        },
+    turnRow: { commitTurn: () => fail("turnRow"), parkTurn: () => fail("turnRow") },
+    bundles: {
+      registry: {
+        readActiveBundle: () => fail("bundles"),
+        readBundleValue: () => fail("bundles"),
       },
+    },
+    targets: { handleTargets: () => fail("targets") },
+    stateReads: {
       safety: {
         directory: { idsOf: () => fail("stateReads") },
         bundle: {
@@ -44,7 +46,6 @@ export function closedPorts(): Ports {
         },
         isStopped: () => fail("stateReads"),
       },
-      targets: { handleTargets: () => fail("stateReads") },
       turn: {
         directory: { partyOf: () => fail("stateReads") },
         safety: { resultsOf: () => fail("stateReads") },
@@ -76,7 +77,6 @@ export function closedPorts(): Ports {
       rows: {
         unplannedRows: () => fail("dataAccess"),
         writePlan: () => fail("dataAccess"),
-        parkTurn: () => fail("dataAccess"),
       },
       outbox: {
         markRow: () => fail("dataAccess"),

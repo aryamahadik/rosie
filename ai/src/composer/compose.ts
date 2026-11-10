@@ -8,12 +8,15 @@
 //      frontier, or any other field, or a term whose words hold "{{" (DL-163), is a typed refusal before any call.
 //   2. One call through the AI gateway (T-361) with T-364's cache markers, Haiku first: the bundle's composer prompt
 //      (T-372, K-01 manifest.prompts.composer) is the cached system prompt, and the row's tagged input
-//      (composeInputText, every value escaped as data: S13-54 rule 67) is the per-turn part. The structured-output
-//      schema is K-03's plan, bundled and static (schema.ts). The gateway retries Haiku once, then asks Sonnet once,
-//      then answers modelsDown.
+//      (composeInputText, every value escaped as data: S13-54 rule 67; a person's private words only as "a private
+//      detail": T-375, ./relay/private.ts) is the per-turn part, with code's situation tag and language as they are.
+//      The structured-output schema is K-03's plan, bundled and static (schema.ts). The gateway retries Haiku once,
+//      then asks Sonnet once, then answers modelsDown.
 //   3. The answer is checked before it leaves the AI layer (check.ts): a K-03 v1 plan (v1.1 leaves the plan as it is);
 //      its formats from the row's allowedFormats; no number, date or price typed in its words, in digits or in words,
-//      that no fact of the row, a slot fact or a term fact, holds. Any failure is a typed refusal, never a plan.
+//      that no fact of the row, a slot fact or a term fact, holds; then what its reader must read (T-375, ./relay): a
+//      relayed sender quoted through {{relay.quote}} once, never typed; on a gentle row no sample service or name and
+//      no "!"; its words in the row's language. Any failure is a typed refusal, never a plan.
 //
 // Rows of one turn are composed side by side by calling compose once per row (each call is independent). An email copy
 // takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines and the message checks are

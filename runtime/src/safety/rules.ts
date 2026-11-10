@@ -1,6 +1,6 @@
 // The safety read's pure rules (T-246): which danger words a text holds, the result a timeout stands for, which checked
-// line goes, and what each outcome holds. No storage, no clock, no outside call. The danger words are the bundle's
-// (K-01 shared lists), passed in; this file holds no word list of its own.
+// line goes (with a partial bundle too, T-1143), and what each outcome holds. No storage, no clock, no outside call. The
+// danger words and the lines are the bundle's (K-01 shared lists), passed in; this file holds no words of its own.
 
 import type {
   BundleSafety,
@@ -105,7 +105,7 @@ export function stricterHold(a: ReleaseRule, b: ReleaseRule): ReleaseRule {
 }
 
 /** The order in which an outcome's line is chosen when several hold: 988 and 911 first, then the others (strictest first). */
-const LINE_ORDER: readonly SafetyOutcome[] = [
+const LINE_ORDER = [
   "Crisis words",
   "An emergency",
   "A threat to staff or others",
@@ -114,30 +114,58 @@ const LINE_ORDER: readonly SafetyOutcome[] = [
   "Needs the business's own line",
   "Safety steps, then go on",
   "Unsure",
-];
+] as const satisfies readonly SafetyOutcome[];
 
 /** The K-01 fixed line a danger-word match gets on a timeout: 988 and 911 for self-harm words, else 911 (arch 02 line 111). */
 export function timeoutLineId(matches: readonly DangerWordMatch[]): "safetyCrisis" | "safetyEmergency" {
   return matches.some((match) => match.kind === "selfHarm") ? "safetyCrisis" : "safetyEmergency";
 }
 
+/** The strictest safety line, 911 (A3-24; arch 02 line 111): the last stand-in for any danger outcome's line (fails closed). */
+const STRICTEST_LINE = "safetyEmergency";
+
+/** The outcome whose writer gets no safety line from the actor (S13-10; S13-24 rule 11; A3-48). */
+const THREAT = "A threat to staff or others" satisfies SafetyOutcome;
+
 /**
- * The checked line for a result the read gave (the direct path's choice; the core makes its own when PostgreSQL is up). The
- * outcome step's checked line first; Crisis and Emergency fall back to the bundle's fixed lines; Unsure takes the danger
- * words' line. A label whose tense is unknown adds the danger question (S13-24 rule 10). Null: nothing to send.
+ * The K-01 fixed line the sources give each danger outcome, for when the pinned bundle holds no checked line of the
+ * outcome's own step (T-1143, DL-325): a partial bundle such as bundle v0, which holds only S1-01 and S1-02. Crisis words get
+ * 988 and 911 (A3-25), an emergency 911 (A3-24). No other outcome has a K-01 v1 fixed line: A3-49's hotline and A3-50's
+ * family violence line come from Rosie's safety list, A3-26's line from the business and A3-23's safety steps from the
+ * plug-in. A3-49, A3-50 and A3-26 each give 911 where anyone is in danger, so all four get 911, the strictest (fails
+ * closed). Unsure takes the danger words' line (`timeoutLineId`), and a threat's writer gets none.
+ */
+const FIXED_LINE_OF: Readonly<
+  Record<Exclude<SafetyOutcome, "No" | "Unsure" | typeof THREAT>, "safetyCrisis" | "safetyEmergency">
+> = {
+  "Crisis words": "safetyCrisis",
+  "An emergency": "safetyEmergency",
+  "Harm to a child or older adult": STRICTEST_LINE,
+  "Unsafe at home": STRICTEST_LINE,
+  "Needs the business's own line": STRICTEST_LINE,
+  "Safety steps, then go on": STRICTEST_LINE,
+};
+
+/**
+ * The checked line for a result the read gave, to the person who wrote the text (the direct path's choice; the core makes
+ * its own when PostgreSQL is up). The outcome first in LINE_ORDER chooses it: its step's checked line in the pinned bundle
+ * first; with none (a partial bundle), the fixed line the sources give that outcome (`FIXED_LINE_OF`; Unsure takes the
+ * danger words' line); with that missing too, 911 (fails closed). Each such stand-in keeps its K-01 id, so the span's line
+ * names it with no words. A label whose tense is unknown adds the danger question (S13-24 rule 10). Null, nothing to send:
+ * No; a threat chosen first, since its writer gets no safety line (S13-10; S13-24 rule 11; A3-48) and the core tells the
+ * owner (DL-330), while crisis words or an emergency in the same text come first in LINE_ORDER and get theirs; or a bundle
+ * with no words for the line at all (this file holds none of its own).
  */
 export function checkedLineFor(result: SafetyResult, bundle: BundleSafety): CheckedLine | null {
   const outcomes = dangerOutcomes(result.outcomes);
   const first = LINE_ORDER.find((outcome) => outcomes.includes(outcome));
-  if (first === undefined) return null;
-  let line: CheckedLine | null;
-  if (first === "Unsure") {
-    line = bundle.fixedLine(timeoutLineId(result.dangerWords));
-  } else {
-    line = bundle.outcomeLine(first);
-    if (line === null && first === "Crisis words") line = bundle.fixedLine("safetyCrisis");
-    if (line === null && first === "An emergency") line = bundle.fixedLine("safetyEmergency");
-  }
+  if (first === undefined || first === THREAT) return null;
+  const line =
+    first === "Unsure"
+      ? (bundle.fixedLine(timeoutLineId(result.dangerWords)) ?? bundle.fixedLine(STRICTEST_LINE))
+      : (bundle.outcomeLine(first) ??
+        bundle.fixedLine(FIXED_LINE_OF[first]) ??
+        bundle.fixedLine(STRICTEST_LINE));
   if (line === null) return null;
   const asks =
     result.read?.labels.some((label) => label.tense === "unknown" && label.outcome !== "No") ?? false;

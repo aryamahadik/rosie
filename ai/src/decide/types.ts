@@ -341,7 +341,10 @@ export interface DecideTurnDecided extends TurnAnswerBase {
   readonly result: DecideResult;
 }
 
-/** A read the AI layer's validator refused (an unmapped read): never compared; the turn's one re-read follows (T-370). */
+/**
+ * A read the AI layer's validator refused (an unmapped read): never compared; the turn's one re-read follows inside the
+ * AI layer (T-370: `reread` with why `unmapped`, CQ-162 (a)).
+ */
 export interface DecideTurnUnmapped extends TurnAnswerBase {
   readonly status: "unmapped";
   /** The role of each read that was refused, first before check. */
@@ -355,13 +358,146 @@ export interface DecideTurnDown extends TurnAnswerBase {
 
 export type DecideTurnAnswer = DecideTurnDecided | DecideTurnUnmapped | DecideTurnDown;
 
-/** Decide, two reads (C-115): routed by stakes, read side by side, compared part by part. */
+// ---- The turn's one Sonnet re-read (T-370, C-116) -----------------------------------------------------------------
+
+/**
+ * Why the turn's one re-read runs (arch 02 line 119; arch 06 line 289; K-02 `decideResult.reread`):
+ *   disagreed        the first and check reads differ on a part or on the text's language (the turn loop asks);
+ *   valueFailsWords  the gate found a value failing its words before the re-read (the turn loop asks with the parts and
+ *                    fields the gate named: K-09 v1 `valueFailsWords`, K-09 README default 25);
+ *   unmapped         a read the AI layer's validator refused: the AI layer asks itself, as the turn has no K-02 result to
+ *                    hand the turn loop (CQ-162 (a)).
+ * The re-read after meaning search (the turn loop's `noneFits`, arch 03 line 189) is not this card's, and is refused.
+ */
+export const REREAD_WHYS = ["disagreed", "valueFailsWords", "unmapped"] as const;
+export type RereadWhy = (typeof REREAD_WHYS)[number];
+
+/** One part the gate named, with the fields whose values fail their words (K-09 v1 `gateAndCommit` valueFailsWords). */
+export interface FailingPart {
+  /** The part's place in the result's parts, 0-based. */
+  readonly part: number;
+  /** The names of its fields whose values fail their words. */
+  readonly fields: readonly string[];
+}
+
+/** The re-read the turn loop asks for (T-251's `RereadRequest`): decide's K-02 result before any re-read, and why. */
+export interface RereadAfterReads {
+  readonly why: "disagreed" | "valueFailsWords";
+  /** The context decide read (the turn's K-02 v1 context). */
+  readonly context: DecideContext;
+  /** K-02 v1 `decideResult` of the turn's first and check reads, exactly as decide gave it (reread false). */
+  readonly decide: DecideResult;
+  /** valueFailsWords: the parts and fields the gate named; disagreed: none. */
+  readonly failing: readonly FailingPart[];
+}
+
+/** The re-read the AI layer asks for itself, for a turn decide answered `unmapped` (CQ-162 (a)). */
+export interface RereadUnmappedTurn {
+  readonly why: "unmapped";
+  /** The context decide read. */
+  readonly context: DecideContext;
+  /** Decide's answer for it, exactly as decide gave it. */
+  readonly unmapped: DecideTurnUnmapped;
+}
+
+export type RereadRequest = RereadAfterReads | RereadUnmappedTurn;
+
+/**
+ * What became of one part at the turn's re-read (labels, never words):
+ *   untouched  the first and check reads agreed on it and the gate named none of its values: it goes as decide gave it
+ *              (the first read's part), whatever the re-read says of it;
+ *   confirmed  the gate named a value of it failing its words, and the re-read gives the part both reads agreed on: it
+ *              goes again as decide gave it, and the gate's limit 6 checks it once more, now after the re-read (K-09
+ *              commit-limit-6-value-fails.json);
+ *   settled    low stakes, the first and check reads differ on it, and the re-read gives the part one of them gives (the
+ *              same verb, choice and every field value): two reads agree, the re-read one of them, so the re-read's
+ *              part goes;
+ *   unclear    anything else: one question, and nothing changes for it (arch 02 line 119; Q-41); it holds the
+ *              re-read's part there, or the last read's that has one, kept for the trace and the question. On high
+ *              stakes every part the first and check reads differ on ends here (arch 06 line 287).
+ */
+export const SETTLEMENTS = ["untouched", "confirmed", "settled", "unclear"] as const;
+export type Settlement = (typeof SETTLEMENTS)[number];
+
+/** One part of the turn at its re-read. */
+export interface PartSettlement {
+  /** Its place in the text's order, as the reads give it. */
+  readonly index: number;
+  /** Its mark from the first and check reads (T-369), or null for a part only the re-read gives. */
+  readonly mark: PartMark | null;
+  /** True when the gate named a value of the part failing its words. */
+  readonly failed: boolean;
+  /** The re-read's part at this place, or null when the re-read gives fewer parts. */
+  readonly reread: DecidePart | null;
+  readonly settlement: Settlement;
+}
+
+interface RereadAnswerBase {
+  readonly turnId: string;
+  readonly bundleId: BundleId;
+  /** The turn's stakes, as decide routed them. */
+  readonly stakes: Stakes;
+  /** The turn's read pair (K-02 `decideResult.routing`). */
+  readonly routing: ReadPair;
+  readonly why: RereadWhy;
+  /** The model the bundle's policy names for the re-read (K-01 v1 `policy.reread`), asked first. */
+  readonly model: ModelRole;
+  /** The re-read's model calls (K-08 v1), its step 1's first, each with the purpose reread. */
+  readonly modelCalls: readonly ModelCall[];
+  /** The reread span's facts: the re-read's seed (`rereadSeed`) and the context's counts (T-367); never words. */
+  readonly span: Readonly<SpanFacts>;
+}
+
+/** The re-read is a K-02 read: K-02 v1's decideResult with it (reread true), the turn's final result. */
+export interface RereadDecided extends RereadAnswerBase {
+  readonly status: "decided";
+  /** The re-read's own answer (decide's one read, T-368, purpose reread). */
+  readonly reread: DecideReadOk;
+  /** What became of each part, in the result's order. */
+  readonly settlement: readonly PartSettlement[];
+  /** K-02 v1 `decideResult` with the re-read: go only on untouched, confirmed and settled parts. */
+  readonly result: DecideResult;
+}
+
+/**
+ * A read of the turn is refused (an unmapped read): the re-read itself, or the first or check read decide answered
+ * `unmapped` for. K-02 v1's decideResult holds only K-02 reads, so it cannot hold this turn (CQ-162 (a), open for the
+ * architect): the turn ends in one question and nothing changes for any part. The re-read's answer is kept for the
+ * trace and the question.
+ */
+export interface RereadUnmapped extends RereadAnswerBase {
+  readonly status: "unmapped";
+  readonly reread: DecideReadOk | DecideReadRefused;
+  /** The role of every read of the turn the AI layer's validator refused, in the order they ran. */
+  readonly refused: readonly ReadRole[];
+  /** How the turn ends: one question, with nothing changed. */
+  readonly end: "oneQuestion";
+}
+
+/** The re-read got neither model (`modelsDown`): no result, and nothing commits; what follows is T-271's. */
+export interface RereadDown extends RereadAnswerBase {
+  readonly status: "modelsDown";
+  readonly reread: DecideReadDown;
+}
+
+export type RereadAnswer = RereadDecided | RereadUnmapped | RereadDown;
+
+/** Decide (C-115, C-116): two reads routed by stakes, read side by side and compared part by part; the one re-read. */
 export interface Decider {
   readonly bundleId: BundleId;
   /**
    * Decides one turn's K-02 v1 context. Never rejects for a failed model call or a bad answer: those are `modelsDown`
    * and `unmapped`. Rejects, before any call, for a turn it cannot route (RoutingRefusedError: another bundle's, no
-   * choice, stakes K-02 does not have) and for a read that cannot be made (as decide's one read rejects).
+   * choice, stakes K-02 does not have) and for a read that cannot be made (as decide's one read rejects). Each decide of
+   * a turn is a new run of it: its one re-read is not yet used.
    */
   decide(context: DecideContext, options?: DecideTurnOptions): Promise<DecideTurnAnswer>;
+  /**
+   * The turn's one Sonnet re-read (C-116): at most one per decide of the turn, whatever asks for it. Never rejects for a
+   * failed model call or a bad answer: those are `modelsDown` and `unmapped`. Rejects, before any call, a second request
+   * (RereadRefusedError), and a request it cannot serve (DecideRequestError: a why that is not its, a result that is not
+   * its two reads' own for this context and bundle, nothing to re-read, a failing part or field the result does not
+   * have), as well as what decide's one read rejects. `options.draw` gives the re-read's seed.
+   */
+  reread(request: RereadRequest, options?: DecideTurnOptions): Promise<RereadAnswer>;
 }
