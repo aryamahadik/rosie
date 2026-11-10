@@ -17,7 +17,14 @@ import { LINQ_WEBHOOK_PATH } from "../../../runtime/src/gateway";
 import { checkOutboxRows, type OutboxReader } from "./outbox";
 import { RecordingLinqDouble, partsOf } from "./parts";
 import { settle, type CollectOptions, type Collected, type SentText } from "./run";
-import { captureConsoleLog, spansOfLogLines, traceOf, type LogCapture, type SpanReader } from "./trace";
+import {
+  captureConsoleLog,
+  spansOfLogLines,
+  traceOf,
+  type LogCapture,
+  type SpanReader,
+  type TraceCheck,
+} from "./trace";
 
 /** A made-up webhook secret for one run: "whsec_" and 32 random bytes in base64. Never Linq's, never stored. */
 export function makeTestWebhookSecret(): string {
@@ -43,6 +50,12 @@ export interface LocalTargetOptions {
   readonly outbox?: OutboxReader;
   /** Epoch milliseconds: a webhook's arrival time. Default Date.now. */
   readonly now?: () => number;
+  /**
+   * How the collected trace is checked against K-08 v1. Default: K-08 v1's `trace` by Ajv's compiler over contracts/ on
+   * disk (k08TraceCheck), which runs in Node only. Inside workerd, where the target posts through the Worker's own
+   * composition root (T-1149), the caller gives the check the prebuilt code runs there.
+   */
+  readonly traceCheck?: TraceCheck;
 }
 
 export interface SendOptions {
@@ -94,7 +107,12 @@ export function createLocalTarget(options: LocalTargetOptions): LocalTarget {
   const spans: SpanReader = options.spans ?? capture?.reader ?? (() => []);
 
   const read = async (traceId: string): Promise<Collected> => {
-    const { trace, problems } = traceOf(traceId, spansOfLogLines(await spans(traceId)));
+    const { trace, problems } = traceOf(
+      traceId,
+      spansOfLogLines(await spans(traceId)),
+      "textWebhook",
+      options.traceCheck,
+    );
     const outbox =
       options.outbox === undefined ? null : await checkOutboxRows(await options.outbox(traceId), traceId);
     return {
