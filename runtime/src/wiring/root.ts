@@ -1,7 +1,7 @@
 // The composition root (T-550; C-046, C-044; build prompt section 10, D-017 'Joins: one hop at a time, in the turn order
 // of What changes'; ops/plan/02-contracts.md section 11): the one place that builds the Worker's gateway, the handle
-// actor's turn and the outbox dispatcher, with each of the ten ports of ./ports.ts bound once to the implementation its
-// environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
+// actor's turn and the outbox dispatcher, with each of the thirteen ports of ./ports.ts bound once to the implementation
+// its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
 // package; nothing else here changes for it.
 //
 // What the root builds from the ports:
@@ -12,21 +12,24 @@
 //   - the Linq webhook route behind the skeleton flag (T-552, ./skeleton.ts): while the flag is on, the gateway's Linq
 //     entry with those doors; while it is off (or no flags are bound), 404 with nothing read, verified or reached;
 //   - the handle actor's ports, put in place for the isolate by `install()`: the safety read on arrival (T-246), the
-//     batch clock (T-247), the bundle pin's reads (T-249), the guard's targets (T-250), the turn loop as the lease's hooks
-//     (T-248, T-251 to T-253) and the turn's ports (`TurnDeps`), the Durable Object reading each of them at use;
+//     batch clock (T-247), the bundle pin's reads (T-249; the bundle port, joined by T-556, so the guard's keyword list is
+//     the pinned bundle's), the guard's targets (T-250; the targets port, joined by T-556), the turn loop as the lease's
+//     hooks (T-248, T-251 to T-253) and the turn's ports (`TurnDeps`), the Durable Object reading each of them at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
 //     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own.
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
-// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing and turn-row ports, which no database
-// feeds there until T-567, so every seal, commit and park fails closed) and the closed set are at hand there, so every
-// door not joined fails and a webhook that gets past the verify answers 503, as before. A test composes the root with
-// environment "test", the fakes (./test-support.ts), what the joined ports are fed (the Linq double's made-up webhook
-// secret, the K-05 double's handleSealingKey, commitTurn and parkTurn), the HandleActor namespace, its flags and its own
-// clock. The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn
-// id the lease hashed from its batch's event ids. Never logged by the root: a word, a number, a key.
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle and targets ports,
+// which no database feeds there until T-567, so every seal, commit, park, pin and targets read fails closed) and the
+// closed set are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as
+// before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
+// (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads and
+// handleTargets), the HandleActor namespace, its flags and its own clock. The turn's park goes through the turn-row port
+// (T-555): K-05's parkTurn writes the turn's one row under the turn id the lease hashed from its batch's event ids. The
+// turn's pin reads its bundle through the bundle port, and the guard its targets through the targets port (T-556). Never
+// logged by the root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -50,7 +53,9 @@ import { environmentOf, PICKS, type Environment } from "./picks";
 import type { Ports } from "./ports";
 import {
   realPorts,
+  type BundleReadCalls,
   type HandleSealingKeyCall,
+  type HandleTargetsCall,
   type LinqVerifyInputs,
   type SafetyReaders,
   type TurnRowCalls,
@@ -109,6 +114,19 @@ export interface RootOptions {
    * until T-567), so every commit and park fails closed.
    */
   readonly turnRows?: TurnRowCalls | null;
+  /**
+   * K-05 v1 item 7's readActiveBundle and readBundleValue (T-185) with their database bound, the reads the actor's pin
+   * makes at each turn's start and the gateway at each webhook (T-556; ./real.ts realBundles): in a test, the K-05 double
+   * holding bundle v0 as bundles/v0 publishes it; null or left out where no database is bound (the Worker until T-567), so
+   * no turn's bundle is pinned and the gateway names bundle v0's stand-in.
+   */
+  readonly bundleReads?: BundleReadCalls | null;
+  /**
+   * K-05 v1.2 handleTargets (T-220) with its database bound, the guard's targets read (T-556; ./real.ts realTargets): in a
+   * test, the K-05 double answering for test owner 1's seeded rows as targets-first-text.json; null or left out where no
+   * database is bound (the Worker until T-567), so every targets read fails closed and no text reaches decide.
+   */
+  readonly handleTargets?: HandleTargetsCall | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -156,6 +174,8 @@ export function composeRoot(options: RootOptions): Root {
         sink: logSink(log),
       },
       turnRows: options.turnRows,
+      bundleReads: options.bundleReads,
+      handleTargets: options.handleTargets,
     }),
     closed: closedPorts(),
   });
@@ -256,7 +276,7 @@ export function composeRoot(options: RootOptions): Root {
     actor: options.actors === null ? closedActorDoor() : durableObjectActor(options.actors),
     receipts,
     keys: ports.sealing,
-    bundleId: () => activeBundleId(ports.stateReads.bundles.registry),
+    bundleId: () => activeBundleId(ports.bundles.registry),
     now,
   };
 
@@ -275,8 +295,8 @@ export function composeRoot(options: RootOptions): Root {
       const restores = [
         setBatchHooks({ clock: { now } }),
         setSafetyDeps(safety),
-        setBundleDeps(ports.stateReads.bundles),
-        setGuardDeps({ targets: ports.stateReads.targets }),
+        setBundleDeps(ports.bundles),
+        setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
         setLeaseHooks(turnHooks),
       ];
@@ -298,13 +318,13 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503), and the sealing port is handed no K-05 call, since no database is bound to the Worker
- * until T-567 (Hyperdrive), so every seal fails closed and the gateway answers 503 with nothing written. The gateway's
- * door to the handle's actor is the HANDLE_ACTOR binding where the environment
- * has one (T-553; env.staging has none until T-566, so there the door stays closed), and no release flags are handed in
- * until staging has its database and the flag's deploy step (T-567, T-569), so the skeleton flag reads off and
- * `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed parts) last as long as the
- * isolate does.
+ * so the gateway answers 503), and the sealing, turn-row, bundle and targets ports are handed no K-05 call, since no
+ * database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and the gateway answers 503 with
+ * nothing written, and no turn's bundle can be pinned. The gateway's door to the handle's actor is the HANDLE_ACTOR
+ * binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays closed), and
+ * no release flags are handed in until staging has its database and the flag's deploy step (T-567, T-569), so the
+ * skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
+ * parts) last as long as the isolate does.
  */
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);
@@ -323,6 +343,12 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // No database is bound until T-567: every commit and park fails closed (./real.ts NoDatabaseError), so no turn row is
     // written; a turn whose commit is not taken lapses and is parked, and its park is tried again (T-248, T-253).
     turnRows: null,
+    // No database is bound until T-567 (nor BUNDLES until T-566; T-1154 binds both): every bundle read fails closed
+    // (./real.ts NoDatabaseError), so no turn's bundle is pinned and no turn's work starts, and the gateway's trace names
+    // bundle v0's stand-in (answer.ts).
+    bundleReads: null,
+    // No database is bound until T-567: every targets read fails closed, so the guard hands no text to the frontier.
+    handleTargets: null,
   });
   workerRoots.set(env, root);
   return root;

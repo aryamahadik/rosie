@@ -136,7 +136,10 @@ interface Rig {
   restore(): void;
 }
 
-/** The root for "test" with the HandleActor namespace and the skeleton flag on, its actor ports installed. */
+/**
+ * The root for "test" with the HandleActor namespace and the skeleton flag on, its actor ports installed; the bundle and
+ * targets ports (joined by T-556) fed their K-05 doubles, so the turn after the read pins its bundle and guards.
+ */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
   const root = composeRoot({
@@ -148,6 +151,8 @@ function rig(log: MockInstance): Rig {
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
     safetyReaders: fakes.models.readers,
+    bundleReads: fakes.bundleReads.calls,
+    handleTargets: fakes.handleTargets.call,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();

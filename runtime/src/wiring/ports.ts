@@ -1,7 +1,7 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the eleven ports
-// the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls it
-// (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the thirteen
+// ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
+// it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
 //
 //   port         what it carries                                                   joined by
@@ -11,9 +11,14 @@
 //   safetyRead   K-02's safety read on each raw text, on arrival                   T-554
 //   turnRow      K-05's two calls that write a turn's one row (K-04 turns), once   T-555
 //                per turn id: the commit (item 1) and the park (item 12)
-//   stateReads   reads of stored state: the bundle (K-05 v1 item 7 and KV), the    T-556, T-557, T-562, T-564
-//                guard's targets (K-05 v1.2), who a handle is, each text's safety
-//                result, a recipient's chat and send state, a question's facts
+//   bundles      K-05 v1 item 7's bundle reads (the active id and PostgreSQL's     T-556
+//                copy; KV is the actor's own BUNDLES binding): the turn's pin, so
+//                the guard's keyword list (K-01 lists.keywords), and the active id
+//                each webhook's trace names
+//   targets      K-05 v1.2 handleTargets: the guard's targets                      T-556
+//   stateReads   other reads of stored state: who a handle is, each text's safety  T-557, T-562, T-564
+//                result, the safety read's bundle lines and stopped flag, a
+//                recipient's chat and send state, a question's facts
 //   turnFace     K-09's turn face (frontier, closest entries, gate and commit,     T-557, T-559, T-560
 //                compose input) and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read                       T-558
@@ -52,12 +57,14 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The eleven ports, in D-017's turn order (02-contracts section 11). */
+/** The thirteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
   "safetyRead",
   "turnRow",
+  "bundles",
+  "targets",
   "stateReads",
   "turnFace",
   "decide",
@@ -84,14 +91,13 @@ export interface TurnRowPort {
   parkTurn(request: ParkTurnRequest): Promise<ParkTurnAnswer>;
 }
 
-/** Reads of stored state, by the part that reads them (K-04 rows through K-05, and the bundle store). */
+/**
+ * Reads of stored state not joined yet, by the part that reads them (K-04 rows through K-05). The bundle reads and the
+ * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`).
+ */
 export interface StateReads {
-  /** K-05 v1 item 7 and the bundle KV: the pin's reads, and the active bundle id each webhook's trace names. */
-  readonly bundles: BundleDeps;
   /** The safety read's: the ids K-09 calls name for a handle, the bundle's checked lines and danger words, the stopped flag. */
   readonly safety: Pick<SafetyDeps, "directory" | "bundle" | "isStopped">;
-  /** K-05 v1.2 handleTargets: the guard's targets. */
-  readonly targets: HandleTargetsPort;
   /** The turn's: who the handle is (K-04 handles, persons, roles, zone), and each text's safety result. */
   readonly turn: Pick<TurnDeps, "directory" | "safety">;
   /** The dispatcher's: a recipient's chat, and limit 8's send state (K-05 v1.2 sendState). */
@@ -132,6 +138,14 @@ export interface Ports {
   readonly sealing: SealingKeyStore;
   readonly safetyRead: SafetyReadPort;
   readonly turnRow: TurnRowPort;
+  /**
+   * K-05 v1 item 7's two bundle reads, primary and uncached (readActiveBundle, readBundleValue), and the bundle KV when
+   * the port carries one (left out: the actor's own BUNDLES binding): the turn's pin at its start (T-249), whose manifest
+   * holds the guard's keyword list (K-01 v1 lists.keywords), and the active bundle id each webhook's trace names.
+   */
+  readonly bundles: BundleDeps;
+  /** K-05 v1.2 handleTargets (item 27): the guard's targets, primary and uncached, across businesses (T-250). */
+  readonly targets: HandleTargetsPort;
   readonly stateReads: StateReads;
   readonly turnFace: TurnFacePort;
   readonly decide: TurnDecide;
