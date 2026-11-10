@@ -17,6 +17,7 @@ export default defineConfig(
     "ops/",
     "scratch/",
     "contracts/generated/",
+    "actions/src/tool-api/generated/",
     "bundles/",
     "fixtures/",
     "infra/rosfield-test-backup/",
