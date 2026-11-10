@@ -452,17 +452,25 @@ for (const folder of [path.join(CONTRACTS_ROOT, "common"), path.join(CONTRACTS_R
       ajv.addSchema(readJson(path.join(folder, entry.name)) as object);
   }
 }
-const schema = readJson(path.join(MODEL_DIR, SCHEMA_FILE)) as {
+interface ModelSchema {
   $id: string;
-  $defs: Record<string, { required?: string[] }>;
-};
+  $defs: Record<string, { required?: string[]; $ref?: string }>;
+}
+const schema = readJson(path.join(MODEL_DIR, SCHEMA_FILE)) as ModelSchema;
 
-function validatorOf(def: string): ValidateFunction {
-  const validate = ajv.getSchema(`${schema.$id}#/$defs/${def}`);
-  if (validate === undefined) throw new Error(`no schema for ${def}`);
+// K-02 is frozen at v1 and v1.1 (T-1142), and one fixtures/index.json lists both. Each entry is checked against the
+// schema its own `version` names (model.<version>.schema.json, its own file and $id), as DL-124 and DL-125 settled for
+// K-06 and K-09; every other check of this file reads v1's schema, as before.
+const FROZEN = (readJson(path.join(MODEL_DIR, "frozen.json")) as { frozen: string[] }).frozen;
+const schemaOf = (version: string): ModelSchema =>
+  version === "v1" ? schema : (readJson(path.join(MODEL_DIR, `model.${version}.schema.json`)) as ModelSchema);
+
+function validatorOf(def: string, version = "v1"): ValidateFunction {
+  const validate = ajv.getSchema(`${schemaOf(version).$id}#/$defs/${def}`);
+  if (validate === undefined) throw new Error(`no schema for ${def} in ${version}`);
   return validate;
 }
-const accepts = (def: string, value: unknown): boolean => validatorOf(def)(value);
+const accepts = (def: string, value: unknown, version = "v1"): boolean => validatorOf(def, version)(value);
 
 // ---------------------------------------------------------------------------------------------------------------
 // 1. Every fixture of the index, checked by the T-003 harness, and the two refused by a named rule
@@ -515,7 +523,7 @@ describe("model.v1 fixtures: the index and the count", () => {
       "contextAndDecide",
     ])
       expect(defs.has(def), def).toBe(true);
-    expect(index.fixtures.every((entry) => entry.version === "v1")).toBe(true);
+    expect(index.fixtures.every((entry) => FROZEN.includes(entry.version))).toBe(true);
     expect(accepted.length).toBeGreaterThan(0);
     expect(refusedBySchema.length + refusedByRule.length).toBeGreaterThan(0);
   });
@@ -524,19 +532,19 @@ describe("model.v1 fixtures: the index and the count", () => {
 describe("model.v1 fixtures: each entry", () => {
   for (const entry of accepted) {
     it(`accepts ${entry.file} (${String(entry.def)})`, () => {
-      const validate = validatorOf(must(entry.def));
+      const validate = validatorOf(must(entry.def), entry.version);
       expect(validate(fixture(entry.file)), formatErrors(validate.errors).join("; ")).toBe(true);
     });
   }
   for (const entry of refusedBySchema) {
     it(`refuses ${entry.file} by the schema (${String(entry.def)})`, () => {
-      expect(accepts(must(entry.def), fixture(entry.file))).toBe(false);
+      expect(accepts(must(entry.def), fixture(entry.file), entry.version)).toBe(false);
     });
   }
   for (const entry of refusedByRule) {
     it(`refuses ${entry.file} by the rule ${String(entry.rule)}, after the schema takes it`, () => {
       const payload = fixture(entry.file) as Pair;
-      expect(accepts(must(entry.def), payload), "the pair is valid JSON Schema").toBe(true);
+      expect(accepts(must(entry.def), payload, entry.version), "the pair is valid JSON Schema").toBe(true);
       expect(rule(must(entry.rule))(payload).length).toBeGreaterThan(0);
     });
   }
@@ -647,17 +655,24 @@ describe("model.v1 fixtures: the named rules", () => {
 // ---------------------------------------------------------------------------------------------------------------
 // 2. The schema is not vacuous
 
-const required = (def: string): string[] => schema.$defs[def]?.required ?? [];
+/** The fields a version's $defs entry requires; a minor version's entry that is an earlier one's by $ref requires its. */
+function required(def: string, version = "v1"): string[] {
+  const entry = schemaOf(version).$defs[def];
+  if (entry?.required !== undefined) return entry.required;
+  const target = /^model\.(v[0-9.]+?)\.schema\.json#\/\$defs\/(\w+)$/.exec(entry?.$ref ?? "");
+  return target === null ? [] : required(must(target[2]), must(target[1]));
+}
 
 describe("model.v1 fixtures: removing a required field makes an accepted fixture refused", () => {
   for (const entry of accepted) {
     it(`${entry.file} (${String(entry.def)})`, () => {
       const def = must(entry.def);
-      const validate = validatorOf(def);
+      const validate = validatorOf(def, entry.version);
       const original = fixture(entry.file) as Record<string, unknown>;
       expect(validate(original), formatErrors(validate.errors).join("; ")).toBe(true);
-      expect(required(def).length, "the schema requires at least one field here").toBeGreaterThan(0);
-      for (const field of required(def)) {
+      const fields = required(def, entry.version);
+      expect(fields.length, "the schema requires at least one field here").toBeGreaterThan(0);
+      for (const field of fields) {
         expect(field in original, `${entry.file} has the required field ${field}`).toBe(true);
         const copy = Object.fromEntries(
           Object.entries(structuredClone(original)).filter(([key]) => key !== field),
@@ -773,7 +788,7 @@ describe("model.v1 fixtures: the contexts", () => {
 });
 
 describe("model.v1 fixtures: the decide results", () => {
-  it("shows seven of the eight verbs between the accepted decide fixtures (enter has none: a side task adds one)", () => {
+  it("shows all eight verbs between the accepted decide fixtures (enter in v1.1's decide-s1-01-enter.json)", () => {
     const verbs = new Set(
       DECIDES.flatMap((file) =>
         decideOf(file).reads.flatMap((read) => read.output.parts.map((part) => part.verb)),
@@ -782,6 +797,7 @@ describe("model.v1 fixtures: the decide results", () => {
     expect([...verbs].sort()).toEqual([
       "ask",
       "choose",
+      "enter",
       "hand_off",
       "no_op",
       "none_fits",

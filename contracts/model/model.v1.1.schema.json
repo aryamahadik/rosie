@@ -1,0 +1,601 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/model/model.v1.1.schema.json",
+  "title": "Model v1.1",
+  "description": "K-02 v1.1, a minor version that only adds (T-1142; DL-322; README 'v1.1'): the door to S1-01, signUp, so the walking skeleton's turn has a choice decide can enter. D-017's turn is a new number's first text (build prompt section 10: 'text JOIN (how the sign-up link starts an owner's chat, S1-01)'), which runs 'decide (two reads)' between the frontier and the gate, and K-08 v1's trace-skeleton.json shows its frontier as one door, S1-01, which both reads enter; v1's door list holds the five doors of arch 03 line 165, none of them S1-01. Every v1 definition is here under its own name: the unchanged ones by $ref to model.v1.schema.json, frozen and unchanged; the three that carry a door (choice, whose door also takes signUp; context and contextAndDecide, which hold choices) only add that enum value, so every v1 payload is a v1.1 payload. The model-facing definitions (decideRead, safetyRead, plannerOutput) are v1's, unchanged: a choice id is a plain string in a read, so the new door changes nothing the model answers in. Owner: the architect.",
+  "$defs": {
+    "language": { "$ref": "model.v1.schema.json#/$defs/language" },
+    "nonEmptyText": { "$ref": "model.v1.schema.json#/$defs/nonEmptyText" },
+    "stakes": { "$ref": "model.v1.schema.json#/$defs/stakes" },
+    "choiceKind": { "$ref": "model.v1.schema.json#/$defs/choiceKind" },
+    "stakesReason": { "$ref": "model.v1.schema.json#/$defs/stakesReason" },
+    "target": { "$ref": "model.v1.schema.json#/$defs/target" },
+    "choice": {
+      "title": "Choice",
+      "description": "One entry of the frontier, the closed list of choices code builds for one turn (arch 01 lines 67 and 69; arch 03 lines 157 to 167; 02-contracts K-02 'What decide is given'), as v1, with one change: a door may also be signUp, the door to S1-01 (README 'v1.1', default 9), whose step is S1-01. Its id is the turn's own and never an enum in a model-facing schema: compiled grammars are cached for 24 hours, so option ids are checked in code (T-360 finding 3; README 'Model-facing schemas'). Every v1 choice is a v1.1 choice.",
+      "type": "object",
+      "properties": {
+        "choiceId": {
+          "description": "The choice's id in this turn, unique in the context (arch 03 line 183: choose names its option; README 'Named rules': optionOffered).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "kind": {
+          "$ref": "#/$defs/choiceKind"
+        },
+        "label": {
+          "description": "Its label: the branch label word for word for an option or a hub case (SPEC-master 5d: 'never rename a branch label'); the row's name for an any-time row (arch 03 line 171); the door's name (arch 03 line 165), for signUp the title of the section S1-01 opens, 'Business onboarding' (README v1.1 default 9); the entry step's title for searchEntry; 'Which booking?' with the booking's business, date and time for whichBooking (arch 03 line 167). arch 06 line 279: 'choices: label + definition'.",
+          "type": "string"
+        },
+        "definition": {
+          "description": "What the choice means: the branch's Means line, or the first sentence of the step it leads to standing in (contracts/bundle card.means; arch 12 line 592); for an any-time row, a door or an entry step, the first sentence of its handler or entry step (README default 3), for signUp S1-01's first sentence. arch 03 line 181: 'each choice's label and definition'.",
+          "type": "string"
+        },
+        "step": {
+          "description": "The step behind it: the open question's step, the hub step, the any-time row's handler in this flow, the door step (S1-01 for signUp), the entry step meaning search found, or the target booking's hub for whichBooking (arch 03 lines 159 to 167; contracts/bundle routingTables).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "question": {
+          "description": "What choose names as its question (arch 03 line 183: 'choose(question, option, fields ...)'): an option's open question id, a hub case's hub step id, the booking id a whichBooking choice stands for; null for door, anytime and searchEntry, which enter takes.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch": {
+          "description": "The branch label word for word, for an option or a hub case; null otherwise (SPEC-master 4 and 5d; contracts/bundle branch.label).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "anytimeRow": {
+          "description": "For an any-time row, which of the 21 (arch 03 line 171; contracts/bundle anytimeRow.row); null otherwise.",
+          "anyOf": [
+            {
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/anytimeRow/properties/row"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "door": {
+          "description": "For a door, which one: the five of arch 03 line 165 (contracts/bundle routingTables.doors): newBooking, existingBooking (after a code check), ownerCommand, teamChange, unclearOwnerOrHelp; and v1.1's signUp, the door to S1-01, offered when the guard finds no target and the pinned bundle holds S1-01 (D-017; K-08 v1 trace-skeleton.json; README v1.1 default 9); null otherwise.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "newBooking",
+                "existingBooking",
+                "ownerCommand",
+                "teamChange",
+                "unclearOwnerOrHelp",
+                "signUp"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hub": {
+          "description": "For a hub case, the target booking's stage whose hub it is (arch 03 line 163; contracts/bundle routingTables.hubs): entry, booked, checkedIn, done, owner, settings, team; null otherwise.",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["entry", "booked", "checkedIn", "done", "owner", "settings", "team"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "fields": {
+          "description": "The fields an answer to this choice carries, with their types (contracts/bundle answerField: the branch's fields, from the gives keys and record values; arch 03 line 183: 'fields with their source words').",
+          "type": "array",
+          "items": {
+            "$ref": "../bundle/bundle.v1.schema.json#/$defs/answerField"
+          }
+        },
+        "stakes": {
+          "$ref": "#/$defs/stakes"
+        },
+        "stakesFrom": {
+          "description": "Why it is high: at least one reason when stakes is high, none when low (arch 01 line 79; README 'Stakes').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stakesReason"
+          }
+        }
+      },
+      "required": [
+        "choiceId",
+        "kind",
+        "label",
+        "definition",
+        "step",
+        "question",
+        "branch",
+        "anytimeRow",
+        "door",
+        "hub",
+        "target",
+        "fields",
+        "stakes",
+        "stakesFrom"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "stakes": {
+          "description": "High has its reasons, low has none (arch 01 line 79; README 'Stakes').",
+          "if": {
+            "properties": {
+              "stakes": {
+                "description": "arch 01 line 79.",
+                "const": "high"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "stakesFrom": {
+                "description": "arch 01 line 79.",
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "stakesFrom": {
+                "description": "arch 01 line 79.",
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        "kind": {
+          "description": "Each kind fills the fields it uses and leaves the others null (arch 01 line 67; arch 03 lines 163 to 167, 189).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "option"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "An option belongs to an open question (arch 01 line 63).",
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  },
+                  "branch": {
+                    "description": "SPEC-master 5d.",
+                    "type": "string"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "hub"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "The hub's step id (arch 03 line 163).",
+                    "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+                  },
+                  "branch": {
+                    "description": "SPEC-master 5d.",
+                    "type": "string"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 163.",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "anytime"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes an any-time row (arch 03 line 183).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 171.",
+                    "type": "string"
+                  },
+                  "door": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 67.",
+                    "const": "door"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes a door (arch 03 line 183).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 165.",
+                    "type": "string"
+                  },
+                  "hub": {
+                    "description": "arch 01 line 67.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 189.",
+                    "const": "searchEntry"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "enter takes an entry step (README default 2).",
+                    "type": "null"
+                  },
+                  "branch": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 189.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "arch 03 line 167.",
+                    "const": "whichBooking"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question": {
+                    "description": "The booking it stands for (arch 03 line 167).",
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  },
+                  "branch": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "anytimeRow": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "door": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  },
+                  "hub": {
+                    "description": "arch 03 line 167.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "door": {
+          "description": "The sign-up door is S1-01's, the first step of section 1 in both flows (README v1.1 default 9; K-01 v1 bundle-v0-skeleton.json flows.A.sections[0]).",
+          "if": {
+            "properties": {
+              "door": {
+                "description": "README v1.1 default 9.",
+                "const": "signUp"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "step": {
+                "description": "S1-01 (MASTER-FLOW-A, 'Sam writes to Rosie first').",
+                "const": "S1-01"
+              }
+            }
+          }
+        }
+      }
+    },
+    "openQuestion": { "$ref": "model.v1.schema.json#/$defs/openQuestion" },
+    "stepCard": { "$ref": "model.v1.schema.json#/$defs/stepCard" },
+    "factValue": { "$ref": "model.v1.schema.json#/$defs/factValue" },
+    "fact": { "$ref": "model.v1.schema.json#/$defs/fact" },
+    "attachment": { "$ref": "model.v1.schema.json#/$defs/attachment" },
+    "text": { "$ref": "model.v1.schema.json#/$defs/text" },
+    "person": { "$ref": "model.v1.schema.json#/$defs/person" },
+    "recentMessage": { "$ref": "model.v1.schema.json#/$defs/recentMessage" },
+    "context": {
+      "title": "Context",
+      "description": "What decide is given: the context bundle (C-114) for one turn, built from the frontier (C-075) and the bundle (02-contracts K-02 'What decide is given'; arch 03 line 181; arch 06 line 279), as v1, with one change: its choices are v1.1's, so a door may be signUp (README 'v1.1'). Decide's input, not model output, so it may carry limits such as at most 60 choices (T-360 finding 5). The planner reads the same context after meaning search (arch 03 line 189). Every v1 context is a v1.1 context.",
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "description": "The turn (arch 01 line 59).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "bundleId": {
+          "description": "The bundle the turn is pinned to (arch 01 line 87; C-050).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+        },
+        "flow": {
+          "description": "The flow of the turn's target business, whose always-on prefix the turn reads (contracts/bundle flowLetter). A choice from the other flow, such as a question about the owner's other business, names its own step, whose id carries its flow (contracts/bundle stepId; arch 03 line 159).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/flowLetter"
+        },
+        "texts": {
+          "description": "The turn: one batch of the handle's texts, oldest first (arch 01 line 59; arch 02 line 113).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "writer": {
+          "description": "Who wrote: the handle, the people behind it and their roles (02-contracts K-02; arch 03 line 181: 'role and language').",
+          "type": "object",
+          "properties": {
+            "handle": {
+              "description": "The phone number or email address that wrote (arch 01 line 55).",
+              "type": "string",
+              "pattern": "."
+            },
+            "people": {
+              "description": "The people behind it (arch 01 line 55; S13-27 rule 28).",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/person"
+              }
+            }
+          },
+          "required": ["handle", "people"],
+          "additionalProperties": false
+        },
+        "businessLanguage": {
+          "description": "The business's language, used when nobody has a stored one (arch 06 line 341). Which stage reports the text's own language: CQ-07 (default: the two decide reads, which must agree).",
+          "$ref": "#/$defs/language"
+        },
+        "openQuestions": {
+          "description": "Every open question sent to this handle (arch 03 line 159; S13-12).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestion"
+          }
+        },
+        "choices": {
+          "description": "The frontier: about 40 choices and never more than 60 (arch 01 line 69 (DD); arch 03 line 167: over 60, each booking other than the target collapses to one 'which booking?' choice). A choice id appears once (a code check: README 'Named rules'). v1.1: a door may be signUp.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 60,
+          "items": {
+            "$ref": "#/$defs/choice"
+          }
+        },
+        "cards": {
+          "description": "Full step cards for the open questions and hubs (arch 03 line 181).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepCard"
+          }
+        },
+        "facts": {
+          "description": "The facts those steps need, each once, from its home (arch 02 line 117; arch 03 line 181).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fact"
+          }
+        },
+        "alwaysOn": {
+          "description": "The always-on rules as the cached prefix, named by the bundle and the prefix's hash rather than repeated (arch 03 line 181: 'the 50 rules as a cached prefix'; contracts/bundle routingTables.alwaysOn).",
+          "type": "object",
+          "properties": {
+            "flow": {
+              "description": "The flow graph whose prefix it is (contracts/bundle routingTables.alwaysOn).",
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/flowLetter"
+            },
+            "prefixSha256": {
+              "description": "The prefix's sha256, as the bundle holds it (contracts/bundle routingTables.alwaysOn.prefixSha256).",
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+            }
+          },
+          "required": ["flow", "prefixSha256"],
+          "additionalProperties": false
+        },
+        "recentMessages": {
+          "description": "The last 6 messages with this business, up to 30 days old, for tone only (arch 03 line 181).",
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/recentMessage"
+          }
+        },
+        "meaningSearch": {
+          "description": "Set when nothing fit and meaning search added the 3 closest entry steps as choices of kind searchEntry, for the turn's one re-read (arch 03 line 189 (DD); Q-42); null on a first read.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "added": {
+                  "description": "The choice ids it added, the closest first (arch 03 line 189: 'adds the 3 closest entry steps').",
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 3,
+                  "items": {
+                    "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                  }
+                },
+                "index": {
+                  "description": "The model or index the match ran on, as Q-42's spike names it (Q-42; README open gaps).",
+                  "type": "string"
+                }
+              },
+              "required": ["added", "index"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "turnId",
+        "bundleId",
+        "flow",
+        "texts",
+        "writer",
+        "businessLanguage",
+        "openQuestions",
+        "choices",
+        "cards",
+        "facts",
+        "alwaysOn",
+        "recentMessages",
+        "meaningSearch"
+      ],
+      "additionalProperties": false
+    },
+    "fieldValue": { "$ref": "model.v1.schema.json#/$defs/fieldValue" },
+    "field": { "$ref": "model.v1.schema.json#/$defs/field" },
+    "quote": { "$ref": "model.v1.schema.json#/$defs/quote" },
+    "choose": { "$ref": "model.v1.schema.json#/$defs/choose" },
+    "enter": { "$ref": "model.v1.schema.json#/$defs/enter" },
+    "ask": { "$ref": "model.v1.schema.json#/$defs/ask" },
+    "noneFits": { "$ref": "model.v1.schema.json#/$defs/noneFits" },
+    "passOn": { "$ref": "model.v1.schema.json#/$defs/passOn" },
+    "handOffAbout": { "$ref": "model.v1.schema.json#/$defs/handOffAbout" },
+    "handOff": { "$ref": "model.v1.schema.json#/$defs/handOff" },
+    "redact": { "$ref": "model.v1.schema.json#/$defs/redact" },
+    "noOp": { "$ref": "model.v1.schema.json#/$defs/noOp" },
+    "decidePart": { "$ref": "model.v1.schema.json#/$defs/decidePart" },
+    "decideRead": { "$ref": "model.v1.schema.json#/$defs/decideRead" },
+    "read": { "$ref": "model.v1.schema.json#/$defs/read" },
+    "resultPart": { "$ref": "model.v1.schema.json#/$defs/resultPart" },
+    "decideResult": { "$ref": "model.v1.schema.json#/$defs/decideResult" },
+    "contextAndDecide": {
+      "title": "ContextAndDecide",
+      "description": "A context with the decide result made from it, as the gate reads them together (C-080; arch 03 line 185), as v1, with one change: the context is v1.1's, so a door may be signUp. Two rules hold across the pair that one JSON Schema cannot state, and contracts/model/model.rules.mjs states them by name: optionOffered (every chosen or entered choice is one the context offers, with the verb its kind takes) and quoteInText (every quote and every field's words are found in the turn's texts); both read a signUp door as any door (enter takes it). README 'Named rules'. Every v1 pair is a v1.1 pair.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "decide": {
+          "$ref": "#/$defs/decideResult"
+        }
+      },
+      "required": ["context", "decide"],
+      "additionalProperties": false
+    },
+    "safetyOutcome": { "$ref": "model.v1.schema.json#/$defs/safetyOutcome" },
+    "tense": { "$ref": "model.v1.schema.json#/$defs/tense" },
+    "safetyLabel": { "$ref": "model.v1.schema.json#/$defs/safetyLabel" },
+    "safetyRead": { "$ref": "model.v1.schema.json#/$defs/safetyRead" },
+    "safetyResult": { "$ref": "model.v1.schema.json#/$defs/safetyResult" },
+    "plannerAnswer": { "$ref": "model.v1.schema.json#/$defs/plannerAnswer" },
+    "plannerAsk": { "$ref": "model.v1.schema.json#/$defs/plannerAsk" },
+    "plannerPassOn": { "$ref": "model.v1.schema.json#/$defs/plannerPassOn" },
+    "plannerHandOff": { "$ref": "model.v1.schema.json#/$defs/plannerHandOff" },
+    "plannerLogGap": { "$ref": "model.v1.schema.json#/$defs/plannerLogGap" },
+    "plannerOutput": { "$ref": "model.v1.schema.json#/$defs/plannerOutput" }
+  }
+}
