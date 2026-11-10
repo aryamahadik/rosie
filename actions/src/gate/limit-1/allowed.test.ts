@@ -20,6 +20,9 @@
 // the business's; a card that cannot be read is the business's; row 1 covers journey 4's customer steps about no booking
 // yet and A3-51's meaning-search entries. Three earlier lines changed with the rulings: two tests that build limit 1 from
 // partial doubles get the new bundle port's double (stepsOf), and A3-51's entry now passes as row 1 (ruling 2).
+// T-1183 (DL-364): K-02 v1.1's sign-up door, as K-09 v1.5's commit-s1-01.json gives it, is anyone's to enter, with no
+// proof asked and nothing read; only the door K-02 v1.1 shapes passes, and the setup step after it stays the business's;
+// each of K-01's five doors answers as before; a door the gate does not know still answers unknown, then nobodyDecides.
 
 import { describe, expect, it } from "vitest";
 
@@ -45,6 +48,7 @@ import {
   NO_STEP_CARDS,
   OWN_RECORD_STEPS,
   askedDeciderOutcome,
+  changeOf,
   contactsOnFileOver,
   createLimit1,
   limit1,
@@ -52,6 +56,8 @@ import {
   sideOfStep,
   stepCardsOf,
   type AllowedDecision,
+  type Change,
+  type ChangeReads,
   type CodeAsk,
   type NobodyWhy,
   type OwnAsk,
@@ -70,6 +76,7 @@ import {
   HOME_SERVICES,
   HOME_VISIT,
   JORDAN,
+  K01_DOORS,
   MASTER_STEP_CARDS,
   NEW_REQUEST,
   NEW_VISIT_CHOICES,
@@ -82,6 +89,7 @@ import {
   SAM_NEW_MOBILE_CODE,
   SAM_OWN_CUT,
   SERVED_UNKNOWN,
+  SIGN_UP_FIXTURE,
   STRANGER,
   TEST_REPO,
   actsFor,
@@ -102,6 +110,7 @@ import {
   exchangeRequest,
   exportList,
   identityFrom,
+  k01Door,
   lateFee,
   letItBook,
   letThemTakeBookings,
@@ -110,6 +119,7 @@ import {
   moveVisit,
   newBookingDoor,
   newContactEntry,
+  option,
   partOf,
   patWith,
   pauseRow,
@@ -125,13 +135,16 @@ import {
   s12Options,
   sampleFlowGraph,
   sendThePrice,
+  signUpDoor,
   someoneElsePays,
   someoneJoins,
   stagesFrom,
   standIn,
   stepsOf,
   stopRow,
+  targetOf,
   turnOf,
+  unknownDoor,
   unwalked,
   whichBooking,
   whoItsFor,
@@ -1028,8 +1041,139 @@ describe("limit 1 checks only what it applies to", () => {
   });
 });
 
+describe("T-1183: K-02 v1.1's sign-up door is anyone's to enter, and every other door answers as before (DL-364)", () => {
+  /** changeOf's reads, which no door needs: each fails the test if asked. */
+  const NO_READS: ChangeReads = {
+    identity: () => {
+      throw new Error("a door's change reads no decider");
+    },
+    steps: () => {
+      throw new Error("a door's change reads no step card");
+    },
+  };
+  const SAMS_TEXT = "Hi, I want to put my barbershop on Rosie";
+  const ANYONE: Change = { kind: "anyone" };
+  const PASS_ANYONE: AllowedDecision = { result: "pass", why: "anyone" };
+  const NOBODY_DECIDES: AllowedDecision = {
+    result: "fail",
+    why: "nobodyDecides",
+    outcome: askedDeciderOutcome(),
+    next: { kind: "nobodyDecides", why: "unknownChange", step: "S1-01" },
+  };
+  const business = (kind: "settings" | "team"): Change => ({
+    kind: "decided",
+    matters: [{ kind }],
+    inRole: false,
+    twoRoles: false,
+  });
+
+  it("commit-s1-01.json's part: Sam entering the sign-up door changes no existing record, so anyone may; limit 1 passes it with no proof asked and nothing read, as the fixture states", async () => {
+    const request = exchangeRequest(SIGN_UP_FIXTURE);
+    expect(await changeOf(partOf(request), turnOf(request), NO_READS)).toEqual(ANYONE);
+    const ownAsked: OwnAsk[] = [];
+    const codeAsked: CodeAsk[] = [];
+    expect(await decision({ ownAsked, codeAsked }, request)).toEqual(PASS_ANYONE);
+    expect([ownAsked, codeAsked]).toEqual([[], []]);
+    // The shipped limit, over a repo that is no database: a part that needed a read would be refused (notBuilt).
+    expect(await limit1.decide(partOf(request), turnOf(request, TEST_REPO))).toEqual(PASS_ANYONE);
+    expect(await limit1.check(partOf(request), turnOf(request, TEST_REPO))).toEqual({ result: "pass" });
+    expect(committedOf(SIGN_UP_FIXTURE).parts[0]?.limits[0]).toEqual({
+      limit: 1,
+      result: "pass",
+      outcome: null,
+    });
+  });
+
+  it("whoever writes it: a number nobody on the record writes from, a customer, staff, or the owner from a phone not proven; no code is sent", async () => {
+    for (const who of [STRANGER, ALEX, RILEY, SAM_NEW_MOBILE]) {
+      const codeAsked: CodeAsk[] = [];
+      const passed = await decision({ codeAsked }, ask(who, signUpDoor(), SAMS_TEXT));
+      expect({ who: who.handleId, passed, codeAsked }).toEqual({
+        who: who.handleId,
+        passed: PASS_ANYONE,
+        codeAsked: [],
+      });
+    }
+  });
+
+  it("only the door as K-02 v1.1 shapes it: one on a booking, with a stake or a field, or at another business, is nobody's to decide (fails closed)", async () => {
+    const door = signUpDoor();
+    const variants: [string, Choice][] = [
+      ["on a booking", { ...door, target: { ...door.target, bookingId: HAIRCUT } }],
+      [
+        "with a stake",
+        { ...door, stakes: "high", stakesFrom: [{ why: "charge", step: "S1-27", ref: null }] },
+      ],
+      ["carrying a field", { ...door, fields: [{ name: "kinds", type: "text" }] }],
+      [
+        "at another business",
+        { ...door, target: { ...door.target, businessId: HOME_SERVICES, businessName: "Lee Home Services" } },
+      ],
+    ];
+    for (const [variant, choice] of variants) {
+      const request = ask(SAM, choice, SAMS_TEXT);
+      expect({
+        variant,
+        change: await changeOf(partOf(request), turnOf(request), NO_READS),
+        decided: await decision({}, request),
+      }).toEqual({ variant, change: { kind: "unknown" }, decided: NOBODY_DECIDES });
+    }
+  });
+
+  it("each of K-01's five doors answers as it did before: the new-booking, booking-already-made and unclear-owner doors are anyone's; the owner-command and team doors are the business's settings and team", async () => {
+    const answers = [];
+    for (const [door, step] of K01_DOORS) {
+      const fromSam = ask(SAM, k01Door(door, step), "yes");
+      answers.push({
+        door,
+        change: await changeOf(partOf(fromSam), turnOf(fromSam), NO_READS),
+        sam: await decision({}, fromSam),
+        alex: await decision({}, ask(ALEX, k01Door(door, step), "yes")),
+      });
+    }
+    expect(answers).toEqual([
+      { door: "newBooking", change: ANYONE, sam: PASS_ANYONE, alex: PASS_ANYONE },
+      { door: "existingBooking", change: ANYONE, sam: PASS_ANYONE, alex: PASS_ANYONE },
+      {
+        door: "ownerCommand",
+        change: business("settings"),
+        sam: PASS_DECIDER,
+        alex: askedOf(["person-sam"], [{ kind: "settings" }]),
+      },
+      {
+        door: "teamChange",
+        change: business("team"),
+        sam: PASS_DECIDER,
+        alex: askedOf(["person-sam"], [{ kind: "team" }]),
+      },
+      { door: "unclearOwnerOrHelp", change: ANYONE, sam: PASS_ANYONE, alex: PASS_ANYONE },
+    ]);
+  });
+
+  it("a door the gate does not know still answers unknown, then nobodyDecides: the step's safe default, with no question to anyone", async () => {
+    for (const who of [SAM, ALEX, STRANGER]) {
+      const request = ask(who, unknownDoor(), "yes");
+      expect({
+        who: who.handleId,
+        change: await changeOf(partOf(request), turnOf(request), NO_READS),
+        decided: await decision({}, request),
+      }).toEqual({ who: who.handleId, change: { kind: "unknown" }, decided: NOBODY_DECIDES });
+    }
+  });
+
+  it("the door decides nothing for an existing business: S1-02's answer after it stays the business's settings, so a sender who is not its owner is asked of the owner, never passed", async () => {
+    const kinds = option("c-s1-02", "oq-s1-02-sam-1", "S1-02", "All on the list", targetOf(BARBERSHOP, null));
+    for (const who of [ALEX, STRANGER]) {
+      expect(await decision({}, ask(who, kinds, "Barbershop"))).toEqual(
+        askedOf(["person-sam"], [{ kind: "settings" }]),
+      );
+    }
+  });
+});
+
 describe("every other K-09 gate fixture comes out as it states with the real limit 1 in its slot", () => {
   const reaching = [
+    SIGN_UP_FIXTURE,
     "commit-s1-02.json",
     "commit-limit-2-owner-rule.json",
     "commit-limit-3-no-exact-yes.json",

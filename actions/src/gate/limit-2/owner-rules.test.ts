@@ -10,7 +10,8 @@
 // the sources names, never passes limit 2: the evaluator cannot read it and throws, and the gate's call rolls back.
 // Also: Sam's S1-02 answer passes with nothing read, as commit-s1-02.json states, and the shipped limit sits in slot 2,
 // passes each K-09 gate fixture's S step part and refuses each visit step's until the walk and the rules read are wired
-// (fails closed); what it returns holds no person's words.
+// (fails closed); what it returns holds no person's words. T-1183 (DL-364): K-02 v1.1's sign-up door, as K-09 v1.5's
+// commit-s1-01.json gives it, is not checked, with no rule read; each of K-01's five doors answers as before.
 
 import { describe, expect, it } from "vitest";
 
@@ -33,6 +34,7 @@ import {
   LimitNotBuiltError,
   partResultOf,
   runGate,
+  type Choice,
   type GateRequest,
   type GateVerdict,
   type GatedPart,
@@ -49,14 +51,20 @@ import {
 import {
   ALEX,
   BARBERSHOP,
+  K01_DOORS,
+  SIGN_UP_FIXTURE,
   decidedIn,
+  enteringDoor,
   exchangeRequest,
+  k01Door,
   option,
   partOf,
   requestFor,
+  signUpDoor,
   stopRow,
   targetOf,
   turnOf,
+  unknownDoor,
 } from "../limit-1/test-support";
 import { LIMITS } from "../limits";
 import { createLimit2, limit2, saidWhatRuleAllowsOutcome, type OwnerRulesDecision } from "./index";
@@ -364,6 +372,7 @@ describe("what limit 2 checks", () => {
 
   it("the shipped limit passes each K-09 gate fixture's S step part and refuses each visit step's (fails closed)", async () => {
     const expected: Record<(typeof DECIDED_GATE_FIXTURES)[number], string> = {
+      "commit-s1-01.json": "notChecked",
       "commit-s1-02.json": "pass",
       "commit-limit-1-unproven-sender.json": "pass",
       "commit-limit-2-owner-rule.json": "notBuilt",
@@ -444,5 +453,64 @@ describe("what limit 2 checks", () => {
       outcome: null,
     });
     expect(part?.result).toBe("passed");
+  });
+});
+
+describe("T-1183: K-02 v1.1's sign-up door has nothing limit 2 applies to, and every other door answers as before (DL-364)", () => {
+  const NOTHING_RULED: OwnerRulesDecision = {
+    result: "pass",
+    why: "nothingRuled",
+    notes: [],
+    ownerOkFirst: false,
+  };
+
+  it("commit-s1-01.json's part: Sam entering the sign-up door is not checked, as the fixture states, with no rule read", async () => {
+    const request = exchangeRequest(SIGN_UP_FIXTURE);
+    const rulesAsked: RulesAsk[] = [];
+    const limit = createLimit2({ rules: rulesFrom(BARBERSHOP_RULES, rulesAsked) });
+    expect(await limit.decide(partOf(request), turnOf(request))).toEqual({ result: "notChecked" });
+    expect(await limit2.check(partOf(request), turnOf(request))).toEqual({ result: "notChecked" });
+    expect(rulesAsked).toEqual([]);
+    expect(committedOf(SIGN_UP_FIXTURE).parts[0]?.limits[1]).toEqual({
+      limit: 2,
+      result: "notChecked",
+      outcome: null,
+    });
+  });
+
+  it("each of K-01's five doors, and a door the gate does not know, answers as it did before: a booking door is refused while the walk is not built, any other passes with nothing ruled", async () => {
+    const rulesAsked: RulesAsk[] = [];
+    const limit = createLimit2({ rules: rulesFrom(BARBERSHOP_RULES, rulesAsked) });
+    const doors = [...K01_DOORS.map(([door, step]) => k01Door(door, step)), unknownDoor()];
+    const answers = [];
+    for (const door of doors) {
+      const request = enteringDoor(door);
+      answers.push({ door: door.door, decided: await limit.decide(partOf(request), turnOf(request)) });
+    }
+    expect(answers).toEqual([
+      { door: "newBooking", decided: { result: "notBuilt", port: "proposals" } },
+      { door: "existingBooking", decided: { result: "notBuilt", port: "proposals" } },
+      { door: "ownerCommand", decided: NOTHING_RULED },
+      { door: "teamChange", decided: NOTHING_RULED },
+      { door: "unclearOwnerOrHelp", decided: NOTHING_RULED },
+      { door: "laterDoor", decided: NOTHING_RULED },
+    ]);
+    expect(rulesAsked).toEqual([]);
+  });
+
+  it("a sign-up door that may carry an owner rule (on a booking, with a ruled stake, or with a time or money value) is not the door K-02 v1.1 shapes: checked as any part, so refused while the walk is not built", async () => {
+    const door = signUpDoor();
+    const variants: Choice[] = [
+      { ...door, target: { ...door.target, bookingId: "booking-alex-haircut" } },
+      { ...door, stakes: "high", stakesFrom: [{ why: "charge", step: "S1-27", ref: null }] },
+      { ...door, fields: [{ name: "fee", type: "money" }] },
+    ];
+    for (const choice of variants) {
+      const request = enteringDoor(choice);
+      expect(await limit2.decide(partOf(request), turnOf(request))).toEqual({
+        result: "notBuilt",
+        port: "proposals",
+      });
+    }
   });
 });
