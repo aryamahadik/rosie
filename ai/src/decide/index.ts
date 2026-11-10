@@ -1,9 +1,12 @@
-// Decide, one read (T-368, C-115): read.ts for the read itself (step 1, then step 2 per part side by side, through the
+// Decide (C-115). One read (T-368): read.ts for the read itself (step 1, then step 2 per part side by side, through the
 // AI gateway), prompt.ts for its cached system prompt and each step's tail, schema.ts for the two steps' structured-output
 // schemas cut from K-02, map.ts for the mapping into K-02's `decideRead`, check.ts for the validator a read passes before
-// it leaves the AI layer. Two reads and their agreement are T-369's.
+// it leaves the AI layer. Two reads (T-369): two-reads.ts runs the first and check reads per the route (T-363) side by
+// side and hands on K-02's `decideResult`; agree.ts compares them part by part. The one re-read is T-370's.
 
 export { DECIDE_EFFORT, createDecideReader } from "./read";
+export { createDecider, twoReadResult } from "./two-reads";
+export { agreeReads, partDifferences } from "./agree";
 export {
   DECIDE_EXAMPLES,
   DECIDE_PROMPT,
@@ -43,10 +46,14 @@ export {
 export { DecideRequestError } from "./errors";
 export {
   DECIDE_PURPOSES,
+  DIFFERENCES,
   HAND_OFF_ABOUT,
+  PART_MARKS,
   READ_ROLES,
+  RESULT_OUTCOMES,
   ROLE_OF,
   VERBS,
+  type Agreement,
   type AskPart,
   type ChoosePart,
   type DecideCallOptions,
@@ -61,6 +68,15 @@ export {
   type DecideReadOk,
   type DecideReadRefused,
   type DecideReadRequest,
+  type DecideResult,
+  type Decider,
+  type DeciderOptions,
+  type DecideTurnAnswer,
+  type DecideTurnDecided,
+  type DecideTurnDown,
+  type DecideTurnOptions,
+  type DecideTurnUnmapped,
+  type Difference,
   type EnterPart,
   type Field,
   type FieldValue,
@@ -71,11 +87,17 @@ export {
   type Money,
   type NoOpPart,
   type NoneFitsPart,
+  type PartAgreement,
   type PartHead,
+  type PartMark,
   type PassOnPart,
   type Read,
+  type ReadPair,
   type ReadRole,
   type RedactPart,
+  type ResultOutcome,
+  type ResultPart,
+  type Stakes,
   type Time,
   type Verb,
 } from "./types";

@@ -6,9 +6,10 @@
 import type { AttemptFailure, CallOptions, FetchLike, GatewayBundle, ModelCall, ModelRole } from "../gateway";
 import type { PromptCache } from "../cache";
 import type { DecideContext } from "../context";
-import type { SpanFacts } from "../../../runtime/src/trace";
+import type { ReadPair, RoutingBundle, Stakes } from "../routing";
+import type { BundleId, SpanFacts } from "../../../runtime/src/trace";
 
-export type { DecideContext, ModelCall, ModelRole };
+export type { DecideContext, ModelCall, ModelRole, ReadPair, Stakes };
 
 /** K-02 v1's eight verbs, one per part of the text (arch 03 line 183), in K-02's order. */
 export const VERBS = [
@@ -213,4 +214,154 @@ export interface DecideReader {
     request: DecideReadRequest,
     options?: DecideCallOptions,
   ): Promise<DecideReadAnswer>;
+}
+
+// ---- Decide, two reads, and their agreement (T-369, C-115) --------------------------------------------------------
+
+/** K-02 v1 `resultPart.outcome`: go to the gate, or one question with nothing changed for the part (arch 02 line 119). */
+export const RESULT_OUTCOMES = ["go", "oneQuestion"] as const;
+export type ResultOutcome = (typeof RESULT_OUTCOMES)[number];
+
+/** K-02 v1 `resultPart`: one part as decide hands it to the gate, with what happens to it. */
+export interface ResultPart {
+  readonly part: DecidePart;
+  readonly outcome: ResultOutcome;
+}
+
+/**
+ * K-02 v1 `decideResult`: what decide hands the gate for one turn: the turn's stakes and read pair, the reads in the order
+ * they ran, whether the first and check reads agreed, whether the one re-read ran, the language they agreed on (or null)
+ * and each part of the text with its outcome.
+ */
+export interface DecideResult {
+  readonly turnId: string;
+  readonly bundleId: BundleId;
+  readonly stakes: Stakes;
+  readonly routing: ReadPair;
+  readonly reads: readonly Read[];
+  readonly agreed: boolean;
+  readonly reread: boolean;
+  readonly language: string | null;
+  readonly parts: readonly ResultPart[];
+}
+
+/**
+ * What the two reads of one part can differ on, as labels (never words): one read has no part there (`missing`), the
+ * verb, choose's question, the choice, the fields (how many, or a name), a field's value, the questions an ask names,
+ * and whom a hand-off is about. In K-02's order of a part's keys; a K-08 span may hold them.
+ */
+export const DIFFERENCES = [
+  "missing",
+  "verb",
+  "question",
+  "choice",
+  "fields",
+  "value",
+  "questions",
+  "about",
+] as const;
+export type Difference = (typeof DIFFERENCES)[number];
+
+/**
+ * How one part came out of the comparison:
+ *   agreed       both reads give it the same verb, choice and every field value: it may go to the gate;
+ *   notAgreed    low stakes, and the reads differ on it: the turn's one Sonnet re-read settles it (T-370), and until
+ *                then nothing changes for it (arch 02 line 119; arch 06 line 289);
+ *   oneQuestion  high stakes, and the reads differ on it: it ends in one question and nothing changes for it (arch 06
+ *                line 287), after the re-read (Q-41's default: the re-read runs before the one question).
+ */
+export const PART_MARKS = ["agreed", "notAgreed", "oneQuestion"] as const;
+export type PartMark = (typeof PART_MARKS)[number];
+
+/** One part of the text, as the two reads give it, compared. */
+export interface PartAgreement {
+  /** Its place in the text's order: the index of the part in each read that has one there. */
+  readonly index: number;
+  /** The first read's part there, or null when the first read has fewer parts. */
+  readonly first: DecidePart | null;
+  /** The check read's part there, or null when the check read has fewer parts. */
+  readonly check: DecidePart | null;
+  readonly mark: PartMark;
+  /** What the two differ on, in DIFFERENCES' order; empty when agreed. */
+  readonly differences: readonly Difference[];
+}
+
+/** A turn's first and check reads compared part by part (arch 02 line 119; arch 06 lines 285 to 287; CQ-07). */
+export interface Agreement {
+  /** The turn's stakes the comparison was made on: they decide what a part that differs comes to. */
+  readonly stakes: Stakes;
+  /** K-02 `decideResult.agreed`: as many parts in each read, every one agreed, and one language. */
+  readonly agreed: boolean;
+  /** K-02 `decideResult.language`: the language both reads give, or null when they differ (CQ-07's default). */
+  readonly language: string | null;
+  /** One entry per part, in the text's order: as many as the read with more parts gives. */
+  readonly parts: readonly PartAgreement[];
+}
+
+/** What decide's two reads are built with: one bundle's K-01 v1 manifest (id, models, routing policy) and its prompts. */
+export interface DeciderOptions {
+  /** The bundle id, its two model ids and its routing policy (K-01 v1 manifest), checked as the router checks them. */
+  readonly bundle: RoutingBundle;
+  /** The same bundle's prompt layout (T-364), as decide's one read takes it. */
+  readonly prompts: PromptCache;
+  /** The environment the key is read from, by name (ANTHROPIC_API_KEY), at the moment of each call. */
+  readonly env: Readonly<Record<string, string | undefined>>;
+  /** Defaults to the global `fetch`. Tests pass a fake Messages API. */
+  readonly fetch?: FetchLike;
+}
+
+/** Where the reads' spans go (the turn's trace), and where their seeds come from. */
+export interface DecideTurnOptions extends DecideCallOptions {
+  /** A 32-bit unsigned seed per call (the router's `draw`). Defaults to drawSeed; tests pass their own. */
+  readonly draw?: () => number;
+}
+
+interface TurnAnswerBase {
+  readonly turnId: string;
+  readonly bundleId: BundleId;
+  /** The turn's stakes as routed, before any read (T-363: high when any choice it offers is high). */
+  readonly stakes: Stakes;
+  /** The ids of the choices that made it high, sorted; empty on low stakes. */
+  readonly highChoices: readonly string[];
+  /** The bundle policy's read pair for those stakes: which model each read asked first (K-02 `decideResult.routing`). */
+  readonly routing: ReadPair;
+  /** Each read's own answer, in the route's order: the first read, then the check read. */
+  readonly answers: readonly [DecideReadAnswer, DecideReadAnswer];
+  /** Every model call of both reads, the first read's first, each read's in its own order (K-08 v1). */
+  readonly modelCalls: readonly ModelCall[];
+  /** The decideReads span's facts: each read's seed under its purpose's name and the context's counts (T-367). */
+  readonly span: Readonly<SpanFacts>;
+}
+
+/** Both reads are K-02 reads: compared, and handed on as K-02's decide result before any re-read. */
+export interface DecideTurnDecided extends TurnAnswerBase {
+  readonly status: "decided";
+  readonly agreement: Agreement;
+  /** K-02 v1 `decideResult`, the re-read not run: agreed parts go, every other part holds one question. */
+  readonly result: DecideResult;
+}
+
+/** A read the AI layer's validator refused (an unmapped read): never compared; the turn's one re-read follows (T-370). */
+export interface DecideTurnUnmapped extends TurnAnswerBase {
+  readonly status: "unmapped";
+  /** The role of each read that was refused, first before check. */
+  readonly refused: readonly ReadRole[];
+}
+
+/** A read the AI gateway got from neither model (`modelsDown`): never compared; what follows is T-271's. */
+export interface DecideTurnDown extends TurnAnswerBase {
+  readonly status: "modelsDown";
+}
+
+export type DecideTurnAnswer = DecideTurnDecided | DecideTurnUnmapped | DecideTurnDown;
+
+/** Decide, two reads (C-115): routed by stakes, read side by side, compared part by part. */
+export interface Decider {
+  readonly bundleId: BundleId;
+  /**
+   * Decides one turn's K-02 v1 context. Never rejects for a failed model call or a bad answer: those are `modelsDown`
+   * and `unmapped`. Rejects, before any call, for a turn it cannot route (RoutingRefusedError: another bundle's, no
+   * choice, stakes K-02 does not have) and for a read that cannot be made (as decide's one read rejects).
+   */
+  decide(context: DecideContext, options?: DecideTurnOptions): Promise<DecideTurnAnswer>;
 }
