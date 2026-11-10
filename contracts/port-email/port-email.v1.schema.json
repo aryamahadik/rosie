@@ -413,7 +413,7 @@
     },
     "failureCode": {
       "title": "EmailFailureCode",
-      "description": "How an email failed, as the K-06 failure code of an email's failed receipt (K-06 failure.code: 'the ports' ... K-12'): bouncePermanent, Resend's email.bounced with bounce type Permanent (the address does not take mail); bounceTemporary, email.bounced with any other bounce type; suppressed, email.suppressed (Resend did not send it: the address is on the suppression list); notSent, email.failed (it could not be sent, such as reached_daily_quota). Each is a failure that starts the channel fallback (02-contracts K-12 'failed or bounced (the channel fallback)'; arch 02 line 125).",
+      "description": "How an email failed, as the K-06 failure code of an email's failed receipt (K-06 failure.code: 'K-11, K-12 list them'): bouncePermanent, Resend's email.bounced with bounce type Permanent (the address does not take mail); bounceTemporary, email.bounced with any other bounce type; suppressed, email.suppressed (Resend did not send it: the address is on the suppression list); notSent, email.failed (it could not be sent, such as reached_daily_quota). Each is a failure that starts the channel fallback (02-contracts K-12 'failed or bounced (the channel fallback)'; arch 02 line 125).",
       "type": "string",
       "enum": ["bouncePermanent", "bounceTemporary", "suppressed", "notSent"]
     },
