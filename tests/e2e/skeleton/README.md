@@ -22,15 +22,16 @@ For example, the guard (row 5 of 02-contracts section 11, K-01 and K-04) uses `t
   - scrub: the actor's inbox entry comes once, on the text's arrival, its words sealed under the key K-05 gave the handle;
   - the safety read: the JOIN reads No, on one Haiku call, read from the text's arrival;
   - the lease: one batch and one turn, bundle v0 pinned, and the turn's one K-04 row;
-  - the guard: no keyword and no target.
+  - the guard: no keyword and no target;
+  - the frontier: @rosie/actions' turn face reads test owner 1's stored state once, under Lee's Barbershop's scope, and gives the JOIN `build-frontier-s1-01.json`'s one choice, the sign-up door to S1-01. KV is empty, so its bundle part comes from PostgreSQL's copy, and its one frontier span, under bundle v0's id, says so (the Tool API base's span; the turn records none, CQ-159).
 
 ## Joined so far
 
-Joins 1 to 5 (T-552 to T-556): receive, scrub with the actor's inbox entry, the safety read, the lease and the guard. Each later join moves `JOINED_THROUGH` to its row's last hop and adds its row's claims.
+Joins 1 to 6 (T-552 to T-557): receive, scrub with the actor's inbox entry, the safety read, the lease, the guard and the frontier. Each later join moves `JOINED_THROUGH` to its row's last hop and adds its row's claims.
 
 ## With SKELETON_UPTO unset
 
-`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to the guard, with every joined row's claims. No contract report is read. Nothing is skipped.
+`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to the frontier, with every joined row's claims. No contract report is read. Nothing is skipped.
 
 ## Known gaps (`gaps.ts`)
 

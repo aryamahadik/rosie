@@ -10,7 +10,8 @@
 //      (./keywords), and their core actions ride in this turn's one commit, input coreOnly, after each text's
 //      recordSafetyOutcome. When its result says rerun, the turn runs them again (at most `KEYWORD_RUNS` in a run). A
 //      fixed line's row is never composed.
-//   4. Frontier (K-09 buildFrontier): the other texts, with the guard's targets, give K-02's context.
+//   4. Frontier (K-09 buildFrontier): the other texts, with the guard's targets, give K-02's context. Its span is the
+//      turn's, unless the turn face records the hop itself (`recordsFrontierSpan`, CQ-159: the Tool API base's span).
 //   5. Decide (K-02, the AI layer's two reads). When the reads disagree on a part, or a part is unmapped, the one Sonnet
 //      re-read runs before anything goes to the gate (Q-41's default: one re-read, then one question; never a commit on a
 //      difference). When nothing fits, meaning search adds the closest entries (K-09 closestEntries) and the re-read runs
@@ -723,9 +724,12 @@ function isContextOf(value: unknown, turnId: string): value is DecideContext {
   return isRecord(value) && value.turnId === turnId && Array.isArray(value.choices);
 }
 
-/** K-09 buildFrontier, with its span: the context, or why there is none (a label). */
+/**
+ * K-09 buildFrontier, with its span: the context, or why there is none (a label). A turn face that records the frontier
+ * span itself (`recordsFrontierSpan`, CQ-159) gets no second one from the turn.
+ */
 async function buildFrontier(run: Run, request: BuildFrontierRequest): Promise<DecideContext | string> {
-  const span = run.trace.start("frontier");
+  const span = run.set.toolApi.recordsFrontierSpan === true ? null : run.trace.start("frontier");
   const got: SpanFacts = {
     texts: request.texts.length,
     roles: request.targets.roles.length,
@@ -1150,8 +1154,12 @@ const FAILED_CODES: ReadonlySet<string> = new Set(["noAnswer", "transient", "bad
 
 const failedOrRefused = (code: string): Outcome => (FAILED_CODES.has(code) ? "failed" : "refused");
 
-/** Records a span; a span the trace refuses is not kept, and the turn goes on. */
-function finish(span: Timer, fields: Parameters<Timer["finish"]>[0]): void {
+/**
+ * Records a span; a span the trace refuses is not kept, and the turn goes on. No span (null): the hop's port records it
+ * itself (CQ-159).
+ */
+function finish(span: Timer | null, fields: Parameters<Timer["finish"]>[0]): void {
+  if (span === null) return;
   try {
     span.finish(fields);
   } catch {

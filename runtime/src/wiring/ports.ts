@@ -113,15 +113,19 @@ export interface StateReads {
 
 /**
  * K-09 buildFrontier (T-557): the turn's texts, its guard's targets and its pinned bundle give K-02's context, through
- * @rosie/actions' turn face, whose Tool API base records the call's one frontier span on the turn's trace (CQ-159).
+ * @rosie/actions' turn face, whose Tool API base records the call's one frontier span on the turn's trace (CQ-159). The
+ * root tells the turn so (TurnFace.recordsFrontierSpan) where this port binds real.
  */
 export type FrontierPort = Pick<TurnFace, "buildFrontier">;
 
 /**
  * K-09's turn face less the frontier and finalize (each its own port), and the K-09 shared-core calls the safety read
- * makes.
+ * makes. The frontier's span flag is the root's to set, from the frontier port's binding.
  */
-export interface TurnFacePort extends Omit<TurnFace, "buildFrontier" | "finalizeMessage"> {
+export interface TurnFacePort extends Omit<
+  TurnFace,
+  "buildFrontier" | "finalizeMessage" | "recordsFrontierSpan"
+> {
   readonly safetyCore: SafetyCore;
 }
 

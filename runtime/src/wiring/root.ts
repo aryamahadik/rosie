@@ -1,6 +1,6 @@
 // The composition root (T-550; C-046, C-044; build prompt section 10, D-017 'Joins: one hop at a time, in the turn order
 // of What changes'; ops/plan/02-contracts.md section 11): the one place that builds the Worker's gateway, the handle
-// actor's turn and the outbox dispatcher, with each of the thirteen ports of ./ports.ts bound once to the implementation
+// actor's turn and the outbox dispatcher, with each of the fourteen ports of ./ports.ts bound once to the implementation
 // its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
 // package; nothing else here changes for it.
 //
@@ -31,8 +31,10 @@
 // The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn id the
 // lease hashed from its batch's event ids. The turn's pin reads its bundle through the bundle port, and the guard its
 // targets through the targets port (T-556). The turn's frontier goes through the frontier port (T-557): @rosie/actions'
-// turn face over the frontier's scope, reading the bundle the run pinned. Never logged by the root: a word, a number, a
-// key.
+// turn face over the frontier's scope, reading the bundle the run pinned. Where that port binds real, its Tool API base
+// records the frontier span and the turn records none (TurnFace.recordsFrontierSpan; CQ-159), so the hop is recorded
+// once; each later join whose port records its own hop's span sets that hop's flag the same way. Never logged by the
+// root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -53,7 +55,7 @@ import type { TurnDeps, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
 import { environmentOf, PICKS, type Environment } from "./picks";
-import type { Ports } from "./ports";
+import type { PortName, Ports } from "./ports";
 import { PinnedRuns } from "./pinned-runs";
 import {
   realPorts,
@@ -231,6 +233,8 @@ export function composeRoot(options: RootOptions): Root {
     keys: ports.sealing,
     safety: ports.stateReads.turn.safety,
     toolApi: {
+      // CQ-159: the real frontier port's Tool API base records the call's one frontier span, so the turn records none.
+      recordsFrontierSpan: bindsReal(bindings, "frontier"),
       buildFrontier: (request, trace) => ports.frontier.buildFrontier(request, trace),
       closestEntries: (request, trace) => ports.turnFace.closestEntries(request, trace),
       gateAndCommit: (request, at, trace) => ports.turnFace.gateAndCommit(request, at, trace),
@@ -323,6 +327,11 @@ export function composeRoot(options: RootOptions): Root {
       };
     },
   };
+}
+
+/** True when the port took its real implementation (./real.ts) in the root's environment. */
+function bindsReal(bindings: readonly Binding[], port: PortName): boolean {
+  return bindings.some((binding) => binding.port === port && binding.implementation === "real");
 }
 
 const workerRoots = new WeakMap<Cloudflare.Env, Root>();

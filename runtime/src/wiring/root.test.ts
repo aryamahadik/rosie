@@ -100,6 +100,8 @@ describe("the ports the root binds", () => {
     expect(root.bindings).toEqual(
       PORTS.map((port) => ({ port, implementation: JOINED.test.includes(port) ? "real" : "fake" })),
     );
+    // CQ-159: the real frontier port's Tool API base records the frontier span, so the turn records none of its own.
+    expect(root.turn.toolApi.recordsFrontierSpan).toBe(true);
   });
 
   it.each(["staging", "production"] as const)(
@@ -112,6 +114,9 @@ describe("the ports the root binds", () => {
       expect(root.bindings).toEqual(
         PORTS.map((port) => ({ port, implementation: joined.includes(port) ? "real" : "closed" })),
       );
+      // CQ-159: the turn leaves the frontier span to the port only where the real frontier port (its Tool API base)
+      // records it; where the port is closed, the turn records the failed frontier itself.
+      expect(root.turn.toolApi.recordsFrontierSpan).toBe(joined.includes("frontier"));
     },
   );
 

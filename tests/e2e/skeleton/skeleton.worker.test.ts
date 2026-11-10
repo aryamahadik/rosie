@@ -130,7 +130,7 @@ function arrivalOf(facts: Facts): { readonly from: number; readonly to: number }
 
 /**
  * What each joined row of 02-contracts section 11 holds the run to, by row: what its join proved in its own Workers test
- * (runtime/src/wiring hop2 to hop5), now on the one run every hop shares.
+ * (runtime/src/wiring hop2 to hop6), now on the one run every hop shares.
  */
 const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 1, "Webhook in, signature checked" (K-11; T-552): the gateway verified the Linq double's signature, and took the
@@ -296,11 +296,15 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       got: { texts: 1, roles: 0, openQuestions: 0, bookings: 0 },
       decided: { keyword: null, flagsVisit: false, toDecide: 1, targets: 0, doors: true },
     });
-    // The targets: K-05's handleTargets asked once, for the seeded handle; the JOIN went on with no target.
+    // The targets: K-05's handleTargets asked once, for the seeded handle; the JOIN went on with no target. The joined
+    // frontier (T-557) shows it: decide's context offers only the sign-up door, which T-1147 offers only when the guard's
+    // targets say noTarget with no role, open question or booking listed.
     expect(facts.run.fakes.handleTargets.requests).toEqual([{ handleId: TEST_OWNER_1.handleId }]);
-    expect(facts.run.fakes.face.frontierCalls.map((request) => request.targets)).toEqual([
-      { roles: [], openQuestionIds: [], bookingIds: [], noTarget: true },
-    ]);
+    expect(
+      facts.run.fakes.decide.decideCalls.map((context) =>
+        context.choices.map((choice) => [choice.kind, choice.door]),
+      ),
+    ).toEqual([[["door", "signUp"]]]);
     return Promise.resolve();
   },
 

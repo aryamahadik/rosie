@@ -20,9 +20,8 @@
 //   - Inside workerd the frontier port's checks are the prebuilt ones (T-1144): a call checks its request (a request K-09
 //     refuses is answered invalidRequest) and makes no code from strings (Function and eval trapped, no call).
 //
-// One frontier span per turn (CQ-159): the Tool API base's span is the one kept, and each test judges that last.
-// runtime/src/turn/turn.ts line 728 still records the turn's own second span around the port, which nothing in
-// runtime/src/wiring can stop: that last check waits for the turn to stop recording it (T-557's NEED).
+// One frontier span per turn (CQ-159): the Tool API base's span is the one kept, and each test judges that last. The
+// root tells the turn that the real frontier port records it (TurnFace.recordsFrontierSpan), so the turn records none.
 // The spans after hop 6 belong to hops not joined yet (decide onward, on the fakes) and are not judged. The Durable
 // Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test uses.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
@@ -253,9 +252,8 @@ function frontierSpanOf(spans: readonly Span[]): Span {
 }
 
 /**
- * One frontier span per turn (CQ-159; K-08: every hop once): the Tool API base's, and no other. Judged last in each test,
- * after everything else: runtime/src/turn/turn.ts line 728 still records the turn's own second span around the port,
- * which nothing in runtime/src/wiring can stop (T-557's NEED).
+ * One frontier span per turn (CQ-159; K-08: every hop once): the Tool API base's, and no other, since the turn records
+ * none of its own where the root binds the real frontier port (TurnFace.recordsFrontierSpan). Judged last in each test.
  */
 function expectOneFrontierSpan(spans: readonly Span[]): void {
   expect(
