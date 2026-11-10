@@ -147,7 +147,9 @@ interface Rig {
  * The root for "test" with the HandleActor namespace, the skeleton flag on and K-05's turn-row calls (the double), its
  * actor ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port. The
  * bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle v0 as bundles/v0 publishes it;
- * and so is the frontier's scope (joined by T-557), so each turn's frontier answers and the turn goes on to its commit.
+ * and so is the frontier's scope (joined by T-557), so each turn's frontier answers; and decide (joined by T-558) is fed
+ * @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads, so the turn goes on to its
+ * commit.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -164,6 +166,7 @@ function rig(log: MockInstance): Rig {
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
+    deciders: fakes.decide.deciders,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
@@ -198,6 +201,7 @@ describe("hop 4 joined: the batch window and the turn lease run on the texts' K-
         const second = "evt-sam-0402";
         run.fakes.known(first);
         run.fakes.known(second);
+        run.fakes.decide.recordTurn([first, second]);
         const firstTrace = await run.post(textOf(first, SAM.handle, JOIN_TEXT));
         await run.fakes.clock.advance(2000);
         const secondTrace = await run.post(textOf(second, SAM.handle, SAM_TRADES_TEXT));
@@ -267,6 +271,7 @@ describe("hop 4 joined: the batch window and the turn lease run on the texts' K-
         const ids = ["evt-alex-0401", "evt-alex-0402", "evt-alex-0403"];
         const words = [JOIN_TEXT, SAM_TRADES_TEXT, IMESSAGE_TEXT];
         for (const id of ids) run.fakes.known(id);
+        run.fakes.decide.recordTurn(ids);
         const traces: string[] = [];
         for (const [index, id] of ids.entries()) {
           if (index > 0) await run.fakes.clock.advance(1000);
@@ -319,6 +324,7 @@ describe("hop 4 joined: the batch window and the turn lease run on the texts' K-
       try {
         const eventId = "evt-plain-0401";
         run.fakes.known(eventId);
+        run.fakes.decide.recordTurn([eventId]);
         const webhook = await run.fakes.sign(textOf(eventId, PLAIN, JOIN_TEXT));
         const answers = await Promise.all([
           run.root.linqWebhook(webhookRequest(webhook)),
@@ -379,6 +385,8 @@ describe("hop 4 joined: the batch window and the turn lease run on the texts' K-
       try {
         const eventId = "evt-lapsed-0401";
         run.fakes.known(eventId);
+        // Each of its three runs decides it again (a new run of the turn): the same two recorded reads each time.
+        run.fakes.decide.recordTurn([eventId]);
         run.fakes.turnRows.failCommitsWith = { error: "transient" };
         const traceId = await run.post(textOf(eventId, LAPSED, JOIN_TEXT));
         await settle(LAPSED_ACTOR);

@@ -49,9 +49,19 @@
 //                first and PostgreSQL's copy on a miss, and its call's span says where each part it read came from.
 //                Inside workerd the Tool API's validator and the frontier's checker are T-1144's prebuilt standalone
 //                code (`npm run build:validators`), never a no-op; under Node, Ajv over the frozen schemas.
+//   decide       T-558: @rosie/ai's decide (T-369 createDecider: two reads routed by stakes and compared part by part;
+//                C-115) and its one Sonnet re-read (T-370; C-116), one decider per bundle for both, handed in by the
+//                root (RootOptions.deciders): in a test, over a fake Messages API answered by the recorded-model double
+//                (T-004, T-1145's turn 1 recordings); in the Worker, none until the bundle's manifest (its models, routing
+//                policy and decide prompt) and flow graphs can be read there and the model key is set by name (J-02;
+//                smoke-size calls only, DL-027), so every decide and re-read there fails closed before any model call and
+//                no turn commits a decided part. The answers are mapped as T-370's handoff maps them (DL-342), and the
+//                re-read is handed back the very result decide gave. Each model call writes its own portCall span into
+//                the turn's trace (the AI gateway's); the decideReads and reread spans stay the turn's, labels only.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
-// names the secret by its name only. A text's words go to the safety read only, never into a span, a log or an error.
+// names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
+// an error.
 
 import { createFrontierChecker, type FrontierChecker } from "@rosie/actions/src/frontier/assemble/check";
 import type {
@@ -68,6 +78,13 @@ import {
   type ParseLookups,
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
+import { RereadRefusedError } from "@rosie/ai/src/decide/errors";
+import type {
+  DecideContext as AiDecideContext,
+  Decider,
+  RereadAfterReads,
+  RereadAnswer,
+} from "@rosie/ai/src/decide/types";
 import type { SafetyReader } from "@rosie/ai/src/safety/types";
 import type {
   ReadActiveBundleResult,
@@ -94,9 +111,16 @@ import { asListed, BundleReader, flowOf, keyOf, readManifest, sameBundle } from 
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
+import { MODELS_DOWN } from "../outage/ai";
 import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
 import { openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
-import type { BuildFrontierAnswer, ParkTurnAnswer } from "../turn/types";
+import type {
+  BuildFrontierAnswer,
+  DecideAnswer,
+  DecideResult,
+  ParkTurnAnswer,
+  TurnDecide,
+} from "../turn/types";
 import type { FrontierPort, Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
@@ -164,6 +188,11 @@ export interface RealInputs {
    * transaction only; null or left out where no database is bound (the Worker until T-567), so every frontier fails closed.
    */
   readonly frontierScope?: FrontierScope | null | undefined;
+  /**
+   * @rosie/ai's decide for each bundle (T-558): null or left out where none can be built (the Worker, until its bundle's
+   * manifest and flows and the model key can be read there), so every decide and re-read fails closed.
+   */
+  readonly deciders?: Deciders | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -185,6 +214,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       bundles: inputs.frontierBundles?.bundles ?? (() => bundles),
       pinnedOf: inputs.frontierBundles?.pinnedOf ?? (() => null),
     }),
+    decide: realDecide({ deciders: inputs.deciders ?? null }),
   };
 }
 
@@ -685,4 +715,137 @@ class FrontierBundleReads implements FrontierBundles {
       Promise.resolve(asListed(value, listed) ? flowOf(value.text, flow) : null),
     );
   }
+}
+
+// ---- decide: @rosie/ai's two reads and the one Sonnet re-read (T-558; C-115, C-116) -----------------------------------
+
+/**
+ * @rosie/ai's decide for one bundle (T-369 `createDecider`, with T-370's one Sonnet re-read), built over that bundle's
+ * K-01 v1 manifest (its id, its two models, its routing policy and its decide prompt) and flow graphs (the always-on
+ * rules and the step cards the prompt layout reads), the model key read by name at each call. A throw (or a rejection)
+ * means no decider can be built for that bundle: the call fails before any model call.
+ */
+export type Deciders = (bundleId: BundleId) => Decider | Promise<Decider>;
+
+/** A decide asked for where none is bound (the Worker, until it can build one). The message names nothing else. */
+export class NoDeciderError extends Error {
+  constructor() {
+    super("no decide is bound here");
+    this.name = "NoDeciderError";
+  }
+}
+
+/** A decider handed in for a bundle that answers as another bundle's: nothing is read on it. */
+export class DeciderBundleError extends Error {
+  constructor() {
+    super("the decider handed in is of another bundle than the one asked for");
+    this.name = "DeciderBundleError";
+  }
+}
+
+/** What the real decide port is fed: @rosie/ai's decide for each bundle, or null where none is bound. */
+export interface DecideInputs {
+  readonly deciders: Deciders | null;
+}
+
+/**
+ * The decide port (T-558): the turn loop's decide and its one re-read (T-251's `TurnDecide`) through @rosie/ai's
+ * decider for the context's bundle, which the turn pinned. One decider per bundle serves both, built at its bundle's first
+ * call and kept, so the once-per-run ledger of the re-read, which lives in the decider, sees every call of a turn (T-370
+ * handoff; the security reviewer's note b); a decider that could not be built is not kept, so the next call asks again.
+ * Each call's model calls write their portCall spans into the turn's trace (the AI gateway's, one per attempt: labels and
+ * counts only); the turn records the decideReads and reread spans itself, so each hop is recorded once (CQ-159's rule:
+ * the AI layer records no hop span of its own). The answers, as T-370's handoff maps them (DL-342):
+ *
+ *   decide   decided      {result: "decided", decide: K-02's result (the re-read not run), modelCalls}: the turn asks for
+ *                         the re-read when the reads disagree or a part holds one question
+ *            modelsDown   {error: "modelsDown"}: T-271's AI-down path follows
+ *            unmapped     a read was refused: the AI layer's own re-read of the turn runs here (why unmapped, CQ-162 (a)),
+ *                         then {error: "modelsDown"} when it got neither model, else {error: "unmapped"}: K-02 v1's
+ *                         result cannot hold a refused read, so the run ends with nothing committed (T-1157, T-1158)
+ *   reread   decided      {result: "decided", decide: K-02's result with the re-read run, modelCalls}
+ *            modelsDown   {error: "modelsDown"}
+ *            unmapped     {error: "unmapped"}: the re-read is refused too, so the turn ends in one question, unasked
+ *            refused      {error: "rereadDone"}: the turn's one re-read has run (RereadRefusedError, before any call)
+ *
+ * The re-read is handed the request as the turn gives it, so its `decide` is the very result decide gave: the re-read
+ * checks it is exactly its two reads' own. A re-read after meaning search (why noneFits) is refused by the AI layer before
+ * any call (DecideRequestError, until T-1159), and the refusal goes back as it came. No decider bound, a decider that
+ * cannot be built or one of another bundle: the call fails before any model call. Nothing here logs or writes a span: a
+ * part's quote and fields go to the gate only, never into a span, a log or an error.
+ */
+export function realDecide(inputs: DecideInputs): TurnDecide {
+  const built = new Map<string, Promise<Decider>>();
+
+  const deciderOf = (bundleId: BundleId): Promise<Decider> => {
+    const deciders = inputs.deciders;
+    if (deciders === null) return Promise.reject(new NoDeciderError());
+    const key = `${bundleId.hash}/${String(bundleId.build)}`;
+    const known = built.get(key);
+    if (known !== undefined) return known;
+    // Kept from this call on, so a call made while the decider is still being built waits for the same one; the factory
+    // runs after it is kept, so even one that throws at once is not kept.
+    const building = Promise.resolve()
+      .then(() => deciders(bundleId))
+      .then((decider) => {
+        if (!sameBundle(decider.bundleId, bundleId)) throw new DeciderBundleError();
+        return decider;
+      });
+    built.set(key, building);
+    void building.catch(() => {
+      if (built.get(key) === building) built.delete(key);
+    });
+    return building;
+  };
+
+  return {
+    async decide(context, trace): Promise<DecideAnswer> {
+      const decider = await deciderOf(context.bundleId);
+      const asked = context as unknown as AiDecideContext;
+      const answer = await decider.decide(asked, { trace });
+      switch (answer.status) {
+        case "decided":
+          return {
+            result: "decided",
+            // The same K-02 v1 decideResult in two hand-written forms: @rosie/ai's, and the turn's (../turn/types.ts),
+            // which reads the result's turn, parts and flags and checks them itself (turn.ts isResultOf).
+            decide: answer.result as unknown as DecideResult,
+            modelCalls: answer.modelCalls,
+          };
+        case "modelsDown":
+          return { error: MODELS_DOWN };
+        case "unmapped": {
+          const again = await decider.reread(
+            { why: "unmapped", context: asked, unmapped: answer },
+            { trace },
+          );
+          return { error: again.status === "modelsDown" ? MODELS_DOWN : "unmapped" };
+        }
+      }
+    },
+    async reread(request, trace): Promise<DecideAnswer> {
+      const decider = await deciderOf(request.context.bundleId);
+      let answer: RereadAnswer;
+      try {
+        // The turn's request as it gives it (T-251's RereadRequest is @rosie/ai's RereadAfterReads, with noneFits beside
+        // it), so the result decide gave goes back unchanged.
+        answer = await decider.reread(request as unknown as RereadAfterReads, { trace });
+      } catch (error) {
+        if (error instanceof RereadRefusedError) return { error: "rereadDone" };
+        throw error;
+      }
+      switch (answer.status) {
+        case "decided":
+          return {
+            result: "decided",
+            decide: answer.result as unknown as DecideResult,
+            modelCalls: answer.modelCalls,
+          };
+        case "modelsDown":
+          return { error: MODELS_DOWN };
+        case "unmapped":
+          return { error: "unmapped" };
+      }
+    },
+  };
 }

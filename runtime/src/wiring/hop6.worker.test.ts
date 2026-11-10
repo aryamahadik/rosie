@@ -22,7 +22,8 @@
 //
 // One frontier span per turn (CQ-159): the Tool API base's span is the one kept, and each test judges that last. The
 // root tells the turn that the real frontier port records it (TurnFace.recordsFrontierSpan), so the turn records none.
-// The spans after hop 6 belong to hops not joined yet (decide onward, on the fakes) and are not judged. The Durable
+// The spans after hop 6 belong to later hops (decide, joined by T-558 over the recorded-model double and judged in
+// ./hop7.worker.test.ts; the gate onward, on the fakes) and are not judged. The Durable
 // Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test uses.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
@@ -196,6 +197,7 @@ function rig(log: MockInstance, fed: { frontier?: boolean } = {}): Rig {
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
     frontierScope: fed.frontier === false ? null : fakes.frontier.scope,
+    deciders: fakes.decide.deciders,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
@@ -327,6 +329,8 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
         // KV is empty: the pool's BUNDLES namespace holds no part of bundle v0.
         expect(await env.BUNDLES?.get(FLOW_A_KEY)).toBeNull();
         run.fakes.known(JOIN_EVENT);
+        // Its turn's two decide reads (decide, joined by T-558, runs on the recorded-model double).
+        run.fakes.decide.recordTurn([JOIN_EVENT]);
         const joinTrace = await run.post(textOf(JOIN_EVENT, TEST_OWNER_1.handle, JOIN_TEXT));
         await settle(OWNER_ACTOR);
         await run.fakes.clock.advance(QUIET_MS);
@@ -498,6 +502,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
       try {
         const eventId = "evt-kv-0601";
         run.fakes.known(eventId);
+        run.fakes.decide.recordTurn([eventId]);
         // A handle no other test uses, whose actor the directory double names as Sam's party, so its turn reads test
         // owner 1's stored state and runs as the JOIN's does.
         const actorName = actorNameOf(FROM_KV);

@@ -1,10 +1,10 @@
 // Doubles for the composition root's tests (T-550, T-552): the fake set the test environment binds (./picks.ts), every
 // port not joined yet on the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's
-// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's decide and commit retargeted to the
-// running turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit wrote, the
-// dispatcher's K-05 store holding that row, and a delivery receipt that arms A7-03's clock. The frontier is the joined one
-// (T-557): its K-05 double answers for test owner 1's seeded rows, so the turn's context is the real frontier's. Not
-// imported by the Worker.
+// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's commit retargeted to the running
+// turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit wrote, the dispatcher's K-05
+// store holding that row, and a delivery receipt that arms A7-03's clock. The frontier is the joined one (T-557): its K-05
+// double answers for test owner 1's seeded rows, so the turn's context is the real frontier's; and decide is the joined
+// one (T-558), whose recorded-model double answers that context's reads. Not imported by the Worker.
 //
 //   linqVerify   joined (T-552): the root binds the Linq adapter's verify (./real.ts). What it is fed comes from here:
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
@@ -43,8 +43,13 @@
 //                directory
 //   turnFace     turn/test-support fakeTurnFace (closest entries, gate, compose input from the S1-02 fixtures) and
 //                safety/test-support fakeCore
-//   decide       turn/test-support fakeDecide (decide-s1-02-choose.json), which keeps each context it is given: the
-//                frontier's answer
+//   decide       joined (T-558): the root binds @rosie/ai's decide and its one Sonnet re-read through its real decide port
+//                (./real.ts realDecide), one decider per bundle. What it is fed comes from here: `fakeDecideModels`, the
+//                decider (T-369 createDecider) for bundle v0 as bundles/v0 publishes it and for bundle-mini-a, over a fake
+//                Messages API whose answers come from the recorded-model double (T-004): ai/recordings' turn 1 recordings
+//                as they are (recording 2 is the JOIN run's own; DL-347), decide-reads-disagree.json's three reads on its
+//                context, and the reads a test records for its own turn of test owner 1's (`recordTurn`); it keeps each
+//                context decide is given (the frontier's answer) and each call it answers
 //   composer     turn/test-support fakeComposer (finalize-pass.json's plan)
 //   finalize     the same fakeTurnFace (finalize-pass.json)
 //   dataAccess   turn/test-support fakeRows (the commit's one row), dispatch/test-support FakeOutboxStore, and
@@ -58,13 +63,20 @@
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
-import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
+import joinRunContextJson from "@rosie/ai/recordings/contexts/join-s1-01.json";
+import recordingsV11 from "@rosie/ai/recordings/recordings.v1.1.json";
+import { createPromptCache, type CacheBundle, type CacheFlow } from "@rosie/ai/src/cache/index";
 import { unescapeData } from "@rosie/ai/src/context/tags";
+import { createDecider } from "@rosie/ai/src/decide/two-reads";
+import type { Decider } from "@rosie/ai/src/decide/types";
 import { KEY_VARIABLE, type FetchLike } from "@rosie/ai/src/gateway/index";
 import { createRecordedModel } from "@rosie/ai/src/recorded-double/double";
-import { requestKey } from "@rosie/ai/src/recorded-double/key";
+import { NoRecordingError } from "@rosie/ai/src/recorded-double/errors";
+import { canonicalJson, requestKey } from "@rosie/ai/src/recorded-double/key";
 import type { RecordedModel } from "@rosie/ai/src/recorded-double/types";
+import { turnStakes, type RoutingBundle, type RoutingContext } from "@rosie/ai/src/routing/index";
 import { createSafetyReader, SAFETY_READ_PROMPT, type SafetyReader } from "@rosie/ai/src/safety/index";
+import bundleMiniA from "@rosie/contracts/bundle/fixtures/bundle-mini-a.json";
 import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
 import activeBundleJson from "@rosie/contracts/data-access/fixtures/active-bundle.json";
 import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.json";
@@ -74,11 +86,13 @@ import targetsFirstTextJson from "@rosie/contracts/data-access/fixtures/targets-
 import seedBusinessHead from "@rosie/contracts/db-schema/core/fixtures/seed-business-head.json";
 import seedPersonRoles from "@rosie/contracts/db-schema/core/fixtures/seed-person-roles.json";
 import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
+import contextS101 from "@rosie/contracts/model/fixtures/context-s1-01.json";
+import decideReadsDisagree from "@rosie/contracts/model/fixtures/decide-reads-disagree.json";
+import decideS101Enter from "@rosie/contracts/model/fixtures/decide-s1-01-enter.json";
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
-import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
 import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
@@ -93,17 +107,17 @@ import type {
 
 import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
 import type { CommitTurnRef } from "../actor";
+import { turnIdOf } from "../actor/lease";
+import { BUNDLE_B } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
 import type { BundleId } from "../trace";
 import {
+  a7_17Context,
   composerOf,
-  decided,
-  decideOf,
   fakeComposer,
-  fakeDecide,
   fakeRows,
   fakeTurnFace,
   planned,
@@ -112,14 +126,14 @@ import {
   SAM,
   turnFaceOf,
   unplannedRow,
-  type FakeDecide,
   type FakeTurnFace,
 } from "../turn/test-support";
-import type { GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
+import type { DecideContext, GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
 import type { Ports } from "./ports";
 import type {
   BundleReadCalls,
   CommitTurnCall,
+  Deciders,
   FrontierScope,
   HandleSealingKeyCall,
   HandleTargetsCall,
@@ -878,6 +892,488 @@ export function fakeFrontierScope(now: () => string = () => new Date().toISOStri
   };
 }
 
+// ---- @rosie/ai's decide over the recorded-model double (T-558) -----------------------------------------------------
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Which read of a turn a recorded decide read is (K-02 v1 `read.role`). */
+export type DecideRole = "first" | "check" | "reread";
+
+/** One decide read the double holds: its recording's id, the request it is keyed on (context and role), its answer. */
+export interface DecideRecording {
+  readonly id: string;
+  readonly context: unknown;
+  readonly role: DecideRole;
+  /** K-02 v1 `decideRead`: the text's language and one verb per part. */
+  readonly output: unknown;
+}
+
+/** A recording as ai/recordings writes it (T-004's file form): its request, and a seed fixture or the answer itself. */
+interface RecordingSpec {
+  readonly id: string;
+  readonly kind: string;
+  readonly request: { readonly context?: unknown; readonly role?: unknown };
+  readonly seed?: { readonly fixture: string };
+  readonly output?: unknown;
+}
+
+/** The K-02 fixtures a recording here may name, by file (the double's own loader reads them from disk; workerd cannot). */
+const MODEL_FIXTURES: Readonly<Record<string, unknown>> = {
+  "context-s1-01.json": contextS101,
+  "decide-s1-01-enter.json": decideS101Enter,
+  "decide-reads-disagree.json": decideReadsDisagree,
+};
+
+/** ai/recordings' own files a recording's context may name, by path (recording 2's: the JOIN run's context). */
+const RECORDING_FILES: Readonly<Record<string, unknown>> = {
+  "contexts/join-s1-01.json": joinRunContextJson,
+};
+
+function namedIn(files: Readonly<Record<string, unknown>>, file: string): unknown {
+  const value = files[file];
+  if (value === undefined) throw new Error(`the decide double is given no ${file}`);
+  return structuredClone(value);
+}
+
+/** A request's context as T-004's loader resolves it: a K-02 fixture, a file of ai/recordings, or written inline. */
+function resolvedContext(context: unknown): unknown {
+  if (isRecord(context) && Object.keys(context).length === 1) {
+    if (typeof context.fixture === "string") return namedIn(MODEL_FIXTURES, context.fixture);
+    if (typeof context.file === "string") return namedIn(RECORDING_FILES, context.file);
+  }
+  return structuredClone(context);
+}
+
+function roleOf(value: unknown): DecideRole {
+  if (value === "first" || value === "check" || value === "reread") return value;
+  throw new Error(`a decide recording's role is first, check or reread, not ${JSON.stringify(value)}`);
+}
+
+/**
+ * A K-02 decide fixture's read in one role, as T-004's loader seeds a decide recording: only when the fixture is the
+ * context's own turn and bundle.
+ */
+function seededRead(fixture: string, context: unknown, role: DecideRole): unknown {
+  const result = namedIn(MODEL_FIXTURES, fixture) as {
+    readonly turnId?: unknown;
+    readonly bundleId?: unknown;
+    readonly reads?: readonly { readonly role: string; readonly output: unknown }[];
+  };
+  const turn = isRecord(context) ? context : {};
+  if (result.turnId !== turn.turnId || canonicalJson(result.bundleId) !== canonicalJson(turn.bundleId)) {
+    throw new Error(`${fixture} is another turn's or bundle's than its recording's context`);
+  }
+  const read = result.reads?.find((each) => each.role === role);
+  if (read === undefined) throw new Error(`${fixture} holds no ${role} read`);
+  return read.output;
+}
+
+/**
+ * The double's decide recordings on K-02 v1.1 (ai/recordings/recordings.v1.1.json; T-1145, DL-347), keyed as its loader
+ * keys them, never copied: recording 1, both Haiku reads on context-s1-01.json (seeded from decide-s1-01-enter.json), and
+ * recording 2, both reads on the JOIN run's own context (contexts/join-s1-01.json: its turn id T-248's hash of
+ * evt-sam-0000, bundle v0 as bundles/v0 publishes it, the text JOIN at 14:01:49Z), each entering c-01 with the quote JOIN.
+ */
+function shippedDecideRecordings(): DecideRecording[] {
+  const file = recordingsV11 as unknown as { readonly recordings: readonly RecordingSpec[] };
+  return file.recordings
+    .filter((spec) => spec.kind === "decideRead")
+    .map((spec) => {
+      const role = roleOf(spec.request.role);
+      const context = resolvedContext(spec.request.context);
+      const output =
+        spec.seed === undefined ? structuredClone(spec.output) : seededRead(spec.seed.fixture, context, role);
+      return { id: spec.id, context, role, output };
+    });
+}
+
+/**
+ * The context decide-reads-disagree.json's reads were made from, as the turn's own tests write it (../turn/test-support
+ * a7_17Context): A7-17 ("Alex replies?") on K-01's bundle-mini-a, its options word for word, the fixture's turn id.
+ */
+export function disagreeContext(): Record<string, unknown> {
+  const flows = (bundleMiniA as unknown as CacheBundle).flows;
+  const flow = flows.A;
+  if (flow === undefined) throw new Error("bundle-mini-a holds flow A");
+  return a7_17Context(BUNDLE_B, flow.routing.alwaysOn.prefixSha256);
+}
+
+/**
+ * decide-reads-disagree.json's three reads on its context (`disagreeContext`), seeded from the fixture by role: Sonnet's
+ * first read and Haiku's check read, which differ on the high-stakes part, and the one Sonnet re-read, which asks.
+ */
+function disagreeRecordings(): DecideRecording[] {
+  const context = disagreeContext();
+  return (["first", "check", "reread"] as const).map((role) => ({
+    id: `decide-reads-disagree-${role}`,
+    context,
+    role,
+    output: seededRead("decide-reads-disagree.json", context, role),
+  }));
+}
+
+/**
+ * decide-s1-01-enter.json's read in one role (both Haiku reads enter c-01, the sign-up door, with no field) with `quote`
+ * as each part's quote: recording 2's answer for another turn of test owner 1's on bundle v0.
+ */
+function enterRead(role: "first" | "check", quote: string): unknown {
+  const read = seededRead("decide-s1-01-enter.json", contextS101, role) as {
+    readonly language: string;
+    readonly parts: readonly Record<string, unknown>[];
+  };
+  return { ...read, parts: read.parts.map((part) => ({ ...part, quote })) };
+}
+
+/** A decide bundle: the routing a decider is built on (K-01 v1 manifest) and the parts its prompt layout reads. */
+interface DecideBundle {
+  readonly routing: RoutingBundle;
+  readonly cache: CacheBundle;
+}
+
+function decideBundleOf(manifest: unknown, flows: CacheBundle["flows"]): DecideBundle {
+  const read = manifest as CacheBundle["manifest"] & Pick<RoutingBundle, "models" | "policy">;
+  return {
+    routing: { bundleId: read.bundleId, models: read.models, policy: read.policy },
+    cache: { manifest: read, flows },
+  };
+}
+
+/**
+ * The bundles the double builds a decider for: bundle v0 as bundles/v0 publishes it (its manifest, with its models,
+ * routing policy and decide prompt, and its flow A graph: the bundle every skeleton turn pins), and K-01's bundle-mini-a
+ * (decide-reads-disagree.json's).
+ */
+function decideBundles(): ReadonlyMap<string, DecideBundle> {
+  const manifest = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, "manifest"));
+  const flowA = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, "flow/A"));
+  if (manifest === undefined || flowA === undefined)
+    throw new Error("bundles/v0 holds its manifest and flow A");
+  const miniA = bundleMiniA as unknown as CacheBundle;
+  return new Map([
+    [bundleTextOf(BUNDLE_V0), decideBundleOf(JSON.parse(manifest), { A: JSON.parse(flowA) as CacheFlow })],
+    [bundleTextOf(BUNDLE_B), decideBundleOf(miniA.manifest, miniA.flows)],
+  ]);
+}
+
+/** A bundle id as the double names it: `<hash>/<build>`. */
+const bundleTextOf = (bundleId: BundleId): string => `${bundleId.hash}/${String(bundleId.build)}`;
+
+/** The step a decide request asks for, from its user message's last tag (T-368's two-step wire form, CQ-25). */
+const STEP_TAG = /<step n="([12])"(?: part="([0-9]+)")?><\/step>$/u;
+
+type DecideStep = { readonly n: 1 } | { readonly n: 2; readonly part: number };
+
+function stepOf(body: Record<string, unknown>): DecideStep | null {
+  const messages = body.messages;
+  const first: unknown = Array.isArray(messages) ? (messages as unknown[])[0] : undefined;
+  const content = isRecord(first) ? first.content : undefined;
+  const match = typeof content === "string" ? STEP_TAG.exec(content) : null;
+  if (match === null) return null;
+  return match[1] === "1" ? { n: 1 } : { n: 2, part: Number(match[2]) };
+}
+
+/**
+ * One step's answer from a K-02 read, as the model splits it (two-step wire form): step 1 the language and each part's
+ * quote and verb; step 2 of part k (from 1) that part's fields, its verb and quote left out; none for a no_op part.
+ */
+function stepAnswer(read: unknown, step: DecideStep): unknown {
+  const parts: unknown[] = isRecord(read) && Array.isArray(read.parts) ? (read.parts as unknown[]) : [];
+  if (step.n === 1) {
+    return {
+      language: isRecord(read) ? read.language : null,
+      parts: parts.map((part) => (isRecord(part) ? { quote: part.quote, verb: part.verb } : part)),
+    };
+  }
+  const part = parts[step.part - 1];
+  if (!isRecord(part) || part.verb === "no_op") return undefined;
+  return Object.fromEntries(Object.entries(part).filter(([key]) => key !== "verb" && key !== "quote"));
+}
+
+/** The paths at which two JSON values differ (at most 8), for a miss's message: field names and places, never values. */
+function differingPaths(a: unknown, b: unknown, path = "", into: string[] = []): string[] {
+  if (into.length >= 8) return into;
+  const here = path === "" ? "(the whole request)" : path;
+  if (isRecord(a) && isRecord(b)) {
+    for (const key of new Set([...Object.keys(a), ...Object.keys(b)]))
+      differingPaths(a[key], b[key], path === "" ? key : `${path}.${key}`, into);
+  } else if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) into.push(`${here} (length)`);
+    else
+      (a as unknown[]).forEach((item, k) =>
+        differingPaths(item, (b as unknown[])[k], `${path}[${String(k)}]`, into),
+      );
+  } else if (JSON.stringify(a) !== JSON.stringify(b)) {
+    into.push(here);
+  }
+  return into;
+}
+
+/** One Messages API call the double answered for a decide read: the model asked, the read and step it was, by whom. */
+export interface DecideModelCall {
+  readonly model: string;
+  /** The reads it was answered from: one role, or both reads of a low-stakes turn, which ask alike on one model. */
+  readonly roles: readonly DecideRole[];
+  readonly step: 1 | 2;
+  /** The recordings that answered it, by id. */
+  readonly recordings: readonly string[];
+}
+
+export interface FakeDecideModels {
+  /**
+   * What the root's real decide port is fed (RootOptions.deciders): @rosie/ai's decider (T-369 createDecider, with T-370's
+   * re-read) for each bundle the double holds, calling a fake Messages API answered by the recorded-model double.
+   */
+  readonly deciders: Deciders;
+  /** Each context decide was given (the frontier's answer), in order. */
+  readonly decideCalls: DecideContext[];
+  /** Each re-read the decider was asked, in order (the turn's, and the AI layer's own for an unmapped turn). */
+  readonly rereadCalls: unknown[];
+  /** Every Messages API call the double answered, in order. */
+  readonly calls: DecideModelCall[];
+  /** Every request the double holds no recording for, with what differs from the nearest recording's request. */
+  readonly misses: string[];
+  /** Every bundle a decider was asked for (`<hash>/<build>`), in order: the port's one decider per bundle. */
+  readonly asked: string[];
+  /** While true, every call answers 529 (overloaded) before any recording is read: the models are down. */
+  down: boolean;
+  /** Keeps a text the Linq double signed this run: its words and send time, for `recordTurn`. */
+  saw(event: LinqInboundEvent): void;
+  /**
+   * Records the two reads of a turn over these texts (in arrival order), as recording 2 holds the JOIN run's: its context
+   * is the JOIN run's (test owner 1's stored state on bundle v0) with the turn's own id (T-248's hash of the event ids)
+   * and texts (as the Linq double signed them: their words and send times), and both Haiku reads enter c-01 with the
+   * first text's words as the quote (decide-s1-01-enter.json's). It may be called before the texts are sent: the
+   * recording is made at the first decide request after they are all signed.
+   */
+  recordTurn(eventIds: readonly string[]): void;
+  /** Holds one more recording: a test's own read of a context (a refused one included, which the loader would refuse). */
+  hold(recording: DecideRecording): void;
+}
+
+/**
+ * @rosie/ai's decide for each bundle (T-369's two reads and T-370's one Sonnet re-read: the real router, decide's one
+ * read, the context bundle and the AI gateway), over K-01's manifests and flows (bundle v0 as bundles/v0 publishes it;
+ * bundle-mini-a), calling a fake Messages API whose every answer comes from the recorded-model double (T-004's
+ * createRecordedModel), keyed as its loader keys a decide recording: the run's own context and the read's role. It holds
+ * ai/recordings' turn 1 recordings as they are (recording 2 is the JOIN run's, keyed on the ids the runtime produces;
+ * DL-347), decide-reads-disagree.json's three reads on its context, and what a test records. Each decide read is told
+ * apart by its role: on the re-read, the re-read's; else by the model the route asks for it (the bundle's policy for the
+ * turn's stakes), and a request both reads ask alike (Haiku twice, one choice) is answered only when both reads' answers
+ * are the same. A request with no recording is a miss: kept, with what differs, and answered 404, so the read fails
+ * loudly, never with a made-up answer. The decider is watched only to know which context and read each request is for
+ * (the double answers one decide or re-read at a time). The key is made up for each run, never Anthropic's.
+ */
+export function fakeDecideModels(log: string[] = []): FakeDecideModels {
+  const held = new Map<string, { output: unknown }>();
+  const ids = new Map<string, string>();
+  const recordings: DecideRecording[] = [];
+  const recorded = createRecordedModel(held);
+  const env = { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` };
+  const signed = new Map<string, { words: string; sentAt: string }>();
+  // The turns a test recorded whose reads are not held yet (`recordTurn`): each one's event ids, in arrival order.
+  const turns: string[][] = [];
+  let reading: { readonly phase: "decide" | "reread"; readonly context: unknown } | null = null;
+  let bundles: ReadonlyMap<string, DecideBundle> | null = null;
+
+  const hold = (recording: DecideRecording): void => {
+    const key = requestKey("decideRead", { context: recording.context, role: recording.role });
+    const known = ids.get(key);
+    if (known !== undefined) {
+      if (canonicalJson(held.get(key)?.output) !== canonicalJson(recording.output))
+        throw new Error(`${recording.id} is keyed on ${known}'s request with another answer`);
+      return;
+    }
+    held.set(key, { output: structuredClone(recording.output) });
+    ids.set(key, recording.id);
+    recordings.push(recording);
+  };
+  for (const recording of [...shippedDecideRecordings(), ...disagreeRecordings()]) hold(recording);
+
+  const answered = (output: unknown): Response =>
+    new Response(
+      JSON.stringify({
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        usage: USAGE,
+      }),
+      { status: 200 },
+    );
+  const failed = (status: number, type: string): Response =>
+    new Response(JSON.stringify({ type: "error", error: { type } }), { status });
+  const miss = (why: string): Response => {
+    models.misses.push(why);
+    return failed(404, "not_found_error");
+  };
+
+  /** What differs between a request and the nearest recording of the same role, for a miss's message. */
+  const nearest = (context: unknown, role: DecideRole): string => {
+    let best: { id: string; paths: string[] } | null = null;
+    for (const recording of recordings.filter((each) => each.role === role)) {
+      const paths = differingPaths(context, recording.context);
+      if (best === null || paths.length < best.paths.length) best = { id: recording.id, paths };
+    }
+    return best === null ? "no recording of that role" : `${best.id} differs at ${best.paths.join(", ")}`;
+  };
+
+  /** The reads of a decide a request on `model` may be: the route's (the bundle's policy for the turn's stakes). */
+  const readsOn = (routing: RoutingBundle, context: unknown, model: string): DecideRole[] => {
+    const { stakes } = turnStakes(context as RoutingContext);
+    const pair = routing.policy[stakes];
+    const id = (role: "haiku" | "sonnet"): string =>
+      role === "haiku" ? routing.models.haiku : routing.models.sonnet;
+    return [
+      ...(id(pair.first) === model ? ["first" as const] : []),
+      ...(id(pair.second) === model ? ["check" as const] : []),
+    ];
+  };
+
+  const fetchFor =
+    (routing: RoutingBundle): FetchLike =>
+    async (_url, init) => {
+      const body = JSON.parse(typeof init.body === "string" ? init.body : "{}") as Record<string, unknown>;
+      const model = typeof body.model === "string" ? body.model : "";
+      if (models.down) return failed(529, "overloaded_error");
+      const now = reading;
+      if (now === null) return miss("a decide request outside a decide or a re-read");
+      const step = stepOf(body);
+      if (step === null) return miss("a decide request with no step tag");
+      const roles: DecideRole[] = now.phase === "reread" ? ["reread"] : readsOn(routing, now.context, model);
+      if (roles.length === 0)
+        return miss(`a decide request on ${model}, which the turn's route asks for no read`);
+      await recordTurns();
+      const answers: { id: string; output: unknown }[] = [];
+      for (const role of roles) {
+        const request = { context: now.context, role };
+        let read: unknown;
+        try {
+          read = await recorded.decide(request as Parameters<RecordedModel["decide"]>[0]);
+        } catch (error) {
+          if (error instanceof NoRecordingError)
+            return miss(`no ${role} read is recorded for the request: ${nearest(now.context, role)}`);
+          throw error;
+        }
+        answers.push({
+          id: ids.get(requestKey("decideRead", request)) ?? "",
+          output: stepAnswer(read, step),
+        });
+      }
+      const [first] = answers;
+      if (first?.output === undefined) return miss(`step ${String(step.n)} of a part its read does not have`);
+      if (new Set(answers.map((answer) => canonicalJson(answer.output ?? null))).size !== 1)
+        return miss("both reads ask alike, but their recordings answer otherwise");
+      models.calls.push({
+        model,
+        roles,
+        step: step.n,
+        recordings: answers.map((answer) => answer.id),
+      });
+      return answered(first.output);
+    };
+
+  /** Runs one decide or re-read of the decider, the double told which context and read its requests are for. */
+  const during = async <T>(
+    phase: "decide" | "reread",
+    context: unknown,
+    run: () => Promise<T>,
+  ): Promise<T> => {
+    if (reading !== null) throw new Error("the decide double answers one decide or re-read at a time");
+    // The context as JSON carries it: what the double keys a request on.
+    reading = { phase, context: JSON.parse(JSON.stringify(context)) as unknown };
+    try {
+      return await run();
+    } finally {
+      reading = null;
+    }
+  };
+
+  const watched = (decider: Decider): Decider =>
+    Object.freeze({
+      bundleId: decider.bundleId,
+      decide(context, options) {
+        models.decideCalls.push(structuredClone(context) as unknown as DecideContext);
+        log.push("decide");
+        return during("decide", context, () => decider.decide(context, options));
+      },
+      reread(request, options) {
+        models.rereadCalls.push(structuredClone(request));
+        log.push("reread");
+        return during("reread", request.context, () => decider.reread(request, options));
+      },
+    } satisfies Decider);
+
+  const models: FakeDecideModels = {
+    decideCalls: [],
+    rereadCalls: [],
+    calls: [],
+    misses: [],
+    asked: [],
+    down: false,
+    deciders(bundleId) {
+      const key = bundleTextOf(bundleId);
+      models.asked.push(key);
+      bundles ??= decideBundles();
+      const bundle = bundles.get(key);
+      if (bundle === undefined) throw new Error(`the decide double holds no bundle ${key}`);
+      const decider = createDecider({
+        bundle: bundle.routing,
+        prompts: createPromptCache(bundle.cache),
+        env,
+        fetch: fetchFor(bundle.routing),
+      });
+      return watched(decider);
+    },
+    saw(event) {
+      if (event.kind === "text" && typeof event.body === "string" && typeof event.sentAt === "string") {
+        signed.set(event.eventId, { words: event.body, sentAt: event.sentAt });
+      }
+    },
+    recordTurn(eventIds) {
+      if (eventIds.length === 0) throw new Error("a turn has at least one text");
+      turns.push([...eventIds]);
+    },
+    hold,
+  };
+
+  /**
+   * Each turn a test recorded, its texts all signed by now, held as its two reads (`recordTurn`): one at a time, so a
+   * request sent beside another (the two reads go side by side) waits for the recording the other one is making.
+   */
+  let recording: Promise<void> = Promise.resolve();
+  const recordTurns = (): Promise<void> => {
+    recording = recording.catch(() => undefined).then(holdRecordedTurns);
+    return recording;
+  };
+  const holdRecordedTurns = async (): Promise<void> => {
+    const base = structuredClone(joinRunContextJson);
+    const zone = base.texts[0]?.sentAt.zone;
+    if (zone === undefined) throw new Error("the JOIN run's context holds its text");
+    for (const eventIds of turns.splice(0)) {
+      const texts = eventIds.flatMap((eventId) => {
+        const text = signed.get(eventId);
+        if (text === undefined) return [];
+        const sentAt = { utc: text.sentAt, zone };
+        return [
+          { eventId, kind: "text", words: text.words, sentAt, attachments: [], poll: null, tapback: null },
+        ];
+      });
+      const [first] = texts;
+      if (first === undefined || texts.length < eventIds.length) {
+        turns.push(eventIds);
+        continue;
+      }
+      const context = { ...base, turnId: await turnIdOf(eventIds), texts };
+      for (const role of ["first", "check"] as const) {
+        hold({ id: `turn-${context.turnId}-${role}`, context, role, output: enterRead(role, first.words) });
+      }
+    }
+  };
+  return models;
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -938,12 +1434,14 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 /** The ports joined so far (./picks.ts): the root builds them itself (./real.ts), fed by the doubles here. */
-type JoinedPort = "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets" | "frontier";
+type JoinedPort =
+  "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets" | "frontier" | "decide";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
-   * read, the turn-row calls, the bundle reads, the targets read and the frontier, which the root builds (./real.ts).
+   * read, the turn-row calls, the bundle reads, the targets read, the frontier and decide, which the root builds
+   * (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -986,8 +1484,11 @@ export interface SkeletonFakes {
    * real frontier port (RootOptions.frontierScope: `frontier.scope`): every read, under the scope its call ran in.
    */
   readonly frontier: FakeFrontierScope;
-  /** K-02's decide on its double: each context it was given (the frontier's answer), and what it answers. */
-  readonly decide: FakeDecide;
+  /**
+   * @rosie/ai's decide over the recorded-model double, for the root's real decide port (RootOptions.deciders:
+   * `decide.deciders`): each context decide was given (the frontier's answer), each re-read, each model call it answered.
+   */
+  readonly decide: FakeDecideModels;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
@@ -1017,10 +1518,9 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const answers: Record<string, SafetyResult> = {};
 
   const face = fakeTurnFace();
-  const ai = fakeDecide(face.log);
+  const decide = fakeDecideModels(face.log);
   const composer = fakeComposer(face.log);
   const rows = fakeRows(face.log);
-  ai.decide = (context) => decided(swap(decideS102, [[S1_02_TURN, context.turnId]]));
   face.gate = (request) => swap(commitS102.outcome, [[S1_02_TURN, request.turn.id]]) as never;
   face.composeInput = (request) =>
     swap(composeInputS102.outcome, [
@@ -1088,7 +1588,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       composeInput: (request, trace) => turnFace.composeInput(request, trace),
       safetyCore: core,
     },
-    decide: decideOf(ai),
     composer: composerOf(composer),
     finalize: { finalizeMessage: (request, trace) => turnFace.finalizeMessage(request, trace) },
     dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
@@ -1100,15 +1599,18 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     clock,
     linqInputs,
     webhooks,
-    sign: (event, partKey = null) =>
-      webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
+    sign: (event, partKey = null) => {
+      // The text's words and send time, for a turn over it that a test records with decide's double.
+      decide.saw(event);
+      return webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey });
+    },
     handleKeys,
     models,
     turnRows,
     bundleReads,
     handleTargets,
     frontier,
-    decide: ai,
+    decide,
     core,
     direct,
     face,

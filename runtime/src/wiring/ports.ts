@@ -25,7 +25,8 @@
 //                recipient's chat and send state, a question's facts
 //   turnFace     the rest of K-09's turn face (closest entries, gate and commit,   T-559, T-560
 //                compose input) and the shared core the safety read calls
-//   decide       K-02's two reads and the one Sonnet re-read                       T-558
+//   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
+//                decider, one per bundle for both
 //   composer     K-03's message plan and its one rewrite                           T-560
 //   finalize     K-09 finalizeMessage: slots, fixed lines, the claim check and     T-561
 //                the message checks
