@@ -20,18 +20,19 @@ For example, the guard (row 5 of 02-contracts section 11, K-01 and K-04) uses `t
 - Each joined row up to the prefix's also holds what its join proved in its own Workers test (`CLAIMS`):
   - receive: the signature is valid and the event id is new;
   - scrub: the actor's inbox entry comes once, on the text's arrival, its words sealed under the key K-05 gave the handle;
-  - the safety read: the JOIN reads No, on one Haiku call, read from the text's arrival;
+  - the safety read: the JOIN reads No, on one Haiku call, read from the text's arrival (its model-call span is the one whose calls are all safety reads);
   - the lease: one batch and one turn, bundle v0 pinned, and the turn's one K-04 row;
   - the guard: no keyword and no target;
-  - the frontier: @rosie/actions' turn face reads test owner 1's stored state once, under Lee's Barbershop's scope, and gives the JOIN `build-frontier-s1-01.json`'s one choice, the sign-up door to S1-01. KV is empty, so its bundle part comes from PostgreSQL's copy, and its one frontier span, under bundle v0's id, says so (the Tool API base's span; the turn records none, CQ-159).
+  - the frontier: @rosie/actions' turn face reads test owner 1's stored state once, under Lee's Barbershop's scope, and gives the JOIN `build-frontier-s1-01.json`'s one choice, the sign-up door to S1-01. KV is empty, so its bundle part comes from PostgreSQL's copy, and its one frontier span, under bundle v0's id, says so (the Tool API base's span; the turn records none, CQ-159);
+  - decide: @rosie/ai's decider, over the recorded-model double's recording 2 (the JOIN run's own context, as `ai/recordings` keys it, DL-347), gives the JOIN turn two Haiku reads, first and check, which agree, and no re-read. Both enter c-01, the sign-up door, with the quote JOIN and no field, as `decide-s1-01-enter.json`'s reads do. The turn records one decideReads span, labels and counts only; each of the reads' four model calls has its own portCall span beside it. Reads that disagree (`decide-reads-disagree.json`: one Sonnet re-read, then one question, nothing committed) are proven in `runtime/src/wiring/hop7.worker.test.ts`, since the JOIN on bundle v0 cannot reach them.
 
 ## Joined so far
 
-Joins 1 to 6 (T-552 to T-557): receive, scrub with the actor's inbox entry, the safety read, the lease, the guard and the frontier. Each later join moves `JOINED_THROUGH` to its row's last hop and adds its row's claims.
+Joins 1 to 7 (T-552 to T-558): receive, scrub with the actor's inbox entry, the safety read, the lease, the guard, the frontier and decide's two reads. Each later join moves `JOINED_THROUGH` to its row's last hop and adds its row's claims.
 
 ## With SKELETON_UPTO unset
 
-`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to the frontier, with every joined row's claims. No contract report is read. Nothing is skipped.
+`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to decide's two reads, with every joined row's claims. No contract report is read. Nothing is skipped.
 
 ## Known gaps (`gaps.ts`)
 

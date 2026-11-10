@@ -226,11 +226,15 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
     expect(Date.parse(read.at)).toBeLessThanOrEqual(arrivalOf(facts).to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
-    // portCall span beside the hops.
+    // portCall span beside the hops. The trace's model-call spans whose calls are all safety reads are the read's; those
+    // holding any other call are decide's, which row 7 holds to its two reads' four calls.
     expect(facts.run.fakes.models.calls).toEqual([{ model: HAIKU_MODEL, text: JOIN_TEXT }]);
     expect(
       facts.judged.trace.spans
-        .filter(isModelCallSpan)
+        .filter(
+          (span) =>
+            isModelCallSpan(span) && (span.model_calls ?? []).every((call) => call.purpose === "safetyRead"),
+        )
         .map((span) => span.model_calls?.map((call) => [call.model, call.purpose])),
     ).toEqual([[[HAIKU_MODEL, "safetyRead"]]]);
     // The actor's own record of the read: done, no danger, no line.
