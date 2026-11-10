@@ -1,7 +1,8 @@
-// Types of the composer's side of the recorded-model double (T-1071, C-123). The composer works at K-03 v1's level
+// Types of the composer's side of the recorded-model double (T-1071, C-123). The composer works at K-03's level
 // (contracts/message-plan/README.md), not K-02's: its input is `$defs/composeInput` and its answer `$defs/plan`. Both are
-// typed as plain JSON here; their one definition is contracts/message-plan/message-plan.v1.schema.json, which the double
-// checks every recording against at load.
+// typed as plain JSON here; their one definition is K-03's schema at the version each recordings file names
+// (message-plan.v1.schema.json, or message-plan.v1.1.schema.json for an input with term facts: T-1175), which the
+// double checks every recording against at load.
 
 import type { JsonObject, RecordedModel } from "./types";
 

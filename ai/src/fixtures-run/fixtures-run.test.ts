@@ -155,17 +155,22 @@ const S1_02_LITERALS: readonly ComposeProblem[] = [
 ];
 
 /**
- * Accepted fixtures the AI layer cannot give on the double yet, each with what it waits for and what the composer gives
- * meanwhile for every input the double holds for it. When the recording lands, the run expects the fixture given.
+ * Accepted fixtures the AI layer cannot give on the double yet, each with what it waits for. When the recording lands,
+ * the run expects the fixture given. None waits now: plan-s1-02.json waited on T-1175 (DL-355), which recorded it for
+ * K-03 v1.1's input-s1-02-v1.1.json and for the JOIN run's input (recording 4), whose term facts hold its 15 and $2.
  */
-const WAITING: Readonly<
-  Record<string, { readonly waitsFor: string; readonly meanwhile: readonly ComposeProblem[] }>
+const WAITING: Readonly<Record<string, { readonly waitsFor: string }>> = {};
+
+/**
+ * Rows the double holds whose plan the composer refuses, each for the reason K-03 names, with the pair K-03 refuses: v1's
+ * input-s1-02.json has no term facts, so plan-s1-02's 15 and $2 are literals no fact holds (literalValue x2), the pair
+ * K-03 v1.1's refuse-plan-s1-02-on-v1-input.json refuses. The double keeps it so the composer's literal check has it to
+ * catch; with S1-02's term facts the same plan is given (composer-s1-02-v1.1, composer-join-s1-02: T-1175).
+ */
+const REFUSED_ROWS: Readonly<
+  Record<string, { readonly pair: string; readonly problems: readonly ComposeProblem[] }>
 > = {
-  "K-03 plan-s1-02.json": {
-    waitsFor:
-      "T-1175 (DL-355): a recording of K-03 v1.1's input-s1-02-v1.1.json, whose term facts hold the plan's 15 and $2; the double holds the plan only for K-03 v1 inputs with no facts (input-s1-02.json, the JOIN run's composer-inputs/join-s1-02.json), and its composer loader reads K-03 v1 alone",
-    meanwhile: S1_02_LITERALS,
-  },
+  "composer-s1-02": { pair: "invalid/refuse-plan-s1-02-on-v1-input.json", problems: S1_02_LITERALS },
 };
 
 /** The definitions none of this card's four stages gives, and whose they are. */
@@ -824,13 +829,17 @@ function slotsOf(plan: MessagePlan): Set<string> {
   );
 }
 
-const COMPOSER_RECORDINGS = RECORDING_FILES["composer.v1.json"].recordings;
+/** The composer's rows the double holds: K-03 v1's file, then K-03 v1.1's (inputs with term facts, T-1175). */
+const COMPOSER_RECORDINGS = [
+  ...RECORDING_FILES["composer.v1.json"].recordings,
+  ...RECORDING_FILES["composer.v1.1.json"].recordings,
+];
 /** Which plan fixtures a recorded row gave, and which it did not. */
 const PLANS_GIVEN = new Map<string, boolean[]>();
 
 describe("the composer (C-118): every row the double holds, one Haiku call each", () => {
   it.each(COMPOSER_RECORDINGS.map((recording) => [recording.id, recording] as const))(
-    "%s: the double's plan passes T-375's four reader checks against its input, and leaves the composer as its K-03 plan, or, for plan-s1-02.json (WAITING on T-1175), is refused for its two literals (literalValue x2)",
+    "%s: the double's plan passes T-375's four reader checks against its input, and leaves the composer as its K-03 plan, or, for plan-s1-02.json on v1's input-s1-02.json (no term facts), is refused for its two literals (literalValue x2), the pair K-03 v1.1 refuses",
     async (_id, recording) => {
       const input = requestOf(recording) as ComposeInput;
       const file = must(recording.seed?.fixture, "the recording's seed");
@@ -842,9 +851,10 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
       expect(readerProblems(asked.answer as unknown as MessagePlan, input)).toEqual([]);
       const run = await composeRow(input, { output: asked.answer, source: asked.source });
       expect(run.wire.map((call) => [call.model, call.answered])).toEqual([[HAIKU_MODEL, true]]);
-      const waiting = WAITING[`K-03 ${file}`];
+      const refused = REFUSED_ROWS[recording.id];
       const given = run.answer.status === "ok";
       PLANS_GIVEN.set(file, [...(PLANS_GIVEN.get(file) ?? []), given]);
+      expect(given, `${recording.id} is given`).toBe(refused === undefined);
       if (given) {
         expect(run.answer).toMatchObject({ model: HAIKU_MODEL, role: "haiku", attempt: 1, fallback: false });
         const plan = planOf(run.answer);
@@ -852,12 +862,14 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
         expect(plans.validate("plan", plan)).toEqual([]);
         expect(planProblems(plan)).toEqual([]);
       } else {
-        // Refused, never a plan: only for a plan WAITING names, for the reason it names.
-        expect(waiting, `${recording.id} is refused`).toBeDefined();
+        // Refused, never a plan: only a row REFUSED_ROWS names, for the reason it names, its input and plan the pair K-03
+        // refuses word for word.
+        const reason = must(refused, `${recording.id}'s reason to be refused`);
+        expect(planFixture(reason.pair)).toEqual({ input, plan: fixture });
         expect(run.answer).toEqual({
           status: "refused",
           stage: "plan",
-          problems: waiting?.meanwhile,
+          problems: reason.problems,
           modelCalls: expect.any(Array) as unknown,
         });
         expect(run.answer).not.toHaveProperty("plan");
@@ -865,7 +877,7 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
     },
   );
 
-  it("each accepted K-03 v1 plan is given by a row the double holds, but for the ones WAITING names (plan-s1-02.json, WAITING on T-1175), which no row gives yet", () => {
+  it("each accepted K-03 v1 plan is given by a row the double holds (plan-s1-02.json by S1-02's rows with term facts, K-03 v1.1's twin and the JOIN run's input: T-1175), but for the ones WAITING names, which no row gives yet", () => {
     const files = (
       planFixture("index.json") as {
         fixtures: { file: string; version: string; def: string; expect: string }[];
@@ -880,9 +892,12 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
       expect(runs.some(Boolean), file).toBe(!waiting);
       mark("K-03", file, waiting ? "waiting" : "given");
     }
+    // plan-s1-02.json's three rows, in the files' order: refused on v1's input-s1-02.json (no term facts), given on K-03
+    // v1.1's input-s1-02-v1.1.json and on the JOIN run's input (recording 4), whose term facts hold its 15 and $2.
+    expect(PLANS_GIVEN.get("plan-s1-02.json")).toEqual([false, true, true]);
   });
 
-  it("input-s1-02.json: the composer takes it (one Haiku call), and the double's plan for it, plan-s1-02.json, is refused for the two literals no fact holds, the pair K-03 v1.1 refuses (refuse-plan-s1-02-on-v1-input.json); the JOIN run's input (recording 4) is the same row", async () => {
+  it("input-s1-02.json: the composer takes it (one Haiku call), and the double's plan for it, plan-s1-02.json, is refused for the two literals no fact holds, the pair K-03 v1.1 refuses (refuse-plan-s1-02-on-v1-input.json); the JOIN run's input (recording 4) is the same row with S1-02's term facts, K-03 v1.1's twin (T-1175)", async () => {
     const input = k03("input-s1-02.json") as ComposeInput;
     expect(input.facts).toEqual([]);
     const run = await composeRow(input);
@@ -897,7 +912,9 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
         "recording 4",
       ),
     ) as ComposeInput;
-    expect({ ...join, row: input.row, turn: input.turn, inbound: input.inbound }).toEqual(input);
+    const twin = planFixture("input-s1-02-v1.1.json") as ComposeInput;
+    expect({ ...twin, facts: [] }).toEqual(input);
+    expect({ ...join, row: input.row, turn: input.turn, inbound: input.inbound }).toEqual(twin);
     mark("K-03", "input-s1-02.json", "taken");
   });
 
