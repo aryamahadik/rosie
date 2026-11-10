@@ -36,6 +36,7 @@ export function closedPorts(): Ports {
       },
     },
     targets: { handleTargets: () => fail("targets") },
+    frontier: { buildFrontier: () => fail("frontier") },
     stateReads: {
       safety: {
         directory: { idsOf: () => fail("stateReads") },
@@ -60,7 +61,6 @@ export function closedPorts(): Ports {
       },
     },
     turnFace: {
-      buildFrontier: () => fail("turnFace"),
       closestEntries: () => fail("turnFace"),
       gateAndCommit: () => fail("turnFace"),
       composeInput: () => fail("turnFace"),

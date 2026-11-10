@@ -62,6 +62,7 @@ export function bindPorts(
       turnRow: take("turnRow"),
       bundles: take("bundles"),
       targets: take("targets"),
+      frontier: take("frontier"),
       stateReads: take("stateReads"),
       turnFace: take("turnFace"),
       decide: take("decide"),

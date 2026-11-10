@@ -1,13 +1,16 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556), under Node (Vitest project "unit"): the
-// ports the root binds in each environment, each once and none left unbound; the check that refuses a port bound twice or
-// left unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's environments
-// still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the
-// safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets; production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557), under Node (Vitest project "unit"):
+// the ports the root binds in each environment, each once and none left unbound; the check that refuses a port bound twice
+// or left unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's
+// environments still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing,
+// T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets, T-557 the frontier;
+// production takes no join yet).
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
-import { describe, expect, it } from "vitest";
+import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
+import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
-import type { ParkTurnRequest } from "../turn/types";
+import { openTrace, type Span } from "../trace";
+import type { BuildFrontierRequest, ParkTurnRequest } from "../turn/types";
 import {
   bindPorts,
   closedPorts,
@@ -27,7 +30,7 @@ import {
   type PortPick,
   type Ports,
 } from "./index";
-import { skeletonFakes } from "./test-support";
+import { BUNDLE_V0, skeletonFakes } from "./test-support";
 
 const VARS = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
 
@@ -41,10 +44,20 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets"],
-  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets"],
+  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier"],
+  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier"],
   production: [],
 };
+
+/** build-frontier-s1-01.json's request (turn 1, Sam's first text) on a trace of its own, under bundle v0. */
+function turnOneOn(traceId: string): BuildFrontierRequest {
+  const request = structuredClone(buildFrontierS101.request) as unknown as BuildFrontierRequest;
+  return {
+    ...request,
+    caller: { ...request.caller, traceId },
+    turn: { ...request.turn, traceId, bundleId: { ...BUNDLE_V0 } },
+  };
+}
 
 /** park-turn.json's request under the turn id the lease hashes from its event ids (CQ-09), as a lapsed turn's park sends it. */
 async function leasePark(): Promise<ParkTurnRequest> {
@@ -53,7 +66,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's thirteen ports in its turn order", () => {
+  it("names D-017's fourteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -61,6 +74,7 @@ describe("the ports the root binds", () => {
       "turnRow",
       "bundles",
       "targets",
+      "frontier",
       "stateReads",
       "turnFace",
       "decide",
@@ -75,7 +89,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads and targets read to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read and frontier to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -261,6 +275,33 @@ describe("the Worker's environments", () => {
       new NoDatabaseError("readActiveBundle"),
     );
   });
+
+  it("fails the frontier closed with no database bound (until T-567): inside the Tool API base, its span failed, nothing read", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    const request = turnOneOn(trace.traceId);
+    trace.setTurn(request.turn.id);
+
+    await expect(root.turn.toolApi.buildFrontier(request, trace)).rejects.toThrow(
+      new NoDatabaseError("readTurnState"),
+    );
+    expect(spans).toMatchObject([
+      {
+        hop: "frontier",
+        outcome: "failed",
+        error_code: "NoDatabaseError",
+        business_id: request.caller.businessId,
+        got: { toolCall: "buildFrontier", callerKind: "turn", bundleParts: [], bundleFrom: [] },
+        decided: { answered: "thrown" },
+      },
+    ]);
+  });
 });
 
 describe("a closed port", () => {
@@ -276,6 +317,9 @@ describe("a closed port", () => {
     );
     await expect(closed.targets.handleTargets({ handleId: "handle-sam" })).rejects.toThrow(
       new NotJoinedError("targets"),
+    );
+    await expect(closed.frontier.buildFrontier({} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("frontier"),
     );
     await expect(closed.decide.decide({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("decide"),
