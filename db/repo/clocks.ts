@@ -69,7 +69,11 @@
 //   8. The sweep's missedBefore may not be after its now (a row is not missed before it is due); the limits are the
 //      schema's (1 to 100 for a handle, 1 to 1000 for the sweep). Rows of equal due time come in id order (collate "C",
 //      compared, never parsed: CQ-09).
+//   9. A firing's state write gives a bytea column (a sealed value) in K-04's text form, "\x" and hex digit pairs, and
+//      it is written as the bytes it spells, as commitTurn's are (commit-turn.ts default 11; bytea.ts; T-1185):
+//      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
+import { byteaFromText } from "./bytea";
 import { NOT_STATE_TABLES } from "./commit-turn";
 import { appendEvent, type EventContext, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
@@ -886,6 +890,8 @@ interface TableInfo {
   readonly name: string;
   readonly columns: ReadonlySet<string>;
   readonly jsonColumns: ReadonlySet<string>;
+  /** The columns of type bytea, whose values come in K-04's text form and are written as their bytes (default 9). */
+  readonly byteaColumns: ReadonlySet<string>;
   readonly key: readonly string[];
   readonly versioned: boolean;
   /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
@@ -926,8 +932,8 @@ function eventContextOf(f: Firing): EventContext {
 }
 
 /**
- * A table's columns, its JSON columns, its primary key and its row-level security, from the catalog: an ordinary table
- * of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
+ * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
+ * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
  */
 async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
   const known = f.tables.get(table);
@@ -935,7 +941,9 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
     return known;
   }
   assertName(FIRE, table, "a table name");
-  const [row] = await f.tx<{ rls: boolean; columns: string[]; json_columns: string[]; key: string[] }[]>`
+  const [row] = await f.tx<
+    { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
+  >`
     select c.relrowsecurity as rls,
            array(select a.attname::text from pg_attribute a
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
@@ -944,6 +952,10 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
                    and a.atttypid in ('json'::regtype, 'jsonb'::regtype)
                  order by a.attnum) as json_columns,
+           array(select a.attname::text from pg_attribute a
+                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+                   and a.atttypid = 'bytea'::regtype
+                 order by a.attnum) as bytea_columns,
            array(select a.attname::text
                  from pg_index i
                  cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
@@ -969,6 +981,7 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
     name: table,
     columns,
     jsonColumns: new Set(row.json_columns),
+    byteaColumns: new Set(row.bytea_columns),
     key: row.key,
     versioned: columns.has("version"),
     scopeColumn,
@@ -1001,7 +1014,29 @@ function businessOf(info: TableInfo, row: Row): string | null {
   return value;
 }
 
-/** Column to value for an insert or an update: JSON columns as JSON, the rest as PostgreSQL text input (K-05 v1). */
+/**
+ * One column's value as postgres.js takes it: null as null, a JSON column's as JSON, a bytea column's as the bytes its
+ * text form spells (default 9: any other form throws, naming the column, never the value), the rest as PostgreSQL text
+ * input (K-05 v1).
+ */
+function columnValue(f: Firing, info: TableInfo, column: string, value: unknown, what: string): unknown {
+  if (value === null) {
+    return null;
+  }
+  if (info.jsonColumns.has(column)) {
+    return f.tx.json(value as Json);
+  }
+  if (info.byteaColumns.has(column)) {
+    const bytes = byteaFromText(value);
+    if (bytes === null) {
+      fail(FIRE, `${what} gives ${info.name}.${column} a value that is not "\\x" and hex digit pairs`);
+    }
+    return bytes;
+  }
+  return value;
+}
+
+/** Column to value for an insert or an update, each as columnValue gives it. */
 function columnValues(f: Firing, info: TableInfo, values: Row, what: string): Record<string, never> {
   const out: Record<string, never> = {};
   for (const [column, value] of Object.entries(values)) {
@@ -1012,9 +1047,7 @@ function columnValues(f: Firing, info: TableInfo, values: Row, what: string): Re
     if (!info.columns.has(column)) {
       fail(FIRE, `${what} names a column ${info.name} does not have`);
     }
-    out[column] = (
-      info.jsonColumns.has(column) && value !== null ? f.tx.json(value as Json) : value
-    ) as never;
+    out[column] = columnValue(f, info, column, value, what) as never;
   }
   if (Object.keys(out).length === 0) {
     fail(FIRE, `${what} writes no column`);
