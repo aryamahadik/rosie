@@ -14,7 +14,12 @@
 //     out a part the text already says; a fixed line is matched whole). Never on an email row: it is a number's line
 //     (RULES 4.3: "The first text a number ever gets"), and no other message carries it;
 //   - the row's other fixed lines, each on its own line after the words, in the port's order: the code text, safety
-//     lines, checked terms and lines RULES quotes, the handling line (S13-45, arch 06, S13-19).
+//     lines, checked terms and lines RULES quotes, the handling line (S13-45, arch 06, S13-19);
+//   - the danger question, K-01's safetyAsk ("Is anyone in danger right now?"), on its own line right after the row's
+//     safety line, once, when a text the row answers holds a label of unknown tense other than No (arch 06 line 329;
+//     S13-24 rule 10; T-1164, CQ-164 d): the rule the handle actor's direct path follows (runtime/src/safety/rules.ts
+//     checkedLineFor, T-1143), since the core's safety record does not choose it (T-1140's handoff 4). See
+//     asksIfInDanger for what readOutboxRow's facts can tell, and dangerQuestionAfter for its place.
 // Poll options are inserted with the parts (rewrite/parts.ts: the step's labels word for word), and the typed options
 // end the words; both stay as they are.
 //
@@ -39,7 +44,10 @@ import {
   OPENER_LINE,
   OPT_OUT_LINE,
   PRIVACY_LINK_LINE,
+  SAFETY_ASK_LINE,
+  SAFETY_LINES,
   STOP_REPLY_LINE,
+  type AnsweredText,
   type FirstTextLines,
   type FixedLineFacts,
 } from "./types";
@@ -106,6 +114,47 @@ function listedLines(lines: readonly string[]): string[] {
   return seen;
 }
 
+/**
+ * Whether a text the row answers holds a label of unknown tense other than No, which adds the danger question (arch 06
+ * line 329: "unknown reads as danger and adds 'Is anyone in danger right now?'"; S13-24 rule 10), as the handle actor's
+ * direct path asks it: a label whose tense is unknown and whose outcome is not No (runtime/src/safety/rules.ts
+ * checkedLineFor, T-1143).
+ *
+ * readOutboxRow gives each text's tenses, one per label, and what holds after code's rules, but not each label's own
+ * outcome (K-34 v1 labels). What holds is each label's danger outcome but an over or joke one, else No, and a trade's
+ * danger word lifts that No to Unsure (ai/src/safety read.ts heldOutcomes, lift.ts afterVerdict). So a label of unknown
+ * tense other than No is always among what holds, and a text asks when one of its tenses is unknown and something other
+ * than No holds (default 1). The one case these facts cannot tell apart, a No label of unknown tense beside a danger
+ * outcome that another label or a danger word gave, asks too, where the actor's path, which reads the labels, asks
+ * nothing: unknown reads as danger (arch 06 line 329; A3-22: "Safe default: unsure is read as danger"). No asks nothing,
+ * nor do known tenses, a read that timed out (no label: CQ-163 b) and a text whose read the scope does not show (null),
+ * as the actor's path asks nothing with no label.
+ */
+export function asksIfInDanger(texts: readonly AnsweredText[]): boolean {
+  return texts.some(
+    ({ outcomes, tenses }) =>
+      (tenses?.includes("unknown") ?? false) && (outcomes?.some((outcome) => outcome !== "No") ?? false),
+  );
+}
+
+/**
+ * The listed lines with the danger question right after the last safety line, once, when the texts the row answers call
+ * for it (asksIfInDanger); a place the port gave it is dropped for this one. Otherwise the lines as listed: no safety
+ * line, or no such label, adds none, and a port that lists the question keeps it where it put it (T-314).
+ */
+export function dangerQuestionAfter(
+  lines: readonly string[],
+  texts: readonly AnsweredText[],
+): readonly string[] {
+  let last = -1;
+  lines.forEach((id, at) => {
+    if (SAFETY_LINES.includes(id)) last = at;
+  });
+  if (last === -1 || !asksIfInDanger(texts)) return lines;
+  const others = (part: readonly string[]): string[] => part.filter((id) => id !== SAFETY_ASK_LINE);
+  return [...others(lines.slice(0, last + 1)), SAFETY_ASK_LINE, ...others(lines.slice(last + 1))];
+}
+
 /** The words with the opener before the first line and each line after on its own line, the last one last. */
 function placed(text: string, before: readonly string[], after: readonly string[]): string {
   const opener = before.join(" ");
@@ -142,7 +191,7 @@ function withLines(
  */
 export function insertFixedLines(parts: FinalParts, row: FinalizeRow, facts: FixedLineFacts): FinalParts {
   const first = firstTextLines(parts.channel, facts);
-  const listed = listedLines(facts.lines);
+  const listed = dangerQuestionAfter(listedLines(facts.lines), facts.answeredTexts);
   const carried = new Set(parts.fixedLines);
   const before = (first.opener ? [OPENER_LINE] : []).filter((id) => !carried.has(id));
   const after = [

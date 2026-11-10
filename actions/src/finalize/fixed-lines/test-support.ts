@@ -8,12 +8,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { CheckLists, FixedLine } from "../checks";
-import type { RecordingRepo } from "../../tool-api/test-support";
+import { contractFile, type RecordingRepo } from "../../tool-api/test-support";
 import type { CallContext } from "../../tool-api";
 import type { FinalParts, FinalizePorts, FinalizeRow, Send } from "../rewrite";
 import { a717Row, bundleLists, fakeRepo, type FakeRepo } from "../rewrite/test-support";
 import { fixedLineInserter } from "./index";
-import type { FixedLineFacts, FixedLinePorts } from "./types";
+import type { AnsweredText, FixedLineFacts, FixedLinePorts } from "./types";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 
@@ -62,6 +62,38 @@ export const HANDLING_LINE: FixedLine = {
 };
 export const SAFETY_ASK = "Is anyone in danger right now?";
 
+/** K-01 v1's safety lines (fixed-lines.json safetyCrisis, A3-25; safetyEmergency, A3-24), word for word. */
+export const SAFETY_CRISIS =
+  "If you're thinking about harming yourself, call or text 988 now. If you're in danger right now, call 911.";
+export const SAFETY_EMERGENCY =
+  "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.";
+
+/** K-02 v1 `safetyOutcome` and `tense`, as readOutboxRow's answered text holds them. */
+type Outcome = NonNullable<AnsweredText["outcomes"]>[number];
+export type Tense = NonNullable<AnsweredText["tenses"]>[number];
+
+/** The part of a K-02 v1 safetyResult fixture readOutboxRow's answered text is made from (K-34 v1 safety_outcomes). */
+interface SafetyResultFixture {
+  readonly eventId: string;
+  readonly read: { readonly labels: readonly { readonly tense: Tense }[] } | null;
+  readonly outcomes: readonly Outcome[];
+}
+
+/**
+ * A K-02 v1 safety fixture's text as K-05 v1.3 readOutboxRow answers it: its event id, the result's outcomes and each
+ * label's tense in the labels' order (K-34 v1 safety_outcomes outcomes and tenses; a timeout has no label), with `change`
+ * laid over it. The fixtures are Alex's texts to Lee's Barbershop (the master's sample cast).
+ */
+export function answeredFrom(file: string, change: Partial<AnsweredText> = {}): AnsweredText {
+  const result = contractFile(`model/fixtures/${file}`) as SafetyResultFixture;
+  return {
+    eventId: result.eventId,
+    outcomes: [...result.outcomes],
+    tenses: (result.read?.labels ?? []).map((label) => label.tense),
+    ...change,
+  };
+}
+
 /** K-01 v1's sample lists with the lines above added (the privacy link, the Spanish opt-out line, the two lines). */
 export function listsWithFirstText(): CheckLists {
   const lists = bundleLists();
@@ -86,11 +118,15 @@ export function firstTextRow(
   };
 }
 
-/** Rosie's first text to a new handle about the row's business: nothing texted before, no opt-out line delivered. */
+/**
+ * Rosie's first text to a new handle about the row's business: nothing texted before, no opt-out line delivered. No text
+ * it answers has a safety read here (T-1164's tests give the texts their reads), so the danger question never applies.
+ */
 export const FIRST_TEXT: FixedLineFacts = {
   textedAboutBusiness: false,
   optOutLineDeliveredAt: null,
   lines: [],
+  answeredTexts: [],
 };
 
 /** The second text: the first was delivered, with the opt-out line on it (phones.optout_line_delivered_at set). */
@@ -98,6 +134,7 @@ export const SECOND_TEXT: FixedLineFacts = {
   textedAboutBusiness: true,
   optOutLineDeliveredAt: "2026-10-23T13:00:21Z",
   lines: [],
+  answeredTexts: [],
 };
 
 /** A slot and the value it took, as K-03 v1's final parts hold it (`fact`: a slot of the vocabulary). */
