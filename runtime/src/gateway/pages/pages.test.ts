@@ -270,6 +270,14 @@ describe("every span the page entry writes is a K-08 v1 span", () => {
       outcome: "refused",
     },
     {
+      name: "a body over the cap (T-1180)",
+      call: "openLink",
+      where: STAGING,
+      body: " ".repeat(PAGE_BODY_LIMIT_BYTES + 1),
+      handlers: recordingPages().handlers,
+      outcome: "refused",
+    },
+    {
       name: "a handler not connected",
       call: "testPhoneParts",
       where: STAGING,
