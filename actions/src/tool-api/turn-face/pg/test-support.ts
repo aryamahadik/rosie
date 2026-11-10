@@ -40,13 +40,19 @@ export interface TurnFaceDatabase {
 }
 
 /**
- * This file's schema and clients (connections per client: `max`), with the fixture's given seeds and then T-1148's seed
- * loaded (see the top). The caller closes it.
+ * This file's schema and clients (connections per client: `max`), with the fixture's given seeds, any `more` K-04 core
+ * seeds (by file name under core/fixtures/: the commit's tests add seed-bundle-registry.json, the row of the bundle the
+ * turn pins, which turns, open_questions and outbox_rows refer to), and then T-1148's seed loaded (see the top). `name`
+ * names the schema. The caller closes it.
  */
-export async function openTurnFaceDatabase(max: number): Promise<TurnFaceDatabase> {
-  const cdb = await openCommitDatabase("turn_face", max);
+export async function openTurnFaceDatabase(
+  max: number,
+  more: readonly string[] = [],
+  name = "turn_face",
+): Promise<TurnFaceDatabase> {
+  const cdb = await openCommitDatabase(name, max);
   try {
-    await seed(cdb, givenSeeds());
+    await seed(cdb, [...givenSeeds(), ...more]);
     const seeded = await seedSkeleton(cdb.db.sql);
     return { cdb, seeded };
   } catch (error) {
