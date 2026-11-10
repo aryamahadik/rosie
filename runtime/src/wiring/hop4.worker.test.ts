@@ -28,13 +28,13 @@ import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { LEASE_MS, MAX_TRIES, QUIET_MS, turnIdOf, type HandleActor } from "../actor";
 import type { InboxEntry } from "../actor/inbox";
-import { BUNDLE_A } from "../bundle/test-support";
 import { actorNameOf } from "../gateway";
 import type { Span } from "../trace";
 import { leaks, spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import { SAM, until } from "../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
+  BUNDLE_V0,
   fakeFlags,
   gateThroughCommit,
   JOIN_TEXT,
@@ -145,7 +145,8 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on and K-05's turn-row calls (the double), its
- * actor ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port.
+ * actor ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port. The
+ * bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle v0 as bundles/v0 publishes it.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -159,6 +160,8 @@ function rig(log: MockInstance): Rig {
     handleKey: fakes.handleKeys.call,
     safetyReaders: fakes.models.readers,
     turnRows: fakes.turnRows.calls,
+    bundleReads: fakes.bundleReads.calls,
+    handleTargets: fakes.handleTargets.call,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
@@ -231,7 +234,7 @@ describe("hop 4 joined: the batch window and the turn lease run on the texts' K-
             handleId: SAM.party.handleId,
             eventIds: [first, second],
             state: "committed",
-            bundleId: BUNDLE_A,
+            bundleId: BUNDLE_V0,
             traceId: firstTrace,
             joinedTraceIds: [secondTrace],
             tries: 1,

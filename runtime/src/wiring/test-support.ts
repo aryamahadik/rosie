@@ -21,9 +21,18 @@
 //                commit-first.json, commit-repeat-same-turn.json and park-turn.json under each running turn's id, and
 //                keeping the one K-04 turns row each turn id is written as; `gateThroughCommit` stands the Tool API's gate
 //                and commit in for a hop's test, its one commit through the root's turn-row port, until T-559
-//   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
-//                Sam's S1-02 targets; Sam's party and ids; each named text's safety result; dispatch/test-support
-//                FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor directory
+//   bundles      joined (T-556): the root binds K-05 v1 item 7's bundle reads through its real bundle port (./real.ts
+//                realBundles). What it is fed comes from here: `fakeBundleReads`, a K-05 double holding bundle v0 as
+//                bundles/v0 publishes it (bundle.kv.json: every part's key and its exact text, the bytes T-569's publish
+//                writes to KV and to PostgreSQL's copy), answering readActiveBundle in active-bundle.json's form with
+//                that bundle's id and readBundleValue in bundle-value-on-miss.json's
+//   targets      joined (T-556): the root binds K-05 v1.2 handleTargets through its real targets port (./real.ts
+//                realTargets). What it is fed comes from here: `fakeHandleTargets`, a K-05 double holding test owner 1's
+//                seeded rows (T-1148, db/seeds/skeleton.ts: handle-sam at the fictional 555-0100, person-sam, no role, no
+//                phone row), answering for that handle as targets-first-text.json and notFound for any other
+//   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
+//                dispatch/test-support FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor
+//                directory
 //   turnFace     turn/test-support fakeTurnFace (frontier, gate, compose input from the S1-02 fixtures) and
 //                safety/test-support fakeCore
 //   decide       turn/test-support fakeDecide (decide-s1-02-choose.json)
@@ -47,9 +56,11 @@ import { requestKey } from "@rosie/ai/src/recorded-double/key";
 import type { RecordedModel } from "@rosie/ai/src/recorded-double/types";
 import { createSafetyReader, SAFETY_READ_PROMPT, type SafetyReader } from "@rosie/ai/src/safety/index";
 import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
+import activeBundleJson from "@rosie/contracts/data-access/fixtures/active-bundle.json";
 import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.json";
 import commitRepeatJson from "@rosie/contracts/data-access/fixtures/commit-repeat-same-turn.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
+import targetsFirstTextJson from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
 import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
@@ -57,19 +68,24 @@ import buildFrontierS102 from "@rosie/contracts/tool-api/fixtures/build-frontier
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
+import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
-import type { TransientError } from "@rosie/db/repo/targets";
+import type {
+  HandleTargetsOutcome,
+  HandleTargetsRequest as K05HandleTargetsRequest,
+  TransientError,
+} from "@rosie/db/repo/targets";
 
+import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
 import type { CommitTurnRef } from "../actor";
-import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
-import { fakeTargets, type FakeTargets } from "../guard/test-support";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
+import type { BundleId } from "../trace";
 import {
   composerOf,
   decided,
@@ -82,8 +98,6 @@ import {
   rowsOf,
   safetyNoFor,
   SAM,
-  SAM_S1_02_TARGETS,
-  targetsAnswer,
   turnFaceOf,
   unplannedRow,
   type FakeTurnFace,
@@ -91,8 +105,10 @@ import {
 import type { GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
 import type { Ports } from "./ports";
 import type {
+  BundleReadCalls,
   CommitTurnCall,
   HandleSealingKeyCall,
+  HandleTargetsCall,
   LinqVerifyInputs,
   SafetyReaders,
   TurnRowCalls,
@@ -242,13 +258,16 @@ export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
 
 /** Sam's JOIN, his first text (D-017's human test; S1-01), as the e2e skeleton sends it. */
 export const JOIN_TEXT = "JOIN";
+/** A bare HELP, one of bundle v0's keywords (K-01 lists.keywords.help): the guard's code path (T-556's proof). */
+export const HELP_TEXT = "HELP";
 /** Sam's words in the runtime's skeleton trace test (./root.worker.test.ts). */
 export const SAM_TRADES_TEXT = "Barbershop, plumbing, electrical";
 
 /**
  * The skeleton's safety recordings, in T-004's form (ai/recordings): each text the wiring's tests send to the safety read,
- * seeded from K-02 v1's safety-no.json, so each reads No. Synthetic words only: Sam's JOIN and trades, and K-06
- * text-imessage.json's body (rule 9).
+ * seeded from K-02 v1's safety-no.json, so each reads No. Synthetic words only: Sam's JOIN, a bare HELP and his trades,
+ * and K-06 text-imessage.json's body (rule 9). Every raw text is read on arrival, a keyword text too (arch 02 step S):
+ * the guard's code path for a keyword comes after that read.
  */
 export const SKELETON_SAFETY_RECORDINGS = {
   version: "v1",
@@ -258,6 +277,12 @@ export const SKELETON_SAFETY_RECORDINGS = {
       id: "skeleton-join",
       kind: "safetyRead",
       request: { text: JOIN_TEXT },
+      seed: { fixture: "safety-no.json" },
+    },
+    {
+      id: "skeleton-help",
+      kind: "safetyRead",
+      request: { text: HELP_TEXT },
       seed: { fixture: "safety-no.json" },
     },
     {
@@ -539,6 +564,159 @@ export function gateThroughCommit(
   };
 }
 
+// ---- K-05 v1 item 7's bundle reads, as a double: bundle v0 as bundles/v0 publishes it (T-556) ----------------------
+
+/**
+ * Bundle v0's parts by K-01 key, each its text byte for byte: bundles/v0/bundle.kv.json, the bulk file T-163's publish
+ * writes beside PostgreSQL's copy, from the same files (T-569 publishes them on staging).
+ */
+const BUNDLE_V0_PARTS: ReadonlyMap<string, string> = new Map(
+  bundleV0Kv.map((part) => [part.key, part.value] as const),
+);
+
+/** The id bundle v0's published manifest names, under its own manifest key (its content hash, build 1). */
+function bundleIdOfParts(parts: ReadonlyMap<string, string>): BundleId {
+  for (const [key, text] of parts) {
+    if (!key.endsWith("/manifest")) continue;
+    const named = (JSON.parse(text) as { bundleId?: { hash?: unknown; build?: unknown } }).bundleId;
+    const hash = named?.hash;
+    const build = named?.build;
+    if (
+      typeof hash === "string" &&
+      typeof build === "number" &&
+      key === bundleKeyOf({ hash, build }, "manifest")
+    ) {
+      return { hash, build };
+    }
+  }
+  throw new Error("bundles/v0 holds no manifest under its own bundle id");
+}
+
+/** A K-01 v1 key, spelled out here for the double: bundle/<hash>/<build>/<part>. */
+function bundleKeyOf(bundleId: BundleId, part: string): string {
+  return `bundle/${bundleId.hash}/${String(bundleId.build)}/${part}`;
+}
+
+/** Bundle v0's id, as bundles/v0 publishes it: the bundle the test environment's bundle port holds active. */
+export const BUNDLE_V0: BundleId = bundleIdOfParts(BUNDLE_V0_PARTS);
+
+/** A K-01 value's kind, from its key's part: the manifest, a flow graph or a trade overlay. */
+function kindOfKey(key: string): StoredText["kind"] {
+  const part = key.split("/").slice(3).join("/");
+  if (part === "manifest") return "manifest";
+  return part.startsWith("trade/") ? "trade" : "flow";
+}
+
+/** One value as PostgreSQL's copy stores it (K-05 v1 storedText): its size in UTF-8 bytes and its sha256, by WebCrypto. */
+async function storedTextOf(key: string, text: string): Promise<StoredText> {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  const sha256 = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  return { key, kind: kindOfKey(key), bytes: data.byteLength, sha256, text };
+}
+
+export interface FakeBundleReads {
+  /** What the root's real bundle port is fed (RootOptions.bundleReads): K-05's two reads over bundle v0's copy. */
+  readonly calls: BundleReadCalls;
+  /** Every call, in order, with the key it asked for (null for readActiveBundle). */
+  readonly reads: { readonly call: "readActiveBundle" | "readBundleValue"; readonly key: string | null }[];
+}
+
+/**
+ * K-05 v1 item 7's readActiveBundle and readBundleValue as a double over PostgreSQL's copy of bundle v0, as bundles/v0
+ * publishes it, with bundle v0 active: readActiveBundle answers in active-bundle.json's form with bundle v0's id and
+ * manifest key (its activatedAt the fixture's); readBundleValue answers in bundle-value-on-miss.json's form, each value's
+ * text byte for byte with its size and sha256 as the publish stores them, and notFound for a key the copy does not hold.
+ */
+export function fakeBundleReads(): FakeBundleReads {
+  const reads: { call: "readActiveBundle" | "readBundleValue"; key: string | null }[] = [];
+  return {
+    reads,
+    calls: {
+      readActiveBundle() {
+        reads.push({ call: "readActiveBundle", key: null });
+        const answer: ReadActiveBundleResult = {
+          result: "active",
+          bundleId: { ...BUNDLE_V0 },
+          manifestKey: bundleKeyOf(BUNDLE_V0, "manifest"),
+          activatedAt: activeBundleJson.outcome.activatedAt,
+        };
+        return Promise.resolve(answer);
+      },
+      async readBundleValue(request): Promise<ReadBundleValueResult> {
+        reads.push({ call: "readBundleValue", key: request.key });
+        const text = BUNDLE_V0_PARTS.get(request.key);
+        if (text === undefined) return { error: "notFound", table: "bundle_values", rowId: request.key };
+        return { result: "value", value: await storedTextOf(request.key, text) };
+      },
+    },
+  };
+}
+
+// ---- K-05 v1.2 handleTargets, as a double: test owner 1's seeded rows (T-556) ------------------------------------
+
+/** A handle and its one linked person as a seed writes them (K-04 handles, persons, person_handles). */
+export interface SeededHandle {
+  readonly handle: { readonly kind: string; readonly address: string };
+  readonly handleId: string;
+  readonly personId: string;
+}
+
+/**
+ * Test owner 1 as T-1148's seed writes K-04 for D-017 (db/seeds/skeleton.ts TEST_OWNER_1 and SKELETON_ROWS; K-21
+ * test-roster.json's tp-01): handle-sam at the fictional 555-0100, linked to person-sam, under Lee's Barbershop's business
+ * head, with no role, no open question, no booking, no phone row and no sealing key, so his JOIN is a first text.
+ */
+export const TEST_OWNER_1 = {
+  handle: { kind: SAM.handle.kind, address: SAM.handle.address },
+  handleId: SAM.party.handleId,
+  personId: SAM.party.personId,
+  businessId: SAM.party.businessId,
+} as const;
+
+/** targets-first-text.json's own handle and person, which the double answers under the seeded handle's ids. */
+const FIRST_TEXT_HANDLE = targetsFirstTextJson.request.handleId;
+const FIRST_TEXT_PERSON = firstTextPerson();
+
+function firstTextPerson(): string {
+  const personId = targetsFirstTextJson.outcome.persons[0]?.personId;
+  if (personId === undefined) throw new Error("targets-first-text.json names no person");
+  return personId;
+}
+
+export interface FakeHandleTargets {
+  /** What the root's real targets port is fed (RootOptions.handleTargets): K-05 v1.2 handleTargets over the seeded rows. */
+  readonly call: HandleTargetsCall;
+  /** Every request, in order. */
+  readonly requests: K05HandleTargetsRequest[];
+}
+
+/**
+ * K-05 v1.2 handleTargets as a double over a seed's rows, by default test owner 1's (T-1148): for a seeded handle, whose one
+ * person has no role, no open question, no booking and no phone row, it answers as targets-first-text.json does, under
+ * that handle's and person's ids (T-1148's integration test shows that the seeded rows give exactly that answer from the
+ * real handleTargets on local PostgreSQL); for any other handle, K-05's notFound.
+ */
+export function fakeHandleTargets(seeded: readonly SeededHandle[] = [TEST_OWNER_1]): FakeHandleTargets {
+  const byHandle = new Map(seeded.map((entry) => [entry.handleId, entry] as const));
+  const requests: K05HandleTargetsRequest[] = [];
+  return {
+    requests,
+    call(request) {
+      requests.push(structuredClone(request));
+      const found = byHandle.get(request.handleId);
+      if (found === undefined) {
+        return Promise.resolve({ error: "notFound", table: "handles", rowId: request.handleId });
+      }
+      const answer = swap(targetsFirstTextJson.outcome, [
+        [FIRST_TEXT_HANDLE, found.handleId],
+        [FIRST_TEXT_PERSON, found.personId],
+      ]);
+      return Promise.resolve(answer as unknown as HandleTargetsOutcome);
+    },
+  };
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -598,12 +776,15 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
   return JSON.parse(text) as T;
 }
 
+/** The ports joined so far (./picks.ts): the root builds them itself (./real.ts), fed by the doubles here. */
+type JoinedPort = "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets";
+
 export interface SkeletonFakes {
   /**
-   * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety read
-   * and the turn-row calls, which the root builds (./real.ts).
+   * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
+   * read, the turn-row calls, the bundle reads and the targets read, which the root builds (./real.ts).
    */
-  readonly ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead" | "turnRow">;
+  readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
   /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
   readonly linqInputs: LinqVerifyInputs;
@@ -629,13 +810,21 @@ export interface SkeletonFakes {
    * every request, and the one turns row each turn id was written as.
    */
   readonly turnRows: FakeTurnRows;
+  /**
+   * K-05 v1 item 7's bundle reads as a double over bundle v0 as bundles/v0 publishes it, for the root's real bundle port
+   * (RootOptions.bundleReads: `bundleReads.calls`): every read, in order.
+   */
+  readonly bundleReads: FakeBundleReads;
+  /**
+   * K-05 v1.2 handleTargets as a double over test owner 1's seeded rows, for the root's real targets port
+   * (RootOptions.handleTargets: `handleTargets.call`): every request, in order.
+   */
+  readonly handleTargets: FakeHandleTargets;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
   readonly direct: FakeDirect;
   readonly face: FakeTurnFace;
-  readonly targets: FakeTargets;
-  readonly bundles: FakeBundles;
   readonly store: FakeOutboxStore;
   readonly linq: FakeLinq;
   readonly arming: WiredArming;
@@ -651,6 +840,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const handleKeys = fakeHandleKeys(() => clock.now());
   const models = fakeSafetyModels(skeletonSafetyDouble());
   const turnRows = fakeTurnRows();
+  const bundleReads = fakeBundleReads();
+  const handleTargets = fakeHandleTargets();
   const core = fakeCore(clock);
   const direct = fakeDirect(clock);
   // Read when each call is made: the turn's commit records what `known` set by then.
@@ -673,9 +864,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   rows.unplanned = () => ({ result: "rows", rows: [unplannedRow(SKELETON_ROW, 1, SAM.party.handleId)] });
   const turnFace = turnFaceOf(face);
 
-  const targets = fakeTargets();
-  targets.answers.set(SAM.party.handleId, targetsAnswer(SAM.party.handleId, SAM_S1_02_TARGETS));
-  const bundles = fakeBundles();
   const store = new FakeOutboxStore([
     {
       id: SKELETON_ROW,
@@ -699,15 +887,13 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
   };
 
-  const ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead" | "turnRow"> = {
+  const ports: Omit<Ports, JoinedPort> = {
     stateReads: {
-      bundles: bundles.deps,
       safety: {
         directory: { idsOf: () => Promise.resolve(SAM_IDS) },
         bundle: fixtureBundle(),
         isStopped: () => false,
       },
-      targets: targets.port,
       turn: {
         directory: { partyOf: () => Promise.resolve(SAM.party) },
         safety: {
@@ -752,11 +938,11 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     handleKeys,
     models,
     turnRows,
+    bundleReads,
+    handleTargets,
     core,
     direct,
     face,
-    targets,
-    bundles,
     store,
     linq,
     arming,

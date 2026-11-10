@@ -60,6 +60,8 @@ export function bindPorts(
       sealing: take("sealing"),
       safetyRead: take("safetyRead"),
       turnRow: take("turnRow"),
+      bundles: take("bundles"),
+      targets: take("targets"),
       stateReads: take("stateReads"),
       turnFace: take("turnFace"),
       decide: take("decide"),

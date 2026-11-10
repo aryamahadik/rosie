@@ -8,7 +8,9 @@
 // Since T-554 joined the safety read, each text's read on arrival goes through @rosie/ai's safety read over the
 // recorded-model double (./test-support.ts fakeSafetyModels, which holds each text these tests send); its model-call span
 // (a portCall to provider anthropic, one per try) sits in the text's trace beside the hops, is set aside from the hop
-// count as the actor's own receive span is, and is checked on its own.
+// count as the actor's own receive span is, and is checked on its own. Since T-556 joined the bundle reads and the
+// guard's targets, the turn pins bundle v0 as bundles/v0 publishes it (./test-support.ts fakeBundleReads, a K-05
+// double), and the guard reads test owner 1's seeded targets (fakeHandleTargets, as targets-first-text.json answers).
 // Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
 // receipt door marks the part delivered and arms its clock.
 //
@@ -31,7 +33,6 @@ import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import type { HandleActor } from "../actor";
-import { BUNDLE_A } from "../bundle/test-support";
 import { A7_03_DELIVERED } from "../clocks/arming-support";
 import { actorNameOf } from "../gateway";
 import { createWorker } from "../index";
@@ -40,6 +41,7 @@ import { checkHops, hopsOfTrace, leaks, spansOfLogLines, spansOfTrace } from "..
 import { SAM, until } from "../turn/test-support";
 import { composeRoot, type HandleActors, type Root } from "./index";
 import {
+  BUNDLE_V0,
   SAM_CHAT,
   SAM_TRADES_TEXT,
   SKELETON_ROW,
@@ -165,6 +167,9 @@ function rig(log: MockInstance): Run {
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
     safetyReaders: fakes.models.readers,
+    // The bundle and targets ports (T-556) on their K-05 doubles: bundle v0 as bundles/v0 publishes it is active.
+    bundleReads: fakes.bundleReads.calls,
+    handleTargets: fakes.handleTargets.call,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);
@@ -290,9 +295,9 @@ describe("through the composition root, every port on its fake: a text's webhook
         ).toEqual([[1, "ok", "safetyRead"]]);
         expect(run.fakes.models.calls).toEqual([{ model: "claude-haiku-5-5", text: words }]);
 
-        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span.
+        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v0's).
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-          new Set([JSON.stringify(BUNDLE_A)]),
+          new Set([JSON.stringify(BUNDLE_V0)]),
         );
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
         expect(run.fakes.face.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
