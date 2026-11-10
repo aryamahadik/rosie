@@ -4,7 +4,7 @@
 // `reset()` after each test, `evictDurableObject` for a restart. Test values only (rule 9).
 import { evictDurableObject, reset, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import delivered from "../../../contracts/inbound-event/fixtures/delivered.json";
 import duplicateEvent from "../../../contracts/inbound-event/fixtures/duplicate-event.json";
@@ -14,6 +14,7 @@ import reactionFromCustomer from "../../../contracts/inbound-event/fixtures/reac
 import reactionFromRosie from "../../../contracts/inbound-event/fixtures/reaction-from-rosie.json";
 import sent from "../../../contracts/inbound-event/fixtures/sent.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
+import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
 import {
   durableObjectActor,
   prepareHandoff,
@@ -23,7 +24,18 @@ import {
   type SealedHandoff,
 } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
-import { setReceiptHooks, type HandleActor, type InboxEntry, type ReceiptHandoff } from "./index";
+import { harness } from "../safety/test-support";
+import type { SafetyResult } from "../safety/types";
+import { logSink, openTrace, type Span, type TraceContext } from "../trace";
+import { spansOfLogLines, spansOfTrace } from "../trace/hop-check";
+import {
+  setBatchHooks,
+  setReceiptHooks,
+  setSafetyDeps,
+  type HandleActor,
+  type InboxEntry,
+  type ReceiptHandoff,
+} from "./index";
 
 type Json = Record<string, unknown>;
 
@@ -313,5 +325,115 @@ describe("refusals and logs", () => {
         .map((row) => row.name),
     );
     expect(tables).toEqual(["inbox", "seen_receipts"]);
+  });
+});
+
+describe("the actor's receive span: K-08's `at` is when the call started and `ms` how long it took, on the actor's clock (T-1170)", () => {
+  /** An instant before any run of this file: a span stamped on the Workers clock instead would start after every span here. */
+  const T0 = Date.parse("2026-10-19T14:01:50.100Z");
+  const utc = (ms: number): string => new Date(ms).toISOString();
+
+  /** The spans logged on the test's trace, in the order K-08 judges them: by when each started, then as written. */
+  function traceOf(log: MockInstance): Span[] {
+    return spansOfTrace(spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0])), TRACE);
+  }
+
+  /** delivered.json as the gateway would hand it if it ever routed one here: scrubbed, no words, nothing sealed. */
+  function deliveredReceipt(): SealedHandoff {
+    return {
+      event: { ...delivered, sealed: null },
+      partKey: "part-r",
+      traceId: TRACE,
+      bundleId: BUNDLE,
+      actorName: ALEX,
+    };
+  }
+
+  it("a receipt's: `at` is the clock as the call began and `ms` the call's length, and each span its hooks write starts after it and ends inside it", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    // The actor's clock, moved only by the hooks: the dispatcher's takes 250 ms, then marks the part delivered in 40 ms; the
+    // clock arming's arms at once, then takes 10 ms. Each hook writes its span on the receipt's trace, on the same clock.
+    let now = T0;
+    const traceFor = (receipt: ReceiptHandoff): TraceContext =>
+      openTrace({
+        openedBy: "textWebhook",
+        bundleId: receipt.bundleId,
+        incomingTraceId: receipt.traceId,
+        sink: logSink({ environment: "test", version: "test" }),
+        now: () => now,
+      });
+    const restores = [
+      setBatchHooks({ clock: { now: () => now } }),
+      setReceiptHooks({
+        toDispatcher(receipt) {
+          now += 250;
+          const span = traceFor(receipt).start("delivered");
+          now += 40;
+          span.finish({ outcome: "ok", provider: "linq", eventId: receipt.event.eventId });
+        },
+        toClockArming(receipt) {
+          traceFor(receipt).record({ hop: "clockArmed", ms: 0, outcome: "ok" });
+          now += 10;
+        },
+      }),
+    ];
+    try {
+      expect(await door().accept(deliveredReceipt())).toBe("written");
+
+      // Judged in start order, the actor's span comes first, though it was written last, as the call answered.
+      const trace = traceOf(log);
+      expect(trace.map((span) => span.hop)).toEqual(["receive", "delivered", "clockArmed"]);
+      const [receive, ...inside] = trace;
+      if (receive === undefined) throw new Error("no receive span");
+      expect(receive).toMatchObject({
+        at: utc(T0),
+        ms: 300,
+        outcome: "ok",
+        got: { door: "handleActor", route: "receipt", kind: "delivered" },
+      });
+      expect(inside.map((span) => [span.at, span.ms])).toEqual([
+        [utc(T0 + 250), 40],
+        [utc(T0 + 290), 0],
+      ]);
+      const start = Date.parse(receive.at);
+      for (const span of inside) {
+        expect(Date.parse(span.at)).toBeGreaterThan(start);
+        expect(Date.parse(span.at) + span.ms).toBeLessThanOrEqual(start + receive.ms);
+      }
+    } finally {
+      for (const restore of restores.reverse()) restore();
+    }
+  });
+
+  it("a text's: `at` is the clock as the call began, and the safety read the call starts, on that clock, starts no earlier and inside it", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const answer = safetyNo as unknown as SafetyResult;
+    // One clock for the actor and its safety read, as the composition root gives them (runtime/src/wiring root.ts install);
+    // the read answers No 1500 ms after it is asked.
+    const h = harness(keys, { [answer.eventId]: answer }, { delayMs: 1500 });
+    const restores = [setSafetyDeps(h.deps), setBatchHooks({ clock: h.clock })];
+    try {
+      await h.clock.advance(T0);
+      expect(await door().accept(await handoffOf(textImessage, { eventId: answer.eventId }))).toBe("written");
+      expect(h.read.requests.map((request) => request.eventId)).toEqual([answer.eventId]);
+      await h.clock.advance(1500);
+      await stubOf(ALEX).safetyIdle();
+
+      const trace = traceOf(log);
+      expect(trace.map((span) => span.hop)).toEqual(["receive", "safetyRead"]);
+      const [receive, read] = trace;
+      if (receive === undefined || read === undefined) throw new Error("no receive or safetyRead span");
+      expect(receive).toMatchObject({
+        at: utc(T0),
+        outcome: "ok",
+        got: { door: "handleActor", route: "inbox", kind: "text" },
+        decided: { stored: true, startsTurn: true },
+      });
+      expect(read).toMatchObject({ at: utc(T0), ms: 1500, outcome: "ok", event_id: answer.eventId });
+      expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(receive.at));
+      expect(Date.parse(read.at)).toBeLessThanOrEqual(Date.parse(receive.at) + receive.ms);
+    } finally {
+      for (const restore of restores.reverse()) restore();
+    }
   });
 });

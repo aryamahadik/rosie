@@ -303,7 +303,10 @@ export class HandleActor extends DurableObject {
    * event id was known and nothing changed. A throw means nothing was kept: the gateway answers 503.
    */
   async accept(handoff: SealedHandoff): Promise<StoreAnswer> {
-    const started = Date.now();
+    // The receive span's start (K-08: `at` is when the hop started; T-1170), read once as the call begins, on the
+    // actor's clock (its batch window's, which the composition root gives the safety read too): no span begun inside
+    // this call, such as the safety read's, starts before it when spans are judged in start order.
+    const started = actorClock().now();
     const route = checkHandoff(handoff);
     let answer: StoreAnswer;
     if (route === "inbox") {
@@ -334,7 +337,7 @@ export class HandleActor extends DurableObject {
     } else {
       answer = await this.passReceipt(handoff);
     }
-    this.recordSpan(handoff, route, answer, Date.now() - started);
+    this.recordSpan(handoff, route, answer, started);
     return answer;
   }
 
@@ -683,14 +686,18 @@ export class HandleActor extends DurableObject {
     return "written";
   }
 
-  /** One K-08 `receive` span for the actor's part of the hop; a span the contract refuses is not logged and changes nothing. */
+  /**
+   * One K-08 `receive` span for the actor's part of the hop, on the actor's clock: `at` is `started`, read as the
+   * call began, and `ms` runs from then to its answer. A span the contract refuses is not logged and changes nothing.
+   */
   private recordSpan(
     handoff: SealedHandoff,
     route: "inbox" | "receipt",
     answer: StoreAnswer,
-    ms: number,
+    started: number,
   ): void {
     try {
+      const ms = Math.max(0, actorClock().now() - started);
       const sink: SpanSink = logSink({
         environment: this.env.ENVIRONMENT,
         version: this.env.GIT_SHA ?? "unknown",
@@ -705,6 +712,7 @@ export class HandleActor extends DurableObject {
       const stored = answer === "written" && route === "inbox";
       context.record({
         hop: "receive",
+        at: new Date(started).toISOString(),
         ms,
         outcome: answer === "duplicate" ? "dropped" : "ok",
         provider: "linq",
