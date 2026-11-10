@@ -13,6 +13,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FrontierError } from "../assemble/handler";
+import { openQuestionsSource } from "../sources/open-questions";
 import {
   BUNDLE_V0,
   checks,
@@ -271,6 +272,8 @@ describe("only the facts the context's choices need", () => {
       {
         seed,
         bundles: fakeBundles(MINI_A),
+        // The open questions' slot alone (DL-361): this test is about their options' facts, not the doors T-1147 wired.
+        sources: [{ name: "openQuestions", source: openQuestionsSource }],
         facts: {
           homes,
           sources: [
