@@ -26,11 +26,12 @@ export interface HandleRef {
 export type SealingKey = Uint8Array | CryptoKey;
 
 /**
- * The handle's sealing key store. `getOrCreateKey` answers the handle's 32-byte data key (AES-256), making it on first
- * sight. A throw means no key: the gateway answers 503 and writes nothing.
+ * The handle's sealing key store. `getOrCreateKey` answers the handle's data key (AES-256), making it on first sight:
+ * the key object K-05 v1.2 `handleSealingKey` hands over (the real port, T-553), or 32 raw bytes (every double's). A
+ * throw means no key: the gateway answers 503 and writes nothing.
  */
 export interface SealingKeyStore {
-  getOrCreateKey(handle: HandleRef): Promise<Uint8Array>;
+  getOrCreateKey(handle: HandleRef): Promise<SealingKey>;
 }
 
 /** The sealed form stored in place of the words. */

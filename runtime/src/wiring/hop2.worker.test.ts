@@ -4,8 +4,11 @@
 // staging) and the skeleton flag on, and each webhook goes in through root.linqWebhook. K-06's text-imessage.json, signed
 // by the Linq double, is verified, scrubbed, sealed under the handle's key and handed to that handle's Durable Object: one
 // entry in its ordered inbox, the words only sealed (unreadable without the key), one actor span after the gateway's;
-// duplicate-event.json adds no entry and is answered 200. The actor's own ports are not installed: hop 2 ends at the inbox
-// (the safety read is T-554's). Then the Worker's wiring (DL-313 ruling 2): its actor ports are wired on its first
+// duplicate-event.json adds no entry and is answered 200. The key is the one the root's real sealing port gets from K-05
+// v1.2 handleSealingKey, here the K-05 double answering as the handle-key-*.json fixtures (DL-313 ruling 4, DL-324): a
+// key object that cannot be exported. With no K-05 call handed in, as on staging until T-567 binds its database, the
+// verified text is answered 503 and nothing reaches the inbox. The actor's own ports are not installed: hop 2 ends at the
+// inbox (the safety read is T-554's). Then the Worker's wiring (DL-313 ruling 2): its actor ports are wired on its first
 // request where HANDLE_ACTOR is bound, and nothing is wired where it is not. Test values only (rule 9).
 import duplicateFixture from "@rosie/contracts/inbound-event/fixtures/duplicate-event.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
@@ -21,6 +24,7 @@ import type { Span } from "../trace";
 import { spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import {
   composeRoot,
+  SEALING_WRAP_KEY,
   SKELETON_FLAG,
   unwireWorker,
   wiredRoot,
@@ -93,6 +97,7 @@ function rig(log: MockInstance): Rig {
     vars: env,
     clock: fakes.clock,
     linq: fakes.linqInputs,
+    handleKey: fakes.handleKeys.call,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   return {
@@ -100,6 +105,11 @@ function rig(log: MockInstance): Rig {
     post: async (event) => root.linqWebhook(webhookRequest(await fakes.sign(event))),
     spans: () => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0])),
   };
+}
+
+/** The log lines written so far, parsed. */
+function linesOf(log: MockInstance): Record<string, unknown>[] {
+  return log.mock.calls.map((call: unknown[]) => JSON.parse(String(call[0])) as Record<string, unknown>);
 }
 
 function traceIdOf(response: Response): string {
@@ -133,11 +143,21 @@ describe("hop 2 joined: a verified text reaches the HandleActor through its name
     expect(JSON.stringify(entry)).not.toContain(BODY);
     const sealed = entry.event.sealed;
     if (sealed === null) throw new Error("the words were not sealed");
-    expect(run.fakes.keys.asked).toEqual([TEXT.handle]);
+    // K-05 was asked once, for this handle, with new ids and the wrapping key by its name; its key is a key object.
+    expect(run.fakes.handleKeys.requests).toEqual([
+      {
+        handle: TEXT.handle,
+        newHandleId: expect.stringMatching(/^handle-/) as unknown,
+        newPersonId: expect.stringMatching(/^person-/) as unknown,
+        wrappingKeyName: SEALING_WRAP_KEY,
+      },
+    ]);
+    const key = run.fakes.handleKeys.keyOf(TEXT.handle.address);
+    expect({ type: key.type, extractable: key.extractable }).toEqual({ type: "secret", extractable: false });
     await expect(
       openWords(sealed, crypto.getRandomValues(new Uint8Array(32)), ACTOR, TEXT.eventId),
     ).rejects.toThrow();
-    expect((await openWords(sealed, run.fakes.keys.keyOf(TEXT.handle), ACTOR, TEXT.eventId)).body).toBe(BODY);
+    expect((await openWords(sealed, key, ACTOR, TEXT.eventId)).body).toBe(BODY);
 
     const trace = spansOfTrace(run.spans(), traceId);
     const gateway = trace.filter((span) => !actorSpan(span));
@@ -169,6 +189,28 @@ describe("hop 2 joined: a verified text reaches the HandleActor through its name
     const repeat = spansOfTrace(run.spans(), traceIdOf(again)).filter((span) => !actorSpan(span));
     expect(repeat.map((span) => [span.hop, span.outcome])).toEqual([["receive", "dropped"]]);
     expect(repeat[0]?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
+  });
+
+  it("with no K-05 call handed in (staging's root until T-567 binds its database): the verified text is answered 503 and nothing reaches the inbox", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const fakes = skeletonFakes();
+    const root = composeRoot({
+      environment: "staging",
+      actors: handleActors(),
+      vars: env,
+      clock: fakes.clock,
+      linq: fakes.linqInputs,
+      flags: fakeFlags([SKELETON_FLAG]),
+    });
+
+    const response = await root.linqWebhook(webhookRequest(await fakes.sign(TEXT)));
+
+    expect(response.status).toBe(503);
+    expect(await inboxOf(ACTOR)).toEqual([]);
+    expect(linesOf(log)).toContainEqual(
+      expect.objectContaining({ msg: "gateway_failed", error: "NoDatabaseError" }),
+    );
+    expect(JSON.stringify(linesOf(log))).not.toContain(BODY);
   });
 });
 

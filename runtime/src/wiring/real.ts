@@ -8,6 +8,11 @@
 //                default 1; set on staging by name, T-568; until J-08 it must be the secret the test-phone page's Linq
 //                double signs with, which K-11 says is the test environment's, never Linq's). Where no secret is set the
 //                call fails, so the gateway answers 503, verifies nothing and hands nothing on.
+//   sealing      T-553: K-05 v1.2 handleSealingKey (T-220, db/repo/handle-keys.ts; item 29) with its database bound,
+//                handed in by the root (RootOptions.handleKey): the K-05 double in a test; nothing in the Worker until
+//                T-567 binds its database, so every seal there fails closed and the gateway answers 503. New ids on every
+//                call, the wrapping key by its name (SEALING_WRAP_KEY), and the data key as the key object K-05 hands
+//                over, never bytes (README default 27).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only.
@@ -44,16 +49,27 @@ export interface LinqVerifyInputs extends ParseLookups {
   readonly webhookSecret: () => string | undefined | Promise<string | undefined>;
 }
 
-/** Where the real set reads its inputs: the Linq verify's (left out: no secret is set) and the root's clock. */
+/**
+ * Where the real set reads its inputs: the Linq verify's (left out: no secret is set), K-05's key call (left out: no
+ * database is bound) and the root's clock.
+ */
 export interface RealInputs {
   readonly linq?: LinqVerifyInputs | undefined;
+  /**
+   * K-05 v1.2 handleSealingKey with its database bound, which the sealing port asks for each handle's key; null or left
+   * out where no database is bound (the Worker until T-567), so every seal fails closed.
+   */
+  readonly handleKey?: HandleSealingKeyCall | null | undefined;
   /** Epoch milliseconds: the adapter's clock for a request whose receipt time is not a time (the gateway always gives one). */
   readonly now: () => number;
 }
 
 /** The real implementation of each port joined so far. */
 export function realPorts(inputs: RealInputs): Partial<Ports> {
-  return { linqVerify: linqVerify(inputs) };
+  return {
+    linqVerify: linqVerify(inputs),
+    sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
+  };
 }
 
 /**

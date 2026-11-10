@@ -1,7 +1,7 @@
-// The composition root's bindings (T-550, T-552), under Node (Vitest project "unit"): the ports the root binds in each
-// environment, each once and none left unbound; the check that refuses a port bound twice or left unbound; each bound port
-// handed to the part that calls it; and the closed implementation the Worker's environments still bind for every port no
-// join has reached (T-552 joined the Linq verify on staging; production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553), under Node (Vitest project "unit"): the ports the root binds in
+// each environment, each once and none left unbound; the check that refuses a port bound twice or left unbound; each bound
+// port handed to the part that calls it; and the closed implementation the Worker's environments still bind for every
+// port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing; production takes no join yet).
 import { describe, expect, it } from "vitest";
 
 import {
@@ -11,6 +11,7 @@ import {
   environmentOf,
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
+  NoDatabaseError,
   NotJoinedError,
   PICKS,
   PORTS,
@@ -31,9 +32,13 @@ function workerEnv(environment: string): Cloudflare.Env {
   return { ENVIRONMENT: environment, BASE_PATH: "", DB_SCHEMA: "" };
 }
 
-/** The ports joined so far on each of the Worker's environments (./picks.ts): their real package; every other closed. */
-const JOINED: Readonly<Record<"staging" | "production", readonly PortName[]>> = {
-  staging: ["linqVerify"],
+/**
+ * The ports joined so far in each environment (./picks.ts): their real package; every other port on its fake under test,
+ * and closed on the Worker's environments.
+ */
+const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
+  test: ["linqVerify", "sealing"],
+  staging: ["linqVerify", "sealing"],
   production: [],
 };
 
@@ -57,7 +62,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify to its real package, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify and sealing to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -66,7 +71,7 @@ describe("the ports the root binds", () => {
     });
 
     expect(root.bindings).toEqual(
-      PORTS.map((port) => ({ port, implementation: port === "linqVerify" ? "real" : "fake" })),
+      PORTS.map((port) => ({ port, implementation: JOINED.test.includes(port) ? "real" : "fake" })),
     );
   });
 
@@ -87,11 +92,13 @@ describe("the ports the root binds", () => {
     const fakes = skeletonFakes();
     const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
 
-    for (const port of PORTS) if (port !== "linqVerify") expect(root.ports[port]).toBe(fakes.ports[port]);
+    for (const port of PORTS) {
+      if (port !== "linqVerify" && port !== "sealing") expect(root.ports[port]).toBe(fakes.ports[port]);
+    }
     expect(root.gateway.linq).toBe(root.ports.linqVerify);
-    expect(root.gateway.keys).toBe(fakes.ports.sealing);
-    expect(root.safety.keys).toBe(fakes.ports.sealing);
-    expect(root.turn.keys).toBe(fakes.ports.sealing);
+    expect(root.gateway.keys).toBe(root.ports.sealing);
+    expect(root.safety.keys).toBe(root.ports.sealing);
+    expect(root.turn.keys).toBe(root.ports.sealing);
     expect(root.safety.read).toBe(fakes.ports.safetyRead);
     expect(root.safety.bundle).toBe(fakes.ports.stateReads.safety.bundle);
     expect(root.safety.directory).toBe(fakes.ports.stateReads.safety.directory);
@@ -176,7 +183,7 @@ describe("a port bound twice or left unbound is refused, naming the port", () =>
   });
 
   it("leaves every port unbound where the environment picks a set the root was not handed: no Worker takes the fakes", () => {
-    const unbound = PORTS.filter((port) => port !== "linqVerify")
+    const unbound = PORTS.filter((port) => !JOINED.test.includes(port))
       .map((port) => `${port} (no fake implementation)`)
       .join(", ");
 
@@ -199,7 +206,7 @@ describe("the Worker's environments", () => {
     expect(workerRoot(env)).toBe(workerRoot(env));
   });
 
-  it("keeps the gateway's doors closed: with no Linq webhook secret set the joined verify fails, and the seal and the actor fail", async () => {
+  it("keeps the gateway's doors closed: with no Linq webhook secret set the joined verify fails, the joined seal fails with no database bound (until T-567), and the actor fails", async () => {
     const { gateway } = workerRoot(workerEnv("staging"));
     const handle = { kind: "phone", address: "+15555550100" };
 
@@ -213,7 +220,9 @@ describe("the Worker's environments", () => {
         traceId: "4f1c2b7a-9d3e-4c5f-8a6b-1e2d3c4b5a69",
       }),
     ).rejects.toThrow(new MissingSecretError(LINQ_WEBHOOK_SECRET));
-    await expect(gateway.keys.getOrCreateKey(handle)).rejects.toThrow(new NotJoinedError("sealing"));
+    await expect(gateway.keys.getOrCreateKey(handle)).rejects.toThrow(
+      new NoDatabaseError("handleSealingKey"),
+    );
     // No HandleActor namespace is handed to the Worker's root yet (T-553): the door to the actor is closed.
     await expect(gateway.actor.accept({} as never)).rejects.toThrow(
       new WiringError("no HandleActor namespace is bound here"),

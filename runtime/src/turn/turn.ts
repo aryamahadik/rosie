@@ -59,7 +59,7 @@ import type {
   LeasedTurn,
   LeaseHooks,
 } from "../actor";
-import { actorNameOf, openWords, type HandleRef, type SealedWords } from "../gateway/seal";
+import { actorNameOf, openWords, type HandleRef, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent } from "../gateway/types";
 import {
   guardTurn,
@@ -461,7 +461,7 @@ export const turnHooks: Required<LeaseHooks> = {
 
 /** Opens each text's sealed words with the handle's key and reads its K-02 form, in arrival order. */
 async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise<OpenedText[]> {
-  const keys = new Map<string, Uint8Array>();
+  const keys = new Map<string, SealingKey>();
   const opened: OpenedText[] = [];
   for (const entry of turn.entries) {
     const event = entry.event;

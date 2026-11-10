@@ -50,7 +50,7 @@
 // This file keeps the hold's state and says so (`routineHeld`, `readSafety`, `unreadTexts`); it does not batch. Never
 // logged or put in a span: a word, an evidence quote, a number.
 
-import { openWords, sealWords, type SealedWords } from "../gateway/seal";
+import { openWords, sealWords, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
 import { isLabel, openTrace, type BundleId, type SpanSink } from "../trace";
 import type { ModelCall } from "../trace/types";
@@ -752,7 +752,7 @@ export class SafetyOnArrival {
       return { refused: "notSafetyRecord" };
     }
     const eventId = write.key.slice(prefix.length);
-    let sealingKey: Uint8Array;
+    let sealingKey: SealingKey;
     try {
       sealingKey = await set.keys.getOrCreateKey(this.handleOf());
     } catch {

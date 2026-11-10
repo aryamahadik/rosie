@@ -9,7 +9,9 @@
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
 //                webhook secret made up for the run, never Linq's, and the root's verify gets the same secret, with the
 //                chat lookup a receipt needs (Sam's chat is Sam's number)
-//   sealing      gateway/test-support fakeKeyStore
+//   sealing      joined (T-553): the root binds K-05 v1.2 handleSealingKey through its real sealing port (./real.ts
+//                realSealing). What it is fed comes from here: `fakeHandleKeys`, a K-05 double answering as the
+//                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run
 //   safetyRead   safety/test-support fakeRead, answering safety-no.json for each text the test names (`known`)
 //   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
 //                Sam's S1-02 targets; Sam's party and ids; each named text's safety result; dispatch/test-support
@@ -41,7 +43,6 @@ import type { TransientError } from "@rosie/db/repo/targets";
 import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
-import { fakeKeyStore, type FakeKeyStore } from "../gateway/test-support";
 import { fakeTargets, type FakeTargets } from "../guard/test-support";
 import { fakeCore, fakeDirect, fakeRead, fixtureBundle } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
@@ -251,8 +252,11 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 export interface SkeletonFakes {
-  /** The fake set the test environment binds: every port but the joined Linq verify, which the root builds (./real.ts). */
-  readonly ports: Omit<Ports, "linqVerify">;
+  /**
+   * The fake set the test environment binds: every port but the joined ones, the Linq verify and the sealing, which the
+   * root builds (./real.ts).
+   */
+  readonly ports: Omit<Ports, "linqVerify" | "sealing">;
   readonly clock: TestClock;
   /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
   readonly linqInputs: LinqVerifyInputs;
@@ -263,7 +267,11 @@ export interface SkeletonFakes {
    * clock (whole seconds), so it is inside the 300 s window of the gateway's receipt time.
    */
   sign(event: LinqInboundEvent, partKey?: string | null): Promise<SignedWebhook>;
-  readonly keys: FakeKeyStore;
+  /**
+   * K-05 v1.2 handleSealingKey as a double, for the root's real sealing port (RootOptions.handleKey: `handleKeys.call`):
+   * every request it was asked, and the key object it handed out for each number.
+   */
+  readonly handleKeys: FakeHandleKeys;
   readonly face: FakeTurnFace;
   readonly targets: FakeTargets;
   readonly bundles: FakeBundles;
@@ -279,7 +287,7 @@ export interface SkeletonFakes {
 
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
 export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
-  const keys = fakeKeyStore();
+  const handleKeys = fakeHandleKeys(() => clock.now());
   // Read when each call is made: the read on arrival answers, and the turn's commit records, what `known` set by then.
   const answers: Record<string, SafetyResult> = {};
 
@@ -326,8 +334,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
   };
 
-  const ports: Omit<Ports, "linqVerify"> = {
-    sealing: keys,
+  const ports: Omit<Ports, "linqVerify" | "sealing"> = {
     safetyRead: fakeRead(clock, answers),
     stateReads: {
       bundles: bundles.deps,
@@ -378,7 +385,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     webhooks,
     sign: (event, partKey = null) =>
       webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
-    keys,
+    handleKeys,
     face,
     targets,
     bundles,

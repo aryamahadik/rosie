@@ -53,7 +53,14 @@ import type {
 } from "../../actor/copies/return-queue";
 import type { KeywordCopy, SafetyTimerCopy } from "../../actor/copies/types";
 import type { InboxEntry } from "../../actor/inbox";
-import { actorNameOf, openWords, sealWords, type HandleRef, type SealedWords } from "../../gateway/seal";
+import {
+  actorNameOf,
+  openWords,
+  sealWords,
+  type HandleRef,
+  type SealedWords,
+  type SealingKey,
+} from "../../gateway/seal";
 import type { SealedEvent } from "../../gateway/types";
 import { keyOf, keywordOf } from "../../guard/keywords";
 import { START_REPLY, STOP_REPLY, wordsFor } from "../../guard/replies/words";
@@ -363,7 +370,7 @@ export class DbOutage {
     const entry = this.host.texts([write.key.slice(prefix.length)])[0];
     if (entry === undefined) return { refused: "unopened" };
     const handle = entry.event.handle;
-    let sealingKey: Uint8Array;
+    let sealingKey: SealingKey;
     try {
       sealingKey = await set.keys.getOrCreateKey(handle);
     } catch {

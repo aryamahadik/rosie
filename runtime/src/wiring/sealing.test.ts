@@ -9,8 +9,8 @@ import type { HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
 import { describe, expect, it } from "vitest";
 
 import { actorNameOf, openWords, sealWords, type HandleRef } from "../gateway/seal";
-import { NoDatabaseError, realSealing, SEALING_WRAP_KEY, SealingKeyError } from "./index";
-import { fakeHandleKeys } from "./test-support";
+import { composeRoot, NoDatabaseError, realSealing, SEALING_WRAP_KEY, SealingKeyError } from "./index";
+import { fakeHandleKeys, skeletonFakes } from "./test-support";
 
 /** handle-key-first-sight.json's number: a new owner's first text (S1-01). */
 const HANDLE: HandleRef = firstSight.request.handle;
@@ -96,6 +96,51 @@ describe("the real sealing port: K-05 v1.2 handleSealingKey (item 29) with its d
     );
 
     expect(keys.requests).toHaveLength(2);
+  });
+});
+
+describe("the root's sealing port (DL-324): real under test and on staging, fed K-05's call through RootOptions", () => {
+  const VARS = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
+  const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+
+  it("binds it to the key K-05 hands over: the gateway's seal, the safety read and the turn all take it", async () => {
+    const keys = fakeHandleKeys();
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: skeletonFakes().ports },
+      actors: null,
+      vars: VARS,
+      handleKey: keys.call,
+    });
+
+    const key = await root.gateway.keys.getOrCreateKey(HANDLE);
+
+    expect(key).toBe(keys.keyOf(HANDLE.address));
+    expect(root.safety.keys).toBe(root.gateway.keys);
+    expect(root.turn.keys).toBe(root.gateway.keys);
+    expect(root.bindings.find((binding) => binding.port === "sealing")?.implementation).toBe("real");
+    // Its new ids are handle-<uuid> and person-<uuid>: K-05's assertId takes any non-empty id with no NUL.
+    expect(keys.requests).toEqual([
+      {
+        handle: { kind: HANDLE.kind, address: HANDLE.address },
+        newHandleId: expect.stringMatching(new RegExp(`^handle-${UUID}$`)) as unknown,
+        newPersonId: expect.stringMatching(new RegExp(`^person-${UUID}$`)) as unknown,
+        wrappingKeyName: SEALING_WRAP_KEY,
+      },
+    ]);
+  });
+
+  it("with no K-05 call handed in, as in the Worker's root until T-567 binds its database, every seal fails closed", async () => {
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: skeletonFakes().ports },
+      actors: null,
+      vars: VARS,
+    });
+
+    await expect(root.gateway.keys.getOrCreateKey(HANDLE)).rejects.toThrow(
+      new NoDatabaseError("handleSealingKey"),
+    );
   });
 });
 
