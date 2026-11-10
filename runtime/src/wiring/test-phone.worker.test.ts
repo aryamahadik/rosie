@@ -232,6 +232,11 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     handleTargets: fakes.handleTargets.call,
     // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, as root.worker.test.ts feeds it.
     frontierScope: fakes.frontier.scope,
+    // The decide port (T-558) over @rosie/ai's deciders on the recorded-model double, as the hop tests feed it.
+    deciders: fakes.decide.deciders,
+    // The gate port (T-559) over its reads' doubles, its one commit through the turn-row port to the K-05 double.
+    turnRows: fakes.turnRows.calls,
+    gateReads: fakes.gate.reads,
     flags: fakeFlags(options.flagOn === false ? [] : [SKELETON_FLAG]),
     testPhone,
   });
@@ -374,6 +379,8 @@ describe("testPhoneParts on staging: test-phone-parts.json lists what the double
       try {
         // Sam's text goes through the actor's turn; three seconds quiet close its batch, and the turn's dispatcher sends.
         run.fakes.known("evt-sam-0001");
+        // Its turn's two decide reads (decide, joined by T-558, runs on the recorded-model double).
+        run.fakes.decide.recordTurn(["evt-sam-0001"]);
         await run.text(samText("evt-sam-0001", SAM_TRADES_TEXT));
         const samActor = actorNameOf(SAM.handle);
         await settle(samActor);
