@@ -17,10 +17,17 @@
 // review keeps every step id and K-01 path from the model (arch 07 line 415); the words alone are what may be stated.
 // The source stays in the input, for the checks (check.ts reads a term fact's words, never its source).
 //
+// A person's own words reach the model in three places: <conversation>, <inbound> and a relay's quote (the relay.quote
+// fact). In each, a private part reads "a private detail" (T-375; arch 07 line 397; RULES 4.5): the row read gives them
+// so, and the edge scrub's tags, "[card number]" and "[SSN]", are given so here too (../relay/private.ts). The row's
+// input itself is unchanged; this is only how the model reads it.
+//
 // The worked examples in the system prompt show their inputs with composeInputText, so an example reads exactly as a
 // real row does; the composer (C-118) sends composeInputText(input) as each call's per-turn part (T-364's layout).
 
 import { dataElement, parentElement } from "../../context/tags";
+import { withPrivateDetails } from "../relay/private";
+import { QUOTE_SLOT } from "../relay/words";
 import type { ComposeInput, InputFact, MessagePlan, PlanLine } from "./types";
 
 /** The input tags, in the order the model reads them; inbound comes only in a reply to its sender. */
@@ -50,11 +57,14 @@ function listElement(name: InputTag, item: string, values: readonly string[]): s
   );
 }
 
-/** One fact: a slot fact with its slot; a term fact (K-03 v1.1 `termFact`) as a term, its words alone: no slot, no source. */
+/**
+ * One fact: a slot fact with its slot, a relay's quote with its private parts as "a private detail"; a term fact (K-03
+ * v1.1 `termFact`) as a term, its words alone: no slot, no source.
+ */
 function factElement(fact: InputFact): string {
-  return "slot" in fact
-    ? dataElement("fact", { slot: fact.slot }, fact.value)
-    : dataElement("term", {}, fact.value);
+  if (!("slot" in fact)) return dataElement("term", {}, fact.value);
+  const value = fact.slot === QUOTE_SLOT ? withPrivateDetails(fact.value) : fact.value;
+  return dataElement("fact", { slot: fact.slot }, value);
 }
 
 /** The row's input as tagged parts, every value escaped as data. */
@@ -64,7 +74,9 @@ export function composeInputText(input: ComposeInput): string {
     parentElement(
       "conversation",
       {},
-      input.conversation.map((message) => dataElement("message", { from: message.from }, message.text)),
+      input.conversation.map((message) =>
+        dataElement("message", { from: message.from }, withPrivateDetails(message.text)),
+      ),
     ),
     dataElement("master_text", {}, input.masterText.text),
     parentElement("facts", {}, input.facts.map(factElement)),
@@ -89,7 +101,7 @@ export function composeInputText(input: ComposeInput): string {
       input.openQuestions.map((question) => dataElement("open_question", { id: question.id }, question.text)),
     ),
   ];
-  if (input.inbound !== null) parts.push(dataElement("inbound", {}, input.inbound.text));
+  if (input.inbound !== null) parts.push(dataElement("inbound", {}, withPrivateDetails(input.inbound.text)));
   return parts.join("\n");
 }
 
