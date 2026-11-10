@@ -15,8 +15,10 @@
 // test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span. Since T-558
 // joined decide, the turn's two reads go through @rosie/ai's decider over the recorded-model double (fakeDecideModels,
 // which holds the reads this test records for its turn), whose model-call spans sit in the trace beside the safety read's.
-// Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
-// receipt door marks the part delivered and arms its clock.
+// Since T-559 joined the gate, the turn's gate and one commit go through @rosie/actions' turn face over the gate's reads'
+// doubles (fakeGateReads), its commit through the turn-row port to the K-05 double (fakeTurnRows), whose rows the turn
+// then composes. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher,
+// and the root's receipt door marks the part delivered and arms its clock.
 //
 // The trace is judged as T-260's runtime trace test judges it (runtime/test/trace-e2e.worker.test.ts, which passes
 // unchanged beside this file), with T-260's hop check (runtime/src/trace/hop-check.ts) against K-08 v1's
@@ -50,9 +52,11 @@ import {
   SAM_TRADES_TEXT,
   SKELETON_ROW,
   skeletonFakes,
+  watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
+  type WatchedGateCall,
 } from "./test-support";
 
 type Json = Record<string, unknown>;
@@ -151,6 +155,8 @@ function webhookRequest(webhook: SignedWebhook): Request {
 interface Run {
   readonly fakes: SkeletonFakes;
   readonly root: Root;
+  /** Each gateAndCommit the turn handed the root, as the turn made it. */
+  readonly gateCalls: readonly WatchedGateCall[];
   /** Signs one K-06 event with the Linq double and posts it to the Worker's route; answers the trace id the gateway opened. */
   post(event: LinqInboundEvent, partKey?: string | null): Promise<string>;
   /** The spans logged so far. */
@@ -178,13 +184,22 @@ function rig(log: MockInstance): Run {
     frontierScope: fakes.frontier.scope,
     // The decide port (T-558): @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads.
     deciders: fakes.decide.deciders,
+    // The gate port (T-559) over its reads' doubles, its one commit through the turn-row port to the K-05 double.
+    turnRows: fakes.turnRows.calls,
+    gateReads: fakes.gate.reads,
   });
-  const restore = root.install();
+  const restoreRoot = root.install();
+  const watched = watchGate(root);
+  const restore = (): void => {
+    watched.restore();
+    restoreRoot();
+  };
   const worker = createWorker(() => root.gateway);
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
     fakes,
     root,
+    gateCalls: watched.calls,
     async post(event, partKey = null) {
       const response = await worker.fetch(
         webhookRequest(await fakes.sign(event, partKey)),
@@ -317,7 +332,7 @@ describe("through the composition root, every port on its fake: a text's webhook
           new Set([JSON.stringify(BUNDLE_V0)]),
         );
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
-        expect(run.fakes.face.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
+        expect(run.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
         // The receipt marked the part delivered once and armed A7-03's clock once (K-05 armClock).
         expect(run.fakes.store.marks.filter((mark) => mark.outcome === "delivered")).toHaveLength(1);
         expect(run.fakes.arming.data.armAnswers).toMatchObject([{ result: "armed", repeated: false }]);

@@ -1,17 +1,24 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558), under Node (Vitest project
-// "unit"): the ports the root binds in each environment, each once and none left unbound; the check that refuses a port
-// bound twice or left unbound; each bound port handed to the part that calls it; and the closed implementation the
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559), under Node (Vitest
+// project "unit"): the ports the root binds in each environment, each once and none left unbound; the check that refuses
+// a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed implementation the
 // Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the
 // sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets, T-557 the
-// frontier, T-558 decide; production takes no join yet).
+// frontier, T-558 decide, T-559 the gate; production takes no join yet).
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
+import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
 import { openTrace, type Span } from "../trace";
-import type { BuildFrontierRequest, DecideContext, DecideResult, ParkTurnRequest } from "../turn/types";
+import type {
+  BuildFrontierRequest,
+  DecideContext,
+  DecideResult,
+  GateAndCommitRequest,
+  ParkTurnRequest,
+} from "../turn/types";
 import {
   bindPorts,
   closedPorts,
@@ -46,10 +53,39 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier", "decide"],
-  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier", "decide"],
+  test: [
+    "linqVerify",
+    "sealing",
+    "safetyRead",
+    "turnRow",
+    "bundles",
+    "targets",
+    "frontier",
+    "decide",
+    "gate",
+  ],
+  staging: [
+    "linqVerify",
+    "sealing",
+    "safetyRead",
+    "turnRow",
+    "bundles",
+    "targets",
+    "frontier",
+    "decide",
+    "gate",
+  ],
   production: [],
 };
+
+/**
+ * commit-s1-01.json's request (turn 1's gateAndCommit, its turn carrying the service and chat id of Sam's text) on a
+ * trace of its own: its caller's and its turn's trace id that trace's.
+ */
+function commitOneOn(traceId: string): GateAndCommitRequest {
+  const request = structuredClone(commitS101.request) as unknown as GateAndCommitRequest;
+  return { ...request, caller: { ...request.caller, traceId }, turn: { ...request.turn, traceId } };
+}
 
 /** build-frontier-s1-01.json's request (turn 1, Sam's first text) on a trace of its own, under bundle v0. */
 function turnOneOn(traceId: string): BuildFrontierRequest {
@@ -68,7 +104,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's fourteen ports in its turn order", () => {
+  it("names D-017's fifteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -80,6 +116,7 @@ describe("the ports the root binds", () => {
       "stateReads",
       "turnFace",
       "decide",
+      "gate",
       "composer",
       "finalize",
       "dataAccess",
@@ -91,7 +128,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier and decide to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide and gate to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -336,6 +373,24 @@ describe("the Worker's environments", () => {
     expect(fetch).not.toHaveBeenCalled();
     expect(spans).toEqual([]);
   });
+
+  it("fails the gate closed with no database bound (until T-567): inside the Tool API base, before anything is read or written, with no span", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    const request = commitOneOn(trace.traceId);
+    trace.setTurn(request.turn.id);
+
+    await expect(root.turn.toolApi.gateAndCommit(request, { holds: [], unread: [] }, trace)).rejects.toThrow(
+      new NoDatabaseError("gateAndCommit"),
+    );
+    // The turn records the gate and commit spans around the call; the base records none for it (DL-376).
+    expect(spans).toEqual([]);
+  });
 });
 
 describe("a closed port", () => {
@@ -357,6 +412,9 @@ describe("a closed port", () => {
     );
     await expect(closed.decide.decide({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("decide"),
+    );
+    await expect(closed.gate.gateAndCommit({} as never, {} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("gate"),
     );
     await expect(closed.dataAccess.outbox.claimOutbox({} as never)).rejects.toThrow(
       new NotJoinedError("dataAccess"),

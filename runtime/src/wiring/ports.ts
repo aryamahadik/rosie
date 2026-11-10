@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the fourteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the fifteen
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -23,10 +23,13 @@
 //   stateReads   other reads of stored state: who a handle is, each text's safety  T-562, T-564
 //                result, the safety read's bundle lines and stopped flag, a
 //                recipient's chat and send state, a question's facts
-//   turnFace     the rest of K-09's turn face (closest entries, gate and commit,   T-559, T-560
-//                compose input) and the shared core the safety read calls
+//   turnFace     the rest of K-09's turn face (closest entries, compose input)     T-560
+//                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
 //                decider, one per bundle for both
+//   gate         K-09 gateAndCommit through @rosie/actions' turn face: the gate    T-559
+//                and one commit (K-05 commitTurn through the turn-row port),
+//                under the turn id, on the turn's pinned bundle
 //   composer     K-03's message plan and its one rewrite                           T-560
 //   finalize     K-09 finalizeMessage: slots, fixed lines, the claim check and     T-561
 //                the message checks
@@ -62,7 +65,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The fourteen ports, in D-017's turn order (02-contracts section 11). */
+/** The fifteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -74,6 +77,7 @@ export const PORTS = [
   "stateReads",
   "turnFace",
   "decide",
+  "gate",
   "composer",
   "finalize",
   "dataAccess",
@@ -90,7 +94,8 @@ export type PortName = (typeof PORTS)[number];
 export interface TurnRowPort {
   /**
    * K-05 v1.1 commitTurn (item 1; T-195): sent by the Tool API's gate and commit behind the lease's commit (C-087's
-   * CommitPorts.commitTurn, which @rosie/actions takes when T-559 joins it), in the generated K-05 types that commit reads.
+   * CommitPorts.commitTurn, which the gate port hands @rosie/actions' commit since T-559 joined it), in the generated K-05
+   * types that commit reads.
    */
   commitTurn(request: CommitTurnRequest): Promise<CommitTurnOutcome>;
   /** K-05 v1 parkTurn (item 12; T-197): the turn's park after a third lapse with no commit (T-253, ../turn/park.ts). */
@@ -120,12 +125,21 @@ export interface StateReads {
 export type FrontierPort = Pick<TurnFace, "buildFrontier">;
 
 /**
- * K-09's turn face less the frontier and finalize (each its own port), and the K-09 shared-core calls the safety read
- * makes. The frontier's span flag is the root's to set, from the frontier port's binding.
+ * K-09 gateAndCommit (T-559): the turn's gate and its one commit under the turn id, through @rosie/actions' turn face, on
+ * the turn's pinned bundle, its K-05 commitTurn through the turn-row port. The request comes with the service and Linq
+ * chat id of the turn's last text on its turn (K-09 v1.5 default 135: the root copies them from that text's K-06 event).
+ * The turn records the gate (one span per part, with its limits) and the commit itself, and the Tool API base records
+ * neither (TURN_RECORDS_GATE; DL-376), so no flag is set for this hop.
+ */
+export type GatePort = Pick<TurnFace, "gateAndCommit">;
+
+/**
+ * K-09's turn face less the frontier, the gate and finalize (each its own port), and the K-09 shared-core calls the safety
+ * read makes. The frontier's span flag is the root's to set, from the frontier port's binding.
  */
 export interface TurnFacePort extends Omit<
   TurnFace,
-  "buildFrontier" | "finalizeMessage" | "recordsFrontierSpan"
+  "buildFrontier" | "gateAndCommit" | "finalizeMessage" | "recordsFrontierSpan"
 > {
   readonly safetyCore: SafetyCore;
 }
@@ -170,6 +184,8 @@ export interface Ports {
   readonly stateReads: StateReads;
   readonly turnFace: TurnFacePort;
   readonly decide: TurnDecide;
+  /** K-09 gateAndCommit through @rosie/actions' turn face (T-559): the gate and the turn's one commit under its id. */
+  readonly gate: GatePort;
   readonly composer: TurnComposer;
   readonly finalize: FinalizePort;
   readonly dataAccess: DataAccess;

@@ -1,6 +1,6 @@
 // The composition root (T-550; C-046, C-044; build prompt section 10, D-017 'Joins: one hop at a time, in the turn order
 // of What changes'; ops/plan/02-contracts.md section 11): the one place that builds the Worker's gateway, the handle
-// actor's turn and the outbox dispatcher, with each of the fourteen ports of ./ports.ts bound once to the implementation
+// actor's turn and the outbox dispatcher, with each of the fifteen ports of ./ports.ts bound once to the implementation
 // its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
 // package; nothing else here changes for it.
 //
@@ -14,22 +14,24 @@
 //   - the handle actor's ports, put in place for the isolate by `install()`: the safety read on arrival (T-246), the
 //     batch clock (T-247), the bundle pin's reads (T-249; the bundle port, joined by T-556, so the guard's keyword list is
 //     the pinned bundle's), the guard's targets (T-250; the targets port, joined by T-556), the turn loop as the lease's
-//     hooks (T-248, T-251 to T-253), each run's pinned bundle kept for its frontier (./pinned-runs.ts, T-557), and the
-//     turn's ports (`TurnDeps`, its frontier the frontier port, joined by T-557), the Durable Object reading each at use;
+//     hooks (T-248, T-251 to T-253), each run's pinned bundle kept for its frontier and gate (./pinned-runs.ts, T-557)
+//     and its last text's service and chat id for its gate (./turn-chats.ts, T-559), and the turn's ports (`TurnDeps`,
+//     its frontier the frontier port, joined by T-557, its gate and commit the gate port, joined by T-559), the Durable
+//     Object reading each at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
 //     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own.
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
-// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets and frontier
-// ports, which no database feeds there until T-567, so every seal, commit, park, pin, targets read and frontier fails
-// closed, and the decide port, which no decider feeds there until J-02, so every decide fails closed) and the closed set
-// are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as before. A
-// test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed (the Linq
-// double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads, handleTargets
-// and the frontier's readTurnState scope, and @rosie/ai's deciders over the recorded-model double), the HandleActor
-// namespace, its flags and its own clock.
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets, frontier
+// and gate ports, which no database feeds there until T-567, so every seal, commit, park, pin, targets read, frontier and
+// gate fails closed, and the decide port, which no decider feeds there until J-02, so every decide fails closed) and the
+// closed set are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as
+// before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
+// (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads,
+// handleTargets and the frontier's readTurnState scope, @rosie/ai's deciders over the recorded-model double, and the
+// gate's reads over the K-05 doubles), the HandleActor namespace, its flags and its own clock.
 // The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn id the
 // lease hashed from its batch's event ids. The turn's pin reads its bundle through the bundle port, and the guard its
 // targets through the targets port (T-556). The turn's frontier goes through the frontier port (T-557): @rosie/actions'
@@ -38,7 +40,12 @@
 // once; each later join whose port records its own hop's span sets that hop's flag the same way. The turn's decide and
 // its one re-read go through the decide port (T-558): @rosie/ai's decider for the turn's bundle, one per bundle for both,
 // which records only its model calls' portCall spans, so the turn keeps recording the decideReads and reread spans and
-// no flag is set for them. Never logged by the root: a word, a number, a key.
+// no flag is set for them. The turn's gate and commit go through the gate port (T-559): @rosie/actions' turn face over
+// the gate's reads (RootOptions.gateReads), the run's pinned bundle and the turn-row port's commitTurn, under the turn id;
+// the root puts the service and Linq chat id of the run's last text on the request's turn, copied from its K-06 event
+// (./turn-chats.ts; K-09 v1.5 default 135), and the turn keeps recording the gate and commit spans while the Tool API
+// base records none (TURN_RECORDS_GATE; DL-376), so no flag is set for them either. Never logged by the root: a word, a
+// number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -66,6 +73,7 @@ import {
   type BundleReadCalls,
   type Deciders,
   type FrontierScope,
+  type GateReads,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type LinqVerifyInputs,
@@ -74,6 +82,7 @@ import {
 } from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
+import { TurnChats } from "./turn-chats";
 
 /** The HandleActor namespace as the root uses it: the gateway's door to each handle's actor, and the clock arming's way to it. */
 export interface HandleActors<Id = unknown> {
@@ -154,6 +163,15 @@ export interface RootOptions {
    * set by name: J-02), so every decide and re-read fails closed before any model call and nothing decided commits.
    */
   readonly deciders?: Deciders | null;
+  /**
+   * What the gate and commit reads with its database bound (T-559; ./real.ts GateReads): the Tool API's own business
+   * scope (rosie_app) and, on its transaction, K-05 v1.3 readOpenHolds and K-05 v1.4's safety reads, and the read-only
+   * sealer. On local PostgreSQL, @rosie/actions' pgCallScope over a client whose connections run as rosie_app, with
+   * readOpenHoldsIn, pgSafetyReads and pgReadOnlySealer over a rosie_job client (turn-face/pg/calls.ts); in a test, the K-05
+   * doubles over test owner 1's seeded rows; null or left out where no database is bound (the Worker until T-567), so every
+   * gate fails closed and nothing commits. Its one commitTurn is the turn-row port's (`turnRows`).
+   */
+  readonly gateReads?: GateReads | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -188,8 +206,10 @@ export function composeRoot(options: RootOptions): Root {
     environment: options.vars.ENVIRONMENT,
     version: options.vars.GIT_SHA ?? "unknown",
   };
-  // Each run's pinned bundle, kept by the lease's hooks (`install`) for the frontier port to read the turn's bundle through.
+  // Each run's pinned bundle, kept by the lease's hooks (`install`) for the frontier and gate ports to read the turn's
+  // bundle through; and each run's last text's service and chat id, for the gateAndCommit request's turn (T-559).
   const pinnedRuns = new PinnedRuns();
+  const turnChats = new TurnChats();
   const { ports, bindings } = bindPorts(PICKS, options.environment, {
     ...options.sets,
     real: realPorts({
@@ -209,6 +229,13 @@ export function composeRoot(options: RootOptions): Root {
       // The bound bundle port, read at each call, for a bundle the turn did not pin; and the bundle each run pinned.
       frontierBundles: { bundles: () => ports.bundles, pinnedOf: (trace) => pinnedRuns.of(trace) },
       deciders: options.deciders,
+      // The gate's reads, its one commit through the bound turn-row port (the turn id checked there), and the run's bundle.
+      gate: {
+        reads: options.gateReads ?? null,
+        commitTurn: (request) => ports.turnRow.commitTurn(request),
+        bundles: () => ports.bundles,
+        pinnedOf: (trace) => pinnedRuns.of(trace),
+      },
     }),
     closed: closedPorts(),
   });
@@ -250,7 +277,10 @@ export function composeRoot(options: RootOptions): Root {
       recordsFrontierSpan: bindsReal(bindings, "frontier"),
       buildFrontier: (request, trace) => ports.frontier.buildFrontier(request, trace),
       closestEntries: (request, trace) => ports.turnFace.closestEntries(request, trace),
-      gateAndCommit: (request, at, trace) => ports.turnFace.gateAndCommit(request, at, trace),
+      // The runtime caller copies the service and Linq chat id of the run's last text onto the request's turn, both or
+      // neither (K-09 v1.5 default 135). The turn records the gate and commit spans; the real gate port's base records none.
+      gateAndCommit: (request, at, trace) =>
+        ports.gate.gateAndCommit(turnChats.onTurn(request, trace), at, trace),
       composeInput: (request, trace) => ports.turnFace.composeInput(request, trace),
       finalizeMessage: (request, trace) => ports.finalize.finalizeMessage(request, trace),
     },
@@ -333,7 +363,7 @@ export function composeRoot(options: RootOptions): Root {
         setBundleDeps(ports.bundles),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
-        setLeaseHooks(pinnedRuns.around(turnHooks)),
+        setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
       ];
       return () => {
         for (const restore of restores.reverse()) restore();
@@ -358,11 +388,12 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503), and the sealing, turn-row, bundle, targets and frontier ports are handed no K-05 call or
- * scope, since no database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and the gateway
- * answers 503 with nothing written, no turn's bundle can be pinned and no frontier runs; the decide port is handed no
- * decider until J-02, so no decide runs. The gateway's door to the handle's actor is the HANDLE_ACTOR
- * binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays closed), and
+ * so the gateway answers 503), and the sealing, turn-row, bundle, targets, frontier and gate ports are handed no K-05
+ * call, scope or read, since no database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and
+ * the gateway answers 503 with nothing written, no turn's bundle can be pinned, no frontier runs and nothing commits; the
+ * decide port is handed no decider until J-02, so no decide runs. The gateway's door to the handle's actor is the
+ * HANDLE_ACTOR binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays
+ * closed), and
  * no release flags are handed in until staging has its database and the flag's deploy step (T-567, T-569), so the
  * skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
  * parts) last as long as the isolate does.
@@ -397,6 +428,9 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // smoke-size calls only, DL-027) can be read in the Worker: every decide and re-read fails closed before any model
     // call (./real.ts NoDeciderError), so no decided part reaches the gate.
     deciders: null,
+    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and the gate's reads): every
+    // gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
+    gateReads: null,
   });
   workerRoots.set(env, root);
   return root;

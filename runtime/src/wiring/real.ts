@@ -58,11 +58,30 @@
 //                no turn commits a decided part. The answers are mapped as T-370's handoff maps them (DL-342), and the
 //                re-read is handed back the very result decide gave. Each model call writes its own portCall span into
 //                the turn's trace (the AI gateway's); the decideReads and reread spans stay the turn's, labels only.
+//   gate         T-559: K-09 gateAndCommit through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
+//                Tool API base with K-09 v1.5's checks and the call's own business scope; T-305's gate with limits 1
+//                to 6 as registered, limit 1 given the pinned bundle's step cards; T-1139's walk after the choice;
+//                T-1140's runCore with the safety service; one K-05 commitTurn per turn id). Its one commitTurn goes
+//                through the root's turn-row port (T-555: K-05's call, refusing a turn id that is not its event ids'
+//                hash), its bundle is the one the turn's run pinned (as the frontier's), and its reads are handed in by
+//                the root (RootOptions.gateReads: the Tool API's business scope and, on its transaction, K-05 v1.3
+//                readOpenHolds and v1.4's safety reads, the read-only sealer; in a test, the K-05 doubles over test owner
+//                1's seeded rows); nothing in the Worker until T-567, so every gate there fails closed before anything is
+//                read or written. The plug-in's stop words are the barbershop's, named here (PLUGIN_LISTS_NO_STOP_WORDS,
+//                DL-344), and nobody is told until T-319 (NOT_TOLD_YET). The turn records the gate's and the commit's
+//                spans; the face tells the base so (TURN_RECORDS_GATE), and the base records none (T-1193; DL-376).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
 // an error.
 
+import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
+import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
+import {
+  NOT_TOLD_YET,
+  PLUGIN_LISTS_NO_STOP_WORDS,
+  type WordsSealer,
+} from "@rosie/actions/src/domain/safety/ports";
 import { createFrontierChecker, type FrontierChecker } from "@rosie/actions/src/frontier/assemble/check";
 import type {
   FrontierBundles,
@@ -71,6 +90,11 @@ import type {
 } from "@rosie/actions/src/frontier/assemble/types";
 import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
 import type { CallTrace } from "@rosie/actions/src/tool-api/tool-api";
+import {
+  turnCommitDeps,
+  type SafetyReads,
+  type TurnCommitBinding,
+} from "@rosie/actions/src/tool-api/turn-face/commit";
 import { createTurnFace } from "@rosie/actions/src/tool-api/turn-face/turn-face";
 import { createToolApiValidator, type ToolApiValidator } from "@rosie/actions/src/tool-api/validator";
 import {
@@ -118,10 +142,11 @@ import type {
   BuildFrontierAnswer,
   DecideAnswer,
   DecideResult,
+  GateAndCommitAnswer,
   ParkTurnAnswer,
   TurnDecide,
 } from "../turn/types";
-import type { FrontierPort, Ports, TurnRowPort } from "./ports";
+import type { FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -193,6 +218,12 @@ export interface RealInputs {
    * manifest and flows and the model key can be read there), so every decide and re-read fails closed.
    */
   readonly deciders?: Deciders | null | undefined;
+  /**
+   * What the gate and commit reads and commits through (T-559): its reads with their database bound (null where none is
+   * bound: the Worker until T-567), the root's turn-row port's commitTurn, and the bundles it reads (as the frontier's).
+   * Left out, every gate fails closed.
+   */
+  readonly gate?: GateInputs | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -215,6 +246,14 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       pinnedOf: inputs.frontierBundles?.pinnedOf ?? (() => null),
     }),
     decide: realDecide({ deciders: inputs.deciders ?? null }),
+    gate: realGate(
+      inputs.gate ?? {
+        reads: null,
+        commitTurn: () => Promise.reject(new NoDatabaseError("commitTurn")),
+        bundles: () => bundles,
+        pinnedOf: () => null,
+      },
+    ),
   };
 }
 
@@ -849,3 +888,119 @@ export function realDecide(inputs: DecideInputs): TurnDecide {
     },
   };
 }
+
+// ---- gate: K-09 gateAndCommit through @rosie/actions' turn face (T-559; C-074, C-087) ----------------------------------
+
+/**
+ * What the gate and commit reads with its database bound (T-559; @rosie/actions' turn-face/pg/calls.ts names each one on
+ * PostgreSQL): the Tool API's own business scope, one transaction per call whose row-level security scope is the call's
+ * business (rosie_app: pgCallScope, never the frontier's rosie_job scope), and on that call's transaction K-05 v1.3
+ * readOpenHolds (readOpenHoldsIn) and K-05 v1.4's seven safety reads (pgSafetyReads: six on the call's transaction, the
+ * business owner's on the runtime side in its own); the safety record's words are sealed by a sealer that only reads the
+ * person's key, which the gateway made at first sight (pgReadOnlySealer). T-317's and T-307's reads (the flags and the
+ * checked line's rows), left out, are the safety service's own on the call's transaction, a database's.
+ */
+export interface GateReads<Repo = unknown> {
+  readonly scope: BusinessScope<Repo>;
+  readonly readOpenHolds: TurnCommitBinding<Repo>["readOpenHolds"];
+  readonly safetyReads: SafetyReads<Repo>;
+  readonly sealer: WordsSealer;
+  readonly flagsReader?: (repo: Repo) => FlagsReader;
+  readonly messagesReader?: (repo: Repo) => MessagesReader;
+}
+
+/** What the real gate port is fed. */
+export interface GateInputs {
+  /** The gate's reads with their database bound; null where none is bound, so every gate fails closed. */
+  readonly reads: GateReads | null;
+  /**
+   * K-05 v1.1 commitTurn as the root's turn-row port sends it (T-555): refused before K-05 when the turn id is not the hash
+   * of its event ids; failing closed where no database is bound.
+   */
+  readonly commitTurn: CommitTurnCall;
+  /** The bound bundle port, read at each call: for a bundle the turn did not pin. */
+  readonly bundles: () => BundleDeps;
+  /** The bundle the run whose trace this is pinned (./pinned-runs.ts), or null for a trace that is no pinned run's. */
+  readonly pinnedOf: (trace: TraceContext) => PinnedBundle | null;
+}
+
+/** The scope where no database is bound: each gate fails closed before anything is read or written, inside the base. */
+const NO_GATE_SCOPE: BusinessScope<unknown> = {
+  withBusiness: () => Promise.reject(new NoDatabaseError("gateAndCommit")),
+};
+
+/**
+ * The gate port (T-559): K-09 gateAndCommit through @rosie/actions' turn face (createTurnFace with its calls, the face
+ * pgTurnCalls builds on PostgreSQL): the Tool API base checks the request against K-09 v1.5 (its turn may carry the service
+ * and chat id of the turn's last text, which the root puts there: K-09 v1.5 default 135) and that it names the trace it
+ * runs in, refuses a call naming no business before anything is read, and runs the gate and the commit inside the call's
+ * business scope (GateReads.scope), holding the answer to K-09 v1.5's response or errors. The commit is T-1141's
+ * binding of T-305's (turnCommitDeps): the flags, then limits 1 to 6 as registered, limit 1 given the turn's pinned
+ * bundle's step cards; what is open at commit time (K-05 readOpenHolds joined with the lease's CommitContext, `at`, handed
+ * on unchanged); each core action through T-1140's runCore and the safety service (its reads, the read-only sealer, the
+ * pinned bundle's checked lines, the barbershop plug-in's stop words, PLUGIN_LISTS_NO_STOP_WORDS (DL-344), and nobody told
+ * until T-319, NOT_TOLD_YET); each passed part's writes from T-1139's walk on the pinned bundle's flow graphs, its row ids
+ * built from the turn's own id (K-09 v1.5 default 131); and one K-05 commitTurn through the root's turn-row port, under
+ * the turn id, its turn row K-05's seven fields alone. A repeat of a committed turn id answers the first commit and writes
+ * nothing (K-05 v1 item 1). The turn's bundle is the one its run pinned, read KV first and PostgreSQL's copy on a miss (as
+ * the frontier reads it). The base records no span: the turn records the gate (one span per part, with its limits) and
+ * the commit itself (TURN_RECORDS_GATE; DL-376), so no flag is set for this hop. With no reads bound every call goes to
+ * the base all the same and fails closed there, before anything is read or written. The validator is made at the first
+ * call and kept: inside workerd, T-1144's prebuilt standalone code; under Node, Ajv over the frozen schemas. Nothing here
+ * logs: the chat id goes to the walk only, never into a span, a log line, an error or an event-log entry's values.
+ */
+export function realGate(inputs: GateInputs): GatePort {
+  let validator: ToolApiValidator | null = null;
+  return {
+    async gateAndCommit(request, at, trace) {
+      validator ??= createToolApiValidator();
+      const reads = inputs.reads;
+      const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const binding: TurnCommitBinding<unknown> = {
+        bundles,
+        commitTurn: (commit) => inputs.commitTurn(commit),
+        readOpenHolds: (repo, asked) =>
+          reads === null
+            ? Promise.reject(new NoDatabaseError("readOpenHolds"))
+            : reads.readOpenHolds(repo, asked),
+        safetyReads: reads?.safetyReads ?? NO_SAFETY_READS,
+        sealer: reads?.sealer ?? NO_SEALER,
+        stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+        telling: NOT_TOLD_YET,
+        safetyExtra: {
+          ...(reads?.flagsReader === undefined ? {} : { flagsReader: reads.flagsReader }),
+          ...(reads?.messagesReader === undefined ? {} : { messagesReader: reads.messagesReader }),
+        },
+      };
+      const face = createTurnFace<FrontierRepo>({
+        // The frontier is its own port's: this face's frontier is never called.
+        scope: NO_FRONTIER_SCOPE,
+        bundles,
+        validator,
+        calls: { scope: reads?.scope ?? NO_GATE_SCOPE, commit: turnCommitDeps(binding) },
+      });
+      const answer = await face.gateAndCommit(request, at, trace);
+      // The same K-09 gateAndCommit answer in two hand-written forms: @rosie/actions' generated one, and the turn's
+      // (../turn/types.ts), which reads the committed answer's turn id, parts, core and rows and checks them itself
+      // (turn.ts committedOf).
+      return answer as unknown as GateAndCommitAnswer;
+    },
+  };
+}
+
+/** A safety read where no database is bound: refused, so the call fails closed. */
+const noRead = (read: string) => (): Promise<never> => Promise.reject(new NoDatabaseError(read));
+
+/** K-05 v1.4's safety reads where no database is bound: each fails closed (never reached: the scope fails first). */
+const NO_SAFETY_READS: SafetyReads<unknown> = {
+  outcomeOfEvent: noRead("readSafetyOutcomeOfEvent"),
+  outcome: noRead("readSafetyOutcome"),
+  hold: noRead("readSafetyHold"),
+  holdOfOutcome: noRead("readSafetyHoldOfOutcome"),
+  outboxRowWritten: noRead("readOutboxRowWritten"),
+  businessZone: noRead("readBusinessZone"),
+  businessOwner: noRead("readBusinessOwner"),
+};
+
+/** The sealer where no database is bound: it seals nothing (never reached: the scope fails first). */
+const NO_SEALER: WordsSealer = { seal: noRead("sealingKey") };
