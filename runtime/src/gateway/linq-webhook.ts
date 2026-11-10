@@ -1,6 +1,8 @@
 // The Linq webhook entry (T-241; C-044; arch 02 step 1 "Receive", line 109).
 //
-// Answers: a bad or stale signature 401, with nothing written or handed on; a signed event type Rosie does not use 200,
+// Answers: a body over its cap (T-1180; body.ts; GatewayDeps.linqBodyLimitBytes, LINQ_BODY_LIMIT_BYTES by default) 413,
+// before the body is read whole, with nothing verified, written or handed on (a 4xx, so Linq does not send it again);
+// a bad or stale signature 401, with nothing written or handed on; a signed event type Rosie does not use 200,
 // handed on to no one; a known event id 200 and dropped; a failing scrub-seal-write (a key store that gives no key, a
 // seal or a write that fails, an event it cannot route, a verify result it does not know, or a verifier that cannot
 // answer) 503, so Linq retries for 30 minutes, with nothing stored; otherwise 200. After the verify the event is
@@ -28,6 +30,7 @@ import {
   type Answer,
   type WebhookEnvironment,
 } from "./answer";
+import { LINQ_BODY_LIMIT_BYTES, bodyLimitOf, readCappedText } from "./body";
 import { HandoffError, prepareHandoff, type Prepared, type ScrubDone } from "./hand-off";
 import type { GatewayDeps, StoreAnswer, VerifyWebhookResult } from "./types";
 
@@ -61,22 +64,24 @@ export async function handleLinqWebhook(
   /** The scrub of an event its actor wrote: its span follows receive's. Undefined for every other answer. */
   let scrubbed: ScrubDone | undefined;
 
-  const fail = (status: 400 | 503, error: string, code: string): void => {
+  const fail = (status: 400 | 413 | 503, error: string, code: string): void => {
     answer = { status, error };
-    outcome = status === 400 ? "refused" : "failed";
+    outcome = status === 503 ? "failed" : "refused";
     errorCode = code;
   };
 
-  let raw: string | undefined;
-  try {
-    raw = await request.text();
-  } catch (error) {
-    logFailure(context.traceId, "readBody", error);
-  }
+  // The body under its cap (body.ts): one over it is never read whole, and nothing of it is logged.
+  const read = await readCappedText(request, bodyLimitOf(deps.linqBodyLimitBytes, LINQ_BODY_LIMIT_BYTES));
 
-  if (raw === undefined) {
-    fail(400, "bad_request", "unreadableBody");
+  if ("problem" in read) {
+    if (read.problem === "tooLarge") {
+      fail(413, "payload_too_large", "bodyTooLarge");
+    } else {
+      logFailure(context.traceId, "readBody", read.error);
+      fail(400, "bad_request", "unreadableBody");
+    }
   } else {
+    const raw = read.text;
     let verified: VerifyWebhookResult | undefined;
     try {
       verified = await deps.linq.verifyWebhook({

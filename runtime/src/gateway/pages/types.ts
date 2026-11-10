@@ -38,7 +38,15 @@ export type PageHandler = (page: PageRequest) => Promise<PageOutcome>;
 /** One handler for every call of K-21 v1. */
 export type PageHandlers = Readonly<Record<PageCallName, PageHandler>>;
 
-/** The page entry's dependencies: the handlers, and the trace's (the active bundle id read at receipt, and the clock). */
+/**
+ * The page entry's dependencies: the handlers, the trace's (the active bundle id read at receipt, and the clock), and the
+ * cap on a call's body.
+ */
 export interface PageDeps extends TraceDeps {
   handlers: PageHandlers;
+  /**
+   * The most bytes a call's body may have (a config value, T-1180): a body over it is answered 413 before it is read
+   * whole, and no handler runs. Left out, or not a whole number from 0, it is PAGE_BODY_LIMIT_BYTES (64 KiB).
+   */
+  bodyLimitBytes?: number;
 }

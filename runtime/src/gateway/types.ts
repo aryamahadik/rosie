@@ -123,4 +123,16 @@ export interface GatewayDeps {
    * outside staging before any handler runs.
    */
   pages?: PageHandlers;
+  /**
+   * The most bytes a page or console call's body may have (a config value, T-1180; body.ts): over it, the call is
+   * answered 413 before its body is read whole, and no handler runs. Left out, or not a whole number from 0, it is
+   * PAGE_BODY_LIMIT_BYTES (64 KiB).
+   */
+  pageBodyLimitBytes?: number;
+  /**
+   * The most bytes a Linq webhook's body may have (a config value, T-1180; body.ts): over it, the webhook is answered
+   * 413 before its body is read whole, and nothing is verified or handed on. Left out, or not a whole number from 0, it
+   * is LINQ_BODY_LIMIT_BYTES (256 KiB).
+   */
+  linqBodyLimitBytes?: number;
 }

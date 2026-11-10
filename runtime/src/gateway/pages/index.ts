@@ -1,6 +1,7 @@
 // The page entry (T-266; C-044): the web app's K-21 v1 page and console calls under BASE_PATH, routed to the action
-// layer's handlers (C-074) under a trace opened per request, the staging-only calls refused outside staging. See
-// entry.ts for the order of one call and calls.ts for the routes.
+// layer's handlers (C-074) under a trace opened per request, the staging-only calls refused outside staging, a body over
+// its cap refused before it is read whole, and only K-21 v1's error names in its span (T-1180). See entry.ts for the order
+// of one call, calls.ts for the routes and errors.ts for the error names.
 
 import { PageNotConnectedError } from "./entry";
 import type { PageCallName } from "./calls";
@@ -16,6 +17,7 @@ export {
   pageRouteOf,
   type PageCallName,
 } from "./calls";
+export { PAGE_ERRORS, UNKNOWN_PAGE_ERROR, isPageError, type PageErrorName } from "./errors";
 export { PageNotConnectedError, STAGING_ONLY_OUTCOME, handlePageCall } from "./entry";
 export type { PageDeps, PageHandler, PageHandlers, PageOutcome, PageRequest } from "./types";
 
