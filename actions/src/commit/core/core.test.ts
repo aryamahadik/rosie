@@ -663,14 +663,26 @@ describe("the core's safety line with bundle v0 pinned (T-1143's rule; DL-325, D
     expect(no.writes.messages).toEqual([]);
   });
 
-  it("harm to a child or older adult: 911 is its line, but no hotline is ever made up, so its record is refused", async () => {
+  it("harm to a child or older adult: 911 is its line and no hotline is ever made up, so it records its hold and files no report", async () => {
     const lines = coreSafetyLines(bundleLines(bundleV0()));
     expect(lines.lineOf("Harm to a child or older adult", [])?.hotline).toBeNull();
-    const refused = await recordAlone(safetyRead("safety-child-or-elder.json")).catch(
-      (thrown: unknown) => thrown,
-    );
-    expect(refused).toBeInstanceOf(SafetyRefusedError);
-    expect(refused).toMatchObject({ fault: "noHotline", rowIds: ["evt-alex-0205"] });
+    // Never refused for want of a hotline (noHotline is retired: CQ-164 (c), T-1162), so nothing throws.
+    const recording = recordAlone(safetyRead("safety-child-or-elder.json"));
+    await expect(recording).resolves.not.toBeInstanceOf(SafetyRefusedError);
+    const run = await recording;
+    const answer = responseOf(run);
+    expect(answer).toMatchObject({
+      outcomes: ["Harm to a child or older adult"],
+      hold: { releaseRule: "at_once", blocksBooking: false },
+      safetyLine: { fixedLineId: "safetyEmergency" },
+      told: [],
+    });
+    // 911 goes to Alex on the handle he wrote from, as a safety row.
+    expect(run.writes.messages.map((row) => [row.id, row.recipientHandleId, row.sendClass])).toEqual([
+      [answer.safetyLine?.outboxRowId, "handle-alex", "safety"],
+    ]);
+    // Its outcome and at-once hold only: no harm_reports row, since K-34 files one only with the hotline given first.
+    expect(run.writes.state.map((write) => write.table)).toEqual(["safety_outcomes", "safety_holds"]);
   });
 
   it("a full bundle's step line still wins, and a threat's never goes to its writer", () => {
