@@ -390,7 +390,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(facts.run.fakes.decide.rereadCalls).toEqual([]);
     // Both reads enter c-01, the sign-up door, with the quote JOIN and no field: the result the gate was handed holds
     // decide-s1-01-enter.json's two reads with the JOIN's own text, and its one part goes.
-    const [gateCall, ...again] = facts.run.fakes.face.gateCalls;
+    const [gateCall, ...again] = facts.run.gateCalls;
     expect(again).toEqual([]);
     const input = gateCall?.request.input;
     if (input?.kind !== "decided") throw new Error("the gate was handed no decided input");

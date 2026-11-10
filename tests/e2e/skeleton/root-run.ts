@@ -16,11 +16,14 @@
 //   join 6, frontier    @rosie/actions' turn face over the frontier's scope: K-05 v1.2 readTurnState as a double over
 //                       test owner 1's seeded rows (T-1148), reading the bundle the turn pinned;
 //   join 7, decide      @rosie/ai's decider (T-369's createDecider with T-370's re-read), one per bundle, over the
-//                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347).
+//                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347);
+//   join 8, gate        @rosie/actions' turn face's gateAndCommit (T-1141), its reads over test owner 1's seeded rows
+//                       and what the K-05 commitTurn double wrote, its one commit through the root's turn-row port.
 //
-// The Tool API's gate and commit is stood in until T-559, its one commit through the root's turn-row port; every port not
-// joined yet is on its fake (T-550). The spans are the log lines the target captures; the actor's inbox, safety state,
-// batches and turns are read inside its Durable Object, and the K-05 doubles keep the rows they wrote.
+// Every port not joined yet is on its fake (T-550). The turn's gate calls are watched on their way to the root's own
+// gateAndCommit (watchGate), which changes nothing they are sent or answer. The spans are the log lines the target
+// captures; the actor's inbox, safety state, batches and turns are read inside its Durable Object, and the K-05 doubles
+// keep the rows they wrote.
 //
 // Inside workerd, Ajv's compiler cannot run and contracts/ is not on disk, so the trace is checked against K-08 by the code
 // T-1144 prebuilds for the Worker (prebuiltTraceCheck). Test values only (rule 9): the master's sample cast, the fictional
@@ -35,9 +38,10 @@ import { actorNameOf } from "../../../runtime/src/gateway";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "../../../runtime/src/wiring";
 import {
   fakeFlags,
-  gateThroughCommit,
   skeletonFakes,
+  watchGate,
   type SkeletonFakes,
+  type WatchedGateCall,
 } from "../../../runtime/src/wiring/test-support";
 import { createLocalTarget, makeTestWebhookSecret, type LocalTarget, type TraceCheck } from "../_driver";
 
@@ -123,6 +127,8 @@ export interface RootRun {
   /** The doubles every port is fed, and the rows they keep. */
   readonly fakes: SkeletonFakes;
   readonly root: Root;
+  /** Each gateAndCommit the turn handed the root, as the turn made it, with the gate port's answer (watchGate). */
+  readonly gateCalls: readonly WatchedGateCall[];
   /** Puts the actor's earlier ports back and stops the target's log capture. */
   close(): void;
 }
@@ -141,6 +147,7 @@ export function startRootRun(): RootRun {
   });
   let root: Root;
   let restore: () => void;
+  let watched: ReturnType<typeof watchGate>;
   try {
     root = composeRoot({
       environment: "test",
@@ -156,11 +163,12 @@ export function startRootRun(): RootRun {
       handleTargets: fakes.handleTargets.call,
       frontierScope: fakes.frontier.scope,
       deciders: fakes.decide.deciders,
+      gateReads: fakes.gate.reads,
       flags: fakeFlags([SKELETON_FLAG]),
     });
-    const composed = root;
-    fakes.face.gate = gateThroughCommit((request) => composed.ports.turnRow.commitTurn(request));
     restore = root.install();
+    // After the install: the watch goes on the root's own turn deps, and comes off before them.
+    watched = watchGate(root);
   } catch (error) {
     // Nothing is left capturing console.log when the root cannot be composed.
     target.close();
@@ -170,8 +178,10 @@ export function startRootRun(): RootRun {
     target,
     fakes,
     root,
+    gateCalls: watched.calls,
     close() {
       target.close();
+      watched.restore();
       restore();
     },
   };
