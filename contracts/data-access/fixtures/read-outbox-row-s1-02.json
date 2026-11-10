@@ -4,7 +4,7 @@
     "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
     "after": ["commit-s1-01-sam.json"],
     "now": "2026-10-19T18:05:05Z",
-    "note": "Compose input reads S1-02's question to Sam (K-09 v1 compose-input-s1-02.json) under the barbershop's scope: the row, unplanned at version 1 (finalize-pass.json's expectVersion), its turn and bundle; S1-02's line 0, from the question it asks; Sam, the owner, as limit 7's reader, with the name and language K-04 stores and his phone's flags; the one text it answers, by event id only, whose words the runtime caller hands in; the business head and the question with its waiting clock row as the slot source; and no other question open with him. The turn's text has no safety row in this chain (commit-s1-01-sam.json's note), so its outcomes are null and the tone stays routine. How Rosie addresses him ('Sam' in K-09's fixture) is the caller's, from the stored name. So is the flow S1-02 is read in (README item 35's table, default 53): S1-02 is a shared step and the row is about no booking (slotSource.booking null), so it is the first of A, then B, that the row's bundle lists whose graph holds S1-02; this row's bundle is K-01's bundle-v0-skeleton.json, whose manifest lists flow A alone and whose flow A graph holds S1-02, so ComposeRow.flow is A, the flow K-09's compose-input-s1-02.json reads S1-02's master line in and finalize-pass.json checks it in."
+    "note": "Compose input reads S1-02's question to Sam (K-09 v1 compose-input-s1-02.json) under the barbershop's scope: the row, unplanned at version 1 (finalize-pass.json's expectVersion), its turn and bundle; S1-02's line 0, from the question it asks; Sam, the owner, as limit 7's reader, with the name and language K-04 stores and his phone's flags; the one text it answers, by event id only (evt-sam-s1-01, the text K-09 v1.5's commit-s1-01.json batched), whose words the runtime caller hands in; the business head and the question with its waiting clock row as the slot source (oq-s1-02-sam-1 and clock-oq-s1-02-sam-1, the ids that commit wrote: K-09 v1.5 default 131), which finalize's question takes; and no other question open with him. The turn's text has no safety row in this chain (commit-s1-01-sam.json's note), so its outcomes are null and the tone stays routine. How Rosie addresses him ('Sam' in K-09's fixture) is the caller's, from the stored name. So is the flow S1-02 is read in (README item 35's table, default 53): S1-02 is a shared step and the row is about no booking (slotSource.booking null), so it is the first of A, then B, that the row's bundle lists whose graph holds S1-02; this row's bundle is K-01's bundle-v0-skeleton.json, whose manifest lists flow A alone and whose flow A graph holds S1-02, so ComposeRow.flow is A, the flow K-09's compose-input-s1-02.json reads S1-02's master line in and finalize-pass.json checks it in."
   },
   "request": {
     "outboxRowId": "outbox-s1-02-sam-1",
@@ -23,7 +23,7 @@
       "channel": "imessage",
       "sendClass": "quick_reply",
       "bookingId": null,
-      "openQuestionId": "oq-s1-02",
+      "openQuestionId": "oq-s1-02-sam-1",
       "copyOfRowId": null,
       "hasPlan": false,
       "finalParts": null
@@ -40,7 +40,7 @@
     },
     "answers": {
       "handleId": "handle-sam",
-      "texts": [{ "eventId": "evt-sam-0000", "outcomes": null, "tenses": null }]
+      "texts": [{ "eventId": "evt-sam-s1-01", "outcomes": null, "tenses": null }]
     },
     "slotSource": {
       "business": {
@@ -52,7 +52,7 @@
       },
       "booking": null,
       "question": {
-        "id": "oq-s1-02",
+        "id": "oq-s1-02-sam-1",
         "step": "S1-02",
         "status": "waiting",
         "options": [],
@@ -60,7 +60,7 @@
         "clock": null,
         "askCount": 1,
         "version": 1,
-        "clockRow": { "id": "clock-oq-s1-02", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+        "clockRow": { "id": "clock-oq-s1-02-sam-1", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
       }
     },
     "openQuestions": []

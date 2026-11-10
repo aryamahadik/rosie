@@ -1150,7 +1150,7 @@
       "def": "commitTurn.exchange",
       "expect": "accept",
       "shows": "The walking skeleton's first turn: Sam's first text commits turn-s1-01-sam with S1-02's question to him, its question clock row waiting, and outbox-s1-02-sam-1 that asks it, with no plan, so the reads that follow have K-09's compose and finalize row",
-      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json (outbox-s1-02-sam-1, turn-s1-01-sam); S1-01, S1-02; 02-contracts K-05 item 1; arch 01 lines 39 to 41; arch 02 line 127; QUESTIONS.md CQ-156 (a)"
+      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json (outbox-s1-02-sam-1, turn-s1-01-sam); K-09 v1.5 commit-s1-01.json and default 131 (T-1142: the ids, evt-sam-s1-01, 18:05:05Z); ADR-013; S1-01, S1-02; 02-contracts K-05 item 1; arch 01 lines 39 to 41; arch 02 line 127; QUESTIONS.md CQ-156 (a)"
     },
     {
       "file": "read-outbox-row-s1-02.json",

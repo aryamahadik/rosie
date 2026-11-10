@@ -11,7 +11,7 @@
     "channel": "imessage",
     "sendClass": "quick_reply",
     "bookingId": null,
-    "openQuestionId": "oq-s1-02",
+    "openQuestionId": "oq-s1-02-sam-1",
     "copyOfRowId": null,
     "hasPlan": false,
     "finalParts": null
@@ -29,7 +29,7 @@
   },
   "answers": {
     "handleId": "handle-sam",
-    "texts": [{ "eventId": "evt-sam-0000", "outcomes": null, "tenses": null }]
+    "texts": [{ "eventId": "evt-sam-s1-01", "outcomes": null, "tenses": null }]
   },
   "slotSource": {
     "business": {
@@ -41,7 +41,7 @@
     },
     "booking": null,
     "question": {
-      "id": "oq-s1-02",
+      "id": "oq-s1-02-sam-1",
       "step": "S1-02",
       "status": "waiting",
       "options": [],
@@ -49,7 +49,7 @@
       "clock": null,
       "askCount": 1,
       "version": 1,
-      "clockRow": { "id": "clock-oq-s1-02", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+      "clockRow": { "id": "clock-oq-s1-02-sam-1", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
     }
   },
   "openQuestions": []
