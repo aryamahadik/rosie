@@ -1,6 +1,9 @@
 // Tests of the recorded-model double (T-004, C-123), against K-02's fixtures: v1's, and v1.1's for the walking
-// skeleton's turn 1 (T-1145; contracts/model/README.md "v1.1", the recordings the double needs). Deterministic and
-// offline: outbound fetch is stubbed to throw for the whole file, and a test fails if anything calls it.
+// skeleton's turn 1 (T-1145; contracts/model/README.md "v1.1", the recordings the double needs). The JOIN run's
+// recordings are keyed on that run's own ids (round 2, DL-347; ./test-support.ts): its context is K-09's
+// build-frontier-s1-01.json frontier with those ids, laid out by the AI layer's context builder (ai/src/context) on
+// bundle v0 as bundles/v0 publishes it. Deterministic and offline: outbound fetch is stubbed to throw for the whole file,
+// and a test fails if anything calls it.
 
 import {
   copyFileSync,
@@ -19,6 +22,18 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
+import { turnIdOf as leaseTurnIdOf } from "../../../runtime/src/actor/lease";
+import { CacheLayoutError, createPromptCache, RULES_CLOSE, RULES_OPEN } from "../cache";
+import { buildContextPrompt, type DecideContext } from "../context";
+import {
+  JOIN_EVENT_ID,
+  JOIN_SENT_UTC,
+  JOIN_TURN_ID,
+  JOIN_WORDS,
+  bundleV0,
+  turnIdOf,
+  type BundleIdValue,
+} from "./test-support";
 import {
   MODEL_VERSIONS,
   NoRecordingError,
@@ -109,9 +124,6 @@ function must<T>(value: T | undefined): T {
 
 // ---- K-02 v1.1: the walking skeleton's turn 1 (T-1145; README "v1.1", the recordings the double needs) ----------
 
-/** The JOIN text and its time, as tests/e2e/skeleton sends them (its JOIN event: body JOIN, sentAt 14:01:49Z). */
-const JOIN_WORDS = "JOIN";
-const JOIN_SENT_UTC = "2026-10-19T14:01:49Z";
 /** The JOIN run's context, recording 2's, in ai/recordings. */
 const JOIN_CONTEXT_FILE = "contexts/join-s1-01.json";
 
@@ -131,9 +143,52 @@ interface TurnChoice {
 /** A K-02 context, as far as these tests read it. */
 interface TurnContext extends JsonObject {
   turnId: string;
-  bundleId: unknown;
+  bundleId: BundleIdValue;
+  flow: string;
   texts: TurnText[];
   choices: TurnChoice[];
+  alwaysOn: { flow: string; prefixSha256: string };
+}
+
+/** K-09 v1.5's build-frontier-s1-01.json: turn 1's frontier call, whose outcome is K-02's context-s1-01.json. */
+interface FrontierFixture {
+  request: {
+    turn: { id: string; eventIds: string[]; bundleId: BundleIdValue };
+    texts: TurnText[];
+  };
+  outcome: { context: TurnContext };
+}
+const FRONTIER = readJson(
+  path.join(CONTRACT_DIR, "tool-api", "fixtures", "build-frontier-s1-01.json"),
+) as FrontierFixture;
+
+/**
+ * The context the JOIN run's frontier builds (README "v1.1" recording 2; DL-347 ruling 3): build-frontier-s1-01.json's
+ * frontier re-keyed to the run's own ids. Its one text is the JOIN of tests/e2e/skeleton (event evt-sam-0000, sent
+ * 14:01:49Z, read in the fixture text's zone); its turn id is T-248's hash of that event id; its bundle is bundle v0 as
+ * bundles/v0 publishes it, with that bundle's flow A rules hash, which the frontier copies from the pinned bundle
+ * (actions/src/frontier/assemble/handler.ts, step 8). Everything else is the fixture's frontier as it is: the writer, the
+ * business's language, the one choice (c-01, the sign-up door), no card, fact or earlier message.
+ */
+function joinRunContext(): TurnContext {
+  const frontier = structuredClone(FRONTIER.outcome.context);
+  const [text, ...more] = frontier.texts;
+  if (text === undefined || more.length > 0) throw new Error("the fixture's frontier holds one text");
+  const v0 = bundleV0();
+  return {
+    ...frontier,
+    turnId: turnIdOf([JOIN_EVENT_ID]),
+    bundleId: v0.bundleId,
+    texts: [
+      {
+        ...text,
+        eventId: JOIN_EVENT_ID,
+        words: JOIN_WORDS,
+        sentAt: { utc: JOIN_SENT_UTC, zone: text.sentAt.zone },
+      },
+    ],
+    alwaysOn: { ...frontier.alwaysOn, prefixSha256: v0.prefixSha256 },
+  };
 }
 interface DecideOutput extends JsonObject {
   language: string;
@@ -627,15 +682,30 @@ describe("turn 1 (K-02 v1.1): the recordings the README names, every context pin
     await expect(model.decide({ context, role: "reread" })).rejects.toThrow(NoRecordingError);
   });
 
-  it("decide on the JOIN run's context: both reads enter c-01 with the quote JOIN, decide-s1-01-enter.json's reads otherwise", async () => {
+  it("the JOIN run's context is build-frontier-s1-01.json's frontier keyed on the run's own ids, never written by hand", async () => {
     const join = joinContext();
-    const base = s101();
-    const text = must(base.texts[0]);
-    // context-s1-01.json with only the JOIN run's turn id and its one text changed (README "v1.1" recording 2).
-    expect({ ...join, turnId: base.turnId, texts: base.texts }).toEqual(base);
-    // The JOIN run's ids are K-08 trace-skeleton.json's: its turn, its one event, its bundle.
-    expect(join.turnId).toBe(TRACE.turn_id);
-    expect(join.bundleId).toEqual(TRACE.bundle_id);
+    const frontier = FRONTIER.outcome.context;
+    const v0 = bundleV0();
+    // The file in ai/recordings pins exactly what the frontier gives with the run's ids (DL-347 ruling 3).
+    expect(join).toEqual(joinRunContext());
+    // The fixture's frontier is K-02 v1.1's context-s1-01.json unchanged (K-09 README v1.5), for its own turn and text.
+    expect(frontier).toEqual(s101());
+    expect([frontier.turnId, FRONTIER.request.texts]).toEqual([FRONTIER.request.turn.id, frontier.texts]);
+    // The turn id is T-248's hash of the JOIN's one event id (runtime/src/actor/lease.ts turnIdOf), 64 lowercase hex
+    // digits: never the fixture's turn-s1-01-sam or K-08 trace-skeleton.json's stand-in turn-s1-01-sam-join.
+    expect(join.turnId).toBe(JOIN_TURN_ID);
+    expect(join.turnId).toMatch(/^[0-9a-f]{64}$/u);
+    expect(turnIdOf([JOIN_EVENT_ID, JOIN_EVENT_ID])).toBe(join.turnId);
+    expect([frontier.turnId, TRACE.turn_id]).not.toContain(join.turnId);
+    // The lease's own function names the run's turn with the same id.
+    expect(await leaseTurnIdOf([JOIN_EVENT_ID])).toBe(join.turnId);
+    // The bundle is bundle v0 as bundles/v0 publishes it, with its flow A rules hash: never the fixtures' 93c00d14.../1.
+    expect(join.bundleId).toEqual(v0.bundleId);
+    expect(join.alwaysOn).toEqual({ flow: join.flow, prefixSha256: v0.prefixSha256 });
+    expect(join.bundleId).not.toEqual(frontier.bundleId);
+    expect(join.bundleId).not.toEqual(TRACE.bundle_id);
+    // Its one text: the JOIN of tests/e2e/skeleton, K-08 trace-skeleton.json's event, at the e2e's send time.
+    const text = must(frontier.texts[0]);
     expect(join.texts).toEqual([
       {
         ...text,
@@ -644,6 +714,61 @@ describe("turn 1 (K-02 v1.1): the recordings the README names, every context pin
         sentAt: { utc: JOIN_SENT_UTC, zone: text.sentAt.zone },
       },
     ]);
+    // Nothing else differs from the fixture's frontier.
+    expect({
+      ...join,
+      turnId: frontier.turnId,
+      bundleId: frontier.bundleId,
+      texts: frontier.texts,
+      alwaysOn: frontier.alwaysOn,
+    }).toEqual(frontier);
+  });
+
+  it("ai/src/context's builder lays the JOIN run's context out on bundle v0 as published, for both reads; the fixture's bundle is refused there", () => {
+    const join = joinContext() as unknown as DecideContext;
+    const v0 = bundleV0();
+    const prompts = createPromptCache(v0.cache);
+    expect(prompts.bundleId).toEqual(v0.bundleId);
+    const decidePrompt = v0.cache.manifest.prompts.decide.text;
+    const rules = must(v0.cache.flows.A).routing.alwaysOn.prefixText;
+    for (const [purpose, seed] of [
+      ["decideFirst", 7],
+      ["decideCheck", 11],
+    ] as const) {
+      const built = buildContextPrompt(prompts, join, { purpose, seed });
+      expect([built.turnId, built.purpose, built.seed]).toEqual([JOIN_TURN_ID, purpose, seed]);
+      expect(built.prompt.bundleId).toEqual(v0.bundleId);
+      // The cached segment is bundle v0's decide prompt and its flow A rules; the turn shows no card.
+      expect(built.prompt.segments).toEqual([
+        { kind: "static", text: `${decidePrompt}${RULES_OPEN}${rules}${RULES_CLOSE}` },
+      ]);
+      // The per-turn part lists the one choice, c-01, and the turn's one text, JOIN.
+      expect(built.choiceOrder).toEqual(["c-01"]);
+      expect(built.prompt.turn).toContain('<choice id="c-01" kind="door" step="S1-01">');
+      expect(built.prompt.turn).toContain(`>${JOIN_WORDS}</text>`);
+      expect(built.span).toEqual({
+        [`${purpose}Seed`]: seed,
+        texts: 1,
+        openQuestions: 0,
+        choices: 1,
+        cards: 0,
+        facts: 0,
+        recentMessages: 0,
+        recentLeftOut: 0,
+      });
+    }
+    // The same context under the fixture's bundle (round 1's key) is refused by bundle v0's layout before any call.
+    expect(() =>
+      buildContextPrompt(
+        prompts,
+        { ...join, bundleId: FRONTIER.outcome.context.bundleId },
+        { purpose: "decideFirst", seed: 7 },
+      ),
+    ).toThrow(CacheLayoutError);
+  });
+
+  it("decide on the JOIN run's context: both reads enter c-01 with the quote JOIN, decide-s1-01-enter.json's reads otherwise", async () => {
+    const join = joinContext();
     // K-08's frontier and decide spans of that run: one door, S1-01, low stakes; two Haiku reads agreeing on enter, no
     // re-read.
     expect(spanOf("frontier").decided).toEqual({
@@ -716,6 +841,16 @@ describe("turn 1 (K-02 v1.1): the recordings the README names, every context pin
     await expect(
       model.decide({ context: { ...join, bundleId: { hash: "0".repeat(64), build: 1 } }, role: "first" }),
     ).rejects.toThrow(/decideRead/);
+    // The JOIN keyed on the skeleton fixtures' stand-in ids (round 1's key: K-08 trace-skeleton.json's turn and the
+    // fixtures' bundle and rules hash), which the runtime never sends: nothing is recorded for it.
+    const standIn = {
+      ...join,
+      turnId: TRACE.turn_id,
+      bundleId: base.bundleId,
+      alwaysOn: base.alwaysOn,
+    };
+    await expect(model.decide({ context: standIn, role: "first" })).rejects.toThrow(NoRecordingError);
+    await expect(model.decide({ context: standIn, role: "check" })).rejects.toThrow(NoRecordingError);
     // A safety text one character off.
     await expect(model.safetyRead({ text: "join" })).rejects.toThrow(NoRecordingError);
     await expect(model.safetyRead({ text: `${JOIN_WORDS} ` })).rejects.toThrow(NoRecordingError);

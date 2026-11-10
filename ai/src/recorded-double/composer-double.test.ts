@@ -1,7 +1,7 @@
 // Tests of the composer's call of the recorded-model double (T-1071, C-123), against K-03 v1's fixtures, with the walking
-// skeleton's JOIN run's input (T-1145; K-02 README "v1.1", recording 4). Deterministic and offline: outbound fetch is
-// stubbed to throw for the whole file, and a test fails if anything calls it. The K-02 side of the double has its own tests
-// (recorded-double.test.ts).
+// skeleton's JOIN run's input (T-1145; K-02 README "v1.1", recording 4), keyed on that run's own turn and row ids (round
+// 2, DL-347; ./test-support.ts). Deterministic and offline: outbound fetch is stubbed to throw for the whole file, and a
+// test fails if anything calls it. The K-02 side of the double has its own tests (recorded-double.test.ts).
 
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
@@ -23,6 +23,15 @@ import {
   type JsonObject,
   type RecordedComposer,
 } from "./index";
+import {
+  JOIN_EVENT_ID,
+  JOIN_ROW_ID,
+  JOIN_SENT_UTC,
+  JOIN_TURN_ID,
+  JOIN_WORDS,
+  rowIdOf,
+  turnIdOf,
+} from "./test-support";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const CONTRACT_DIR = path.join(REPO_ROOT, "contracts");
@@ -83,6 +92,24 @@ interface Inbound {
   text: string;
   sentAt: { utc: string; zone: string };
 }
+/** A composer input, as far as these tests read it: its row, its turn and the text it replies to. */
+type InputOf = JsonObject & { row: string; turn: string; inbound: Inbound };
+
+/**
+ * The compose input for the JOIN run's row (K-02 README "v1.1" recording 4; DL-347 ruling 2): K-03's input-s1-02.json
+ * for the run's own row and turn, replying to the run's one text. The turn is T-248's hash of the JOIN's event id; the row
+ * is S1-02's question, ADR-013 default 131's `outbox-s1-02-<turn key>-1` with that turn id as the turn key; the inbound
+ * is the JOIN of tests/e2e/skeleton at its send time, in the fixture's zone. Everything else is the fixture's.
+ */
+function joinRunInput(): InputOf {
+  const chain = fixture("input-s1-02.json") as InputOf;
+  return {
+    ...chain,
+    row: rowIdOf("outbox", "S1-02", turnIdOf([JOIN_EVENT_ID]), 1),
+    turn: turnIdOf([JOIN_EVENT_ID]),
+    inbound: { text: JOIN_WORDS, sentAt: { utc: JOIN_SENT_UTC, zone: chain.inbound.sentAt.zone } },
+  };
+}
 const unique = (names: readonly string[]): string[] => [...new Set(names)];
 
 /** The composer's input a recording names. */
@@ -124,18 +151,38 @@ describe("the plan fixtures: each input gets its plan", () => {
     expect(accepts("plan", answer)).toBe(true);
   });
 
-  it("answers the JOIN run's input, input-s1-02 with only its inbound changed to JOIN and its time, with plan-s1-02", async () => {
-    const join = recordingFile(JOIN_INPUT_FILE) as JsonObject & { inbound: Inbound };
-    const chain = fixture("input-s1-02.json") as JsonObject & { inbound: Inbound };
-    expect({ ...join, inbound: chain.inbound }).toEqual(chain);
+  it("answers the JOIN run's input, input-s1-02 for the run's own row and turn replying to JOIN at its time, with plan-s1-02", async () => {
+    const join = recordingFile(JOIN_INPUT_FILE) as InputOf;
+    const chain = fixture("input-s1-02.json") as InputOf;
+    // The file in ai/recordings pins exactly the input the run's row gets (DL-347 ruling 2), never written by hand.
+    expect(join).toEqual(joinRunInput());
+    // The run's ids: T-248's hash of the JOIN's one event id (64 lowercase hex digits), and default 131's row id with it as
+    // the turn key; the fixture's row is the same rule with the fixture's stand-in turn key, sam (ADR-013 default 131).
+    expect([join.turn, join.row]).toEqual([JOIN_TURN_ID, JOIN_ROW_ID]);
+    expect(join.turn).toMatch(/^[0-9a-f]{64}$/u);
+    expect(join.row).toBe(`outbox-s1-02-${join.turn}-1`);
+    expect(rowIdOf("outbox", "S1-02", "sam", 1)).toBe(chain.row);
+    expect([chain.row, chain.turn]).not.toContain(join.row);
+    expect([chain.row, chain.turn]).not.toContain(join.turn);
+    // K-09's compose input for turn 1's row is K-03's input-s1-02.json: the Tool API writes the row and the turn from the
+    // request's row and its caller's turn, so those, with the text replied to, are what the run's own request changes.
+    const toolApi = readJson(path.join(CONTRACT_DIR, "tool-api", "fixtures", "compose-input-s1-02.json")) as {
+      request: { caller: { turnId: string }; outboxRowId: string };
+      outcome: { input: InputOf };
+    };
+    expect(toolApi.outcome.input).toEqual(chain);
+    expect([chain.row, chain.turn]).toEqual([toolApi.request.outboxRowId, toolApi.request.caller.turnId]);
+    expect({ ...join, row: chain.row, turn: chain.turn, inbound: chain.inbound }).toEqual(chain);
     expect(join.inbound).toEqual({
-      text: "JOIN",
-      sentAt: { utc: "2026-10-19T14:01:49Z", zone: chain.inbound.sentAt.zone },
+      text: JOIN_WORDS,
+      sentAt: { utc: JOIN_SENT_UTC, zone: chain.inbound.sentAt.zone },
     });
-    // The same JOIN text and time as the JOIN run's decide context (ai/recordings/recordings.v1.1.json).
+    // The same turn, JOIN text and time as the JOIN run's decide context (ai/recordings/recordings.v1.1.json).
     const context = recordingFile("contexts/join-s1-01.json") as {
+      turnId: string;
       texts: { words: string; sentAt: Inbound["sentAt"] }[];
     };
+    expect(context.turnId).toBe(join.turn);
     expect(context.texts.map((text) => ({ text: text.words, sentAt: text.sentAt }))).toEqual([join.inbound]);
     expect(accepts("composeInput", join)).toBe(true);
     const recorded = composerFile().recordings.filter((entry) => entry.request.file === JOIN_INPUT_FILE);
@@ -219,7 +266,7 @@ describe("an input with no recording fails loudly", () => {
   });
 
   it("rejects the JOIN run's input at another time, or with its text changed (T-1145)", async () => {
-    const join = recordingFile(JOIN_INPUT_FILE) as JsonObject & { inbound: Inbound };
+    const join = recordingFile(JOIN_INPUT_FILE) as InputOf;
     const later = { ...join.inbound.sentAt, utc: "2026-10-19T14:01:50Z" };
     await expect(composer.composer({ ...join, inbound: { ...join.inbound, sentAt: later } })).rejects.toThrow(
       NoRecordingError,
@@ -227,6 +274,18 @@ describe("an input with no recording fails loudly", () => {
     await expect(composer.composer({ ...join, inbound: { ...join.inbound, text: "join" } })).rejects.toThrow(
       /composerPlan/,
     );
+  });
+
+  it("rejects the JOIN run's input under the fixture's stand-in row and turn (round 1's key), or another turn's row", async () => {
+    const join = recordingFile(JOIN_INPUT_FILE) as InputOf;
+    const chain = fixture("input-s1-02.json") as InputOf;
+    await expect(composer.composer({ ...join, row: chain.row, turn: chain.turn })).rejects.toThrow(
+      NoRecordingError,
+    );
+    const other = turnIdOf([JOIN_EVENT_ID, "evt-sam-0001"]);
+    await expect(
+      composer.composer({ ...join, row: rowIdOf("outbox", "S1-02", other, 1), turn: other }),
+    ).rejects.toThrow(/composerPlan/);
   });
 
   it("fails the same way when the file holds no composer recording at all", async () => {
