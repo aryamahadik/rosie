@@ -1,0 +1,32 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-10-23T14:05:03Z",
+    "note": "Alex gave an email, so A7-03's question goes there too, as its own row with the text row's plan and the options typed (K-07 outbox-email-copy.json: out-a7-03-alex-email). The booking's confirmation email went earlier, and its delivered receipt reported its Message-ID, so this one threads under it."
+  },
+  "request": {
+    "idempotencyKey": "out-a7-03-alex-email/1/1",
+    "purpose": "copy",
+    "bookingId": "booking-alex-haircut",
+    "from": {
+      "name": "Lee's Barbershop",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "alex@example.com",
+    "replyTo": "booking-alex-haircut@reply.example.com",
+    "subject": "Your haircut at Lee's Barbershop",
+    "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nSure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?\n1 Sat 12:00pm\n2 Sat 2:00pm\n3 Sat 3:30pm\n\nManage your booking: https://example.com/m/a03",
+    "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+    "manageLink": "https://example.com/m/a03",
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": "<rfc-demo-0005@email.example.com>",
+      "references": ["<rfc-demo-0005@email.example.com>"]
+    }
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "email-msg-demo-0007",
+    "acceptedAt": "2026-10-23T14:05:03Z"
+  }
+}

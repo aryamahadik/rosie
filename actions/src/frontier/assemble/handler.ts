@@ -1,7 +1,8 @@
-// buildFrontier, the Tool API call (T-291; K-09 v1 buildFrontier; arch 02 step 4, line 117): the turn, its targets from
-// the guard and the pinned bundle give K-02 v1's context. Registered on the T-290 base (createToolApi), which checks the
-// request against K-09 v1, runs this handler inside one transaction scoped to the caller's business, holds the answer
-// to buildFrontier's response or errors, and opens the call's one K-08 span (hop frontier). In this order:
+// buildFrontier, the Tool API call (T-291, T-1150; K-09 v1's call, typed and checked by K-09 v1.5's buildFrontier; arch
+// 02 step 4, line 117): the turn, its targets from the guard and the pinned bundle give K-02 v1.1's context. Registered
+// on the T-290 base (createToolApi), which checks the request against K-09 v1.5, runs this handler inside one
+// transaction scoped to the caller's business, holds the answer to buildFrontier's response or errors, and opens the
+// call's one K-08 span (hop frontier). In this order:
 //
 //   1. the pinned bundle's manifest (K-01 v1), or bundleNotFound;
 //   2. the turn's stored state in one read: K-05 v1.2 readTurnState under the call's business, with the business's name
@@ -18,7 +19,7 @@
 //      primary, uncached (T-295, facts/; arch 02 line 117; arch 10 line 538); a second value for one key is refused, the
 //      home's value goes in and the step is named in `flagged`. The read's notFound and transient are buildFrontier's
 //      own errors;
-//   8. the context, checked against K-02 v1 as a whole. No choice at all, or a context K-02 refuses: a FrontierError,
+//   8. the context, checked against K-02 v1.1 as a whole. No choice at all, or a context K-02 refuses: a FrontierError,
 //      which the base records as a failed span and passes on, so the turn takes the outage path (arch 06 line 293) and
 //      decide never sees a frontier that is not closed and valid.
 //
@@ -49,10 +50,10 @@ import {
   type Time,
 } from "./types";
 
-/** The most choices a frontier holds (arch 01 line 69; K-02 v1 context.choices maxItems): the cap's (cap/). */
+/** The most choices a frontier holds (arch 01 line 69; K-02 v1.1 context.choices maxItems): the cap's (cap/). */
 export { MAX_CHOICES };
 
-/** Why the frontier cannot answer within K-09 v1: a builder fault, never a refusal of the caller. */
+/** Why the frontier cannot answer within K-09 v1.5: a builder fault, never a refusal of the caller. */
 export type FrontierFault = "noChoices" | "noWriter" | "unknownFact" | "badState" | "invalidContext";
 
 /** A builder fault: the base records a failed span and passes it on. Its message is its code, never a value. */
@@ -73,7 +74,7 @@ export interface FrontierOptions {
   sources?: readonly SourceSlot[];
   /** Where the frontier's log lines go. Default: one JSON line each on console.warn. */
   log?: FrontierLogSink;
-  /** The K-02 v1 checks. Default: one checker per isolate. */
+  /** The K-02 v1.1 checks. Default: one checker per isolate. */
   checker?: FrontierChecker;
   /** The facts' homes, sources and read port (facts/). Default: no home listed yet, so no fact; K-05 readTurnState. */
   facts?: FrontierFactsOptions;

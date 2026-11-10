@@ -60,10 +60,10 @@ export function contractFixture(file: string): unknown {
 // K-05 v1.2's frozen schema, for the fake repo's request and answer
 
 const DATA_ACCESS_V12_ID = "https://rosie.invalid/contracts/data-access/data-access.v1.2.schema.json";
+/** K-05 v1.1 and v1.2, beside the Tool API's files (K-06 v1, which v1.2 also reaches, is among those: K-09 v1.5). */
 const EXTRA_SCHEMAS = [
   "data-access/data-access.v1.1.schema.json",
   "data-access/data-access.v1.2.schema.json",
-  "inbound-event/inbound-event.v1.schema.json",
 ];
 
 let k05: Ajv2020 | undefined;

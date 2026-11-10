@@ -1,32 +1,34 @@
 // What the policy gate (C-080, T-298) reads and gives, and the one small interface each of limits 1 to 6 implements.
 //
-// The gate is gateAndCommit's first half (K-09 v1; arch 02 line 121; arch 06 lines 295 to 309): it takes the turn's
-// context and decide's result (K-02 v1 contextAndDecide), confirms decide's output (arch 03 line 185), then runs limits
+// The gate is gateAndCommit's first half (K-09 v1.5; arch 02 line 121; arch 06 lines 295 to 309): it takes the turn's
+// context and decide's result (K-02 v1.1 contextAndDecide), confirms decide's output (arch 03 line 185), then runs limits
 // 1 to 6 on each agreed part in order. Each limit lives in its own folder, actions/src/gate/limit-N/, registered in
 // actions/src/gate/limits.ts; until its task lands (T-299 to T-304) the folder holds the fail-closed stub (stub.ts).
 //
-// Every type below that K-09 v1 or K-02 v1 defines is the generated contract type (`npm run contracts:types`; ADR-005),
-// reached through the gateAndCommit request, so the gate and the Tool API base read one shape.
+// Every type below that K-09 v1.5 or K-02 v1.1 defines is the generated contract type (`npm run contracts:types`;
+// ADR-005), reached through the gateAndCommit request, so the gate and the Tool API base read one shape. Each keeps v1's
+// meaning: v1.5 and K-02 v1.1 only add (a choice's door may be signUp; the turn may carry its last text's service and
+// chat id; a part may give a later journey's key), and the rest are v1's definitions by reference.
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import type { RequestOf } from "../../tool-api";
 
-/** The gateAndCommit request (K-09 v1 `gateAndCommit.request`), as the Tool API base hands it to its handler. */
+/** The gateAndCommit request (K-09 v1.5 `gateAndCommit.request`), as the Tool API base hands it to its handler. */
 export type GateRequest = RequestOf<"gateAndCommit">;
-/** A context with the decide result made from it, as the gate reads them (K-02 v1 `contextAndDecide`). */
+/** A context with the decide result made from it, as the gate reads them (K-02 v1.1 `contextAndDecide`). */
 export type Decided = K09.DecidedInput["decided"];
-/** The turn's context: its texts, open questions and offered choices (K-02 v1 `context`). */
+/** The turn's context: its texts, open questions and offered choices (K-02 v1.1 `context`). */
 export type Context = Decided["context"];
-/** Decide's result: the reads and the parts handed to the gate (K-02 v1 `decideResult`). */
+/** Decide's result: the reads and the parts handed to the gate (K-02 v1.1 `decideResult`, v1's by reference). */
 export type DecideResult = Decided["decide"];
-/** One verb for one part of the text (K-02 v1 `decidePart`). */
+/** One verb for one part of the text (K-02 v1.1 `decidePart`, v1's by reference). */
 export type DecidePart = DecideResult["parts"][number]["part"];
-/** One offered choice of the frontier (K-02 v1 `choice`). */
+/** One offered choice of the frontier (K-02 v1.1 `choice`, whose door may also be signUp). */
 export type Choice = Context["choices"][number];
 /** The verbs the limits gate: those whose part writes something in the commit (gate.ts, default 2). */
 export type GatedVerbPart = Extract<DecidePart, { verb: "choose" | "enter" | "pass_on" | "hand_off" }>;
 
-/** Each limit's outcomes when it fails (K-09 v1 `limit1Outcome` to `limit6Outcome`). */
+/** Each limit's outcomes when it fails (K-09 v1.5 `limit1Outcome` to `limit6Outcome`, v1's by reference). */
 export interface LimitOutcomes {
   1: K09.Limit1Outcome;
   2: K09.Limit2Outcome;
@@ -38,24 +40,24 @@ export interface LimitOutcomes {
 
 /** A limit checked at the gate: 1 Allowed, 2 Owner rules, 3 Exact yes, 4 Versions, 5 Reserved, 6 Values (arch 06). */
 export type LimitNumber = keyof LimitOutcomes;
-/** The failed limit and its outcome (K-09 v1 `limitOutcome`). */
+/** The failed limit and its outcome (K-09 v1.5 `limitOutcome`, v1's by reference). */
 export type LimitOutcome = K09.LimitOutcome;
 /** One limit's result as the gate span and the part's result log it (K-08 v1 `limitResult`). */
 export type LimitResult = K09.LimitResult;
-/** What the gate did with one part, as gateAndCommit answers it (K-09 v1 `partResult`). */
+/** What the gate did with one part, as gateAndCommit answers it (K-09 v1.5 `partResult`, v1.4's by reference). */
 export type PartResult = K09.PartResult;
-/** A key a part's step gives (K-09 v1 `setupKey`), which the commit names on a committed part. */
-export type SetupKey = K09.SetupKey;
-/** Decide's output broke a K-02 v1 named rule (K-09 v1 `gateAndCommit.errors` decideRefused). */
+/** A key a part's step gives (K-09 v1.5 `stepKey`, `partResult.gives`), which the commit names on a committed part. */
+export type SetupKey = K09.StepKey;
+/** Decide's output broke a K-02 v1.1 named rule (K-09 v1.5 `gateAndCommit.errors` decideRefused). */
 export type DecideRefused = K09.DecideRefusedError;
-/** A value failed its words before decide's one re-read (K-09 v1 `gateAndCommit.errors` valueFailsWords). */
+/** A value failed its words before decide's one re-read (K-09 v1.5 `gateAndCommit.errors` valueFailsWords). */
 export type ValueFailsWords = K09.ValueFailsWordsError;
-/** gateAndCommit's refusals that the gate itself answers: nothing is written (K-09 v1 `gateAndCommit.errors`). */
+/** gateAndCommit's refusals that the gate itself answers: nothing is written (K-09 v1.5 `gateAndCommit.errors`). */
 export type GateRefusal = DecideRefused | ValueFailsWords;
 
 /** One agreed part as a limit checks it: its quote, its choice and every value's words already confirmed. */
 export interface GatePart {
-  /** The part's index in decide.parts (K-02 v1 `decideResult.parts`; K-09 v1 `partResult.part`). */
+  /** The part's index in decide.parts (K-02 v1.1 `decideResult.parts`; K-09 v1.5 `partResult.part`). */
   readonly index: number;
   /** The part as decide agreed it: choose, enter, pass_on or hand_off. */
   readonly part: GatedVerbPart;

@@ -1,0 +1,49 @@
+{
+  "call": "readReply",
+  "given": {
+    "now": "2026-10-23T18:30:04Z",
+    "note": "The reply verify-reply-received.json announced: Alex answers his haircut's thread by email. Resend's receiving API gives its text, with the quoted earlier email dropped, and its sender check: DKIM and DMARC pass for his address, so passed (RULES 6.1; README default 12; vendor-samples/received-email.json). The event is K-06 email-reply-check-passed.json byte for byte: from is the handle, the booking's reply address picks the booking and thread (RULES 4.1), and the subject and text are the email's."
+  },
+  "request": {
+    "eventId": "evt-email-alex-0001",
+    "receivedEmailId": "resend-in-demo-alex-0001",
+    "receivedAt": "2026-10-23T18:30:04Z",
+    "traceId": "trace-email-alex-0001"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "evt-email-alex-0001",
+      "provider": "email",
+      "handle": {
+        "kind": "email",
+        "address": "alex@example.com"
+      },
+      "service": "email",
+      "kind": "text",
+      "messageId": "email-msg-demo-alex-0001",
+      "chatId": null,
+      "sentAt": "2026-10-23T18:30:00Z",
+      "receivedAt": "2026-10-23T18:30:04Z",
+      "body": "Can we make it 2pm instead?",
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": null,
+      "fromRosie": false,
+      "email": {
+        "replyAddress": "booking-alex-haircut@reply.example.com",
+        "subject": "Re: Your haircut at Lee's Barbershop",
+        "senderCheck": "passed"
+      },
+      "traceId": "trace-email-alex-0001"
+    }
+  }
+}

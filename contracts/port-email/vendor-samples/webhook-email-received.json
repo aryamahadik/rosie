@@ -1,0 +1,16 @@
+{
+  "type": "email.received",
+  "created_at": "2026-10-23T18:30:03.020Z",
+  "data": {
+    "email_id": "resend-in-demo-alex-0001",
+    "created_at": "2026-10-23T18:30:00.412Z",
+    "from": "alex@example.com",
+    "to": ["booking-alex-haircut@reply.example.com"],
+    "cc": [],
+    "bcc": [],
+    "received_for": ["booking-alex-haircut@reply.example.com"],
+    "message_id": "email-msg-demo-alex-0001",
+    "subject": "Re: Your haircut at Lee's Barbershop",
+    "attachments": []
+  }
+}

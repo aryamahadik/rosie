@@ -9,7 +9,12 @@
 // sendState, which reads phones.optout_line_delivered_at, runs only on the runtime side and refuses under a business
 // scope; no K-05 call reads whether Rosie texted a handle about a business before). Until it lands the port fails closed
 // (notBuiltFixedLinePorts), and the tests use a double.
+//
+// The texts a row answers, each with its safety read's plain result, are K-05 v1.3 readOutboxRow's `answers.texts`
+// (T-1137, T-1138), handed through by the port as they are read: they decide the danger question after a safety line
+// (T-1164; CQ-164 d).
 
+import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.3";
 import type { CallContext } from "../../tool-api";
 import type { FinalizeRow } from "../rewrite";
 
@@ -35,6 +40,25 @@ export const FIRST_TEXT_LINES: readonly string[] = [OPENER_LINE, OPT_OUT_LINE, P
  */
 export const STOP_REPLY_LINE = "stopReply";
 
+/**
+ * K-01 v1's safety lines (contracts/bundle fixed-lines.json): an emergency's 911 (A3-24) and crisis words' 988 and 911
+ * (A3-25), the lines the safety service's fallbacks give every other danger outcome too (commit/core/lines.ts; T-1143's
+ * FIXED_LINE_OF). A step card's own line is not a K-01 fixed line, so this inserter never places one.
+ */
+export const SAFETY_LINES: readonly string[] = ["safetyEmergency", "safetyCrisis"];
+
+/** K-01 v1's danger question, "Is anyone in danger right now?" (arch 06 line 329; S13-24 rule 10). */
+export const SAFETY_ASK_LINE = "safetyAsk";
+
+/**
+ * One text a row answers, as K-05 v1.3 readOutboxRow gives it (answeredText): a text of the turn that committed the row,
+ * by its event id, with its safety read's plain result (K-34 v1 safety_outcomes): `outcomes`, what holds after code's
+ * rules (K-02 v1 safetyResult.outcomes), and `tenses`, each label's tense in the labels' order. Both are null when the
+ * scope shows no safety row for the text, and for a clock turn's one event id. Never the text's words nor the read's
+ * sealed words, and not each label's own outcome (K-34 v1 labels), which readOutboxRow does not give.
+ */
+export type AnsweredText = K05.ReadOutboxRowResponse["answers"]["texts"][number];
+
 /** What the send state says about the row's handle and business, and the other fixed lines the row carries. */
 export interface FixedLineFacts {
   /**
@@ -54,9 +78,17 @@ export interface FixedLineFacts {
    * The row's other fixed lines, by K-01 id, in the order they go after the words: the code text (S13-45), safety lines
    * (arch 06 line 329: "unknown reads as danger and adds 'Is anyone in danger right now?'"), checked terms and lines
    * RULES quotes (arch 06 line 341), the handling line on owner and staff messages about a private booking or a
-   * texts-only or email-only customer (S13-19). Never a first text's line, never stopReply, each once.
+   * texts-only or email-only customer (S13-19). Never a first text's line, never stopReply, each once. The danger question
+   * after a safety line is the inserter's own, from `answeredTexts` (insert.ts dangerQuestionAfter); a port that lists it
+   * itself keeps it where it put it unless that rule places it.
    */
   readonly lines: readonly string[];
+  /**
+   * The texts the row answers, in turn order, each with its safety read: K-05 v1.3 readOutboxRow's `answers.texts`, as
+   * read. When the row carries a safety line and one of them holds a label of unknown tense other than No, the inserter
+   * adds the danger question after that line, once (arch 06 line 329; S13-24 rule 10; T-1164).
+   */
+  readonly answeredTexts: readonly AnsweredText[];
 }
 
 /**

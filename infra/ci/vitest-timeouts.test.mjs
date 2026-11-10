@@ -23,7 +23,7 @@ const vitestConfig = readFileSync(path.join(root, "vitest.config.ts"), "utf8");
 
 const VITEST_DEFAULT_MS = 5000;
 const GUARD_MS = 30000;
-const PROJECTS = ["unit", "parity", "workers", "contract", "integration", "scenario", "e2e"];
+const PROJECTS = ["unit", "parity", "workers", "contract", "integration", "scenario", "e2e", "e2e-workers"];
 
 // The root test options: the config's text before its project list.
 const rootOptions = vitestConfig.slice(0, vitestConfig.indexOf("projects:"));

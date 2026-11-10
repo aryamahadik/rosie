@@ -1,9 +1,12 @@
-// Rosie's Worker. Routes (factory spec 6; T-241; T-275): GET {BASE_PATH}/health, and the gateway's webhooks, each a POST
-// under BASE_PATH: /webhooks/linq; Stripe's /webhooks/stripe/rosfield and /webhooks/stripe/businesses; the calendars'
-// /webhooks/calendar/google and /webhooks/calendar/microsoft.
+// Rosie's Worker. Routes (factory spec 6; T-241; T-275; T-266): GET {BASE_PATH}/health, and the gateway's webhooks, each a
+// POST under BASE_PATH: /webhooks/linq; Stripe's /webhooks/stripe/rosfield and /webhooks/stripe/businesses; the calendars'
+// /webhooks/calendar/google and /webhooks/calendar/microsoft. And the page entry: the web app's K-21 v1 page and console
+// calls, each a POST to {BASE_PATH}/page-api/<call>, handed to the action layer's handler for that call; a staging-only
+// call answers stagingOnly wherever ENVIRONMENT is not staging (runtime/src/gateway/pages).
 // Every request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
-// Each webhook opens its own id at receipt (runtime/src/gateway).
+// Each webhook opens its own id at receipt, and each page call its own, keeping a valid incoming one (runtime/src/gateway);
+// a page call's 200 carries only its K-21 outcome, so its id is in the header alone.
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
 // The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
 // for the Worker's environment. The Worker's Linq route is the root's, behind the skeleton flag (T-552, T-553).
@@ -11,8 +14,11 @@
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
   handleLinqWebhook,
+  handlePageCall,
   handleProviderWebhook,
   LINQ_WEBHOOK_PATH,
+  pageDepsOf,
+  pageRouteOf,
   providerDepsOf,
   providerRouteOf,
   type GatewayDeps,
@@ -59,7 +65,8 @@ function jsonResponse(status: number, body: Record<string, unknown>, traceId: st
 }
 
 /**
- * The health and 404 answers are synchronous (the health tests read them without waiting); the webhooks answer later.
+ * The health and 404 answers are synchronous (the health tests read them without waiting); the webhooks and the page
+ * calls answer later.
  * The Workers runtime always passes the execution context, so its call is the second form.
  */
 export interface RosieWorker {
@@ -129,6 +136,14 @@ export function createWorker(
         environment,
         version,
       });
+    }
+
+    const pageCall = pathname.startsWith(basePath) ? pageRouteOf(pathname.slice(basePath.length)) : null;
+    if (pageCall !== null) {
+      if (request.method !== "POST") {
+        return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
+      }
+      return handlePageCall(request, pageCall, pageDepsOf(gatewayDeps(env)), { environment, version });
     }
 
     if (request.method === "GET" && pathname === `${basePath}/health`) {

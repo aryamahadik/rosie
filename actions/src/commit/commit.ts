@@ -52,7 +52,14 @@ import {
 import { LIMITS } from "../gate/limits";
 import type { CallContext, Handler } from "../tool-api";
 import type { RowRef as SpanRowRef } from "../../../runtime/src/trace/types";
-import { buildCommitRequest, effectView, type Answer, type CommitUnit, type TurnActor } from "./build";
+import {
+  buildCommitRequest,
+  effectView,
+  k05TurnRow,
+  type Answer,
+  type CommitUnit,
+  type TurnActor,
+} from "./build";
 import { CommitNotBuiltError, CommitRefusedError } from "./errors";
 import { askedBookings, bookingKey, bundleMismatchOf, checkTurn, choiceOf, heldParts } from "./hold";
 import type {
@@ -96,7 +103,7 @@ function turnRowOf(request: GateAndCommitRequest): TurnRow {
   const turn = request.turn;
   if (turn === null) throw new CommitRefusedError("callerNotTurn");
   checkTurn(request, turn);
-  return turn;
+  return k05TurnRow(turn);
 }
 
 /**

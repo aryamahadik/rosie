@@ -25,14 +25,30 @@
 //   7. The KV bulk file bundles/v0/bundle.kv.json holds one entry per part, every key under the bundle id, each value
 //      the part's bytes.
 //   8. With --db: readActiveBundle answers, and readBundleValue gives back every part byte for byte.
+//   9. The fixed lines (T-1146; Q-30): sharedLists.fixedLines is compiler/src/fixed-lines's list for staging's base path
+//      (wrangler.jsonc env.staging BASE_PATH): K-01 v1's accepted lines first, unchanged, then optOutLine in Spanish
+//      (msgtext.js line 32) and privacyLink, Q-30's default stand-in naming the privacy notice under that base path,
+//      asWritten (never pendingJay), each id once per language.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
-import { BUNDLE_DIR, FLOW, HERE, PROMPTS_FILE, ROOT, STEPS, load, promptsFromModules } from "./build.mjs";
+import {
+  BUNDLE_DIR,
+  ENVIRONMENT,
+  FLOW,
+  HERE,
+  KV_FILE,
+  PROMPTS_FILE,
+  ROOT,
+  STEPS,
+  fixedLinesOfV0,
+  load,
+  promptsFromModules,
+} from "./build.mjs";
 
 const SKELETON = join(ROOT, "contracts/bundle/fixtures/bundle-v0-skeleton.json");
-const KV_FILE = `${BUNDLE_DIR}.kv.json`;
+const K01_FIXED_LINES = join(ROOT, "contracts/bundle/fixtures/fixed-lines.json");
 const PROMPT_KINDS = ["safetyRead", "decide", "planner", "composer"];
 
 let failed = 0;
@@ -298,6 +314,40 @@ function checkKv(read) {
   report(ok, `KV bulk file: ${String(entries.length)} entries, one per part, every key under ${prefix}, each value the part's bytes`);
 }
 
+// ---- 9. the fixed lines ---------------------------------------------------------------------------------------------
+
+async function checkFixedLines(bundle) {
+  const { basePath, fixedLines } = await fixedLinesOfV0();
+  const lines = bundle.manifest.lists.fixedLines.lines;
+  report(
+    same(bundle.manifest.lists.fixedLines, fixedLines),
+    `sharedLists.fixedLines are compiler/src/fixed-lines's for ${ENVIRONMENT} (wrangler.jsonc BASE_PATH ${basePath}): ${String(lines.length)} lines, ${lines.map((line) => `${line.id} (${line.lang})`).join(", ")}`,
+  );
+  const k01 = JSON.parse(readFileSync(K01_FIXED_LINES, "utf8")).lines;
+  report(
+    same(lines.slice(0, k01.length), k01),
+    `K-01 v1's ${String(k01.length)} accepted lines first, each unchanged (contracts/bundle/fixtures/fixed-lines.json)`,
+  );
+  const keys = lines.map((line) => `${line.id} ${line.lang}`);
+  report(new Set(keys).size === keys.length, "each fixed line's id once per language (optOutLine in English and in Spanish)");
+  const privacy = lines.filter((line) => line.id === "privacyLink");
+  const link = privacy[0];
+  report(
+    privacy.length === 1 &&
+      link.lang === "en" &&
+      link.status === "asWritten" &&
+      typeof link.text === "string" &&
+      link.text.endsWith(`rosfield.com${basePath}/privacy`) &&
+      link.source.startsWith("Q-30's default, for Jay to confirm before production"),
+    `sharedLists.fixedLines holds privacyLink "${String(link?.text)}", ${String(link?.status)} (never pendingJay), marked "${String(link?.source.split(":")[0])}"`,
+  );
+  const spanish = lines.find((line) => line.id === "optOutLine" && line.lang === "es");
+  report(
+    spanish?.status === "asWritten" && typeof spanish.text === "string" && spanish.source.startsWith("msgtext.js line 32 "),
+    `optOutLine in Spanish "${String(spanish?.text)}" (${String(spanish?.source.split(";")[0])})`,
+  );
+}
+
 // ---- 8. PostgreSQL --------------------------------------------------------------------------------------------------
 
 async function checkDb(read) {
@@ -346,6 +396,7 @@ async function main() {
   checkStop(read.bundle);
   await checkManifest(read.bundle);
   checkKv(read);
+  await checkFixedLines(read.bundle);
   if (given.db) await checkDb(read);
   console.log(failed === 0 ? "all checks passed" : `${String(failed)} checks failed`);
   process.exitCode = failed === 0 ? 0 : 1;

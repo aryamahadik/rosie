@@ -138,11 +138,30 @@ export function checkPrefixRun(
   prefix: SkeletonPrefix,
   contracts: ContractReport | null,
 ): PrefixRunReport {
-  const trace = collected.trace === null ? null : prefixTrace(collected.trace, prefix.hops);
-  const report = checkRun({ ...collected, trace }, prefix.hops);
   const contractTests = prefix.row.contracts.map((contract) =>
     contractTestResult(contractTestOf(contract), contracts),
   );
+  return judgePrefixRun(collected, prefix, contractTests);
+}
+
+/**
+ * checkPrefixRun with hop n's contract tests already read (each contract's v1 test and how it fared in the report): what
+ * a run that cannot read contracts/ or the report itself is judged with, such as the skeleton's run inside workerd, whose
+ * results were read in Node (T-1149, ./plan.ts). The tests must be hop n's row's, one per contract, in the row's order.
+ */
+export function judgePrefixRun(
+  collected: Collected,
+  prefix: SkeletonPrefix,
+  contractTests: readonly ContractTestResult[],
+): PrefixRunReport {
+  const named = contractTests.map((result) => result.contract);
+  if (named.length !== prefix.row.contracts.length || named.some((id, i) => id !== prefix.row.contracts[i])) {
+    throw new Error(
+      `${hopLabel(prefix)}: the contract tests given are ${named.join(", ") || "none"}, where its row's are ${prefix.row.contracts.join(", ")}`,
+    );
+  }
+  const trace = collected.trace === null ? null : prefixTrace(collected.trace, prefix.hops);
+  const report = checkRun({ ...collected, trace }, prefix.hops);
   const contractProblems = contractTests.flatMap((result) => contractProblem(prefix, result) ?? []);
   return {
     ...report,
@@ -153,7 +172,7 @@ export function checkPrefixRun(
       row: prefix.row.row,
       hops: prefix.hops,
       spansAfter: (collected.trace?.spans.length ?? 0) - (trace?.spans.length ?? 0),
-      contractTests,
+      contractTests: [...contractTests],
     },
   };
 }

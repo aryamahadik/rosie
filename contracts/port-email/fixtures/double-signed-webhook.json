@@ -1,0 +1,55 @@
+{
+  "call": "doubleWebhook",
+  "given": {
+    "now": "2026-10-24T11:00:07Z",
+    "note": "On staging the email double fakes the delivered receipt for Ben's confirmation, which it recorded (double-sent-emails.json): a webhook in Resend's form, signed with the test environment's secret. verifyWebhook on it gives back this event and Message-ID, so the dispatcher and clock arming see a delivery as from Resend (BP 9.4).",
+    "signing": "valid"
+  },
+  "request": {
+    "event": {
+      "eventId": "evt-email-double-0001",
+      "provider": "email",
+      "handle": {
+        "kind": "email",
+        "address": "ben@example.com"
+      },
+      "service": "email",
+      "kind": "delivered",
+      "messageId": null,
+      "chatId": null,
+      "sentAt": null,
+      "receivedAt": "2026-10-24T11:00:07Z",
+      "body": null,
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": {
+        "messageId": "email-double-msg-0001",
+        "at": "2026-10-24T11:00:07Z",
+        "failure": null
+      },
+      "fromRosie": false,
+      "email": null,
+      "traceId": "trace-email-double-0001"
+    },
+    "rfcMessageId": "<email-double-0001@double.example.com>"
+  },
+  "outcome": {
+    "result": "signed",
+    "webhook": {
+      "webhookId": "evt-email-double-0001",
+      "timestamp": "1792839607",
+      "signature": "v1,signed-at-test-time",
+      "raw": "{\"type\":\"email.delivered\",\"created_at\":\"2026-10-24T11:00:07.000Z\",\"data\":{\"created_at\":\"2026-10-24T11:00:05.000Z\",\"email_id\":\"email-double-msg-0001\",\"message_id\":\"<email-double-0001@double.example.com>\",\"from\":\"Lee's Barbershop <rosie@mail.rosfield.com>\",\"to\":[\"ben@example.com\"],\"subject\":\"Booked: Sat Nov 21, 2:00pm\"}}",
+      "receivedAt": "2026-10-24T11:00:07Z",
+      "traceId": "trace-email-double-0001"
+    },
+    "receivedEmailId": null
+  }
+}

@@ -23,6 +23,7 @@ export {
   SKELETON_UPTO_NAMES,
   checkPrefixRun,
   checkSkeletonRun,
+  judgePrefixRun,
   prefixOf,
   prefixTrace,
   skeletonUpto,
@@ -31,6 +32,7 @@ export {
   type SkeletonPrefix,
   type SkeletonRunOptions,
 } from "./prefix";
+export { CONTRACT_REPORT, SKELETON_PLAN, skeletonPlanOf, type SkeletonPlan } from "./plan";
 export {
   SECTION_11_ROWS,
   contractTestOf,

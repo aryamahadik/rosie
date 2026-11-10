@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import {
   PLUGIN_LISTS_NO_STOP_WORDS,
   type SafetyLines,

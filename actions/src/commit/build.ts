@@ -12,6 +12,11 @@
 // or final parts (words are written in after the commit: arch 01 line 41; K-07 v1); every effect row on its own
 // idempotency key (arch 10 line 542; K-07 v1 refuse-effect-without-key); no id given twice.
 //
+// The turn row is K-05 v1's `turn` with its seven fields alone (T-1150; K-09 v1.5 default 135): a gateAndCommit request's
+// turn may also carry the service and the Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn), which are
+// the walk's inputs, never the row's. K-05 v1's turn is closed and K-04 turns has no such column, and the chat id's one
+// home is K-04 threads.linq_chat_id: never the turn row, an event-log entry's values, a span or a log line.
+//
 // Nothing here logs, and what it throws names faults and row ids, never a value (K-08 v1 README line 75).
 //
 // Defaults used (for ops/QUESTIONS.md):
@@ -110,6 +115,7 @@ export interface TurnActor {
 }
 
 export interface BuildInput {
+  /** The request's turn: the row is written with K-05's seven fields of it alone (k05TurnRow). */
   readonly turn: TurnRow;
   /** The zone the turn's texts were read in, or null (default 4). */
   readonly zone: string | null;
@@ -133,6 +139,24 @@ export interface QuestionClock extends ClockNew {
 }
 
 const copy = <T>(value: T): T => structuredClone(value);
+
+/**
+ * The turn row K-05 writes: K-05 v1 `turn`'s seven fields of the request's turn (data-access.v1.schema.json `$defs/turn`,
+ * closed), and nothing else, so the service and the chat id a K-09 v1.5 request's turn may carry never reach the row
+ * (K-09 v1.5 default 135). The type check holds this literal to the generated K-05 turn (every field required, no other
+ * allowed); a test holds its keys to the schema itself.
+ */
+export function k05TurnRow(turn: TurnRow): TurnRow {
+  return {
+    id: turn.id,
+    handleId: turn.handleId,
+    eventIds: copy(turn.eventIds),
+    bundleId: copy(turn.bundleId),
+    traceId: turn.traceId,
+    joinedTraceIds: copy(turn.joinedTraceIds),
+    tries: turn.tries,
+  };
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -418,8 +442,9 @@ function writeUnit(
 }
 
 /**
- * The turn's one K-05 commitTurn request: the turn row as given, every row read, and every unit's writes in order with the
- * rows the commit owns and the event-log entries. Checks the units first (checkUnits): a fault refuses the whole turn.
+ * The turn's one K-05 commitTurn request: the turn row (K-05's seven fields of the request's turn: k05TurnRow), every row
+ * read, and every unit's writes in order with the rows the commit owns and the event-log entries. Checks the units first
+ * (checkUnits): a fault refuses the whole turn.
  */
 export function buildCommitRequest(input: BuildInput): CommitTurnRequest {
   checkUnits(input.units);
@@ -442,5 +467,5 @@ export function buildCommitRequest(input: BuildInput): CommitTurnRequest {
 
   onceEach(writes.events.map((entry) => entry.id));
   if (effects.write.length > 0 || effects.letGo.length > 0) writes.effects = effects;
-  return { turn: copy(input.turn), versionsRead, writes };
+  return { turn: k05TurnRow(input.turn), versionsRead, writes };
 }

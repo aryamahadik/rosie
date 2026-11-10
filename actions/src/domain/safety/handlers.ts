@@ -12,7 +12,7 @@
 //      40001, nothing written), since K-09 v1 lists no versionChanged for recordSafetyOutcome: the call is tried again.
 
 import type { ClockNew, CommitTurnContext, CoreAction, CoreRun, OpenHolds } from "../../commit";
-import type { Handler } from "../../tool-api";
+import { NotBuiltError, type Handler } from "../../tool-api";
 import {
   KEYED_IDS,
   NO_ALONE_COMMIT,
@@ -108,6 +108,17 @@ export interface SafetyCoreRun<Run extends CoreRun = CoreRun> {
 }
 
 const clockNow = (): string => new Date().toISOString().replace(/\.\d{3}Z$/u, "Z");
+
+/**
+ * K-09 v1.1's record or release on arrival (arrivalCaller, caller.kind actorOnArrival: the handle actor, before batching;
+ * README default 36), which v1.5's requests take beside v1's. Neither is built here (journey 3's lane), so each answers
+ * notBuilt before anything is read or written, never run as v1's request (fail closed).
+ */
+function onArrival<Request extends { readonly caller: { readonly kind: string } }>(
+  request: Request,
+): request is Extract<Request, { readonly caller: { readonly kind: "actorOnArrival" } }> {
+  return request.caller.kind === "actorOnArrival";
+}
 
 function recordPortsOf<Repo>(deps: SafetyDeps<Repo>, repo: Repo, businessId: string | null): RecordPorts {
   const messages: MessagesConsent | null =
@@ -250,11 +261,17 @@ export async function recordSafetyOutcomeAlone<Repo>(
   return answer;
 }
 
-/** recordSafetyOutcome as the Tool API base's handler (a page's or an outside AI's free text). */
+/**
+ * recordSafetyOutcome as the Tool API base's handler (a page's or an outside AI's free text). A record on arrival answers
+ * notBuilt (onArrival): recordSafetyOutcomeAlone takes K-09 v1's request only (record.ts RecordRequest).
+ */
 export function recordSafetyOutcomeHandler<Repo>(
   deps: SafetyDeps<Repo> = {},
 ): Handler<"recordSafetyOutcome", Repo> {
-  return (request, context) => recordSafetyOutcomeAlone(request, context.repo, context.businessId, deps);
+  return (request, context) =>
+    onArrival(request)
+      ? Promise.reject(new NotBuiltError("recordSafetyOutcome"))
+      : recordSafetyOutcomeAlone(request, context.repo, context.businessId, deps);
 }
 
 // ---- releaseSafetyHold ----------------------------------------------------------------------------------------------
@@ -298,13 +315,18 @@ export async function releaseSafetyHoldCore<Repo>(
   };
 }
 
-/** releaseSafetyHold made alone (a page, the actor's at-once release after handing its line on), under the call's scope. */
+/**
+ * releaseSafetyHold made alone (a page, the actor's at-once release after handing its line on), under the call's scope. A
+ * release on arrival answers notBuilt (onArrival), so its handler and any other caller fail closed: release.ts's
+ * ReleaseRequest is v1.5's, which takes it.
+ */
 export async function releaseSafetyHoldAlone<Repo>(
   request: ReleaseRequest,
   repo: Repo,
   businessId: string | null,
   deps: SafetyDeps<Repo> = {},
 ): Promise<ReleaseAnswer> {
+  if (onArrival(request)) throw new NotBuiltError("releaseSafetyHold");
   const plan = await planReleaseSafetyHold(
     { request, turn: null, businessId, now: (deps.now ?? clockNow)(), open: [] },
     releasePortsOf(deps, repo),

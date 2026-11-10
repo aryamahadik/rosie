@@ -4,7 +4,7 @@
 // Values come only from the contracts' fixtures (K-02 v1 and K-09 v1: the master's sample cast, the 555-01xx range;
 // rule 9).
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import { HANDLE_REF, contractFile, fixture } from "../../tool-api/test-support";
 import type { CallContext, SpanNotes } from "../../tool-api/tool-api";
 import { notBuiltLimit } from "./stub";

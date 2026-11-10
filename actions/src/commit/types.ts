@@ -3,8 +3,9 @@
 //
 // gateAndCommit's second half: the gate (T-298, ../gate/framework) passes or stops each agreed part; the commit turns the
 // parts that may go into one K-05 commitTurn request (K-05 v1, with K-05 v1.1's effect rows) and sends it once. The
-// K-05 request and its answer are the generated contract types (`npm run contracts:types`; ADR-005); so are K-09 v1's
-// request and answer, reached through the Tool API's call types, so the commit and the base read one shape.
+// K-05 request and its answer are the generated contract types (`npm run contracts:types`; ADR-005); so are K-09 v1.5's
+// request and answer (T-1150: K-09 v1's call, by v1.5's definitions of the same name), reached through the Tool API's
+// call types, so the commit and the base read one shape.
 //
 // What a passed part writes (the walk after its choice, its step's writes: arch 03 line 191), what a core action writes
 // (the shared-core calls), what is open now (the safety holds and the turn's unread texts) and the K-05 call itself are
@@ -43,26 +44,34 @@ export type EffectLetGo = K05.EffectLetGo;
 /** K-05 v1 `eventEntry`, written in K-08 v1's shapes (kinds, `why`, `approvedBy`). */
 export type EventEntry = K05.EventEntry;
 
-// ---- K-09 v1 gateAndCommit (contracts/tool-api), through the Tool API's call types --------------------------------
+// ---- K-09 v1.5 gateAndCommit (contracts/tool-api), through the Tool API's call types ------------------------------
 
+/**
+ * K-09 v1.5 `gateAndCommit.request`: its turn (`gateAndCommit.turn`) is K-05 v1's seven fields with, on a turn of texts,
+ * the service and the chat id of the turn's last text, both or neither (default 135): the walk's inputs, never the turn
+ * row's (build.ts k05TurnRow).
+ */
 export type GateAndCommitRequest = RequestOf<"gateAndCommit">;
 /** What gateAndCommit answers: its response or one of its errors (each "Refused, nothing written"). */
 export type GateAndCommitAnswer = ResponseOf<"gateAndCommit"> | ErrorsOf<"gateAndCommit">;
-/** K-09 v1 `gateAndCommit.committed`. */
+/** K-09 v1.5 `gateAndCommit.committed`. */
 export type Committed = Extract<ResponseOf<"gateAndCommit">, { result: "committed" }>;
-/** K-09 v1 `partResult`. */
+/** K-09 v1.5 `partResult`. */
 export type PartResult = Committed["parts"][number];
-/** K-09 v1 `coreAction`: a shared-core call carried inside the turn's one commit. */
+/** K-09 v1.5 `coreAction`: a shared-core call carried inside the turn's one commit. */
 export type CoreAction = GateAndCommitRequest["core"][number];
-/** K-09 v1 `coreResult`. */
+/** K-09 v1.5 `coreResult`. */
 export type CoreResult = Committed["core"][number];
-/** K-09 v1 `effectWritten`. */
+/** K-09 v1.5 `effectWritten`. */
 export type EffectWritten = Committed["effects"][number];
 /** K-07 v1 `effectKind`. */
 export type EffectKind = EffectWritten["kind"];
-/** K-09 v1 `BundleMismatchError`. */
+/** K-09 v1.5 `BundleMismatchError`. */
 export type BundleMismatch = Extract<ErrorsOf<"gateAndCommit">, { error: "bundleMismatch" }>;
-/** K-09 v1 `safetyHold`: an open hold on the handle's routine actions (K-34 v1 safety_holds; arch 06 lines 315 to 327). */
+/**
+ * K-09 v1.5 `safetyHold`: an open hold on the handle's routine actions (K-34 v1 safety_holds; arch 06 lines 315 to
+ * 327).
+ */
 export type SafetyHold = NonNullable<
   NonNullable<Extract<CoreResult, { call: "recordSafetyOutcome" }>["response"]>["hold"]
 >;
@@ -127,11 +136,13 @@ export interface UnitWrites {
   };
   /** Effect rows, each on one idempotency key (arch 10 line 508; K-07 v1), and effects in outage let go (K-05 v1.1). */
   readonly effects: { readonly write: readonly EffectNew[]; readonly letGo: readonly EffectLetGo[] };
-  /** For a part, the keys its step gives that these writes write (K-09 v1 `partResult.gives`); empty for a core action. */
+  /**
+   * For a part, the keys its step gives that these writes write (K-09 v1.5 `partResult.gives`); empty for a core action.
+   */
   readonly gives: readonly SetupKey[];
 }
 
-/** One core action run inside the turn: its result (K-09 v1 `coreResult`) and what it writes (none when refused). */
+/** One core action run inside the turn: its result (K-09 v1.5 `coreResult`) and what it writes (none when refused). */
 export interface CoreRun {
   readonly result: CoreResult;
   readonly writes: UnitWrites;
@@ -148,8 +159,15 @@ export interface PassedPart {
 
 /** The turn as the commit's ports read it, inside the call's business scope. */
 export interface CommitTurnContext<Repo = unknown> {
+  /**
+   * The gateAndCommit request (K-09 v1.5): the walk reads the service and the chat id of the turn's last text here, on
+   * `request.turn` (default 135), and never from the turn row below.
+   */
   readonly request: GateAndCommitRequest;
-  /** The turn row the commit writes (K-05 v1 turn): its id is the lease's (T-248, CQ-69), its bundle the pinned one. */
+  /**
+   * The turn row the commit writes (K-05 v1 turn): its id is the lease's (T-248, CQ-69), its bundle the pinned one. The
+   * row written holds its seven fields alone (build.ts k05TurnRow).
+   */
   readonly turn: TurnRow;
   readonly repo: Repo;
   readonly businessId: string;
@@ -159,7 +177,7 @@ export interface CommitTurnContext<Repo = unknown> {
  * What the commit calls, each another task's:
  *   - commitTurn: K-05 v1.1 commitTurn (T-306 wires the database engineer's data-access call; tests use a fake);
  *   - writesOf: what a passed part's choice writes (the walk after a choice, arch 03 line 191, and each step's writes);
- *   - runCore: one shared-core call made in the turn (K-09 v1 `coreAction`; M3b's calls), in the request's order;
+ *   - runCore: one shared-core call made in the turn (K-09 v1.5 `coreAction`; M3b's calls), in the request's order;
  *   - openHolds: what is open on the turn's handle, read at commit time (OpenHolds: the safety holds and the turn's
  *     unread texts; QUESTIONS.md CQ-65: the commit path reads them again, so a hold opened mid-turn binds this commit
  *     too). K-05 v1.2 has no read for K-34's holds yet (its open gap 26).
