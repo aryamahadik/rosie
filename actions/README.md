@@ -37,5 +37,5 @@ Steps 2 to 4 answer before anything is read or written.
 
 ### Open points
 
-- **Ajv in the Worker.** Ajv compiles a schema with `new Function`, which the Workers runtime refuses (`runtime/src/trace/validate.ts`), and the schemas are read from disk. Before the Tool API runs inside the Worker, its checks need Ajv's standalone code, built ahead of time for the same definitions, and `ajv` (a root devDependency today) must ship with it: a task for the release engineer with the action layer.
+- **Ajv in the Worker** (closed by T-1144 and T-1150): inside the Worker the Tool API's checks (K-09 v1.5's definitions of K-09 v1's calls, K-08 v1.1's span) and the frontier's (K-02 v1.1) run as Ajv's standalone code, which `npm run build:validators` builds ahead of time for the same definitions and options and holds to Ajv's compiler on the contracts' fixtures (`infra/build/tool-api-validators.mjs`; `validator.worker.test.ts`, `src/frontier/assemble/check.worker.test.ts`), so no code is made at run time; Node keeps Ajv's compiler, and compose input's K-03 check (`src/compose-input/check.ts`) still compiles at run time, a task of its own.
 - **The scope seam** is the database client's scoped transaction for now; lead card T-1083 (a lost-connection-safe scoped transaction for every repo call) replaces the adapter in `scope.ts` only.

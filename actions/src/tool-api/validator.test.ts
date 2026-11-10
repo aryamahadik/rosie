@@ -1,20 +1,36 @@
 // T-290: the Tool API's one validator holds the frozen schemas, and agrees with the contracts' own fixtures: K-09 v1's
 // accepted exchanges pass their call's request and response or errors, its refused requests are refused, and K-08 v1.1's
-// span refuses a raw phone number and a person's words. Values come only from the contracts' fixtures (rule 9).
+// span refuses a raw phone number and a person's words. T-1150: it checks K-09 v1's 29 calls by K-09 v1.5's definitions
+// of the same name, so the walking skeleton's turn 1 passes (build-frontier-s1-01.json's sign-up door; commit-s1-01.json's
+// turn with the service and chat id of its last text, both or neither: default 135), every v1 fixture gets the answer
+// K-09 v1 gives it, and the calls v1.1 to v1.4 add stay unknown. Values come only from the contracts' fixtures (rule 9).
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
+import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
-import { CALL_NAMES, CALLER_KINDS } from "./calls";
-import { acceptedExchanges, contractFile, fixture, fixtureEntries } from "./test-support";
+import { CALL_NAMES, CALLER_KINDS, isCallName, type CallName } from "./calls";
 import {
+  acceptedExchanges,
+  contractFile,
+  fixture,
+  fixtureEntries,
+  recordingScope,
+  traceFor,
+} from "./test-support";
+import { createToolApi, notBuiltHandlers } from "./tool-api";
+import {
+  AJV_OPTIONS,
   CONTRACTS_DIR,
+  MODEL_SCHEMA_ID,
   SCHEMA_FILES,
+  TOOL_API_SCHEMA_ID,
   createToolApiValidator,
   formatProblems,
   loadToolApiSchemas,
+  type CallPart,
 } from "./validator";
 
 const validator = createToolApiValidator();
@@ -22,6 +38,54 @@ const validator = createToolApiValidator();
 type Json = Record<string, unknown>;
 
 const k09 = contractFile("tool-api/tool-api.v1.schema.json") as { $defs: Record<string, Json> };
+const k09v15 = contractFile("tool-api/tool-api.v1.5.schema.json") as {
+  $id: string;
+  $defs: Record<string, Json>;
+};
+
+const PARTS: readonly CallPart[] = ["request", "response", "errors"];
+
+/** The $id of K-09 v1, whose definitions the Tool API checked before v1.5. */
+const K09_V1_ID = "https://rosie.invalid/contracts/tool-api/tool-api.v1.schema.json";
+
+/** Ajv's compiler on the validator's files (K-09 v1 among them), for K-09 v1's answers beside v1.5's. */
+const ajv = new Ajv2020(AJV_OPTIONS);
+for (const schema of loadToolApiSchemas()) ajv.addSchema(schema);
+
+/** The problem lines a K-09 definition (`<call>.<part>`) of the schema `schemaId` finds in `value`. */
+function problemsUnder(schemaId: string, definition: string, value: unknown): string[] {
+  const validate = ajv.getSchema(`${schemaId}#/$defs/${definition}`);
+  if (validate === undefined) throw new Error(`${schemaId} has no definition ${definition}`);
+  return validate(value) ? [] : formatProblems(validate.errors);
+}
+
+/** Every file the $refs of `roots` reach, relative to contracts/ (contracts/README.md convention 2). */
+function closureOf(roots: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const queue = [...roots];
+  while (queue.length > 0) {
+    const file = queue.shift() ?? "";
+    if (seen.has(file)) continue;
+    seen.add(file);
+    queue.push(...referencedFiles(file));
+  }
+  return [...seen].sort();
+}
+
+/** A turn 1 exchange of K-09 v1.5 (contracts/tool-api/fixtures), freshly parsed. */
+function v15Exchange(file: string): { call: CallName; request: Json; outcome: unknown } {
+  return fixture(file) as { call: CallName; request: Json; outcome: unknown };
+}
+
+/** commit-s1-01.json's request with its turn changed by `change`. */
+function commitS101With(change: (turn: Json) => void): Json {
+  const { request } = v15Exchange("commit-s1-01.json");
+  change(request.turn as Json);
+  return request;
+}
+
+/** The chat id commit-s1-01.json's turn carries (K-06 text-imessage.json's form): never in a problem line. */
+const CHAT_ID = "linq-chat-demo-sam";
 
 /** Every file a schema's $refs name, relative to contracts/. */
 function referencedFiles(file: string): string[] {
@@ -150,5 +214,183 @@ describe("problem lines", () => {
     const lines = formatProblems(errors);
     expect(lines).toHaveLength(21);
     expect(lines[20]).toBe("and 5 more");
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1150: K-09 v1.5's definitions of K-09 v1's 29 calls
+
+describe("K-09 v1's 29 calls, each checked by K-09 v1.5's definition of the same name", () => {
+  it("checks against K-09 v1.5, and K-02 v1.1 is the frontier's", () => {
+    expect(TOOL_API_SCHEMA_ID).toBe(k09v15.$id);
+    expect(MODEL_SCHEMA_ID).toBe((contractFile("model/model.v1.1.schema.json") as { $id: string }).$id);
+  });
+
+  it("holds exactly the files K-09 v1.5's and K-08 v1.1's $refs reach: K-06 v1, K-02 v1.1 and K-09 v1 to v1.4 among them", () => {
+    const reached = closureOf([
+      "tool-api/tool-api.v1.5.schema.json",
+      "event-trace/event-trace.v1.1.schema.json",
+    ]);
+    expect([...SCHEMA_FILES].sort()).toEqual(reached);
+    expect(reached).toEqual(
+      expect.arrayContaining([
+        "inbound-event/inbound-event.v1.schema.json",
+        "model/model.v1.1.schema.json",
+        "tool-api/tool-api.v1.schema.json",
+        "tool-api/tool-api.v1.4.schema.json",
+      ]),
+    );
+  });
+
+  it("K-09 v1.5 names each call's request, response and errors, and lists every call of v1 among its own", () => {
+    for (const call of CALL_NAMES) {
+      for (const part of PARTS) expect(k09v15.$defs[`${call}.${part}`], `${call}.${part}`).toBeDefined();
+    }
+    const v14 = contractFile("tool-api/tool-api.v1.4.schema.json") as {
+      $defs: { callName: { enum: string[] } };
+    };
+    expect(k09v15.$defs.callName).toEqual({ $ref: "tool-api.v1.4.schema.json#/$defs/callName" });
+    expect(v14.$defs.callName.enum).toEqual(expect.arrayContaining([...CALL_NAMES]));
+  });
+
+  it("the calls v1.1 to v1.4 add are no calls of the Tool API: the validator throws, and the base answers unknownCall", async () => {
+    const v14 = contractFile("tool-api/tool-api.v1.4.schema.json") as {
+      $defs: { callName: { enum: string[] } };
+    };
+    const added = v14.$defs.callName.enum.filter((call) => !(CALL_NAMES as readonly string[]).includes(call));
+    expect(added.length).toBeGreaterThan(0);
+    const api = createToolApi({ validator, scope: recordingScope(), handlers: notBuiltHandlers() });
+    for (const call of added) {
+      expect(isCallName(call), call).toBe(false);
+      expect(() => validator.check(call as CallName, "request", {}), call).toThrow("not a call of K-09 v1");
+      const { trace } = traceFor({});
+      expect(await api.call(call, {}, trace), call).toEqual({ error: "unknownCall" });
+    }
+  });
+});
+
+describe("every v1 fixture gets the answer K-09 v1 gives it", () => {
+  const entries = fixtureEntries().filter((entry) => {
+    const [call, part] = entry.def.split(".");
+    return isCallName(call) && (part === "exchange" || (PARTS as readonly string[]).includes(part ?? ""));
+  });
+
+  it("reads all 59 accepted exchanges, the six refused requests and the exchange a named rule refuses", () => {
+    const accepted = entries.filter((entry) => entry.expect === "accept" && entry.def.endsWith(".exchange"));
+    const refused = entries.filter((entry) => entry.expect === "refuse" && entry.def.endsWith(".request"));
+    expect(accepted).toHaveLength(59);
+    expect(refused).toHaveLength(6);
+    expect(entries.filter((entry) => !accepted.includes(entry) && !refused.includes(entry))).toEqual([
+      expect.objectContaining({
+        def: "gateAndCommit.exchange",
+        rule: "rereadBeforeQuestion",
+        expect: "refuse",
+      }),
+    ]);
+  });
+
+  for (const entry of entries) {
+    it(`${entry.file}: K-09 v1.5's definitions give K-09 v1's problem lines`, () => {
+      const [call, part] = entry.def.split(".") as [CallName, string];
+      const document = fixture(entry.file) as Json;
+      const checks: [CallPart, unknown][] =
+        part === "exchange"
+          ? [
+              ["request", document.request],
+              ["response", document.outcome],
+              ["errors", document.outcome],
+            ]
+          : [[part as CallPart, document]];
+      for (const [checked, value] of checks) {
+        const v1 = problemsUnder(K09_V1_ID, `${call}.${checked}`, value);
+        expect(validator.check(call, checked, value), `${call}.${checked}`).toEqual(v1);
+      }
+    });
+  }
+});
+
+describe("the walking skeleton's turn 1 (K-09 v1.5): the sign-up door and the turn's service and chat id", () => {
+  for (const file of ["build-frontier-s1-01.json", "commit-s1-01.json"]) {
+    it(`${file}: its request passes, and its outcome passes the call's response, as K-09 v1 never let it`, () => {
+      const { call, request, outcome } = v15Exchange(file);
+      expect(validator.check(call, "request", request)).toEqual([]);
+      expect(validator.check(call, "response", outcome)).toEqual([]);
+      const underV1 = [
+        ...problemsUnder(K09_V1_ID, `${call}.request`, request),
+        ...problemsUnder(K09_V1_ID, `${call}.response`, outcome),
+      ];
+      expect(underV1).not.toEqual([]);
+    });
+  }
+
+  it("build-frontier-s1-01.json's frontier offers the sign-up door (K-02 v1.1)", () => {
+    const { outcome } = v15Exchange("build-frontier-s1-01.json");
+    const { context } = outcome as { context: { choices: Json[] } };
+    expect(context.choices.map((choice) => [choice.kind, choice.door, choice.step])).toEqual([
+      ["door", "signUp", "S1-01"],
+    ]);
+  });
+
+  it("commit-s1-01.json's turn carries the service and the chat id, beside K-05 v1's seven fields", () => {
+    const { request } = v15Exchange("commit-s1-01.json");
+    const turn = request.turn as Json;
+    const k05 = contractFile("data-access/data-access.v1.schema.json") as {
+      $defs: { turn: { properties: Json } };
+    };
+    expect(Object.keys(turn)).toEqual([...Object.keys(k05.$defs.turn.properties), "service", "chatId"]);
+    expect([turn.service, turn.chatId]).toEqual(["imessage", CHAT_ID]);
+  });
+
+  it("both or neither: a turn with the service and no chat id, or the chat id and no service, is refused", () => {
+    const noChatId = commitS101With((turn) => {
+      delete turn.chatId;
+    });
+    const noService = commitS101With((turn) => {
+      delete turn.service;
+    });
+    expect(validator.check("gateAndCommit", "request", noChatId)).toContain(
+      "/turn must have property chatId when property service is present",
+    );
+    expect(validator.check("gateAndCommit", "request", noService)).toContain(
+      "/turn must have property service when property chatId is present",
+    );
+    const neither = commitS101With((turn) => {
+      delete turn.service;
+      delete turn.chatId;
+    });
+    expect(validator.check("gateAndCommit", "request", neither)).toEqual([]);
+    const nullChatId = commitS101With((turn) => {
+      turn.chatId = null;
+    });
+    expect(validator.check("gateAndCommit", "request", nullChatId)).toEqual([]);
+  });
+
+  it("a clock's firing carries neither: its turn with the service and chat id is refused", () => {
+    const clock = fixture("clock-staff-invite-48h.json") as { request: Json & { turn: Json | null } };
+    expect(validator.check("gateAndCommit", "request", clock.request)).toEqual([]);
+    expect(clock.request.turn).not.toBeNull();
+    const withText = {
+      ...clock.request,
+      turn: { ...clock.request.turn, service: "imessage", chatId: CHAT_ID },
+    };
+    expect(validator.check("gateAndCommit", "request", withText)).not.toEqual([]);
+  });
+
+  it("a service K-06 v1 does not name is refused, and no problem line holds the chat id", () => {
+    const refusals = [
+      commitS101With((turn) => {
+        turn.service = "carrierPigeon";
+      }),
+      commitS101With((turn) => {
+        delete turn.service;
+      }),
+      commitS101With((turn) => {
+        turn.chatId = 42;
+      }),
+    ].map((request) => validator.check("gateAndCommit", "request", request));
+    for (const problems of refusals) {
+      expect(problems).not.toEqual([]);
+      expect(problems.join("\n")).not.toContain(CHAT_ID);
+    }
   });
 });
