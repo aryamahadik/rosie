@@ -135,18 +135,18 @@ Each line replaces the card's line of the same name; "add" adds to it.
 **T-293** (the frontier's hubs and doors; new task 3)
 
 - Reads, add: `K-02 v1.1 (default 9: the sign-up door); K-09 v1.5 (build-frontier-s1-01.json; README default 129); ADR-013.`
-- Gives, add: `the sign-up door to S1-01 when the guard finds no target and the pinned bundle holds S1-01; a door only when the pinned bundle holds its entry step.`
+- Gives, add: `the sign-up door to S1-01 when the guard finds no target and the pinned bundle holds S1-01, labelled with section 1's title without its number ('1. Business onboarding' gives 'Business onboarding': K-02 README v1.1 default 9); a door only when the pinned bundle holds its entry step.`
 - Proves it with, add: `build-frontier-s1-01.json's request gives exactly its one choice on bundle v0.`
 
 ### 7. New tasks found (outside this card)
 
-1. **The double's turn 1 recordings** (AI engineer; `ai/src/recorded-double/**`, `ai/recordings/**`): read K-02 v1.1's schema and fixtures, and add the four recordings of K-02 README "v1.1" (decide on `context-s1-01.json`; decide on the JOIN run's context; the safety reads of JOIN and of the master's words; the composer on the JOIN run's input). Before T-554's, T-558's and T-560's proofs.
-2. **The bundle's `privacyLink` fixed line** (playbook engineer, with Q-30's words and address from Jay; T-314's handoff item 3). Before T-561 and the human test.
+1. **The double's turn 1 recordings** (AI engineer; `ai/src/recorded-double/**`, `ai/recordings/**`; carded as T-1145, DL-330): read K-02 v1.1's schema and fixtures, and add the four recordings of K-02 README "v1.1" (decide on `context-s1-01.json`; decide on the JOIN run's context; the safety reads of JOIN and of the master's words; the composer on the JOIN run's input). Before T-554's, T-558's and T-560's proofs.
+2. **The bundle's `privacyLink` fixed line** (playbook engineer, with Q-30's words and address from Jay; T-314's handoff item 3; carded as T-1146, DL-330). Before T-561 and the human test.
 3. **T-293's lines above** (the sign-up door).
 4. **Test owner 1's seed for D-017** (database engineer; T-200 and T-202): a handle and a person, no role and no phone row, so JOIN is a first text (K-05 v1.2 `targets-first-text.json`). K-04's `seed-person-roles.json` gives Sam owner roles, C-202's M3 row a customer role, and K-21's `test-roster.json` an owner of a live business; each makes JOIN a turn with a target, not turn 1.
 5. **K-01 minor version**: `routingTables.doors.signUp` (K-02 README "v1.1" open gap).
 6. **The Tool API mock** generated again for K-09 v1.5 (`contracts/mock/**`).
-7. **The contract tests**: `tests/contract/model.v1.test.ts` checks each entry by its own version (DL-124, DL-125), and `contracts/scripts/model-contract.test.mjs` names K-02's frozen versions as `frozen.json` holds them and adds a minor version that does not exist yet (v1.2): both pin K-02 to v1 alone today.
+7. **The contract tests** (done in T-1142's round 2, DL-330): `tests/contract/model.v1.test.ts` checks each entry by its own version (DL-124, DL-125) and expects all eight verbs; `contracts/scripts/model-contract.test.mjs` names K-02's frozen versions as `frozen.json` holds them and adds a minor version that does not exist yet (v1.2); the double's test pins its two contexts by version v1 until task 1.
 8. **Renumbering**: T-054's journey 7 freeze becomes K-09 v1.6 (DL-322); T-070's photo reading becomes K-02 v1.2.
 
 ## Consequences
