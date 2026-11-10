@@ -46,6 +46,7 @@ import {
   type SafetyLines,
   type SafetyReader,
   type SafetyTelling,
+  type SafetyWords,
   type StopWords,
   type WordsSealer,
 } from "./ports";
@@ -53,6 +54,7 @@ import {
   planRecordSafetyOutcome,
   type CarryingTurn,
   type RecordAnswer,
+  type RecordLine,
   type RecordPorts,
   type RecordRequest,
 } from "./record";
@@ -84,6 +86,11 @@ export interface SafetyDeps<Repo> {
   readonly stopWords?: StopWords;
   /** Hand-offs and pages (T-319). Default: none, so an outcome that must tell someone answers notBuilt. */
   readonly telling?: SafetyTelling;
+  /**
+   * K-01's fixed lines' words from the pinned bundle, for the danger question a record's line carries (record.ts default
+   * 18; T-1176). Default: none, so a record whose line asks it answers notBuilt; a line that asks nothing never reads it.
+   */
+  readonly words?: SafetyWords;
   /** K-05's commit with no turn. Default NO_ALONE_COMMIT. */
   readonly commitAlone?: AloneCommit<Repo>;
   /** The call's now, UTC ending in Z, for a call made alone. Default: the clock, to the whole second. */
@@ -105,6 +112,12 @@ export interface SafetyCoreRun<Run extends CoreRun = CoreRun> {
   readonly run: Run;
   /** Clock rows armed at the commit that no question owns: a pause's call-off (S11-62), a hand-off's escalation (T-319). */
   readonly clocks: readonly ClockNew[];
+}
+
+/** A recordSafetyOutcome core action's run, with the record's own line and the danger question it carries (T-1176). */
+export interface RecordSafetyCoreRun extends SafetyCoreRun<RecordCoreRun> {
+  /** The line of the row its commit writes (record.ts RecordLine), or of the first record's on a repeat; null for none. */
+  readonly line: RecordLine | null;
 }
 
 const clockNow = (): string => new Date().toISOString().replace(/\.\d{3}Z$/u, "Z");
@@ -145,6 +158,7 @@ function recordPortsOf<Repo>(deps: SafetyDeps<Repo>, repo: Repo, businessId: str
     lines: deps.lines ?? FIXED_SAFETY_LINES,
     stopWords: deps.stopWords ?? STOP_WORDS_NOT_WIRED,
     telling: deps.telling ?? NOT_TOLD_YET,
+    words: deps.words ?? null,
   };
 }
 
@@ -172,14 +186,15 @@ function unitAndClocks(writes: FlagWrites): { unit: CoreRun["writes"]; clocks: r
 /**
  * recordSafetyOutcome as a core action of a turn (gateAndCommit's runCore): its result and what the turn's commit writes.
  * Its answer's hold binds the core actions and parts after it (the commit adds it to what is open in force). Every text
- * of the turn carries one, No included (K-09 README default 5).
+ * of the turn carries one, No included (K-09 README default 5). Its `line` is the record's own line, carrying the danger
+ * question when a label's tense is unknown (record.ts default 18).
  */
 export async function recordSafetyOutcomeCore<Repo>(
   action: Extract<CoreAction, { call: "recordSafetyOutcome" }>,
   turn: CommitTurnContext<Repo>,
   open: OpenHolds,
   deps: SafetyDeps<Repo> = {},
-): Promise<SafetyCoreRun<RecordCoreRun>> {
+): Promise<RecordSafetyCoreRun> {
   const plan = await planRecordSafetyOutcome(
     {
       request: action.request,
@@ -202,6 +217,7 @@ export async function recordSafetyOutcomeCore<Repo>(
       writes: unit,
     },
     clocks: refused ? [] : clocks,
+    line: refused ? null : plan.line,
   };
 }
 
