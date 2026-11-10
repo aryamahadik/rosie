@@ -17,7 +17,7 @@ import {
   providerRouteOf,
   type GatewayDeps,
 } from "./gateway";
-import { workerRoot } from "./wiring";
+import { wireWorker, workerRoot } from "./wiring";
 
 // The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
 export { HandleActor } from "./actor";
@@ -150,8 +150,23 @@ export function createWorker(
 // joined is closed there, so its doors fail and each provider route answers 503 (a Stripe request with an unreadable
 // signature header, 401); the provider doors stay unconfigured (T-275). The Linq route is the root's (T-552's security
 // review): 404 while the skeleton flag is off, which it is wherever no release flags are bound (D-017's rollback).
-export default createWorker(
+const rosie = createWorker(
   (env) => workerRoot(env).gateway,
   clockActorsOf,
   (request, env) => workerRoot(env).linqWebhook(request),
 );
+
+// The actor's ports are wired on the Worker's first request, where the HandleActor namespace is bound (T-553; DL-313
+// ruling 2: runtime/src/wiring wireWorker): never at module load, where Workers refuse crypto.randomUUID(), and not in the
+// Workers test pool or on staging, which have no binding until T-566.
+const fetchAndWire = (
+  request: Request,
+  env: Cloudflare.Env,
+  context: ExecutionContext,
+): Response | Promise<Response> => {
+  wireWorker(env);
+  return rosie.fetch(request, env, context);
+};
+
+// The cast states the arity rule of RosieWorker, as createWorker's does.
+export default { ...rosie, fetch: fetchAndWire as RosieWorker["fetch"] } satisfies RosieWorker;

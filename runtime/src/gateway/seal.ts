@@ -7,13 +7,23 @@
 // text, {"body": ..., "subject": ...}: the words after the scrub, and an email's subject.
 //
 // The key comes through a key-store interface (the real call is K-05 v1.2's "get or create a handle's sealing key",
-// T-072, served by T-220; it joins at D-017). Never logged, put in a span or answered: a key, a plain body.
+// T-072, served by T-220; it joins at D-017, T-553). The seal and the open take the handle's data key in either of two
+// forms: 32 raw bytes (T-243's form, every double's), or the key object K-05 v1.2 item 29 hands over (T-182's form:
+// AES-256-GCM, for encrypt and decrypt, never exportable; README default 27: "the gateway's seal takes a WebCrypto key").
+// A key object of any other kind is refused, so nothing is sealed or opened under it. Never logged, put in a span or
+// answered: a key, a plain body.
 
 /** A handle as K-06 and K-04 write it: the phone in E.164 or the email in lower case. */
 export interface HandleRef {
   readonly kind: string;
   readonly address: string;
 }
+
+/**
+ * A handle's data key (AES-256): its 32 raw bytes, or a key object for AES-256-GCM that cannot be exported (T-182's
+ * form, which K-05 v1.2 `handleSealingKey` hands over).
+ */
+export type SealingKey = Uint8Array | CryptoKey;
 
 /**
  * The handle's sealing key store. `getOrCreateKey` answers the handle's 32-byte data key (AES-256), making it on first
@@ -69,10 +79,36 @@ async function importKey(key: Uint8Array): Promise<CryptoKey> {
   return crypto.subtle.importKey("raw", Uint8Array.from(key), "AES-GCM", false, ["encrypt", "decrypt"]);
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+/**
+ * A key object as T-182 makes it: a secret AES-GCM key of 256 bits that cannot be exported and may be used for `use`.
+ * Anything else is refused, naming no key.
+ */
+function checkedKeyObject(key: CryptoKey, use: "encrypt" | "decrypt"): CryptoKey {
+  const algorithm: unknown = key.algorithm;
+  const fits =
+    key.type === "secret" &&
+    !key.extractable &&
+    isRecord(algorithm) &&
+    algorithm.name === "AES-GCM" &&
+    algorithm.length === KEY_BYTES * 8 &&
+    key.usages.includes(use);
+  if (!fits) throw new Error("sealing key is not a non-exportable AES-256-GCM key");
+  return key;
+}
+
+/** The key as WebCrypto takes it: raw bytes imported as before, a key object checked and used as it is. */
+function keyFor(key: SealingKey, use: "encrypt" | "decrypt"): Promise<CryptoKey> {
+  if (ArrayBuffer.isView(key)) return importKey(key);
+  return Promise.resolve(checkedKeyObject(key, use));
+}
+
 /** Seals the words under the key. */
 export async function sealWords(
   words: SealedWords,
-  key: Uint8Array,
+  key: SealingKey,
   actorName: string,
   eventId: string,
 ): Promise<SealedBox> {
@@ -80,7 +116,7 @@ export async function sealWords(
   const plain = new TextEncoder().encode(JSON.stringify({ body: words.body, subject: words.subject }));
   const cipher = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv, additionalData: additionalData(actorName, eventId), tagLength: 128 },
-    await importKey(key),
+    await keyFor(key, "encrypt"),
     plain,
   );
   return { v: 1, alg: "A256GCM", iv: toBase64(iv), ct: toBase64(new Uint8Array(cipher)) };
@@ -89,7 +125,7 @@ export async function sealWords(
 /** Opens a box; throws when the key, the actor name or the event id is not the one it was sealed with. */
 export async function openWords(
   box: SealedBox,
-  key: Uint8Array,
+  key: SealingKey,
   actorName: string,
   eventId: string,
 ): Promise<SealedWords> {
@@ -100,7 +136,7 @@ export async function openWords(
       additionalData: additionalData(actorName, eventId),
       tagLength: 128,
     },
-    await importKey(key),
+    await keyFor(key, "decrypt"),
     fromBase64(box.ct),
   );
   const parsed = JSON.parse(new TextDecoder().decode(plain)) as {

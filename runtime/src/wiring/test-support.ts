@@ -35,6 +35,8 @@ import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
 import type { FlagSubject } from "@rosie/db/repo/flags";
+import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
+import type { TransientError } from "@rosie/db/repo/targets";
 
 import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
@@ -62,7 +64,7 @@ import {
   type FakeTurnFace,
 } from "../turn/test-support";
 import type { Ports } from "./ports";
-import type { LinqVerifyInputs } from "./real";
+import type { HandleSealingKeyCall, LinqVerifyInputs } from "./real";
 import type { RootClock } from "./root";
 import type { ReleaseFlags } from "./skeleton";
 
@@ -127,6 +129,66 @@ export function withSignatureChanged(webhook: SignedWebhook): SignedWebhook {
     ...webhook,
     signature: `${prefix}${changed}${webhook.signature.slice(prefix.length + 1)}`,
   };
+}
+
+// ---- K-05 v1.2 handleSealingKey, as a double (T-553; DL-313 ruling 4) ----------------------------------------------
+
+export interface FakeHandleKeys {
+  /** K-05's call as the root's real sealing port is fed it, its database bound. */
+  readonly call: HandleSealingKeyCall;
+  /** Every request, in order. */
+  readonly requests: HandleSealingKeyRequest[];
+  /** The key object handed out for a handle's address, for a test that opens a box itself; throws when none was made. */
+  keyOf(address: string): CryptoKey;
+  /** When set, every call answers it with no key, as K-05's constraint or transient answer. */
+  failWith: ConstraintError | TransientError | null;
+}
+
+/**
+ * K-05 v1.2 handleSealingKey as a double answering as the handle-key-*.json fixtures do: at a number's first sight its
+ * handle and person take the request's new ids and a key is made (handle-key-first-sight.json); each later call for that
+ * number finds them and writes nothing (handle-key-first-sight-repeat.json). The key is a random AES-256-GCM key object,
+ * for encrypt and decrypt, that cannot be exported (T-182's form), made for the run; its createdAt is `now`'s.
+ */
+export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
+  const known = new Map<string, { handleId: string; personId: string; createdAt: string; key: CryptoKey }>();
+  const requests: HandleSealingKeyRequest[] = [];
+  const keys: FakeHandleKeys = {
+    requests,
+    failWith: null,
+    keyOf(address) {
+      const entry = known.get(address);
+      if (entry === undefined) throw new Error("no key was made for that handle");
+      return entry.key;
+    },
+    async call(request) {
+      requests.push(structuredClone(request));
+      if (keys.failWith !== null) return { outcome: keys.failWith, dataKey: null };
+      const found = known.get(request.handle.address);
+      const entry = found ?? {
+        handleId: request.newHandleId,
+        personId: request.newPersonId,
+        createdAt: utcSeconds(now()),
+        key: (await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+          "encrypt",
+          "decrypt",
+        ])) as CryptoKey,
+      };
+      known.set(request.handle.address, entry);
+      const made = found === undefined;
+      return {
+        outcome: {
+          result: "key",
+          handleId: entry.handleId,
+          personId: entry.personId,
+          created: { handle: made, person: made, key: made },
+          key: { wrappingKeyName: request.wrappingKeyName, createdAt: entry.createdAt, version: 1 },
+        },
+        dataKey: entry.key,
+      };
+    },
+  };
+  return keys;
 }
 
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------

@@ -126,7 +126,9 @@ export function composeRoot(options: RootOptions): Root {
   const where: WebhookEnvironment = { environment: log.environment, version: log.version };
   const rowTraces = new RowTraces();
   const armings = new ArmingMemory();
-  const claimer = `dispatcher-${crypto.randomUUID()}`;
+  // Made at the first wake, never when the root is built: Workers refuse crypto.randomUUID() at global scope (DL-313).
+  let claimer: string | null = null;
+  const claimerOf = (): string => (claimer ??= `dispatcher-${crypto.randomUUID()}`);
 
   const dispatcher: TurnDispatcher = {
     async wake(request, trace) {
@@ -142,7 +144,7 @@ export function composeRoot(options: RootOptions): Root {
             return trace;
           },
           now: utc,
-          claimer,
+          claimer: claimerOf(),
         },
         { recipientHandleId: request.handleId },
       );
@@ -254,22 +256,62 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503). No HandleActor namespace is handed to the gateway until its join (T-553, with env.staging's
- * binding from T-566), and no release flags until staging has its database and the flag's deploy step (T-567, T-569), so
- * the skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
- * parts) last as long as the isolate does.
+ * so the gateway answers 503). The gateway's door to the handle's actor is the HANDLE_ACTOR binding where the environment
+ * has one (T-553; env.staging has none until T-566, so there the door stays closed), and no release flags are handed in
+ * until staging has its database and the flag's deploy step (T-567, T-569), so the skeleton flag reads off and
+ * `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed parts) last as long as the
+ * isolate does.
  */
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);
   if (known !== undefined) return known;
   const root = composeRoot({
     environment: environmentOf(env),
-    actors: null,
+    actors: handleActorsOf(env),
     vars: env,
     linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
   });
   workerRoots.set(env, root);
   return root;
+}
+
+/** The HANDLE_ACTOR binding as the root takes it (wrangler.jsonc, T-276); null where the environment has none. */
+function handleActorsOf(env: Cloudflare.Env): HandleActors<DurableObjectId> | null {
+  const namespace = env.HANDLE_ACTOR;
+  if (namespace === undefined) return null;
+  return {
+    idFromName: (name) => namespace.idFromName(name),
+    // The stub's own type cannot carry the actor's RPC methods (the class is the actor module's), so it is typed here.
+    get: (id) => namespace.get(id) as unknown as HandleActorRpc & ClockActorRpc,
+  };
+}
+
+/** The root this isolate's actor ports are wired to, and the function that puts the earlier ones back. */
+let wired: { readonly root: Root; readonly restore: () => void } | null = null;
+
+/**
+ * Wires the Worker's actor ports for this isolate (the root's `install()`), once, on its first request (DL-313 ruling 2):
+ * only where the HandleActor namespace is bound, and never at global scope. Where none is bound (the Workers test pool,
+ * and staging until T-566) nothing is wired, so the actor keeps its unwired defaults. Answers the root wired, or null.
+ */
+export function wireWorker(env: Cloudflare.Env & WorkerSecrets): Root | null {
+  if (wired !== null) return wired.root;
+  if (env.HANDLE_ACTOR === undefined) return null;
+  const root = workerRoot(env);
+  wired = { root, restore: root.install() };
+  return root;
+}
+
+/** The root this isolate's actor ports are wired to by `wireWorker`, or null while none is. */
+export function wiredRoot(): Root | null {
+  return wired?.root ?? null;
+}
+
+/** Puts back the actor ports that were in place before `wireWorker` (a test's clean-up; the Worker never calls it). */
+export function unwireWorker(): void {
+  const done = wired;
+  wired = null;
+  done?.restore();
 }
 
 /** The door to the handle's actor where no HandleActor namespace is bound: every hand-off fails, so the gateway answers 503. */

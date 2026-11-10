@@ -17,7 +17,9 @@ import {
   type ParseLookups,
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
+import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 
+import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { Ports } from "./ports";
 
@@ -74,6 +76,74 @@ function linqVerify(inputs: RealInputs): LinqPort {
   return {
     async verifyWebhook(request) {
       return gatewayResultOf(await verifier.verifyWebhook(request));
+    },
+  };
+}
+
+// ---- sealing: K-05 v1.2 handleSealingKey (T-553; DL-313 ruling 4) ------------------------------------------------------
+
+/** The name the wrapping key is read by (NQ-DB-1's default: one environment key wraps every data key). A name, never a value. */
+export const SEALING_WRAP_KEY = "SEALING_WRAP_KEY";
+
+/**
+ * K-05 v1.2 `handleSealingKey` (T-220, db/repo/handle-keys.ts) with its database bound (the primary, as rosie_job) and
+ * its resolver reading the wrapping key by name: the answer, with the data key beside it as a key object that cannot be
+ * exported.
+ */
+export type HandleSealingKeyCall = (request: HandleSealingKeyRequest) => Promise<HandleSealingKeyResult>;
+
+/** A call that needs a database where none is bound (the Worker until T-567's Hyperdrive). The message names the call only. */
+export class NoDatabaseError extends Error {
+  constructor(call: string) {
+    super(`no database is bound here for ${call}`);
+    this.name = "NoDatabaseError";
+  }
+}
+
+/** The key call gave no key (K-05's constraint or transient, or a handle K-04 cannot hold): nothing is sealed. */
+export class SealingKeyError extends Error {
+  readonly code: string;
+
+  constructor(code: string) {
+    super(`no sealing key: ${code}`);
+    this.name = "SealingKeyError";
+    this.code = code;
+  }
+}
+
+/** What the real sealing port is fed: K-05's call with its database bound, or null where none is bound. */
+export interface SealingInputs {
+  readonly handleKey: HandleSealingKeyCall | null;
+  /** A new id for each call, never built from the address (K-05 v1.2 consumer note); crypto.randomUUID when left out. */
+  readonly newId?: () => string;
+}
+
+/** The handle's key as K-05 hands it over. A throw means no key, so the gateway answers 503 and writes nothing. */
+export interface KeyObjectStore {
+  getOrCreateKey(handle: HandleRef): Promise<CryptoKey>;
+}
+
+/**
+ * The handle's sealing key from K-05 v1.2 item 29 (get or create a handle's sealing key): new handle and person ids on
+ * every call, never built from the address (an id built from it would meet 23505 on every retry once a number's keys were
+ * erased twice); the wrapping key by its name; the data key as the key object K-05 hands over, never bytes. With no
+ * database bound, a constraint or transient answer, or a handle kind K-04 does not hold, it throws: fails closed.
+ */
+export function realSealing(inputs: SealingInputs): KeyObjectStore {
+  const newId = inputs.newId ?? ((): string => crypto.randomUUID());
+  return {
+    async getOrCreateKey(handle) {
+      const call = inputs.handleKey;
+      if (call === null) throw new NoDatabaseError("handleSealingKey");
+      if (handle.kind !== "phone" && handle.kind !== "email") throw new SealingKeyError("badHandle");
+      const answer = await call({
+        handle: { kind: handle.kind, address: handle.address },
+        newHandleId: `handle-${newId()}`,
+        newPersonId: `person-${newId()}`,
+        wrappingKeyName: SEALING_WRAP_KEY,
+      });
+      if (answer.dataKey === null) throw new SealingKeyError(answer.outcome.error);
+      return answer.dataKey;
     },
   };
 }
