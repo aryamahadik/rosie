@@ -1,10 +1,13 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554), under Node (Vitest project "unit"): the ports the root
-// binds in each environment, each once and none left unbound; the check that refuses a port bound twice or left unbound;
-// each bound port handed to the part that calls it; and the closed implementation the Worker's environments still bind for
-// every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the safety read;
-// production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555), under Node (Vitest project "unit"): the ports the
+// root binds in each environment, each once and none left unbound; the check that refuses a port bound twice or left
+// unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's environments still
+// bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the safety
+// read, T-555 the turn-row calls; production takes no join yet).
+import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import { describe, expect, it } from "vitest";
 
+import { turnIdOf } from "../actor/lease";
+import type { ParkTurnRequest } from "../turn/types";
 import {
   bindPorts,
   closedPorts,
@@ -38,17 +41,24 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing", "safetyRead"],
-  staging: ["linqVerify", "sealing", "safetyRead"],
+  test: ["linqVerify", "sealing", "safetyRead", "turnRow"],
+  staging: ["linqVerify", "sealing", "safetyRead", "turnRow"],
   production: [],
 };
 
+/** park-turn.json's request under the turn id the lease hashes from its event ids (CQ-09), as a lapsed turn's park sends it. */
+async function leasePark(): Promise<ParkTurnRequest> {
+  const request = structuredClone(parkTurnJson.request) as unknown as ParkTurnRequest;
+  return { ...request, turn: { ...request.turn, id: await turnIdOf(request.turn.eventIds) } };
+}
+
 describe("the ports the root binds", () => {
-  it("names D-017's ten ports in its turn order", () => {
+  it("names D-017's eleven ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
       "safetyRead",
+      "turnRow",
       "stateReads",
       "turnFace",
       "decide",
@@ -63,7 +73,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing and safety read to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read and turn-row calls to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -89,13 +99,20 @@ describe("the ports the root binds", () => {
     },
   );
 
-  it("hands each bound port to the part that calls it", () => {
+  it("hands each bound port to the part that calls it", async () => {
     const fakes = skeletonFakes();
-    const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: fakes.ports },
+      actors: null,
+      vars: VARS,
+      turnRows: fakes.turnRows.calls,
+    });
+    const fakeSet: Partial<Ports> = fakes.ports;
 
     for (const port of PORTS) {
-      if (port !== "linqVerify" && port !== "sealing" && port !== "safetyRead") {
-        expect(root.ports[port]).toBe(fakes.ports[port]);
+      if (!JOINED.test.includes(port)) {
+        expect(root.ports[port]).toBe(fakeSet[port]);
       }
     }
     expect(root.gateway.linq).toBe(root.ports.linqVerify);
@@ -111,7 +128,13 @@ describe("the ports the root binds", () => {
     expect(root.turn.safety).toBe(fakes.ports.stateReads.turn.safety);
     expect(root.turn.ai).toBe(fakes.ports.decide);
     expect(root.turn.composer).toBe(fakes.ports.composer);
-    expect(root.turn.rows).toBe(fakes.ports.dataAccess.rows);
+    // The turn's plan calls go to the data-access port; its park writes the turn's one row through the turn-row port
+    // (T-555), never through the data-access port's fake.
+    const park = await leasePark();
+    await root.turn.rows.unplannedRows({ turnId: park.turn.id });
+    expect(await root.turn.rows.parkTurn(park)).toMatchObject({ result: "parked", turnId: park.turn.id });
+    expect(fakes.face.log).toEqual(["unplannedRows"]);
+    expect(fakes.turnRows.parks.map((request) => request.turn.id)).toEqual([park.turn.id]);
     expect(root.turn.dispatcher).toBe(root.dispatcher);
   });
 
@@ -240,6 +263,8 @@ describe("a closed port", () => {
     const closed = closedPorts();
 
     await expect(closed.safetyRead.read({} as never)).rejects.toThrow(new NotJoinedError("safetyRead"));
+    await expect(closed.turnRow.commitTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));
+    await expect(closed.turnRow.parkTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));
     await expect(closed.decide.decide({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("decide"),
     );

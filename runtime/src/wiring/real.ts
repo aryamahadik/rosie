@@ -16,11 +16,18 @@
 //   safetyRead   T-554: @rosie/ai's safety read (T-365 createSafetyReader, with T-366's danger-word rules; C-113) for
 //                the bundle each text names, handed in by the root (RootOptions.safetyReaders): in a test, over a fake
 //                Messages API answered by the recorded-model double (T-004); in the Worker, none until the bundle's
-//                manifest (its two models and its safety read prompt) can be read there (the bundle reads join with
-//                T-555; staging's BUNDLES binding is T-566) and the model key is set by name (J-02; smoke-size calls only,
+//                manifest (its two models and its safety read prompt) can be read there (the bundle reads are not joined
+//                yet; staging's BUNDLES binding is T-566) and the model key is set by name (J-02; smoke-size calls only,
 //                DL-027), so every read there fails closed and the actor applies its no-verdict rule (T-246). Each read
 //                gets the pinned bundle's danger words from the actor's own bundle port, and writes its model-call spans
 //                into the text's trace.
+//   turnRow      T-555: K-05 v1.1 commitTurn (T-195, db/repo/commit-turn.ts) and K-05 v1 parkTurn (T-197, db/repo/park.ts),
+//                the two calls that write a turn's one row (K-04 turns), with their database bound, handed in by the root
+//                (RootOptions.turnRows): the K-05 double in a test; nothing in the Worker until T-567 binds its database,
+//                so every commit and park there fails closed (the turn's commit is not taken, and its park is tried again,
+//                as the lease's rules say). Each request's turn id must be T-248's hash of its own event ids (CQ-09;
+//                ADR-013), the id the lease took the batch under, so one batch is one turn row. The park is the turn's
+//                own (T-253); the commit is the Tool API's gate and commit's, behind the lease (C-087; T-559).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read only, never into a span, a log or an error.
@@ -31,13 +38,17 @@ import {
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
 import type { SafetyReader } from "@rosie/ai/src/safety/types";
+import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
+import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
 
+import { turnIdOf } from "../actor/lease";
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
 import { openTrace, type BundleId, type SpanSink } from "../trace";
-import type { Ports } from "./ports";
+import type { ParkTurnAnswer } from "../turn/types";
+import type { Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -78,6 +89,11 @@ export interface RealInputs {
    * spans go. Left out, no safety read is bound, so every read fails closed.
    */
   readonly safetyRead?: Omit<SafetyReadInputs, "now"> | undefined;
+  /**
+   * K-05's commitTurn and parkTurn with their database bound (T-555); null or left out where no database is bound (the
+   * Worker until T-567), so every commit and park fails closed.
+   */
+  readonly turnRows?: TurnRowCalls | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -90,6 +106,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
         ? { readers: null, dangerWords: () => [], sink: () => undefined, now: inputs.now }
         : { ...inputs.safetyRead, now: inputs.now },
     ),
+    turnRow: realTurnRow({ calls: inputs.turnRows ?? null }),
   };
 }
 
@@ -271,6 +288,68 @@ export function realSafetyRead(inputs: SafetyReadInputs): SafetyReadPort {
         },
         trace.reusedIncoming ? { trace, dangerWords } : { dangerWords },
       );
+    },
+  };
+}
+
+// ---- turnRow: K-05's commitTurn and parkTurn, a turn's one row (T-555; C-048, C-049) -----------------------------------
+
+/** K-05 v1.1 commitTurn (T-195, db/repo/commit-turn.ts) with its database bound (the primary, as rosie_job). */
+export type CommitTurnCall = (request: CommitTurnRequest) => Promise<CommitTurnOutcome>;
+
+/** K-05 v1 parkTurn (T-197, db/repo/park.ts) with its database bound (the primary, as rosie_job). */
+export type ParkTurnCall = (request: K05ParkTurnRequest) => Promise<ParkTurnOutcome>;
+
+/** K-05's two calls that write a turn's one row, with their database bound: what the root is handed (RootOptions.turnRows). */
+export interface TurnRowCalls {
+  readonly commitTurn: CommitTurnCall;
+  readonly parkTurn: ParkTurnCall;
+}
+
+/**
+ * A commit or a park whose turn id is not T-248's hash of the turn's own event ids (CQ-09; ADR-013), or that names no event
+ * id: nothing is sent, so no turn row is written under any id but the one its batch hashes to. The message names the call.
+ */
+export class TurnIdError extends Error {
+  constructor(call: string) {
+    super(`${call}: the turn id is not the hash of its event ids`);
+    this.name = "TurnIdError";
+  }
+}
+
+/** Refuses a turn whose id is not the hash of its event ids, as T-248's lease takes a batch under it. */
+async function checkTurnId(
+  call: string,
+  turn: { readonly id: string; readonly eventIds: readonly string[] },
+): Promise<void> {
+  if (turn.eventIds.length === 0 || turn.id !== (await turnIdOf(turn.eventIds))) throw new TurnIdError(call);
+}
+
+/**
+ * The turn-row port (T-555): K-05's commitTurn and parkTurn, the two calls that write a turn's one row in PostgreSQL (K-04
+ * turns), each once per turn id (QUESTIONS.md NQ-RT-3's default: the lease lives in the actor; the row is written once, as
+ * committed or parked). A request's turn id must be T-248's hash of its own event ids, the id the lease took its batch
+ * under (CQ-09; ADR-013): any other is refused before K-05 is reached, so one batch is one turn row. With no database
+ * bound (the Worker until T-567) every call fails closed: the commit is not taken, and the park is tried again later.
+ * K-05's answer comes back as it is (committed, first or repeated; parked; or its refusal, nothing written): the turn's
+ * park reads it (T-253), and the Tool API's gate and commit reads the commit's (C-087; T-559). Nothing here logs.
+ */
+export function realTurnRow(inputs: { readonly calls: TurnRowCalls | null }): TurnRowPort {
+  return {
+    async commitTurn(request) {
+      const calls = inputs.calls;
+      if (calls === null) throw new NoDatabaseError("commitTurn");
+      await checkTurnId("commitTurn", request.turn);
+      return calls.commitTurn(request);
+    },
+    async parkTurn(request) {
+      const calls = inputs.calls;
+      if (calls === null) throw new NoDatabaseError("parkTurn");
+      await checkTurnId("parkTurn", request.turn);
+      // The same K-05 v1 parkTurn exchange in two hand-written forms: the runtime's (../turn/types.ts, which the park
+      // builds and reads) and the generated one db/repo/park.ts takes and answers.
+      const answer = await calls.parkTurn(request as unknown as K05ParkTurnRequest);
+      return answer as unknown as ParkTurnAnswer;
     },
   };
 }
