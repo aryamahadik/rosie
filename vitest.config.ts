@@ -80,7 +80,12 @@ export default defineConfig({
         ],
         test: {
           name: "workers",
-          include: ["runtime/src/**/*.worker.test.ts", "runtime/test/**/*.worker.test.ts"],
+          // T-1144: the action layer's checks that must hold inside the Workers runtime (the Tool API's validator).
+          include: [
+            "runtime/src/**/*.worker.test.ts",
+            "runtime/test/**/*.worker.test.ts",
+            "actions/src/**/*.worker.test.ts",
+          ],
         },
       },
       {
