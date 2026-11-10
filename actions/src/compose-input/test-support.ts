@@ -1,4 +1,4 @@
-// Doubles and helpers for the compose-input call's tests (T-309). Never imported by the Worker. No database and no KV:
+// Doubles and helpers for the compose-input call's tests (T-309; T-1174). Never imported by the Worker. No database or KV:
 // the row reader is a fake that answers one row read, reading through the call's scoped repo so the recording scope
 // writes down the business scope the read ran under; the bundles are K-01 v1's sample bundles (the frontier's fakes).
 // Values come only from the contracts' fixtures and the master's sample cast (Sam, Alex M., Riley, Lee's Barbershop,
@@ -37,17 +37,25 @@ const isRecord = (value: unknown): value is Json =>
 export const ZONE = "America/New_York";
 
 // ---------------------------------------------------------------------------------------------------------------
-// K-09 v1's compose-input-s1-02.json and its row
+// K-09 v1.6's compose-input-s1-02-v1.6.json and its row
 
-/** compose-input-s1-02.json: its request and its outcome. */
+/** A composeInput exchange answered compose: its request and its outcome. */
 export interface ComposeExchange {
   call: "composeInput";
   request: ComposeInputRequest;
   outcome: Json & { result: "compose"; input: Json };
 }
 
-/** K-09 v1's compose-input-s1-02.json, freshly parsed. */
+/**
+ * K-09 v1.6's compose-input-s1-02-v1.6.json, freshly parsed: what the call answers for S1-02's row (T-1174), its input
+ * K-03 v1.1's input-s1-02-v1.1.json word for word.
+ */
 export function s102Exchange(): ComposeExchange {
+  return fixture("compose-input-s1-02-v1.6.json") as ComposeExchange;
+}
+
+/** K-09 v1's compose-input-s1-02.json, freshly parsed: the same request, answered with K-03 v1's input. */
+export function s102ExchangeV1(): ComposeExchange {
   return fixture("compose-input-s1-02.json") as ComposeExchange;
 }
 
@@ -197,6 +205,32 @@ export function callOffStep(): Json {
     does: "The customer is told the visit is off and what goes back.",
     say: [message("cust", text, {}, text)],
     pageTypes: ["visit"],
+    next: null,
+    lint: [],
+  };
+}
+
+/**
+ * A test step written by hand in K-01 v1's shape under a trade's own step id (SPEC-prof 3), so it names no master step:
+ * the customer asks, then Rosie's line to the customer (its say[1]) names the business, the service and the day as
+ * slots, with a card of `lines` (K-01 elements.card), as journey 4's cards put Rosie's own terms beside the record's
+ * values (K-09 README v1.6 open gap 125).
+ */
+export function cardStep(id: string, lines: readonly unknown[]): Json {
+  const text = "{{biz.name:Lee's Barbershop}} has your {{svc.intext:Haircut}} on {{day:Sat Oct 24}}.";
+  return {
+    id,
+    section: 7,
+    lines: ["7.2"],
+    who: "san",
+    via: "msg",
+    title: "A test step: the visit's card",
+    does: "The customer asks about the visit and gets its card.",
+    say: [
+      { from: "cust", to: "san", text: "Is it still on?", plainText: "Is it still on?" },
+      message("cust", text, { card: { title: "Your visit", lines: [...lines] } }, text),
+    ],
+    pageTypes: [],
     next: null,
     lint: [],
   };

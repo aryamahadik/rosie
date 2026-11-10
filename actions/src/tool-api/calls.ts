@@ -12,10 +12,16 @@
 // call's v1.5 exchange, which has no numbered duplicate, never by a numbered name (DL-350), and calls.test.ts pins every
 // call's three types to its exchange's, so typecheck fails on a drift.
 //
+// composeInput alone is K-09 v1.6's (T-1174; README "v1.6"; DL-355): its answer is K-03 v1.1's composer input, whose facts
+// may also be term facts, or one of its errors, fixedLineRow and masterLineMissing among them. Its three types are read
+// off v1.6's own exchange, taken from v1.6's root by its call (DL-350's way: no generated name, plain or numbered, is
+// trusted), and calls.test.ts pins them there. Every other call keeps its v1.5 exchange.
+//
 // The types are imported as types only, so nothing here loads the generated module at run time; the validator
-// (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions.
+// (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions (v1.6's for composeInput).
 
 import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1.5";
+import type * as K09V16 from "../../../contracts/generated/tool-api/tool-api.v1.6";
 import type { Hop } from "../../../runtime/src/trace";
 
 /** Every call K-09 v1 holds, in the order of v1's `$defs/callName` (a test holds this list to the schema's enum). */
@@ -87,12 +93,22 @@ interface Shapes<Request, Response, Errors> {
   errors: Errors;
 }
 
-/** Each call's request, response and errors: K-09 v1.5's, the four v1.1 changed read off their exchanges. */
+/** composeInput's exchange in K-09 v1.6 (T-1174), read off v1.6's root by its call. */
+type ComposeInputV16Exchange = Extract<K09V16.ToolApiV1Dot6, { call: "composeInput" }>;
+
+/**
+ * Each call's request, response and errors: K-09 v1.5's, the four v1.1 changed read off their exchanges, and
+ * composeInput's K-09 v1.6's, read off its v1.6 exchange (each error an object with its own "error"; no response has one).
+ */
 export interface CallTypes {
   buildFrontier: Shapes<K09.BuildFrontierRequest, K09.BuildFrontierResponse, K09.BuildFrontierErrors>;
   closestEntries: Shapes<K09.ClosestEntriesRequest, K09.ClosestEntriesResponse, K09.ClosestEntriesErrors>;
   gateAndCommit: Shapes<K09.GateAndCommitRequest, K09.GateAndCommitResponse, K09.GateAndCommitErrors>;
-  composeInput: Shapes<K09.ComposeInputRequest, K09.ComposeInputResponse, K09.ComposeInputErrors>;
+  composeInput: Shapes<
+    ComposeInputV16Exchange["request"],
+    Exclude<ComposeInputV16Exchange["outcome"], { error: string }>,
+    Extract<ComposeInputV16Exchange["outcome"], { error: string }>
+  >;
   finalizeMessage: Shapes<K09.FinalizeMessageRequest, K09.FinalizeMessageResponse, K09.FinalizeMessageErrors>;
   recordSafetyOutcome: Shapes<
     K09.RecordSafetyOutcomeExchange["request"],

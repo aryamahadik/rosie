@@ -1,9 +1,11 @@
-// What the compose-input call reads and gives (C-090, T-309; K-09 v1 composeInput; K-03 v1 composeInput; arch 07 line
-// 397: "After the commit, each outbox row gets its own composer call, in parallel, with its committed choices and only
-// what limit 7 lets its recipient see, never the frontier; an email copy takes its text row's plan instead").
+// What the compose-input call reads and gives (C-090, T-309, T-1174; K-09 v1.6 composeInput; K-03 v1.1 composeInput;
+// arch 07 line 397: "After the commit, each outbox row gets its own composer call, in parallel, with its committed
+// choices and only what limit 7 lets its recipient see, never the frontier; an email copy takes its text row's plan
+// instead").
 //
-// K-09 v1's request and answer, and the K-03 v1 composer input inside it, are the generated contract types (`npm run
-// contracts:types`; ADR-005), reached through the Tool API's call types, so the call and the base read one shape. What
+// K-09 v1.6's request and answer, and the K-03 v1.1 composer input inside it, are the generated contract types (`npm run
+// contracts:types`; ADR-005), reached through the Tool API's call types, which read them off v1.6's composeInput exchange
+// (DL-350's way), so the call and the base read one shape. What
 // code knows about the row is a port, another task's: no K-05 v1 call reads an outbox row with its step and its reader
 // (T-313's readRow is the same seam for the finalize call). So the call is tested with doubles, and it fails closed
 // (notBuilt, nothing read) until the port is built.
@@ -14,20 +16,33 @@ import type { SlotName, SlotSource } from "../finalize/slots";
 import type { BundleId, FlowLetter, FrontierBundles } from "../frontier/assemble/types";
 import type { AnswerOf, CallContext, ErrorsOf, RequestOf, ResponseOf } from "../tool-api";
 
-// ---- K-09 v1 composeInput (contracts/tool-api), through the Tool API's call types ------------------------------------
+// ---- K-09 v1.6 composeInput (contracts/tool-api), through the Tool API's call types ----------------------------------
 
 export type ComposeInputRequest = RequestOf<"composeInput">;
 export type ComposeInputResponse = ResponseOf<"composeInput">;
-/** K-09 v1 `composeInput.errors`: each "Refused, nothing written". */
+/** K-09 v1.6 `composeInput.errors`: each "Refused, nothing composed and nothing written". */
 export type ComposeInputError = ErrorsOf<"composeInput">;
 export type ComposeInputAnswer = AnswerOf<"composeInput">;
+/** K-09 v1.6 `fixedLineRowError`: the row carries a fixed line, so it is never composed (README v1.6 default 139). */
+export type FixedLineRow = Extract<ComposeInputError, { error: "fixedLineRow" }>;
+/** K-09 v1.6 `masterLineMissingError`: the row's master line cannot be read (README v1.6 default 140). */
+export type MasterLineMissing = Extract<ComposeInputError, { error: "masterLineMissing" }>;
+/** What is missing when a row's master line cannot be read: its bundle, its step, or the reader's line in it. */
+export type Missing = MasterLineMissing["missing"];
 
-/** K-03 v1 `composeInput`: the composer's input for one outbox row. */
+/** K-03 v1.1 `composeInput`: the composer's input for one outbox row. */
 export type ComposeInput = Extract<ComposeInputResponse, { result: "compose" }>["input"];
-/** K-03 v1 `conversationMessage`: one of the reader's last messages with this business, redacted. */
+/** K-03 v1.1 `conversationMessage` (v1's): one of the reader's last messages with this business, redacted. */
 export type ConversationMessage = ComposeInput["conversation"][number];
-/** K-03 v1 `fact`: a slot name and its value as this reader may see it. */
+/** K-03 v1.1 `inputFact`: a slot fact or a term fact. */
 export type Fact = ComposeInput["facts"][number];
+/** K-03 v1.1 `fact` (v1's): a slot name and its value as this reader may see it. */
+export type SlotFact = Extract<Fact, { slot: unknown }>;
+/**
+ * K-03 v1.1 `termFact`: one of Rosie's own fixed terms that the row's step card states, word for word, with its source
+ * line; never a slot (README v1.6 defaults 137, 138).
+ */
+export type TermFact = Exclude<Fact, { slot: unknown }>;
 /** K-03 v1 `audience`. */
 export type Audience = ComposeInput["audience"];
 /** K-03 v1 `situation`: code's tone tag (arch 07 line 357; C-090). */
@@ -137,7 +152,10 @@ export interface ComposeRow {
    * K-04 v1 person_roles; S13-31), read as limit 7's reader (readerOf).
    */
   readonly role: Role;
-  /** The reader's name as Rosie addresses them, or null when none is known (K-03 v1 audience.name). */
+  /**
+   * The reader's name as the row read gives it (K-04 persons.name), or null when none is known. Rosie addresses the
+   * reader by its first word (K-03 audience.name; T-1141's default, DL-364, DL-367): the seed's "Sam Lee" is "Sam".
+   */
   readonly name: string | null;
   /** How this reader is reached (K-03 v1 audience.way). */
   readonly way: Reach;

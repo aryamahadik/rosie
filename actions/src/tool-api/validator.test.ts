@@ -3,7 +3,9 @@
 // span refuses a raw phone number and a person's words. T-1150: it checks K-09 v1's 29 calls by K-09 v1.5's definitions
 // of the same name, so the walking skeleton's turn 1 passes (build-frontier-s1-01.json's sign-up door; commit-s1-01.json's
 // turn with the service and chat id of its last text, both or neither: default 135), every v1 fixture gets the answer
-// K-09 v1 gives it, and the calls v1.1 to v1.4 add stay unknown. Values come only from the contracts' fixtures (rule 9).
+// K-09 v1 gives it, and the calls v1.1 to v1.4 add stay unknown. T-1174: composeInput alone is checked by K-09 v1.6's
+// definitions, so its v1.6 exchanges pass (term facts, fixedLineRow, masterLineMissing), its refused ones are refused as
+// v1.6 says, and every v1 composeInput exchange keeps its verdict. Values come only from the contracts' fixtures (rule 9).
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -23,13 +25,16 @@ import {
 import { createToolApi, notBuiltHandlers } from "./tool-api";
 import {
   AJV_OPTIONS,
+  COMPOSE_INPUT_TOOL_API_SCHEMA_ID,
   CONTRACTS_DIR,
   MODEL_SCHEMA_ID,
   SCHEMA_FILES,
   TOOL_API_SCHEMA_ID,
+  V1_6_SCHEMA_FILES,
   createToolApiValidator,
   formatProblems,
   loadToolApiSchemas,
+  toolApiSchemaIdOf,
   type CallPart,
 } from "./validator";
 
@@ -123,7 +128,13 @@ describe("the validator holds K-09 v1 and every schema it refers to", () => {
       for (const target of referencedFiles(file))
         expect(files.has(target), `${file} refers to ${target}`).toBe(true);
     }
-    expect(loadToolApiSchemas()).toHaveLength(SCHEMA_FILES.length);
+    // With K-09 v1.6 and K-03 v1.1 (composeInput's, T-1174) the set is still closed.
+    const withV16 = new Set<string>([...SCHEMA_FILES, ...V1_6_SCHEMA_FILES]);
+    for (const file of withV16) {
+      for (const target of referencedFiles(file))
+        expect(withV16.has(target), `${file} refers to ${target}`).toBe(true);
+    }
+    expect(loadToolApiSchemas()).toHaveLength(SCHEMA_FILES.length + V1_6_SCHEMA_FILES.length);
   });
 
   it("compiles every call's request, response and errors in strict mode, and an empty request is refused", () => {
@@ -290,7 +301,7 @@ describe("every v1 fixture gets the answer K-09 v1 gives it", () => {
   });
 
   for (const entry of entries) {
-    it(`${entry.file}: K-09 v1.5's definitions give K-09 v1's problem lines`, () => {
+    it(`${entry.file}: K-09 v1.5's definitions give K-09 v1's problem lines (composeInput's v1.6 its verdict)`, () => {
       const [call, part] = entry.def.split(".") as [CallName, string];
       const document = fixture(entry.file) as Json;
       const checks: [CallPart, unknown][] =
@@ -303,10 +314,103 @@ describe("every v1 fixture gets the answer K-09 v1 gives it", () => {
           : [[part as CallPart, document]];
       for (const [checked, value] of checks) {
         const v1 = problemsUnder(K09_V1_ID, `${call}.${checked}`, value);
-        expect(validator.check(call, checked, value), `${call}.${checked}`).toEqual(v1);
+        const lines = validator.check(call, checked, value);
+        if (call === "composeInput" && checked !== "request") {
+          // v1.6's response and errors are v1's widened (K-03 v1.1's input; two errors more): the same verdict, and
+          // nothing to say where v1 accepts; a refusal names v1.6's own branches.
+          expect(lines.length === 0, `${call}.${checked}`).toBe(v1.length === 0);
+        } else {
+          expect(lines, `${call}.${checked}`).toEqual(v1);
+        }
       }
     });
   }
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1174: composeInput by K-09 v1.6's definitions
+
+describe("composeInput is checked by K-09 v1.6's definitions, every other call by v1.5's (T-1174)", () => {
+  const k09v16 = contractFile("tool-api/tool-api.v1.6.schema.json") as {
+    $id: string;
+    $defs: Record<string, Json>;
+  };
+  const v16Entries = (
+    JSON.parse(readFileSync(path.join(CONTRACTS_DIR, "tool-api", "fixtures", "index.json"), "utf8")) as {
+      fixtures: { file: string; version: string; def: string; expect: string; rule?: string }[];
+    }
+  ).fixtures.filter((entry) => entry.version === "v1.6");
+
+  it("names v1.6 for composeInput alone, whose files the validator holds beside v1.5's", () => {
+    expect(COMPOSE_INPUT_TOOL_API_SCHEMA_ID).toBe(k09v16.$id);
+    for (const call of CALL_NAMES) {
+      expect(toolApiSchemaIdOf(call), call).toBe(
+        call === "composeInput" ? COMPOSE_INPUT_TOOL_API_SCHEMA_ID : TOOL_API_SCHEMA_ID,
+      );
+    }
+    const reached = closureOf([
+      "tool-api/tool-api.v1.5.schema.json",
+      "tool-api/tool-api.v1.6.schema.json",
+      "event-trace/event-trace.v1.1.schema.json",
+    ]);
+    expect([...SCHEMA_FILES, ...V1_6_SCHEMA_FILES].sort()).toEqual(reached);
+    expect(k09v16.$defs["composeInput.request"]).toEqual({
+      $ref: "tool-api.v1.5.schema.json#/$defs/composeInput.request",
+    });
+  });
+
+  it("v1.6 holds six composeInput fixtures: three accepted, three refused", () => {
+    expect(v16Entries.map((entry) => [entry.def, entry.expect])).toEqual([
+      ["composeInput.exchange", "accept"],
+      ["composeInput.exchange", "accept"],
+      ["composeInput.exchange", "accept"],
+      ["composeInput.exchange", "refuse"],
+      ["composeInput.exchange", "refuse"],
+      ["composeInput.exchange", "refuse"],
+    ]);
+  });
+
+  for (const file of [
+    "compose-input-s1-02-v1.6.json",
+    "compose-input-fixed-line-row.json",
+    "compose-input-master-line-missing.json",
+  ]) {
+    it(`${file}: its request passes, its outcome passes v1.6's response or errors, and v1.5 refuses the outcome`, () => {
+      const { request, outcome } = v15Exchange(file);
+      expect(validator.check("composeInput", "request", request)).toEqual([]);
+      const asResponse = validator.check("composeInput", "response", outcome);
+      const asErrors = validator.check("composeInput", "errors", outcome);
+      expect(asResponse.length === 0 || asErrors.length === 0).toBe(true);
+      const underV15 = [
+        ...problemsUnder(TOOL_API_SCHEMA_ID, "composeInput.response", outcome),
+        ...problemsUnder(TOOL_API_SCHEMA_ID, "composeInput.errors", outcome),
+      ];
+      expect(underV15.length).toBeGreaterThan(0);
+      expect(
+        problemsUnder(TOOL_API_SCHEMA_ID, "composeInput.response", outcome).length === 0 ||
+          problemsUnder(TOOL_API_SCHEMA_ID, "composeInput.errors", outcome).length === 0,
+      ).toBe(false);
+    });
+  }
+
+  it("refuses a term fact with no source line, or one that names a slot, and no problem line holds its words", () => {
+    for (const file of [
+      "invalid/refuse-term-fact-no-source.json",
+      "invalid/refuse-term-fact-names-slot.json",
+    ]) {
+      const { outcome } = v15Exchange(file);
+      const asResponse = validator.check("composeInput", "response", outcome);
+      expect(asResponse, file).not.toEqual([]);
+      expect(validator.check("composeInput", "errors", outcome), file).not.toEqual([]);
+      expect(asResponse.join("\n"), file).not.toContain("$2");
+    }
+  });
+
+  it("takes a term fact that is no card line, which the schema cannot see: only compose input's own build gives card lines", () => {
+    const { request, outcome } = v15Exchange("invalid/refuse-term-fact-not-card-line.json");
+    expect(validator.check("composeInput", "request", request)).toEqual([]);
+    expect(validator.check("composeInput", "response", outcome)).toEqual([]);
+  });
 });
 
 describe("the walking skeleton's turn 1 (K-09 v1.5): the sign-up door and the turn's service and chat id", () => {

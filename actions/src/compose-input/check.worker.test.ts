@@ -5,8 +5,8 @@
 // validator.worker.test.ts and the frontier's check.worker.test.ts do, the test traps Function and eval while check.ts
 // makes its checkers and runs every check below, and the trap counts no call.
 //
-// Both K-03 versions are prebuilt (DL-357): v1's composeInput, which compose input checks, and v1.1's, whose facts may
-// also be term facts, which T-1174 moves it to. The build records, in compose-input-answers.js, what Ajv's compiler
+// Both K-03 versions are prebuilt (DL-357): v1.1's composeInput, whose facts may also be term facts, which compose input
+// checks since T-1174 (its default checker), and v1's. The build records, in compose-input-answers.js, what Ajv's compiler
 // answers in Node, with the Tool API validator's options, to each K-03 input on the contracts' fixtures under each
 // version: each K-03 composeInput fixture (input-s1-02-v1.1.json among them), each inputAndPlan fixture's input, the
 // input K-09's compose-input-s1-02.json answers, and {}. Here, each check gives the same verdict, errors and problem
