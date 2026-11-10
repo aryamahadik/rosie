@@ -44,7 +44,7 @@ The runtime's own trace test names what the merged runtime does not write yet (`
 
 - The trace is checked against K-08 with the code T-1144 prebuilds for the Worker (K-08 v1.1's span, which is v1's). Ajv's compiler cannot run in workerd. `npm run test:e2e` builds that code first.
 - The local target starts capturing log lines before the root is composed, because the root binds its span sinks to `console.log` at that moment.
-- The actor stamps its inbox entry's span when it answers the hand-off, so its `at` is its end, not its start as K-08 says (T-1170). Nor is `at` less `ms` its start: the actor reads the clock for `ms` and again for `at`, and the clock moves in between. So the inbox entry and the safety read are timed on the gateway's own readings, which are exact: after its scrub, before its answer.
+- The actor's inbox entry's span starts when the hand-off reaches the actor, as K-08 says: the actor reads its clock once as the call begins and stamps the span from that reading when it answers (T-1170). The inbox entry is timed on the gateway's own readings, which are exact: after its scrub, before its answer. The safety read starts no earlier than the inbox entry, since the actor stores the text and starts its read in one step, and before the gateway's answer.
 - The dispatcher still sends to the root's fake Linq port, not to the local target's recording Linq double. So the parts the full check reads are wired by the send join (T-563) or by T-466.
 
 T-466 then completes the file with D-017's automated tests:
