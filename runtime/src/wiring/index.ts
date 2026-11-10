@@ -20,6 +20,7 @@ export {
   type Ports,
   type StateReads,
   type TurnFacePort,
+  type TurnRowPort,
 } from "./ports";
 export {
   LINQ_WEBHOOK_SECRET,
@@ -29,15 +30,20 @@ export {
   realPorts,
   realSafetyRead,
   realSealing,
+  realTurnRow,
   SEALING_WRAP_KEY,
   SealingKeyError,
+  TurnIdError,
+  type CommitTurnCall,
   type HandleSealingKeyCall,
   type KeyObjectStore,
   type LinqVerifyInputs,
+  type ParkTurnCall,
   type RealInputs,
   type SafetyReaders,
   type SafetyReadInputs,
   type SealingInputs,
+  type TurnRowCalls,
 } from "./real";
 export {
   composeRoot,

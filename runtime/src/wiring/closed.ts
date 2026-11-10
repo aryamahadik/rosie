@@ -28,6 +28,7 @@ export function closedPorts(): Ports {
     linqVerify: { verifyWebhook: () => fail("linqVerify") },
     sealing: { getOrCreateKey: () => fail("sealing") },
     safetyRead: { read: () => fail("safetyRead") },
+    turnRow: { commitTurn: () => fail("turnRow"), parkTurn: () => fail("turnRow") },
     stateReads: {
       bundles: {
         registry: {
@@ -76,7 +77,6 @@ export function closedPorts(): Ports {
       rows: {
         unplannedRows: () => fail("dataAccess"),
         writePlan: () => fail("dataAccess"),
-        parkTurn: () => fail("dataAccess"),
       },
       outbox: {
         markRow: () => fail("dataAccess"),

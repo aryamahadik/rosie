@@ -59,6 +59,7 @@ export function bindPorts(
       linqVerify: take("linqVerify"),
       sealing: take("sealing"),
       safetyRead: take("safetyRead"),
+      turnRow: take("turnRow"),
       stateReads: take("stateReads"),
       turnFace: take("turnFace"),
       decide: take("decide"),

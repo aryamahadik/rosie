@@ -12,10 +12,11 @@
 // flag (./skeleton.ts); sealing (T-553), K-05 v1.2 handleSealingKey with its database bound, fed by the K-05 double in a
 // test and by no database on staging until T-567, so every seal there fails closed; safetyRead (T-554), @rosie/ai's
 // safety read, over the recorded-model double in a test and over no reader on staging until the bundle's manifest and
-// the model key can be read there, so every read there fails closed and the actor applies its no-verdict rule. Every
-// other port of the Worker's
-// environments stays closed: each call fails, as `unconfiguredGateway` did before, so a webhook that gets past the
-// verify still answers 503. The fakes never reach a
+// the model key can be read there, so every read there fails closed and the actor applies its no-verdict rule; turnRow
+// (T-555), K-05's commitTurn and parkTurn with their database bound, the two calls that write a turn's one row under the
+// turn id the lease hashed, fed by the K-05 double in a test and by no database on staging until T-567, so every commit
+// and park there fails closed. Every other port of the Worker's environments stays closed: each call fails, as
+// `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
 
@@ -44,12 +45,13 @@ export const PICKS: readonly PortPick[] = [
   { port: "linqVerify", test: "real", staging: "real", production: "closed" }, // T-552
   { port: "sealing", test: "real", staging: "real", production: "closed" }, // T-553
   { port: "safetyRead", test: "real", staging: "real", production: "closed" }, // T-554
-  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-555 to T-557, T-562, T-564
+  { port: "turnRow", test: "real", staging: "real", production: "closed" }, // T-555
+  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-556, T-557, T-562, T-564
   { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-557, T-559, T-560
   { port: "decide", test: "fake", staging: "closed", production: "closed" }, // T-558
   { port: "composer", test: "fake", staging: "closed", production: "closed" }, // T-560
   { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561
-  { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-555, T-562, T-564
+  { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
   { port: "linqSend", test: "fake", staging: "closed", production: "closed" }, // T-563
 ];
 

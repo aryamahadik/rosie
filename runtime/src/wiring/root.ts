@@ -20,12 +20,13 @@
 //     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own.
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
-// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing port, which no database feeds there
-// until T-567, so every seal fails closed) and the closed set are at hand there, so every door not joined fails and a
-// webhook that gets past the verify answers 503, as before. A test composes the root with environment "test", the fakes
-// (./test-support.ts), what the joined ports are fed (the Linq double's made-up webhook secret, the K-05 double's
-// handleSealingKey), the HandleActor namespace, its flags and its own clock. Never logged by the root: a word, a number,
-// a key.
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing and turn-row ports, which no database
+// feeds there until T-567, so every seal, commit and park fails closed) and the closed set are at hand there, so every
+// door not joined fails and a webhook that gets past the verify answers 503, as before. A test composes the root with
+// environment "test", the fakes (./test-support.ts), what the joined ports are fed (the Linq double's made-up webhook
+// secret, the K-05 double's handleSealingKey, commitTurn and parkTurn), the HandleActor namespace, its flags and its own
+// clock. The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn
+// id the lease hashed from its batch's event ids. Never logged by the root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -47,7 +48,13 @@ import { bindPorts, WiringError, type Binding, type ImplementationSets } from ".
 import { closedPorts } from "./closed";
 import { environmentOf, PICKS, type Environment } from "./picks";
 import type { Ports } from "./ports";
-import { realPorts, type HandleSealingKeyCall, type LinqVerifyInputs, type SafetyReaders } from "./real";
+import {
+  realPorts,
+  type HandleSealingKeyCall,
+  type LinqVerifyInputs,
+  type SafetyReaders,
+  type TurnRowCalls,
+} from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 
@@ -96,6 +103,12 @@ export interface RootOptions {
    * so every read fails closed and the actor applies its no-verdict rule (T-246).
    */
   readonly safetyReaders?: SafetyReaders | null;
+  /**
+   * K-05's commitTurn (T-195) and parkTurn (T-197) with their database bound, the two calls that write a turn's one row
+   * (T-555; ./real.ts realTurnRow): in a test, the K-05 double; null or left out where no database is bound (the Worker
+   * until T-567), so every commit and park fails closed.
+   */
+  readonly turnRows?: TurnRowCalls | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -142,6 +155,7 @@ export function composeRoot(options: RootOptions): Root {
         dangerWords: () => ports.stateReads.safety.bundle.dangerWords(),
         sink: logSink(log),
       },
+      turnRows: options.turnRows,
     }),
     closed: closedPorts(),
   });
@@ -187,7 +201,12 @@ export function composeRoot(options: RootOptions): Root {
     },
     ai: ports.decide,
     composer: ports.composer,
-    rows: ports.dataAccess.rows,
+    // The plan calls are the data-access port's; the park writes the turn's one row through the turn-row port (T-555).
+    rows: {
+      unplannedRows: (request) => ports.dataAccess.rows.unplannedRows(request),
+      writePlan: (request) => ports.dataAccess.rows.writePlan(request),
+      parkTurn: (request) => ports.turnRow.parkTurn(request),
+    },
     dispatcher,
     now: utc,
   };
@@ -301,6 +320,9 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // (J-02; DL-027) can be read in the Worker: every read fails closed (./real.ts NoSafetyReaderError), so the actor
     // applies its no-verdict rule.
     safetyReaders: null,
+    // No database is bound until T-567: every commit and park fails closed (./real.ts NoDatabaseError), so no turn row is
+    // written; a turn whose commit is not taken lapses and is parked, and its park is tried again (T-248, T-253).
+    turnRows: null,
   });
   workerRoots.set(env, root);
   return root;
