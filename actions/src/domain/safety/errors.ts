@@ -20,9 +20,11 @@ export type SafetyFault =
   | "noSafetyLine"
   /** The checked line has nobody to go to: no row could be built for its recipient (MC C9), or no owner to tell (A3-48). */
   | "safetyLineNotBuilt"
-  /** Harm to a child or older adult with no hotline from Rosie's safety list (A3-49: "Never make up or guess a hotline"). */
-  | "noHotline"
-  /** A harm report names the business it came from (K-34 v1 harm_reports.business_id is not null). */
+  /**
+   * A harm report names the business it came from (K-34 v1 harm_reports.business_id is not null). Filed only with the
+   * hotline its line gives: with none in the pinned bundle the record sends 911 and files no report, never refused for
+   * want of a hotline (record.ts default 10; CQ-164 (c)).
+   */
   | "harmReportNeedsBusiness"
   /** A booking_private release whose booking is not private yet (A3-50: "Once the booking is made private"). */
   | "bookingNotPrivate"
