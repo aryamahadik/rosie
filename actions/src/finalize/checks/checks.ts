@@ -155,16 +155,22 @@ export const valuesFaults: Check = (parts, context) => {
 };
 
 // ---------------------------------------------------------------------------------------------------------------
-// One question (S13-28 rule 50; arch 07 line 411): at most one question per text.
+// One question (S13-28 rule 50; arch 07 line 411): at most one question per text, counted in the composed words only.
+// What code inserted never counts toward it: each fixed line (safetyAsk, the opt-out line, the privacy link, any other)
+// and the typed options are code's own words, like a slot value (arch 07 line 361; DL-158 a), so the danger question
+// the inserter adds after a safety line (T-1164) never makes a composed question a second one (T-1178; DL-355).
 
 const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 
-/** At most one question mark in the message's words, outside a quote and the typed options. */
+/**
+ * At most one question mark in the composed words: outside each fixed line's source words and the typed options, each
+ * taken out at its first place (code inserts each once, so a copy anywhere else is the model's), and outside a quote.
+ */
 export const oneQuestionFaults: Check = (parts, context) => {
-  const typed = context.typedOptions === null ? [] : [context.typedOptions];
+  const inserted = insertedWords(parts, context);
   const quotes = quotesOf(parts);
   const asked = sendTexts(parts)
-    .map((text) => blankOut(withoutInserted(text, typed), quotes))
+    .map((text) => blankOut(withoutInserted(text, inserted), quotes))
     .join("\n")
     .match(/\?+/g)?.length;
   if (asked === undefined || asked <= 1) return [];

@@ -607,15 +607,22 @@ describe("oneQuestion: at most one question per text (S13-28 rule 50)", () => {
     ]);
   });
 
-  it("reads '??' as one question, a fixed line's question as one, and a quote's as none", () => {
+  it("reads '??' as one question, a fixed line's question as none, and a quote's as none", () => {
     const loud = textOf("Does that still work??");
     expect(oneQuestionFaults(loud, contextFor(loud))).toEqual([]);
+    // safetyAsk is code's fixed line, so only the composed words' one question counts (T-1178; DL-355).
     const safety = partsOf(
       [wordsSend("Is anyone in danger right now? What time works for you?")],
       [],
       ["safetyAsk"],
     );
-    expect(oneQuestionFaults(safety, contextFor(safety))).toEqual([
+    expect(oneQuestionFaults(safety, contextFor(safety))).toEqual([]);
+    const twoOwn = partsOf(
+      [wordsSend("Is anyone in danger right now? What time works for you? Or should we call you?")],
+      [],
+      ["safetyAsk"],
+    );
+    expect(oneQuestionFaults(twoOwn, contextFor(twoOwn))).toEqual([
       "The text asks two questions; ask at most one question per text.",
     ]);
     const quote = "Can you come at 3pm instead?";
