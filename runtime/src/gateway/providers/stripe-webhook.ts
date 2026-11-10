@@ -4,6 +4,10 @@
 // and `businesses`, the connected accounts. The signature is checked by the port's verify call (K-14 `verifyWebhook`:
 // the Stripe adapters check it with the shared helper, adapters/src/shared/hmac.ts); the door holds no secret and no
 // HMAC. Answers, after T-241's rules (../answer.ts, ./common.ts):
+// - 413, nothing verified or stored: a body over the door's cap (T-1195; ../body.ts; ProviderDoors.stripeBodyLimitBytes,
+//   STRIPE_BODY_LIMIT_BYTES by default), refused before it is read whole and before any signature check, with nothing
+//   logged but the span, as the page entry and the Linq webhook refuse theirs (T-1180). Every other answer comes in the
+//   order it came before the cap, from the same header, clock and text;
 // - 401, nothing stored: a missing Stripe-Signature header, one with no single t= of whole seconds or no v1=, more than
 //   5 v1= entries, a t= more than 300 s from receipt, or a clock that is not a number, all refused by the door itself
 //   before any HMAC (fail closed on the odd input T-1079 hardens the shared verifiers against); and every rejection the
@@ -27,6 +31,7 @@ import {
   respond,
   type WebhookEnvironment,
 } from "../answer";
+import { bodyLimitOf, readCappedText } from "../body";
 import {
   answerOf,
   dropped,
@@ -37,6 +42,7 @@ import {
   recordOnce,
   refused,
   scrubPayload,
+  tooLarge,
   unreadableBody,
   written,
   type Verdict,
@@ -52,6 +58,12 @@ import type {
 
 /** Stripe's signature header (K-14 `verifyWebhook.request.signatureHeader`; README spike row 13). */
 const SIGNATURE_HEADER = "stripe-signature";
+
+/**
+ * The Stripe door's cap in bytes: 256 KiB, the card's default (T-1195) and the Linq webhook's, over a hundred times K-14's
+ * largest webhook (each fixture, its body inside, under 2 KB); neither K-14 nor its spike's Stripe documents give a size.
+ */
+export const STRIPE_BODY_LIMIT_BYTES = 256 * 1024;
 
 /**
  * The most v1= entries the door lets through to the verify call: one per active secret, two while a secret is rolled
@@ -199,6 +211,11 @@ async function decide(
   onError: (stage: string, error: unknown) => void,
 ): Promise<Verdict> {
   const nowMs = (deps.now ?? Date.now)();
+  // The body under its cap (../body.ts), before any signature check: one over it is never read whole or verified, and
+  // nothing but the span is logged. A body that cannot be read still answers only after the header's checks.
+  const read = await readCappedText(request, bodyLimitOf(deps.stripeBodyLimitBytes, STRIPE_BODY_LIMIT_BYTES));
+  if ("problem" in read && read.problem === "tooLarge") return tooLarge();
+
   // A clock that is not a number cannot measure the window: refused, as T-1079 refuses a NaN clock.
   if (!Number.isFinite(nowMs)) return refused("badClock", { signatureValid: false });
   const receivedAt = new Date(nowMs).toISOString();
@@ -207,13 +224,12 @@ async function decide(
   const problem = signatureHeaderProblem(header, nowMs);
   if (problem !== null) return refused(problem, { signatureValid: false });
 
-  let raw: string;
-  try {
-    raw = await request.text();
-  } catch (error) {
-    onError("readBody", error);
+  if ("problem" in read) {
+    onError("readBody", read.error);
     return unreadableBody();
   }
+  // The text request.text() gave before the cap (../body.ts): Stripe signs "<t>.<raw>", so the verify gets it as sent.
+  const raw = read.text;
 
   let answer: unknown;
   try {

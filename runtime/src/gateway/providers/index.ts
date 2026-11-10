@@ -1,5 +1,6 @@
 // The provider webhook doors (T-275; C-044): Stripe's two endpoints and the two calendar providers' pushes, each verified
-// through its port and stored once by its event id in PostgreSQL. See stripe-webhook.ts and calendar-webhook.ts.
+// through its port and stored once by its event id in PostgreSQL, each body read under its door's cap first (T-1195,
+// ../body.ts). See stripe-webhook.ts and calendar-webhook.ts.
 
 import type { WebhookEnvironment } from "../answer";
 import { handleCalendarWebhook, type CalendarSource } from "./calendar-webhook";
@@ -7,6 +8,7 @@ import { handleStripeWebhook } from "./stripe-webhook";
 import type { ProviderDeps, ProviderDoors, StripeEndpoint } from "./types";
 
 export {
+  CALENDAR_BODY_LIMIT_BYTES,
   googlePushOf,
   graphNotificationsOf,
   handleCalendarWebhook,
@@ -15,6 +17,7 @@ export {
 export { scrubPayload } from "./common";
 export {
   MAX_SIGNATURE_ENTRIES,
+  STRIPE_BODY_LIMIT_BYTES,
   WINDOW_SECONDS,
   handleStripeWebhook,
   outOfMode,
