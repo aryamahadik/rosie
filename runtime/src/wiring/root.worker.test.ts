@@ -1,6 +1,7 @@
 // The composition root in the Workers runtime (T-550; C-046, C-044; build prompt section 10, D-017: "the trace shows every
 // hop once, in order"; "a repeated webhook sends nothing twice"). The root is composed for the test environment, every
-// port not joined yet on its fake (./test-support.ts), with the HandleActor namespace and one test clock; `install()` puts
+// port not joined yet on its fake (./test-support.ts) and the joined sealing port fed the K-05 double (T-553), with the
+// HandleActor namespace and one test clock; `install()` puts
 // the actor's ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts
 // createWorker), with the root's gateway. Since T-552 joined the Linq verify, each webhook is signed by the Linq double
 // (T-412) under the run's made-up secret and verified by the root's real verify (T-413), which is fed the same secret.
@@ -154,6 +155,7 @@ function rig(log: MockInstance): Run {
     vars: env,
     clock: fakes.clock,
     linq: fakes.linqInputs,
+    handleKey: fakes.handleKeys.call,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);

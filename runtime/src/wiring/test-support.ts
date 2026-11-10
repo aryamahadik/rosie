@@ -9,7 +9,9 @@
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
 //                webhook secret made up for the run, never Linq's, and the root's verify gets the same secret, with the
 //                chat lookup a receipt needs (Sam's chat is Sam's number)
-//   sealing      gateway/test-support fakeKeyStore
+//   sealing      joined (T-553): the root binds K-05 v1.2 handleSealingKey through its real sealing port (./real.ts
+//                realSealing). What it is fed comes from here: `fakeHandleKeys`, a K-05 double answering as the
+//                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run
 //   safetyRead   safety/test-support fakeRead, answering safety-no.json for each text the test names (`known`)
 //   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
 //                Sam's S1-02 targets; Sam's party and ids; each named text's safety result; dispatch/test-support
@@ -35,11 +37,12 @@ import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
 import type { FlagSubject } from "@rosie/db/repo/flags";
+import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
+import type { TransientError } from "@rosie/db/repo/targets";
 
 import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
-import { fakeKeyStore, type FakeKeyStore } from "../gateway/test-support";
 import { fakeTargets, type FakeTargets } from "../guard/test-support";
 import { fakeCore, fakeDirect, fakeRead, fixtureBundle } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
@@ -62,7 +65,7 @@ import {
   type FakeTurnFace,
 } from "../turn/test-support";
 import type { Ports } from "./ports";
-import type { LinqVerifyInputs } from "./real";
+import type { HandleSealingKeyCall, LinqVerifyInputs } from "./real";
 import type { RootClock } from "./root";
 import type { ReleaseFlags } from "./skeleton";
 
@@ -129,6 +132,66 @@ export function withSignatureChanged(webhook: SignedWebhook): SignedWebhook {
   };
 }
 
+// ---- K-05 v1.2 handleSealingKey, as a double (T-553; DL-313 ruling 4) ----------------------------------------------
+
+export interface FakeHandleKeys {
+  /** K-05's call as the root's real sealing port is fed it, its database bound. */
+  readonly call: HandleSealingKeyCall;
+  /** Every request, in order. */
+  readonly requests: HandleSealingKeyRequest[];
+  /** The key object handed out for a handle's address, for a test that opens a box itself; throws when none was made. */
+  keyOf(address: string): CryptoKey;
+  /** When set, every call answers it with no key, as K-05's constraint or transient answer. */
+  failWith: ConstraintError | TransientError | null;
+}
+
+/**
+ * K-05 v1.2 handleSealingKey as a double answering as the handle-key-*.json fixtures do: at a number's first sight its
+ * handle and person take the request's new ids and a key is made (handle-key-first-sight.json); each later call for that
+ * number finds them and writes nothing (handle-key-first-sight-repeat.json). The key is a random AES-256-GCM key object,
+ * for encrypt and decrypt, that cannot be exported (T-182's form), made for the run; its createdAt is `now`'s.
+ */
+export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
+  const known = new Map<string, { handleId: string; personId: string; createdAt: string; key: CryptoKey }>();
+  const requests: HandleSealingKeyRequest[] = [];
+  const keys: FakeHandleKeys = {
+    requests,
+    failWith: null,
+    keyOf(address) {
+      const entry = known.get(address);
+      if (entry === undefined) throw new Error("no key was made for that handle");
+      return entry.key;
+    },
+    async call(request) {
+      requests.push(structuredClone(request));
+      if (keys.failWith !== null) return { outcome: keys.failWith, dataKey: null };
+      const found = known.get(request.handle.address);
+      const entry = found ?? {
+        handleId: request.newHandleId,
+        personId: request.newPersonId,
+        createdAt: utcSeconds(now()),
+        key: (await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+          "encrypt",
+          "decrypt",
+        ])) as CryptoKey,
+      };
+      known.set(request.handle.address, entry);
+      const made = found === undefined;
+      return {
+        outcome: {
+          result: "key",
+          handleId: entry.handleId,
+          personId: entry.personId,
+          created: { handle: made, person: made, key: made },
+          key: { wrappingKeyName: request.wrappingKeyName, createdAt: entry.createdAt, version: 1 },
+        },
+        dataKey: entry.key,
+      };
+    },
+  };
+  return keys;
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -189,8 +252,11 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 export interface SkeletonFakes {
-  /** The fake set the test environment binds: every port but the joined Linq verify, which the root builds (./real.ts). */
-  readonly ports: Omit<Ports, "linqVerify">;
+  /**
+   * The fake set the test environment binds: every port but the joined ones, the Linq verify and the sealing, which the
+   * root builds (./real.ts).
+   */
+  readonly ports: Omit<Ports, "linqVerify" | "sealing">;
   readonly clock: TestClock;
   /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
   readonly linqInputs: LinqVerifyInputs;
@@ -201,7 +267,11 @@ export interface SkeletonFakes {
    * clock (whole seconds), so it is inside the 300 s window of the gateway's receipt time.
    */
   sign(event: LinqInboundEvent, partKey?: string | null): Promise<SignedWebhook>;
-  readonly keys: FakeKeyStore;
+  /**
+   * K-05 v1.2 handleSealingKey as a double, for the root's real sealing port (RootOptions.handleKey: `handleKeys.call`):
+   * every request it was asked, and the key object it handed out for each number.
+   */
+  readonly handleKeys: FakeHandleKeys;
   readonly face: FakeTurnFace;
   readonly targets: FakeTargets;
   readonly bundles: FakeBundles;
@@ -217,7 +287,7 @@ export interface SkeletonFakes {
 
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
 export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
-  const keys = fakeKeyStore();
+  const handleKeys = fakeHandleKeys(() => clock.now());
   // Read when each call is made: the read on arrival answers, and the turn's commit records, what `known` set by then.
   const answers: Record<string, SafetyResult> = {};
 
@@ -264,8 +334,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
   };
 
-  const ports: Omit<Ports, "linqVerify"> = {
-    sealing: keys,
+  const ports: Omit<Ports, "linqVerify" | "sealing"> = {
     safetyRead: fakeRead(clock, answers),
     stateReads: {
       bundles: bundles.deps,
@@ -316,7 +385,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     webhooks,
     sign: (event, partKey = null) =>
       webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
-    keys,
+    handleKeys,
     face,
     targets,
     bundles,

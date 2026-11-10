@@ -24,13 +24,23 @@ export {
 export {
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
+  NoDatabaseError,
   realPorts,
+  realSealing,
+  SEALING_WRAP_KEY,
+  SealingKeyError,
+  type HandleSealingKeyCall,
+  type KeyObjectStore,
   type LinqVerifyInputs,
   type RealInputs,
+  type SealingInputs,
 } from "./real";
 export {
   composeRoot,
+  unwireWorker,
   WORKER_CLOCK,
+  wiredRoot,
+  wireWorker,
   workerRoot,
   type HandleActors,
   type Root,

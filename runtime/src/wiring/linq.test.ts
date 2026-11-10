@@ -4,7 +4,8 @@
 // (T-185's release-flag read). Every webhook here is the double's, signed under a webhook secret made up for the run;
 // double-signed-webhook.json (K-11 v1) is the one the card names. The doors after the gateway are doubles, since the
 // handle's actor is hop 2 (T-553): a HandleActors namespace whose actors store an event once and record every time one is
-// reached, the fake sealing key store, and the fake outbox store behind the receipt door. Test values only (rule 9).
+// reached, the K-05 double behind the root's real sealing port (T-553: the key K-05 v1.2 handleSealingKey hands over), and
+// the fake outbox store behind the receipt door. Test values only (rule 9).
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -122,6 +123,7 @@ async function rig(options: RigOptions = {}): Promise<Rig> {
     vars: VARS,
     clock,
     flags,
+    handleKey: fakes.handleKeys.call,
     ...(linq === "no secret" ? {} : { linq }),
   });
   const lines = (): Line[] => spy.mock.calls.map(([line]) => JSON.parse(String(line)) as Line);
@@ -158,7 +160,7 @@ function doubleSignedWebhook(fakes: SkeletonFakes): Promise<SignedWebhook> {
 function expectNothingWritten(run: Rig): void {
   expect(run.actors.opened).toEqual([]);
   expect(run.actors.accepted).toEqual([]);
-  expect(run.fakes.keys.asked).toEqual([]);
+  expect(run.fakes.handleKeys.requests).toEqual([]);
   expect(run.fakes.store.marks).toEqual([]);
 }
 
@@ -214,7 +216,8 @@ describe("hop 1 joined: the Linq double's signed webhook verified at the gateway
     expect(Math.abs(Date.parse(String(handoff.event.receivedAt)) - FIXTURE_NOW)).toBeLessThan(1000);
     const sealed = handoff.event.sealed;
     if (sealed === null) throw new Error("the words were not sealed");
-    const words = await openWords(sealed, run.fakes.keys.keyOf(EVENT.handle), MAYA_ACTOR, EVENT.eventId);
+    const key = run.fakes.handleKeys.keyOf(EVENT.handle.address);
+    const words = await openWords(sealed, key, MAYA_ACTOR, EVENT.eventId);
     expect(words.body).toBe(EVENT.body);
   });
 
