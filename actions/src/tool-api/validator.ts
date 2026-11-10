@@ -20,14 +20,12 @@
 // validator.worker.test.ts and the frontier's check.worker.test.ts check it again inside workerd. Problem lines name a
 // path and what the schema wants, never a value.
 //
-// composeInput alone is checked by K-09 v1.6's definitions (T-1174; README "v1.6"; DL-355): its answer is K-03 v1.1's
-// composer input, whose facts may also be term facts, or one of its errors, fixedLineRow and masterLineMissing among
-// them. v1.6 accepts every v1 to v1.5 composeInput exchange, and its request is v1.5's by reference. In Node the
-// validator also holds v1.6 and K-03 v1.1 (V1_6_SCHEMA_FILES). The prebuilt code holds SCHEMA_FILES' definitions alone
-// until build:validators compiles v1.6's composeInput too (T-1174's NEED: infra/build is outside its card), so inside
-// workerd composeInput is still checked by v1.5's definitions, which refuse a term fact and the two new errors: there the
-// call fails closed (invalidResponse), never answering what the Worker cannot check. Nothing in the Worker calls
-// composeInput yet (the turn face's compose hop is T-1141's).
+// composeInput alone is checked by K-09 v1.6's definitions (T-1174, T-1189; README "v1.6"; DL-355, DL-373), in Node
+// and inside workerd alike: its answer is K-03 v1.1's composer input, whose facts may also be term facts, or one of its
+// errors, fixedLineRow and masterLineMissing among them. v1.6 accepts every v1 to v1.5 composeInput exchange, and its
+// request is v1.5's by reference. SCHEMA_FILES holds v1.6 and K-03 v1.1 beside v1.5's files, and build:validators
+// compiles composeInput's request, response and errors from v1.6 (its other calls' from v1.5), so the prebuilt code
+// holds exactly the definitions toolApiSchemaIdOf names.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -41,7 +39,7 @@ import { build as prebuilt, definitions as prebuiltDefinitions } from "./generat
 
 /** The $id of K-09 v1.5, whose definitions of K-09 v1's calls the validator checks (contracts/README.md convention 2). */
 export const TOOL_API_SCHEMA_ID = "https://rosie.invalid/contracts/tool-api/tool-api.v1.5.schema.json";
-/** The $id of K-09 v1.6, whose composeInput the validator checks in Node (T-1174; see the top). */
+/** The $id of K-09 v1.6, whose composeInput the validator checks in Node and in workerd (T-1174, T-1189). */
 export const COMPOSE_INPUT_TOOL_API_SCHEMA_ID =
   "https://rosie.invalid/contracts/tool-api/tool-api.v1.6.schema.json";
 /** The $id of K-08 v1.1, whose `span` is v1's, unchanged (event-trace README "v1.1"). */
@@ -54,8 +52,9 @@ export const EVENT_TRACE_SCHEMA_ID =
 export const MODEL_SCHEMA_ID = "https://rosie.invalid/contracts/model/model.v1.1.schema.json";
 
 /**
- * The frozen schema files the validator holds, relative to contracts/: every file K-09 v1.5's and K-08 v1.1's $refs reach,
- * K-09 v1 to v1.4, K-02 v1 and v1.1 and K-06 v1 (gateAndCommit.turn's service) among them (a test checks that the list is
+ * The frozen schema files the validator holds, relative to contracts/, in Node and in the prebuilt code alike: every file
+ * K-09 v1.5's, K-09 v1.6's and K-08 v1.1's $refs reach, K-09 v1 to v1.4, K-02 v1 and v1.1, K-06 v1 (gateAndCommit.turn's
+ * service) and K-03 v1.1 (whose composeInput v1.6's composeInput answers) among them (a test checks that the list is
  * exactly that closure).
  */
 export const SCHEMA_FILES = [
@@ -64,6 +63,7 @@ export const SCHEMA_FILES = [
   "model/model.v1.schema.json",
   "model/model.v1.1.schema.json",
   "message-plan/message-plan.v1.schema.json",
+  "message-plan/message-plan.v1.1.schema.json",
   "data-access/data-access.v1.schema.json",
   "inbound-event/inbound-event.v1.schema.json",
   "outbox-effects/outbox-effects.v1.schema.json",
@@ -75,17 +75,18 @@ export const SCHEMA_FILES = [
   "tool-api/tool-api.v1.3.schema.json",
   "tool-api/tool-api.v1.4.schema.json",
   "tool-api/tool-api.v1.5.schema.json",
+  "tool-api/tool-api.v1.6.schema.json",
 ] as const;
 
 /**
- * The frozen files K-09 v1.6's composeInput reaches beyond SCHEMA_FILES, relative to contracts/: K-03 v1.1, whose
- * composeInput its answer holds, and v1.6 itself (T-1174). The validator holds them in Node; the prebuilt code does not
- * yet (see the top).
+ * The two files of SCHEMA_FILES that K-09 v1.6's composeInput added (T-1174): K-03 v1.1 and v1.6 itself. Since T-1189
+ * no list of its own: the validator and the prebuilt code read SCHEMA_FILES alone. The name stays only because
+ * index.ts re-exports it (outside T-1189's card); it can go with that line.
  */
 export const V1_6_SCHEMA_FILES = [
   "message-plan/message-plan.v1.1.schema.json",
   "tool-api/tool-api.v1.6.schema.json",
-] as const;
+] as const satisfies readonly (typeof SCHEMA_FILES)[number][];
 
 /** Ajv's options, for the compiler here and for the prebuilt code (infra/build/tool-api-validators.mjs). */
 export const AJV_OPTIONS = { strict: true, strictRequired: false, allErrors: true } as const;
@@ -129,27 +130,24 @@ export interface Validate {
  */
 export type DefinitionChecks = (schemaId: string, definition: string) => Validate;
 
-/**
- * Reads the frozen schema files from `contractsDir` (default: this repository's contracts/), SCHEMA_FILES' and then
- * V1_6_SCHEMA_FILES'; Node only.
- */
+/** Reads the frozen schema files, SCHEMA_FILES, from `contractsDir` (default: this repository's contracts/); Node only. */
 export function loadToolApiSchemas(contractsDir: string = CONTRACTS_DIR): object[] {
   if (RUNS_IN_WORKERD) {
     throw new Error(
       "workerd has no contracts/ on disk: createToolApiValidator() uses the prebuilt validators there",
     );
   }
-  return [...SCHEMA_FILES, ...V1_6_SCHEMA_FILES].map(
+  return SCHEMA_FILES.map(
     (file) => JSON.parse(readFileSync(path.join(contractsDir, ...file.split("/")), "utf8")) as object,
   );
 }
 
 /**
- * The $id of the K-09 version whose definitions check a call: v1.6's for composeInput (T-1174), v1.5's for every other
- * call. Inside workerd composeInput's is still v1.5's, the only one the prebuilt code holds (see the top).
+ * The $id of the K-09 version whose definitions check a call, in Node and in workerd alike: v1.6's for composeInput
+ * (T-1174, T-1189), v1.5's for every other call.
  */
 export function toolApiSchemaIdOf(call: CallName): string {
-  return call === "composeInput" && !RUNS_IN_WORKERD ? COMPOSE_INPUT_TOOL_API_SCHEMA_ID : TOOL_API_SCHEMA_ID;
+  return call === "composeInput" ? COMPOSE_INPUT_TOOL_API_SCHEMA_ID : TOOL_API_SCHEMA_ID;
 }
 
 /** Ajv's errors as one line each: the place (the root as "(root)") and what the schema wants. */
@@ -190,13 +188,17 @@ function sameList(a: readonly string[], b: readonly string[]): boolean {
 }
 
 /**
- * The prebuilt code (./generated/validators.js), once it is shown to hold exactly these schemas with these options:
- * code built for other schemas or options throws rather than check against the wrong contract.
+ * The prebuilt code (./generated/validators.js), once it is shown to hold exactly these schemas with these options, each
+ * call's definitions of the K-09 version toolApiSchemaIdOf names: code built for other schemas, versions or options
+ * throws rather than check against the wrong contract.
  */
 function prebuiltValidators(): DefinitionChecks {
   const options = Object.entries(AJV_OPTIONS);
+  const v16Calls = CALL_NAMES.filter((call) => toolApiSchemaIdOf(call) === COMPOSE_INPUT_TOOL_API_SCHEMA_ID);
   const stale =
     prebuilt.toolApiSchemaId !== TOOL_API_SCHEMA_ID ||
+    prebuilt.composeInputToolApiSchemaId !== COMPOSE_INPUT_TOOL_API_SCHEMA_ID ||
+    !sameList(prebuilt.composeInputToolApiCalls, v16Calls) ||
     prebuilt.eventTraceSchemaId !== EVENT_TRACE_SCHEMA_ID ||
     prebuilt.modelSchemaId !== MODEL_SCHEMA_ID ||
     !sameList(prebuilt.schemaFiles, SCHEMA_FILES) ||

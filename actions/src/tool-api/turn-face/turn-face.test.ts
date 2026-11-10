@@ -2,10 +2,10 @@
 // on turn 1, Sam's first text (K-09 v1.5 build-frontier-s1-01.json), through the Tool API base with the frontier's
 // sources as main's registry has them. Its answer is the fixture's frontier as far as main's sources give it
 // (test-support.ts asFarAsMain): the fixture's frontier less the choices named as waiting, each with its task
-// (test-support.ts WAITING), never stood in for. On main turn 1's one choice, the sign-up door, waits for T-1147, so no
-// choice is left: the call fails closed with FrontierError noChoices, its frontier span failed (error_code FrontierError)
-// and its transaction rolled back. When T-1147 takes the door off WAITING, the same tests expect the fixture's whole
-// frontier, its span ok and its transaction committed.
+// (test-support.ts WAITING), never stood in for. Since T-1147 wired turn 1's one choice, the sign-up door, into the
+// frontier, none waits (DL-365): the same tests expect the fixture's whole frontier, its span ok and its transaction
+// committed. With no choice left, the call would fail closed with FrontierError noChoices, its frontier span failed
+// (error_code FrontierError) and its transaction rolled back.
 //
 // No database: the stored state is the frontier's fake K-05 v1.2 readTurnState over T-1148's seed rows (test owner 1,
 // Sam, with no role, no open question, no booking and no phone row: test-support.ts firstTextSeed), each request and

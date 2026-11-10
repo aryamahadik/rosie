@@ -19,7 +19,10 @@
 // with their database bound, the turn's pin (so the guard's keyword list is the pinned bundle's) and the guard's
 // targets, fed in a test by the K-05 doubles (bundle v0 as bundles/v0 publishes it; test owner 1's seeded rows answering
 // as targets-first-text.json) and by no database on staging until T-567 (and no BUNDLES until T-566), so every pin and
-// every targets read there fails closed. Every other port of the Worker's environments stays closed: each call fails, as
+// every targets read there fails closed; frontier (T-557), K-09 buildFrontier through @rosie/actions' turn face over the
+// turn's pinned bundle and K-05 v1.2 readTurnState as rosie_job under the call's business scope, fed in a test by the
+// K-05 double over test owner 1's seeded rows (T-1148) and by no database on staging until T-567, so every frontier
+// there fails closed. Every other port of the Worker's environments stays closed: each call fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
@@ -52,8 +55,9 @@ export const PICKS: readonly PortPick[] = [
   { port: "turnRow", test: "real", staging: "real", production: "closed" }, // T-555
   { port: "bundles", test: "real", staging: "real", production: "closed" }, // T-556
   { port: "targets", test: "real", staging: "real", production: "closed" }, // T-556
-  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-557, T-562, T-564
-  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-557, T-559, T-560
+  { port: "frontier", test: "real", staging: "real", production: "closed" }, // T-557
+  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
+  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-559, T-560
   { port: "decide", test: "fake", staging: "closed", production: "closed" }, // T-558
   { port: "composer", test: "fake", staging: "closed", production: "closed" }, // T-560
   { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561

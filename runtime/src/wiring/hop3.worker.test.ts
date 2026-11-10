@@ -138,7 +138,8 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace and the skeleton flag on, its actor ports installed; the bundle and
- * targets ports (joined by T-556) fed their K-05 doubles, so the turn after the read pins its bundle and guards.
+ * targets ports (joined by T-556) fed their K-05 doubles, so the turn after the read pins its bundle and guards, and the
+ * frontier's scope (joined by T-557) fed its K-05 double, so the turn's frontier answers and the turn goes on.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -153,6 +154,7 @@ function rig(log: MockInstance): Rig {
     safetyReaders: fakes.models.readers,
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
+    frontierScope: fakes.frontier.scope,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();

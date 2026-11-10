@@ -39,10 +39,30 @@
 //                business, with its database bound, handed in by the root (RootOptions.handleTargets): in a test, the
 //                K-05 double answering for test owner 1's seeded rows (T-1148) as targets-first-text.json; nothing in the
 //                Worker until T-567, so every read there fails closed and no text reaches the frontier or decide.
+//   frontier     T-557: K-09 buildFrontier through @rosie/actions' turn face (T-315, createTurnFace: the Tool API base
+//                with K-09 v1.5's checks, the call's business scope and its one frontier span; the frontier with main's
+//                sources, T-1147's sign-up door among them). Its stored state is K-05 v1.2 readTurnState as rosie_job
+//                under the call's business scope, set for the transaction only, through the scope the root is handed
+//                (RootOptions.frontierScope: pgFrontierScope over a rosie_job client, the scope pgTurnFace builds on; in
+//                a test, the K-05 double over test owner 1's seeded rows); nothing in the Worker until T-567, so every
+//                frontier there fails closed. Its bundle is the one the turn's run pinned (./pinned-runs.ts), read KV
+//                first and PostgreSQL's copy on a miss, and its call's span says where each part it read came from.
+//                Inside workerd the Tool API's validator and the frontier's checker are T-1144's prebuilt standalone
+//                code (`npm run build:validators`), never a no-op; under Node, Ajv over the frozen schemas.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read only, never into a span, a log or an error.
 
+import { createFrontierChecker, type FrontierChecker } from "@rosie/actions/src/frontier/assemble/check";
+import type {
+  FrontierBundles,
+  FrontierRepo,
+  FlowLetter as FrontierFlow,
+} from "@rosie/actions/src/frontier/assemble/types";
+import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
+import type { CallTrace } from "@rosie/actions/src/tool-api/tool-api";
+import { createTurnFace } from "@rosie/actions/src/tool-api/turn-face/turn-face";
+import { createToolApiValidator, type ToolApiValidator } from "@rosie/actions/src/tool-api/validator";
 import {
   createLinqWebhookVerifier,
   type ParseLookups,
@@ -63,14 +83,21 @@ import type {
 } from "@rosie/db/repo/targets";
 
 import { turnIdOf } from "../actor/lease";
-import type { BundleDeps } from "../bundle/types";
+import {
+  BundleError,
+  type BundleDeps,
+  type Manifest,
+  type PartRead,
+  type PinnedBundle,
+} from "../bundle/types";
+import { asListed, BundleReader, flowOf, keyOf, readManifest, sameBundle } from "../bundle/values";
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
 import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
-import { openTrace, type BundleId, type SpanSink } from "../trace";
-import type { ParkTurnAnswer } from "../turn/types";
-import type { Ports, TurnRowPort } from "./ports";
+import { openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
+import type { BuildFrontierAnswer, ParkTurnAnswer } from "../turn/types";
+import type { FrontierPort, Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -126,10 +153,22 @@ export interface RealInputs {
    * T-567), so every targets read fails closed.
    */
   readonly handleTargets?: HandleTargetsCall | null | undefined;
+  /**
+   * What the frontier reads through besides its scope (T-557): the bound bundle port, for a bundle the turn did not pin,
+   * and the bundle each run of a turn pinned, by the run's trace. Left out, the frontier reads every bundle through its
+   * own bundle port (realBundles over `bundleReads`).
+   */
+  readonly frontierBundles?: Omit<FrontierInputs, "scope"> | undefined;
+  /**
+   * The frontier's business scope (T-557): K-05 v1.2 readTurnState as rosie_job under each call's business, set for the
+   * transaction only; null or left out where no database is bound (the Worker until T-567), so every frontier fails closed.
+   */
+  readonly frontierScope?: FrontierScope | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
 export function realPorts(inputs: RealInputs): Partial<Ports> {
+  const bundles = realBundles({ calls: inputs.bundleReads ?? null });
   return {
     linqVerify: linqVerify(inputs),
     sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
@@ -139,8 +178,13 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
         : { ...inputs.safetyRead, now: inputs.now },
     ),
     turnRow: realTurnRow({ calls: inputs.turnRows ?? null }),
-    bundles: realBundles({ calls: inputs.bundleReads ?? null }),
+    bundles,
     targets: realTargets({ call: inputs.handleTargets ?? null }),
+    frontier: realFrontier({
+      scope: inputs.frontierScope ?? null,
+      bundles: inputs.frontierBundles?.bundles ?? (() => bundles),
+      pinnedOf: inputs.frontierBundles?.pinnedOf ?? (() => null),
+    }),
   };
 }
 
@@ -456,4 +500,189 @@ export function realTargets(inputs: { readonly call: HandleTargetsCall | null })
       return call({ handleId: request.handleId }) as unknown as Promise<HandleTargetsAnswer>;
     },
   };
+}
+
+// ---- frontier: K-09 buildFrontier through @rosie/actions' turn face (T-557; C-074, C-075, C-050) -----------------------
+
+/**
+ * The frontier's business scope (K-05 v1.2 item 26 and its default 25; @rosie/actions' tool-api/scope.ts): one read-only
+ * transaction per call, as rosie_job, whose row-level security scope is the call's business, set for the transaction
+ * only and checked again before it ends, with the frontier's repo (readTurnState) inside it. On PostgreSQL it is
+ * pgFrontierScope over a client whose connections run as rosie_job (@rosie/actions' turn-face/pg/frontier.ts: the scope
+ * pgTurnFace builds its turn face on), the primary, uncached.
+ */
+export type FrontierScope = BusinessScope<FrontierRepo>;
+
+/** What the real frontier port is fed. */
+export interface FrontierInputs {
+  /** The frontier's scope with its database bound; null where none is bound, so every frontier fails closed. */
+  readonly scope: FrontierScope | null;
+  /**
+   * The bound bundle port (K-05 v1 item 7's reads, and the bundle KV when the port carries one), read at each call: for a
+   * bundle the turn did not pin (an open question asked under an earlier bundle), read by its id.
+   */
+  readonly bundles: () => BundleDeps;
+  /** The bundle the run whose trace this is pinned (./pinned-runs.ts), or null for a trace that is no pinned run's. */
+  readonly pinnedOf: (trace: TraceContext) => PinnedBundle | null;
+}
+
+/** The scope where no database is bound: each call fails closed before anything is read, inside the Tool API base. */
+const NO_FRONTIER_SCOPE: FrontierScope = {
+  withBusiness: () => Promise.reject(new NoDatabaseError("readTurnState")),
+};
+
+/**
+ * The frontier port (T-557): K-09 buildFrontier through @rosie/actions' turn face (createTurnFace, the face pgTurnFace
+ * makes over pgFrontierScope): the Tool API base checks the request against K-09 v1.5 and that it names the trace it runs
+ * in, refuses a call naming no business before anything is read, runs the frontier inside the call's scope, holds its
+ * answer to K-09 v1.5's response or errors, and records the call's one frontier span on the turn's trace, under the
+ * turn's pinned bundle id (CQ-159). The frontier reads the turn's stored state through the scope (K-05 v1.2
+ * readTurnState as rosie_job) and its bundle through the bundle the turn's run pinned (FrontierBundleReads), so turn 1's
+ * closed list (the sign-up door to S1-01, T-1147) comes from stored state. With no database bound every call goes to the
+ * base all the same and fails closed there, its span failed, before anything is read: a frontier never runs unscoped.
+ * The Tool API's validator and the frontier's checker are made at the first call and kept: inside workerd, T-1144's
+ * prebuilt standalone code, which throws rather than check against other schemas (never a no-op); under Node, Ajv over
+ * the frozen schemas from disk. K-09's answer comes back as it is (the context, one of buildFrontier's errors, or the
+ * base's refusal); a frontier that cannot answer within K-09 throws, its span failed, and the turn takes it as no answer.
+ * Nothing here logs: the frontier's own log lines are labels only (@rosie/actions' frontier/assemble/log.ts).
+ */
+export function realFrontier(inputs: FrontierInputs): FrontierPort {
+  let checks: { readonly validator: ToolApiValidator; readonly checker: FrontierChecker } | null = null;
+  return {
+    async buildFrontier(request, trace) {
+      checks ??= { validator: createToolApiValidator(), checker: createFrontierChecker() };
+      const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const face = createTurnFace<FrontierRepo>({
+        scope: inputs.scope ?? NO_FRONTIER_SCOPE,
+        bundles,
+        validator: checks.validator,
+        checker: checks.checker,
+      });
+      const answer = await face.buildFrontier(request, spanNamingReads(trace, bundles));
+      // The same K-09 buildFrontier answer in two hand-written forms: @rosie/actions' generated one, and the turn's
+      // (../turn/types.ts), which reads the context's turn id and choices and checks them itself (turn.ts isContextOf).
+      return answer as unknown as BuildFrontierAnswer;
+    },
+  };
+}
+
+/**
+ * The turn's trace as the Tool API base takes it (its CallTrace: the trace id and `start`), the call's own frontier span
+ * naming each bundle part the frontier read on this call, in order, and where it came from (K-01 v1 parts; KV, or
+ * PostgreSQL's copy on a miss): `got.bundleParts` (flow/A, ...) and `got.bundleFrom` (kv or postgres), labels only. A part
+ * the turn read before this call (its manifest, at the pin: the lease span's manifestFrom) is not named again.
+ */
+function spanNamingReads(trace: TraceContext, bundles: FrontierBundleReads): CallTrace {
+  return {
+    traceId: trace.traceId,
+    start(hop) {
+      const timer = trace.start(hop);
+      return {
+        finish(rest) {
+          if (hop !== "frontier") return timer.finish(rest);
+          const reads = bundles.reads();
+          return timer.finish({
+            ...rest,
+            got: {
+              ...rest.got,
+              bundleParts: reads.map((read) => read.part),
+              bundleFrom: reads.map((read) => read.from),
+            },
+          });
+        },
+      };
+    },
+  };
+}
+
+/** One bundle part the frontier read on a call: its K-01 part (manifest, flow/A, trade/<id>) and where it came from. */
+interface FrontierRead {
+  readonly part: string;
+  readonly from: PartRead["from"];
+}
+
+/** A K-01 v1 key's part: what follows bundle/<hash>/<build>/. */
+function partOf(key: string): string {
+  return key.split("/").slice(3).join("/");
+}
+
+/** A value a bundle does not hold (K-01 v1: the manifest lists no such value) reads as null; any other failure throws. */
+async function nullWhenNotIn<T>(read: () => Promise<T>): Promise<T | null> {
+  try {
+    return await read();
+  } catch (error) {
+    if (error instanceof BundleError && error.code === "notInBundle") return null;
+    throw error;
+  }
+}
+
+/**
+ * The bundles one frontier call reads (K-01 v1; @rosie/actions' FrontierBundles): the turn's pinned bundle as its run
+ * pinned it (its manifest as checked at the pin; each flow graph once per run, KV first and PostgreSQL's copy on a miss,
+ * checked against the manifest's size and sha256: runtime/src/bundle/pin.ts), and any other bundle by its id, through
+ * the bundle port (KV first when the port carries one, else PostgreSQL's copy), each value checked the same way. A bundle
+ * in neither copy, or a flow its manifest does not list, is null (the frontier offers nothing from it); a value no copy
+ * holds as the bundle's own, or a read that gets no answer, throws, so the call fails closed. Never logged: a value.
+ */
+class FrontierBundleReads implements FrontierBundles {
+  private readonly before: number;
+  private readonly reader: BundleReader;
+  private readonly manifests = new Map<string, Promise<Manifest | null>>();
+  private readonly flows = new Map<string, Promise<unknown>>();
+
+  constructor(
+    private readonly pinned: PinnedBundle | null,
+    deps: BundleDeps,
+  ) {
+    this.before = pinned?.reads().length ?? 0;
+    this.reader = new BundleReader(deps.registry, deps.kv ?? null);
+  }
+
+  manifest(bundleId: BundleId): Promise<unknown> {
+    const pinned = this.pinned;
+    if (pinned !== null && sameBundle(bundleId, pinned.bundleId)) return Promise.resolve(pinned.manifest);
+    return this.otherManifest(bundleId);
+  }
+
+  async flow(bundleId: BundleId, flow: FrontierFlow): Promise<unknown> {
+    const pinned = this.pinned;
+    if (pinned !== null && sameBundle(bundleId, pinned.bundleId)) {
+      return nullWhenNotIn(() => pinned.flow(flow));
+    }
+    const key = keyOf(bundleId, `flow/${flow}`);
+    const known = this.flows.get(key);
+    if (known !== undefined) return known;
+    const loading = this.otherFlow(bundleId, flow, key);
+    this.flows.set(key, loading);
+    return loading;
+  }
+
+  /** Every part this call read, in order, with where it came from: the pinned bundle's first, then the others'. */
+  reads(): FrontierRead[] {
+    const pinned = this.pinned?.reads().slice(this.before) ?? [];
+    return [...pinned, ...this.reader.reads()].map((read) => ({ part: partOf(read.key), from: read.from }));
+  }
+
+  /** Another bundle's manifest, read once per call and checked against its id; null when no copy holds it. */
+  private otherManifest(bundleId: BundleId): Promise<Manifest | null> {
+    const key = keyOf(bundleId, "manifest");
+    const known = this.manifests.get(key);
+    if (known !== undefined) return known;
+    const loading = readManifest(this.reader, bundleId).catch((error: unknown) => {
+      if (error instanceof BundleError && error.code === "notFound") return null;
+      throw error;
+    });
+    this.manifests.set(key, loading);
+    return loading;
+  }
+
+  /** Another bundle's flow graph, when its manifest lists it, checked against the listing. */
+  private async otherFlow(bundleId: BundleId, flow: FrontierFlow, key: string): Promise<unknown> {
+    const manifest = await this.otherManifest(bundleId);
+    const listed = manifest?.storage.values.find((value) => value.key === key && value.kind === "flow");
+    if (listed === undefined) return null;
+    return this.reader.read(key, "flow", (value) =>
+      Promise.resolve(asListed(value, listed) ? flowOf(value.text, flow) : null),
+    );
+  }
 }

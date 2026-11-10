@@ -5,7 +5,9 @@
 // turn with the service and chat id of its last text, both or neither: default 135), every v1 fixture gets the answer
 // K-09 v1 gives it, and the calls v1.1 to v1.4 add stay unknown. T-1174: composeInput alone is checked by K-09 v1.6's
 // definitions, so its v1.6 exchanges pass (term facts, fixedLineRow, masterLineMissing), its refused ones are refused as
-// v1.6 says, and every v1 composeInput exchange keeps its verdict. Values come only from the contracts' fixtures (rule 9).
+// v1.6 says, and every v1 composeInput exchange keeps its verdict. T-1189: SCHEMA_FILES, the one list the validator and
+// the prebuilt code read, is the closure of K-09 v1.5's, v1.6's and K-08 v1.1's $refs (validator.worker.test.ts checks
+// composeInput by v1.6 inside workerd). Values come only from the contracts' fixtures (rule 9).
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -30,7 +32,6 @@ import {
   MODEL_SCHEMA_ID,
   SCHEMA_FILES,
   TOOL_API_SCHEMA_ID,
-  V1_6_SCHEMA_FILES,
   createToolApiValidator,
   formatProblems,
   loadToolApiSchemas,
@@ -128,13 +129,10 @@ describe("the validator holds K-09 v1 and every schema it refers to", () => {
       for (const target of referencedFiles(file))
         expect(files.has(target), `${file} refers to ${target}`).toBe(true);
     }
-    // With K-09 v1.6 and K-03 v1.1 (composeInput's, T-1174) the set is still closed.
-    const withV16 = new Set<string>([...SCHEMA_FILES, ...V1_6_SCHEMA_FILES]);
-    for (const file of withV16) {
-      for (const target of referencedFiles(file))
-        expect(withV16.has(target), `${file} refers to ${target}`).toBe(true);
-    }
-    expect(loadToolApiSchemas()).toHaveLength(SCHEMA_FILES.length + V1_6_SCHEMA_FILES.length);
+    // K-09 v1.6 and K-03 v1.1 (composeInput's, T-1174) are in the set itself since T-1189, and it is still closed.
+    expect(files.has("tool-api/tool-api.v1.6.schema.json")).toBe(true);
+    expect(files.has("message-plan/message-plan.v1.1.schema.json")).toBe(true);
+    expect(loadToolApiSchemas()).toHaveLength(SCHEMA_FILES.length);
   });
 
   it("compiles every call's request, response and errors in strict mode, and an empty request is refused", () => {
@@ -237,9 +235,10 @@ describe("K-09 v1's 29 calls, each checked by K-09 v1.5's definition of the same
     expect(MODEL_SCHEMA_ID).toBe((contractFile("model/model.v1.1.schema.json") as { $id: string }).$id);
   });
 
-  it("holds exactly the files K-09 v1.5's and K-08 v1.1's $refs reach: K-06 v1, K-02 v1.1 and K-09 v1 to v1.4 among them", () => {
+  it("holds exactly the files K-09 v1.5's, v1.6's and K-08 v1.1's $refs reach: K-06 v1, K-02 v1.1, K-03 v1.1 and K-09 v1 to v1.4 among them", () => {
     const reached = closureOf([
       "tool-api/tool-api.v1.5.schema.json",
+      "tool-api/tool-api.v1.6.schema.json",
       "event-trace/event-trace.v1.1.schema.json",
     ]);
     expect([...SCHEMA_FILES].sort()).toEqual(reached);
@@ -247,10 +246,20 @@ describe("K-09 v1's 29 calls, each checked by K-09 v1.5's definition of the same
       expect.arrayContaining([
         "inbound-event/inbound-event.v1.schema.json",
         "model/model.v1.1.schema.json",
+        "message-plan/message-plan.v1.1.schema.json",
         "tool-api/tool-api.v1.schema.json",
         "tool-api/tool-api.v1.4.schema.json",
       ]),
     );
+    // v1.6 (composeInput's, T-1174) adds exactly K-03 v1.1 and itself to what v1.5's and K-08 v1.1's $refs reach.
+    const v15Reached = closureOf([
+      "tool-api/tool-api.v1.5.schema.json",
+      "event-trace/event-trace.v1.1.schema.json",
+    ]);
+    expect(reached.filter((file) => !v15Reached.includes(file))).toEqual([
+      "message-plan/message-plan.v1.1.schema.json",
+      "tool-api/tool-api.v1.6.schema.json",
+    ]);
   });
 
   it("K-09 v1.5 names each call's request, response and errors, and lists every call of v1 among its own", () => {
@@ -353,7 +362,7 @@ describe("composeInput is checked by K-09 v1.6's definitions, every other call b
       "tool-api/tool-api.v1.6.schema.json",
       "event-trace/event-trace.v1.1.schema.json",
     ]);
-    expect([...SCHEMA_FILES, ...V1_6_SCHEMA_FILES].sort()).toEqual(reached);
+    expect([...SCHEMA_FILES].sort()).toEqual(reached);
     expect(k09v16.$defs["composeInput.request"]).toEqual({
       $ref: "tool-api.v1.5.schema.json#/$defs/composeInput.request",
     });

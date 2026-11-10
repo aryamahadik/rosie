@@ -146,7 +146,8 @@ interface Rig {
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on and K-05's turn-row calls (the double), its
  * actor ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port. The
- * bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle v0 as bundles/v0 publishes it.
+ * bundle and targets ports (joined by T-556) are fed their K-05 doubles: the turn pins bundle v0 as bundles/v0 publishes it;
+ * and so is the frontier's scope (joined by T-557), so each turn's frontier answers and the turn goes on to its commit.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -162,6 +163,7 @@ function rig(log: MockInstance): Rig {
     turnRows: fakes.turnRows.calls,
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
+    frontierScope: fakes.frontier.scope,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));

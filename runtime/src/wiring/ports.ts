@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the thirteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the fourteen
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -16,10 +16,14 @@
 //                the guard's keyword list (K-01 lists.keywords), and the active id
 //                each webhook's trace names
 //   targets      K-05 v1.2 handleTargets: the guard's targets                      T-556
-//   stateReads   other reads of stored state: who a handle is, each text's safety  T-557, T-562, T-564
+//   frontier     K-09 buildFrontier through @rosie/actions' turn face: the Tool     T-557
+//                API base (its K-09 checks, the call's business scope, its span)
+//                and the frontier over K-05 v1.2 readTurnState and the turn's
+//                pinned bundle
+//   stateReads   other reads of stored state: who a handle is, each text's safety  T-562, T-564
 //                result, the safety read's bundle lines and stopped flag, a
 //                recipient's chat and send state, a question's facts
-//   turnFace     K-09's turn face (frontier, closest entries, gate and commit,     T-557, T-559, T-560
+//   turnFace     the rest of K-09's turn face (closest entries, gate and commit,   T-559, T-560
 //                compose input) and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read                       T-558
 //   composer     K-03's message plan and its one rewrite                           T-560
@@ -57,7 +61,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The thirteen ports, in D-017's turn order (02-contracts section 11). */
+/** The fourteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -65,6 +69,7 @@ export const PORTS = [
   "turnRow",
   "bundles",
   "targets",
+  "frontier",
   "stateReads",
   "turnFace",
   "decide",
@@ -106,8 +111,21 @@ export interface StateReads {
   readonly arming: Pick<ArmingOptions, "facts" | "directory">;
 }
 
-/** K-09's turn face less finalize (its own port), and the K-09 shared-core calls the safety read makes. */
-export interface TurnFacePort extends Omit<TurnFace, "finalizeMessage"> {
+/**
+ * K-09 buildFrontier (T-557): the turn's texts, its guard's targets and its pinned bundle give K-02's context, through
+ * @rosie/actions' turn face, whose Tool API base records the call's one frontier span on the turn's trace (CQ-159). The
+ * root tells the turn so (TurnFace.recordsFrontierSpan) where this port binds real.
+ */
+export type FrontierPort = Pick<TurnFace, "buildFrontier">;
+
+/**
+ * K-09's turn face less the frontier and finalize (each its own port), and the K-09 shared-core calls the safety read
+ * makes. The frontier's span flag is the root's to set, from the frontier port's binding.
+ */
+export interface TurnFacePort extends Omit<
+  TurnFace,
+  "buildFrontier" | "finalizeMessage" | "recordsFrontierSpan"
+> {
   readonly safetyCore: SafetyCore;
 }
 
@@ -146,6 +164,8 @@ export interface Ports {
   readonly bundles: BundleDeps;
   /** K-05 v1.2 handleTargets (item 27): the guard's targets, primary and uncached, across businesses (T-250). */
   readonly targets: HandleTargetsPort;
+  /** K-09 buildFrontier through @rosie/actions' turn face (T-557): the turn's closed list of choices from stored state. */
+  readonly frontier: FrontierPort;
   readonly stateReads: StateReads;
   readonly turnFace: TurnFacePort;
   readonly decide: TurnDecide;

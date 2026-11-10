@@ -21,16 +21,18 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 5 (T-552 to T-556), receive to the guard. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 6 (T-552 to T-557), receive to the frontier. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
 
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
+import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, inject, it } from "vitest";
 
 import { HAIKU_MODEL } from "../../../ai/src/gateway/index";
 import traceSkeleton from "../../../contracts/event-trace/fixtures/trace-skeleton.json";
+import buildFrontierS101 from "../../../contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/event-trace.v1";
 import { QUIET_MS, turnIdOf } from "../../../runtime/src/actor";
 import { actorNameOf, openWords } from "../../../runtime/src/gateway";
@@ -56,8 +58,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 5's, the guard (T-556). */
-const JOINED_THROUGH: SkeletonHop = "guard";
+/** The last hop joined on main: join 6's, the frontier (T-557). */
+const JOINED_THROUGH: SkeletonHop = "frontier";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -128,7 +130,7 @@ function arrivalOf(facts: Facts): { readonly from: number; readonly to: number }
 
 /**
  * What each joined row of 02-contracts section 11 holds the run to, by row: what its join proved in its own Workers test
- * (runtime/src/wiring hop2 to hop5), now on the one run every hop shares.
+ * (runtime/src/wiring hop2 to hop6), now on the one run every hop shares.
  */
 const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 1, "Webhook in, signature checked" (K-11; T-552): the gateway verified the Linq double's signature, and took the
@@ -294,12 +296,47 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       got: { texts: 1, roles: 0, openQuestions: 0, bookings: 0 },
       decided: { keyword: null, flagsVisit: false, toDecide: 1, targets: 0, doors: true },
     });
-    // The targets: K-05's handleTargets asked once, for the seeded handle; the JOIN went on with no target.
+    // The targets: K-05's handleTargets asked once, for the seeded handle; the JOIN went on with no target. The joined
+    // frontier (T-557) shows it: decide's context offers only the sign-up door, which T-1147 offers only when the guard's
+    // targets say noTarget with no role, open question or booking listed.
     expect(facts.run.fakes.handleTargets.requests).toEqual([{ handleId: TEST_OWNER_1.handleId }]);
-    expect(facts.run.fakes.face.frontierCalls.map((request) => request.targets)).toEqual([
-      { roles: [], openQuestionIds: [], bookingIds: [], noTarget: true },
-    ]);
+    expect(
+      facts.run.fakes.decide.decideCalls.map((context) =>
+        context.choices.map((choice) => [choice.kind, choice.door]),
+      ),
+    ).toEqual([[["door", "signUp"]]]);
     return Promise.resolve();
+  },
+
+  // Row 6, "Frontier from the Tool API" (K-09 buildFrontier, K-02 context, K-01 bundle v0; T-557): @rosie/actions' turn
+  // face, over the bundle the turn pinned and test owner 1's stored state (K-05 v1.2 readTurnState under Lee's
+  // Barbershop's scope: no role, open question, booking or phone row), gives the JOIN turn build-frontier-s1-01.json's
+  // choices: one choice, c-01, the sign-up door to S1-01. KV is empty, so its bundle part comes from PostgreSQL's copy,
+  // and its span, under bundle v0's id, says so.
+  6: async (facts) => {
+    const flowKey = `bundle/${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}/flow/A`;
+    expect(onlySpan(facts, "frontier")).toMatchObject({
+      outcome: "ok",
+      turn_id: facts.turnId,
+      error_code: null,
+      bundle_id: BUNDLE_V0,
+      business_id: TEST_OWNER_1.businessId,
+      got: {
+        toolCall: "buildFrontier",
+        callerKind: "turn",
+        bundleParts: ["flow/A"],
+        bundleFrom: ["postgres"],
+      },
+      decided: { answered: "response" },
+    });
+    expect(await env.BUNDLES?.get(flowKey)).toBeNull();
+    expect(facts.run.fakes.bundleReads.reads).toContainEqual({ call: "readBundleValue", key: flowKey });
+    expect(facts.run.fakes.frontier.reads.map((read) => [read.call, read.scope])).toEqual([
+      ["readTurnState", TEST_OWNER_1.businessId],
+    ]);
+    expect(facts.run.fakes.decide.decideCalls.map((context) => context.choices)).toEqual([
+      buildFrontierS101.outcome.context.choices,
+    ]);
   },
 };
 

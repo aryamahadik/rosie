@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 // The Tool API's, the frontier's and compose input's schema checks, compiled ahead of time for the Worker (T-1144,
-// T-1150, T-1165; DL-327, DL-340, DL-357; ADR-005): `npm run build:validators`. ES module, so strict mode is on.
+// T-1150, T-1165, T-1189; DL-327, DL-340, DL-357, DL-373; ADR-005): `npm run build:validators`. ES module, so strict
+// mode is on.
 //
 // Ajv compiles a schema with new Function, which the Workers runtime refuses (actions/README.md, open point "Ajv in
 // the Worker"). So this build compiles, here in Node, exactly the definitions actions/src/tool-api/validator.ts and
 // actions/src/frontier/assemble/check.ts check: for each call of K-09 v1's `$defs/callName` (the 29 calls the Tool API
 // registers; the calls v1.1 to v1.4 add are their journey lanes'), K-09 v1.5's `$defs/<call>.request`, `.response` and
 // `.errors` (v1.5 holds every v1 definition under its own name, the unchanged ones by $ref back to v1.4 to v1, and
-// accepts every v1 exchange: README "v1.5"); K-08 v1.1's `$defs/span`; and K-02 v1.1's `$defs/choice`,
+// accepts every v1 exchange: README "v1.5"), except composeInput's three, which are K-09 v1.6's (T-1174, T-1189;
+// validator.ts's toolApiSchemaIdOf: its answer is K-03 v1.1's composer input, whose facts may also be term facts, or
+// one of its errors, fixedLineRow and masterLineMissing among them; v1.6 accepts every v1 to v1.5 composeInput exchange
+// and its request is v1.5's by $ref: README "v1.6"); K-08 v1.1's `$defs/span`; and K-02 v1.1's `$defs/choice`,
 // `openQuestion`, `stepCard` and `context`, the frontier's checks. It reads every schema their $refs reach from
 // contracts/ on disk (nothing is fetched), and uses validator.ts's Ajv: the 2020-12 class in strict mode with the same
 // options, so the code is the code Ajv's compiler runs in Node. Ajv writes it out as standalone code
@@ -16,18 +20,21 @@
 // devDependency.
 //
 // Compose input's check (actions/src/compose-input/check.ts) gets a module of its own, built the same way, with the same
-// options: K-03 v1's and v1.1's `$defs/composeInput`, from the schemas their $refs reach. v1's is the input compose
-// input checks today; v1.1's, whose facts may also be term facts, is the one T-1174 moves it to (DL-355, DL-357), so
-// that move needs no change here. A module of its own, because validators.js holds exactly the definitions validator.ts
-// and the frontier's checks read, built from exactly the files K-09 v1.5's and K-08 v1.1's $refs reach
-// (validator.worker.test.ts holds it to that), and K-03 v1.1 is none of those files.
+// options: K-03 v1's and v1.1's `$defs/composeInput`, from the schemas their $refs reach. v1.1's, whose facts may also
+// be term facts, is the input compose input checks since T-1174 (DL-355, DL-357); a checker made for v1 still checks
+// v1's. A module of its own, because validators.js holds exactly the definitions validator.ts and the frontier's checks
+// read (validator.worker.test.ts holds it to that), and K-03's composeInput is none of them: K-09 v1.6's
+// composeInput.response holds K-03 v1.1's input, so K-03 v1.1's file is among the files validators.js is built from,
+// but the definition compose input checks is K-03's own.
 //
 // It writes into actions/src/tool-api/generated/, which is git-ignored, never edited and never committed (ADR-005):
 //   validators.js     the standalone code: one validate function per definition, `definitions` (each by its $ref)
 //                     and `build` (Ajv's version, the options, the schema ids and files, each file's sha256);
 //   validators.d.ts   its types;
 //   ajv-answers.js    what Ajv's compiler itself answers here in Node, with validator.ts's options, to each check on
-//                     the contracts' own fixtures (each K-09 fixture of a K-09 v1 call, every version, with the K-02
+//                     the contracts' own fixtures (each K-09 fixture of a K-09 v1 call, every version, against the
+//                     version validator.ts checks that call by: v1.6's composeInput exchanges, term facts,
+//                     fixedLineRow and masterLineMissing among them, against v1.6's composeInput; with the K-02
 //                     context a buildFrontier exchange answers; each K-08 span fixture; each K-02 fixture of a
 //                     definition the frontier checks; each choice, open question and card of those contexts) and on
 //                     {} for each definition. validator.worker.test.ts and check.worker.test.ts hold the code to
@@ -80,8 +87,15 @@ export const AJV_OPTIONS = Object.freeze({ strict: true, strictRequired: false, 
 
 /** K-09 v1, whose `$defs/callName` lists the calls the Tool API registers (actions/src/tool-api/calls.ts). */
 export const CALLS_FILE = "tool-api/tool-api.v1.schema.json";
-/** K-09 v1.5, whose definitions of those calls validator.ts checks, relative to contracts/. */
+/** K-09 v1.5, whose definitions of those calls validator.ts checks (V1_6_CALLS' aside), relative to contracts/. */
 export const TOOL_API_FILE = "tool-api/tool-api.v1.5.schema.json";
+/**
+ * K-09 v1.6, whose definitions of V1_6_CALLS validator.ts checks (T-1174, T-1189: its COMPOSE_INPUT_TOOL_API_SCHEMA_ID),
+ * relative to contracts/.
+ */
+export const COMPOSE_INPUT_TOOL_API_FILE = "tool-api/tool-api.v1.6.schema.json";
+/** The calls validator.ts checks by K-09 v1.6's definitions (its toolApiSchemaIdOf); every other call by v1.5's. */
+export const V1_6_CALLS = Object.freeze(["composeInput"]);
 /** K-08 v1.1, whose `span` validator.ts checks. */
 export const EVENT_TRACE_FILE = "event-trace/event-trace.v1.1.schema.json";
 /** K-02 v1.1, whose definitions the frontier checks (actions/src/frontier/assemble/check.ts). */
@@ -163,11 +177,15 @@ function referencedFiles(file, schema) {
 }
 
 /**
- * K-09 v1.5, K-08 v1.1 and every schema file their $refs reach (K-09 v1, whose call list the Tool API keeps, and K-02
- * v1.1, the frontier's, among them), each with its text's sha256, sorted by file. Given other `roots` (compose input's
- * MESSAGE_PLAN_FILES), those files and every file their $refs reach instead.
+ * K-09 v1.5 and v1.6, K-08 v1.1 and every schema file their $refs reach (K-09 v1, whose call list the Tool API keeps,
+ * K-02 v1.1, the frontier's, and K-03 v1.1, whose input v1.6's composeInput answers, among them), each with its text's
+ * sha256, sorted by file. Given other `roots` (compose input's MESSAGE_PLAN_FILES), those files and every file their
+ * $refs reach instead.
  */
-export function readSchemas(contractsDir = CONTRACTS_DIR, roots = [TOOL_API_FILE, EVENT_TRACE_FILE]) {
+export function readSchemas(
+  contractsDir = CONTRACTS_DIR,
+  roots = [TOOL_API_FILE, COMPOSE_INPUT_TOOL_API_FILE, EVENT_TRACE_FILE],
+) {
   const read = new Map();
   const queue = [...roots];
   while (queue.length > 0) {
@@ -188,27 +206,39 @@ function schemaOf(schemas, file) {
   return schema;
 }
 
-/** The calls the Tool API registers: K-09 v1's `$defs/callName`, in its order. */
+/**
+ * The calls the Tool API registers: K-09 v1's `$defs/callName`, in its order. Each of V1_6_CALLS must be one of them,
+ * or the build fails rather than leave a call on the wrong version.
+ */
 function callNamesOf(schemas) {
   const calls = schemaOf(schemas, CALLS_FILE).$defs?.callName?.enum;
   if (!Array.isArray(calls) || calls.length === 0)
     throw new Error(`${CALLS_FILE} has no $defs/callName list`);
+  for (const call of V1_6_CALLS) {
+    if (!calls.includes(call)) throw new Error(`${call} is no call of ${CALLS_FILE}'s $defs/callName`);
+  }
   return calls;
 }
 
+/** The K-09 file whose definitions validator.ts checks `call` by: v1.6's for V1_6_CALLS, v1.5's for every other. */
+export const toolApiFileOf = (call) =>
+  V1_6_CALLS.includes(call) ? COMPOSE_INPUT_TOOL_API_FILE : TOOL_API_FILE;
+
 /**
- * Each definition the code holds, as { exportName, ref }: K-09 v1.5's for each call of K-09 v1, in callName's order,
- * then K-08 v1.1's span, then K-02 v1.1's four, in MODEL_PARTS' order.
+ * Each definition the code holds, as { exportName, ref }: for each call of K-09 v1, in callName's order, its request,
+ * response and errors of the K-09 version validator.ts checks it by (toolApiFileOf: v1.6's for composeInput, v1.5's
+ * for every other call), then K-08 v1.1's span, then K-02 v1.1's four, in MODEL_PARTS' order.
  */
 export function definitionsOf(schemas) {
-  const toolApi = schemaOf(schemas, TOOL_API_FILE);
   const eventTrace = schemaOf(schemas, EVENT_TRACE_FILE);
   const model = schemaOf(schemas, MODEL_FILE);
   const definitions = [];
   for (const call of callNamesOf(schemas)) {
+    const file = toolApiFileOf(call);
+    const toolApi = schemaOf(schemas, file);
     for (const part of PARTS) {
       const name = `${call}.${part}`;
-      if (toolApi.$defs?.[name] === undefined) throw new Error(`${TOOL_API_FILE} has no definition ${name}`);
+      if (toolApi.$defs?.[name] === undefined) throw new Error(`${file} has no definition ${name}`);
       definitions.push({ exportName: `${call}_${part}`, ref: `${toolApi.$id}#/$defs/${name}` });
     }
   }
@@ -317,17 +347,19 @@ function answerRecord(ajv, definitions) {
  * What Ajv's compiler answers in Node, with validator.ts's options: each check as { version, def, expect, source, at,
  * definition, valid, errors }, and the fixtures it reads by source (a file relative to contracts/). `at` is the path
  * of keys from the fixture's root to the value checked: ["request"] or ["outcome"] of an exchange, a K-02 context's
- * place and its items' (["outcome", "context", "choices", 0]), or [] for the whole file; a source of null is {}.
+ * place and its items' (["outcome", "context", "choices", 0]), or [] for the whole file; a source of null is {}. A K-09
+ * fixture of any version is checked against the definitions of the version validator.ts checks its call by
+ * (toolApiFileOf), so v1.6's composeInput exchanges are checked against v1.6's composeInput, as every older one is.
  */
 export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
   const ajv = ajvWith(schemas, AJV_OPTIONS);
-  const toolApi = schemaOf(schemas, TOOL_API_FILE);
   const eventTrace = schemaOf(schemas, EVENT_TRACE_FILE);
   const model = schemaOf(schemas, MODEL_FILE);
   const calls = new Set(callNamesOf(schemas));
   const { fixtures, checks, check } = answerRecord(ajv, definitions);
 
-  const toolApiRef = (name) => `${toolApi.$id}#/$defs/${name}`;
+  /** `$defs/<call>.<part>` of the K-09 version validator.ts checks `call` by, as a $ref. */
+  const toolApiRef = (call, part) => `${schemaOf(schemas, toolApiFileOf(call)).$id}#/$defs/${call}.${part}`;
   const modelRef = (part) => `${model.$id}#/$defs/${part}`;
   /** A K-02 context against the frontier's `context`, and each of its choices, open questions and cards. */
   const checkContext = (about, source, at) => {
@@ -349,15 +381,15 @@ export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
     fixtures[source] = readJson(contractsDir, source);
     const about = { version: entry.version, def: entry.def, expect: entry.expect };
     if (part === "exchange") {
-      check(about, source, ["request"], toolApiRef(`${call}.request`));
-      check(about, source, ["outcome"], toolApiRef(`${call}.response`));
-      check(about, source, ["outcome"], toolApiRef(`${call}.errors`));
+      check(about, source, ["request"], toolApiRef(call, "request"));
+      check(about, source, ["outcome"], toolApiRef(call, "response"));
+      check(about, source, ["outcome"], toolApiRef(call, "errors"));
       // The frontier a buildFrontier exchange answers, as the frontier's checks read it before it goes (K-02 v1.1).
       if (call === "buildFrontier" && isRecord(fixtures[source].outcome?.context)) {
         checkContext(about, source, ["outcome", "context"]);
       }
     } else {
-      check(about, source, [], toolApiRef(entry.def));
+      check(about, source, [], toolApiRef(call, part));
     }
   }
   const spanRef = `${eventTrace.$id}#/$defs/span`;
@@ -425,6 +457,8 @@ function validatorsJs(schemas, definitions, generated) {
     ajv: ajvVersion(),
     options: AJV_OPTIONS,
     toolApiSchemaId: schemaOf(schemas, TOOL_API_FILE).$id,
+    composeInputToolApiSchemaId: schemaOf(schemas, COMPOSE_INPUT_TOOL_API_FILE).$id,
+    composeInputToolApiCalls: V1_6_CALLS,
     eventTraceSchemaId: schemaOf(schemas, EVENT_TRACE_FILE).$id,
     modelSchemaId: schemaOf(schemas, MODEL_FILE).$id,
     schemaFiles: schemas.map(({ file }) => file),
@@ -507,7 +541,12 @@ export declare const definitions: Readonly<Record<string, StandaloneValidate>>;
 export declare const build: {
   readonly ajv: string;
   readonly options: Readonly<Record<string, boolean>>;
+  /** K-09 v1.5's $id: the version of every call's definitions but composeInputToolApiCalls'. */
   readonly toolApiSchemaId: string;
+  /** K-09 v1.6's $id: the version of composeInputToolApiCalls' definitions. */
+  readonly composeInputToolApiSchemaId: string;
+  /** The calls whose definitions are K-09 v1.6's: composeInput. */
+  readonly composeInputToolApiCalls: readonly string[];
   readonly eventTraceSchemaId: string;
   readonly modelSchemaId: string;
   readonly schemaFiles: readonly string[];
@@ -610,10 +649,11 @@ async function differences(dir, file, answers) {
 }
 
 /**
- * Builds everything into outDir; resolves to { definitions, checks, helpers, schemas, files, composeInput }, where
- * composeInput is { definitions, checks, helpers, schemas } for compose input's module. The files are written into a
- * staging folder inside outDir and moved into place only once each module gives every answer of the compiler; any
- * failure removes the staging folder and the files in place, then throws.
+ * Builds everything into outDir; resolves to { definitions, checks, helpers, schemas, files, v1_6, composeInput }, where
+ * v1_6 is { definitions, checks }, the $refs of K-09 v1.6's definitions the code holds (composeInput's) and how many of
+ * the checks are against them, and composeInput is { definitions, checks, helpers, schemas } for compose input's
+ * module. The files are written into a staging folder inside outDir and moved into place only once each module gives
+ * every answer of the compiler; any failure removes the staging folder and the files in place, then throws.
  */
 export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = DEFAULT_OUT } = {}) {
   const schemas = readSchemas(contractsDir);
@@ -658,12 +698,17 @@ export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = D
     rmSync(staging, { recursive: true, force: true });
     if (!placed) for (const name of Object.keys(files)) rmSync(path.join(outDir, name), { force: true });
   }
+  const v1_6 = `${schemaOf(schemas, COMPOSE_INPUT_TOOL_API_FILE).$id}#`;
   return {
     definitions: definitions.length,
     checks: answers.checks.length,
     helpers: generated.helpers,
     schemas: schemas.map(({ file }) => file),
     files: Object.keys(files),
+    v1_6: {
+      definitions: definitions.filter(({ ref }) => ref.startsWith(v1_6)).map(({ ref }) => ref),
+      checks: answers.checks.filter(({ definition }) => definition.startsWith(v1_6)).length,
+    },
     composeInput: {
       definitions: k03Definitions.length,
       checks: k03Answers.checks.length,
@@ -691,10 +736,12 @@ export async function main(argv, { write = (line) => console.log(line) } = {}) {
     const built = await buildValidators({ outDir });
     const where = path.relative(process.cwd(), outDir) || ".";
     const k03 = built.composeInput;
+    const v1_6 = built.v1_6.definitions.map((ref) => ref.slice(ref.indexOf("#/$defs/") + "#/$defs/".length));
     write(
       `tool-api validators: ${String(built.definitions)} standalone validators from ${String(built.schemas.length)} ` +
-        `schema files written to ${where} (${built.files.join(", ")}); the code gives Ajv's compiled answer to ` +
-        `all ${String(built.checks)} checks; run-time helpers: ${built.helpers.join(", ") || "none"}. ` +
+        `schema files written to ${where} (${built.files.join(", ")}); K-09 v1.6's: ${v1_6.join(", ") || "none"}; ` +
+        `the code gives Ajv's compiled answer to all ${String(built.checks)} checks (${String(built.v1_6.checks)} ` +
+        `of them against K-09 v1.6's); run-time helpers: ${built.helpers.join(", ") || "none"}. ` +
         `Compose input's: ${String(k03.definitions)} standalone validators from ${String(k03.schemas.length)} ` +
         `schema files; the code gives Ajv's compiled answer to all ${String(k03.checks)} checks; run-time helpers: ` +
         `${k03.helpers.join(", ") || "none"}`,

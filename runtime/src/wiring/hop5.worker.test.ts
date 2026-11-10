@@ -24,9 +24,12 @@
 //   - With no bundle reads handed in (the Worker until T-567): no bundle is pinned, so no turn's work starts and no guard
 //     runs; the gateway's trace names bundle v0's stand-in.
 //
-// The spans after hop 5 belong to hops not joined yet (frontier onward, on the fakes) and are not judged. The Durable
-// Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test uses. Test
-// values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
+// The spans after hop 5 belong to later hops (the frontier, joined by T-557 and judged in ./hop6.worker.test.ts; decide
+// onward, on the fakes) and are not judged. The root is fed the frontier's scope too, so the JOIN's turn runs on to its
+// reply; that the JOIN went on with no target shows in the joined frontier's one read and in its answer, the sign-up
+// door, which it offers only when the guard's targets say noTarget with no role, open question or booking (T-1147). The
+// Durable Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test
+// uses. Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
 import { HAIKU_MODEL } from "@rosie/ai/src/gateway/index";
 import targetsFirstText from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
@@ -189,6 +192,7 @@ function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = 
     turnRows: fakes.turnRows.calls,
     bundleReads: fed.bundles === false ? null : fakes.bundleReads.calls,
     handleTargets: fed.targets === false ? null : fakes.handleTargets.call,
+    frontierScope: fakes.frontier.scope,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
@@ -316,12 +320,31 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
           bookings: [],
           phone: null,
         });
-        expect(run.fakes.face.frontierCalls.map((request) => request.targets)).toEqual([
-          { roles: [], openQuestionIds: [], bookingIds: [], noTarget: true },
+        // The JOIN went on to the frontier (joined by T-557) with no target: its one read of the stored state, for the
+        // seeded handle under Lee's Barbershop, names only Sam's name among the people (no role was listed for another),
+        // and its answer to the turn is the sign-up door alone, which it offers only when the guard's targets say noTarget
+        // with no role, open question or booking and the read holds none either (T-1147); the turn's text is the JOIN.
+        expect(
+          run.fakes.frontier.reads.map((read) => {
+            const request = read.request as { handleId: string; facts: { key: string }[] };
+            return [read.call, read.scope, request.handleId, request.facts.map((fact) => fact.key)];
+          }),
+        ).toEqual([
+          [
+            "readTurnState",
+            TEST_OWNER_1.businessId,
+            TEST_OWNER_1.handleId,
+            ["biz.name", "biz.zone", `person.name/${TEST_OWNER_1.personId}`],
+          ],
         ]);
         expect(
-          run.fakes.face.frontierCalls.map((request) =>
-            request.texts.map((text) => [text.eventId, text.words]),
+          run.fakes.decide.decideCalls.map((context) =>
+            context.choices.map((choice) => [choice.choiceId, choice.door]),
+          ),
+        ).toEqual([[["c-01", "signUp"]]]);
+        expect(
+          run.fakes.decide.decideCalls.map((context) =>
+            (context.texts as { eventId: string; words: string }[]).map((text) => [text.eventId, text.words]),
           ),
         ).toEqual([[[JOIN_EVENT, JOIN_TEXT]]]);
         // The turn went on through the stood-in hops and committed its one row, under the pinned bundle v0.
@@ -330,6 +353,7 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
         ]);
         const joinCalls = run.fakes.face.log.length;
         const joinReads = run.fakes.models.calls.length;
+        const joinFrontierReads = run.fakes.frontier.reads.length;
 
         // ---- a bare HELP, from the same phone ----
         run.fakes.known(HELP_EVENT);
@@ -361,6 +385,7 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
         expect(run.fakes.handleTargets.requests).toEqual([{ handleId: TEST_OWNER_1.handleId }]);
         // Nothing past the guard reaches a model: no frontier, decide, re-read, meaning search or composer for it.
         expect(help.filter((span) => MODEL_HOPS.includes(span.hop))).toEqual([]);
+        expect(run.fakes.frontier.reads).toHaveLength(joinFrontierReads);
         expect(
           run.fakes.face.log
             .slice(joinCalls)
@@ -417,7 +442,9 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
           decided: { keyword: null, toDecide: 1 },
         });
         expect(run.fakes.handleTargets.requests).toEqual([]);
-        expect(run.fakes.face.frontierCalls).toEqual([]);
+        expect(run.fakes.frontier.reads).toEqual([]);
+        expect(trace.filter((span) => span.hop === "frontier")).toEqual([]);
+        expect(run.fakes.decide.decideCalls).toEqual([]);
         expect(run.fakes.face.log.filter((entry) => ["frontier", "decide", "gate"].includes(entry))).toEqual(
           [],
         );
@@ -461,6 +488,8 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
         ).toEqual(DEFAULT_BUNDLE_ID);
         expect(run.fakes.bundleReads.reads).toEqual([]);
         expect(run.fakes.handleTargets.requests).toEqual([]);
+        expect(run.fakes.frontier.reads).toEqual([]);
+        expect(trace.filter((span) => span.hop === "frontier")).toEqual([]);
         expect(run.fakes.face.log).toEqual([]);
         expect(leaks(run.spans(), CAST_NUMBERS)).toEqual([]);
       } finally {

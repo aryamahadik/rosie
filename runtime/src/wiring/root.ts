@@ -1,6 +1,6 @@
 // The composition root (T-550; C-046, C-044; build prompt section 10, D-017 'Joins: one hop at a time, in the turn order
 // of What changes'; ops/plan/02-contracts.md section 11): the one place that builds the Worker's gateway, the handle
-// actor's turn and the outbox dispatcher, with each of the thirteen ports of ./ports.ts bound once to the implementation
+// actor's turn and the outbox dispatcher, with each of the fourteen ports of ./ports.ts bound once to the implementation
 // its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
 // package; nothing else here changes for it.
 //
@@ -14,7 +14,8 @@
 //   - the handle actor's ports, put in place for the isolate by `install()`: the safety read on arrival (T-246), the
 //     batch clock (T-247), the bundle pin's reads (T-249; the bundle port, joined by T-556, so the guard's keyword list is
 //     the pinned bundle's), the guard's targets (T-250; the targets port, joined by T-556), the turn loop as the lease's
-//     hooks (T-248, T-251 to T-253) and the turn's ports (`TurnDeps`), the Durable Object reading each of them at use;
+//     hooks (T-248, T-251 to T-253), each run's pinned bundle kept for its frontier (./pinned-runs.ts, T-557), and the
+//     turn's ports (`TurnDeps`, its frontier the frontier port, joined by T-557), the Durable Object reading each at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
@@ -24,15 +25,19 @@
 //     which posts through the Linq route above; every other page call stays unconfigured (503).
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
-// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle and targets ports,
-// which no database feeds there until T-567, so every seal, commit, park, pin and targets read fails closed) and the
-// closed set are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as
-// before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
-// (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads and
-// handleTargets), the HandleActor namespace, its flags and its own clock. The turn's park goes through the turn-row port
-// (T-555): K-05's parkTurn writes the turn's one row under the turn id the lease hashed from its batch's event ids. The
-// turn's pin reads its bundle through the bundle port, and the guard its targets through the targets port (T-556). Never
-// logged by the root: a word, a number, a key.
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets and frontier
+// ports, which no database feeds there until T-567, so every seal, commit, park, pin, targets read and frontier fails
+// closed) and the closed set are at hand there, so every door not joined fails and a webhook that gets past the verify
+// answers 503, as before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined
+// ports are fed (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle
+// reads, handleTargets and the frontier's readTurnState scope), the HandleActor namespace, its flags and its own clock.
+// The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn id the
+// lease hashed from its batch's event ids. The turn's pin reads its bundle through the bundle port, and the guard its
+// targets through the targets port (T-556). The turn's frontier goes through the frontier port (T-557): @rosie/actions'
+// turn face over the frontier's scope, reading the bundle the run pinned. Where that port binds real, its Tool API base
+// records the frontier span and the turn records none (TurnFace.recordsFrontierSpan; CQ-159), so the hop is recorded
+// once; each later join whose port records its own hop's span sets that hop's flag the same way. Never logged by the
+// root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -54,10 +59,12 @@ import type { TurnDeps, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
 import { environmentOf, PICKS, type Environment } from "./picks";
-import type { Ports } from "./ports";
+import type { PortName, Ports } from "./ports";
+import { PinnedRuns } from "./pinned-runs";
 import {
   realPorts,
   type BundleReadCalls,
+  type FrontierScope,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type LinqVerifyInputs,
@@ -132,6 +139,14 @@ export interface RootOptions {
    * database is bound (the Worker until T-567), so every targets read fails closed and no text reaches decide.
    */
   readonly handleTargets?: HandleTargetsCall | null;
+  /**
+   * The frontier's business scope with its database bound (T-557; ./real.ts FrontierScope): K-05 v1.2 readTurnState as
+   * rosie_job under each call's business, set for the transaction only. On local PostgreSQL, @rosie/actions'
+   * pgFrontierScope over a client whose connections run as rosie_job (the scope pgTurnFace builds on); in a test, the
+   * K-05 double over test owner 1's seeded rows (T-1148); null or left out where no database is bound (the Worker until
+   * T-567), so every frontier fails closed and no text reaches decide.
+   */
+  readonly frontierScope?: FrontierScope | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -172,6 +187,8 @@ export function composeRoot(options: RootOptions): Root {
     environment: options.vars.ENVIRONMENT,
     version: options.vars.GIT_SHA ?? "unknown",
   };
+  // Each run's pinned bundle, kept by the lease's hooks (`install`) for the frontier port to read the turn's bundle through.
+  const pinnedRuns = new PinnedRuns();
   const { ports, bindings } = bindPorts(PICKS, options.environment, {
     ...options.sets,
     real: realPorts({
@@ -187,6 +204,9 @@ export function composeRoot(options: RootOptions): Root {
       turnRows: options.turnRows,
       bundleReads: options.bundleReads,
       handleTargets: options.handleTargets,
+      frontierScope: options.frontierScope,
+      // The bound bundle port, read at each call, for a bundle the turn did not pin; and the bundle each run pinned.
+      frontierBundles: { bundles: () => ports.bundles, pinnedOf: (trace) => pinnedRuns.of(trace) },
     }),
     closed: closedPorts(),
   });
@@ -224,7 +244,9 @@ export function composeRoot(options: RootOptions): Root {
     keys: ports.sealing,
     safety: ports.stateReads.turn.safety,
     toolApi: {
-      buildFrontier: (request, trace) => ports.turnFace.buildFrontier(request, trace),
+      // CQ-159: the real frontier port's Tool API base records the call's one frontier span, so the turn records none.
+      recordsFrontierSpan: bindsReal(bindings, "frontier"),
+      buildFrontier: (request, trace) => ports.frontier.buildFrontier(request, trace),
       closestEntries: (request, trace) => ports.turnFace.closestEntries(request, trace),
       gateAndCommit: (request, at, trace) => ports.turnFace.gateAndCommit(request, at, trace),
       composeInput: (request, trace) => ports.turnFace.composeInput(request, trace),
@@ -326,13 +348,18 @@ export function composeRoot(options: RootOptions): Root {
         setBundleDeps(ports.bundles),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
-        setLeaseHooks(turnHooks),
+        setLeaseHooks(pinnedRuns.around(turnHooks)),
       ];
       return () => {
         for (const restore of restores.reverse()) restore();
       };
     },
   };
+}
+
+/** True when the port took its real implementation (./real.ts) in the root's environment. */
+function bindsReal(bindings: readonly Binding[], port: PortName): boolean {
+  return bindings.some((binding) => binding.port === port && binding.implementation === "real");
 }
 
 const workerRoots = new WeakMap<Cloudflare.Env, Root>();
@@ -346,9 +373,9 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503), and the sealing, turn-row, bundle and targets ports are handed no K-05 call, since no
- * database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and the gateway answers 503 with
- * nothing written, and no turn's bundle can be pinned. The gateway's door to the handle's actor is the HANDLE_ACTOR
+ * so the gateway answers 503), and the sealing, turn-row, bundle, targets and frontier ports are handed no K-05 call or
+ * scope, since no database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and the gateway
+ * answers 503 with nothing written, no turn's bundle can be pinned and no frontier runs. The gateway's door to the handle's actor is the HANDLE_ACTOR
  * binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays closed), and
  * no release flags are handed in until staging has its database and the flag's deploy step (T-567, T-569), so the
  * skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
@@ -377,6 +404,9 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     bundleReads: null,
     // No database is bound until T-567: every targets read fails closed, so the guard hands no text to the frontier.
     handleTargets: null,
+    // No database is bound until T-567 (its rosie_job client gives pgFrontierScope): every frontier fails closed inside
+    // the Tool API base, before anything is read, so no text reaches decide.
+    frontierScope: null,
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as
