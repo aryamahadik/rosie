@@ -22,7 +22,7 @@ Steps 2 to 4 answer before anything is read or written.
 | File              | What it holds                                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `calls.ts`        | The call list, each call's request, response and errors as the generated `@rosie/contracts` types name them (`npm run contracts:types`, type imports only), and each call's span hop |
-| `validator.ts`    | The one Ajv 2020-12 validator in strict mode (02-contracts section 2 item 8): K-09 v1, K-08 v1.1 and every schema their `$ref`s reach, read from `contracts/`                        |
+| `validator.ts`    | The one Ajv 2020-12 validator in strict mode (02-contracts section 2 item 8): K-09 v1.5, K-08 v1.1 and every schema their `$ref`s reach, from `contracts/`; prebuilt for the Worker  |
 | `scope.ts`        | The business-scope seam (`withBusiness`), and its adapter over the database client's scoped transaction (`db/repo/client.ts`, on the primary)                                        |
 | `errors.ts`       | The base's own refusals and errors                                                                                                                                                   |
 | `tool-api.ts`     | `createToolApi`, the handler and context types, `notBuiltHandlers`                                                                                                                   |

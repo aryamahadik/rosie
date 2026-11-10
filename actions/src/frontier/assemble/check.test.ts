@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 import { AJV_OPTIONS, formatProblems, loadToolApiSchemas } from "../../tool-api/validator";
 import { K02_PARTS, MODEL_SCHEMA_ID, createFrontierChecker, type K02Part } from "./check";
 import { contractFixture } from "./test-support";
+import type { Choice } from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -97,6 +98,14 @@ describe("the sign-up door (K-02 v1.1 default 9)", () => {
         "unclearOwnerOrHelp, signUp)",
     );
     expect(checker.check("context", frontier)).not.toEqual([]);
+  });
+
+  it("the frontier's Choice type (assemble/types.ts) is K-02 v1.1's: it takes the sign-up door, which passes", () => {
+    // A type check as much as a test: under K-02 v1's Choice this line does not compile.
+    const signUp: NonNullable<Choice["door"]> = "signUp";
+    const [door] = turnOneFrontier().choices;
+    if (door === undefined) throw new Error("no choice");
+    expect(checker.check("choice", { ...door, door: signUp })).toEqual([]);
   });
 
   it("the sign-up door leads to S1-01 alone: another step is refused", () => {

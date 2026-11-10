@@ -8,7 +8,7 @@
 // Every type below that K-09 v1 or K-02 v1 defines is the generated contract type (`npm run contracts:types`; ADR-005),
 // reached through the gateAndCommit request, so the gate and the Tool API base read one shape.
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import type { RequestOf } from "../../tool-api";
 
 /** The gateAndCommit request (K-09 v1 `gateAndCommit.request`), as the Tool API base hands it to its handler. */
@@ -45,7 +45,7 @@ export type LimitResult = K09.LimitResult;
 /** What the gate did with one part, as gateAndCommit answers it (K-09 v1 `partResult`). */
 export type PartResult = K09.PartResult;
 /** A key a part's step gives (K-09 v1 `setupKey`), which the commit names on a committed part. */
-export type SetupKey = K09.SetupKey;
+export type SetupKey = K09.StepKey;
 /** Decide's output broke a K-02 v1 named rule (K-09 v1 `gateAndCommit.errors` decideRefused). */
 export type DecideRefused = K09.DecideRefusedError;
 /** A value failed its words before decide's one re-read (K-09 v1 `gateAndCommit.errors` valueFailsWords). */

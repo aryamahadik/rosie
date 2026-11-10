@@ -30,6 +30,7 @@ import type {
   CommitTurnContext,
   CommitTurnRequest,
   CoreRun,
+  GateAndCommitRequest,
   OpenQuestionNew,
   OutboxRowNew,
   StateWrite,
@@ -65,8 +66,11 @@ function stated(): StatedS101 {
   return (contractFile(`tool-api/fixtures/${S1_01}`) as { given: { stated: StatedS101 } }).given.stated;
 }
 
-/** commit-s1-01.json's request turn: K-09 v1.5 gateAndCommit.turn, K-05's seven fields with the service and chat id. */
-function requestTurn(): TurnRow & { service?: unknown; chatId?: unknown } {
+/**
+ * commit-s1-01.json's request turn, typed as the gate and the commit read it: K-09 v1.5 gateAndCommit.turn, K-05's seven
+ * fields with the service and chat id.
+ */
+function requestTurn(): NonNullable<GateRequest["turn"]> {
   const { turn } = gateExchange(S1_01).request;
   if (turn === null) throw new Error("commit-s1-01.json carries a turn");
   return turn;
@@ -253,6 +257,9 @@ describe("commit-s1-01.json through the Tool API: K-09 v1.5's validator passes i
     expect(called.answer).toEqual({ ok: true, value: exchange.outcome });
     expect(deps.contexts).toHaveLength(1);
     expect(deps.contexts[0]?.request.turn).toMatchObject({ service: "imessage", chatId: CHAT_ID });
+    // Read as the walk (T-1139) reads them: through CommitTurnContext.request's own type, K-09 v1.5's, with no cast.
+    const seen: GateAndCommitRequest["turn"] | undefined = deps.contexts[0]?.request.turn;
+    expect([seen?.service, seen?.chatId]).toEqual(["imessage", CHAT_ID]);
 
     // One K-05 request (the fake holds it to K-05 v1.1, whose turn is closed), its turn row K-05's seven fields.
     expect(deps.k05.requests).toHaveLength(1);

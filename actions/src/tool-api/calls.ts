@@ -1,14 +1,17 @@
-// The calls the Tool API registers (T-290; C-074): every call K-09 v1 holds (contracts/tool-api, `$defs/callName`), the
-// types the contract's generated module gives each call's request, response and errors (`npm run contracts:types`;
-// ADR-005: generated into contracts/generated/, never committed), and the K-08 hop each call's span takes.
+// The calls the Tool API registers (T-290, T-1150; C-074): every call K-09 v1 holds (contracts/tool-api, v1's
+// `$defs/callName`; the calls v1.1 to v1.4 add are their journey lanes'), the types K-09 v1.5's generated module gives
+// each call's request, response and errors under the same names (`npm run contracts:types`; ADR-005: generated into
+// contracts/generated/, never committed), and the K-08 hop each call's span takes. v1.5 holds every v1 definition under
+// its own name and accepts every v1 exchange (README "v1.5"; DL-340), so gateAndCommit's turn may carry the service and
+// the chat id of the turn's last text (default 135) and buildFrontier's context may offer the sign-up door (K-02 v1.1).
 //
 // The types are imported as types only, so nothing here loads the generated module at run time; the validator
-// (validator.ts) holds every value to the frozen schema itself.
+// (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions.
 
-import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1.5";
 import type { Hop } from "../../../runtime/src/trace";
 
-/** Every call K-09 v1 holds, in the order of `$defs/callName` (a test holds this list to the schema's enum). */
+/** Every call K-09 v1 holds, in the order of v1's `$defs/callName` (a test holds this list to the schema's enum). */
 export const CALL_NAMES = [
   "buildFrontier",
   "closestEntries",
@@ -43,7 +46,10 @@ export const CALL_NAMES = [
 
 export type CallName = (typeof CALL_NAMES)[number];
 
-/** K-09 v1 `$defs/caller`: who calls, under which business, for whom, and the trace the call joins. */
+/**
+ * K-09 v1.5 `$defs/caller` (v1's, by reference): who calls, under which business, for whom, and the trace the call
+ * joins.
+ */
 export type Caller = K09.Caller;
 export type CallerKind = Caller["kind"];
 
@@ -59,8 +65,9 @@ export const CALLER_KINDS: readonly CallerKind[] = [
 ];
 
 /**
- * plannerVerbs' errors (`$defs/plannerVerbs.errors`). The generator writes no type for them: plannerVerbs has no exchange,
- * since it rides inside gateAndCommit, so the root never reaches its errors. The validator still holds them to the schema.
+ * plannerVerbs' errors (K-09 v1.5 `$defs/plannerVerbs.errors`, v1's by reference). The generator writes no type for them,
+ * in v1 or v1.5: plannerVerbs has no exchange, since it rides inside gateAndCommit, so the root never reaches its errors.
+ * The validator still holds them to the schema.
  */
 export interface PlannerVerbsErrors {
   error: "plannerRefused";
@@ -73,7 +80,7 @@ interface Shapes<Request, Response, Errors> {
   errors: Errors;
 }
 
-/** Each call's request, response and errors, as the contract's generated module names them. */
+/** Each call's request, response and errors, as K-09 v1.5's generated module names them. */
 export interface CallTypes {
   buildFrontier: Shapes<K09.BuildFrontierRequest, K09.BuildFrontierResponse, K09.BuildFrontierErrors>;
   closestEntries: Shapes<K09.ClosestEntriesRequest, K09.ClosestEntriesResponse, K09.ClosestEntriesErrors>;
