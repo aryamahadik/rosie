@@ -13,9 +13,11 @@
 //                       (default 48); its reader (the handle's kind, the person's stored name and language, their live
 //                       roles at the row's business, the phone's flags); the turn's texts by event id with their safety
 //                       results (never their words: default 47); the slot source K-04 holds (the business head, the
-//                       booking head, the question with its clock row); and the other questions still open with the
-//                       reader, each with the words part of the newest asking row that has gone (item 26's rule, default
-//                       41; default 51). A row of send class safety answers fixedLineRow and nothing else (default 49).
+//                       booking head, the question with its clock row); the row's business's sensitive switch (v1.6 item
+//                       45, T-1197: below); and the other questions still open with the reader, each with the words part
+//                       of the newest asking row that has gone (item 26's rule, default 41; default 51). A row of send
+//                       class safety answers fixedLineRow and nothing else (default 49). Every answer is v1.6's
+//                       readOutboxRow.v1dot6Response: businessSensitive is always stated, true, false or null.
 //   readFixedLineFacts  the fixed-line facts of a row's own handle and business (item 36): whether Rosie texted the handle
 //                       about the business before (K-04's opener mark naming another row; with no business, an earlier row
 //                       to the handle with no business whose final parts carry the opener: default 50), the row the opener
@@ -40,7 +42,24 @@
 // list is the barrier; the integration test reads every statement the three reads send and checks it. No answer carries
 // a sealed value, the words of a text, an address, a number, a key or a wrapping key's name: the words a row answers are
 // handed in by the runtime caller (default 47), and "the words as sent" of an open question are Rosie's own, from the
-// asking row's stored final parts.
+// asking row's stored final parts. Of K-23's company_kinds the read names business_id, pf_switches_a and pf_switches_b
+// alone, and answers the switch's one value, never a kind of work, its facts, its trade name or another switch
+// (v1.6 default 69).
+//
+// The sensitive switch (K-05 v1.6 item 45; RULES 4.6; S13-22; DL-391), read in readOutboxRow's own transaction, as
+// rosie_job under the row's business (company_kinds is business-scoped, and rosie_job reads it behind its runtime
+// policy: 0019), naming the business beside the scope (company_kinds_business_idx). A kind of work turns the switch on
+// when pf_switches_a or pf_switches_b lists K-26's name for it, sensitive (plugin_switches, 0023; code writes only
+// registry names there, and the database checks them for form alone):
+//   - true when any of the business's kinds of work lists it, in either flow (default 66: the stricter wins);
+//   - false only when the business has kinds of work and each one's two lists were read and neither lists it;
+//   - null when it has none (a sign-up before S1-04 writes them), and for a row with no business, for which no
+//     company_kinds row is read at all (default 68: a kind whose business is null is a sign-up's, never the row's).
+// A NULL element in a list (0019's names check lets one through, since array_to_string skips it) leaves that kind's
+// answer unknown, PostgreSQL's three-valued `= any`, and it is never taken as off: with no kind that lists the switch the
+// answer is null, which the caller reads as on (default 67; the security review's N2 on T-1196). bool_or skips a NULL
+// input, so the unknown kinds are kept apart rather than folded into false. A read that fails is never an answer: it
+// fails the whole call, as every other read here does (transient, or thrown).
 //
 // Reads (arch 10 lines 504, 538): the primary, uncached, in one read-only transaction at repeatable read, so an answer is
 // one moment's. Ids are compared byte by byte (collate "C"), never parsed (CQ-09). A serialization failure, a deadlock or
@@ -57,6 +76,7 @@
 //   3. "The words part" of an asking row's final parts is its first send of kind words with a non-empty text (K-03 v1
 //      finalParts: the words first, then one poll or card).
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.3";
+import type * as K05v1dot6 from "../../contracts/generated/data-access/data-access.v1.6";
 import {
   assertBusinessId,
   BusinessScopeError,
@@ -81,7 +101,7 @@ import {
 
 type Db = Sql | Tx;
 
-// ---- the requests and the answers (data-access.v1.3.schema.json) ----------------------------------------------------
+// ---- the requests and the answers (data-access.v1.3.schema.json; readOutboxRow's answer, v1.6's) --------------------
 
 export type ReadOpenHoldsRequest = K05.ReadOpenHoldsRequest;
 export type ReadOpenHoldsResponse = K05.ReadOpenHoldsResponse;
@@ -89,21 +109,32 @@ export type OpenHold = K05.OpenHold;
 export type ReadOpenHoldsOutcome = ReadOpenHoldsResponse | NotFoundError | TransientError;
 
 export type ReadOutboxRowRequest = K05.ReadOutboxRowRequest;
-export type ReadOutboxRowResponse = K05.ReadOutboxRowResponse;
+/**
+ * K-05 v1.6 readOutboxRow.v1dot6Response (item 45): the answer readOutboxRow gives, v1.3's fields (item 35) with
+ * businessSensitive always stated, true, false or null.
+ */
+export type ReadOutboxRowV1Dot6Response = K05v1dot6.ReadOutboxRowV1Dot6Response;
+/**
+ * K-05 v1.6 readOutboxRow.response: the same fields with businessSensitive optional, for a consumer that also reads a
+ * v1.3 to v1.5 answer, which has none and reads as null, on (default 67). readOutboxRow itself always states it.
+ */
+export type ReadOutboxRowResponse = K05v1dot6.ReadOutboxRowResponse;
 /** K-05 v1.3 fixedLineRowError: a safety row, never composed nor finalized; nothing else is returned. */
 export type FixedLineRowError = K05.FixedLineRowError;
-export type ReadOutboxRowOutcome = ReadOutboxRowResponse | NotFoundError | FixedLineRowError | TransientError;
+export type ReadOutboxRowOutcome =
+  ReadOutboxRowV1Dot6Response | NotFoundError | FixedLineRowError | TransientError;
 
 export type ReadFixedLineFactsRequest = K05.ReadFixedLineFactsRequest;
 export type ReadFixedLineFactsResponse = K05.ReadFixedLineFactsResponse;
 export type ReadFixedLineFactsOutcome = ReadFixedLineFactsResponse | NotFoundError | TransientError;
 
-type RowRead = ReadOutboxRowResponse["row"];
-type SlotSource = ReadOutboxRowResponse["slotSource"];
-type Answers = ReadOutboxRowResponse["answers"];
+type RowRead = ReadOutboxRowV1Dot6Response["row"];
+type SlotSource = ReadOutboxRowV1Dot6Response["slotSource"];
+type Answers = ReadOutboxRowV1Dot6Response["answers"];
 type AnsweredText = Answers["texts"][number];
-type RowRecipient = ReadOutboxRowResponse["recipient"];
+type RowRecipient = ReadOutboxRowV1Dot6Response["recipient"];
 type RowQuestion = NonNullable<SlotSource["question"]>;
+type BusinessSensitive = ReadOutboxRowV1Dot6Response["businessSensitive"];
 
 /**
  * A stored record one of these reads cannot answer from without guessing (default 2): the read fails closed rather than
@@ -634,6 +665,31 @@ async function openQuestionsOf(db: Db, row: OutboxRowRow): Promise<ReadOutboxRow
 }
 
 /**
+ * The row's business's sensitive switch (v1.6 item 45; see the top of this file): of K-23's company_kinds under the
+ * row's business, whether any kind of work lists K-26's sensitive in pf_switches_a or pf_switches_b (`listed`), and
+ * whether any kind's answer is unknown, a list holding a NULL element and not the switch (`unknown`). Over no rows both
+ * aggregates are null. With no business, no company_kinds row is read (default 68).
+ */
+async function businessSensitiveOf(db: Db, businessId: string | null): Promise<BusinessSensitive> {
+  if (businessId === null) {
+    return null;
+  }
+  const [kinds] = await db<{ listed: boolean | null; unknown: boolean | null }[]>`
+    select bool_or(kind.listed) as listed, bool_or(kind.listed is null) as unknown
+    from (
+      select 'sensitive' = any(pf_switches_a) or 'sensitive' = any(pf_switches_b) as listed
+      from company_kinds
+      where business_id = ${businessId}
+    ) as kind
+  `;
+  if (kinds?.listed === true) {
+    return true;
+  }
+  // Off only when there are kinds of work and each one's answer was a plain no; none stored, or one unknown, is null.
+  return kinds?.unknown === false ? false : null;
+}
+
+/**
  * An outbox row as compose input and finalize read it, inside the transaction `db`, which must already run on the
  * request's side as rosie_job: under the request's business scope (confirmed here by requireBusinessScope() before the
  * first read), or with businessId null on the runtime side, with no scope. It should be read-only at repeatable read.
@@ -643,7 +699,7 @@ export async function readOutboxRowIn(
   db: Db,
   request: ReadOutboxRowRequest,
   options: ReadOptions = {},
-): Promise<ReadOutboxRowResponse | NotFoundError | FixedLineRowError> {
+): Promise<ReadOutboxRowV1Dot6Response | NotFoundError | FixedLineRowError> {
   checkRowRequest(request, "readOutboxRow");
   const { outboxRowId, businessId } = request;
   await assertSide(db, "readOutboxRow", businessId);
@@ -666,6 +722,7 @@ export async function readOutboxRowIn(
   const recipient = await recipientOf(db, row);
   const answers = await answersOf(db, row);
   const slotSource = await slotSourceOf(db, row);
+  const businessSensitive = await businessSensitiveOf(db, row.business_id);
   const openQuestions = await openQuestionsOf(db, row);
   return {
     result: "outboxRow",
@@ -693,16 +750,18 @@ export async function readOutboxRowIn(
     recipient,
     answers,
     slotSource,
+    businessSensitive,
     openQuestions,
   };
 }
 
 /**
- * An outbox row as compose input and finalize read it (K-05 v1.3 item 35): one read-only transaction at repeatable read
- * on the primary, uncached. Pass the runtime's client (rosie_job): with a business the read runs under its scope, set and
- * confirmed before the first read; with businessId null on the runtime side. notFound when there is no such row or the
- * scope hides it; fixedLineRow for a safety row; transient on a serialization failure, a deadlock or a lost connection.
- * A request of the wrong shape throws a TypeError, a broken record a BrokenRecordError.
+ * An outbox row as compose input and finalize read it (K-05 v1.3 item 35), with its business's sensitive switch (v1.6
+ * item 45): one read-only transaction at repeatable read on the primary, uncached. Pass the runtime's client (rosie_job):
+ * with a business the read runs under its scope, set and confirmed before the first read; with businessId null on the
+ * runtime side. notFound when there is no such row or the scope hides it; fixedLineRow for a safety row; transient on a
+ * serialization failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken
+ * record a BrokenRecordError, and any other failed read its own error: never an answer, so never a switch read as off.
  */
 export async function readOutboxRow(
   sql: Sql,
