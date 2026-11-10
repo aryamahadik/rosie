@@ -89,7 +89,13 @@ export function pgFrontierScope(runtime: Sql): BusinessScope<FrontierRepo> {
   };
 }
 
-/** The turn face whose frontier reads stored state on `runtime` (rosie_job) under each call's business scope. */
-export function pgTurnFace(runtime: Sql, options: Omit<TurnFaceOptions<FrontierRepo>, "scope">): TurnFace {
-  return createTurnFace<FrontierRepo>({ ...options, scope: pgFrontierScope(runtime) });
+/**
+ * The turn face whose frontier reads stored state on `runtime` (rosie_job) under each call's business scope; the calls
+ * after it run as `options.calls` binds them (pg/calls.ts pgTurnCalls: the Tool API's own scope, never this one).
+ */
+export function pgTurnFace<CallRepo = unknown>(
+  runtime: Sql,
+  options: Omit<TurnFaceOptions<FrontierRepo, CallRepo>, "scope">,
+): TurnFace {
+  return createTurnFace<FrontierRepo, CallRepo>({ ...options, scope: pgFrontierScope(runtime) });
 }

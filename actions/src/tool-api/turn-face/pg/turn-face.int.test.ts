@@ -13,10 +13,11 @@
 // is and written down with its answer), and the statements the rosie_job client sends (their text, never a value).
 //
 // The card's proofs: Sam's first text at Lee's Barbershop is read once, under Lee's Barbershop's scope, and gives the
-// fixture's frontier as far as main's sources give it (../test-support.ts asFarAsMain): on main none, since the sign-up
-// door waits for T-1147, so the call fails closed with FrontierError noChoices, its span failed and its transaction
-// rolled back, as in the unit proof; the same call under another business's scope (Sam's text sent to the yoga studio)
-// sees nothing of Lee's Barbershop.
+// fixture's frontier as far as main's sources give it (../test-support.ts asFarAsMain): since T-1147 wired the sign-up
+// door into the frontier (DL-365), that is the fixture's whole frontier, its one choice the door to S1-01, its span ok and
+// its read-only transaction committed, as in the unit proof (with no choice left, the call would fail closed with
+// FrontierError noChoices, its span failed and its transaction rolled back); the same call under another business's
+// scope (Sam's text sent to the yoga studio) sees nothing of Lee's Barbershop.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
