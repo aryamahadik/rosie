@@ -47,7 +47,7 @@ import { bindPorts, WiringError, type Binding, type ImplementationSets } from ".
 import { closedPorts } from "./closed";
 import { environmentOf, PICKS, type Environment } from "./picks";
 import type { Ports } from "./ports";
-import { realPorts, type HandleSealingKeyCall, type LinqVerifyInputs } from "./real";
+import { realPorts, type HandleSealingKeyCall, type LinqVerifyInputs, type SafetyReaders } from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 
@@ -90,6 +90,12 @@ export interface RootOptions {
    * (./real.ts); null or left out where no database is bound, so every seal fails closed and the gateway answers 503.
    */
   readonly handleKey?: HandleSealingKeyCall | null;
+  /**
+   * @rosie/ai's safety read for each bundle (T-554; ./real.ts SafetyReaders): in a test, over the recorded-model double;
+   * null or left out where none can be built (the Worker, until its bundle's manifest and model key can be read there),
+   * so every read fails closed and the actor applies its no-verdict rule (T-246).
+   */
+  readonly safetyReaders?: SafetyReaders | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -120,16 +126,26 @@ export interface Root {
 export function composeRoot(options: RootOptions): Root {
   const clock = options.clock ?? WORKER_CLOCK;
   const now = (): number => clock.now();
-  const { ports, bindings } = bindPorts(PICKS, options.environment, {
-    ...options.sets,
-    real: realPorts({ linq: options.linq, handleKey: options.handleKey, now }),
-    closed: closedPorts(),
-  });
-  const utc = (): string => new Date(clock.now()).toISOString();
   const log: LogContext = {
     environment: options.vars.ENVIRONMENT,
     version: options.vars.GIT_SHA ?? "unknown",
   };
+  const { ports, bindings } = bindPorts(PICKS, options.environment, {
+    ...options.sets,
+    real: realPorts({
+      linq: options.linq,
+      handleKey: options.handleKey,
+      now,
+      safetyRead: {
+        readers: options.safetyReaders ?? null,
+        // The bound bundle port's danger words, read at each read: the list the actor's no-verdict rule matches too.
+        dangerWords: () => ports.stateReads.safety.bundle.dangerWords(),
+        sink: logSink(log),
+      },
+    }),
+    closed: closedPorts(),
+  });
+  const utc = (): string => new Date(clock.now()).toISOString();
   const where: WebhookEnvironment = { environment: log.environment, version: log.version };
   const rowTraces = new RowTraces();
   const armings = new ArmingMemory();
@@ -281,6 +297,10 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
     // No database is bound until T-567: the sealing port fails closed (./real.ts NoDatabaseError).
     handleKey: null,
+    // No safety read until the bundle's manifest (T-555's bundle reads, T-566's BUNDLES on staging) and the model key
+    // (J-02; DL-027) can be read in the Worker: every read fails closed (./real.ts NoSafetyReaderError), so the actor
+    // applies its no-verdict rule.
+    safetyReaders: null,
   });
   workerRoots.set(env, root);
   return root;

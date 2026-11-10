@@ -5,6 +5,10 @@
 // the actor's ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts
 // createWorker), with the root's gateway. Since T-552 joined the Linq verify, each webhook is signed by the Linq double
 // (T-412) under the run's made-up secret and verified by the root's real verify (T-413), which is fed the same secret.
+// Since T-554 joined the safety read, each text's read on arrival goes through @rosie/ai's safety read over the
+// recorded-model double (./test-support.ts fakeSafetyModels, which holds each text these tests send); its model-call span
+// (a portCall to provider anthropic, one per try) sits in the text's trace beside the hops, is set aside from the hop
+// count as the actor's own receive span is, and is checked on its own.
 // Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
 // receipt door marks the part delivered and arms its clock.
 //
@@ -37,6 +41,7 @@ import { SAM, until } from "../turn/test-support";
 import { composeRoot, type HandleActors, type Root } from "./index";
 import {
   SAM_CHAT,
+  SAM_TRADES_TEXT,
   SKELETON_ROW,
   skeletonFakes,
   type LinqInboundEvent,
@@ -57,6 +62,9 @@ const NO_WRITER_YET: readonly Hop[] = ["scrub", "batch"];
 
 /** The handle actor's own receive span beside the gateway's (T-260's gap c, T-1108), set aside from the count. */
 const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
+
+/** A model call's own span beside the hops: a portCall to provider anthropic, one per try of the safety read (T-554). */
+const modelCall = (span: Span): boolean => span.hop === "portCall" && span.provider === "anthropic";
 
 /** The fictional numbers of the sample cast, in each form a number could leak in. */
 const CAST_NUMBERS = [
@@ -156,6 +164,7 @@ function rig(log: MockInstance): Run {
     clock: fakes.clock,
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
+    safetyReaders: fakes.models.readers,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);
@@ -216,7 +225,7 @@ describe("through the composition root, every port on its fake: a text's webhook
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const run = rig(log);
       try {
-        const words = "Barbershop, plumbing, electrical";
+        const words = SAM_TRADES_TEXT;
         run.fakes.known("evt-sam-0001");
         const traceId = await run.post(samText("evt-sam-0001", words));
         await settle(SAM_ACTOR);
@@ -249,7 +258,7 @@ describe("through the composition root, every port on its fake: a text's webhook
           traceId,
           expected: hopsOfTrace(SKELETON),
           notWritten: unwritten,
-          extra: actorReceive,
+          extra: (span) => actorReceive(span) || modelCall(span),
         });
         expect(report.problems).toEqual([]);
         expect(report.ok).toBe(true);
@@ -272,7 +281,14 @@ describe("through the composition root, every port on its fake: a text's webhook
             "clockArmed",
           ]),
         );
-        expect(report.extra.length).toBeLessThanOrEqual(1);
+        expect(report.extra.filter(actorReceive).length).toBeLessThanOrEqual(1);
+        // The text's safety read on arrival (T-554): one Haiku call, answered by the recorded-model double.
+        expect(
+          report.extra
+            .filter(modelCall)
+            .map((span) => [span.attempt, span.outcome, span.model_calls?.[0]?.purpose]),
+        ).toEqual([[1, "ok", "safetyRead"]]);
+        expect(run.fakes.models.calls).toEqual([{ model: "claude-haiku-5-5", text: words }]);
 
         // One bundle id: the root's active id at receipt is the one the turn pinned, on every span.
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
@@ -325,10 +341,12 @@ describe("through the composition root, a repeated webhook (trace-duplicate-webh
       expect(dropped?.outcome).toBe(DUPLICATE.spans[0]?.outcome);
       expect(dropped?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
 
-      const firstHops = spansOfTrace(spans, firstTrace)
-        .filter((span) => !actorReceive(span))
-        .map((span) => span.hop);
+      const firstSpans = spansOfTrace(spans, firstTrace).filter((span) => !actorReceive(span));
+      const firstHops = firstSpans.filter((span) => !modelCall(span)).map((span) => span.hop);
       expect(firstHops.filter((hop) => !NO_WRITER_YET.includes(hop))).toEqual(["receive", "safetyRead"]);
+      // The first arrival's safety read made one model call (T-554); the repeat, dropped at receipt, made none.
+      expect(firstSpans.filter(modelCall)).toHaveLength(1);
+      expect(repeat.filter(modelCall)).toEqual([]);
       expectNoWords(spans, [String((textFixture as Json).body)]);
     } finally {
       run.restore();

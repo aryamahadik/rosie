@@ -1,7 +1,8 @@
-// The composition root's bindings (T-550, T-552, T-553), under Node (Vitest project "unit"): the ports the root binds in
-// each environment, each once and none left unbound; the check that refuses a port bound twice or left unbound; each bound
-// port handed to the part that calls it; and the closed implementation the Worker's environments still bind for every
-// port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing; production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554), under Node (Vitest project "unit"): the ports the root
+// binds in each environment, each once and none left unbound; the check that refuses a port bound twice or left unbound;
+// each bound port handed to the part that calls it; and the closed implementation the Worker's environments still bind for
+// every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing, T-554 the safety read;
+// production takes no join yet).
 import { describe, expect, it } from "vitest";
 
 import {
@@ -37,8 +38,8 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing"],
-  staging: ["linqVerify", "sealing"],
+  test: ["linqVerify", "sealing", "safetyRead"],
+  staging: ["linqVerify", "sealing", "safetyRead"],
   production: [],
 };
 
@@ -62,7 +63,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify and sealing to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing and safety read to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -93,13 +94,15 @@ describe("the ports the root binds", () => {
     const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
 
     for (const port of PORTS) {
-      if (port !== "linqVerify" && port !== "sealing") expect(root.ports[port]).toBe(fakes.ports[port]);
+      if (port !== "linqVerify" && port !== "sealing" && port !== "safetyRead") {
+        expect(root.ports[port]).toBe(fakes.ports[port]);
+      }
     }
     expect(root.gateway.linq).toBe(root.ports.linqVerify);
     expect(root.gateway.keys).toBe(root.ports.sealing);
     expect(root.safety.keys).toBe(root.ports.sealing);
     expect(root.turn.keys).toBe(root.ports.sealing);
-    expect(root.safety.read).toBe(fakes.ports.safetyRead);
+    expect(root.safety.read).toBe(root.ports.safetyRead);
     expect(root.safety.bundle).toBe(fakes.ports.stateReads.safety.bundle);
     expect(root.safety.directory).toBe(fakes.ports.stateReads.safety.directory);
     expect(root.safety.core).toBe(fakes.ports.turnFace.safetyCore);
