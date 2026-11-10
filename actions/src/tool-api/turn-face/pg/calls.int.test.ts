@@ -182,11 +182,13 @@ describe("gateAndCommit for turn 1 on local PostgreSQL (T-1141)", () => {
       const rows = await footprint(cdb, TURN);
       expect(rows).toMatchObject({ turns: 1, outbox: 1, questions: 1, effects: 0 });
       expect(rows.clocks).toBeGreaterThanOrEqual(1);
-      expect(await rowOf(cdb, "threads", "thread-s1-01-sam-1", ["handle_id", "kind", "booking_id"])).toEqual({
+      const thread = ["handle_id", "kind", "booking_id", "linq_chat_id"];
+      expect(await rowOf(cdb, "threads", "thread-s1-01-sam-1", thread)).toEqual({
         version: 1,
         handle_id: "handle-sam",
         kind: "chat",
         booking_id: null,
+        linq_chat_id: "linq-chat-demo-sam",
       });
       const [outbox] = await cdb.db.sql<
         { id: string; state: string; channel: string; send_class: string; open_question_id: string }[]

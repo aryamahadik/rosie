@@ -81,8 +81,12 @@ function chainOf(row: OutboxRowRead, bundle: BundleDocument) {
 
 /** Steps 1 and 2: the frontier's answer feeds the commit, which answers commit-s1-01.json's outcome. */
 async function frontierThenCommit(chain: ReturnType<typeof chainOf>): Promise<void> {
-  // 1. The frontier: the fixture's whole frontier (its last messages empty while no frozen call reads them).
+  // 1. The frontier: the fixture's whole frontier (its last messages empty while no frozen call reads them). JOIN's
+  // targets are none (noTarget, every list empty: DL-365), and the frontier gives the sign-up door for them.
   const frontierExchange = s101Exchange();
+  expect(frontierExchange.request).toMatchObject({
+    targets: { roles: [], openQuestionIds: [], bookingIds: [], noTarget: true },
+  });
   const expected = asFarAsMain(frontierExchange);
   if (expected.ends !== "answer") throw new Error("the frontier gives turn 1's sign-up door since T-1147");
   const frontier = await chain.face.buildFrontier(
