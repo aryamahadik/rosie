@@ -1479,6 +1479,46 @@
       "expect": "refuse",
       "shows": "A zone answer of null: K-04 keeps every business's zone, and a business the scope does not show is notFound, never a null zone",
       "source": "K-04 v1 businesses.time_zone (not null), businesses_time_zone_form; record.ts default 10; K-05 v1.4 item 43, default 56"
+    },
+    {
+      "file": "row-reader-s1-02-no-role.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's row, outbox-s1-02-sam-1, with recipient.roles empty as T-1148's seed leaves Sam: S1-02 is in section 1 of flow A and its one line from Rosie goes to the owner, so Sam, a person with no role, reads it as the owner by the sign-up line, as K-09's compose-input-s1-02.json and compose-input-s1-02-v1.6.json read him",
+      "source": "T-1141 round 1 Need 2; DL-364; QUESTIONS.md CQ-179; ADR-013 sections 3 and 4 (default 130); db/seeds/skeleton.ts (T-1148); K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (role, FinalizeRow.reader); K-01 v1 bundle-v0-skeleton.json (flows.A.steps.S1-02: section 1, say[0] from san to owner); K-09 v1 compose-input-s1-02.json and v1.6 compose-input-s1-02-v1.6.json (audience.role owner); K-02 v1.1 default 9; K-05 v1.5 item 44"
+    },
+    {
+      "file": "row-reader-s1-02-owner.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "The same row with Sam's owner role at the barbershop, as v1.3's read-outbox-row-s1-02.json reads it: he is read by his role (role-sam-barber), never by the line",
+      "source": "K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (role, FinalizeRow.reader); K-04 v1 seed-person-roles.json; T-308 (S13-31: the role the message is for); actions/src/finalize/claim-check/audience.ts readerOf; K-05 v1.5 item 44"
+    },
+    {
+      "file": "row-reader-a5-05-tomas-no-role.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "A row of A5-05 (flow A, section 5) to Tomás, who holds no role at the barbershop: outside section 1 the sign-up reading does not apply, so it is refused, noReader (noRole), never read as the customer by the line",
+      "source": "DL-364 ('every other row with no role is still refused'); K-05 v1.3 item 35's table ('with none, refused'); K-04 v1 seed-person-roles.json (Tomás: staff at the movers alone); K-01 v1 bundle-mini-a.json (flows.A.steps.A5-05: section 5, say[0] from san to cust); K-05 v1.5 item 44, open gap 44"
+    },
+    {
+      "file": "invalid/refuse-row-reader-no-role-outside-section-1.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "refuse",
+      "shows": "Tomás's A5-05 row read as the customer by the line: a recipient with no role is read by the line only on a section 1 step, so outside section 1 the row has no reader (put right, it is row-reader-a5-05-tomas-no-role)",
+      "source": "DL-364; QUESTIONS.md CQ-179; K-05 v1.3 item 35's table ('with none, refused'); K-01 v1 step.section; ADR-013 section 3 (the sign-up door enters section 1); K-05 v1.5 item 44"
+    },
+    {
+      "file": "invalid/refuse-row-reader-role-read-by-line.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "refuse",
+      "shows": "Sam's S1-02 row read by the sign-up line while he holds his owner role: a recipient who holds a role is read by it, never by the line (put right, it is row-reader-s1-02-owner)",
+      "source": "K-05 v1.3 item 35's table (role, FinalizeRow.reader: the one of recipient.roles the message is for); T-308; S13-31; the card's security line (a person with no role reads only their own sign-up rows); K-05 v1.5 item 44"
     }
   ]
 }

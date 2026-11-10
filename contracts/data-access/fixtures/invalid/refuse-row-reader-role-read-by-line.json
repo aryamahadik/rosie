@@ -1,0 +1,28 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["read-outbox-row-s1-02.json"],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "The same row as v1.3's read-outbox-row-s1-02.json reads it, with K-04's seed-person-roles.json: Sam holds his owner role at the barbershop (role-sam-barber), so he is read by it, as v1.3 maps a reader (the one of recipient.roles the message is for, through readerOf), never by the line, though S1-02's line goes to the owner too. Once a role is written, the row is read by it (README item 44). Not a database call."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "personId": "person-sam",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }]
+    },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}
