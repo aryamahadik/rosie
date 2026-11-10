@@ -1,9 +1,11 @@
 // The turn face's compose input and finalize (T-1141; C-074 over C-090, C-093 and C-089): the two readRow ports and the
-// fixed lines' facts bound to K-05 v1.3's readOutboxRow and readFixedLineFacts (T-1138), from K-05 v1.3 item 35's table
-// ("T-1141 binds the ports from this table; nothing else is read for them"), the words the runtime hands in (default 47)
-// and the pinned bundle the row was committed under. Both reads run on the runtime side (rosie_job) in a read-only
-// transaction of their own under the call's business (STATE note 59; T-315's security note b); finalize's two K-05 writes
-// (writePlan, cancelClock) are the runtime side's own transactions too.
+// fixed lines' facts bound to K-05's readOutboxRow, as v1.6 answers it (v1.3's row with the business's sensitive switch:
+// T-1197, T-1190), and v1.3's readFixedLineFacts (T-1138), from K-05 v1.3 item 35's table ("T-1141 binds the ports from
+// this table; nothing else is read for them") and v1.6 item 45, the words the runtime hands in (default 47) and the
+// pinned bundle the row was committed under. Both reads run on the runtime side (rosie_job) in a read-only transaction of
+// their own under the call's business (STATE note 59; T-315's security note b; readOutboxRow, never readOutboxRowIn, so
+// the read holds its own read-only transaction: DL-402 note b); finalize's two K-05 writes (writePlan, cancelClock) are
+// the runtime side's own transactions too.
 //
 // Where each field comes from (item 35's table, and the defaults below where the table leaves a rule to the caller):
 //   - the row, its step and line (line 0 of the question it asks), its turn, bundle and channel: readOutboxRow; a null line
@@ -19,8 +21,8 @@
 //     (default 63): it is how this one call reads the row, never written, cached or handed on as a role the person holds.
 //     Only the row's own recipient's roles are read, as readOutboxRow answers them (S13-31);
 //   - the source: the business head (biz.name and its display name), the business's zone, the row's channel, ask.by from
-//     the question's armed clock row; the sensitive switch ON (DL-326 note b: fail closed until the business's switch is
-//     read, so a first text shows the display name);
+//     the question's armed clock row; the sensitive switch from readOutboxRow's businessSensitive (K-05 v1.6 item 45;
+//     sensitiveOf below);
 //   - the step's master line, links, card terms and fallback text: the pinned bundle, at the step, in that flow;
 //   - the situation's safety outcomes: answers.texts' outcomes; the inbound text: the words the runtime handed in for
 //     answers.texts (gateAndCommit's context.texts, held by the face for its turn: held.ts), only when answers.handleId
@@ -29,6 +31,17 @@
 //   - the fixed lines' facts: readFixedLineFacts' two facts, readOutboxRow's answers.texts as read (T-1164), and the row's
 //     other lines: a K-01 safety line only on a row to the danger text's writer, never safetyAsk (DL-355).
 // Nothing here logs; a refusal names a fault, never a value.
+//
+// The sensitive switch (K-05 v1.6 item 45 and default 67; RULES 4.6; S13-22; T-1190, DL-391, DL-395, DL-402). It is
+// SlotSource.sensitive, which the claim check and the fill read (each slot in its sensitive form, so biz.name gives the
+// display name) and the situation tag reads (gentle). For a row about no booking it is the row's business's switch as
+// readOutboxRow answers it, and only an answer of exactly false is off: null (the business holds no kinds of work yet:
+// open gap 47), a field left out (a v1.3 to v1.5 answer) and true are on, so it fails closed (DL-326 note b; the security
+// review's N1 on T-1196: never `!x` or `x ?? false`, which would read a missing switch as off). A row about a booking is
+// on whatever the business's switch (item 35's table; open gap 30: its booking's own switch is not read yet). A read that
+// fails never gives a switch: K-05's transientError carries no row and no switch, so the call fails with its own
+// transient error (nothing read, the same request may be sent again; DL-402 note a), never read as on, off or null; any
+// other error answer, and a read that throws, is thrown (rowErrorOf).
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   4. How Rosie addresses the reader (K-03 audience.name; finalize's readerName) is the first word of the stored name
@@ -56,7 +69,7 @@
 //      never guessed. A row whose bundle or step is missing is refused before a reader is looked for (K-05 v1.5
 //      rowReader.errors; bundleMissing, stepMissing), so compose input never reaches its masterLineMissing for it.
 
-import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.5";
+import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.6";
 import { NotBuiltError } from "../errors";
 import {
   addressedAs,
@@ -66,7 +79,7 @@ import {
   type ComposeRow,
   type ComposeRowRead,
 } from "../../compose-input";
-import type { InboundText, Option } from "../../compose-input/types";
+import type { InboundText } from "../../compose-input/types";
 import { optOutLinesOf, withoutOptOutLine, READER_LANES, ROSIE_LANE } from "../../compose-input/master-line";
 import { FIXED_LINE_OF } from "../../commit/core";
 import { claimFacts, readerOf, type Reader } from "../../finalize/claim-check";
@@ -74,7 +87,6 @@ import type { CheckLists } from "../../finalize/checks";
 import {
   claimedBusiness,
   fixedLineInserter,
-  type AnsweredText,
   type FixedLineFacts,
   type FixedLinePorts,
 } from "../../finalize/fixed-lines";
@@ -105,61 +117,15 @@ type Json = Record<string, unknown>;
 const isRecord = (value: unknown): value is Json =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-// ---- K-05 v1.3's two reads, as the binding takes them (db/repo/turn-face-reads.ts) ----------------------------------
+// ---- K-05's two reads, as the binding takes them (db/repo/turn-face-reads.ts) ----------------------------------------
 
-/** K-05 v1.3 readOutboxRow.response (item 35), the fields the binding reads. */
-export interface OutboxRowRead {
-  readonly result: "outboxRow";
-  readonly outboxRowId: string;
-  readonly businessId: string | null;
-  readonly readAt: string;
-  readonly row: {
-    readonly turnId: string;
-    readonly bundleId: { readonly hash: string; readonly build: number };
-    readonly state: ComposeRow["state"];
-    readonly version: number;
-    readonly channel: ComposeRow["channel"];
-    readonly sendClass: string;
-    readonly bookingId: string | null;
-    readonly openQuestionId: string | null;
-    readonly copyOfRowId: string | null;
-    readonly hasPlan: boolean;
-    readonly finalParts: FinalizeRow["finalParts"];
-  };
-  readonly line: { readonly step: string; readonly index: number; readonly from: "openQuestion" } | null;
-  readonly recipient: {
-    readonly handleId: string;
-    readonly kind: "phone" | "email";
-    readonly personId: string | null;
-    readonly name: string | null;
-    readonly storedLanguage: string | null;
-    readonly roles: readonly { readonly roleId: string; readonly role: Role; readonly version: number }[];
-  };
-  readonly answers: { readonly handleId: string; readonly texts: readonly AnsweredText[] };
-  readonly slotSource: {
-    readonly business: {
-      readonly id: string;
-      readonly name: string;
-      readonly displayName: string;
-      readonly timeZone: string;
-      readonly version: number;
-    } | null;
-    readonly booking: { readonly flow: FlowLetter } | null;
-    readonly question: {
-      readonly id: string;
-      readonly options: readonly Option[];
-      readonly version: number;
-      readonly clockRow: {
-        readonly id: string;
-        readonly state: string;
-        readonly dueAt: string | null;
-        readonly dueZone: string | null;
-        readonly version: number;
-      } | null;
-    } | null;
-  };
-  readonly openQuestions: readonly { readonly id: string; readonly step: string; readonly text: string }[];
-}
+/**
+ * K-05 v1.6 readOutboxRow.v1dot6Response (items 35 and 45): the answer a v1.6 call gives, as db/repo's readOutboxRow
+ * types it (T-1197): v1.3's row with the row's business's sensitive switch, businessSensitive, always stated (true, false
+ * or null). A v1.3 to v1.5 answer, which has none, is not this type; one that reaches the binding all the same reads as
+ * null, on (default 67: sensitiveOf).
+ */
+export type OutboxRowRead = K05.ReadOutboxRowV1Dot6Response;
 
 /** K-05 v1.3 readFixedLineFacts.response (item 36), the fields the binding reads. */
 export interface FixedLineFactsRead {
@@ -393,6 +359,16 @@ interface RowView {
   readonly name: string | null;
 }
 
+/**
+ * The row's sensitive switch, SlotSource.sensitive (K-05 v1.6 item 45; see the top): on for a row about a booking (item
+ * 35's table; open gap 30); for a row about no booking, off only when readOutboxRow's businessSensitive is exactly false.
+ * null (no kinds of work stored), a field left out (default 67) and true are on, so nothing unknown reads as off.
+ */
+export function sensitiveOf(read: OutboxRowRead): boolean {
+  if (read.row.bookingId !== null || read.slotSource.booking !== null) return true;
+  return read.businessSensitive !== false;
+}
+
 /** The row read for `call`, refused (notBuilt) where default 7 says the binding reads no more yet. */
 async function viewOf(
   binding: RowBinding,
@@ -436,8 +412,8 @@ async function viewOf(
       filledAt: read.readAt,
       zones: { visit: null, business: business.timeZone },
       channel: read.row.channel,
-      // DL-326 note b: the switch is not read yet, so it is on (the display name shows): fail closed.
-      sensitive: true,
+      // K-05 v1.6 item 45: the business's switch, off only when readOutboxRow answers exactly false (see the top).
+      sensitive: sensitiveOf(read),
       record: null,
       facts: { business: { name: business.name, displayName: business.displayName }, ...askBy },
     },
@@ -505,7 +481,10 @@ export async function composeRowOf(binding: RowBinding, read: OutboxRowRead): Pr
   };
 }
 
-/** A read's error as the calls answer it: notFound and transient are their own errors; any other is thrown. */
+/**
+ * A read's error as the calls answer it: notFound and transient are their own errors, so the call fails with nothing read
+ * (a transientError carries no row and no switch, never read as on, off or null: DL-402 note a); any other is thrown.
+ */
 function rowErrorOf(
   error: RowErrorAnswer,
 ): { error: "notFound"; table: string; rowId: string } | { error: "transient"; sqlstate: string } {

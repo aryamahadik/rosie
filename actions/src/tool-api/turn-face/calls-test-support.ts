@@ -8,12 +8,17 @@
 // Round 2 (DL-364, DL-370): limit 1 passes turn 1's sign-up door since T-1183, and a row to someone with no role on the
 // sign-up section is read by its line's audience since T-1184 (K-05 v1.5 item 44), so nothing of turn 1 waits here any
 // more. K-05 v1.5's rowReader fixtures and schema, read below, are what rows.ts's reader mapping is held to.
+//
+// T-1190 (DL-391, DL-395): the row reads are K-05 v1.6's answers, which state the business's sensitive switch: S1-02's row
+// at the barbershop with its barber kind of work (false) and with no kinds of work (null), and v1.3's answer, which leaves
+// the switch out; and the walking skeleton's JOIN row, read against T-1175's recording 4 (ai/recordings, read only).
 
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import Ajv2020 from "ajv/dist/2020.js";
 
+import { SKELETON_ROWS, TEST_OWNER_1 } from "../../../../db/seeds/skeleton";
 import type { GateAndCommitRequest } from "../../commit";
 import type { CommitTurnContext } from "../../commit";
 import { S1_01_IDS, sameSealer, type SameSealer } from "../../commit/core/test-support";
@@ -45,7 +50,7 @@ import {
   type SafetyReads,
   type TurnCommitBinding,
 } from "./commit";
-import { HeldTurns } from "./held";
+import { HeldTurns, heldTurnOf, type HeldTurn } from "./held";
 import {
   composeInputDeps,
   finalizeDeps,
@@ -60,6 +65,9 @@ import {
 import type { TurnFaceCalls } from "./turn-face";
 
 type Json = Record<string, unknown>;
+
+/** One text a row read answers (K-05 v1.3 answeredText), as the binding takes it. */
+type AnsweredRead = OutboxRowRead["answers"]["texts"][number];
 
 /** The turn key commit-s1-01.json's ids are built from (K-09 v1.5 default 131: the handle's sample name). */
 export const SAM_KEY = "sam";
@@ -324,15 +332,41 @@ export function composeS102(): ComposeS102 {
   return { request: v1.request, outcome: v16.outcome };
 }
 
-/** K-05 v1.3's read-outbox-row-s1-02.json answer (S1-02's row to Sam, the owner, after commit-s1-01-sam.json). */
-export function outboxRowS102(): OutboxRowRead {
-  return (contractFile("data-access/fixtures/read-outbox-row-s1-02.json") as { outcome: OutboxRowRead })
-    .outcome;
+/** A K-05 readOutboxRow fixture's answer, freshly parsed, by its file name under contracts/data-access/fixtures/. */
+function outboxRowFixture(file: string): unknown {
+  return (contractFile(`data-access/fixtures/${file}`) as { outcome: unknown }).outcome;
 }
 
 /**
- * Turn 1's row as it runs (K-05 v1.5 row-reader-s1-02-no-role.json's given): read-outbox-row-s1-02.json's answer with
- * recipient.roles empty, as T-1148's seed stores Sam (ADR-013 default 130): a person who holds no role yet.
+ * K-05 v1.6's read-outbox-row-s1-02-not-sensitive.json answer: S1-02's row to Sam, the owner, after commit-s1-01-sam.json,
+ * every field as v1.3's read-outbox-row-s1-02.json reads it, at a barbershop that holds its kinds of work (K-23's barber,
+ * no switch on): businessSensitive false, so the row is filled in its routine form (item 45).
+ */
+export function outboxRowS102(): OutboxRowRead {
+  return outboxRowFixture("read-outbox-row-s1-02-not-sensitive.json") as OutboxRowRead;
+}
+
+/**
+ * K-05 v1.6's read-outbox-row-s1-02-no-kinds.json answer: the same row with K-04's seeds alone, the barbershop holding no
+ * kinds of work yet: businessSensitive null, which the binding reads as on (default 67; open gap 47).
+ */
+export function outboxRowNoKinds(): OutboxRowRead {
+  return outboxRowFixture("read-outbox-row-s1-02-no-kinds.json") as OutboxRowRead;
+}
+
+/**
+ * K-05 v1.3's read-outbox-row-s1-02.json answer: the same row as a v1.3 to v1.5 call answers it, with no
+ * businessSensitive. It is no v1.6 answer (readOutboxRow.v1dot6Response requires the field), so a test hands it in as one
+ * only to show that the switch left out reads as on (default 67).
+ */
+export function outboxRowSwitchLeftOut(): Omit<OutboxRowRead, "businessSensitive"> {
+  return outboxRowFixture("read-outbox-row-s1-02.json") as Omit<OutboxRowRead, "businessSensitive">;
+}
+
+/**
+ * Turn 1's row as it runs (K-05 v1.5 row-reader-s1-02-no-role.json's given): read-outbox-row-s1-02-not-sensitive.json's
+ * answer with recipient.roles empty, as T-1148's seed stores Sam (ADR-013 default 130): a person who holds no role yet, at
+ * the barbershop that seed gives K-23's barber kind of work, no switch on (T-1197; CQ-185), so businessSensitive false.
  */
 export function outboxRowTurnOne(): OutboxRowRead {
   const read = outboxRowS102();
@@ -451,6 +485,99 @@ export function rowUnderPublishedV0(row: OutboxRowRead = outboxRowS102()): Outbo
   return { ...row, row: { ...row.row, bundleId } };
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// The walking skeleton's JOIN run (tests/e2e/skeleton's JOIN): T-1175's recordings, read only
+
+const RECORDINGS_DIR = new URL("../../../../ai/recordings/", import.meta.url);
+
+/** One file of ai/recordings (T-1175's), freshly parsed. */
+function recordingFile(file: string): unknown {
+  return JSON.parse(readFileSync(new URL(file, RECORDINGS_DIR), "utf8")) as unknown;
+}
+
+/** Recording 4's request (composer.v1.1.json's composer-join-s1-02): the composer input of the JOIN run's S1-02 row. */
+export interface JoinComposeInput extends Json {
+  readonly row: string;
+  readonly turn: string;
+  readonly inbound: Json;
+}
+
+/** ai/recordings/composer-inputs/join-s1-02.json, recording 4's request, freshly parsed. */
+export function joinComposeInput(): JoinComposeInput {
+  return recordingFile("composer-inputs/join-s1-02.json") as JoinComposeInput;
+}
+
+/**
+ * The JOIN run's turn as its gateAndCommit hands it to the face (heldTurnOf, as the face holds every turn's words): the
+ * run's recorded context (recording 2's request, contexts/join-s1-01.json: its turn id and its one text, JOIN) on the
+ * seed's handle, with decide's language as recording 2 answers it.
+ */
+export function joinHeldTurn(): { turnId: string; turn: HeldTurn } {
+  const context = recordingFile("contexts/join-s1-01.json") as Json & { turnId: string };
+  const { recordings } = recordingFile("recordings.v1.1.json") as {
+    recordings: { id: string; output?: { language?: string } }[];
+  };
+  const decide = recordings.find((each) => each.id === "decide-s1-01-join-first")?.output;
+  const held = heldTurnOf({
+    turn: { id: context.turnId, handleId: TEST_OWNER_1.handleId },
+    input: { kind: "decided", decided: { context, decide } },
+  });
+  if (held === null) throw new Error("the JOIN run's context holds its text");
+  return held;
+}
+
+/**
+ * The JOIN row as K-05 v1.6's readOutboxRow answers it once the JOIN run's turn commits on T-1148's seed with T-1197's
+ * barber kind of work: turn 1's row as it runs (outboxRowTurnOne: businessSensitive false, Sam with no role) under bundle
+ * v0 as published, the bundle the run pins; its row, question and clock ids the walk's (K-09 v1.5 default 131, with the
+ * run's turn id as the turn key); no language stored for Sam (the seed's); and the one text it answers, the JOIN, read No
+ * (recording 3's safety read, safety-no.json).
+ */
+export function joinRow(): OutboxRowRead {
+  const { turnId, turn } = joinHeldTurn();
+  const [eventId] = turn.texts.keys();
+  if (eventId === undefined) throw new Error("the JOIN run's turn holds its text");
+  const safety = contractFile("model/fixtures/safety-no.json") as {
+    outcomes: NonNullable<AnsweredRead["outcomes"]>;
+    read: { labels: { tense: NonNullable<AnsweredRead["tenses"]>[number] }[] };
+  };
+  const sam = SKELETON_ROWS.persons.find((person) => person.id === TEST_OWNER_1.personId);
+  if (sam === undefined) throw new Error("T-1148's seed holds Sam");
+  const read = rowUnderPublishedV0(outboxRowTurnOne());
+  const question = read.slotSource.question;
+  if (question?.clockRow == null) throw new Error("S1-02's row asks its question with its clock row");
+  const questionId = `oq-s1-02-${turnId}-1`;
+  return {
+    ...read,
+    outboxRowId: `outbox-s1-02-${turnId}-1`,
+    row: { ...read.row, turnId, openQuestionId: questionId },
+    recipient: { ...read.recipient, storedLanguage: sam.language },
+    answers: {
+      handleId: read.recipient.handleId,
+      texts: [{ eventId, outcomes: safety.outcomes, tenses: safety.read.labels.map((label) => label.tense) }],
+    },
+    slotSource: {
+      ...read.slotSource,
+      question: {
+        ...question,
+        id: questionId,
+        clockRow: { ...question.clockRow, id: `clock-${questionId}` },
+      },
+    },
+  };
+}
+
+/** Compose input's request for the JOIN row: compose-input-s1-02.json's, with the run's turn and row. */
+export function joinComposeRequest(): Json {
+  const { request } = composeS102();
+  const { turnId } = joinHeldTurn();
+  return {
+    ...request,
+    caller: { ...(request.caller as Json), turnId, requestId: turnId },
+    outboxRowId: joinRow().outboxRowId,
+  };
+}
+
 /** The doubles of K-05's row reads and finalize's writes, with what each was asked. */
 export interface RowDoubles {
   readonly data: RowData;
@@ -465,19 +592,25 @@ export interface RowDoublesOptions {
   readonly row?: OutboxRowRead | RowErrorAnswer;
   readonly facts?: FixedLineFactsRead | RowErrorAnswer;
   readonly bundle?: BundleDocument;
+  /** A read that fails: readOutboxRow rejects with it, as db/repo's throws every error but a transient one (T-1197). */
+  readonly readFails?: Error;
 }
 
-/** K-05 v1.3's two reads answering as given (K-05's s1-02 fixtures by default), and writePlan and cancelClock taking each. */
+/**
+ * K-05's two reads answering as given (K-05 v1.6's and v1.3's s1-02 fixtures by default), and writePlan and cancelClock
+ * taking each.
+ */
 export function rowDoubles(options: RowDoublesOptions = {}): RowDoubles {
   const reads: string[] = [];
   const plans: WritePlanRequest[] = [];
   const cancels: CancelClockRequest[] = [];
   const row = options.row ?? outboxRowS102();
   const facts = options.facts ?? fixedLineFactsS102();
+  const { readFails } = options;
   const data: RowData = {
     readOutboxRow: (request) => {
       reads.push(`readOutboxRow ${request.outboxRowId}@${request.businessId}`);
-      return Promise.resolve(structuredClone(row));
+      return readFails === undefined ? Promise.resolve(structuredClone(row)) : Promise.reject(readFails);
     },
     readFixedLineFacts: (request) => {
       reads.push(`readFixedLineFacts ${request.outboxRowId}@${request.businessId}`);
