@@ -1,6 +1,7 @@
-// The input's own check before it goes (T-309, T-1165): K-03 v1's `$defs/composeInput`, whose additionalProperties false
-// is what refuses a frontier (arch 07 line 397: "never the frontier"; refuse-frontier-in-input.json), and K-03's code
-// check that <conversation> holds at most 6 messages. Problem lines name a path and what the schema wants, never a value.
+// The input's own check before it goes (T-309, T-1165, T-1174): K-03 v1.1's `$defs/composeInput`, whose facts may be
+// slot facts or term facts and whose additionalProperties false is what refuses a frontier (arch 07 line 397: "never
+// the frontier"; refuse-frontier-in-input.json), and K-03's code check that <conversation> holds at most 6 messages.
+// Problem lines name a path and what the schema wants, never a value.
 //
 // The base checks the answer against K-09 again after the handler; this check is the call's own, so an input that
 // carries anything K-03 does not name is refused here, by name, before it can reach the base or the composer.
@@ -14,8 +15,9 @@
 //     ahead of time, with the same options, into compose-input-validators.js (tool-api/generated/, git-ignored) and
 //     checks that the code gives the compiler's answer to each K-03 input on the contracts' fixtures. Nothing is
 //     evaluated at run time (check.worker.test.ts).
-// K-03 v1 is the input compose input checks; K-03 v1.1, whose facts may also be term facts, is prebuilt too, because
-// T-1174 moves compose input to it (DL-355): a checker made for v1.1 checks it, in Node and in the Worker alike.
+// K-03 v1.1, whose facts may also be term facts, is the input compose input checks since T-1174 (DL-355; K-09 v1.6's
+// answer): the default checker is v1.1's, in Node and in the Worker alike. Every K-03 v1 input is a v1.1 input and gets
+// the same answer; a checker made for v1 still checks v1.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -40,13 +42,13 @@ import type { ComposeInput } from "./types";
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** The $id of K-03 v1, whose composeInput compose input checks (contracts/README.md convention 2). */
+/** The $id of K-03 v1, whose composeInput compose input checked until T-1174 (contracts/README.md convention 2). */
 export const MESSAGE_PLAN_SCHEMA_ID =
   "https://rosie.invalid/contracts/message-plan/message-plan.v1.schema.json";
 
 /**
- * The $id of K-03 v1.1, whose composeInput's facts may also be term facts (K-03 README "v1.1"): T-1174 moves compose
- * input to it (DL-355).
+ * The $id of K-03 v1.1, whose composeInput's facts may also be term facts (K-03 README "v1.1"): the version compose
+ * input checks since T-1174 (DL-355).
  */
 export const MESSAGE_PLAN_V1_1_SCHEMA_ID =
   "https://rosie.invalid/contracts/message-plan/message-plan.v1.1.schema.json";
@@ -73,7 +75,7 @@ const COMPOSE_INPUT = "composeInput";
 
 export interface ComposeInputChecker {
   /**
-   * The problems K-03's composeInput (K-03 v1's, or the version the checker was made for) finds in `value` as a
+   * The problems K-03's composeInput (K-03 v1.1's, or the version the checker was made for) finds in `value` as a
    * composer input, one line each; empty when accepted.
    */
   check(value: unknown): string[];
@@ -124,14 +126,14 @@ function prebuiltChecks(): DefinitionChecks {
 }
 
 /**
- * The checker of K-03's composeInput: K-03 v1's unless `schemaId` names v1.1's. In Node: Ajv's compiler with the Tool API
- * validator's options, holding `schemas` (default: the frozen files from disk, COMPOSE_INPUT_SCHEMA_FILES). Inside
+ * The checker of K-03's composeInput: K-03 v1.1's unless `schemaId` names v1's. In Node: Ajv's compiler with the Tool
+ * API validator's options, holding `schemas` (default: the frozen files from disk, COMPOSE_INPUT_SCHEMA_FILES). Inside
  * workerd: the prebuilt code; workerd cannot compile, so passing `schemas` there throws. A version that is none of
  * COMPOSE_INPUT_SCHEMA_IDS throws in both, rather than check against a definition the Worker does not hold.
  */
 export function createComposeInputChecker(
   schemas?: readonly object[],
-  schemaId: ComposeInputSchemaId = MESSAGE_PLAN_SCHEMA_ID,
+  schemaId: ComposeInputSchemaId = MESSAGE_PLAN_V1_1_SCHEMA_ID,
 ): ComposeInputChecker {
   if (!(COMPOSE_INPUT_SCHEMA_IDS as readonly string[]).includes(schemaId)) {
     throw new Error("not a K-03 version whose composeInput compose input checks");
@@ -158,7 +160,7 @@ export function createComposeInputChecker(
 
 let shared: ComposeInputChecker | undefined;
 
-/** One checker per isolate, made on first use: K-03 v1's. */
+/** One checker per isolate, made on first use: K-03 v1.1's. */
 export function defaultComposeInputChecker(): ComposeInputChecker {
   shared ??= createComposeInputChecker();
   return shared;

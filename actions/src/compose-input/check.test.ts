@@ -1,9 +1,8 @@
 // T-1165: compose input's check (check.ts) in Node, with Ajv's compiler and the Tool API validator's strict options, on
 // the frozen K-03 files it reads from disk: exactly the files K-03 v1's and v1.1's composeInput reach. It gives the
 // answers the build recorded from Ajv's compiler (compose-input-answers.js), which the Worker's prebuilt code is held to
-// (check.worker.test.ts), under each version; K-03 v1 stays the version compose input checks, and every v1 input gets
-// the same answer under v1.1, the version T-1174 moves it to (DL-355, DL-357). Values come only from the contracts'
-// fixtures (rule 9).
+// (check.worker.test.ts), under each version; K-03 v1.1 is the version compose input checks since T-1174 (DL-355,
+// DL-357), and every v1 input gets the same answer under v1.1. Values come only from the contracts' fixtures (rule 9).
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -91,7 +90,7 @@ function withConversation(count: number): Json {
   return input;
 }
 
-describe("compose input checks K-03 v1's composeInput, and v1.1's for a checker made for it", () => {
+describe("compose input checks K-03 v1.1's composeInput, and v1's for a checker made for it", () => {
   it("reads K-03 v1's and v1.1's $ids, in that order, each with its composeInput", () => {
     const v1 = contractFile("message-plan/message-plan.v1.schema.json") as { $id: string; $defs: Json };
     const v11 = contractFile("message-plan/message-plan.v1.1.schema.json") as { $id: string; $defs: Json };
@@ -113,12 +112,15 @@ describe("compose input checks K-03 v1's composeInput, and v1.1's for a checker 
     expect(ids).toEqual(expect.arrayContaining([...COMPOSE_INPUT_SCHEMA_IDS]));
   });
 
-  it("the shared checker is K-03 v1's: input-s1-02-v1.1.json's term facts are refused, input-s1-02.json passes", () => {
+  it("the shared checker is K-03 v1.1's (T-1174): input-s1-02-v1.1.json's term facts pass, and input-s1-02.json", () => {
     expect(defaultComposeInputChecker().check(k03Fixture("input-s1-02.json"))).toEqual([]);
-    expect(defaultComposeInputChecker().check(k03Fixture("input-s1-02-v1.1.json"))).toEqual(
-      checkerFor(MESSAGE_PLAN_SCHEMA_ID).check(k03Fixture("input-s1-02-v1.1.json")),
-    );
-    expect(createComposeInputChecker().check(k03Fixture("input-s1-02-v1.1.json"))).not.toEqual([]);
+    expect(defaultComposeInputChecker().check(k03Fixture("input-s1-02-v1.1.json"))).toEqual([]);
+    expect(createComposeInputChecker().check(k03Fixture("input-s1-02-v1.1.json"))).toEqual([]);
+    // A checker made for v1 still refuses term facts.
+    expect(
+      createComposeInputChecker(undefined, MESSAGE_PLAN_SCHEMA_ID).check(k03Fixture("input-s1-02-v1.1.json")),
+    ).toEqual(checkerFor(MESSAGE_PLAN_SCHEMA_ID).check(k03Fixture("input-s1-02-v1.1.json")));
+    expect(checkerFor(MESSAGE_PLAN_SCHEMA_ID).check(k03Fixture("input-s1-02-v1.1.json"))).not.toEqual([]);
   });
 
   it("a K-03 version it does not check throws, rather than check against a definition the Worker does not hold", () => {
@@ -128,14 +130,21 @@ describe("compose input checks K-03 v1's composeInput, and v1.1's for a checker 
     );
   });
 
-  it("takes the schemas it is given, as before: the Tool API validator's files hold K-03 v1, not v1.1", () => {
+  it("takes the schemas it is given: the Tool API validator's files hold K-03 v1 and, since K-09 v1.6, v1.1", () => {
     const given = createComposeInputChecker(loadToolApiSchemas());
     expect(given.check(k03Fixture("input-s1-02.json"))).toEqual([]);
+    expect(given.check(k03Fixture("input-s1-02-v1.1.json"))).toEqual([]);
     expect(given.check(k03Fixture("invalid/refuse-frontier-in-input.json"))).toEqual([
       "(root) must NOT have additional properties (frontier)",
     ]);
-    const withoutV11 = createComposeInputChecker(loadToolApiSchemas(), MESSAGE_PLAN_V1_1_SCHEMA_ID);
-    expect(() => withoutV11.check(k03Fixture("input-s1-02.json"))).toThrow();
+    // Given files without K-03 v1.1, the default (v1.1) checker throws rather than check against nothing; v1's checks.
+    const withoutV11 = loadToolApiSchemas().filter(
+      (schema) => (schema as { $id?: string }).$id !== MESSAGE_PLAN_V1_1_SCHEMA_ID,
+    );
+    expect(() => createComposeInputChecker(withoutV11).check(k03Fixture("input-s1-02.json"))).toThrow();
+    expect(
+      createComposeInputChecker(withoutV11, MESSAGE_PLAN_SCHEMA_ID).check(k03Fixture("input-s1-02.json")),
+    ).toEqual([]);
   });
 });
 
