@@ -17,6 +17,9 @@
 // the walk's inputs, never the row's. K-05 v1's turn is closed and K-04 turns has no such column, and the chat id's one
 // home is K-04 threads.linq_chat_id: never the turn row, an event-log entry's values, a span or a log line.
 //
+// rowsNamedBy names the rows one unit's writes write, by table and id, so the commit's answer can tell a core action's
+// rows from the parts' (commit.ts default 9; K-09 v1.5 default 134).
+//
 // Nothing here logs, and what it throws names faults and row ids, never a value (K-08 v1 README line 75).
 //
 // Defaults used (for ops/QUESTIONS.md):
@@ -31,6 +34,9 @@
 //      approvalAnswer); nothing else carries an approval.
 //   4. The entries' zone is the zone the turn's texts were read in (the frontier's: K-02 v1 text.sentAt.zone; CQ-05),
 //      null (UTC) for a turn with no texts. Old values the commit did not read are null; the database stamps the time.
+//   5. A unit's state insert names its row by its K-04 `id` column (rowsNamedBy), the key of every table the built core
+//      actions insert into (K-34 safety_outcomes, safety_holds and harm_reports; hand_offs, team_pages; pauses); an update
+//      names it by its key's one column (K-05 stateWrite.key). An insert with no `id` names no row.
 
 import { CommitRefusedError } from "./errors";
 import type {
@@ -41,6 +47,7 @@ import type {
   EventEntry,
   OpenQuestionNew,
   RowRef,
+  StateWrite,
   TurnRow,
   UnitWrites,
   Writes,
@@ -237,6 +244,46 @@ export function questionClock(question: OpenQuestionNew, safeDefault: string | n
     bookingId: question.bookingId,
     fires: { step: question.step, safeDefault },
   };
+}
+
+/** A row by its table and id: K-05 v1 rowRef without its version. */
+export interface RowName {
+  readonly table: string;
+  readonly rowId: string;
+}
+
+/** A state write's row id: an insert's K-04 `id`, an update's one key value (K-05 stateWrite.key); null when it names none. */
+function stateRowId(write: StateWrite): string | null {
+  const named: unknown[] = write.op === "insert" ? [write.values.id] : Object.values(write.key);
+  const [id] = named;
+  if (named.length !== 1 || (typeof id !== "string" && typeof id !== "number") || id === "") return null;
+  return String(id);
+}
+
+/**
+ * The rows one unit's writes name, by table and id, as K-05 names them in `written` (K-05 v1 commitResult): each state
+ * write's row (stateRowId), each question it opens with the commit's clock row for it, each question it closes, each clock
+ * row it cancels, each reservation it confirms or releases, each effect it writes or lets go. Its outbox rows are K-05's
+ * `outboxRows`, never `written`; the rows K-05 adds of its own to a reservation (its saved-time clock row, its class seats,
+ * the one promoted) are not the unit's to name.
+ */
+export function rowsNamedBy(writes: UnitWrites): RowName[] {
+  const named: RowName[] = [];
+  const name = (table: string, rowId: string | null): void => {
+    if (rowId !== null) named.push({ table, rowId });
+  };
+  for (const write of writes.state) name(write.table, stateRowId(write));
+  for (const ask of writes.asks) {
+    name("open_questions", ask.question.id);
+    name("clock_rows", questionClock(ask.question, ask.safeDefault).id);
+  }
+  for (const close of writes.closes) name("open_questions", close.id);
+  for (const cancel of writes.clockCancels) name("clock_rows", cancel.id);
+  for (const confirm of writes.reservations.confirm) name("reservations", confirm.id);
+  for (const release of writes.reservations.release) name("reservations", release.id);
+  for (const effect of writes.effects.write) name("effects", effectView(effect).effectId);
+  for (const letGo of writes.effects.letGo) name("effects", letGo.effectId);
+  return named;
 }
 
 /** K-08 v1 approvalAnswer, in its column's spelling (K-04 event_log.approved_by). */

@@ -322,10 +322,48 @@ describe("commit-s1-01.json: the skeleton's turn 1 gives its core actions' write
     expect(sent?.turn.id).toBe("turn-s1-01-sam");
     expect(sent?.writes.state.map((write) => write.table)).toEqual(["safety_outcomes"]);
     expect(sent?.writes.events.map((entry) => entry.kind)).toContain("safety_outcome.recorded");
-    expect(answer.written.written.map((row) => [row.table, row.rowId])).toEqual([
-      ["safety_outcomes", "safety-outcome-sam-s1-01"],
+    // K-05's one commit writes the record's row; the answer's `written` leaves it out, as commit-s1-01.json's does
+    // (K-09 v1.5 default 134; T-1194), and the record's response names it (outcomeId).
+    expect(k05.commits.map((commit) => commit.written.map((row) => [row.table, row.rowId]))).toEqual([
+      [["safety_outcomes", "safety-outcome-sam-s1-01"]],
     ]);
+    expect(answer.written.written).toEqual([]);
+    expect(answer.core).toMatchObject([{ response: { outcomeId: "safety-outcome-sam-s1-01" } }]);
   });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+
+describe("`written` lists no core action's row; K-05's one commit writes them all (K-09 v1.5 default 134; T-1194)", () => {
+  it.each([
+    ["crisis words", "safety-crisis-words.json"],
+    ["a threat", "safety-threat.json"],
+  ] as const)(
+    "%s: every row the record writes (its outcome, its hold, the hand-off and the rest) is committed, none is listed, and its line stays in outboxRows",
+    async (_, file) => {
+      const request = alexTurn([safetyRead(file)]);
+      const { deps } = coreDoublesOn(safetyWorldOf());
+      const { answer, k05 } = await committed(request, deps);
+      const [sent] = k05.requests;
+      if (sent === undefined) throw new Error("one commit was sent");
+      // Every state row the record writes is a versioned row K-05 wrote, in that one commit.
+      const tables = sent.writes.state.map((write) => write.table);
+      expect(tables).toEqual(expect.arrayContaining(["safety_outcomes", "safety_holds", "hand_offs"]));
+      expect(k05.commits).toHaveLength(1);
+      expect(k05.commits[0]?.written.map((row) => row.table)).toEqual(tables);
+      // The answer lists none of them: the record's response names its outcome and its hold.
+      expect(answer.written.written).toEqual([]);
+      const [core] = answer.core;
+      if (core?.call !== "recordSafetyOutcome" || core.response === null) throw new Error("recorded");
+      const named = k05.commits[0]?.written.map((row) => row.rowId);
+      expect(named).toEqual(expect.arrayContaining([core.response.outcomeId, core.response.hold?.holdId]));
+      // Its line is one of the turn's outbox rows, listed as K-05 lists them.
+      expect(answer.written.outboxRows.map((row) => row.id)).toEqual(
+        sent.writes.outboxRows.map((row) => row.id),
+      );
+      expect(answer.written.outboxRows.map((row) => row.id)).toEqual([core.response.safetyLine?.outboxRowId]);
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------------------------------------------

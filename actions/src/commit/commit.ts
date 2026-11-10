@@ -20,8 +20,8 @@
 //      K-09 v1 gateAndCommit.request); a second one fails closed. A parked turn, a database rule and a transient failure
 //      come back as K-09's own errors;
 //   8. the answer: each part as K-09 v1 partResult (partResultOf; held and waiting parts as below), the core results, what
-//      K-05 wrote, the effect rows and the questions opened and closed; the call's span keeps the rows written (K-08 v1
-//      rowRef: tables and ids, never a value).
+//      K-05 wrote (`written` without the core actions' rows: default 9), the effect rows and the questions opened and
+//      closed; the call's span keeps every row written (K-08 v1 rowRef: tables and ids, never a value).
 //
 // Nothing here logs; what it returns or throws names parts, limits, faults and row ids, never a quote's or a value's words
 // (K-08 v1 README line 75).
@@ -36,6 +36,11 @@
 //      new, and the turn's rows are the first commit's.
 //   8. Only the parts the gate passed write. The rows a stopped part's outcome writes (a limit's question, read-back or
 //      code: K-09 v1 limitNOutcome) are each limit's own (T-299 to T-304) and need a port of their own, not built here.
+//   9. `written` lists the rows the walk and the parts wrote, as commit-s1-01.json's outcome does (K-09 v1.5 default 134;
+//      T-1194, DL-376): a row a core action's writes name (build.ts rowsNamedBy) is left out, its response naming it
+//      instead (the safety record's outcomeId and hold), although the one K-05 request writes it all the same. Kept whole:
+//      `outboxRows` (a core action's line among them, as K-09 v1 stop-recorded.json lists its stop reply; the actor leaves
+//      a fixed line's row out of what it composes itself), `promoted` and the call's span (every row the call wrote).
 
 import {
   partResultOf,
@@ -56,8 +61,10 @@ import {
   buildCommitRequest,
   effectView,
   k05TurnRow,
+  rowsNamedBy,
   type Answer,
   type CommitUnit,
+  type RowName,
   type TurnActor,
 } from "./build";
 import { CommitNotBuiltError, CommitRefusedError } from "./errors";
@@ -75,6 +82,7 @@ import type {
   OpenHolds,
   PartResult,
   PassedPart,
+  RowRef,
   SafetyHold,
   TurnRow,
   UnitWrites,
@@ -212,6 +220,17 @@ function waitingResult(gated: GatedPart): PartResult {
   return partResultOf({ ...gated, result: "asked" });
 }
 
+const rowKey = (row: RowName): string => JSON.stringify([row.table, row.rowId]);
+
+/**
+ * The rows K-05 wrote that `written` lists (default 9): every one but the rows the turn's core actions' writes name, which
+ * their responses name instead (K-09 v1.5 default 134). They are written all the same, in the same K-05 request.
+ */
+function writtenOf(rows: readonly RowRef[], core: readonly CoreRun[]): RowRef[] {
+  const coreRows = new Set(core.flatMap((run) => rowsNamedBy(run.writes)).map(rowKey));
+  return rows.filter((row) => !coreRows.has(rowKey(row))).map(copy);
+}
+
 /** The answer of a committed turn (step 8), from K-05's answer and the request it answered. */
 function committedOf(
   answer: CommitTurnResponse,
@@ -235,8 +254,9 @@ function committedOf(
     parts: [...parts],
     planner: null,
     core: core.map((run) => copy(run.result)),
-    // K-09 v1 answers K-05 v1's commitResult, without K-05 v1.1's waitingChat (K-09 v1 open gap 22).
-    written: { written: copy(written), outboxRows: copy(outboxRows), promoted: copy(promoted) },
+    // K-09 v1 answers K-05 v1's commitResult, without K-05 v1.1's waitingChat (K-09 v1 open gap 22), and `written` without
+    // the core actions' rows (default 9).
+    written: { written: writtenOf(written, core), outboxRows: copy(outboxRows), promoted: copy(promoted) },
     effects,
     openQuestions: fresh
       ? {
