@@ -3,13 +3,21 @@
 // /webhooks/calendar/google and /webhooks/calendar/microsoft. And the page entry: the web app's K-21 v1 page and console
 // calls, each a POST to {BASE_PATH}/page-api/<call>, handed to the action layer's handler for that call; a staging-only
 // call answers stagingOnly wherever ENVIRONMENT is not staging (runtime/src/gateway/pages).
-// Every request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
+// Then, last before the 404, web's pages (T-1171, T-1192): @rosie/web's servePage answers GET and HEAD at a page's exact
+// path under BASE_PATH, and 405 to any other method there. Today that is the privacy notice at {BASE_PATH}/privacy
+// (rosfield.com/test/privacy on staging), the address on the last line of Rosie's first text (RULES 4.3). Its answer is
+// sent as web made it (web/src/shell/serve.ts): static HTML whose headers set no cookie and whose content security
+// policy allows nothing but the page's own style. It has no trace id and no log line: a page reads nothing from the
+// request, and nothing about the reader is logged.
+// Every other request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
 // Each webhook opens its own id at receipt, and each page call its own, keeping a valid incoming one (runtime/src/gateway);
 // a page call's 200 carries only its K-21 outcome, so its id is in the header alone.
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
 // The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
 // for the Worker's environment. The Worker's Linq route is the root's, behind the skeleton flag (T-552, T-553).
+
+import { servePage } from "@rosie/web/src/shell/serve";
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
@@ -65,8 +73,8 @@ function jsonResponse(status: number, body: Record<string, unknown>, traceId: st
 }
 
 /**
- * The health and 404 answers are synchronous (the health tests read them without waiting); the webhooks and the page
- * calls answer later.
+ * The health answer, web's pages and the 404 are synchronous (the health tests read them without waiting); the webhooks
+ * and the page calls answer later.
  * The Workers runtime always passes the execution context, so its call is the second form.
  */
 export interface RosieWorker {
@@ -154,6 +162,11 @@ export function createWorker(
         traceId,
       );
     }
+
+    // web's pages (T-1192): web's answer, sent as it is; a path that is no page's goes on to the 404.
+    const page = servePage(request, env.BASE_PATH);
+    if (page !== null) return page;
+
     console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
     return jsonResponse(404, { ok: false, error: "not_found", trace_id: traceId }, traceId);
   };
