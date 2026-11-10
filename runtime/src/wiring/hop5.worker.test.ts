@@ -24,9 +24,9 @@
 //   - With no bundle reads handed in (the Worker until T-567): no bundle is pinned, so no turn's work starts and no guard
 //     runs; the gateway's trace names bundle v0's stand-in.
 //
-// The spans after hop 5 belong to later hops (the frontier, joined by T-557 and judged in ./hop6.worker.test.ts; decide
-// onward, on the fakes) and are not judged. The root is fed the frontier's scope too, so the JOIN's turn runs on to its
-// reply; that the JOIN went on with no target shows in the joined frontier's one read and in its answer, the sign-up
+// The spans after hop 5 belong to later hops (the frontier, joined by T-557 and judged in ./hop6.worker.test.ts; decide,
+// joined by T-558 and judged in ./hop7.worker.test.ts; the gate onward, on the fakes) and are not judged. The root is fed
+// the frontier's scope and decide's deciders too, so the JOIN's turn runs on to its reply; that the JOIN went on with no target shows in the joined frontier's one read and in its answer, the sign-up
 // door, which it offers only when the guard's targets say noTarget with no role, open question or booking (T-1147). The
 // Durable Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test
 // uses. Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
@@ -193,6 +193,7 @@ function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = 
     bundleReads: fed.bundles === false ? null : fakes.bundleReads.calls,
     handleTargets: fed.targets === false ? null : fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
+    deciders: fakes.decide.deciders,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
@@ -268,6 +269,8 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
       try {
         // ---- JOIN, test owner 1's first text ----
         run.fakes.known(JOIN_EVENT);
+        // Its turn's two decide reads (decide, joined by T-558, runs on the recorded-model double).
+        run.fakes.decide.recordTurn([JOIN_EVENT]);
         const joinTrace = await run.post(textOf(JOIN_EVENT, TEST_OWNER_1.handle, JOIN_TEXT));
         await settle(OWNER_ACTOR);
         await run.fakes.clock.advance(QUIET_MS);

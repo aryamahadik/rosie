@@ -25,11 +25,14 @@ export {
   type TurnRowPort,
 } from "./ports";
 export {
+  DeciderBundleError,
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
   NoDatabaseError,
+  NoDeciderError,
   NoSafetyReaderError,
   realBundles,
+  realDecide,
   realFrontier,
   realPorts,
   realSafetyRead,
@@ -41,6 +44,8 @@ export {
   TurnIdError,
   type BundleReadCalls,
   type CommitTurnCall,
+  type DecideInputs,
+  type Deciders,
   type FrontierInputs,
   type FrontierScope,
   type HandleSealingKeyCall,

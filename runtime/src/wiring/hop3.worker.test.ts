@@ -126,6 +126,10 @@ function webhookRequest(webhook: SignedWebhook): Request {
 /** A model call's own span beside the hops: a portCall to provider anthropic, one per try (T-365). */
 const modelCall = (span: Span): boolean => span.hop === "portCall" && span.provider === "anthropic";
 
+/** The safety read's own model-call spans; the turn's decide (joined by T-558) writes its own beside them. */
+const safetyCall = (span: Span): boolean =>
+  modelCall(span) && (span.model_calls ?? []).every((call) => call.purpose === "safetyRead");
+
 interface Rig {
   readonly fakes: SkeletonFakes;
   /** Signs one K-06 event with the Linq double, posts it through root.linqWebhook, and answers its trace id. */
@@ -138,8 +142,9 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace and the skeleton flag on, its actor ports installed; the bundle and
- * targets ports (joined by T-556) fed their K-05 doubles, so the turn after the read pins its bundle and guards, and the
- * frontier's scope (joined by T-557) fed its K-05 double, so the turn's frontier answers and the turn goes on.
+ * targets ports (joined by T-556) fed their K-05 doubles, so the turn after the read pins its bundle and guards, the
+ * frontier's scope (joined by T-557) fed its K-05 double, so the turn's frontier answers, and decide (joined by T-558)
+ * fed @rosie/ai's deciders over the recorded-model double, so the turn goes on.
  */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
@@ -155,6 +160,7 @@ function rig(log: MockInstance): Rig {
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
+    deciders: fakes.decide.deciders,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();
@@ -188,6 +194,8 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
       const run = rig(log);
       try {
         run.fakes.known(JOIN_EVENT);
+        // Its turn's two decide reads, recorded for this text as recording 2 holds the e2e JOIN's (T-558).
+        run.fakes.decide.recordTurn([JOIN_EVENT]);
         const traceId = await run.post(textOf(JOIN_EVENT, SAM.handle, JOIN_TEXT));
         await actorOf(SAM_ACTOR).safetyIdle();
 
@@ -226,8 +234,16 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
           got: { via: "verdict", outcomes: [OUTCOME_LABEL.No], dangerWords: 0 },
           decided: { danger: false, path: "none" },
         });
-        const calls = trace.filter(modelCall);
+        const calls = trace.filter(safetyCall);
         expect(calls).toHaveLength(1);
+        // Every other model call of the trace is the turn's decide's (T-558), after the read: its two reads, each its
+        // step 1 and its one part's step 2; none is a safety read's.
+        expect(
+          trace
+            .filter((span) => modelCall(span) && !safetyCall(span))
+            .flatMap((span) => span.model_calls?.map((call) => call.purpose) ?? [])
+            .sort(),
+        ).toEqual(["decideCheck", "decideCheck", "decideFirst", "decideFirst"]);
         expect(calls[0]).toMatchObject({
           call: "messages",
           attempt: 1,

@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 6 (T-552 to T-557), receive to the frontier. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 7 (T-552 to T-558), receive to decide. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -32,6 +32,7 @@ import { afterEach, describe, expect, inject, it } from "vitest";
 
 import { HAIKU_MODEL } from "../../../ai/src/gateway/index";
 import traceSkeleton from "../../../contracts/event-trace/fixtures/trace-skeleton.json";
+import decideS101Enter from "../../../contracts/model/fixtures/decide-s1-01-enter.json";
 import buildFrontierS101 from "../../../contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/event-trace.v1";
 import { QUIET_MS, turnIdOf } from "../../../runtime/src/actor";
@@ -58,8 +59,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 6's, the frontier (T-557). */
-const JOINED_THROUGH: SkeletonHop = "frontier";
+/** The last hop joined on main: join 7's, decide's two reads (T-558). */
+const JOINED_THROUGH: SkeletonHop = "decideReads";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -225,11 +226,15 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
     expect(Date.parse(read.at)).toBeLessThanOrEqual(arrivalOf(facts).to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
-    // portCall span beside the hops.
+    // portCall span beside the hops. The trace's model-call spans whose calls are all safety reads are the read's; those
+    // holding any other call are decide's, which row 7 holds to its two reads' four calls.
     expect(facts.run.fakes.models.calls).toEqual([{ model: HAIKU_MODEL, text: JOIN_TEXT }]);
     expect(
       facts.judged.trace.spans
-        .filter(isModelCallSpan)
+        .filter(
+          (span) =>
+            isModelCallSpan(span) && (span.model_calls ?? []).every((call) => call.purpose === "safetyRead"),
+        )
         .map((span) => span.model_calls?.map((call) => [call.model, call.purpose])),
     ).toEqual([[[HAIKU_MODEL, "safetyRead"]]]);
     // The actor's own record of the read: done, no danger, no line.
@@ -337,6 +342,80 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(facts.run.fakes.decide.decideCalls.map((context) => context.choices)).toEqual([
       buildFrontierS101.outcome.context.choices,
     ]);
+  },
+
+  // Row 7, "Decide, two reads" (K-02; T-558): @rosie/ai's decider, over the recorded-model double's recording 2 (the JOIN
+  // run's own context, as ai/recordings keys it: DL-347), gives the JOIN turn two decide reads, first and check, both
+  // Haiku, which agree, and no re-read: both enter c-01, the sign-up door, with the quote JOIN and no field, as
+  // decide-s1-01-enter.json's reads do with its own text. The turn records the hop's one decideReads span (the AI layer
+  // records only each model call's portCall span beside it), labels and counts only.
+  7: (facts) => {
+    const decide = onlySpan(facts, "decideReads");
+    expect(decide).toMatchObject({
+      outcome: "ok",
+      turn_id: facts.turnId,
+      error_code: null,
+      bundle_id: BUNDLE_V0,
+      business_id: TEST_OWNER_1.businessId,
+      got: { choices: 1 },
+      decided: {
+        agreed: true,
+        reread: false,
+        parts: 1,
+        oneQuestion: 0,
+        verbs: ["enter"],
+        stakes: "low",
+        language: "en",
+      },
+    });
+    // Two reads, both Haiku: each read's step 1 and its one part's step 2 (the two-step wire form), each call on its own
+    // portCall span beside the hops, answered at its first attempt.
+    const byPurpose = (calls: readonly { model: string; purpose: string }[]): string[] =>
+      calls.map((call) => `${call.model} ${call.purpose}`).sort();
+    const twoHaikuReads = [
+      `${HAIKU_MODEL} decideCheck`,
+      `${HAIKU_MODEL} decideCheck`,
+      `${HAIKU_MODEL} decideFirst`,
+      `${HAIKU_MODEL} decideFirst`,
+    ];
+    expect(byPurpose(decide.model_calls ?? [])).toEqual(twoHaikuReads);
+    const decideCalls = facts.judged.trace.spans.filter(
+      (span) => isModelCallSpan(span) && span.model_calls?.some((call) => call.purpose !== "safetyRead"),
+    );
+    expect(byPurpose(decideCalls.flatMap((span) => span.model_calls ?? []))).toEqual(twoHaikuReads);
+    expect(decideCalls.map((span) => [span.attempt, span.outcome])).toEqual(decideCalls.map(() => [1, "ok"]));
+    // Then no re-read.
+    expect(facts.collected.spans.filter((span) => span.hop === "reread")).toEqual([]);
+    expect(facts.run.fakes.decide.rereadCalls).toEqual([]);
+    // Both reads enter c-01, the sign-up door, with the quote JOIN and no field: the result the gate was handed holds
+    // decide-s1-01-enter.json's two reads with the JOIN's own text, and its one part goes.
+    const [gateCall, ...again] = facts.run.fakes.face.gateCalls;
+    expect(again).toEqual([]);
+    const input = gateCall?.request.input;
+    if (input?.kind !== "decided") throw new Error("the gate was handed no decided input");
+    const enter = decideS101Enter as unknown as {
+      readonly reads: readonly { readonly output: { readonly parts: readonly object[] } }[];
+    };
+    expect(input.decided.decide.reads).toEqual(
+      enter.reads.map((read) => ({
+        ...read,
+        output: { ...read.output, parts: read.output.parts.map((part) => ({ ...part, quote: JOIN.body })) },
+      })),
+    );
+    expect(input.decided.decide).toMatchObject({
+      turnId: facts.turnId,
+      bundleId: BUNDLE_V0,
+      agreed: true,
+      reread: false,
+      parts: [{ outcome: "go", part: { verb: "enter", quote: JOIN_TEXT, choice: "c-01", fields: [] } }],
+    });
+    expect(input.decided.context.choices).toMatchObject([{ choiceId: "c-01", kind: "door", door: "signUp" }]);
+    // Every decide call was answered from recording 2 as ai/recordings keys it: the run's request is the recording's.
+    expect(facts.run.fakes.decide.misses).toEqual([]);
+    expect(new Set(facts.run.fakes.decide.calls.flatMap((call) => call.recordings))).toEqual(
+      new Set(["decide-s1-01-join-first", "decide-s1-01-join-check"]),
+    );
+    return Promise.resolve();
   },
 };
 

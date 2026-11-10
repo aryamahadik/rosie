@@ -22,7 +22,10 @@
 // every targets read there fails closed; frontier (T-557), K-09 buildFrontier through @rosie/actions' turn face over the
 // turn's pinned bundle and K-05 v1.2 readTurnState as rosie_job under the call's business scope, fed in a test by the
 // K-05 double over test owner 1's seeded rows (T-1148) and by no database on staging until T-567, so every frontier
-// there fails closed. Every other port of the Worker's environments stays closed: each call fails, as
+// there fails closed; decide (T-558), @rosie/ai's two reads and its one Sonnet re-read, one decider per bundle, over the
+// recorded-model double in a test and over no decider on staging until the bundle's manifest and flows and the model key
+// can be read there (J-02), so every decide and re-read there fails closed before any model call. Every other port of
+// the Worker's environments stays closed: each call fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
@@ -58,7 +61,7 @@ export const PICKS: readonly PortPick[] = [
   { port: "frontier", test: "real", staging: "real", production: "closed" }, // T-557
   { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
   { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-559, T-560
-  { port: "decide", test: "fake", staging: "closed", production: "closed" }, // T-558
+  { port: "decide", test: "real", staging: "real", production: "closed" }, // T-558
   { port: "composer", test: "fake", staging: "closed", production: "closed" }, // T-560
   { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561
   { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
