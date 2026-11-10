@@ -25,7 +25,9 @@ export {
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
   NoDatabaseError,
+  NoSafetyReaderError,
   realPorts,
+  realSafetyRead,
   realSealing,
   SEALING_WRAP_KEY,
   SealingKeyError,
@@ -33,6 +35,8 @@ export {
   type KeyObjectStore,
   type LinqVerifyInputs,
   type RealInputs,
+  type SafetyReaders,
+  type SafetyReadInputs,
   type SealingInputs,
 } from "./real";
 export {

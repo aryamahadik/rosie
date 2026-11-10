@@ -10,7 +10,10 @@
 // builds itself); production's waits for the release that takes it there. Joined so far: linqVerify (T-552), the Linq
 // adapter's verify, fed by the Linq double's signer in a test and by LINQ_WEBHOOK_SECRET on staging, behind the skeleton
 // flag (./skeleton.ts); sealing (T-553), K-05 v1.2 handleSealingKey with its database bound, fed by the K-05 double in a
-// test and by no database on staging until T-567, so every seal there fails closed. Every other port of the Worker's
+// test and by no database on staging until T-567, so every seal there fails closed; safetyRead (T-554), @rosie/ai's
+// safety read, over the recorded-model double in a test and over no reader on staging until the bundle's manifest and
+// the model key can be read there, so every read there fails closed and the actor applies its no-verdict rule. Every
+// other port of the Worker's
 // environments stays closed: each call fails, as `unconfiguredGateway` did before, so a webhook that gets past the
 // verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
@@ -40,7 +43,7 @@ export interface PortPick {
 export const PICKS: readonly PortPick[] = [
   { port: "linqVerify", test: "real", staging: "real", production: "closed" }, // T-552
   { port: "sealing", test: "real", staging: "real", production: "closed" }, // T-553
-  { port: "safetyRead", test: "fake", staging: "closed", production: "closed" }, // T-554
+  { port: "safetyRead", test: "real", staging: "real", production: "closed" }, // T-554
   { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-555 to T-557, T-562, T-564
   { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-557, T-559, T-560
   { port: "decide", test: "fake", staging: "closed", production: "closed" }, // T-558

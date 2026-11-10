@@ -13,19 +13,30 @@
 //                T-567 binds its database, so every seal there fails closed and the gateway answers 503. New ids on every
 //                call, the wrapping key by its name (SEALING_WRAP_KEY), and the data key as the key object K-05 hands
 //                over, never bytes (README default 27).
+//   safetyRead   T-554: @rosie/ai's safety read (T-365 createSafetyReader, with T-366's danger-word rules; C-113) for
+//                the bundle each text names, handed in by the root (RootOptions.safetyReaders): in a test, over a fake
+//                Messages API answered by the recorded-model double (T-004); in the Worker, none until the bundle's
+//                manifest (its two models and its safety read prompt) can be read there (the bundle reads join with
+//                T-555; staging's BUNDLES binding is T-566) and the model key is set by name (J-02; smoke-size calls only,
+//                DL-027), so every read there fails closed and the actor applies its no-verdict rule (T-246). Each read
+//                gets the pinned bundle's danger words from the actor's own bundle port, and writes its model-call spans
+//                into the text's trace.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
-// names the secret by its name only.
+// names the secret by its name only. A text's words go to the safety read only, never into a span, a log or an error.
 
 import {
   createLinqWebhookVerifier,
   type ParseLookups,
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
+import type { SafetyReader } from "@rosie/ai/src/safety/types";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
+import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
+import { openTrace, type BundleId, type SpanSink } from "../trace";
 import type { Ports } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
@@ -62,6 +73,11 @@ export interface RealInputs {
   readonly handleKey?: HandleSealingKeyCall | null | undefined;
   /** Epoch milliseconds: the adapter's clock for a request whose receipt time is not a time (the gateway always gives one). */
   readonly now: () => number;
+  /**
+   * What the safety read is fed (T-554): @rosie/ai's safety read for each bundle, the bundle's danger words and where its
+   * spans go. Left out, no safety read is bound, so every read fails closed.
+   */
+  readonly safetyRead?: Omit<SafetyReadInputs, "now"> | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -69,6 +85,11 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
   return {
     linqVerify: linqVerify(inputs),
     sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
+    safetyRead: realSafetyRead(
+      inputs.safetyRead === undefined
+        ? { readers: null, dangerWords: () => [], sink: () => undefined, now: inputs.now }
+        : { ...inputs.safetyRead, now: inputs.now },
+    ),
   };
 }
 
@@ -182,4 +203,74 @@ function gatewayResultOf(answer: AdapterVerifyResult): VerifyWebhookResult {
     case "rejected":
       return { result: "rejected", httpStatus: 401, reason: answer.reason };
   }
+}
+
+// ---- safetyRead: @rosie/ai's safety read (T-554; C-047, C-113) ---------------------------------------------------------
+
+/**
+ * @rosie/ai's safety read (T-365 `createSafetyReader`, with T-366's danger-word rules) for one bundle, built over that
+ * bundle's two models and its safety read prompt (K-01 v1 manifest), the model key read by name at each call. A throw (or
+ * a rejection) means no read can be made for that bundle: the read fails, and the actor applies its no-verdict rule.
+ */
+export type SafetyReaders = (bundleId: BundleId) => SafetyReader | Promise<SafetyReader>;
+
+/** A safety read asked for where none is bound (the Worker, until it can build one). The message names nothing else. */
+export class NoSafetyReaderError extends Error {
+  constructor() {
+    super("no safety read is bound here");
+    this.name = "NoSafetyReaderError";
+  }
+}
+
+/** What the real safety-read port is fed. */
+export interface SafetyReadInputs {
+  /** @rosie/ai's safety read for a text's bundle; null where none is bound, so every read fails closed. */
+  readonly readers: SafetyReaders | null;
+  /**
+   * The pinned bundle's danger words (K-01 shared lists), as the actor's own bundle port gives them
+   * (`BundleSafety.dangerWords`), read at each read: the same list the actor's no-verdict rule matches.
+   */
+  readonly dangerWords: () => readonly DangerWordEntry[];
+  /** Where the read's model-call spans go (the log sink): into the text's own trace. */
+  readonly sink: SpanSink;
+  /** Epoch milliseconds: the root's clock, for those spans. */
+  readonly now: () => number;
+}
+
+/**
+ * The actor's safety-read port (T-246's `SafetyReadPort`) bound to @rosie/ai's safety read: each raw text, as the actor
+ * opened it on arrival, is read for danger by meaning (Haiku, then Sonnet, 2 s each) with the bundle's danger words, and
+ * the K-02 v1 answer goes back to the actor as it is. The read's model-call spans (a portCall to provider anthropic per
+ * try) go into the text's trace, under its trace id and bundle id. No reader bound, a danger-word list that cannot be
+ * read, or a reader that cannot be built: the read fails before any model call, so the actor applies its no-verdict rule
+ * (a danger word gets the safety line, any other text the outage line and its unread hold), and no verdict ever skips the
+ * bundle's danger words. The words go to the read only: never into a span, a log or an error.
+ */
+export function realSafetyRead(inputs: SafetyReadInputs): SafetyReadPort {
+  return {
+    async read(request) {
+      const readers = inputs.readers;
+      if (readers === null) throw new NoSafetyReaderError();
+      const dangerWords = inputs.dangerWords();
+      const reader = await readers(request.bundleId);
+      const trace = openTrace({
+        openedBy: "textWebhook",
+        bundleId: request.bundleId,
+        incomingTraceId: request.traceId,
+        sink: inputs.sink,
+        now: inputs.now,
+      });
+      // The text's own trace id (the gateway's, always valid). One the trace could not take would open another id, so
+      // the spans are then left out rather than written on a trace of their own.
+      return reader.read(
+        {
+          eventId: request.eventId,
+          source: request.source,
+          text: request.words.body ?? "",
+          subject: request.words.subject,
+        },
+        trace.reusedIncoming ? { trace, dangerWords } : { dangerWords },
+      );
+    },
+  };
 }

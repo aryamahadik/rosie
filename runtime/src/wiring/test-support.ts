@@ -12,7 +12,10 @@
 //   sealing      joined (T-553): the root binds K-05 v1.2 handleSealingKey through its real sealing port (./real.ts
 //                realSealing). What it is fed comes from here: `fakeHandleKeys`, a K-05 double answering as the
 //                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run
-//   safetyRead   safety/test-support fakeRead, answering safety-no.json for each text the test names (`known`)
+//   safetyRead   joined (T-554): the root binds @rosie/ai's safety read through its real port (./real.ts
+//                realSafetyRead). What it is fed comes from here: `fakeSafetyModels`, the safety read (T-365) built over
+//                a fake Messages API whose answers come from the recorded-model double (T-004) holding the skeleton's
+//                texts (SKELETON_SAFETY_RECORDINGS, each seeded from safety-no.json), and able to wait before answering
 //   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
 //                Sam's S1-02 targets; Sam's party and ids; each named text's safety result; dispatch/test-support
 //                FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor directory
@@ -31,6 +34,16 @@
 
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
+import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
+import { unescapeData } from "@rosie/ai/src/context/tags";
+import { KEY_VARIABLE, type FetchLike } from "@rosie/ai/src/gateway/index";
+import { createRecordedModel } from "@rosie/ai/src/recorded-double/double";
+import { requestKey } from "@rosie/ai/src/recorded-double/key";
+import type { RecordedModel } from "@rosie/ai/src/recorded-double/types";
+import { createSafetyReader, SAFETY_READ_PROMPT, type SafetyReader } from "@rosie/ai/src/safety/index";
+import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
+import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
+import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import buildFrontierS102 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
@@ -44,7 +57,7 @@ import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
 import { fakeTargets, type FakeTargets } from "../guard/test-support";
-import { fakeCore, fakeDirect, fakeRead, fixtureBundle } from "../safety/test-support";
+import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
 import {
   composerOf,
@@ -65,7 +78,7 @@ import {
   type FakeTurnFace,
 } from "../turn/test-support";
 import type { Ports } from "./ports";
-import type { HandleSealingKeyCall, LinqVerifyInputs } from "./real";
+import type { HandleSealingKeyCall, LinqVerifyInputs, SafetyReaders } from "./real";
 import type { RootClock } from "./root";
 import type { ReleaseFlags } from "./skeleton";
 
@@ -192,6 +205,157 @@ export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
   return keys;
 }
 
+// ---- @rosie/ai's safety read over the recorded-model double (T-554) ------------------------------------------------
+
+/** Sam's JOIN, his first text (D-017's human test; S1-01), as the e2e skeleton sends it. */
+export const JOIN_TEXT = "JOIN";
+/** Sam's words in the runtime's skeleton trace test (./root.worker.test.ts). */
+export const SAM_TRADES_TEXT = "Barbershop, plumbing, electrical";
+
+/**
+ * The skeleton's safety recordings, in T-004's form (ai/recordings): each text the wiring's tests send to the safety read,
+ * seeded from K-02 v1's safety-no.json, so each reads No. Synthetic words only: Sam's JOIN and trades, and K-06
+ * text-imessage.json's body (rule 9).
+ */
+export const SKELETON_SAFETY_RECORDINGS = {
+  version: "v1",
+  contract: "model.v1",
+  recordings: [
+    {
+      id: "skeleton-join",
+      kind: "safetyRead",
+      request: { text: JOIN_TEXT },
+      seed: { fixture: "safety-no.json" },
+    },
+    {
+      id: "skeleton-sam-trades",
+      kind: "safetyRead",
+      request: { text: SAM_TRADES_TEXT },
+      seed: { fixture: "safety-no.json" },
+    },
+    {
+      id: "skeleton-text-imessage",
+      kind: "safetyRead",
+      request: { text: textImessage.body },
+      seed: { fixture: "safety-no.json" },
+    },
+  ],
+} as const;
+
+/** The K-02 v1 fixtures the skeleton's recordings are seeded from, by file. */
+const SEEDS: Readonly<Record<string, { readonly read: unknown }>> = { "safety-no.json": safetyNo };
+
+/**
+ * The recorded-model double (T-004's `createRecordedModel`) holding the skeleton's recordings, each keyed by its request
+ * as T-004's loader keys it and answering its seed's read. Built without the loader, which reads files and compiles
+ * K-02's schema with Ajv, neither of which the Workers runtime allows; ./safety-read.test.ts holds every answer to the
+ * loader's own, under Node.
+ */
+export function skeletonSafetyDouble(): RecordedModel {
+  const held = new Map<string, { output: unknown }>();
+  for (const recording of SKELETON_SAFETY_RECORDINGS.recordings) {
+    const seed = SEEDS[recording.seed.fixture];
+    if (seed === undefined) throw new Error(`no K-02 fixture ${recording.seed.fixture} to seed from`);
+    held.set(requestKey("safetyRead", recording.request), { output: structuredClone(seed.read) });
+  }
+  return createRecordedModel(held);
+}
+
+/** K-01 v1's sample manifest: its two models (claude-haiku-5-5, claude-sonnet-5-5) and its prompts. */
+const MANIFEST = manifestFixture as unknown as {
+  readonly models: { readonly haiku: string; readonly sonnet: string };
+  readonly prompts: CacheBundle["manifest"]["prompts"];
+};
+
+/** The words of a safety read's <text> element (ai/src/safety/prompt.ts safetyReadTurn), escaped as data. */
+const TEXT_ELEMENT = /<text source="(?:text|page|agent)">([\s\S]*)<\/text>$/u;
+
+/** The token counts each recorded answer reports. */
+const USAGE = {
+  input_tokens: 40,
+  output_tokens: 60,
+  cache_read_input_tokens: 1800,
+  cache_creation_input_tokens: 0,
+};
+
+/** Resolves after `ms` real milliseconds, or rejects at once when the call is aborted (each try is cut off at 2 s). */
+function waitOrAbort(ms: number, signal: AbortSignal | null | undefined): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(new Error("aborted"));
+    });
+  });
+}
+
+export interface FakeSafetyModels {
+  /** What the root's real safety read is fed (RootOptions.safetyReaders): @rosie/ai's safety read for each bundle id. */
+  readonly readers: SafetyReaders;
+  /** Every model call the safety read made, in order: the model asked and the words it was given. */
+  readonly calls: { readonly model: string; readonly text: string }[];
+  /** How long each answer waits, in real milliseconds, before the double gives it: past 2 s, every try is cut off. */
+  delayMs: number;
+}
+
+/**
+ * @rosie/ai's safety read (T-365 `createSafetyReader`) for each bundle id, over K-01's sample manifest's models and this
+ * build's safety read prompt, calling a fake Messages API and never a model (J-02): each call's answer is the double's
+ * recording for its words, after `delayMs`; a text the double holds no recording for fails the call. The key is made up
+ * for each run, never Anthropic's.
+ */
+export function fakeSafetyModels(recorded: Pick<RecordedModel, "safetyRead">): FakeSafetyModels {
+  const calls: { model: string; text: string }[] = [];
+  const env = { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` };
+  const fetch: FetchLike = async (_url, init) => {
+    const body = JSON.parse(typeof init.body === "string" ? init.body : "{}") as {
+      model?: string;
+      messages?: { content?: string }[];
+    };
+    const text = unescapeData(TEXT_ELEMENT.exec(body.messages?.[0]?.content ?? "")?.[1] ?? "");
+    calls.push({ model: body.model ?? "", text });
+    if (models.delayMs > 0) await waitOrAbort(models.delayMs, init.signal);
+    const output = await recorded.safetyRead({ text });
+    return new Response(
+      JSON.stringify({
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        usage: USAGE,
+      }),
+      { status: 200 },
+    );
+  };
+  const built = new Map<string, SafetyReader>();
+  const models: FakeSafetyModels = {
+    calls,
+    delayMs: 0,
+    readers(bundleId) {
+      const key = `${bundleId.hash}/${String(bundleId.build)}`;
+      const known = built.get(key);
+      if (known !== undefined) return known;
+      const reader = createSafetyReader({
+        bundle: { bundleId, models: MANIFEST.models },
+        prompts: createPromptCache({
+          manifest: {
+            bundleId,
+            prompts: { ...MANIFEST.prompts, safetyRead: SAFETY_READ_PROMPT },
+            partial: true,
+          },
+          flows: {},
+        }),
+        env,
+        fetch,
+      });
+      built.set(key, reader);
+      return reader;
+    },
+  };
+  return models;
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -253,10 +417,10 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 
 export interface SkeletonFakes {
   /**
-   * The fake set the test environment binds: every port but the joined ones, the Linq verify and the sealing, which the
-   * root builds (./real.ts).
+   * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing and the safety
+   * read, which the root builds (./real.ts).
    */
-  readonly ports: Omit<Ports, "linqVerify" | "sealing">;
+  readonly ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead">;
   readonly clock: TestClock;
   /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
   readonly linqInputs: LinqVerifyInputs;
@@ -272,6 +436,15 @@ export interface SkeletonFakes {
    * every request it was asked, and the key object it handed out for each number.
    */
   readonly handleKeys: FakeHandleKeys;
+  /**
+   * @rosie/ai's safety read over the recorded-model double, for the root's real safety read (RootOptions.safetyReaders:
+   * `models.readers`): every model call it made, and how long each answer waits.
+   */
+  readonly models: FakeSafetyModels;
+  /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
+  readonly core: FakeCore;
+  /** The direct send through Linq the safety read uses only while the core is down. */
+  readonly direct: FakeDirect;
   readonly face: FakeTurnFace;
   readonly targets: FakeTargets;
   readonly bundles: FakeBundles;
@@ -279,8 +452,8 @@ export interface SkeletonFakes {
   readonly linq: FakeLinq;
   readonly arming: WiredArming;
   /**
-   * Sets a text's safety result before it is sent: safety-no.json under its event id, what the read on arrival answers and
-   * what the turn's commit records (K-09 README default 5).
+   * Sets a text's safety result before it is sent: safety-no.json under its event id, what the turn's commit records
+   * (K-09 README default 5). The read on arrival is the joined one (T-554): `models`, over the recorded-model double.
    */
   known(eventId: string): void;
 }
@@ -288,7 +461,10 @@ export interface SkeletonFakes {
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
 export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const handleKeys = fakeHandleKeys(() => clock.now());
-  // Read when each call is made: the read on arrival answers, and the turn's commit records, what `known` set by then.
+  const models = fakeSafetyModels(skeletonSafetyDouble());
+  const core = fakeCore(clock);
+  const direct = fakeDirect(clock);
+  // Read when each call is made: the turn's commit records what `known` set by then.
   const answers: Record<string, SafetyResult> = {};
 
   const face = fakeTurnFace();
@@ -334,8 +510,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
   };
 
-  const ports: Omit<Ports, "linqVerify" | "sealing"> = {
-    safetyRead: fakeRead(clock, answers),
+  const ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead"> = {
     stateReads: {
       bundles: bundles.deps,
       safety: {
@@ -369,13 +544,13 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       gateAndCommit: (request, at, trace) => turnFace.gateAndCommit(request, at, trace),
       composeInput: (request, trace) => turnFace.composeInput(request, trace),
-      safetyCore: fakeCore(clock),
+      safetyCore: core,
     },
     decide: decideOf(ai),
     composer: composerOf(composer),
     finalize: { finalizeMessage: (request, trace) => turnFace.finalizeMessage(request, trace) },
     dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
-    linqSend: { parts: linq, direct: fakeDirect(clock) },
+    linqSend: { parts: linq, direct },
   };
 
   return {
@@ -386,6 +561,9 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     sign: (event, partKey = null) =>
       webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
     handleKeys,
+    models,
+    core,
+    direct,
     face,
     targets,
     bundles,
