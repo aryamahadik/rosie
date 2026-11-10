@@ -1,0 +1,7 @@
+{
+  "$comment": "The staging flag set (build prompt 5.4, deploy step 4; ADR-010; T-569). deploy-staging.sh runs `flags.sh --env staging apply`, which sets each flag below at the global scope of the staging database. Only flags an approved card names. skeleton: D-017's walking skeleton, staging only; its rollback is `bash infra/scripts/flags.sh off skeleton`. Every flag here is named in production.json too.",
+  "environment": "staging",
+  "flags": {
+    "skeleton": true
+  }
+}
