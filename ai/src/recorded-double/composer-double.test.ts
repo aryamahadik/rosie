@@ -1,6 +1,7 @@
-// Tests of the composer's call of the recorded-model double (T-1071, C-123), against K-03 v1's fixtures. Deterministic and
-// offline: outbound fetch is stubbed to throw for the whole file, and a test fails if anything calls it. The K-02 side of the
-// double has its own tests (recorded-double.test.ts).
+// Tests of the composer's call of the recorded-model double (T-1071, C-123), against K-03 v1's fixtures, with the walking
+// skeleton's JOIN run's input (T-1145; K-02 README "v1.1", recording 4). Deterministic and offline: outbound fetch is
+// stubbed to throw for the whole file, and a test fails if anything calls it. The K-02 side of the double has its own tests
+// (recorded-double.test.ts).
 
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
@@ -75,6 +76,15 @@ const slotNames = new Set(
   (fixture("slots.json") as { slots: { name: string }[] }).slots.map((slot) => slot.name),
 );
 
+/** The walking skeleton's JOIN run's input (T-1145; K-02 README "v1.1", recording 4), in ai/recordings. */
+const JOIN_INPUT_FILE = "composer-inputs/join-s1-02.json";
+/** A composer input's inbound text and its time (K-03 v1 composeInput.inbound). */
+interface Inbound {
+  text: string;
+  sentAt: { utc: string; zone: string };
+}
+const unique = (names: readonly string[]): string[] => [...new Set(names)];
+
 /** The composer's input a recording names. */
 function inputOf(recording: RawRecording): JsonObject {
   if (recording.request.fixture !== undefined) return fixture(recording.request.fixture);
@@ -97,11 +107,15 @@ afterAll(() => {
 });
 
 describe("the plan fixtures: each input gets its plan", () => {
-  it("holds a recording for every accepted K-03 v1 plan fixture, once", () => {
+  it("holds a recording for every accepted K-03 v1 plan fixture, and plan-s1-02's for turn 1's two inputs", () => {
     expect(acceptedPlans).toHaveLength(6);
     const seeded = composerFile().recordings.map((entry) => entry.seed.fixture);
-    expect(seeded.sort()).toEqual([...acceptedPlans].sort());
-    expect(composer.size).toBe(acceptedPlans.length);
+    expect(unique(seeded).sort()).toEqual([...acceptedPlans].sort());
+    // Each plan seeds one recording, but plan-s1-02.json: the fixture chain's input-s1-02.json and the JOIN run's input
+    // (T-1145; K-02 README "v1.1", recording 4).
+    expect(seeded.filter((file) => file === "plan-s1-02.json")).toHaveLength(2);
+    expect(seeded).toHaveLength(acceptedPlans.length + 1);
+    expect(composer.size).toBe(acceptedPlans.length + 1);
   });
 
   it("answers input-s1-02 with plan-s1-02", async () => {
@@ -110,8 +124,32 @@ describe("the plan fixtures: each input gets its plan", () => {
     expect(accepts("plan", answer)).toBe(true);
   });
 
+  it("answers the JOIN run's input, input-s1-02 with only its inbound changed to JOIN and its time, with plan-s1-02", async () => {
+    const join = recordingFile(JOIN_INPUT_FILE) as JsonObject & { inbound: Inbound };
+    const chain = fixture("input-s1-02.json") as JsonObject & { inbound: Inbound };
+    expect({ ...join, inbound: chain.inbound }).toEqual(chain);
+    expect(join.inbound).toEqual({
+      text: "JOIN",
+      sentAt: { utc: "2026-10-19T14:01:49Z", zone: chain.inbound.sentAt.zone },
+    });
+    // The same JOIN text and time as the JOIN run's decide context (ai/recordings/recordings.v1.1.json).
+    const context = recordingFile("contexts/join-s1-01.json") as {
+      texts: { words: string; sentAt: Inbound["sentAt"] }[];
+    };
+    expect(context.texts.map((text) => ({ text: text.words, sentAt: text.sentAt }))).toEqual([join.inbound]);
+    expect(accepts("composeInput", join)).toBe(true);
+    const recorded = composerFile().recordings.filter((entry) => entry.request.file === JOIN_INPUT_FILE);
+    expect(recorded.map((entry) => [entry.id, entry.seed.fixture])).toEqual([
+      ["composer-join-s1-02", "plan-s1-02.json"],
+    ]);
+    const answer = await composer.composer(join);
+    expect(answer).toEqual(fixture("plan-s1-02.json"));
+    expect(answer).toEqual(await composer.composer(chain));
+    expect(accepts("plan", answer)).toBe(true);
+  });
+
   for (const recording of composerFile().recordings) {
-    it(`${recording.seed.fixture}: its input is valid and gets it, valid against $defs/plan`, async () => {
+    it(`${recording.id} (${recording.seed.fixture}): its input is valid and gets it, valid against $defs/plan`, async () => {
       const input = inputOf(recording);
       expect(accepts("composeInput", input)).toBe(true);
       const answer = await composer.composer(input);
@@ -124,7 +162,7 @@ describe("the plan fixtures: each input gets its plan", () => {
       expect(words).not.toContain("{{hold");
     });
 
-    it(`${recording.seed.fixture}: the plan keeps to what its input allows`, async () => {
+    it(`${recording.id} (${recording.seed.fixture}): the plan keeps to what its input allows`, async () => {
       const input = inputOf(recording) as {
         allowedFormats: string[];
         allowedLinks: string[];
@@ -178,6 +216,17 @@ describe("an input with no recording fails loudly", () => {
 
   it("rejects an input JSON cannot hold, never answers it", async () => {
     await expect(composer.composer({ row: undefined })).rejects.toThrow(TypeError);
+  });
+
+  it("rejects the JOIN run's input at another time, or with its text changed (T-1145)", async () => {
+    const join = recordingFile(JOIN_INPUT_FILE) as JsonObject & { inbound: Inbound };
+    const later = { ...join.inbound.sentAt, utc: "2026-10-19T14:01:50Z" };
+    await expect(composer.composer({ ...join, inbound: { ...join.inbound, sentAt: later } })).rejects.toThrow(
+      NoRecordingError,
+    );
+    await expect(composer.composer({ ...join, inbound: { ...join.inbound, text: "join" } })).rejects.toThrow(
+      /composerPlan/,
+    );
   });
 
   it("fails the same way when the file holds no composer recording at all", async () => {

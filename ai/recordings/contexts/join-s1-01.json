@@ -1,0 +1,66 @@
+{
+  "turnId": "turn-s1-01-sam-join",
+  "bundleId": {
+    "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+    "build": 1
+  },
+  "flow": "A",
+  "texts": [
+    {
+      "eventId": "evt-sam-0000",
+      "kind": "text",
+      "words": "JOIN",
+      "sentAt": {
+        "utc": "2026-10-19T14:01:49Z",
+        "zone": "America/New_York"
+      },
+      "attachments": [],
+      "poll": null,
+      "tapback": null
+    }
+  ],
+  "writer": {
+    "handle": "+15555550100",
+    "people": [
+      {
+        "personId": "person-sam",
+        "name": "Sam Lee",
+        "roles": [],
+        "language": null
+      }
+    ]
+  },
+  "businessLanguage": "en",
+  "openQuestions": [],
+  "choices": [
+    {
+      "question": null,
+      "branch": null,
+      "anytimeRow": null,
+      "door": "signUp",
+      "hub": null,
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-01",
+      "kind": "door",
+      "label": "Business onboarding",
+      "definition": "Sam taps a link or scans a QR code on rosfield.com, and a chat with Rosie opens.",
+      "step": "S1-01",
+      "target": {
+        "businessId": "biz-lees-barbershop",
+        "businessName": "Lee's Barbershop",
+        "bookingId": null,
+        "visitAt": null
+      }
+    }
+  ],
+  "cards": [],
+  "facts": [],
+  "alwaysOn": {
+    "flow": "A",
+    "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+  },
+  "recentMessages": [],
+  "meaningSearch": null
+}

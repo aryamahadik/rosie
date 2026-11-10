@@ -1,0 +1,49 @@
+{
+  "version": "v1",
+  "contract": "model.v1.1",
+  "about": "Recordings for the recorded-model double (T-004, C-123) checked against K-02 v1.1: the walking skeleton's turn 1, Sam's first text (T-1145; ADR-013; contracts/model/README.md 'v1.1', the recordings the double needs, 1 to 3; the composer's, 4, is in composer.v1.json). Each is one model answer keyed by its request, written from K-02's fixtures, never from a live call (J-02 open). 1: decide's first and check reads on context-s1-01.json, seeded from decide-s1-01-enter.json: both Haiku reads enter c-01, the sign-up door. 2: the same two reads on the JOIN run's context, contexts/join-s1-01.json, which is context-s1-01.json with the JOIN run's turn and event ids (K-08 v1 trace-skeleton.json: turn-s1-01-sam-join, evt-sam-0000) and its one text, JOIN, as tests/e2e/skeleton sends it (sent 2026-10-19T14:01:49Z); each answers decide-s1-01-enter.json's read with the quote JOIN, given as output because no K-02 fixture is that turn's. 3: the safety reads of the text JOIN and of the master's words (S1-01's say, context-s1-01.json's text), each seeded from safety-no.json, so each reads No. No re-read is recorded: turn 1's two reads agree (README 'v1.1' default 10). The master's sample cast and the fictional 555-0100 only; no real person or customer (rule 9).",
+  "recordings": [
+    {
+      "id": "decide-s1-01-first",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-s1-01.json" }, "role": "first" },
+      "seed": { "fixture": "decide-s1-01-enter.json" }
+    },
+    {
+      "id": "decide-s1-01-check",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-s1-01.json" }, "role": "check" },
+      "seed": { "fixture": "decide-s1-01-enter.json" }
+    },
+    {
+      "id": "decide-s1-01-join-first",
+      "kind": "decideRead",
+      "request": { "context": { "file": "contexts/join-s1-01.json" }, "role": "first" },
+      "output": {
+        "language": "en",
+        "parts": [{ "verb": "enter", "quote": "JOIN", "choice": "c-01", "fields": [] }]
+      }
+    },
+    {
+      "id": "decide-s1-01-join-check",
+      "kind": "decideRead",
+      "request": { "context": { "file": "contexts/join-s1-01.json" }, "role": "check" },
+      "output": {
+        "language": "en",
+        "parts": [{ "verb": "enter", "quote": "JOIN", "choice": "c-01", "fields": [] }]
+      }
+    },
+    {
+      "id": "safety-s1-01-join",
+      "kind": "safetyRead",
+      "request": { "text": "JOIN" },
+      "seed": { "fixture": "safety-no.json" }
+    },
+    {
+      "id": "safety-s1-01-master",
+      "kind": "safetyRead",
+      "request": { "text": "Hi, I want to put my barbershop on Rosie" },
+      "seed": { "fixture": "safety-no.json" }
+    }
+  ]
+}

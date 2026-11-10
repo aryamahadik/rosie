@@ -1,0 +1,31 @@
+{
+  "row": "outbox-s1-02-sam-1",
+  "turn": "turn-s1-01-sam",
+  "conversation": [],
+  "masterText": {
+    "step": "S1-02",
+    "text": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them."
+  },
+  "facts": [],
+  "audience": {
+    "role": "owner",
+    "name": "Sam",
+    "way": "texts",
+    "handlingLine": null
+  },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "routine",
+  "allowedFormats": ["text"],
+  "allowedLinks": [],
+  "options": [],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": {
+    "text": "JOIN",
+    "sentAt": {
+      "utc": "2026-10-19T14:01:49Z",
+      "zone": "America/New_York"
+    }
+  }
+}

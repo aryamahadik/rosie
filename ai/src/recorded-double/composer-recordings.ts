@@ -1,6 +1,7 @@
 // Loading the composer's recordings (T-1071): every recording is resolved, checked against K-03 v1 and keyed by its
 // input, and the whole file is refused (nothing loads) when any one of them fails. They sit in their own file,
-// ai/recordings/composer.v1.json, because the composer is K-03's and the file of recordings.v1.json is K-02's. A recording is
+// ai/recordings/composer.v1.json, because the composer is K-03's and recordings.v1.json and recordings.v1.1.json are
+// K-02's. A recording is
 //
 //   { id, kind: "composerPlan", request, seed | output }
 //
@@ -213,7 +214,10 @@ export function loadRecordedComposer(options: LoadOptions = {}): RecordedCompose
   return buildRecordedComposer(file, options);
 }
 
-/** Loads both files: the three K-02 reads of recordings.v1.json and the composer of composer.v1.json, as one double. */
+/**
+ * Loads every file: the three K-02 reads of recordings.v1.json and recordings.v1.1.json and the composer of
+ * composer.v1.json, as one double.
+ */
 export async function loadRecordedDouble(options: LoadOptions = {}): Promise<RecordedDouble> {
   const model = await loadRecordedModel(options);
   const composer = loadRecordedComposer(options);

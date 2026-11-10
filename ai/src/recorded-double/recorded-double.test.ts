@@ -1,7 +1,18 @@
-// Tests of the recorded-model double (T-004, C-123), against K-02 v1's fixtures. Deterministic and offline: outbound
-// fetch is stubbed to throw for the whole file, and a test fails if anything calls it.
+// Tests of the recorded-model double (T-004, C-123), against K-02's fixtures: v1's, and v1.1's for the walking
+// skeleton's turn 1 (T-1145; contracts/model/README.md "v1.1", the recordings the double needs). Deterministic and
+// offline: outbound fetch is stubbed to throw for the whole file, and a test fails if anything calls it.
 
-import { readdirSync, readFileSync } from "node:fs";
+import {
+  copyFileSync,
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,14 +20,21 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
+  MODEL_VERSIONS,
   NoRecordingError,
+  RECORDINGS_FILE,
+  RECORDINGS_FILES,
+  RECORDINGS_V1_1_FILE,
   RecordingRefusedError,
   buildRecordedModel,
+  buildRecordedModelFromFiles,
   canonicalJson,
+  loadModelContract,
   loadRecordedModel,
   requestKey,
   type DecideRole,
   type JsonObject,
+  type ModelVersion,
   type RecordedModel,
 } from "./index";
 
@@ -30,12 +48,18 @@ function readJson(file: string): unknown {
 }
 const fixture = (file: string): Record<string, unknown> =>
   readJson(path.join(FIXTURES_DIR, file)) as Record<string, unknown>;
-const recordingsFile = (): { version: string; contract: string; recordings: Record<string, unknown>[] } =>
-  readJson(path.join(RECORDINGS_DIR, "recordings.v1.json")) as {
-    version: string;
-    contract: string;
-    recordings: Record<string, unknown>[];
-  };
+interface RecordingsFile {
+  version: string;
+  contract: string;
+  recordings: Record<string, unknown>[];
+}
+const recordingsFile = (): RecordingsFile =>
+  readJson(path.join(RECORDINGS_DIR, "recordings.v1.json")) as RecordingsFile;
+/** K-02 v1.1's recordings: the walking skeleton's turn 1 (T-1145). */
+const v1dot1File = (): RecordingsFile =>
+  readJson(path.join(RECORDINGS_DIR, "recordings.v1.1.json")) as RecordingsFile;
+/** A context file of ai/recordings, by its path there. */
+const recordedContext = (file: string): JsonObject => readJson(path.join(RECORDINGS_DIR, file)) as JsonObject;
 
 // An independent validator, as T-081's contract test builds it, so the double is not the judge of its own answers.
 const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
@@ -44,10 +68,18 @@ for (const folder of ["common", "bundle", "model"]) {
   for (const name of readdirSync(dir).filter((entry) => entry.endsWith(".schema.json")))
     ajv.addSchema(readJson(path.join(dir, name)) as object);
 }
-const SCHEMA_ID = (readJson(path.join(CONTRACT_DIR, "model", "model.v1.schema.json")) as { $id: string }).$id;
+const schemaIdOf = (version: ModelVersion): string =>
+  (readJson(path.join(CONTRACT_DIR, "model", `model.${version}.schema.json`)) as { $id: string }).$id;
+const SCHEMA_ID = schemaIdOf("v1");
 function accepts(def: string, value: unknown): boolean {
   const validate = ajv.getSchema(`${SCHEMA_ID}#/$defs/${def}`);
   if (validate === undefined) throw new Error(`no schema for ${def}`);
+  return validate(value) as boolean;
+}
+/** Whether K-02 at `version` accepts `value` as `$defs/<def>`, by the independent validator. */
+function acceptsAt(version: ModelVersion, def: string, value: unknown): boolean {
+  const validate = ajv.getSchema(`${schemaIdOf(version)}#/$defs/${def}`);
+  if (validate === undefined) throw new Error(`no schema for ${def} at ${version}`);
   return validate(value) as boolean;
 }
 
@@ -75,6 +107,74 @@ function must<T>(value: T | undefined): T {
   return value;
 }
 
+// ---- K-02 v1.1: the walking skeleton's turn 1 (T-1145; README "v1.1", the recordings the double needs) ----------
+
+/** The JOIN text and its time, as tests/e2e/skeleton sends them (its JOIN event: body JOIN, sentAt 14:01:49Z). */
+const JOIN_WORDS = "JOIN";
+const JOIN_SENT_UTC = "2026-10-19T14:01:49Z";
+/** The JOIN run's context, recording 2's, in ai/recordings. */
+const JOIN_CONTEXT_FILE = "contexts/join-s1-01.json";
+
+interface TurnText {
+  eventId: string;
+  words: string;
+  sentAt: { utc: string; zone: string };
+}
+interface TurnChoice {
+  choiceId: string;
+  kind: string;
+  door: string | null;
+  step: string;
+  stakes: string;
+  fields: unknown[];
+}
+/** A K-02 context, as far as these tests read it. */
+interface TurnContext extends JsonObject {
+  turnId: string;
+  bundleId: unknown;
+  texts: TurnText[];
+  choices: TurnChoice[];
+}
+interface DecideOutput extends JsonObject {
+  language: string;
+  parts: JsonObject[];
+}
+/** A K-02 decideResult fixture, as far as these tests read it. */
+interface DecideFixture {
+  stakes: string;
+  routing: { first: string; second: string };
+  reads: { model: string; role: DecideRole; output: DecideOutput }[];
+  agreed: boolean;
+  reread: boolean;
+  parts: { outcome: string }[];
+}
+interface TraceSpan {
+  hop: string;
+  event_id?: string;
+  decided?: Record<string, unknown>;
+  model_calls?: { model: string; purpose: string }[];
+}
+/** K-08 v1's trace of the skeleton's JOIN run (the card's "the JOIN run's ids"): its turn, bundle and spans. */
+const TRACE = readJson(path.join(CONTRACT_DIR, "event-trace", "fixtures", "trace-skeleton.json")) as {
+  turn_id: string;
+  bundle_id: unknown;
+  spans: TraceSpan[];
+};
+const spanOf = (hop: string): TraceSpan => must(TRACE.spans.find((span) => span.hop === hop));
+
+/** A read with every part's quote replaced: decide-s1-01-enter.json's read as the JOIN run's quote gives it. */
+const withQuote = (output: DecideOutput, quote: string): JsonObject => ({
+  ...output,
+  parts: output.parts.map((part) => ({ ...part, quote })),
+});
+
+/** What a recording's request names as its context: a K-02 fixture's file, or a path in ai/recordings. */
+function contextNameOf(recording: Record<string, unknown>): string {
+  const context = (recording.request as { context: { fixture?: string; file?: string } }).context;
+  return must(context.fixture ?? context.file);
+}
+const unique = (names: readonly string[]): string[] => [...new Set(names)];
+
 const fetchStub = vi.fn(() => {
   throw new Error("no network in a double test: outbound fetch was called");
 });
@@ -90,7 +190,8 @@ afterAll(() => {
 });
 
 describe("the context fixtures: each gets its paired decide answer", () => {
-  // K-02 v1's contexts, by version: v1.1's context-s1-01.json gets its recordings in T-1145 (ADR-013, new task 1).
+  // K-02 v1's contexts, by version, in recordings.v1.json; v1.1's context-s1-01.json has its recordings in
+  // recordings.v1.1.json (T-1145; ADR-013, new task 1), pinned below in "turn 1".
   const contexts = acceptedOf("context", "v1");
   const decides = acceptedOf("decideResult");
 
@@ -197,7 +298,7 @@ describe("a request with no recording fails loudly", () => {
 
   it("holds no composer: K-02 has no composer output, so the double offers only the three reads", () => {
     expect(Object.keys(model).sort()).toEqual(["decide", "planner", "safetyRead", "size"]);
-    expect(model.size).toBe(recordingsFile().recordings.length);
+    expect(model.size).toBe(recordingsFile().recordings.length + v1dot1File().recordings.length);
   });
 });
 
@@ -239,7 +340,7 @@ describe("a recording the K-02 schema or rules refuse is refused at load", () =>
 
   it("loads the extra recording once it is whole (the refusals below each break one thing)", async () => {
     const loaded = await buildRecordedModel(withRecording(good()));
-    expect(loaded.size).toBe(model.size + 1);
+    expect(loaded.size).toBe(recordingsFile().recordings.length + 1);
     expect(await loaded.decide({ context: sam, role: "reread" })).toEqual(good().output);
     await expect(model.decide({ context: sam, role: "reread" })).rejects.toThrow(NoRecordingError);
   });
@@ -432,6 +533,328 @@ describe("a recording the K-02 schema or rules refuse is refused at load", () =>
   });
 });
 
+describe("turn 1 (K-02 v1.1): the recordings the README names, every context pinned by version", () => {
+  const s101 = (): TurnContext => fixture("context-s1-01.json") as TurnContext;
+  const enter = (): DecideFixture => fixture("decide-s1-01-enter.json") as unknown as DecideFixture;
+  const joinContext = (): TurnContext => recordedContext(JOIN_CONTEXT_FILE) as TurnContext;
+  /** K-02 v1.1's decide recordings, in the file's order. */
+  const decideRecordings = (): Record<string, unknown>[] =>
+    v1dot1File().recordings.filter((entry) => entry.kind === "decideRead");
+
+  it("pins every context it knows by its K-02 version, each accepted by its own version's schema", () => {
+    expect(MODEL_VERSIONS).toEqual(["v1", "v1.1"]);
+    const frozen = readJson(path.join(CONTRACT_DIR, "model", "frozen.json")) as { frozen: string[] };
+    expect(frozen.frozen).toEqual([...MODEL_VERSIONS]);
+    // K-02's context fixtures by version: v1's two and v1.1's turn 1; no other version holds one.
+    expect(acceptedOf("context", "v1")).toEqual(["context-s1-02.json", "context-two-requests.json"]);
+    expect(acceptedOf("context", "v1.1")).toEqual(["context-s1-01.json"]);
+    expect(acceptedOf("context")).toHaveLength(3);
+    // Every context a recording names, by the file that holds it, and so by the version it is checked against.
+    expect(RECORDINGS_FILES).toEqual([RECORDINGS_FILE, RECORDINGS_V1_1_FILE]);
+    expect([recordingsFile().contract, v1dot1File().contract]).toEqual(["model.v1", "model.v1.1"]);
+    const known = (file: RecordingsFile): string[] =>
+      unique(file.recordings.filter((entry) => entry.kind !== "safetyRead").map(contextNameOf));
+    const byVersion: Record<ModelVersion, string[]> = {
+      v1: known(recordingsFile()),
+      "v1.1": known(v1dot1File()),
+    };
+    expect(byVersion).toEqual({
+      v1: [
+        "context-s1-02.json",
+        "context-two-requests.json",
+        "contexts/planner-answer.json",
+        "contexts/planner-log-gap.json",
+        "contexts/planner-hand-off.json",
+      ],
+      "v1.1": ["context-s1-01.json", JOIN_CONTEXT_FILE],
+    });
+    const contextOf = (name: string): unknown =>
+      name.startsWith("contexts/") ? recordedContext(name) : fixture(name);
+    // A v1 context is a v1.1 context too; a context with the sign-up door is v1.1's alone.
+    for (const name of byVersion.v1) {
+      expect(acceptsAt("v1", "context", contextOf(name))).toBe(true);
+      expect(acceptsAt("v1.1", "context", contextOf(name))).toBe(true);
+    }
+    for (const name of byVersion["v1.1"]) {
+      expect(acceptsAt("v1.1", "context", contextOf(name))).toBe(true);
+      expect(acceptsAt("v1", "context", contextOf(name))).toBe(false);
+    }
+  });
+
+  it("decide on context-s1-01.json: both Haiku reads enter c-01, the sign-up door, with no re-read", async () => {
+    const context = s101();
+    const decide = enter();
+    // The one choice: c-01, the sign-up door to S1-01, low stakes, no field (README "v1.1" default 9).
+    expect(context.choices).toHaveLength(1);
+    expect(must(context.choices[0])).toMatchObject({
+      choiceId: "c-01",
+      kind: "door",
+      door: "signUp",
+      step: "S1-01",
+      stakes: "low",
+      fields: [],
+    });
+    // decide-s1-01-enter.json: two Haiku reads, first and check, agreed, no re-read, the part goes (default 10).
+    expect(decide.routing).toEqual({ first: "haiku", second: "haiku" });
+    expect(decide.reads.map((read) => [read.model, read.role])).toEqual([
+      ["haiku", "first"],
+      ["haiku", "check"],
+    ]);
+    expect([decide.stakes, decide.agreed, decide.reread]).toEqual(["low", true, false]);
+    expect(decide.parts.map((part) => part.outcome)).toEqual(["go"]);
+    // The double holds exactly those two reads for this context, each seeded from that fixture.
+    const recorded = decideRecordings().filter((entry) => contextNameOf(entry) === "context-s1-01.json");
+    expect(
+      recorded.map((entry) => [
+        entry.kind,
+        (entry.request as { role: string }).role,
+        (entry.seed as { fixture: string }).fixture,
+      ]),
+    ).toEqual([
+      ["decideRead", "first", "decide-s1-01-enter.json"],
+      ["decideRead", "check", "decide-s1-01-enter.json"],
+    ]);
+    for (const read of decide.reads) {
+      const answer = await model.decide({ context, role: read.role });
+      expect(answer).toEqual(read.output);
+      expect(answer).toEqual({
+        language: "en",
+        parts: [{ verb: "enter", quote: must(context.texts[0]).words, choice: "c-01", fields: [] }],
+      });
+      expect(acceptsAt("v1.1", "decideRead", answer)).toBe(true);
+    }
+    // No re-read: the double holds none for this turn, and asking for one fails loudly.
+    await expect(model.decide({ context, role: "reread" })).rejects.toThrow(NoRecordingError);
+  });
+
+  it("decide on the JOIN run's context: both reads enter c-01 with the quote JOIN, decide-s1-01-enter.json's reads otherwise", async () => {
+    const join = joinContext();
+    const base = s101();
+    const text = must(base.texts[0]);
+    // context-s1-01.json with only the JOIN run's turn id and its one text changed (README "v1.1" recording 2).
+    expect({ ...join, turnId: base.turnId, texts: base.texts }).toEqual(base);
+    // The JOIN run's ids are K-08 trace-skeleton.json's: its turn, its one event, its bundle.
+    expect(join.turnId).toBe(TRACE.turn_id);
+    expect(join.bundleId).toEqual(TRACE.bundle_id);
+    expect(join.texts).toEqual([
+      {
+        ...text,
+        eventId: spanOf("receive").event_id,
+        words: JOIN_WORDS,
+        sentAt: { utc: JOIN_SENT_UTC, zone: text.sentAt.zone },
+      },
+    ]);
+    // K-08's frontier and decide spans of that run: one door, S1-01, low stakes; two Haiku reads agreeing on enter, no
+    // re-read.
+    expect(spanOf("frontier").decided).toEqual({
+      choices: join.choices.length,
+      doors: [must(join.choices[0]).step],
+      stakes: "low",
+    });
+    expect(spanOf("decideReads").decided).toEqual({
+      readsAgree: true,
+      verb: "enter",
+      choice: "S1-01",
+      reread: false,
+    });
+    expect(must(spanOf("decideReads").model_calls).map((call) => [call.model, call.purpose])).toEqual([
+      ["claude-haiku-5-5", "decideFirst"],
+      ["claude-haiku-5-5", "decideCheck"],
+    ]);
+    // Each recorded read is decide-s1-01-enter.json's own read in its role, with the quote JOIN.
+    const recorded = decideRecordings().filter((entry) => contextNameOf(entry) === JOIN_CONTEXT_FILE);
+    expect(recorded.map((entry) => (entry.request as { role: string }).role)).toEqual(["first", "check"]);
+    for (const read of enter().reads) {
+      const written = recorded.find((entry) => (entry.request as { role: string }).role === read.role);
+      expect(must(written).output).toEqual(withQuote(read.output, JOIN_WORDS));
+      const answer = await model.decide({ context: join, role: read.role });
+      expect(answer).toEqual(withQuote(read.output, JOIN_WORDS));
+      expect(answer).toEqual({
+        language: "en",
+        parts: [{ verb: "enter", quote: "JOIN", choice: "c-01", fields: [] }],
+      });
+      expect(acceptsAt("v1.1", "decideRead", answer)).toBe(true);
+    }
+    await expect(model.decide({ context: join, role: "reread" })).rejects.toThrow(NoRecordingError);
+  });
+
+  it("the safety reads of JOIN and of the master's words each read No, seeded from safety-no.json", async () => {
+    const masterWords = must(s101().texts[0]).words;
+    const recorded = v1dot1File().recordings.filter((entry) => entry.kind === "safetyRead");
+    expect(
+      recorded.map((entry) => [
+        (entry.request as { text: string }).text,
+        (entry.seed as { fixture: string }).fixture,
+      ]),
+    ).toEqual([
+      [JOIN_WORDS, "safety-no.json"],
+      [masterWords, "safety-no.json"],
+    ]);
+    const no = (fixture("safety-no.json") as { read: { labels: { outcome: string }[] } }).read;
+    expect(no.labels.map((label) => label.outcome)).toEqual(["No"]);
+    for (const text of [JOIN_WORDS, masterWords]) {
+      const answer = await model.safetyRead({ text });
+      expect(answer).toEqual(no);
+      expect((answer.labels as { outcome: string }[]).map((label) => label.outcome)).toEqual(["No"]);
+      expect(acceptsAt("v1.1", "safetyRead", answer)).toBe(true);
+    }
+    // K-08's safety span of the JOIN run reads No too.
+    expect(spanOf("safetyRead").decided).toEqual({ labels: ["No"], dangerWords: 0, timedOut: false });
+  });
+
+  it("fails loudly for a turn 1 request it holds no recording for, never with a made-up answer", async () => {
+    const base = s101();
+    const join = joinContext();
+    // The master's words under the JOIN run's turn id, and JOIN under the fixture's: contexts nobody recorded.
+    await expect(model.decide({ context: { ...base, turnId: join.turnId }, role: "first" })).rejects.toThrow(
+      NoRecordingError,
+    );
+    await expect(model.decide({ context: { ...join, turnId: base.turnId }, role: "check" })).rejects.toThrow(
+      NoRecordingError,
+    );
+    // The JOIN run on another bundle.
+    await expect(
+      model.decide({ context: { ...join, bundleId: { hash: "0".repeat(64), build: 1 } }, role: "first" }),
+    ).rejects.toThrow(/decideRead/);
+    // A safety text one character off.
+    await expect(model.safetyRead({ text: "join" })).rejects.toThrow(NoRecordingError);
+    await expect(model.safetyRead({ text: `${JOIN_WORDS} ` })).rejects.toThrow(NoRecordingError);
+    // The planner holds nothing for turn 1.
+    await expect(model.planner({ context: base })).rejects.toThrow(/plannerOutput/);
+  });
+});
+
+describe("the double reads K-02 v1.1, each file by its own version", () => {
+  const firstRead = (): DecideOutput =>
+    must((fixture("decide-s1-01-enter.json") as unknown as DecideFixture).reads[0]).output;
+  /** Turn 1's first read with its context inline, given as output. */
+  const inlineTurn1 = (): Record<string, unknown> => ({
+    id: "inline-s1-01",
+    kind: "decideRead",
+    request: { context: fixture("context-s1-01.json"), role: "first" },
+    output: firstRead(),
+  });
+  const refusalOf = async (built: Promise<RecordedModel>): Promise<string> => {
+    const error = await built.then(
+      () => undefined,
+      (caught: unknown) => caught,
+    );
+    expect(error).toBeInstanceOf(RecordingRefusedError);
+    return (error as RecordingRefusedError).problems.join("\n");
+  };
+  const v1With = (...extra: Record<string, unknown>[]): RecordingsFile => {
+    const file = recordingsFile();
+    return { ...file, recordings: [...file.recordings, ...extra] };
+  };
+  const v1dot1With = (...extra: Record<string, unknown>[]): RecordingsFile => {
+    const file = v1dot1File();
+    return { ...file, recordings: [...file.recordings, ...extra] };
+  };
+
+  it("refuses turn 1's sign-up door in a v1 file, and takes the same recording in a v1.1 file", async () => {
+    // K-02 v1 neither reads v1.1's fixture nor accepts the sign-up door.
+    const seeded = must(v1dot1File().recordings[0]);
+    expect(seeded.id).toBe("decide-s1-01-first");
+    expect(await refusalOf(buildRecordedModel(v1With(seeded)))).toContain(
+      "decide-s1-01-first: the request cannot be read: context-s1-01.json is a v1.1 fixture, not v1",
+    );
+    expect(await refusalOf(buildRecordedModel(v1With(inlineTurn1())))).toContain(
+      "inline-s1-01: the context: /choices/0/door",
+    );
+    // K-02 v1.1 takes each of them.
+    for (const recording of [seeded, inlineTurn1()]) {
+      const loaded = await buildRecordedModel({
+        version: "v1",
+        contract: "model.v1.1",
+        recordings: [recording],
+      });
+      expect(loaded.size).toBe(1);
+      expect(await loaded.decide({ context: fixture("context-s1-01.json"), role: "first" })).toEqual(
+        firstRead(),
+      );
+    }
+  });
+
+  it("refuses a file whose contract is a K-02 version the double does not read, and names it among several", async () => {
+    await expect(
+      buildRecordedModel({ version: "v1", contract: "model.v1.2", recordings: [] }),
+    ).rejects.toThrow(RecordingRefusedError);
+    await expect(
+      buildRecordedModel({ version: "v1", contract: "message-plan.v1", recordings: [] }),
+    ).rejects.toThrow(RecordingRefusedError);
+    await expect(buildRecordedModel({ version: "v1", contract: "toString", recordings: [] })).rejects.toThrow(
+      RecordingRefusedError,
+    );
+    const lines = await refusalOf(
+      buildRecordedModelFromFiles({
+        [RECORDINGS_FILE]: recordingsFile(),
+        [RECORDINGS_V1_1_FILE]: { ...v1dot1File(), contract: "model.v1.2" },
+      }),
+    );
+    expect(lines).toContain(`${RECORDINGS_V1_1_FILE}: the file is not`);
+  });
+
+  it("loads both files as one double, and refuses a request or an id recorded in both", async () => {
+    const both = await buildRecordedModelFromFiles({
+      [RECORDINGS_FILE]: recordingsFile(),
+      [RECORDINGS_V1_1_FILE]: v1dot1File(),
+    });
+    expect(both.size).toBe(model.size);
+    expect(await both.safetyRead({ text: JOIN_WORDS })).toEqual(await model.safetyRead({ text: JOIN_WORDS }));
+    const safetyNo = must(recordingsFile().recordings[4]);
+    expect(safetyNo.id).toBe("safety-no");
+    const repeated = await refusalOf(
+      buildRecordedModelFromFiles({
+        [RECORDINGS_FILE]: recordingsFile(),
+        [RECORDINGS_V1_1_FILE]: v1dot1With({ ...safetyNo, id: "again" }),
+      }),
+    );
+    expect(repeated).toContain("again: has the same request as safety-no");
+    const reused = await refusalOf(
+      buildRecordedModelFromFiles({
+        [RECORDINGS_FILE]: recordingsFile(),
+        [RECORDINGS_V1_1_FILE]: v1dot1With({ ...safetyNo, request: { text: "Is the shop open today?" } }),
+      }),
+    );
+    expect(reused).toContain("safety-no: the id is used twice");
+  });
+
+  it("reads K-02 v1 by default and v1.1 when asked, never a version frozen.json does not list", async () => {
+    const v1 = await loadModelContract();
+    expect(v1.version).toBe("v1");
+    expect(() => v1.fixtures.read("context-s1-01.json")).toThrow(
+      "context-s1-01.json is a v1.1 fixture, not v1",
+    );
+    expect(v1.validate("context", fixture("context-s1-01.json"))).not.toEqual([]);
+    const v1dot1 = await loadModelContract(undefined, "v1.1");
+    expect(v1dot1.version).toBe("v1.1");
+    for (const name of ["context-s1-01.json", "context-s1-02.json"]) {
+      expect(v1dot1.fixtures.read(name)).toEqual(fixture(name));
+      expect(v1dot1.validate("context", fixture(name))).toEqual([]);
+    }
+    expect(() => v1dot1.fixtures.read("invalid/refuse-over-60-choices.json")).toThrow(
+      "a fixture K-02 refuses",
+    );
+    await expect(loadModelContract(undefined, "v1.2" as unknown as ModelVersion)).rejects.toThrow("not v1.2");
+    // A copy of the contracts whose frozen.json lists v1 alone: v1.1 is not read from it.
+    const root = mkdtempSync(path.join(os.tmpdir(), "rosie-k02-"));
+    try {
+      for (const folder of ["common", "bundle"]) {
+        mkdirSync(path.join(root, folder));
+        for (const name of readdirSync(path.join(CONTRACT_DIR, folder)).filter((entry) =>
+          entry.endsWith(".schema.json"),
+        ))
+          copyFileSync(path.join(CONTRACT_DIR, folder, name), path.join(root, folder, name));
+      }
+      cpSync(path.join(CONTRACT_DIR, "model"), path.join(root, "model"), { recursive: true });
+      writeFileSync(path.join(root, "model", "frozen.json"), JSON.stringify({ frozen: ["v1"] }));
+      await expect(loadModelContract(root, "v1.1")).rejects.toThrow("K-02 v1.1 is not frozen");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
 describe("the same request twice gives byte-identical answers", () => {
   it("returns the same bytes on every call, for every kind", async () => {
     const sam = fixture("context-s1-02.json") as JsonObject;
@@ -443,6 +866,20 @@ describe("the same request twice gives byte-identical answers", () => {
     ];
     for (const call of calls) {
       const [a, b, c] = [await call(), await call(), await call()];
+      expect(JSON.stringify(b)).toBe(JSON.stringify(a));
+      expect(JSON.stringify(c)).toBe(JSON.stringify(a));
+    }
+  });
+
+  it("gives turn 1's answers byte for byte on every call and from a second load (K-02 v1.1)", async () => {
+    const again = await loadRecordedModel();
+    const calls: ((double: RecordedModel) => Promise<unknown>)[] = [
+      (double) => double.decide({ context: fixture("context-s1-01.json"), role: "first" }),
+      (double) => double.decide({ context: recordedContext(JOIN_CONTEXT_FILE), role: "check" }),
+      (double) => double.safetyRead({ text: JOIN_WORDS }),
+    ];
+    for (const call of calls) {
+      const [a, b, c] = [await call(model), await call(model), await call(again)];
       expect(JSON.stringify(b)).toBe(JSON.stringify(a));
       expect(JSON.stringify(c)).toBe(JSON.stringify(a));
     }
