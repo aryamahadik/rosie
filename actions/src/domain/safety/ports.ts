@@ -11,7 +11,8 @@
 //     IV). With none, a record that has words to seal answers notBuilt: the words are never written in plain;
 //   - SafetyLines: the outcome steps' checked lines, from the pinned bundle (K-01 v1 fixed lines and the step cards'
 //     lines, as the handle actor's BundleSafety reads them). The default knows only K-01 v1's own fixed lines, so any
-//     other outcome's record is refused (noSafetyLine);
+//     other outcome's record is refused (noSafetyLine), but harm to a child or older adult's: with no hotline from the
+//     bundle its record sends 911 (record.ts default 10);
 //   - StopWords: whether the plug-in's own-line words stop a booking (A3-26), which K-02 v1's result does not carry. No
 //     source of a plug-in's stop words is wired yet (QUESTIONS.md), so the default answers notBuilt for every record
 //     rather than let a plug-in's stop words go unread; a plug-in known to list none is wired as such, by name
@@ -139,7 +140,10 @@ export interface SafetyLineChoice {
    * or the business's owner (A3-48: san to owner; S13-10: "no safety message to the one who threatens").
    */
   readonly to: "writer" | "owner";
-  /** The hotline of Rosie's safety list the line gives (A3-49, A3-50), when it gives one; null otherwise. */
+  /**
+   * The hotline of Rosie's safety list the line gives (A3-49, A3-50), when it gives one; null otherwise. A harm outcome's
+   * line with none is sent as safetyEmergency (911) instead, and files no harm report (record.ts default 10).
+   */
   readonly hotline: HotlineKind | null;
 }
 
@@ -156,7 +160,8 @@ export interface SafetyLines {
 /**
  * K-01 v1's own fixed lines only (contracts/bundle: safetyEmergency, 911; safetyCrisis, 988 and 911; outage): crisis
  * words, an emergency and Unsure, each to the writer. Every other outcome's line is its step card's, which the wiring
- * reads from the pinned bundle; until then such an outcome is refused (noSafetyLine) rather than sent silently.
+ * reads from the pinned bundle; until then such an outcome is refused (noSafetyLine) rather than sent silently, but harm
+ * to a child or older adult, which the record sends 911 for while no hotline is held (record.ts default 10).
  */
 export const FIXED_SAFETY_LINES: SafetyLines = {
   lineOf(outcome, wordKinds) {

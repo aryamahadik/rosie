@@ -46,10 +46,16 @@
 //      event-log entry carries the same bytes as base64 (K-05 v1 sealedValues).
 //   9. Every entry here is Rosie's own act (actor rosie), why step A3-22, the danger check that gives safe (its flow B twin
 //      is B3-17; the call names no flow), zone null (UTC); a harm report's entry carries no business (K-08 v1.1 team only).
-//  10. Harm to a child or older adult files its harm report only with the business known (K-34 harm_reports.business_id is
-//      not null), its zone, and the hotline the line gives; otherwise the call is refused (fail closed: A3-49 "Never make
-//      up or guess a hotline number"). Unsafe at home and a report about the owner or staff file none here: K-02 v1 does not
-//      say whose risk it is or whom it names (CQ-22).
+//  10. Harm to a child or older adult (A3-49; CQ-164 (c); T-1162): its checked line is the pinned bundle's when that line
+//      gives a hotline from Rosie's safety list. With no hotline in the bundle (bundle v0 holds no A3-49 step), it is
+//      safetyEmergency (911) to the writer, the strictest the sources allow, as the handle actor's direct path sends it
+//      (T-1143), and the record is never refused for want of one: the outcome, its at-once hold and the 911 line are
+//      written, and the turn goes on. A hotline is never made up or guessed (A3-49), so the harm report is filed only with
+//      the hotline the line gives (K-34 harm_reports_child_or_elder_has_hotline), with the business known
+//      (harm_reports.business_id is not null) and its zone, else the call is refused (harmReportNeedsBusiness). With no
+//      hotline no report is filed and `told` names none (QUESTIONS.md: who tells Rosie's team that day until the bundle
+//      holds the hotline); a repeat names the report by the same rule. Unsafe at home and a report about the owner or staff
+//      file none here: K-02 v1 does not say whose risk it is or whom it names (CQ-22).
 //  17. A protective flag the outcome calls for is never dropped. A pause T-317 refuses (no such person, phone or handle:
 //      notFound) refuses the record with that answer, and nothing is written: the never hold cannot show a missing pause,
 //      and the handle actor keeps its own hold and sends the checked line itself (errors.ts). A refusal K-09 v1 lists no
@@ -107,6 +113,12 @@ type LineView = NonNullable<RecordResponse["safetyLine"]>;
 
 /** The step every entry of the record names (default 9). */
 export const RECORD_STEP = "A3-22";
+
+/** The outcome whose line gives a hotline and whose report goes to Rosie's team that day (A3-49; default 10). */
+const HARM: SafetyOutcome = "Harm to a child or older adult";
+
+/** The strictest safety line, 911 (A3-24; arch 02 line 111): harm's line when the bundle holds no hotline (default 10). */
+const STRICTEST_LINE = "safetyEmergency";
 
 /** The turn whose commit carries a record: its id, handle, texts and core actions (K-05 v1 turn; K-09 v1 coreAction). */
 export interface CarryingTurn {
@@ -275,25 +287,47 @@ interface LinePick {
   readonly sendClass: "safety" | "quick_reply";
 }
 
+type WordKinds = readonly ("selfHarm" | "other")[];
+
+/**
+ * Harm to a child or older adult's checked line (default 10): the pinned bundle's when it gives a hotline from Rosie's
+ * safety list (A3-49); otherwise safetyEmergency (911) to the writer, with no hotline, as the handle actor's direct path
+ * sends it (T-1143). Never null, so no harm record is refused for want of a line, and never a hotline made up.
+ */
+function harmLineOf(lines: SafetyLines, wordKinds: WordKinds): SafetyLineChoice {
+  const own = lines.lineOf(HARM, wordKinds);
+  if (own !== null && own.hotline !== null) return own;
+  return { fixedLineId: STRICTEST_LINE, to: "writer", hotline: null };
+}
+
+/** An outcome's checked line from the pinned bundle, or null when its step sends nothing here; harm's by its own rule. */
+function lineChoiceOf(
+  lines: SafetyLines,
+  outcome: SafetyOutcome,
+  wordKinds: WordKinds,
+): SafetyLineChoice | null {
+  return outcome === HARM ? harmLineOf(lines, wordKinds) : lines.lineOf(outcome, wordKinds);
+}
+
 /**
  * The checked line a record sends: its outcome step's (LINE_ORDER), as a safety row; for a read that timed out with no
  * danger word, the outage line, as a quick_reply row (default 2); null when nothing goes (No, or a step with nothing to
  * send). A danger outcome whose step must send and has no line is refused (`strict`), except on a repeat, which writes
- * nothing and names only what it knows.
+ * nothing and names only what it knows; harm to a child or older adult always has one (default 10).
  */
 function pickLine(
   ports: RecordPorts,
   read: {
     readonly outcomes: readonly SafetyOutcome[];
     readonly timedOut: boolean;
-    readonly wordKinds: readonly ("selfHarm" | "other")[];
+    readonly wordKinds: WordKinds;
   },
   eventId: string,
   strict: boolean,
 ): LinePick | null {
   const outcome = lineOutcomeOf(dangerOf(read.outcomes));
   if (outcome !== null) {
-    const choice = ports.lines.lineOf(outcome, read.wordKinds);
+    const choice = lineChoiceOf(ports.lines, outcome, read.wordKinds);
     if (choice === null && strict && mustSendLine(outcome)) {
       throw new SafetyRefusedError("noSafetyLine", [eventId]);
     }
@@ -407,7 +441,8 @@ async function repeatAnswer(
     });
     told.push(...plan.told);
   }
-  if (stored.outcomes.includes("Harm to a child or older adult")) {
+  // The first record filed a harm report only with the hotline its line gave (default 10).
+  if (stored.outcomes.includes(HARM) && harmLineOf(ports.lines, stored.dangerWordKinds).hotline !== null) {
     told.push({ who: "team", via: "harmReport", id: await ports.ids.rowId("harmReport", eventId) });
   }
 
@@ -653,10 +688,10 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
     told.push(...plan.told);
     tellWrites = plan.writes;
   }
-  if (safety.outcomes.includes("Harm to a child or older adult")) {
+  // With no hotline in the pinned bundle the record stands with its hold and 911, and no report is filed (default 10).
+  const hotline = safety.outcomes.includes(HARM) ? harmLineOf(ports.lines, wordKinds).hotline : null;
+  if (hotline !== null) {
     const harmId = await ports.ids.rowId("harmReport", eventId);
-    const hotline = ports.lines.lineOf("Harm to a child or older adult", wordKinds)?.hotline ?? null;
-    if (hotline === null) throw new SafetyRefusedError("noHotline", [eventId]);
     if (businessId === null) throw new SafetyRefusedError("harmReportNeedsBusiness", [eventId]);
     const zone = await ports.reader.businessZone(businessId);
     if (zone === null) throw new SafetyRefusedError("harmReportNeedsBusiness", [eventId]);

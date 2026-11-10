@@ -17,8 +17,8 @@
 //   - only No sends nothing.
 // The service asks for the line of the outcome LINE_ORDER puts first (domain/safety/record.ts pickLine) and, for a harm
 // report, for harm's hotline, which only the step's own line gives: a fallback names no hotline, since none is ever made
-// up (A3-49), so with a partial bundle a harm report is refused (noHotline) and the turn fails closed. The outage line is
-// the bundle's own.
+// up (A3-49), so with a partial bundle harm is recorded with its hold and 911 and files no harm report, never refused
+// (record.ts default 10; CQ-164 (c), T-1162). The outage line is the bundle's own.
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   1. A threat whose step's line the pinned bundle lacks tells the owner with safetyEmergency (911): no K-01 v1 fixed line
