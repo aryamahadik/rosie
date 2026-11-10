@@ -1,16 +1,17 @@
 // T-1141's integration proof of the turn face's compose input and finalize on local PostgreSQL (`npm run db:up`, then
-// `npm run test:integration -- actions/src/tool-api/turn-face`), on the row turn 1's commit writes: K-05's own
-// commit-s1-01-sam.json (S1-02's question, its clock row and outbox-s1-02-sam-1), committed for real by T-306's commitTurn
-// in the world K-05 v1.3's read-outbox-row-s1-02.json reads it in (K-04's business heads, Sam as the barbershop's owner,
-// his phone), since on main the turn face's own commit of turn 1 writes no row while limit 1 stops the sign-up door
-// (calls.int.test.ts, GATE_WAITING). Every read and write is real: the Tool API base on rosie_app, K-05 v1.3's
+// `npm run test:integration -- actions/src/tool-api/turn-face`), on the row K-05's own commit-s1-01-sam.json writes
+// (S1-02's question, its clock row and outbox-s1-02-sam-1), committed for real by T-306's commitTurn in the world K-05
+// v1.3's read-outbox-row-s1-02.json reads it in (K-04's business heads, Sam holding his owner role, his phone): the row
+// read by Sam's role (K-05 v1.5 item 44's by-role branch, row-reader-s1-02-owner.json). The turn face's own commit of
+// turn 1 on T-1148's seed, where Sam holds no role and the row is read by S1-02's sign-up line, is calls.int.test.ts's,
+// with the whole turn to its final parts. Every read and write is real: the Tool API base on rosie_app, K-05 v1.3's
 // readOutboxRow and readFixedLineFacts and finalize's writePlan on rosie_job, each its own transaction. Given: bundle v0
 // (K-01 v1's bundle-v0-skeleton.json, which the row pins) through the frontier's fake bundles.
 //
-// The card's proof as far as main gives it: compose input gives K-09's compose-input-s1-02.json's input for the row
-// (gentle while the sensitive switch is treated as on: DL-326 note b), with the inbound words only once the runtime
-// handed them through gateAndCommit; finalize with finalize-pass.json's plan refuses Rosie's first text whole on bundle v0,
-// lineNotInBundle for privacyLink (K-09 v1.5 open gap 121), and writes nothing.
+// The proofs: compose input gives K-09's compose-input-s1-02.json's input for the row (gentle while the sensitive switch
+// is treated as on: DL-326 note b), with the inbound words only once the runtime handed them through gateAndCommit;
+// finalize with finalize-pass.json's plan refuses Rosie's first text whole on bundle v0, lineNotInBundle for privacyLink
+// (K-09 v1.5 open gap 121), and writes nothing; on bundle v0 as published (T-1146) it writes the row's final parts.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

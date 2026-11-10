@@ -4,27 +4,39 @@
 // over K-05 v1.3's own answers (read-outbox-row-s1-02.json, fixed-line-facts-s1-02.json), and the turn's words handed in
 // by the runtime through gateAndCommit (held.ts). Nothing under test is stood in for; the bundles are K-01 v1's
 // bundle-v0-skeleton.json, which the row pins, and bundle v0 as bundles/v0 publishes it with T-1146's privacyLink.
+//
+// Round 2 (DL-364, DL-370): the reader is K-05 v1.5's rowReader (README item 44), proven on its 3 accepted fixtures, its
+// 2 refused ones, the three security cases (no person, lineTo null, a cust line: never read as the owner), the by-role
+// branch, and turn 1's row as it runs, to Sam with no role, read as the owner and addressed as "Sam".
 
 import { describe, expect, it } from "vitest";
 
+import type { Role } from "../../domain/identity-access";
+import { readerOf } from "../../finalize/claim-check";
 import { FixedLineRefusedError } from "../../finalize/fixed-lines";
-import type { BundleDocument } from "../../frontier/assemble/test-support";
+import { fakeBundles, sampleBundle, type BundleDocument } from "../../frontier/assemble/test-support";
 import { contractFile, fixture, traceFor } from "../test-support";
 import { createToolApiValidator } from "../validator";
 import {
-  READER_WAITING,
+  ROW_READER_ACCEPTED,
+  ROW_READER_REFUSED,
+  bundleOfRequest,
   commitRequestAfter,
   firstTextFacts,
   outboxRowS102,
+  outboxRowTurnOne,
   publishedBundleV0,
+  readOfRequest,
   rowCalls,
   rowDoubles,
+  rowReaderFixture,
+  rowReaderProblems,
   rowUnderPublishedV0,
   type RowDoubles,
 } from "./calls-test-support";
 import { NOTHING_OPEN_AT } from "./commit";
 import { TurnFaceRefusedError } from "./errors";
-import { addressedAs, safetyLinesFor, type OutboxRowRead } from "./rows";
+import { addressedAs, composeRowOf, lineToOf, readerOfRow, safetyLinesFor, type OutboxRowRead } from "./rows";
 import { createTurnFace, type TurnFace } from "./turn-face";
 
 type Json = Record<string, unknown>;
@@ -66,6 +78,45 @@ function rowWith(change: (row: OutboxRowRead) => OutboxRowRead): OutboxRowRead {
   return change(structuredClone(outboxRowS102()));
 }
 
+/** bundle-v0-skeleton.json (the row's pin) with its S1-02 changed, a test's own copy. */
+function skeletonWithS102(change: (step: Json) => void): BundleDocument {
+  const bundle = sampleBundle("bundle-v0-skeleton.json");
+  const flow = bundle.flows.A as { steps: Record<string, Json | undefined> };
+  const step = flow.steps["S1-02"];
+  if (step === undefined) throw new Error("bundle v0 holds S1-02");
+  change(step);
+  return bundle;
+}
+
+/** S1-02 whose lines from Rosie go to these lanes, in say order: its own first line, once to each. */
+function withSayTo(lanes: readonly string[]): BundleDocument {
+  return skeletonWithS102((step) => {
+    const say = step.say as Json[];
+    const [first] = say;
+    step.say = [...lanes.map((to) => ({ ...first, to })), ...say.slice(1)];
+  });
+}
+
+/** S1-02 as a step of another section of its flow. */
+function withSection(section: number): BundleDocument {
+  return skeletonWithS102((step) => {
+    step.section = section;
+  });
+}
+
+/** The reader rows.ts maps for a read on a bundle (K-05 v1.5 item 44). */
+async function readingOf(
+  read: OutboxRowRead,
+  bundle: BundleDocument = sampleBundle("bundle-v0-skeleton.json"),
+) {
+  return readerOfRow(fakeBundles(bundle), read);
+}
+
+/** The exchange a reading states: rowReader's call, a given, and the binding's own request and outcome. */
+function exchangeOf(given: Json, request: unknown, outcome: unknown): Json {
+  return { call: "rowReader", given, request, outcome };
+}
+
 describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-outbox-row-s1-02.json)", () => {
   it("gives compose-input-s1-02.json's input from the row, the bundle and the words the runtime handed in; gentle while the sensitive switch is treated as on (DL-326 note b)", async () => {
     const doubles = rowDoubles();
@@ -98,17 +149,46 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     expect(outcome.input.inbound).not.toBeNull();
   });
 
-  it("refuses the row of a recipient who holds no role yet, never guessing a reader (READER_WAITING)", async () => {
-    expect(READER_WAITING).toHaveLength(1);
-    const doubles = rowDoubles({
-      row: rowWith((row) => ({ ...row, recipient: { ...row.recipient, roles: [] } })),
-    });
+  it("turn 1's row as it runs, to Sam who holds no role yet, gives the same input: read as the owner by S1-02's sign-up line (K-05 v1.5 item 44), addressed as Sam", async () => {
+    const doubles = rowDoubles({ row: outboxRowTurnOne() });
+    const face = await faceAfterTurnOne(doubles);
+    const { request, outcome } = composeExchange();
+    const answer = await face.composeInput(structuredClone(request), traceFor(request).trace);
+    expect(validator.check("composeInput", "response", answer)).toEqual([]);
+    expect(answer).toEqual({ result: "compose", input: { ...outcome.input, situation: "gentle" } });
+    // Sam's stored name is "Sam Lee"; Rosie addresses him by its first word (default 4), as K-09's fixture does.
+    expect(outboxRowTurnOne().recipient.name).toBe("Sam Lee");
+    expect(answer).toMatchObject({ input: { audience: { role: "owner", name: "Sam" } } });
+  });
+
+  it("refuses a row no one reads, with rowReader's why: no person, a line to no reader, a step outside section 1, a role that reads as no one", async () => {
     const { request } = composeExchange();
-    const called = await settle(
-      faceOf(doubles).composeInput(structuredClone(request), traceFor(request).trace),
-    );
-    expect(called.thrown).toBeInstanceOf(TurnFaceRefusedError);
-    expect(called.thrown).toMatchObject({ fault: "noReader" });
+    const refused = async (row: OutboxRowRead, bundle?: BundleDocument) => {
+      const doubles = rowDoubles({ row, ...(bundle === undefined ? {} : { bundle }) });
+      return (await settle(faceOf(doubles).composeInput(structuredClone(request), traceFor(request).trace)))
+        .thrown;
+    };
+    const noRole = outboxRowTurnOne();
+    const cases: { row: OutboxRowRead; bundle?: BundleDocument; why: string }[] = [
+      { row: { ...noRole, recipient: { ...noRole.recipient, personId: null } }, why: "noRole" },
+      { row: noRole, bundle: withSayTo(["owner", "cust"]), why: "lineHasNoReader" },
+      { row: noRole, bundle: withSection(2), why: "noRole" },
+      {
+        row: rowWith((row) => ({
+          ...row,
+          recipient: {
+            ...row.recipient,
+            roles: [{ roleId: "role-sam-own", role: "own_business", version: 1 }],
+          },
+        })),
+        why: "roleReadsAsNoOne",
+      },
+    ];
+    for (const each of cases) {
+      const thrown = await refused(each.row, each.bundle);
+      expect(thrown).toBeInstanceOf(TurnFaceRefusedError);
+      expect(thrown).toMatchObject({ fault: "noReader", why: each.why });
+    }
   });
 
   it("answers K-05's notFound and transient as its own errors, and refuses a safety row and a row that asks nothing", async () => {
@@ -155,6 +235,138 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     expect(addressedAs("Sam Lee")).toBe("Sam");
     expect(addressedAs(null)).toBeNull();
     expect(addressedAs("  ")).toBeNull();
+  });
+});
+
+describe("the reader, mapped exactly as K-05 v1.5's rowReader (README item 44; DL-370)", () => {
+  it("the 3 accepted rowReader fixtures read as stated: from each request's read and its bundle, the binding builds the fixture's request and gives its outcome", async () => {
+    for (const file of ROW_READER_ACCEPTED) {
+      const exchange = rowReaderFixture(file);
+      const { request, outcome } = await readerOfRow(
+        bundleOfRequest(exchange.request),
+        readOfRequest(exchange.request),
+      );
+      expect(request, file).toEqual(exchange.request);
+      expect(outcome, file).toEqual(exchange.outcome);
+      expect(outcome.outboxRowId, file).toBe(request.outboxRowId);
+      expect(rowReaderProblems(exchangeOf(exchange.given, request, outcome)), file).toEqual([]);
+    }
+  });
+
+  it("the 2 refused fixtures are never given: on each one's request the binding gives its accepted twin's outcome, and the schema refuses theirs", async () => {
+    for (const { file, twin } of ROW_READER_REFUSED) {
+      const refused = rowReaderFixture(`invalid/${file}`);
+      expect(rowReaderProblems(refused), file).not.toEqual([]);
+      const { outcome } = await readerOfRow(bundleOfRequest(refused.request), readOfRequest(refused.request));
+      expect(outcome, file).not.toEqual(refused.outcome);
+      expect(outcome, file).toEqual(rowReaderFixture(twin).outcome);
+    }
+  });
+
+  it("the three security cases are refused: a row with no person, a line told as null, and a cust line are never read as the owner", async () => {
+    const turnOne = outboxRowTurnOne();
+    const given = rowReaderFixture("row-reader-s1-02-no-role.json").given;
+    const asOwner = (request: unknown) =>
+      exchangeOf(given, request, {
+        result: "reader",
+        outboxRowId: turnOne.outboxRowId,
+        reader: "owner",
+        from: "signUpLine",
+        roleId: null,
+      });
+
+    // No person on the row (a bare handle): noReader noRole, on section 1 too (default 64).
+    const noPerson = await readingOf({ ...turnOne, recipient: { ...turnOne.recipient, personId: null } });
+    expect(noPerson.request.recipient).toEqual({ personId: null, roles: [] });
+    expect(noPerson.outcome).toEqual({ error: "noReader", outboxRowId: turnOne.outboxRowId, why: "noRole" });
+
+    // S1-02's lines from Rosie to two lanes: lineTo null, so the line is never told by a guess (default 62).
+    const twoLanes = await readingOf(turnOne, withSayTo(["owner", "cust"]));
+    expect(twoLanes.request.lineTo).toBeNull();
+    expect(twoLanes.outcome).toEqual({
+      error: "noReader",
+      outboxRowId: turnOne.outboxRowId,
+      why: "lineHasNoReader",
+    });
+
+    // A section 1 line to the customer: read as the customer, never as the owner.
+    const custLine = await readingOf(turnOne, withSayTo(["cust"]));
+    expect(custLine.request.lineTo).toBe("cust");
+    expect(custLine.outcome).toEqual({
+      result: "reader",
+      outboxRowId: turnOne.outboxRowId,
+      reader: "customer",
+      from: "signUpLine",
+      roleId: null,
+    });
+
+    for (const reading of [noPerson, twoLanes, custLine]) {
+      expect(rowReaderProblems(exchangeOf(given, reading.request, reading.outcome))).toEqual([]);
+      expect(rowReaderProblems(asOwner(reading.request))).not.toEqual([]);
+      expect(reading.outcome.outboxRowId).toBe(reading.request.outboxRowId);
+    }
+
+    // A line to no reader lane (the customer's own AI, agent): lineHasNoReader; outside section 1: noRole, any lane.
+    const toRosie = await readingOf(turnOne, withSayTo(["agent"]));
+    expect(toRosie.outcome).toMatchObject({ error: "noReader", why: "lineHasNoReader" });
+    const outside = await readingOf(turnOne, withSection(5));
+    expect(outside.request).toMatchObject({ section: 5, lineTo: "owner" });
+    expect(outside.outcome).toMatchObject({ error: "noReader", why: "noRole" });
+  });
+
+  it("the by-role branch ties the reader to readerOf(role) and the role id to one of the request's roles, never to the line", async () => {
+    const withRoles = (roles: { roleId: string; role: Role; version: number }[]): OutboxRowRead =>
+      rowWith((row) => ({ ...row, recipient: { ...row.recipient, roles } }));
+    const given = rowReaderFixture("row-reader-s1-02-owner.json").given;
+    const role = (roleId: string, held: Role) => ({ roleId, role: held, version: 1 });
+    const cases: { roles: ReturnType<typeof role>[]; roleId: string | null }[] = [
+      { roles: [role("role-sam-barber", "owner")], roleId: "role-sam-barber" },
+      { roles: [role("role-sam-admin", "admin")], roleId: "role-sam-admin" },
+      // The role the message is for (default 10): S1-02's line is to the owner, so the customer role is passed over.
+      {
+        roles: [role("role-a-customer", "customer"), role("role-b-owner", "owner")],
+        roleId: "role-b-owner",
+      },
+      // No role the recipient holds reads S1-02's line: refused, never read by the line though it goes to the owner.
+      { roles: [role("role-sam-staff", "staff")], roleId: null },
+      { roles: [role("role-sam-own", "own_business")], roleId: null },
+    ];
+    for (const each of cases) {
+      const { request, outcome } = await readingOf(withRoles(each.roles));
+      expect(request.recipient.roles).toEqual(each.roles);
+      expect(outcome.outboxRowId).toBe(request.outboxRowId);
+      expect(rowReaderProblems(exchangeOf(given, request, outcome))).toEqual([]);
+      if (each.roleId === null) {
+        expect(outcome).toEqual({
+          error: "noReader",
+          outboxRowId: request.outboxRowId,
+          why: "roleReadsAsNoOne",
+        });
+        continue;
+      }
+      if (!("result" in outcome) || outcome.from !== "roles") throw new Error("read by a role");
+      const held = request.recipient.roles.find((one) => one.roleId === outcome.roleId);
+      expect(outcome.roleId).toBe(each.roleId);
+      expect(held).toBeDefined();
+      expect(outcome.reader).toBe(readerOf(held?.role ?? "own_business"));
+    }
+  });
+
+  it("the sign-up reading's role is never stored or handed on: compose input reads the owner, and the read's roles stay empty", async () => {
+    const read = outboxRowTurnOne();
+    const doubles = rowDoubles({ row: read });
+    const row = await composeRowOf(doubles.binding, structuredClone(read));
+    expect(row.role).toBe("owner");
+    expect(row.name).toBe("Sam");
+    expect(read.recipient.roles).toEqual([]);
+    expect(doubles.plans).toEqual([]);
+    // lineToOf alone: S1-02's one line from Rosie, to the owner, at index 0; none at index 1.
+    const step = (sampleBundle("bundle-v0-skeleton.json").flows.A as { steps: Record<string, Json> }).steps[
+      "S1-02"
+    ];
+    if (step === undefined) throw new Error("bundle v0 holds S1-02");
+    expect(lineToOf(step, 0)).toBe("owner");
+    expect(lineToOf(step, 1)).toBeNull();
   });
 });
 

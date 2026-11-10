@@ -5,15 +5,14 @@
 // runCore and the safety service, is never stood in for. Values come only from the contracts' fixtures and the master's
 // sample cast (rule 9).
 //
-// What main cannot give yet is named, each with what it waits for, never faked (DL-346's rule, as T-315's WAITING):
-//   - GATE_WAITING: limit 1 names no sign-up door (K-02 v1.1's signUp: gate/limit-1/allowed.ts changeOf answers unknown
-//     for any door it does not list), so it stops turn 1's part with askedDecider (nobodyDecides), where K-09 v1.5's
-//     commit-s1-01.json and ADR-013 section 2 pass it. A check fails, naming the entry, once limit 1 passes the door.
-//   - READER_WAITING: turn 1's recipient holds no role yet (ADR-013 default 130; T-1148's seed), and K-05 v1.3 item 35's
-//     table gives the reader from the recipient's live roles, "with none, refused", where K-09's compose-input-s1-02.json
-//     reads him as the owner. Which reader a new owner's first reply has is the architect's to rule.
+// Round 2 (DL-364, DL-370): limit 1 passes turn 1's sign-up door since T-1183, and a row to someone with no role on the
+// sign-up section is read by its line's audience since T-1184 (K-05 v1.5 item 44), so nothing of turn 1 waits here any
+// more. K-05 v1.5's rowReader fixtures and schema, read below, are what rows.ts's reader mapping is held to.
 
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+import Ajv2020 from "ajv/dist/2020.js";
 
 import type { GateAndCommitRequest } from "../../commit";
 import type { CommitTurnContext } from "../../commit";
@@ -36,6 +35,7 @@ import {
 } from "../../frontier/assemble/test-support";
 import type { GatePart, GateTurn, LimitVerdict } from "../../gate/framework";
 import { contractFile, fixture } from "../test-support";
+import { CONTRACTS_DIR, formatProblems } from "../validator";
 import {
   bundleStepCards,
   turnCommitDeps,
@@ -54,6 +54,8 @@ import {
   type RowBinding,
   type RowData,
   type RowErrorAnswer,
+  type RowReaderOutcome,
+  type RowReaderRequest,
 } from "./rows";
 import type { TurnFaceCalls } from "./turn-face";
 
@@ -83,6 +85,16 @@ export function commitS101(): CommitS101 {
 }
 
 /**
+ * What main's commit answers beyond commit-s1-01.json, named and never faked: `written` lists the core action's own row,
+ * the text's safety record, before the rows the fixture states. K-09 v1.5 default 134 leaves the core action's rows out
+ * of `written` ("named in its response", as recordSafetyOutcome's outcomeId names it), while T-305's commit hands on
+ * K-05 commitTurn's list whole (actions/src/commit, outside this card). Emptied once the commit leaves it out.
+ */
+export const CORE_ROW_IN_WRITTEN: readonly Json[] = [
+  { table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 },
+];
+
+/**
  * commit-s1-01.json's request with its decided context taken from the frontier's answer (each call's output feeding the
  * next: DL-322), or the fixture's own context when the frontier gave none (main's frontier fails closed while its door
  * waits: T-315's WAITING), so the commit always reads the context the turn's frontier gives, or would give.
@@ -96,33 +108,7 @@ export function commitRequestAfter(frontierContext: unknown): GateAndCommitReque
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// What main's gate cannot give yet (the module note)
-
-/** A limit main's gate fails a part on where the fixture passes it, with what it waits for. */
-export interface GateWaiting {
-  readonly limit: 1;
-  readonly part: number;
-  readonly door: "signUp";
-  readonly step: string;
-  /** What main's limit answers instead: askedDecider, by nobodyDecides (changeOf's unknown). */
-  readonly answers: { readonly outcome: "ask"; readonly action: "askedDecider" };
-  /** What it waits for: a change to limit 1 outside this card (the T-1141 report's new task). */
-  readonly waitsFor: string;
-}
-
-export const GATE_WAITING: readonly GateWaiting[] = [
-  {
-    limit: 1,
-    part: 0,
-    door: "signUp",
-    step: "S1-01",
-    answers: { outcome: "ask", action: "askedDecider" },
-    waitsFor: "limit 1 passes K-02 v1.1's sign-up door (ADR-013 section 2): a new task from T-1141's report",
-  },
-];
-
-/** Whether main's limit 1 still stops turn 1's sign-up door: the expectations that follow GATE_WAITING read it. */
-export const LIMIT_ONE_WAITS: boolean = GATE_WAITING.length > 0;
+// The gate's slot 1 on turn 1's part
 
 /** The gate's turn for one part of a request, as runGate builds it, on a repo that is no database. */
 export function gateTurnOf(request: GateAndCommitRequest): { part: GatePart; turn: GateTurn } {
@@ -328,19 +314,106 @@ export function commitContextOf(request: GateAndCommitRequest): CommitTurnContex
 // ---------------------------------------------------------------------------------------------------------------
 // Compose input and finalize: K-05 v1.3's row reads as doubles, the bundles the row was committed under
 
-/** What main cannot give yet for turn 1's row (the module note). */
-export const READER_WAITING: readonly { readonly roles: "none"; readonly waitsFor: string }[] = [
-  {
-    roles: "none",
-    waitsFor:
-      "the reader of a reply to a person who holds no role yet (K-05 v1.3 item 35: with none, refused): the architect's ruling, from T-1141's report",
-  },
-];
-
 /** K-05 v1.3's read-outbox-row-s1-02.json answer (S1-02's row to Sam, the owner, after commit-s1-01-sam.json). */
 export function outboxRowS102(): OutboxRowRead {
   return (contractFile("data-access/fixtures/read-outbox-row-s1-02.json") as { outcome: OutboxRowRead })
     .outcome;
+}
+
+/**
+ * Turn 1's row as it runs (K-05 v1.5 row-reader-s1-02-no-role.json's given): read-outbox-row-s1-02.json's answer with
+ * recipient.roles empty, as T-1148's seed stores Sam (ADR-013 default 130): a person who holds no role yet.
+ */
+export function outboxRowTurnOne(): OutboxRowRead {
+  const read = outboxRowS102();
+  return { ...read, recipient: { ...read.recipient, roles: [] } };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// K-05 v1.5's rowReader: its fixtures and its schema (README item 44)
+
+/** One rowReader exchange (K-05 v1.5 rowReader.exchange). */
+export interface RowReaderExchange {
+  readonly call: "rowReader";
+  readonly given: Json;
+  readonly request: RowReaderRequest;
+  readonly outcome: RowReaderOutcome;
+}
+
+/** K-05 v1.5's accepted rowReader fixtures, by file name under contracts/data-access/fixtures/. */
+export const ROW_READER_ACCEPTED = [
+  "row-reader-s1-02-no-role.json",
+  "row-reader-s1-02-owner.json",
+  "row-reader-a5-05-tomas-no-role.json",
+] as const;
+
+/** K-05 v1.5's refused rowReader fixtures, under fixtures/invalid/, each with its accepted twin. */
+export const ROW_READER_REFUSED = [
+  { file: "refuse-row-reader-no-role-outside-section-1.json", twin: "row-reader-a5-05-tomas-no-role.json" },
+  { file: "refuse-row-reader-role-read-by-line.json", twin: "row-reader-s1-02-owner.json" },
+] as const;
+
+/** A rowReader fixture of K-05 v1.5, freshly parsed, by its path under contracts/data-access/fixtures/. */
+export function rowReaderFixture(file: string): RowReaderExchange {
+  return contractFile(`data-access/fixtures/${file}`) as RowReaderExchange;
+}
+
+/** The K-01 v1 sample bundles a rowReader fixture's request may pin, by their file names under bundle/fixtures/. */
+const SAMPLE_BUNDLES = ["bundle-v0-skeleton.json", "bundle-mini-a.json", "bundle-mini-b.json"];
+
+/** The K-01 v1 sample bundle whose id a rowReader request pins (its bundleId), as the frontier's fake bundles. */
+export function bundleOfRequest(request: RowReaderRequest): FakeBundles {
+  for (const file of SAMPLE_BUNDLES) {
+    const bundle = sampleBundle(file);
+    const id = bundle.manifest.bundleId as { hash: string; build: number };
+    if (id.hash === request.bundleId.hash && id.build === request.bundleId.build) return fakeBundles(bundle);
+  }
+  throw new Error("no K-01 sample bundle has the request's bundle id");
+}
+
+/**
+ * The row read a rowReader request was read from: read-outbox-row-s1-02.json's answer with the request's row, bundle,
+ * line and recipient (the read's other fields are what item 44 does not read).
+ */
+export function readOfRequest(request: RowReaderRequest): OutboxRowRead {
+  const read = outboxRowS102();
+  return {
+    ...read,
+    outboxRowId: request.outboxRowId,
+    row: { ...read.row, bundleId: { ...request.bundleId } },
+    line: { ...request.line },
+    recipient: {
+      ...read.recipient,
+      personId: request.recipient.personId,
+      roles: request.recipient.roles.map((role) => ({ ...role })),
+    },
+  };
+}
+
+/** Every contract schema under contracts/ (Ajv 2020-12, strict, as contracts:check runs them), loaded once. */
+let contracts: Ajv2020 | undefined;
+
+function contractSchemas(): Ajv2020 {
+  if (contracts !== undefined) return contracts;
+  const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
+  const files = readdirSync(CONTRACTS_DIR, { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".schema.json") && !file.endsWith(".meta.schema.json"))
+    .filter((file) => !file.startsWith("generated") && !file.startsWith("scripts"))
+    .filter((file) => !file.includes("node_modules"));
+  for (const file of files) {
+    ajv.addSchema(JSON.parse(readFileSync(path.join(CONTRACTS_DIR, file), "utf8")) as object);
+  }
+  contracts = ajv;
+  return ajv;
+}
+
+const DATA_ACCESS_V15_ID = "https://rosie.invalid/contracts/data-access/data-access.v1.5.schema.json";
+
+/** The problems K-05 v1.5's rowReader.exchange, with item 44's rules, finds in an exchange; empty when accepted. */
+export function rowReaderProblems(exchange: unknown): string[] {
+  const validate = contractSchemas().getSchema(`${DATA_ACCESS_V15_ID}#/$defs/rowReader.exchange`);
+  if (validate === undefined) throw new Error("K-05 v1.5 has no rowReader.exchange");
+  return validate(exchange) ? [] : formatProblems(validate.errors);
 }
 
 /** K-05 v1.3's fixed-line-facts-s1-02.json answer (no opener mark; the opt-out line delivered before). */

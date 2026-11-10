@@ -26,7 +26,10 @@ export type TurnFaceFault =
   | "bundleMissing"
   /** The row's step is in no flow graph its bundle lists (K-05 v1.3 default 53). */
   | "stepMissing"
-  /** The row's step has no line from Rosie to any reader the recipient's live roles read as (S13-31). */
+  /**
+   * No one reads the row (K-05 v1.5 rowReader's noReader, README item 44): its why says which rule refused it (noRole,
+   * lineHasNoReader or roleReadsAsNoOne).
+   */
   | "noReader"
   /** The row asks no question, so it names no step or line (K-05 v1.3 default 48): never guessed. */
   | "noLine"
@@ -39,9 +42,12 @@ export type TurnFaceFault =
 export class TurnFaceRefusedError extends Error {
   override name = "TurnFaceRefusedError";
   readonly fault: TurnFaceFault;
+  /** Why, where the fault has a rule of its own (noReader: rowReader's why), a label; else null. */
+  readonly why: string | null;
 
-  constructor(fault: TurnFaceFault) {
-    super(`the turn face refuses: ${fault}`);
+  constructor(fault: TurnFaceFault, why: string | null = null) {
+    super(why === null ? `the turn face refuses: ${fault}` : `the turn face refuses: ${fault} (${why})`);
     this.fault = fault;
+    this.why = why;
   }
 }

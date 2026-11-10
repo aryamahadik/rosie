@@ -10,8 +10,14 @@
 //     is refused, never guessed; a safety row (fixedLineRow) is the handlers' fixed-line refusal;
 //   - the flow the step is read in: default 53 (an A or B step's own; a shared step's, the booking's, else the first of A,
 //     then B, that the row's bundle lists whose graph holds the step; none: stepMissing);
-//   - the reader: the one of the recipient's live roles the step's line from Rosie is written to (identity and access,
-//     S13-31: "the role comes from what the message is about"), through readerOf; with none, refused (noReader);
+//   - the reader (ComposeRow.role, FinalizeRow.reader): K-05 v1.5 item 44's mapping, exactly as its rowReader states it
+//     (rowReaderOf below; T-1184, DL-364, DL-370): a recipient who holds a live role at the row's business is read by the
+//     role the message is for, through readerOf, never by the line; a recipient who holds no role is read by the audience
+//     of the step line the row carries only when they are a person (default 64), the step is in section 1 of its flow (K-01
+//     step.section, default 65) and that line's lane, told with no role (default 62), is owner, staff or cust; every other
+//     row is refused (noReader, with rowReader's why). The sign-up reading's ComposeRow.role is the reader's own name
+//     (default 63): it is how this one call reads the row, never written, cached or handed on as a role the person holds.
+//     Only the row's own recipient's roles are read, as readOutboxRow answers them (S13-31);
 //   - the source: the business head (biz.name and its display name), the business's zone, the row's channel, ask.by from
 //     the question's armed clock row; the sensitive switch ON (DL-326 note b: fail closed until the business's switch is
 //     read, so a first text shows the display name);
@@ -38,7 +44,13 @@
 //   9. The danger text's writer's row carries each danger outcome's K-01 line once (crisis words: safetyCrisis; an
 //      emergency and every other danger outcome: safetyEmergency; Unsure: safetyCrisis, which also gives 911, since the
 //      read does not say its danger words' kind); a threat's writer gets none (S13-10).
+//  10. The role the message is for (rowReader's by-role branch, "the caller's": K-05 v1.5 README item 44; T-308) is the
+//      first of the recipient's live roles, in role id order as stored, whose reader the step's line from Rosie at the
+//      row's index is written to (S13-31: "the role comes from what the message is about"). When none is (every role reads
+//      as no one, or as a reader the line is not written to), no role the recipient holds reads the row: it is refused as
+//      roleReadsAsNoOne, the one refusal K-05 v1.5's rules give a recipient who holds a role, who is never read by the line.
 
+import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.5";
 import { NotBuiltError } from "../errors";
 import {
   ComposeInputRefusedError,
@@ -108,7 +120,7 @@ export interface OutboxRowRead {
     readonly hasPlan: boolean;
     readonly finalParts: FinalizeRow["finalParts"];
   };
-  readonly line: { readonly step: string; readonly index: number; readonly from: string } | null;
+  readonly line: { readonly step: string; readonly index: number; readonly from: "openQuestion" } | null;
   readonly recipient: {
     readonly handleId: string;
     readonly kind: "phone" | "email";
@@ -225,16 +237,123 @@ function linesTo(step: Json, reader: Reader): Json[] {
   );
 }
 
+// ---- the reader: K-05 v1.5 rowReader (README item 44; defaults 62 to 65) ---------------------------------------------
+
+/** K-05 v1.5 rowReader's request: what the reader mapping reads, from one row read and the row's bundle. */
+export type RowReaderRequest = K05.RowReaderRequest;
+
+/** K-05 v1.5 rowReader's outcome: the reader, by a role or by the sign-up line, or noReader with why. */
+export type RowReaderOutcome = K05.RowReaderResponse | K05.RowReaderErrors;
+
+/** K-01 v1's lanes (bundle.v1 lane). */
+const LANES: readonly string[] = ["owner", "san", "staff", "cust", "agent", "pay", "out", "other"];
+
+const isLane = (value: unknown): value is K05.Lane => typeof value === "string" && LANES.includes(value);
+
+/** Section 1 of a flow, the sign-up section the sign-up door enters (K-02 v1.1 default 9; ADR-013 section 3). */
+const SIGN_UP_SECTION = 1;
+
+/** A flow graph's sections, 1 to 13 (K-01 v1 step.section; SPEC-master section 1). */
+const isSection = (value: unknown): value is number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 13;
+
 /**
- * The reader: the first of the recipient's live roles (in role id order) whose reader the step's line from Rosie at the
- * row's index is written to (S13-31); with none, refused.
+ * Default 62: the lane of the step line the row carries, told with no role: the step's `say` messages from Rosie (from
+ * san), in say order. When they all go to one lane, that lane, the row's index counted among them; null when they go to
+ * two or more lanes (the index counts the lines to a reader, which only a role names), and null when the step has no line
+ * from Rosie at that index.
  */
-function readerAndRole(read: OutboxRowRead, step: Json, index: number): { reader: Reader; role: Role } {
-  for (const { role } of read.recipient.roles) {
-    const reader = readerOf(role);
-    if (reader !== null && linesTo(step, reader)[index] !== undefined) return { reader, role };
+export function lineToOf(step: Json, index: number): K05.Lane | null {
+  const say: unknown[] = Array.isArray(step.say) ? step.say : [];
+  const fromRosie = say.filter(
+    (message): message is Json => isRecord(message) && message.from === ROSIE_LANE,
+  );
+  const lanes = new Set(fromRosie.map((message) => message.to));
+  const [lane] = lanes;
+  return lanes.size === 1 && isLane(lane) && fromRosie[index] !== undefined ? lane : null;
+}
+
+/** The reader a reader lane names (K-01 lane to K-03 readerRole: READER_LANES, read back): owner, staff and cust. */
+function readerOfLane(lane: K05.Lane | null): Reader | null {
+  const readers: readonly Reader[] = ["owner", "staff", "customer"];
+  return readers.find((reader) => READER_LANES[reader] === lane) ?? null;
+}
+
+/**
+ * K-05 v1.5 rowReader (README item 44), exactly. A recipient who holds a live role at the row's business is read by the
+ * role the message is for, through readerOf, and never by the line: the first role whose reader `lineFor` says the
+ * step's line at the row's index is written to (default 10), else noReader roleReadsAsNoOne. A recipient who holds no
+ * role is read by the line's audience only as a person (default 64) on a section 1 step (default 65) whose line goes to
+ * owner, staff or cust (default 62): by the sign-up line, with no role id (default 63). Every other one is refused:
+ * noReader, noRole (no person, or outside section 1) or lineHasNoReader (a line to no reader, or lineTo null).
+ */
+export function rowReaderOf(
+  request: RowReaderRequest,
+  lineFor: (reader: Reader) => boolean,
+): RowReaderOutcome {
+  const { outboxRowId, recipient } = request;
+  const noReader = (why: K05.NoReaderError["why"]): K05.NoReaderError => ({
+    error: "noReader",
+    outboxRowId,
+    why,
+  });
+  if (recipient.roles.length > 0) {
+    for (const { roleId, role } of recipient.roles) {
+      const reader = readerOf(role);
+      if (reader !== null && lineFor(reader)) {
+        return { result: "reader", outboxRowId, reader, from: "roles", roleId };
+      }
+    }
+    return noReader("roleReadsAsNoOne");
   }
-  throw new TurnFaceRefusedError("noReader");
+  if (recipient.personId === null || request.section !== SIGN_UP_SECTION) return noReader("noRole");
+  const reader = readerOfLane(request.lineTo);
+  if (reader === null) return noReader("lineHasNoReader");
+  return { result: "reader", outboxRowId, reader, from: "signUpLine", roleId: null };
+}
+
+/** One row's reader, as item 44 maps it: rowReader's request, built from the read and the row's bundle, and its outcome. */
+export interface RowReading {
+  readonly request: RowReaderRequest;
+  readonly outcome: RowReaderOutcome;
+  /** The step the request was read from, in its flow (default 53). */
+  readonly step: StepRead;
+}
+
+/**
+ * The reader of one row read (item 35's table, row role; FinalizeRow.reader): rowReader's request from readOutboxRow's
+ * answer (the row, its bundle and line, its own recipient's person and live roles as stored) and the row's bundle (the
+ * flow, the step's section, the lane of its line), then rowReaderOf. A null line, a step the bundle does not hold and a
+ * step with no section are refused before a reader is looked for (noLine, stepMissing).
+ */
+export async function readerOfRow(bundles: ComposeBundles, read: OutboxRowRead): Promise<RowReading> {
+  const line = read.line;
+  if (line === null) throw new TurnFaceRefusedError("noLine");
+  const step = await stepOf(bundles, read, line.step);
+  const section = step.step.section;
+  if (!isSection(section)) throw new TurnFaceRefusedError("stepMissing");
+  const request: RowReaderRequest = {
+    outboxRowId: read.outboxRowId,
+    bundleId: { hash: read.row.bundleId.hash, build: read.row.bundleId.build },
+    line: { step: line.step, index: line.index, from: line.from },
+    recipient: {
+      personId: read.recipient.personId,
+      roles: read.recipient.roles.map(({ roleId, role, version }) => ({ roleId, role, version })),
+    },
+    flow: step.flow,
+    section,
+    lineTo: lineToOf(step.step, line.index),
+  };
+  const outcome = rowReaderOf(request, (reader) => linesTo(step.step, reader)[line.index] !== undefined);
+  return { request, outcome, step };
+}
+
+/** ComposeRow.role for a reading: the role the message is for, or the reader's own name (default 63), never stored. */
+function roleOfReading(read: OutboxRowRead, outcome: K05.RowReaderResponse): Role {
+  if (outcome.from === "signUpLine") return outcome.reader;
+  const held = read.recipient.roles.find((each) => each.roleId === outcome.roleId);
+  if (held === undefined) throw new TurnFaceRefusedError("noReader", "roleNotHeld");
+  return held.role;
 }
 
 /** Default 4: how Rosie addresses the reader, the first word of the stored name. */
@@ -285,10 +404,15 @@ async function viewOf(
   const question = read.slotSource.question;
   if (question !== null && question.options.length > 0) throw new NotBuiltError(call);
   const stepId = read.line.step;
-  const step = await stepOf(binding.bundles, read, stepId);
-  const { reader, role } = readerAndRole(read, step.step, read.line.index);
+  // Item 44's mapping (K-05 v1.5 rowReader): the reader, or the row refused with rowReader's why.
+  const { outcome, step } = await readerOfRow(binding.bundles, read);
+  if ("error" in outcome) throw new TurnFaceRefusedError("noReader", outcome.why);
+  const { reader } = outcome;
+  const role = roleOfReading(read, outcome);
   const line = linesTo(step.step, reader)[read.line.index];
-  if (line === undefined || typeof line.text !== "string") throw new TurnFaceRefusedError("noReader");
+  if (line === undefined || typeof line.text !== "string") {
+    throw new TurnFaceRefusedError("noReader", "lineHasNoReader");
+  }
   const optOutLines = optOutLinesOf(step.manifest);
   const clock = question?.clockRow ?? null;
   const askBy =
