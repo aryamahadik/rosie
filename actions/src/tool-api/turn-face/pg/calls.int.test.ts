@@ -256,7 +256,10 @@ describe("the card's integration line: one turn from gate and commit to finalize
     await whole.close();
   });
 
-  /** The turn's three calls after the frontier, in turn order, each on the turn's trace, with the spans they left. */
+  /**
+   * The turn's three calls after the frontier, in turn order, each on the turn's trace, with the spans they left: none of
+   * the base's since T-1193, the handle actor's turn recording those hops itself.
+   */
   async function runTurn() {
     const request = pinnedRequest();
     const commitTrace = traceFor(request);
@@ -327,12 +330,9 @@ describe("the card's integration line: one turn from gate and commit to finalize
       `;
       expect(entries.length).toBeGreaterThan(0);
       for (const entry of entries) expect([entry.turn_id, entry.trace_id]).toEqual([TURN, TRACE]);
-      // Each call's one span, gate then fillAndChecks twice, on the same turn and trace.
-      expect(first.spans.map((span) => [span.hop, span.turn_id, span.trace_id])).toEqual([
-        ["gate", TURN, TRACE],
-        ["fillAndChecks", TURN, TRACE],
-        ["fillAndChecks", TURN, TRACE],
-      ]);
+      // No span of the base's: the turn records the gate, the commit and each row's fillAndChecks itself, and the face
+      // tells the base so (T-1193; DL-376), so each of those hops is the turn's alone.
+      expect(first.spans).toEqual([]);
 
       // Replaying the turn writes nothing twice: the commit answers the first, repeated; compose input and finalize each
       // answer alreadyPlanned for the row that holds its plan, finalize with the parts written; no row, version or entry

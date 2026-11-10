@@ -2,7 +2,9 @@
 // or write goes through one of K-09 v1's calls, made here. For one call, in this order:
 //
 //   1. its span opens on the caller's trace (K-08 v1.1): a page's call is a pageRequest, an outside AI's an
-//      agentApiRequest, any other the call's own hop (calls.ts);
+//      agentApiRequest, any other the call's own hop (calls.ts); unless the caller records that hop itself (CallOptions:
+//      the turn face's gateAndCommit, composeInput and finalizeMessage, whose hops the handle actor's turn records:
+//      T-1193), when no span of the base's opens for the call, and steps 2 to 6 run as they always do;
 //   2. the name must be a call of K-09 v1 (unknownCall otherwise);
 //   3. the request must pass `$defs/<call>.request` and name the trace the call runs in (invalidRequest otherwise);
 //   4. the request must name a business (noBusinessScope otherwise): row-level security scopes every call by it (arch 10
@@ -12,9 +14,10 @@
 //   6. the handler's answer must pass `$defs/<call>.response`, or `$defs/<call>.errors`, which the contract says are
 //      "Refused, nothing written", so an error answer rolls the transaction back; an answer that passes neither is the
 //      handler's fault, rolled back and thrown (ToolApiContractError), never passed on;
-//   7. the span records the outcome: the trace id and bundle id are the trace's, the handle is the trace's handle id, and
-//      what the span got and decided are labels and counts only (the call, the caller's kind, what was answered), so no
-//      phone number and no person's words can reach it (K-08 v1 "Never the raw number or words").
+//   7. the span, when step 1 opened one, records the outcome: the trace id and bundle id are the trace's, the handle is
+//      the trace's handle id, and what the span got and decided are labels and counts only (the call, the caller's kind,
+//      what was answered), so no phone number and no person's words can reach it (K-08 v1 "Never the raw number or
+//      words").
 //
 // Steps 2 to 4 answer before anything is read or written. Each call's own logic is T-291 onward: until then every
 // handler is a stub that answers notBuilt (notBuiltHandlers).
@@ -78,9 +81,25 @@ export type Handlers<Repo> = { readonly [C in CallName]: Handler<C, Repo> };
 /** What a call answers: its handler's response or error, or the base's own refusal (errors.ts). */
 export type CallAnswer = AnswerOf<CallName> | BaseRefusal;
 
+/** How one call runs (T-1193; DL-376). Left out or empty, the base records the call's span, as it always has. */
+export interface CallOptions {
+  /**
+   * The hop the caller records itself (K-08 v1.1: the hop check fails a hop recorded twice). The handle actor's turn
+   * records the gate (one span per part, with its limits) and the commit around gateAndCommit, and one fillAndChecks span
+   * per row, the hop composeInput and finalizeMessage take (runtime/src/turn), so the turn face names those hops for
+   * them. When it is the hop this call's span takes (hopOf), the base records no span for the call. Nothing else changes:
+   * the checks, the scope, the handler (whose span notes then go nowhere), the answer and every error are as without it.
+   * Any other hop changes nothing at all: a page's call keeps its pageRequest span, an agent's its agentApiRequest.
+   */
+  readonly callerRecordsHop?: Hop;
+}
+
 export interface ToolApi {
-  /** Runs one call; `call` and `request` come as given (a page's or an agent's text included) and are checked first. */
-  call(call: string, request: unknown, trace: CallTrace): Promise<CallAnswer>;
+  /**
+   * Runs one call; `call` and `request` come as given (a page's or an agent's text included) and are checked first.
+   * `options` changes only whether the base records the call's span (CallOptions).
+   */
+  call(call: string, request: unknown, trace: CallTrace, options?: CallOptions): Promise<CallAnswer>;
 }
 
 /** What the span of a refused span reports, labels only. */
@@ -218,12 +237,13 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
   };
 
   return {
-    async call(name, request, trace) {
+    async call(name, request, trace, options) {
       const call = isCallName(name) ? name : undefined;
       const rawKind = callerOf(request)?.kind;
       const callerKind: CallerKind | undefined = isCallerKind(rawKind) ? rawKind : undefined;
       const hop: Hop = hopOf(call, callerKind);
-      const timing = trace.start(hop);
+      // The caller records this hop itself (CallOptions): the call has no span of the base's, so nothing is timed or kept.
+      const timing = options?.callerRecordsHop === hop ? null : trace.start(hop);
       const notes: SpanNotes = { limits: [], rows: [] };
       const got: SpanFacts = {
         ...(call === undefined ? {} : { toolCall: call }),
@@ -232,6 +252,7 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
       let spanBusinessId: string | undefined;
 
       const finish = (ending: Ending): void => {
+        if (timing === null) return;
         const decided: SpanFacts = {
           answered: ending.answered,
           ...(ending.problems === undefined ? {} : { problems: ending.problems }),
