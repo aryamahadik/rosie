@@ -11,8 +11,9 @@
 //   3. the open questions' bookings' visit times (FrontierRepo.readVisitTimes; K-05 v1.2 open gap 25);
 //   4. the context's flow (frame.ts), and the flow graphs of the pinned bundle and of each bundle an open question was
 //      asked under;
-//   5. every source in its slot (registry.ts), assembled (assemble.ts): a source not built, throwing or refused offers
-//      nothing and is logged;
+//   5. every source in its slot (registry.ts frontierSources, made for the bundles port the call reads with: the
+//      hubs-and-doors source reads its doors' words through it), assembled (assemble.ts): a source not built, throwing
+//      or refused offers nothing and is logged;
 //   6. the cap (T-295, cap/): over 60 choices, each booking other than the target collapses to one 'which booking?'
 //      choice (arch 03 line 167), named in `collapsedBookingIds`; still over 60: tooManyChoices with the count;
 //   7. the facts the choices' steps need, each once from its one home with its row and version, read strong: the
@@ -34,7 +35,7 @@ import { readBundle, readManifest, flowOfStep, type ManifestView } from "./bundl
 import { defaultChecker, type FrontierChecker } from "./check";
 import { DEFAULT_BUSINESS_LANGUAGE, contextFlowOf, frameFacts, namedPersons, writerOf } from "./frame";
 import { consoleSink, frontierLogger, type FrontierLogSink } from "./log";
-import { FRONTIER_SOURCES } from "./registry";
+import { frontierSources } from "./registry";
 import {
   bundleKey,
   type BuildFrontierAnswer,
@@ -70,7 +71,7 @@ export class FrontierError extends Error {
 export interface FrontierOptions {
   /** The bundles, read under their ids (KV, or PostgreSQL's copy on a miss). */
   bundles: FrontierBundles;
-  /** The slots, in order. Default: FRONTIER_SOURCES. */
+  /** The slots, in order. Default: the registry's, made for `bundles` (registry.ts frontierSources). */
   sources?: readonly SourceSlot[];
   /** Where the frontier's log lines go. Default: one JSON line each on console.warn. */
   log?: FrontierLogSink;
@@ -199,7 +200,7 @@ async function buildFrontier(
     bundles,
     log,
   };
-  const assembled = await assemble(options.sources ?? FRONTIER_SOURCES, input, checker);
+  const assembled = await assemble(options.sources ?? frontierSources(options.bundles), input, checker);
   if (assembled.choices.length === 0) throw new FrontierError("noChoices");
 
   // 6. The cap.
