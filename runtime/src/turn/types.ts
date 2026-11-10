@@ -371,9 +371,17 @@ export type FinalizeMessageAnswer = FinalizeMessageResponse | ToolApiError;
 /**
  * K-09 v1's turn face, as the turn reaches it (C-074, the Tool API; joined at D-017). Each call is handed the turn's trace;
  * the turn records the call's own span (frontier, search, gate and commit; after the commit fillAndChecks and
- * rewriteOrFallback), so a joined port records only what runs beneath it, never the same hop again.
+ * rewriteOrFallback), so a joined port records only what runs beneath it, never the same hop again. The one exception is
+ * a hop whose port records its own span, which says so with that hop's flag (one flag per hop: `recordsFrontierSpan`
+ * now), and then the turn starts none for it, so the hop is still recorded once (K-08).
  */
 export interface TurnFace {
+  /**
+   * True when buildFrontier records the call's frontier span itself (CQ-159, T-557): @rosie/actions' Tool API base does,
+   * on the trace it is handed, with the call's own fields. The turn then starts no frontier span of its own. Left out or
+   * false: the turn records it.
+   */
+  readonly recordsFrontierSpan?: boolean;
   buildFrontier(request: BuildFrontierRequest, trace: TraceContext): Promise<BuildFrontierAnswer>;
   closestEntries(request: ClosestEntriesRequest, trace: TraceContext): Promise<ClosestEntriesAnswer>;
   /**

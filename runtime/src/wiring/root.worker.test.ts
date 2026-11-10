@@ -11,6 +11,8 @@
 // count as the actor's own receive span is, and is checked on its own. Since T-556 joined the bundle reads and the
 // guard's targets, the turn pins bundle v0 as bundles/v0 publishes it (./test-support.ts fakeBundleReads, a K-05
 // double), and the guard reads test owner 1's seeded targets (fakeHandleTargets, as targets-first-text.json answers).
+// Since T-557 joined the frontier, the turn's frontier is @rosie/actions' turn face over the bundle the turn pinned and
+// test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span.
 // Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
 // receipt door marks the part delivered and arms its clock.
 //
@@ -170,6 +172,8 @@ function rig(log: MockInstance): Run {
     // The bundle and targets ports (T-556) on their K-05 doubles: bundle v0 as bundles/v0 publishes it is active.
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
+    // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, so the frontier's answer is turn 1's.
+    frontierScope: fakes.frontier.scope,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);

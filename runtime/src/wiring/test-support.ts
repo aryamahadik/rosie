@@ -1,9 +1,10 @@
 // Doubles for the composition root's tests (T-550, T-552): the fake set the test environment binds (./picks.ts), every
 // port not joined yet on the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's
-// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's frontier, decide and commit
-// retargeted to the running turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit
-// wrote, the dispatcher's K-05 store holding that row, and a delivery receipt that arms A7-03's clock. Not imported by the
-// Worker.
+// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's decide and commit retargeted to the
+// running turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit wrote, the
+// dispatcher's K-05 store holding that row, and a delivery receipt that arms A7-03's clock. The frontier is the joined one
+// (T-557): its K-05 double answers for test owner 1's seeded rows, so the turn's context is the real frontier's. Not
+// imported by the Worker.
 //
 //   linqVerify   joined (T-552): the root binds the Linq adapter's verify (./real.ts). What it is fed comes from here:
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
@@ -30,12 +31,20 @@
 //                realTargets). What it is fed comes from here: `fakeHandleTargets`, a K-05 double holding test owner 1's
 //                seeded rows (T-1148, db/seeds/skeleton.ts: handle-sam at the fictional 555-0100, person-sam, no role, no
 //                phone row), answering for that handle as targets-first-text.json and notFound for any other
+//   frontier     joined (T-557): the root binds @rosie/actions' turn face through its real frontier port (./real.ts
+//                realFrontier), over the bundle the turn's run pinned. What it is fed comes from here:
+//                `fakeFrontierScope`, the frontier's business scope over a K-05 v1.2 readTurnState double holding test
+//                owner 1's seeded rows (T-1148: Lee's Barbershop's business head, Sam with no role, open question,
+//                booking, phone row or language), answering as T-315's integration test shows the real readTurnState
+//                answers on those rows under Lee's Barbershop's scope, and refusing a read that names another business
+//                than the call's scope, as T-219's readTurnStateIn does
 //   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
 //                dispatch/test-support FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor
 //                directory
-//   turnFace     turn/test-support fakeTurnFace (frontier, gate, compose input from the S1-02 fixtures) and
+//   turnFace     turn/test-support fakeTurnFace (closest entries, gate, compose input from the S1-02 fixtures) and
 //                safety/test-support fakeCore
-//   decide       turn/test-support fakeDecide (decide-s1-02-choose.json)
+//   decide       turn/test-support fakeDecide (decide-s1-02-choose.json), which keeps each context it is given: the
+//                frontier's answer
 //   composer     turn/test-support fakeComposer (finalize-pass.json's plan)
 //   finalize     the same fakeTurnFace (finalize-pass.json)
 //   dataAccess   turn/test-support fakeRows (the commit's one row), dispatch/test-support FakeOutboxStore, and
@@ -46,6 +55,7 @@
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
 // cast, the frozen fixtures' ids, the fictional 555-01xx numbers (rule 9) and a webhook secret made up for each run.
 
+import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
@@ -61,10 +71,11 @@ import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.
 import commitRepeatJson from "@rosie/contracts/data-access/fixtures/commit-repeat-same-turn.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import targetsFirstTextJson from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
+import seedBusinessHead from "@rosie/contracts/db-schema/core/fixtures/seed-business-head.json";
+import seedPersonRoles from "@rosie/contracts/db-schema/core/fixtures/seed-person-roles.json";
 import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
-import buildFrontierS102 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
@@ -73,6 +84,7 @@ import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import { BusinessScopeError } from "@rosie/db/repo/scope";
 import type {
   HandleTargetsOutcome,
   HandleTargetsRequest as K05HandleTargetsRequest,
@@ -100,6 +112,7 @@ import {
   SAM,
   turnFaceOf,
   unplannedRow,
+  type FakeDecide,
   type FakeTurnFace,
 } from "../turn/test-support";
 import type { GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
@@ -107,6 +120,7 @@ import type { Ports } from "./ports";
 import type {
   BundleReadCalls,
   CommitTurnCall,
+  FrontierScope,
   HandleSealingKeyCall,
   HandleTargetsCall,
   LinqVerifyInputs,
@@ -717,6 +731,153 @@ export function fakeHandleTargets(seeded: readonly SeededHandle[] = [TEST_OWNER_
   };
 }
 
+// ---- K-05 v1.2 readTurnState under the frontier's scope, as a double: test owner 1's seeded rows (T-557) -----------
+
+type SeededValue = string | number | null;
+
+/** One seeded row as T-1148's seed writes it (db/seeds/skeleton.ts SKELETON_ROWS): its columns and its version. */
+interface SeededRow {
+  readonly values: Readonly<Record<string, SeededValue>>;
+  readonly version: number;
+}
+
+/** The one row of a K-04 seed fixture with this table and id. */
+function seedRowOf(
+  fixture: { readonly rows: readonly { readonly table: string; readonly values: Record<string, unknown> }[] },
+  table: string,
+  id: string,
+): Record<string, unknown> {
+  const row = fixture.rows.find((each) => each.table === table && each.values.id === id);
+  if (row === undefined) throw new Error(`the seed fixture holds no ${table} row ${id}`);
+  return row.values;
+}
+
+/**
+ * The rows T-1148's seed writes for test owner 1 (db/seeds/skeleton.ts SKELETON_ROWS), by table and id: Lee's
+ * Barbershop's business head as K-04 seed-business-head.json gives it, value for value, version included; and Sam as K-04
+ * seed-person-roles.json names him, with no language stored yet (K-02 v1.1 default 11), written once (version 1).
+ */
+const SEEDED: Readonly<Record<"businesses" | "persons", ReadonlyMap<string, SeededRow>>> = {
+  businesses: new Map([
+    [
+      TEST_OWNER_1.businessId,
+      (() => {
+        const { version, ...values } = seedRowOf(seedBusinessHead, "businesses", TEST_OWNER_1.businessId);
+        return { values: values as Record<string, SeededValue>, version: Number(version) };
+      })(),
+    ],
+  ]),
+  persons: new Map([
+    [
+      TEST_OWNER_1.personId,
+      {
+        values: {
+          id: TEST_OWNER_1.personId,
+          name: String(seedRowOf(seedPersonRoles, "persons", TEST_OWNER_1.personId).name),
+          language: null,
+        },
+        version: 1,
+      },
+    ],
+  ]),
+};
+
+/** One read the frontier made through the scope: the business the call's transaction was scoped to, and the read. */
+export interface FrontierScopeRead {
+  readonly scope: string;
+  readonly call: "readTurnState" | "readVisitTimes";
+  readonly request: unknown;
+}
+
+export interface FakeFrontierScope {
+  /** What the root's real frontier port is fed (RootOptions.frontierScope): the scope over the K-05 double. */
+  readonly scope: FrontierScope;
+  /** Every read, in order, under the scope each call ran in. */
+  readonly reads: FrontierScopeRead[];
+}
+
+/**
+ * K-05 v1.2 readTurnState for test owner 1 (T-1148's rows), read under `businessId`: his handle and its one person, no
+ * role, open question, booking, pause or consent and no phone row, and each fact from its home row with that row's
+ * version (T-315's integration test shows the real readTurnState gives exactly this on the seeded rows); notFound for
+ * another handle, a booking or a row the seed does not hold, unknownFact for a column it does not hold.
+ */
+function seededTurnState(request: ReadTurnStateRequest, readAt: string): ReadTurnStateAnswer {
+  if (request.handleId !== TEST_OWNER_1.handleId) {
+    return { error: "notFound", table: "handles", rowId: request.handleId };
+  }
+  const [booking] = request.bookingIds;
+  if (booking !== undefined) return { error: "notFound", table: "bookings", rowId: booking };
+  const facts: {
+    key: string;
+    table: string;
+    rowId: string;
+    column: string;
+    value: SeededValue;
+    version: number;
+  }[] = [];
+  for (const fact of request.facts) {
+    const table = fact.table as string;
+    const rows = table === "businesses" || table === "persons" ? SEEDED[table] : undefined;
+    const row = rows?.get(fact.rowId);
+    if (row === undefined) return { error: "notFound", table, rowId: fact.rowId };
+    const value = row.values[fact.column];
+    if (value === undefined) return { error: "unknownFact", key: fact.key, table, column: fact.column };
+    facts.push({ key: fact.key, table, rowId: fact.rowId, column: fact.column, value, version: row.version });
+  }
+  const answer = {
+    result: "turnState",
+    handleId: TEST_OWNER_1.handleId,
+    handle: { kind: TEST_OWNER_1.handle.kind, address: TEST_OWNER_1.handle.address },
+    businessId: request.businessId,
+    readAt,
+    persons: [{ personId: TEST_OWNER_1.personId, language: null, version: 1 }],
+    roles: [],
+    phone: null,
+    openQuestions: [],
+    bookings: [],
+    pauses: [],
+    consents: [],
+    facts,
+  };
+  return answer as unknown as ReadTurnStateAnswer;
+}
+
+/**
+ * The frontier's business scope (./real.ts FrontierScope) over a K-05 v1.2 readTurnState double holding test owner 1's
+ * seeded rows (T-1148), as pgFrontierScope runs the real one: each call's reads happen inside `withBusiness` for the
+ * call's business, and a read that names another business than the scope is refused before anything is read
+ * (BusinessScopeError, as T-219's readTurnStateIn refuses it). A booking's visit time is never read (K-05 v1.2 open gap
+ * 25: pgFrontierRepo answers none). `readAt` is the test clock's now.
+ */
+export function fakeFrontierScope(now: () => string = () => new Date().toISOString()): FakeFrontierScope {
+  const reads: FrontierScopeRead[] = [];
+  return {
+    reads,
+    scope: {
+      withBusiness: (businessId, work) =>
+        work({
+          readTurnState(request) {
+            reads.push({ scope: businessId, call: "readTurnState", request: structuredClone(request) });
+            if (request.businessId !== businessId) {
+              return Promise.reject(
+                new BusinessScopeError("a read names another business than the call's scope"),
+              );
+            }
+            return Promise.resolve(seededTurnState(request, now()));
+          },
+          readVisitTimes(request) {
+            reads.push({ scope: businessId, call: "readVisitTimes", request: structuredClone(request) });
+            return Promise.resolve({
+              result: "visits",
+              visits: request.bookingIds.map((bookingId) => ({ bookingId, visitAt: null })),
+            });
+          },
+        }),
+    },
+  };
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -777,12 +938,12 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 /** The ports joined so far (./picks.ts): the root builds them itself (./real.ts), fed by the doubles here. */
-type JoinedPort = "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets";
+type JoinedPort = "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets" | "frontier";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
-   * read, the turn-row calls, the bundle reads and the targets read, which the root builds (./real.ts).
+   * read, the turn-row calls, the bundle reads, the targets read and the frontier, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -820,6 +981,13 @@ export interface SkeletonFakes {
    * (RootOptions.handleTargets: `handleTargets.call`): every request, in order.
    */
   readonly handleTargets: FakeHandleTargets;
+  /**
+   * The frontier's business scope over a K-05 v1.2 readTurnState double holding test owner 1's seeded rows, for the root's
+   * real frontier port (RootOptions.frontierScope: `frontier.scope`): every read, under the scope its call ran in.
+   */
+  readonly frontier: FakeFrontierScope;
+  /** K-02's decide on its double: each context it was given (the frontier's answer), and what it answers. */
+  readonly decide: FakeDecide;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
@@ -842,6 +1010,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const turnRows = fakeTurnRows();
   const bundleReads = fakeBundleReads();
   const handleTargets = fakeHandleTargets();
+  const frontier = fakeFrontierScope(() => clock.utc());
   const core = fakeCore(clock);
   const direct = fakeDirect(clock);
   // Read when each call is made: the turn's commit records what `known` set by then.
@@ -851,7 +1020,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const ai = fakeDecide(face.log);
   const composer = fakeComposer(face.log);
   const rows = fakeRows(face.log);
-  face.frontier = (request) => swap(buildFrontierS102.outcome, [[S1_02_TURN, request.turn.id]]);
   ai.decide = (context) => decided(swap(decideS102, [[S1_02_TURN, context.turnId]]));
   face.gate = (request) => swap(commitS102.outcome, [[S1_02_TURN, request.turn.id]]) as never;
   face.composeInput = (request) =>
@@ -915,7 +1083,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       arming: { facts: arming.facts.reader, directory: arming.actors.directory },
     },
     turnFace: {
-      buildFrontier: (request, trace) => turnFace.buildFrontier(request, trace),
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       gateAndCommit: (request, at, trace) => turnFace.gateAndCommit(request, at, trace),
       composeInput: (request, trace) => turnFace.composeInput(request, trace),
@@ -940,6 +1107,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     turnRows,
     bundleReads,
     handleTargets,
+    frontier,
+    decide: ai,
     core,
     direct,
     face,

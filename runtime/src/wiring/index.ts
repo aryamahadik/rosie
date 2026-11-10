@@ -11,10 +11,12 @@ export {
   type ImplementationName,
   type PortPick,
 } from "./picks";
+export { PinnedRuns } from "./pinned-runs";
 export {
   PORTS,
   type DataAccess,
   type FinalizePort,
+  type FrontierPort,
   type LinqSend,
   type PortName,
   type Ports,
@@ -28,6 +30,7 @@ export {
   NoDatabaseError,
   NoSafetyReaderError,
   realBundles,
+  realFrontier,
   realPorts,
   realSafetyRead,
   realSealing,
@@ -38,6 +41,8 @@ export {
   TurnIdError,
   type BundleReadCalls,
   type CommitTurnCall,
+  type FrontierInputs,
+  type FrontierScope,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type KeyObjectStore,
