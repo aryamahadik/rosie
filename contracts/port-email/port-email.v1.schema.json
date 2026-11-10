@@ -1,0 +1,792 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-email/port-email.v1.schema.json",
+  "title": "PortEmailV1",
+  "description": "K-12 v1, the email port (Resend) in Rosie's own terms (02-contracts K-12): send one email row; verify and parse a webhook (a delivery event, or the notice that a reply came in); read an inbound reply into one K-06 event; and the email double's test hooks (a signed webhook, and the emails it recorded, for the test-phone page). Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every fixture is. The root is any one exchange, so the type generator writes a type for every call (ADR-005). Resend's wire format (its paths, headers, field names and codes) stays inside the adapter, with recorded vendor samples beside this contract in vendor-samples/ (02-contracts section 5); the README records what the spike found in Resend's documents. Keys are named, never shown (rule 7): sendEmail reads RESEND_API_KEY, verifyWebhook RESEND_WEBHOOK_SECRET and readReply RESEND_RECEIVING_KEY from the environment, and no request or response holds any of them. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/sendEmail.exchange" },
+    { "$ref": "#/$defs/verifyWebhook.exchange" },
+    { "$ref": "#/$defs/readReply.exchange" },
+    { "$ref": "#/$defs/doubleWebhook.exchange" },
+    { "$ref": "#/$defs/doubleSentEmails.exchange" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code compares as a whole and never parses (CQ-09). Resend's own ids (an email's id, a received email's id, an attachment's id) are UUIDs, and a webhook's id is Svix's msg_ form (README 'Spike findings'); fixtures use readable placeholders, as K-06 and K-07 do.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC (CQ-09). The adapter writes Resend's ISO 8601 times to whole seconds, as K-06's and K-07's fixtures write them (README default 8).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "emailAddress": {
+      "title": "EmailAddress",
+      "description": "An email address in lower case, as K-04's handles.address writes an email handle (K-04 handles_address_form; K-06 handle). The adapter takes the bare address from Resend's fields and lowers it (README 'Spike findings': a received email's from is the bare address).",
+      "type": "string",
+      "pattern": "^[^@\\sA-Z]+@[^@\\sA-Z]+$"
+    },
+    "rfcMessageId": {
+      "title": "RfcMessageId",
+      "description": "An email's Message-ID header value as RFC 5322 writes it, angle brackets included, such as <111-222-333@email.example.com>: Resend sets it on every email it sends and reports it as message_id on its email webhooks; a reply's own is in the received email's message_id (README 'Spike findings'). The thread headers name earlier emails by it.",
+      "type": "string",
+      "pattern": "^<[^<>@\\s]+@[^<>@\\s]+>$"
+    },
+    "partKey": {
+      "title": "PartKey",
+      "description": "The email part's idempotency key, '<row>/<part>/<try>', K-07 v1's (arch 01 line 65; an email row has one part: K-07 'Email rows'). Sent as Resend's Idempotency-Key header: within 24 hours a repeat with the same key and the same email answers the first answer and sends nothing again (README 'Spike findings').",
+      "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/idempotencyKey"
+    },
+    "given": {
+      "title": "Given",
+      "description": "What a fixture assumes before the call: the moment it runs, a note, and for a webhook how it was signed. Fixtures only; never sent.",
+      "type": "object",
+      "properties": {
+        "now": { "$ref": "#/$defs/utc" },
+        "note": {
+          "description": "The case in plain words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "signing": {
+          "description": "For a webhook: how its signature header was made. valid: Svix's HMAC-SHA256 over '<webhookId>.<timestamp>.<raw>' under the test environment's signing secret (the email double's, C-213), base64, written 'v1,<signature>'; oneByteChanged: that signature with one byte changed. The fixture holds no secret and no real signature (rule 7): the contract test signs the fixture's own webhook id, timestamp and raw body at run time and, for oneByteChanged, changes one byte (README 'Fixtures').",
+          "type": "string",
+          "enum": ["valid", "oneByteChanged"]
+        }
+      },
+      "required": ["now", "note"],
+      "additionalProperties": false
+    },
+
+    "purpose": {
+      "title": "EmailPurpose",
+      "description": "Why this email goes: the transactional uses 02-contracts K-12 lists, and nothing else, so a marketing email has no purpose it can carry (RULES 4.1: 'Email is transactional only, never marketing'; RULES 4.4: no offers, news, invites or 'book again'). confirmation: a booking's confirmation that carries the chat link and its QR, for a mobile whose chat is not open (MC C9; RULES 4.1b; 'Never opened: each new booking's confirmation carries the link again'). copy: the copy of a message to a customer who gave an email (RULES 4.1: 'A customer's email gets every message, in step with the chat'; arch 02 line 125; K-07 copyOfRowId). emailWay: a message to a person whose way is email (RULES 4.8; arch 02 line 125: 'email only for the email way'), such as an owner after a STOP (S1-10: the owner email 'is where Rosie writes if the owner texts STOP'). nextWay: the next way after texts kept failing for 15 minutes (S12-09, S12-10; arch 02 line 125; K-07 followUps nextWay), to a customer or to the owner. code: a proof code (RULES 6.1, 6.2; MC C9; FS row B13; S1-75; K-09 sendProofCode). notice: S1-35's go-live notice to the listing's email (Q-02's default: 'Notice: email only').",
+      "type": "string",
+      "enum": ["confirmation", "copy", "emailWay", "nextWay", "code", "notice"]
+    },
+    "sender": {
+      "title": "EmailSender",
+      "description": "The From of every email: the one confirmation address, showing the business name (RULES 4.1: 'One email address for every confirmation. It shows the business name.'), on mail.rosfield.com, the sending domain Resend verified (DL-028; SPF, DKIM and DMARC set: RULES 4.1).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name the From shows: the business's display name for an email about one business (K-04 businesses.display_name, B02: with the sensitive switch on, only it shows: RULES 4.6), else 'Rosie' (README default 3). One line, with no angle brackets or double quotes, since the adapter writes it as 'name <address>'.",
+          "type": "string",
+          "pattern": "^[^\\r\\n<>\"]*\\S[^\\r\\n<>\"]*$"
+        },
+        "address": {
+          "description": "The one confirmation address, a config value the adapter holds (README default 2), on mail.rosfield.com (DL-028).",
+          "type": "string",
+          "pattern": "^[a-z0-9._+-]+@mail[.]rosfield[.]com$"
+        }
+      },
+      "required": ["name", "address"],
+      "additionalProperties": false
+    },
+    "chatLink": {
+      "title": "EmailChatLink",
+      "description": "The chat link a confirmation carries, with its QR (MC C9: 'The chat link, with a QR code beside it wherever a screen shows it, reaches the person through ... the booking page and the confirmation email'): K-09's issueChatLink outcome as it gave it, given via confirmation_email (K-29 chat_links.given_via). The text holds the link; the adapter draws the QR from qrText as an attached image, since a plain-text email shows none inline (README default 5).",
+      "type": "object",
+      "properties": {
+        "link": {
+          "description": "The link that opens Messages to Rosie's number with the ready text (K-09 issueChatLink link; RULES 4.1b).",
+          "type": "string",
+          "pattern": "^sms:\\+[1-9][0-9]{6,14}&body=\\S+$"
+        },
+        "readyText": {
+          "description": "The ready text the link fills in, with its short code: for a booking, 'Hey, send me further updates about my booking' and a short booking ref (RULES 4.1b; K-29 chat_links.ready_text).",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "shortCode": {
+          "description": "The link's short code, which the ready text holds (K-29 chat_links.short_code; MC C9).",
+          "type": "string",
+          "pattern": "^\\S+$"
+        },
+        "qrText": {
+          "description": "The text the QR code encodes (K-09 issueChatLink qrText).",
+          "type": "string",
+          "pattern": "^\\S+$"
+        }
+      },
+      "required": ["link", "readyText", "shortCode", "qrText"],
+      "additionalProperties": false
+    },
+    "thread": {
+      "title": "EmailThread",
+      "description": "The headers that keep an email in the booking's reply thread (02-contracts K-12; RULES 4.1: 'Rosie answers replies in that thread'): In-Reply-To and References, which Resend documents as custom headers for threading (README 'Spike findings'). The first email of a booking's thread, and an email about no booking, has none.",
+      "type": "object",
+      "properties": {
+        "inReplyTo": {
+          "description": "The Message-ID this email answers: a person's reply (K-06 messageId of the email text event), or Rosie's last email in the thread (as its receipt reported it: verifyWebhook rfcMessageId); null for none.",
+          "anyOf": [{ "$ref": "#/$defs/rfcMessageId" }, { "type": "null" }]
+        },
+        "references": {
+          "description": "The Message-IDs of the thread's earlier emails, oldest first, the last of them inReplyTo (RFC 5322 References; Resend: 'append the previous message_ids to the References header'); empty for none.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rfcMessageId" }
+        }
+      },
+      "required": ["inReplyTo", "references"],
+      "additionalProperties": false,
+      "if": {
+        "properties": { "inReplyTo": { "type": "string" } }
+      },
+      "then": {
+        "properties": { "references": { "type": "array", "minItems": 1 } }
+      }
+    },
+    "sendEmail.request": {
+      "title": "SendEmailRequest",
+      "description": "Send one email row (02-contracts K-12 'Send one email row'; arch 07 line 371: 'Email is its own row with the same plan, the automated-assistant line (RULES 1.11), a code-built subject like S12-10's, typed options and a manage link, in the booking's reply thread'): one email to one person, plain text, under its K-07 key. The runtime's email rows (C-129) build it from the row's final parts (K-03, the options typed: K-07 'Email rows') and add what K-07 v1's final parts carry none of (K-07 open gap 7): the subject, the automated-assistant line, the manage link and the thread. text holds every word as it goes; assistantLine, manageLink and chatLink name what it must hold, so the double, the contract test and the checks can find each (README 'The email row').",
+      "type": "object",
+      "properties": {
+        "idempotencyKey": { "$ref": "#/$defs/partKey" },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "bookingId": {
+          "description": "The booking it is about (K-04 bookings.id), whose own reply address and manage link it carries; null for an email about no booking, such as a sign-in code or S12-10's notice to the owner.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "from": { "$ref": "#/$defs/sender" },
+        "to": {
+          "description": "The one person it goes to: their email handle's address (K-04 handles.address; RULES 4.8: 'an email if they have one'). Staging sends only to the few named inboxes (Q-23's default), by the adapter's allow-list, not a field here.",
+          "$ref": "#/$defs/emailAddress"
+        },
+        "replyTo": {
+          "description": "The booking's own reply address (RULES 4.1: 'Each booking has its own reply address, and Rosie answers replies in that thread'; K-04 threads.reply_address of the booking's email thread), sent as Reply-To so a reply comes back to it; null only for an email about no booking. Its domain is the receiving domain J-14 decides (README open gap 1).",
+          "anyOf": [{ "$ref": "#/$defs/emailAddress" }, { "type": "null" }]
+        },
+        "subject": {
+          "description": "The subject, built by code, never written by the model (arch 07 line 371: 'a code-built subject like S12-10's', such as 'Booked: Sat Nov 7, 2:00pm'). One line: a line break is refused, so no header can be added through it.",
+          "type": "string",
+          "pattern": "^[^\\r\\n]*\\S[^\\r\\n]*$"
+        },
+        "text": {
+          "description": "The whole plain-text body as it goes (02-contracts K-12: 'the plain text with typed options and a manage link'): the automated-assistant line first, then the row's final words with any options typed (K-07 'Email rows'; arch 07 line 371), then the manage link, and for a confirmation the chat link. No HTML part in v1.",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "assistantLine": {
+          "description": "The fixed line that says Rosie is an automated assistant, word for word as code adds it (RULES 1.11: 'Rosie says it is an automated assistant in every call, chat and email'; arch 07 line 361's opener, 'This is Rosie, the automated booking assistant for <business>.'). The text's first line; one line, and it says 'automated'.",
+          "type": "string",
+          "pattern": "^[^\\r\\n]*[Aa]utomated[^\\r\\n]*$"
+        },
+        "manageLink": {
+          "description": "The secure link to manage the booking, which the text holds (arch 07 line 371: 'a manage link'; S12-10: 'Manage your booking: rosfield.com/m/b07'); null for an email about no booking. Its host is a config value (Q-51).",
+          "anyOf": [{ "type": "string", "pattern": "^https://\\S+$" }, { "type": "null" }]
+        },
+        "chatLink": {
+          "description": "For a confirmation, the chat link and its QR (MC C9); null for every other purpose.",
+          "anyOf": [{ "$ref": "#/$defs/chatLink" }, { "type": "null" }]
+        },
+        "thread": { "$ref": "#/$defs/thread" }
+      },
+      "required": [
+        "idempotencyKey",
+        "purpose",
+        "bookingId",
+        "from",
+        "to",
+        "replyTo",
+        "subject",
+        "text",
+        "assistantLine",
+        "manageLink",
+        "chatLink",
+        "thread"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "bookingId": {
+          "description": "An email about a booking carries the booking's reply address and its manage link (RULES 4.1; arch 07 line 371); one about no booking has neither and no thread, since an email thread belongs to one booking (K-04 threads_chat_or_email).",
+          "if": {
+            "properties": { "bookingId": { "type": "null" } }
+          },
+          "then": {
+            "properties": {
+              "replyTo": { "type": "null" },
+              "manageLink": { "type": "null" },
+              "thread": {
+                "type": "object",
+                "properties": {
+                  "inReplyTo": { "type": "null" },
+                  "references": { "type": "array", "maxItems": 0 }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "replyTo": { "$ref": "#/$defs/emailAddress" },
+              "manageLink": { "type": "string" }
+            }
+          }
+        },
+        "purpose": {
+          "description": "What each purpose carries (MC C9; RULES 4.1, 4.1b).",
+          "allOf": [
+            {
+              "if": {
+                "properties": { "purpose": { "const": "confirmation" } }
+              },
+              "then": {
+                "description": "A confirmation is about its booking and carries the chat link and QR (MC C9).",
+                "properties": {
+                  "bookingId": { "$ref": "#/$defs/id" },
+                  "chatLink": { "$ref": "#/$defs/chatLink" }
+                }
+              },
+              "else": {
+                "description": "Only a confirmation carries the chat link (MC C9: 'each new booking's confirmation carries the link again').",
+                "properties": {
+                  "chatLink": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": { "purpose": { "const": "copy" } }
+              },
+              "then": {
+                "description": "A copy is a customer's copy of a message about a booking, in that booking's thread (RULES 4.1).",
+                "properties": {
+                  "bookingId": { "$ref": "#/$defs/id" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sendEmail.response": {
+      "title": "SendEmailResponse",
+      "description": "Resend accepted the email (02-contracts K-12: 'returns the provider's message id'). Its id goes to the part through K-05 markPart sent (K-07 providerMessageId), and its receipts name it (K-06 status.messageId), so they find the part. Accepted is not delivered: delivery comes later as a K-06 delivered receipt (arch 02 line 127). A repeat under the same key within 24 hours answers this same id (README 'Spike findings').",
+      "type": "object",
+      "properties": {
+        "result": { "const": "accepted" },
+        "providerMessageId": {
+          "description": "Resend's id for the email (its response's id).",
+          "$ref": "#/$defs/id"
+        },
+        "acceptedAt": {
+          "description": "When Resend accepted it (K-08 providerAccepted).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "providerMessageId", "acceptedAt"],
+      "additionalProperties": false
+    },
+    "sendEmail.errors": {
+      "title": "SendEmailErrors",
+      "description": "Resend refused or failed the email. The kind tells the dispatcher what K-07's rules do: rateLimited, a 429 rate_limit_exceeded, tried again after its retry-after (arch 10 line 540; K-07 rule 6); quotaReached, a 429 daily or monthly quota (the daily one resets at midnight UTC), which no try within the 15 minutes clears, so the row fails and the next way follows (K-07 rule 5; J-14: Free's 100 emails a day); refused, any other 4xx, such as a validation error, an unverified domain, a key problem or a key reused with another email, never tried again as it was (K-07 rule 5's next way); transient, a 5xx, a 409 for the same key still in progress, a timeout or a network error, tried again under K-07's rules (arch 02 line 125). The code is Resend's error name, as text (K-04 outbox_parts.error_code).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "kind": {
+          "type": "string",
+          "enum": ["rateLimited", "quotaReached", "refused", "transient"]
+        },
+        "httpStatus": {
+          "description": "The HTTP status Resend answered with; null when no answer came (a timeout or a network error).",
+          "anyOf": [{ "type": "integer", "minimum": 100, "maximum": 599 }, { "type": "null" }]
+        },
+        "code": {
+          "description": "Resend's error name, such as rate_limit_exceeded, daily_quota_exceeded or validation_error; null when it gave none.",
+          "anyOf": [{ "type": "string", "pattern": "^[a-z][a-z_]*$" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "What failed, in Resend's words or the adapter's, for the team console's failed rows (C-194). Never a key, an address or the email's words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "retryAfterSeconds": {
+          "description": "For rateLimited: the wait Resend gave (its retry-after header), which K-07 stores as the claim's nextTryNotBefore; null when it gave none, and for every other kind (arch 10 line 540).",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "kind", "httpStatus", "code", "reason", "retryAfterSeconds"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "The statuses and names each kind is read from (README 'Outcomes of a send').",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "rateLimited" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": { "const": 429 },
+                  "code": { "const": "rate_limit_exceeded" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "quotaReached" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": { "const": 429 },
+                  "code": { "enum": ["daily_quota_exceeded", "monthly_quota_exceeded"] },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "refused" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": {
+                    "type": "integer",
+                    "minimum": 400,
+                    "maximum": 499,
+                    "not": { "const": 429 }
+                  },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "transient" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": {
+                    "anyOf": [
+                      { "type": "null" },
+                      { "const": 409 },
+                      { "type": "integer", "minimum": 500, "maximum": 599 }
+                    ]
+                  },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sendEmail.exchange": {
+      "title": "SendEmailExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendEmail" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendEmail.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendEmail.response" }, { "$ref": "#/$defs/sendEmail.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "verifyWebhook.request": {
+      "title": "EmailVerifyWebhookRequest",
+      "description": "One webhook as the gateway (C-044) received it from Resend, before any parsing. Resend signs its webhooks through Svix: the adapter reads the svix-id, svix-timestamp and svix-signature headers into these fields (README 'Spike findings').",
+      "type": "object",
+      "properties": {
+        "webhookId": {
+          "description": "The svix-id header: the webhook's id, the same on every retry of it, so it is the event id duplicates are dropped by (K-06 eventId; arch 02 line 109).",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The svix-timestamp header as sent, whole seconds since 1970, which must lie within 300 s of receivedAt (the window arch 02 line 109 gives Linq's webhooks; Svix's own libraries reject a timestamp more than 5 minutes off). Kept as text, so a header that is not whole seconds is refused rather than read.",
+          "type": "string"
+        },
+        "signature": {
+          "description": "The svix-signature header exactly as sent: one or more 'v1,<base64>' separated by spaces. Empty when the header is missing.",
+          "type": "string"
+        },
+        "raw": {
+          "description": "The body exactly as received, byte for byte as text; the signature covers '<webhookId>.<timestamp>.<raw>'. Never parsed before the signature passes.",
+          "type": "string"
+        },
+        "receivedAt": {
+          "description": "When the gateway received it (K-06 receivedAt), the 'now' the 300 s window is measured from.",
+          "$ref": "#/$defs/utc"
+        },
+        "traceId": {
+          "description": "The trace id the gateway opened at receipt (K-08 v1; arch 10 line 548); the parsed event carries it as K-06 traceId.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["webhookId", "timestamp", "signature", "raw", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "failureCode": {
+      "title": "EmailFailureCode",
+      "description": "How an email failed, as the K-06 failure code of an email's failed receipt (K-06 failure.code: 'the ports' ... K-12'): bouncePermanent, Resend's email.bounced with bounce type Permanent (the address does not take mail); bounceTemporary, email.bounced with any other bounce type; suppressed, email.suppressed (Resend did not send it: the address is on the suppression list); notSent, email.failed (it could not be sent, such as reached_daily_quota). Each is a failure that starts the channel fallback (02-contracts K-12 'failed or bounced (the channel fallback)'; arch 02 line 125).",
+      "type": "string",
+      "enum": ["bouncePermanent", "bounceTemporary", "suppressed", "notSent"]
+    },
+    "receiptEvent": {
+      "title": "EmailReceiptEvent",
+      "description": "A delivery event for one of Rosie's emails as one K-06 v1 event, its provider email: delivered (Resend's email.delivered, which arms the question's clock: arch 02 line 127) or failed (a bounce, a suppression or a failure to send, the channel fallback: 02-contracts K-12). K-06 gives the rest: the handle the email went to, service email, status.messageId Resend's email id, which sendEmail returned, and status.at when Resend reported it.",
+      "type": "object",
+      "allOf": [
+        { "$ref": "../inbound-event/inbound-event.v1.schema.json" },
+        {
+          "properties": {
+            "provider": { "const": "email" },
+            "kind": { "enum": ["delivered", "failed"] }
+          },
+          "if": {
+            "properties": { "kind": { "const": "failed" } }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "type": "object",
+                "properties": {
+                  "failure": {
+                    "type": "object",
+                    "properties": { "code": { "$ref": "#/$defs/failureCode" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "verifyWebhook.response": {
+      "title": "EmailVerifyWebhookResponse",
+      "description": "The signature passed. event: a delivery event parsed into one K-06 event, with the email's Message-ID beside it (rfcMessageId), which the gateway seals and hands to the dispatcher and clock arming, then answers 200 (arch 02 lines 109, 127); a known event id also gets 200 and is dropped, and a failed write gets 503 so Resend retries. reply: Resend's email.received, which carries only a reply's metadata, so the gateway reads the reply with readReply before it writes anything and answers after that (README 'Inbound replies'). ignored: a signed event of a type Rosie does not use (README default 10), answered 200 and dropped.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "event" },
+            "httpStatus": {
+              "description": "What the gateway answers once the event is written (arch 02 line 109).",
+              "const": 200
+            },
+            "event": { "$ref": "#/$defs/receiptEvent" },
+            "rfcMessageId": {
+              "description": "The Message-ID of Rosie's email the receipt reports on (Resend's message_id), which later emails in the booking's thread name in In-Reply-To and References; null when Resend gives none (email.suppressed and email.failed: the email never went). K-06 v1 has no field for it, so it travels beside the event, never in it.",
+              "anyOf": [{ "$ref": "#/$defs/rfcMessageId" }, { "type": "null" }]
+            }
+          },
+          "required": ["result", "httpStatus", "event", "rfcMessageId"],
+          "additionalProperties": false,
+          "if": {
+            "description": "An email that never went has no Message-ID (README 'Spike findings').",
+            "properties": {
+              "event": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "failure": {
+                        "type": "object",
+                        "properties": { "code": { "enum": ["suppressed", "notSent"] } },
+                        "required": ["code"]
+                      }
+                    },
+                    "required": ["failure"]
+                  }
+                },
+                "required": ["status"]
+              }
+            }
+          },
+          "then": { "properties": { "rfcMessageId": { "type": "null" } } }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "reply" },
+            "eventId": {
+              "description": "The event id the reply's K-06 event will carry, the webhook id; the gateway drops a known one with 200 before reading (arch 02 line 109).",
+              "$ref": "#/$defs/id"
+            },
+            "receivedEmailId": {
+              "description": "Resend's id for the received email, which readReply reads it by.",
+              "$ref": "#/$defs/id"
+            },
+            "replyAddress": {
+              "description": "The address on Rosie's receiving domain it was sent to: the first of to, cc and received_for there (README default 13). The booking's own reply address picks the booking and thread (02-contracts K-12; RULES 4.1; K-04 threads.reply_address), so the gateway can tell a booking's reply from other mail before reading it.",
+              "$ref": "#/$defs/emailAddress"
+            }
+          },
+          "required": ["result", "eventId", "receivedEmailId", "replyAddress"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "ignored" },
+            "httpStatus": { "const": 200 },
+            "eventType": {
+              "description": "Resend's event type, for the log (README 'Spike findings' lists them).",
+              "type": "string",
+              "pattern": "^[a-z_]+([.][a-z_]+)+$"
+            }
+          },
+          "required": ["result", "httpStatus", "eventType"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "verifyWebhook.errors": {
+      "title": "EmailVerifyWebhookErrors",
+      "description": "The webhook is rejected: the gateway answers 401 and drops it, and it never becomes an event (arch 02 line 109: 'Bad signature: 401, dropped'). badTimestamp: the svix-timestamp header is not whole seconds; staleTimestamp: it lies more than 300 s from receivedAt; badSignature: no signature in the header matches. The reason is a label only: never the key, the body or the signature (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "rejected" },
+        "httpStatus": { "const": 401 },
+        "reason": {
+          "type": "string",
+          "enum": ["badTimestamp", "staleTimestamp", "badSignature"]
+        }
+      },
+      "required": ["result", "httpStatus", "reason"],
+      "additionalProperties": false
+    },
+    "verifyWebhook.exchange": {
+      "title": "EmailVerifyWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "verifyWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/verifyWebhook.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/verifyWebhook.response" }, { "$ref": "#/$defs/verifyWebhook.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "readReply.request": {
+      "title": "ReadReplyRequest",
+      "description": "Read one inbound reply that verifyWebhook announced (02-contracts K-12 'Inbound replies'). Resend's email.received webhook carries only metadata, so the adapter reads the email (its text, headers, attachments and sender check) from Resend's receiving API (README 'Spike findings').",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The webhook id verifyWebhook gave as eventId: the K-06 event's eventId.",
+          "$ref": "#/$defs/id"
+        },
+        "receivedEmailId": {
+          "description": "Resend's id for the received email (verifyWebhook receivedEmailId).",
+          "$ref": "#/$defs/id"
+        },
+        "receivedAt": {
+          "description": "When the gateway received the webhook (K-06 receivedAt).",
+          "$ref": "#/$defs/utc"
+        },
+        "traceId": {
+          "description": "The trace id the gateway opened at receipt (K-06 traceId; K-08).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["eventId", "receivedEmailId", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "replyEvent": {
+      "title": "EmailReplyEvent",
+      "description": "An inbound reply as one K-06 v1 event, its provider email and kind text (02-contracts K-12: 'turned into K-06 events for the handle's actor'): from is the handle; to, the booking's reply address, is email.replyAddress, which picks the booking and thread; the subject is email.subject; the text is the body; the attachments are the event's (K-13 turns each id into a file reference); the sender check is email.senderCheck (RULES 6.1). A reply threads under no message in v1 (threadedReplyTo null: its reply address already names its thread; README default 18).",
+      "type": "object",
+      "allOf": [
+        { "$ref": "../inbound-event/inbound-event.v1.schema.json" },
+        {
+          "properties": {
+            "provider": { "const": "email" },
+            "kind": { "const": "text" },
+            "threadedReplyTo": { "type": "null" },
+            "email": { "type": "object" }
+          }
+        }
+      ]
+    },
+    "readReply.response": {
+      "title": "ReadReplyResponse",
+      "description": "The reply is read. event: one K-06 text event, which the gateway seals and writes to the handle's actor, then answers the webhook 200 (arch 02 line 109). ignored: an automatic reply, such as an out-of-office note (its Auto-Submitted header is other than 'no': RFC 3834), which is answered 200 and dropped, so no loop of automatic emails starts (README default 17).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "event" },
+            "httpStatus": { "const": 200 },
+            "event": { "$ref": "#/$defs/replyEvent" }
+          },
+          "required": ["result", "httpStatus", "event"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "ignored" },
+            "httpStatus": { "const": 200 },
+            "reason": { "const": "automaticReply" }
+          },
+          "required": ["result", "httpStatus", "reason"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "readReply.errors": {
+      "title": "ReadReplyErrors",
+      "description": "The reply could not be read. transient: a 5xx, a timeout, a network error, or a key that cannot read received email (Resend's restricted_api_key for a send-only key: README open gap 1): the gateway answers the webhook 503, so Resend retries it (arch 02 line 109: 'Write fails: 503, and the provider retries'). unreadable: Resend has no such email, or keeps none of its content (not_found, email_above_quota): answered 200 and dropped, and the team console shows it (C-194). The code is Resend's error name, as text.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "kind": { "type": "string", "enum": ["transient", "unreadable"] },
+        "httpStatus": {
+          "description": "What the gateway answers the webhook: 503 for transient, 200 for unreadable.",
+          "type": "integer",
+          "enum": [200, 503]
+        },
+        "code": {
+          "description": "Resend's error name; null when it gave none.",
+          "anyOf": [{ "type": "string", "pattern": "^[a-z][a-z_]*$" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "What failed, in Resend's words or the adapter's; never a key, an address or the email's words.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["result", "kind", "httpStatus", "code", "reason"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "transient" } } },
+              "then": { "properties": { "httpStatus": { "const": 503 } } }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "unreadable" } } },
+              "then": { "properties": { "httpStatus": { "const": 200 } } }
+            }
+          ]
+        }
+      }
+    },
+    "readReply.exchange": {
+      "title": "ReadReplyExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readReply" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readReply.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readReply.response" }, { "$ref": "#/$defs/readReply.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "doubleWebhook.request": {
+      "title": "EmailDoubleWebhookRequest",
+      "description": "Ask the email double (C-213's double; test code only) for a signed webhook in Resend's form that carries one event: a faked delivered or bounce receipt for an email it recorded, or a faked inbound reply (02-contracts K-12 'The double's test hooks': 'fakes delivered and bounce events and inbound replies'; BP 9.4). For a reply the double also keeps the reply, so readReply on the id it gives answers the request's event with the gateway's own receivedAt and traceId.",
+      "type": "object",
+      "properties": {
+        "event": {
+          "description": "The K-06 v1 event the gateway must get back: from verifyWebhook for a receipt, from readReply for a reply, given the same receivedAt and traceId; its provider is email.",
+          "anyOf": [{ "$ref": "#/$defs/receiptEvent" }, { "$ref": "#/$defs/replyEvent" }]
+        },
+        "rfcMessageId": {
+          "description": "For a delivered or bounced receipt, the Message-ID the webhook reports, which verifyWebhook gives back beside the event; else null.",
+          "anyOf": [{ "$ref": "#/$defs/rfcMessageId" }, { "type": "null" }]
+        }
+      },
+      "required": ["event", "rfcMessageId"],
+      "additionalProperties": false,
+      "if": {
+        "description": "A reply's own Message-ID is its event's messageId; nothing travels beside it.",
+        "properties": {
+          "event": {
+            "type": "object",
+            "properties": { "kind": { "const": "text" } },
+            "required": ["kind"]
+          }
+        }
+      },
+      "then": { "properties": { "rfcMessageId": { "type": "null" } } }
+    },
+    "doubleWebhook.response": {
+      "title": "EmailDoubleWebhookResponse",
+      "description": "The signed webhook, ready for the gateway: verifyWebhook on it, inside the 300 s window, gives back the request's receipt and rfcMessageId, or for a reply the reply outcome naming receivedEmailId, on which readReply gives back the request's event (the contract test's round trip). Signed with the test environment's webhook secret, never Resend's (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signed" },
+        "webhook": { "$ref": "#/$defs/verifyWebhook.request" },
+        "receivedEmailId": {
+          "description": "For a reply, the double's id for the reply it keeps for readReply; null for a receipt.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "webhook", "receivedEmailId"],
+      "additionalProperties": false
+    },
+    "doubleWebhook.exchange": {
+      "title": "EmailDoubleWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "doubleWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/doubleWebhook.request" },
+        "outcome": { "$ref": "#/$defs/doubleWebhook.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "doubleSentEmails.request": {
+      "title": "DoubleSentEmailsRequest",
+      "description": "Ask the email double (test code only) for the emails it recorded, so the staging test-phone page can show them (02-contracts K-12: 'records each email ... and shows its output on the test-phone page'; BP 9.4; C-205), such as a confirmation's chat link for a tester to send its ready text.",
+      "type": "object",
+      "properties": {
+        "to": {
+          "description": "Only the emails to this address; null for every email recorded.",
+          "anyOf": [{ "$ref": "#/$defs/emailAddress" }, { "type": "null" }]
+        }
+      },
+      "required": ["to"],
+      "additionalProperties": false
+    },
+    "doubleSentEmails.response": {
+      "title": "DoubleSentEmailsResponse",
+      "description": "The emails the double accepted, oldest first, each as its sendEmail request with the id the double gave it. A repeat under one key is recorded once, as Resend sends it once.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "recorded" },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "recordedAt": {
+                "description": "When the double accepted it.",
+                "$ref": "#/$defs/utc"
+              },
+              "providerMessageId": {
+                "description": "The id the double answered with (sendEmail.response providerMessageId).",
+                "$ref": "#/$defs/id"
+              },
+              "request": { "$ref": "#/$defs/sendEmail.request" }
+            },
+            "required": ["recordedAt", "providerMessageId", "request"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "emails"],
+      "additionalProperties": false
+    },
+    "doubleSentEmails.exchange": {
+      "title": "DoubleSentEmailsExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "doubleSentEmails" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/doubleSentEmails.request" },
+        "outcome": { "$ref": "#/$defs/doubleSentEmails.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

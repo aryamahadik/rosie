@@ -1,0 +1,18 @@
+{
+  "call": "readReply",
+  "given": {
+    "now": "2026-10-23T14:05:41Z",
+    "note": "Right after Alex's copy of A7-03 went (send-copy-of-text.json), his mail sends an out-of-office note to the booking's reply address. Its Auto-Submitted header is auto-replied (RFC 3834), so it is answered 200 and dropped: it never reaches decide, and no answer to it starts a loop of automatic emails (README default 17)."
+  },
+  "request": {
+    "eventId": "evt-email-alex-0003",
+    "receivedEmailId": "resend-in-demo-alex-0003",
+    "receivedAt": "2026-10-23T14:05:41Z",
+    "traceId": "trace-email-alex-0003"
+  },
+  "outcome": {
+    "result": "ignored",
+    "httpStatus": 200,
+    "reason": "automaticReply"
+  }
+}

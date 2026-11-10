@@ -1,0 +1,172 @@
+{
+  "fixtures": [
+    {
+      "file": "send-confirmation-with-chat-link.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "Ben's confirmation for his Nov 21 skin fade, his chat not open: from the one address on mail.rosfield.com showing Lee's Barbershop, the booking's reply address, a code-built subject, the automated-assistant line, the manage link, and the chat link and QR K-09 issued (BEN21X); first in its thread; accepted with Resend's id.",
+      "source": "02-contracts K-12 Fixtures and 'Send one email row'; MC C9; RULES 4.1, 4.1b, 1.11; arch 07 line 371; K-09 chat-link-after-contact-add.json; S12-09, S12-27 (sample cast)"
+    },
+    {
+      "file": "send-copy-of-text.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "Alex's copy of A7-03's question as its own email row, the options typed, under key out-a7-03-alex-email/1/1, threaded under the booking's earlier email: accepted with email-msg-demo-0007 (K-07 outbox-email-copy.json).",
+      "source": "02-contracts K-12 Fixtures; RULES 4.1; arch 07 lines 371, 397; K-07 outbox-email-copy.json and 'Email rows'"
+    },
+    {
+      "file": "send-code.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "Sam's owner-email code (FS row B13), about no booking, so with no reply address, manage link or thread: accepted.",
+      "source": "02-contracts K-12 Fixtures ('emailed codes'); RULES 6.1, 6.2; MC C9; FS row B13; S1-10; K-09 email-check-typed.json"
+    },
+    {
+      "file": "send-fallback-s12-10.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "S12-10: Alex's confirmation by email after texts failed for 15 minutes, with S12-10's subject and first line: accepted (K-07 outbox-fallback-email.json's next way).",
+      "source": "02-contracts K-12 Fixtures; S12-09, S12-10; arch 02 line 125; K-07 outbox-fallback-email.json"
+    },
+    {
+      "file": "delivered.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Resend's email.delivered for Alex's copy, signed by Svix: a K-06 delivered event naming email-msg-demo-0007 at 14:05:09, which arms the clock, with the email's Message-ID beside it.",
+      "source": "02-contracts K-12 Fixtures and 'Delivery events'; arch 02 lines 109, 127; K-07 outbox-email-copy.json; README 'Spike findings' rows 6 to 8"
+    },
+    {
+      "file": "bounced.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Resend's email.bounced (Permanent) for Ben's confirmation: a K-06 failed event with failure code bouncePermanent, which starts the channel fallback, with the Message-ID beside it.",
+      "source": "02-contracts K-12 Fixtures ('failed or bounced (the channel fallback)'); arch 02 line 125; README 'Spike findings' row 7"
+    },
+    {
+      "file": "inbound-reply-passed.json",
+      "version": "v1",
+      "def": "readReply.exchange",
+      "expect": "accept",
+      "shows": "Alex's email reply read from Resend's receiving API, its quoted email dropped and its sender check passed: K-06 email-reply-check-passed.json byte for byte.",
+      "source": "02-contracts K-12 Fixtures and 'Inbound replies'; RULES 4.1, 6.1; K-06 email-reply-check-passed.json; README 'Spike findings' rows 10 to 12"
+    },
+    {
+      "file": "inbound-reply-failed-check.json",
+      "version": "v1",
+      "def": "readReply.exchange",
+      "expect": "accept",
+      "shows": "A reply from Alex's address that fails DKIM and DMARC: sender check failed, so it proves nothing: K-06 email-reply-check-failed.json byte for byte.",
+      "source": "02-contracts K-12 Fixtures; RULES 6.1; K-06 email-reply-check-failed.json and default 4; README default 12"
+    },
+    {
+      "file": "verify-reply-received.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Resend's email.received for Alex's reply, metadata only: the reply outcome with its event id, Resend's received-email id for readReply, and the booking's reply address it came to.",
+      "source": "02-contracts K-12 'Inbound replies'; RULES 4.1; README 'Spike findings' row 10"
+    },
+    {
+      "file": "verify-bad-signature.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "The same email.received webhook with one byte of its signature changed: rejected badSignature, 401, dropped; nothing is read.",
+      "source": "arch 02 line 109 ('Bad signature: 401, dropped'); README 'Spike findings' row 9"
+    },
+    {
+      "file": "verify-ignored-delivery-delayed.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Resend's email.delivery_delayed: ignored with 200, no receipt and no failure, so no channel fallback starts.",
+      "source": "README default 10; README 'Spike findings' row 6"
+    },
+    {
+      "file": "reply-automatic-ignored.json",
+      "version": "v1",
+      "def": "readReply.exchange",
+      "expect": "accept",
+      "shows": "An out-of-office reply (Auto-Submitted, RFC 3834) to the booking's reply address: ignored with 200, so it never reaches decide and starts no loop.",
+      "source": "README default 17; RFC 3834"
+    },
+    {
+      "file": "send-rate-limited.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "Sam's code meets Resend's rate limit: failed rateLimited, 429 rate_limit_exceeded, retry after 1 s.",
+      "source": "arch 10 line 540; K-07 rule 6; README 'Spike findings' row 14"
+    },
+    {
+      "file": "send-daily-quota.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "accept",
+      "shows": "Alex's S12-10 email on a day the daily quota is used up: failed quotaReached, 429 daily_quota_exceeded, no retry-after; the next way follows.",
+      "source": "BP 3.7 J-14 (Free's 100 emails a day); Q-23; K-07 rule 5; README 'Spike findings' row 14"
+    },
+    {
+      "file": "double-signed-webhook.json",
+      "version": "v1",
+      "def": "doubleWebhook.exchange",
+      "expect": "accept",
+      "shows": "The email double fakes the delivered receipt for Ben's confirmation it recorded: a webhook in Resend's form, signed with the test secret, which verifyWebhook gives back as the same event and Message-ID.",
+      "source": "02-contracts K-12 'The double's test hooks'; BP 9.4"
+    },
+    {
+      "file": "double-signed-reply.json",
+      "version": "v1",
+      "def": "doubleWebhook.exchange",
+      "expect": "accept",
+      "shows": "The email double fakes Alex's reply: an email.received webhook naming the reply it keeps, which readReply gives back as K-06 email-reply-check-passed.json.",
+      "source": "02-contracts K-12 'The double's test hooks' ('fakes ... inbound replies'); BP 9.4; K-06 email-reply-check-passed.json"
+    },
+    {
+      "file": "double-sent-emails.json",
+      "version": "v1",
+      "def": "doubleSentEmails.exchange",
+      "expect": "accept",
+      "shows": "The test-phone page asks the double what it sent to Ben: his confirmation, with the chat link and ready text a tester can send.",
+      "source": "02-contracts K-12 'The double's test hooks' ('shows its output on the test-phone page'); BP 9.4; C-205"
+    },
+    {
+      "file": "invalid/refuse-marketing-email.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "refuse",
+      "shows": "send-copy-of-text.json as an offer to book again (purpose offer): refused, since an email's purpose is one of the transactional uses only.",
+      "source": "02-contracts K-12 Fixtures; RULES 4.1 ('transactional only, never marketing'), 4.4"
+    },
+    {
+      "file": "invalid/refuse-no-reply-address.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "refuse",
+      "shows": "send-copy-of-text.json with no reply address though it is about a booking: refused.",
+      "source": "02-contracts K-12 Fixtures; RULES 4.1 ('Each booking has its own reply address')"
+    },
+    {
+      "file": "invalid/refuse-from-other-domain.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "refuse",
+      "shows": "send-copy-of-text.json sent from rosfield.com, not mail.rosfield.com: refused.",
+      "source": "DL-028 (mail.rosfield.com verified); RULES 4.1"
+    },
+    {
+      "file": "invalid/refuse-subject-line-break.json",
+      "version": "v1",
+      "def": "sendEmail.exchange",
+      "expect": "refuse",
+      "shows": "send-copy-of-text.json with a line break and a Bcc header inside its subject: refused, so no header can be added through it.",
+      "source": "arch 07 line 371 (a code-built subject); README 'The email row'"
+    }
+  ]
+}

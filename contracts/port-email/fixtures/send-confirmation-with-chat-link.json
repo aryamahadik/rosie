@@ -1,0 +1,37 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-10-24T11:00:05Z",
+    "note": "Ben booked on the booking page, his mobile was added as a Linq contact, and his chat is not open, so his confirmation goes by email with the chat link and its QR, as K-09 chat-link-after-contact-add.json issued them (MC C9; RULES 4.1b). It is the first email of the booking's thread, so it threads under nothing. The facts are the master's sample cast (S12-09: the skin fade with Avery at 88 Elm St; S12-27: $40)."
+  },
+  "request": {
+    "idempotencyKey": "out-ben-nov21-confirm-email/1/1",
+    "purpose": "confirmation",
+    "bookingId": "booking-ben-nov21",
+    "from": {
+      "name": "Lee's Barbershop",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "ben@example.com",
+    "replyTo": "booking-ben-nov21@reply.example.com",
+    "subject": "Booked: Sat Nov 21, 2:00pm",
+    "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nYou're booked! Give this code at the chair when you arrive.\nLee's Barbershop · Skin fade · $40\nSat Nov 21 · 2:00pm · Avery\n88 Elm St, Springfield\nYour check-in code: 4417\n\nManage your booking: https://example.com/m/b21\n\nGet updates by text: open this link on your phone and send the message it fills in, or scan the attached QR code.\nsms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X",
+    "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+    "manageLink": "https://example.com/m/b21",
+    "chatLink": {
+      "link": "sms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X",
+      "readyText": "Hey, send me further updates about my booking BEN21X",
+      "shortCode": "BEN21X",
+      "qrText": "sms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X"
+    },
+    "thread": {
+      "inReplyTo": null,
+      "references": []
+    }
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "email-msg-demo-0021",
+    "acceptedAt": "2026-10-24T11:00:05Z"
+  }
+}
