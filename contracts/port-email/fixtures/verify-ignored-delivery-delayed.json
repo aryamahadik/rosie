@@ -1,0 +1,21 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-07T15:26:31Z",
+    "note": "Resend's email.delivery_delayed for Alex's S12-10 email (send-fallback-s12-10.json): Resend keeps trying, and a delivered or bounced event follows, so a delay is no receipt and no failure; it is answered 200 and dropped, and no channel fallback starts (README default 10).",
+    "signing": "valid"
+  },
+  "request": {
+    "webhookId": "evt-email-delayed-0040",
+    "timestamp": "1794065190",
+    "signature": "v1,signed-at-test-time",
+    "raw": "{\"type\":\"email.delivery_delayed\",\"created_at\":\"2026-11-07T15:26:30.004Z\",\"data\":{\"created_at\":\"2026-11-07T15:25:01.118Z\",\"email_id\":\"email-msg-demo-0040\",\"message_id\":\"<rfc-demo-0040@email.example.com>\",\"from\":\"Lee's Barbershop <rosie@mail.rosfield.com>\",\"to\":[\"alex@example.com\"],\"subject\":\"Booked: Sat Nov 14, 11:00am\"}}",
+    "receivedAt": "2026-11-07T15:26:31Z",
+    "traceId": "trace-email-delayed-0040"
+  },
+  "outcome": {
+    "result": "ignored",
+    "httpStatus": 200,
+    "eventType": "email.delivery_delayed"
+  }
+}

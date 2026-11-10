@@ -1,0 +1,28 @@
+{
+  "id": "resend-in-demo-alex-0002",
+  "created_at": "2026-10-23T19:10:00.255Z",
+  "from": "alex@example.com",
+  "to": ["booking-alex-haircut@reply.example.com"],
+  "cc": [],
+  "bcc": [],
+  "reply_to": [],
+  "received_for": ["booking-alex-haircut@reply.example.com"],
+  "subject": "Re: Your haircut at Lee's Barbershop",
+  "message_id": "email-msg-demo-alex-0002",
+  "text": "Please cancel my haircut.\n",
+  "html": null,
+  "headers": {
+    "from": "Alex M. <alex@example.com>",
+    "mime-version": "1.0"
+  },
+  "authentication": {
+    "spf": "fail",
+    "dkim": "gray",
+    "dmarc": "fail"
+  },
+  "attachments": [],
+  "raw": {
+    "download_url": "https://example.com/raw/resend-in-demo-alex-0002",
+    "expires_at": "2026-10-23T20:10:03.000Z"
+  }
+}

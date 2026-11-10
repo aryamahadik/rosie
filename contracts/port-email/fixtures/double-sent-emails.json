@@ -1,0 +1,44 @@
+{
+  "call": "doubleSentEmails",
+  "given": {
+    "now": "2026-10-24T11:01:00Z",
+    "note": "The staging test-phone page asks the email double what it sent to Ben: his confirmation, with the chat link and ready text a tester can send from Ben's test phone (BP 9.4; C-205). The double answered it with its own id."
+  },
+  "request": {
+    "to": "ben@example.com"
+  },
+  "outcome": {
+    "result": "recorded",
+    "emails": [
+      {
+        "recordedAt": "2026-10-24T11:00:05Z",
+        "providerMessageId": "email-double-msg-0001",
+        "request": {
+          "idempotencyKey": "out-ben-nov21-confirm-email/1/1",
+          "purpose": "confirmation",
+          "bookingId": "booking-ben-nov21",
+          "from": {
+            "name": "Lee's Barbershop",
+            "address": "rosie@mail.rosfield.com"
+          },
+          "to": "ben@example.com",
+          "replyTo": "booking-ben-nov21@reply.example.com",
+          "subject": "Booked: Sat Nov 21, 2:00pm",
+          "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nYou're booked! Give this code at the chair when you arrive.\nLee's Barbershop · Skin fade · $40\nSat Nov 21 · 2:00pm · Avery\n88 Elm St, Springfield\nYour check-in code: 4417\n\nManage your booking: https://example.com/m/b21\n\nGet updates by text: open this link on your phone and send the message it fills in, or scan the attached QR code.\nsms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X",
+          "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+          "manageLink": "https://example.com/m/b21",
+          "chatLink": {
+            "link": "sms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X",
+            "readyText": "Hey, send me further updates about my booking BEN21X",
+            "shortCode": "BEN21X",
+            "qrText": "sms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X"
+          },
+          "thread": {
+            "inReplyTo": null,
+            "references": []
+          }
+        }
+      }
+    ]
+  }
+}

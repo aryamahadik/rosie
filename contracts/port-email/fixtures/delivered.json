@@ -1,0 +1,53 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-23T14:05:10Z",
+    "note": "Resend's email.delivered for Alex's copy of A7-03 (send-copy-of-text.json), signed by Svix over id.timestamp.raw: parsed into a K-06 delivered event naming Resend's email id, which is K-07's providerMessageId for that part, at K-07 outbox-email-copy.json's delivered time. It arms the question's clock (arch 02 line 127). The email's Message-ID goes beside the event for the thread's later emails.",
+    "signing": "valid"
+  },
+  "request": {
+    "webhookId": "evt-email-delivered-0007",
+    "timestamp": "1792764309",
+    "signature": "v1,signed-at-test-time",
+    "raw": "{\"type\":\"email.delivered\",\"created_at\":\"2026-10-23T14:05:09.126Z\",\"data\":{\"created_at\":\"2026-10-23T14:05:03.402Z\",\"email_id\":\"email-msg-demo-0007\",\"message_id\":\"<rfc-demo-0007@email.example.com>\",\"from\":\"Lee's Barbershop <rosie@mail.rosfield.com>\",\"to\":[\"alex@example.com\"],\"subject\":\"Your haircut at Lee's Barbershop\"}}",
+    "receivedAt": "2026-10-23T14:05:10Z",
+    "traceId": "trace-email-delivered-0007"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "evt-email-delivered-0007",
+      "provider": "email",
+      "handle": {
+        "kind": "email",
+        "address": "alex@example.com"
+      },
+      "service": "email",
+      "kind": "delivered",
+      "messageId": null,
+      "chatId": null,
+      "sentAt": null,
+      "receivedAt": "2026-10-23T14:05:10Z",
+      "body": null,
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": {
+        "messageId": "email-msg-demo-0007",
+        "at": "2026-10-23T14:05:09Z",
+        "failure": null
+      },
+      "fromRosie": false,
+      "email": null,
+      "traceId": "trace-email-delivered-0007"
+    },
+    "rfcMessageId": "<rfc-demo-0007@email.example.com>"
+  }
+}

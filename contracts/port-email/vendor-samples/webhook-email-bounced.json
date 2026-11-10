@@ -1,0 +1,17 @@
+{
+  "type": "email.bounced",
+  "created_at": "2026-10-24T11:00:08.511Z",
+  "data": {
+    "created_at": "2026-10-24T11:00:05.230Z",
+    "email_id": "email-msg-demo-0021",
+    "message_id": "<rfc-demo-0021@email.example.com>",
+    "from": "Lee's Barbershop <rosie@mail.rosfield.com>",
+    "to": ["ben@example.com"],
+    "subject": "Booked: Sat Nov 21, 2:00pm",
+    "bounce": {
+      "message": "The recipient's mail server rejected the email because the mailbox does not exist.",
+      "subType": "General",
+      "type": "Permanent"
+    }
+  }
+}

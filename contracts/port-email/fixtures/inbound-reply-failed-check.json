@@ -1,0 +1,49 @@
+{
+  "call": "readReply",
+  "given": {
+    "now": "2026-10-23T19:10:03Z",
+    "note": "A second reply in Alex's thread, from his address, asks to cancel, but Resend's receiving server found DKIM and DMARC failing for it (vendor-samples/received-email-check-failed.json), so its sender check is failed: it proves nothing, and nothing is cancelled on it (RULES 6.1; README default 12). The event is K-06 email-reply-check-failed.json byte for byte."
+  },
+  "request": {
+    "eventId": "evt-email-alex-0002",
+    "receivedEmailId": "resend-in-demo-alex-0002",
+    "receivedAt": "2026-10-23T19:10:03Z",
+    "traceId": "trace-email-alex-0002"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "evt-email-alex-0002",
+      "provider": "email",
+      "handle": {
+        "kind": "email",
+        "address": "alex@example.com"
+      },
+      "service": "email",
+      "kind": "text",
+      "messageId": "email-msg-demo-alex-0002",
+      "chatId": null,
+      "sentAt": "2026-10-23T19:10:00Z",
+      "receivedAt": "2026-10-23T19:10:03Z",
+      "body": "Please cancel my haircut.",
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": null,
+      "fromRosie": false,
+      "email": {
+        "replyAddress": "booking-alex-haircut@reply.example.com",
+        "subject": "Re: Your haircut at Lee's Barbershop",
+        "senderCheck": "failed"
+      },
+      "traceId": "trace-email-alex-0002"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-10-19T14:30:21Z",
+    "note": "Sam's email code (send-code.json) meets Resend's rate limit (10 requests a second for the team): a 429 rate_limit_exceeded with retry-after 1, so the next try goes after it (arch 10 line 540; K-07 rule 6). Nothing was sent."
+  },
+  "request": {
+    "idempotencyKey": "out-sam-email-check-code/1/1",
+    "purpose": "code",
+    "bookingId": null,
+    "from": {
+      "name": "Rosie",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "sam@lees-barbershop.example",
+    "replyTo": null,
+    "subject": "Your Rosie code",
+    "text": "This is Rosie, an automated assistant, setting up Lee's Barbershop.\n\nCode 4829: type it on the page to prove this email. It works for 10 minutes.",
+    "assistantLine": "This is Rosie, an automated assistant, setting up Lee's Barbershop.",
+    "manageLink": null,
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": null,
+      "references": []
+    }
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "rateLimited",
+    "httpStatus": 429,
+    "code": "rate_limit_exceeded",
+    "reason": "Too many requests: Resend allows 10 a second for the team.",
+    "retryAfterSeconds": 1
+  }
+}
