@@ -81,7 +81,7 @@ export const HUBS_AND_DOORS = "hubsAndDoors";
 
 /** A hub's key: the target booking's stage, or the writer's role (K-01 v1 routingTables.hubs; K-02 v1 choice.hub). */
 export type HubKey = NonNullable<Choice["hub"]>;
-/** A door's key (K-01 v1 routingTables.doors; K-02 v1 choice.door). */
+/** A door's key (K-01 v1 routingTables.doors): K-02 v1.1 choice.door but signUp, the sixth, which T-1147 offers. */
 export type DoorKey = Exclude<NonNullable<Choice["door"]>, "signUp">;
 
 type BookingHead = TurnState["bookings"][number];

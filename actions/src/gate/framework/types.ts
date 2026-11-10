@@ -44,7 +44,7 @@ export type LimitOutcome = K09.LimitOutcome;
 export type LimitResult = K09.LimitResult;
 /** What the gate did with one part, as gateAndCommit answers it (K-09 v1 `partResult`). */
 export type PartResult = K09.PartResult;
-/** A key a part's step gives (K-09 v1 `setupKey`), which the commit names on a committed part. */
+/** A key a part's step gives (K-09 v1.5 `stepKey`, `partResult.gives`), which the commit names on a committed part. */
 export type SetupKey = K09.StepKey;
 /** Decide's output broke a K-02 v1 named rule (K-09 v1 `gateAndCommit.errors` decideRefused). */
 export type DecideRefused = K09.DecideRefusedError;

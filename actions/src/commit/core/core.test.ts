@@ -11,7 +11,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import {
   NOT_TOLD_YET,
   STOP_WORDS_NOT_WIRED,

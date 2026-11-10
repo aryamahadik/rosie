@@ -271,6 +271,40 @@ describe("commit-s1-01.json through the Tool API: K-09 v1.5's validator passes i
     expect(placesHolding(sent, CHAT_ID)).toEqual(["/writes/state/0/values/linq_chat_id"]);
   });
 
+  it("every port is handed CommitTurnContext.turn as K-05's seven fields alone, its request keeping the service and chat id", async () => {
+    const exchange = gateExchange(S1_01);
+    const deps = s101Deps();
+    const handed: { port: string; context: CommitTurnContext }[] = [];
+    const ports: CommitPorts = {
+      ...deps.ports,
+      openHolds(turn) {
+        handed.push({ port: "openHolds", context: turn });
+        return deps.ports.openHolds(turn);
+      },
+      runCore(action, turn, open) {
+        handed.push({ port: "runCore", context: turn });
+        return deps.ports.runCore(action, turn, open);
+      },
+      writesOf(part, turn, open) {
+        handed.push({ port: "writesOf", context: turn });
+        return deps.ports.writesOf(part, turn, open);
+      },
+    };
+    const called = await callCommit(copy(exchange.request), { limits: deps.limits, ports });
+
+    expect(called.answer).toEqual({ ok: true, value: exchange.outcome });
+    expect(handed.map((each) => each.port)).toEqual(["openHolds", "runCore", "writesOf"]);
+    for (const { port, context } of handed) {
+      // At run time, not only by its type: the row holds no service and no chat id, and K-05's closed turn takes it.
+      expect(Object.keys(context.turn), port).toEqual(K05_TURN_FIELDS);
+      expect(context.turn, port).toEqual(k05TurnRow(requestTurn()));
+      expect(placesHolding(context.turn, CHAT_ID), port).toEqual([]);
+      expect(contractChecks().k05("turn", context.turn), port).toEqual([]);
+      // The walk's inputs stay on the request's turn (K-09 v1.5 default 135).
+      expect(context.request.turn, port).toMatchObject({ service: "imessage", chatId: CHAT_ID });
+    }
+  });
+
   it("no span, log line, event-log entry's values or answer holds the chat id", async () => {
     const exchange = gateExchange(S1_01);
     const deps = s101Deps();
