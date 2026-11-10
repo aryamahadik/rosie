@@ -1,0 +1,10 @@
+{
+  "result": "businessOwner",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-27T09:00:04Z",
+  "owner": {
+    "personId": "person-sam",
+    "handleId": "handle-sam",
+    "address": "+15555550100"
+  }
+}
