@@ -10,7 +10,8 @@
 //
 // What the rows must be is read here from the frozen fixtures themselves (node:fs), never through the seed: K-04 v1
 // seed-business-head.json and seed-person-roles.json, K-21 v1 test-roster.json (tp-01), K-02 v1.1 context-s1-01.json
-// (turn 1's writer) and K-05 v1.2 targets-first-text.json (the guard's answer); for the refusals, K-04's
+// (turn 1's writer) and K-05 v1.2 targets-first-text.json (the guard's answer); K-23 v1 seed-company-two-kinds.json and
+// fixture set v1's barber shop for the barbershop's company and kind of work (T-1197; CQ-185); for the refusals, K-04's
 // seed-bundle-registry.json and seed-phone-chat-open.json and K-09 v1.5's commit-s1-01.json (what turn 1's commit
 // leaves). No value is a real person's: the master's sample cast and the fictional 555-01xx numbers only (rule 9).
 import { readFileSync } from "node:fs";
@@ -28,7 +29,14 @@ const RUNTIME_ROLE = "rosie_job";
 const CONTRACTS = new URL("../../contracts/", import.meta.url);
 // The fiction range: 555-0100 to 555-0199 in an area code, as E.164.
 const FICTIONAL = /^\+1[2-9][0-9]{2}55501[0-9]{2}$/;
-const SKELETON_TABLES = ["businesses", "persons", "handles", "person_handles"] as const;
+const SKELETON_TABLES = [
+  "businesses",
+  "persons",
+  "handles",
+  "person_handles",
+  "companies",
+  "company_kinds",
+] as const;
 // Every table whose rows decide tp-01's targets, the rows the seed writes, and a key it never writes.
 const WATCHED = [
   "businesses",
@@ -36,6 +44,8 @@ const WATCHED = [
   "person_roles",
   "handles",
   "person_handles",
+  "companies",
+  "company_kinds",
   "phones",
   "sealing_keys",
   "bookings",
@@ -43,6 +53,10 @@ const WATCHED = [
   "turns",
   "open_questions",
 ] as const;
+/** Fixture set v1's barber shop (test-kit/shops/barber.json): its kind of work's facts and switches (rule 9). */
+const BARBER_SHOP = JSON.parse(
+  readFileSync(new URL("../../fixtures/v1/test-kit/shops/barber.json", import.meta.url), "utf8"),
+) as { id: string; facts: string[]; switches: Record<string, unknown> };
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 type Values = Record<string, Json>;
@@ -109,6 +123,11 @@ interface CommitExchange {
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(new URL(path, CONTRACTS), "utf8"));
 const k04 = (file: string): SeedFile => readJson(`db-schema/core/fixtures/${file}`) as SeedFile;
+/** K-23 v1 seed-company-two-kinds.json's rows of `table` for tp-01's business (K-05 v1.6 open gap 47). */
+const k23BarbershopRows = (table: string): Values[] =>
+  (readJson("db-schema/business-setup/fixtures/seed-company-two-kinds.json") as SeedFile).rows
+    .filter((row) => row.table === table && row.values.business_id === TEST_OWNER_1.businessId)
+    .map((row) => row.values);
 
 /** One row of a K-04 seed fixture: the one of `table` whose values match `where`. */
 function k04Row(file: string, table: string, where: Values): Values {
@@ -195,6 +214,15 @@ async function skeletonRows(sql: Sql): Promise<Record<string, unknown[]>> {
     person_handles: [
       ...(await sql`select person_id, handle_id from person_handles order by person_id, handle_id`),
     ],
+    companies: [
+      ...(await sql`select id, owner_person_id, name, business_id, version from companies order by id`),
+    ],
+    company_kinds: [
+      ...(await sql`
+        select company_id, kind_id, business_id, trade_name, pf_facts, pf_switches_a, pf_switches_b, version
+        from company_kinds order by company_id, kind_id
+      `),
+    ],
   };
 }
 
@@ -279,6 +307,21 @@ describe("the rows: test owner 1 as the frozen fixtures give him", () => {
     // seed-person-roles.json gives Sam three owner roles: the reason this set exists. It holds no roles table at all.
     expect(Object.keys(SKELETON_ROWS).sort()).toEqual([...SKELETON_TABLES].sort());
   });
+
+  it("the barbershop's company and its one kind of work are K-23 seed-company-two-kinds.json's rows for tp-01's business, value for value (CQ-185)", () => {
+    expect(SKELETON_ROWS.companies).toEqual(k23BarbershopRows("companies"));
+    expect(SKELETON_ROWS.company_kinds).toEqual(k23BarbershopRows("company_kinds"));
+    expect(SKELETON_ROWS.companies).toMatchObject([
+      { owner_person_id: TEST_OWNER_1.personId, business_id: TEST_OWNER_1.businessId },
+    ]);
+  });
+
+  it("the kind of work is fixture set v1's barber shop: its facts, and no switch on in either flow, so K-05 v1.6 reads the barbershop's sensitive switch as off", () => {
+    expect(BARBER_SHOP.switches).toEqual({});
+    expect(SKELETON_ROWS.company_kinds).toMatchObject([
+      { kind_id: BARBER_SHOP.id, pf_facts: BARBER_SHOP.facts, pf_switches_a: [], pf_switches_b: [] },
+    ]);
+  });
 });
 
 describe("the skeleton seed on a fresh schema", () => {
@@ -300,7 +343,7 @@ describe("the skeleton seed on a fresh schema", () => {
   });
 
   it(
-    "writes its four rows and nothing else, as the job role, rosie_job, with no business scope",
+    "writes its six rows and nothing else, as the job role, rosie_job, with no business scope",
     SLOW,
     async () => {
       const first = await seedSkeleton(db.sql);
@@ -311,6 +354,8 @@ describe("the skeleton seed on a fresh schema", () => {
           persons: { rows: 1, inserted: 1, kept: 0 },
           handles: { rows: 1, inserted: 1, kept: 0 },
           person_handles: { rows: 1, inserted: 1, kept: 0 },
+          companies: { rows: 1, inserted: 1, kept: 0 },
+          company_kinds: { rows: 1, inserted: 1, kept: 0 },
         },
         testOwner: TEST_OWNER_1,
       });
@@ -371,6 +416,8 @@ describe("the skeleton seed on a fresh schema", () => {
         persons: { rows: 1, inserted: 0, kept: 1 },
         handles: { rows: 1, inserted: 0, kept: 1 },
         person_handles: { rows: 1, inserted: 1, kept: 0 },
+        companies: { rows: 1, inserted: 0, kept: 1 },
+        company_kinds: { rows: 1, inserted: 0, kept: 1 },
       });
       expect(await snapshot(db.sql)).toEqual(before);
     },

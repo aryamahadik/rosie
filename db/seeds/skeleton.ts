@@ -12,6 +12,17 @@
 //   handles         handle-sam           kind phone, at tp-01's number: K-04 seed-person-roles.json's handle-sam, the
 //                                        number tests/e2e/skeleton's JOIN comes from
 //   person_handles  Sam writes from that handle
+//   companies       company-lees-barbershop
+//                                        the barbershop's company, owned by Sam (T-1197; CQ-185): K-23 v1
+//                                        seed-company-two-kinds.json's row for tp-01's business, value for value,
+//                                        version included
+//   company_kinds   company-lees-barbershop's barber
+//                                        the barbershop's one kind of work, K-23's row likewise: fixture set v1's
+//                                        barber shop, with its facts and no switch on in either flow
+// The kind of work is here so turn 1's S1-02 row reads K-05 v1.6's businessSensitive as false (item 45: kinds of work,
+// none lists sensitive), and is filled in its routine form, as K-09 v1.6's compose-input-s1-02-v1.6.json and T-1175's
+// recording 4 have it; with none the read answers null, which the caller reads as on (K-05 open gap 47; DL-391). The
+// guard reads no kind of work (K-05 v1.2 handleTargets), so JOIN stays a first text.
 // Never seeded here: a role (K-04's seed-person-roles.json gives Sam three owner roles, and T-202's staging set plans a
 // customer role for each test phone: either makes JOIN a turn with a target), an open question, a booking, a phone row
 // (the number has none until turn 1 commits) and a sealing key (the gateway's handleSealingKey makes Sam's key at his
@@ -22,15 +33,16 @@
 //
 // In one transaction as the job role rosie_job with no business scope (T-191), as the core seed writes, stopping at the
 // first failure: refuses when another handle holds tp-01's number; writes each row only when its primary key is free
-// (ON CONFLICT DO NOTHING; nothing is updated or deleted); then reads tp-01's handle as the guard does (K-05 v1.2
-// handleTargets, db/repo/targets.ts) and refuses, rolling the whole transaction back, unless that handle holds tp-01's
-// number and the guard would find a first text: test owner 1 alone, with no live role, no live open question, no
-// booking and no phone row. So this set is loaded in place of K-04's seed-person-roles.json and of any other row for
-// tp-01, never on top of them; and once a turn from tp-01 has committed it refuses to run again (S1-02's question waits
-// for Sam's answer), since only a fresh schema makes his JOIN a first text again. Otherwise idempotent: a second run
-// writes nothing and leaves every row as it was, version included; a row that went missing is written again as the
-// first run wrote it. Nothing is printed, and no error names a value of a row: the caller (T-201's runner) prints the
-// counts this returns.
+// (ON CONFLICT DO NOTHING; nothing is updated or deleted; a clash on any other key, such as another company already
+// holding the barbershop, is an error that rolls the whole transaction back); then reads tp-01's handle as the guard
+// does (K-05 v1.2 handleTargets, db/repo/targets.ts) and refuses, rolling the whole transaction back, unless that handle
+// holds tp-01's number and the guard would find a first text: test owner 1 alone, with no live role, no live open
+// question, no booking and no phone row. So this set is loaded in place of K-04's seed-person-roles.json and of any
+// other row for tp-01, never on top of them; and once a turn from tp-01 has committed it refuses to run again (S1-02's
+// question waits for Sam's answer), since only a fresh schema makes his JOIN a first text again. Otherwise idempotent:
+// a second run writes nothing and leaves every row as it was, version included; a row that went missing is written
+// again as the first run wrote it. Nothing is printed, and no error names a value of a row: the caller (T-201's runner)
+// prints the counts this returns.
 //
 // D-017's run loads, in order: db/seeds/core.ts (T-200's demo shops, which share no id or number with this set), then
 // this set.
@@ -76,12 +88,36 @@ export interface SkeletonPersonHandleRow {
   readonly handle_id: string;
 }
 
+/** K-23 v1 companies: a company and the business it is (one company is one business, B10). */
+export interface SkeletonCompanyRow {
+  readonly id: string;
+  readonly owner_person_id: string;
+  readonly name: string;
+  readonly business_id: string;
+  readonly version: number;
+}
+
+/** K-23 v1 company_kinds: a kind of work of a company, its facts and the plug-in switches on in each flow. */
+export interface SkeletonCompanyKindRow {
+  readonly company_id: string;
+  readonly kind_id: string;
+  readonly business_id: string;
+  readonly trade_name: string | null;
+  readonly pf_facts: readonly string[];
+  /** Never K-26's sensitive here: the barbershop's switch reads off (K-05 v1.6 item 45). */
+  readonly pf_switches_a: readonly string[];
+  readonly pf_switches_b: readonly string[];
+  readonly version: number;
+}
+
 /** The set's rows, table by table, in the order their foreign keys need. */
 export interface SkeletonSeedRows {
   readonly businesses: readonly SkeletonBusinessRow[];
   readonly persons: readonly SkeletonPersonRow[];
   readonly handles: readonly SkeletonHandleRow[];
   readonly person_handles: readonly SkeletonPersonHandleRow[];
+  readonly companies: readonly SkeletonCompanyRow[];
+  readonly company_kinds: readonly SkeletonCompanyKindRow[];
 }
 
 export type SkeletonSeedTable = keyof SkeletonSeedRows;
@@ -103,6 +139,27 @@ export const SKELETON_ROWS: SkeletonSeedRows = {
   persons: [{ id: TEST_OWNER_1.personId, name: "Sam Lee", language: null }],
   handles: [{ id: TEST_OWNER_1.handleId, kind: "phone", address: "+15555550100" }],
   person_handles: [{ person_id: TEST_OWNER_1.personId, handle_id: TEST_OWNER_1.handleId }],
+  companies: [
+    {
+      id: "company-lees-barbershop",
+      owner_person_id: TEST_OWNER_1.personId,
+      name: "Lee's Barbershop LLC",
+      business_id: TEST_OWNER_1.businessId,
+      version: 2,
+    },
+  ],
+  company_kinds: [
+    {
+      company_id: "company-lees-barbershop",
+      kind_id: "barber",
+      business_id: TEST_OWNER_1.businessId,
+      trade_name: null,
+      pf_facts: ["children", "documents", "extrawork", "groups", "photos"],
+      pf_switches_a: [],
+      pf_switches_b: [],
+      version: 1,
+    },
+  ],
 };
 
 export interface SkeletonSeedResult {
@@ -227,6 +284,24 @@ export async function seedSkeleton(sql: Sql): Promise<SkeletonSeedResult> {
       insert into person_handles ${tx(rows.person_handles, "person_id", "handle_id")}
       on conflict (person_id, handle_id) do nothing
     `;
+    const companies = await tx`
+      insert into companies ${tx(rows.companies, "id", "owner_person_id", "name", "business_id", "version")}
+      on conflict (id) do nothing
+    `;
+    const companyKinds = await tx`
+      insert into company_kinds ${tx(
+        rows.company_kinds,
+        "company_id",
+        "kind_id",
+        "business_id",
+        "trade_name",
+        "pf_facts",
+        "pf_switches_a",
+        "pf_switches_b",
+        "version",
+      )}
+      on conflict (company_id, kind_id) do nothing
+    `;
     await requireFirstText(tx, handle);
     return {
       ranAs: who?.role ?? "",
@@ -235,6 +310,8 @@ export async function seedSkeleton(sql: Sql): Promise<SkeletonSeedResult> {
         persons: persons.count,
         handles: handles.count,
         person_handles: personHandles.count,
+        companies: companies.count,
+        company_kinds: companyKinds.count,
       },
     };
   });
@@ -251,6 +328,8 @@ export async function seedSkeleton(sql: Sql): Promise<SkeletonSeedResult> {
       persons: count("persons"),
       handles: count("handles"),
       person_handles: count("person_handles"),
+      companies: count("companies"),
+      company_kinds: count("company_kinds"),
     },
     testOwner: TEST_OWNER_1,
   };
