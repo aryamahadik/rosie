@@ -1,8 +1,21 @@
-// Data-access K-05 v1 items 2 to 4: write a row's plan and final parts, list the rows a crash left unplanned, claim
-// outbox rows in commit order, and move a row's parts and the row with them (T-196; C-152; K-05 README items 2, 3 and
-// 4; K-07 v1's states and allowed moves; arch 01 lines 39 to 41 and 65; arch 02 lines 123 to 127; arch 06 line 313;
-// arch 11 line 576). The runtime calls them, never a Tool API path: finalize writes the final parts (C-087, join 10:
-// T-561), and the dispatcher claims, marks and receives (C-124, C-125, join 11: T-562).
+// Data-access K-05 v1 items 2 to 4, with v1.1 items 13 to 16 and v1.2 items 30 to 32: write a row's plan and final
+// parts, list the rows a crash left unplanned, claim outbox rows in commit order, renew a claim just before a part goes,
+// and move a row's parts and the row with them (T-196, T-1135; C-152; K-05 README items 2 to 4, 13 to 16 and 30 to 32,
+// and "The stop and the send"; K-07 v1's states, allowed moves and outbox_claims ("How a claim lapses"); arch 01 lines
+// 39 to 41 and 65; arch 02 lines 123 to 127; arch 06 line 313; arch 11 line 576). The runtime calls them, never a Tool
+// API path: finalize writes the final parts (C-087, join 10: T-561), and the dispatcher claims, renews, marks and
+// receives (C-124, C-125, join 11: T-562).
+//
+// The outbox calls come in two versions, each answering its own contract's shapes:
+//   K-05 v1    claimOutbox, markPart and markRow, as T-196 built them: a claim writes no outbox_claims row and never
+//              lapses (K-05 v1 open gap 1), and every answer is v1's.
+//   K-05 v1.2  claimOutboxV12, renewClaim, markPartV12 and markRowV12 (T-1135): the dispatcher's send loop, as
+//              runtime/src/dispatch/types.ts's OutboxStore calls it. Each writes what v1.1 and v1.2 add (the claim, its
+//              renewal and re-claim, the row after a mark, a failure's message id and Retry-After, waitingChat, the
+//              port, the phone read with the renewal, a receipt found by its part's key), and its answer always carries
+//              the new fields, so it is a v1.1 answer with v1.2's fields added (K-05 v1.2: every v1.1 exchange is a
+//              v1.2 exchange). Only these write outbox_claims (default 20).
+// writePlan and unplannedRows are the same in every version.
 //
 //   writePlan      Locks the row. A row that holds a plan answers alreadyPlanned, checked before its version (after a
 //                  crash "only rows without a plan are composed": arch 11 line 576); else the version is compared and the
@@ -21,8 +34,25 @@
 //                  row under '<row>/<part>/<try>' (a new part try 1, attempts 1, its K-03 send kind; a part the provider
 //                  never accepted keeps its stored key with attempts raised; an accepted part is listed as sent). At most
 //                  `limit` rows in all. Finished rows (sent, delivered, dropped_stopped, withdrawn, failed, superseded) are
-//                  not open, so they are skipped. Under v1 a claim never lapses (K-05 v1 open gap 1; v1.1's re-claim of a
-//                  lapsed claim and its outbox_claims row are not here).
+//                  not open, so they are skipped. Under v1 a claim never lapses (K-05 v1 open gap 1).
+//   claimOutboxV12 claimOutbox, and (v1.1 item 13) each claim writes the row's outbox_claims row under the row's lock:
+//                  claimer, claimed_at = now, lapses_at = now + 60 s (K-07 default 2), claim_no 1 for a row with none or
+//                  raised by one, first_try_at and next_try_not_before kept, the claim's version raised; it is returned as
+//                  claim, with claimedFrom (checked, held or sending) and (v1.2 item 30) port: linq for the imessage, rcs
+//                  and sms channels, email for email, so never an SMS port (DL-012). Under the recipient's lock the walk
+//                  also takes a sending row whose claim has lapsed (lapses_at <= now) or that has no claim row (K-05
+//                  default 20), by compare-and-set on the row's version and the claim's claim_no: its unsent parts under
+//                  their stored keys with attempts raised, its accepted parts listed as sent. A sending row with a live
+//                  claim stops the walk. The sweep also walks a recipient whose first row not passed is such a row.
+//   renewClaim     The dispatcher's call just before each send of a part (v1.1 item 14; K-05 default 11). It locks the row
+//                  and its claim: the row must be sending and the claim the caller's (claimer and claimNo), or claimLost
+//                  (a lapsed claim nobody took again is still the caller's); the key a pending part of the row (notFound,
+//                  wrongState); a next_try_not_before after `at` answers notYet with it. Then lapses_at = at + 60 s,
+//                  first_try_at = at if null, next_try_not_before cleared; only the claim's version rises, never the
+//                  row's. In the same transaction (v1.2 item 32) it reads the recipient's phone row FOR SHARE, which waits
+//                  for a STOP whose commit is writing that row, so the renewal sees the stop, and returns its stopped flag,
+//                  chat flag and version as recipient (null with no phone row: an email handle). It refuses nothing for
+//                  a stop: what a stop allows is limit 8's (C-125; K-05 default 38).
 //   markPart       One part's outcome, found by its key (attempt, sent, failed) or by the provider's message id
 //                  (delivered: outbox_parts_linq_message_idx). The part moves as K-07's partMove allows, and the row moves
 //                  with its parts in the same transaction, as K-07 says (the row follows the latest try of each part):
@@ -35,28 +65,46 @@
 //                  same key after a timeout. A second receipt, a second sent or a second failure for the same key changes
 //                  nothing and says repeated. Every mark that changes a part raises the row's version by one (K-07 "raising
 //                  the row's version").
+//   markPartV12    markPart, answering the row's state and version after the mark (v1.1 item 15: the dispatcher compares
+//                  them in its next markRow), and: failed may carry providerMessageId, stored in linq_message_id when the
+//                  part holds none, and with retry nextTryNotBefore, the provider's Retry-After, stored in the claim's
+//                  next_try_not_before; delivered may carry the part's key the receipt echoes (v1.2 item 31): when no part
+//                  holds the receipt's message id, the part under the key is the receipt's if it holds no message id of
+//                  its own (a 4001 or 4006 gave none), and the receipt's id is stored on it, so a later receipt finds it
+//                  the first way and a receipt after a 4001 or 4006 moves failed to delivered (K-05 default 39). A part
+//                  under the key that holds another message id is not the receipt's (notFound).
 //   markRow        Limit 8's outcome at send (arch 06 line 313), compare-and-set on the row's version: held sets held_until
 //                  (the row returns to the open rows, claimed again once it passes), droppedStopped and withdrawn close
 //                  it, and stale clears plan and final_parts, so unplannedRows lists it and it is composed again from
 //                  today's record (S13-57).
+//   markRowV12     markRow, and waitingChat (v1.1 item 16): sending to waiting_chat, held_until cleared and the row's
+//                  outbox_claims row deleted; no clock arms and nothing is sent (arch 06 line 313; RULES 4.1b; MC C9).
+//                  The other outcomes keep the claim row, so claim_no keeps counting the row's claims (a held row's
+//                  morning claim is claim 2: K-07 outbox-held-text-hours).
 //
 // Every move these calls make is one of K-07 v1's (ROW_MOVES and PART_MOVES below, K-07's lists word for word: the
 // integration test compares them with outbox-effects.v1.schema.json). A move K-07 does not allow is refused before
 // anything is written (delivered back to sending, anything out of dropped_stopped): K-05 v1.1's wrongState, with the
 // state the row or part stands in now.
 //
-// Side (K-05 README "Scope": runtime; T-191's roles): each call is one transaction on the primary, uncached, run as
-// rosie_job with no business scope (inRuntimeTransaction clears it), so the dispatcher's sweep sees every business's
-// rows. outbox_parts has no row-level security (the dispatcher alone reads and writes it: K-04).
+// Locks: every call that writes a row's parts or its claim locks the outbox row first (FOR UPDATE), so two calls on one
+// row run one after the other and never wait on each other in a circle; renewClaim's phone read comes last.
 //
-// Answers: K-05 v1's responses and errors, and K-05 v1.1's wrongState for a move K-07 does not allow (default 1). A
-// serialization failure, a deadlock or a lost connection answers transient: nothing was written, and the same request
-// may be sent again. A request a call cannot carry out throws a TypeError, a database refusal no K-05 answer names
-// throws DataAccessDatabaseError (its SQLSTATE and names only), and nothing is written either way.
+// Side (K-05 README "Scope": runtime; T-191's roles): each call is one transaction on the primary, uncached, run as
+// rosie_job with no business scope (inRuntimeTransaction clears it; read committed for the writes, so a FOR SHARE read
+// that waited sees the row the other transaction committed), so the dispatcher's sweep sees every business's rows.
+// outbox_parts, outbox_claims and phones have no row-level security (the dispatcher alone reads and writes the first two,
+// and the runtime side alone reads phones: K-04, K-07).
+//
+// Answers: K-05 v1's responses and errors, and K-05 v1.1's wrongState for a move K-07 does not allow (default 1); the
+// v1.2 calls K-05 v1.2's, with v1.1's claimLost and notYet. A serialization failure, a deadlock (a renewal's with a STOP
+// that is committing included: K-05 v1.2 item 32) or a lost connection answers transient: nothing was written, and the
+// same request may be sent again. A request a call cannot carry out throws a TypeError, a database refusal no K-05
+// answer names throws DataAccessDatabaseError (its SQLSTATE and names only), and nothing is written either way.
 //
 // Nothing here logs. What it throws names a call, a field, a table or a state, never a value, a row id or a key (a key
 // carries its row id); a refusal never carries PostgresError.detail, which can hold a row's words (CQ-59; the security
-// reviewer's note (a) on T-189).
+// reviewer's note (a) on T-189). A phone row is read for its two flags and its version only, never its number.
 //
 // Defaults used (for ops/QUESTIONS.md; each where no source decides):
 //   1. A refusal K-05 v1's errors do not name answers K-05 v1.1's wrongState (frozen: "markRow and markPart need a
@@ -95,11 +143,44 @@
 //  11. Commit order is commit_seq, the order K-04's identity column gives at insert (K-05 item 1): two commits to one
 //      recipient in flight at once can commit in the other order, and a walk sees only committed rows (the architect's
 //      note c on T-189: the walk uses order, not adjacency).
+//  12. A claim reads the row's claim row FOR UPDATE under the row's lock. A checked row that was claimed before (a sent
+//      row whose accepted part failed and went back to checked, or a stale row composed again) or a held row keeps its
+//      claim row, so its claim updates it, claim_no + 1, keeping first_try_at and next_try_not_before (K-05 item 13:
+//      "kept from it"); a row with none gets claim 1. The claim's times are the request's `now`, not the database's.
+//  13. A lapsed sending row whose part's latest try failed with no next try (a 4001 or 4006 waiting for its receipt, or
+//      for its minute: K-07 rule 2) stops its recipient's walk unclaimed, as default 5 says for any claimable row: a new
+//      dispatcher cannot know when the minute ends, and nothing is sent twice. Its receipt (markPartV12 delivered, by
+//      message id or key) or a failure with retry (its next try) moves it; until then the sweep finds it again.
+//  14. renewClaim checks in K-05 item 14's order: the row (notFound), then the claim (claimLost, naming the claimer and
+//      claim number now, or null and null with no claim row), then the part, then the Retry-After (notYet). A key no
+//      part holds answers notFound (outbox_parts, the key); a key of another row's part, or of a part that is not
+//      pending, answers wrongState with that part's state (renewClaim.errors: "the part is not this row's or not
+//      pending"). The part is read without a lock: its row's lock, held, keeps it still. A renewal whose at + 60 s is
+//      not after the claim's claimed_at is refused by outbox_claims_lapse_after_claim (DataAccessDatabaseError).
+//  15. renewClaim's phone row is the one whose handle_id is the row's recipient (K-04 phones_handle_key), read last, so a
+//      refusal waits on no phone lock. With no phone row (an email handle, or a number whose first turn wrote none)
+//      recipient is null, which T-562 treats as unreadable and sends nothing (K-05 README, the consumer note for T-562).
+//  16. A receipt found by its key answers notFound naming the receipt's message id, as a receipt by message id does,
+//      when the part under the key holds another message id; under the row's lock the part is read again, so a receipt
+//      whose id a twin receipt stored meanwhile is that part's (a repeat). A part under the key that is pending (never
+//      accepted) answers wrongState: K-07 has no pending-to-delivered move.
+//  17. markPartV12 failed stores providerMessageId only as the part moves to failed (when it holds none); a failure for a
+//      part already failed, a repeat or its next try's writing, stores none (the part does not move).
+//  18. markPartV12 failed's nextTryNotBefore is written to the claim only with the next try it holds (retry true, a mark
+//      that is not a repeat). A row with no claim row (claimed by v1 code) refuses it, thrown with nothing written: the
+//      Retry-After would otherwise be lost. A failure with retry and no nextTryNotBefore leaves the claim as it is.
+//  19. markPartV12 refuses a failure carrying followUps or events (a failed safety line's other ways, written with its
+//      first failure: v1.1 item 15), thrown with nothing written, until the task that writes them (T-1136) lands: a
+//      safety failure is never recorded without the rows that follow it (K-05 default 22).
+//  20. Only the v1.2 calls write outbox_claims; the v1 calls keep T-196's behaviour and answers unchanged, so a row a v1
+//      claim holds has no claim row and a v1.2 claim takes it again at once (K-05 default 20). The two are never run
+//      against one outbox: the dispatcher (T-562) calls the v1.2 calls only.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
+import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
 import { commitSeqOf, instantOf, transientOrScrubbed } from "./clocks";
 import type { Sql } from "./scope";
-import { assertRequestShape, inRuntimeTransaction, utc } from "./targets";
+import { assertRequestShape, inRuntimeTransaction, utc, utcOrNull } from "./targets";
 
 type Json = Parameters<Sql["json"]>[0];
 type Row = Record<string, unknown>;
@@ -235,16 +316,71 @@ type Channel = K05.Channel;
 type SendClass = K05.SendClass;
 type PassedHeld = ClaimOutboxResponse["passedHeld"][number];
 
+// ---- the v1.2 calls' shapes (K-05 v1.2, which refers on to v1.1 for renewClaim's request, markPart's answer and
+// markRow) ------------------------------------------------------------------------------------------------------------
+
+/** K-07 v1 outboxClaim, K-05 v1.1's claim: who holds the row, when it lapses, its number and the two kept times. */
+export type OutboxClaim = K05v12.OutboxClaim;
+/** K-07 v1 port in K-05 v1.2's names: linq or email, never an SMS port (DL-012). */
+export type Port = K05v12.Port;
+/** The state a claimed row was claimed from: K-07's moves to sending by claimOutbox. */
+export type ClaimedFrom = "checked" | "held" | "sending";
+
+/** K-05 v1.2 claimedRow as a v1.2 call always writes it: v1's fields, v1.1's claim and claimedFrom, v1.2's port. */
+export type ClaimedRowV12 = ClaimedRow & { claim: OutboxClaim; claimedFrom: ClaimedFrom; port: Port };
+
+/** K-05 v1.2 claimOutbox.response: each claimed row with its claim and port. */
+export interface ClaimOutboxV12Response {
+  result: "claimed";
+  claimed: ClaimedRowV12[];
+  passedHeld: PassedHeld[];
+}
+export type ClaimOutboxV12Outcome = ClaimOutboxV12Response | K05.TransientError;
+
+export type RenewClaimRequest = K05v12.RenewClaimRequest;
+/** K-05 v1.2 phoneFlags: the recipient's stopped flag, chat flag and phone row version. */
+export type PhoneFlags = K05v12.PhoneFlags;
+/** K-05 v1.2 renewClaim.response as a v1.2 call always writes it: the renewed claim and the phone read with it. */
+export interface RenewClaimResponse {
+  result: "renewed";
+  outboxRowId: string;
+  claim: OutboxClaim;
+  /** The recipient's phone row as this transaction read it, FOR SHARE; null with no phone row (an email handle). */
+  recipient: PhoneFlags | null;
+}
+export type ClaimLostError = K05v12.ClaimLostError;
+export type NotYetError = K05v12.NotYetError;
+export type RenewClaimError =
+  ClaimLostError | NotYetError | WrongStateError | K05.NotFoundError | K05.TransientError;
+export type RenewClaimOutcome = RenewClaimResponse | RenewClaimError;
+
+export type MarkPartV12Request = K05v12.MarkPartRequest;
+/** The row after a mark: its state in K-07's words and its version (K-05 v1.1 markPart.response row). */
+export interface RowAfter {
+  state: RowState;
+  version: number;
+}
+/** K-05 v1.1 markPart.response as a v1.2 call always writes it: v1's fields and the row after the mark. */
+export type MarkPartV12Response = MarkPartResponse & { row: RowAfter };
+export type MarkPartV12Outcome = MarkPartV12Response | MarkPartError;
+
+export type MarkRowV12Request = K05v12.MarkRowRequest;
+export type MarkRowV12Response = K05v12.MarkRowResponse;
+export type MarkRowV12Outcome = MarkRowV12Response | MarkRowError;
+
 // ---- request checks: what the database cannot be trusted to refuse ---------------------------------------------------
 
 const WRITE_PLAN = "writePlan";
 const UNPLANNED_ROWS = "unplannedRows";
 const CLAIM_OUTBOX = "claimOutbox";
+const RENEW_CLAIM = "renewClaim";
 const MARK_PART = "markPart";
 const MARK_ROW = "markRow";
 
 /** K-05 claimOutbox.limit: at most this many rows in all. */
 const MAX_LIMIT = 100;
+/** K-07 default 2: a claim lapses 60 s after it is taken or renewed. */
+const CLAIM_LAPSE_MS = 60_000;
 /** K-04 outbox_parts_key_form as K-05 writes it: '<row>/<part>/<try>'. */
 const PART_KEY = /^.+\/[12]\/[1-9][0-9]*$/;
 const CHANNELS: ReadonlySet<string> = new Set<Channel>(["imessage", "rcs", "sms", "email"]);
@@ -291,6 +427,20 @@ function assertFields(call: string, record: Row, fields: readonly string[], what
   const keys = Object.keys(record);
   if (keys.length !== fields.length || !fields.every((field) => Object.hasOwn(record, field))) {
     fail(call, `${what} takes exactly ${fields.join(", ")}`);
+  }
+}
+
+/** Refuses a record that lacks one of `required` or has a field outside `required` and `optional`. */
+function assertFieldsWithin(
+  call: string,
+  record: Row,
+  required: readonly string[],
+  optional: readonly string[],
+  what: string,
+): void {
+  const known = (key: string): boolean => required.includes(key) || optional.includes(key);
+  if (!required.every((field) => Object.hasOwn(record, field)) || !Object.keys(record).every(known)) {
+    fail(call, `${what} takes ${required.join(", ")}, and may take ${optional.join(", ")}`);
   }
 }
 
@@ -437,6 +587,31 @@ function checkClaim(request: ClaimOutboxRequest): ClaimChecked {
   };
 }
 
+interface RenewChecked {
+  readonly outboxRowId: string;
+  readonly claimer: string;
+  readonly claimNo: number;
+  readonly key: string;
+  readonly at: Date;
+}
+
+/** renewClaim's request: every field required (K-05 v1.1 renewClaim.request). */
+function checkRenew(request: RenewClaimRequest): RenewChecked {
+  assertRequestShape(request, RENEW_CLAIM, ["outboxRowId", "claimer", "claimNo", "idempotencyKey", "at"]);
+  const raw = request as unknown as Row;
+  const claimNo = raw.claimNo;
+  if (typeof claimNo !== "number" || !Number.isSafeInteger(claimNo) || claimNo < 1) {
+    fail(RENEW_CLAIM, "claimNo is not a claim number (a positive integer)");
+  }
+  return {
+    outboxRowId: idOf(RENEW_CLAIM, raw.outboxRowId, "outboxRowId"),
+    claimer: idOf(RENEW_CLAIM, raw.claimer, "claimer"),
+    claimNo,
+    key: partKeyOf(RENEW_CLAIM, raw.idempotencyKey),
+    at: instantOf(RENEW_CLAIM, raw.at, "at"),
+  };
+}
+
 type MarkChecked =
   | { readonly outcome: "attempt"; readonly key: string; readonly at: Date }
   | {
@@ -446,15 +621,79 @@ type MarkChecked =
       readonly providerOptionIds: string[] | null;
       readonly at: Date;
     }
-  | { readonly outcome: "delivered"; readonly providerMessageId: string; readonly at: Date }
+  | {
+      readonly outcome: "delivered";
+      readonly providerMessageId: string;
+      /** v1.2: the part's key the receipt echoes, used only when no part holds the message id; v1: always null. */
+      readonly key: string | null;
+      readonly at: Date;
+    }
   | {
       readonly outcome: "failed";
       readonly key: string;
       readonly errorCode: string;
       readonly retry: boolean;
+      /** v1.1: the provider's message id the failure carries; v1: always null. */
+      readonly providerMessageId: string | null;
+      /** v1.1: the provider's Retry-After for the next try (retry true only); v1: always null. */
+      readonly nextTryNotBefore: Date | null;
       readonly at: Date;
     };
 
+/** markPart's attempt, the same in every version. */
+function attemptOf(raw: Row): MarkChecked {
+  assertFields(MARK_PART, raw, ["outcome", "idempotencyKey", "at"], "an attempt");
+  return {
+    outcome: "attempt",
+    key: partKeyOf(MARK_PART, raw.idempotencyKey),
+    at: instantOf(MARK_PART, raw.at, "at"),
+  };
+}
+
+/** markPart's sent, the same in every version. */
+function sentOf(raw: Row): MarkChecked {
+  assertFields(
+    MARK_PART,
+    raw,
+    ["outcome", "idempotencyKey", "providerMessageId", "providerOptionIds", "at"],
+    "a sent mark",
+  );
+  const optionIds = raw.providerOptionIds;
+  if (optionIds !== null && !Array.isArray(optionIds)) {
+    fail(MARK_PART, "providerOptionIds is not a list or null");
+  }
+  return {
+    outcome: "sent",
+    key: partKeyOf(MARK_PART, raw.idempotencyKey),
+    providerMessageId: idOf(MARK_PART, raw.providerMessageId, "providerMessageId"),
+    providerOptionIds:
+      optionIds === null
+        ? null
+        : (optionIds as unknown[]).map((id, index) =>
+            idOf(MARK_PART, id, `providerOptionIds[${String(index)}]`),
+          ),
+    at: instantOf(MARK_PART, raw.at, "at"),
+  };
+}
+
+/** markPart failed's fields of every version: its code, whether a next try follows, its key and time. */
+function failureOf(raw: Row): { key: string; errorCode: string; retry: boolean; at: Date } {
+  const errorCode = raw.errorCode;
+  if (typeof errorCode !== "string" || errorCode === "" || errorCode.includes("\u0000")) {
+    fail(MARK_PART, "errorCode is not a non-empty code");
+  }
+  if (typeof raw.retry !== "boolean") {
+    fail(MARK_PART, "retry is not true or false");
+  }
+  return {
+    key: partKeyOf(MARK_PART, raw.idempotencyKey),
+    errorCode,
+    retry: raw.retry,
+    at: instantOf(MARK_PART, raw.at, "at"),
+  };
+}
+
+/** K-05 v1 markPart.request. */
 function checkMarkPart(request: MarkPartRequest): MarkChecked {
   if (!isRecord(request)) {
     fail(MARK_PART, "the request is not an object");
@@ -462,58 +701,86 @@ function checkMarkPart(request: MarkPartRequest): MarkChecked {
   const raw = request as Row;
   switch (raw.outcome) {
     case "attempt":
-      assertFields(MARK_PART, raw, ["outcome", "idempotencyKey", "at"], "an attempt");
-      return {
-        outcome: "attempt",
-        key: partKeyOf(MARK_PART, raw.idempotencyKey),
-        at: instantOf(MARK_PART, raw.at, "at"),
-      };
-    case "sent": {
-      assertFields(
-        MARK_PART,
-        raw,
-        ["outcome", "idempotencyKey", "providerMessageId", "providerOptionIds", "at"],
-        "a sent mark",
-      );
-      const optionIds = raw.providerOptionIds;
-      if (optionIds !== null && !Array.isArray(optionIds)) {
-        fail(MARK_PART, "providerOptionIds is not a list or null");
-      }
-      return {
-        outcome: "sent",
-        key: partKeyOf(MARK_PART, raw.idempotencyKey),
-        providerMessageId: idOf(MARK_PART, raw.providerMessageId, "providerMessageId"),
-        providerOptionIds:
-          optionIds === null
-            ? null
-            : (optionIds as unknown[]).map((id, index) =>
-                idOf(MARK_PART, id, `providerOptionIds[${String(index)}]`),
-              ),
-        at: instantOf(MARK_PART, raw.at, "at"),
-      };
-    }
+      return attemptOf(raw);
+    case "sent":
+      return sentOf(raw);
     case "delivered":
       assertFields(MARK_PART, raw, ["outcome", "providerMessageId", "at"], "a delivery receipt");
       return {
         outcome: "delivered",
         providerMessageId: idOf(MARK_PART, raw.providerMessageId, "providerMessageId"),
+        key: null,
         at: instantOf(MARK_PART, raw.at, "at"),
       };
-    case "failed": {
+    case "failed":
       assertFields(MARK_PART, raw, ["outcome", "idempotencyKey", "errorCode", "retry", "at"], "a failure");
-      const errorCode = raw.errorCode;
-      if (typeof errorCode !== "string" || errorCode === "" || errorCode.includes("\u0000")) {
-        fail(MARK_PART, "errorCode is not a non-empty code");
+      return { outcome: "failed", ...failureOf(raw), providerMessageId: null, nextTryNotBefore: null };
+    default:
+      return fail(MARK_PART, "outcome is not attempt, sent, delivered or failed");
+  }
+}
+
+/** K-05 v1.2 markPart.request: v1.1's failure fields (followUps refused: default 19) and v1.2's receipt key. */
+function checkMarkPartV12(request: MarkPartV12Request): MarkChecked {
+  if (!isRecord(request)) {
+    fail(MARK_PART, "the request is not an object");
+  }
+  const raw = request as Row;
+  switch (raw.outcome) {
+    case "attempt":
+      return attemptOf(raw);
+    case "sent":
+      return sentOf(raw);
+    case "delivered": {
+      assertFieldsWithin(
+        MARK_PART,
+        raw,
+        ["outcome", "providerMessageId", "at"],
+        ["idempotencyKey"],
+        "a delivery receipt",
+      );
+      const key = raw.idempotencyKey;
+      return {
+        outcome: "delivered",
+        // A receipt always carries its message id (refuse-mark-delivered-key-only).
+        providerMessageId: idOf(MARK_PART, raw.providerMessageId, "providerMessageId"),
+        key: key === undefined || key === null ? null : partKeyOf(MARK_PART, key),
+        at: instantOf(MARK_PART, raw.at, "at"),
+      };
+    }
+    case "failed": {
+      if (Object.hasOwn(raw, "followUps") || Object.hasOwn(raw, "events")) {
+        fail(
+          MARK_PART,
+          "followUps and events (a failed safety line's other ways) are not written here (default 19)",
+        );
       }
-      if (typeof raw.retry !== "boolean") {
-        fail(MARK_PART, "retry is not true or false");
+      assertFieldsWithin(
+        MARK_PART,
+        raw,
+        ["outcome", "idempotencyKey", "errorCode", "retry", "at"],
+        ["providerMessageId", "nextTryNotBefore"],
+        "a failure",
+      );
+      const failure = failureOf(raw);
+      const messageId = raw.providerMessageId;
+      const notBefore = raw.nextTryNotBefore;
+      const nextTryNotBefore =
+        notBefore === undefined || notBefore === null
+          ? null
+          : instantOf(MARK_PART, notBefore, "nextTryNotBefore");
+      if (nextTryNotBefore !== null && !failure.retry) {
+        // The schema's if/then: a Retry-After holds a next try, so it goes only with retry true.
+        fail(MARK_PART, "nextTryNotBefore is null for a failure with no retry");
       }
       return {
         outcome: "failed",
-        key: partKeyOf(MARK_PART, raw.idempotencyKey),
-        errorCode,
-        retry: raw.retry,
-        at: instantOf(MARK_PART, raw.at, "at"),
+        ...failure,
+        providerMessageId:
+          messageId === undefined || messageId === null
+            ? null
+            : idOf(MARK_PART, messageId, "providerMessageId"),
+        nextTryNotBefore,
       };
     }
     default:
@@ -521,7 +788,7 @@ function checkMarkPart(request: MarkPartRequest): MarkChecked {
   }
 }
 
-/** markRow's outcomes and the K-07 state each moves the row to. */
+/** markRow's outcomes under K-05 v1 and the K-07 state each moves the row to. */
 const MARKED_STATES = {
   held: "held",
   droppedStopped: "dropped_stopped",
@@ -529,12 +796,19 @@ const MARKED_STATES = {
   withdrawn: "withdrawn",
 } as const satisfies Record<MarkRowRequest["outcome"], RowState>;
 
-type MarkRowOutcomeName = keyof typeof MARKED_STATES;
+/** markRow's outcomes under K-05 v1.1 and v1.2: v1's, and waitingChat. */
+const MARKED_STATES_V12 = {
+  ...MARKED_STATES,
+  waitingChat: "waiting_chat",
+} as const satisfies Record<MarkRowV12Request["outcome"], RowState>;
 
-interface MarkRowChecked {
+type MarkRowOutcomeName = keyof typeof MARKED_STATES;
+type MarkRowV12OutcomeName = keyof typeof MARKED_STATES_V12;
+
+interface MarkRowChecked<O extends MarkRowV12OutcomeName> {
   readonly outboxRowId: string;
   readonly expectVersion: number;
-  readonly outcome: MarkRowOutcomeName;
+  readonly outcome: O;
   readonly heldUntil: Date | null;
 }
 
@@ -542,12 +816,21 @@ function isMarkRowOutcome(value: unknown): value is MarkRowOutcomeName {
   return typeof value === "string" && Object.hasOwn(MARKED_STATES, value);
 }
 
-function checkMarkRow(request: MarkRowRequest): MarkRowChecked {
+function isMarkRowV12Outcome(value: unknown): value is MarkRowV12OutcomeName {
+  return typeof value === "string" && Object.hasOwn(MARKED_STATES_V12, value);
+}
+
+/** markRow's request, its outcome one of the version's (`isOutcome`, named by `outcomes` when refused). */
+function checkMarkRowOf<O extends MarkRowV12OutcomeName>(
+  request: unknown,
+  isOutcome: (value: unknown) => value is O,
+  outcomes: string,
+): MarkRowChecked<O> {
   assertRequestShape(request, MARK_ROW, ["outboxRowId", "expectVersion", "outcome", "heldUntil", "at"]);
-  const raw = request as unknown as Row;
+  const raw = request as Row;
   const outcome = raw.outcome;
-  if (!isMarkRowOutcome(outcome)) {
-    fail(MARK_ROW, "outcome is not held, droppedStopped, stale or withdrawn");
+  if (!isOutcome(outcome)) {
+    fail(MARK_ROW, `outcome is not ${outcomes}`);
   }
   // The schema's if/then/else: held carries the time it is held until, every other outcome null.
   let heldUntil: Date | null = null;
@@ -565,6 +848,18 @@ function checkMarkRow(request: MarkRowRequest): MarkRowChecked {
   };
 }
 
+function checkMarkRow(request: MarkRowRequest): MarkRowChecked<MarkRowOutcomeName> {
+  return checkMarkRowOf(request, isMarkRowOutcome, "held, droppedStopped, stale or withdrawn");
+}
+
+function checkMarkRowV12(request: MarkRowV12Request): MarkRowChecked<MarkRowV12OutcomeName> {
+  return checkMarkRowOf(
+    request,
+    isMarkRowV12Outcome,
+    "held, droppedStopped, stale, withdrawn or waitingChat",
+  );
+}
+
 // ---- answers ----------------------------------------------------------------------------------------------------------
 
 function wrongState(
@@ -577,6 +872,85 @@ function wrongState(
 
 function versionChanged(rowId: string, readVersion: number, currentVersion: number): K05.VersionChangedError {
   return { error: "versionChanged", changed: [{ table: "outbox_rows", rowId, readVersion, currentVersion }] };
+}
+
+// ---- the claim on a sending row (K-07 outbox_claims; K-05 v1.1 items 13, 14 and 16) -------------------------------------
+
+/** An outbox_claims row as read. */
+interface ClaimRead {
+  claimer: string;
+  claimed_at: Date;
+  lapses_at: Date;
+  claim_no: number;
+  first_try_at: Date | null;
+  next_try_not_before: Date | null;
+  version: number;
+}
+
+const CLAIM_COLUMNS = "claimer, claimed_at, lapses_at, claim_no, first_try_at, next_try_not_before, version";
+
+/** When a claim taken or renewed at `at` lapses (K-07 default 2). */
+function lapseAfter(at: Date): Date {
+  return new Date(at.getTime() + CLAIM_LAPSE_MS);
+}
+
+/** The row's claim, locked; undefined when it has none. The caller holds the row's lock. */
+async function lockClaim(tx: Sql, rowId: string): Promise<ClaimRead | undefined> {
+  const [claim] = await tx<ClaimRead[]>`
+    select ${tx.unsafe(CLAIM_COLUMNS)} from outbox_claims where outbox_row_id = ${rowId} for update
+  `;
+  return claim;
+}
+
+/** A claim row in K-07's names (outboxClaim). */
+function claimOf(claim: ClaimRead): OutboxClaim {
+  return {
+    claimer: claim.claimer,
+    claimedAt: utc(claim.claimed_at),
+    lapsesAt: utc(claim.lapses_at),
+    claimNo: claim.claim_no,
+    firstTryAt: utcOrNull(claim.first_try_at),
+    nextTryNotBefore: utcOrNull(claim.next_try_not_before),
+  };
+}
+
+/** The claim a v1.2 claim takes: who, at which moment, over the claim row read under the row's lock (if any). */
+interface Claiming {
+  readonly claimer: string;
+  readonly now: Date;
+  readonly current: ClaimRead | undefined;
+}
+
+/**
+ * Writes the claim a claim takes (K-05 v1.1 item 13; default 12): claim 1 for a row with no claim row; else the row's
+ * claim taken over by compare-and-set on its claim_no and version, claim_no + 1, its two kept times as they are.
+ */
+async function writeClaim(tx: Sql, rowId: string, claiming: Claiming): Promise<OutboxClaim> {
+  const { claimer, now, current } = claiming;
+  const lapses = lapseAfter(now);
+  const [written] =
+    current === undefined
+      ? await tx<ClaimRead[]>`
+          insert into outbox_claims (outbox_row_id, claimer, claimed_at, lapses_at, claim_no)
+          values (${rowId}, ${claimer}, ${now}, ${lapses}, 1)
+          returning ${tx.unsafe(CLAIM_COLUMNS)}
+        `
+      : await tx<ClaimRead[]>`
+          update outbox_claims
+          set claimer = ${claimer}, claimed_at = ${now}, lapses_at = ${lapses}, claim_no = claim_no + 1,
+              version = version + 1
+          where outbox_row_id = ${rowId} and claim_no = ${current.claim_no} and version = ${current.version}
+          returning ${tx.unsafe(CLAIM_COLUMNS)}
+        `;
+  if (written === undefined) {
+    throw new Error("claimOutbox: a claim moved while its row was locked");
+  }
+  return claimOf(written);
+}
+
+/** K-07 outboxRow.port, from the channel as K-07 ties them (K-05 v1.2 item 30): no SMS port (DL-012). */
+function portOf(channel: Channel): Port {
+  return channel === "email" ? "email" : "linq";
 }
 
 // ---- writePlan (K-05 v1 item 2) -------------------------------------------------------------------------------------
@@ -678,7 +1052,7 @@ export async function unplannedRows(sql: Sql, request: UnplannedRowsRequest): Pr
   }
 }
 
-// ---- claimOutbox (K-05 v1 item 3) -------------------------------------------------------------------------------------
+// ---- claimOutbox (K-05 v1 item 3; v1.1 item 13 and v1.2 item 30 in claimOutboxV12) ------------------------------------
 
 interface OpenRow {
   id: string;
@@ -742,6 +1116,34 @@ async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
   return rows.map((row) => row.recipient_handle_id);
 }
 
+/**
+ * The v1.2 sweep's recipients: as claimableRecipients, and a recipient whose first open row that is not passed is a
+ * sending row whose claim lapsed or that has no claim row (K-05 v1.1 item 13; default 20).
+ */
+async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
+  const rows = await tx<{ recipient_handle_id: string }[]>`
+    select f.recipient_handle_id
+    from (
+      select distinct on (r.recipient_handle_id) r.recipient_handle_id, r.state,
+             (c.outbox_row_id is null or c.lapses_at <= ${now}) as lapsed
+      from outbox_rows r
+      left join outbox_claims c on c.outbox_row_id = r.id
+      where r.state in ('planned', 'checked', 'sending', 'stale')
+         or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now}))
+      order by r.recipient_handle_id, r.commit_seq
+    ) as f
+    join (
+      select recipient_handle_id, min(commit_seq) as first_open
+      from outbox_rows
+      where state in ${tx(OPEN_STATES)}
+      group by recipient_handle_id
+    ) as o on o.recipient_handle_id = f.recipient_handle_id
+    where f.state in ('checked', 'held') or (f.state = 'sending' and f.lapsed)
+    order by o.first_open
+  `;
+  return rows.map((row) => row.recipient_handle_id);
+}
+
 /** The recipient's transaction-level lock, or false when another claim holds it (default 10). */
 async function lockRecipient(tx: Sql, recipientHandleId: string): Promise<boolean> {
   const [lock] = await tx<{ taken: boolean }[]>`
@@ -784,7 +1186,7 @@ type PartPlan =
 /**
  * What the claim writes for each of the row's parts (K-05 item 3; arch 11 line 576), decided before anything is
  * written: a new part try 1; a part never accepted, again under its stored key; an accepted part, listed as sent. Null
- * when a part's latest try failed with no next try: the row is not sendable as it stands (default 5).
+ * when a part's latest try failed with no next try: the row is not sendable as it stands (defaults 5 and 13).
  */
 function planParts(parts: readonly PartRow[], kinds: readonly SendKind[]): PartPlan[] | null {
   const latest = latestTries(parts);
@@ -861,11 +1263,34 @@ function partsOf(parts: readonly ClaimedPart[]): ClaimedRow["parts"] {
   return second === undefined ? [first] : [first, second];
 }
 
+/** The state a row is claimed from (K-07: checked, held or sending to sending, by claimOutbox). */
+function claimedFromOf(state: RowState): ClaimedFrom {
+  if (state === "checked" || state === "held" || state === "sending") {
+    return state;
+  }
+  throw new Error(`claimOutbox: K-07 lets no claim move a ${state} row`);
+}
+
+/** One row a claim took: v1's claimed row, the state it was claimed from, its port and (v1.2) its claim. */
+interface Taken {
+  readonly row: ClaimedRow;
+  readonly from: ClaimedFrom;
+  readonly port: Port;
+  /** The claim a v1.2 claim wrote; null under v1, which writes none. */
+  readonly claim: OutboxClaim | null;
+}
+
 /**
- * Claims one row under the recipient's lock: its parts, then its move to sending under compare-and-set (K-07: checked or
- * held to sending, by claimOutbox). Null when the row is not sendable as it stands (default 5): nothing is written.
+ * Claims one row under the recipient's lock: its parts, then its move to sending under compare-and-set (K-07: checked,
+ * held or, for a lapsed claim, sending to sending, by claimOutbox), then, for a v1.2 claim (`claiming`), its claim row.
+ * Null when the row is not sendable as it stands (defaults 5 and 13): nothing is written.
  */
-async function claimRow(tx: Sql, row: OpenRow, recipientHandleId: string): Promise<ClaimedRow | null> {
+async function claimRow(
+  tx: Sql,
+  row: OpenRow,
+  recipientHandleId: string,
+  claiming: Claiming | null,
+): Promise<Taken | null> {
   if (!rowMoveAllowed(row.state, "sending", "claimOutbox")) {
     throw new Error(`claimOutbox: K-07 lets no claim move a ${row.state} row`);
   }
@@ -892,33 +1317,40 @@ async function claimRow(tx: Sql, row: OpenRow, recipientHandleId: string): Promi
     throw new Error("claimOutbox: a row moved while it was locked");
   }
   const claimedParts = await writeParts(tx, row.id, plans);
+  const claim = claiming === null ? null : await writeClaim(tx, row.id, claiming);
   return {
-    outboxRowId: row.id,
-    version: moved.version,
-    commitSeq: commitSeqOf(row.commit_seq),
-    recipientHandleId,
-    recipientPersonId: row.recipient_person_id,
-    businessId: row.business_id,
-    bookingId: row.booking_id,
-    openQuestionId: row.open_question_id,
-    channel: row.channel,
-    sendClass: row.send_class,
-    versionsRead: row.versions_read as K05.RowRef[],
-    finalParts: row.final_parts as K05.FinalParts,
-    parts: partsOf(claimedParts),
-    traceId: row.trace_id,
+    row: {
+      outboxRowId: row.id,
+      version: moved.version,
+      commitSeq: commitSeqOf(row.commit_seq),
+      recipientHandleId,
+      recipientPersonId: row.recipient_person_id,
+      businessId: row.business_id,
+      bookingId: row.booking_id,
+      openQuestionId: row.open_question_id,
+      channel: row.channel,
+      sendClass: row.send_class,
+      versionsRead: row.versions_read as K05.RowRef[],
+      finalParts: row.final_parts as K05.FinalParts,
+      parts: partsOf(claimedParts),
+      traceId: row.trace_id,
+    },
+    from: claimedFromOf(row.state),
+    port: portOf(row.channel),
+    claim,
   };
 }
 
 /**
- * One recipient's walk under its lock (K-05 item 3; K-07 "How K-05 v1's calls use them"), adding to `claimed` and
- * `passedHeld` until the walk stops or the limit is reached.
+ * One recipient's walk under its lock (K-05 item 3, and v1.1 item 13 for `v12`; K-07 "How K-05 v1's calls use them"),
+ * adding to `taken` and `passedHeld` until the walk stops or the limit is reached.
  */
 async function walkRecipient(
   tx: Sql,
   recipientHandleId: string,
   request: ClaimChecked,
-  claimed: ClaimedRow[],
+  v12: boolean,
+  taken: Taken[],
   passedHeld: PassedHeld[],
 ): Promise<void> {
   const rows = await tx<OpenRow[]>`
@@ -930,7 +1362,7 @@ async function walkRecipient(
     for update
   `;
   for (const row of rows) {
-    if (claimed.length >= request.limit) {
+    if (taken.length >= request.limit) {
       return;
     }
     if (row.state === "waiting_chat") {
@@ -942,34 +1374,56 @@ async function walkRecipient(
       }
       continue;
     }
-    if (row.state !== "checked" && row.state !== "held") {
-      // sending: claimed earlier and not finished; planned or stale: no final parts yet. Commit order: stop.
+    let current: ClaimRead | undefined;
+    if (row.state === "sending") {
+      if (!v12) {
+        // v1: claimed earlier and not finished, and a claim never lapses (K-05 v1 open gap 1). Commit order: stop.
+        return;
+      }
+      // v1.1: a live claim stops the walk; a lapsed claim, or none (default 20), is taken again.
+      current = await lockClaim(tx, row.id);
+      if (current !== undefined && current.lapses_at.getTime() > request.now.getTime()) {
+        return;
+      }
+    } else if (row.state === "checked" || row.state === "held") {
+      current = v12 ? await lockClaim(tx, row.id) : undefined;
+    } else {
+      // planned or stale: no final parts yet. Commit order: stop.
       return;
     }
-    const one = await claimRow(tx, row, recipientHandleId);
+    const claiming = v12 ? { claimer: request.claimer, now: request.now, current } : null;
+    const one = await claimRow(tx, row, recipientHandleId, claiming);
     if (one === null) {
       return;
     }
-    claimed.push(one);
+    taken.push(one);
   }
 }
 
-async function claimIn(tx: Sql, request: ClaimChecked): Promise<ClaimOutboxResponse> {
-  const recipients =
-    request.recipientHandleId === null
-      ? await claimableRecipients(tx, request.now)
-      : [request.recipientHandleId];
-  const claimed: ClaimedRow[] = [];
+async function claimIn(
+  tx: Sql,
+  request: ClaimChecked,
+  v12: boolean,
+): Promise<{ taken: Taken[]; passedHeld: PassedHeld[] }> {
+  let recipients: string[];
+  if (request.recipientHandleId !== null) {
+    recipients = [request.recipientHandleId];
+  } else if (v12) {
+    recipients = await claimableRecipientsV12(tx, request.now);
+  } else {
+    recipients = await claimableRecipients(tx, request.now);
+  }
+  const taken: Taken[] = [];
   const passedHeld: PassedHeld[] = [];
   for (const recipient of recipients) {
-    if (claimed.length >= request.limit) {
+    if (taken.length >= request.limit) {
       break;
     }
     if (await lockRecipient(tx, recipient)) {
-      await walkRecipient(tx, recipient, request, claimed, passedHeld);
+      await walkRecipient(tx, recipient, request, v12, taken, passedHeld);
     }
   }
-  return { result: "claimed", claimed, passedHeld };
+  return { taken, passedHeld };
 }
 
 /**
@@ -982,13 +1436,126 @@ async function claimIn(tx: Sql, request: ClaimChecked): Promise<ClaimOutboxRespo
 export async function claimOutbox(sql: Sql, request: ClaimOutboxRequest): Promise<ClaimOutboxOutcome> {
   const checked = checkClaim(request);
   try {
-    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => claimIn(tx, checked));
+    return await inRuntimeTransaction(sql, { readOnly: false }, async (tx): Promise<ClaimOutboxResponse> => {
+      const { taken, passedHeld } = await claimIn(tx, checked, false);
+      return { result: "claimed", claimed: taken.map((one) => one.row), passedHeld };
+    });
   } catch (error) {
     return transientOrScrubbed(CLAIM_OUTBOX, error);
   }
 }
 
-// ---- markPart (K-05 v1 item 4) ------------------------------------------------------------------------------------------
+function claimedV12(one: Taken): ClaimedRowV12 {
+  if (one.claim === null) {
+    throw new Error("claimOutbox: a v1.2 claim wrote no claim");
+  }
+  return { ...one.row, claim: one.claim, claimedFrom: one.from, port: one.port };
+}
+
+/**
+ * K-05 v1.2's claim (v1.1 item 13, v1.2 item 30): claimOutbox, each claim written to outbox_claims and returned with the
+ * state it was claimed from and the row's port, and a sending row whose claim lapsed taken again. One transaction on the
+ * primary, on the runtime side; pass the client's primary handle, run as rosie_job. Answers claimed or transient.
+ */
+export async function claimOutboxV12(sql: Sql, request: ClaimOutboxRequest): Promise<ClaimOutboxV12Outcome> {
+  const checked = checkClaim(request);
+  try {
+    return await inRuntimeTransaction(
+      sql,
+      { readOnly: false },
+      async (tx): Promise<ClaimOutboxV12Response> => {
+        const { taken, passedHeld } = await claimIn(tx, checked, true);
+        return { result: "claimed", claimed: taken.map(claimedV12), passedHeld };
+      },
+    );
+  } catch (error) {
+    return transientOrScrubbed(CLAIM_OUTBOX, error);
+  }
+}
+
+// ---- renewClaim (K-05 v1.1 item 14, v1.2 item 32) -----------------------------------------------------------------------
+
+/** The recipient's phone row, read FOR SHARE: a STOP whose commit is writing it is waited for (default 15). */
+async function phoneFlagsOf(tx: Sql, recipientHandleId: string): Promise<PhoneFlags | null> {
+  const [phone] = await tx<{ stopped: boolean; chat_open: boolean; version: number }[]>`
+    select stopped, chat_open, version from phones where handle_id = ${recipientHandleId}
+    for share
+  `;
+  return phone === undefined
+    ? null
+    : { stopped: phone.stopped, chatOpen: phone.chat_open, version: phone.version };
+}
+
+async function renewIn(tx: Sql, renew: RenewChecked): Promise<RenewClaimOutcome> {
+  const { outboxRowId } = renew;
+  const [row] = await tx<{ state: RowState; recipient_handle_id: string }[]>`
+    select state, recipient_handle_id from outbox_rows where id = ${outboxRowId} for update
+  `;
+  if (row === undefined) {
+    return { error: "notFound", table: "outbox_rows", rowId: outboxRowId };
+  }
+  const claim = await lockClaim(tx, outboxRowId);
+  if (row.state !== "sending" || claim?.claimer !== renew.claimer || claim.claim_no !== renew.claimNo) {
+    // The caller sends nothing (default 14). A lapsed claim nobody took again is still the caller's: no lapse check.
+    return {
+      error: "claimLost",
+      table: "outbox_rows",
+      rowId: outboxRowId,
+      claimer: claim?.claimer ?? null,
+      claimNo: claim?.claim_no ?? null,
+      state: row.state,
+    };
+  }
+  const [part] = await tx<{ outbox_row_id: string; state: PartState }[]>`
+    select outbox_row_id, state from outbox_parts where idempotency_key = ${renew.key}
+  `;
+  if (part === undefined) {
+    return { error: "notFound", table: "outbox_parts", rowId: renew.key };
+  }
+  if (part.outbox_row_id !== outboxRowId || part.state !== "pending") {
+    return wrongState("outbox_parts", renew.key, part.state);
+  }
+  const notBefore = claim.next_try_not_before;
+  if (notBefore !== null && notBefore.getTime() > renew.at.getTime()) {
+    // K-07 rule 6: the provider's Retry-After holds the try.
+    return { error: "notYet", outboxRowId, notBefore: utc(notBefore) };
+  }
+  const [renewed] = await tx<ClaimRead[]>`
+    update outbox_claims
+    set lapses_at = ${lapseAfter(renew.at)}, first_try_at = coalesce(first_try_at, ${renew.at}),
+        next_try_not_before = null, version = version + 1
+    where outbox_row_id = ${outboxRowId} and claim_no = ${claim.claim_no} and version = ${claim.version}
+    returning ${tx.unsafe(CLAIM_COLUMNS)}
+  `;
+  if (renewed === undefined) {
+    throw new Error("renewClaim: the claim moved while its row was locked");
+  }
+  return {
+    result: "renewed",
+    outboxRowId,
+    claim: claimOf(renewed),
+    recipient: await phoneFlagsOf(tx, row.recipient_handle_id),
+  };
+}
+
+/**
+ * Renews the caller's claim just before a part goes, and reads the recipient's stop with it (K-05 v1.1 item 14, v1.2
+ * item 32; README "The stop and the send"): one read committed transaction on the primary, on the runtime side. Pass
+ * the client's primary handle, run as rosie_job. Answers renewed (the claim with lapsesAt at + 60 s, firstTryAt set
+ * once, nextTryNotBefore cleared, and recipient: the phone's stopped and chat flags as this transaction read them,
+ * FOR SHARE, or null with no phone row), claimLost, notYet, wrongState, notFound or transient. A stopped phone is no
+ * refusal: limit 8 decides what goes (C-125). Throws for a request it cannot carry out; nothing is written then either.
+ */
+export async function renewClaim(sql: Sql, request: RenewClaimRequest): Promise<RenewClaimOutcome> {
+  const checked = checkRenew(request);
+  try {
+    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => renewIn(tx, checked));
+  } catch (error) {
+    return transientOrScrubbed(RENEW_CLAIM, error);
+  }
+}
+
+// ---- markPart (K-05 v1 item 4; v1.1 item 15 and v1.2 item 31 in markPartV12) ---------------------------------------------
 
 interface MarkedRow {
   id: string;
@@ -1033,20 +1600,54 @@ function rowStateAfter(state: RowState, parts: readonly PartRow[], partCount: nu
   return state;
 }
 
-/** The part a mark names, found without a lock: its row's id and its key; null when no part holds the key or id. */
-async function findPart(tx: Sql, mark: MarkChecked): Promise<{ rowId: string; key: string } | null> {
-  const [found] =
-    mark.outcome === "delivered"
-      ? await tx<{ outbox_row_id: string; idempotency_key: string }[]>`
-          select outbox_row_id, idempotency_key from outbox_parts
-          where linq_message_id = ${mark.providerMessageId}
-          order by try_no desc, part_no
-          limit 1
-        `
-      : await tx<{ outbox_row_id: string; idempotency_key: string }[]>`
-          select outbox_row_id, idempotency_key from outbox_parts where idempotency_key = ${mark.key}
-        `;
-  return found === undefined ? null : { rowId: found.outbox_row_id, key: found.idempotency_key };
+/** The part a mark names: its row's id and its key, and whether a receipt found it by its key (v1.2 item 31). */
+interface FoundPart {
+  readonly rowId: string;
+  readonly key: string;
+  readonly receiptByKey: boolean;
+}
+
+interface PartFound {
+  outbox_row_id: string;
+  idempotency_key: string;
+  linq_message_id: string | null;
+}
+
+/**
+ * The part a mark names, found without a lock; null when no part holds the key or id. A receipt is found by its message
+ * id, else (v1.2, with the key it echoes) by its key when the part under it holds no message id.
+ */
+async function findPart(tx: Sql, mark: MarkChecked): Promise<FoundPart | null> {
+  if (mark.outcome !== "delivered") {
+    const [found] = await tx<PartFound[]>`
+      select outbox_row_id, idempotency_key, linq_message_id from outbox_parts where idempotency_key = ${mark.key}
+    `;
+    return found === undefined
+      ? null
+      : { rowId: found.outbox_row_id, key: found.idempotency_key, receiptByKey: false };
+  }
+  const [byMessage] = await tx<PartFound[]>`
+    select outbox_row_id, idempotency_key, linq_message_id from outbox_parts
+    where linq_message_id = ${mark.providerMessageId}
+    order by try_no desc, part_no
+    limit 1
+  `;
+  if (byMessage !== undefined) {
+    return { rowId: byMessage.outbox_row_id, key: byMessage.idempotency_key, receiptByKey: false };
+  }
+  if (mark.key === null) {
+    return null;
+  }
+  const [byKey] = await tx<PartFound[]>`
+    select outbox_row_id, idempotency_key, linq_message_id from outbox_parts where idempotency_key = ${mark.key}
+  `;
+  if (byKey === undefined) {
+    return null;
+  }
+  // A part under the key that holds another message id is not the receipt's (default 16).
+  return byKey.linq_message_id === null
+    ? { rowId: byKey.outbox_row_id, key: byKey.idempotency_key, receiptByKey: true }
+    : null;
 }
 
 /** The repeat's answer, or the change a non-repeat mark makes; or wrongState (default 1). Nothing is written here. */
@@ -1112,7 +1713,25 @@ function decideMark(
   }
 }
 
-async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> {
+/** Holds the next try's Retry-After in the row's claim (K-05 v1.1 item 15; K-07 rule 6; default 18). */
+async function holdNextTry(tx: Sql, rowId: string, notBefore: Date): Promise<void> {
+  const [held] = await tx<{ claim_no: number }[]>`
+    update outbox_claims set next_try_not_before = ${notBefore}, version = version + 1
+    where outbox_row_id = ${rowId}
+    returning claim_no
+  `;
+  if (held === undefined) {
+    throw new Error("markPart: the row has no claim to hold its next try's Retry-After (default 18)");
+  }
+}
+
+/** A mark's answer as v1 gives it, and the row after the mark, which v1.1 adds to it. */
+interface PartMarked {
+  readonly answer: MarkPartResponse;
+  readonly row: RowAfter;
+}
+
+async function markPartIn(tx: Sql, mark: MarkChecked): Promise<PartMarked | MarkPartError> {
   const found = await findPart(tx, mark);
   if (found === null) {
     const rowId = mark.outcome === "delivered" ? mark.providerMessageId : mark.key;
@@ -1135,6 +1754,15 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
   if (part === undefined) {
     throw new Error("markPart: a part moved while it was found");
   }
+  if (
+    mark.outcome === "delivered" &&
+    found.receiptByKey &&
+    part.linq_message_id !== null &&
+    part.linq_message_id !== mark.providerMessageId
+  ) {
+    // Read again under the lock (default 16): the part under the key now holds another message id.
+    return { error: "notFound", table: "outbox_parts", rowId: mark.providerMessageId };
+  }
   const marked = (repeated: boolean, firstDelivery: boolean, attempts: number, nextKey: string | null) => ({
     result: "marked" as const,
     outboxRowId: row.id,
@@ -1152,7 +1780,10 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
     return decision.refused;
   }
   if ("repeat" in decision) {
-    return marked(true, false, part.attempts, decision.repeat.nextKey);
+    return {
+      answer: marked(true, false, part.attempts, decision.repeat.nextKey),
+      row: { state: row.state, version: row.version },
+    };
   }
   const { change } = decision;
 
@@ -1207,16 +1838,22 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
       `;
       break;
     case "delivered":
+      // A part found by its message id holds it already; one found by its key holds none and keeps the receipt's
+      // (v1.2 item 31), so a later receipt finds it the first way.
       await tx`
-        update outbox_parts set state = 'delivered', delivered_at = ${mark.at}, version = version + 1
+        update outbox_parts
+        set state = 'delivered', delivered_at = ${mark.at},
+            linq_message_id = coalesce(linq_message_id, ${mark.providerMessageId}), version = version + 1
         where idempotency_key = ${part.idempotency_key} and state in ('sent', 'failed')
       `;
       break;
     case "failed":
       if (change.to === "failed") {
+        // v1.1: the failure's message id, kept when the part holds none (default 17); v1 gives none.
         await tx`
           update outbox_parts
-          set state = 'failed', failed_at = ${mark.at}, error_code = ${mark.errorCode}, version = version + 1
+          set state = 'failed', failed_at = ${mark.at}, error_code = ${mark.errorCode},
+              linq_message_id = coalesce(linq_message_id, ${mark.providerMessageId}), version = version + 1
           where idempotency_key = ${part.idempotency_key} and state in ('pending', 'sent')
         `;
       }
@@ -1226,6 +1863,9 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
           insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, state)
           values (${row.id}, ${part.part_no}, ${change.nextTry}, ${nextKey}, 1, 'words', 'pending')
         `;
+        if (mark.nextTryNotBefore !== null) {
+          await holdNextTry(tx, row.id, mark.nextTryNotBefore);
+        }
       }
       break;
   }
@@ -1238,7 +1878,10 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
   if (moved === undefined) {
     throw new Error("markPart: the row moved while it was locked");
   }
-  return marked(false, firstDelivery, attempts, nextKey);
+  return {
+    answer: marked(false, firstDelivery, attempts, nextKey),
+    row: { state: rowTo, version: moved.version },
+  };
 }
 
 /**
@@ -1251,15 +1894,36 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<MarkPartOutcome> 
 export async function markPart(sql: Sql, request: MarkPartRequest): Promise<MarkPartOutcome> {
   const checked = checkMarkPart(request);
   try {
-    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markPartIn(tx, checked));
+    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markPartIn(tx, checked));
+    return "answer" in marked ? marked.answer : marked;
   } catch (error) {
     return transientOrScrubbed(MARK_PART, error);
   }
 }
 
-// ---- markRow (K-05 v1 item 4: limit 8's outcomes) -----------------------------------------------------------------------
+/**
+ * K-05 v1.2's markPart (v1.1 item 15, v1.2 item 31): markPart, its answer carrying the row's state and version after
+ * the mark; a failure's message id and Retry-After kept (the part's linq_message_id, the claim's next_try_not_before);
+ * a receipt found by its part's key when no part holds its message id. One transaction on the primary, on the runtime
+ * side; pass the client's primary handle, run as rosie_job. Answers marked, notFound, wrongState or transient. Throws
+ * for a request it cannot carry out (a safety line's followUps among them: default 19); nothing is written then either.
+ */
+export async function markPartV12(sql: Sql, request: MarkPartV12Request): Promise<MarkPartV12Outcome> {
+  const checked = checkMarkPartV12(request);
+  try {
+    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markPartIn(tx, checked));
+    return "answer" in marked ? { ...marked.answer, row: { ...marked.row } } : marked;
+  } catch (error) {
+    return transientOrScrubbed(MARK_PART, error);
+  }
+}
 
-async function markRowIn(tx: Sql, mark: MarkRowChecked): Promise<MarkRowOutcome> {
+// ---- markRow (K-05 v1 item 4: limit 8's outcomes; v1.1 item 16's waitingChat in markRowV12) -----------------------------
+
+async function markRowIn<O extends MarkRowV12OutcomeName>(
+  tx: Sql,
+  mark: MarkRowChecked<O>,
+): Promise<{ result: "marked"; outboxRowId: string; version: number; outcome: O } | MarkRowError> {
   const { outboxRowId } = mark;
   const [row] = await tx<{ state: RowState; version: number }[]>`
     select state, version from outbox_rows where id = ${outboxRowId} for update
@@ -1267,7 +1931,7 @@ async function markRowIn(tx: Sql, mark: MarkRowChecked): Promise<MarkRowOutcome>
   if (row === undefined) {
     return { error: "notFound", table: "outbox_rows", rowId: outboxRowId };
   }
-  const to = MARKED_STATES[mark.outcome];
+  const to: RowState = MARKED_STATES_V12[mark.outcome];
   // Limit 8's outcomes start only from sending (K-07 rowMove): checked before the version, as K-05 v1.1 item 16 lists it.
   if (!rowMoveAllowed(row.state, to, "markRow")) {
     return wrongState("outbox_rows", outboxRowId, row.state);
@@ -1275,24 +1939,34 @@ async function markRowIn(tx: Sql, mark: MarkRowChecked): Promise<MarkRowOutcome>
   if (row.version !== mark.expectVersion) {
     return versionChanged(outboxRowId, mark.expectVersion, row.version);
   }
-  const [marked] =
-    mark.outcome === "held"
-      ? await tx<{ version: number }[]>`
-          update outbox_rows set state = 'held', held_until = ${mark.heldUntil}, version = version + 1
-          where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
-          returning version
-        `
-      : mark.outcome === "stale"
-        ? await tx<{ version: number }[]>`
-            update outbox_rows set state = 'stale', plan = null, final_parts = null, version = version + 1
-            where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
-            returning version
-          `
-        : await tx<{ version: number }[]>`
-            update outbox_rows set state = ${to}, version = version + 1
-            where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
-            returning version
-          `;
+  let marked: { version: number } | undefined;
+  if (mark.outcome === "held") {
+    [marked] = await tx<{ version: number }[]>`
+      update outbox_rows set state = 'held', held_until = ${mark.heldUntil}, version = version + 1
+      where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
+      returning version
+    `;
+  } else if (mark.outcome === "stale") {
+    [marked] = await tx<{ version: number }[]>`
+      update outbox_rows set state = 'stale', plan = null, final_parts = null, version = version + 1
+      where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
+      returning version
+    `;
+  } else if (mark.outcome === "waitingChat") {
+    // v1.1 item 16: the row waits with no clock and no held_until, and lets its claim go (K-07 default 11).
+    [marked] = await tx<{ version: number }[]>`
+      update outbox_rows set state = 'waiting_chat', held_until = null, version = version + 1
+      where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
+      returning version
+    `;
+    await tx`delete from outbox_claims where outbox_row_id = ${outboxRowId}`;
+  } else {
+    [marked] = await tx<{ version: number }[]>`
+      update outbox_rows set state = ${to}, version = version + 1
+      where id = ${outboxRowId} and version = ${mark.expectVersion} and state = 'sending'
+      returning version
+    `;
+  }
   if (marked === undefined) {
     throw new Error("markRow: the row moved while it was locked");
   }
@@ -1307,6 +1981,21 @@ async function markRowIn(tx: Sql, mark: MarkRowChecked): Promise<MarkRowOutcome>
  */
 export async function markRow(sql: Sql, request: MarkRowRequest): Promise<MarkRowOutcome> {
   const checked = checkMarkRow(request);
+  try {
+    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markRowIn(tx, checked));
+  } catch (error) {
+    return transientOrScrubbed(MARK_ROW, error);
+  }
+}
+
+/**
+ * K-05 v1.2's markRow (v1.1 item 16): markRow, and waitingChat, which moves a sending row to waiting_chat, clears its
+ * held_until and deletes its outbox_claims row (no clock, nothing sent); the other outcomes keep the claim row. One
+ * transaction on the primary, on the runtime side; pass the client's primary handle, run as rosie_job. Answers as
+ * markRow. Throws for a request it cannot carry out (held with no time, waitingChat with one); nothing is written then.
+ */
+export async function markRowV12(sql: Sql, request: MarkRowV12Request): Promise<MarkRowV12Outcome> {
+  const checked = checkMarkRowV12(request);
   try {
     return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markRowIn(tx, checked));
   } catch (error) {
