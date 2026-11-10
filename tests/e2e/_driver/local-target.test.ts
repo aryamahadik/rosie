@@ -29,6 +29,7 @@ import {
   checkRepeat,
   checkRun,
   createLocalTarget,
+  k08TraceCheck,
   makeTestWebhookSecret,
   readReceipt,
   schemaProblems,
@@ -212,6 +213,32 @@ describe("the local target", () => {
       pollMs: 10,
     });
     expect(collected.parts).toHaveLength(1);
+  });
+
+  it("checks the trace with the check the caller gives (inside workerd, the prebuilt one), and by default with K-08's own", async () => {
+    const secret = makeTestWebhookSecret();
+    const checked: string[] = [];
+    target = createLocalTarget({
+      gateway: gatewayWith(secret).fetch,
+      webhookSecret: secret,
+      traceCheck: (trace) => {
+        checked.push(trace.trace_id);
+        return [`checked ${String(trace.spans.length)} spans`];
+      },
+    });
+    const sent = await target.sendEvent(text);
+    const given = await target.collect(sent.traceId);
+    expect(checked).toEqual([sent.traceId]);
+    expect(given.traceProblems).toEqual(["checked 2 spans"]);
+    expect(checkRun(given, ["receive", "scrub"]).problems).toEqual(["checked 2 spans"]);
+    target.close();
+
+    target = createLocalTarget({ gateway: gatewayWith(secret).fetch, webhookSecret: secret });
+    const own = await target.collect((await target.sendEvent(text)).traceId);
+    if (own.trace === null) throw new Error("no trace");
+    expect(own.traceProblems).toEqual(k08TraceCheck(own.trace));
+    expect(own.traceProblems).toEqual([]);
+    expect(k08TraceCheck({ ...own.trace, opened_by: "nobody" } as never)).not.toEqual([]);
   });
 
   it("puts console.log back when closed", () => {

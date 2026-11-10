@@ -135,22 +135,31 @@ export function startRootRun(): RootRun {
     now: () => fakes.clock.now(),
     traceCheck: prebuiltTraceCheck(),
   });
-  const root = composeRoot({
-    environment: "test",
-    sets: { fake: fakes.ports },
-    actors: handleActors(),
-    vars: env,
-    clock: fakes.clock,
-    linq: { ...fakes.linqInputs, webhookSecret: () => secret },
-    handleKey: fakes.handleKeys.call,
-    safetyReaders: fakes.models.readers,
-    turnRows: fakes.turnRows.calls,
-    bundleReads: fakes.bundleReads.calls,
-    handleTargets: fakes.handleTargets.call,
-    flags: fakeFlags([SKELETON_FLAG]),
-  });
-  fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
-  const restore = root.install();
+  let root: Root;
+  let restore: () => void;
+  try {
+    root = composeRoot({
+      environment: "test",
+      sets: { fake: fakes.ports },
+      actors: handleActors(),
+      vars: env,
+      clock: fakes.clock,
+      linq: { ...fakes.linqInputs, webhookSecret: () => secret },
+      handleKey: fakes.handleKeys.call,
+      safetyReaders: fakes.models.readers,
+      turnRows: fakes.turnRows.calls,
+      bundleReads: fakes.bundleReads.calls,
+      handleTargets: fakes.handleTargets.call,
+      flags: fakeFlags([SKELETON_FLAG]),
+    });
+    const composed = root;
+    fakes.face.gate = gateThroughCommit((request) => composed.ports.turnRow.commitTurn(request));
+    restore = root.install();
+  } catch (error) {
+    // Nothing is left capturing console.log when the root cannot be composed.
+    target.close();
+    throw error;
+  }
   return {
     target,
     fakes,

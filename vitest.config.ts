@@ -127,6 +127,7 @@ export default defineConfig({
       {
         // The walking skeleton's end-to-end test inside the Workers runtime (T-1149, DL-332): the local target posts
         // through runtime/src/wiring's composition root with the HandleActor installed, as the workers project runs it.
+        // `npm run test:e2e` runs it with the e2e project.
         plugins: [
           cloudflareTest({
             wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
