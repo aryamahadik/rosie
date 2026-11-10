@@ -1519,6 +1519,46 @@
       "expect": "refuse",
       "shows": "Sam's S1-02 row read by the sign-up line while he holds his owner role: a recipient who holds a role is read by it, never by the line (put right, it is row-reader-s1-02-owner)",
       "source": "K-05 v1.3 item 35's table (role, FinalizeRow.reader: the one of recipient.roles the message is for); T-308; S13-31; the card's security line (a person with no role reads only their own sign-up rows); K-05 v1.5 item 44"
+    },
+    {
+      "file": "read-outbox-row-s1-02-not-sensitive.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's row, read as v1.3's read-outbox-row-s1-02 reads it, at a barbershop that holds its kinds of work (K-23's seed: one, barber, with no switch on in either flow): the business's sensitive switch is false, so S1-02's row, about no booking, is filled in its routine form, as K-09 v1.6's compose-input-s1-02-v1.6.json and T-1175's recording 4 have it",
+      "source": "DL-391; DL-373; RULES 4.6; K-23 v1 company_kinds (pf_switches_a, pf_switches_b), seed-company-two-kinds.json; K-26 v1 plugin_switches (sensitive; migration 0023); K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (source: SlotSource.sensitive); K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "read-outbox-row-s1-02-no-kinds.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "The same row with K-04's seeds alone: the barbershop holds no kinds of work yet (S1-04 writes them), as at the walking skeleton's start, so nothing is stored to read the switch from and the read answers null, never false, which the caller reads as on (fails closed)",
+      "source": "DL-391; DL-326 note b; RULES 4.6; S1-04; K-23 v1 company_kinds; db/seeds/skeleton.ts (T-1148); K-05 v1.3 read-outbox-row-s1-02.json; K-05 v1.6 item 45, default 67, open gap 47"
+    },
+    {
+      "file": "read-outbox-row-practice-sensitive.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Alex's first reply from Lee Associates, a practice whose one kind of work, therapist, lists sensitive in flow A only: one flow is enough, so the business's switch is true; his roles and open questions at other businesses are not read",
+      "source": "DL-391; RULES 4.6; S13-22; SPEC-master 5b (a switch can differ by flow); K-23 v1 company_kinds; K-26 v1 plugin_switches (sensitive: health care, therapy and the rest; migration 0023); fixtures/v1/test-kit/shops/therapist.json (flows.A.business Lee Associates, facts, switches.sensitive); K-04 v1 seed-person-roles.json, seed-phone-chat-open.json; K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-switch-left-out.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.v1dot6Response",
+      "expect": "refuse",
+      "shows": "The practice's answer with its sensitive switch left out: a v1.6 read always states it, true, false or null, so no consumer takes a missing switch as off and fills a therapy practice's row in its routine form (put right, it is read-outbox-row-practice-sensitive's outcome)",
+      "source": "DL-391 (null and a read error never read as off); DL-326 note b; RULES 4.6; K-05 v1.6 item 45, default 67"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-switch-per-flow.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "The practice's switch answered per flow, as its kind of work stores it (on in flow A, off in flow B), instead of the business's one value: the read answers true, false or null, never a value a consumer could read as off for the flow a row is read in (put right, it is read-outbox-row-practice-sensitive's outcome)",
+      "source": "DL-391 (true when any kind of work lists it in either flow); K-23 v1 company_kinds pf_switches_a, pf_switches_b; SPEC-master 5b; RULES 4.6; K-05 v1.6 item 45, default 66"
     }
   ]
 }

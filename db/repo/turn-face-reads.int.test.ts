@@ -11,10 +11,18 @@
 //
 // Both role clients record every statement they send (postgres.js `debug`), so the column-list test reads what the three
 // reads sent, not a copy of their SQL (DL-326 note a).
+//
+// T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45), so every readOutboxRow answer is checked against
+// v1.6's readOutboxRow.v1dot6Response, and every fixture of the three reads, v1.3 to v1.6, runs here, each valid at its own
+// version and at v1.6. A v1.3 fixture's answer states no switch; a v1.6 call always states it, so its answer is the
+// fixture's with the switch as v1.6 reads the fixture's world: null, as no seed of a v1.3 chain holds a kind of work
+// (checked, not assumed). The rows a v1.6 fixture's note says its database side writes itself, since no frozen seed holds
+// them (read-outbox-row-practice-sensitive.json's five), are written as its note lists them, after its seeds and chain.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { seedSkeleton, TEST_OWNER_1 } from "../seeds/skeleton";
 import { resolvePrimaryUrl } from "./client";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
 import { BusinessScopeError, setBusinessScope, type Sql, type Tx, withBusiness } from "./scope";
@@ -33,7 +41,7 @@ import {
   readOutboxRow,
   readOutboxRowIn,
   type ReadOutboxRowRequest,
-  type ReadOutboxRowResponse,
+  type ReadOutboxRowV1Dot6Response,
 } from "./turn-face-reads";
 
 type Db = Sql | Tx;
@@ -43,6 +51,8 @@ const CONTRACTS = new URL("../../contracts/", import.meta.url);
 const ACCESS_DIR = new URL("data-access/fixtures/", CONTRACTS);
 const DB_SCHEMA_DIR = new URL("db-schema/", CONTRACTS);
 const CORE_DIR = new URL("db-schema/core/fixtures/", CONTRACTS);
+/** Fixture set v1's demo shops (rule 9): the practice's kinds of work take their facts from here. */
+const SHOPS_DIR = new URL("../../fixtures/v1/test-kit/shops/", import.meta.url);
 const APP_ROLE = "rosie_app";
 const JOB_ROLE = "rosie_job";
 const SLOW = { timeout: 60_000 };
@@ -89,6 +99,14 @@ const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR
 const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const acceptedOf = (def: string): string[] =>
   INDEX.filter((entry) => entry.def === def && entry.expect === "accept").map((entry) => entry.file);
+/** The version the index lists a fixture under. */
+function versionOf(file: string): string {
+  const entry = INDEX.find((candidate) => candidate.file === file);
+  if (entry === undefined) {
+    throw new Error(`the index lists no ${file}`);
+  }
+  return entry.version;
+}
 const OPEN_HOLDS_FIXTURES = acceptedOf("readOpenHolds.exchange");
 const OUTBOX_ROW_FIXTURES = acceptedOf("readOutboxRow.exchange");
 const FIXED_LINE_FIXTURES = acceptedOf("readFixedLineFacts.exchange");
@@ -110,23 +128,31 @@ const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true }
 for (const file of schemaFiles(CONTRACTS)) {
   ajv.addSchema(readJson(file) as object);
 }
-const V13_ID = (readJson(new URL("data-access/data-access.v1.3.schema.json", CONTRACTS)) as { $id: string })
-  .$id;
+/** The $id of data-access's schema at `version`. */
+const idOf = (version: string): string =>
+  (readJson(new URL(`data-access/data-access.${version}.schema.json`, CONTRACTS)) as { $id: string }).$id;
 
-/** Checks `value` against one $defs entry of data-access v1.3, returning Ajv's errors (none when it passes). */
-function schemaErrors(def: string, value: unknown): string[] {
-  const validate = ajv.getSchema(`${V13_ID}#/$defs/${def}`);
+/** Checks `value` against one $defs entry of data-access at `version`, returning Ajv's errors (none when it passes). */
+function schemaErrors(def: string, value: unknown, version = "v1.3"): string[] {
+  const validate = ajv.getSchema(`${idOf(version)}#/$defs/${def}`);
   if (validate === undefined) {
-    throw new Error(`data-access v1.3 has no $defs/${def}`);
+    throw new Error(`data-access ${version} has no $defs/${def}`);
   }
   return validate(value)
     ? []
     : (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`);
 }
 
-/** The outcome checked against the call's response, or its errors when it is one. */
+/**
+ * The outcome checked against the call's errors when it is one, else against the answer the call gives: v1.3's response
+ * for readOpenHolds and readFixedLineFacts, and for readOutboxRow v1.6's readOutboxRow.v1dot6Response, which requires
+ * businessSensitive (K-05 README "Consumers of v1.6": T-1197 checks every answer against it).
+ */
 function outcomeErrors(call: string, outcome: unknown): string[] {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
+  if (call === "readOutboxRow") {
+    return schemaErrors(isError ? `${call}.errors` : `${call}.v1dot6Response`, outcome, "v1.6");
+  }
   return schemaErrors(isError ? `${call}.errors` : `${call}.response`, outcome);
 }
 
@@ -137,11 +163,11 @@ function asHolds(outcome: unknown): ReadOpenHoldsResponse {
   return outcome as ReadOpenHoldsResponse;
 }
 
-function asRow(outcome: unknown): ReadOutboxRowResponse {
+function asRow(outcome: unknown): ReadOutboxRowV1Dot6Response {
   if ((outcome as { result?: unknown }).result !== "outboxRow") {
     throw new Error("expected an outbox row");
   }
-  return outcome as ReadOutboxRowResponse;
+  return outcome as ReadOutboxRowV1Dot6Response;
 }
 
 function asFacts(outcome: unknown): ReadFixedLineFactsResponse {
@@ -260,7 +286,106 @@ function chainOf(file: string, seen = new Set<string>()): { seeds: URL[]; steps:
   return { seeds, steps };
 }
 
-/** Loads a fixture's seeds and runs its chain's commits for real (commitTurn, T-195, as rosie_job). */
+// ---- the rows a v1.6 fixture's note says its database side writes (K-05 README v1.6 "Fixtures") -------------------
+
+/** A demo shop of fixture set v1 (test-kit/shops/<id>.json): the facts its kind of work lists. */
+const shopFactsOf = (id: string): string[] =>
+  (readJson(new URL(`${id}.json`, SHOPS_DIR)) as { facts: string[] }).facts;
+
+const PRACTICE = "biz-lee-associates";
+const PRACTICE_COMPANY = "company-lee-associates";
+
+/**
+ * read-outbox-row-practice-sensitive.json's five rows, in its note's order and with its note's values: Lee Associates'
+ * business head (fixture set v1's therapist demo shop's flow A business), its company, owned by Sam, its one kind of
+ * work, therapist, with the facts therapist.json lists and the switch on in flow A only, the turn of Alex's first text
+ * there and the row that answers it, which asks nothing.
+ */
+function practiceRows(): SeedRow[] {
+  return [
+    {
+      table: "businesses",
+      values: {
+        id: PRACTICE,
+        name: "Lee Associates",
+        display_name: "Lee Associates",
+        status: "live",
+        time_zone: "America/New_York",
+        text_hours_start: "08:00",
+        text_hours_end: "20:00",
+        version: 1,
+      },
+    },
+    {
+      table: "companies",
+      values: {
+        id: PRACTICE_COMPANY,
+        owner_person_id: "person-sam",
+        name: "Lee Associates",
+        business_id: PRACTICE,
+        version: 1,
+      },
+    },
+    {
+      table: "company_kinds",
+      values: {
+        company_id: PRACTICE_COMPANY,
+        kind_id: "therapist",
+        business_id: PRACTICE,
+        trade_name: null,
+        pf_facts: shopFactsOf("therapist"),
+        pf_switches_a: ["sensitive"],
+        pf_switches_b: [],
+        version: 1,
+      },
+    },
+    {
+      table: "turns",
+      values: {
+        id: "turn-alex-lee-associates-first",
+        handle_id: "handle-alex",
+        event_ids: ["evt-alex-lee-associates-0001"],
+        state: "committed",
+        bundle_hash: BUNDLE_HASH,
+        bundle_build: 1,
+        trace_id: "trace-alex-lee-associates-0001",
+        joined_trace_ids: [],
+        tries: 1,
+        committed_at: "2026-10-26T15:00:03Z",
+        version: 1,
+      },
+    },
+    {
+      table: "outbox_rows",
+      values: {
+        id: "out-alex-lee-associates-first",
+        turn_id: "turn-alex-lee-associates-first",
+        recipient_handle_id: "handle-alex",
+        recipient_person_id: "person-alex",
+        business_id: PRACTICE,
+        booking_id: null,
+        channel: "imessage",
+        send_class: "quick_reply",
+        versions_read: [],
+        open_question_id: null,
+        plan: null,
+        final_parts: null,
+        state: "planned",
+        bundle_hash: BUNDLE_HASH,
+        bundle_build: 1,
+        trace_id: "trace-alex-lee-associates-0001",
+        version: 1,
+      },
+    },
+  ];
+}
+
+/** By fixture file, the rows its note says its database side writes itself before the read: no frozen seed holds them. */
+const NOTED_ROWS: Readonly<Record<string, () => SeedRow[]>> = {
+  "read-outbox-row-practice-sensitive.json": practiceRows,
+};
+
+/** Loads a fixture's seeds, runs its chain's commits for real (commitTurn, T-195, as rosie_job), then its noted rows. */
 async function given(file: string): Promise<Exchange> {
   const exchange = exchangeOf(file);
   const chain = chainOf(file);
@@ -276,7 +401,32 @@ async function given(file: string): Promise<Exchange> {
     });
     expect(outcome, step).toEqual(before.outcome);
   }
+  const noted = NOTED_ROWS[file]?.() ?? [];
+  await db.sql.begin(async (tx) => {
+    for (const row of noted) {
+      await insertRow(tx, row.table, row.values);
+    }
+  });
   return exchange;
+}
+
+/**
+ * What a v1.6 call answers for a fixture's request in the fixture's world: the fixture's outcome; for an outbox row of a
+ * fixture written before v1.6, which states no switch, that outcome with the switch v1.6 reads there (item 45): null,
+ * since such a world holds no kind of work at all (checked here, as the tables' owner, whom no policy binds).
+ */
+async function answerOf(exchange: Exchange): Promise<Record<string, Json>> {
+  const { outcome } = exchange;
+  if (
+    exchange.call !== "readOutboxRow" ||
+    outcome.result !== "outboxRow" ||
+    Object.hasOwn(outcome, "businessSensitive")
+  ) {
+    return outcome;
+  }
+  const [held] = await db.sql<{ kinds: number }[]>`select count(1)::int as kinds from company_kinds`;
+  expect(held?.kinds, "the fixture's world holds no kind of work").toBe(0);
+  return { ...outcome, businessSensitive: null };
 }
 
 const nowOf = (exchange: Exchange): { now: Date } => ({ now: new Date(exchange.given.now) });
@@ -644,39 +794,63 @@ describe("the roles the reads run as (K-05 v1.3 items 34 to 36; T-191)", () => {
   });
 });
 
-describe("each v1.3 fixture of the three reads gives its outcome (K-05 v1.3 items 34 to 36)", () => {
-  it("the index lists the three reads' twelve exchanges, each valid against data-access v1.3", SLOW, () => {
-    expect([...OPEN_HOLDS_FIXTURES].sort()).toEqual([
-      "read-open-holds-alex.json",
-      "read-open-holds-other-business.json",
-      "read-open-holds-s1-02.json",
-    ]);
-    expect([...OUTBOX_ROW_FIXTURES].sort()).toEqual([
-      "read-outbox-row-a7-03.json",
-      "read-outbox-row-no-question.json",
-      "read-outbox-row-other-business.json",
-      "read-outbox-row-s1-02.json",
-      "read-outbox-row-safety-line.json",
-    ]);
-    expect([...FIXED_LINE_FIXTURES].sort()).toEqual([
-      "fixed-line-facts-opener-row.json",
-      "fixed-line-facts-other-business.json",
-      "fixed-line-facts-s1-02.json",
-      "fixed-line-facts-texted-before.json",
-    ]);
-    for (const file of READ_FIXTURES) {
-      const exchange = exchangeOf(file);
-      expect(schemaErrors(`${exchange.call}.exchange`, exchange), file).toEqual([]);
-    }
-  });
+describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05 v1.3 items 34 to 36; v1.6 item 45)", () => {
+  it(
+    "the index lists the three reads' fifteen exchanges, each valid at its own version and at v1.6",
+    SLOW,
+    () => {
+      expect([...OPEN_HOLDS_FIXTURES].sort()).toEqual([
+        "read-open-holds-alex.json",
+        "read-open-holds-other-business.json",
+        "read-open-holds-s1-02.json",
+      ]);
+      expect([...OUTBOX_ROW_FIXTURES].sort()).toEqual([
+        "read-outbox-row-a7-03.json",
+        "read-outbox-row-no-question.json",
+        "read-outbox-row-other-business.json",
+        "read-outbox-row-practice-sensitive.json",
+        "read-outbox-row-s1-02-no-kinds.json",
+        "read-outbox-row-s1-02-not-sensitive.json",
+        "read-outbox-row-s1-02.json",
+        "read-outbox-row-safety-line.json",
+      ]);
+      expect([...FIXED_LINE_FIXTURES].sort()).toEqual([
+        "fixed-line-facts-opener-row.json",
+        "fixed-line-facts-other-business.json",
+        "fixed-line-facts-s1-02.json",
+        "fixed-line-facts-texted-before.json",
+      ]);
+      expect(
+        READ_FIXTURES.filter((file) => versionOf(file) === "v1.6").sort(),
+        "v1.6's three readOutboxRow exchanges",
+      ).toEqual([
+        "read-outbox-row-practice-sensitive.json",
+        "read-outbox-row-s1-02-no-kinds.json",
+        "read-outbox-row-s1-02-not-sensitive.json",
+      ]);
+      for (const file of READ_FIXTURES) {
+        const exchange = exchangeOf(file);
+        expect(schemaErrors(`${exchange.call}.exchange`, exchange, versionOf(file)), file).toEqual([]);
+        expect(schemaErrors(`${exchange.call}.exchange`, exchange, "v1.6"), `${file} at v1.6`).toEqual([]);
+      }
+    },
+  );
 
   for (const file of READ_FIXTURES) {
-    it(`${file}: in its role and on its side, the call answers the fixture's outcome`, SLOW, async () => {
-      const exchange = await given(file);
-      const outcome = await runRead(exchange);
-      expect(outcome).toEqual(exchange.outcome);
-      expect(outcomeErrors(exchange.call, outcome)).toEqual([]);
-    });
+    it(
+      `${file} (${versionOf(file)}): in its role and on its side, the call answers the fixture's outcome`,
+      SLOW,
+      async () => {
+        const exchange = await given(file);
+        const outcome = await runRead(exchange);
+        expect(outcome).toEqual(await answerOf(exchange));
+        expect(outcomeErrors(exchange.call, outcome)).toEqual([]);
+        expect(
+          schemaErrors(`${exchange.call}.exchange`, { ...exchange, outcome }, "v1.6"),
+          "the exchange with the call's answer, at v1.6",
+        ).toEqual([]);
+      },
+    );
   }
 
   it(
@@ -872,7 +1046,7 @@ describe("readOutboxRow: one business's row and record, never another's (K-05 v1
       await addYogaRows();
       await addNoBusinessRows();
       const outcome = await readOutboxRow(job, ALEX_FIRST, nowOf(exchange));
-      expect(outcome).toEqual(exchange.outcome);
+      expect(outcome).toEqual(await answerOf(exchange));
     },
   );
 
@@ -958,6 +1132,8 @@ describe("readOutboxRow: one business's row and record, never another's (K-05 v1
             },
           },
         },
+        // K-04's seeds give the yoga studio no kind of work (item 45).
+        businessSensitive: null,
         openQuestions: [],
       });
       expect(outcomeErrors("readOutboxRow", outcome)).toEqual([]);
@@ -975,7 +1151,7 @@ describe("readOutboxRow: one business's row and record, never another's (K-05 v1
         await setBusinessScope(tx, BARBERSHOP);
         return readOutboxRowIn(tx, ALEX_FIRST, nowOf(exchange));
       });
-      expect(outcome).toEqual(exchange.outcome);
+      expect(outcome).toEqual(await answerOf(exchange));
     },
   );
 
@@ -1028,6 +1204,222 @@ describe("readOutboxRow: one business's row and record, never another's (K-05 v1
   );
 });
 
+describe("readOutboxRow's businessSensitive: the row's business's switch, read under its business (K-05 v1.6 item 45)", () => {
+  const S1_02: ReadOutboxRowRequest = { outboxRowId: "outbox-s1-02-sam-1", businessId: BARBERSHOP };
+  const PRACTICE_ROW: ReadOutboxRowRequest = {
+    outboxRowId: "out-alex-lee-associates-first",
+    businessId: PRACTICE,
+  };
+  const BARBERSHOP_COMPANY = "company-lees-barbershop";
+
+  /** The switch one read answers, as rosie_job; the whole answer is checked against v1.6's v1dot6Response first. */
+  async function switchOf(request: ReadOutboxRowRequest, exchange: Exchange): Promise<boolean | null> {
+    const row = asRow(await readOutboxRow(job, request, nowOf(exchange)));
+    expect(outcomeErrors("readOutboxRow", row)).toEqual([]);
+    return row.businessSensitive;
+  }
+
+  /** Sets one kind of work's two switch lists from array literals ('{sensitive}', '{NULL}'), as the tables' owner. */
+  async function setSwitches(companyId: string, kindId: string, flowA: string, flowB: string): Promise<void> {
+    await db.sql`
+      update company_kinds
+      set pf_switches_a = ${flowA}::text[], pf_switches_b = ${flowB}::text[], version = version + 1
+      where company_id = ${companyId} and kind_id = ${kindId}
+    `;
+  }
+
+  /** A second kind of work of a company, as fixture set v1's shop of that id lists its facts, with no switch on. */
+  async function addKind(companyId: string, businessId: string | null, kindId: string): Promise<void> {
+    await insertRow(db.sql, "company_kinds", {
+      company_id: companyId,
+      kind_id: kindId,
+      business_id: businessId,
+      trade_name: null,
+      pf_facts: shopFactsOf(kindId),
+      pf_switches_a: [],
+      pf_switches_b: [],
+    });
+  }
+
+  /** What one call answers, with every statement it sent (both role clients record theirs). */
+  async function withStatements(
+    read: () => Promise<unknown>,
+  ): Promise<{ outcome: unknown; statements: string[] }> {
+    sent.length = 0;
+    const outcome = await read();
+    return { outcome, statements: [...sent] };
+  }
+
+  const readsKinds = (statement: string): boolean => /\bcompany_kinds\b/i.test(statement);
+
+  it(
+    "a kind of work listing sensitive in flow A only, in flow B only or in both gives true, beside a second kind that lists nothing; with neither flow on, false",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-practice-sensitive.json");
+      expect(await switchOf(PRACTICE_ROW, exchange), "flow A only: the fixture's").toBe(true);
+      await addKind(PRACTICE_COMPANY, PRACTICE, "coach");
+      expect(await switchOf(PRACTICE_ROW, exchange), "flow A only, beside the coach").toBe(true);
+      for (const [flowA, flowB] of [
+        ["{}", "{sensitive}"],
+        ["{sensitive}", "{sensitive}"],
+        ["{cancelright}", "{cancelright,sensitive}"],
+      ] as const) {
+        await setSwitches(PRACTICE_COMPANY, "therapist", flowA, flowB);
+        expect(await switchOf(PRACTICE_ROW, exchange), `${flowA} ${flowB}`).toBe(true);
+      }
+      await setSwitches(PRACTICE_COMPANY, "therapist", "{cancelright}", "{}");
+      expect(await switchOf(PRACTICE_ROW, exchange), "two kinds, neither lists it").toBe(false);
+    },
+  );
+
+  it(
+    "the barbershop (K-23's barber, no switch on) gives false with Lee Home Services' kinds and a practice's sensitive kind stored beside it; run by the tables' owner under its scope, the same answer",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-s1-02-not-sensitive.json");
+      // Lee Associates' business head, company and sensitive kind of work (its fixture's first three rows).
+      await db.sql.begin(async (tx) => {
+        for (const row of practiceRows().slice(0, 3)) {
+          await insertRow(tx, row.table, row.values);
+        }
+      });
+      expect(await readOutboxRow(job, S1_02, nowOf(exchange))).toEqual(exchange.outcome);
+      const owner = await db.sql.begin(async (tx) => {
+        await setBusinessScope(tx, BARBERSHOP);
+        return readOutboxRowIn(tx, S1_02, nowOf(exchange));
+      });
+      expect(owner).toEqual(exchange.outcome);
+    },
+  );
+
+  it(
+    "a NULL element in a switch list (0019's names check lets one through) is unknown, never off: null unless a kind lists the switch (the security review's N2 on T-1196)",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-s1-02-not-sensitive.json");
+      expect(await switchOf(S1_02, exchange)).toBe(false);
+      for (const [flowA, flowB] of [
+        ["{NULL}", "{}"],
+        ["{}", "{cancelright,NULL}"],
+        ["{NULL}", "{NULL}"],
+      ] as const) {
+        await setSwitches(BARBERSHOP_COMPANY, "barber", flowA, flowB);
+        expect(await switchOf(S1_02, exchange), `${flowA} ${flowB}`).toBeNull();
+      }
+      // Beside a second kind whose lists are plain: bool_or alone would skip the NULL and answer false.
+      await addKind(BARBERSHOP_COMPANY, BARBERSHOP, "hair");
+      expect(await switchOf(S1_02, exchange), "the NULL beside a plain kind").toBeNull();
+      // The switch listed, by the other kind or beside the NULL itself: true.
+      await setSwitches(BARBERSHOP_COMPANY, "hair", "{}", "{sensitive}");
+      expect(await switchOf(S1_02, exchange), "another kind lists it").toBe(true);
+      await setSwitches(BARBERSHOP_COMPANY, "hair", "{}", "{}");
+      await setSwitches(BARBERSHOP_COMPANY, "barber", "{NULL,sensitive}", "{}");
+      expect(await switchOf(S1_02, exchange), "listed beside the NULL").toBe(true);
+      // A NULL among the facts, which the read never names, leaves a plain no.
+      await setSwitches(BARBERSHOP_COMPANY, "barber", "{}", "{}");
+      await db.sql`
+        update company_kinds set pf_facts = pf_facts || array[null]::text[], version = version + 1
+        where company_id = ${BARBERSHOP_COMPANY} and kind_id = 'barber'
+      `;
+      expect(await switchOf(S1_02, exchange), "a NULL fact").toBe(false);
+    },
+  );
+
+  it(
+    "a row with no business answers null and reads no kind of work at all, though a sign-up's company kind with no business lists the switch (default 68)",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-no-question.json");
+      await addNoBusinessRows();
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "companies", {
+          id: "company-alex-signup",
+          owner_person_id: "person-alex",
+          name: "Alex M.",
+          business_id: null,
+        });
+        await insertRow(tx, "company_kinds", {
+          company_id: "company-alex-signup",
+          kind_id: "therapist",
+          business_id: null,
+          trade_name: null,
+          pf_facts: shopFactsOf("therapist"),
+          pf_switches_a: ["sensitive"],
+          pf_switches_b: [],
+        });
+      });
+      const { outcome, statements } = await withStatements(() =>
+        readOutboxRow(job, { outboxRowId: "out-nobiz-alex-later", businessId: null }, nowOf(exchange)),
+      );
+      expect(asRow(outcome).businessSensitive).toBeNull();
+      expect(outcomeErrors("readOutboxRow", outcome)).toEqual([]);
+      expect(statements.length, "the read reached the database").toBeGreaterThan(0);
+      expect(statements.filter(readsKinds)).toEqual([]);
+    },
+  );
+
+  it(
+    "the yoga studio's scope over the barbershop's row: notFound, and no kind of work of any business is read",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-s1-02-not-sensitive.json");
+      const { outcome, statements } = await withStatements(() =>
+        readOutboxRow(job, { outboxRowId: "outbox-s1-02-sam-1", businessId: YOGA }, nowOf(exchange)),
+      );
+      expect(outcome).toEqual({ error: "notFound", table: "outbox_rows", rowId: "outbox-s1-02-sam-1" });
+      expect(outcomeErrors("readOutboxRow", outcome)).toEqual([]);
+      expect(statements.filter(readsKinds)).toEqual([]);
+    },
+  );
+
+  it(
+    "a read of company_kinds that fails fails the call with the database's own error, never an answer of false or null",
+    SLOW,
+    async () => {
+      const exchange = await given("read-outbox-row-s1-02-not-sensitive.json");
+      // This file's schema only: rosie_job loses SELECT on company_kinds, and gets it back below.
+      await db.sql`revoke select on company_kinds from rosie_job`;
+      try {
+        await expect(readOutboxRow(job, S1_02, nowOf(exchange))).rejects.toMatchObject({ code: "42501" });
+        await expect(
+          withBusiness(job, BARBERSHOP, (tx) => readOutboxRowIn(tx, S1_02, nowOf(exchange))),
+        ).rejects.toMatchObject({ code: "42501" });
+      } finally {
+        await db.sql`grant select on company_kinds to rosie_job`;
+      }
+      expect(await switchOf(S1_02, exchange)).toBe(false);
+    },
+  );
+
+  it(
+    "T-1148's skeleton seed (db/seeds/skeleton.ts) gives the barbershop K-23's barber kind of work, so turn 1's row reads false (CQ-185)",
+    SLOW,
+    async () => {
+      const exchange = exchangeOf("read-outbox-row-s1-02-not-sensitive.json");
+      const commit = exchangeOf("commit-s1-01-sam.json");
+      await reset();
+      await loadSeeds([new URL("seed-bundle-registry.json", CORE_DIR)]);
+      await seedSkeleton(db.sql);
+      expect(
+        await commitTurn(job, structuredClone(commit.request) as unknown as CommitTurnRequest, {
+          now: new Date(commit.given.now),
+        }),
+      ).toEqual(commit.outcome);
+      const outcome = await readOutboxRow(job, S1_02, nowOf(exchange));
+      const fixture = asRow(exchange.outcome);
+      // The seed's Sam holds no role and no stored language, and his number no phone row yet (T-1148); the rest of the
+      // answer is the fixture's, the switch false among it.
+      expect(outcome).toEqual({
+        ...fixture,
+        recipient: { ...fixture.recipient, storedLanguage: null, roles: [], phone: null },
+      });
+      expect([TEST_OWNER_1.businessId, asRow(outcome).businessSensitive]).toEqual([BARBERSHOP, false]);
+      expect(outcomeErrors("readOutboxRow", outcome)).toEqual([]);
+    },
+  );
+});
+
 describe("no business yet: the runtime side returns no row that has a business (items 35 and 36)", () => {
   it(
     "readOutboxRow with no business: a row with none, with no role, no business head and none of any business's questions or safety rows",
@@ -1071,6 +1463,8 @@ describe("no business yet: the runtime side returns no row that has a business (
         },
         answers: { handleId: "handle-alex", texts: NO_BUSINESS_TEXTS },
         slotSource: { business: null, booking: null, question: null },
+        // A row with no business reads no kinds of work (default 68).
+        businessSensitive: null,
         openQuestions: [{ id: "oq-nobiz-alex", step: "S1-02", text: "No-business words as sent" }],
       });
       expect(outcomeErrors("readOutboxRow", later)).toEqual([]);
@@ -1301,6 +1695,7 @@ describe("sealed values: never selected, never answered, never logged (item 35's
         "phones",
         "bookings",
         "openers_sent",
+        "company_kinds",
       ]) {
         expect(named.has(table), table).toBe(true);
       }
@@ -1310,6 +1705,25 @@ describe("sealed values: never selected, never answered, never logged (item 35's
           statement,
         ).toEqual([]);
         expect(statement.includes("*"), statement).toBe(false);
+      }
+      // Of company_kinds, the business and the two switch lists alone: never a kind, its facts or its trade name (v1.6
+      // default 69). Its columns are read from the schema, so a column added later is held to this too.
+      const kindColumns = (
+        await db.sql<{ name: string }[]>`
+          select column_name as name from information_schema.columns
+          where table_schema = ${db.schema} and table_name = 'company_kinds'
+        `
+      ).map((column) => column.name);
+      expect(kindColumns).toEqual(expect.arrayContaining(["kind_id", "trade_name", "pf_facts"]));
+      const switchReads = statements.filter((statement) => namesOf(statement).includes("company_kinds"));
+      expect(switchReads.length).toBeGreaterThan(0);
+      for (const statement of switchReads) {
+        const names = new Set(namesOf(statement));
+        expect(kindColumns.filter((column) => names.has(column)).sort(), statement).toEqual([
+          "business_id",
+          "pf_switches_a",
+          "pf_switches_b",
+        ]);
       }
       expect(logged).toBe(0);
       expect(outcomes).toHaveLength(READ_FIXTURES.length + 6);
@@ -1405,7 +1819,7 @@ describe("the side and the request (STATE notes 5 and 22; T-1094's note N2)", ()
       const holds: ReadOpenHoldsRequest = { handleId: "handle-alex", businessId: BARBERSHOP, eventIds: [] };
       const row: ReadOutboxRowRequest = { outboxRowId: "out-a7-03-alex", businessId: BARBERSHOP };
       expect(await withBusiness(job, BARBERSHOP, (tx) => readOutboxRowIn(tx, row, nowOf(exchange)))).toEqual(
-        exchange.outcome,
+        await answerOf(exchange),
       );
       const scoped: ((tx: Db) => Promise<unknown>)[] = [
         (tx) => readOpenHoldsIn(tx, holds),

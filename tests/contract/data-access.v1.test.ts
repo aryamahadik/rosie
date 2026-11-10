@@ -1,21 +1,22 @@
-// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.5 (T-084; T-1169, with
-// T-1188 folded in by DL-373; ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12;
+// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.6 (T-084; T-1169, with
+// T-1188 folded in by DL-373; T-1199 for v1.6; ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12;
 // contracts/data-access/README.md "Fixtures", "Producers and consumers" and each version's "Consumers of" list).
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, fixtures
 // and README, and one part per producer or consumer side, added later by a QA side task that depends on this task and
-// on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3
-// and v1.4, every fixture of both run through db/repo's own reads against local PostgreSQL, is
-// data-access.v1.db-side.test.ts (T-1169); v1.5 adds no database call.
+// on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3,
+// v1.4 and v1.6, every fixture of the three run through db/repo's own reads against local PostgreSQL, is
+// data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199); v1.5 adds no database call.
 //
-// K-05 is frozen at v1 to v1.5 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
+// K-05 is frozen at v1 to v1.6 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
 // checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
 // data-access.<version>.schema.json #/$defs/<def>), and entries are selected by version, never by a pinned list or
 // count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land. As DL-124
 // settled for K-06, this file holds v1 and its additive minor versions: the v1.2 fixture part the README plans as
 // T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here, and so are the fixture parts of
-// v1.3, v1.4 and v1.5 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did"), with part 5, v1.5's
-// rowReader read as README item 44 says and three faults no fixture shows refused (T-1188; T-1184's security note b).
+// v1.3, v1.4, v1.5 and v1.6 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did"; v1.6's "joins
+// tests/contract/data-access.v1.test.ts as v1.5's did"), with part 5, v1.5's rowReader read as README item 44 says and
+// three faults no fixture shows refused (T-1188; T-1184's security note b).
 //
 // What this part proves:
 //   1. every fixture in contracts/data-access/fixtures/index.json is checked against the schema of its version:
@@ -39,8 +40,9 @@
 //      once its outcome is put right: a row with no person, a line to no one (lineTo null) and a cust line, each read as
 //      the owner.
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: each fixture's request run against local
-//   PostgreSQL giving its outcome (v1.3's and v1.4's in data-access.v1.db-side.test.ts), 1,000 parallel reserves, a
-//   repeated commit, parallel claims, and each consumer accepting every valid fixture and refusing every invalid one.
+//   PostgreSQL giving its outcome (v1.3's, v1.4's and v1.6's in data-access.v1.db-side.test.ts), 1,000 parallel
+//   reserves, a repeated commit, parallel claims, and each consumer accepting every valid fixture and refusing every
+//   invalid one.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -61,7 +63,7 @@ const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const ID_BASE = "https://rosie.invalid/contracts/";
 
 /** The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own. */
-const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5"];
+const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6"];
 /** The fixture parts the README plans as tasks of their own that this file covers (DL-124). */
 const COVERED_HERE = ["T-128"];
 
@@ -818,6 +820,25 @@ const MENDS: Record<string, Mend[]> = {
         { at: "outcome.roleId", to: "role-sam-barber" },
       ],
       same: { file: "row-reader-s1-02-owner.json", at: "" },
+    },
+  ],
+  // v1.6
+  "invalid/refuse-outbox-row-switch-left-out.json": [
+    {
+      reason:
+        "the practice's answer leaves its sensitive switch out, and a v1.6 answer always states it, true, false or null, so no consumer reads a missing switch as off (readOutboxRow.v1dot6Response)",
+      putRight: "with the switch stated, true, as the practice's one kind of work lists it in flow A",
+      changes: [{ at: "businessSensitive", to: true }],
+      same: { file: "read-outbox-row-practice-sensitive.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-outbox-row-switch-per-flow.json": [
+    {
+      reason:
+        "the practice's switch is answered per flow (on in flow A, off in flow B), and the read answers the business's one value, true when any kind of work lists it in either flow (businessSensitive)",
+      putRight: "with that one value, true, the stricter of its two flows",
+      changes: [{ at: "businessSensitive", to: true }],
+      same: { file: "read-outbox-row-practice-sensitive.json", at: "outcome" },
     },
   ],
 };
@@ -1626,7 +1647,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-151 migrating K-07's schema addition",
     ],
     needs:
-      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call.",
+      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition.",
   },
   {
     id: "consumer-action-layer",
@@ -1646,7 +1667,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-104 the safety and hand-offs service",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one, each at the newest frozen minor version its task needs: the commit sends one commitTurn per turn, takes versionChanged and reservationLost as limits 4 and 5 and a repeat as the first commit, and from v1.1 writes its effects and the waiting rows it ends (C-087); reserve, release and extend as the reservation and saved-time rules use them: at most two saved times, a third refused with each one's end, the next in line promoted with its own saved-time clock row, one extension and never for the customer's own AI (C-100, C-134); the effects runner claims, records each try with its effect.result entry and runs an effect in outage once more after serviceBack on the same key, with the claim entries from v1.2 (C-109, at least v1.1); the reconciliation writes only a stripe_refund (C-112, at least v1.1); the frontier and the Tool API turn face read readTurnState under one business, unknownFact and notFound failing closed (C-075, C-074: T-315). From v1.3 the Tool API turn face (C-074) binds, in T-1141, readOpenHolds behind the commit's openHolds, naming the turn's unread texts and cutting each hold to K-09 safetyHold's three fields (C-087), readOutboxRow behind compose input's and finalize's readRow, refusing a row whose line is null and in finalize a question with no clock row, the flow read by item 35's rule (default 53), the words of answered texts only those the runtime hands in (C-090, C-093: T-313's port), and readFixedLineFacts behind the fixed-line inserter's readFixedLines (C-089: T-314's port), mapping fixedLineRow to the call's fixed-line refusal. From v1.4 the safety and hand-offs service (C-104, T-318) reads the seven safety reads as its SafetyReader through runCore (C-087, T-1140), bound by T-1141 on the call's own transaction and business, each answer handed on in the port's own shape, notFound, moreThanOneOwner and transient mapped to a thrown error that fails closed, never to null or false, and arrivedAt answering null until T-1155. From v1.5 compose input's ComposeRow.role and finalize's FinalizeRow.reader map the reader by item 44 exactly as the rowReader fixtures read (T-1141's round 2): a held role first; with none, the line's audience only for a person on a section 1 step whose line goes to owner, staff or cust; noReader otherwise, never written, cached or passed on as a role.",
+      "Accepts every valid fixture and refuses every invalid one, each at the newest frozen minor version its task needs: the commit sends one commitTurn per turn, takes versionChanged and reservationLost as limits 4 and 5 and a repeat as the first commit, and from v1.1 writes its effects and the waiting rows it ends (C-087); reserve, release and extend as the reservation and saved-time rules use them: at most two saved times, a third refused with each one's end, the next in line promoted with its own saved-time clock row, one extension and never for the customer's own AI (C-100, C-134); the effects runner claims, records each try with its effect.result entry and runs an effect in outage once more after serviceBack on the same key, with the claim entries from v1.2 (C-109, at least v1.1); the reconciliation writes only a stripe_refund (C-112, at least v1.1); the frontier and the Tool API turn face read readTurnState under one business, unknownFact and notFound failing closed (C-075, C-074: T-315). From v1.3 the Tool API turn face (C-074) binds, in T-1141, readOpenHolds behind the commit's openHolds, naming the turn's unread texts and cutting each hold to K-09 safetyHold's three fields (C-087), readOutboxRow behind compose input's and finalize's readRow, refusing a row whose line is null and in finalize a question with no clock row, the flow read by item 35's rule (default 53), the words of answered texts only those the runtime hands in (C-090, C-093: T-313's port), and readFixedLineFacts behind the fixed-line inserter's readFixedLines (C-089: T-314's port), mapping fixedLineRow to the call's fixed-line refusal. From v1.4 the safety and hand-offs service (C-104, T-318) reads the seven safety reads as its SafetyReader through runCore (C-087, T-1140), bound by T-1141 on the call's own transaction and business, each answer handed on in the port's own shape, notFound, moreThanOneOwner and transient mapped to a thrown error that fails closed, never to null or false, and arrivedAt answering null until T-1155. From v1.5 compose input's ComposeRow.role and finalize's FinalizeRow.reader map the reader by item 44 exactly as the rowReader fixtures read (T-1141's round 2): a held role first; with none, the line's audience only for a person on a section 1 step whose line goes to owner, staff or cust; noReader otherwise, never written, cached or passed on as a role. From v1.6 the same row ports fill SlotSource.sensitive from readOutboxRow's businessSensitive for a row about no booking (C-074, C-090, C-093: T-1190): null and a missing field read as on, only false is off, a row about a booking stays on, and a read that fails fails the call, never read as off (README item 45, default 67).",
   },
   {
     id: "consumer-runtime",
@@ -1974,8 +1995,8 @@ describe("data-access sides: the list where each producer and consumer side is a
     }
     const named = WRITTEN_FOR.flatMap((version) => groupsOf(version).flatMap((group) => taskIds(group.text)));
     for (const task of COVERED_HERE) expect(named, task).toContain(task);
-    // The producer's database side of v1.3 and v1.4 names the builds it runs, beside this file.
-    for (const task of ["T-1138", "T-1161"]) expect(producer.needs, task).toContain(task);
+    // The producer's database side of v1.3, v1.4 and v1.6 names the builds it runs, beside this file.
+    for (const task of ["T-1138", "T-1161", "T-1197"]) expect(producer.needs, task).toContain(task);
     expect(producer.needs).toContain("data-access.v1.db-side.test.ts");
   });
 

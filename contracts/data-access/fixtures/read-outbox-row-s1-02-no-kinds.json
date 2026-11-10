@@ -1,0 +1,69 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "Turn 1's row, S1-02's question to Sam, read under the barbershop's scope as v1.3's read-outbox-row-s1-02.json reads it, every field the same, with K-04's seeds alone: Lee's Barbershop holds no kinds of work yet (no company_kinds row names it: S1-04 writes them), as at the walking skeleton's start, whose seed (T-1148's db/seeds/skeleton.ts) writes the barbershop's head, Sam, his handle and their link, and no kind of work. Nothing is stored to read the switch from, so the read answers businessSensitive null (README item 45), never false: the caller reads null as on and fails closed (DL-326 note b; DL-391; README default 67), so this row is filled in its sensitive form (README open gap 47)."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:05:05Z",
+    "row": {
+      "turnId": "turn-s1-01-sam",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": "oq-s1-02-sam-1",
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "handleId": "handle-sam",
+      "kind": "phone",
+      "personId": "person-sam",
+      "name": "Sam Lee",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }],
+      "phone": { "stopped": false, "chatOpen": true, "chatWay": "imessage", "pollVotedAt": null, "version": 2 }
+    },
+    "answers": {
+      "handleId": "handle-sam",
+      "texts": [{ "eventId": "evt-sam-s1-01", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": null,
+      "question": {
+        "id": "oq-s1-02-sam-1",
+        "step": "S1-02",
+        "status": "waiting",
+        "options": [],
+        "readback": null,
+        "clock": null,
+        "askCount": 1,
+        "version": 1,
+        "clockRow": { "id": "clock-oq-s1-02-sam-1", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+      }
+    },
+    "businessSensitive": null,
+    "openQuestions": []
+  }
+}
