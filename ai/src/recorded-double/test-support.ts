@@ -11,7 +11,10 @@
 //     turn (T-556): its manifest under its own id, and its flow A graph, whose always-on rules' hash the frontier copies
 //     into the context (actions/src/frontier/assemble/handler.ts, step 8);
 //   - the row id: ADR-013 default 131, `<kind>-<step>-<turn key>-<n>`, the step in lower case and the turn's own id as the
-//     turn key (actions/src/commit/walk/writes.ts rowIds).
+//     turn key (actions/src/commit/walk/writes.ts rowIds);
+//   - S1-02's master line and card lines, as that bundle publishes them (K-01 flows.A.steps.S1-02.say[0]): the row's
+//     compose input carries the line as its masterText and the card's four lines as its term facts (K-09 v1.6; K-03
+//     v1.1 README "v1.1"), which recording 4 is keyed on (T-1175).
 
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -102,4 +105,33 @@ export function bundleV0(): PublishedBundle {
     };
   }
   throw new Error("bundles/v0/bundle.kv.json holds no manifest under its own bundle id");
+}
+
+/** What a step says first (K-01 step say[0]): the master's line, and its card's lines, each word for word. */
+export interface FirstSay {
+  readonly text: string;
+  readonly cardLines: readonly string[];
+}
+
+/**
+ * What `stepId` says first in a published bundle's flow A graph, read under the bundle's own id (K-01
+ * flows.A.steps.<id>.say[0]): the master's line, which a row's compose input carries as its masterText, and its card's
+ * lines, which it carries as term facts, word for word (K-09 v1.6; K-03 v1.1 README "v1.1").
+ */
+export function firstSayOf(bundle: PublishedBundle, stepId: string): FirstSay {
+  const steps: unknown = bundle.cache.flows.A?.steps;
+  const step = isRecord(steps) ? steps[stepId] : undefined;
+  const says: unknown = isRecord(step) ? step.say : undefined;
+  const first: unknown = Array.isArray(says) ? (says as readonly unknown[])[0] : undefined;
+  const elements: unknown = isRecord(first) ? first.elements : undefined;
+  const card: unknown = isRecord(elements) ? elements.card : undefined;
+  const lines: unknown = isRecord(card) ? card.lines : undefined;
+  if (!isRecord(first) || typeof first.text !== "string" || !Array.isArray(lines))
+    throw new Error(`bundle v0's flow A says nothing with a card at ${stepId}`);
+  const cardLines: string[] = [];
+  for (const line of lines as readonly unknown[]) {
+    if (typeof line !== "string") throw new Error(`a card line of ${stepId} in bundle v0 is not words`);
+    cardLines.push(line);
+  }
+  return { text: first.text, cardLines };
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// The Tool API's and the frontier's schema checks, compiled ahead of time for the Worker (T-1144, T-1150; DL-327,
-// DL-340; ADR-005): `npm run build:validators`. ES module, so strict mode is on.
+// The Tool API's, the frontier's and compose input's schema checks, compiled ahead of time for the Worker (T-1144,
+// T-1150, T-1165; DL-327, DL-340, DL-357; ADR-005): `npm run build:validators`. ES module, so strict mode is on.
 //
 // Ajv compiles a schema with new Function, which the Workers runtime refuses (actions/README.md, open point "Ajv in
 // the Worker"). So this build compiles, here in Node, exactly the definitions actions/src/tool-api/validator.ts and
@@ -15,6 +15,13 @@
 // helpers it calls (ajv/dist/runtime) are imported, and the bundler takes them from node_modules, so ajv stays a
 // devDependency.
 //
+// Compose input's check (actions/src/compose-input/check.ts) gets a module of its own, built the same way, with the same
+// options: K-03 v1's and v1.1's `$defs/composeInput`, from the schemas their $refs reach. v1's is the input compose
+// input checks today; v1.1's, whose facts may also be term facts, is the one T-1174 moves it to (DL-355, DL-357), so
+// that move needs no change here. A module of its own, because validators.js holds exactly the definitions validator.ts
+// and the frontier's checks read, built from exactly the files K-09 v1.5's and K-08 v1.1's $refs reach
+// (validator.worker.test.ts holds it to that), and K-03 v1.1 is none of those files.
+//
 // It writes into actions/src/tool-api/generated/, which is git-ignored, never edited and never committed (ADR-005):
 //   validators.js     the standalone code: one validate function per definition, `definitions` (each by its $ref)
 //                     and `build` (Ajv's version, the options, the schema ids and files, each file's sha256);
@@ -25,12 +32,19 @@
 //                     definition the frontier checks; each choice, open question and card of those contexts) and on
 //                     {} for each definition. validator.worker.test.ts and check.worker.test.ts hold the code to
 //                     these answers inside workerd, where the compiler cannot run;
-//   ajv-answers.d.ts  its types.
-// It writes them first into a staging folder of its own inside that folder, loads validators.js from there in this
-// Node and checks that it gives every one of those answers; only then does it move the four files into place. On any
-// failure (a check that differs, or one that throws) it removes the staging folder and the four files in place, and
-// fails, so no unchecked code and no code that differs from the compiler's is ever left in place (the security
-// reviewer's note 1 on T-1144).
+//   ajv-answers.d.ts  its types;
+//   compose-input-validators.js, compose-input-validators.d.ts, compose-input-answers.js, compose-input-answers.d.ts
+//                     the same four for compose input's check: the standalone code of K-03 v1's and v1.1's
+//                     composeInput, with its `definitions` and its `build` (the K-03 ids in place of the three above);
+//                     and what Ajv's compiler answers to each K-03 input on the contracts' fixtures (each K-03
+//                     composeInput fixture, each inputAndPlan fixture's input, and the input each K-09 composeInput
+//                     exchange answers), each under both versions, and to {} for each, which
+//                     actions/src/compose-input/check.worker.test.ts holds the code to inside workerd.
+// It writes them first into a staging folder of its own inside that folder, loads validators.js and
+// compose-input-validators.js from there in this Node and checks that each gives every one of its answers; only then
+// does it move the eight files into place. On any failure (a check that differs, or one that throws) it removes the
+// staging folder and the eight files in place, and fails, so no unchecked code and no code that differs from the
+// compiler's is ever left in place (the security reviewer's note 1 on T-1144).
 //
 // It runs before lint, the type check, the tests and the staging deploy: `npm run contracts:types` runs it after the
 // contract types (the step ci.yml and merge-check.yml, and so the local merge-check, run before lint and the type
@@ -79,10 +93,26 @@ export const PARTS = Object.freeze(["request", "response", "errors"]);
 /** The K-02 v1.1 definitions the frontier checks: check.ts's K02_PARTS. */
 export const MODEL_PARTS = Object.freeze(["choice", "openQuestion", "stepCard", "context"]);
 
+/**
+ * K-03 v1 and v1.1, relative to contracts/, whose `composeInput` compose input checks (actions/src/compose-input/check.ts:
+ * its COMPOSE_INPUT_SCHEMA_IDS, in this order): v1's today, v1.1's once T-1174 moves compose input to it.
+ */
+export const MESSAGE_PLAN_FILES = Object.freeze([
+  "message-plan/message-plan.v1.schema.json",
+  "message-plan/message-plan.v1.1.schema.json",
+]);
+
+/** The K-03 definition compose input checks. */
+export const COMPOSE_INPUT_DEFINITION = "composeInput";
+
 /** The fixture indexes the answers are taken on, relative to contracts/. */
 const TOOL_API_INDEX = "tool-api/fixtures/index.json";
 const EVENT_TRACE_INDEX = "event-trace/fixtures/index.json";
 const MODEL_INDEX = "model/fixtures/index.json";
+const MESSAGE_PLAN_INDEX = "message-plan/fixtures/index.json";
+
+/** The K-03 fixtures that hold a composer input, by their definition, with the input's place in the file. */
+const INPUT_PLACES = Object.freeze({ composeInput: [], inputAndPlan: ["input"] });
 
 /** The lists of a K-02 context the frontier checks item by item, with the definition of each item. */
 const CONTEXT_LISTS = Object.freeze([
@@ -134,11 +164,12 @@ function referencedFiles(file, schema) {
 
 /**
  * K-09 v1.5, K-08 v1.1 and every schema file their $refs reach (K-09 v1, whose call list the Tool API keeps, and K-02
- * v1.1, the frontier's, among them), each with its text's sha256, sorted by file.
+ * v1.1, the frontier's, among them), each with its text's sha256, sorted by file. Given other `roots` (compose input's
+ * MESSAGE_PLAN_FILES), those files and every file their $refs reach instead.
  */
-export function readSchemas(contractsDir = CONTRACTS_DIR) {
+export function readSchemas(contractsDir = CONTRACTS_DIR, roots = [TOOL_API_FILE, EVENT_TRACE_FILE]) {
   const read = new Map();
-  const queue = [TOOL_API_FILE, EVENT_TRACE_FILE];
+  const queue = [...roots];
   while (queue.length > 0) {
     const file = queue.shift();
     if (read.has(file)) continue;
@@ -153,7 +184,7 @@ export function readSchemas(contractsDir = CONTRACTS_DIR) {
 /** One schema the build read, by its file; throws when the files read do not hold it. */
 function schemaOf(schemas, file) {
   const schema = schemas.find((entry) => entry.file === file)?.schema;
-  if (schema === undefined) throw new Error(`${file} is not among the schemas ${TOOL_API_FILE} reaches`);
+  if (schema === undefined) throw new Error(`${file} is not among the schema files the build read`);
   return schema;
 }
 
@@ -191,6 +222,24 @@ export function definitionsOf(schemas) {
     if (!IDENTIFIER.test(exportName)) throw new Error(`${exportName} cannot be an export name`);
   }
   return definitions;
+}
+
+/**
+ * Each definition compose input's code holds, as { exportName, ref }: `composeInput` of each of MESSAGE_PLAN_FILES, in
+ * its order (K-03 v1's, then v1.1's), from the schemas readSchemas(contractsDir, MESSAGE_PLAN_FILES) read.
+ */
+export function composeInputDefinitionsOf(schemas) {
+  return MESSAGE_PLAN_FILES.map((file) => {
+    const schema = schemaOf(schemas, file);
+    if (schema.$defs?.[COMPOSE_INPUT_DEFINITION] === undefined) {
+      throw new Error(`${file} has no definition ${COMPOSE_INPUT_DEFINITION}`);
+    }
+    // message-plan.v1.1.schema.json gives message_plan_v1_1_composeInput.
+    const version = path.posix.basename(file, ".schema.json").replace(/[^A-Za-z0-9]/g, "_");
+    const exportName = `${version}_${COMPOSE_INPUT_DEFINITION}`;
+    if (!IDENTIFIER.test(exportName)) throw new Error(`${exportName} cannot be an export name`);
+    return { exportName, ref: `${schema.$id}#/$defs/${COMPOSE_INPUT_DEFINITION}` };
+  });
 }
 
 function ajvWith(schemas, options) {
@@ -238,18 +287,12 @@ function valueAt(document, at) {
 }
 
 /**
- * What Ajv's compiler answers in Node, with validator.ts's options: each check as { version, def, expect, source, at,
- * definition, valid, errors }, and the fixtures it reads by source (a file relative to contracts/). `at` is the path
- * of keys from the fixture's root to the value checked: ["request"] or ["outcome"] of an exchange, a K-02 context's
- * place and its items' (["outcome", "context", "choices", 0]), or [] for the whole file; a source of null is {}.
+ * Where Ajv's compiler's answers go, for the checks of `definitions` (each { ref }) on the Ajv instance `ajv`: the
+ * fixtures read, by source, and the checks. `check(about, source, at, ref)` checks the value at `at` in the fixture
+ * `source` (read into `fixtures` first; null for {}) against `ref`, and records the answer.
  */
-export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
-  const ajv = ajvWith(schemas, AJV_OPTIONS);
-  const toolApi = schemaOf(schemas, TOOL_API_FILE);
-  const eventTrace = schemaOf(schemas, EVENT_TRACE_FILE);
-  const model = schemaOf(schemas, MODEL_FILE);
+function answerRecord(ajv, definitions) {
   const refs = new Set(definitions.map(({ ref }) => ref));
-  const calls = new Set(callNamesOf(schemas));
   const fixtures = {};
   const checks = [];
   const check = (about, source, at, ref) => {
@@ -267,6 +310,22 @@ export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
       errors: valid ? [] : plain(validate.errors),
     });
   };
+  return { fixtures, checks, check };
+}
+
+/**
+ * What Ajv's compiler answers in Node, with validator.ts's options: each check as { version, def, expect, source, at,
+ * definition, valid, errors }, and the fixtures it reads by source (a file relative to contracts/). `at` is the path
+ * of keys from the fixture's root to the value checked: ["request"] or ["outcome"] of an exchange, a K-02 context's
+ * place and its items' (["outcome", "context", "choices", 0]), or [] for the whole file; a source of null is {}.
+ */
+export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
+  const ajv = ajvWith(schemas, AJV_OPTIONS);
+  const toolApi = schemaOf(schemas, TOOL_API_FILE);
+  const eventTrace = schemaOf(schemas, EVENT_TRACE_FILE);
+  const model = schemaOf(schemas, MODEL_FILE);
+  const calls = new Set(callNamesOf(schemas));
+  const { fixtures, checks, check } = answerRecord(ajv, definitions);
 
   const toolApiRef = (name) => `${toolApi.$id}#/$defs/${name}`;
   const modelRef = (part) => `${model.$id}#/$defs/${part}`;
@@ -320,12 +379,50 @@ export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
   return { fixtures, checks };
 }
 
+/**
+ * What Ajv's compiler answers in Node, with the same options, to compose input's checks, in ajvAnswers' form: each K-03
+ * input on the contracts' fixtures under each version's composeInput (`definitions`: composeInputDefinitionsOf's).
+ * The inputs are each K-03 composeInput fixture (at []), each K-03 inputAndPlan fixture's input (["input"]), and the
+ * input each K-09 composeInput exchange answers (["outcome", "input"]: compose-input-s1-02.json's is K-03's
+ * input-s1-02.json); then {} against each.
+ */
+export function composeInputAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
+  const ajv = ajvWith(schemas, AJV_OPTIONS);
+  const { fixtures, checks, check } = answerRecord(ajv, definitions);
+  const checkInput = (about, source, at) => {
+    for (const { ref } of definitions) check(about, source, at, ref);
+  };
+  for (const entry of readJson(contractsDir, MESSAGE_PLAN_INDEX).fixtures) {
+    const at = INPUT_PLACES[entry.def];
+    if (at === undefined) continue;
+    const source = `message-plan/fixtures/${entry.file}`;
+    fixtures[source] = readJson(contractsDir, source);
+    checkInput({ version: entry.version, def: entry.def, expect: entry.expect }, source, at);
+  }
+  for (const entry of readJson(contractsDir, TOOL_API_INDEX).fixtures) {
+    if (entry.def !== `${COMPOSE_INPUT_DEFINITION}.exchange`) continue;
+    const source = `tool-api/fixtures/${entry.file}`;
+    const exchange = readJson(contractsDir, source);
+    if (!isRecord(exchange.outcome?.input)) continue;
+    fixtures[source] = exchange;
+    checkInput({ version: entry.version, def: entry.def, expect: entry.expect }, source, [
+      "outcome",
+      "input",
+    ]);
+  }
+  for (const { ref } of definitions) check({ version: null, def: null, expect: null }, null, [], ref);
+  return { fixtures, checks };
+}
+
 const json = (value) => JSON.stringify(value, null, 2);
 
+/** The version of Ajv that compiles the code. */
+const ajvVersion = () =>
+  JSON.parse(readFileSync(fileURLToPath(import.meta.resolve("ajv/package.json")), "utf8")).version;
+
 function validatorsJs(schemas, definitions, generated) {
-  const ajvVersion = JSON.parse(readFileSync(fileURLToPath(import.meta.resolve("ajv/package.json")), "utf8"));
   const build = {
-    ajv: ajvVersion.version,
+    ajv: ajvVersion(),
     options: AJV_OPTIONS,
     toolApiSchemaId: schemaOf(schemas, TOOL_API_FILE).$id,
     eventTraceSchemaId: schemaOf(schemas, EVENT_TRACE_FILE).$id,
@@ -334,18 +431,53 @@ function validatorsJs(schemas, definitions, generated) {
     sha256: Object.fromEntries(schemas.map(({ file, sha256 }) => [file, sha256])),
     helpers: generated.helpers,
   };
-  const table = definitions
-    .map(({ exportName, ref }) => `  ${JSON.stringify(ref)}: ${exportName},`)
-    .join("\n");
-  return [
+  const header = [
     "// Generated by infra/build/tool-api-validators.mjs (npm run build:validators) from contracts/: Ajv's standalone",
     "// code for the definitions actions/src/tool-api/validator.ts and actions/src/frontier/assemble/check.ts check.",
     "// Git-ignored: never edit or commit (ADR-005).",
-    ...generated.imports,
-    "",
-    "/** Ajv's run-time helper: a bundler gives the CommonJS module's default export, Node gives module.exports. */",
-    'const helper = (module) => (typeof module === "function" ? module : module.default);',
-    ...generated.picks,
+  ];
+  return moduleJs(header, definitions, generated, build);
+}
+
+/** compose-input-validators.js: compose input's code, with the K-03 ids in place of validators.js's three. */
+function composeInputValidatorsJs(schemas, definitions, generated) {
+  const build = {
+    ajv: ajvVersion(),
+    options: AJV_OPTIONS,
+    messagePlanSchemaIds: MESSAGE_PLAN_FILES.map((file) => schemaOf(schemas, file).$id),
+    schemaFiles: schemas.map(({ file }) => file),
+    sha256: Object.fromEntries(schemas.map(({ file, sha256 }) => [file, sha256])),
+    helpers: generated.helpers,
+  };
+  const header = [
+    "// Generated by infra/build/tool-api-validators.mjs (npm run build:validators) from contracts/: Ajv's standalone",
+    "// code for the definitions actions/src/compose-input/check.ts checks, K-03 v1's and v1.1's composeInput.",
+    "// Git-ignored: never edit or commit (ADR-005).",
+  ];
+  return moduleJs(header, definitions, generated, build);
+}
+
+/**
+ * One module of standalone code: its header, the run-time helpers it imports (none when the code calls none), the code,
+ * `definitions` and `build`.
+ */
+function moduleJs(header, definitions, generated, build) {
+  const table = definitions
+    .map(({ exportName, ref }) => `  ${JSON.stringify(ref)}: ${exportName},`)
+    .join("\n");
+  const helpers =
+    generated.helpers.length === 0
+      ? []
+      : [
+          ...generated.imports,
+          "",
+          "/** Ajv's run-time helper: a bundler gives the CommonJS module's default export, Node gives module.exports. */",
+          'const helper = (module) => (typeof module === "function" ? module : module.default);',
+          ...generated.picks,
+        ];
+  return [
+    ...header,
+    ...helpers,
     "",
     generated.body,
     "",
@@ -421,12 +553,48 @@ export declare const ajvAnswers: {
 };
 `;
 
+const COMPOSE_INPUT_VALIDATORS_D_TS = `// Generated by infra/build/tool-api-validators.mjs (npm run build:validators): the types of
+// compose-input-validators.js. Git-ignored: never edit or commit (ADR-005).
+import type { StandaloneValidate } from "./validators";
+
+/** K-03 v1's and v1.1's composeInput validate functions, by $ref: the schema's $id, "#/$defs/" and "composeInput". */
+export declare const definitions: Readonly<Record<string, StandaloneValidate>>;
+
+/** What compose-input-validators.js was built from: the K-03 versions whose composeInput it holds, in order. */
+export declare const build: {
+  readonly ajv: string;
+  readonly options: Readonly<Record<string, boolean>>;
+  readonly messagePlanSchemaIds: readonly string[];
+  readonly schemaFiles: readonly string[];
+  readonly sha256: Readonly<Record<string, string>>;
+  readonly helpers: readonly string[];
+};
+`;
+
+const COMPOSE_INPUT_ANSWERS_D_TS = `// Generated by infra/build/tool-api-validators.mjs (npm run build:validators): the types of
+// compose-input-answers.js. Git-ignored: never edit or commit (ADR-005).
+import type { AjvCheck } from "./ajv-answers";
+
+export type { AjvCheck };
+
+/**
+ * Compose input's checks: each K-03 input on the contracts' fixtures (a composeInput fixture's whole file, an
+ * inputAndPlan fixture's input, a K-09 composeInput exchange's outcome.input) against K-03 v1's and v1.1's
+ * composeInput, and {} against each, with what Ajv's compiler answered in Node.
+ */
+export declare const ajvAnswers: {
+  /** Each fixture checked, by its file relative to contracts/. */
+  readonly fixtures: Readonly<Record<string, unknown>>;
+  readonly checks: readonly AjvCheck[];
+};
+`;
+
 /** The value a check reads: the fixture's value at its path, or {}. */
 const valueOf = (answers, { source, at }) => valueAt(source === null ? {} : answers.fixtures[source], at);
 
-/** Loads validators.js from `dir` here in Node and lists every check whose answer differs from the compiler's. */
-async function differences(dir, answers) {
-  const url = pathToFileURL(path.join(dir, "validators.js"));
+/** Loads the module `file` from `dir` here in Node and lists every check whose answer differs from the compiler's. */
+async function differences(dir, file, answers) {
+  const url = pathToFileURL(path.join(dir, file));
   url.searchParams.set("built", String(Date.now()));
   const { definitions } = await import(url.href);
   const differ = [];
@@ -442,8 +610,9 @@ async function differences(dir, answers) {
 }
 
 /**
- * Builds everything into outDir; resolves to { definitions, checks, helpers, schemas, files }. The files are written
- * into a staging folder inside outDir and moved into place only once the code gives every answer of the compiler; any
+ * Builds everything into outDir; resolves to { definitions, checks, helpers, schemas, files, composeInput }, where
+ * composeInput is { definitions, checks, helpers, schemas } for compose input's module. The files are written into a
+ * staging folder inside outDir and moved into place only once each module gives every answer of the compiler; any
  * failure removes the staging folder and the files in place, then throws.
  */
 export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = DEFAULT_OUT } = {}) {
@@ -451,11 +620,20 @@ export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = D
   const definitions = definitionsOf(schemas);
   const generated = standaloneModule(schemas, definitions);
   const answers = ajvAnswers(schemas, definitions, contractsDir);
+  // Compose input's module: K-03 v1's and v1.1's composeInput, from the files they reach.
+  const k03Schemas = readSchemas(contractsDir, MESSAGE_PLAN_FILES);
+  const k03Definitions = composeInputDefinitionsOf(k03Schemas);
+  const k03Generated = standaloneModule(k03Schemas, k03Definitions);
+  const k03Answers = composeInputAnswers(k03Schemas, k03Definitions, contractsDir);
   const files = {
     "validators.js": validatorsJs(schemas, definitions, generated),
     "validators.d.ts": VALIDATORS_D_TS,
     "ajv-answers.js": answersJs(answers),
     "ajv-answers.d.ts": ANSWERS_D_TS,
+    "compose-input-validators.js": composeInputValidatorsJs(k03Schemas, k03Definitions, k03Generated),
+    "compose-input-validators.d.ts": COMPOSE_INPUT_VALIDATORS_D_TS,
+    "compose-input-answers.js": answersJs(k03Answers),
+    "compose-input-answers.d.ts": COMPOSE_INPUT_ANSWERS_D_TS,
   };
   mkdirSync(outDir, { recursive: true });
   // Inside outDir, so the code resolves Ajv's run-time helpers from the same node_modules, each move is a rename on one
@@ -464,7 +642,10 @@ export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = D
   let placed = false;
   try {
     for (const [name, text] of Object.entries(files)) writeFileSync(path.join(staging, name), text);
-    const differ = await differences(staging, answers);
+    const differ = [
+      ...(await differences(staging, "validators.js", answers)),
+      ...(await differences(staging, "compose-input-validators.js", k03Answers)),
+    ];
     if (differ.length > 0) {
       const listed = differ.slice(0, 10).join("; ");
       throw new Error(
@@ -483,6 +664,12 @@ export async function buildValidators({ contractsDir = CONTRACTS_DIR, outDir = D
     helpers: generated.helpers,
     schemas: schemas.map(({ file }) => file),
     files: Object.keys(files),
+    composeInput: {
+      definitions: k03Definitions.length,
+      checks: k03Answers.checks.length,
+      helpers: k03Generated.helpers,
+      schemas: k03Schemas.map(({ file }) => file),
+    },
   };
 }
 
@@ -503,10 +690,14 @@ export async function main(argv, { write = (line) => console.log(line) } = {}) {
   try {
     const built = await buildValidators({ outDir });
     const where = path.relative(process.cwd(), outDir) || ".";
+    const k03 = built.composeInput;
     write(
       `tool-api validators: ${String(built.definitions)} standalone validators from ${String(built.schemas.length)} ` +
         `schema files written to ${where} (${built.files.join(", ")}); the code gives Ajv's compiled answer to ` +
-        `all ${String(built.checks)} checks; run-time helpers: ${built.helpers.join(", ") || "none"}`,
+        `all ${String(built.checks)} checks; run-time helpers: ${built.helpers.join(", ") || "none"}. ` +
+        `Compose input's: ${String(k03.definitions)} standalone validators from ${String(k03.schemas.length)} ` +
+        `schema files; the code gives Ajv's compiled answer to all ${String(k03.checks)} checks; run-time helpers: ` +
+        `${k03.helpers.join(", ") || "none"}`,
     );
     return 0;
   } catch (error) {

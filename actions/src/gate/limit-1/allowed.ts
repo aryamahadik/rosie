@@ -113,6 +113,17 @@
 //      anything that already exists"; with no booking, nothing else exists to add to.
 //  12. With no bundle read (the shipped default, NO_STEP_CARDS) every step but row 1's doors and entries, the any-time
 //      rows read without a step and the owner, settings and team hubs counts as unread, so the business's.
+//
+// T-1183 (DL-364; T-1141's Need 1): K-02 v1.1 adds a sixth door, signUp, the door to S1-01 (its default 9: the turn's
+// business as its target, no booking, no field, low stakes). K-01's five doors answer as before.
+//  13. The sign-up door is anyone's to enter, on their own word with no proof asked (ADR-013 section 2; K-09 v1.5's
+//      commit-s1-01.json: limit 1 passes Sam's first text). Entering it starts a business's sign-up, whose walk (arch 03
+//      line 191) writes only rows new in the turn, the handle's own thread (S1-01) and S1-02's question to the sender, so
+//      it changes no existing record and decides nothing for an existing business. What follows it stays the business's:
+//      S1-02's answer is a choice at an S1 step, so the business's settings (defaults 3a and 9). Only the door as K-02
+//      v1.1 shapes it passes: at S1-01, on no booking, with no stake and no field. A sign-up door that names a booking, a
+//      stake or a field, or another business than the call's, is not that door, so nobody decides it (fails closed), as
+//      with a door the gate does not know, which still answers unknown.
 
 import { holdClassOf } from "../../commit/hold";
 import {
@@ -168,7 +179,10 @@ export type Change =
   | { readonly kind: "nothing" }
   /** Only protects: on anyone's word (S13-57; S13-45's rule; arch 06 line 329). */
   | { readonly kind: "protects" }
-  /** S13-45 row 1: "Ask, see prices and times, book a new visit: anyone, at any door." */
+  /**
+   * S13-45 row 1: "Ask, see prices and times, book a new visit: anyone, at any door." And the sign-up door, which changes
+   * no existing record (default 13).
+   */
   | { readonly kind: "anyone" }
   /**
    * Needs the decider's own yes for every one of these matters. inRole: a question about a booking put to the sender in
@@ -265,6 +279,22 @@ export const BUSINESS_ROLES: readonly Role[] = ["owner", "admin", "staff"];
  * or a question about the business, A3-51 (B3-40)"; K-09 closest-entries.json adds A3-51's "Asks for a person").
  */
 export const NEW_BOOKING_DOORS: readonly string[] = ["A3-51", "B3-40"];
+
+/** The sign-up door's step: S1-01, the first step of section 1 in both flows (K-02 v1.1 default 9). */
+const SIGN_UP_STEP = "S1-01";
+
+/**
+ * Whether a sign-up door is the one K-02 v1.1 default 9 shapes (default 13): at S1-01, on no booking, with no stake and no
+ * field. Its business is the call's, as changeOf checks first for every choice.
+ */
+function shapedAsSignUp(choice: Choice): boolean {
+  return (
+    choice.step === SIGN_UP_STEP &&
+    choice.target.bookingId === null &&
+    choice.stakesFrom.length === 0 &&
+    choice.fields.length === 0
+  );
+}
 
 /** The business's own matter at a step (default 3a): team for S2 (journey 2), settings for any other step. */
 function businessBase(step: string): "team" | "settings" {
@@ -444,6 +474,9 @@ export async function changeOf(part: GatePart, turn: GateTurn, reads: ChangeRead
         case "existingBooking":
         case "unclearOwnerOrHelp":
           return ANYONE;
+        case "signUp":
+          // Starting a business's sign-up changes no existing record: anyone's, as the door K-02 shapes (default 13).
+          return shapedAsSignUp(choice) ? ANYONE : UNKNOWN;
         default:
           return UNKNOWN;
       }
@@ -603,7 +636,7 @@ async function proofStandingOf(
 
 // ---- the decision ---------------------------------------------------------------------------------------------------
 
-/** Why a part passes: it only protects, it is open to anyone (row 1), or the decider's own word. */
+/** Why a part passes: it only protects, it is open to anyone (row 1, or the sign-up door), or the decider's own word. */
 export type PassWhy = "protects" | "anyone" | "decider";
 
 /** Why a part fails: an unproven sender, the wrong person, nobody who may decide it, or two roles that fit (default 10). */

@@ -10,7 +10,7 @@
 //   1. What it applies to: a choose of an option of an open question (K-02 v1 choice kind option). That question's row
 //      holds what the read-back showed: versions_read (K-04 v1 open_questions; K-05 v1.2 openQuestionRead). Any other part
 //      (pass_on, hand_off, a hub case, a which-booking pick, an any-time row, a door, a search entry) was shown no
-//      read-back: notChecked.
+//      read-back: notChecked; but the sign-up door passes, with nothing to compare and set (default 6).
 //   2. The question, live on the turn's handle. One no longer live there (answered, defaulted or withdrawn since) is no
 //      longer possible: say what changed (saidWhatChanged, questionClosed). A call with no turn (a secure page, an own
 //      AI, a job) has no handle to read it on: what a page or a bound token showed is K-21's and T-328's, neither built,
@@ -51,6 +51,12 @@
 //      today's facts, T-292) changes this rule.
 //   5. The review item is the team review queue's (K-37 v1 review_items: "each thing the sources send to a person on
 //      Rosie's team"), its subject the question; K-37 v1 and K-09 v1 openReviewItem name no kind for it (QUESTIONS.md).
+//   6. T-1183 (DL-364): K-02 v1.1's sign-up door (its default 9), on no booking, passes, as K-09 v1.5's commit-s1-01.json
+//      and K-08 v1's trace-skeleton.json log it (ADR-013 section 2). Its walk (S1-01's thread, then S1-02's question and
+//      its outbox row) only inserts rows new in the turn and reads no version (the fixture's stated writes: versionsRead
+//      empty), so compare-and-set on every row it was shown holds with none to compare: nothing shown changed, so it
+//      commits (arch 06 line 305), with no row to compare and set and nothing read. Every other door, and a sign-up door
+//      that names a booking (not the door K-02 v1.1 shapes), stays notChecked as before (step 1).
 
 import type { Choice, Context, GatePart, GateTurn, LimitOutcomes } from "../framework";
 import type { AskedQuestion, QuestionReader, RowRef } from "../limit-3/facts";
@@ -197,6 +203,13 @@ export function changedRows(shown: readonly RowRef[], today: readonly RowRef[]):
   return changed;
 }
 
+/** K-02 v1.1's sign-up door on no booking (default 6): its commit inserts new rows only and compares none. */
+function isSignUpDoor(choice: Choice | null): boolean {
+  return (
+    choice !== null && choice.kind === "door" && choice.door === "signUp" && choice.target.bookingId === null
+  );
+}
+
 /** The open question a part answers: a choose of one of its options; null for any other part (step 1). */
 function questionOf(part: GatePart): string | null {
   const { part: said, choice } = part;
@@ -257,9 +270,11 @@ export async function decideVersions(
   turn: GateTurn,
   ports: VersionsPorts,
 ): Promise<VersionsDecision> {
-  // 1. What it applies to.
+  // 1. What it applies to; the sign-up door passes with nothing to compare (default 6).
   const openQuestionId = questionOf(part);
-  if (openQuestionId === null || part.choice === null) return NOT_CHECKED;
+  if (openQuestionId === null || part.choice === null) {
+    return isSignUpDoor(part.choice) ? { result: "pass", compareAndSet: [] } : NOT_CHECKED;
+  }
   const answered: Answered = {
     choice: part.choice,
     openQuestionId,

@@ -15,6 +15,7 @@ import { createFrontierChecker } from "../../assemble/check";
 import {
   bundleIdOf,
   callBuildFrontier,
+  draftOf,
   fakeBundles,
   s102Exchange,
   sampleBundle,
@@ -45,6 +46,7 @@ import {
   frontierRequest,
   masterBundle,
   prepare,
+  s101Exchange,
   samState,
   storedMeans,
   storedStep,
@@ -165,6 +167,13 @@ function expectedDoor(document: BundleDocument, flow: FlowLetter, key: DoorKey, 
     target: aboutBusiness(business),
     fields: [],
   };
+}
+
+/** The sign-up door as K-09 v1.5's build-frontier-s1-01.json gives it (c-01; K-02 v1.1 default 9), about a business. */
+function expectedSignUp(business: Business): Json {
+  const [door] = s101Exchange().outcome.context.choices;
+  if (door === undefined) throw new Error("build-frontier-s1-01.json gives no choice");
+  return shape({ ...draftOf(door), target: aboutBusiness(business) });
 }
 
 function aboutBusiness(business: Business): Target {
@@ -588,7 +597,8 @@ describe("no business named yet: search first; named-only work gets one ask for 
     expect(offer).toEqual({ openQuestions: [], choices: [], cards: [] });
     expect(port.reads).toEqual([]);
     expect(log.lines).toEqual([]);
-    // The same new number writing to a business it named: that business's new-booking door is its entry.
+    // The same new number writing to a business it named: that business's new-booking door is its entry and, with
+    // nothing here its target, the sign-up door to S1-01 after it (T-1147; K-02 v1.1 default 9).
     const named = await offerFor({
       ...firstText([MASTER]),
       state: { ...firstTextState(), businessId: LEES_BARBERSHOP.id },
@@ -601,6 +611,7 @@ describe("no business named yet: search first; named-only work gets one ask for 
     });
     expect(named.offer.choices.map(shape)).toEqual([
       expectedDoor(MASTER, "A", "newBooking", LEES_BARBERSHOP),
+      expectedSignUp(LEES_BARBERSHOP),
     ]);
   });
 

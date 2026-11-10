@@ -105,10 +105,9 @@ function onlySpan(facts: Facts, hop: Hop): Span {
 }
 
 /**
- * The actor's inbox entry: its own receive span (gap actorReceive). The actor stamps it when it answers the hand-off
- * (runtime/src/actor/handle-actor.ts accept and recordSpan), so its `at` is when the entry ended, not when it started as
- * K-08 says (T-1170). Nor is `at` less `ms` its start: the actor reads the clock once for `ms` and again for `at`, and the
- * clock moves between the two, so `at` less `ms` can come out after the start of the safety read the entry begins.
+ * The actor's inbox entry: its own receive span (gap actorReceive). Its `at` is when the entry started, as K-08 says: the
+ * actor reads its clock once as the hand-off reaches it and stamps the span from that reading when it answers
+ * (runtime/src/actor/handle-actor.ts accept and recordSpan; T-1170).
  */
 function inboxEntrySpan(facts: Facts): Span {
   expect(facts.judged.actorReceives, stillHolds("actorReceive")).toHaveLength(1);
@@ -219,11 +218,10 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       got: { via: "verdict", outcomes: ["no"], dangerWords: 0 },
       decided: { danger: false, path: "none", line: null },
     });
-    // On arrival: the read started while the text arrived, after the gateway's scrub handed it on and before the gateway
-    // answered, which waits for the actor's step that stores the text and starts its read (arrivalOf).
-    const arrival = arrivalOf(facts);
-    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(arrival.from);
-    expect(Date.parse(read.at)).toBeLessThanOrEqual(arrival.to);
+    // On arrival: the read started once the text's inbox entry had (the actor stores the text and starts its read in one
+    // step: handle-actor.ts accept), and before the gateway answered, which waits for that step (arrivalOf).
+    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
+    expect(Date.parse(read.at)).toBeLessThanOrEqual(arrivalOf(facts).to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
     // portCall span beside the hops.
     expect(facts.run.fakes.models.calls).toEqual([{ model: HAIKU_MODEL, text: JOIN_TEXT }]);
