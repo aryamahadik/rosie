@@ -148,7 +148,11 @@ export interface RenewClaimResponse {
   claim: OutboxClaim;
 }
 
-/** K-05 v1.1 `markPart.request`, the outcomes the dispatcher writes: `sent` and `delivered`, and `failed`. */
+/**
+ * K-05 v1.1 `markPart.request`, the outcomes the dispatcher writes: `sent` and `delivered`, and `failed` (T-258: with
+ * `retry`, the next try's key; with v1.1's `nextTryNotBefore`, the provider's Retry-After). `delivered` may carry the
+ * part's key the receipt echoes (K-05 v1.2 item 31).
+ */
 export type MarkPartRequest =
   | {
       outcome: "sent";
@@ -157,14 +161,30 @@ export type MarkPartRequest =
       providerOptionIds: readonly string[] | null;
       at: Utc;
     }
-  | { outcome: "delivered"; providerMessageId: string; at: Utc }
+  | {
+      outcome: "delivered";
+      providerMessageId: string;
+      at: Utc;
+      /**
+       * K-05 v1.2 item 31: the part's key the receipt echoes (K-11 `partKey`). The store finds the part by the message id
+       * first; when no part holds it, the part under this key is the receipt's if it holds no message id of its own (a
+       * 4001 or 4006 gave none: K-11 error-4006.json). Left out: by the message id alone.
+       */
+      idempotencyKey?: string;
+    }
   | {
       outcome: "failed";
       idempotencyKey: string;
       errorCode: string;
+      /** True writes the next try's part under a new key (K-07 rule 1), answered as `nextKey`. */
       retry: boolean;
       at: Utc;
       providerMessageId?: string | null;
+      /**
+       * K-05 v1.1: the provider's Retry-After as a time, kept in the claim's `next_try_not_before` so no try goes before
+       * it (K-07 rule 6); only with `retry` true. Left out or null: none given.
+       */
+      nextTryNotBefore?: Utc | null;
     };
 
 export interface MarkPartResponse {
