@@ -110,7 +110,10 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     // 3. Compose input on that commit's row (compose-input-s1-02.json's request names it).
     const compose = fixture("compose-input-s1-02.json") as { request: Json; outcome: { input: Json } };
     expect(compose.request.outboxRowId).toBe(ROW);
-    const composed = await face.composeInput(structuredClone(compose.request), traceFor(compose.request).trace);
+    const composed = await face.composeInput(
+      structuredClone(compose.request),
+      traceFor(compose.request).trace,
+    );
     if (!written()) {
       // The commit wrote no row (limit 1 waits): the chain ends here, nothing composed.
       expect(composed).toEqual({ error: "notFound", table: "outbox_rows", rowId: ROW });

@@ -78,6 +78,9 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     expect(doubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
     expect(spans).toHaveLength(1);
     expect(JSON.stringify(spans)).not.toContain("Hi, I want to put my barbershop on Rosie");
+    // DL-245: the bundle's S1-02 message carries the opt-out line in its plainText; the input never does, as only the
+    // fixed-line inserter adds it.
+    expect(JSON.stringify(answer)).not.toContain("Reply STOP to opt out");
   });
 
   it("gives no inbound text when the face was not handed the turn's words, nor in a reply to anyone but their sender", async () => {
