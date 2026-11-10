@@ -1,18 +1,24 @@
-// T-315's unit proof (DL-319 ruling 2; DL-322 ruling 8): the turn face's buildFrontier on K-09 v1's
-// build-frontier-s1-02.json, as main has it (T-1142's turn 1 fixture has not merged), through the Tool API base with the
-// frontier's sources as main's registry has them. Its answer is the fixture's frontier as far as main's sources give it,
-// and each choice they cannot give yet is named, with the task it waits for (test-support.ts WAITING), never stood in for.
+// T-315's unit proof, round 4 (DL-346 rulings 1 and 2; ADR-013 section 6's T-315 lines): the turn face's buildFrontier
+// on turn 1, Sam's first text (K-09 v1.5 build-frontier-s1-01.json), through the Tool API base with the frontier's
+// sources as main's registry has them. Its answer is the fixture's frontier as far as main's sources give it
+// (test-support.ts asFarAsMain): the fixture's frontier less the choices named as waiting, each with its task
+// (test-support.ts WAITING), never stood in for. On main turn 1's one choice, the sign-up door, waits for T-1147, so no
+// choice is left: the call fails closed with FrontierError noChoices, its frontier span failed (error_code FrontierError)
+// and its transaction rolled back. When T-1147 takes the door off WAITING, the same tests expect the fixture's whole
+// frontier, its span ok and its transaction committed.
 //
-// No database: the stored state is the frontier's fake K-05 v1.2 readTurnState (Sam's state at S1-02: his handle, person,
-// owner role, and S1-02's question sent at 14:02 under bundle v0), each request and answer held to K-05 v1.2's frozen
-// schema, behind a scope that records each transaction; the bundle is K-01 v1's bundle-v0-skeleton.json. The same call on
-// local PostgreSQL, under the call's business scope as rosie_job, is pg/turn-face.int.test.ts. Values come only from the
-// contracts' fixtures and the master's sample cast (rule 9).
+// No database: the stored state is the frontier's fake K-05 v1.2 readTurnState over T-1148's seed rows (test owner 1,
+// Sam, with no role, no open question, no booking and no phone row: test-support.ts firstTextSeed), each request and
+// answer held to K-05 v1.2's frozen schema, behind a scope that records each transaction; the bundle is K-01 v1's
+// bundle-v0-skeleton.json, which the fixture's turn pins. The same call on local PostgreSQL, on T-1148's seed itself under
+// the call's business scope as rosie_job, is pg/turn-face.int.test.ts. Values come only from the contracts' fixtures and
+// the master's sample cast (rule 9).
 
 import { describe, expect, it } from "vitest";
 
 import { isLabel, type Span } from "../../../../runtime/src/trace";
-import { FRONTIER_SOURCES, SLOT_NAMES } from "../../frontier";
+import { FrontierError } from "../../frontier";
+import { frameFacts } from "../../frontier/assemble/frame";
 import {
   BUNDLE_V0,
   captureLog,
@@ -20,9 +26,7 @@ import {
   fakeBundles,
   fakeRepo,
   frontierScope,
-  s102Exchange,
   sampleBundle,
-  samSeed,
   stringsIn,
   type FakeBundles,
   type FakeRepo,
@@ -31,16 +35,30 @@ import {
 } from "../../frontier/assemble/test-support";
 import type { Context } from "../../frontier/assemble/types";
 import { traceFor } from "../test-support";
-import { SLOTS_NOT_BUILT, WAITING, asFarAsMain } from "./test-support";
+import {
+  WAITING,
+  asFarAsMain,
+  firstTextSeed,
+  s101Exchange,
+  slotsNotBuilt,
+  type AsFarAsMain,
+} from "./test-support";
 import { createTurnFace, type BuildFrontierCallAnswer } from "./turn-face";
 
 type Json = Record<string, unknown>;
 
+const BARBERSHOP = "biz-lees-barbershop";
+const TRACE = "trace-sam-0000";
+const TURN = "turn-s1-01-sam";
+/** Every bundle read of the call is of the turn's pinned bundle (BUNDLE_V0 by its key). */
+const PINNED = `${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}/`;
+
 const { validator, checker } = checks();
 
-/** What one call through the turn face left: its answer, the reads, the transaction, the bundle reads, log and spans. */
+/** What one call through the turn face left: its answer or what it threw, the reads, the transaction, log and spans. */
 interface Called {
-  answer: BuildFrontierCallAnswer;
+  answer: BuildFrontierCallAnswer | undefined;
+  thrown: unknown;
   repo: FakeRepo;
   scope: FrontierScope;
   bundles: FakeBundles;
@@ -48,113 +66,144 @@ interface Called {
   spans: Span[];
 }
 
-/** One buildFrontier call through a turn face over Sam's stored state at S1-02 and bundle v0. */
+/** One buildFrontier call through a turn face over turn 1's stored state (T-1148's rows) and bundle v0. */
 async function callTurnFace(request: unknown): Promise<Called> {
-  const repo = fakeRepo(samSeed());
+  const repo = fakeRepo(firstTextSeed());
   const scope = frontierScope(repo);
   const bundles = fakeBundles(sampleBundle("bundle-v0-skeleton.json"));
   const log = captureLog();
   const face = createTurnFace<FakeRepo>({ scope, bundles, validator, checker, log: log.sink });
   const { trace, spans } = traceFor(request);
-  const answer = await face.buildFrontier(structuredClone(request), trace);
-  return { answer, repo, scope, bundles, log, spans };
+  const settled = await face.buildFrontier(structuredClone(request), trace).then(
+    (answer) => ({ answer, thrown: undefined }),
+    (thrown: unknown) => ({ answer: undefined, thrown }),
+  );
+  return { ...settled, repo, scope, bundles, log, spans };
 }
 
-function contextOf(answer: BuildFrontierCallAnswer): Context {
-  if ("error" in answer) throw new Error(`the turn face answered ${answer.error}`);
-  return answer.context;
+/** The choices the call gave: none when it answered no context. */
+function givenChoices(called: Called): string[] {
+  if (called.answer === undefined || "error" in called.answer) return [];
+  return called.answer.context.choices.map((choice) => choice.choiceId);
 }
 
-describe("build-frontier-s1-02.json through the turn face", () => {
-  it("gives the fixture's frontier as far as main's frontier sources give it: S1-02's three options and card", async () => {
-    const exchange = s102Exchange();
+/** How the call's one transaction ends: committed with its answer, rolled back when the frontier fails closed. */
+function transactionEnd(expected: AsFarAsMain): "commit" | "rollback" {
+  return expected.ends === "answer" ? "commit" : "rollback";
+}
+
+/** The frontier span's ending: ok with K-09's response, or failed with the thrown FrontierError. */
+function spanEnding(expected: AsFarAsMain): Partial<Span> {
+  return expected.ends === "answer"
+    ? { outcome: "ok", error_code: null, decided: { answered: "response" } }
+    : { outcome: "failed", error_code: "FrontierError", decided: { answered: "thrown" } };
+}
+
+/** The call answered as far as main gives the fixture's frontier, or failed closed with noChoices when that is none. */
+function expectAsFarAsMain(called: Called, expected: AsFarAsMain): void {
+  if (expected.ends === "answer") {
+    expect(called.thrown).toBeUndefined();
+    expect(called.answer).toEqual(expected.answer);
+    expect(validator.check("buildFrontier", "response", called.answer)).toEqual([]);
+    expect(checker.check("context", (called.answer as { context: Context }).context)).toEqual([]);
+  } else {
+    expect(called.answer).toBeUndefined();
+    expect(called.thrown).toBeInstanceOf(FrontierError);
+    // A builder fault, never a refusal of the caller: K-09's buildFrontier.errors names no error for an empty frontier
+    // (CQ-167), so the call throws and the actor maps it to noAnswer. Its message is its code, never a value.
+    expect((called.thrown as FrontierError).code).toBe("noChoices");
+    expect((called.thrown as FrontierError).message).toBe("noChoices");
+  }
+}
+
+describe("build-frontier-s1-01.json, turn 1, through the turn face", () => {
+  it("gives the fixture's frontier as far as main's frontier sources give it, and fails closed (noChoices) when that is none", async () => {
+    const exchange = s101Exchange();
+    const expected = asFarAsMain(exchange);
     const called = await callTurnFace(exchange.request);
 
-    expect(called.answer).toEqual(asFarAsMain(exchange));
-    const context = contextOf(called.answer);
-    expect(context.choices.map((choice) => [choice.choiceId, choice.kind, choice.step])).toEqual([
-      ["c-01", "option", "S1-02"],
-      ["c-02", "option", "S1-02"],
-      ["c-03", "option", "S1-02"],
-    ]);
-    expect(context.recentMessages).toEqual([]);
-    expect(validator.check("buildFrontier", "response", called.answer)).toEqual([]);
-    expect(checker.check("context", context)).toEqual([]);
+    expectAsFarAsMain(called, expected);
+    expect(called.scope.events.at(-1)).toEqual({ what: transactionEnd(expected) });
+    expect(called.spans).toHaveLength(1);
+    expect(called.spans[0]).toMatchObject({ hop: "frontier", ...spanEnding(expected) });
 
     // Each slot main has not built is logged on the call (fail closed), by labels only.
-    expect(called.log.lines).toEqual(
-      SLOTS_NOT_BUILT.map((source) => ({
-        level: "warn",
-        msg: "frontier_source_missing",
-        trace_id: "trace-sam-0001",
-        turn_id: "turn-s1-02-sam-kinds",
-        source,
-      })),
-    );
+    expect(
+      called.log.lines
+        .filter((line) => line.msg === "frontier_source_missing")
+        .map((line) => [line.trace_id, line.turn_id, line.source]),
+    ).toEqual(slotsNotBuilt().map((source) => [TRACE, TURN, source]));
   });
 
   it("names each choice main cannot give yet with the task it waits for: not in the answer, its slot still empty", async () => {
-    const exchange = s102Exchange();
+    const exchange = s101Exchange();
     const called = await callTurnFace(exchange.request);
-    const given = contextOf(called.answer).choices.map((choice) => choice.choiceId);
+    const given = givenChoices(called);
     const fixtureChoices = exchange.outcome.context.choices;
 
     for (const waiting of WAITING) {
       const choice = fixtureChoices.find((each) => each.choiceId === waiting.choiceId);
       expect(choice, `${waiting.choiceId} is one of the fixture's choices`).toMatchObject({
         kind: waiting.kind,
+        door: waiting.door,
         step: waiting.step,
       });
       expect(given, `${waiting.choiceId} waits for ${waiting.task}`).not.toContain(waiting.choiceId);
-      const slot = FRONTIER_SOURCES.find((each) => each.name === waiting.slot);
-      expect(slot, `${waiting.slot} is a slot of the frontier`).toBeDefined();
       expect(
-        slot?.source ?? null,
+        slotsNotBuilt(),
         `${waiting.task} has filled the ${waiting.slot} slot: ${waiting.choiceId} no longer waits, so take it off WAITING`,
-      ).toBeNull();
+      ).toContain(waiting.slot);
       expect(called.log.lines.map((line) => line.source)).toContain(waiting.slot);
     }
     // Every choice of the fixture is either given or named as waiting: none is left out silently.
     expect([...given, ...WAITING.map((each) => each.choiceId)].sort()).toEqual(
       fixtureChoices.map((choice) => String(choice.choiceId)).sort(),
     );
-    expect(
-      SLOT_NAMES.filter((name) =>
-        FRONTIER_SOURCES.some((slot) => slot.name === name && slot.source === null),
-      ),
-    ).toEqual([...SLOTS_NOT_BUILT]);
   });
 
   it("reads the stored state once, under the call's business, through K-05 v1.2 readTurnState, and writes nothing", async () => {
-    const exchange = s102Exchange();
+    const exchange = s101Exchange();
+    const expected = asFarAsMain(exchange);
     const called = await callTurnFace(exchange.request);
 
-    expect(called.repo.calls).toHaveLength(1);
-    expect(called.repo.calls[0]).toMatchObject({
-      call: "readTurnState",
-      scope: "biz-lees-barbershop",
-      request: { handleId: "handle-sam", businessId: "biz-lees-barbershop", bookingIds: [] },
-    });
+    // One read, under Lee's Barbershop's scope, naming that business, Sam's handle, no booking, and the facts of the
+    // frame: the business's name and zone, and the caller's name (Sam has no role for the guard to list).
+    expect(called.repo.calls).toEqual([
+      {
+        call: "readTurnState",
+        scope: BARBERSHOP,
+        request: {
+          handleId: "handle-sam",
+          businessId: BARBERSHOP,
+          bookingIds: [],
+          facts: frameFacts(BARBERSHOP, ["person-sam"]),
+        },
+      },
+    ]);
     // One transaction, scoped before the read, that only reads (K-09 README: buildFrontier is safe to repeat).
     expect(called.scope.events).toEqual([
       { what: "begin" },
-      { what: "scope", businessId: "biz-lees-barbershop" },
-      { what: "commit" },
+      { what: "scope", businessId: BARBERSHOP },
+      { what: transactionEnd(expected) },
     ]);
-    // The turn's pinned bundle, as the request names it.
-    expect(called.bundles.reads).toEqual([`${BUNDLE_V0.hash}/1/manifest`, `${BUNDLE_V0.hash}/1/flow/A`]);
+    // The turn's pinned bundle, as the request names it: its manifest first, then flow A's graph.
+    expect(called.bundles.reads.slice(0, 2)).toEqual([`${PINNED}manifest`, `${PINNED}flow/A`]);
+    expect(called.bundles.reads.every((read) => read.startsWith(PINNED))).toBe(true);
   });
 
   it("records one K-08 span, hop frontier, with labels only: no text, number, name or choice's words", async () => {
-    const exchange = s102Exchange();
+    const exchange = s101Exchange();
+    const expected = asFarAsMain(exchange);
     const called = await callTurnFace(exchange.request);
     expect(called.spans).toHaveLength(1);
     const [span] = called.spans;
     expect(span).toMatchObject({
       hop: "frontier",
-      outcome: "ok",
-      trace_id: "trace-sam-0001",
-      business_id: "biz-lees-barbershop",
+      trace_id: TRACE,
+      turn_id: TURN,
+      business_id: BARBERSHOP,
+      got: { toolCall: "buildFrontier", callerKind: "turn" },
+      ...spanEnding(expected),
     });
     expect(validator.checkSpan(span)).toEqual([]);
 
@@ -165,14 +214,19 @@ describe("build-frontier-s1-02.json through the turn face", () => {
       context.writer.handle,
       ...context.writer.people.map((person) => person.name),
     ];
-    for (const line of [JSON.stringify(span), ...called.log.lines.map((each) => JSON.stringify(each))]) {
+    const thrown = called.thrown instanceof Error ? [called.thrown.message] : [];
+    for (const line of [
+      JSON.stringify(span),
+      ...called.log.lines.map((each) => JSON.stringify(each)),
+      ...thrown,
+    ]) {
       for (const each of words) expect(line.includes(each), `"${each}" in ${line}`).toBe(false);
     }
     for (const line of called.log.lines) expect(stringsIn(line).every((value) => isLabel(value))).toBe(true);
   });
 
-  it("refuses before any read: a request naming no business, and one K-09 v1 refuses", async () => {
-    const exchange = s102Exchange();
+  it("refuses before any read: a request naming no business, and one K-09 refuses", async () => {
+    const exchange = s101Exchange();
     const unscoped = structuredClone(exchange.request) as Json & { caller: Json };
     unscoped.caller.businessId = null;
     const noScope = await callTurnFace(unscoped);
@@ -184,9 +238,12 @@ describe("build-frontier-s1-02.json through the turn face", () => {
     expect(invalid.answer).toMatchObject({ error: "invalidRequest", call: "buildFrontier" });
 
     for (const called of [noScope, invalid]) {
+      expect(called.thrown).toBeUndefined();
       expect(called.repo.calls).toEqual([]);
       expect(called.scope.events).toEqual([]);
       expect(called.bundles.reads).toEqual([]);
+      expect(called.spans).toHaveLength(1);
+      expect(called.spans[0]).toMatchObject({ hop: "frontier", outcome: "refused" });
     }
   });
 });
