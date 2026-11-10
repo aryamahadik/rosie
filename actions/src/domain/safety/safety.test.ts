@@ -32,6 +32,7 @@ import {
   type LimitCall,
 } from "../../gate/framework/test-support";
 import { createToolApiValidator, NotBuiltError, type ToolApiValidator } from "../../tool-api";
+import type { FlagsReader } from "../flags";
 import { flagsReaderOn, fixtureIds, messagesReaderOn, stringsIn } from "../flags/test-support";
 import { contractJson } from "../messages-consent/test-support";
 import { SafetyRefusedError } from "./errors";
@@ -43,6 +44,7 @@ import {
   type SafetyDeps,
 } from "./handlers";
 import { KEYED_SAFETY_IDS } from "./ids";
+import { PLUGIN_LISTS_NO_STOP_WORDS, type SafetyReader, type StopWords } from "./ports";
 import { base64Of, byteaText, wordsOf, type RecordRequest, type RecordResponse } from "./record";
 import type { ReleaseRequest } from "./release";
 import { isClearSafe, ruleOf, type SafetyResult } from "./rules";
@@ -155,10 +157,32 @@ function doublesOn(world: SafetyWorld, extra: SafetyDeps<unknown> = {}): Doubles
     flagIds: THREAT_FLAG_IDS,
     visits: { visitsOf: () => Promise.resolve([NOV14]) },
     lines: TEST_LINES,
+    // The barbershop's plug-in lists no words that stop a booking (K-09 v1.1 j3-safety-arrival-own-line.json).
+    stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
     telling,
     ...extra,
   };
   return { world, sealer, telling, deps };
+}
+
+/** K-34's reads over the world with the texts' arrival never read: a rule decided without it never asks for it. */
+function arrivalUnread(world: SafetyWorld): SafetyReader {
+  return {
+    ...safetyReaderOn(world, BARBERSHOP),
+    arrivedAt: () => Promise.reject(new Error("decided without the texts' arrival")),
+  };
+}
+
+/** A secure page's caller acting for Sam, under the barbershop. */
+function samsPage(requestId: string): K09.Caller {
+  return {
+    kind: "page",
+    turnId: null,
+    requestId,
+    businessId: BARBERSHOP,
+    personId: "person-sam",
+    traceId: `trace-${requestId}`,
+  };
 }
 
 /** The deps without one port, as the Worker runs before that port's task lands (its default then applies). */
@@ -439,8 +463,30 @@ describe("a crisis outcome holds routine work until a 'we're safe' with a fresh 
     return { ports, calls: doubles.calls, k05: doubles.k05 };
   }
 
+  /**
+   * When the actor took Sam's texts (K-06 receivedAt): the crisis text a second after he sent it (commit-s1-02.json's
+   * sentAt 14:05:00), and a later "we're safe, it's handled" just before its turn.
+   */
+  const CRISIS_ARRIVED = "2026-10-19T14:05:01Z";
+  const SAFE_ARRIVED = "2026-10-19T14:19:58Z";
+
+  /** A turn of core actions committed through gateAndCommit with the handle's open holds; its writes applied to the world. */
+  async function committedTurn(world: SafetyWorld, deps: SafetyDeps<unknown>, turn: CommitTurnContext) {
+    const { ports, k05 } = commitPorts(deps, openHoldsOf(world, turn.turn.handleId));
+    const answer = await gateAndCommit(turn.request, callContext(BARBERSHOP), {
+      limits: scriptedLimits(),
+      ports,
+    });
+    if ("error" in answer || answer.result !== "committed") throw new Error("the turn commits");
+    const sent = k05.requests[0];
+    if (sent === undefined) throw new Error("one commit was sent");
+    applySafetyWrites(world, sent.writes.state, sent.writes.outboxRows);
+    return { answer, sent };
+  }
+
   /** Sam's crisis turn, committed through gateAndCommit; its writes applied to the world. */
   async function committedCrisis(doubles: Doubles) {
+    doubles.world.arrivals = { ...doubles.world.arrivals, "evt-sam-0001": CRISIS_ARRIVED };
     const request = crisisS1_02();
     const { ports, calls, k05 } = commitPorts(doubles.deps);
     const limitCalls: LimitCall[] = [];
@@ -557,6 +603,8 @@ describe("a crisis outcome holds routine work until a 'we're safe' with a fresh 
   it("a clear 'we're safe' later in the held chat releases it; the held turn is decided again with a fresh read-back", async () => {
     const doubles = doublesOn(safetyWorldOf());
     const { request, answer } = await committedCrisis(doubles);
+    // The "we're safe" text came a quarter hour after the crisis text.
+    doubles.world.arrivals = { ...doubles.world.arrivals, "evt-sam-0002": SAFE_ARRIVED };
     const core = answer.core[0];
     const crisisHold = core?.call === "recordSafetyOutcome" ? (core.response?.hold ?? null) : null;
     if (crisisHold === null) throw new Error("the crisis holds");
@@ -663,7 +711,7 @@ describe("a crisis outcome holds routine work until a 'we're safe' with a fresh 
         BARBERSHOP,
         { ...deps, now: () => now },
       );
-    // seed-hold-released's "we're safe" was read on Oct 24, before the crisis hold of Oct 25: not a release of it.
+    // seed-hold-released's "we're safe" came on Oct 24, before the crisis text of Oct 25: not a release of it.
     expect(await releaseBy("safety-alex-0220", "2026-10-26T10:00:00Z")).toEqual({
       error: "stillDanger",
       outcomeId: "safety-alex-0220",
@@ -699,6 +747,208 @@ describe("a crisis outcome holds routine work until a 'we're safe' with a fresh 
       releasedAt: "2026-10-24T16:30:03Z",
       redecideTurnId: "turn-alex-0202",
       repeated: true,
+    });
+  });
+
+  it("'all good, we're safe' sent just before crisis words, in the same batch, never releases the crisis hold", async () => {
+    const world = safetyWorldOf();
+    const doubles = doublesOn(world);
+    // Decided by the batch alone: the texts' arrival is never read for it.
+    const batchOnly: SafetyDeps<unknown> = { ...doubles.deps, reader: () => arrivalUnread(world) };
+    // Sam's batch: "all good, we're safe", then crisis words, where the actor closed it (K-09 README default 5).
+    const batch = turnOf({
+      turnId: "turn-sam-batch",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0003", "evt-sam-0004"],
+      personId: "person-sam",
+      now: "2026-10-20T09:00:06Z",
+      core: (caller) => [
+        recordAction(caller, weAreSafe("evt-sam-0003"), "handle-sam", null),
+        recordAction(caller, readOf("safety-crisis-words.json", "evt-sam-0004"), "handle-sam", null),
+      ],
+    });
+    await committedTurn(world, batchOnly, batch);
+    const [hold] = world.safety.holds;
+    if (hold === undefined) throw new Error("the crisis holds");
+    const safeId = await KEYED_SAFETY_IDS.rowId("outcome", "evt-sam-0003");
+    const safe = world.safety.outcomes.find((outcome) => outcome.id === safeId);
+    if (safe === undefined) throw new Error("the batch records its 'we're safe'");
+    // A clear "we're safe", stored with the hold's own time: read_at and held_at cannot say which text came first.
+    expect(isClearSafe(safe)).toBe(true);
+    expect([safe.turnId, safe.readAt]).toEqual([hold.turnId, hold.heldAt]);
+
+    const fields = {
+      holdId: hold.id,
+      expectVersion: 1,
+      why: "safe_readback" as const,
+      releasedByOutcomeId: safeId,
+    };
+    const stillDanger = { error: "stillDanger", outcomeId: safeId };
+    // Named by a later turn's release ...
+    const later = turnOf({
+      turnId: "turn-sam-later",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0005"],
+      personId: "person-sam",
+      now: "2026-10-20T09:30:00Z",
+      core: (caller) => [releaseAction(caller, fields)],
+    });
+    const inTurn = await releaseSafetyHoldCore(releaseIn(later), later, NOTHING_OPEN, batchOnly);
+    expect(inTurn.run.result).toEqual({ call: "releaseSafetyHold", response: null, error: stillDanger });
+    expect(inTurn.run.writes.state).toEqual([]);
+    // ... or by a page, made alone: the same.
+    expect(
+      await releaseSafetyHoldAlone(
+        { caller: samsPage("req-sam-batch"), ...fields },
+        {},
+        BARBERSHOP,
+        batchOnly,
+      ),
+    ).toEqual(stillDanger);
+    // Still held: routine work waits.
+    expect(openHoldsOf(world, "handle-sam")).toEqual([
+      { holdId: hold.id, releaseRule: "after_safe", blocksBooking: false },
+    ]);
+  });
+
+  it("a hold written on arrival: its batch's own earlier 'we're safe' never releases it, a later text's does", async () => {
+    const world = safetyWorldOf();
+    const doubles = doublesOn(world);
+    const batchOnly: SafetyDeps<unknown> = { ...doubles.deps, reader: () => arrivalUnread(world) };
+    const crisis = readOf("safety-crisis-words.json", "evt-sam-0004");
+    // The crisis text's arrival record: a turn of its one text, where its hold is written (K-09 v1.1 default 36).
+    const arrival = turnOf({
+      turnId: "turn-arrival-sam-0004",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0004"],
+      personId: "person-sam",
+      now: "2026-10-20T09:00:03Z",
+      core: (caller) => [recordAction(caller, crisis, "handle-sam", null)],
+    });
+    await committedTurn(world, batchOnly, arrival);
+    const [hold] = world.safety.holds;
+    if (hold?.turnId !== "turn-arrival-sam-0004") throw new Error("held on arrival");
+
+    // The batch turn after it: "all good, we're safe" first, then the crisis text, where the batch closed. Its own "we're
+    // safe", recorded there and named by the id its record writes, is no release.
+    const safeId = await KEYED_SAFETY_IDS.rowId("outcome", "evt-sam-0003");
+    const fields = {
+      holdId: hold.id,
+      expectVersion: 1,
+      why: "safe_readback" as const,
+      releasedByOutcomeId: safeId,
+    };
+    const batch = turnOf({
+      turnId: "turn-sam-batch",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0003", "evt-sam-0004"],
+      personId: "person-sam",
+      now: "2026-10-20T09:00:08Z",
+      core: (caller) => [
+        recordAction(caller, weAreSafe("evt-sam-0003"), "handle-sam", null),
+        recordAction(caller, crisis, "handle-sam", null),
+        releaseAction(caller, fields),
+      ],
+    });
+    const inBatch = await committedTurn(world, batchOnly, batch);
+    expect(inBatch.answer.core[2]).toEqual({
+      call: "releaseSafetyHold",
+      response: null,
+      error: { error: "stillDanger", outcomeId: safeId },
+    });
+    expect(inBatch.sent.writes.state.map((write) => write.table)).toEqual(["safety_outcomes"]);
+    expect(openHoldsOf(world, "handle-sam").map((open) => open.holdId)).toEqual([hold.id]);
+
+    // A clear "we're safe, it's handled" that came after the crisis text, in a later turn, releases it.
+    world.arrivals = {
+      "evt-sam-0003": "2026-10-20T08:59:58Z",
+      "evt-sam-0004": "2026-10-20T09:00:01Z",
+      "evt-sam-0006": "2026-10-20T09:40:00Z",
+    };
+    const laterId = await KEYED_SAFETY_IDS.rowId("outcome", "evt-sam-0006");
+    const later = turnOf({
+      turnId: "turn-sam-safe-later",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0006"],
+      personId: "person-sam",
+      now: "2026-10-20T09:40:02Z",
+      core: (caller) => [
+        recordAction(caller, weAreSafe("evt-sam-0006"), "handle-sam", null),
+        releaseAction(caller, { ...fields, releasedByOutcomeId: laterId }),
+      ],
+    });
+    const released = await committedTurn(world, doubles.deps, later);
+    expect(released.answer.core[1]).toMatchObject({
+      call: "releaseSafetyHold",
+      response: { holdId: hold.id, releasedAt: "2026-10-20T09:40:02Z", repeated: false },
+      error: null,
+    });
+    expect(released.sent.writes.state).toContainEqual({
+      op: "update",
+      table: "safety_holds",
+      key: { id: hold.id },
+      expectVersion: 1,
+      set: {
+        released_at: "2026-10-20T09:40:02Z",
+        released_why: "safe_readback",
+        released_by_turn_id: "turn-sam-safe-later",
+        released_by_outcome_id: laterId,
+      },
+    });
+    expect(openHoldsOf(world, "handle-sam")).toEqual([]);
+  });
+
+  it("a later turn's clear 'we're safe' releases only once its text is known to have come after the danger text", async () => {
+    const doubles = doublesOn(safetyWorldOf());
+    await committedCrisis(doubles);
+    const [hold] = doubles.world.safety.holds;
+    if (hold === undefined) throw new Error("the crisis holds");
+    const safeId = await KEYED_SAFETY_IDS.rowId("outcome", "evt-sam-0002");
+    const later = turnOf({
+      turnId: "turn-sam-safe",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0002"],
+      personId: "person-sam",
+      now: "2026-10-19T14:20:00Z",
+      core: (caller) => [
+        recordAction(caller, weAreSafe("evt-sam-0002"), "handle-sam", null),
+        releaseAction(caller, {
+          holdId: hold.id,
+          expectVersion: 1,
+          why: "safe_readback",
+          releasedByOutcomeId: safeId,
+        }),
+      ],
+    });
+    const released = async (arrivals: Record<string, string>) => {
+      doubles.world.arrivals = arrivals;
+      return (await releaseSafetyHoldCore(releaseIn(later), later, NOTHING_OPEN, doubles.deps)).run.result;
+    };
+    const stillDanger = {
+      call: "releaseSafetyHold",
+      response: null,
+      error: { error: "stillDanger", outcomeId: safeId },
+    };
+    // Its arrival unknown, or the crisis text's: not known to be later, so the hold stays (fail closed).
+    expect(await released({ "evt-sam-0001": CRISIS_ARRIVED })).toEqual(stillDanger);
+    expect(await released({ "evt-sam-0002": SAFE_ARRIVED })).toEqual(stillDanger);
+    // The same moment as the crisis text, or before it (a text the actor took first): not later.
+    expect(await released({ "evt-sam-0001": CRISIS_ARRIVED, "evt-sam-0002": CRISIS_ARRIVED })).toEqual(
+      stillDanger,
+    );
+    expect(
+      await released({ "evt-sam-0001": CRISIS_ARRIVED, "evt-sam-0002": "2026-10-19T14:04:59Z" }),
+    ).toEqual(stillDanger);
+    // Both known, and the "we're safe" later: released.
+    expect(await released({ "evt-sam-0001": CRISIS_ARRIVED, "evt-sam-0002": SAFE_ARRIVED })).toEqual({
+      call: "releaseSafetyHold",
+      response: {
+        holdId: hold.id,
+        releasedAt: "2026-10-19T14:20:00Z",
+        redecideTurnId: "turn-s1-02-sam-kinds",
+        repeated: false,
+      },
+      error: null,
     });
   });
 });
@@ -856,6 +1106,38 @@ describe("a threat pauses later visits and nothing books (A3-48)", () => {
       .filter((write) => write.table === "pauses")
       .map((write) => (write.op === "insert" ? write.values.target : null));
     expect(targets).toEqual(["phone"]);
+  });
+
+  it("a pause T-317 refuses shows in the outcome: the record answers it and writes nothing, never a threat without it", async () => {
+    const doubles = doublesOn(safetyWorldOf());
+    const turn = alexThreat();
+    const reader = flagsReaderOn(doubles.world.flags, BARBERSHOP);
+    const recordWith = (flagsReader: FlagsReader) =>
+      recordSafetyOutcomeCore(firstRecord(turn), turn, NOTHING_OPEN, {
+        ...doubles.deps,
+        flagsReader: () => flagsReader,
+      });
+    // No phone row behind Alex's handle: T-317 refuses the phone's pause, named by the handle's id, never the number.
+    const noPhone = await recordWith({ ...reader, phone: () => Promise.resolve(null) });
+    expect(noPhone.run.result).toEqual({
+      call: "recordSafetyOutcome",
+      response: null,
+      error: { error: "notFound", table: "phones", rowId: "handle-alex" },
+    });
+    expect(validator.check("recordSafetyOutcome", "errors", noPhone.run.result.error)).toEqual([]);
+    // Nothing is written for it: no outcome row, no hold, no pause, no line, no call-off clock.
+    expect(noPhone.run.writes.state).toEqual([]);
+    expect(noPhone.run.writes.stateEvents).toEqual([]);
+    expect(noPhone.run.writes.messages).toEqual([]);
+    expect(noPhone.clocks).toEqual([]);
+    // No such person: the person's pause is refused the same way, by the person's id.
+    const noPerson = await recordWith({ ...reader, personExists: () => Promise.resolve(false) });
+    expect(noPerson.run.result.error).toEqual({ error: "notFound", table: "persons", rowId: "person-alex" });
+    expect(noPerson.run.writes.state).toEqual([]);
+    // No such handle: no phone can be paused, and that is refused too, never passed over.
+    const noHandle = await recordWith({ ...reader, handle: () => Promise.resolve(null) });
+    expect(noHandle.run.result.error).toEqual({ error: "notFound", table: "handles", rowId: "handle-alex" });
+    expect(noHandle.run.writes.state).toEqual([]);
   });
 });
 
@@ -1205,6 +1487,39 @@ describe("each record and release keeps its contract", () => {
     await expect(recordSafetyOutcomeCore(firstRecord(turn), turn, NOTHING_OPEN, untold)).rejects.toThrow(
       NotBuiltError,
     );
+  });
+
+  it("the plug-in's stop words (A3-26): not wired, a record is not built; wired, a plug-in's stop words hold booking", async () => {
+    const doubles = doublesOn(safetyWorldOf());
+    const turn = turnOf({
+      turnId: "turn-alex-0201",
+      handleId: "handle-alex",
+      eventIds: ["evt-alex-0201"],
+      personId: "person-alex",
+      now: "2026-10-22T10:00:02Z",
+      core: (caller) => [recordAction(caller, safetyRead("safety-no.json"), "handle-alex", null)],
+    });
+    const record = (deps: SafetyDeps<unknown>) =>
+      recordSafetyOutcomeCore(firstRecord(turn), turn, NOTHING_OPEN, deps);
+    // Not wired: fail closed, before anything is sealed or written, so no plug-in's stop words go unread.
+    await expect(record(withoutPort(doubles.deps, "stopWords"))).rejects.toThrow(NotBuiltError);
+    expect(doubles.sealer.calls).toEqual([]);
+    // Wired for the barbershop, whose plug-in lists none: a No holds nothing (commit-s1-02.json).
+    const none = await record(doubles.deps);
+    expect(responseOf(none.run.result)).toMatchObject({ hold: null, nothingBooks: false });
+    // A plug-in that says the words this text matched stop a booking: held at once, booking blocked, nothing books.
+    const stops: StopWords = { stopsBooking: () => Promise.resolve(true) };
+    const { run } = await record({ ...doubles.deps, stopWords: stops });
+    expect(responseOf(run.result)).toMatchObject({
+      outcomes: ["No"],
+      hold: { releaseRule: "at_once", blocksBooking: true },
+      nothingBooks: true,
+    });
+    const hold = run.writes.state.find((write) => write.table === "safety_holds");
+    expect(hold?.op === "insert" ? hold.values : null).toMatchObject({
+      release_rule: "at_once",
+      blocks_booking: true,
+    });
   });
 
   it("the rules: a timeout with no danger word holds at once, a danger word lifts it to Unsure, after_safe", () => {

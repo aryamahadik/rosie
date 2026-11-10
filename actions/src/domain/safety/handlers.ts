@@ -41,7 +41,7 @@ import { KEYED_SAFETY_IDS, type SafetyIds } from "./ids";
 import {
   FIXED_SAFETY_LINES,
   NOT_TOLD_YET,
-  NO_STOP_WORDS,
+  STOP_WORDS_NOT_WIRED,
   noSafetyReads,
   type SafetyLines,
   type SafetyReader,
@@ -77,7 +77,10 @@ export interface SafetyDeps<Repo> {
   readonly visits?: VisitsCovered;
   /** The checked lines of the pinned bundle. Default: K-01 v1's own fixed lines only. */
   readonly lines?: SafetyLines;
-  /** The plug-in's stop words. Default: none. */
+  /**
+   * The plug-in's stop words (A3-26). Default: not wired, so a record answers notBuilt (STOP_WORDS_NOT_WIRED); a plug-in
+   * known to list none is wired by name (PLUGIN_LISTS_NO_STOP_WORDS).
+   */
   readonly stopWords?: StopWords;
   /** Hand-offs and pages (T-319). Default: none, so an outcome that must tell someone answers notBuilt. */
   readonly telling?: SafetyTelling;
@@ -129,7 +132,7 @@ function recordPortsOf<Repo>(deps: SafetyDeps<Repo>, repo: Repo, businessId: str
     messages,
     sealer: deps.sealer === undefined ? null : deps.sealer(repo),
     lines: deps.lines ?? FIXED_SAFETY_LINES,
-    stopWords: deps.stopWords ?? NO_STOP_WORDS,
+    stopWords: deps.stopWords ?? STOP_WORDS_NOT_WIRED,
     telling: deps.telling ?? NOT_TOLD_YET,
   };
 }

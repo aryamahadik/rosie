@@ -36,7 +36,9 @@
 //      never writes it twice.
 //   5. A hold needs a handle (K-34 safety_holds.handle_id): free text from a page or an AI with no handle writes no hold;
 //      its answer says nothing books whenever its outcomes hold danger (arch 02 line 129).
-//   6. read_at and held_at are the call's now: K-02 v1's result carries no time of its own.
+//   6. read_at and held_at are the call's now: K-02 v1's result carries no time of its own. Every text of one turn so
+//      shares them, so they never say which text came first: a release compares the texts' arrival (release.ts default
+//      13).
 //   7. The words sealed are one JSON value: {"labels": [{"evidence", "atRisk", "writer"}...], "dangerWords": [...]}, in
 //      the read's order; with no person known nothing is sealed and the words are not kept (K-34 sealed_words "null when
 //      no person is known"). A harm report seals the same words for the one who told Rosie (K-34 sealed_details).
@@ -48,6 +50,11 @@
 //      not null), its zone, and the hotline the line gives; otherwise the call is refused (fail closed: A3-49 "Never make
 //      up or guess a hotline number"). Unsafe at home and a report about the owner or staff file none here: K-02 v1 does not
 //      say whose risk it is or whom it names (CQ-22).
+//  17. A protective flag the outcome calls for is never dropped. A pause T-317 refuses (no such person, phone or handle:
+//      notFound) refuses the record with that answer, and nothing is written: the never hold cannot show a missing pause,
+//      and the handle actor keeps its own hold and sends the checked line itself (errors.ts). A refusal K-09 v1 lists no
+//      record error for fails the call (pauseRefused). A private flag T-317 refuses leaves the when_private hold held and
+//      unreleased, which the answer names (default 3), so the booking waits until it is private.
 
 import type { CoreAction, EventEntry, OutboxRowNew, SafetyHold, StateWrite } from "../../commit";
 import { NotBuiltError, type ErrorsOf, type RequestOf, type ResponseOf } from "../../tool-api";
@@ -58,6 +65,7 @@ import {
   type FlagIds,
   type FlagsReader,
   type FlagWrites,
+  type RecordFlagError,
   type RecordFlagRequest,
   type VisitsCovered,
 } from "../flags";
@@ -202,13 +210,18 @@ export function carriedByTurn(
   );
 }
 
-/** One protective flag the outcome calls for, planned through T-317's setRecordFlag (its writes, or none). */
+/** A protective flag as planned: set (with its writes, or none when it already holds) or refused by T-317 (default 17). */
+type FlagPlanned =
+  | { readonly set: true; readonly writes: FlagWrites | null }
+  | { readonly set: false; readonly refused: RecordFlagError };
+
+/** One protective flag the outcome calls for, planned through T-317's setRecordFlag. */
 async function flagWrites(
   call: RecordCall,
   ports: RecordPorts,
   flag: RecordFlagRequest["flag"],
   target: FlagTarget,
-): Promise<{ readonly set: boolean; readonly writes: FlagWrites | null }> {
+): Promise<FlagPlanned> {
   if (carriedByTurn(call.turn, flag, target)) return { set: true, writes: null };
   const plan = await planRecordFlag(
     {
@@ -217,8 +230,19 @@ async function flagWrites(
     },
     { reader: ports.flags.reader, ids: ports.flags.ids, visits: ports.flags.visits, sealer: null },
   );
-  if ("error" in plan.answer) return { set: false, writes: null };
+  if ("error" in plan.answer) return { set: false, refused: plan.answer };
   return { set: true, writes: plan.answer.repeated ? null : plan.writes };
+}
+
+/**
+ * A pause T-317 refused, as the record's own answer (default 17): K-09 v1 recordSafetyOutcome.errors holds notFound,
+ * bookingPaused and transient in the same shapes; any other refusal fails the call, naming the pause's target by id.
+ */
+function pauseRefusal(refused: RecordFlagError, targetRowId: string): RecordError {
+  if (refused.error === "notFound" || refused.error === "bookingPaused" || refused.error === "transient") {
+    return refused;
+  }
+  throw new SafetyRefusedError("pauseRefused", [targetRowId]);
 }
 
 // ---- the record ---------------------------------------------------------------------------------------------------------
@@ -504,24 +528,29 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
     }),
   );
 
-  // ---- the protective flags the outcome calls for (default 4) --------------------------------------------------------
+  // ---- the protective flags the outcome calls for (defaults 4 and 17) -------------------------------------------------
   const flagged: FlagWrites[] = [];
   let madePrivate = false;
   if (businessId !== null && caller.businessId !== null) {
     if (safety.outcomes.includes("A threat to staff or others")) {
-      if (personId !== null) {
-        const person = await flagWrites(call, ports, "paused", { personId });
-        if (person.writes !== null) flagged.push(person.writes);
+      // The writer, then the handle's phone; each named by id when refused, never by its number.
+      const pauses: { readonly target: FlagTarget; readonly rowId: string }[] = [];
+      if (personId !== null) pauses.push({ target: { personId }, rowId: personId });
+      if (handleId !== null) {
+        const handle = await ports.flags.reader.handle(handleId);
+        if (handle === null) return nothing({ error: "notFound", table: "handles", rowId: handleId });
+        if (handle.kind === "phone")
+          pauses.push({ target: { phoneNumber: handle.address }, rowId: handle.id });
       }
-      const handle = handleId === null ? null : await ports.flags.reader.handle(handleId);
-      if (handle?.kind === "phone") {
-        const phone = await flagWrites(call, ports, "paused", { phoneNumber: handle.address });
-        if (phone.writes !== null) flagged.push(phone.writes);
+      for (const pause of pauses) {
+        const planned = await flagWrites(call, ports, "paused", pause.target);
+        if (!planned.set) return nothing(pauseRefusal(planned.refused, pause.rowId));
+        if (planned.writes !== null) flagged.push(planned.writes);
       }
     }
     if (rule === "when_private" && bookingId !== null) {
       const booking = await flagWrites(call, ports, "private", { bookingId });
-      if (booking.writes !== null) flagged.push(booking.writes);
+      if (booking.set && booking.writes !== null) flagged.push(booking.writes);
       madePrivate = booking.set;
     }
   }

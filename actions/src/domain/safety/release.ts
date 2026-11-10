@@ -4,8 +4,9 @@
 //   - at once, after the outcome's message (outcome_message_sent);
 //   - once the booking is made private (booking_private: A3-50), read from the booking head as it is now;
 //   - after a clear "we're safe" (safe_readback: A3-24 "we're safe, it's handled", A3-25 "I'm safe right now"): the safety
-//     read of a later text from the held handle's own chat (K-09 default 31), which holds no danger (rules.ts isClearSafe;
-//     S13-10: "A fire, gas or a threat that could start again still gets the message");
+//     read of a text from the held handle's own chat (K-09 default 31) that arrived after the danger text (default 13), and
+//     which holds no danger (rules.ts isClearSafe; S13-10: "A fire, gas or a threat that could start again still gets the
+//     message");
 //   - never, for a threat (A3-48): nothing books, and new requests wait for the owner.
 //
 // The release writes only the hold's release, compared on its version (limit 4). Nothing it held is committed by it: the
@@ -19,9 +20,19 @@
 //      K-34's, no reason can be written that fits both (K-34 safety_holds_why_fits_rule binds the stored rule), so the hold
 //      stays and the call answers wrongRule with the binding rule.
 //  12. Only safe_readback names an outcome: a releasedByOutcomeId given with another reason does not fit (wrongRule).
-//  13. A "we're safe" must be read after the hold was set: an older text's read is not a release of a later hold, and
-//      answers stillDanger (the hold stays and the message goes again). The text may be one this same turn records: the
-//      turn's own recordSafetyOutcome action names it by the id the record will write.
+//  13. A "we're safe" releases a hold only when its text arrived after the danger text (K-34
+//      safety_holds_not_released_by_itself: "a later, clear 'we're safe'"; arch 06 line 323). The order is the texts'
+//      arrival as the handle actor took them (K-06 v1 default 2: receivedAt), never read_at against held_at: a record
+//      writes both at its commit's now (record.ts default 6), so every text of the danger text's batch would pass. So:
+//        - never the hold's own read, nor a text of the hold's own turn or of the danger text's turn: the actor closed that
+//          batch at the danger text (K-09 README default 5), so every other text in it came before;
+//        - never a text of the releasing turn when that turn holds the danger text too: the batch turn after a hold written
+//          on arrival (K-09 v1.1 default 36) is closed at the danger text in the same way;
+//        - otherwise only a text whose arrival is known and strictly later than the danger text's (SafetyReader
+//          arrivedAt; for danger in a page's or an AI's free text, which no batch carries, the time it was read). Unknown,
+//          or the same moment, is not later.
+//      Each answers stillDanger: the hold stays and the message goes again. The text may be one this same turn records:
+//      the turn's own recordSafetyOutcome action names it by the id the record will write.
 //  14. A booking_private release reads the booking head as it is, or the turn's own setRecordFlag private for it; a booking
 //      not yet private is refused (bookingNotPrivate), since K-09 v1 lists no answer for it.
 //  15. released_at is the call's now, never before held_at (K-34 safety_holds_released_after_held).
@@ -31,7 +42,7 @@ import type { ErrorsOf, RequestOf, ResponseOf } from "../../tool-api";
 import { eventEntry, noWrites, type FlagsReader, type FlagWrites } from "../flags";
 import { SafetyRefusedError } from "./errors";
 import type { SafetyIds } from "./ids";
-import type { SafetyReader, StoredOutcome } from "./ports";
+import type { SafetyReader, StoredHold, StoredOutcome } from "./ports";
 import { carriedByTurn, type CarryingTurn } from "./record";
 import { WHY_OF_RULE, isClearSafe, labelsOf, strictestOf } from "./rules";
 
@@ -95,6 +106,7 @@ async function outcomeNamed(
       businessId: call.businessId,
       bookingId: request.bookingId,
       turnId: safety.source === "text" && turn !== null ? turn.id : null,
+      // What the record will write (record.ts default 6); never the order the texts came in (default 13).
       readAt: call.now,
       timedOut: safety.timedOut,
       labels,
@@ -105,6 +117,28 @@ async function outcomeNamed(
     };
   }
   return ports.reader.outcome(outcomeId);
+}
+
+/** Whether the "we're safe" text arrived after the danger text whose hold it would release (default 13). Reads only. */
+async function arrivedAfterDanger(
+  call: ReleaseCall,
+  ports: ReleasePorts,
+  hold: StoredHold,
+  safe: StoredOutcome,
+): Promise<boolean> {
+  // Never the hold's own read, nor a text of the hold's own turn: that batch closed at the danger text.
+  if (safe.id === hold.safetyOutcomeId || safe.turnId === hold.turnId) return false;
+  const danger = await ports.reader.outcome(hold.safetyOutcomeId);
+  if (danger === null || danger.eventId === safe.eventId) return false;
+  if (danger.turnId !== null && danger.turnId === safe.turnId) return false;
+  // A text of the releasing turn when that turn holds the danger text too (the batch after an arrival record).
+  const { turn } = call;
+  if (turn !== null && safe.turnId === turn.id && turn.eventIds.includes(danger.eventId)) return false;
+  // Otherwise the texts' arrival, as the actor took them: known, and strictly later.
+  const safeAt = await ports.reader.arrivedAt(safe.eventId);
+  const dangerAt = danger.source === "text" ? await ports.reader.arrivedAt(danger.eventId) : danger.readAt;
+  if (safeAt === null || dangerAt === null) return false;
+  return Date.parse(safeAt) > Date.parse(dangerAt);
 }
 
 /** Plans one releaseSafetyHold call: what it answers and what its commit writes. Reads only. */
@@ -159,8 +193,10 @@ export async function planReleaseSafetyHold(call: ReleaseCall, ports: ReleasePor
     if (safe.source !== "text" || safe.handleId !== hold.handleId || safe.turnId === null) {
       return nothing({ error: "notAllowed", why: "notDecider" });
     }
-    const fresh = safe.id !== hold.safetyOutcomeId && Date.parse(safe.readAt) >= Date.parse(hold.heldAt);
-    if (!fresh || !isClearSafe(safe)) return nothing({ error: "stillDanger", outcomeId: safe.id });
+    // Clear, and come after the danger text (default 13); else the hold stays and the message goes again.
+    if (!isClearSafe(safe) || !(await arrivedAfterDanger(call, ports, hold, safe))) {
+      return nothing({ error: "stillDanger", outcomeId: safe.id });
+    }
     releasedByTurnId = safe.turnId;
   }
 

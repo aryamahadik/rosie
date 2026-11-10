@@ -54,6 +54,8 @@ export interface SafetyWorld {
   safety: SafetyRecord;
   /** K-04 businesses.time_zone, by business. */
   readonly zones: Readonly<Record<string, string>>;
+  /** When each text arrived (K-06 receivedAt), by event id, as the actor took them; a text not here is unknown. */
+  arrivals: Record<string, string>;
 }
 
 type Values = Readonly<Record<string, unknown>>;
@@ -113,20 +115,26 @@ function holdOf(values: Values): StoredHold {
   };
 }
 
-/** The world of T-317's K-04 seeds and these K-34 seeds (paths under contracts/). */
+/**
+ * The world of T-317's K-04 seeds and these K-34 seeds (paths under contracts/). The seeds give no text's arrival, so a
+ * seeded text's read time stands in for it (the read runs on arrival, before batching: arch 02 line 111, and K-34's seeds
+ * write each read_at before its turn's commit); a test sets the arrival of every other text it needs.
+ */
 export function safetyWorldOf(safetySeeds: readonly string[] = []): SafetyWorld {
   const rows = seedRows(safetySeeds);
   const flags: FlagsRecord = flagsRecordOf([...FLAG_SEEDS, ...safetySeeds]);
+  const outcomes = rows.filter((row) => row.table === "safety_outcomes").map((row) => outcomeOf(row.values));
   return {
     flags: { record: flags },
     safety: {
-      outcomes: rows.filter((row) => row.table === "safety_outcomes").map((row) => outcomeOf(row.values)),
+      outcomes,
       holds: rows.filter((row) => row.table === "safety_holds").map((row) => holdOf(row.values)),
       outboxRowIds: [],
       harmReports: [],
     },
     // K-34 seed-harm-report.json's day zone for the barbershop.
     zones: { [BARBERSHOP]: "America/New_York" },
+    arrivals: Object.fromEntries(outcomes.map((outcome) => [outcome.eventId, outcome.readAt])),
   };
 }
 
@@ -166,6 +174,7 @@ export function safetyReaderOn(world: SafetyWorld, scope: string | null): Safety
       return Promise.resolve(owner);
     },
     businessZone: (businessId) => Promise.resolve(world.zones[businessId] ?? null),
+    arrivedAt: (eventId) => Promise.resolve(world.arrivals[eventId] ?? null),
   };
 }
 

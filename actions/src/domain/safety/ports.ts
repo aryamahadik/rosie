@@ -1,18 +1,24 @@
 // What the safety service reads and is given (T-318; C-104), each a port another task fills, so the service is tested with
 // doubles and fails closed while one is not built:
 //
-//   - SafetyReader: K-34 v1's outcomes and holds, and the two K-04 facts the record needs (the owner to tell, the zone
-//     "that day" is read in). K-05 has no read of K-34's tables yet (its open gap 26; T-1137 and T-1138 freeze and build
-//     the commit's reads), so the default reader refuses every read (notBuilt);
+//   - SafetyReader: K-34 v1's outcomes and holds, the two K-04 facts the record needs (the owner to tell, the zone "that
+//     day" is read in) and when a text arrived (K-06 receivedAt), which a release compares (release.ts default 13). K-05
+//     has no read of K-34's tables yet (its open gap 26; T-1137 and T-1138 freeze and build the commit's reads), so the
+//     default reader refuses every read (notBuilt);
 //   - WordsSealer: seals the read's words under one person's key (db/repo/sealing.ts seal, which the wiring binds to the
 //     call's transaction and the wrapping secret). The key already exists (the gateway made it at the text's first
 //     sight: K-05 item 29), so sealing stores nothing outside the commit; a sealed value differs on each run (a fresh
 //     IV). With none, a record that has words to seal answers notBuilt: the words are never written in plain;
 //   - SafetyLines: the outcome steps' checked lines, from the pinned bundle (K-01 v1 fixed lines and the step cards'
-//     lines, as the handle actor's BundleSafety reads them). The default knows only K-01 v1's own fixed lines;
-//   - StopWords: whether the plug-in's own-line words stop a booking (A3-26), which K-02 v1's result does not carry;
+//     lines, as the handle actor's BundleSafety reads them). The default knows only K-01 v1's own fixed lines, so any
+//     other outcome's record is refused (noSafetyLine);
+//   - StopWords: whether the plug-in's own-line words stop a booking (A3-26), which K-02 v1's result does not carry. No
+//     source of a plug-in's stop words is wired yet (QUESTIONS.md), so the default answers notBuilt for every record
+//     rather than let a plug-in's stop words go unread; a plug-in known to list none is wired as such, by name
+//     (PLUGIN_LISTS_NO_STOP_WORDS), never by default;
 //   - SafetyTelling: who is told through a hand-off or a page (K-36 v1; arch 06 line 329), T-319's paging and hand-offs.
 //     With none, an outcome that must tell someone answers notBuilt.
+// So every port fails closed until it is wired (D-017; T-1138).
 //
 // No port is called for anything but a read or a pure answer: a repeated turn runs the service again before K-05 answers
 // `repeated`, so nothing here may send, store or tell outside the one commit (CommitPorts in ../../commit/types.ts; STATE
@@ -87,6 +93,14 @@ export interface SafetyReader {
   ownerOf(businessId: string): Promise<OwnerContact | null>;
   /** K-04 businesses.time_zone: the IANA zone "that day" is read in for a harm report (CQ-05), or null. */
   businessZone(businessId: string): Promise<string | null>;
+  /**
+   * When a text arrived: its K-06 v1 receivedAt (when the gateway received it), UTC ending in Z, by its event id; null when
+   * unknown. The handle actor takes a handle's texts in that order (K-06 v1 default 2), so a release reads it to know that
+   * a "we're safe" came after the danger text (release.ts default 13). No frozen table keeps it yet: K-04 v1 `messages`
+   * keeps the sender's `sent_at`, and `turns.event_ids` the order within one turn only (handoff: a K-04 and K-05 minor
+   * version, or the actor's own record, gives it a home). Until then a release that needs it fails closed.
+   */
+  arrivedAt(eventId: string): Promise<string | null>;
 }
 
 /** No read of K-34 yet (K-05 open gap 26): every read answers notBuilt, so the call fails closed. */
@@ -100,6 +114,7 @@ export function noSafetyReads(call: CallName): SafetyReader {
     outboxRowWritten: refuse,
     ownerOf: refuse,
     businessZone: refuse,
+    arrivedAt: refuse,
   };
 }
 
@@ -170,8 +185,21 @@ export interface StopWords {
   stopsBooking(businessId: string | null, eventId: string): Promise<boolean>;
 }
 
-/** No plug-in stop words known (a barbershop's plug-in lists none: K-09 v1.1 j3-safety-arrival-own-line.json). */
-export const NO_STOP_WORDS: StopWords = {
+/**
+ * The default, while no source of the plug-in's stop words is wired (QUESTIONS.md: where they come from): every new record
+ * answers notBuilt and writes nothing, so a plug-in's stop words are never passed over unread (fail closed; A3-26). The
+ * handle actor then keeps its own hold and sends the checked line itself (errors.ts).
+ */
+export const STOP_WORDS_NOT_WIRED: StopWords = {
+  stopsBooking: () => Promise.reject(new NotBuiltError("recordSafetyOutcome")),
+};
+
+/**
+ * A plug-in that lists no words that stop a booking, as the barbershop's lists none (K-09 v1.1
+ * j3-safety-arrival-own-line.json: "A barbershop's plug-in lists no words that stop a booking here"). Wired by name, for a
+ * plug-in known to list none; never the default, since a plug-in that lists some would then book past them.
+ */
+export const PLUGIN_LISTS_NO_STOP_WORDS: StopWords = {
   stopsBooking: () => Promise.resolve(false),
 };
 

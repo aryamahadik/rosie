@@ -25,7 +25,9 @@ export type SafetyFault =
   /** A harm report names the business it came from (K-34 v1 harm_reports.business_id is not null). */
   | "harmReportNeedsBusiness"
   /** A booking_private release whose booking is not private yet (A3-50: "Once the booking is made private"). */
-  | "bookingNotPrivate";
+  | "bookingNotPrivate"
+  /** A threat's pause T-317 refused with an answer K-09 v1 lists no record error for: never dropped (record.ts default 17). */
+  | "pauseRefused";
 
 export class SafetyRefusedError extends Error {
   readonly fault: SafetyFault;
