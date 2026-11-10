@@ -1,0 +1,7 @@
+{
+  "$comment": "The production flag set (build prompt 5.4; section 2's table; T-569): what production's flags are. Only the protected release job applies it, after Jay or the CTO acts from his own login; flags.sh refuses --env production. It names every flag of staging.json, so production's value is always stated: skeleton stays off (D-017: 'Flag: skeleton (staging only)').",
+  "environment": "production",
+  "flags": {
+    "skeleton": false
+  }
+}

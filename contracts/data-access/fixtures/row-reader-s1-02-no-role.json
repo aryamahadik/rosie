@@ -1,0 +1,25 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "The walking skeleton's turn 1 as it runs (ADR-013 default 130; DL-364; QUESTIONS.md CQ-179). T-1148's seed (db/seeds/skeleton.ts), loaded in place of K-04's seed-person-roles.json, writes the barbershop's head, Sam and his handle, and no role. Turn 1's commit (K-09 v1.5 commit-s1-01.json, the writes K-05 v1.3's commit-s1-01-sam.json shows) writes outbox-s1-02-sam-1, S1-02's question to him, and readOutboxRow answers what v1.3's read-outbox-row-s1-02.json answers but with recipient.roles empty: roles as stored. The row's bundle is K-01's bundle-v0-skeleton.json, whose manifest lists flow A alone: S1-02, a shared step about no booking, is read in flow A (README default 53), its step.section is 1, and its one line from Rosie goes to the owner (flows.A.steps.S1-02.say[0], from san to owner). So Sam, a person who holds no role, reads S1-02 by the sign-up line, as the owner (README item 44), as K-09 v1's compose-input-s1-02.json and v1.6's compose-input-s1-02-v1.6.json read him (audience.role owner). Not a database call: rowReader is the consumers' mapping, which T-1141's round 2 binds in the turn face."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}

@@ -48,7 +48,7 @@ const isRaw = (value: unknown): value is Raw =>
 /** The kinds of answer the double replays: K-02's three model-facing outputs and the composer's plan (K-03). */
 export type DoubleKind = "safetyRead" | "decideRead" | "plannerOutput" | "composerPlan";
 
-/** One recording as its file writes it (ai/recordings; T-004, T-1071, T-1145). */
+/** One recording as its file writes it (ai/recordings; T-004, T-1071, T-1145, T-1175). */
 export interface RecordingSpec {
   readonly id: string;
   readonly kind: DoubleKind;
@@ -64,11 +64,15 @@ export interface RecordingsFile {
   readonly recordings: readonly RecordingSpec[];
 }
 
-/** The double's four files, as written (the double loads K-02's two as one lookup, and the composer's beside it). */
+/**
+ * The double's files, as written (the double loads K-02's two as one lookup, and the composer's two, K-03 v1's and
+ * v1.1's, as another beside it: T-1175).
+ */
 export const RECORDING_FILES = {
   "recordings.v1.json": readJson("ai/recordings/recordings.v1.json") as RecordingsFile,
   "recordings.v1.1.json": readJson("ai/recordings/recordings.v1.1.json") as RecordingsFile,
   "composer.v1.json": readJson("ai/recordings/composer.v1.json") as RecordingsFile,
+  "composer.v1.1.json": readJson("ai/recordings/composer.v1.1.json") as RecordingsFile,
 } as const;
 
 /** Every recording the double holds, in its files' order. */
