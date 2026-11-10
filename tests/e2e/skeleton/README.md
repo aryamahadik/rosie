@@ -19,8 +19,8 @@ For example, the guard (row 5 of 02-contracts section 11, K-01 and K-04) uses `t
 - The run passes when its trace shows hops 1 to n once each, in turn order, under one trace id and one bundle id. Spans after hop n belong to hops not joined yet, and they are not judged.
 - Each joined row up to the prefix's also holds what its join proved in its own Workers test (`CLAIMS`):
   - receive: the signature is valid and the event id is new;
-  - scrub: the actor's inbox entry comes once, its words sealed under the key K-05 gave the handle;
-  - the safety read: the JOIN reads No, on one Haiku call;
+  - scrub: the actor's inbox entry comes once, on the text's arrival, its words sealed under the key K-05 gave the handle;
+  - the safety read: the JOIN reads No, on one Haiku call, read from the text's arrival;
   - the lease: one batch and one turn, bundle v0 pinned, and the turn's one K-04 row;
   - the guard: no keyword and no target.
 
@@ -44,6 +44,7 @@ The runtime's own trace test names what the merged runtime does not write yet (`
 
 - The trace is checked against K-08 with the code T-1144 prebuilds for the Worker (K-08 v1.1's span, which is v1's). Ajv's compiler cannot run in workerd. `npm run test:e2e` builds that code first.
 - The local target starts capturing log lines before the root is composed, because the root binds its span sinks to `console.log` at that moment.
+- The actor stamps its inbox entry's span when it answers the hand-off, so its `at` is its end, not its start as K-08 says (T-1170). Nor is `at` less `ms` its start: the actor reads the clock for `ms` and again for `at`, and the clock moves in between. So the inbox entry and the safety read are timed on the gateway's own readings, which are exact: after its scrub, before its answer.
 - The dispatcher still sends to the root's fake Linq port, not to the local target's recording Linq double. So the parts the full check reads are wired by the send join (T-563) or by T-466.
 
 T-466 then completes the file with D-017's automated tests:

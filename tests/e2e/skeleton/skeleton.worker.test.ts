@@ -105,14 +105,26 @@ function onlySpan(facts: Facts, hop: Hop): Span {
 }
 
 /**
- * The actor's inbox entry: its own receive span (gap actorReceive). It is written when the hand-off is answered, so its `at`
- * is then (runtime/src/actor/handle-actor.ts recordSpan): it started `ms` earlier.
+ * The actor's inbox entry: its own receive span (gap actorReceive). The actor stamps it when it answers the hand-off
+ * (runtime/src/actor/handle-actor.ts accept and recordSpan), so its `at` is when the entry ended, not when it started as
+ * K-08 says (T-1170). Nor is `at` less `ms` its start: the actor reads the clock once for `ms` and again for `at`, and the
+ * clock moves between the two, so `at` less `ms` can come out after the start of the safety read the entry begins.
  */
-function inboxEntrySpan(facts: Facts): { readonly span: Span; readonly started: number } {
+function inboxEntrySpan(facts: Facts): Span {
   expect(facts.judged.actorReceives, stillHolds("actorReceive")).toHaveLength(1);
   const [span] = facts.judged.actorReceives;
   if (span === undefined) throw new Error("no span of the actor's inbox entry");
-  return { span, started: Date.parse(span.at) - span.ms };
+  return span;
+}
+
+/**
+ * The text's arrival, on the gateway's own clock readings, which are exact: from the start of the scrub that hands the text
+ * on to its actor (scrub's `at`) to the gateway's answer, which waits for the actor's (receive's `at` plus `ms`, read at its
+ * start and at its finish). The actor stores the text and starts its safety read in between (handle-actor.ts accept).
+ */
+function arrivalOf(facts: Facts): { readonly from: number; readonly to: number } {
+  const receive = onlySpan(facts, "receive");
+  return { from: Date.parse(onlySpan(facts, "scrub").at), to: Date.parse(receive.at) + receive.ms };
 }
 
 /**
@@ -151,16 +163,19 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       error_code: null,
       decided: skeletonSpan("scrub").decided,
     });
-    // The actor's inbox entry, once, under the trace id, after the gateway's scrub.
+    // The actor's inbox entry, once, under the trace id, on the text's arrival: after the gateway's scrub, and before the
+    // gateway answered.
     const entry = inboxEntrySpan(facts);
-    expect(entry.span).toMatchObject({
+    expect(entry).toMatchObject({
       outcome: "ok",
       event_id: JOIN.eventId,
       error_code: null,
       got: { door: "handleActor", route: "inbox", kind: "text" },
       decided: { stored: true, startsTurn: true },
     });
-    expect(entry.started).toBeGreaterThanOrEqual(Date.parse(scrub.at));
+    const arrival = arrivalOf(facts);
+    expect(Date.parse(entry.at)).toBeGreaterThanOrEqual(arrival.from);
+    expect(Date.parse(entry.at)).toBeLessThanOrEqual(arrival.to);
     // Read back: one entry, the JOIN's, on its trace, starting a turn. Its words are only sealed: they open under the key
     // K-05 gave the handle at its first sight, and under no other.
     const inbox = await facts.actor.inbox();
@@ -204,8 +219,11 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       got: { via: "verdict", outcomes: ["no"], dangerWords: 0 },
       decided: { danger: false, path: "none", line: null },
     });
-    // On arrival: the read started once the text was in the actor's inbox.
-    expect(inboxEntrySpan(facts).started).toBeLessThanOrEqual(Date.parse(read.at));
+    // On arrival: the read started while the text arrived, after the gateway's scrub handed it on and before the gateway
+    // answered, which waits for the actor's step that stores the text and starts its read (arrivalOf).
+    const arrival = arrivalOf(facts);
+    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(arrival.from);
+    expect(Date.parse(read.at)).toBeLessThanOrEqual(arrival.to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
     // portCall span beside the hops.
     expect(facts.run.fakes.models.calls).toEqual([{ model: HAIKU_MODEL, text: JOIN_TEXT }]);
