@@ -256,21 +256,19 @@ describe("the card's integration line: one turn from gate and commit to finalize
     await whole.close();
   });
 
-  /** The turn's three calls after the frontier, in turn order, each on the same turn's trace. */
+  /** The turn's three calls after the frontier, in turn order, each on the turn's trace, with the spans they left. */
   async function runTurn() {
     const request = pinnedRequest();
-    const committed = await wholeFace.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+    const commitTrace = traceFor(request);
+    const committed = await wholeFace.gateAndCommit(request, NOTHING_OPEN_AT, commitTrace.trace);
     const compose = fixture("compose-input-s1-02.json") as { request: Json };
-    const composed = await wholeFace.composeInput(
-      structuredClone(compose.request),
-      traceFor(compose.request).trace,
-    );
+    const composeTrace = traceFor(compose.request);
+    const composed = await wholeFace.composeInput(structuredClone(compose.request), composeTrace.trace);
     const finalize = fixture("finalize-pass.json") as { request: Json };
-    const finalized = await wholeFace.finalizeMessage(
-      structuredClone(finalize.request),
-      traceFor(finalize.request).trace,
-    );
-    return { committed, composed, finalized };
+    const finalizeTrace = traceFor(finalize.request);
+    const finalized = await wholeFace.finalizeMessage(structuredClone(finalize.request), finalizeTrace.trace);
+    const spans = [...commitTrace.spans, ...composeTrace.spans, ...finalizeTrace.spans];
+    return { committed, composed, finalized, spans };
   }
 
   it(
@@ -329,6 +327,12 @@ describe("the card's integration line: one turn from gate and commit to finalize
       `;
       expect(entries.length).toBeGreaterThan(0);
       for (const entry of entries) expect([entry.turn_id, entry.trace_id]).toEqual([TURN, TRACE]);
+      // Each call's one span, gate then fillAndChecks twice, on the same turn and trace.
+      expect(first.spans.map((span) => [span.hop, span.turn_id, span.trace_id])).toEqual([
+        ["gate", TURN, TRACE],
+        ["fillAndChecks", TURN, TRACE],
+        ["fillAndChecks", TURN, TRACE],
+      ]);
 
       // Replaying the turn writes nothing twice: the commit answers the first, repeated; compose input and finalize each
       // answer alreadyPlanned for the row that holds its plan, finalize with the parts written; no row, version or entry
