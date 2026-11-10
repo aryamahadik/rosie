@@ -112,7 +112,6 @@ import {
  * with the checks that name it.
  */
 const GAPS = {
-  scrubSpan: { task: "T-1096", what: "(a) the gateway writes no scrub span" },
   batchSpans: {
     task: "T-1108",
     what: "(b) the batch window writes no batch span (runtime/src/actor/batch.ts logs nothing, and runtime/src/trace closeBatch, which writes CQ-06's batch spans, has no caller), so a joined text's trace has no joinedTurn span either",
@@ -158,7 +157,7 @@ function stillHolds(gap: Gap): string {
  * Hops of a text's trace (trace-skeleton.json, trace-batch-three-texts.json) with no writer yet, each by its gap: left
  * out of the check, and unexpected (so the test fails, naming the gap) once a writer lands.
  */
-const NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = { scrub: "scrubSpan", batch: "batchSpans" };
+const NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = { batch: "batchSpans" };
 
 /** Hops of a clock firing's trace (trace-clock-fire.json) with no writer yet: seven of its eight. */
 const CLOCK_NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = {
@@ -650,6 +649,7 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
         expectHops(report, NOT_WRITTEN);
         expect(report.judged).toEqual([
           "receive",
+          "scrub",
           "safetyRead",
           "lease",
           "guard",
@@ -685,6 +685,7 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
         const fromLease = trace.slice(trace.findIndex((span) => span.hop === "lease"));
         expect(new Set(fromLease.map((span) => span.turn_id))).toEqual(new Set([turnId]));
         expect(trace.filter((span) => !fromLease.includes(span)).map((span) => span.turn_id)).toEqual([
+          null,
           null,
           null,
           null,
@@ -817,7 +818,7 @@ describe("a three-text batch (trace-batch-three-texts.json)", () => {
         });
         // The joined texts' traces carry no turn: nothing ran on them after their safety read.
         for (const traceId of [secondTrace, thirdTrace]) {
-          expect(spansOfTrace(spans, traceId).map((span) => span.turn_id)).toEqual([null, null, null]);
+          expect(spansOfTrace(spans, traceId).map((span) => span.turn_id)).toEqual([null, null, null, null]);
         }
         expectNoWords(spans, [...texts.map(([, body]) => body), ...FIXTURE_WORDS]);
       } finally {
