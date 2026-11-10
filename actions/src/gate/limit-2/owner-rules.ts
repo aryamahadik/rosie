@@ -8,7 +8,8 @@
 //   1. pass_on and hand_off choose nothing a rule governs: notChecked (K-08 v1 limitResult: "notChecked when the turn has
 //      nothing it applies to");
 //   2. what the part proposes (the walk, facts.ts): nothing an owner rule governs passes, with no rule read (K-09 v1's
-//      commit-s1-02.json: limit 2 passes Sam's S1-02 answer); a proposal not known yet is refused (notBuilt);
+//      commit-s1-02.json: limit 2 passes Sam's S1-02 answer), but at the sign-up door, which starts a business's sign-up,
+//      there is nothing to check (notChecked: default 4); a proposal not known yet is refused (notBuilt);
 //   3. a proposal at another business than the call's cannot be checked in the call's scope: refused (notBuilt);
 //   4. the business's K-26 v1 rules rows (facts.ts), checked by the one evaluator (actions/src/rules/evaluator): a row of a
 //      kind not in the frozen registry, or one it cannot read, refuses the part, never ignored; a broken rule fails it with
@@ -36,9 +37,15 @@
 //      has no hours kind (its README: hours are K-27's, H01), so the limit's tests give the barbershop a K-26 notice rule
 //      of 24 hours (a made-up value) that the time breaks. Whether limit 2 also reads K-27's hours, or a K-09 minor version
 //      rewords the fixture's note, is the architect's (open question).
+//   4. T-1183 (DL-364): K-02 v1.1's sign-up door (its default 9) starts a business's sign-up, before any rule of the
+//      business could govern what it does (K-26's rules hold a business's bookings: S11-57), so when it proposes nothing
+//      an owner rule governs, limit 2 has nothing to apply to it: notChecked, as K-09 v1.5's commit-s1-01.json and K-08
+//      v1's trace-skeleton.json log it (ADR-013 section 2). Every other part that proposes nothing ruled still passes, the
+//      answer at S1-02 that follows the door among them (commit-s1-02.json), and a sign-up door that may carry a rule (on
+//      a booking, with a ruled stake, with a time or money value: not the door K-02 v1.1 shapes) is checked as any part.
 
 import { evaluateRules, type BrokenCheck, type NotedCheck, type RefusedRule } from "../../rules/evaluator";
-import type { GatePart, GateTurn, LimitOutcomes } from "../framework";
+import type { Choice, GatePart, GateTurn, LimitOutcomes } from "../framework";
 import type { OwnerRules, Proposals } from "./facts";
 
 /** Limit 2's outcome when it fails (K-09 v1 limit2Outcome). */
@@ -91,6 +98,11 @@ const NOTHING_RULED: OwnerRulesDecision = {
 };
 const notBuilt = (port: Limit2Port): OwnerRulesDecision => ({ result: "notBuilt", port });
 
+/** K-02 v1.1's sign-up door (its default 9), which starts a business's sign-up (default 4). */
+function startsSignUp(choice: Choice): boolean {
+  return choice.kind === "door" && choice.door === "signUp";
+}
+
 /** Limit 2 on one agreed part: pass, notChecked, the failure with what each broken rule allows, or refused. */
 export async function decideOwnerRules(
   part: GatePart,
@@ -102,7 +114,7 @@ export async function decideOwnerRules(
   if (choice === null) throw new TypeError("limit 2 got a choose or enter part without its offered choice");
 
   const proposed = await ports.proposals.proposalOf(part, turn);
-  if (proposed.kind === "none") return NOTHING_RULED;
+  if (proposed.kind === "none") return startsSignUp(choice) ? NOT_CHECKED : NOTHING_RULED;
   if (proposed.kind === "unknown") return notBuilt("proposals");
   const { proposal } = proposed;
   // The rules are read in the call's business scope only; another business's cannot be checked here (fails closed).

@@ -7,7 +7,8 @@
 //   - a second conflict on the same open question opens a review item instead of a third try.
 // Also: what limit 4 compares and sends with the commit; nothing shown changed commits; the K-09 gate fixtures that reach
 // limit 4 come out as they state; what it returns holds no person's words; the shipped limit sits in slot 4 and reads
-// only through the call's database.
+// only through the call's database. T-1183 (DL-364): K-02 v1.1's sign-up door, as K-09 v1.5's commit-s1-01.json gives
+// it, passes with nothing to compare and nothing read; each of K-01's five doors is still not checked.
 
 import { describe, expect, it } from "vitest";
 
@@ -45,6 +46,14 @@ import {
   type LimitCall,
 } from "../framework/test-support";
 import { LIMITS } from "../limits";
+import {
+  K01_DOORS,
+  SIGN_UP_FIXTURE,
+  enteringDoor,
+  k01Door,
+  signUpDoor,
+  unknownDoor,
+} from "../limit-1/test-support";
 import type { AskedQuestion, RowRef } from "../limit-3/facts";
 import {
   ALEX,
@@ -705,6 +714,43 @@ describe("what limit 4 compares", () => {
       await expect(runGate(request, callContext(BARBERSHOP), registryWith(limitIn(world)))).rejects.toThrow(
         LimitNotBuiltError,
       );
+    }
+  });
+});
+
+describe("T-1183: K-02 v1.1's sign-up door passes limit 4 with nothing to compare, and every other door answers as before (DL-364)", () => {
+  it("commit-s1-01.json's part: Sam entering the sign-up door passes, with no row to compare and set and nothing read, as the fixture states", async () => {
+    const request = exchangeRequest(SIGN_UP_FIXTURE);
+    const reads: TodayReads = { versions: [], bookings: [] };
+    const world: World = { questions: [], today: counted(versionsFake().today, reads) };
+    expect(await decisionOf(world, request)).toEqual({ result: "pass", compareAndSet: [] });
+    expect(reads).toEqual({ versions: [], bookings: [] });
+    // The shipped limit, over a repo that is no database: a read would throw.
+    expect(await limit4.decide(partOf(request), turnOf(request))).toEqual({
+      result: "pass",
+      compareAndSet: [],
+    });
+    expect(await limit4.check(partOf(request), turnOf(request))).toEqual({ result: "pass" });
+    expect(statedCommit(SIGN_UP_FIXTURE).parts[0]?.limits[3]).toEqual({
+      limit: 4,
+      result: "pass",
+      outcome: null,
+    });
+  });
+
+  it("each of K-01's five doors, a door the gate does not know and a sign-up door on a booking are shown no read-back: not checked, as before, with nothing read", async () => {
+    const door = signUpDoor();
+    const doors = [
+      ...K01_DOORS.map(([value, step]) => k01Door(value, step)),
+      unknownDoor(),
+      { ...door, target: { ...door.target, bookingId: HAIRCUT } },
+    ];
+    for (const each of doors) {
+      const request = enteringDoor(each);
+      expect({ door: each.door, decided: await limit4.decide(partOf(request), turnOf(request)) }).toEqual({
+        door: each.door,
+        decided: { result: "notChecked" },
+      });
     }
   });
 });

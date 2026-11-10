@@ -7,7 +7,8 @@
 //
 // For one gated part, each field decide gave (K-02 v1 field: name, value, words), in its choice's type (K-02 v1
 // choice.fields; contracts/bundle answerField.type):
-//   1. a part with no field (pass_on, hand_off, a choose or enter with none) has nothing to re-parse: notChecked;
+//   1. a part with no field (pass_on, hand_off, a choose or enter with none) has nothing to re-parse: notChecked; but the
+//      sign-up door with none passes (default 13);
 //   2. a value read from a photo (the photo port, C-120's) passes only with the read-back of it the owner said yes to,
 //      re-parsed from that read-back's words: never from a caption, never before the yes;
 //   3. any other value re-parses from its words (actions/src/values reparse) as each text that carries them sent them:
@@ -149,6 +150,13 @@
 //      or an adding word ("at 3, 4 people" and "at 3 and 4 people" keep "at 3"). A reading of the cited words or the
 //      phrase that takes an hour the whole text does not is noText (values/parties.ts, values/times.ts,
 //      values/phrase.ts).
+//  13. T-1183 (DL-364): K-02 v1.1's sign-up door (its default 9), on no booking and with no field, passes, as K-09 v1.5's
+//      commit-s1-01.json and K-08 v1's trace-skeleton.json log it (ADR-013 section 2). S1-01 takes no value, so its walk
+//      writes nothing read from the person's words (S1-01's thread takes the turn's chat id; S1-02's question and its
+//      outbox row take the turn's ids: K-09 v1.5 defaults 131 to 135), and every value the part carries re-parses, there
+//      being none. A sign-up door that carried a field would have each value re-parsed as any part's (steps 2 to 4); any
+//      other part with no field, and a sign-up door that names a booking (not the door K-02 v1.1 shapes), stays
+//      notChecked as before (step 1).
 
 import {
   foundAtWordEdges,
@@ -391,6 +399,13 @@ function outcomeFor(choice: Choice, context: Context): Limit6Outcome {
 
 // ---- the rule ---------------------------------------------------------------------------------------------------------
 
+/** K-02 v1.1's sign-up door on no booking (default 13): S1-01 takes no value. */
+function isSignUpDoor(choice: Choice | null): boolean {
+  return (
+    choice !== null && choice.kind === "door" && choice.door === "signUp" && choice.target.bookingId === null
+  );
+}
+
 /** Limit 6 on one agreed part: pass, notChecked, or the failure naming each field whose value failed. */
 export async function decideValues(
   part: GatePart,
@@ -399,7 +414,7 @@ export async function decideValues(
 ): Promise<ValuesDecision> {
   const { part: said, choice } = part;
   if (said.verb !== "choose" && said.verb !== "enter") return NOT_CHECKED;
-  if (said.fields.length === 0) return NOT_CHECKED;
+  if (said.fields.length === 0) return isSignUpDoor(choice) ? PASS : NOT_CHECKED;
   if (choice === null) throw new TypeError("limit 6 got a choose or enter part without its offered choice");
   let zones: Promise<VisitZones> | null = null;
   const run: FieldRun = {
