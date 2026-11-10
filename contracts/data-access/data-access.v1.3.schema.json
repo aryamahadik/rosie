@@ -834,7 +834,7 @@
     },
     "rowLine": {
       "title": "RowLine",
-      "description": "Which of Rosie's lines an outbox row carries to its reader: the step (K-01 v1 stepId) and the line's index among that step's lines from Rosie to that reader, in the step's say order, 0 for the first (ComposeRow.step and line; QUESTIONS.md CQ-151 (a) and its default 2). K-04 v1's outbox_rows holds neither (CQ-151 a), so v1.3 says where each comes from in from: openQuestion, the step of the open question the row asks (outbox_rows.open_question_id, open_questions.step: 'The step that asks', K-04 v1), at index 0 (CQ-151 (a)'s default 2). A later minor version adds the row's own stored step and line once K-04 holds them (README open gap 29). New in v1.3.",
+      "description": "Which of Rosie's lines an outbox row carries to its reader: the step (K-01 v1 stepId) and the line's index among that step's lines from Rosie to that reader, in the step's say order, 0 for the first (ComposeRow.step and line; QUESTIONS.md CQ-151 (a) and its default 2). K-04 v1's outbox_rows holds neither (CQ-151 a), so v1.3 says where each comes from in from: openQuestion, the step of the open question the row asks (outbox_rows.open_question_id, open_questions.step: 'The step that asks', K-04 v1), at index 0 (CQ-151 (a)'s default 2). A later minor version adds the row's own stored step and line once K-04 holds them (README open gap 29). The flow a shared step is read in (ComposeRow.flow) is not stored either: the caller takes it from the row's booking, else from the row's bundle, the first of A, then B, whose graph holds the step (README item 35, default 53). New in v1.3.",
       "type": "object",
       "properties": {
         "step": {
@@ -1086,7 +1086,7 @@
           "$ref": "#/$defs/version"
         },
         "clockRow": {
-          "description": "The question's clock row (kind question), or null when it has none: its state, due time and zone (null until it arms) and version.",
+          "description": "The question's clock row (kind question), or null when it has none, a row finalize refuses rather than give FinalizeRow.question null, since the passed-on path withdraws a question only with its clock row (README item 35, default 54): its state, due time and zone (null until it arms) and version.",
           "anyOf": [
             {
               "type": "object",
@@ -1185,7 +1185,7 @@
     },
     "readOutboxRow.response": {
       "title": "ReadOutboxRowResponse",
-      "description": "The row as one read of the primary saw it (one read-only transaction, one moment): row, what K-04 v1 outbox_rows holds that compose input and finalize read; line, its step and line (rowLine; null for a row that asks no question: README open gap 29); recipient, its reader (rowRecipient); answers, the texts it answers by event id with their safety results, never their words; slotSource, the record its slots are filled from that K-04 v1 holds (the business head, the booking head, the question it asks); openQuestions, the other questions still open with the reader with their words as sent. What the caller adds, field by field, is in README item 35's table: the inbound words (handed in by the runtime caller), the bundle's master line, links and checks, and code's rules. Every list is present, empty when there is none. Never a sealed value, the inbound words, the recipient's address, a key or a wrapping key's name (rule 7). New in v1.3.",
+      "description": "The row as one read of the primary saw it (one read-only transaction, one moment): row, what K-04 v1 outbox_rows holds that compose input and finalize read; line, its step and line (rowLine; null for a row that asks no question: README open gap 29); recipient, its reader (rowRecipient); answers, the texts it answers by event id with their safety results, never their words; slotSource, the record its slots are filled from that K-04 v1 holds (the business head, the booking head, the question it asks); openQuestions, the other questions still open with the reader with their words as sent. What the caller adds, field by field, is in README item 35's table: the inbound words (handed in by the runtime caller), the flow the row's step is read in and the bundle's master line, links and checks (from the row's bundle: README default 53), and code's rules. Every list is present, empty when there is none. Never a sealed value, the inbound words, the recipient's address, a key or a wrapping key's name (rule 7). New in v1.3.",
       "type": "object",
       "properties": {
         "result": {
