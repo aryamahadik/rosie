@@ -174,3 +174,37 @@ export function labelsOf(result: SafetyResult): { labels: SafetyOutcome[]; tense
   const labels = result.read?.labels ?? [];
   return { labels: labels.map((label) => label.outcome), tenses: labels.map((label) => label.tense) };
 }
+
+// ---- the danger question (T-1176; CQ-172) ---------------------------------------------------------------------------
+
+/** K-01 v1's danger question, by its fixed line id: "Is anyone in danger right now?" as the pinned bundle writes it. */
+export const SAFETY_ASK_LINE = "safetyAsk";
+
+/** One label as the danger question reads it: its outcome and its tense (K-02 v1 safetyLabel; K-34 v1 labels, tenses). */
+export interface LabelTense {
+  readonly outcome: SafetyOutcome;
+  readonly tense: Tense;
+}
+
+/**
+ * A stored record's own labels, each with its tense, in the read's order (K-34 v1 `labels` and `tenses`, one tense per
+ * label: safety_outcomes_one_tense_per_label). A label with no tense beside it, which K-34 refuses, reads as unknown:
+ * unknown reads as danger (arch 06 line 329).
+ */
+export function storedLabels(stored: {
+  readonly labels: readonly SafetyOutcome[];
+  readonly tenses: readonly Tense[];
+}): LabelTense[] {
+  return stored.labels.map((outcome, at) => ({ outcome, tense: stored.tenses[at] ?? "unknown" }));
+}
+
+/**
+ * Whether a record's own labels add the danger question to its line (arch 06 line 329: "unknown reads as danger and adds
+ * 'Is anyone in danger right now?'"; S13-24 rule 10; A3-22), as the handle actor's direct path asks it
+ * (runtime/src/safety/rules.ts checkedLineFor, lines 170 to 172; T-1143; CQ-172): a label whose tense is unknown and whose
+ * outcome is not No. Never for No, nor for a label of a known tense (over, now, could restart, joke), nor for a read with
+ * no label: a timeout has none (CQ-163 b), and a read not given is no label.
+ */
+export function asksIfInDanger(labels: readonly LabelTense[]): boolean {
+  return labels.some((label) => label.tense === "unknown" && label.outcome !== "No");
+}

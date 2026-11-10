@@ -18,6 +18,12 @@ export type SafetyFault =
   | "textNeedsHandle"
   /** A danger outcome whose step must send its checked line, with no line for it in the bundle (A3-22: never silent). */
   | "noSafetyLine"
+  /**
+   * The line goes with the danger question (a label of unknown tense, arch 06 line 329), and the pinned bundle holds no
+   * words for K-01's safetyAsk: the line never goes without it (fail closed, as finalize's inserter refuses such a row:
+   * T-1164's lineNotInBundle; T-1176, CQ-172).
+   */
+  | "noSafetyAsk"
   /** The checked line has nobody to go to: no row could be built for its recipient (MC C9), or no owner to tell (A3-48). */
   | "safetyLineNotBuilt"
   /**

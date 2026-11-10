@@ -6,6 +6,9 @@
 // only, never for the code under test. Values come only from the contracts' fixtures and the master's sample cast, in the
 // 555-01xx range (rule 9); sealed bytes are short stand-ins, never real ciphertext.
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import type { OutboxRowNew, StateWrite } from "../../commit";
 import { applied, flagsRecordOf, FLAG_SEEDS, type FlagsRecord, type World } from "../flags/test-support";
 import { seedRows } from "../messages-consent/test-support";
@@ -14,12 +17,14 @@ import type { SafetyIds, SafetyRow } from "./ids";
 import { KEYED_SAFETY_IDS } from "./ids";
 import {
   FIXED_SAFETY_LINES,
+  type FixedLineWords,
   type OwnerContact,
   type SafetyLineChoice,
   type SafetyLines,
   type SafetyReader,
   type SafetyTelling,
   type SafetyTold,
+  type SafetyWords,
   type StoredHold,
   type StoredOutcome,
   type TellRequest,
@@ -322,6 +327,63 @@ export const TEST_LINES: SafetyLines = {
   },
   outageLine: () => "outage",
 };
+
+// ---------------------------------------------------------------------------------------------------------------
+// The pinned bundle's words: bundle v0 (T-163), as its own manifest writes K-01's fixed lines
+
+const BUNDLE_V0_MANIFEST = fileURLToPath(
+  new URL("../../../../bundles/v0/bundle/manifest.json", import.meta.url),
+);
+
+interface ManifestLines {
+  readonly lists: {
+    readonly fixedLines: {
+      readonly lines: readonly {
+        readonly id: string;
+        readonly text: string | null;
+        readonly lang?: string;
+        readonly status: string;
+      }[];
+    };
+  };
+}
+
+/** A words port over some K-01 fixed lines, each by id: what the pinned bundle's words port gives. */
+export interface WordsDouble extends SafetyWords {
+  /** The lines it holds words for, by id. */
+  readonly lines: ReadonlyMap<string, string>;
+  /** Every id asked for, in order. */
+  readonly asked: string[];
+}
+
+/** A words port that holds these lines' words and no other (a line it lacks answers null, as a bundle with none). */
+export function wordsDouble(lines: Iterable<readonly [string, string]>): WordsDouble {
+  const held = new Map(lines);
+  const asked: string[] = [];
+  return {
+    lines: held,
+    asked,
+    fixedLine(id): FixedLineWords | null {
+      asked.push(id);
+      const text = held.get(id);
+      return text === undefined ? null : { id, text };
+    },
+  };
+}
+
+/**
+ * Bundle v0's K-01 fixed lines with their words, read from its own manifest (bundles/v0/bundle/manifest.json): the English
+ * lines written as the bundle holds them (status asWritten); a line waiting for Jay has no words, so none is given. The
+ * same words the handle actor reads for its checked lines when bundle v0 is pinned.
+ */
+export function bundleV0Words(): WordsDouble {
+  const manifest = JSON.parse(readFileSync(BUNDLE_V0_MANIFEST, "utf8")) as ManifestLines;
+  return wordsDouble(
+    manifest.lists.fixedLines.lines
+      .filter((line) => (line.lang ?? "en") === "en" && line.status === "asWritten")
+      .flatMap((line) => (line.text === null ? [] : [[line.id, line.text] as const])),
+  );
+}
 
 export interface FakeTelling extends SafetyTelling {
   /** Every request, in order. */
