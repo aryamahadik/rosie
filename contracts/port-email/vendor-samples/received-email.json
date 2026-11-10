@@ -1,0 +1,30 @@
+{
+  "id": "resend-in-demo-alex-0001",
+  "created_at": "2026-10-23T18:30:00.412Z",
+  "from": "alex@example.com",
+  "to": ["booking-alex-haircut@reply.example.com"],
+  "cc": [],
+  "bcc": [],
+  "reply_to": [],
+  "received_for": ["booking-alex-haircut@reply.example.com"],
+  "subject": "Re: Your haircut at Lee's Barbershop",
+  "message_id": "email-msg-demo-alex-0001",
+  "text": "Can we make it 2pm instead?\n\nOn Fri, Oct 23, 2026 at 10:05 AM Lee's Barbershop <rosie@mail.rosfield.com> wrote:\n> This is Rosie, the automated booking assistant for Lee's Barbershop.\n>\n> Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\n> Which time works?\n> 1 Sat 12:00pm\n> 2 Sat 2:00pm\n> 3 Sat 3:30pm\n>\n> Manage your booking: https://example.com/m/a03\n",
+  "html": null,
+  "headers": {
+    "from": "Alex M. <alex@example.com>",
+    "in-reply-to": "<rfc-demo-0007@email.example.com>",
+    "references": "<rfc-demo-0005@email.example.com> <rfc-demo-0007@email.example.com>",
+    "mime-version": "1.0"
+  },
+  "authentication": {
+    "spf": "pass",
+    "dkim": "pass",
+    "dmarc": "pass"
+  },
+  "attachments": [],
+  "raw": {
+    "download_url": "https://example.com/raw/resend-in-demo-alex-0001",
+    "expires_at": "2026-10-23T19:30:04.000Z"
+  }
+}

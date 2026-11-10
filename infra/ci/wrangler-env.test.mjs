@@ -159,7 +159,10 @@ describe("wrangler.jsonc env.production (T-1003)", () => {
   it("leaves staging's and the top level's own settings as they were", () => {
     assert.equal(config.name, "rosie");
     assert.equal(config.env.staging.name, "rosie-staging");
-    assert.equal(config.env.staging.kv_namespaces, undefined);
+    assert.deepEqual(
+      config.env.staging.kv_namespaces.map((kv) => kv.binding),
+      ["BUNDLES"],
+    );
     assert.equal(config.env.staging.hyperdrive, undefined);
     assert.deepEqual(
       config.env.staging.routes.map((r) => r.pattern),

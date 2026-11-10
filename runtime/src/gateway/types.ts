@@ -4,6 +4,7 @@
 // - Sealing the event and writing it to the handle's actor is T-243's; the scrub is T-242's (runtime/src/scrub).
 
 import type { BundleId } from "../trace";
+import type { PageHandlers } from "./pages/types";
 import type { ProviderDoors } from "./providers/types";
 import type { HandleRef, SealedBox, SealingKeyStore } from "./seal";
 
@@ -116,4 +117,10 @@ export interface GatewayDeps {
    * routes answer 503 and store nothing until D-017 joins them.
    */
   providers?: ProviderDoors;
+  /**
+   * The action layer's handler for each K-21 v1 page and console call (T-266, pages/; C-074); left out, each answers by
+   * failing, so its route answers 503 and does nothing until its handler is joined. The staging-only calls are refused
+   * outside staging before any handler runs.
+   */
+  pages?: PageHandlers;
 }

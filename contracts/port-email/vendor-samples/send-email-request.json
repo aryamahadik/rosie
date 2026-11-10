@@ -1,0 +1,11 @@
+{
+  "from": "Lee's Barbershop <rosie@mail.rosfield.com>",
+  "to": ["alex@example.com"],
+  "reply_to": "booking-alex-haircut@reply.example.com",
+  "subject": "Your haircut at Lee's Barbershop",
+  "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nSure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?\n1 Sat 12:00pm\n2 Sat 2:00pm\n3 Sat 3:30pm\n\nManage your booking: https://example.com/m/a03",
+  "headers": {
+    "In-Reply-To": "<rfc-demo-0005@email.example.com>",
+    "References": "<rfc-demo-0005@email.example.com>"
+  }
+}
