@@ -1,0 +1,18 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-outbox-row.json"],
+    "after": [],
+    "now": "2026-10-23T14:07:00Z",
+    "note": "A read under the yoga studio's scope that names Alex's A7-03 row, the barbershop's: row-level security hides it (K-04 v1 rule 4) and every read also names the business, so the read answers notFound and returns nothing of it, its reader, its texts or its record."
+  },
+  "request": {
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "outbox_rows",
+    "rowId": "out-a7-03-alex"
+  }
+}

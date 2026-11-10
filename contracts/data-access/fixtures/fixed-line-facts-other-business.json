@@ -1,0 +1,18 @@
+{
+  "call": "readFixedLineFacts",
+  "given": {
+    "k04Seeds": ["seed-thread-messages.json", "seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-23T14:05:03Z",
+    "note": "A read under the yoga studio's scope that names A7-03's row, the barbershop's: the scope hides it, so the read answers notFound and says nothing of Alex's opener mark or his number."
+  },
+  "request": {
+    "outboxRowId": "out-a7-03-alex",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "outbox_rows",
+    "rowId": "out-a7-03-alex"
+  }
+}

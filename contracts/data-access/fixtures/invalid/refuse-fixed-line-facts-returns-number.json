@@ -1,0 +1,11 @@
+{
+  "result": "fixedLineFacts",
+  "outboxRowId": "outbox-s1-02-sam-1",
+  "businessId": "biz-lees-barbershop",
+  "recipientHandleId": "handle-sam",
+  "readAt": "2026-10-19T18:05:07Z",
+  "textedAboutBusiness": false,
+  "openerRowId": null,
+  "optOutLineDeliveredAt": "2026-10-19T14:00:00Z",
+  "phoneNumber": "+15555550100"
+}
