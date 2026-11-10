@@ -110,13 +110,7 @@ case "$env_name" in
     where="the staging database"
     ;;
   local)
-    if [[ -n "${DATABASE_URL:-}" ]]; then
-      db_url="$DATABASE_URL"
-    elif [[ -n "${CI:-}" ]]; then
-      die "refused: DATABASE_URL is not set (the local default is never used when CI is set)"
-    else
-      db_url="$LOCAL_DATABASE_URL"
-    fi
+    db_url="${DATABASE_URL:-$LOCAL_DATABASE_URL}"
     [[ "$db_url" =~ $LOCAL_HOST_URL ]] ||
       die "refused: --env local writes only a database on this machine (127.0.0.1, localhost or ::1), and" \
         "DATABASE_URL names another host"
