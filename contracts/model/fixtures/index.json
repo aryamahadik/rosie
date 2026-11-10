@@ -233,6 +233,22 @@
       "source": "arch 06 lines 291 and 329; S13-29 rule 58; fixture set v1 test-kit/shops/barber.json (Riley and Avery)"
     },
     {
+      "file": "context-s1-01.json",
+      "version": "v1.1",
+      "def": "context",
+      "expect": "accept",
+      "shows": "What decide is given for the walking skeleton's turn, Sam's first text from a new number (S1-01, in the master's words): no role, no open question, no booking, so the guard found no target, and the frontier's one choice is the sign-up door to S1-01 (v1.1), low stakes, with no card, no fact and no earlier message.",
+      "source": "README 'v1.1' defaults 9 to 11; build prompt section 10, D-017; S1-01 (contracts/bundle/fixtures/bundle-v0-skeleton.json); K-08 v1 trace-skeleton.json (frontier: one door, S1-01); K-09 v1 compose-input-s1-02.json (turn-s1-01-sam and its text)"
+    },
+    {
+      "file": "decide-s1-01-enter.json",
+      "version": "v1.1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Two Haiku reads agree on enter(the sign-up door) with Sam's whole text as the quote and no field: low stakes, no re-read, the part goes ahead to the gate, which walks S1-01 to S1-02's question.",
+      "source": "README 'v1.1' default 10; arch 03 line 183; arch 02 line 119; D-017 ('decide (two reads)'); K-08 v1 trace-skeleton.json (decideReads: enter S1-01, reads agree, no re-read)"
+    },
+    {
       "file": "invalid/refuse-unknown-verb.json",
       "version": "v1",
       "def": "decideRead",
