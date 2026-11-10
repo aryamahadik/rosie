@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.5.schema.json",
   "title": "ToolApiV1dot5",
-  "description": "K-09 Tool API v1.5, a minor version for the walking skeleton's turn (T-1142; DL-322; README 'v1.5'): Sam's first text from a new number (S1-01), whose reply is S1-02's question, the turn D-017's card and human test run end to end. It only adds to v1.4 (tool-api.v1.4.schema.json, frozen by T-053 and unchanged, referred to here, which refers to v1.3, v1.2, v1.1 and v1): every v1.4 definition named here is under its own name, the unchanged ones by reference; the changed ones (buildFrontier.response, closestEntries.request, closestEntries.response, gateAndCommit.request and the three exchanges that hold them) only take K-02 v1.1's context (../model/model.v1.1.schema.json) in place of K-02 v1's, whose one change is a door value, signUp, the door to S1-01. So every v1 to v1.4 exchange is a v1.5 exchange. Added: no call, no key and no rule; the fixtures of the skeleton's turn 1 (build-frontier-s1-01.json, commit-s1-01.json), which turn 2's S1-02 fixtures (v1) stood in for. Each call's read, repeat and time budget are v1's (README 'Reads, repeats and time budgets'). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-09 Tool API v1.5, a minor version for the walking skeleton's turn (T-1142; DL-322; README 'v1.5'): Sam's first text from a new number (S1-01), whose reply is S1-02's question, the turn D-017's card and human test run end to end. It only adds to v1.4 (tool-api.v1.4.schema.json, frozen by T-053 and unchanged, referred to here, which refers to v1.3, v1.2, v1.1 and v1): every v1.4 definition named here is under its own name, the unchanged ones by reference; the changed ones (buildFrontier.response, closestEntries.request, closestEntries.response, gateAndCommit.request and the three exchanges that hold them) only take K-02 v1.1's context (../model/model.v1.1.schema.json) in place of K-02 v1's, whose one change is a door value, signUp, the door to S1-01. So every v1 to v1.4 exchange is a v1.5 exchange. Added: no call, no key, no error and no named rule; the fixtures of the skeleton's turn 1 (build-frontier-s1-01.json, commit-s1-01.json), which turn 2's S1-02 fixtures (v1) stood in for; and, in round 3 (DL-333), two optional fields of the gateAndCommit request's turn, the service and the Linq chat id of the turn's last text, which the runtime caller copies from that text's K-06 v1 event (gateAndCommit.turn; README v1.5 default 135), and a statement of the rows a gateAndCommit fixture's step writes (gateAndCommit.given, statedWrites; default 136). Each call's read, repeat and time budget are v1's (README 'Reads, repeats and time budgets'). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     { "$ref": "#/$defs/buildFrontier.exchange" },
     { "$ref": "#/$defs/closestEntries.exchange" },
@@ -192,19 +192,56 @@
     "coreAction": { "$ref": "tool-api.v1.4.schema.json#/$defs/coreAction" },
     "coreResult": { "$ref": "tool-api.v1.4.schema.json#/$defs/coreResult" },
     "partResult": { "$ref": "tool-api.v1.4.schema.json#/$defs/partResult" },
+    "gateAndCommit.turn": {
+      "title": "GateAndCommitTurn",
+      "description": "The turn a gateAndCommit request carries (v1.5, round 3; DL-333; README v1.5 default 135): K-05 v1's turn, its seven fields each by reference and required as K-05 requires them, with two fields the commit's walk reads, which the runtime caller (the handle actor, C-046) copies from the K-06 v1 event of the turn's last text, the last of eventIds: service, the channel of a reply in this turn (default 132), and chatId, the Linq chat id S1-01's thread row takes (default 134). Both or neither: the caller fills both on a turn of texts (input decided or coreOnly); a clock's turn has no text and carries neither (gateAndCommit.request); every v1 to v1.4 turn carries neither, and a walk that needs one and finds none fails closed, never guessed. They are the walk's inputs, never the turn row's: K-04 turns has no such column and K-05 v1's turn is closed, so the commit writes the turn row with K-05's seven fields alone. Neither reaches the model: buildFrontier's request keeps K-05 v1's closed turn, and K-02's context holds neither.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/id" },
+        "handleId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/handleId" },
+        "eventIds": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/eventIds" },
+        "bundleId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/bundleId" },
+        "traceId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/traceId" },
+        "joinedTraceIds": {
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/joinedTraceIds"
+        },
+        "tries": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/tries" },
+        "service": {
+          "description": "The service the turn's last text came in on: that K-06 v1 event's service (imessage, rcs or sms through Linq, or email), copied by the runtime caller; never null, since a text always names its service (K-06 v1: null only on a delivery receipt). The channel of the outbox row a reply in this turn writes (README v1.5 default 132): a number with no phone row has no stored way (K-04 phones.chat_way; Q-33).",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json#/$defs/service"
+        },
+        "chatId": {
+          "description": "Linq's id for the chat the turn's last text came in on: that K-06 v1 event's chatId, copied by the runtime caller; null when Linq did not report it, and for email, whose thread is its reply address (K-06 v1 chatId). S1-01's thread row takes it as K-04 threads.linq_chat_id (README v1.5 default 134), its one home: it never goes into K-02's context, a span, a log line or an event-log entry's values (default 135).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "handleId", "eventIds", "bundleId", "traceId", "joinedTraceIds", "tries"],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "service": ["chatId"],
+        "chatId": ["service"]
+      }
+    },
     "gateAndCommit.request": {
       "title": "GateAndCommitRequest",
-      "description": "Gate and commit a turn, as v1 (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508; K-05 v1 commitTurn and fireClock; README 'Reads, repeats and time budgets': the primary, uncached; the turn id is the key; at most 300 ms), with one change: decided texts carry K-02 v1.1's context with decide's result, so a part may enter the sign-up door, whose walk writes S1-01's thread and S1-02's question, its clock row and one outbox row in the one commit (README v1.5 defaults 128 to 133; commit-s1-01.json). Every v1 to v1.4 request is a v1.5 request.",
+      "description": "Gate and commit a turn, as v1 (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508; K-05 v1 commitTurn and fireClock; README 'Reads, repeats and time budgets': the primary, uncached; the turn id is the key; at most 300 ms), with two changes: decided texts carry K-02 v1.1's context with decide's result, so a part may enter the sign-up door, whose walk writes S1-01's thread and S1-02's question, its clock row and one outbox row in the one commit (README v1.5 defaults 128 to 134; commit-s1-01.json); and the turn is gateAndCommit.turn, which may carry the service and the Linq chat id of the turn's last text, the walk's sources for a reply's channel and S1-01's thread (round 3; defaults 132, 134 and 135). Every v1 to v1.4 request is a v1.5 request.",
       "type": "object",
       "properties": {
         "caller": {
           "$ref": "#/$defs/caller"
         },
         "turn": {
-          "description": "The turn row the commit writes (K-05 v1 turn); every input but a clock's needs one. For a clock's firing (input.kind clock), the clock turn on the clock row's handle, or null when the firing's writes hold no outbox row (K-05 v1 fireClock.request.turn), as for any row no handle owns (K-04 turns.handle_id is not null). A clock turn has no texts: its one event id is the clock row's id (K-05 v1 default 9), its id is that event id's hash, as every turn's is (CQ-09), so one row's firing has one turn id and a repeat finds the first firing, and its trace id is the firing's own (CQ-06); its caller.kind is turn, with caller.turnId and caller.requestId its id. A firing with no turn is called with caller.kind clockFiring, caller.turnId null and caller.requestId the clock row's id. The named rule clockTurn checks these.",
+          "description": "The turn row the commit writes (K-05 v1 turn); every input but a clock's needs one. For a clock's firing (input.kind clock), the clock turn on the clock row's handle, or null when the firing's writes hold no outbox row (K-05 v1 fireClock.request.turn), as for any row no handle owns (K-04 turns.handle_id is not null). A clock turn has no texts: its one event id is the clock row's id (K-05 v1 default 9), its id is that event id's hash, as every turn's is (CQ-09), so one row's firing has one turn id and a repeat finds the first firing, and its trace id is the firing's own (CQ-06); its caller.kind is turn, with caller.turnId and caller.requestId its id. A firing with no turn is called with caller.kind clockFiring, caller.turnId null and caller.requestId the clock row's id. The named rule clockTurn checks these. From v1.5 the turn is gateAndCommit.turn: K-05 v1's turn, with the service and the chat id the runtime caller copies from the K-06 event of the turn's last text (README v1.5 default 135), which the commit leaves out of the turn row it writes.",
           "anyOf": [
             {
-              "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+              "$ref": "#/$defs/gateAndCommit.turn"
             },
             {
               "type": "null"
@@ -314,13 +351,29 @@
         "required": ["input"]
       },
       "then": {
-        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule."
-      },
-      "else": {
-        "description": "Decided texts or core actions only: the turn is required (K-05 v1 commitTurn).",
+        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule. A clock's turn has no text, so it carries no service and no chat id (v1.5; README v1.5 default 135).",
         "properties": {
           "turn": {
-            "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "service": false,
+                  "chatId": false
+                }
+              }
+            ]
+          }
+        }
+      },
+      "else": {
+        "description": "Decided texts or core actions only: the turn is required (K-05 v1 commitTurn), as gateAndCommit.turn: the runtime caller fills its service and chat id from the turn's last text (v1.5; README v1.5 default 135).",
+        "properties": {
+          "turn": {
+            "$ref": "#/$defs/gateAndCommit.turn"
           }
         }
       }
@@ -331,6 +384,66 @@
     "gateAndCommit.fired": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.fired" },
     "gateAndCommit.committed": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.committed" },
     "gateAndCommit.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.errors" },
+    "gateAndCommit.given": {
+      "title": "GateAndCommitGiven",
+      "description": "What a gateAndCommit exchange assumes before its request runs, as v1.4's given (seeds, the fixtures run first, the clock, what it states), with one change (v1.5, round 3; DL-333; README v1.5 default 136): a fixture that states a step may also state the rows that step's part writes in the commit, field for field (stated.writes, statedWrites), so a proof reads their values from the fixture. A fixture's given is never sent: the response's written stays K-05 v1 commitResult's table, row id and version. Every v1 to v1.4 given is a v1.5 gateAndCommit given.",
+      "type": "object",
+      "properties": {
+        "seeds": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/seeds" },
+        "after": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/after" },
+        "now": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/now" },
+        "stated": {
+          "description": "What the fixture states, as v1.4: for a limit fixture, the limit that fails, the kind of its outcome and its action; for a step's fixture, the step and the keys it gives and, from v1.5, the rows its part writes (writes, optional); null otherwise.",
+          "anyOf": [
+            { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/stated/anyOf/0" },
+            {
+              "title": "StatedGivesAndWrites",
+              "description": "A step's fixture: the step and the keys it gives, as v1.4's StatedGives, and from v1.5 optionally the rows its part writes (statedWrites). Without writes it is v1.4's StatedGives exactly.",
+              "type": "object",
+              "properties": {
+                "step": { "$ref": "#/$defs/stepId" },
+                "gives": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/stepKey" },
+                  "uniqueItems": true
+                },
+                "writes": { "$ref": "#/$defs/statedWrites" }
+              },
+              "required": ["step", "gives"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/note" }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "statedWrites": {
+      "title": "StatedWrites",
+      "description": "The rows a stated step's part writes in the turn's one commit, field for field (v1.5, round 3; DL-333 ruling 2; README v1.5 default 136), each in K-05 v1's own write shape, as the commit's walk hands it to the commit (actions/src/commit/types.ts UnitWrites: state, asks' questions, messages) and the commit's one K-05 commitTurn request carries it: state, the state writes (writes.state); openQuestions, the questions the part opens (writes.openQuestions.open); outboxRows, its messages (writes.outboxRows), which hold no plan (K-05 v1 outboxRowNew has no plan field: words go in after the commit, arch 01 line 41). Every list is present, empty when the part writes none of its kind. Left out, as the commit's own (T-305): each opened question's clock row (clock-<question id>, kind question, waiting, firing the question's step with the safe default its card names), the event-log entries and the turn row; and each core action's rows, which its response names.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "The part's state writes, in the walk's order (K-05 v1 stateWrite: an insert names the table and its K-04 columns and values, as K-04's seed fixtures write them).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/stateWrite" }
+        },
+        "openQuestions": {
+          "description": "The questions the part opens, in the walk's order (K-05 v1 openQuestionNew).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/openQuestionNew" }
+        },
+        "outboxRows": {
+          "description": "The part's outbox rows, one per message, in the walk's order (K-05 v1 outboxRowNew: no plan).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/outboxRowNew" }
+        }
+      },
+      "required": ["state", "openQuestions", "outboxRows"],
+      "additionalProperties": false
+    },
     "composeInput.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.request" },
     "composeInput.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.response" },
     "composeInput.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.errors" },
@@ -640,11 +753,11 @@
     },
     "gateAndCommit.exchange": {
       "title": "GateAndCommitExchange",
-      "description": "One gateAndCommit request with its outcome, as v1.4, its decided texts' context K-02 v1.1's (README 'v1.5').",
+      "description": "One gateAndCommit request with its outcome, as v1.4, its decided texts' context K-02 v1.1's, its turn gateAndCommit.turn and its given gateAndCommit.given, which may state the rows a stated step writes (README 'v1.5', defaults 135 and 136).",
       "type": "object",
       "properties": {
         "call": { "const": "gateAndCommit" },
-        "given": { "$ref": "#/$defs/given" },
+        "given": { "$ref": "#/$defs/gateAndCommit.given" },
         "request": { "$ref": "#/$defs/gateAndCommit.request" },
         "outcome": {
           "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
