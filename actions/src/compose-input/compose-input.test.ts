@@ -1,14 +1,16 @@
-// The compose-input call (T-309; K-09 v1 composeInput; K-03 v1 composeInput), through the Tool API base over the fake
-// row reader and K-01 v1's sample bundles. The card's checks: compose-input-s1-02.json produced exactly from the
-// committed S1-02 row; an input holding frontier choices refused (refuse-frontier-in-input.json); the tag order (a row
-// about a death is gentle even when it also names money). And the lead's: the opt-out line never comes from a bundle
-// message's plainText or stop marker (DL-245), and the input gives no money words but the record's rows (DL-182).
+// The compose-input call (T-309, T-1174; K-09 v1.6 composeInput; K-03 v1.1 composeInput), through the Tool API base
+// over the fake row reader and K-01 v1's sample bundles. The cards' checks: compose-input-s1-02-v1.6.json produced
+// exactly from the committed S1-02 row, its input K-03 v1.1's input-s1-02-v1.1.json with S1-02's four card terms; an
+// input holding frontier choices refused (refuse-frontier-in-input.json); the tag order (a row about a death is gentle
+// even when it also names money); a fixed-line row and a missing master line answered as K-09 v1.6 says. And the
+// lead's: the opt-out line never comes from a bundle message's plainText or stop marker (DL-245), and the input gives
+// no money words but the record's rows and Rosie's own card terms (DL-182; term-facts.test.ts holds the terms).
 
 import { describe, expect, it } from "vitest";
 
 import { SECURE_PAGE_WORDS, claimFacts } from "../finalize/claim-check";
 import { barberSource, therapistSource } from "../finalize/claim-check/test-support";
-import { fakeBundles } from "../frontier/assemble/test-support";
+import { bundleIdOf, fakeBundles } from "../frontier/assemble/test-support";
 import {
   ComposeInputRefusedError,
   admitInput,
@@ -18,6 +20,7 @@ import {
   type ComposeRow,
   type RowState,
 } from "./index";
+import { fixture } from "../tool-api/test-support";
 import {
   a614Step,
   alexRow,
@@ -32,6 +35,7 @@ import {
   optOutLineOf,
   requestFor,
   s102Exchange,
+  s102ExchangeV1,
   s102Row,
   sayOf,
   stepOf,
@@ -64,7 +68,7 @@ function thrownFrom(work: () => unknown): unknown {
   throw new Error("nothing was thrown");
 }
 
-describe("compose-input-s1-02.json is produced exactly from the committed S1-02 row", () => {
+describe("compose-input-s1-02-v1.6.json is produced exactly from the committed S1-02 row", () => {
   it("answers the fixture's outcome word for word, field order and all, through the Tool API base", async () => {
     const exchange = s102Exchange();
     const called = await callComposeInput(exchange.request, { row: s102Row() });
@@ -88,11 +92,22 @@ describe("compose-input-s1-02.json is produced exactly from the committed S1-02 
     ]);
   });
 
-  it("is K-03's input-s1-02.json, its master line bundle v0's S1-02 message text word for word", async () => {
+  it("is K-03 v1.1's input-s1-02-v1.1.json, its master line bundle v0's S1-02 message text word for word", async () => {
     const input = inputOf(await callComposeInput(s102Exchange().request));
-    expect(input).toStrictEqual(k03Fixture("input-s1-02.json"));
+    expect(input).toStrictEqual(k03Fixture("input-s1-02-v1.1.json"));
+    expect(JSON.stringify(input)).toBe(JSON.stringify(k03Fixture("input-s1-02-v1.1.json")));
     const [line] = sayOf(stepOf(bundleV0(), "S1-02"));
     expect(input.masterText).toStrictEqual({ step: "S1-02", text: line?.text });
+  });
+
+  it("asks what v1's compose-input-s1-02.json asks, and answers v1's input with S1-02's four term facts added, nothing else", async () => {
+    const v1 = s102ExchangeV1();
+    expect(v1.request).toStrictEqual(s102Exchange().request);
+    const input = inputOf(await callComposeInput(v1.request));
+    const facts = input.facts as Record<string, unknown>[];
+    expect(facts).toHaveLength(4);
+    expect(facts.every((fact) => typeof fact.source === "string" && !("slot" in fact))).toBe(true);
+    expect({ ...input, facts: [] }).toStrictEqual(v1.outcome.input);
   });
 
   it("is a read: the same row asked again gives the same input", async () => {
@@ -116,10 +131,18 @@ describe("DL-245: the opt-out line comes only from the fixed-line inserter, neve
       expect(words).not.toContain("Reply STOP");
       expect(words).not.toContain("opt out");
       expect(words).not.toContain("Msg & data rates");
-      // DL-182, STATE note 56: no money words of the card's (Rosie's $2 fee is a v1.1 term fact, never v1's input).
-      expect(words).not.toContain("$2");
+      // The card's title is no term: only its lines are (K-03 v1.1 termFact).
       expect(words).not.toContain("Setting up with Rosie");
     }
+    // DL-182, STATE note 56: Rosie's $2 fee comes only as S1-02's card line 4, a K-03 v1.1 term fact with its source
+    // line, never in any other field of the input.
+    const { facts, ...rest } = inputOf(called);
+    for (const words of stringsIn(rest)) expect(words).not.toContain("$2");
+    const fee = (facts as { value: string; source: string }[]).filter((fact) => fact.value.includes("$2"));
+    expect(fee.map((fact) => fact.value)).toStrictEqual([
+      "$2 a booking, counted at its check-in or DONE, explained before you go live",
+    ]);
+    expect(fee[0]?.source).toContain("RULES 3.15");
   });
 
   it("a message stop-marked true gives the same input, with no opt-out line", async () => {
@@ -192,12 +215,22 @@ describe("DL-245: the opt-out line comes only from the fixed-line inserter, neve
 });
 
 describe("never the frontier (K-03 v1 refuse-frontier-in-input.json)", () => {
-  it("K-03 v1's check refuses refuse-frontier-in-input.json for its frontier alone, and accepts input-s1-02.json", () => {
+  it("K-03 v1.1's check refuses refuse-frontier-in-input.json for its frontier alone, and accepts both S1-02 inputs", () => {
     const { checker } = checks();
     expect(checker.check(k03Fixture("invalid/refuse-frontier-in-input.json"))).toStrictEqual([
       "(root) must NOT have additional properties (frontier)",
     ]);
     expect(checker.check(k03Fixture("input-s1-02.json"))).toStrictEqual([]);
+    expect(checker.check(k03Fixture("input-s1-02-v1.1.json"))).toStrictEqual([]);
+  });
+
+  it("the frontier stays refused beside term facts: input-s1-02-v1.1.json with refuse-frontier-in-input.json's frontier", () => {
+    const frontier = (k03Fixture("invalid/refuse-frontier-in-input.json") as { frontier: unknown }).frontier;
+    const input = { ...(k03Fixture("input-s1-02-v1.1.json") as Record<string, unknown>), frontier };
+    expect(checks().checker.check(input)).toStrictEqual([
+      "(root) must NOT have additional properties (frontier)",
+    ]);
+    expect(refusalOf(thrownFrom(() => admitInput(input, checks().checker))).fault).toBe("inputRefused");
   });
 
   it("an input holding frontier choices is refused, thrown with its problem count and never passed on", () => {
@@ -364,10 +397,10 @@ describe("the facts: only what limit 7 lets this reader see (T-311's claimFacts 
     expect(input.situation).toBe("gentle");
   });
 
-  it("gives no fact code cannot fill: S1-02's row has no business yet", async () => {
+  it("gives no slot fact code cannot fill: S1-02's row has no business yet, so its facts are its card's terms alone", async () => {
     const row: ComposeRow = { ...s102Row(), factSlots: ["biz.name", "biz.phone"] };
     const input = inputOf(await callComposeInput(s102Exchange().request, { row }));
-    expect(input.facts).toStrictEqual([]);
+    expect(input.facts).toStrictEqual((k03Fixture("input-s1-02-v1.1.json") as { facts: unknown }).facts);
   });
 });
 
@@ -511,8 +544,7 @@ describe("fail closed: nothing is composed for a row code cannot compose", () =>
     return refusalOf(thrownBy(called));
   }
 
-  it("refuses a fixed-line row (STATE note 17), a row read for another row, and a copy on a text channel", async () => {
-    expect((await refusal({ ...s102Row(), fixedLineId: "stopReply" })).fault).toBe("fixedLineRow");
+  it("refuses a row read for another row, and a copy on a text channel (K-09 v1.6 open gap 127)", async () => {
     expect((await refusal({ ...s102Row(), outboxRowId: "outbox-other" })).fault).toBe("rowMismatch");
     expect((await refusal({ ...s102Row(), copyOfRowId: "outbox-text" })).fault).toBe("copyNotEmail");
   });
@@ -527,14 +559,7 @@ describe("fail closed: nothing is composed for a row code cannot compose", () =>
     expect((await refusal({ ...s102Row(), role: "own_business" })).fault).toBe("noReader");
   });
 
-  it("refuses when the bundle, the step or the reader's line is missing", async () => {
-    expect((await refusal(s102Row(), fakeBundles())).fault).toBe("bundleMissing");
-    expect((await refusal({ ...s102Row(), step: "S1-04" })).fault).toBe("stepMissing");
-    expect((await refusal({ ...s102Row(), role: "staff" })).fault).toBe("noMasterLine");
-    expect((await refusal({ ...s102Row(), line: 1 })).fault).toBe("noMasterLine");
-  });
-
-  it("refuses an input K-03 v1 refuses: a language that is not a two-letter code, or no format allowed", async () => {
+  it("refuses an input K-03 v1.1 refuses: a language that is not a two-letter code, or no format allowed", async () => {
     expect((await refusal({ ...s102Row(), language: "english" })).fault).toBe("inputRefused");
     expect((await refusal({ ...s102Row(), allowedFormats: [] })).fault).toBe("inputRefused");
   });
@@ -549,5 +574,75 @@ describe("fail closed: nothing is composed for a row code cannot compose", () =>
   it("names no value or step words in what it throws", async () => {
     const thrown = await refusal({ ...s102Row(), language: "english" });
     expect(thrown.message).toBe("composeInput: refused (inputRefused); nothing was composed");
+  });
+});
+
+describe("K-09 v1.6's two answers where T-309 threw: fixedLineRow and masterLineMissing (defaults 139, 140)", () => {
+  /** A call answered with one of composeInput's errors: refused, rolled back, nothing composed. */
+  async function errorAnswer(request: unknown, row: ComposeRow, bundles = fakeBundles(bundleV0())) {
+    const called = await callComposeInput(request, { row, bundles });
+    expect(called.scope.events.at(-1)).toStrictEqual({ what: "rollback" });
+    return called;
+  }
+
+  it("a fixed-line row answers fixedLineRow with its fixed line's id: compose-input-fixed-line-row.json's outcome", async () => {
+    const exchange = fixture("compose-input-fixed-line-row.json") as { outcome: unknown };
+    const row: ComposeRow = { ...s102Row(), outboxRowId: "out-ben-stop-reply", fixedLineId: "stopReply" };
+    const called = await errorAnswer(requestFor("out-ben-stop-reply"), row);
+    expect(answerOf(called)).toStrictEqual(exchange.outcome);
+    expect(called.spans.map((span) => [span.hop, span.outcome, span.error_code])).toStrictEqual([
+      ["fillAndChecks", "refused", "fixedLineRow"],
+    ]);
+    // Never composed: no bundle is read for it.
+    expect(called.bundles.reads).toStrictEqual([]);
+  });
+
+  it("a fixed-line row answers fixedLineRow whatever its state, before anything else is read", async () => {
+    for (const state of ["dropped_stopped", "planned", "checked"] as RowState[]) {
+      const row: ComposeRow = { ...s102Row(), state, hasPlan: state === "checked", fixedLineId: "stopReply" };
+      const called = await errorAnswer(s102Exchange().request, row);
+      expect(answerOf(called)).toStrictEqual({
+        error: "fixedLineRow",
+        outboxRowId: "outbox-s1-02-sam-1",
+        fixedLineId: "stopReply",
+      });
+    }
+  });
+
+  it("a step the row's bundle does not hold answers masterLineMissing, step: compose-input-master-line-missing.json's outcome", async () => {
+    const exchange = fixture("compose-input-master-line-missing.json") as {
+      request: unknown;
+      outcome: unknown;
+    };
+    const row: ComposeRow = {
+      ...s102Row(),
+      outboxRowId: "out-s1-04-sam",
+      turnId: "turn-s1-02-sam-kinds",
+      step: "S1-04",
+    };
+    const called = await errorAnswer(exchange.request, row);
+    expect(answerOf(called)).toStrictEqual(exchange.outcome);
+    expect(called.spans.map((span) => [span.hop, span.outcome, span.error_code])).toStrictEqual([
+      ["fillAndChecks", "refused", "masterLineMissing"],
+    ]);
+  });
+
+  it("a bundle in neither store answers missing bundle, and no line for this reader at the row's place missing line", async () => {
+    const missing = (what: string) => ({
+      error: "masterLineMissing",
+      outboxRowId: "outbox-s1-02-sam-1",
+      bundleId: bundleIdOf(bundleV0()),
+      step: "S1-02",
+      missing: what,
+    });
+    const request = s102Exchange().request;
+    expect(answerOf(await errorAnswer(request, s102Row(), fakeBundles()))).toStrictEqual(missing("bundle"));
+    expect(answerOf(await errorAnswer(request, { ...s102Row(), role: "staff" }))).toStrictEqual(
+      missing("line"),
+    );
+    expect(answerOf(await errorAnswer(request, { ...s102Row(), line: 1 }))).toStrictEqual(missing("line"));
+    // Ids alone: never a line's words.
+    const answered = JSON.stringify(answerOf(await errorAnswer(request, { ...s102Row(), line: 1 })));
+    expect(answered).not.toContain("Rosie");
   });
 });

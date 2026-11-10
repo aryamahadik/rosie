@@ -15,6 +15,11 @@
 //
 // Each answer is checked against data-access v1.1 with Ajv 2020-12, strict, as contracts:check runs it, and each commit
 // exchange and its answer also against the version its index entry lists (T-1137 round 3, DL-334).
+//
+// T-1185: a bytea value a state write gives in K-04's text form ("\x" and hex) is written as the bytes it spells, and a
+// sealed safety record opens with its person's key (sealing.ts, under a wrapping key made here from random bytes for the
+// run and never written to a file); any other form is refused with nothing written. Assertions on sealed bytes compare
+// to true or false, so a failing run prints none.
 import { readdirSync, readFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import Ajv2020 from "ajv/dist/2020.js";
@@ -29,6 +34,16 @@ import {
 } from "./commit-turn";
 import { release, reserve, type ReleaseRequest, type ReserveRequest } from "./reservations";
 import type { Sql, Tx } from "./scope";
+import {
+  DEFAULT_WRAPPING_KEY_NAME,
+  SEAL_OVERHEAD_BYTES,
+  SealingError,
+  type SealingErrorCode,
+  seal,
+  unseal,
+  unsealText,
+  type WrappingKeys,
+} from "./sealing";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 type Db = Sql | Tx;
@@ -1178,4 +1193,292 @@ describe("time budget (arch 04 line 223: gate and commit within 300 ms)", () => 
     console.info(`commitTurn p95 over ${String(count)} commits: ${p95.toFixed(1)} ms`);
     expect(p95).toBeLessThan(300);
   });
+});
+
+// ---- bytea values (T-1185; commit-turn.ts default 11) ---------------------------------------------------------------
+
+const MODEL_DIR = new URL("model/fixtures/", CONTRACTS);
+const encoder = new TextEncoder();
+
+/** One wrapping key per run: random, in memory only, named like the Workers secret that holds the real one. */
+const WRAP_KEY = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+const KEYS: WrappingKeys = {
+  resolve: (name) => (name === DEFAULT_WRAPPING_KEY_NAME ? WRAP_KEY : undefined),
+};
+
+/** Bytes in K-04's text form, "\x" and lower-case hex: how actions' byteaText puts a sealed value into a commit. */
+const byteaText = (bytes: Uint8Array): string =>
+  `\\x${[...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+
+const sameBytes = (a: Uint8Array, b: Uint8Array): boolean =>
+  a.length === b.length && a.every((byte, index) => byte === b[index]);
+
+/** Whether `needle` appears anywhere inside `haystack`. */
+function holds(haystack: Uint8Array, needle: Uint8Array): boolean {
+  for (let start = 0; start + needle.length <= haystack.length; start += 1) {
+    if (sameBytes(haystack.subarray(start, start + needle.length), needle)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** The SealingError code a promise fails with. Any other outcome is a failed test. */
+async function sealingFailure(promise: Promise<unknown>): Promise<SealingErrorCode> {
+  try {
+    await promise;
+  } catch (error) {
+    if (error instanceof SealingError) {
+      return error.code;
+    }
+    throw error;
+  }
+  throw new Error("the value opened; it should not have");
+}
+
+/** What a promise was rejected with, or null when it was not. */
+async function thrownBy(promise: Promise<unknown>): Promise<unknown> {
+  try {
+    await promise;
+  } catch (error) {
+    return error;
+  }
+  return null;
+}
+
+/** K-02 v1's safety-emergency-now read: an emergency, now, in the words of the person at the handle. */
+interface SafetyRead {
+  tries: { model: string; result: string }[];
+  read: { labels: { outcome: string; tense: string; evidence: string; atRisk: string; writer: string }[] };
+  timedOut: boolean;
+  dangerWords: { words: string; list: string; kind: string }[];
+  outcomes: string[];
+  liftedToUnsure: boolean;
+}
+const EMERGENCY = readJson(new URL("safety-emergency-now.json", MODEL_DIR)) as SafetyRead;
+
+/** The read's words that name people, as one JSON value: what a safety record seals (actions' wordsOf, default 7). */
+const EMERGENCY_WORDS = JSON.stringify({
+  labels: EMERGENCY.read.labels.map(({ evidence, atRisk, writer }) => ({ evidence, atRisk, writer })),
+  dangerWords: EMERGENCY.dangerWords.map((match) => match.words),
+});
+
+const OUTCOME_ID = "safety-alex-0050";
+const PAUSE_ID = "pause-alex-address-t1185";
+const NOT_TEXT_FORM = 'a value that is not "\\x" and hex digit pairs';
+
+/**
+ * commit-alex-safety.json's turn with its text's safety record (K-34 safety_outcomes: evt-alex-0050 read as K-02's
+ * emergency), its sealed words given as `sealedWords`.
+ */
+function safetyCommit(sealedWords: unknown): CommitTurnRequest {
+  const request = requestOf("commit-alex-safety.json");
+  request.writes.state.push({
+    op: "insert",
+    table: "safety_outcomes",
+    values: {
+      id: OUTCOME_ID,
+      event_id: "evt-alex-0050",
+      source: "text",
+      handle_id: "handle-alex",
+      person_id: "person-alex",
+      business_id: "biz-lees-barbershop",
+      booking_id: null,
+      turn_id: request.turn.id,
+      read_at: "2026-11-07T15:59:57Z",
+      tries: EMERGENCY.tries,
+      timed_out: EMERGENCY.timedOut,
+      labels: EMERGENCY.read.labels.map((label) => label.outcome),
+      tenses: EMERGENCY.read.labels.map((label) => label.tense),
+      danger_word_lists: EMERGENCY.dangerWords.map((match) => match.list),
+      danger_word_kinds: EMERGENCY.dangerWords.map((match) => match.kind),
+      sealed_words: sealedWords,
+      outcomes: EMERGENCY.outcomes,
+      lifted_to_unsure: EMERGENCY.liftedToUnsure,
+    },
+  });
+  return request;
+}
+
+/** The safety record's sealed words as stored, as postgres.js reads a bytea column (its bytes). */
+async function storedWords(): Promise<Uint8Array> {
+  const [row] = await db.sql<{ sealed_words: Uint8Array | null }[]>`
+    select sealed_words from safety_outcomes where id = ${OUTCOME_ID}
+  `;
+  if (row?.sealed_words === null || row?.sealed_words === undefined) {
+    throw new Error("the safety record holds no sealed words");
+  }
+  return new Uint8Array(row.sealed_words);
+}
+
+async function safetyRecords(): Promise<number> {
+  const [row] = await db.sql<{ n: number }[]>`select count(*)::int as n from safety_outcomes`;
+  return row?.n ?? 0;
+}
+
+describe("a bytea value a commit writes: K-04's text form as its bytes (T-1185; default 11)", () => {
+  it(
+    "a safety record written by a commit opens with the person's key to the exact sealed words",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-safety.json");
+      // Alex's key is made by the first seal, as the gateway makes it at first sight; the read's words go under it.
+      const sealed = await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS);
+      const request = safetyCommit(byteaText(sealed));
+      expect(schemaErrors("commitTurn.request", request)).toEqual([]);
+      const outcome = await commitTurn(runtime, request, { now: new Date(exchange.given.now) });
+      // safety_outcomes carries no version, so the answer lists no row for it: the fixture's own answer.
+      expect(outcome).toEqual(exchange.outcome);
+      expect(await safetyRecords()).toBe(1);
+      expect(await unsealText(db.sql, KEYS, "person-alex", await storedWords())).toBe(EMERGENCY_WORDS);
+    },
+  );
+
+  it("the stored bytes equal the hex form's bytes, byte for byte", SLOW, async () => {
+    const exchange = await given("commit-alex-safety.json");
+    const sealed = await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS);
+    const text = byteaText(sealed);
+    committed(await commitTurn(runtime, safetyCommit(text), { now: new Date(exchange.given.now) }));
+    const [row] = await db.sql<{ same: boolean; hex: string; length: number }[]>`
+      select sealed_words = decode(${text.slice(2)}, 'hex') as same, encode(sealed_words, 'hex') as hex,
+             octet_length(sealed_words) as length
+      from safety_outcomes where id = ${OUTCOME_ID}
+    `;
+    // The database's own reading of the hex, and the column back as hex: the same bytes, one per pair of digits.
+    expect(row?.same, "sealed_words is decode(hex) of the text form").toBe(true);
+    expect(`\\x${row?.hex ?? ""}` === text, "sealed_words read back as hex is the text form").toBe(true);
+    expect(row?.length).toBe(sealed.length);
+    expect(sealed.length).toBe(SEAL_OVERHEAD_BYTES + encoder.encode(EMERGENCY_WORDS).length);
+    expect(sameBytes(await storedWords(), sealed), "postgres.js reads back the sealed bytes").toBe(true);
+  });
+
+  it("a value that is not hex is refused, and nothing is written", SLOW, async () => {
+    const exchange = await given("commit-alex-safety.json");
+    const now = new Date(exchange.given.now);
+    const sealed = await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS);
+    const text = byteaText(sealed);
+    const notTextForm: [string, unknown][] = [
+      ["hex with no \\x", text.slice(2)],
+      ["an odd number of hex digits", `${text}0`],
+      ["a character that is not hex", `${text.slice(0, -1)}g`],
+      ["a space between the pairs", `${text.slice(0, 4)} ${text.slice(4)}`],
+      ["a doubled backslash", `\\${text}`],
+      ["an upper-case \\X", `\\X${text.slice(2)}`],
+      ["the escape format", "Words of a text\\000"],
+      ["the words themselves", EMERGENCY_WORDS],
+      ["a number", 171],
+      ["a list of byte values", [...sealed]],
+      ["an object", { base64: "AQI=" }],
+      ["bytes already made", sealed],
+    ];
+    const before = await snapshot();
+    for (const [what, value] of notTextForm) {
+      const error = await thrownBy(commitTurn(runtime, safetyCommit(value), { now }));
+      // Thrown before the record's insert is sent, naming the column and never the value; the turn row rolls back.
+      expect(error, what).toBeInstanceOf(TypeError);
+      expect((error as Error).message, what).toBe(
+        `commitTurn: a state insert into safety_outcomes gives safety_outcomes.sealed_words ${NOT_TEXT_FORM}`,
+      );
+      expect(await snapshot(), what).toEqual(before);
+      expect(await footprint("turn-alex-safety-1"), what).toEqual(NO_FOOTPRINT);
+      expect(await safetyRecords(), what).toBe(0);
+    }
+    // Refused for its value alone: the same commit with the text form commits.
+    expect(await commitTurn(runtime, safetyCommit(text), { now })).toEqual(exchange.outcome);
+    expect(await safetyRecords()).toBe(1);
+  });
+
+  it(
+    "the sealed words stay sealed: not in the row in the clear, and another person's key does not open them",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-safety.json");
+      const sealed = await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS);
+      const now = new Date(exchange.given.now);
+      committed(await commitTurn(runtime, safetyCommit(byteaText(sealed)), { now }));
+      const stored = await storedWords();
+      for (const label of EMERGENCY.read.labels) {
+        expect(holds(stored, encoder.encode(label.evidence)), "the evidence words in the clear").toBe(false);
+      }
+      for (const match of EMERGENCY.dangerWords) {
+        expect(holds(stored, encoder.encode(match.words)), "the danger words in the clear").toBe(false);
+      }
+      // Sam gets a key of his own; Alex's words do not open under it (sealing.ts binds a value to its person).
+      await seal(db.sql, KEYS, "person-sam", "Sam's own stand-in words, so Sam has a key");
+      expect(await sealingFailure(unseal(db.sql, KEYS, "person-sam", stored))).toBe("cannot_open");
+      expect(await unsealText(db.sql, KEYS, "person-alex", stored)).toBe(EMERGENCY_WORDS);
+    },
+  );
+
+  it(
+    "a state update writes a bytea column as its bytes too, and refuses one that is not hex (a pause's sealed address)",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-safety.json");
+      const now = new Date(exchange.given.now);
+      const firstAddress = "A stand-in address for Alex, not real (1)";
+      const secondAddress = "A stand-in address for Alex, not real (2)";
+      const first = await seal(db.sql, KEYS, "person-alex", firstAddress);
+      const second = await seal(db.sql, KEYS, "person-alex", secondAddress);
+      const pause = requestOf("commit-alex-safety.json");
+      pause.writes.state.push({
+        op: "insert",
+        table: "pauses",
+        values: {
+          id: PAUSE_ID,
+          business_id: "biz-lees-barbershop",
+          target: "address",
+          address: byteaText(first),
+          sealed_for_person_id: "person-alex",
+          set_by_turn_id: pause.turn.id,
+          set_at: exchange.given.now,
+        },
+      });
+      const inserted = committed(await commitTurn(runtime, pause, { now }));
+      expect(inserted.committed.written).toEqual([{ table: "pauses", rowId: PAUSE_ID, version: 1 }]);
+
+      const storedAddress = async (): Promise<{ address: Uint8Array; version: number }> => {
+        const [row] = await db.sql<{ address: Uint8Array; version: number }[]>`
+          select address, version from pauses where id = ${PAUSE_ID}
+        `;
+        if (row === undefined) {
+          throw new Error("the pause was not written");
+        }
+        return { address: new Uint8Array(row.address), version: row.version };
+      };
+      const move = (address: unknown): CommitTurnRequest => {
+        const request = requestOf("commit-alex-safety.json");
+        request.turn = {
+          ...request.turn,
+          id: "turn-alex-address-2",
+          eventIds: ["evt-alex-0051"],
+          traceId: "trace-alex-0051",
+        };
+        request.writes.outboxRows = [];
+        request.writes.state = [
+          { op: "update", table: "pauses", key: { id: PAUSE_ID }, expectVersion: 1, set: { address } },
+        ];
+        return request;
+      };
+
+      const before = await snapshot();
+      const error = await thrownBy(commitTurn(runtime, move(byteaText(second).slice(2)), { now }));
+      expect(error).toBeInstanceOf(TypeError);
+      expect((error as Error).message).toBe(
+        `commitTurn: a state update of pauses gives pauses.address ${NOT_TEXT_FORM}`,
+      );
+      expect(await snapshot()).toEqual(before);
+      expect(await footprint("turn-alex-address-2")).toEqual(NO_FOOTPRINT);
+      const kept = await storedAddress();
+      expect(kept.version).toBe(1);
+      expect(sameBytes(kept.address, first), "the refused update left the first address").toBe(true);
+
+      const updated = committed(await commitTurn(runtime, move(byteaText(second)), { now }));
+      expect(updated.committed.written).toEqual([{ table: "pauses", rowId: PAUSE_ID, version: 2 }]);
+      const moved = await storedAddress();
+      expect(moved.version).toBe(2);
+      expect(sameBytes(moved.address, second), "the stored address is the second address's bytes").toBe(true);
+      expect(await unsealText(db.sql, KEYS, "person-alex", moved.address)).toBe(secondAddress);
+    },
+  );
 });

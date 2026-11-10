@@ -23,35 +23,25 @@ export class ComposeInputNotBuiltError extends NotBuiltError {
 }
 
 /**
- * Why the compose-input call refused a request it cannot answer with one of K-09 v1's errors (fail closed):
+ * Why the compose-input call refused a request it cannot answer with one of K-09 v1.6's errors (fail closed; K-09
+ * README v1.6 open gap 127). A fixed-line row and a missing bundle, step or master line are K-09 v1.6's own answers
+ * (fixedLineRow, masterLineMissing: defaults 139, 140), never thrown (T-1174).
  *   - rowMismatch: the row read names another row than the request's;
- *   - fixedLineRow: the row carries a fixed line code writes word for word, so it is never composed (STATE note 17);
  *   - rowNotComposable: the row holds no plan but is neither planned nor stale (K-07 v1), so nothing may compose it;
  *   - copyNotEmail: a row that names a text row to copy goes on a text channel (K-05 v1 outboxRowNew: only an email row
  *     is a copy);
  *   - noReader: the recipient's role reads as no reader (readerOf: own_business, or a role K-04 does not name), so limit
  *     7 could show them nothing;
- *   - bundleMissing: the row's bundle is in neither KV nor PostgreSQL's copy;
- *   - stepMissing: the row's step is in none of the bundle's flow graphs;
- *   - noMasterLine: the step prints no line from Rosie to this reader at the row's index, so there is no master text;
- *   - inputRefused: the input built breaks K-03 v1's composeInput (a frontier among it, say), so it never goes.
+ *   - inputRefused: the input built breaks K-03 v1.1's composeInput (a frontier among it, say), so it never goes.
  */
 export type ComposeInputFault =
-  | "rowMismatch"
-  | "fixedLineRow"
-  | "rowNotComposable"
-  | "copyNotEmail"
-  | "noReader"
-  | "bundleMissing"
-  | "stepMissing"
-  | "noMasterLine"
-  | "inputRefused";
+  "rowMismatch" | "rowNotComposable" | "copyNotEmail" | "noReader" | "inputRefused";
 
 /** The compose-input call refused the request: nothing was composed. */
 export class ComposeInputRefusedError extends Error {
   override name = "ComposeInputRefusedError";
   readonly fault: ComposeInputFault;
-  /** How many problems K-03 v1 found, for inputRefused (a count, never a value); else 0. */
+  /** How many problems K-03 found, for inputRefused (a count, never a value); else 0. */
   readonly problems: number;
 
   constructor(fault: ComposeInputFault, problems = 0) {

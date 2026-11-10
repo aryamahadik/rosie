@@ -8,6 +8,7 @@
     "./shared": "./src/shared/index.ts",
     "./linq/webhook": "./src/linq/webhook/index.ts",
     "./linq/double": "./src/linq/double/index.ts",
+    "./email/double": "./src/email/double/index.ts",
     "./linq/double-webhooks": "./src/linq/double-webhooks/index.ts"
   }
 }

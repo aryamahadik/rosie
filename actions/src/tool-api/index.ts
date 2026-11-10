@@ -44,13 +44,16 @@ export {
   type ToolApiOptions,
 } from "./tool-api";
 export {
+  COMPOSE_INPUT_TOOL_API_SCHEMA_ID,
   CONTRACTS_DIR,
   EVENT_TRACE_SCHEMA_ID,
   SCHEMA_FILES,
   TOOL_API_SCHEMA_ID,
+  V1_6_SCHEMA_FILES,
   createToolApiValidator,
   formatProblems,
   loadToolApiSchemas,
+  toolApiSchemaIdOf,
   type CallPart,
   type ToolApiValidator,
 } from "./validator";

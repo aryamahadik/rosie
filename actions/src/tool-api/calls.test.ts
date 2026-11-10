@@ -12,12 +12,23 @@
 // type as their call's and pass the validator; and a record or release on arrival, which no handler builds yet, answers
 // notBuilt through the Tool API before any port is made (fail closed: nothing read or written). Values come only from the
 // contracts' fixtures (rule 9).
+//
+// T-1174 (DL-355): composeInput alone is K-09 v1.6's, so its pin is v1.6's exchange (read off v1.6's root by its call),
+// and its types are no longer v1.5's; v1.6's three composeInput exchanges type as its own and pass the validator.
 
 import { describe, expect, it } from "vitest";
 
 import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1.5";
+import type * as K09V16 from "../../../contracts/generated/tool-api/tool-api.v1.6";
 import { recordSafetyOutcomeHandler, releaseSafetyHoldHandler, type SafetyDeps } from "../domain/safety";
-import { CALL_NAMES, type CallName, type CallTypes, type RequestOf, type ResponseOf } from "./calls";
+import {
+  CALL_NAMES,
+  type CallName,
+  type CallTypes,
+  type ErrorsOf,
+  type RequestOf,
+  type ResponseOf,
+} from "./calls";
 import { contractFile, fixture, recordingScope, traceFor, type RecordingRepo } from "./test-support";
 import { createToolApi, notBuiltHandlers, type Handlers } from "./tool-api";
 import { createToolApiValidator } from "./validator";
@@ -65,8 +76,20 @@ type DriftOf<C extends CallName, Home> = {
 /** true when each part is its v1.5 definition; otherwise the drifted "<call>.<part>"s, which typecheck's message names. */
 type Pin<Drift> = [Drift] extends [never] ? true : Drift;
 
-/** One pin per call of K-09 v1, in CALL_NAMES' order: a line compiles only while its call's parts are v1.5's. */
-const PINS: { readonly [C in ExchangeCall]: Pin<DriftOf<C, ExchangeHome<C>>> } & {
+/** composeInput's exchange in K-09 v1.6 (T-1174), read off v1.6's root by its call, its outcome split as above. */
+type ComposeInputV16 = Extract<K09V16.ToolApiV1Dot6, { call: "composeInput" }>;
+interface ComposeInputHome {
+  request: ComposeInputV16["request"];
+  response: Exclude<ComposeInputV16["outcome"], { error: string }>;
+  errors: Extract<ComposeInputV16["outcome"], { error: string }>;
+}
+
+/**
+ * One pin per call of K-09 v1, in CALL_NAMES' order: a line compiles only while its call's parts are v1.5's, and
+ * composeInput's while they are v1.6's.
+ */
+const PINS: { readonly [C in Exclude<ExchangeCall, "composeInput">]: Pin<DriftOf<C, ExchangeHome<C>>> } & {
+  readonly composeInput: Pin<DriftOf<"composeInput", ComposeInputHome>>;
   readonly plannerVerbs: Pin<DriftOf<"plannerVerbs", PlannerVerbsHome>>;
 } = {
   buildFrontier: true,
@@ -103,11 +126,18 @@ const PINS: { readonly [C in ExchangeCall]: Pin<DriftOf<C, ExchangeHome<C>>> } &
 /** Compiles only while plannerVerbs is the one call v1.5's root holds no exchange for. */
 const ONLY_PLANNER_VERBS: Same<WithoutExchange, "plannerVerbs"> = true;
 
-describe("each call's request, response and errors are K-09 v1.5's, pinned to its exchange (npm run typecheck)", () => {
+/** Compiles only while composeInput's response and errors are not v1.5's (T-1174 moved them to v1.6). */
+const COMPOSE_INPUT_LEFT_V15: [
+  Same<CallTypes["composeInput"]["response"], ExchangeHome<"composeInput">["response"]>,
+  Same<CallTypes["composeInput"]["errors"], ExchangeHome<"composeInput">["errors"]>,
+] = [false, false];
+
+describe("each call's request, response and errors are K-09 v1.5's, composeInput's v1.6's, pinned to its exchange (npm run typecheck)", () => {
   it("every one of the 29 calls is pinned, and plannerVerbs alone has no exchange", () => {
     expect(Object.keys(PINS)).toEqual([...CALL_NAMES]);
     expect(Object.values(PINS)).toEqual(CALL_NAMES.map(() => true));
     expect(ONLY_PLANNER_VERBS).toBe(true);
+    expect(COMPOSE_INPUT_LEFT_V15).toEqual([false, false]);
 
     // The same at run time, from the frozen schema: v1.5's root names an exchange for every call of v1 but plannerVerbs.
     const root = contractFile("tool-api/tool-api.v1.5.schema.json") as { anyOf: { $ref: string }[] };
@@ -149,6 +179,38 @@ describe("the v1.1 exchanges K-09 v1's definitions left out of these types are t
     expect(validator.check("recordStopOrStart", "response", response)).toEqual([]);
     expect(response.businessesTold?.map((told) => told.businessId)).toEqual(["biz-lees-barbershop"]);
   });
+});
+
+// ---- composeInput on K-09 v1.6 (T-1174) ------------------------------------------------------------------------------
+
+describe("composeInput's v1.6 exchanges type as its own and pass the validator (T-1174)", () => {
+  it("compose-input-s1-02-v1.6.json: the request is composeInput's, the input with its term facts its response's", () => {
+    const exchange = fixture("compose-input-s1-02-v1.6.json") as ComposeInputV16;
+    const request: RequestOf<"composeInput"> = exchange.request;
+    if ("error" in exchange.outcome) throw new Error("the fixture's outcome is a response");
+    const response: ResponseOf<"composeInput"> = exchange.outcome;
+
+    expect(validator.check("composeInput", "request", request)).toEqual([]);
+    expect(validator.check("composeInput", "response", response)).toEqual([]);
+    if (response.result !== "compose") throw new Error("the fixture's response is a composer input");
+    expect(response.input.facts.map((fact) => ("source" in fact ? "term" : "slot"))).toEqual([
+      "term",
+      "term",
+      "term",
+      "term",
+    ]);
+  });
+
+  it.each(["compose-input-fixed-line-row.json", "compose-input-master-line-missing.json"])(
+    "%s: its error is one of composeInput's errors",
+    (file) => {
+      const exchange = fixture(file) as ComposeInputV16;
+      if (!("error" in exchange.outcome)) throw new Error("the fixture's outcome is an error");
+      const error: ErrorsOf<"composeInput"> = exchange.outcome;
+      expect(validator.check("composeInput", "errors", error)).toEqual([]);
+      expect(validator.check("composeInput", "response", error)).not.toEqual([]);
+    },
+  );
 });
 
 // ---- a request on arrival answers notBuilt --------------------------------------------------------------------------

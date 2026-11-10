@@ -65,7 +65,11 @@
 //      provider through (null in (...) is unknown), so code holds the rule until K-07's minor version (CQ-76, DL-132).
 //  10. Every time the commit writes (committed_at, closed_at, cancelled_at, armed_at, released_at, an effect's
 //      created_at, each entry's at) is one moment, the transaction's now() (the test's clock when given).
+//  11. A state write's value for a bytea column (a sealed value, such as safety_outcomes.sealed_words or a pause's
+//      address) is K-04's text form, "\x" and hex digit pairs, and is written as the bytes it spells (bytea.ts; T-1185):
+//      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
+import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
@@ -319,6 +323,8 @@ interface TableInfo {
   readonly name: string;
   readonly columns: ReadonlySet<string>;
   readonly jsonColumns: ReadonlySet<string>;
+  /** The columns of type bytea, whose values come in K-04's text form and are written as their bytes (default 11). */
+  readonly byteaColumns: ReadonlySet<string>;
   readonly key: readonly string[];
   readonly versioned: boolean;
   /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
@@ -336,8 +342,8 @@ interface Context {
 }
 
 /**
- * A table's columns, its JSON columns, its primary key and its row-level security, from the catalog: an ordinary table
- * of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
+ * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
+ * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
  */
 async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
   const known = ctx.tables.get(table);
@@ -345,7 +351,9 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     return known;
   }
   assertName(table, "a table name");
-  const [row] = await ctx.tx<{ rls: boolean; columns: string[]; json_columns: string[]; key: string[] }[]>`
+  const [row] = await ctx.tx<
+    { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
+  >`
     select c.relrowsecurity as rls,
            array(select a.attname::text from pg_attribute a
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
@@ -354,6 +362,10 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
                    and a.atttypid in ('json'::regtype, 'jsonb'::regtype)
                  order by a.attnum) as json_columns,
+           array(select a.attname::text from pg_attribute a
+                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+                   and a.atttypid = 'bytea'::regtype
+                 order by a.attnum) as bytea_columns,
            array(select a.attname::text
                  from pg_index i
                  cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
@@ -379,6 +391,7 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     name: table,
     columns,
     jsonColumns: new Set(row.json_columns),
+    byteaColumns: new Set(row.bytea_columns),
     key: row.key,
     versioned: columns.has("version"),
     scopeColumn,
@@ -411,7 +424,29 @@ function businessOf(info: TableInfo, row: Row): string | null {
   return value;
 }
 
-/** Column to value for an insert or an update: JSON columns as JSON, the rest as PostgreSQL text input (K-05 v1). */
+/**
+ * One column's value as postgres.js takes it: null as null, a JSON column's as JSON, a bytea column's as the bytes its
+ * text form spells (default 11: any other form throws, naming the column, never the value), the rest as PostgreSQL text
+ * input (K-05 v1).
+ */
+function columnValue(ctx: Context, info: TableInfo, column: string, value: unknown, what: string): unknown {
+  if (value === null) {
+    return null;
+  }
+  if (info.jsonColumns.has(column)) {
+    return ctx.tx.json(value as Json);
+  }
+  if (info.byteaColumns.has(column)) {
+    const bytes = byteaFromText(value);
+    if (bytes === null) {
+      fail(`${what} gives ${info.name}.${column} a value that is not "\\x" and hex digit pairs`);
+    }
+    return bytes;
+  }
+  return value;
+}
+
+/** Column to value for an insert or an update, each as columnValue gives it. */
 function columnValues(ctx: Context, info: TableInfo, values: Row, what: string): Record<string, never> {
   const out: Record<string, never> = {};
   for (const [column, value] of Object.entries(values)) {
@@ -422,9 +457,7 @@ function columnValues(ctx: Context, info: TableInfo, values: Row, what: string):
     if (!info.columns.has(column)) {
       fail(`${what} names a column ${info.name} does not have`);
     }
-    out[column] = (
-      info.jsonColumns.has(column) && value !== null ? ctx.tx.json(value as Json) : value
-    ) as never;
+    out[column] = columnValue(ctx, info, column, value, what) as never;
   }
   if (Object.keys(out).length === 0) {
     fail(`${what} writes no column`);
