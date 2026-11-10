@@ -101,9 +101,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 /**
  * The service and chat id of the turn's last text, from the request's turn, which the runtime caller copies from that
- * text's K-06 event (K-09 v1.5 default 135). K-09 v1's request type does not name them until T-1150 moves it to v1.5
- * (DL-340), so the turn is read as a plain record with a runtime check: both non-empty strings, the service one of
- * K-06's, or the part fails closed (noServiceOrChatId), never guessed. Never logged, and never in an error.
+ * text's K-06 event (K-09 v1.5 default 135). v1.5's request type names them since T-1150 (DL-340), but a turn may carry
+ * neither (a v1 caller's, or a clock's) and the chat id may be null (email, or none reported), so the turn is still read
+ * with a runtime check: both non-empty strings, the service one of K-06's, or the part fails closed (noServiceOrChatId),
+ * never guessed. Never logged, and never in an error.
  */
 export function textSourceOf(request: GateAndCommitRequest): TextSource {
   const turn: unknown = request.turn;

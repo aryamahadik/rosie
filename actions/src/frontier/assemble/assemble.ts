@@ -5,7 +5,7 @@
 // Each source fails closed (the card's Gives: "sources not yet built fail closed (offer nothing)"):
 //   - a slot whose module is not built yet offers nothing, and is logged (frontier_source_missing);
 //   - a source that throws or rejects offers nothing, and is logged with its error's kind (frontier_source_failed);
-//   - a source whose offer K-02 v1 refuses (a choice, an open question or a card that breaks the contract) offers
+//   - a source whose offer K-02 v1.1 refuses (a choice, an open question or a card that breaks the contract) offers
 //     nothing, and is logged with the count of problems (frontier_source_refused), so one faulty source never reaches
 //     decide and never takes the rest of the frontier down with it.
 // Then an option naming an open question the frontier does not list is left out (frontier_option_orphaned), the
@@ -57,7 +57,7 @@ type SlotResult =
       fields: LogFields;
     };
 
-/** One slot's offer, or why it offers nothing: not built, thrown, or refused by K-02 v1. */
+/** One slot's offer, or why it offers nothing: not built, thrown, or refused by K-02 v1.1. */
 async function offerOf(
   slot: SourceSlot,
   input: FrontierInput,
@@ -75,7 +75,7 @@ async function offerOf(
   return { offer: offer as SourceOffer };
 }
 
-/** How many problems K-02 v1 finds in an offer: each open question, each choice (under a draft id) and each card. */
+/** How many problems K-02 v1.1 finds in an offer: each open question, each choice (under a draft id) and each card. */
 function problemsIn(offer: unknown, checker: FrontierChecker): number {
   if (
     !isRecord(offer) ||

@@ -1,42 +1,46 @@
-// The frontier's checks against K-02 v1 (T-291): each source's choices, open questions and cards before they join the
-// frontier, and the whole context before it is answered. One strict Ajv 2020-12 instance over the frozen schemas the
-// Tool API's validator holds (tool-api/validator.ts: K-02 v1 and every schema its $refs reach), so the frontier and the
-// base read the same files. Problem lines name a path and what the schema wants, never a value.
-//
-// Ajv compiles with new Function, which the Workers runtime refuses: the Tool API base's open point (actions/README.md,
-// "Ajv in the Worker") covers these checks too.
+// The frontier's checks against K-02 v1.1 (T-291, T-1150): each source's choices, open questions and cards before they
+// join the frontier, and the whole context before it is answered, against K-02 v1.1's choice, openQuestion, stepCard
+// and context. v1.1's doors also take signUp, the door to S1-01 (K-02 README "v1.1", default 9), and every K-02 v1 value
+// is a v1.1 value. The checks are the Tool API validator's own (tool-api/validator.ts, definitionChecks: the frozen
+// schemas K-09 v1.5 reaches, K-02 v1.1 among them, with the same strict options), so the frontier and the base read the
+// same files: in Node, Ajv's compiler; inside the Worker (workerd), the prebuilt code `npm run build:validators` compiles
+// for these four definitions beside the Tool API's (infra/build/tool-api-validators.mjs), so no code is made at run
+// time (check.worker.test.ts). Problem lines name a path and what the schema wants, never a value.
 
-import type { ValidateFunction } from "ajv";
-import Ajv2020 from "ajv/dist/2020.js";
+import { MODEL_SCHEMA_ID, RUNS_IN_WORKERD, definitionChecks, formatProblems } from "../../tool-api/validator";
 
-import { formatProblems, loadToolApiSchemas } from "../../tool-api/validator";
+export { MODEL_SCHEMA_ID };
 
-/** The $id of K-02 v1 (contracts/README.md convention 2). */
-export const MODEL_SCHEMA_ID = "https://rosie.invalid/contracts/model/model.v1.schema.json";
+/** The K-02 v1.1 definitions the frontier checks, which the build compiles for the Worker (its MODEL_PARTS). */
+export const K02_PARTS = ["choice", "openQuestion", "stepCard", "context"] as const;
 
-/** The K-02 v1 definitions the frontier checks. */
-export type K02Part = "choice" | "openQuestion" | "stepCard" | "context";
+/** One of the K-02 v1.1 definitions the frontier checks. */
+export type K02Part = (typeof K02_PARTS)[number];
 
 export interface FrontierChecker {
-  /** The problems K-02 v1's `$defs/<part>` finds in `value`, one line each; empty when accepted. */
+  /** The problems K-02 v1.1's `$defs/<part>` finds in `value`, one line each; empty when accepted. */
   check(part: K02Part, value: unknown): string[];
 }
 
-export function createFrontierChecker(schemas: readonly object[] = loadToolApiSchemas()): FrontierChecker {
-  const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
-  for (const schema of schemas) ajv.addSchema(schema);
-  const compiled = new Map<K02Part, ValidateFunction>();
-  const validatorOf = (part: K02Part): ValidateFunction => {
-    const known = compiled.get(part);
-    if (known !== undefined) return known;
-    const validate = ajv.getSchema(`${MODEL_SCHEMA_ID}#/$defs/${part}`);
-    if (validate === undefined) throw new Error(`K-02 v1 has no definition ${part}`);
-    compiled.set(part, validate);
-    return validate;
-  };
+/**
+ * The frontier's checker. In Node: one strict Ajv 2020-12 instance holding `schemas` (default: the frozen files the Tool
+ * API's validator reads from disk). Inside workerd: the prebuilt code; workerd cannot compile, so passing `schemas`
+ * there throws. A name that is none of K02_PARTS throws in both, rather than check against a definition the Worker does
+ * not hold.
+ */
+export function createFrontierChecker(schemas?: readonly object[]): FrontierChecker {
+  if (RUNS_IN_WORKERD && schemas !== undefined) {
+    throw new Error(
+      "Ajv's compiler cannot run inside workerd (new Function): call createFrontierChecker() there",
+    );
+  }
+  const checks = definitionChecks(schemas);
   return {
     check(part, value) {
-      const validate = validatorOf(part);
+      if (!(K02_PARTS as readonly string[]).includes(part)) {
+        throw new Error("not a K-02 v1.1 definition the frontier checks");
+      }
+      const validate = checks(MODEL_SCHEMA_ID, part);
       return validate(value) ? [] : formatProblems(validate.errors);
     },
   };
