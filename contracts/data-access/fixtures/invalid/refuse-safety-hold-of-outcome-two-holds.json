@@ -1,0 +1,42 @@
+{
+  "result": "safetyHoldOfOutcome",
+  "outcomeId": "safety-alex-0204",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-27T09:00:04Z",
+  "hold": [
+    {
+      "id": "hold-alex-0204",
+      "safetyOutcomeId": "safety-alex-0204",
+      "businessId": "biz-lees-barbershop",
+      "handleId": "handle-alex",
+      "personId": "person-alex",
+      "bookingId": null,
+      "turnId": "turn-alex-0204",
+      "releaseRule": "never",
+      "blocksBooking": false,
+      "heldAt": "2026-10-26T21:40:03Z",
+      "releasedAt": null,
+      "releasedWhy": null,
+      "releasedByTurnId": null,
+      "releasedByOutcomeId": null,
+      "version": 1
+    },
+    {
+      "id": "hold-alex-0204-b",
+      "safetyOutcomeId": "safety-alex-0204",
+      "businessId": "biz-lees-barbershop",
+      "handleId": "handle-alex",
+      "personId": "person-alex",
+      "bookingId": null,
+      "turnId": "turn-alex-0204",
+      "releaseRule": "at_once",
+      "blocksBooking": false,
+      "heldAt": "2026-10-26T21:40:03Z",
+      "releasedAt": null,
+      "releasedWhy": null,
+      "releasedByTurnId": null,
+      "releasedByOutcomeId": null,
+      "version": 1
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "call": "readOutboxRowWritten",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-07T15:59:57Z",
+    "note": "The same row before any commit wrote it (as when the first record's line was sent by the actor itself, sentByActor, and no row was built): the answer is false, and a repeated record names no row for its line (record.ts repeatAnswer)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRowWritten",
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-11-07T15:59:57Z",
+    "written": false
+  }
+}

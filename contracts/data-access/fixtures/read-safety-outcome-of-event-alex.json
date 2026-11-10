@@ -1,0 +1,37 @@
+{
+  "call": "readSafetyOutcomeOfEvent",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-outcome-crisis.json"],
+    "after": [],
+    "now": "2026-10-25T23:11:05Z",
+    "note": "Alex's crisis words after booking (K-34 v1 seed-outcome-crisis) are recorded already when the same text's record runs again: a lapsed turn's rerun, or the batch turn after the actor's arrival record (ids.ts; K-09 v1.1 j3-safety-arrival-batch-turn.json). Its first read finds the row under the barbershop's scope, so the record is a repeat and answers from the stored rows, writing nothing (record.ts default 1). The row comes back with its labels, tenses, the danger word's kind and its outcomes plain, as K-34 keeps them (K-34 default 5), and never its sealed words (K-34 README rule 6)."
+  },
+  "request": {
+    "eventId": "evt-alex-0203",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "safetyOutcomeOfEvent",
+    "eventId": "evt-alex-0203",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-25T23:11:05Z",
+    "safetyOutcome": {
+      "id": "safety-alex-0203",
+      "eventId": "evt-alex-0203",
+      "source": "text",
+      "handleId": "handle-alex",
+      "personId": "person-alex",
+      "businessId": "biz-lees-barbershop",
+      "bookingId": "booking-alex-haircut",
+      "turnId": "turn-alex-0203",
+      "readAt": "2026-10-25T23:10:01Z",
+      "timedOut": false,
+      "labels": ["Crisis words"],
+      "tenses": ["now"],
+      "dangerWordKinds": ["selfHarm"],
+      "outcomes": ["Crisis words"],
+      "liftedToUnsure": false
+    }
+  }
+}
