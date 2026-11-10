@@ -1,6 +1,7 @@
 // The Linq webhook entry, run inside the Workers runtime (T-241). The Linq port is a double that answers exactly as
 // K-11's fixtures state (it knows no signature algorithm: that is the adapter's); the actor is a stub that models the
 // seen-event-id check. Fixtures: contracts/port-linq/fixtures and contracts/inbound-event/fixtures.
+// T-1180: a body over its own cap is answered 413 before it is read whole, with nothing verified or handed on.
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -11,8 +12,9 @@ import deliveredAfter4006 from "../../../contracts/port-linq/fixtures/verify-del
 import verifyOk from "../../../contracts/port-linq/fixtures/verify-ok.json";
 import staleTimestamp from "../../../contracts/port-linq/fixtures/verify-stale-timestamp.json";
 import duplicateEvent from "../../../contracts/inbound-event/fixtures/duplicate-event.json";
+import { LINQ_BODY_LIMIT_BYTES } from "./body";
 import { handleLinqWebhook } from "./linq-webhook";
-import { fakeKeyStore } from "./test-support";
+import { countedStream, fakeKeyStore, postOf, xBytes } from "./test-support";
 import type { SealingKeyStore } from "./seal";
 import type {
   ActorHandoff,
@@ -346,6 +348,146 @@ describe("POST /webhooks/linq", () => {
     expect(text).not.toContain("Haircut");
     expect(text).not.toContain("5555550101");
     expect(text).not.toContain(verifyOk.request.signature);
+  });
+});
+
+describe("the Linq webhook's body cap (T-1180)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // The gateway never reads the context; the Workers runtime's own context has members this test cannot build.
+  const context = {
+    waitUntil: () => undefined,
+    passThroughOnException: () => undefined,
+    props: {},
+  } as unknown as ExecutionContext;
+
+  /** verify-ok's webhook, its raw body followed by spaces to exactly `bytes` bytes. */
+  function paddedWebhook(bytes: number): { request: Request; raw: string } {
+    const raw =
+      verifyOk.request.raw + " ".repeat(bytes - new TextEncoder().encode(verifyOk.request.raw).byteLength);
+    return { request: webhookOf({ ...verifyOk, request: { ...verifyOk.request, raw } }), raw };
+  }
+
+  /** verify-ok's headers on a streamed body, with these headers besides. */
+  function streamedWebhook(
+    stream: ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Request {
+    return postOf(
+      stream,
+      {
+        "webhook-id": verifyOk.request.webhookId,
+        "webhook-timestamp": verifyOk.request.timestamp,
+        "webhook-signature": verifyOk.request.signature,
+        ...headers,
+      },
+      "https://rosie.test/test/webhooks/linq",
+    );
+  }
+
+  it("a body one byte over its cap: 413 with the trace id, nothing verified, written or handed on, a refused receive span, nothing of the body logged", async () => {
+    const logLines = captureLogLines();
+    const linq = portDouble(ALL);
+    const actor = actorStub();
+    const receipts = receiptsStub();
+    const { request } = paddedWebhook(LINQ_BODY_LIMIT_BYTES + 1);
+
+    const response = await handleLinqWebhook(request, depsOf(linq, actor, receipts), WHERE);
+
+    expect(response.status).toBe(413);
+    const traceId = response.headers.get("x-trace-id");
+    expect(traceId).toMatch(UUID);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ ok: false, error: "payload_too_large", trace_id: traceId });
+    expect(linq.requests).toEqual([]);
+    expect(actor.calls).toEqual([]);
+    expect(receipts.written).toEqual([]);
+    const lines = logLines();
+    expect(lines).toHaveLength(1);
+    expect(receiveSpans(lines)).toMatchObject([
+      { trace_id: traceId, provider: "linq", outcome: "refused", error_code: "bodyTooLarge" },
+    ]);
+    const text = JSON.stringify(lines);
+    expect(text).not.toContain("Haircut");
+    expect(text).not.toContain("5555550101");
+    expect(text).not.toContain(verifyOk.request.signature);
+  });
+
+  it("a body exactly at its cap reaches the verify as sent", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const { request, raw } = paddedWebhook(LINQ_BODY_LIMIT_BYTES);
+
+    await handleLinqWebhook(request, depsOf(linq, actorStub()), WHERE);
+
+    expect(linq.requests).toHaveLength(1);
+    expect(linq.requests[0]?.raw).toBe(raw);
+  });
+
+  it("a declared length over its cap is answered 413 before a byte of the body is read", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const source = countedStream(1024, () => xBytes(1024));
+
+    const response = await handleLinqWebhook(
+      streamedWebhook(source.stream, { "content-length": String(LINQ_BODY_LIMIT_BYTES + 1) }),
+      depsOf(linq, actorStub()),
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBe(0);
+    expect(linq.requests).toEqual([]);
+  });
+
+  it("a body that declares no length is cut off at the chunk that takes it over its cap: a 1 GiB body is never read whole", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const source = countedStream(1024 * 1024, () => xBytes(1024));
+
+    const response = await handleLinqWebhook(
+      streamedWebhook(source.stream),
+      depsOf(linq, actorStub()),
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBeGreaterThan(LINQ_BODY_LIMIT_BYTES / 1024);
+    expect(source.pulled()).toBeLessThan((2 * LINQ_BODY_LIMIT_BYTES) / 1024);
+    expect(source.cancelled()).toBe(true);
+    expect(linq.requests).toEqual([]);
+  });
+
+  it("its cap is its own config value: GatewayDeps.linqBodyLimitBytes sets it, the page entry's cap does not, and a mistyped value leaves the default", async () => {
+    captureLogLines();
+    const answer = async (more: Partial<GatewayDeps>): Promise<number> => {
+      const deps = { ...depsOf(portDouble(ALL), actorStub()), ...more };
+      return (await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE)).status;
+    };
+
+    expect(await answer({ linqBodyLimitBytes: 64 })).toBe(413);
+    expect(
+      await answer({ linqBodyLimitBytes: new TextEncoder().encode(verifyOk.request.raw).byteLength }),
+    ).toBe(200);
+    expect(await answer({ pageBodyLimitBytes: 1 })).toBe(200);
+    expect(await answer({ linqBodyLimitBytes: Number.NaN })).toBe(200);
+    expect(await answer({ linqBodyLimitBytes: -1 })).toBe(200);
+  });
+
+  it("through the Worker's route, a webhook over its cap is answered 413 and reaches no door", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const actor = actorStub();
+    const routed = createWorker(() => depsOf(linq, actor));
+
+    const response = await routed.fetch(paddedWebhook(LINQ_BODY_LIMIT_BYTES + 1).request, env, context);
+
+    expect(response.status).toBe(413);
+    expect(response.headers.get("x-trace-id")).toMatch(UUID);
+    expect(linq.requests).toEqual([]);
+    expect(actor.calls).toEqual([]);
   });
 });
 

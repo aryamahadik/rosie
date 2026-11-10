@@ -1,6 +1,6 @@
 // The gateway (C-044): the Linq webhook entry (T-241, linq-webhook.ts), the Stripe and calendar webhook doors (T-275,
 // providers/) and the page entry for the web app's page and console calls (T-266, pages/), with the answer rules they
-// share (answer.ts).
+// share (answer.ts) and the capped body read the Linq entry and the page entry read through (T-1180, body.ts).
 
 import { DEFAULT_BUNDLE_ID } from "./answer";
 import { unconfiguredPages, type PageDeps } from "./pages";
@@ -8,6 +8,13 @@ import { unconfiguredProviders, type ProviderDeps } from "./providers";
 import type { GatewayDeps } from "./types";
 
 export { DEFAULT_BUNDLE_ID, type WebhookEnvironment } from "./answer";
+export {
+  LINQ_BODY_LIMIT_BYTES,
+  PAGE_BODY_LIMIT_BYTES,
+  bodyLimitOf,
+  readCappedText,
+  type BodyRead,
+} from "./body";
 export { handleLinqWebhook } from "./linq-webhook";
 export { durableObjectActor, type ActorNamespace, type HandleActorRpc } from "./actor-door";
 export {
@@ -21,17 +28,21 @@ export {
 export {
   PAGE_API_PATH,
   PAGE_CALLS,
+  PAGE_ERRORS,
   PageNotConnectedError,
   STAGING_ONLY_CALLS,
   STAGING_ONLY_OUTCOME,
+  UNKNOWN_PAGE_ERROR,
   handlePageCall,
   isPageCall,
+  isPageError,
   isStagingOnly,
   pagePathOf,
   pageRouteOf,
   unconfiguredPages,
   type PageCallName,
   type PageDeps,
+  type PageErrorName,
   type PageHandler,
   type PageHandlers,
   type PageOutcome,
@@ -107,11 +118,15 @@ export function providerDepsOf(deps: GatewayDeps): ProviderDeps {
   };
 }
 
-/** The page entry's dependencies from the gateway's: its handlers (not connected when left out), bundle id and clock. */
+/**
+ * The page entry's dependencies from the gateway's: its handlers (not connected when left out), bundle id, clock and body
+ * cap (PAGE_BODY_LIMIT_BYTES when left out).
+ */
 export function pageDepsOf(deps: GatewayDeps): PageDeps {
   return {
     handlers: deps.pages ?? unconfiguredPages(),
     bundleId: deps.bundleId,
     ...(deps.now === undefined ? {} : { now: deps.now }),
+    ...(deps.pageBodyLimitBytes === undefined ? {} : { bodyLimitBytes: deps.pageBodyLimitBytes }),
   };
 }

@@ -12,7 +12,9 @@
 // guard's targets, the turn pins bundle v0 as bundles/v0 publishes it (./test-support.ts fakeBundleReads, a K-05
 // double), and the guard reads test owner 1's seeded targets (fakeHandleTargets, as targets-first-text.json answers).
 // Since T-557 joined the frontier, the turn's frontier is @rosie/actions' turn face over the bundle the turn pinned and
-// test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span.
+// test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span. Since T-558
+// joined decide, the turn's two reads go through @rosie/ai's decider over the recorded-model double (fakeDecideModels,
+// which holds the reads this test records for its turn), whose model-call spans sit in the trace beside the safety read's.
 // Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
 // receipt door marks the part delivered and arms its clock.
 //
@@ -174,6 +176,8 @@ function rig(log: MockInstance): Run {
     handleTargets: fakes.handleTargets.call,
     // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, so the frontier's answer is turn 1's.
     frontierScope: fakes.frontier.scope,
+    // The decide port (T-558): @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads.
+    deciders: fakes.decide.deciders,
   });
   const restore = root.install();
   const worker = createWorker(() => root.gateway);
@@ -236,6 +240,7 @@ describe("through the composition root, every port on its fake: a text's webhook
       try {
         const words = SAM_TRADES_TEXT;
         run.fakes.known("evt-sam-0001");
+        run.fakes.decide.recordTurn(["evt-sam-0001"]);
         const traceId = await run.post(samText("evt-sam-0001", words));
         await settle(SAM_ACTOR);
 
@@ -292,12 +297,20 @@ describe("through the composition root, every port on its fake: a text's webhook
         );
         expect(report.extra.filter(actorReceive).length).toBeLessThanOrEqual(1);
         // The text's safety read on arrival (T-554): one Haiku call, answered by the recorded-model double.
-        expect(
-          report.extra
-            .filter(modelCall)
-            .map((span) => [span.attempt, span.outcome, span.model_calls?.[0]?.purpose]),
-        ).toEqual([[1, "ok", "safetyRead"]]);
+        const calls = report.extra
+          .filter(modelCall)
+          .map((span) => [span.attempt, span.outcome, span.model_calls?.[0]?.purpose]);
+        expect(calls.filter((call) => call[2] === "safetyRead")).toEqual([[1, "ok", "safetyRead"]]);
         expect(run.fakes.models.calls).toEqual([{ model: "claude-haiku-5-5", text: words }]);
+        // The turn's decide (T-558): two Haiku reads, each its step 1 and its one part's step 2, each call answered at
+        // its first attempt by the recorded-model double; no other model call.
+        expect(
+          calls
+            .filter((call) => call[2] !== "safetyRead")
+            .map((call) => call.join())
+            .sort(),
+        ).toEqual(["1,ok,decideCheck", "1,ok,decideCheck", "1,ok,decideFirst", "1,ok,decideFirst"]);
+        expect(run.fakes.decide.misses).toEqual([]);
 
         // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v0's).
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(

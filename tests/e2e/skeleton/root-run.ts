@@ -14,7 +14,9 @@
 //   join 5, bundles     K-05's bundle reads holding bundle v0 as bundles/v0 publishes it, and targets: K-05 v1.2
 //                       handleTargets over test owner 1's seeded rows (T-1148), as targets-first-text.json;
 //   join 6, frontier    @rosie/actions' turn face over the frontier's scope: K-05 v1.2 readTurnState as a double over
-//                       test owner 1's seeded rows (T-1148), reading the bundle the turn pinned.
+//                       test owner 1's seeded rows (T-1148), reading the bundle the turn pinned;
+//   join 7, decide      @rosie/ai's decider (T-369's createDecider with T-370's re-read), one per bundle, over the
+//                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347).
 //
 // The Tool API's gate and commit is stood in until T-559, its one commit through the root's turn-row port; every port not
 // joined yet is on its fake (T-550). The spans are the log lines the target captures; the actor's inbox, safety state,
@@ -153,6 +155,7 @@ export function startRootRun(): RootRun {
       bundleReads: fakes.bundleReads.calls,
       handleTargets: fakes.handleTargets.call,
       frontierScope: fakes.frontier.scope,
+      deciders: fakes.decide.deciders,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     const composed = root;

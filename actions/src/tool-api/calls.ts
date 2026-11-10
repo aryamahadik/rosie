@@ -178,7 +178,9 @@ export function isCallerKind(value: unknown): value is CallerKind {
  * The hop of each call's span when a turn, the console, a job, a clock's firing or the actor on return makes it (K-08 v1
  * hop table; K-09 v1 `caller.traceId` names the hops). A read of the turn face takes its own hop, gateAndCommit (with the
  * planner's verbs inside it) the gate, composeInput and finalizeMessage the code side of the reply (arch 02 line 123), and
- * every call that writes alone or rides in a turn's commit the commit (README defaults).
+ * every call that writes alone or rides in a turn's commit the commit (README defaults). The handle actor's turn records
+ * the gate and fillAndChecks hops itself, so the turn face's gateAndCommit, composeInput and finalizeMessage tell the base
+ * so, and the base records no span for them (tool-api.ts CallOptions; T-1193).
  */
 export const CALL_HOPS: Readonly<Record<CallName, Hop>> = {
   buildFrontier: "frontier",

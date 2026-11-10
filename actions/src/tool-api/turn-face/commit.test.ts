@@ -7,6 +7,13 @@
 // Round 2 (DL-364): limit 1 passes turn 1's sign-up door since T-1183, so the turn commits exactly as commit-s1-01.json
 // states it: the six limit answers, S1-01's thread, S1-02's question with its clock row and outbox-s1-02-sam-1, and the
 // text's safety record, under one turn id and its trace.
+//
+// T-1193 (DL-376): the handle actor's turn records the gate (one span per part, with its limits) and the commit itself,
+// so the face's gateAndCommit leaves no span of the base's; the same handlers on a base called without the face's option
+// give the same commit and record the base's one gate span, labels only.
+//
+// T-1194: the answer's `written` leaves the safety record's row out, as commit-s1-01.json's does (K-09 v1.5 default 134),
+// so the whole answer equals the fixture's; K-05's one commit still writes the record.
 
 import { describe, expect, it } from "vitest";
 
@@ -15,9 +22,9 @@ import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
 import { NotBuiltError } from "../errors";
 import { traceFor } from "../test-support";
+import { createToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
 import {
-  CORE_ROW_IN_WRITTEN,
   bundleV0,
   callDoubles,
   commitContextOf,
@@ -37,7 +44,7 @@ import {
   type SafetyReads,
 } from "./commit";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
-import { createTurnFace, type GateAndCommitCallAnswer, type TurnFaceCalls } from "./turn-face";
+import { callHandlers, createTurnFace, type GateAndCommitCallAnswer, type TurnFaceCalls } from "./turn-face";
 
 type Json = Record<string, unknown>;
 
@@ -83,14 +90,9 @@ describe("gateAndCommit through the turn face: commit-s1-01.json, turn 1 (K-09 v
     const doubles = callDoubles();
     const { answer, spans } = await commitThrough(doubles.calls, commitRequestAfter(undefined));
     const result = committed(answer);
-    // Every field as the fixture states it; `written` too, but for the core action's row main's commit lists first
-    // (CORE_ROW_IN_WRITTEN: named, never faked).
-    const { written, ...rest } = result as unknown as Json & { written: { written: Json[] } };
-    const { written: stated, ...statedRest } = exchange.outcome as unknown as Json & {
-      written: { written: Json[]; outboxRows: Json[]; promoted: Json[] };
-    };
-    expect(rest).toEqual(statedRest);
-    expect(written).toEqual({ ...stated, written: [...CORE_ROW_IN_WRITTEN, ...stated.written] });
+    // Every field as the fixture states it, `written` included: the rows the walk wrote, the core action's left out and
+    // named in its response instead (K-09 v1.5 default 134; T-1194).
+    expect(result).toEqual(exchange.outcome);
 
     // One K-05 commit, its turn row K-05's seven fields alone (default 135), the record's row and entry among its writes.
     expect(doubles.k05.requests).toHaveLength(1);
@@ -102,6 +104,38 @@ describe("gateAndCommit through the turn face: commit-s1-01.json, turn 1 (K-09 v
     expect(sent.turn).toMatchObject({ id: "turn-s1-01-sam", traceId: "trace-sam-0000" });
     expect(sent.writes.events.map((entry) => entry.kind)).toContain("safety_outcome.recorded");
     expect(sent.writes.outboxRows.map((row) => row.id)).toEqual(["outbox-s1-02-sam-1"]);
+    // The safety record is still written, by that same commit: K-05 wrote its row first, then the rows `written` lists.
+    expect(doubles.k05.commits).toEqual([
+      {
+        turnId: "turn-s1-01-sam",
+        written: [
+          { table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 },
+          ...exchange.outcome.written.written,
+        ],
+      },
+    ]);
+
+    // No span of the base's on the turn's trace: the turn records the gate and the commit itself, and the face tells the
+    // base so (T-1193). The base's own gate span, without the face's option, is the next test's.
+    expect(spans).toEqual([]);
+  });
+
+  it("without the face's option, the same handlers on the base give the same commit and record its one gate span: the rows by table and id, never a word or the chat id (T-1193)", async () => {
+    const request = commitRequestAfter(undefined);
+    const faceDoubles = callDoubles();
+    const viaFace = await commitThrough(faceDoubles.calls, request);
+    expect(viaFace.spans).toEqual([]);
+    // The face's own handlers for gateAndCommit, on a base called as any other caller calls it.
+    const doubles = callDoubles();
+    const base = createToolApi<unknown>({
+      validator,
+      scope: doubles.calls.scope,
+      handlers: callHandlers(doubles.calls, NOTHING_OPEN_AT),
+    });
+    const { trace, spans } = traceFor(request);
+    const answer = await base.call("gateAndCommit", structuredClone(request), trace);
+    expect(answer).toEqual(viaFace.answer);
+    expect(doubles.k05.requests).toEqual(faceDoubles.k05.requests);
 
     // One gate span on the turn's trace: the gate's limits, the rows by table and id, never a word or the chat id.
     expect(spans).toHaveLength(1);

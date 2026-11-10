@@ -10,7 +10,8 @@
 //     lines 173 to 175: "The safety read alone sets the first three rows"): a threat pauses the person and their phone, so
 //     their later visits are called off unless the owner decides and new requests wait for him (A3-48); unsafe at home
 //     makes the booking private, which releases its hold in the same commit (A3-50);
-//   - the outcome step's checked line, as an outbox row of send class safety, at any hour and past any opt-out;
+//   - the outcome step's checked line, as an outbox row of send class safety, at any hour and past any opt-out, carrying
+//     the danger question when a label's tense is unknown (default 18; the plan's `line`);
 //   - who is told: a harm report to Rosie's team that day for harm to a child or older adult (K-34 harm_reports; A3-49),
 //     and the owner or Rosie's team through the hand-offs and pages port (T-319) for crisis words, an emergency or a threat.
 //
@@ -61,6 +62,20 @@
 //      and the handle actor keeps its own hold and sends the checked line itself (errors.ts). A refusal K-09 v1 lists no
 //      record error for fails the call (pauseRefused). A private flag T-317 refuses leaves the when_private hold held and
 //      unreleased, which the answer names (default 3), so the booking waits until it is private.
+//  18. The danger question on the core's own line (T-1176; CQ-172; arch 06 line 329; S13-24 rule 10): the line's row is
+//      a safety row, whose words go in word for word after the commit (arch 07 lines 347, 361) and which finalize's
+//      fixed-line inserter never reads (readOutboxRow answers fixedLineRow; T-1164's review). So the record's line
+//      (RecordLine, the plan's `line`) carries K-01's safetyAsk itself, in the actor's cases: a label of unknown tense whose
+//      outcome is not No, read from the record's own labels (the read's, or K-34's stored labels and tenses on a repeat),
+//      as runtime/src/safety/rules.ts checkedLineFor asks it, and placed as it places it, on the same line after a space
+//      (lineWordsOf). Never after No, a known tense (over, now, could restart, joke) or a read with no label (a timeout,
+//      CQ-163 b). Only a safety line to the text's writer asks: a threat's line to the owner carries none (the actor sends
+//      a threat's writer nothing, so it asks nothing; S13-10, A3-48), nor does the outage line. The words are the pinned
+//      bundle's (SafetyWords): with no words port the record is not built (notBuilt), and with no words for safetyAsk it
+//      is refused (noSafetyAsk), as finalize's inserter refuses such a row (T-1164): the line never goes without its
+//      question. The K-09 v1 answer still names the line by its own id (safetyLine.fixedLineId), as the actor's line keeps
+//      its id with the question added, and a line the commit writes no row for (the actor's own send, or one a page or an
+//      AI shows) has no `line`.
 
 import type { CoreAction, EventEntry, OutboxRowNew, SafetyHold, StateWrite } from "../../commit";
 import { NotBuiltError, type ErrorsOf, type RequestOf, type ResponseOf } from "../../tool-api";
@@ -84,20 +99,25 @@ import type {
   SafetyReader,
   SafetyTelling,
   SafetyTold,
+  SafetyWords,
   StopWords,
   StoredHold,
   StoredOutcome,
   WordsSealer,
 } from "./ports";
 import {
+  SAFETY_ASK_LINE,
+  asksIfInDanger,
   dangerOf,
   labelsOf,
   lineOutcomeOf,
   mustSendLine,
   nothingBooksUnder,
   ruleOf,
+  storedLabels,
   strictestOf,
   tellsOf,
+  type LabelTense,
   type ReleaseRule,
   type SafetyOutcome,
   type SafetyResult,
@@ -151,6 +171,28 @@ export interface RecordPorts {
   readonly lines: SafetyLines;
   readonly stopWords: StopWords;
   readonly telling: SafetyTelling;
+  /** K-01's fixed lines' words from the pinned bundle, or null while none is wired (a line that asks is then not built). */
+  readonly words: SafetyWords | null;
+}
+
+/**
+ * The record's own checked line, as its commit writes the line's outbox row (default 18; T-1176, CQ-172): the line's
+ * K-09 id, who it goes to, its row, and the danger question it carries. The row holds no words at the commit (K-05 v1
+ * outboxRowNew: words go in after it, arch 01 line 41); a safety line's are fixed text, written into it word for word
+ * (arch 07 lines 347, 361; K-05 writePlan, as write-plan-alex-safety.json: no lines of its own, the line's words and its
+ * fixed line ids), here the line's own words and then the question's (lineWordsOf).
+ */
+export interface RecordLine {
+  /** K-09 v1 fixedLineId: the outcome step's checked line, or the K-01 fixed line in its place (commit/core/lines.ts). */
+  readonly fixedLineId: string;
+  /** Who it goes to: the text's writer, or the business's owner for a threat (A3-48), who is never asked. */
+  readonly to: SafetyLineChoice["to"];
+  /** The outbox row the commit writes for it: the first T-307 builds (an email copy of it takes its words). */
+  readonly outboxRowId: string;
+  /** The K-01 v1 fixed lines its words hold, in order: the line, then safetyAsk when the danger question goes with it. */
+  readonly fixedLines: readonly string[];
+  /** The danger question's words, as the pinned bundle writes K-01's safetyAsk, when it goes with the line; else null. */
+  readonly ask: string | null;
 }
 
 export interface RecordPlan {
@@ -159,6 +201,12 @@ export interface RecordPlan {
   readonly answer: RecordAnswer;
   /** What the commit writes; `clocks` are the clock rows no question owns (a pause's call-off, a hand-off's escalation). */
   readonly writes: FlagWrites;
+  /**
+   * The record's own line, with the danger question it carries (default 18): the row this commit writes for its checked
+   * line, or on a repeat the row the first record wrote. Null when it writes none: No, a refusal, a step with nothing to
+   * send, the actor's own send, a line a page or an AI shows, or the outage line held back from a stopped phone.
+   */
+  readonly line: RecordLine | null;
 }
 
 // ---- small helpers ------------------------------------------------------------------------------------------------------
@@ -340,6 +388,48 @@ function pickLine(
     : { choice: { fixedLineId: outage, to: "writer", hotline: null }, sendClass: "quick_reply" };
 }
 
+/**
+ * The danger question's words a record's line carries (default 18), or null when none goes: a safety line to the text's
+ * writer whose record's own labels hold one of unknown tense whose outcome is not No (rules.ts asksIfInDanger), as the
+ * handle actor's direct path asks it. The words are the pinned bundle's K-01 safetyAsk: with no words port the record is
+ * not built, and with none for safetyAsk (or blank ones) it is refused, so the line never goes without its question.
+ * A line that asks nothing reads no words.
+ */
+function dangerQuestionOf(
+  ports: RecordPorts,
+  picked: LinePick,
+  labels: readonly LabelTense[],
+  eventId: string,
+): string | null {
+  if (picked.sendClass !== "safety" || picked.choice.to !== "writer" || !asksIfInDanger(labels)) return null;
+  if (ports.words === null) throw new NotBuiltError("recordSafetyOutcome");
+  const ask = ports.words.fixedLine(SAFETY_ASK_LINE);
+  if (ask?.id !== SAFETY_ASK_LINE || ask.text.trim() === "") {
+    throw new SafetyRefusedError("noSafetyAsk", [eventId]);
+  }
+  return ask.text;
+}
+
+/** The record's line for the row written for it, carrying the danger question when one goes (`ask`). */
+function recordLine(choice: SafetyLineChoice, outboxRowId: string, ask: string | null): RecordLine {
+  return {
+    fixedLineId: choice.fixedLineId,
+    to: choice.to,
+    outboxRowId,
+    fixedLines: ask === null ? [choice.fixedLineId] : [choice.fixedLineId, SAFETY_ASK_LINE],
+    ask,
+  };
+}
+
+/**
+ * The words a record's line sends, placed as the handle actor's direct path places them (runtime/src/safety/rules.ts
+ * checkedLineFor, line 173): the line's own words as the pinned bundle writes them, then the danger question on the same
+ * line after a space, once.
+ */
+export function lineWordsOf(own: string, line: Pick<RecordLine, "ask">): string {
+  return line.ask === null ? own : `${own} ${line.ask}`;
+}
+
 /** The outbox rows of the checked line, built by T-307 for its recipient; refused when nothing can carry it. */
 async function lineRows(
   call: RecordCall,
@@ -400,18 +490,22 @@ function repeatHold(
   };
 }
 
-/** The first record's answer, from the stored rows: nothing is written (default 1). */
+/**
+ * The first record's answer, from the stored rows: nothing is written (default 1). Its line is the first record's, with
+ * the danger question read from the stored labels and tenses (default 18).
+ */
 async function repeatAnswer(
   call: RecordCall,
   ports: RecordPorts,
   stored: StoredOutcome,
-): Promise<RecordResponse> {
+): Promise<{ readonly answer: RecordResponse; readonly line: RecordLine | null }> {
   const { request, businessId } = call;
   const eventId = stored.eventId;
   const latest = ruleOf(request.safety, false);
   const hold = repeatHold(await ports.reader.holdOfOutcome(stored.id), call.open, latest);
 
   let safetyLine: LineView | null = null;
+  let line: RecordLine | null = null;
   const picked = pickLine(
     ports,
     { outcomes: stored.outcomes, timedOut: stored.timedOut, wordKinds: stored.dangerWordKinds },
@@ -422,6 +516,13 @@ async function repeatAnswer(
     const lineId = await ports.ids.rowId("line", eventId);
     const written = await ports.reader.outboxRowWritten(lineId);
     safetyLine = { fixedLineId: picked.choice.fixedLineId, outboxRowId: written ? lineId : null };
+    if (written) {
+      line = recordLine(
+        picked.choice,
+        lineId,
+        dangerQuestionOf(ports, picked, storedLabels(stored), eventId),
+      );
+    }
   }
 
   const told: SafetyTold[] = [];
@@ -448,7 +549,7 @@ async function repeatAnswer(
 
   // With no hold row (free text with no handle: default 5), nothing books while its outcomes hold danger.
   const storedRule = stored.handleId === null ? ruleOf(stored, false) : null;
-  return {
+  const answer: RecordResponse = {
     outcomeId: stored.id,
     outcomes: [...stored.outcomes],
     hold,
@@ -460,6 +561,7 @@ async function repeatAnswer(
         : storedRule !== null && nothingBooksUnder({ releaseRule: storedRule, blocksBooking: false }),
     repeated: true,
   };
+  return { answer, line };
 }
 
 /** Plans one recordSafetyOutcome call: what it answers and what its commit writes. Reads only. */
@@ -469,14 +571,18 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
   const { caller, safety, handleId, bookingId, sentByActor } = request;
   const eventId = safety.eventId;
   const why = { step: RECORD_STEP, choice: null };
-  const nothing = (answer: RecordAnswer): RecordPlan => ({
+  const nothing = (answer: RecordAnswer, line: RecordLine | null = null): RecordPlan => ({
     key: eventId,
     answer,
     writes: noWrites(RECORD_STEP),
+    line,
   });
 
   const stored = await ports.reader.outcomeOfEvent(eventId);
-  if (stored !== null) return nothing(await repeatAnswer(call, ports, stored));
+  if (stored !== null) {
+    const repeat = await repeatAnswer(call, ports, stored);
+    return nothing(repeat.answer, repeat.line);
+  }
 
   const personId = caller.personId;
   const turnId = safety.source === "text" && turn !== null ? turn.id : null;
@@ -644,8 +750,9 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
     }
   }
 
-  // ---- the checked line -----------------------------------------------------------------------------------------------
+  // ---- the checked line, with the danger question it carries (default 18) ----------------------------------------------
   let safetyLine: LineView | null = null;
+  let line: RecordLine | null = null;
   let lineMessages: readonly OutboxRowNew[] = [];
   const wordKinds = safety.dangerWords.map((match) => match.kind);
   const picked = pickLine(
@@ -661,10 +768,13 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
     if (callerShowsLine(request)) {
       safetyLine = { fixedLineId: choice.fixedLineId, outboxRowId: null };
     } else {
+      // From the read's own labels, before the row is built: a line that cannot carry its question builds nothing.
+      const ask = dangerQuestionOf(ports, picked, safety.read?.labels ?? [], eventId);
       const lineId = await ports.ids.rowId("line", eventId);
       lineMessages = await lineRows(call, ports, lineId, choice, sendClass);
       const first = lineMessages[0];
       safetyLine = first === undefined ? null : { fixedLineId: choice.fixedLineId, outboxRowId: first.id };
+      line = first === undefined ? null : recordLine(choice, first.id, ask);
     }
   }
 
@@ -758,5 +868,6 @@ export async function planRecordSafetyOutcome(call: RecordCall, ports: RecordPor
       repeated: false,
     },
     writes,
+    line,
   };
 }

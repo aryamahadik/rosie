@@ -11,9 +11,12 @@ export const DEFAULT_BUNDLE_ID: BundleId = {
   build: 1,
 };
 
-/** One webhook answer: its status and, for anything but a 200, a label naming why (never a value from the request). */
+/**
+ * One webhook answer: its status and, for anything but a 200, a label naming why (never a value from the request). A 413
+ * is a body over its door's cap (T-1180, body.ts).
+ */
 export interface Answer {
-  status: 200 | 400 | 401 | 503;
+  status: 200 | 400 | 401 | 413 | 503;
   error?: string;
 }
 

@@ -7,10 +7,14 @@
 //   - each call opens one K-08 span with the trace's id and bundle id, which never carries a raw phone number or a
 //     person's words, checked against K-08 v1.1's span schema, which refuses refuse-raw-phone-in-span.json.
 // Values come only from the contracts' fixtures (the master's sample cast, the 555-01xx range: rule 9).
+//
+// T-1193's proofs (DL-376): a caller that records the call's hop itself says so (CallOptions.callerRecordsHop), and then
+// the base records no span for the call, while its answer, its handler, its scope and every error are exactly as without
+// it; an option naming any other hop, an empty one or none changes nothing, so every call records its span as before.
 
 import { describe, expect, it } from "vitest";
 
-import type { Span } from "../../../runtime/src/trace";
+import type { Hop, Span } from "../../../runtime/src/trace";
 import type { Tx } from "../../../db/repo/scope";
 import { CALL_HOPS, CALL_NAMES, hopOf, type CallName, type CallerKind } from "./calls";
 import { NotBuiltError, ToolApiContractError } from "./errors";
@@ -30,8 +34,15 @@ import {
   type Exchange,
   type HandlerCall,
   type RecordingRepo,
+  type ScopeEvent,
 } from "./test-support";
-import { createToolApi, notBuiltHandlers, type CallContext } from "./tool-api";
+import {
+  createToolApi,
+  notBuiltHandlers,
+  type CallContext,
+  type CallOptions,
+  type SpanRefusedReport,
+} from "./tool-api";
 import { createToolApiValidator } from "./validator";
 
 type Json = Record<string, unknown>;
@@ -599,6 +610,234 @@ describe("what a handler notes on its span", () => {
     trace.end();
     expect(await api.call("setRecordFlag", paused.request, trace)).toEqual(paused.outcome);
     expect(reports).toEqual([{ traceId: "trace-page-sam-0140", call: "setRecordFlag", error: "TraceError" }]);
+  });
+});
+
+/** A span without its timing (when it started, how long it ran), which two runs of a call never share. */
+function untimed(span: Span): Partial<Span> {
+  const copy: Partial<Span> = { ...span };
+  delete copy.at;
+  delete copy.ms;
+  return copy;
+}
+
+describe("a caller that records the call's hop itself (CallOptions, T-1193): no span of the base's, nothing else changed", () => {
+  /** The calls the turn face makes for the handle actor, whose hops the actor's turn records itself (DL-376). */
+  const TURN_RECORDED: readonly CallName[] = ["gateAndCommit", "composeInput", "finalizeMessage"];
+  /** The option naming the call's own hop, the one a turn's call takes: as the turn face passes it for these calls. */
+  const ownHop = (call: CallName): CallOptions => ({ callerRecordsHop: CALL_HOPS[call] });
+
+  /** What one call on a fresh base left: its answer or what it threw, what its handler saw, its scope and its spans. */
+  interface Ran {
+    answered: unknown;
+    thrown: unknown;
+    seen: HandlerCall[];
+    events: ScopeEvent[];
+    spans: Span[];
+  }
+
+  async function run(
+    call: CallName,
+    request: unknown,
+    answer: (request: unknown, context: CallContext<RecordingRepo>) => unknown,
+    options?: CallOptions,
+    traceId?: string,
+  ): Promise<Ran> {
+    const { api, scope, seen } = setup(call, answer);
+    const { trace, spans } = traceFor(request, traceId);
+    const settled = await api.call(call, structuredClone(request), trace, options).then(
+      (answered) => ({ answered, thrown: undefined }),
+      (thrown: unknown) => ({ answered: undefined, thrown }),
+    );
+    return { ...settled, seen, events: scope.events, spans };
+  }
+
+  /** What the caller got: the answer, or the error thrown, by its class and message. */
+  function gotOf(ran: Ran): unknown {
+    const { thrown } = ran;
+    if (thrown === undefined) return { answered: ran.answered };
+    return thrown instanceof Error ? { threw: thrown.constructor.name, message: thrown.message } : { thrown };
+  }
+
+  /** The same call without the option and with it: the same answer, handler and scope; one span of the base's, then none. */
+  function expectOnlyTheSpanGone(without: Ran, opted: Ran, hop: Hop, what: string): void {
+    expect(gotOf(opted), what).toEqual(gotOf(without));
+    expect(opted.seen, what).toEqual(without.seen);
+    expect(opted.events, what).toEqual(without.events);
+    expect(
+      without.spans.map((span) => span.hop),
+      what,
+    ).toEqual([hop]);
+    expect(opted.spans, what).toEqual([]);
+  }
+
+  const exchanges = acceptedExchanges().filter(({ exchange }) => TURN_RECORDED.includes(exchange.call));
+
+  it("K-09 v1 has accepted exchanges of all three calls, each a turn's, whose span takes the call's own hop", () => {
+    expect([...new Set(exchanges.map(({ exchange }) => exchange.call))].sort()).toEqual(
+      [...TURN_RECORDED].sort(),
+    );
+    for (const { file, exchange } of exchanges) {
+      const kind = callerOf(exchange.request)?.kind;
+      expect(kind, file).toBe("turn");
+      expect(hopOf(exchange.call, kind as CallerKind), file).toBe(CALL_HOPS[exchange.call]);
+    }
+    expect([CALL_HOPS.gateAndCommit, CALL_HOPS.composeInput, CALL_HOPS.finalizeMessage]).toEqual([
+      "gate",
+      "fillAndChecks",
+      "fillAndChecks",
+    ]);
+  });
+
+  for (const { file, exchange } of exchanges) {
+    it(`${file}: ${exchange.call} with the option answers exactly as without it, its handler and scope alike, and leaves no span`, async () => {
+      const answer = (): unknown => exchange.outcome;
+      const without = await run(exchange.call, exchange.request, answer);
+      const opted = await run(exchange.call, exchange.request, answer, ownHop(exchange.call));
+      const scoped = typeof callerOf(exchange.request)?.businessId === "string";
+      expect(without.answered).toEqual(
+        scoped ? exchange.outcome : { error: "noBusinessScope", call: exchange.call },
+      );
+      expectOnlyTheSpanGone(without, opted, CALL_HOPS[exchange.call], file);
+    });
+  }
+
+  for (const call of TURN_RECORDED) {
+    it(`${call}: every refusal and failure, before its handler or after, is the same with the option, and leaves no span`, async () => {
+      const valid = VALID[call];
+      if (valid === undefined) throw new Error(`K-09 v1 has an accepted ${call} request`);
+      const notBuilt = (): unknown => {
+        throw new NotBuiltError(call);
+      };
+      const throws = (): unknown => {
+        throw new TypeError("Sam Lee at +15555550100 broke it");
+      };
+      const cases: {
+        what: string;
+        request: unknown;
+        answer: () => unknown;
+        traceId?: string;
+        ends: string;
+      }[] = [
+        { what: "a request K-09 refuses", request: {}, answer: never, ends: "invalidRequest" },
+        {
+          what: "a request naming another trace",
+          request: valid,
+          answer: never,
+          traceId: "trace-sam-9999",
+          ends: "invalidRequest",
+        },
+        {
+          what: "a request naming no business",
+          request: { ...valid, caller: { ...callerOf(valid), businessId: null } },
+          answer: never,
+          ends: "noBusinessScope",
+        },
+        { what: "a handler not built yet", request: valid, answer: notBuilt, ends: "notBuilt" },
+        {
+          what: "one of the call's errors",
+          request: valid,
+          answer: () => ({ error: "transient", sqlstate: "40001" }),
+          ends: "transient",
+        },
+        {
+          what: "an answer outside the contract",
+          request: valid,
+          answer: () => ({ rowId: 7, phone: "+15555550131" }),
+          ends: "ToolApiContractError",
+        },
+        { what: "a handler that throws", request: valid, answer: throws, ends: "TypeError" },
+      ];
+      for (const { what, request, answer, traceId, ends } of cases) {
+        const without = await run(call, request, answer, undefined, traceId);
+        const opted = await run(call, request, answer, ownHop(call), traceId);
+        const ended =
+          without.thrown instanceof Error
+            ? without.thrown.constructor.name
+            : (without.answered as { error?: unknown }).error;
+        expect(ended, what).toBe(ends);
+        expectOnlyTheSpanGone(without, opted, CALL_HOPS[call], `${call}: ${what}`);
+        expect(without.spans[0]?.outcome, what).not.toBe("ok");
+      }
+    });
+  }
+
+  it("on a trace that has ended, the option leaves nothing to refuse or report, and the answer is the same", async () => {
+    const exchange = fixture("commit-s1-02.json") as Exchange;
+    const onEnded = async (options?: CallOptions) => {
+      const reports: SpanRefusedReport[] = [];
+      const api = createToolApi({
+        validator,
+        scope: recordingScope(),
+        handlers: recordingHandlers("gateAndCommit", () => exchange.outcome),
+        onSpanRefused: (report) => reports.push(report),
+      });
+      const { trace, spans } = traceFor(exchange.request);
+      trace.end();
+      const answer = await api.call("gateAndCommit", structuredClone(exchange.request), trace, options);
+      return { answer, reports, spans };
+    };
+    const without = await onEnded();
+    const opted = await onEnded(ownHop("gateAndCommit"));
+    expect(without.answer).toEqual(exchange.outcome);
+    expect(opted.answer).toEqual(without.answer);
+    expect(without.reports).toEqual([
+      { traceId: callerOf(exchange.request)?.traceId, call: "gateAndCommit", error: "TraceError" },
+    ]);
+    expect(opted.reports).toEqual([]);
+    expect([...without.spans, ...opted.spans]).toEqual([]);
+  });
+
+  it("an option naming a hop the call's span does not take changes nothing: the base records the same span as without it", async () => {
+    const commit = fixture("commit-s1-02.json") as Exchange;
+    const compose = fixture("compose-input-s1-02.json") as Exchange;
+    const frontier = fixture("build-frontier-s1-02.json") as Exchange;
+    const paused = fixture("flag-paused.json") as Exchange;
+    const cases: { exchange: Exchange; options: CallOptions; hop: Hop }[] = [
+      // A turn's gateAndCommit takes the gate hop, its compose input fillAndChecks: another hop named is not theirs.
+      { exchange: commit, options: { callerRecordsHop: "fillAndChecks" }, hop: "gate" },
+      { exchange: compose, options: { callerRecordsHop: "gate" }, hop: "fillAndChecks" },
+      // The frontier's span stays the base's (CQ-159, T-557).
+      { exchange: frontier, options: { callerRecordsHop: "gate" }, hop: "frontier" },
+      // A page's call is a pageRequest whatever the call: naming the call's own hop never silences it.
+      { exchange: paused, options: ownHop("setRecordFlag"), hop: "pageRequest" },
+    ];
+    for (const { exchange, options, hop } of cases) {
+      const answer = (): unknown => exchange.outcome;
+      const without = await run(exchange.call, exchange.request, answer);
+      const opted = await run(exchange.call, exchange.request, answer, options);
+      expect(gotOf(opted), exchange.call).toEqual(gotOf(without));
+      expect(opted.events, exchange.call).toEqual(without.events);
+      expect(onlySpan(without.spans).hop).toBe(hop);
+      expect(untimed(onlySpan(opted.spans)), exchange.call).toEqual(untimed(onlySpan(without.spans)));
+    }
+    // gateAndCommit's span still logs limits 1 to 6 as notChecked when its handler gave none.
+    const gate = await run("gateAndCommit", commit.request, () => commit.outcome, {
+      callerRecordsHop: "fillAndChecks",
+    });
+    expect(onlySpan(gate.spans).limits).toEqual(
+      [1, 2, 3, 4, 5, 6].map((limit) => ({ limit, result: "notChecked", outcome: null })),
+    );
+  });
+
+  it("without the option, or with an empty one, every call of K-09 v1 records its one span as before", async () => {
+    const requests: [CallName, unknown][] = [
+      ...(Object.entries(VALID) as [CallName, Json][]),
+      ...BUILT,
+      ["plannerVerbs", PLANNER_REQUEST],
+    ];
+    expect(requests.map(([call]) => call).sort()).toEqual([...CALL_NAMES].sort());
+    for (const [call, request] of requests) {
+      const spansOf = async (options?: CallOptions): Promise<Span[]> => {
+        const api = createToolApi({ validator, scope: recordingScope(), handlers: notBuiltHandlers() });
+        const { trace, spans } = traceFor(request);
+        await api.call(call, structuredClone(request), trace, options);
+        return spans;
+      };
+      const plain = onlySpan(await spansOf());
+      expect(plain.hop, call).toBe(hopOf(call, callerOf(request)?.kind as CallerKind | undefined));
+      expect(untimed(onlySpan(await spansOf({}))), call).toEqual(untimed(plain));
+    }
   });
 });
 

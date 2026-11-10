@@ -27,17 +27,21 @@
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
 // have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets and frontier
 // ports, which no database feeds there until T-567, so every seal, commit, park, pin, targets read and frontier fails
-// closed) and the closed set are at hand there, so every door not joined fails and a webhook that gets past the verify
-// answers 503, as before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined
-// ports are fed (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle
-// reads, handleTargets and the frontier's readTurnState scope), the HandleActor namespace, its flags and its own clock.
+// closed, and the decide port, which no decider feeds there until J-02, so every decide fails closed) and the closed set
+// are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as before. A
+// test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed (the Linq
+// double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads, handleTargets
+// and the frontier's readTurnState scope, and @rosie/ai's deciders over the recorded-model double), the HandleActor
+// namespace, its flags and its own clock.
 // The turn's park goes through the turn-row port (T-555): K-05's parkTurn writes the turn's one row under the turn id the
 // lease hashed from its batch's event ids. The turn's pin reads its bundle through the bundle port, and the guard its
 // targets through the targets port (T-556). The turn's frontier goes through the frontier port (T-557): @rosie/actions'
 // turn face over the frontier's scope, reading the bundle the run pinned. Where that port binds real, its Tool API base
 // records the frontier span and the turn records none (TurnFace.recordsFrontierSpan; CQ-159), so the hop is recorded
-// once; each later join whose port records its own hop's span sets that hop's flag the same way. Never logged by the
-// root: a word, a number, a key.
+// once; each later join whose port records its own hop's span sets that hop's flag the same way. The turn's decide and
+// its one re-read go through the decide port (T-558): @rosie/ai's decider for the turn's bundle, one per bundle for both,
+// which records only its model calls' portCall spans, so the turn keeps recording the decideReads and reread spans and
+// no flag is set for them. Never logged by the root: a word, a number, a key.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -64,6 +68,7 @@ import { PinnedRuns } from "./pinned-runs";
 import {
   realPorts,
   type BundleReadCalls,
+  type Deciders,
   type FrontierScope,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
@@ -147,6 +152,13 @@ export interface RootOptions {
    * T-567), so every frontier fails closed and no text reaches decide.
    */
   readonly frontierScope?: FrontierScope | null;
+  /**
+   * @rosie/ai's decide for each bundle (T-558; ./real.ts Deciders): the turn's two reads and its one Sonnet re-read, one
+   * decider per bundle for both. In a test, over a fake Messages API answered by the recorded-model double; null or left
+   * out where none can be built (the Worker, until its bundle's manifest and flows can be read there and the model key is
+   * set by name: J-02), so every decide and re-read fails closed before any model call and nothing decided commits.
+   */
+  readonly deciders?: Deciders | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -207,6 +219,7 @@ export function composeRoot(options: RootOptions): Root {
       frontierScope: options.frontierScope,
       // The bound bundle port, read at each call, for a bundle the turn did not pin; and the bundle each run pinned.
       frontierBundles: { bundles: () => ports.bundles, pinnedOf: (trace) => pinnedRuns.of(trace) },
+      deciders: options.deciders,
     }),
     closed: closedPorts(),
   });
@@ -375,7 +388,8 @@ export interface WorkerSecrets {
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
  * so the gateway answers 503), and the sealing, turn-row, bundle, targets and frontier ports are handed no K-05 call or
  * scope, since no database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and the gateway
- * answers 503 with nothing written, no turn's bundle can be pinned and no frontier runs. The gateway's door to the handle's actor is the HANDLE_ACTOR
+ * answers 503 with nothing written, no turn's bundle can be pinned and no frontier runs; the decide port is handed no
+ * decider until J-02, so no decide runs. The gateway's door to the handle's actor is the HANDLE_ACTOR
  * binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays closed), and
  * no release flags are handed in until staging has its database and the flag's deploy step (T-567, T-569), so the
  * skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
@@ -407,6 +421,10 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // No database is bound until T-567 (its rosie_job client gives pgFrontierScope): every frontier fails closed inside
     // the Tool API base, before anything is read, so no text reaches decide.
     frontierScope: null,
+    // No decide until the bundle's manifest and flows (T-566's BUNDLES, T-567's database) and the model key (J-02;
+    // smoke-size calls only, DL-027) can be read in the Worker: every decide and re-read fails closed before any model
+    // call (./real.ts NoDeciderError), so no decided part reaches the gate.
+    deciders: null,
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as

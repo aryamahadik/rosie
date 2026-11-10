@@ -1,16 +1,17 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557), under Node (Vitest project "unit"):
-// the ports the root binds in each environment, each once and none left unbound; the check that refuses a port bound twice
-// or left unbound; each bound port handed to the part that calls it; and the closed implementation the Worker's
-// environments still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the sealing,
-// T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets, T-557 the frontier;
-// production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558), under Node (Vitest project
+// "unit"): the ports the root binds in each environment, each once and none left unbound; the check that refuses a port
+// bound twice or left unbound; each bound port handed to the part that calls it; and the closed implementation the
+// Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the
+// sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets, T-557 the
+// frontier, T-558 decide; production takes no join yet).
+import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
 import { openTrace, type Span } from "../trace";
-import type { BuildFrontierRequest, ParkTurnRequest } from "../turn/types";
+import type { BuildFrontierRequest, DecideContext, DecideResult, ParkTurnRequest } from "../turn/types";
 import {
   bindPorts,
   closedPorts,
@@ -19,6 +20,7 @@ import {
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
   NoDatabaseError,
+  NoDeciderError,
   NotJoinedError,
   PICKS,
   PORTS,
@@ -44,8 +46,8 @@ function workerEnv(environment: string): Cloudflare.Env {
  * and closed on the Worker's environments.
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
-  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier"],
-  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier"],
+  test: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier", "decide"],
+  staging: ["linqVerify", "sealing", "safetyRead", "turnRow", "bundles", "targets", "frontier", "decide"],
   production: [],
 };
 
@@ -89,7 +91,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read and frontier to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier and decide to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -147,7 +149,8 @@ describe("the ports the root binds", () => {
     expect(root.safety.direct).toBe(fakes.ports.linqSend.direct);
     expect(root.turn.directory).toBe(fakes.ports.stateReads.turn.directory);
     expect(root.turn.safety).toBe(fakes.ports.stateReads.turn.safety);
-    expect(root.turn.ai).toBe(fakes.ports.decide);
+    // The turn's decide and its one re-read go to the joined decide port (T-558), never to a fake.
+    expect(root.turn.ai).toBe(root.ports.decide);
     expect(root.turn.composer).toBe(fakes.ports.composer);
     // The turn's plan calls go to the data-access port; its park writes the turn's one row through the turn-row port
     // (T-555), never through the data-access port's fake.
@@ -220,12 +223,13 @@ describe("a port bound twice or left unbound is refused, naming the port", () =>
   });
 
   it("refuses a port whose picked implementation is not at hand", () => {
+    // The composer: a port no join has reached yet, so the test environment picks its fake (decide is joined, T-558).
     const partial = Object.fromEntries(
-      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "decide"),
+      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "composer"),
     ) as Partial<Ports>;
 
     expect(() => bindPorts(PICKS, "test", { ...sets, fake: partial })).toThrow(
-      new WiringError("left unbound in test: decide (no fake implementation)"),
+      new WiringError("left unbound in test: composer (no fake implementation)"),
     );
   });
 
@@ -306,6 +310,31 @@ describe("the Worker's environments", () => {
         decided: { answered: "thrown" },
       },
     ]);
+  });
+
+  it("fails decide and its re-read closed with no decider bound (until J-02): before any model call, with no span", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    // The JOIN run's own context (K-02 README "v1.1", recording 2): what the frontier gives turn 1 on bundle v0.
+    const context = structuredClone(joinRunContext) as unknown as DecideContext;
+    trace.setTurn(context.turnId);
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    try {
+      await expect(root.turn.ai.decide(context, trace)).rejects.toThrow(new NoDeciderError());
+      await expect(
+        root.turn.ai.reread({ context, decide: {} as DecideResult, why: "disagreed", failing: [] }, trace),
+      ).rejects.toThrow(new NoDeciderError());
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(fetch).not.toHaveBeenCalled();
+    expect(spans).toEqual([]);
   });
 });
 

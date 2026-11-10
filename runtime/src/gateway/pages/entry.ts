@@ -8,8 +8,9 @@
 //   2. A staging-only call anywhere but staging (ENVIRONMENT is not exactly "staging") answers K-21's stagingOnly at once:
 //      its body is never read and no handler runs (BP 9.4 "Never in production"; fire-now-in-production.json, and
 //      refuse-fire-now-in-production.json: no other answer there).
-//   3. The body must be one JSON object, or the answer is 400 and no handler runs. The gateway checks nothing else in it:
-//      the contract's checks are the handler's.
+//   3. The body is read under its cap (T-1180; ../body.ts; PageDeps.bodyLimitBytes, PAGE_BODY_LIMIT_BYTES by default): a
+//      body over it is answered 413 before it is read whole, and no handler runs. Then it must be one JSON object, or the
+//      answer is 400 and no handler runs. The gateway checks nothing else in it: the contract's checks are the handler's.
 //   4. The call's handler gets the request, the trace and the environment. Its outcome, a response or one of the call's
 //      errors, is sent as it is with 200. A handler that throws, or answers anything but an object JSON can send, gives
 //      503 with no outcome, and the web app may send the call again (each K-21 call is safe to repeat by its own rule).
@@ -19,13 +20,17 @@
 // { ok: false, error, trace_id }, as the webhooks and the 404 give it.
 //
 // One K-08 pageRequest span ends every answer: the call's name, the status, what was answered (response or an error's
-// name) and the outcome. Never in a span or a log line: anything from the request (its body, session token, link code,
-// typed words, even its envelope's ids), or a handler's error message (which could quote them); a failure's log line
-// names its stage and the error's name only, and only when that name is a label.
+// name) and the outcome. An error's name is the handler's `error` only when it is one of K-21 v1's (errors.ts); any other
+// value, a label or not, is written as UNKNOWN_PAGE_ERROR (T-1180). Never in a span or a log line: anything from the
+// request (its body, session token, link code, typed words, even its envelope's ids), or a handler's error message
+// (which could quote them); a failure's log line names its stage and the error's name only, and only when that name is a
+// label.
 
 import { isLabel, logSink, openTrace, type BundleId, type TraceContext } from "../../trace";
 import { DEFAULT_BUNDLE_ID, readBundleId, respond, type WebhookEnvironment } from "../answer";
+import { PAGE_BODY_LIMIT_BYTES, bodyLimitOf, readCappedText } from "../body";
 import { isStagingOnly, type PageCallName } from "./calls";
+import { UNKNOWN_PAGE_ERROR, isPageError } from "./errors";
 import type { PageDeps, PageOutcome } from "./types";
 
 /** K-21's answer to a staging-only call anywhere but staging (K-21 v1 `$defs/stagingOnlyError`). */
@@ -50,7 +55,7 @@ export class PageNotConnectedError extends Error {
 
 /**
  * How one call ended. A 200 sends an outcome (`sent`, as JSON) and names what it was ("response" or the K-21 error's
- * name); a 400 or a 503 is the edge's own answer, with no outcome.
+ * name); a 400, a 413 or a 503 is the edge's own answer, with no outcome.
  */
 type Ending =
   | {
@@ -60,7 +65,14 @@ type Ending =
       answer: string;
       errorCode: string | null;
     }
-  | { status: 400 | 503; outcome: "refused" | "failed"; errorCode: string };
+  | { status: 400 | 413 | 503; outcome: "refused" | "failed"; errorCode: string };
+
+/** The edge's own answer for each status it gives, a fixed label (never a value from the request). */
+const EDGE_ERRORS = {
+  400: "bad_request",
+  413: "payload_too_large",
+  503: "unavailable",
+} as const;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -94,13 +106,10 @@ export async function handlePageCall(
   }
 
   if (ending.status === 200) return outcomeResponse(ending.sent, trace.traceId);
-  return respond(
-    { status: ending.status, error: ending.status === 400 ? "bad_request" : "unavailable" },
-    trace.traceId,
-  );
+  return respond({ status: ending.status, error: EDGE_ERRORS[ending.status] }, trace.traceId);
 }
 
-/** Steps 2 to 4: the staging-only refusal, the body, then the handler's outcome. */
+/** Steps 2 to 4: the staging-only refusal, the body under its cap, then the handler's outcome. */
 async function answerOf(
   request: Request,
   call: PageCallName,
@@ -118,8 +127,15 @@ async function answerOf(
     };
   }
 
-  const body = await readObject(request, trace.traceId);
-  if ("problem" in body) return { status: 400, outcome: "refused", errorCode: body.problem };
+  const body = await readObject(
+    request,
+    bodyLimitOf(deps.bodyLimitBytes, PAGE_BODY_LIMIT_BYTES),
+    trace.traceId,
+  );
+  if ("problem" in body) {
+    const status = body.problem === "bodyTooLarge" ? 413 : 400;
+    return { status, outcome: "refused", errorCode: body.problem };
+  }
 
   let outcome: unknown;
   try {
@@ -143,8 +159,9 @@ async function answerOf(
   if (!Object.hasOwn(outcome, "error")) {
     return { status: 200, sent, outcome: "ok", answer: "response", errorCode: null };
   }
+  // Only K-21 v1's own names reach the span; anything else a handler sets is one fixed label (errors.ts).
   const error = outcome.error;
-  const code = typeof error === "string" && isLabel(error) ? error : "error";
+  const code = isPageError(error) ? error : UNKNOWN_PAGE_ERROR;
   return {
     status: 200,
     sent,
@@ -177,21 +194,27 @@ function openPageTrace(
   }
 }
 
-/** The body as one JSON object, or why it is not one (a label for the span). Its text and the parser's message are never logged. */
+/**
+ * The body as one JSON object, read under `limitBytes`, or why it is not one (a label for the span). Its text and the
+ * parser's message are never logged, and a body over the cap is never read whole (../body.ts).
+ */
 async function readObject(
   request: Request,
+  limitBytes: number,
   traceId: string,
-): Promise<{ request: Record<string, unknown> } | { problem: "unreadableBody" | "notJson" | "notAnObject" }> {
-  let text: string;
-  try {
-    text = await request.text();
-  } catch (error) {
-    logPageFailure(traceId, "readBody", error);
+): Promise<
+  | { request: Record<string, unknown> }
+  | { problem: "bodyTooLarge" | "unreadableBody" | "notJson" | "notAnObject" }
+> {
+  const read = await readCappedText(request, limitBytes);
+  if ("problem" in read) {
+    if (read.problem === "tooLarge") return { problem: "bodyTooLarge" };
+    logPageFailure(traceId, "readBody", read.error);
     return { problem: "unreadableBody" };
   }
   let value: unknown;
   try {
-    value = JSON.parse(text);
+    value = JSON.parse(read.text);
   } catch {
     // The parser's message can quote the body, so nothing is logged.
     return { problem: "notJson" };

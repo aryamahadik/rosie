@@ -18,7 +18,10 @@
 //     rather than let a plug-in's stop words go unread; a plug-in known to list none is wired as such, by name
 //     (PLUGIN_LISTS_NO_STOP_WORDS), never by default;
 //   - SafetyTelling: who is told through a hand-off or a page (K-36 v1; arch 06 line 329), T-319's paging and hand-offs.
-//     With none, an outcome that must tell someone answers notBuilt.
+//     With none, an outcome that must tell someone answers notBuilt;
+//   - SafetyWords: K-01 v1's fixed lines word for word, from the pinned bundle (as the handle actor's BundleSafety reads
+//     them): the record reads safetyAsk's, the danger question its line carries after a label of unknown tense (T-1176;
+//     CQ-172). With none, a record whose line asks it answers notBuilt; one whose line asks nothing never reads it.
 // So every port fails closed until it is wired (D-017; T-1138).
 //
 // No port is called for anything but a read or a pure answer: a repeated turn runs the service again before K-05 answers
@@ -179,6 +182,25 @@ export const FIXED_SAFETY_LINES: SafetyLines = {
   },
   outageLine: () => "outage",
 };
+
+// ---- the fixed lines' words -----------------------------------------------------------------------------------------
+
+/** A K-01 v1 fixed line with its words, as the pinned bundle writes them (the handle actor's CheckedLine). */
+export interface FixedLineWords {
+  /** K-01 v1 fixedLine.id. */
+  readonly id: string;
+  readonly text: string;
+}
+
+/**
+ * K-01 v1's fixed lines word for word, from the pinned bundle (sharedLists.fixedLines), as the handle actor's
+ * BundleSafety.fixedLine reads them: the record's line carries safetyAsk's words when the danger question goes with it
+ * (record.ts dangerQuestionOf, default 18). This service holds no words of its own (rule 3), so no default gives any.
+ */
+export interface SafetyWords {
+  /** A K-01 fixed line by id, in English; null when the bundle holds no words for it (missing, or waiting for Jay). */
+  fixedLine(id: string): FixedLineWords | null;
+}
 
 // ---- the plug-in's stop words ---------------------------------------------------------------------------------------
 

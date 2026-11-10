@@ -16,9 +16,14 @@
 // rosie_job scope: T-315's security note b), and each K-05 call that needs the runtime side runs in a transaction of its
 // own (STATE note 59). Without `calls`, each of them answers notBuilt and nothing is read (fail closed).
 //
-// The base records the call's span (frontier, gate, fillAndChecks) on the trace it is handed. The actor's turn records
-// its own spans around its ports (runtime/src/turn/turn.ts), and K-08's hop check fails a hop recorded twice, so which of
-// the two the skeleton's trace keeps is for each join to wire (T-315's handoff).
+// Spans: K-08's hop check fails a hop recorded twice, and the actor's turn records its own spans around its ports
+// (runtime/src/turn). The frontier's span is the base's, on the trace it is handed, since it names where each bundle part
+// came from; the turn records none for it (CQ-159, T-557: TurnFace.recordsFrontierSpan). For the three calls after it,
+// the turn records the hops itself: the gate (one span per part, with its limits) and the commit around gateAndCommit,
+// and one fillAndChecks span per row (around the row's finalize), the hop composeInput and finalizeMessage take. So the
+// face tells the base so on each of those calls (CallOptions.callerRecordsHop: TURN_RECORDS_GATE,
+// TURN_RECORDS_FILL_AND_CHECKS), and the base records no span for them; their checks, answers and errors are as without
+// it (T-1193; DL-376).
 
 import {
   frontierHandlers,
@@ -37,6 +42,7 @@ import type { BusinessScope } from "../scope";
 import {
   createToolApi,
   notBuiltHandlers,
+  type CallOptions,
   type CallTrace,
   type Handlers,
   type SpanRefusedReport,
@@ -65,12 +71,19 @@ export interface TurnFace {
   /**
    * K-09 gateAndCommit, behind the lease: `at` is the lease's CommitContext (the safety holds open and the texts not read
    * yet at commit time), handed on unchanged; the commit's openHolds joins it with K-05's read. A repeat of the same
-   * turn id answers the first commit and writes nothing (K-05 v1 item 1).
+   * turn id answers the first commit and writes nothing (K-05 v1 item 1). The base records no span: the turn records the
+   * gate and the commit itself (TURN_RECORDS_GATE).
    */
   gateAndCommit(request: unknown, at: CommitAt, trace: CallTrace): Promise<GateAndCommitCallAnswer>;
-  /** K-09 composeInput: a committed row's K-03 composer input, with only what limit 7 lets its reader see. A read. */
+  /**
+   * K-09 composeInput: a committed row's K-03 composer input, with only what limit 7 lets its reader see. A read. The base
+   * records no span: the turn records the row's fillAndChecks itself (TURN_RECORDS_FILL_AND_CHECKS).
+   */
   composeInput(request: unknown, trace: CallTrace): Promise<ComposeInputCallAnswer>;
-  /** K-09 finalizeMessage: the row's options, fixed lines, slots and checks on the plan, written with it when it sends. */
+  /**
+   * K-09 finalizeMessage: the row's options, fixed lines, slots and checks on the plan, written with it when it sends. The
+   * base records no span: the turn records the row's fillAndChecks itself (TURN_RECORDS_FILL_AND_CHECKS).
+   */
   finalizeMessage(request: unknown, trace: CallTrace): Promise<FinalizeCallAnswer>;
 }
 
@@ -112,8 +125,23 @@ export interface TurnFaceOptions<Repo extends FrontierRepo, CallRepo = unknown> 
   readonly onSpanRefused?: (report: SpanRefusedReport) => void;
 }
 
-/** The base's handlers for the three calls after the frontier, gateAndCommit's deps those of one call's context. */
-function callHandlers<Repo>(calls: TurnFaceCalls<Repo>, at: CommitAt | null): Handlers<Repo> {
+/**
+ * The handle actor's turn records the gate (one span per part, with its limits) and the commit around gateAndCommit
+ * (runtime/src/turn/turn.ts sendCommit), so the face's gateAndCommit tells the base it records the gate hop itself.
+ */
+export const TURN_RECORDS_GATE: CallOptions = { callerRecordsHop: "gate" };
+
+/**
+ * The turn records one fillAndChecks span per row, around the row's finalize (runtime/src/turn/compose.ts), the hop
+ * composeInput and finalizeMessage take, so the face's two calls tell the base it records that hop itself.
+ */
+export const TURN_RECORDS_FILL_AND_CHECKS: CallOptions = { callerRecordsHop: "fillAndChecks" };
+
+/**
+ * The base's handlers for the three calls after the frontier, gateAndCommit's deps those of one call's context. Exported
+ * so a test can run the same handlers on a base called as any other caller calls it, without the face's options.
+ */
+export function callHandlers<Repo>(calls: TurnFaceCalls<Repo>, at: CommitAt | null): Handlers<Repo> {
   const handlers = notBuiltHandlers() as Handlers<Repo>;
   return {
     ...handlers,
@@ -157,11 +185,17 @@ export function createTurnFace<Repo extends FrontierRepo, CallRepo = unknown>(
         });
   const steady = callsApi(null);
   return {
-    // The base holds each answer to its call's response or errors, or answers one of its own refusals.
+    // The base holds each answer to its call's response or errors, or answers one of its own refusals. The frontier's
+    // span is the base's; for the three calls after it the turn records the hop, so the base records none (T-1193).
     buildFrontier: (request, trace) =>
       frontier.call("buildFrontier", request, trace) as Promise<BuildFrontierCallAnswer>,
     async gateAndCommit(request, at, trace) {
-      const answer = (await callsApi(at).call("gateAndCommit", request, trace)) as GateAndCommitCallAnswer;
+      const answer = (await callsApi(at).call(
+        "gateAndCommit",
+        request,
+        trace,
+        TURN_RECORDS_GATE,
+      )) as GateAndCommitCallAnswer;
       // A committed turn (first or repeated): its texts and language, as the runtime handed them, held for its rows.
       if ("result" in answer && answer.result === "committed") {
         const held = heldTurnOf(request);
@@ -170,8 +204,18 @@ export function createTurnFace<Repo extends FrontierRepo, CallRepo = unknown>(
       return answer;
     },
     composeInput: (request, trace) =>
-      steady.call("composeInput", request, trace) as Promise<ComposeInputCallAnswer>,
+      steady.call(
+        "composeInput",
+        request,
+        trace,
+        TURN_RECORDS_FILL_AND_CHECKS,
+      ) as Promise<ComposeInputCallAnswer>,
     finalizeMessage: (request, trace) =>
-      steady.call("finalizeMessage", request, trace) as Promise<FinalizeCallAnswer>,
+      steady.call(
+        "finalizeMessage",
+        request,
+        trace,
+        TURN_RECORDS_FILL_AND_CHECKS,
+      ) as Promise<FinalizeCallAnswer>,
   };
 }

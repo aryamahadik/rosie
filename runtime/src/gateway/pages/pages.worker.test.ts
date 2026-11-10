@@ -3,17 +3,23 @@
 // The handlers are recording stubs (test-support.ts) that answer each fixture's own outcome; the Worker gets
 // wrangler.jsonc's staging vars (ENVIRONMENT "staging", BASE_PATH "/test"), and a test that runs elsewhere changes them.
 // Fixtures: every K-21 v1 fixture in contracts/page-api/fixtures/index.json, accepted and refused.
+// T-1180: a body over the cap is answered 413 before it is read whole, with no stub run, and the span takes a handler's
+// error only when it is one of K-21 v1's names; every fixture above still reaches its stub under the cap.
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import worker, { createWorker } from "../../index";
 import { unconfiguredGateway } from "..";
+import { PAGE_BODY_LIMIT_BYTES } from "../body";
+import { countedStream, postOf, xBytes } from "../test-support";
 import type { GatewayDeps } from "../types";
 import {
   PAGE_API_PATH,
   PAGE_CALLS,
+  PAGE_ERRORS,
   STAGING_ONLY_CALLS,
   STAGING_ONLY_OUTCOME,
+  UNKNOWN_PAGE_ERROR,
   isStagingOnly,
   pagePathOf,
   type PageCallName,
@@ -55,8 +61,17 @@ function fixture(file: string): V1Fixture {
 }
 
 /** The gateway with these page handlers, a fixed bundle id and clock; every other door unconfigured. */
-function gatewayWith(pages: PageHandlers): GatewayDeps {
-  return { ...unconfiguredGateway(), pages, bundleId: () => BUNDLE, now: () => NOW };
+function gatewayWith(pages: PageHandlers, more: Partial<GatewayDeps> = {}): GatewayDeps {
+  return { ...unconfiguredGateway(), pages, bundleId: () => BUNDLE, now: () => NOW, ...more };
+}
+
+const bytesOf = (text: string): number => new TextEncoder().encode(text).byteLength;
+
+/** A request as JSON, then trailing spaces (the same JSON) to exactly `bytes` bytes. */
+function paddedTo(request: Record<string, unknown>, bytes: number): string {
+  const json = JSON.stringify(request);
+  if (bytesOf(json) > bytes) throw new Error(`the request is over ${String(bytes)} bytes already`);
+  return json + " ".repeat(bytes - bytesOf(json));
 }
 
 /** The Worker's vars where a call runs: staging's as wrangler.jsonc sets them, or another ENVIRONMENT with BASE_PATH "". */
@@ -526,6 +541,273 @@ describe("the edge's own answers", () => {
     expect(stubs.calls).toEqual([]);
     expect(pageSpans(logLines())).toEqual([]);
   });
+});
+
+describe("the body cap (T-1180): a body over it is answered 413 before it is read whole, and no stub runs", () => {
+  /** The first staging fixture of each call: every call reads its body on staging. */
+  const perCall = PAGE_CALLS.map((call) => {
+    const given = ACCEPTED.find(
+      (candidate) => candidate.call === call && candidate.environment === "staging",
+    );
+    if (given === undefined) throw new Error(`no staging fixture of ${call}`);
+    return given;
+  });
+
+  it("a body one byte over the cap, on every call: 413 with the trace id, no stub runs, a refused span naming bodyTooLarge, nothing of the body logged", async () => {
+    const logLines = captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+
+    for (const given of perCall) {
+      const traceId = crypto.randomUUID();
+      const body = paddedTo(given.request, PAGE_BODY_LIMIT_BYTES + 1);
+      expect(bytesOf(body), given.file).toBe(PAGE_BODY_LIMIT_BYTES + 1);
+
+      const response = await routed.fetch(
+        pagePost(pathIn("staging", given.call), body, { traceId }),
+        env,
+        context,
+      );
+
+      expect(response.status, given.file).toBe(413);
+      expect(response.headers.get("x-trace-id"), given.file).toBe(traceId);
+      expect(response.headers.get("content-type"), given.file).toBe("application/json; charset=utf-8");
+      expect(response.headers.get("cache-control"), given.file).toBe("no-store");
+      expect(await response.json(), given.file).toEqual({
+        ok: false,
+        error: "payload_too_large",
+        trace_id: traceId,
+      });
+    }
+
+    expect(stubs.calls).toEqual([]);
+    const lines = logLines();
+    const spans = pageSpans(lines);
+    expect(spans.map((span) => (span.got as { pageCall: string }).pageCall)).toEqual([...PAGE_CALLS]);
+    for (const span of spans) {
+      expect(span).toMatchObject({
+        outcome: "refused",
+        error_code: "bodyTooLarge",
+        decided: { answered: 413 },
+      });
+    }
+    expect(lines).toHaveLength(PAGE_CALLS.length);
+    const text = JSON.stringify(lines);
+    for (const word of perCall
+      .flatMap((given) => stringsOf(given.request))
+      .filter((word) => word.length >= 8)) {
+      expect(text, word).not.toContain(word);
+    }
+  });
+
+  it("a body exactly at the cap still reaches its stub, with its request as sent", async () => {
+    captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+    const given = fixture("open-link-secure-page.json");
+
+    const response = await routed.fetch(
+      pagePost("/test/page-api/openLink", paddedTo(given.request, PAGE_BODY_LIMIT_BYTES), {
+        traceId: TRACE_ID,
+      }),
+      env,
+      context,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ result: "stub" });
+    expect(stubs.calls).toEqual([
+      {
+        call: "openLink",
+        request: given.request,
+        traceId: TRACE_ID,
+        openedBy: "pageRequest",
+        environment: "staging",
+      },
+    ]);
+  });
+
+  it("counts bytes, not characters: a body under the cap in characters but one byte over it in UTF-8 is answered 413", async () => {
+    captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+    const given = fixture("open-link-secure-page.json");
+    const room = PAGE_BODY_LIMIT_BYTES + 1 - bytesOf(JSON.stringify({ ...given.request, note: "" }));
+    const pairs = Math.floor(room / 2);
+    const body = JSON.stringify({ ...given.request, note: "é".repeat(pairs) }) + " ".repeat(room - 2 * pairs);
+    expect(bytesOf(body)).toBe(PAGE_BODY_LIMIT_BYTES + 1);
+    expect(body.length).toBeLessThan(PAGE_BODY_LIMIT_BYTES);
+
+    const response = await routed.fetch(
+      pagePost("/test/page-api/openLink", body, { traceId: TRACE_ID }),
+      env,
+      context,
+    );
+
+    expect(response.status).toBe(413);
+    expect(stubs.calls).toEqual([]);
+  });
+
+  it("a declared length over the cap is answered 413 before a byte of the body is read", async () => {
+    const logLines = captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+    const source = countedStream(1024, () => xBytes(1024));
+
+    const response = await routed.fetch(
+      postOf(
+        source.stream,
+        {
+          "content-type": "application/json",
+          "content-length": String(PAGE_BODY_LIMIT_BYTES + 1),
+          "x-trace-id": TRACE_ID,
+        },
+        "https://rosie.test/test/page-api/openLink",
+      ),
+      env,
+      context,
+    );
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ ok: false, error: "payload_too_large", trace_id: TRACE_ID });
+    expect(source.pulled()).toBe(0);
+    expect(stubs.calls).toEqual([]);
+    expect(pageSpans(logLines())).toMatchObject([{ error_code: "bodyTooLarge", decided: { answered: 413 } }]);
+  });
+
+  it("a body that declares no length is cut off at the chunk that takes it over the cap: a 1 GiB body is never read whole", async () => {
+    captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+    const source = countedStream(1024 * 1024, () => xBytes(1024));
+
+    const response = await routed.fetch(
+      postOf(
+        source.stream,
+        { "content-type": "application/json", "x-trace-id": TRACE_ID },
+        "https://rosie.test/test/page-api/openLink",
+      ),
+      env,
+      context,
+    );
+
+    expect(response.status).toBe(413);
+    expect(response.headers.get("x-trace-id")).toBe(TRACE_ID);
+    expect(source.pulled()).toBeGreaterThan(PAGE_BODY_LIMIT_BYTES / 1024);
+    expect(source.pulled()).toBeLessThan((2 * PAGE_BODY_LIMIT_BYTES) / 1024);
+    expect(source.cancelled()).toBe(true);
+    expect(stubs.calls).toEqual([]);
+  });
+
+  it("is a config value: GatewayDeps.pageBodyLimitBytes sets it, and a value that is not a whole number from 0 leaves the default", async () => {
+    captureLogLines();
+    const given = fixture("sign-out.json");
+    const answers: number[] = [];
+
+    for (const [limit, bytes] of [
+      [1024, 1024],
+      [1024, 1025],
+      [Number.NaN, PAGE_BODY_LIMIT_BYTES],
+      [-1, PAGE_BODY_LIMIT_BYTES + 1],
+    ] as const) {
+      const stubs = recordingPages();
+      const routed = createWorker(() => gatewayWith(stubs.handlers, { pageBodyLimitBytes: limit }));
+      const response = await routed.fetch(
+        pagePost("/test/page-api/signOut", paddedTo(given.request, bytes)),
+        env,
+        context,
+      );
+      answers.push(response.status);
+      expect(stubs.calls.length, `${String(limit)}: ${String(bytes)} bytes`).toBe(
+        response.status === 200 ? 1 : 0,
+      );
+    }
+
+    expect(answers).toEqual([200, 413, 200, 413]);
+  });
+
+  it("a staging-only call outside staging still answers stagingOnly, whatever its size: its body is never read", async () => {
+    captureLogLines();
+    const stubs = recordingPages();
+    const routed = createWorker(() => gatewayWith(stubs.handlers));
+    const source = countedStream(1024, () => xBytes(1024));
+
+    const response = await routed.fetch(
+      postOf(
+        source.stream,
+        { "content-type": "application/json" },
+        `https://rosie.test${pagePathOf("fireNow")}`,
+      ),
+      envFor("production"),
+      context,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(STAGING_ONLY_OUTCOME);
+    expect(source.pulled()).toBe(0);
+    expect(stubs.calls).toEqual([]);
+  });
+});
+
+describe("the span takes a handler's error only when it is one of K-21 v1's names (T-1180)", () => {
+  const FAILED = new Set(["transient", "bookingPaused"]);
+
+  it.each([...PAGE_ERRORS])(
+    "%s, a K-21 v1 error name: written in the span as itself, and the outcome sent as it is",
+    async (error) => {
+      const logLines = captureLogLines();
+      const stubs = recordingPages(() => Promise.resolve({ error }));
+
+      const { response, traceId } = await postFixture(stubs.handlers, fixture("sign-out.json"));
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("x-trace-id")).toBe(traceId);
+      expect(await response.json()).toEqual({ error });
+      expect(pageSpans(logLines())).toMatchObject([
+        {
+          outcome: FAILED.has(error) ? "failed" : "refused",
+          error_code: error,
+          decided: { answered: 200, answer: error },
+        },
+      ]);
+    },
+  );
+
+  it.each([
+    ["a label K-21 v1 does not have", "notAK21Error"],
+    ["the old fallback label", "error"],
+    ["a K-21 name in another case", "LinkExpired"],
+    ["a K-21 name with a space after it", "linkExpired "],
+    ["a label shaped like an id", "handle.test-0001"],
+    ["the gateway's own label", "bodyTooLarge"],
+    ["words", "words from the page"],
+    ["a number", 42],
+    ["null", null],
+    ["true", true],
+    ["a list", ["linkExpired"]],
+    ["an object", { name: "linkExpired" }],
+  ])(
+    "%s: written in the span as the fixed label unknownPageError, never itself, and the outcome still sent as it is",
+    async (_name, error) => {
+      const logLines = captureLogLines();
+      const outcome = { error };
+      const stubs = recordingPages(() => Promise.resolve(outcome));
+
+      const { response } = await postFixture(stubs.handlers, fixture("sign-out.json"));
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual(outcome);
+      const lines = logLines();
+      expect(pageSpans(lines)).toMatchObject([
+        {
+          outcome: "refused",
+          error_code: UNKNOWN_PAGE_ERROR,
+          decided: { answered: 200, answer: UNKNOWN_PAGE_ERROR },
+        },
+      ]);
+      if (typeof error === "string") expect(JSON.stringify(lines)).not.toContain(`"${error}"`);
+    },
+  );
 });
 
 describe("the Worker as deployed (no page handler joined yet)", () => {

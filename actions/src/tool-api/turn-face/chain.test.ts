@@ -10,6 +10,9 @@
 // sign-up line as the owner (K-05 v1.5 item 44, T-1184). The row read answers only a row the commit wrote, as K-05
 // answers it after that commit on T-1148's seed (row-reader-s1-02-no-role.json's given: read-outbox-row-s1-02.json with
 // recipient.roles empty), and its row, turn, bundle, question, recipient, channel and send class are the commit's own.
+//
+// T-1193 (DL-376): on the turn's one trace, the face's only span is the frontier's, the base's as before (CQ-159); gate
+// and commit, compose input and finalize leave none of the base's, since the handle actor's turn records those hops.
 
 import { describe, expect, it } from "vitest";
 
@@ -25,7 +28,6 @@ import {
 } from "../../frontier/assemble/test-support";
 import { fixture, traceFor } from "../test-support";
 import {
-  CORE_ROW_IN_WRITTEN,
   callDoubles,
   commitRequestAfter,
   commitS101,
@@ -98,18 +100,19 @@ async function frontierThenCommit(chain: ReturnType<typeof chainOf>): Promise<vo
   const { context } = frontier as unknown as { context: Json };
   expect(context.choices).toEqual(frontierExchange.outcome.context.choices);
 
-  // 2. Gate and commit on the frontier's context: commit-s1-01.json's outcome (CORE_ROW_IN_WRITTEN apart).
+  // 2. Gate and commit on the frontier's context: commit-s1-01.json's whole outcome, `written` included (T-1194).
   const request = commitRequestAfter(context);
   if (request.input.kind !== "decided") throw new Error("turn 1 is decided");
   expect(request.input.decided.context).toEqual({ ...frontierExchange.outcome.context, recentMessages: [] });
   const committed = await chain.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
   expect(validator.check("gateAndCommit", "response", committed)).toEqual([]);
-  const stated = commitS101().outcome as Json & { written: { written: Json[] } };
-  expect(committed).toEqual({
-    ...stated,
-    written: { ...stated.written, written: [...CORE_ROW_IN_WRITTEN, ...stated.written.written] },
-  });
+  const stated = commitS101().outcome;
+  expect(committed).toEqual(stated);
+  // One K-05 commit, which still writes Sam's safety record beside the rows `written` lists.
   expect(chain.commit.k05.requests).toHaveLength(1);
+  expect(chain.commit.k05.commits.map((commit) => commit.written)).toEqual([
+    [{ table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 }, ...stated.written.written],
+  ]);
 }
 
 /** The row read compose input and finalize get is the commit's own: its row, turn, bundle, question and recipient. */
@@ -211,5 +214,44 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     expect(chain.rows.plans.map((plan) => [plan.outboxRowId, plan.finalParts])).toEqual([
       [ROW, answer.finalParts],
     ]);
+  });
+
+  it("on the turn's one trace, the face's only span is the frontier's, the base's as before: gate and commit, compose input and finalize leave none, the turn records those hops itself (T-1193)", async () => {
+    const chain = chainOf(rowUnderPublishedV0(outboxRowTurnOne()), publishedBundleV0());
+    const frontierExchange = s101Exchange();
+    // Every request of the turn names the turn's trace: the frontier's, the commit's, compose input's and finalize's.
+    const { trace, spans } = traceFor(frontierExchange.request);
+    const frontier = await chain.face.buildFrontier(structuredClone(frontierExchange.request), trace);
+    const expected = asFarAsMain(frontierExchange);
+    if (expected.ends !== "answer") throw new Error("the frontier gives turn 1's sign-up door since T-1147");
+    expect(frontier).toEqual(expected.answer);
+    const { context } = frontier as unknown as { context: Json };
+
+    const committed = await chain.face.gateAndCommit(commitRequestAfter(context), NOTHING_OPEN_AT, trace);
+    expect(committed).toMatchObject({ result: "committed", turnId: "turn-s1-01-sam", repeated: false });
+    const compose = composeS102();
+    expect(await chain.face.composeInput(structuredClone(compose.request), trace)).toMatchObject({
+      result: "compose",
+      input: { row: ROW },
+    });
+    const finalize = fixture("finalize-pass.json") as { request: Json };
+    expect(await chain.face.finalizeMessage(structuredClone(finalize.request), trace)).toMatchObject({
+      outcome: "send",
+    });
+
+    // One span: the frontier's, with the call's own fields, as the base has always recorded it.
+    expect(spans.map((span) => span.hop)).toEqual(["frontier"]);
+    const [span] = spans;
+    expect(span).toMatchObject({
+      seq: 1,
+      trace_id: "trace-sam-0000",
+      turn_id: "turn-s1-01-sam",
+      business_id: "biz-lees-barbershop",
+      outcome: "ok",
+      error_code: null,
+      got: { toolCall: "buildFrontier", callerKind: "turn" },
+      decided: { answered: "response" },
+    });
+    expect(validator.checkSpan(span)).toEqual([]);
   });
 });
