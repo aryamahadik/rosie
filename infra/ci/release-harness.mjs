@@ -11,13 +11,15 @@
 //                                 each call and never reaches Cloudflare; fake curl and sleep (script-harness.mjs). Its
 //                                 HOME is empty, so no test reads this Mac's sign-in or keys. It holds no .dev.vars,
 //                                 unless devVars gives the text of a made-up one (BAD_DATABASE_URLS' commented line).
-//   v0WithBuild(t, build)         bundle v0 (bundles/v0/bundle) under another build number: the manifest's bundle id and
-//                                 keys rewritten as the compiler's withBundleId() does, the stored values byte for byte,
-//                                 so it is a second sound bundle with an id of its own.
+//   v0WithBuild(t, n)             bundle v0 (bundles/v0/bundle) under another build number, v0's own plus n (so never
+//                                 v0's, whatever build bundles/v0 holds): the manifest's bundle id and keys rewritten as
+//                                 the compiler's withBundleId() does, the stored values byte for byte, so it is a second
+//                                 sound bundle with an id of its own.
 //   readActive(sql)               the active bundle id as K-05 readActiveBundle answers it: "<hash>/<build>" or "none".
-//   BAD_DATABASE_URLS             staging database URLs that do not parse, each to be refused with no part of it
-//                                 printed (security review of round 1, DL-356); runWith(rigs, bad, ...) runs a script
-//                                 with one of them, and assertNoUrlPart(result, bad) checks its output.
+//   BAD_DATABASE_URLS             staging database URLs a script must fail on with no part of them printed: three that
+//                                 do not parse, to be refused, and two of databases that do not answer (the security
+//                                 reviews of rounds 1 and 2, DL-356 and DL-363); badUrlRunners(t, rig, names) runs a
+//                                 script with each one named, and assertNoUrlPart(result, bad) checks its output.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
@@ -44,6 +46,7 @@ const SCRIPTS = [
   "deploy-staging.sh",
   "publish-bundle.sh",
   "flags.sh",
+  "db-url.mjs",
   "lib.sh",
   "cf.sh",
   "post-deploy-check.sh",
@@ -159,13 +162,14 @@ export function releaseRoot(t, { devVars } = {}) {
   };
 }
 
-/** Bundle v0 under build number `build` (see the top of this file). */
-export function v0WithBuild(t, build) {
-  const dir = path.join(tempDir(t, `bundle-${build}`), "bundle");
+/** Bundle v0 under build number v0's own plus `n` (see the top of this file). */
+export function v0WithBuild(t, n) {
+  const dir = path.join(tempDir(t, `bundle-${n}`), "bundle");
   cpSync(path.join(REPO, "bundles", "v0", "bundle"), dir, { recursive: true });
   const file = path.join(dir, "manifest.json");
   const manifest = JSON.parse(readFileSync(file, "utf8"));
   const { hash } = manifest.bundleId;
+  const build = manifest.bundleId.build + n;
   const from = `bundle/${hash}/${manifest.bundleId.build}/`;
   const to = `bundle/${hash}/${build}/`;
   manifest.bundleId = { hash, build };
@@ -187,36 +191,52 @@ export async function readActive(sql) {
   throw new Error(`readActiveBundle answered ${answer.error}`);
 }
 
-// Made up, as every value below: no such user or password exists, and a .invalid host never resolves (RFC 6761).
+// Made up, as every value below: no such user, password or database exists, a .invalid host never resolves (RFC 6761),
+// and port 1 of this machine refuses a connection at once.
 const BAD_USER = "staging_owner_t569";
 const BAD_HOST = "db-t569.example.invalid";
+const BAD_DATABASE = "t569_staging_db";
 
 /**
- * Staging database URLs that do not parse (the security review of round 1; DL-356). Each comes from
+ * Staging database URLs a script must fail on (the security reviews of rounds 1 and 2; DL-356, DL-363). Each comes from
  * STAGING_DATABASE_URL (env) or from a line of the checkout's .dev.vars (devVars); `parts` are what no output may hold:
- * the user, the password and each piece of it around its "#", and the host.
+ * the user, the password and each piece of it around its "#", the host and the database name.
+ * Three do not parse, and are refused before any client is built:
  *   hash             a password with an unencoded "#": what follows no longer parses as a URL, and Node's URL error
  *                    keeps the whole string, password included, in its input property.
  *   hashAfterDigits  the same after digits: what follows still parses, as a URL whose host is the user and whose port
  *                    is the digits, so a client would connect to a host the URL never named.
  *   comment          a .dev.vars line with a comment after the quoted URL: lib.sh's load_dev_var keeps the quotes and
  *                    the comment in the value.
+ * Two parse, and name a database that does not answer, so the client's own error would name its host:
+ *   refused          a connection refused (port 1 of this machine).
+ *   notFound         a host that is not found (a .invalid name).
  */
 export const BAD_DATABASE_URLS = {
   hash: {
     name: "a password with an unencoded #",
-    env: `postgres://${BAD_USER}:Zq9vT2#Lk4pX@${BAD_HOST}:5432/rosie`,
-    parts: [BAD_USER, "Zq9vT2#Lk4pX", "Zq9vT2", "Lk4pX", BAD_HOST],
+    env: `postgres://${BAD_USER}:Zq9vT2#Lk4pX@${BAD_HOST}:5432/${BAD_DATABASE}`,
+    parts: [BAD_USER, "Zq9vT2#Lk4pX", "Zq9vT2", "Lk4pX", BAD_HOST, BAD_DATABASE],
   },
   hashAfterDigits: {
     name: "a password with an unencoded # after digits",
-    env: `postgres://${BAD_USER}:2718#Wm5yH8@${BAD_HOST}:5432/rosie`,
-    parts: [BAD_USER, "2718#Wm5yH8", "Wm5yH8", BAD_HOST],
+    env: `postgres://${BAD_USER}:2718#Wm5yH8@${BAD_HOST}:5432/${BAD_DATABASE}`,
+    parts: [BAD_USER, "2718#Wm5yH8", "Wm5yH8", BAD_HOST, BAD_DATABASE],
   },
   comment: {
     name: "a .dev.vars line with a comment after the quoted URL",
-    devVars: `STAGING_DATABASE_URL="postgres://${BAD_USER}:Vb7rN3sQ9kL2@${BAD_HOST}:5432/rosie" # the staging database (J-06)\n`,
-    parts: [BAD_USER, "Vb7rN3sQ9kL2", BAD_HOST],
+    devVars: `STAGING_DATABASE_URL="postgres://${BAD_USER}:Vb7rN3sQ9kL2@${BAD_HOST}:5432/${BAD_DATABASE}" # the staging database (J-06)\n`,
+    parts: [BAD_USER, "Vb7rN3sQ9kL2", BAD_HOST, BAD_DATABASE],
+  },
+  refused: {
+    name: "a database that refuses the connection",
+    env: `postgres://${BAD_USER}:Pw9sK2mX7@127.0.0.1:1/${BAD_DATABASE}`,
+    parts: [BAD_USER, "Pw9sK2mX7", "127.0.0.1", BAD_DATABASE],
+  },
+  notFound: {
+    name: "a database host that is not found",
+    env: `postgres://${BAD_USER}:Hn4wQ8zR2@${BAD_HOST}:5432/${BAD_DATABASE}`,
+    parts: [BAD_USER, "Hn4wQ8zR2", BAD_HOST, BAD_DATABASE],
   },
 };
 

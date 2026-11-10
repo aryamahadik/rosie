@@ -192,10 +192,11 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
     assert.equal(rig.calls().length, callsBefore);
   });
 
-  it("a staging database URL that does not parse stops the deploy at step 1: no part of it printed, nothing deployed or written", async () => {
+  it("a staging database URL that does not parse, or a staging database that does not answer, stops the deploy at step 1: no part of it printed, nothing deployed or written", async () => {
     const active = await readActive(db.sql);
     const flag = await skeleton();
-    for (const runner of badUrlRunners(t, rig, ["hash", "comment"])) {
+    const names = ["hash", "hashAfterDigits", "comment", "refused", "notFound"];
+    for (const runner of badUrlRunners(t, rig, names)) {
       const what = runner.bad.name;
       const callsBefore = runner.calls().length;
       const result = runner.run("deploy-staging.sh", [], { ...DEPLOY_ENV, DATABASE_URL: db.url });

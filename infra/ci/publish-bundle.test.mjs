@@ -84,7 +84,7 @@ describe("publish-bundle.sh", () => {
   });
 
   it("a failed switch leaves the old active id: an id never published is refused (notPublished)", async () => {
-    const unpublished = `${V0_ID.split("/")[0]}/9`;
+    const unpublished = v0WithBuild(t, 9).id;
     const result = local("--activate", unpublished);
     assert.equal(result.status, 1, result.output);
     assert.match(

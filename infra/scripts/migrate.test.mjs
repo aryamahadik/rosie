@@ -42,10 +42,10 @@ function folder(files) {
   return dir;
 }
 
-function run(dir) {
-  const env = { ...process.env, DATABASE_URL: url, DB_SCHEMA: schema, MIGRATIONS_DIR: dir };
+function run(dir, databaseUrl = url, args = []) {
+  const env = { ...process.env, DATABASE_URL: databaseUrl, DB_SCHEMA: schema, MIGRATIONS_DIR: dir };
   delete env.CI;
-  const result = spawnSync("node", [migrate], { env, encoding: "utf8" });
+  const result = spawnSync("node", [migrate, ...args], { env, encoding: "utf8" });
   return { code: result.status, out: `${result.stdout}${result.stderr}` };
 }
 
@@ -191,6 +191,56 @@ describe("migrate.mjs: files of only CREATE INDEX CONCURRENTLY", () => {
     } finally {
       await sql.unsafe(`drop table if exists public.${table}`);
     }
+  });
+});
+
+describe("migrate.mjs: a database URL it cannot use (deploy step 1; T-569, DL-363)", () => {
+  // Made up: no such user, password or database exists, a .invalid host never resolves (RFC 6761), and port 1 of this
+  // machine refuses a connection at once. `parts` are what no output may hold: the user, each piece of the password,
+  // the host and the database name.
+  const user = "migrate_owner_t569";
+  const host = "db-t569.example.invalid";
+  const database = "t569_migrate_db";
+  const cases = [
+    {
+      name: "a password with an unencoded # after digits, which parses with the user as the host",
+      url: `postgres://${user}:2718#Wm5yH8@${host}:5432/${database}`,
+      parts: [user, "2718#Wm5yH8", "Wm5yH8", host, database],
+      exit: 1,
+      says: /^migrate: refused: DATABASE_URL does not parse: it holds a # .+; nothing was read or written$/m,
+    },
+    {
+      name: "a database that refuses the connection",
+      url: `postgres://${user}:Pw9sK2mX7@127.0.0.1:1/${database}`,
+      parts: [user, "Pw9sK2mX7", "127.0.0.1", database],
+      exit: 1,
+      says: /^migrate: connect ECONNREFUSED \[redacted\]\n {2}code: ECONNREFUSED$/m,
+    },
+    {
+      name: "a database host that is not found",
+      url: `postgres://${user}:Hn4wQ8zR2@${host}:5432/${database}`,
+      parts: [user, "Hn4wQ8zR2", host, database],
+      exit: 1,
+      // ENOTFOUND, or EAI_AGAIN where no name server answers.
+      says: /^migrate: getaddrinfo (ENOTFOUND|EAI_AGAIN) \[redacted\]\n {2}code: (ENOTFOUND|EAI_AGAIN)$/m,
+    },
+  ];
+  cases.forEach((each, index) => {
+    it(`${each.name}: exits non-zero, prints no part of the URL and writes nothing`, async () => {
+      freshSchema(`url${index}`);
+      const dir = folder({ "0002_items.sql": TABLE });
+      for (const args of [[], ["--status"]]) {
+        const what = args.join(" ") || "apply";
+        const result = run(dir, each.url, args);
+        assert.equal(result.code, each.exit, `${what}: ${result.out}`);
+        assert.match(result.out, each.says, what);
+        const held = each.parts.filter((part) => result.out.includes(part));
+        assert.deepEqual(held, [], `${what}: the output holds a part of the database URL:\n${result.out}`);
+      }
+      // Nothing was written, here either: the schema the run was given was never made on this machine's database.
+      const [row] = await sql`select count(*)::int as n from pg_namespace where nspname = ${schema}`;
+      assert.equal(row.n, 0);
+    });
   });
 });
 

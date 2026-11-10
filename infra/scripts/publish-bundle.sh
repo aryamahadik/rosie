@@ -29,9 +29,10 @@
 #                                database of infra/docker-compose.yml; DB_SCHEMA as set.
 #   --env production             refused, as is any other name: production's bundle is switched only by the protected
 #                                release job, after Jay or the CTO acts from his own login (build prompt 5.4).
-# Nothing here prints the database URL or any part of it (its user, password, host or database name): the URL is
-# checked before anything reads it, a URL that does not parse is refused with its fault named, and a failed database
-# call is printed with every part of the URL taken out (the registry program below).
+# Nothing here prints the database URL or any part of it (its user, password, host, port or database name): the URL
+# is checked before anything reads it, a URL that does not parse is refused with its fault named, and a failed
+# database call is printed with every part of the URL taken out (the registry program below, through
+# infra/scripts/db-url.mjs, which migrate.mjs and flags.sh use too).
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -131,11 +132,12 @@ cd "$ROOT"
 # activate <id> <the id read before, or none> [<record file>].
 # db/repo/client.ts imports its neighbours without an extension, so a relative import from a .ts file is completed
 # with .ts or /index.ts, as compiler/src/cli/commands/publish.ts does.
-# The database URL (the security review of round 1; DL-356): every command but manifest-id runs in one try. It first
-# checks the URL, then builds the client, or runs compiler publish, whose own client reads the same URL. Its catch
-# prints the fault alone: a URL that does not parse is refused by name, and any other error is printed with every part
-# of the URL taken out, as is each error line of compiler publish. postgres.js would otherwise throw a URL error whose
-# input property holds the whole string, password included, and Node prints that property for an error not caught.
+# The database URL (the security reviews of rounds 1 and 2; DL-356, DL-363): every command but manifest-id runs in one
+# try. It first checks the URL (infra/scripts/db-url.mjs), then builds the client, or runs compiler publish, whose own
+# client reads the same URL. Its catch prints the fault alone: a URL that does not parse is refused by name, and any
+# other error is printed with every part of the URL taken out, as is each error line of compiler publish. postgres.js
+# would otherwise throw a URL error whose input property holds the whole string, password included, and Node prints
+# that property for an error not caught.
 REGISTRY='
 import { readFileSync, writeFileSync } from "node:fs";
 import { registerHooks } from "node:module";
@@ -162,6 +164,9 @@ registerHooks({
 
 const [root, envName, command, ...args] = process.argv.slice(1);
 const load = (file) => import(pathToFileURL(root + "/" + file).href);
+const { DatabaseUrlFault, checkDatabaseUrl, describeError, printStrayErrors, scrub } = await load(
+  "infra/scripts/db-url.mjs",
+);
 const say = (line) => console.log(`[${new Date().toISOString().replace(/\.\d+Z$/, "Z")}] ${line}`);
 const label = (id) => `${id.hash}/${String(id.build)}`;
 const idOf = (text) => {
@@ -174,57 +179,10 @@ const fail = (line) => {
   process.exitCode = 1;
 };
 
-/** A database URL refused before anything reads it: its message names the fault and holds no part of the URL. */
-class UrlFault extends Error {}
-
-/**
- * The database URL, checked: one postgres:// URL that Node and postgres.js read alike, so a client connects only where
- * it names. Returns the parts no printed line may hold, longest first: the URL, its user, password and database name
- * (as written and decoded) and its host (with and without the port). Throws UrlFault.
- */
-function urlParts(raw) {
-  if (raw === "") throw new UrlFault("it is empty");
-  if (/[\s"\x27`]/.test(raw))
-    throw new UrlFault("it holds a quote or a space (a .dev.vars value is the URL alone, with no comment after it)");
-  if (raw.includes("#"))
-    throw new UrlFault("it holds a # (a # in the password is written %23, and a .dev.vars value has no comment after the URL)");
-  let url;
-  try {
-    url = new URL(raw);
-  } catch {
-    throw new UrlFault("it is not a URL (a / or ? in the user or password is written %2F or %3F)");
-  }
-  if (url.protocol !== "postgres:" && url.protocol !== "postgresql:")
-    throw new UrlFault("it is not a postgres:// or postgresql:// URL");
-  if (url.hostname === "") throw new UrlFault("it names no host");
-  // An @ after the host means the user or password held a / or ?, so the URL read here names another host.
-  const afterScheme = raw.slice(raw.indexOf("//") + 2);
-  if (afterScheme.slice(afterScheme.search(/[/?]|$/)).includes("@"))
-    throw new UrlFault("it holds an @ after its host (a / or ? in the user or password is written %2F or %3F)");
-  const parts = [raw, url.href, url.host, url.hostname, ...url.hostname.split(","), url.hostname.replace(/^\[|\]$/g, "")];
-  for (const part of [url.username, url.password, url.pathname.slice(1)]) {
-    try {
-      parts.push(part, decodeURIComponent(part));
-    } catch {
-      throw new UrlFault("a % in its user, password or database name starts no escape (a % is written %25)");
-    }
-  }
-  return [...new Set(parts.filter((part) => part !== ""))].sort((a, b) => b.length - a.length);
-}
-
-// The parts of the URL taken out of every error line: the whole string until the URL is checked, then each part.
-let secrets = [process.env.DATABASE_URL ?? ""].filter((part) => part !== "");
-const scrub = (text) => secrets.reduce((out, part) => out.split(part).join("[redacted]"), String(text));
-/** A failed call as printed: its code (a SQLSTATE, or a code such as ECONNREFUSED) and its message, never its fields. */
-const fault = (error) => {
-  const code = typeof error?.code === "string" && /^[A-Za-z0-9_]{1,40}$/.test(error.code) ? ` (${scrub(error.code)})` : "";
-  return `${code}: ${scrub(error instanceof Error ? error.message : String(error))}`;
-};
-// An error that no catch below takes (a stray rejection) is printed the same way: Node would print its fields too.
-process.on("uncaughtException", (error) => {
-  fail(`failed${fault(error)}`);
-  process.exit(1);
-});
+// The parts of the URL taken out of every error line: the whole string until the URL is checked, then each part
+// (db-url.mjs). An error that no catch below takes (a stray rejection) is printed the same way, never its fields.
+let secrets = [process.env.DATABASE_URL ?? ""];
+printStrayErrors("publish-bundle.sh", () => secrets);
 
 /** The registry commands (active, status, activate) on `sql`, through K-05 readActiveBundle and setActiveBundle. */
 async function registryCall(sql, { readActiveBundle, setActiveBundle }) {
@@ -267,10 +225,10 @@ if (command === "manifest-id") {
 } else {
   let db;
   try {
-    secrets = urlParts(process.env.DATABASE_URL ?? "");
+    secrets = checkDatabaseUrl(process.env.DATABASE_URL ?? "");
     if (command === "publish") {
       const { command: publish } = await load("compiler/src/cli/commands/publish.ts");
-      const io = { out: (line) => console.log(line), err: (line) => console.error(scrub(line)) };
+      const io = { out: (line) => console.log(line), err: (line) => console.error(scrub(line, secrets)) };
       process.exitCode = await publish.run([args[0], "--kv", args[1]], io);
     } else {
       const { createClient } = await load("db/repo/client.ts");
@@ -279,13 +237,13 @@ if (command === "manifest-id") {
       await registryCall(db.primary, calls);
     }
   } catch (error) {
-    if (error instanceof UrlFault) {
+    if (error instanceof DatabaseUrlFault) {
       fail(`refused: the ${envName} database URL does not parse: ${error.message}; nothing was read or written`);
     } else {
-      fail(`the database call failed${fault(error)}`);
+      fail(`the database call failed${describeError(error, secrets)}`);
     }
   } finally {
-    await db?.close().catch((error) => fail(`closing the database client failed${fault(error)}`));
+    await db?.close().catch((error) => fail(`closing the database client failed${describeError(error, secrets)}`));
   }
 }
 '

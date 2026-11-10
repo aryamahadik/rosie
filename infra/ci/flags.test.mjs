@@ -225,14 +225,36 @@ describe("flags.sh", () => {
     }
   });
 
-  it("a staging database URL that does not parse fails every command: no part of it printed, no flag written", async () => {
+  it("a staging database URL that does not parse is refused by every command before any client is built: no part of it printed, no flag written", async () => {
     const before = await rows();
-    for (const runner of badUrlRunners(t, rig, ["hash", "comment"])) {
+    for (const runner of badUrlRunners(t, rig, ["hash", "hashAfterDigits", "comment"])) {
       for (const args of [["apply"], ["off", "skeleton"], ["list"]]) {
         const what = `${runner.bad.name}, ${args.join(" ")}`;
         const result = runner.run("flags.sh", args, { DATABASE_URL: db.url });
         assert.equal(result.status, 1, `${what}: ${result.output}`);
-        assert.match(result.stderr, /^flags\.sh: failed: /m, what);
+        assert.match(
+          result.stderr,
+          /^flags\.sh: refused: the database URL does not parse: it holds (a #|a quote or a space) .+; nothing was read or written$/m,
+          what,
+        );
+        assertNoUrlPart(result, runner.bad, what);
+        assert.deepEqual(await rows(), before, what);
+      }
+    }
+  });
+
+  it("a staging database that does not answer (a refused connection, a host not found) fails every command: no part of its URL printed, no flag written", async () => {
+    const before = await rows();
+    // A host not found is ENOTFOUND, or EAI_AGAIN where no name server answers.
+    const codes = { refused: /\(ECONNREFUSED\)/, notFound: /\((ENOTFOUND|EAI_AGAIN)\)/ };
+    for (const name of ["refused", "notFound"]) {
+      const [runner] = badUrlRunners(t, rig, [name]);
+      for (const args of [["apply"], ["off", "skeleton"], ["list"]]) {
+        const what = `${runner.bad.name}, ${args.join(" ")}`;
+        const result = runner.run("flags.sh", args, { DATABASE_URL: db.url });
+        assert.equal(result.status, 1, `${what}: ${result.output}`);
+        assert.match(result.stderr, /^flags\.sh: failed \([A-Z_]+\): .*\[redacted\]/m, what);
+        assert.match(result.stderr, codes[name], what);
         assertNoUrlPart(result, runner.bad, what);
         assert.deepEqual(await rows(), before, what);
       }

@@ -15,12 +15,17 @@
 // A flag set is {"$comment", "environment", "flags": {<name>: true or false}}. Production's set names every flag of
 // staging's, so production's value is always stated. There is no `on`: a flag goes on only through a flag set that an
 // approved card changed (BP 5.4: "the flags the approved cards name"), and going forward after a rollback needs the
-// normal approval. Never printed: a connection string or a phone number (a phone's scope shows without its number).
+// normal approval. Never printed: a phone number (a phone's scope shows without its number), or the database URL or any
+// part of it (its user, password, host, port or database name): the URL is checked before the client is built, a URL
+// that does not parse is refused with its fault named, and a failed call is printed as its code and its message with
+// every part of the URL taken out (infra/scripts/db-url.mjs, as publish-bundle.sh and migrate.mjs do; DL-363).
 // Exit: 0 done; 1 refused or failed; 2 misuse.
 import { appendFileSync, readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+
+import { DatabaseUrlFault, checkDatabaseUrl, describeError, printStrayErrors } from "../scripts/db-url.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "../..");
@@ -59,8 +64,10 @@ registerHooks({
   },
 });
 
-/** Removes the database's connection string from a message; replaced by db/repo/client.ts's redact once loaded. */
-let hide = (text) => text.split(process.env.DATABASE_URL || "\u0000").join("[redacted]");
+// The parts of the database URL taken out of every error line: the whole string until the URL is checked, then each
+// part. An error that no catch takes (a stray rejection) is printed the same way, never its fields.
+let secrets = [process.env.DATABASE_URL ?? ""];
+printStrayErrors("flags.sh", () => secrets);
 
 function say(line) {
   console.log(`[${new Date().toISOString().replace(/\.\d+Z$/, "Z")}] flags: ${line}`);
@@ -205,9 +212,11 @@ async function main() {
   const sets = readSets();
   const load = (file) => import(pathToFileURL(path.join(ROOT, file)).href);
   const client = await load("db/repo/client.ts");
-  hide = (text) => client.redact(text, [client.resolvePrimaryUrl()]);
+  // The URL the client would use, checked before it is built; the client then uses it alone (no replica URL).
+  const url = client.resolvePrimaryUrl();
+  secrets = checkDatabaseUrl(url);
   const calls = await load("db/repo/flags.ts");
-  const db = client.createClient({ max: 1 });
+  const db = client.createClient({ max: 1, primaryUrl: url, env: { DB_SCHEMA: process.env.DB_SCHEMA } });
   try {
     if (given.command === "apply") await apply(db.primary, calls, sets.staging, given.record);
     else if (given.command === "off") await turnOff(db.primary, calls, sets, given.flag);
@@ -226,8 +235,13 @@ try {
   } else if (error instanceof Refusal) {
     console.error(`flags.sh: refused: ${error.message}`);
     process.exitCode = 1;
+  } else if (error instanceof DatabaseUrlFault) {
+    console.error(
+      `flags.sh: refused: the database URL does not parse: ${error.message}; nothing was read or written`,
+    );
+    process.exitCode = 1;
   } else {
-    console.error(`flags.sh: failed: ${hide(error instanceof Error ? error.message : String(error))}`);
+    console.error(`flags.sh: failed${describeError(error, secrets)}`);
     process.exitCode = 1;
   }
 }
