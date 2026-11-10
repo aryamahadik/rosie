@@ -230,6 +230,8 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     safetyReaders: fakes.models.readers,
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
+    // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, as root.worker.test.ts feeds it.
+    frontierScope: fakes.frontier.scope,
     flags: fakeFlags(options.flagOn === false ? [] : [SKELETON_FLAG]),
     testPhone,
   });
