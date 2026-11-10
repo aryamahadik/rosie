@@ -10,7 +10,7 @@ import { registerHooks } from "node:module";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
-import { createThrowawayDatabase, releaseRoot } from "./release-harness.mjs";
+import { assertNoUrlPart, badUrlRunners, createThrowawayDatabase, releaseRoot } from "./release-harness.mjs";
 import { REPO } from "./script-harness.mjs";
 
 // runtime/src imports its neighbours without an extension, as the bundler resolves them: a relative import from a .ts
@@ -222,6 +222,20 @@ describe("flags.sh", () => {
       assert.deepEqual(await rows(), before);
     } finally {
       writeFileSync(file, kept);
+    }
+  });
+
+  it("a staging database URL that does not parse fails every command: no part of it printed, no flag written", async () => {
+    const before = await rows();
+    for (const runner of badUrlRunners(t, rig, ["hash", "comment"])) {
+      for (const args of [["apply"], ["off", "skeleton"], ["list"]]) {
+        const what = `${runner.bad.name}, ${args.join(" ")}`;
+        const result = runner.run("flags.sh", args, { DATABASE_URL: db.url });
+        assert.equal(result.status, 1, `${what}: ${result.output}`);
+        assert.match(result.stderr, /^flags\.sh: failed: /m, what);
+        assertNoUrlPart(result, runner.bad, what);
+        assert.deepEqual(await rows(), before, what);
+      }
     }
   });
 });

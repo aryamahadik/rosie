@@ -10,6 +10,8 @@ import { after, before, describe, it } from "node:test";
 import {
   V0_ID,
   V0_KEYS,
+  assertNoUrlPart,
+  badUrlRunners,
   createThrowawayDatabase,
   readActive,
   releaseRoot,
@@ -191,5 +193,97 @@ describe("publish-bundle.sh", () => {
     assert.equal(result.status, 1, result.output);
     assert.match(result.stderr, /holds no bundle: no manifest\.json in it or in its bundle\/ folder/);
     assert.ok(existsSync(rig.dir));
+  });
+
+  it("a staging database URL that does not parse is refused on every path: no part of it printed, nothing written", async () => {
+    // Build 6 active, build 7 published and not active, build 8 never published.
+    const active = v0WithBuild(t, 6);
+    const other = v0WithBuild(t, 7);
+    const unpublished = v0WithBuild(t, 8);
+    for (const bundle of [other, active]) {
+      const published = local(bundle.dir);
+      assert.equal(published.status, 0, published.output);
+    }
+    assert.equal(await readActive(db.sql), active.id);
+    const registered = await registry();
+    const paths = [
+      ["--status", ["--status"]],
+      ["--activate <id>", ["--activate", other.id]],
+      ["a publish", [unpublished.dir]],
+    ];
+    for (const runner of badUrlRunners(t, rig, ["hash", "hashAfterDigits", "comment"])) {
+      for (const [which, args] of paths) {
+        const what = `${runner.bad.name}, ${which}`;
+        const callsBefore = runner.calls().length;
+        const result = runner.run("publish-bundle.sh", args, { DATABASE_URL: db.url });
+        assert.equal(result.status, 1, `${what}: ${result.output}`);
+        assert.match(
+          result.stderr,
+          /^publish-bundle\.sh: refused: the staging database URL does not parse: .+; nothing was read or written$/m,
+          what,
+        );
+        assertNoUrlPart(result, runner.bad, what);
+        assert.equal(await readActive(db.sql), active.id, what);
+        assert.deepEqual(await registry(), registered, what);
+        assert.equal(runner.calls().length, callsBefore, `${what}: wrangler never ran`);
+      }
+    }
+  });
+
+  it("each way a database URL can fail its check is refused by name, before any client is built", async () => {
+    const active = await readActive(db.sql);
+    // Made up: no such user or password exists, and a .invalid host never resolves.
+    const user = "staging_owner_t569";
+    const host = "db-t569.example.invalid";
+    const cases = [
+      ["staging", "it holds a quote or a space", `postgres://${user}:Qx7Lm9@${host}:5432/rosie `, "Qx7Lm9"],
+      ["staging", "it is not a URL", `postgres://${user}:Qx/7Lm@${host}:5432/rosie`, "Qx/7Lm"],
+      [
+        "staging",
+        "it is not a postgres:// or postgresql:// URL",
+        `mysql://${user}:Qx7Lm9@${host}/rosie`,
+        "Qx7Lm9",
+      ],
+      ["staging", "it names no host", "postgres:///t569_no_host", "t569_no_host"],
+      // A / or ? after digits: the rest still parses, as a URL whose host is the user.
+      ["staging", "it holds an @ after its host", `postgres://${user}:12/Qx7Lm@${host}:5432/rosie`, "Qx7Lm"],
+      ["staging", "it holds an @ after its host", `postgres://${user}:12?Qx7Lm@${host}:5432/rosie`, "Qx7Lm"],
+      [
+        "staging",
+        "a % in its user, password or database name starts no escape",
+        `postgres://${user}:Qx7%zzLm@${host}:5432/rosie`,
+        "Qx7%zzLm",
+      ],
+      ["local", "it holds a #", `postgres://${user}:Qx7#Lm9@127.0.0.1:54329/rosie`, "Qx7#Lm9"],
+    ];
+    for (const [env, fault, url, password] of cases) {
+      const what = `${env}: ${fault}`;
+      const result =
+        env === "staging"
+          ? rig.run("publish-bundle.sh", ["--status"], { STAGING_DATABASE_URL: url, DATABASE_URL: db.url })
+          : rig.run("publish-bundle.sh", ["--env", "local", "--status"], { DATABASE_URL: url });
+      assert.equal(result.status, 1, `${what}: ${result.output}`);
+      const refusal = `publish-bundle.sh: refused: the ${env} database URL does not parse: ${fault}`;
+      assert.ok(result.stderr.startsWith(refusal), `${what}: ${result.stderr}`);
+      assertNoUrlPart(result, { parts: [user, host, "127.0.0.1", password] }, what);
+    }
+    assert.equal(await readActive(db.sql), active);
+  });
+
+  it("a database that refuses the connection: the fault is named, and no part of its URL is printed", async () => {
+    const active = await readActive(db.sql);
+    // Port 1 of this machine refuses a connection at once; the user, password and database name are made up.
+    const refused = {
+      url: "postgres://refused_user_t569:Pw9sK2mX7@127.0.0.1:1/t569_nowhere",
+      parts: ["refused_user_t569", "Pw9sK2mX7", "127.0.0.1", "t569_nowhere"],
+    };
+    for (const args of [["--status"], ["--activate", V0_ID], [v0]]) {
+      const what = args.join(" ");
+      const result = rig.run("publish-bundle.sh", ["--env", "local", ...args], { DATABASE_URL: refused.url });
+      assert.equal(result.status, 1, `${what}: ${result.output}`);
+      assert.match(result.stderr, /^publish-bundle\.sh: the database call failed \(ECONNREFUSED\): /m, what);
+      assertNoUrlPart(result, refused, what);
+    }
+    assert.equal(await readActive(db.sql), active);
   });
 });

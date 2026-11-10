@@ -11,6 +11,8 @@ import { after, before, describe, it } from "node:test";
 import {
   V0_ID,
   V0_KEYS,
+  assertNoUrlPart,
+  badUrlRunners,
   createThrowawayDatabase,
   readActive,
   releaseRoot,
@@ -19,6 +21,14 @@ import {
 
 const SHA = "5690000000000000000000000000000000000569";
 const LIVE = "00000000-0000-4000-8000-000000000569";
+/** The deploy's variables: the commit, the fake wrangler's live version, the fake check's answer, the base URL. */
+const DEPLOY_ENV = {
+  GIT_SHA: SHA,
+  FAKE_VERSION: SHA,
+  FAKE_LIVE_VERSION: LIVE,
+  STAGING_BASE_URL: "https://rosie-staging.example.invalid/test",
+  CHECK_ATTEMPTS: "1",
+};
 
 describe("deploy-staging.sh: steps 3 and 4", () => {
   const cleanups = [];
@@ -38,15 +48,7 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
     await db?.drop();
   });
 
-  const deploy = (args, extra = {}) =>
-    rig.run("deploy-staging.sh", args, {
-      GIT_SHA: SHA,
-      FAKE_VERSION: SHA,
-      FAKE_LIVE_VERSION: LIVE,
-      STAGING_BASE_URL: "https://rosie-staging.example.invalid/test",
-      CHECK_ATTEMPTS: "1",
-      ...extra,
-    });
+  const deploy = (args, extra = {}) => rig.run("deploy-staging.sh", args, { ...DEPLOY_ENV, ...extra });
   const skeleton = async () => {
     const [row] =
       await db.sql`select enabled from release_flags where name = 'skeleton' and scope = 'global'`;
@@ -188,5 +190,26 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
       /holds no bundle \(no manifest\.json in it or in its bundle\/ folder\): nothing was deployed/,
     );
     assert.equal(rig.calls().length, callsBefore);
+  });
+
+  it("a staging database URL that does not parse stops the deploy at step 1: no part of it printed, nothing deployed or written", async () => {
+    const active = await readActive(db.sql);
+    const flag = await skeleton();
+    for (const runner of badUrlRunners(t, rig, ["hash", "comment"])) {
+      const what = runner.bad.name;
+      const callsBefore = runner.calls().length;
+      const result = runner.run("deploy-staging.sh", [], { ...DEPLOY_ENV, DATABASE_URL: db.url });
+      assert.equal(result.status, 1, `${what}: ${result.output}`);
+      const lines = steps(result.stdout);
+      assert.ok(lines.includes("step 1/4 migrate: start"), `${what}: ${lines.join("\n")}`);
+      assert.ok(
+        !lines.some((line) => /^step (1\/4 migrate: done|[234]\/4)/.test(line)),
+        `${what}: ${lines.join("\n")}`,
+      );
+      assertNoUrlPart(result, runner.bad, what);
+      assert.equal(runner.calls().length, callsBefore, `${what}: nothing was deployed (wrangler never ran)`);
+      assert.equal(await readActive(db.sql), active, what);
+      assert.equal(await skeleton(), flag, what);
+    }
   });
 });

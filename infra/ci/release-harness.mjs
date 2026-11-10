@@ -5,15 +5,20 @@
 //                                 local Docker database (factory spec 4: rosie/rosie is local only, not a secret),
 //                                 migrated with infra/scripts/migrate.mjs into its public schema, as the staging
 //                                 database is. drop() removes it; only a t569_ database this helper made is dropped.
-//   releaseRoot(t)                a throwaway checkout the scripts run in: copies of the scripts and flag sets under
+//   releaseRoot(t, {devVars})     a throwaway checkout the scripts run in: copies of the scripts and flag sets under
 //                                 test and of wrangler.jsonc; this repository's compiler/, db/, bundles/ and migrate.mjs
 //                                 linked in (the code the scripts run, read where it is); a fake wrangler that records
 //                                 each call and never reaches Cloudflare; fake curl and sleep (script-harness.mjs). Its
-//                                 HOME is empty and it holds no .dev.vars, so no test reads this Mac's sign-in or keys.
+//                                 HOME is empty, so no test reads this Mac's sign-in or keys. It holds no .dev.vars,
+//                                 unless devVars gives the text of a made-up one (BAD_DATABASE_URLS' commented line).
 //   v0WithBuild(t, build)         bundle v0 (bundles/v0/bundle) under another build number: the manifest's bundle id and
 //                                 keys rewritten as the compiler's withBundleId() does, the stored values byte for byte,
 //                                 so it is a second sound bundle with an id of its own.
 //   readActive(sql)               the active bundle id as K-05 readActiveBundle answers it: "<hash>/<build>" or "none".
+//   BAD_DATABASE_URLS             staging database URLs that do not parse, each to be refused with no part of it
+//                                 printed (security review of round 1, DL-356); runWith(rigs, bad, ...) runs a script
+//                                 with one of them, and assertNoUrlPart(result, bad) checks its output.
+import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { copyFileSync, cpSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
@@ -105,10 +110,11 @@ export async function createThrowawayDatabase(tag) {
 }
 
 /** A throwaway checkout to run the release scripts in (see the top of this file). */
-export function releaseRoot(t) {
+export function releaseRoot(t, { devVars } = {}) {
   const dir = tempDir(t, "release");
   const root = path.join(dir, "rosie");
   for (const script of SCRIPTS) copyScript(script, root);
+  if (devVars !== undefined) write(path.join(root, ".dev.vars"), devVars);
   for (const file of ["flags.mjs", "staging.json", "production.json"]) {
     write(path.join(root, "infra", "flags", file), readFileSync(path.join(REPO, "infra", "flags", file)));
   }
@@ -179,4 +185,62 @@ export async function readActive(sql) {
   if ("result" in answer) return `${answer.bundleId.hash}/${answer.bundleId.build}`;
   if (answer.error === "noActiveBundle") return "none";
   throw new Error(`readActiveBundle answered ${answer.error}`);
+}
+
+// Made up, as every value below: no such user or password exists, and a .invalid host never resolves (RFC 6761).
+const BAD_USER = "staging_owner_t569";
+const BAD_HOST = "db-t569.example.invalid";
+
+/**
+ * Staging database URLs that do not parse (the security review of round 1; DL-356). Each comes from
+ * STAGING_DATABASE_URL (env) or from a line of the checkout's .dev.vars (devVars); `parts` are what no output may hold:
+ * the user, the password and each piece of it around its "#", and the host.
+ *   hash             a password with an unencoded "#": what follows no longer parses as a URL, and Node's URL error
+ *                    keeps the whole string, password included, in its input property.
+ *   hashAfterDigits  the same after digits: what follows still parses, as a URL whose host is the user and whose port
+ *                    is the digits, so a client would connect to a host the URL never named.
+ *   comment          a .dev.vars line with a comment after the quoted URL: lib.sh's load_dev_var keeps the quotes and
+ *                    the comment in the value.
+ */
+export const BAD_DATABASE_URLS = {
+  hash: {
+    name: "a password with an unencoded #",
+    env: `postgres://${BAD_USER}:Zq9vT2#Lk4pX@${BAD_HOST}:5432/rosie`,
+    parts: [BAD_USER, "Zq9vT2#Lk4pX", "Zq9vT2", "Lk4pX", BAD_HOST],
+  },
+  hashAfterDigits: {
+    name: "a password with an unencoded # after digits",
+    env: `postgres://${BAD_USER}:2718#Wm5yH8@${BAD_HOST}:5432/rosie`,
+    parts: [BAD_USER, "2718#Wm5yH8", "Wm5yH8", BAD_HOST],
+  },
+  comment: {
+    name: "a .dev.vars line with a comment after the quoted URL",
+    devVars: `STAGING_DATABASE_URL="postgres://${BAD_USER}:Vb7rN3sQ9kL2@${BAD_HOST}:5432/rosie" # the staging database (J-06)\n`,
+    parts: [BAD_USER, "Vb7rN3sQ9kL2", BAD_HOST],
+  },
+};
+
+/**
+ * One runner for each BAD_DATABASE_URLS value `names` lists. run(script, args, extra) runs infra/scripts/<script> with
+ * that value as the staging database URL: from the environment on `rig`, or from the .dev.vars of a release root of
+ * its own; calls() are the fake calls of the root it runs in. Give the test's own database in extra's DATABASE_URL: a
+ * script that fell back to it would write where the test looks.
+ */
+export function badUrlRunners(t, rig, names) {
+  return names.map((name) => {
+    const bad = BAD_DATABASE_URLS[name];
+    const on = bad.devVars === undefined ? rig : releaseRoot(t, { devVars: bad.devVars });
+    const env = bad.env === undefined ? {} : { STAGING_DATABASE_URL: bad.env };
+    return {
+      bad,
+      run: (script, args, extra = {}) => on.run(script, args, { ...extra, ...env }),
+      calls: () => on.calls(),
+    };
+  });
+}
+
+/** Fails when a run's stdout or stderr holds any of bad.parts (a database URL's user, password or host). */
+export function assertNoUrlPart(result, bad, what) {
+  const held = bad.parts.filter((part) => result.output.includes(part));
+  assert.deepEqual(held, [], `${what}: the output holds a part of the database URL:\n${result.output}`);
 }

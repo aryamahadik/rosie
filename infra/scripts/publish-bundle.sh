@@ -29,7 +29,9 @@
 #                                database of infra/docker-compose.yml; DB_SCHEMA as set.
 #   --env production             refused, as is any other name: production's bundle is switched only by the protected
 #                                release job, after Jay or the CTO acts from his own login (build prompt 5.4).
-# Nothing here prints a connection string.
+# Nothing here prints the database URL or any part of it (its user, password, host or database name): the URL is
+# checked before anything reads it, a URL that does not parse is refused with its fault named, and a failed database
+# call is printed with every part of the URL taken out (the registry program below).
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -124,10 +126,16 @@ esac
 cd "$ROOT"
 
 # The registry's calls (db/repo/bundles.ts: K-05 v1 item 7) and the compiler's publish command, run by node on the
-# database of DATABASE_URL and DB_SCHEMA. Commands: manifest-id <bundle dir>; active (the id, or none); status;
-# publish <bundle dir> <KV bulk file>; activate <id> <the id read before, or none> [<record file>].
+# database of DATABASE_URL and DB_SCHEMA. Arguments: <root> <env name> <command> [arguments]. Commands:
+# manifest-id <bundle dir>; active (the id, or none); status; publish <bundle dir> <KV bulk file>;
+# activate <id> <the id read before, or none> [<record file>].
 # db/repo/client.ts imports its neighbours without an extension, so a relative import from a .ts file is completed
 # with .ts or /index.ts, as compiler/src/cli/commands/publish.ts does.
+# The database URL (the security review of round 1; DL-356): every command but manifest-id runs in one try. It first
+# checks the URL, then builds the client, or runs compiler publish, whose own client reads the same URL. Its catch
+# prints the fault alone: a URL that does not parse is refused by name, and any other error is printed with every part
+# of the URL taken out, as is each error line of compiler publish. postgres.js would otherwise throw a URL error whose
+# input property holds the whole string, password included, and Node prints that property for an error not caught.
 REGISTRY='
 import { readFileSync, writeFileSync } from "node:fs";
 import { registerHooks } from "node:module";
@@ -152,7 +160,7 @@ registerHooks({
   },
 });
 
-const [root, command, ...args] = process.argv.slice(1);
+const [root, envName, command, ...args] = process.argv.slice(1);
 const load = (file) => import(pathToFileURL(root + "/" + file).href);
 const say = (line) => console.log(`[${new Date().toISOString().replace(/\.\d+Z$/, "Z")}] ${line}`);
 const label = (id) => `${id.hash}/${String(id.build)}`;
@@ -161,58 +169,123 @@ const idOf = (text) => {
   if (match === null) throw new Error(`"${text}" is not a bundle id (<hash>/<build>)`);
   return { hash: match[1], build: Number(match[2]) };
 };
+const fail = (line) => {
+  console.error(`publish-bundle.sh: ${line}`);
+  process.exitCode = 1;
+};
+
+/** A database URL refused before anything reads it: its message names the fault and holds no part of the URL. */
+class UrlFault extends Error {}
+
+/**
+ * The database URL, checked: one postgres:// URL that Node and postgres.js read alike, so a client connects only where
+ * it names. Returns the parts no printed line may hold, longest first: the URL, its user, password and database name
+ * (as written and decoded) and its host (with and without the port). Throws UrlFault.
+ */
+function urlParts(raw) {
+  if (raw === "") throw new UrlFault("it is empty");
+  if (/[\s"\x27`]/.test(raw))
+    throw new UrlFault("it holds a quote or a space (a .dev.vars value is the URL alone, with no comment after it)");
+  if (raw.includes("#"))
+    throw new UrlFault("it holds a # (a # in the password is written %23, and a .dev.vars value has no comment after the URL)");
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new UrlFault("it is not a URL (a / or ? in the user or password is written %2F or %3F)");
+  }
+  if (url.protocol !== "postgres:" && url.protocol !== "postgresql:")
+    throw new UrlFault("it is not a postgres:// or postgresql:// URL");
+  if (url.hostname === "") throw new UrlFault("it names no host");
+  // An @ after the host means the user or password held a / or ?, so the URL read here names another host.
+  const afterScheme = raw.slice(raw.indexOf("//") + 2);
+  if (afterScheme.slice(afterScheme.search(/[/?]|$/)).includes("@"))
+    throw new UrlFault("it holds an @ after its host (a / or ? in the user or password is written %2F or %3F)");
+  const parts = [raw, url.href, url.host, url.hostname, ...url.hostname.split(","), url.hostname.replace(/^\[|\]$/g, "")];
+  for (const part of [url.username, url.password, url.pathname.slice(1)]) {
+    try {
+      parts.push(part, decodeURIComponent(part));
+    } catch {
+      throw new UrlFault("a % in its user, password or database name starts no escape (a % is written %25)");
+    }
+  }
+  return [...new Set(parts.filter((part) => part !== ""))].sort((a, b) => b.length - a.length);
+}
+
+// The parts of the URL taken out of every error line: the whole string until the URL is checked, then each part.
+let secrets = [process.env.DATABASE_URL ?? ""].filter((part) => part !== "");
+const scrub = (text) => secrets.reduce((out, part) => out.split(part).join("[redacted]"), String(text));
+/** A failed call as printed: its code (a SQLSTATE, or a code such as ECONNREFUSED) and its message, never its fields. */
+const fault = (error) => {
+  const code = typeof error?.code === "string" && /^[A-Za-z0-9_]{1,40}$/.test(error.code) ? ` (${scrub(error.code)})` : "";
+  return `${code}: ${scrub(error instanceof Error ? error.message : String(error))}`;
+};
+// An error that no catch below takes (a stray rejection) is printed the same way: Node would print its fields too.
+process.on("uncaughtException", (error) => {
+  fail(`failed${fault(error)}`);
+  process.exit(1);
+});
+
+/** The registry commands (active, status, activate) on `sql`, through K-05 readActiveBundle and setActiveBundle. */
+async function registryCall(sql, { readActiveBundle, setActiveBundle }) {
+  const active = await readActiveBundle(sql);
+  if ("error" in active && active.error === "transient") {
+    fail(`refused: PostgreSQL could not answer now (K-05 readActiveBundle: transient, SQLSTATE ${active.sqlstate}); nothing changed; run it again`);
+  } else if (command === "active") {
+    console.log("result" in active ? label(active.bundleId) : "none");
+  } else if (command === "status") {
+    say("result" in active ? `active bundle id: ${label(active.bundleId)} (active since ${active.activatedAt})` : "active bundle id: none (K-05 readActiveBundle: noActiveBundle)");
+  } else if (command === "activate") {
+    const [wanted, expected, record] = args;
+    const answer = await setActiveBundle(sql, {
+      bundleId: idOf(wanted),
+      expectActive: expected === "none" ? null : idOf(expected),
+      at: new Date().toISOString(),
+    });
+    if (answer.error === "notPublished") {
+      fail(`refused: bundle ${wanted} is not published (K-05 setActiveBundle: notPublished); the active bundle id stays ${expected}`);
+    } else if (answer.error === "activeChanged") {
+      fail(`refused: the active bundle id is ${answer.active === null ? "none" : label(answer.active)}, not ${expected} as read before (K-05 setActiveBundle: activeChanged); nothing switched`);
+    } else if (answer.error !== undefined) {
+      fail(`refused: PostgreSQL could not answer now (K-05 setActiveBundle: transient, SQLSTATE ${answer.sqlstate}); nothing switched; run it again`);
+    } else {
+      const before = answer.repeated ? wanted : expected === "none" ? null : expected;
+      if (record) writeFileSync(record, `${JSON.stringify({ before, after: wanted })}\n`);
+      say(answer.repeated ? `active bundle id: ${wanted}, already active (K-05 setActiveBundle: repeated)` : `active bundle id: ${expected} -> ${wanted} (K-05 setActiveBundle)`);
+      const now = await readActiveBundle(sql);
+      if ("result" in now && label(now.bundleId) === wanted) say(`readActiveBundle: ${wanted} (active since ${now.activatedAt})`);
+      else fail(`readActiveBundle after the switch does not return ${wanted}`);
+    }
+  } else {
+    fail(`unknown registry command ${command}`);
+  }
+}
 
 if (command === "manifest-id") {
   const manifest = JSON.parse(readFileSync(`${args[0]}/manifest.json`, "utf8"));
   console.log(label(idOf(label(manifest.bundleId ?? {}))));
-} else if (command === "publish") {
-  const { command: publish } = await load("compiler/src/cli/commands/publish.ts");
-  const io = { out: (line) => console.log(line), err: (line) => console.error(line) };
-  process.exitCode = await publish.run([args[0], "--kv", args[1]], io);
 } else {
-  const { createClient, redact, resolvePrimaryUrl } = await load("db/repo/client.ts");
-  const { readActiveBundle, setActiveBundle } = await load("db/repo/bundles.ts");
-  const db = createClient({ max: 1 });
-  const fail = (line) => {
-    console.error(`publish-bundle.sh: ${line}`);
-    process.exitCode = 1;
-  };
+  let db;
   try {
-    const active = await readActiveBundle(db.primary);
-    if ("error" in active && active.error === "transient") {
-      fail(`refused: PostgreSQL could not answer now (K-05 readActiveBundle: transient, SQLSTATE ${active.sqlstate}); nothing changed; run it again`);
-    } else if (command === "active") {
-      console.log("result" in active ? label(active.bundleId) : "none");
-    } else if (command === "status") {
-      say("result" in active ? `active bundle id: ${label(active.bundleId)} (active since ${active.activatedAt})` : "active bundle id: none (K-05 readActiveBundle: noActiveBundle)");
-    } else if (command === "activate") {
-      const [wanted, expected, record] = args;
-      const answer = await setActiveBundle(db.primary, {
-        bundleId: idOf(wanted),
-        expectActive: expected === "none" ? null : idOf(expected),
-        at: new Date().toISOString(),
-      });
-      if (answer.error === "notPublished") {
-        fail(`refused: bundle ${wanted} is not published (K-05 setActiveBundle: notPublished); the active bundle id stays ${expected}`);
-      } else if (answer.error === "activeChanged") {
-        fail(`refused: the active bundle id is ${answer.active === null ? "none" : label(answer.active)}, not ${expected} as read before (K-05 setActiveBundle: activeChanged); nothing switched`);
-      } else if (answer.error !== undefined) {
-        fail(`refused: PostgreSQL could not answer now (K-05 setActiveBundle: transient, SQLSTATE ${answer.sqlstate}); nothing switched; run it again`);
-      } else {
-        const before = answer.repeated ? wanted : expected === "none" ? null : expected;
-        if (record) writeFileSync(record, `${JSON.stringify({ before, after: wanted })}\n`);
-        say(answer.repeated ? `active bundle id: ${wanted}, already active (K-05 setActiveBundle: repeated)` : `active bundle id: ${expected} -> ${wanted} (K-05 setActiveBundle)`);
-        const now = await readActiveBundle(db.primary);
-        if ("result" in now && label(now.bundleId) === wanted) say(`readActiveBundle: ${wanted} (active since ${now.activatedAt})`);
-        else fail(`readActiveBundle after the switch does not return ${wanted}`);
-      }
+    secrets = urlParts(process.env.DATABASE_URL ?? "");
+    if (command === "publish") {
+      const { command: publish } = await load("compiler/src/cli/commands/publish.ts");
+      const io = { out: (line) => console.log(line), err: (line) => console.error(scrub(line)) };
+      process.exitCode = await publish.run([args[0], "--kv", args[1]], io);
     } else {
-      fail(`unknown registry command ${command}`);
+      const { createClient } = await load("db/repo/client.ts");
+      const calls = await load("db/repo/bundles.ts");
+      db = createClient({ max: 1 });
+      await registryCall(db.primary, calls);
     }
   } catch (error) {
-    fail(`the database call failed: ${redact(error instanceof Error ? error.message : String(error), [resolvePrimaryUrl()])}`);
+    if (error instanceof UrlFault) {
+      fail(`refused: the ${envName} database URL does not parse: ${error.message}; nothing was read or written`);
+    } else {
+      fail(`the database call failed${fault(error)}`);
+    }
   } finally {
-    await db.close();
+    await db?.close().catch((error) => fail(`closing the database client failed${fault(error)}`));
   }
 }
 '
@@ -220,7 +293,7 @@ if (command === "manifest-id") {
 # registry <command> [arguments]: the program above, on the database --env names.
 registry() {
   DATABASE_URL="$db_url" DB_SCHEMA="$db_schema" node --disable-warning=ExperimentalWarning --input-type=module \
-    -e "$REGISTRY" "$ROOT" "$@"
+    -e "$REGISTRY" "$ROOT" "$env_name" "$@"
 }
 
 work="$(mktemp -d)"
