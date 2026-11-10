@@ -1,0 +1,24 @@
+{
+  "result": "safetyOutcomeOfEvent",
+  "eventId": "evt-alex-0203",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-25T23:11:05Z",
+  "safetyOutcome": {
+    "id": "safety-alex-0203",
+    "eventId": "evt-alex-0203",
+    "source": "text",
+    "handleId": "handle-alex",
+    "personId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut",
+    "turnId": "turn-alex-0203",
+    "readAt": "2026-10-25T23:10:01Z",
+    "timedOut": false,
+    "labels": ["Crisis words"],
+    "tenses": ["now"],
+    "dangerWordKinds": ["selfHarm"],
+    "outcomes": ["Crisis words"],
+    "liftedToUnsure": false,
+    "sealedWords": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c"
+  }
+}

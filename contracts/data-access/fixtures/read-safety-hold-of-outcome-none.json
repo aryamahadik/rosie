@@ -1,0 +1,21 @@
+{
+  "call": "readSafetyHoldOfOutcome",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-hold-released.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "A No read holds nothing: Alex's 'we're safe, it's handled' (K-34 v1 seed-hold-released, No over) set no hold, so a repeated record of it reads null and names no hold (record.ts default 1), as turn 1's No record of Sam's text would on a rerun."
+  },
+  "request": {
+    "outcomeId": "safety-alex-0220",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "safetyHoldOfOutcome",
+    "outcomeId": "safety-alex-0220",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-27T09:00:04Z",
+    "hold": null
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "call": "readSafetyOutcome",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-hold-released.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "A read with no business runs on the runtime side, where no row-level security leaves rows out, and returns only rows with no business (v1.2 default 25): Alex's emergency read is the barbershop's, so it is not returned, and the answer is null. A row with a business never reaches a call made before there is one."
+  },
+  "request": {
+    "outcomeId": "safety-alex-0202",
+    "businessId": null
+  },
+  "outcome": {
+    "result": "safetyOutcome",
+    "outcomeId": "safety-alex-0202",
+    "businessId": null,
+    "readAt": "2026-10-27T09:00:04Z",
+    "safetyOutcome": null
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "call": "readSafetyHoldOfOutcome",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-threat-pause.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "A repeated record of Alex's threat to Riley (K-34 v1 seed-threat-pause) reads the hold its outcome set: the one hold of that outcome (safety_holds_one_per_outcome), never released (A3-48), which the repeat names, with nothing written (record.ts default 1)."
+  },
+  "request": {
+    "outcomeId": "safety-alex-0204",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "safetyHoldOfOutcome",
+    "outcomeId": "safety-alex-0204",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-27T09:00:04Z",
+    "hold": {
+      "id": "hold-alex-0204",
+      "safetyOutcomeId": "safety-alex-0204",
+      "businessId": "biz-lees-barbershop",
+      "handleId": "handle-alex",
+      "personId": "person-alex",
+      "bookingId": null,
+      "turnId": "turn-alex-0204",
+      "releaseRule": "never",
+      "blocksBooking": false,
+      "heldAt": "2026-10-26T21:40:03Z",
+      "releasedAt": null,
+      "releasedWhy": null,
+      "releasedByTurnId": null,
+      "releasedByOutcomeId": null,
+      "version": 1
+    }
+  }
+}

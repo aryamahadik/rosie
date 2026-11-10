@@ -1,0 +1,21 @@
+{
+  "call": "readSafetyHold",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-outcome-crisis.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "The barbershop's crisis hold named under the yoga studio's scope: the scope never shows another business's hold (K-34 v1 rule 4), so the answer is null and a release under this scope answers notFound (release.ts), with nothing of the hold read."
+  },
+  "request": {
+    "holdId": "hold-alex-0203",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "result": "safetyHold",
+    "holdId": "hold-alex-0203",
+    "businessId": "biz-yoga-studio",
+    "readAt": "2026-10-27T09:00:04Z",
+    "hold": null
+  }
+}

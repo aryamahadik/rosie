@@ -1,0 +1,18 @@
+{
+  "call": "readBusinessOwner",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "The barbershop before any owner role is written (the walking skeleton's start: T-1148's seed writes the business, Sam and his handle, and no role): the business is there with no live owner role, so the answer is null, and a line to the owner is not built: the safety service refuses the record (safetyLineNotBuilt), failing closed. Turn 1's No record sends no line, so it never asks."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "businessOwner",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:05:05Z",
+    "owner": null
+  }
+}
