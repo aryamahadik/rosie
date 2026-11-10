@@ -9,8 +9,18 @@
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
 //                webhook secret made up for the run, never Linq's, and the root's verify gets the same secret, with the
 //                chat lookup a receipt needs (Sam's chat is Sam's number)
-//   sealing      gateway/test-support fakeKeyStore
-//   safetyRead   safety/test-support fakeRead, answering safety-no.json for each text the test names (`known`)
+//   sealing      joined (T-553): the root binds K-05 v1.2 handleSealingKey through its real sealing port (./real.ts
+//                realSealing). What it is fed comes from here: `fakeHandleKeys`, a K-05 double answering as the
+//                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run
+//   safetyRead   joined (T-554): the root binds @rosie/ai's safety read through its real port (./real.ts
+//                realSafetyRead). What it is fed comes from here: `fakeSafetyModels`, the safety read (T-365) built over
+//                a fake Messages API whose answers come from the recorded-model double (T-004) holding the skeleton's
+//                texts (SKELETON_SAFETY_RECORDINGS, each seeded from safety-no.json), and able to wait before answering
+//   turnRow      joined (T-555): the root binds K-05's commitTurn and parkTurn through its real turn-row port (./real.ts
+//                realTurnRow). What it is fed comes from here: `fakeTurnRows`, a K-05 double answering as
+//                commit-first.json, commit-repeat-same-turn.json and park-turn.json under each running turn's id, and
+//                keeping the one K-04 turns row each turn id is written as; `gateThroughCommit` stands the Tool API's gate
+//                and commit in for a hop's test, its one commit through the root's turn-row port, until T-559
 //   stateReads   bundle/test-support fakeBundles; safety/test-support fixtureBundle; guard/test-support fakeTargets with
 //                Sam's S1-02 targets; Sam's party and ids; each named text's safety result; dispatch/test-support
 //                FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor directory
@@ -29,19 +39,36 @@
 
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
+import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
+import { unescapeData } from "@rosie/ai/src/context/tags";
+import { KEY_VARIABLE, type FetchLike } from "@rosie/ai/src/gateway/index";
+import { createRecordedModel } from "@rosie/ai/src/recorded-double/double";
+import { requestKey } from "@rosie/ai/src/recorded-double/key";
+import type { RecordedModel } from "@rosie/ai/src/recorded-double/types";
+import { createSafetyReader, SAFETY_READ_PROMPT, type SafetyReader } from "@rosie/ai/src/safety/index";
+import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
+import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.json";
+import commitRepeatJson from "@rosie/contracts/data-access/fixtures/commit-repeat-same-turn.json";
+import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
+import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
+import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import buildFrontierS102 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import decideS102 from "@rosie/contracts/model/fixtures/decide-s1-02-choose.json";
+import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
+import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
+import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import type { TransientError } from "@rosie/db/repo/targets";
 
+import type { CommitTurnRef } from "../actor";
 import { fakeBundles, type FakeBundles } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
-import { fakeKeyStore, type FakeKeyStore } from "../gateway/test-support";
 import { fakeTargets, type FakeTargets } from "../guard/test-support";
-import { fakeCore, fakeDirect, fakeRead, fixtureBundle } from "../safety/test-support";
+import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
 import {
   composerOf,
@@ -61,8 +88,15 @@ import {
   unplannedRow,
   type FakeTurnFace,
 } from "../turn/test-support";
+import type { GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
 import type { Ports } from "./ports";
-import type { LinqVerifyInputs } from "./real";
+import type {
+  CommitTurnCall,
+  HandleSealingKeyCall,
+  LinqVerifyInputs,
+  SafetyReaders,
+  TurnRowCalls,
+} from "./real";
 import type { RootClock } from "./root";
 import type { ReleaseFlags } from "./skeleton";
 
@@ -129,6 +163,382 @@ export function withSignatureChanged(webhook: SignedWebhook): SignedWebhook {
   };
 }
 
+// ---- K-05 v1.2 handleSealingKey, as a double (T-553; DL-313 ruling 4) ----------------------------------------------
+
+export interface FakeHandleKeys {
+  /** K-05's call as the root's real sealing port is fed it, its database bound. */
+  readonly call: HandleSealingKeyCall;
+  /** Every request, in order. */
+  readonly requests: HandleSealingKeyRequest[];
+  /** The key object handed out for a handle's address, for a test that opens a box itself; throws when none was made. */
+  keyOf(address: string): CryptoKey;
+  /** When set, every call answers it with no key, as K-05's constraint or transient answer. */
+  failWith: ConstraintError | TransientError | null;
+}
+
+/** A number's handle, person and key as the K-05 double made them at its first sight. */
+interface SightedHandle {
+  handleId: string;
+  personId: string;
+  createdAt: string;
+  key: CryptoKey;
+}
+
+/**
+ * K-05 v1.2 handleSealingKey as a double answering as the handle-key-*.json fixtures do: at a number's first sight its
+ * handle and person take the request's new ids and a key is made (handle-key-first-sight.json); each later call for that
+ * number finds them and writes nothing (handle-key-first-sight-repeat.json). The key is a random AES-256-GCM key object,
+ * for encrypt and decrypt, that cannot be exported (T-182's form), made for the run; its createdAt is `now`'s. A number's
+ * first sight is kept from its first call on, so a call made while it is still being made waits for it and finds it, as
+ * K-05's one transaction per call does (two webhooks of a new number at once give one handle and one key).
+ */
+export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
+  const known = new Map<string, SightedHandle>();
+  const sighted = new Map<string, Promise<SightedHandle>>();
+  const requests: HandleSealingKeyRequest[] = [];
+  const firstSight = async (request: HandleSealingKeyRequest): Promise<SightedHandle> => ({
+    handleId: request.newHandleId,
+    personId: request.newPersonId,
+    createdAt: utcSeconds(now()),
+    key: (await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+      "encrypt",
+      "decrypt",
+    ])) as CryptoKey,
+  });
+  const keys: FakeHandleKeys = {
+    requests,
+    failWith: null,
+    keyOf(address) {
+      const entry = known.get(address);
+      if (entry === undefined) throw new Error("no key was made for that handle");
+      return entry.key;
+    },
+    async call(request) {
+      requests.push(structuredClone(request));
+      if (keys.failWith !== null) return { outcome: keys.failWith, dataKey: null };
+      const address = request.handle.address;
+      const found = sighted.get(address);
+      const pending = found ?? firstSight(request);
+      if (found === undefined) sighted.set(address, pending);
+      const entry = await pending;
+      known.set(address, entry);
+      const made = found === undefined;
+      return {
+        outcome: {
+          result: "key",
+          handleId: entry.handleId,
+          personId: entry.personId,
+          created: { handle: made, person: made, key: made },
+          key: { wrappingKeyName: request.wrappingKeyName, createdAt: entry.createdAt, version: 1 },
+        },
+        dataKey: entry.key,
+      };
+    },
+  };
+  return keys;
+}
+
+// ---- @rosie/ai's safety read over the recorded-model double (T-554) ------------------------------------------------
+
+/** Sam's JOIN, his first text (D-017's human test; S1-01), as the e2e skeleton sends it. */
+export const JOIN_TEXT = "JOIN";
+/** Sam's words in the runtime's skeleton trace test (./root.worker.test.ts). */
+export const SAM_TRADES_TEXT = "Barbershop, plumbing, electrical";
+
+/**
+ * The skeleton's safety recordings, in T-004's form (ai/recordings): each text the wiring's tests send to the safety read,
+ * seeded from K-02 v1's safety-no.json, so each reads No. Synthetic words only: Sam's JOIN and trades, and K-06
+ * text-imessage.json's body (rule 9).
+ */
+export const SKELETON_SAFETY_RECORDINGS = {
+  version: "v1",
+  contract: "model.v1",
+  recordings: [
+    {
+      id: "skeleton-join",
+      kind: "safetyRead",
+      request: { text: JOIN_TEXT },
+      seed: { fixture: "safety-no.json" },
+    },
+    {
+      id: "skeleton-sam-trades",
+      kind: "safetyRead",
+      request: { text: SAM_TRADES_TEXT },
+      seed: { fixture: "safety-no.json" },
+    },
+    {
+      id: "skeleton-text-imessage",
+      kind: "safetyRead",
+      request: { text: textImessage.body },
+      seed: { fixture: "safety-no.json" },
+    },
+  ],
+} as const;
+
+/** The K-02 v1 fixtures the skeleton's recordings are seeded from, by file. */
+const SEEDS: Readonly<Record<string, { readonly read: unknown }>> = { "safety-no.json": safetyNo };
+
+/**
+ * The recorded-model double (T-004's `createRecordedModel`) holding the skeleton's recordings, each keyed by its request
+ * as T-004's loader keys it and answering its seed's read. Built without the loader, which reads files and compiles
+ * K-02's schema with Ajv, neither of which the Workers runtime allows; ./safety-read.test.ts holds every answer to the
+ * loader's own, under Node.
+ */
+export function skeletonSafetyDouble(): RecordedModel {
+  const held = new Map<string, { output: unknown }>();
+  for (const recording of SKELETON_SAFETY_RECORDINGS.recordings) {
+    const seed = SEEDS[recording.seed.fixture];
+    if (seed === undefined) throw new Error(`no K-02 fixture ${recording.seed.fixture} to seed from`);
+    held.set(requestKey("safetyRead", recording.request), { output: structuredClone(seed.read) });
+  }
+  return createRecordedModel(held);
+}
+
+/** K-01 v1's sample manifest: its two models (claude-haiku-5-5, claude-sonnet-5-5) and its prompts. */
+const MANIFEST = manifestFixture as unknown as {
+  readonly models: { readonly haiku: string; readonly sonnet: string };
+  readonly prompts: CacheBundle["manifest"]["prompts"];
+};
+
+/** The words of a safety read's <text> element (ai/src/safety/prompt.ts safetyReadTurn), escaped as data. */
+const TEXT_ELEMENT = /<text source="(?:text|page|agent)">([\s\S]*)<\/text>$/u;
+
+/** The token counts each recorded answer reports. */
+const USAGE = {
+  input_tokens: 40,
+  output_tokens: 60,
+  cache_read_input_tokens: 1800,
+  cache_creation_input_tokens: 0,
+};
+
+/** Resolves after `ms` real milliseconds, or rejects at once when the call is aborted (each try is cut off at 2 s). */
+function waitOrAbort(ms: number, signal: AbortSignal | null | undefined): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(new Error("aborted"));
+    });
+  });
+}
+
+export interface FakeSafetyModels {
+  /** What the root's real safety read is fed (RootOptions.safetyReaders): @rosie/ai's safety read for each bundle id. */
+  readonly readers: SafetyReaders;
+  /** Every model call the safety read made, in order: the model asked and the words it was given. */
+  readonly calls: { readonly model: string; readonly text: string }[];
+  /** How long each answer waits, in real milliseconds, before the double gives it: past 2 s, every try is cut off. */
+  delayMs: number;
+}
+
+/**
+ * @rosie/ai's safety read (T-365 `createSafetyReader`) for each bundle id, over K-01's sample manifest's models and this
+ * build's safety read prompt, calling a fake Messages API and never a model (J-02): each call's answer is the double's
+ * recording for its words, after `delayMs`; a text the double holds no recording for fails the call. The key is made up
+ * for each run, never Anthropic's.
+ */
+export function fakeSafetyModels(recorded: Pick<RecordedModel, "safetyRead">): FakeSafetyModels {
+  const calls: { model: string; text: string }[] = [];
+  const env = { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` };
+  const fetch: FetchLike = async (_url, init) => {
+    const body = JSON.parse(typeof init.body === "string" ? init.body : "{}") as {
+      model?: string;
+      messages?: { content?: string }[];
+    };
+    const text = unescapeData(TEXT_ELEMENT.exec(body.messages?.[0]?.content ?? "")?.[1] ?? "");
+    calls.push({ model: body.model ?? "", text });
+    if (models.delayMs > 0) await waitOrAbort(models.delayMs, init.signal);
+    const output = await recorded.safetyRead({ text });
+    return new Response(
+      JSON.stringify({
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        usage: USAGE,
+      }),
+      { status: 200 },
+    );
+  };
+  const built = new Map<string, SafetyReader>();
+  const models: FakeSafetyModels = {
+    calls,
+    delayMs: 0,
+    readers(bundleId) {
+      const key = `${bundleId.hash}/${String(bundleId.build)}`;
+      const known = built.get(key);
+      if (known !== undefined) return known;
+      const reader = createSafetyReader({
+        bundle: { bundleId, models: MANIFEST.models },
+        prompts: createPromptCache({
+          manifest: {
+            bundleId,
+            prompts: { ...MANIFEST.prompts, safetyRead: SAFETY_READ_PROMPT },
+            partial: true,
+          },
+          flows: {},
+        }),
+        env,
+        fetch,
+      });
+      built.set(key, reader);
+      return reader;
+    },
+  };
+  return models;
+}
+
+// ---- K-05 commitTurn and parkTurn, as a double: a turn's one row (T-555) ------------------------------------------
+
+/** One K-04 turns row as the double writes it: once per turn id, as committed or parked (NQ-RT-3's default). */
+export interface TurnsRow {
+  readonly id: string;
+  readonly handleId: string;
+  readonly eventIds: readonly string[];
+  readonly state: "committed" | "parked";
+  readonly bundleId: { readonly hash: string; readonly build: number };
+  readonly traceId: string;
+  readonly joinedTraceIds: readonly string[];
+  readonly tries: number;
+  /** When it was committed (commit-first.json's committedAt) or parked (the park's parkedAt). */
+  readonly at: string;
+}
+
+export interface FakeTurnRows {
+  /** What the root's turn-row port is fed (RootOptions.turnRows): K-05's two calls, over the double's turns rows. */
+  readonly calls: TurnRowCalls;
+  /** K-04 turns, by turn id: the one row each turn id was written as. */
+  readonly turns: Map<string, TurnsRow>;
+  /** Every commitTurn request, in order. */
+  readonly commits: CommitTurnRequest[];
+  /** Every parkTurn request, in order. */
+  readonly parks: K05ParkTurnRequest[];
+  /** When set, every commitTurn answers it and writes nothing, as K-05 answering transient (the same request may come again). */
+  failCommitsWith: { readonly error: "transient" } | null;
+}
+
+const COMMIT_FIRST_TURN = commitFirstJson.request.turn.id;
+const PARK_TURN_ID = parkTurnJson.request.turn.id;
+
+const commitAnswer = (value: unknown): Promise<CommitTurnOutcome> =>
+  Promise.resolve(structuredClone(value) as CommitTurnOutcome);
+const parkAnswer = (value: unknown): Promise<ParkTurnOutcome> =>
+  Promise.resolve(structuredClone(value) as ParkTurnOutcome);
+
+/** The turns row K-05 writes for a commit's or a park's turn (both name it as K-05 v1 `turn`). */
+function turnsRowOf(turn: CommitTurnRequest["turn"], state: TurnsRow["state"], at: string): TurnsRow {
+  return {
+    id: turn.id,
+    handleId: turn.handleId,
+    eventIds: [...turn.eventIds],
+    state,
+    bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
+    traceId: turn.traceId,
+    joinedTraceIds: [...turn.joinedTraceIds],
+    tries: turn.tries,
+    at,
+  };
+}
+
+/**
+ * K-05 commitTurn and parkTurn as a double answering as commit-first.json, commit-repeat-same-turn.json and park-turn.json
+ * do, for whichever turn asks (K-05 README items 1 and 12): the first call for a turn id writes that id's one turns row,
+ * committed or parked, and answers its fixture's outcome under that turn id; a later commit of a committed id answers the
+ * repeat's (nothing written, repeated); a later park of a parked id its first park again, repeated; a commit of a parked id
+ * turnParked; a park of a committed id alreadyCommitted. A parked row's time is the request's parkedAt.
+ */
+export function fakeTurnRows(): FakeTurnRows {
+  const turns = new Map<string, TurnsRow>();
+  const commits: CommitTurnRequest[] = [];
+  const parks: K05ParkTurnRequest[] = [];
+  const firstParks = new Map<string, Record<string, unknown>>();
+  const double: FakeTurnRows = {
+    turns,
+    commits,
+    parks,
+    failCommitsWith: null,
+    calls: {
+      commitTurn(request) {
+        commits.push(structuredClone(request));
+        if (double.failCommitsWith !== null) return commitAnswer({ ...double.failCommitsWith });
+        const turnId = request.turn.id;
+        const known = turns.get(turnId);
+        if (known?.state === "parked")
+          return commitAnswer({ error: "turnParked", turnId, parkedAt: known.at });
+        if (known !== undefined) {
+          return commitAnswer(swap(commitRepeatJson.outcome, [[COMMIT_FIRST_TURN, turnId]]));
+        }
+        turns.set(turnId, turnsRowOf(request.turn, "committed", commitFirstJson.outcome.committedAt));
+        return commitAnswer(swap(commitFirstJson.outcome, [[COMMIT_FIRST_TURN, turnId]]));
+      },
+      parkTurn(request) {
+        parks.push(structuredClone(request));
+        const turnId = request.turn.id;
+        const known = turns.get(turnId);
+        if (known?.state === "committed") {
+          return parkAnswer({ error: "alreadyCommitted", turnId, committedAt: known.at });
+        }
+        const first = firstParks.get(turnId);
+        if (first !== undefined) return parkAnswer({ ...first, repeated: true });
+        const parked: Record<string, unknown> = {
+          ...swap(parkTurnJson.outcome, [[PARK_TURN_ID, turnId]]),
+          parkedAt: request.parkedAt,
+          outboxRows: request.outboxRows.map((row, index) => ({ id: row.id, commitSeq: index + 1 })),
+          repeated: false,
+        };
+        turns.set(turnId, turnsRowOf(request.turn, "parked", request.parkedAt));
+        firstParks.set(turnId, parked);
+        return parkAnswer(parked);
+      },
+    },
+  };
+  return double;
+}
+
+/**
+ * K-05 v1.1 commitTurn's request for the running turn: commit-first.json's body (its versions read and its writes) under
+ * the turn the K-09 gate was handed, as K-05 names it (K-05 v1 turn: the lease's turn id, its batch's event ids, the pinned
+ * bundle, the trace ids and the try).
+ */
+export function commitFirstFor(turn: CommitTurnRef): CommitTurnRequest {
+  const body = structuredClone(commitFirstJson.request) as unknown as CommitTurnRequest;
+  const k05Turn = {
+    id: turn.id,
+    handleId: turn.handleId,
+    eventIds: [...turn.eventIds],
+    bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
+    traceId: turn.traceId,
+    joinedTraceIds: [...turn.joinedTraceIds],
+    tries: turn.tries,
+  };
+  return { ...body, turn: k05Turn as unknown as CommitTurnRequest["turn"] };
+}
+
+/**
+ * The Tool API's gate and commit as a hop's test stands it in until T-559 joins @rosie/actions' (a FakeTurnFace `gate`): no
+ * limit is read, and the turn's one commit is K-05 commitTurn through `commit` (in a hop's test, the root's turn-row port),
+ * with commit-first.json's body under the running turn (`commitFirstFor`). K-05's committed answer, first or repeated, comes
+ * back as K-09's: commit-s1-02.json's outcome under the running turn's id, with K-05's turn id, commit time and repeat flag,
+ * so the turn goes on to its reply as the skeleton's does; K-05's refusal (transient, turnParked) comes back as K-09's error,
+ * with nothing written.
+ */
+export function gateThroughCommit(
+  commit: CommitTurnCall,
+): (request: GateAndCommitRequest) => Promise<GateAndCommitAnswer> {
+  return async (request) => {
+    const answer = await commit(commitFirstFor(request.turn));
+    if (!("result" in answer)) return answer as unknown as GateAndCommitAnswer;
+    const committed = swap(commitS102.outcome, [[S1_02_TURN, request.turn.id]]) as unknown as GateCommitted;
+    return {
+      ...committed,
+      turnId: answer.turnId,
+      committedAt: answer.committedAt,
+      repeated: answer.repeated,
+    };
+  };
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -189,8 +599,11 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 }
 
 export interface SkeletonFakes {
-  /** The fake set the test environment binds: every port but the joined Linq verify, which the root builds (./real.ts). */
-  readonly ports: Omit<Ports, "linqVerify">;
+  /**
+   * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety read
+   * and the turn-row calls, which the root builds (./real.ts).
+   */
+  readonly ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead" | "turnRow">;
   readonly clock: TestClock;
   /** What the root's real Linq verify is fed (RootOptions.linq): the run's webhook secret and Sam's chat for a receipt. */
   readonly linqInputs: LinqVerifyInputs;
@@ -201,7 +614,25 @@ export interface SkeletonFakes {
    * clock (whole seconds), so it is inside the 300 s window of the gateway's receipt time.
    */
   sign(event: LinqInboundEvent, partKey?: string | null): Promise<SignedWebhook>;
-  readonly keys: FakeKeyStore;
+  /**
+   * K-05 v1.2 handleSealingKey as a double, for the root's real sealing port (RootOptions.handleKey: `handleKeys.call`):
+   * every request it was asked, and the key object it handed out for each number.
+   */
+  readonly handleKeys: FakeHandleKeys;
+  /**
+   * @rosie/ai's safety read over the recorded-model double, for the root's real safety read (RootOptions.safetyReaders:
+   * `models.readers`): every model call it made, and how long each answer waits.
+   */
+  readonly models: FakeSafetyModels;
+  /**
+   * K-05's commitTurn and parkTurn as a double, for the root's real turn-row port (RootOptions.turnRows: `turnRows.calls`):
+   * every request, and the one turns row each turn id was written as.
+   */
+  readonly turnRows: FakeTurnRows;
+  /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
+  readonly core: FakeCore;
+  /** The direct send through Linq the safety read uses only while the core is down. */
+  readonly direct: FakeDirect;
   readonly face: FakeTurnFace;
   readonly targets: FakeTargets;
   readonly bundles: FakeBundles;
@@ -209,16 +640,20 @@ export interface SkeletonFakes {
   readonly linq: FakeLinq;
   readonly arming: WiredArming;
   /**
-   * Sets a text's safety result before it is sent: safety-no.json under its event id, what the read on arrival answers and
-   * what the turn's commit records (K-09 README default 5).
+   * Sets a text's safety result before it is sent: safety-no.json under its event id, what the turn's commit records
+   * (K-09 README default 5). The read on arrival is the joined one (T-554): `models`, over the recorded-model double.
    */
   known(eventId: string): void;
 }
 
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
 export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
-  const keys = fakeKeyStore();
-  // Read when each call is made: the read on arrival answers, and the turn's commit records, what `known` set by then.
+  const handleKeys = fakeHandleKeys(() => clock.now());
+  const models = fakeSafetyModels(skeletonSafetyDouble());
+  const turnRows = fakeTurnRows();
+  const core = fakeCore(clock);
+  const direct = fakeDirect(clock);
+  // Read when each call is made: the turn's commit records what `known` set by then.
   const answers: Record<string, SafetyResult> = {};
 
   const face = fakeTurnFace();
@@ -264,9 +699,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     chatHandle: (chatId) => (chatId === SAM_CHAT ? SAM.handle.address : null),
   };
 
-  const ports: Omit<Ports, "linqVerify"> = {
-    sealing: keys,
-    safetyRead: fakeRead(clock, answers),
+  const ports: Omit<Ports, "linqVerify" | "sealing" | "safetyRead" | "turnRow"> = {
     stateReads: {
       bundles: bundles.deps,
       safety: {
@@ -300,13 +733,13 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       gateAndCommit: (request, at, trace) => turnFace.gateAndCommit(request, at, trace),
       composeInput: (request, trace) => turnFace.composeInput(request, trace),
-      safetyCore: fakeCore(clock),
+      safetyCore: core,
     },
     decide: decideOf(ai),
     composer: composerOf(composer),
     finalize: { finalizeMessage: (request, trace) => turnFace.finalizeMessage(request, trace) },
     dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
-    linqSend: { parts: linq, direct: fakeDirect(clock) },
+    linqSend: { parts: linq, direct },
   };
 
   return {
@@ -316,7 +749,11 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     webhooks,
     sign: (event, partKey = null) =>
       webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey }),
-    keys,
+    handleKeys,
+    models,
+    turnRows,
+    core,
+    direct,
     face,
     targets,
     bundles,

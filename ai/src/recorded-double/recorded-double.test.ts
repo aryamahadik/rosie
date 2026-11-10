@@ -54,11 +54,20 @@ function accepts(def: string, value: unknown): boolean {
 const index = (readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: IndexEntry[] }).fixtures;
 interface IndexEntry {
   file: string;
+  version: string;
   def?: string;
   expect: string;
 }
-const acceptedOf = (def: string): string[] =>
-  index.filter((entry) => entry.expect === "accept" && entry.def === def).map((entry) => entry.file);
+/** The accepted fixtures of one $defs entry, of every version or of the one named. */
+const acceptedOf = (def: string, version?: string): string[] =>
+  index
+    .filter(
+      (entry) =>
+        entry.expect === "accept" &&
+        entry.def === def &&
+        (version === undefined || entry.version === version),
+    )
+    .map((entry) => entry.file);
 
 /** A value a test must find; a miss is a broken test. */
 function must<T>(value: T | undefined): T {
@@ -81,7 +90,8 @@ afterAll(() => {
 });
 
 describe("the context fixtures: each gets its paired decide answer", () => {
-  const contexts = acceptedOf("context");
+  // K-02 v1's contexts, by version: v1.1's context-s1-01.json gets its recordings in T-1145 (ADR-013, new task 1).
+  const contexts = acceptedOf("context", "v1");
   const decides = acceptedOf("decideResult");
 
   it("holds every accepted K-02 v1 context fixture, and pairs each with one decide fixture", () => {

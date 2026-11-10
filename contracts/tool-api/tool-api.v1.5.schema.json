@@ -1,0 +1,800 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.5.schema.json",
+  "title": "ToolApiV1dot5",
+  "description": "K-09 Tool API v1.5, a minor version for the walking skeleton's turn (T-1142; DL-322; README 'v1.5'): Sam's first text from a new number (S1-01), whose reply is S1-02's question, the turn D-017's card and human test run end to end. It only adds to v1.4 (tool-api.v1.4.schema.json, frozen by T-053 and unchanged, referred to here, which refers to v1.3, v1.2, v1.1 and v1): every v1.4 definition named here is under its own name, the unchanged ones by reference; the changed ones (buildFrontier.response, closestEntries.request, closestEntries.response, gateAndCommit.request and the three exchanges that hold them) only take K-02 v1.1's context (../model/model.v1.1.schema.json) in place of K-02 v1's, whose one change is a door value, signUp, the door to S1-01. So every v1 to v1.4 exchange is a v1.5 exchange. Added: no call, no key, no error and no named rule; the fixtures of the skeleton's turn 1 (build-frontier-s1-01.json, commit-s1-01.json), which turn 2's S1-02 fixtures (v1) stood in for; and, in round 3 (DL-333), two optional fields of the gateAndCommit request's turn, the service and the Linq chat id of the turn's last text, which the runtime caller copies from that text's K-06 v1 event (gateAndCommit.turn; README v1.5 default 135), and a statement of the rows a gateAndCommit fixture's step writes (gateAndCommit.given, statedWrites; default 136). Each call's read, repeat and time budget are v1's (README 'Reads, repeats and time budgets'). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/buildFrontier.exchange" },
+    { "$ref": "#/$defs/closestEntries.exchange" },
+    { "$ref": "#/$defs/gateAndCommit.exchange" },
+    { "$ref": "#/$defs/composeInput.exchange" },
+    { "$ref": "#/$defs/finalizeMessage.exchange" },
+    { "$ref": "#/$defs/recordSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/releaseSafetyHold.exchange" },
+    { "$ref": "#/$defs/recordStopOrStart.exchange" },
+    { "$ref": "#/$defs/setRecordFlag.exchange" },
+    { "$ref": "#/$defs/handOff.exchange" },
+    { "$ref": "#/$defs/answerHandOff.exchange" },
+    { "$ref": "#/$defs/pageTeam.exchange" },
+    { "$ref": "#/$defs/acknowledgePage.exchange" },
+    { "$ref": "#/$defs/openReviewItem.exchange" },
+    { "$ref": "#/$defs/decideReviewItem.exchange" },
+    { "$ref": "#/$defs/enterDoor.exchange" },
+    { "$ref": "#/$defs/sendFixedLine.exchange" },
+    { "$ref": "#/$defs/sendsFailing.exchange" },
+    { "$ref": "#/$defs/textingBack.exchange" },
+    { "$ref": "#/$defs/calendarLinkDropped.exchange" },
+    { "$ref": "#/$defs/calendarLinkBack.exchange" },
+    { "$ref": "#/$defs/sendProofCode.exchange" },
+    { "$ref": "#/$defs/proveCode.exchange" },
+    { "$ref": "#/$defs/issueChatLink.exchange" },
+    { "$ref": "#/$defs/matchKinds.exchange" },
+    { "$ref": "#/$defs/lookupListing.exchange" },
+    { "$ref": "#/$defs/saveSetupStep.exchange" },
+    { "$ref": "#/$defs/readSetup.exchange" },
+    { "$ref": "#/$defs/openRequest.exchange" },
+    { "$ref": "#/$defs/confirmBusinessBooking.exchange" },
+    { "$ref": "#/$defs/readBackBusinessBooking.exchange" },
+    { "$ref": "#/$defs/findCustomer.exchange" },
+    { "$ref": "#/$defs/checkBookingFirst.exchange" },
+    { "$ref": "#/$defs/setCustomerBlock.exchange" },
+    { "$ref": "#/$defs/matchService.exchange" },
+    { "$ref": "#/$defs/setWhoFor.exchange" },
+    { "$ref": "#/$defs/setReachWay.exchange" },
+    { "$ref": "#/$defs/addCustomer.exchange" },
+    { "$ref": "#/$defs/setPrice.exchange" },
+    { "$ref": "#/$defs/quoteFromPhotos.exchange" },
+    { "$ref": "#/$defs/showTimes.exchange" },
+    { "$ref": "#/$defs/saveTime.exchange" },
+    { "$ref": "#/$defs/extendTime.exchange" },
+    { "$ref": "#/$defs/joinWaitlist.exchange" },
+    { "$ref": "#/$defs/sendSecureLink.exchange" },
+    { "$ref": "#/$defs/checkPlace.exchange" },
+    { "$ref": "#/$defs/saveSecurePage.exchange" },
+    { "$ref": "#/$defs/showMoneyBefore.exchange" },
+    { "$ref": "#/$defs/settleOffer.exchange" },
+    { "$ref": "#/$defs/signDocument.exchange" },
+    { "$ref": "#/$defs/takeMoneyBefore.exchange" },
+    { "$ref": "#/$defs/refundAtOnce.exchange" },
+    { "$ref": "#/$defs/askOwnerFirst.exchange" },
+    { "$ref": "#/$defs/sendToOnCall.exchange" },
+    { "$ref": "#/$defs/writeBooking.exchange" },
+    { "$ref": "#/$defs/recordStaffTold.exchange" },
+    { "$ref": "#/$defs/askAboutClash.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "tool-api.v1.4.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "tool-api.v1.4.schema.json#/$defs/nullableId" },
+    "turnId": { "$ref": "tool-api.v1.4.schema.json#/$defs/turnId" },
+    "utc": { "$ref": "tool-api.v1.4.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "tool-api.v1.4.schema.json#/$defs/nullableUtc" },
+    "stepId": { "$ref": "tool-api.v1.4.schema.json#/$defs/stepId" },
+    "fixedLineId": { "$ref": "tool-api.v1.4.schema.json#/$defs/fixedLineId" },
+    "phoneNumber": { "$ref": "tool-api.v1.4.schema.json#/$defs/phoneNumber" },
+    "rowRef": { "$ref": "tool-api.v1.4.schema.json#/$defs/rowRef" },
+    "tableName": { "$ref": "tool-api.v1.4.schema.json#/$defs/tableName" },
+    "version": { "$ref": "tool-api.v1.4.schema.json#/$defs/version" },
+    "caller": { "$ref": "tool-api.v1.4.schema.json#/$defs/caller" },
+    "sentByActor": { "$ref": "tool-api.v1.4.schema.json#/$defs/sentByActor" },
+    "notFoundError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notFoundError" },
+    "transientError": { "$ref": "tool-api.v1.4.schema.json#/$defs/transientError" },
+    "constraintError": { "$ref": "tool-api.v1.4.schema.json#/$defs/constraintError" },
+    "versionChangedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/versionChangedError" },
+    "notAllowedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/bookingPausedError" },
+    "turnParkedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/turnParkedError" },
+    "gateOutcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateOutcome" },
+    "limit1Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit1Outcome" },
+    "limit2Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit2Outcome" },
+    "limit3Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit3Outcome" },
+    "limit4Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit4Outcome" },
+    "limit5Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit5Outcome" },
+    "limit6Outcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limit6Outcome" },
+    "limitOutcome": { "$ref": "tool-api.v1.4.schema.json#/$defs/limitOutcome" },
+    "guardTargets": { "$ref": "tool-api.v1.4.schema.json#/$defs/guardTargets" },
+    "buildFrontier.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/buildFrontier.request" },
+    "buildFrontier.response": {
+      "title": "BuildFrontierResponse",
+      "description": "The context for decide, with what the builder flagged or collapsed, as v1, with one change: the context is K-02 v1.1's, whose doors also take signUp, the door to S1-01 a new number's first text is offered (README v1.5 default 128; K-02 v1.1 default 9). Every v1 to v1.4 response is a v1.5 response.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "K-02 v1.1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's). writer.handle is the writer's own number, the turn's own data: C-114 leaves it out of the prompt.",
+          "$ref": "../model/model.v1.1.schema.json#/$defs/context"
+        },
+        "flagged": {
+          "description": "Steps flagged for a fix: a second value for one key was refused and the home's value went in (arch 02 line 117; this closes nm01).",
+          "type": "array",
+          "items": {
+            "title": "FlaggedStep",
+            "type": "object",
+            "properties": {
+              "stepId": {
+                "$ref": "#/$defs/stepId"
+              },
+              "key": {
+                "description": "The fact key that had a second value (arch 02 line 117).",
+                "type": "string",
+                "minLength": 1
+              },
+              "kept": {
+                "description": "The home's row and version whose value went in (S13-30).",
+                "$ref": "#/$defs/rowRef"
+              }
+            },
+            "required": ["stepId", "key", "kept"],
+            "additionalProperties": false
+          }
+        },
+        "collapsedBookingIds": {
+          "description": "Bookings other than the target collapsed to one 'which booking?' choice because the frontier passed 60 (arch 03 line 167); empty when none.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      },
+      "required": ["context", "flagged", "collapsedBookingIds"],
+      "additionalProperties": false
+    },
+    "buildFrontier.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/buildFrontier.errors" },
+    "closestEntries.request": {
+      "title": "ClosestEntriesRequest",
+      "description": "Add the closest entries when nothing fits, as v1 (arch 03 line 189; K-02 context.meaningSearch; Q-42; README default 3: 200 ms; once per turn), with one change: the context is K-02 v1.1's, so a frontier that offered the sign-up door can go on to meaning search (README 'v1.5'). Every v1 request is a v1.5 request.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "context": {
+          "description": "The turn's context as buildFrontier gave it (K-02 v1.1).",
+          "$ref": "../model/model.v1.1.schema.json#/$defs/context"
+        },
+        "quotes": {
+          "description": "The parts of the text nothing fit, each by its exact quote (arch 03 line 185).",
+          "type": "array",
+          "items": {
+            "description": "A quote of a part nothing fit (K-02 v1 noneFits).",
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["caller", "context", "quotes"],
+      "additionalProperties": false
+    },
+    "closestEntries.response": {
+      "title": "ClosestEntriesResponse",
+      "description": "The context with the closest entries added, as v1, the context K-02 v1.1's (README 'v1.5').",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "The same context with at most 3 entry steps added as choices of kind searchEntry and meaningSearch set (K-02 v1.1).",
+          "$ref": "../model/model.v1.1.schema.json#/$defs/context"
+        },
+        "added": {
+          "description": "The entry steps added, closest first (arch 03 line 189).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          },
+          "maxItems": 3
+        }
+      },
+      "required": ["context", "added"],
+      "additionalProperties": false
+    },
+    "closestEntries.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/closestEntries.errors" },
+    "plannerVerbs.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/plannerVerbs.request" },
+    "plannerVerbs.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/plannerVerbs.response" },
+    "plannerVerbs.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/plannerVerbs.errors" },
+    "coreAction": { "$ref": "tool-api.v1.4.schema.json#/$defs/coreAction" },
+    "coreResult": { "$ref": "tool-api.v1.4.schema.json#/$defs/coreResult" },
+    "partResult": { "$ref": "tool-api.v1.4.schema.json#/$defs/partResult" },
+    "gateAndCommit.turn": {
+      "title": "GateAndCommitTurn",
+      "description": "The turn a gateAndCommit request carries (v1.5, round 3; DL-333; README v1.5 default 135): K-05 v1's turn, its seven fields each by reference and required as K-05 requires them, with two fields the commit's walk reads, which the runtime caller (the handle actor, C-046) copies from the K-06 v1 event of the turn's last text, the last of eventIds: service, the channel of a reply in this turn (default 132), and chatId, the Linq chat id S1-01's thread row takes (default 134). Both or neither: the caller fills both on a turn of texts (input decided or coreOnly); a clock's turn has no text and carries neither (gateAndCommit.request); every v1 to v1.4 turn carries neither, and a walk that needs one and finds none fails closed, never guessed. They are the walk's inputs, never the turn row's: K-04 turns has no such column and K-05 v1's turn is closed, so the commit writes the turn row with K-05's seven fields alone. Neither reaches the model: buildFrontier's request keeps K-05 v1's closed turn, and K-02's context holds neither.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/id" },
+        "handleId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/handleId" },
+        "eventIds": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/eventIds" },
+        "bundleId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/bundleId" },
+        "traceId": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/traceId" },
+        "joinedTraceIds": {
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/joinedTraceIds"
+        },
+        "tries": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn/properties/tries" },
+        "service": {
+          "description": "The service the turn's last text came in on: that K-06 v1 event's service (imessage, rcs or sms through Linq, or email), copied by the runtime caller; never null, since a text always names its service (K-06 v1: null only on a delivery receipt). The channel of the outbox row a reply in this turn writes (README v1.5 default 132): a number with no phone row has no stored way (K-04 phones.chat_way; Q-33).",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json#/$defs/service"
+        },
+        "chatId": {
+          "description": "Linq's id for the chat the turn's last text came in on: that K-06 v1 event's chatId, copied by the runtime caller; null when Linq did not report it, and for email, whose thread is its reply address (K-06 v1 chatId). S1-01's thread row takes it as K-04 threads.linq_chat_id (README v1.5 default 134), its one home: it never goes into K-02's context, a span, a log line or an event-log entry's values (default 135).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "handleId", "eventIds", "bundleId", "traceId", "joinedTraceIds", "tries"],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "service": ["chatId"],
+        "chatId": ["service"]
+      }
+    },
+    "gateAndCommit.request": {
+      "title": "GateAndCommitRequest",
+      "description": "Gate and commit a turn, as v1 (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508; K-05 v1 commitTurn and fireClock; README 'Reads, repeats and time budgets': the primary, uncached; the turn id is the key; at most 300 ms), with two changes: decided texts carry K-02 v1.1's context with decide's result, so a part may enter the sign-up door, whose walk writes S1-01's thread and S1-02's question, its clock row and one outbox row in the one commit (README v1.5 defaults 128 to 134; commit-s1-01.json); and the turn is gateAndCommit.turn, which may carry the service and the Linq chat id of the turn's last text, the walk's sources for a reply's channel and S1-01's thread (round 3; defaults 132, 134 and 135). Every v1 to v1.4 request is a v1.5 request.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "turn": {
+          "description": "The turn row the commit writes (K-05 v1 turn); every input but a clock's needs one. For a clock's firing (input.kind clock), the clock turn on the clock row's handle, or null when the firing's writes hold no outbox row (K-05 v1 fireClock.request.turn), as for any row no handle owns (K-04 turns.handle_id is not null). A clock turn has no texts: its one event id is the clock row's id (K-05 v1 default 9), its id is that event id's hash, as every turn's is (CQ-09), so one row's firing has one turn id and a repeat finds the first firing, and its trace id is the firing's own (CQ-06); its caller.kind is turn, with caller.turnId and caller.requestId its id. A firing with no turn is called with caller.kind clockFiring, caller.turnId null and caller.requestId the clock row's id. The named rule clockTurn checks these. From v1.5 the turn is gateAndCommit.turn: K-05 v1's turn, with the service and the chat id the runtime caller copies from the K-06 event of the turn's last text (README v1.5 default 135), which the commit leaves out of the turn row it writes.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/gateAndCommit.turn"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input": {
+          "description": "What the turn acts on: decided texts, a clock's firing, or only core actions (the guard's keyword-only texts: arch 02 line 115).",
+          "oneOf": [
+            {
+              "title": "DecidedInput",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "decided"
+                },
+                "decided": {
+                  "description": "The context and decide's result, as the gate reads them (K-02 v1.1 contextAndDecide: v1's, its doors also taking signUp; its named rules are the gate's: optionOffered, quoteInText).",
+                  "$ref": "../model/model.v1.1.schema.json#/$defs/contextAndDecide"
+                },
+                "planner": {
+                  "description": "The planner's verb when nothing fit after meaning search; null otherwise.",
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/plannerVerbs.request"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": ["kind", "decided", "planner"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ClockInput",
+              "description": "A clock's firing runs its step's clock branch, the safe default and who is told, with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127), and answers fired (gateAndCommit.response), or notArmed, notDue or the clock row's versionChanged (gateAndCommit.errors). A version change on a row the branch read reloads once and runs the branch again, as limit 4 does (arch 06 line 305).",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "clock"
+                },
+                "clockRowId": {
+                  "description": "The clock row firing (K-05 v1 fireClock).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "expectVersion": {
+                  "$ref": "#/$defs/version"
+                },
+                "firedAt": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+                },
+                "by": {
+                  "description": "As K-05 v1 fireClock.request.by: the actor's alarm, the minute sweep, or staging's Fire now (BP 9.4).",
+                  "type": "string",
+                  "enum": ["alarm", "sweep", "fireNow"]
+                },
+                "jobId": {
+                  "description": "The firing's job id for the event log (K-05 v1 fireClock).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "clockRowId", "expectVersion", "firedAt", "by", "jobId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "CoreOnlyInput",
+              "description": "Only core actions: STOP, START, HELP and the like, which code alone acts on (arch 02 line 115).",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "coreOnly"
+                }
+              },
+              "required": ["kind"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "core": {
+          "description": "Shared-core calls this turn commits, in order (README 'In a turn or alone'). Each of the turn's texts carries one recordSafetyOutcome, whatever its outcome, since K-34 v1 writes one outcome row per text under the turn that joins it (README default 5); a clock's turn carries none.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coreAction"
+          }
+        },
+        "now": {
+          "description": "The time the gate reads 'now' at.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "turn", "input", "core", "now"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "input": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "clock"
+              }
+            },
+            "required": ["kind"]
+          }
+        },
+        "required": ["input"]
+      },
+      "then": {
+        "description": "A clock's firing: its turn may be null (K-05 v1 fireClock.request.turn); the named rule clockTurn checks the caller and the turn's id rule. A clock's turn has no text, so it carries no service and no chat id (v1.5; README v1.5 default 135).",
+        "properties": {
+          "turn": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "service": false,
+                  "chatId": false
+                }
+              }
+            ]
+          }
+        }
+      },
+      "else": {
+        "description": "Decided texts or core actions only: the turn is required (K-05 v1 commitTurn), as gateAndCommit.turn: the runtime caller fills its service and chat id from the turn's last text (v1.5; README v1.5 default 135).",
+        "properties": {
+          "turn": {
+            "$ref": "#/$defs/gateAndCommit.turn"
+          }
+        }
+      }
+    },
+    "gateAndCommit.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.response" },
+    "effectWritten": { "$ref": "tool-api.v1.4.schema.json#/$defs/effectWritten" },
+    "openQuestionsWritten": { "$ref": "tool-api.v1.4.schema.json#/$defs/openQuestionsWritten" },
+    "gateAndCommit.fired": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.fired" },
+    "gateAndCommit.committed": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.committed" },
+    "gateAndCommit.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/gateAndCommit.errors" },
+    "gateAndCommit.given": {
+      "title": "GateAndCommitGiven",
+      "description": "What a gateAndCommit exchange assumes before its request runs, as v1.4's given (seeds, the fixtures run first, the clock, what it states), with one change (v1.5, round 3; DL-333; README v1.5 default 136): a fixture that states a step may also state the rows that step's part writes in the commit, field for field (stated.writes, statedWrites), so a proof reads their values from the fixture. A fixture's given is never sent: the response's written stays K-05 v1 commitResult's table, row id and version. Every v1 to v1.4 given is a v1.5 gateAndCommit given.",
+      "type": "object",
+      "properties": {
+        "seeds": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/seeds" },
+        "after": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/after" },
+        "now": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/now" },
+        "stated": {
+          "description": "What the fixture states, as v1.4: for a limit fixture, the limit that fails, the kind of its outcome and its action; for a step's fixture, the step and the keys it gives and, from v1.5, the rows its part writes (writes, optional); null otherwise.",
+          "anyOf": [
+            { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/stated/anyOf/0" },
+            {
+              "title": "StatedGivesAndWrites",
+              "description": "A step's fixture: the step and the keys it gives, as v1.4's StatedGives, and from v1.5 optionally the rows its part writes (statedWrites). Without writes it is v1.4's StatedGives exactly.",
+              "type": "object",
+              "properties": {
+                "step": { "$ref": "#/$defs/stepId" },
+                "gives": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/stepKey" },
+                  "uniqueItems": true
+                },
+                "writes": { "$ref": "#/$defs/statedWrites" }
+              },
+              "required": ["step", "gives"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "note": { "$ref": "tool-api.v1.4.schema.json#/$defs/given/properties/note" }
+      },
+      "required": ["seeds", "after", "now", "stated"],
+      "additionalProperties": false
+    },
+    "statedWrites": {
+      "title": "StatedWrites",
+      "description": "The rows a stated step's part writes in the turn's one commit, field for field (v1.5, round 3; DL-333 ruling 2; README v1.5 default 136), each in K-05 v1's own write shape, as the commit's walk hands it to the commit (actions/src/commit/types.ts UnitWrites: state, asks' questions, messages) and the commit's one K-05 commitTurn request carries it: state, the state writes (writes.state); openQuestions, the questions the part opens (writes.openQuestions.open); outboxRows, its messages (writes.outboxRows), which hold no plan (K-05 v1 outboxRowNew has no plan field: words go in after the commit, arch 01 line 41). Every list is present, empty when the part writes none of its kind. Left out, as the commit's own (T-305): each opened question's clock row (clock-<question id>, kind question, waiting, firing the question's step with the safe default its card names), the event-log entries and the turn row; and each core action's rows, which its response names.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "The part's state writes, in the walk's order (K-05 v1 stateWrite: an insert names the table and its K-04 columns and values, as K-04's seed fixtures write them).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/stateWrite" }
+        },
+        "openQuestions": {
+          "description": "The questions the part opens, in the walk's order (K-05 v1 openQuestionNew).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/openQuestionNew" }
+        },
+        "outboxRows": {
+          "description": "The part's outbox rows, one per message, in the walk's order (K-05 v1 outboxRowNew: no plan).",
+          "type": "array",
+          "items": { "$ref": "../data-access/data-access.v1.schema.json#/$defs/outboxRowNew" }
+        }
+      },
+      "required": ["state", "openQuestions", "outboxRows"],
+      "additionalProperties": false
+    },
+    "composeInput.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.request" },
+    "composeInput.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.response" },
+    "composeInput.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.errors" },
+    "finalizeMessage.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/finalizeMessage.request" },
+    "finalizeMessage.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/finalizeMessage.response" },
+    "finalizeMessage.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/finalizeMessage.errors" },
+    "recordSafetyOutcome.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordSafetyOutcome.request" },
+    "recordSafetyOutcome.arrival": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordSafetyOutcome.arrival" },
+    "arrivalCaller": { "$ref": "tool-api.v1.4.schema.json#/$defs/arrivalCaller" },
+    "recordSafetyOutcome.response": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/recordSafetyOutcome.response"
+    },
+    "recordSafetyOutcome.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordSafetyOutcome.errors" },
+    "releaseSafetyHold.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/releaseSafetyHold.request" },
+    "releaseSafetyHold.arrival": { "$ref": "tool-api.v1.4.schema.json#/$defs/releaseSafetyHold.arrival" },
+    "releaseSafetyHold.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/releaseSafetyHold.response" },
+    "releaseSafetyHold.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/releaseSafetyHold.errors" },
+    "recordStopOrStart.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStopOrStart.request" },
+    "recordStopOrStart.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStopOrStart.response" },
+    "recordStopOrStart.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStopOrStart.errors" },
+    "setRecordFlag.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/setRecordFlag.request" },
+    "setRecordFlag.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/setRecordFlag.response" },
+    "setRecordFlag.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/setRecordFlag.errors" },
+    "handOff.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/handOff.request" },
+    "handOff.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/handOff.response" },
+    "handOff.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/handOff.errors" },
+    "answerHandOff.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/answerHandOff.request" },
+    "answerHandOff.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/answerHandOff.response" },
+    "answerHandOff.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/answerHandOff.errors" },
+    "pageTeam.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/pageTeam.request" },
+    "pageTeam.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/pageTeam.response" },
+    "pageTeam.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/pageTeam.errors" },
+    "acknowledgePage.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/acknowledgePage.request" },
+    "acknowledgePage.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/acknowledgePage.response" },
+    "acknowledgePage.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/acknowledgePage.errors" },
+    "openReviewItem.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/openReviewItem.request" },
+    "openReviewItem.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/openReviewItem.response" },
+    "openReviewItem.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/openReviewItem.errors" },
+    "decideReviewItem.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/decideReviewItem.request" },
+    "decideReviewItem.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/decideReviewItem.response" },
+    "decideReviewItem.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/decideReviewItem.errors" },
+    "enterDoor.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/enterDoor.request" },
+    "enterDoor.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/enterDoor.response" },
+    "enterDoor.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/enterDoor.errors" },
+    "sendFixedLine.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendFixedLine.request" },
+    "sendFixedLine.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendFixedLine.response" },
+    "sendFixedLine.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendFixedLine.errors" },
+    "sendsFailing.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendsFailing.request" },
+    "sendsFailing.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendsFailing.response" },
+    "sendsFailing.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendsFailing.errors" },
+    "textingBack.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/textingBack.request" },
+    "textingBack.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/textingBack.response" },
+    "textingBack.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/textingBack.errors" },
+    "calendarLinkDropped.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkDropped.request" },
+    "calendarLinkDropped.response": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkDropped.response"
+    },
+    "calendarLinkDropped.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkDropped.errors" },
+    "calendarLinkBack.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkBack.request" },
+    "calendarLinkBack.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkBack.response" },
+    "calendarLinkBack.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkBack.errors" },
+    "sendProofCode.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendProofCode.request" },
+    "sendProofCode.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendProofCode.response" },
+    "sendProofCode.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendProofCode.errors" },
+    "proveCode.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/proveCode.request" },
+    "proveCode.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/proveCode.response" },
+    "proveCode.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/proveCode.errors" },
+    "issueChatLink.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/issueChatLink.request" },
+    "issueChatLink.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/issueChatLink.response" },
+    "issueChatLink.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/issueChatLink.errors" },
+    "setupKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/setupKey" },
+    "journeyThreeKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/journeyThreeKey" },
+    "journeyFourKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/journeyFourKey" },
+    "journeyFiveKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/journeyFiveKey" },
+    "journeySixKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/journeySixKey" },
+    "stepKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/stepKey" },
+    "kindId": { "$ref": "tool-api.v1.4.schema.json#/$defs/kindId" },
+    "objectKey": { "$ref": "tool-api.v1.4.schema.json#/$defs/objectKey" },
+    "emailAddress": { "$ref": "tool-api.v1.4.schema.json#/$defs/emailAddress" },
+    "localDate": { "$ref": "tool-api.v1.4.schema.json#/$defs/localDate" },
+    "money": { "$ref": "tool-api.v1.4.schema.json#/$defs/money" },
+    "licenseAsGiven": { "$ref": "tool-api.v1.4.schema.json#/$defs/licenseAsGiven" },
+    "given": { "$ref": "tool-api.v1.4.schema.json#/$defs/given" },
+    "matchKinds.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchKinds.request" },
+    "matchKinds.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchKinds.response" },
+    "matchKinds.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchKinds.errors" },
+    "lookupListing.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/lookupListing.request" },
+    "lookupListing.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/lookupListing.response" },
+    "lookupListing.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/lookupListing.errors" },
+    "saveSetupStep.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSetupStep.request" },
+    "setupStepS2_05": { "$ref": "tool-api.v1.4.schema.json#/$defs/setupStepS2_05" },
+    "saveSetupStepInTurn": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSetupStepInTurn" },
+    "saveSetupStep.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSetupStep.response" },
+    "saveSetupStep.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSetupStep.errors" },
+    "readSetup.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/readSetup.request" },
+    "readSetup.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/readSetup.response" },
+    "readSetup.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/readSetup.errors" },
+    "businessCaller": { "$ref": "tool-api.v1.4.schema.json#/$defs/businessCaller" },
+    "customerBlockedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/customerBlockedError" },
+    "notLiveError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notLiveError" },
+    "safetyHeldError": { "$ref": "tool-api.v1.4.schema.json#/$defs/safetyHeldError" },
+    "waitsForOwnerError": { "$ref": "tool-api.v1.4.schema.json#/$defs/waitsForOwnerError" },
+    "timeEntered": { "$ref": "tool-api.v1.4.schema.json#/$defs/timeEntered" },
+    "serviceEntered": { "$ref": "tool-api.v1.4.schema.json#/$defs/serviceEntered" },
+    "newCustomerEntered": { "$ref": "tool-api.v1.4.schema.json#/$defs/newCustomerEntered" },
+    "enteredBooking": { "$ref": "tool-api.v1.4.schema.json#/$defs/enteredBooking" },
+    "heldTime": { "$ref": "tool-api.v1.4.schema.json#/$defs/heldTime" },
+    "openRequest.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/openRequest.request" },
+    "openRequest.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/openRequest.response" },
+    "openRequest.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/openRequest.errors" },
+    "openRequest.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/openRequest.exchange" },
+    "confirmBusinessBooking.request": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/confirmBusinessBooking.request"
+    },
+    "confirmBusinessBooking.response": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/confirmBusinessBooking.response"
+    },
+    "wrongDoorError": { "$ref": "tool-api.v1.4.schema.json#/$defs/wrongDoorError" },
+    "timeTakenError": { "$ref": "tool-api.v1.4.schema.json#/$defs/timeTakenError" },
+    "confirmBusinessBooking.errors": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/confirmBusinessBooking.errors"
+    },
+    "confirmBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/confirmBusinessBooking.exchange"
+    },
+    "readBackBusinessBooking.request": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/readBackBusinessBooking.request"
+    },
+    "readBackBusinessBooking.response": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/readBackBusinessBooking.response"
+    },
+    "readBackBusinessBooking.errors": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/readBackBusinessBooking.errors"
+    },
+    "readBackBusinessBooking.exchange": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/readBackBusinessBooking.exchange"
+    },
+    "findCustomer.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/findCustomer.request" },
+    "findCustomer.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/findCustomer.response" },
+    "findCustomer.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/findCustomer.errors" },
+    "findCustomer.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/findCustomer.exchange" },
+    "checkBookingFirst.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkBookingFirst.request" },
+    "checkBookingFirst.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkBookingFirst.response" },
+    "checkBookingFirst.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkBookingFirst.errors" },
+    "checkBookingFirst.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkBookingFirst.exchange" },
+    "setCustomerBlock.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/setCustomerBlock.request" },
+    "setCustomerBlock.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/setCustomerBlock.response" },
+    "setCustomerBlock.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/setCustomerBlock.errors" },
+    "setCustomerBlock.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/setCustomerBlock.exchange" },
+    "customerSideCaller": { "$ref": "tool-api.v1.4.schema.json#/$defs/customerSideCaller" },
+    "wayOffered": { "$ref": "tool-api.v1.4.schema.json#/$defs/wayOffered" },
+    "optionPrice": { "$ref": "tool-api.v1.4.schema.json#/$defs/optionPrice" },
+    "linkIssued": { "$ref": "tool-api.v1.4.schema.json#/$defs/linkIssued" },
+    "textsOffNotice": { "$ref": "tool-api.v1.4.schema.json#/$defs/textsOffNotice" },
+    "savedTimeCapError": { "$ref": "tool-api.v1.4.schema.json#/$defs/savedTimeCapError" },
+    "notExtendableError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notExtendableError" },
+    "timeOffered": { "$ref": "tool-api.v1.4.schema.json#/$defs/timeOffered" },
+    "readBackYes": { "$ref": "tool-api.v1.4.schema.json#/$defs/readBackYes" },
+    "wrongDetailsError": { "$ref": "tool-api.v1.4.schema.json#/$defs/wrongDetailsError" },
+    "overBookingLimitError": { "$ref": "tool-api.v1.4.schema.json#/$defs/overBookingLimitError" },
+    "quoteStateError": { "$ref": "tool-api.v1.4.schema.json#/$defs/quoteStateError" },
+    "notReachableError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notReachableError" },
+    "mobileRequiredError": { "$ref": "tool-api.v1.4.schema.json#/$defs/mobileRequiredError" },
+    "geoUnavailableError": { "$ref": "tool-api.v1.4.schema.json#/$defs/geoUnavailableError" },
+    "matchService.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchService.request" },
+    "matchService.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchService.response" },
+    "matchService.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchService.errors" },
+    "matchService.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchService.exchange" },
+    "setWhoFor.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/setWhoFor.request" },
+    "setWhoFor.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/setWhoFor.response" },
+    "setWhoFor.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/setWhoFor.errors" },
+    "setWhoFor.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/setWhoFor.exchange" },
+    "setReachWay.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/setReachWay.request" },
+    "setReachWay.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/setReachWay.response" },
+    "setReachWay.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/setReachWay.errors" },
+    "setReachWay.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/setReachWay.exchange" },
+    "addCustomer.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/addCustomer.request" },
+    "addCustomer.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/addCustomer.response" },
+    "addCustomer.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/addCustomer.errors" },
+    "addCustomer.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/addCustomer.exchange" },
+    "setPrice.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/setPrice.request" },
+    "setPrice.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/setPrice.response" },
+    "setPrice.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/setPrice.errors" },
+    "setPrice.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/setPrice.exchange" },
+    "quoteFromPhotos.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/quoteFromPhotos.request" },
+    "quoteFromPhotos.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/quoteFromPhotos.response" },
+    "quoteFromPhotos.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/quoteFromPhotos.errors" },
+    "quoteFromPhotos.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/quoteFromPhotos.exchange" },
+    "showTimes.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/showTimes.request" },
+    "showTimes.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/showTimes.response" },
+    "showTimes.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/showTimes.errors" },
+    "showTimes.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/showTimes.exchange" },
+    "saveTime.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveTime.request" },
+    "saveTime.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveTime.response" },
+    "saveTime.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveTime.errors" },
+    "saveTime.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveTime.exchange" },
+    "extendTime.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/extendTime.request" },
+    "extendTime.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/extendTime.response" },
+    "extendTime.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/extendTime.errors" },
+    "extendTime.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/extendTime.exchange" },
+    "joinWaitlist.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/joinWaitlist.request" },
+    "joinWaitlist.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/joinWaitlist.response" },
+    "joinWaitlist.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/joinWaitlist.errors" },
+    "joinWaitlist.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/joinWaitlist.exchange" },
+    "sendSecureLink.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendSecureLink.request" },
+    "sendSecureLink.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendSecureLink.response" },
+    "sendSecureLink.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendSecureLink.errors" },
+    "sendSecureLink.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendSecureLink.exchange" },
+    "checkPlace.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkPlace.request" },
+    "checkPlace.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkPlace.response" },
+    "checkPlace.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkPlace.errors" },
+    "checkPlace.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/checkPlace.exchange" },
+    "saveSecurePage.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSecurePage.request" },
+    "saveSecurePage.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSecurePage.response" },
+    "saveSecurePage.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSecurePage.errors" },
+    "saveSecurePage.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSecurePage.exchange" },
+    "moneyBranch": { "$ref": "tool-api.v1.4.schema.json#/$defs/moneyBranch" },
+    "moneyWord": { "$ref": "tool-api.v1.4.schema.json#/$defs/moneyWord" },
+    "payLinkIssued": { "$ref": "tool-api.v1.4.schema.json#/$defs/payLinkIssued" },
+    "cardNotReadyError": { "$ref": "tool-api.v1.4.schema.json#/$defs/cardNotReadyError" },
+    "documentUnsignedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/documentUnsignedError" },
+    "ownYesNeededError": { "$ref": "tool-api.v1.4.schema.json#/$defs/ownYesNeededError" },
+    "wordsDifferError": { "$ref": "tool-api.v1.4.schema.json#/$defs/wordsDifferError" },
+    "notOfferedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notOfferedError" },
+    "creditsShortError": { "$ref": "tool-api.v1.4.schema.json#/$defs/creditsShortError" },
+    "holdEndedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/holdEndedError" },
+    "showMoneyBefore.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/showMoneyBefore.request" },
+    "showMoneyBefore.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/showMoneyBefore.response" },
+    "showMoneyBefore.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/showMoneyBefore.errors" },
+    "showMoneyBefore.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/showMoneyBefore.exchange" },
+    "settleOffer.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/settleOffer.request" },
+    "settleOffer.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/settleOffer.response" },
+    "settleOffer.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/settleOffer.errors" },
+    "settleOffer.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/settleOffer.exchange" },
+    "signDocument.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/signDocument.request" },
+    "signDocument.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/signDocument.response" },
+    "signDocument.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/signDocument.errors" },
+    "signDocument.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/signDocument.exchange" },
+    "takeMoneyBefore.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/takeMoneyBefore.request" },
+    "takeMoneyBefore.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/takeMoneyBefore.response" },
+    "takeMoneyBefore.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/takeMoneyBefore.errors" },
+    "takeMoneyBefore.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/takeMoneyBefore.exchange" },
+    "refundAtOnce.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/refundAtOnce.request" },
+    "refundAtOnce.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/refundAtOnce.response" },
+    "refundAtOnce.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/refundAtOnce.errors" },
+    "refundAtOnce.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/refundAtOnce.exchange" },
+    "messageWritten": { "$ref": "tool-api.v1.4.schema.json#/$defs/messageWritten" },
+    "journeySixMoneyWord": { "$ref": "tool-api.v1.4.schema.json#/$defs/journeySixMoneyWord" },
+    "visitWritten": { "$ref": "tool-api.v1.4.schema.json#/$defs/visitWritten" },
+    "chargeBound": { "$ref": "tool-api.v1.4.schema.json#/$defs/chargeBound" },
+    "requestEndedError": { "$ref": "tool-api.v1.4.schema.json#/$defs/requestEndedError" },
+    "calendarUnreadableError": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarUnreadableError" },
+    "notPaidYetError": { "$ref": "tool-api.v1.4.schema.json#/$defs/notPaidYetError" },
+    "priceDiffersError": { "$ref": "tool-api.v1.4.schema.json#/$defs/priceDiffersError" },
+    "askOwnerFirst.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/askOwnerFirst.request" },
+    "askOwnerFirst.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/askOwnerFirst.response" },
+    "askOwnerFirst.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/askOwnerFirst.errors" },
+    "askOwnerFirst.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/askOwnerFirst.exchange" },
+    "sendToOnCall.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendToOnCall.request" },
+    "sendToOnCall.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendToOnCall.response" },
+    "sendToOnCall.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendToOnCall.errors" },
+    "sendToOnCall.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendToOnCall.exchange" },
+    "writeBooking.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/writeBooking.request" },
+    "writeBooking.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/writeBooking.response" },
+    "writeBooking.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/writeBooking.errors" },
+    "writeBooking.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/writeBooking.exchange" },
+    "recordStaffTold.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStaffTold.request" },
+    "recordStaffTold.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStaffTold.response" },
+    "recordStaffTold.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStaffTold.errors" },
+    "recordStaffTold.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStaffTold.exchange" },
+    "askAboutClash.request": { "$ref": "tool-api.v1.4.schema.json#/$defs/askAboutClash.request" },
+    "askAboutClash.response": { "$ref": "tool-api.v1.4.schema.json#/$defs/askAboutClash.response" },
+    "askAboutClash.errors": { "$ref": "tool-api.v1.4.schema.json#/$defs/askAboutClash.errors" },
+    "askAboutClash.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/askAboutClash.exchange" },
+    "buildFrontier.exchange": {
+      "title": "BuildFrontierExchange",
+      "description": "One buildFrontier request with its outcome (fixtures; the mock, C-186), as v1, its response's context K-02 v1.1's (README 'v1.5').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "buildFrontier" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/buildFrontier.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/buildFrontier.response" }, { "$ref": "#/$defs/buildFrontier.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "closestEntries.exchange": {
+      "title": "ClosestEntriesExchange",
+      "description": "One closestEntries request with its outcome, as v1, its contexts K-02 v1.1's (README 'v1.5').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "closestEntries" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/closestEntries.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/closestEntries.response" },
+            { "$ref": "#/$defs/closestEntries.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.exchange": {
+      "title": "GateAndCommitExchange",
+      "description": "One gateAndCommit request with its outcome, as v1.4, its decided texts' context K-02 v1.1's, its turn gateAndCommit.turn and its given gateAndCommit.given, which may state the rows a stated step writes (README 'v1.5', defaults 135 and 136).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "gateAndCommit" },
+        "given": { "$ref": "#/$defs/gateAndCommit.given" },
+        "request": { "$ref": "#/$defs/gateAndCommit.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/gateAndCommit.response" }, { "$ref": "#/$defs/gateAndCommit.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "composeInput.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/composeInput.exchange" },
+    "finalizeMessage.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/finalizeMessage.exchange" },
+    "recordSafetyOutcome.exchange": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/recordSafetyOutcome.exchange"
+    },
+    "releaseSafetyHold.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/releaseSafetyHold.exchange" },
+    "recordStopOrStart.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/recordStopOrStart.exchange" },
+    "setRecordFlag.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/setRecordFlag.exchange" },
+    "handOff.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/handOff.exchange" },
+    "answerHandOff.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/answerHandOff.exchange" },
+    "pageTeam.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/pageTeam.exchange" },
+    "acknowledgePage.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/acknowledgePage.exchange" },
+    "openReviewItem.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/openReviewItem.exchange" },
+    "decideReviewItem.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/decideReviewItem.exchange" },
+    "enterDoor.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/enterDoor.exchange" },
+    "sendFixedLine.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendFixedLine.exchange" },
+    "sendsFailing.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendsFailing.exchange" },
+    "textingBack.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/textingBack.exchange" },
+    "calendarLinkDropped.exchange": {
+      "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkDropped.exchange"
+    },
+    "calendarLinkBack.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/calendarLinkBack.exchange" },
+    "sendProofCode.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/sendProofCode.exchange" },
+    "proveCode.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/proveCode.exchange" },
+    "issueChatLink.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/issueChatLink.exchange" },
+    "matchKinds.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/matchKinds.exchange" },
+    "lookupListing.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/lookupListing.exchange" },
+    "saveSetupStep.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/saveSetupStep.exchange" },
+    "readSetup.exchange": { "$ref": "tool-api.v1.4.schema.json#/$defs/readSetup.exchange" },
+    "callName": { "$ref": "tool-api.v1.4.schema.json#/$defs/callName" }
+  }
+}

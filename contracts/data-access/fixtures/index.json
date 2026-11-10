@@ -1119,6 +1119,158 @@
       "expect": "refuse",
       "shows": "A turn state under the barbershop's scope that carries, as a fact, whom Alex's report about staff names: a table only Rosie's team reads is never a fact, so its rows never reach the business, its owner included",
       "source": "S11-70; A3-49; K-34 v1 harm_reports, README rule 4, seed-harm-report; security review of T-072 round 2 (N3)"
+    },
+    {
+      "file": "read-open-holds-s1-02.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's commit reads what is open on Sam's handle at the barbershop: its one text's outcome rides in the commit's core, so no text is named, and with no hold nothing is open, so S1-02's part may commit",
+      "source": "K-09 v1 commit-s1-02.json; QUESTIONS.md CQ-65 (DL-119, DL-127, DL-128); actions/src/commit/types.ts OpenHolds; K-05 v1.3 item 34, closing v1.2 open gap 26"
+    },
+    {
+      "file": "read-open-holds-alex.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "Alex's open holds at the barbershop, oldest first, each with what it holds back in K-09 safetyHold's names (crisis words after-safe on the haircut, the threat's never), his released emergency hold left out; of the two texts named, the one with no safety row is unread",
+      "source": "arch 06 lines 315 to 329; A3-24, A3-25, A3-48; K-34 v1 safety_holds, safety_holds_open_handle_idx, safety_outcomes_event_key, seed-outcome-crisis, seed-threat-pause, seed-hold-released; CQ-65 (DL-127, DL-133); K-09 v1 safetyHold"
+    },
+    {
+      "file": "read-open-holds-other-business.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "The same handle under the yoga studio's scope sees none of the barbershop's holds, and a text whose safety row is the barbershop's counts as unread there: the read fails closed",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-34 v1 rule 4; CQ-65 (DL-127); K-05 v1.3 item 34, default 44"
+    },
+    {
+      "file": "commit-s1-01-sam.json",
+      "version": "v1.3",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's first turn: Sam's first text commits turn-s1-01-sam with S1-02's question to him, its question clock row waiting, and outbox-s1-02-sam-1 that asks it, with no plan, so the reads that follow have K-09's compose and finalize row",
+      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json (outbox-s1-02-sam-1, turn-s1-01-sam); K-09 v1.5 commit-s1-01.json and default 131 (T-1142: the ids, evt-sam-s1-01, 18:05:05Z); ADR-013; S1-01, S1-02; 02-contracts K-05 item 1; arch 01 lines 39 to 41; arch 02 line 127; QUESTIONS.md CQ-156 (a)"
+    },
+    {
+      "file": "read-outbox-row-s1-02.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Compose input's and finalize's row for S1-02's question to Sam: the row unplanned at version 1, its turn and bundle, S1-02's line 0 from its question, Sam the owner as reader with his phone's flags, the one text it answers by event id only, the business head and the question with its waiting clock as the slot source",
+      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json; arch 07 line 397; QUESTIONS.md CQ-151 (a) and its default 2; actions/src/compose-input/types.ts ComposeRow; actions/src/finalize/rewrite/types.ts FinalizeRow; K-05 v1.3 item 35"
+    },
+    {
+      "file": "read-outbox-row-a7-03.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "The tour's A7-03 row to Alex as compose input reads it right after its commit: A7-03's line 0, Alex the customer as reader, the haircut's booking head with its flags, the question's options as sent, its 24-hour Clock line and its clock row",
+      "source": "tour lines 423 to 427; K-04 v1 outbox_rows, open_questions, clock_rows, bookings; K-03 v1 option; arch 07 lines 389, 397; K-05 v1.3 item 35"
+    },
+    {
+      "file": "read-outbox-row-no-question.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A row that asks no question answers its line null, since K-04 v1 stores no step or line, so compose input and finalize refuse it rather than guess; the questions still open with the reader come with their words as sent",
+      "source": "QUESTIONS.md CQ-151 (a); K-04 v1 outbox_rows; arch 07 line 389; K-05 v1.2 item 26, default 41; K-05 v1.3 item 35, open gap 29"
+    },
+    {
+      "file": "read-outbox-row-other-business.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A row of the barbershop read under the yoga studio's scope answers notFound and nothing of it",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-09 v1 composeInput.errors notFound"
+    },
+    {
+      "file": "read-outbox-row-safety-line.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A safety line row is a fixed line: the read answers fixedLineRow and gives no compose or finalize view of it",
+      "source": "arch 07 line 347 ('Safety lines stay fixed text'); arch 02 line 111; STATE note 17; K-09 v1 open gap 16, recordSafetyOutcome safetyLine; K-07 v1 outbox-safety-retry"
+    },
+    {
+      "file": "fixed-line-facts-s1-02.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "S1-02's question is Rosie's first text to Sam about the barbershop (no opener mark), so it carries the opener; his number's opt-out line was delivered before, so it does not ride again",
+      "source": "arch 07 line 361; RULES 1.11, 4.3; Q-30; K-04 v1 openers_sent, phones.optout_line_delivered_at; K-09 v1 finalize-pass.json (fixedLines opener); actions/src/finalize/fixed-lines/types.ts FixedLineFacts"
+    },
+    {
+      "file": "fixed-line-facts-texted-before.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "A row to Alex at the barbershop after his first reply: the opener mark names another row, so Rosie texted him about it before and no opener rides",
+      "source": "arch 07 line 361; K-04 v1 openers_sent, seed-thread-messages; K-05 v1.3 item 36"
+    },
+    {
+      "file": "fixed-line-facts-opener-row.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "The row the opener mark names is the first text itself, so for it Rosie had not texted the handle about the business before, and it carries the opener again if finalized again",
+      "source": "arch 07 line 361; K-04 v1 openers_sent.outbox_row_id; K-05 v1.3 item 36, default 50"
+    },
+    {
+      "file": "fixed-line-facts-other-business.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "A row of the barbershop read under the yoga studio's scope answers notFound: nothing of its handle's opener mark or number",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-09 v1 finalizeMessage.errors notFound"
+    },
+    {
+      "file": "invalid/refuse-open-holds-hold-with-words.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.response",
+      "expect": "refuse",
+      "shows": "An open hold that carries its outcome's sealed words: a hold says what it holds back, never what the person wrote",
+      "source": "arch 09 line 492; RULES 4.5; K-34 v1 safety_outcomes.sealed_words (sealed by person_id), default 5; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-open-holds-no-scope.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.request",
+      "expect": "refuse",
+      "shows": "A hold read that states no business: the scope is always named, a business or null, so the read never runs with no scope by omission",
+      "source": "arch 10 line 546; K-04 v1 rule 4; STATE note 22; QUESTIONS.md CQ-70; T-1094 note N2"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-returns-inbound-words.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "A row read that returns the words of the text it answers: the words stay sealed and the runtime caller hands them in, so no K-05 exchange ever carries them",
+      "source": "K-04 v1 messages.words (sealed: QUESTIONS.md CQ-54); arch 01 line 93; arch 09 line 492; K-05 v1.2 default 27; K-05 v1.3 item 35, default 47"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-returns-address.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "A row read that returns the recipient's number: compose input and finalize never need it, so the read never gives it",
+      "source": "K-04 v1 handles.address ('Traces never carry it'); K-08 v1; RULES 4.5"
+    },
+    {
+      "file": "invalid/refuse-fixed-line-facts-caller-handle.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.request",
+      "expect": "refuse",
+      "shows": "A fixed-line facts request that names a handle: the read takes the handle and business from the row itself, so no caller can ask about another handle",
+      "source": "arch 07 line 361; K-04 v1 outbox_rows.recipient_handle_id; K-05 v1.2 refuse-send-state-caller-versions (the same rule)"
+    },
+    {
+      "file": "invalid/refuse-fixed-line-facts-returns-number.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.response",
+      "expect": "refuse",
+      "shows": "Fixed-line facts that carry the phone's number: the inserter needs only when the opt-out line was delivered, never the number",
+      "source": "K-04 v1 phones.number; RULES 4.3, 4.5; K-08 v1"
     }
   ]
 }

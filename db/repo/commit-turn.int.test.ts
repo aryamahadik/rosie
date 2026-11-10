@@ -13,7 +13,8 @@
 // and effect calls (T-196, T-199) are not built yet, so each of those steps writes, as the owner, the rows its exchange
 // states in its request and its outcome: what the commit that follows sees.
 //
-// Each answer is checked against data-access v1.1 with Ajv 2020-12, strict, as contracts:check runs it.
+// Each answer is checked against data-access v1.1 with Ajv 2020-12, strict, as contracts:check runs it, and each commit
+// exchange and its answer also against the version its index entry lists (T-1137 round 3, DL-334).
 import { readdirSync, readFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import Ajv2020 from "ajv/dist/2020.js";
@@ -73,9 +74,8 @@ const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR
 const requestOf = (file: string): CommitTurnRequest =>
   structuredClone(exchangeOf(file).request) as unknown as CommitTurnRequest;
 const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexEntry[] }).fixtures;
-const COMMIT_FIXTURES = INDEX.filter((entry) => entry.def === "commitTurn.exchange").map(
-  (entry) => entry.file,
-);
+const COMMIT_ENTRIES = INDEX.filter((entry) => entry.def === "commitTurn.exchange");
+const COMMIT_FIXTURES = COMMIT_ENTRIES.map((entry) => entry.file);
 
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
@@ -94,14 +94,18 @@ const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true }
 for (const file of schemaFiles(CONTRACTS)) {
   ajv.addSchema(readJson(file) as object);
 }
-const V11_ID = (readJson(new URL("data-access/data-access.v1.1.schema.json", CONTRACTS)) as { $id: string })
-  .$id;
+/** The $id of data-access at one version (`data-access.<version>.schema.json`, the version an index entry lists). */
+function schemaIdOf(version: string): string {
+  return (readJson(new URL(`data-access/data-access.${version}.schema.json`, CONTRACTS)) as { $id: string })
+    .$id;
+}
+const V11_ID = schemaIdOf("v1.1");
 
-/** Checks `value` against one $defs entry of data-access v1.1, returning Ajv's errors (none when it passes). */
-function schemaErrors(def: string, value: unknown): string[] {
-  const validate = ajv.getSchema(`${V11_ID}#/$defs/${def}`);
+/** Checks `value` against one $defs entry of data-access v1.1, or of the schema given, returning Ajv's errors (none when it passes). */
+function schemaErrors(def: string, value: unknown, schemaId = V11_ID): string[] {
+  const validate = ajv.getSchema(`${schemaId}#/$defs/${def}`);
   if (validate === undefined) {
-    throw new Error(`data-access v1.1 has no $defs/${def}`);
+    throw new Error(`${schemaId} has no $defs/${def}`);
   }
   return validate(value)
     ? []
@@ -109,9 +113,9 @@ function schemaErrors(def: string, value: unknown): string[] {
 }
 
 /** The answer checked against its own definition: an error against commitTurn.errors, else the response. */
-function answerErrors(outcome: unknown): string[] {
+function answerErrors(outcome: unknown, schemaId = V11_ID): string[] {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
-  return schemaErrors(isError ? "commitTurn.errors" : "commitTurn.response", outcome);
+  return schemaErrors(isError ? "commitTurn.errors" : "commitTurn.response", outcome, schemaId);
 }
 
 // ---- databases and clients ------------------------------------------------------------------------------------------
@@ -533,7 +537,7 @@ describe("the runtime side the commit runs on (K-05 README 'Scope'; T-191)", () 
 });
 
 describe("commitTurn: each K-05 commit fixture's request gives its response (K-05 v1 and v1.1, item 1)", () => {
-  it("the index lists fifteen commitTurn exchanges, each valid against data-access v1.1 (Ajv strict)", () => {
+  it("the index lists sixteen commitTurn exchanges, each valid against data-access v1.1 and the version it is listed under (Ajv strict)", () => {
     expect([...COMMIT_FIXTURES].sort()).toEqual([
       "commit-adds-dee-booking.json",
       "commit-alex-cancels-while-sending.json",
@@ -545,21 +549,25 @@ describe("commitTurn: each K-05 commit fixture's request gives its response (K-0
       "commit-opens-question.json",
       "commit-repeat-same-turn.json",
       "commit-reservation-lost.json",
+      "commit-s1-01-sam.json",
       "commit-sam-quick-reply.json",
       "commit-supersedes-waiting.json",
       "commit-version-changed.json",
       "commit-withdraws-waiting.json",
       "commit-writes-effect.json",
     ]);
-    for (const file of COMMIT_FIXTURES) {
+    for (const { file, version } of COMMIT_ENTRIES) {
       const exchange = exchangeOf(file);
-      expect(schemaErrors("commitTurn.exchange", exchange), file).toEqual([]);
-      expect(schemaErrors("commitTurn.request", exchange.request), file).toEqual([]);
-      expect(answerErrors(exchange.outcome), file).toEqual([]);
+      for (const schemaId of [V11_ID, schemaIdOf(version)]) {
+        const at = `${file} against ${schemaId}`;
+        expect(schemaErrors("commitTurn.exchange", exchange, schemaId), at).toEqual([]);
+        expect(schemaErrors("commitTurn.request", exchange.request, schemaId), at).toEqual([]);
+        expect(answerErrors(exchange.outcome, schemaId), at).toEqual([]);
+      }
     }
   });
 
-  for (const file of COMMIT_FIXTURES) {
+  for (const { file, version } of COMMIT_ENTRIES) {
     it(
       `${file}: as rosie_job, the call answers the fixture's outcome and writes all or nothing`,
       SLOW,
@@ -571,6 +579,7 @@ describe("commitTurn: each K-05 commit fixture's request gives its response (K-0
         const outcome = await commitTurn(runtime, request, { now: new Date(exchange.given.now) });
         expect(outcome).toEqual(exchange.outcome);
         expect(answerErrors(outcome)).toEqual([]);
+        expect(answerErrors(outcome, schemaIdOf(version))).toEqual([]);
 
         if ("error" in outcome) {
           // Refused: nothing at all was written.

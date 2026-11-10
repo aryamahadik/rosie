@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the ten ports
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the eleven ports
 // the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls it
 // (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -9,7 +9,9 @@
 //   sealing      the handle's sealing key: the gateway seals, the safety read      T-553
 //                and the turn open
 //   safetyRead   K-02's safety read on each raw text, on arrival                   T-554
-//   stateReads   reads of stored state: the bundle (K-05 v1 item 7 and KV), the    T-555 to T-557, T-562, T-564
+//   turnRow      K-05's two calls that write a turn's one row (K-04 turns), once   T-555
+//                per turn id: the commit (item 1) and the park (item 12)
+//   stateReads   reads of stored state: the bundle (K-05 v1 item 7 and KV), the    T-556, T-557, T-562, T-564
 //                guard's targets (K-05 v1.2), who a handle is, each text's safety
 //                result, a recipient's chat and send state, a question's facts
 //   turnFace     K-09's turn face (frontier, closest entries, gate and commit,     T-557, T-559, T-560
@@ -18,8 +20,8 @@
 //   composer     K-03's message plan and its one rewrite                           T-560
 //   finalize     K-09 finalizeMessage: slots, fixed lines, the claim check and     T-561
 //                the message checks
-//   dataAccess   K-05 writes: the turn's plans and park, the outbox claim and      T-555, T-562, T-564
-//                marks, the clock arming
+//   dataAccess   K-05 writes: the turn's plans, the outbox claim and marks, the     T-562, T-564
+//                clock arming
 //   linqSend     K-11 sendPart, and the checked safety line sent straight through  T-563
 //                Linq while PostgreSQL is down
 //
@@ -28,6 +30,8 @@
 // the turn wakes the dispatcher; the receipt door marks the part delivered and arms its clock). Not bound here: the
 // guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`) and the
 // Stripe and calendar doors, none of which a D-017 hop runs.
+
+import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 
 import type { ArmingOptions } from "../clocks/arming";
 import type { ArmingData } from "../clocks/types";
@@ -38,13 +42,22 @@ import type { SealingKeyStore } from "../gateway/seal";
 import type { LinqPort as LinqVerifyCall } from "../gateway/types";
 import type { HandleTargetsPort } from "../guard/types";
 import type { DirectLineSender, SafetyCore, SafetyDeps, SafetyReadPort } from "../safety/types";
-import type { TurnComposer, TurnDecide, TurnDeps, TurnFace, TurnRows } from "../turn/types";
+import type {
+  ParkTurnAnswer,
+  ParkTurnRequest,
+  TurnComposer,
+  TurnDecide,
+  TurnDeps,
+  TurnFace,
+  TurnRows,
+} from "../turn/types";
 
-/** The ten ports, in D-017's turn order (02-contracts section 11). */
+/** The eleven ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
   "safetyRead",
+  "turnRow",
   "stateReads",
   "turnFace",
   "decide",
@@ -55,6 +68,21 @@ export const PORTS = [
 ] as const;
 
 export type PortName = (typeof PORTS)[number];
+
+/**
+ * K-05's two calls that write a turn's one row in PostgreSQL (K-04 turns), each once per turn id (QUESTIONS.md NQ-RT-3's
+ * default: the 60 s lease lives in the actor, and the row is written once, as committed or parked, never "leased"). The
+ * turn id is the one the lease hashed from its batch's K-06 event ids (CQ-09; T-248 `turnIdOf`), so one batch is one row.
+ */
+export interface TurnRowPort {
+  /**
+   * K-05 v1.1 commitTurn (item 1; T-195): sent by the Tool API's gate and commit behind the lease's commit (C-087's
+   * CommitPorts.commitTurn, which @rosie/actions takes when T-559 joins it), in the generated K-05 types that commit reads.
+   */
+  commitTurn(request: CommitTurnRequest): Promise<CommitTurnOutcome>;
+  /** K-05 v1 parkTurn (item 12; T-197): the turn's park after a third lapse with no commit (T-253, ../turn/park.ts). */
+  parkTurn(request: ParkTurnRequest): Promise<ParkTurnAnswer>;
+}
 
 /** Reads of stored state, by the part that reads them (K-04 rows through K-05, and the bundle store). */
 export interface StateReads {
@@ -82,8 +110,8 @@ export type FinalizePort = Pick<TurnFace, "finalizeMessage">;
 
 /** K-05 writes. */
 export interface DataAccess {
-  /** K-05 v1 unplannedRows, writePlan and parkTurn: the turn's rows after its commit, and the park. */
-  readonly rows: TurnRows;
+  /** K-05 v1 unplannedRows and writePlan: the turn's rows after its commit (its park is the turn-row port's). */
+  readonly rows: Omit<TurnRows, "parkTurn">;
   /** K-05 v1.1 claimOutbox, renewClaim, markRow and markPart: the dispatcher's and the receipt door's. */
   readonly outbox: OutboxStore;
   /** K-05 v1 armClock and cancelClock: the clock arming's. */
@@ -103,6 +131,7 @@ export interface Ports {
   readonly linqVerify: LinqVerifyCall;
   readonly sealing: SealingKeyStore;
   readonly safetyRead: SafetyReadPort;
+  readonly turnRow: TurnRowPort;
   readonly stateReads: StateReads;
   readonly turnFace: TurnFacePort;
   readonly decide: TurnDecide;
