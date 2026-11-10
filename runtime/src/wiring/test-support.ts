@@ -1,10 +1,11 @@
 // Doubles for the composition root's tests (T-550, T-552): the fake set the test environment binds (./picks.ts), every
 // port not joined yet on the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's
-// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's commit retargeted to the running
-// turn's id, S1-02's compose input and finalize-pass.json retargeted to the row the commit wrote, the dispatcher's K-05
-// store holding that row, and a delivery receipt that arms A7-03's clock. The frontier is the joined one (T-557): its K-05
-// double answers for test owner 1's seeded rows, so the turn's context is the real frontier's; and decide is the joined
-// one (T-558), whose recorded-model double answers that context's reads. Not imported by the Worker.
+// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's compose input and
+// finalize-pass.json retargeted to each row the commit wrote, the dispatcher's K-05 store holding the skeleton's row, and a
+// delivery receipt that arms A7-03's clock. The frontier is the joined one (T-557): its K-05 double answers for test owner
+// 1's seeded rows, so the turn's context is the real frontier's; decide is the joined one (T-558), whose recorded-model
+// double answers that context's reads; and the gate is the joined one (T-559), whose K-05 doubles write the turn's rows.
+// Not imported by the Worker.
 //
 //   linqVerify   joined (T-552): the root binds the Linq adapter's verify (./real.ts). What it is fed comes from here:
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
@@ -2071,7 +2072,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const decide = fakeDecideModels(face.log);
   const composer = fakeComposer(face.log);
   const rows = fakeRows(face.log);
-  face.gate = (request) => swap(commitS102.outcome, [[S1_02_TURN, request.turn.id]]) as never;
   face.composeInput = (request) =>
     swap(composeInputS102.outcome, [
       [FIXTURE_ROW, request.outboxRowId],
