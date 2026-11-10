@@ -27,7 +27,8 @@ interface Run {
   readonly models: FakeDecideModels;
   readonly port: TurnDecide;
   readonly spans: Span[];
-  traceFor(context: DecideContext): TraceContext;
+  /** The turn's trace for a context: under its bundle, set to its turn, its spans kept in `spans`. */
+  readonly traceFor: (context: DecideContext) => TraceContext;
 }
 
 function run(): Run {
@@ -37,7 +38,7 @@ function run(): Run {
     models,
     port: realDecide({ deciders: models.deciders }),
     spans,
-    traceFor(context) {
+    traceFor: (context) => {
       const trace = openTrace({
         openedBy: "textWebhook",
         bundleId: context.bundleId,

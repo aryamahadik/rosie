@@ -236,12 +236,14 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
         });
         const calls = trace.filter(safetyCall);
         expect(calls).toHaveLength(1);
-        // Every other model call of the trace is the turn's decide's (T-558), after the read: none is a safety read's.
+        // Every other model call of the trace is the turn's decide's (T-558), after the read: its two reads, each its
+        // step 1 and its one part's step 2; none is a safety read's.
         expect(
           trace
             .filter((span) => modelCall(span) && !safetyCall(span))
-            .flatMap((span) => span.model_calls?.map((call) => call.purpose) ?? []),
-        ).toEqual(expect.arrayContaining(["decideFirst", "decideCheck"]));
+            .flatMap((span) => span.model_calls?.map((call) => call.purpose) ?? [])
+            .sort(),
+        ).toEqual(["decideCheck", "decideCheck", "decideFirst", "decideFirst"]);
         expect(calls[0]).toMatchObject({
           call: "messages",
           attempt: 1,
