@@ -10,6 +10,10 @@
 // branch, and turn 1's row as it runs, to Sam with no role, read as the owner and addressed as "Sam". Since T-1174,
 // compose input answers compose-input-s1-02.json's request as K-09 v1.6's compose-input-s1-02-v1.6.json states it
 // (calls-test-support.ts composeS102).
+//
+// T-1193 (DL-376): the handle actor's turn records each row's fillAndChecks itself, so the face's compose input and
+// finalize leave no span of the base's; the same handlers on a base called without the face's option give the same
+// answers and record the base's one fillAndChecks span each, never the words.
 
 import { describe, expect, it } from "vitest";
 
@@ -19,6 +23,7 @@ import { readerOf } from "../../finalize/claim-check";
 import { FixedLineRefusedError } from "../../finalize/fixed-lines";
 import { fakeBundles, sampleBundle, type BundleDocument } from "../../frontier/assemble/test-support";
 import { contractFile, fixture, traceFor } from "../test-support";
+import { createToolApi, type ToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
 import {
   ROW_READER_ACCEPTED,
@@ -41,7 +46,7 @@ import {
 import { NOTHING_OPEN_AT } from "./commit";
 import { TurnFaceRefusedError } from "./errors";
 import { composeRowOf, lineToOf, readerOfRow, safetyLinesFor, type OutboxRowRead } from "./rows";
-import { createTurnFace, type TurnFace } from "./turn-face";
+import { callHandlers, createTurnFace, type TurnFace } from "./turn-face";
 
 type Json = Record<string, unknown>;
 
@@ -58,6 +63,15 @@ function faceOf(doubles: RowDoubles): TurnFace {
     validator,
     calls: rowCalls(doubles),
   });
+}
+
+/**
+ * The face's own handlers for compose input and finalize over the doubles, on a base called as any other caller calls it:
+ * without the face's option, so the base records each call's span (T-1193).
+ */
+function baseOf(doubles: RowDoubles): ToolApi {
+  const calls = rowCalls(doubles);
+  return createToolApi<unknown>({ validator, scope: calls.scope, handlers: callHandlers(calls, null) });
 }
 
 /** The face, after turn 1's gateAndCommit handed it the turn's words (commit-s1-01.json's request). */
@@ -130,11 +144,41 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     expect(validator.check("composeInput", "response", answer)).toEqual([]);
     expect(answer).toEqual({ result: "compose", input: { ...outcome.input, situation: "gentle" } });
     expect(doubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
-    expect(spans).toHaveLength(1);
-    expect(JSON.stringify(spans)).not.toContain("Hi, I want to put my barbershop on Rosie");
+    // No span of the base's: the turn records the row's fillAndChecks itself, and the face tells the base so (T-1193).
+    // The base's own span, without the face's option and never with the words, is the next test's.
+    expect(spans).toEqual([]);
     // DL-245: the bundle's S1-02 message carries the opt-out line in its plainText; the input never does, as only the
     // fixed-line inserter adds it.
     expect(JSON.stringify(answer)).not.toContain("Reply STOP to opt out");
+  });
+
+  it("without the face's option, the same handlers on the base give the same input and record its one fillAndChecks span, never the words the runtime handed in (T-1193)", async () => {
+    const doubles = rowDoubles();
+    const face = await faceAfterTurnOne(doubles);
+    const { request } = composeExchange();
+    const viaFace = traceFor(request);
+    const answer = await face.composeInput(structuredClone(request), viaFace.trace);
+    expect(viaFace.spans).toEqual([]);
+    // A read: on the same doubles and the words the face holds, the base reads the row alike and answers the same.
+    const { trace, spans } = traceFor(request);
+    expect(await baseOf(doubles).call("composeInput", structuredClone(request), trace)).toEqual(answer);
+    expect(JSON.stringify(answer)).toContain("Hi, I want to put my barbershop on Rosie");
+    expect(doubles.reads).toEqual([
+      "readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop",
+      "readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop",
+    ]);
+
+    expect(spans).toHaveLength(1);
+    const [span] = spans;
+    expect(span).toMatchObject({
+      hop: "fillAndChecks",
+      trace_id: "trace-sam-0000",
+      turn_id: "turn-s1-01-sam",
+      outcome: "ok",
+      got: { toolCall: "composeInput", callerKind: "turn" },
+    });
+    expect(validator.checkSpan(span)).toEqual([]);
+    expect(JSON.stringify(spans)).not.toContain("Hi, I want to put my barbershop on Rosie");
   });
 
   it("gives no inbound text when the face was not handed the turn's words, nor in a reply to anyone but their sender", async () => {
@@ -415,6 +459,40 @@ describe("finalize through the turn face with finalize-pass.json's plan on S1-02
     expect(lines.slice(-2)).toEqual([words("optOutLine"), words("privacyLink")]);
     expect(answer.outcome, JSON.stringify(answer.checks)).toBe("send");
     expect(doubles.plans.map((plan) => plan.finalParts)).toEqual([answer.finalParts]);
+  });
+
+  it("through the face it leaves no span of the base's; without the face's option, the same handlers on the base give the same answer, write the same plan once and record its one fillAndChecks span, never the text (T-1193)", async () => {
+    const bundle: BundleDocument = publishedBundleV0();
+    const onTheRow = (): RowDoubles =>
+      rowDoubles({ row: rowUnderPublishedV0(), facts: firstTextFacts(), bundle });
+    const { request } = finalizeExchange();
+    const faceDoubles = onTheRow();
+    const viaFace = traceFor(request);
+    const answer = await faceOf(faceDoubles).finalizeMessage(structuredClone(request), viaFace.trace);
+    expect(viaFace.spans).toEqual([]);
+
+    const doubles = onTheRow();
+    const { trace, spans } = traceFor(request);
+    expect(await baseOf(doubles).call("finalizeMessage", structuredClone(request), trace)).toEqual(answer);
+    expect(answer).toMatchObject({ outcome: "send" });
+    expect(doubles.plans).toEqual(faceDoubles.plans);
+    expect(doubles.plans).toHaveLength(1);
+
+    expect(spans).toHaveLength(1);
+    const [span] = spans;
+    expect(span).toMatchObject({
+      hop: "fillAndChecks",
+      trace_id: "trace-sam-0000",
+      turn_id: "turn-s1-01-sam",
+      outcome: "ok",
+      got: { toolCall: "finalizeMessage", callerKind: "turn" },
+    });
+    expect(validator.checkSpan(span)).toEqual([]);
+    // Each line of the text it sends (the opener, the question, the opt-out line, the privacy link): none in the span.
+    const sent = (answer as unknown as { finalParts: { sends: { text: string }[] } }).finalParts.sends;
+    const lines = (sent[0]?.text ?? "").split("\n").filter((line) => line.length >= 12);
+    expect(lines.length).toBeGreaterThanOrEqual(3);
+    for (const line of lines) expect(JSON.stringify(spans)).not.toContain(line);
   });
 
   it("the opener names the business as limit 7 shows it: the display name, while the switch is treated as on (DL-326 note b)", async () => {
