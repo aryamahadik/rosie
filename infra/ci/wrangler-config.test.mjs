@@ -155,6 +155,41 @@ describe("wrangler.jsonc retry queue (T-279)", () => {
   });
 });
 
+// The test-phone line (T-1186, DL-379, DL-388): env.staging repeats the top level's Durable Object bindings
+// and migrations, then adds staging's TEST_PHONE_LINE (class TestPhoneLine) with its own migration tag. Never
+// at the top level or in env.production, which never wire the test-phone page (DL-373 gap d). These checks
+// come first, so the top-level copy below fails on its own check, not on staging's equality.
+const LINE_BINDING = { name: "TEST_PHONE_LINE", class_name: "TestPhoneLine" };
+const LINE_MIGRATION = { tag: "v2-test-phone-line", new_sqlite_classes: ["TestPhoneLine"] };
+
+function checkStagingLine(cfg) {
+  for (const [where, section] of [
+    ["the top level", cfg],
+    ["env.production", cfg.env.production],
+  ]) {
+    const bindings = section.durable_objects?.bindings ?? [];
+    assert.ok(
+      !bindings.some((b) => b.name === LINE_BINDING.name || b.class_name === LINE_BINDING.class_name),
+      `${where} binds no TestPhoneLine`,
+    );
+    assert.ok(
+      !JSON.stringify(section.migrations ?? []).includes(LINE_BINDING.class_name),
+      `${where} migrates no TestPhoneLine`,
+    );
+  }
+  assert.deepEqual(cfg.env.staging.durable_objects, {
+    bindings: [...cfg.durable_objects.bindings, LINE_BINDING],
+  });
+  assert.deepEqual(cfg.env.staging.migrations, [...cfg.migrations, LINE_MIGRATION]);
+}
+
+/** checkStagingLine on an in-memory copy of wrangler.jsonc after `change`; the file is never written. */
+const brokenCopy = (change) => {
+  const copy = structuredClone(config);
+  change(copy);
+  return () => checkStagingLine(copy);
+};
+
 describe("wrangler.jsonc HandleActor binding", () => {
   it("declares exactly the HANDLE_ACTOR binding on class HandleActor", () => {
     assert.deepEqual(config.durable_objects, {
@@ -176,12 +211,39 @@ describe("wrangler.jsonc HandleActor binding", () => {
     assert.equal(config.routes, undefined);
     assert.equal(config.route, undefined);
     assert.deepEqual(config.secrets, { required: [] });
-    assert.deepEqual(config.env.staging.durable_objects, config.durable_objects);
+    checkStagingLine(config);
     assert.deepEqual(
       config.env.staging.routes.map((r) => r.pattern),
       ["rosfield.com/test", "rosfield.com/test/*"],
     );
     assert.equal(config.vars.ENVIRONMENT, "production");
     assert.ok(!/(sk_|key|token)\s*["']?\s*:/i.test(JSON.stringify(config.vars)));
+  });
+
+  it("rejects an in-memory copy that binds the test-phone line at the top level", () => {
+    assert.throws(
+      brokenCopy((c) => c.durable_objects.bindings.push(LINE_BINDING)),
+      /the top level binds no TestPhoneLine/,
+    );
+  });
+
+  it("rejects an in-memory copy that binds the test-phone line in env.production", () => {
+    assert.throws(
+      brokenCopy((c) => c.env.production.durable_objects.bindings.push(LINE_BINDING)),
+      /env\.production binds no TestPhoneLine/,
+    );
+  });
+
+  it("rejects an in-memory copy where env.production migrates TestPhoneLine", () => {
+    assert.throws(
+      brokenCopy((c) => c.env.production.migrations.push(LINE_MIGRATION)),
+      /env\.production migrates no TestPhoneLine/,
+    );
+  });
+
+  it("rejects an in-memory copy where env.staging loses the line, HandleActor or the line's migration", () => {
+    assert.throws(brokenCopy((c) => c.env.staging.durable_objects.bindings.pop()));
+    assert.throws(brokenCopy((c) => c.env.staging.durable_objects.bindings.shift()));
+    assert.throws(brokenCopy((c) => c.env.staging.migrations.pop()));
   });
 });
