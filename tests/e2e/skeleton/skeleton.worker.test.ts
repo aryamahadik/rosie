@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 7 (T-552 to T-558), receive to decide. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 8 (T-552 to T-559), receive to the commit. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -34,6 +34,7 @@ import { HAIKU_MODEL } from "../../../ai/src/gateway/index";
 import traceSkeleton from "../../../contracts/event-trace/fixtures/trace-skeleton.json";
 import decideS101Enter from "../../../contracts/model/fixtures/decide-s1-01-enter.json";
 import buildFrontierS101 from "../../../contracts/tool-api/fixtures/build-frontier-s1-01.json";
+import commitS101 from "../../../contracts/tool-api/fixtures/commit-s1-01.json";
 import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/event-trace.v1";
 import { QUIET_MS, turnIdOf } from "../../../runtime/src/actor";
 import { actorNameOf, openWords } from "../../../runtime/src/gateway";
@@ -59,8 +60,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 7's, decide's two reads (T-558). */
-const JOINED_THROUGH: SkeletonHop = "decideReads";
+/** The last hop joined on main: join 8's, the gate and its one commit (T-559). */
+const JOINED_THROUGH: SkeletonHop = "commit";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -415,6 +416,140 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(new Set(facts.run.fakes.decide.calls.flatMap((call) => call.recordings))).toEqual(
       new Set(["decide-s1-01-join-first", "decide-s1-01-join-check"]),
     );
+    return Promise.resolve();
+  },
+
+  // Row 8, "Gate and one commit: state, the open question and its clock row, one outbox row, the event log, under the turn
+  // id" (K-09, K-05, K-04, K-07, K-08; T-559; ADR-013 sections 4 and 6; K-09 v1.5 defaults 130 to 136): @rosie/actions'
+  // turn face's gateAndCommit, its one K-05 commitTurn through the root's turn-row port, gives the JOIN turn one gate span
+  // with commit-s1-01.json's limits (trace-skeleton.json's: 1, 4 and 6 pass) and one commit span naming commit-s1-01.json's
+  // rows; K-04 then holds exactly 1 turn row (K-05's seven fields alone), 1 thread row, 1 open question, 1 clock row
+  // (waiting, unarmed), 1 outbox row and the event-log entries, under one turn id and one trace id, each row id built from
+  // the turn's own id (default 131), each value commit-s1-01.json's given.stated.writes states but for the ids and the chat
+  // id, which are the run's. The thread and the outbox row took the JOIN event's chat id and service, which the request's
+  // turn carried (default 135), and no span or event-log entry's values hold the chat id.
+  8: (facts) => {
+    const fixture = commitS101 as unknown as {
+      readonly given: {
+        readonly stated: {
+          readonly writes: {
+            readonly state: readonly { readonly values: Record<string, unknown> }[];
+            readonly openQuestions: readonly Record<string, unknown>[];
+            readonly outboxRows: readonly Record<string, unknown>[];
+          };
+        };
+      };
+      readonly outcome: {
+        readonly parts: readonly { readonly limits: unknown }[];
+        readonly written: {
+          readonly written: readonly { readonly table: string; readonly rowId: string }[];
+          readonly outboxRows: readonly { readonly id: string }[];
+        };
+      };
+    };
+    // The fixture's ids, built from the run's turn id (default 131: its turn key, `sam`, is the handle's sample name),
+    // and its chat id the run's (the JOIN event's).
+    const asRun = <T>(value: T): T =>
+      JSON.parse(
+        JSON.stringify(value)
+          .replaceAll(`-sam-1"`, `-${facts.turnId}-1"`)
+          .replaceAll(`"linq-chat-demo-sam"`, JSON.stringify(JOIN.chatId)),
+      ) as T;
+    const { turnRows } = facts.run.fakes;
+    const rowsIn = (table: string) => [...(turnRows.rows.get(table)?.values() ?? [])];
+
+    // The gate: one span for the turn's one part, the turn's own (the Tool API base records none: DL-376).
+    const gate = onlySpan(facts, "gate");
+    expect(gate.limits).toEqual(skeletonSpan("gate").limits);
+    expect(gate.limits).toEqual(fixture.outcome.parts[0]?.limits);
+    expect(gate).toMatchObject({
+      outcome: "ok",
+      error_code: null,
+      turn_id: facts.turnId,
+      business_id: TEST_OWNER_1.businessId,
+      decided: { part: 0, result: "committed", choice: "c-01" },
+    });
+    // The commit: one span, its rows commit-s1-01.json's by the run's ids.
+    const commit = onlySpan(facts, "commit");
+    expect(commit.rows).toEqual(
+      asRun([
+        ...fixture.outcome.written.written.map((row) => ({ table: row.table, id: row.rowId })),
+        ...fixture.outcome.written.outboxRows.map((row) => ({ table: "outbox_rows", id: row.id })),
+      ]),
+    );
+    expect(commit).toMatchObject({
+      outcome: "ok",
+      error_code: null,
+      turn_id: facts.turnId,
+      decided: { repeated: false, parts: 1, committedParts: 1, core: 1, outboxRows: 1 },
+    });
+
+    // K-05: one commitTurn under the lease's turn id, its turn K-05's seven fields alone.
+    expect(turnRows.commits.map((request) => request.turn)).toEqual([
+      {
+        id: facts.turnId,
+        handleId: TEST_OWNER_1.handleId,
+        eventIds: [JOIN.eventId],
+        bundleId: BUNDLE_V0,
+        traceId: facts.sent.traceId,
+        joinedTraceIds: [],
+        tries: 1,
+      },
+    ]);
+    // K-04: exactly the turn row, the part's rows and the safety record's outcome row (the core action's: default 5).
+    expect([...turnRows.turns.keys()]).toEqual([facts.turnId]);
+    expect([...turnRows.rows.keys()].sort()).toEqual([
+      "clock_rows",
+      "open_questions",
+      "outbox_rows",
+      "safety_outcomes",
+      "threads",
+    ]);
+    const stated = fixture.given.stated.writes;
+    // 1 thread row (S1-01): chat, no booking, its linq_chat_id the JOIN event's chat id, no reply address.
+    expect(rowsIn("threads").map((row) => [row.id, row.values])).toEqual([
+      [`thread-s1-01-${facts.turnId}-1`, asRun(stated.state[0]?.values)],
+    ]);
+    expect(rowsIn("threads")[0]?.values).toMatchObject({ linq_chat_id: JOIN.chatId, booking_id: null });
+    // 1 open question (S1-02's, no options), waiting.
+    expect(rowsIn("open_questions").map((row) => [row.id, row.values])).toEqual([
+      [`oq-s1-02-${facts.turnId}-1`, { ...asRun(stated.openQuestions[0]), status: "waiting" }],
+    ]);
+    // 1 clock row, the commit's own: waiting, not armed until the first delivery receipt.
+    expect(rowsIn("clock_rows").map((row) => [row.id, row.values.state, row.values.due ?? null])).toEqual([
+      [`clock-oq-s1-02-${facts.turnId}-1`, "waiting", null],
+    ]);
+    // 1 outbox row: the JOIN event's service, quick_reply, the question's id, no plan.
+    expect(rowsIn("outbox_rows").map((row) => [row.id, row.values])).toEqual([
+      [`outbox-s1-02-${facts.turnId}-1`, { ...asRun(stated.outboxRows[0]), commitSeq: 1 }],
+    ]);
+    expect(rowsIn("outbox_rows")[0]?.values).toMatchObject({
+      channel: JOIN.service,
+      sendClass: "quick_reply",
+    });
+    // The event-log entries: each under the one turn id, the one trace id and bundle v0.
+    expect(turnRows.eventLog.length).toBeGreaterThan(0);
+    expect(
+      new Set(
+        turnRows.eventLog.map((row) =>
+          JSON.stringify([row.turn_id, row.trace_id, row.bundle_hash, row.bundle_build]),
+        ),
+      ),
+    ).toEqual(new Set([JSON.stringify([facts.turnId, facts.sent.traceId, BUNDLE_V0.hash, BUNDLE_V0.build])]));
+    // Every row under the one turn id.
+    expect(
+      new Set([...turnRows.rows.values()].flatMap((table) => [...table.values()].map((row) => row.turnId))),
+    ).toEqual(new Set([facts.turnId]));
+    // The chat id's one home is the thread row: no span and no event-log entry's values hold it.
+    const chatId = String(JOIN.chatId);
+    expect(stringsOf(facts.collected.spans).filter((text) => text.includes(chatId))).toEqual([]);
+    expect(
+      stringsOf(turnRows.eventLog.map((row) => [row.old_values, row.new_values])).filter((text) =>
+        text.includes(chatId),
+      ),
+    ).toEqual([]);
+    // The gate's reads ran under Lee's Barbershop's scope, once.
+    expect(facts.run.fakes.gate.scopes).toEqual([TEST_OWNER_1.businessId]);
     return Promise.resolve();
   },
 };

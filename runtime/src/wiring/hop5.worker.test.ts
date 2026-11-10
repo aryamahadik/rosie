@@ -47,7 +47,6 @@ import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./inde
 import {
   BUNDLE_V0,
   fakeFlags,
-  gateThroughCommit,
   HELP_TEXT,
   JOIN_TEXT,
   SAM_CHAT,
@@ -176,7 +175,7 @@ interface Rig {
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on, K-05's turn-row calls (the double) and the two
  * ports this hop joins fed their K-05 doubles, unless a test leaves one out (as the Worker does until T-567); its actor
- * ports installed; the Tool API's gate and commit stood in, its one commit through the root's turn-row port.
+ * ports installed; the gate (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port.
  */
 function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = {}): Rig {
   const fakes = skeletonFakes();
@@ -194,9 +193,9 @@ function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = 
     handleTargets: fed.targets === false ? null : fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
     deciders: fakes.decide.deciders,
+    gateReads: fakes.gate.reads,
     flags: fakeFlags([SKELETON_FLAG]),
   });
-  fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
   const restore = root.install();
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
@@ -350,7 +349,8 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
             (context.texts as { eventId: string; words: string }[]).map((text) => [text.eventId, text.words]),
           ),
         ).toEqual([[[JOIN_EVENT, JOIN_TEXT]]]);
-        // The turn went on through the stood-in hops and committed its one row, under the pinned bundle v0.
+        // The turn went on through the joined gate and the stood-in hops after it, and committed its one row, under the
+        // pinned bundle v0.
         expect([...run.fakes.turnRows.turns.values()].map((row) => [row.id, row.bundleId])).toEqual([
           [joinTurn, BUNDLE_V0],
         ]);
@@ -451,6 +451,8 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
         expect(run.fakes.face.log.filter((entry) => ["frontier", "decide", "gate"].includes(entry))).toEqual(
           [],
         );
+        // No gateAndCommit reached the joined gate (T-559): it opened no scope and read nothing.
+        expect(run.fakes.gate.scopes).toEqual([]);
         expect(run.fakes.turnRows.commits).toEqual([]);
         expect(leaks(run.spans(), CAST_NUMBERS)).toEqual([]);
       } finally {

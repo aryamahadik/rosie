@@ -18,10 +18,10 @@
 //                a fake Messages API whose answers come from the recorded-model double (T-004) holding the skeleton's
 //                texts (SKELETON_SAFETY_RECORDINGS, each seeded from safety-no.json), and able to wait before answering
 //   turnRow      joined (T-555): the root binds K-05's commitTurn and parkTurn through its real turn-row port (./real.ts
-//                realTurnRow). What it is fed comes from here: `fakeTurnRows`, a K-05 double answering as
-//                commit-first.json, commit-repeat-same-turn.json and park-turn.json under each running turn's id, and
-//                keeping the one K-04 turns row each turn id is written as; `gateThroughCommit` stands the Tool API's gate
-//                and commit in for a hop's test, its one commit through the root's turn-row port, until T-559
+//                realTurnRow). What it is fed comes from here: `fakeTurnRows`, a K-05 double over an in-memory K-04,
+//                answering as commit-first.json, commit-repeat-same-turn.json, commit-opens-question.json and
+//                park-turn.json do for each running turn, and keeping the one K-04 turns row each turn id is written as,
+//                every other row its commit wrote and the event log it appended
 //   bundles      joined (T-556): the root binds K-05 v1 item 7's bundle reads through its real bundle port (./real.ts
 //                realBundles). What it is fed comes from here: `fakeBundleReads`, a K-05 double holding bundle v0 as
 //                bundles/v0 publishes it (bundle.kv.json: every part's key and its exact text, the bytes T-569's publish
@@ -41,8 +41,13 @@
 //   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
 //                dispatch/test-support FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor
 //                directory
-//   turnFace     turn/test-support fakeTurnFace (closest entries, gate, compose input from the S1-02 fixtures) and
+//   turnFace     turn/test-support fakeTurnFace (closest entries, compose input from the S1-02 fixtures) and
 //                safety/test-support fakeCore
+//   gate         joined (T-559): the root binds @rosie/actions' turn face's gateAndCommit through its real gate port
+//                (./real.ts realGate), its one commit through the root's turn-row port (`fakeTurnRows`). What its reads
+//                are fed comes from here: `fakeGateReads`, the Tool API's business scope and K-05 v1.3 and v1.4's reads
+//                over test owner 1's seeded rows and what the K-05 commitTurn double wrote, and a read-only sealer over
+//                the keys K-05's handleSealingKey double made
 //   decide       joined (T-558): the root binds @rosie/ai's decide and its one Sonnet re-read through its real decide port
 //                (./real.ts realDecide), one decider per bundle. What it is fed comes from here: `fakeDecideModels`, the
 //                decider (T-369 createDecider) for bundle v0 as bundles/v0 publishes it and for bundle-mini-a, over a fake
@@ -60,7 +65,11 @@
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
 // cast, the frozen fixtures' ids, the fictional 555-01xx numbers (rule 9) and a webhook secret made up for each run.
 
+import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
+import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
+import type { StoredHold, StoredOutcome } from "@rosie/actions/src/domain/safety/ports";
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
+import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import joinRunContextJson from "@rosie/ai/recordings/contexts/join-s1-01.json";
@@ -80,7 +89,6 @@ import bundleMiniA from "@rosie/contracts/bundle/fixtures/bundle-mini-a.json";
 import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
 import activeBundleJson from "@rosie/contracts/data-access/fixtures/active-bundle.json";
 import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.json";
-import commitRepeatJson from "@rosie/contracts/data-access/fixtures/commit-repeat-same-turn.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import targetsFirstTextJson from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
 import seedBusinessHead from "@rosie/contracts/db-schema/core/fixtures/seed-business-head.json";
@@ -106,14 +114,15 @@ import type {
 } from "@rosie/db/repo/targets";
 
 import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
-import type { CommitTurnRef } from "../actor";
+import type { CommitContext, CommitTurnRef } from "../actor";
 import { turnIdOf } from "../actor/lease";
 import { BUNDLE_B } from "../bundle/test-support";
 import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
 import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
-import type { BundleId } from "../trace";
+import type { BundleId, TraceContext } from "../trace";
+import { setTurnDeps } from "../turn/turn";
 import {
   a7_17Context,
   composerOf,
@@ -135,13 +144,14 @@ import type {
   CommitTurnCall,
   Deciders,
   FrontierScope,
+  GateReads,
   HandleSealingKeyCall,
   HandleTargetsCall,
   LinqVerifyInputs,
   SafetyReaders,
   TurnRowCalls,
 } from "./real";
-import type { RootClock } from "./root";
+import type { Root, RootClock } from "./root";
 import type { ReleaseFlags } from "./skeleton";
 
 // ---- one clock for every fake ------------------------------------------------------------------------------------
@@ -442,7 +452,7 @@ export function fakeSafetyModels(recorded: Pick<RecordedModel, "safetyRead">): F
   return models;
 }
 
-// ---- K-05 commitTurn and parkTurn, as a double: a turn's one row (T-555) ------------------------------------------
+// ---- K-05 commitTurn and parkTurn, as a double: a turn's one row and what its commit writes (T-555, T-559) ---------
 
 /** One K-04 turns row as the double writes it: once per turn id, as committed or parked (NQ-RT-3's default). */
 export interface TurnsRow {
@@ -458,11 +468,45 @@ export interface TurnsRow {
   readonly at: string;
 }
 
+/** One row a commit wrote besides its turns row (K-04), as the double keeps it. */
+export interface WrittenRow {
+  readonly table: string;
+  readonly id: string;
+  /**
+   * Its values as K-05's request wrote them, field for field: a state insert's values (an update's `set` merged over
+   * them), an open question, a clock row with the state K-05 gives it (waiting until its first delivery receipt arms it,
+   * or armed when the write names when it is due), an outbox row with its commit order.
+   */
+  readonly values: Readonly<Record<string, unknown>>;
+  /** Its version after the commit: an insert 1, an update its read version plus one. */
+  readonly version: number;
+  /** The turn whose commit wrote it. */
+  readonly turnId: string;
+}
+
+/** One event-log row as K-05 appends it (K-08 v1.1 eventLogRow, column for column): the entry, with the turn's ids. */
+export type EventLogRow = Readonly<Record<string, unknown>>;
+
+/** K-05 v1's turn, a closed object of seven fields (K-05 v1 `turn`): what the double takes, and nothing more. */
+const K05_TURN_FIELDS = ["id", "handleId", "eventIds", "bundleId", "traceId", "joinedTraceIds", "tries"];
+
+/** A request K-05 does not take; the message names a field, never a value. */
+export class K05RefusedError extends Error {
+  constructor(what: string) {
+    super(`K-05 v1.1 refuses the commitTurn request: ${what}`);
+    this.name = "K05RefusedError";
+  }
+}
+
 export interface FakeTurnRows {
   /** What the root's turn-row port is fed (RootOptions.turnRows): K-05's two calls, over the double's turns rows. */
   readonly calls: TurnRowCalls;
   /** K-04 turns, by turn id: the one row each turn id was written as. */
   readonly turns: Map<string, TurnsRow>;
+  /** Every other row the commits wrote (K-04 and its domain parts), by table, then by id. */
+  readonly rows: Map<string, Map<string, WrittenRow>>;
+  /** The event log the commits appended, in order. */
+  readonly eventLog: EventLogRow[];
   /** Every commitTurn request, in order. */
   readonly commits: CommitTurnRequest[];
   /** Every parkTurn request, in order. */
@@ -471,13 +515,60 @@ export interface FakeTurnRows {
   failCommitsWith: { readonly error: "transient" } | null;
 }
 
-const COMMIT_FIRST_TURN = commitFirstJson.request.turn.id;
 const PARK_TURN_ID = parkTurnJson.request.turn.id;
+/** The database's now() at each first commit: commit-first.json's committedAt. */
+const COMMITTED_AT = commitFirstJson.outcome.committedAt;
 
 const commitAnswer = (value: unknown): Promise<CommitTurnOutcome> =>
   Promise.resolve(structuredClone(value) as CommitTurnOutcome);
 const parkAnswer = (value: unknown): Promise<ParkTurnOutcome> =>
   Promise.resolve(structuredClone(value) as ParkTurnOutcome);
+
+type K05Writes = CommitTurnRequest["writes"];
+type K05Committed = Extract<CommitTurnOutcome, { result: "committed" }>;
+
+/** The one id of a state update's key (K-04: a row is named by its primary key alone). */
+function keyIdOf(key: Readonly<Record<string, unknown>>): string {
+  const values = Object.values(key);
+  const [id] = values;
+  if (values.length !== 1 || typeof id !== "string") throw new K05RefusedError("a state update's key");
+  return id;
+}
+
+/**
+ * K-05 v1 eventEntry as K-05 appends it to K-04's event_log (K-08 v1.1 eventLogRow, column for column): "the turn's id,
+ * trace id and bundle ... come from the call, not the entry" (K-05 v1 eventEntry), at the commit's time.
+ */
+function eventLogRowOf(
+  entry: K05Writes["events"][number],
+  turn: CommitTurnRequest["turn"],
+  at: string,
+): EventLogRow {
+  return {
+    id: entry.id,
+    at,
+    zone: entry.zone,
+    turn_id: turn.id,
+    job_id: null,
+    trace_id: turn.traceId,
+    bundle_hash: turn.bundleId.hash,
+    bundle_build: turn.bundleId.build,
+    business_id: entry.businessId,
+    actor_kind: entry.actorKind,
+    actor_person_id: entry.actorPersonId,
+    actor_role: entry.actorRole,
+    kind: entry.kind,
+    table_name: entry.tableName,
+    row_id: entry.rowId,
+    old_values: entry.oldValues,
+    new_values: entry.newValues,
+    sealed_values: entry.sealed?.base64 ?? null,
+    sealed_for_person_id: entry.sealed?.forPersonId ?? null,
+    why: entry.why,
+    approved_by: entry.approvedBy,
+    proofs: entry.proofs,
+  };
+}
 
 /** The turns row K-05 writes for a commit's or a park's turn (both name it as K-05 v1 `turn`). */
 function turnsRowOf(turn: CommitTurnRequest["turn"], state: TurnsRow["state"], at: string): TurnsRow {
@@ -495,19 +586,144 @@ function turnsRowOf(turn: CommitTurnRequest["turn"], state: TurnsRow["state"], a
 }
 
 /**
- * K-05 commitTurn and parkTurn as a double answering as commit-first.json, commit-repeat-same-turn.json and park-turn.json
- * do, for whichever turn asks (K-05 README items 1 and 12): the first call for a turn id writes that id's one turns row,
- * committed or parked, and answers its fixture's outcome under that turn id; a later commit of a committed id answers the
- * repeat's (nothing written, repeated); a later park of a parked id its first park again, repeated; a commit of a parked id
- * turnParked; a park of a committed id alreadyCommitted. A parked row's time is the request's parkedAt.
+ * K-05 commitTurn and parkTurn as a double over an in-memory K-04 (K-05 README items 1 and 12), answering as
+ * commit-first.json, commit-repeat-same-turn.json, commit-opens-question.json and park-turn.json do, for whichever turn
+ * asks. A commit's turn is K-05 v1's closed turn: a field beyond its seven is refused (K05RefusedError, nothing written).
+ * The first commit of a turn id writes that id's one turns row, committed, and every row its request writes, all or
+ * nothing: each state insert or update, each open question opened (waiting) or closed, each clock row made (waiting until
+ * its first delivery receipt arms it, unless it names when it is due) or cancelled, each outbox row in commit order, each
+ * reservation confirmed or released, each effect, and one event-log row per entry with the turn's id, trace id and
+ * bundle; it answers K-05's commitResult: the versioned rows in the order written (an insert at version 1, an update at
+ * its read version plus one; a confirmed reservation also cancels its saved-time clock row) and the outbox rows with their
+ * commit order, at commit-first.json's committedAt (so commit-first.json's own request gets its own outcome). A later
+ * commit of a committed id writes nothing and answers the first commit, repeated, with no rows written (the repeat's body
+ * is not read: commit-repeat-same-turn.json). A later park of a parked id answers its first park again, repeated; a commit
+ * of a parked id turnParked; a park of a committed id alreadyCommitted. A parked row's time is the request's parkedAt.
+ * Each call runs whole before the next: two commits of one turn id at once give one commit.
  */
 export function fakeTurnRows(): FakeTurnRows {
   const turns = new Map<string, TurnsRow>();
+  const rows = new Map<string, Map<string, WrittenRow>>();
+  const eventLog: EventLogRow[] = [];
   const commits: CommitTurnRequest[] = [];
   const parks: K05ParkTurnRequest[] = [];
+  const firstCommits = new Map<string, K05Committed>();
   const firstParks = new Map<string, Record<string, unknown>>();
+  let nextCommitSeq = 1;
+
+  const tableOf = (table: string): Map<string, WrittenRow> => {
+    const known = rows.get(table);
+    if (known !== undefined) return known;
+    const made = new Map<string, WrittenRow>();
+    rows.set(table, made);
+    return made;
+  };
+
+  /** Writes a first commit's rows, all of them, and answers K-05's commitResult. */
+  const commitWrites = (request: CommitTurnRequest): K05Committed => {
+    const { writes, turn } = request;
+    const staged: WrittenRow[] = [];
+    const written: { table: string; rowId: string; version: number }[] = [];
+    const before = (table: string, id: string): Readonly<Record<string, unknown>> => {
+      const stagedRow = [...staged].reverse().find((row) => row.table === table && row.id === id);
+      return stagedRow?.values ?? rows.get(table)?.get(id)?.values ?? {};
+    };
+    const put = (
+      table: string,
+      id: string,
+      values: Readonly<Record<string, unknown>>,
+      version: number,
+    ): void => {
+      staged.push({ table, id, values: structuredClone(values), version, turnId: turn.id });
+      written.push({ table, rowId: id, version });
+    };
+    for (const write of writes.state) {
+      if (write.op === "insert") {
+        const id = write.values.id;
+        if (typeof id !== "string") throw new K05RefusedError(`a ${write.table} insert names no id`);
+        put(write.table, id, write.values, 1);
+      } else {
+        const id = keyIdOf(write.key);
+        put(write.table, id, { ...before(write.table, id), ...write.set }, write.expectVersion + 1);
+      }
+    }
+    for (const question of writes.openQuestions.open) {
+      put("open_questions", question.id, { ...question, status: "waiting" }, 1);
+    }
+    for (const close of writes.openQuestions.close) {
+      put(
+        "open_questions",
+        close.id,
+        { ...before("open_questions", close.id), ...close },
+        close.expectVersion + 1,
+      );
+    }
+    for (const clock of writes.clockRows.make) {
+      const id = clock.id;
+      if (typeof id !== "string") throw new K05RefusedError("a clock row names no id");
+      const due = clock.due ?? null;
+      put(
+        "clock_rows",
+        id,
+        { ...clock, state: due === null ? "waiting" : "armed", createdByTurnId: turn.id },
+        1,
+      );
+    }
+    for (const cancel of writes.clockRows.cancel) {
+      put(
+        "clock_rows",
+        cancel.id,
+        { ...before("clock_rows", cancel.id), state: "cancelled" },
+        cancel.expectVersion + 1,
+      );
+    }
+    for (const confirm of writes.reservations.confirm) {
+      put("reservations", confirm.id, { ...confirm, state: "booked" }, confirm.expectVersion + 1);
+      written.push({ table: "clock_rows", rowId: `${confirm.id}/saved-time`, version: 2 });
+    }
+    for (const release of writes.reservations.release) {
+      put("reservations", release.id, { ...release }, release.expectVersion + 1);
+    }
+    for (const effect of writes.effects?.write ?? []) {
+      const id = effect.effectId;
+      if (typeof id !== "string") throw new K05RefusedError("an effect names no id");
+      put("effects", id, { ...effect, state: "pending" }, 1);
+    }
+    for (const letGo of writes.effects?.letGo ?? []) {
+      put(
+        "effects",
+        letGo.effectId,
+        { ...before("effects", letGo.effectId), state: "cancelled" },
+        letGo.expectVersion + 1,
+      );
+    }
+    const outboxRows = writes.outboxRows.map((row) => {
+      const commitSeq = nextCommitSeq++;
+      staged.push({
+        table: "outbox_rows",
+        id: row.id,
+        values: { ...structuredClone(row), commitSeq },
+        version: 1,
+        turnId: turn.id,
+      });
+      return { id: row.id, commitSeq };
+    });
+    // All or nothing: every row lands once the whole request has been read.
+    for (const row of staged) tableOf(row.table).set(row.id, row);
+    for (const entry of writes.events) eventLog.push(eventLogRowOf(entry, turn, COMMITTED_AT));
+    return {
+      result: "committed",
+      turnId: turn.id,
+      committedAt: COMMITTED_AT,
+      repeated: false,
+      committed: { written, outboxRows, promoted: [] },
+    };
+  };
+
   const double: FakeTurnRows = {
     turns,
+    rows,
+    eventLog,
     commits,
     parks,
     failCommitsWith: null,
@@ -515,15 +731,33 @@ export function fakeTurnRows(): FakeTurnRows {
       commitTurn(request) {
         commits.push(structuredClone(request));
         if (double.failCommitsWith !== null) return commitAnswer({ ...double.failCommitsWith });
+        const extra = Object.keys(request.turn).filter((field) => !K05_TURN_FIELDS.includes(field));
+        if (extra.length > 0) {
+          return Promise.reject(
+            new K05RefusedError(`its turn holds ${extra.join(", ")}, beyond K-05 v1's turn`),
+          );
+        }
         const turnId = request.turn.id;
         const known = turns.get(turnId);
         if (known?.state === "parked")
           return commitAnswer({ error: "turnParked", turnId, parkedAt: known.at });
-        if (known !== undefined) {
-          return commitAnswer(swap(commitRepeatJson.outcome, [[COMMIT_FIRST_TURN, turnId]]));
+        const first = firstCommits.get(turnId);
+        if (first !== undefined) {
+          return commitAnswer({
+            ...first,
+            repeated: true,
+            committed: { written: [], outboxRows: first.committed.outboxRows, promoted: [] },
+          });
         }
-        turns.set(turnId, turnsRowOf(request.turn, "committed", commitFirstJson.outcome.committedAt));
-        return commitAnswer(swap(commitFirstJson.outcome, [[COMMIT_FIRST_TURN, turnId]]));
+        let answer: K05Committed;
+        try {
+          answer = commitWrites(request);
+        } catch (error) {
+          return Promise.reject(error instanceof Error ? error : new K05RefusedError("its writes"));
+        }
+        turns.set(turnId, turnsRowOf(request.turn, "committed", COMMITTED_AT));
+        firstCommits.set(turnId, answer);
+        return commitAnswer(answer);
       },
       parkTurn(request) {
         parks.push(structuredClone(request));
@@ -569,7 +803,9 @@ export function commitFirstFor(turn: CommitTurnRef): CommitTurnRequest {
 }
 
 /**
- * The Tool API's gate and commit as a hop's test stands it in until T-559 joins @rosie/actions' (a FakeTurnFace `gate`): no
+ * The Tool API's gate and commit as the hops' tests stood it in before T-559 joined @rosie/actions' (a FakeTurnFace
+ * `gate`; since then the gate port is real under test, and this stand-in answers only where a test calls it itself, such
+ * as ./turn-row.test.ts's check of the turn-row port): no
  * limit is read, and the turn's one commit is K-05 commitTurn through `commit` (in a hop's test, the root's turn-row port),
  * with commit-first.json's body under the running turn (`commitFirstFor`). K-05's committed answer, first or repeated, comes
  * back as K-09's: commit-s1-02.json's outcome under the running turn's id, with K-05's turn id, commit time and repeat flag,
@@ -590,6 +826,43 @@ export function gateThroughCommit(
       repeated: answer.repeated,
     };
   };
+}
+
+/** One gateAndCommit the turn handed the root: the request as the turn made it, its CommitContext and the run's trace. */
+export interface WatchedGateCall {
+  readonly request: GateAndCommitRequest;
+  readonly at: CommitContext;
+  readonly trace: TraceContext;
+  /** What the root's gate port answered (or threw), once it has. */
+  answer: unknown;
+}
+
+/**
+ * Watches the turn's gateAndCommit on a root whose actor ports are installed (call it after `root.install()`): each call
+ * the turn makes is kept, as the turn made it, then goes on to the root's own gateAndCommit unchanged (which puts the run's
+ * text source on the request's turn and sends it to the gate port), its answer kept beside it. A test's observer only:
+ * nothing it holds changes what the gate is sent or answers. Returns the calls and what puts the root's own turn deps back.
+ */
+export function watchGate(root: Root): { readonly calls: WatchedGateCall[]; restore(): void } {
+  const calls: WatchedGateCall[] = [];
+  const restore = setTurnDeps({
+    ...root.turn,
+    toolApi: {
+      ...root.turn.toolApi,
+      async gateAndCommit(request, at, trace) {
+        const call: WatchedGateCall = { request: structuredClone(request), at, trace, answer: undefined };
+        calls.push(call);
+        try {
+          call.answer = await root.turn.toolApi.gateAndCommit(request, at, trace);
+        } catch (error) {
+          call.answer = error;
+          throw error;
+        }
+        return call.answer as GateAndCommitAnswer;
+      },
+    },
+  });
+  return { calls, restore };
 }
 
 // ---- K-05 v1 item 7's bundle reads, as a double: bundle v0 as bundles/v0 publishes it (T-556) ----------------------
@@ -892,10 +1165,272 @@ export function fakeFrontierScope(now: () => string = () => new Date().toISOStri
   };
 }
 
-// ---- @rosie/ai's decide over the recorded-model double (T-558) -----------------------------------------------------
+// ---- the gate's reads, as doubles: test owner 1's seeded rows and what the commits wrote (T-559) -------------------
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** The repo of one gate call's transaction in the doubles: no database, only the business it is scoped to. */
+export interface GateCallRepo {
+  readonly scopedTo: string;
+}
+
+/** One read the gate made through the doubles: its K-05 name and the business its request named. */
+export interface GateRead {
+  readonly read: string;
+  readonly businessId: string | null;
+}
+
+export interface FakeGateReads {
+  /** What the root's real gate port is fed (RootOptions.gateReads): the scope and the reads over the doubles. */
+  readonly reads: GateReads;
+  /** Each gate call's business scope, in order (the Tool API's own: rosie_app on PostgreSQL). */
+  readonly scopes: string[];
+  /** Every read, in order. */
+  readonly seen: GateRead[];
+  /** Each seal, by the person whose key sealed it (the words are never kept). */
+  readonly sealedFor: string[];
+}
+
+/** A K-34 safety_outcomes row as K-05 v1.4's reads answer it (StoredOutcome), from the row a commit wrote. */
+function storedOutcomeOf(row: WrittenRow): StoredOutcome {
+  const values = row.values;
+  return {
+    id: row.id,
+    eventId: values.event_id,
+    source: values.source,
+    handleId: values.handle_id ?? null,
+    personId: values.person_id ?? null,
+    businessId: values.business_id ?? null,
+    bookingId: values.booking_id ?? null,
+    turnId: values.turn_id ?? null,
+    readAt: values.read_at,
+    timedOut: values.timed_out,
+    labels: values.labels,
+    tenses: values.tenses,
+    dangerWordKinds: values.danger_word_kinds,
+    outcomes: values.outcomes,
+    liftedToUnsure: values.lifted_to_unsure,
+  } as StoredOutcome;
+}
+
+/** A K-34 safety_holds row as K-05 v1.4's reads answer it (StoredHold), from the row a commit wrote. */
+function storedHoldOf(row: WrittenRow): StoredHold {
+  const values = row.values;
+  return {
+    id: row.id,
+    safetyOutcomeId: values.safety_outcome_id,
+    businessId: values.business_id ?? null,
+    handleId: values.handle_id,
+    personId: values.person_id ?? null,
+    bookingId: values.booking_id ?? null,
+    turnId: values.turn_id ?? null,
+    releaseRule: values.release_rule,
+    blocksBooking: values.blocks_booking,
+    heldAt: values.held_at,
+    releasedAt: values.released_at ?? null,
+    releasedWhy: values.released_why ?? null,
+    releasedByTurnId: values.released_by_turn_id ?? null,
+    releasedByOutcomeId: values.released_by_outcome_id ?? null,
+    version: row.version,
+  } as StoredHold;
+}
+
+/** A reader whose every read is refused, naming the read: test owner 1's seeded rows answer none of them on turn 1. */
+function refusingReader<T extends object>(reader: string, reads: readonly (keyof T & string)[]): T {
+  return Object.fromEntries(
+    reads.map((read) => [
+      read,
+      () =>
+        Promise.reject(new Error(`the skeleton's ${reader} double holds no ${read} read: turn 1 makes none`)),
+    ]),
+  ) as T;
+}
+
+const FLAGS_READS: readonly (keyof FlagsReader)[] = [
+  "handleOfAddress",
+  "handle",
+  "phone",
+  "personIdsOfHandle",
+  "handleIdsOfPerson",
+  "personExists",
+  "liveRoles",
+  "consentWritten",
+  "consentsOfPersons",
+  "bookingHead",
+  "bookingsOfPerson",
+  "pause",
+  "openPausesOfPerson",
+  "openPausesOfPhone",
+  "openQuestionsOfHandle",
+];
+
+const MESSAGES_READS: readonly (keyof MessagesReader)[] = [
+  "person",
+  "handleIdsOfPerson",
+  "handle",
+  "phoneOfHandle",
+  "chatThreadOf",
+  "consentsOfPersons",
+];
+
+/**
+ * The gate's reads (./real.ts GateReads) as doubles over test owner 1's seeded rows (T-1148: Lee's Barbershop's business
+ * head, Sam with no role, no hold and no outcome) and the rows the K-05 commitTurn double wrote (`written`), as the real
+ * reads answer on PostgreSQL:
+ *   scope           one call's transaction, its repo scoped to the call's business (rosie_app's row-level security);
+ *   readOpenHolds   K-05 v1.3: the handle's holds still open at the business, and the asked texts with no outcome there;
+ *   safety reads    K-05 v1.4: the outcomes and holds the commits wrote, whether an outbox row is written, the seeded
+ *                   business's zone, and its owner (none: Sam holds no role yet, ADR-013 default 130);
+ *   sealer          read-only: the words sealed (AES-256-GCM, a fresh IV, bound to the person's id) under the seeded
+ *                   person's key, as the gateway's first sight of their number made it (one non-exportable key per seeded
+ *                   person, made for the run), and refused (noSealingKey) for a person the seed does not hold: a key is
+ *                   never made here;
+ *   flags, messages T-317's and T-307's reads, each refused, naming the read: a No record reads none of them.
+ * Each read on the call's transaction refuses a request that names another business than the call's scope, before
+ * anything is read (BusinessScopeError, as db/repo/scope.ts does).
+ */
+export function fakeGateReads(
+  written: Pick<FakeTurnRows, "rows">,
+  seeded: readonly SeededHandle[] = [TEST_OWNER_1],
+): FakeGateReads {
+  const scopes: string[] = [];
+  const seen: GateRead[] = [];
+  const sealedFor: string[] = [];
+  const rowsOf = (table: string): WrittenRow[] => [...(written.rows.get(table)?.values() ?? [])];
+  /** Notes the read, and refuses it when its business is not the call's scope. */
+  const inScope = (repo: unknown, read: string, businessId: string | null): void => {
+    seen.push({ read, businessId });
+    if (!isRecord(repo) || repo.scopedTo !== businessId) {
+      throw new BusinessScopeError("a read names another business than the call's scope");
+    }
+  };
+  const outcomeWhere = (businessId: string, match: (row: WrittenRow) => boolean): StoredOutcome | null => {
+    const row = rowsOf("safety_outcomes").find(
+      (each) => match(each) && each.values.business_id === businessId,
+    );
+    return row === undefined ? null : storedOutcomeOf(row);
+  };
+  const holdWhere = (businessId: string, match: (row: WrittenRow) => boolean): StoredHold | null => {
+    const row = rowsOf("safety_holds").find((each) => match(each) && each.values.business_id === businessId);
+    return row === undefined ? null : storedHoldOf(row);
+  };
+  const zoneOf = (businessId: string): string | null => {
+    const zone = SEEDED.businesses.get(businessId)?.values.time_zone;
+    return typeof zone === "string" ? zone : null;
+  };
+  // Each seeded person's key, as the gateway's first sight of their number made it (K-05 v1.2 item 29).
+  const personKeys = new Map<string, Promise<CryptoKey>>();
+  const keyOfPerson = (personId: string): Promise<CryptoKey> => {
+    if (!seeded.some((entry) => entry.personId === personId)) {
+      return Promise.reject(new TurnFaceRefusedError("noSealingKey"));
+    }
+    const known = personKeys.get(personId);
+    if (known !== undefined) return known;
+    const made = crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+      "encrypt",
+      "decrypt",
+    ]) as Promise<CryptoKey>;
+    personKeys.set(personId, made);
+    return made;
+  };
+
+  const reads: GateReads = {
+    scope: {
+      withBusiness: (businessId, work) => {
+        scopes.push(businessId);
+        const repo: GateCallRepo = { scopedTo: businessId };
+        return work(repo);
+      },
+    },
+    readOpenHolds: (repo, request) => {
+      try {
+        inScope(repo, "readOpenHolds", request.businessId);
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error("readOpenHolds"));
+      }
+      const businessId = request.businessId;
+      const holds = rowsOf("safety_holds")
+        .filter(
+          (row) =>
+            row.values.handle_id === request.handleId &&
+            row.values.business_id === businessId &&
+            (row.values.released_at ?? null) === null,
+        )
+        .map((row) => {
+          const hold = storedHoldOf(row);
+          return { holdId: hold.id, releaseRule: hold.releaseRule, blocksBooking: hold.blocksBooking };
+        });
+      const unreadEventIds = request.eventIds.filter(
+        (eventId) =>
+          businessId === null || outcomeWhere(businessId, (row) => row.values.event_id === eventId) === null,
+      );
+      return Promise.resolve({ result: "openHolds", holds, unreadEventIds });
+    },
+    safetyReads: {
+      outcomeOfEvent: (repo, { eventId, businessId }) => {
+        inScope(repo, "readSafetyOutcomeOfEvent", businessId);
+        return Promise.resolve({
+          safetyOutcome: outcomeWhere(businessId, (row) => row.values.event_id === eventId),
+        });
+      },
+      outcome: (repo, { outcomeId, businessId }) => {
+        inScope(repo, "readSafetyOutcome", businessId);
+        return Promise.resolve({ safetyOutcome: outcomeWhere(businessId, (row) => row.id === outcomeId) });
+      },
+      hold: (repo, { holdId, businessId }) => {
+        inScope(repo, "readSafetyHold", businessId);
+        return Promise.resolve({ hold: holdWhere(businessId, (row) => row.id === holdId) });
+      },
+      holdOfOutcome: (repo, { outcomeId, businessId }) => {
+        inScope(repo, "readSafetyHoldOfOutcome", businessId);
+        return Promise.resolve({
+          hold: holdWhere(businessId, (row) => row.values.safety_outcome_id === outcomeId),
+        });
+      },
+      outboxRowWritten: (repo, { outboxRowId, businessId }) => {
+        inScope(repo, "readOutboxRowWritten", businessId);
+        return Promise.resolve({ written: written.rows.get("outbox_rows")?.has(outboxRowId) ?? false });
+      },
+      businessZone: (repo, { businessId }) => {
+        inScope(repo, "readBusinessZone", businessId);
+        const timeZone = zoneOf(businessId);
+        return Promise.resolve(
+          timeZone === null ? { error: "notFound", table: "businesses", rowId: businessId } : { timeZone },
+        );
+      },
+      // The runtime side's read, in a transaction of its own under the business (no call's repo).
+      businessOwner: ({ businessId }) => {
+        seen.push({ read: "readBusinessOwner", businessId });
+        if (!SEEDED.businesses.has(businessId)) {
+          return Promise.resolve({ error: "notFound", table: "businesses", rowId: businessId });
+        }
+        return Promise.resolve({ owner: null });
+      },
+    },
+    sealer: {
+      async seal(plaintext, forPersonId) {
+        const key = await keyOfPerson(forPersonId);
+        sealedFor.push(forPersonId);
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const sealed = await crypto.subtle.encrypt(
+          { name: "AES-GCM", iv, additionalData: new TextEncoder().encode(forPersonId) },
+          key,
+          new TextEncoder().encode(plaintext),
+        );
+        const bytes = new Uint8Array(iv.byteLength + sealed.byteLength);
+        bytes.set(iv, 0);
+        bytes.set(new Uint8Array(sealed), iv.byteLength);
+        return bytes;
+      },
+    },
+    flagsReader: () => refusingReader<FlagsReader>("flags", FLAGS_READS),
+    messagesReader: () => refusingReader<MessagesReader>("messages", MESSAGES_READS),
+  };
+  return { reads, scopes, seen, sealedFor };
+}
+
+// ---- @rosie/ai's decide over the recorded-model double (T-558) -----------------------------------------------------
 
 /** Which read of a turn a recorded decide read is (K-02 v1 `read.role`). */
 export type DecideRole = "first" | "check" | "reread";
@@ -1435,12 +1970,20 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 
 /** The ports joined so far (./picks.ts): the root builds them itself (./real.ts), fed by the doubles here. */
 type JoinedPort =
-  "linqVerify" | "sealing" | "safetyRead" | "turnRow" | "bundles" | "targets" | "frontier" | "decide";
+  | "linqVerify"
+  | "sealing"
+  | "safetyRead"
+  | "turnRow"
+  | "bundles"
+  | "targets"
+  | "frontier"
+  | "decide"
+  | "gate";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
-   * read, the turn-row calls, the bundle reads, the targets read, the frontier and decide, which the root builds
+   * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide and the gate, which the root builds
    * (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
@@ -1489,6 +2032,12 @@ export interface SkeletonFakes {
    * `decide.deciders`): each context decide was given (the frontier's answer), each re-read, each model call it answered.
    */
   readonly decide: FakeDecideModels;
+  /**
+   * The gate's reads as doubles over test owner 1's seeded rows and what the K-05 commitTurn double wrote, for the root's
+   * real gate port (RootOptions.gateReads: `gate.reads`): each call's scope and every read it made. Its one commit goes
+   * through the turn-row port, to `turnRows`, which keeps every row it wrote.
+   */
+  readonly gate: FakeGateReads;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
@@ -1512,6 +2061,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const bundleReads = fakeBundleReads();
   const handleTargets = fakeHandleTargets();
   const frontier = fakeFrontierScope(() => clock.utc());
+  const gate = fakeGateReads(turnRows);
   const core = fakeCore(clock);
   const direct = fakeDirect(clock);
   // Read when each call is made: the turn's commit records what `known` set by then.
@@ -1529,7 +2079,21 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     ]) as never;
   face.finalize = (request) => swap(finalizePass.outcome, [[FIXTURE_ROW, request.outboxRowId]]) as never;
   composer.compose = () => planned(finalizePass.request.plan.plan);
-  rows.unplanned = () => ({ result: "rows", rows: [unplannedRow(SKELETON_ROW, 1, SAM.party.handleId)] });
+  // The turn's rows with no plan yet (K-05 unplannedRows): the outbox rows the K-05 double's commit wrote for that turn
+  // (the joined gate's, T-559), each as committed, in commit order.
+  rows.unplanned = (turnId) => ({
+    result: "rows",
+    rows: [...(turnRows.rows.get("outbox_rows")?.values() ?? [])]
+      .filter((row) => row.turnId === turnId)
+      .map((row) =>
+        unplannedRow(
+          row.id,
+          Number(row.values.commitSeq),
+          String(row.values.recipientHandleId),
+          row.values.channel as Parameters<typeof unplannedRow>[3],
+        ),
+      ),
+  });
   const turnFace = turnFaceOf(face);
 
   const store = new FakeOutboxStore([
@@ -1584,7 +2148,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     },
     turnFace: {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
-      gateAndCommit: (request, at, trace) => turnFace.gateAndCommit(request, at, trace),
       composeInput: (request, trace) => turnFace.composeInput(request, trace),
       safetyCore: core,
     },
@@ -1611,6 +2174,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     handleTargets,
     frontier,
     decide,
+    gate,
     core,
     direct,
     face,

@@ -17,6 +17,7 @@ export {
   type DataAccess,
   type FinalizePort,
   type FrontierPort,
+  type GatePort,
   type LinqSend,
   type PortName,
   type Ports,
@@ -34,6 +35,7 @@ export {
   realBundles,
   realDecide,
   realFrontier,
+  realGate,
   realPorts,
   realSafetyRead,
   realSealing,
@@ -48,6 +50,8 @@ export {
   type Deciders,
   type FrontierInputs,
   type FrontierScope,
+  type GateInputs,
+  type GateReads,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type KeyObjectStore,
@@ -76,3 +80,4 @@ export {
 } from "./root";
 export { ROW_MEMORY, RowTraces } from "./row-traces";
 export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";
+export { lastTextSourceOf, TurnChats, withTextSource, type TextSource } from "./turn-chats";

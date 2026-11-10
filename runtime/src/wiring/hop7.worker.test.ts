@@ -1,7 +1,7 @@
 // T-558's join, hop 7 of D-017 (C-046; build prompt section 10, D-017: "decide joins between the frontier and the gate";
 // 02-contracts section 11, 'Decide, two reads': K-02; ADR-013 sections 2 and 6), in the Workers runtime. The composition
 // root is composed for the test environment as hop 6's tests compose it (the HandleActor namespace, the skeleton flag on,
-// the actor's ports installed, the joined ports fed their doubles, the Tool API's gate stood in), now with the decide port
+// the actor's ports installed, the joined ports fed their doubles, the gate among them since T-559), now with the decide port
 // this hop joins: @rosie/ai's decider (T-369's two reads, T-370's one Sonnet re-read), one per bundle for both, the real
 // router, decide's one read, the context bundle and the AI gateway, over a fake Messages API whose every answer comes from
 // the recorded-model double (./test-support.ts fakeDecideModels; T-1145's turn 1 recordings as ai/recordings holds them).
@@ -20,7 +20,8 @@
 //
 // One span per hop: the AI layer records no hop span of its own, only each model call's portCall span (the AI gateway's,
 // one per attempt), so the turn's decideReads and reread spans are the hop's one span each and no flag is set (CQ-159's
-// rule). The spans after hop 7 belong to hops not joined yet (the gate onward, on the fakes) and are not judged. The Durable
+// rule). The spans after hop 7 belong to later hops (the gate and commit, joined by T-559 and judged in
+// ./hop8.worker.test.ts; the composer onward, on the fakes) and are not judged. The Durable
 // Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test uses. Test
 // values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
@@ -62,13 +63,14 @@ import {
   BUNDLE_V0,
   disagreeContext,
   fakeFlags,
-  gateThroughCommit,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
+  type WatchedGateCall,
 } from "./test-support";
 
 type Json = Record<string, unknown>;
@@ -201,6 +203,8 @@ function enterResultFor(context: DecideContext, quote: string): DecideResult {
 interface Rig {
   readonly fakes: SkeletonFakes;
   readonly root: Root;
+  /** Each gateAndCommit the turn handed the root (the joined gate's, T-559), as the turn made it. */
+  readonly gateCalls: readonly WatchedGateCall[];
   /** Signs one K-06 event with the Linq double, posts it through root.linqWebhook, and answers its trace id. */
   post(event: LinqInboundEvent): Promise<string>;
   spans(): Span[];
@@ -212,8 +216,9 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace, the skeleton flag on, every joined port fed its double, decide's
- * deciders among them unless a test leaves them out (as the Worker does until J-02); its actor ports installed; the Tool
- * API's gate and commit stood in, its one commit through the root's turn-row port.
+ * deciders among them unless a test leaves them out (as the Worker does until J-02); its actor ports installed; the gate
+ * (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port, and each request the turn
+ * hands it watched.
  */
 function rig(log: MockInstance, fed: { deciders?: boolean } = {}): Rig {
   const fakes = skeletonFakes();
@@ -231,14 +236,20 @@ function rig(log: MockInstance, fed: { deciders?: boolean } = {}): Rig {
     handleTargets: fakes.handleTargets.call,
     frontierScope: fakes.frontier.scope,
     deciders: fed.deciders === false ? null : fakes.decide.deciders,
+    gateReads: fakes.gate.reads,
     flags: fakeFlags([SKELETON_FLAG]),
   });
-  fakes.face.gate = gateThroughCommit((request) => root.ports.turnRow.commitTurn(request));
-  const restore = root.install();
+  const restoreRoot = root.install();
+  const watched = watchGate(root);
+  const restore = (): void => {
+    watched.restore();
+    restoreRoot();
+  };
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
     fakes,
     root,
+    gateCalls: watched.calls,
     async post(event) {
       const response = await root.linqWebhook(webhookRequest(await fakes.sign(event)));
       if (response.status !== 200) throw new Error(`the gateway answered ${String(response.status)}`);
@@ -291,11 +302,9 @@ function onlySpan(spans: readonly Span[], hop: Hop): Span {
 }
 
 /** The gate's one request: the decided input the turn handed it. */
-function gateRequestOf(fakes: {
-  readonly face: { readonly gateCalls: readonly { request: GateAndCommitRequest }[] };
-}) {
-  expect(fakes.face.gateCalls).toHaveLength(1);
-  const request = fakes.face.gateCalls[0]?.request;
+function gateRequestOf(gateCalls: readonly { readonly request: GateAndCommitRequest }[]) {
+  expect(gateCalls).toHaveLength(1);
+  const request = gateCalls[0]?.request;
   if (request?.input.kind !== "decided") throw new Error("the gate was handed no decided input");
   return request.input.decided;
 }
@@ -379,7 +388,7 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
 
         // Both reads enter c-01, the sign-up door, with the quote JOIN and no field: the result the gate was handed is
         // decide-s1-01-enter.json's with the run's own turn, bundle and text.
-        const decided = gateRequestOf(run.fakes);
+        const decided = gateRequestOf(run.gateCalls);
         expect(decided.decide).toEqual(enterResultFor(JOIN_CONTEXT, "JOIN"));
         expect(decided.decide.reads.map((read) => [read.model, read.role, read.output])).toEqual([
           [
@@ -405,7 +414,7 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
         ]);
         expect(run.fakes.decide.rereadCalls).toEqual([]);
         expect(run.fakes.decide.asked).toEqual([`${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}`]);
-        // The turn went on through the stood-in gate and committed its one row; no live call, no number or words in a span.
+        // The turn went on through the joined gate and committed its one row; no live call, no number or words in a span.
         expect([...run.fakes.turnRows.turns.keys()]).toEqual([turnId]);
         expect(fetch).not.toHaveBeenCalled();
         expect(leaks(run.spans(), [...CAST_NUMBERS, "JOIN"])).toEqual([]);
@@ -564,7 +573,7 @@ describe("the one Sonnet re-read, and decide closed, through the root's decide p
 
       // The gate is handed decide-reads-disagree.json's result exactly: three reads, the re-read run, the part one
       // question with nothing changed; and it answers asked, writing nothing for the part.
-      const decided = gateRequestOf(turn);
+      const decided = gateRequestOf(turn.face.gateCalls);
       expect(decided.decide).toEqual(decideReadsDisagree);
       expect(decided.decide.parts.map((part) => part.outcome)).toEqual(["oneQuestion"]);
       expect(decided.context).toEqual(disagreeContext());

@@ -62,7 +62,6 @@ export function closedPorts(): Ports {
     },
     turnFace: {
       closestEntries: () => fail("turnFace"),
-      gateAndCommit: () => fail("turnFace"),
       composeInput: () => fail("turnFace"),
       safetyCore: {
         recordSafetyOutcome: () => fail("turnFace"),
@@ -71,6 +70,7 @@ export function closedPorts(): Ports {
       },
     },
     decide: { decide: () => fail("decide"), reread: () => fail("decide") },
+    gate: { gateAndCommit: () => fail("gate") },
     composer: { compose: () => fail("composer"), rewrite: () => fail("composer") },
     finalize: { finalizeMessage: () => fail("finalize") },
     dataAccess: {

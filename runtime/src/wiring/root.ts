@@ -38,7 +38,12 @@
 // once; each later join whose port records its own hop's span sets that hop's flag the same way. The turn's decide and
 // its one re-read go through the decide port (T-558): @rosie/ai's decider for the turn's bundle, one per bundle for both,
 // which records only its model calls' portCall spans, so the turn keeps recording the decideReads and reread spans and
-// no flag is set for them. Never logged by the root: a word, a number, a key.
+// no flag is set for them. The turn's gate and commit go through the gate port (T-559): @rosie/actions' turn face over
+// the gate's reads (RootOptions.gateReads), the run's pinned bundle and the turn-row port's commitTurn, under the turn id;
+// the root puts the service and Linq chat id of the run's last text on the request's turn, copied from its K-06 event
+// (./turn-chats.ts; K-09 v1.5 default 135), and the turn keeps recording the gate and commit spans while the Tool API
+// base records none (TURN_RECORDS_GATE; DL-376), so no flag is set for them either. Never logged by the root: a word, a
+// number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -66,6 +71,7 @@ import {
   type BundleReadCalls,
   type Deciders,
   type FrontierScope,
+  type GateReads,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type LinqVerifyInputs,
@@ -74,6 +80,7 @@ import {
 } from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
+import { TurnChats } from "./turn-chats";
 
 /** The HandleActor namespace as the root uses it: the gateway's door to each handle's actor, and the clock arming's way to it. */
 export interface HandleActors<Id = unknown> {
@@ -154,6 +161,15 @@ export interface RootOptions {
    * set by name: J-02), so every decide and re-read fails closed before any model call and nothing decided commits.
    */
   readonly deciders?: Deciders | null;
+  /**
+   * What the gate and commit reads with its database bound (T-559; ./real.ts GateReads): the Tool API's own business
+   * scope (rosie_app) and, on its transaction, K-05 v1.3 readOpenHolds and K-05 v1.4's safety reads, and the read-only
+   * sealer. On local PostgreSQL, @rosie/actions' pgCallScope over a client whose connections run as rosie_app, with
+   * readOpenHoldsIn, pgSafetyReads and pgReadOnlySealer over a rosie_job client (turn-face/pg/calls.ts); in a test, the K-05
+   * doubles over test owner 1's seeded rows; null or left out where no database is bound (the Worker until T-567), so every
+   * gate fails closed and nothing commits. Its one commitTurn is the turn-row port's (`turnRows`).
+   */
+  readonly gateReads?: GateReads | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -188,8 +204,10 @@ export function composeRoot(options: RootOptions): Root {
     environment: options.vars.ENVIRONMENT,
     version: options.vars.GIT_SHA ?? "unknown",
   };
-  // Each run's pinned bundle, kept by the lease's hooks (`install`) for the frontier port to read the turn's bundle through.
+  // Each run's pinned bundle, kept by the lease's hooks (`install`) for the frontier and gate ports to read the turn's
+  // bundle through; and each run's last text's service and chat id, for the gateAndCommit request's turn (T-559).
   const pinnedRuns = new PinnedRuns();
+  const turnChats = new TurnChats();
   const { ports, bindings } = bindPorts(PICKS, options.environment, {
     ...options.sets,
     real: realPorts({
@@ -209,6 +227,13 @@ export function composeRoot(options: RootOptions): Root {
       // The bound bundle port, read at each call, for a bundle the turn did not pin; and the bundle each run pinned.
       frontierBundles: { bundles: () => ports.bundles, pinnedOf: (trace) => pinnedRuns.of(trace) },
       deciders: options.deciders,
+      // The gate's reads, its one commit through the bound turn-row port (the turn id checked there), and the run's bundle.
+      gate: {
+        reads: options.gateReads ?? null,
+        commitTurn: (request) => ports.turnRow.commitTurn(request),
+        bundles: () => ports.bundles,
+        pinnedOf: (trace) => pinnedRuns.of(trace),
+      },
     }),
     closed: closedPorts(),
   });
@@ -250,7 +275,10 @@ export function composeRoot(options: RootOptions): Root {
       recordsFrontierSpan: bindsReal(bindings, "frontier"),
       buildFrontier: (request, trace) => ports.frontier.buildFrontier(request, trace),
       closestEntries: (request, trace) => ports.turnFace.closestEntries(request, trace),
-      gateAndCommit: (request, at, trace) => ports.turnFace.gateAndCommit(request, at, trace),
+      // The runtime caller copies the service and Linq chat id of the run's last text onto the request's turn, both or
+      // neither (K-09 v1.5 default 135). The turn records the gate and commit spans; the real gate port's base records none.
+      gateAndCommit: (request, at, trace) =>
+        ports.gate.gateAndCommit(turnChats.onTurn(request, trace), at, trace),
       composeInput: (request, trace) => ports.turnFace.composeInput(request, trace),
       finalizeMessage: (request, trace) => ports.finalize.finalizeMessage(request, trace),
     },
@@ -333,7 +361,7 @@ export function composeRoot(options: RootOptions): Root {
         setBundleDeps(ports.bundles),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
-        setLeaseHooks(pinnedRuns.around(turnHooks)),
+        setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
       ];
       return () => {
         for (const restore of restores.reverse()) restore();
@@ -397,6 +425,9 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // smoke-size calls only, DL-027) can be read in the Worker: every decide and re-read fails closed before any model
     // call (./real.ts NoDeciderError), so no decided part reaches the gate.
     deciders: null,
+    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and the gate's reads): every
+    // gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
+    gateReads: null,
   });
   workerRoots.set(env, root);
   return root;
