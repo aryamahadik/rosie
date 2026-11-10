@@ -13,7 +13,9 @@
 //   4. the business's K-26 v1 rules rows (facts.ts), checked by the one evaluator (actions/src/rules/evaluator): a row of a
 //      kind not in the frozen registry, or one it cannot read, refuses the part, never ignored; a broken rule fails it with
 //      saidWhatRuleAllows and what each broken rule allows; else it passes, with the notes for the owner's booking card
-//      (minimumNotChecked) and whether an OK rule makes the booking wait for the owner's OK (A4-98).
+//      (minimumNotChecked) and whether an OK rule makes the booking wait for the owner's OK (A4-98). A proposal the
+//      evaluator cannot read, such as a list price with no amount (DL-328), throws: the gate's call rolls back and
+//      nothing passes.
 //
 // The limit only checks. It has no port that writes, and what its outcome writes (Rosie's reply saying what the rule
 // allows; the note on the owner's booking card) is the commit's (K-09 v1 limitNOutcome; T-305 default 8), so a repeated

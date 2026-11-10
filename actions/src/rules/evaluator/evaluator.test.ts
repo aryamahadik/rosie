@@ -5,6 +5,10 @@
 //   - an hourly or at-visit price passes and sets the 'minimum could not be checked' note;
 //   - an unknown rule kind is refused, never ignored: K-26's refuse-unknown-rule-kind.json row refuses the whole verdict,
 //     whatever the other rules say, in effect or not, in scope or not.
+// Round 2 (the lead's ruling, DL-328): a price with no amount skips the minimum only as the sources allow (a photo quote
+// waits; a price set at the visit or by the hour passes, noted); a list price with none, or a basis none of the sources
+// names, never holds, with or without a note: the evaluator itself cannot read it and throws, since search imports it
+// without limit 2 around it.
 // Also: the registry is K-26 v1's seed, kind for kind; every other kind as its registry entry means it; effective dates
 // and the most specific scope; what the verdict holds names no owner's or person's words.
 
@@ -40,6 +44,8 @@ import {
   k26Values,
   moneyRule,
   onRule,
+  priceOf,
+  priceOutsideType,
   proposalOf,
   refusedK26Row,
   ruleRowOf,
@@ -90,10 +96,7 @@ describe("the closed registry is K-26 v1's", () => {
 
 describe("a $250 minimum, on the booking's total with any extra work (arch 06 line 301)", () => {
   const minimumAt = (basis: PriceBasis, cents: number | null, extras: number[] = []): RulesVerdict =>
-    evaluateRules(
-      [MINIMUM_250],
-      homeServices({ price: { basis, price: cents === null ? null : usd(cents), extras: extras.map(usd) } }),
-    );
+    evaluateRules([MINIMUM_250], homeServices({ price: priceOf(basis, cents, extras) }));
   const broken = {
     kind: "minimum_job",
     ruleIds: ["rule-lee-home-services-minimum"],
@@ -149,6 +152,51 @@ describe("a $250 minimum, on the booking's total with any extra work (arch 06 li
           notes: [noted],
           ownerOkFirst: false,
         });
+      }
+    }
+  });
+
+  it("skips the minimum for a price with no amount only as the sources allow (DL-328): a photo quote waits, and a price set at the visit or by the hour passes noted", () => {
+    // $300 of extras would meet the minimum on their own: neither price is read as a total.
+    expect(holdsOf(minimumAt("photoQuote", null, [30_000])).checks).toEqual([
+      {
+        kind: "minimum_job",
+        ruleIds: ["rule-lee-home-services-minimum"],
+        result: "notApplicable",
+        why: "notPricedYet",
+      },
+    ]);
+    for (const basis of ["atVisit", "hourly"] as const) {
+      expect(holdsOf(minimumAt(basis, null, [30_000])).notes).toEqual([
+        {
+          kind: "minimum_job",
+          ruleIds: ["rule-lee-home-services-minimum"],
+          result: "noted",
+          note: "minimumNotChecked",
+        },
+      ]);
+    }
+  });
+
+  it("never holds a list price with no amount, with or without a note: it cannot be read, so the evaluator throws (fails closed)", () => {
+    for (const extras of [[], [6_000], [30_000]]) {
+      const price = priceOutsideType("list", null, extras);
+      expect(() => evaluateRules([MINIMUM_250], homeServices({ price }))).toThrow(TypeError);
+      // The proposal itself cannot be read, whatever the rules; the message names no value.
+      expect(() => evaluateRules([], homeServices({ price }))).toThrow(
+        /^the proposal's price is not one it can read$/u,
+      );
+    }
+  });
+
+  it("never holds a price on a basis none of the sources names, priced or not (fails closed)", () => {
+    for (const basis of ["estimate", "List", ""]) {
+      for (const cents of [null, 30_000]) {
+        const price = priceOutsideType(basis, cents, [6_000]);
+        expect(() => evaluateRules([MINIMUM_250], homeServices({ price }))).toThrow(TypeError);
+        expect(() => evaluateRules([], homeServices({ price }))).toThrow(
+          /^the proposal's price is not one it can read$/u,
+        );
       }
     }
   });

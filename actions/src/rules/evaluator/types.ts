@@ -94,17 +94,20 @@ export interface RefusedRule {
  */
 export type PriceBasis = "list" | "photoQuote" | "atVisit" | "hourly";
 
-export interface ProposedPrice {
-  readonly basis: PriceBasis;
-  /**
-   * The price before any extra work: the list price, or a photo quote once it is priced (A4-05: "checked when it is
-   * priced"); null for a photo quote not priced yet. Not read for a price set at the visit or by the hour, whose total
-   * nobody knows before the visit.
-   */
-  readonly price: Money | null;
-  /** The extra work on the booking, each amount on its own (arch 06 line 301: "the booking's total with any extra work"). */
-  readonly extras: readonly Money[];
-}
+/**
+ * The booking's price as a proposal sets it: its basis, the price before any extra work (`price`), and the extra work on
+ * the booking, each amount on its own (`extras`; arch 06 line 301: "the booking's total with any extra work"). A price
+ * goes without its amount only as the sources allow (the lead's ruling, DL-328): a photo quote not priced yet, and a
+ * price set at the visit or by the hour. A list price always has its amount. A price outside this type (a list price
+ * with no amount, a basis not named here) cannot be read: the evaluator throws, so nothing passes on it.
+ */
+export type ProposedPrice =
+  /** From the price list: its amount is always given. */
+  | { readonly basis: "list"; readonly price: Money; readonly extras: readonly Money[] }
+  /** Quoted from photos: null until it is priced, its minimum checked then (A4-05: "checked when it is priced"). */
+  | { readonly basis: "photoQuote"; readonly price: Money | null; readonly extras: readonly Money[] }
+  /** Set at the visit or by the hour: nobody knows the total before the visit, so a price given is not read. */
+  | { readonly basis: "atVisit" | "hourly"; readonly price: Money | null; readonly extras: readonly Money[] };
 
 /** What the who-rules read about the person a new booking is for. */
 export interface CustomerFacts {

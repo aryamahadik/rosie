@@ -5,7 +5,7 @@
 // with made-up values (rule 9). Times are the K-09 fixtures' (Fri Oct 23 2026 in America/New_York).
 
 import { contractFile } from "../../tool-api/test-support";
-import type { Money, Proposal, RuleRow } from "./index";
+import type { Money, PriceBasis, Proposal, ProposedPrice, RuleRow } from "./index";
 
 export const BARBERSHOP = "biz-lees-barbershop";
 export const HOME_SERVICES = "biz-lee-home-services";
@@ -26,6 +26,32 @@ export const NOV_2 = "2026-11-02T05:00:00Z";
 
 /** Whole cents in US dollars. */
 export const usd = (cents: number): Money => ({ cents, currency: "USD" });
+
+/** A proposed price in whole US cents, in ProposedPrice's form: a list price always has its amount. */
+export function priceOf(
+  basis: PriceBasis,
+  cents: number | null,
+  extras: readonly number[] = [],
+): ProposedPrice {
+  const price = cents === null ? null : usd(cents);
+  if (basis !== "list") return { basis, price, extras: extras.map(usd) };
+  if (price === null) throw new Error("a list price always has its amount (ProposedPrice)");
+  return { basis, price, extras: extras.map(usd) };
+}
+
+/**
+ * A price outside ProposedPrice's type, in whole US cents, as a maker that builds it without the type's help could hand
+ * it over: a list price with no amount, or a basis none of the sources names. Only the tests that the evaluator cannot
+ * read it, and so fails closed (the lead's ruling, DL-328), build one.
+ */
+export function priceOutsideType(
+  basis: string,
+  cents: number | null,
+  extras: readonly number[] = [],
+): ProposedPrice {
+  const given = { basis, price: cents === null ? null : usd(cents), extras: extras.map(usd) };
+  return given as unknown as ProposedPrice;
+}
 
 type Values = Readonly<Record<string, unknown>>;
 

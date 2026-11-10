@@ -6,6 +6,8 @@
 //   - a $250 minimum fails a $200 service and passes $200 plus $60 of extras (the total with extras);
 //   - an hourly or at-visit price passes and sets the 'minimum could not be checked' note;
 //   - an unknown rule kind is refused, never ignored: the part is refused and the gate refuses the whole call.
+// Round 2 (the lead's ruling, DL-328): a proposal with a list price that has no amount, or a price on a basis none of
+// the sources names, never passes limit 2: the evaluator cannot read it and throws, and the gate's call rolls back.
 // Also: Sam's S1-02 answer passes with nothing read, as commit-s1-02.json states, and the shipped limit sits in slot 2,
 // passes each K-09 gate fixture's S step part and refuses each visit step's until the walk and the rules read are wired
 // (fails closed); what it returns holds no person's words.
@@ -20,6 +22,8 @@ import {
   NOV_14,
   SAT_11AM,
   k26Rows,
+  priceOf,
+  priceOutsideType,
   proposalOf,
   refusedK26Row,
   usd,
@@ -116,7 +120,7 @@ function pickPriced(basis: PriceBasis, cents: number | null, extras: number[] = 
     businessId: HOME_SERVICES,
     flow: "B",
     visitAt: SAT_11AM,
-    price: { basis, price: cents === null ? null : usd(cents), extras: extras.map(usd) },
+    price: priceOf(basis, cents, extras),
   });
 }
 
@@ -284,6 +288,36 @@ describe("an hourly or at-visit price passes and sets the 'minimum could not be 
       expect(await limit.check(partOf(request), turnOf(request))).toEqual({ result: "pass" });
     });
   }
+});
+
+describe("a price the evaluator cannot read never passes limit 2 (DL-328)", () => {
+  it("a list price with no amount, or a basis none of the sources names, throws at limit 2, never a pass, noted or not", async () => {
+    const request = homeServicesPick();
+    for (const basis of ["list", "estimate"]) {
+      const proposal = proposalOf({
+        businessId: HOME_SERVICES,
+        flow: "B",
+        visitAt: SAT_11AM,
+        price: priceOutsideType(basis, null, [30_000]),
+      });
+      const limit = limitIn({ rows: [MINIMUM_250], walk: proposing(proposal) });
+      await expect(limit.decide(partOf(request), turnOf(request))).rejects.toBeInstanceOf(TypeError);
+      await expect(limit.check(partOf(request), turnOf(request))).rejects.toBeInstanceOf(TypeError);
+    }
+  });
+
+  it("through the gate the call rolls back with nothing passed, whatever the business's rules", async () => {
+    const request = exchangeRequest(LIMIT_2_FIXTURE);
+    const unreadable = proposalOf({ visitAt: NOV_14, price: priceOutsideType("list", null, [30_000]) });
+    const calls: LimitCall[] = [];
+    const limit = limitIn({ rows: BARBERSHOP_RULES, walk: proposing(unreadable) });
+    const run = runGate(request, callContext(BARBERSHOP), registryWith(limit, {}, calls));
+    await expect(run).rejects.toBeInstanceOf(TypeError);
+    expect(calls).toEqual([
+      { limit: 1, part: 0 },
+      { limit: 2, part: 0 },
+    ]);
+  });
 });
 
 describe("an unknown rule kind is refused, never ignored", () => {

@@ -3,7 +3,8 @@
 // writes: limit 2 at the gate, and search (C-097) for each candidate row, hand it the business's K-26 v1 rules rows and
 // one proposal, and get one verdict, so the gate and search never disagree about a rule.
 //
-// In this order:
+// First the proposal is read (readProposal): one it cannot read, such as a price with no amount where the sources give
+// it one (default 3), throws, so nothing passes on it. Then, in this order:
 //   1. Every row is checked against the closed K-26 v1 registry (registry.ts): its kind known, its value of the kind's one
 //      type and in range, its scope and dates in form. Any row that fails refuses the whole verdict, in effect or not, in
 //      scope or not: a rule the evaluator cannot read is never ignored, since it may be the one that forbids the proposal.
@@ -25,7 +26,9 @@
 //      cannot be shown to meet it, so the minimum is broken (fails closed). The same holds for a deposit or fee cap.
 //   3. A photo quote not priced yet has no total: its minimum does not apply until it is priced (A4-05: "checked when it
 //      is priced, before any yes"). A price set only at the visit or by the hour holds, noted minimumNotChecked for the
-//      owner's booking card (arch 06 line 301, DD).
+//      owner's booking card (arch 06 line 301, DD). No other price goes without its amount (the lead's ruling, DL-328):
+//      a list price with none, or a basis none of the sources names, cannot be read, so the evaluator throws (fails
+//      closed) and the minimum is never skipped on it, at the gate or in search.
 //   4. The OK rules (ok_same_day, ok_new_customer, ok_dates) never break: where one applies the booking waits for the
 //      owner's OK (A4-98, B4-115), which the verdict says (ownerOkFirst). "Same day" is the visit's day in the business's
 //      zone being the day the proposal is made there; a dates rule's days are the business's (K-26 README rule 8).
@@ -196,7 +199,19 @@ export function rulesThatApply(
 
 // ---- checking a proposal (step 3) ---------------------------------------------------------------------------------
 
-/** The proposal's instants, read once. */
+/**
+ * A proposal's price as the minimum reads it (default 3):
+ *   total            the list price, or a photo quote once it is priced, with every extra: the total the minimum holds;
+ *   notPricedYet     a photo quote not priced yet: the minimum waits until it is priced (A4-05);
+ *   knownAfterVisit  a price set at the visit or by the hour: nobody knows the total before the visit, so the minimum
+ *                    holds, noted minimumNotChecked for the owner's booking card (arch 06 line 301).
+ */
+type PriceRead =
+  | { readonly read: "total"; readonly amounts: readonly Money[] }
+  | { readonly read: "notPricedYet" }
+  | { readonly read: "knownAfterVisit" };
+
+/** The proposal's instants and price, read once. */
 interface Run {
   readonly proposal: Proposal;
   /** The instant whose rules apply. */
@@ -204,6 +219,8 @@ interface Run {
   readonly madeAt: number;
   /** The visit's start, or null when the proposal sets no time. */
   readonly visit: number | null;
+  /** The price as the minimum reads it, or null when the proposal sets none. */
+  readonly price: PriceRead | null;
 }
 
 type Of = Pick<RuleCheck, "kind" | "ruleIds">;
@@ -286,22 +303,30 @@ function monthsCheck(rules: readonly OwnerRule[], run: Run): RuleCheck {
   return broken(of, { kind: "dates", days: [...ranges].sort(rangeOrder) });
 }
 
-/** minimum_job on the booking's total with any extra work (arch 06 line 301; defaults 2 and 3). */
+/**
+ * minimum_job on the booking's total with any extra work (arch 06 line 301; defaults 2 and 3). It goes unchecked only for
+ * the two prices readPrice reads without a total: a photo quote not priced yet, and a price set at the visit or by the
+ * hour, noted.
+ */
 function minimumCheck(rule: OwnerRule, run: Run): RuleCheck {
   const of = ofRules(rule.kind, [rule]);
   const minimum = moneyOf(rule);
-  const { price } = run.proposal;
+  const { price } = run;
   if (price === null) return notApplicable(of, "notInProposal");
-  if (price.basis === "atVisit" || price.basis === "hourly") {
-    return { ...of, result: "noted", note: "minimumNotChecked" };
+  switch (price.read) {
+    case "knownAfterVisit":
+      return { ...of, result: "noted", note: "minimumNotChecked" };
+    case "notPricedYet":
+      return notApplicable(of, "notPricedYet");
+    case "total": {
+      const { amounts } = price;
+      const sameCurrency = amounts.every((amount) => amount.currency === minimum.currency);
+      const total = amounts.reduce((sum, amount) => sum + amount.cents, 0);
+      return sameCurrency && total >= minimum.cents
+        ? holds(of)
+        : broken(of, { kind: "minimum", atLeast: minimum });
+    }
   }
-  if (price.price === null) return notApplicable(of, "notPricedYet");
-  const amounts = [price.price, ...price.extras];
-  const sameCurrency = amounts.every((amount) => amount.currency === minimum.currency);
-  const total = amounts.reduce((sum, amount) => sum + amount.cents, 0);
-  return sameCurrency && total >= minimum.cents
-    ? holds(of)
-    : broken(of, { kind: "minimum", atLeast: minimum });
 }
 
 /** deposit_cap or fee_cap: the amount the proposal takes is at most the cap (default 2). */
@@ -409,10 +434,34 @@ function checksOfKind(kind: RuleKind, rules: readonly OwnerRule[], run: Run): Ru
 const isWholeMoney = (money: Money): boolean =>
   Number.isSafeInteger(money.cents) && CURRENCY_FORM.test(money.currency);
 
+/** A proposed price as its maker hands it over, its basis and its amount not yet read together. */
+interface PriceGiven {
+  readonly basis: string;
+  readonly price: Money | null;
+  readonly extras: readonly Money[];
+}
+
 /**
- * The proposal's instants as epoch ms. A proposal the evaluator cannot read (an instant that is none, a zone the platform
- * does not know, an amount that is not whole cents with a currency code, a count that is no whole number) is a fault of
- * whoever made it: it throws, so nothing passes on it. The message names no value.
+ * Reads a proposal's price for the minimum (default 3; the lead's ruling, DL-328). A price goes without its amount only
+ * as the sources allow: a photo quote not priced yet waits (A4-05), and a price set at the visit or by the hour is not
+ * read (arch 06 line 301). A list price with no amount, or a basis none of them names, cannot be read: it throws, so the
+ * minimum is never skipped on it, at the gate or in search (which has no limit 2 around it). The message names no value.
+ */
+function readPrice(given: PriceGiven): PriceRead {
+  const { basis, price, extras } = given;
+  if (basis === "atVisit" || basis === "hourly") return { read: "knownAfterVisit" };
+  if (basis === "photoQuote" && price === null) return { read: "notPricedYet" };
+  if ((basis === "list" || basis === "photoQuote") && price !== null) {
+    return { read: "total", amounts: [price, ...extras] };
+  }
+  throw new TypeError("the proposal's price is not one it can read");
+}
+
+/**
+ * The proposal's instants as epoch ms, and its price as the minimum reads it. A proposal the evaluator cannot read (an
+ * instant that is none, a zone the platform does not know, an amount that is not whole cents with a currency code, a
+ * price with no amount where the sources give it one or on a basis none of them names, a count that is no whole number)
+ * is a fault of whoever made it: it throws, so nothing passes on it. The message names no value.
  */
 function readProposal(proposal: Proposal): Run {
   const rulesAt = instantOf(proposal.rulesAt);
@@ -433,7 +482,7 @@ function readProposal(proposal: Proposal): Run {
   if (customer !== null && !(Number.isSafeInteger(customer.noShows) && customer.noShows >= 0)) {
     throw new TypeError("the proposal's no-show count is not a whole number");
   }
-  return { proposal, rulesAt, madeAt, visit };
+  return { proposal, rulesAt, madeAt, visit, price: price === null ? null : readPrice(price) };
 }
 
 /**
