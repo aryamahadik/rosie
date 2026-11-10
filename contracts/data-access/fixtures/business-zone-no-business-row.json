@@ -1,0 +1,17 @@
+{
+  "call": "readBusinessZone",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "A call under a business that has no row: the read answers notFound (table businesses), never a null zone, so the harm report is refused (record.ts default 10: harmReportNeedsBusiness) rather than filed with a zone made up."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "businesses",
+    "rowId": "biz-lees-barbershop"
+  }
+}

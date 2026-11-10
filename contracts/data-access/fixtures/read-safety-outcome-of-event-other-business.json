@@ -1,0 +1,21 @@
+{
+  "call": "readSafetyOutcomeOfEvent",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-outcome-crisis.json"],
+    "after": [],
+    "now": "2026-10-25T23:11:05Z",
+    "note": "The same text read under the yoga studio's scope: its safety row is the barbershop's, which this scope never shows (K-34 v1 rule 4; K-04 v1 rule 4), so the answer is null and nothing of the row reaches this business. A record under this scope would then write the row again, and its commit's insert would meet safety_outcomes_event_key (23505): constraint, nothing written, so the call fails closed rather than read another business's record (README item 37, default 57; open gap 42)."
+  },
+  "request": {
+    "eventId": "evt-alex-0203",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "result": "safetyOutcomeOfEvent",
+    "eventId": "evt-alex-0203",
+    "businessId": "biz-yoga-studio",
+    "readAt": "2026-10-25T23:11:05Z",
+    "safetyOutcome": null
+  }
+}

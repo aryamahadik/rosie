@@ -1271,6 +1271,214 @@
       "expect": "refuse",
       "shows": "Fixed-line facts that carry the phone's number: the inserter needs only when the opt-out line was delivered, never the number",
       "source": "K-04 v1 phones.number; RULES 4.3, 4.5; K-08 v1"
+    },
+    {
+      "file": "read-safety-outcome-of-event-s1-01.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the No record of Sam's first text reads its own event under the barbershop's scope before its commit, finds no safety row yet, and answers null, so the record writes the row in that commit",
+      "source": "K-09 v1.5 commit-s1-01.json (core: recordSafetyOutcome for evt-sam-s1-01, read No); ADR-013; T-1140's handoff 1 (DL-344); actions/src/domain/safety/ports.ts SafetyReader.outcomeOfEvent; record.ts default 1; K-34 v1 safety_outcomes_event_key; K-05 v1.4 item 37"
+    },
+    {
+      "file": "read-safety-outcome-of-event-alex.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "A repeated record of Alex's crisis words finds the text's row under the barbershop's scope, labels, tenses, the danger word's kind and outcomes plain, never the sealed words",
+      "source": "K-34 v1 seed-outcome-crisis, safety_outcomes_event_key, README rule 6, default 5; K-09 v1 recordSafetyOutcome (the event id is the key); record.ts default 1; ids.ts; K-05 v1.4 item 37"
+    },
+    {
+      "file": "read-safety-outcome-of-event-other-business.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "The same text under the yoga studio's scope answers null: another business's safety row is never seen",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-34 v1 rule 4; K-05 v1.4 item 37, default 57"
+    },
+    {
+      "file": "read-safety-outcome-alex-safe.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.exchange",
+      "expect": "accept",
+      "shows": "A release reads the 'we're safe' text's safety outcome by its id: No, over, from Alex's own chat in a turn",
+      "source": "A3-24; K-34 v1 seed-hold-released; K-09 v1 releaseSafetyHold.releasedByOutcomeId; release.ts defaults 12 and 13; K-05 v1.4 item 38"
+    },
+    {
+      "file": "read-safety-outcome-no-business.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.exchange",
+      "expect": "accept",
+      "shows": "A read with no business runs on the runtime side and returns only rows with no business, so the barbershop's emergency read answers null",
+      "source": "K-05 v1.2 default 25; K-05 v1.3 item 34; K-04 v1 rule 4; K-05 v1.4 item 38, default 55"
+    },
+    {
+      "file": "read-safety-hold-alex-open.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "The hold a release names: Alex's crisis words hold the haircut after_safe, open, at version 1, every column under the port's names",
+      "source": "arch 06 lines 315 to 327; A3-25; K-34 v1 seed-outcome-crisis, safety_holds; actions/src/domain/safety/ports.ts StoredHold; release.ts; K-05 v1.4 item 39"
+    },
+    {
+      "file": "read-safety-hold-alex-released.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "Alex's emergency hold, released by a clear 'we're safe': the release time, safe_readback, the releasing turn and read, version 2, which a release named again answers as its first",
+      "source": "A3-24; K-34 v1 seed-hold-released, safety_holds_released_pair, safety_holds_safe_release_has_read; CQ-80; release.ts; K-05 v1.4 item 39"
+    },
+    {
+      "file": "read-safety-hold-other-business.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's hold named under the yoga studio's scope answers null, which a release answers notFound",
+      "source": "arch 10 line 546; K-34 v1 rule 4; release.ts; K-05 v1.4 item 39, default 57"
+    },
+    {
+      "file": "read-safety-hold-of-outcome-alex-threat.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.exchange",
+      "expect": "accept",
+      "shows": "A repeated record of Alex's threat reads the one hold its outcome set: never released",
+      "source": "A3-48; S13-10; K-34 v1 seed-threat-pause, safety_holds_one_per_outcome; record.ts default 1; K-05 v1.4 item 40"
+    },
+    {
+      "file": "read-safety-hold-of-outcome-none.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.exchange",
+      "expect": "accept",
+      "shows": "A No read held nothing, so the hold of its outcome is null and a repeat names no hold",
+      "source": "arch 06 lines 317 to 327; K-34 v1 seed-hold-released; K-09 v1 commit-s1-02.json (No holds nothing); record.ts default 1; K-05 v1.4 item 40"
+    },
+    {
+      "file": "outbox-row-written-alex-safety.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "After the commit that wrote Alex's emergency line as a safety row, the row is written: true, its id alone read",
+      "source": "K-05 v1.1 commit-alex-safety; K-07 v1 outbox-safety-retry; record.ts repeatAnswer; ids.ts; K-05 v1.4 item 41"
+    },
+    {
+      "file": "outbox-row-written-not-yet.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "The same row before any commit wrote it: false, so a repeated record names no row for its line",
+      "source": "record.ts repeatAnswer; K-09 v1 recordSafetyOutcome sentByActor; K-05 v1.4 item 41"
+    },
+    {
+      "file": "outbox-row-written-other-business.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's safety row named under the yoga studio's scope: false, so not even its existence reaches another business",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-05 v1.4 item 41, default 57"
+    },
+    {
+      "file": "business-owner-barbershop.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's one live owner, Sam, and the handle he writes from, by id: whom a checked line to the owner goes to",
+      "source": "A3-48; S13-10; S2-02 ('One account owner'); K-04 v1 person_roles, person_handles, seed-person-roles; record.ts lineRows; actions/src/domain/safety/ports.ts OwnerContact; K-05 v1.4 item 42"
+    },
+    {
+      "file": "business-owner-phone-first.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "An owner who writes from a phone and an email gets the line on the phone handle: phone handles first, then email, each in handle id order",
+      "source": "FS row B12; K-22 v1 seed-owner-id-upload, accounts.mobile; arch 02 line 125; T-307's Reach (handle id order); CQ-09; K-05 v1.4 item 42, default 59"
+    },
+    {
+      "file": "business-owner-none.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "A business with no live owner role answers null, so a line to the owner is not built and the record fails closed",
+      "source": "T-1148's skeleton seed (no role); K-04 v1 seed-business-head, person_roles; record.ts lineRows (safetyLineNotBuilt); K-05 v1.4 item 42"
+    },
+    {
+      "file": "business-zone-barbershop.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's time zone, which 'that day' is read in for a harm report",
+      "source": "A3-49; K-34 v1 harm_reports.day_zone, default 4; CQ-05; K-04 v1 businesses.time_zone, seed-business-head; record.ts default 10; K-05 v1.4 item 43"
+    },
+    {
+      "file": "business-zone-no-business-row.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.exchange",
+      "expect": "accept",
+      "shows": "A business with no row answers notFound, never a null zone, so no harm report is filed with a zone made up",
+      "source": "A3-49 ('Never make up or guess'); record.ts default 10 (harmReportNeedsBusiness); K-04 v1 businesses; K-05 v1.4 item 43, default 56"
+    },
+    {
+      "file": "invalid/refuse-safety-outcome-with-sealed-words.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.response",
+      "expect": "refuse",
+      "shows": "A safety record that carries its sealed words: the read gives the port's fields alone, never what the person wrote",
+      "source": "arch 09 line 492; RULES 4.5; A3-25 ('never the words'); K-34 v1 safety_outcomes.sealed_words, README rule 6; BP rule 7; K-05 v1.4 item 37, default 60"
+    },
+    {
+      "file": "invalid/refuse-safety-outcome-no-scope.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.request",
+      "expect": "refuse",
+      "shows": "A safety outcome read that states no business: the scope is always named, a business or null, so no read runs with no scope by omission",
+      "source": "arch 10 line 546; K-04 v1 rule 4; STATE note 22; QUESTIONS.md CQ-70; K-05 v1.3 refuse-open-holds-no-scope (the same rule)"
+    },
+    {
+      "file": "invalid/refuse-safety-hold-released-without-why.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.response",
+      "expect": "refuse",
+      "shows": "A hold answered released with no reason: a release time and its reason come together or not at all",
+      "source": "K-34 v1 safety_holds_released_pair, safety_holds_why_fits_rule; arch 06 lines 317 to 325; release.ts"
+    },
+    {
+      "file": "invalid/refuse-safety-hold-of-outcome-two-holds.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.response",
+      "expect": "refuse",
+      "shows": "Two holds answered for one outcome: K-34 holds one per outcome, with the strictest rule of its outcomes",
+      "source": "arch 06 line 327 ('Several at once: The strictest holds'); K-34 v1 safety_holds_one_per_outcome"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-written-returns-words.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.response",
+      "expect": "refuse",
+      "shows": "A written answer that carries the row's final parts: the read says only whether the row is written, never its words",
+      "source": "actions/src/domain/safety/ports.ts SafetyReader.outboxRowWritten ('never its words'); K-04 v1 outbox_rows.final_parts; K-07 v1 outbox-safety-retry; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-business-owner-returns-number.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.response",
+      "expect": "refuse",
+      "shows": "An owner answer that carries the owner's number: the line takes the handle by id, so the read never gives the address",
+      "source": "K-04 v1 handles.address ('Traces never carry it'); RULES 4.5; S2-06 ('Texts say on file, never a number'); K-08 v1; K-05 v1.4 item 42"
+    },
+    {
+      "file": "invalid/refuse-business-owner-no-business.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.request",
+      "expect": "refuse",
+      "shows": "An owner read with no business: an owner is a business's, and the read names the call's own business, never none",
+      "source": "K-04 v1 person_roles.business_id (not null); record.ts lineRows; K-05 v1.4 item 42"
+    },
+    {
+      "file": "invalid/refuse-business-zone-null.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.response",
+      "expect": "refuse",
+      "shows": "A zone answer of null: K-04 keeps every business's zone, and a business the scope does not show is notFound, never a null zone",
+      "source": "K-04 v1 businesses.time_zone (not null), businesses_time_zone_form; record.ts default 10; K-05 v1.4 item 43, default 56"
     }
   ]
 }

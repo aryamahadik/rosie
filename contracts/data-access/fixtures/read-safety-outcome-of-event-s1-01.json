@@ -1,0 +1,20 @@
+{
+  "call": "readSafetyOutcomeOfEvent",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "The walking skeleton's turn 1 (K-09 v1.5 commit-s1-01.json; ADR-013): Sam's first text, evt-sam-s1-01, read No, rides in turn-s1-01-sam's commit as its recordSafetyOutcome core action (T-1140's runCore, through T-318's safety service). The record's first read is this one, under the barbershop's scope (the call's own), before the commit: the text has no safety row yet, so the answer is null, and the record writes the row in that same commit (K-09's safety-outcome-sam-s1-01, read No, which holds nothing and sends no line). The state is K-05 v1.3's commit-s1-01-sam's before it commits: K-04's seeds alone, with no safety row."
+  },
+  "request": {
+    "eventId": "evt-sam-s1-01",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "safetyOutcomeOfEvent",
+    "eventId": "evt-sam-s1-01",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:05:05Z",
+    "safetyOutcome": null
+  }
+}

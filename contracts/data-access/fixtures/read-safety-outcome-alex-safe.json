@@ -1,0 +1,37 @@
+{
+  "call": "readSafetyOutcome",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-hold-released.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "The safety read of Alex's 'we're safe, it's handled' text (K-34 v1 seed-hold-released: No, over), by its id, as a release reads the read it is given (K-09 v1 releaseSafetyHold.releasedByOutcomeId) to check that it holds no danger, came from the held handle's own chat in a turn, and arrived after the danger text (release.ts defaults 12 and 13). Its labels and tense are plain; its sealed words are never read."
+  },
+  "request": {
+    "outcomeId": "safety-alex-0220",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "safetyOutcome",
+    "outcomeId": "safety-alex-0220",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-27T09:00:04Z",
+    "safetyOutcome": {
+      "id": "safety-alex-0220",
+      "eventId": "evt-alex-0220",
+      "source": "text",
+      "handleId": "handle-alex",
+      "personId": "person-alex",
+      "businessId": "biz-lees-barbershop",
+      "bookingId": null,
+      "turnId": "turn-alex-0220",
+      "readAt": "2026-10-24T16:30:01Z",
+      "timedOut": false,
+      "labels": ["No"],
+      "tenses": ["over"],
+      "dangerWordKinds": [],
+      "outcomes": ["No"],
+      "liftedToUnsure": false
+    }
+  }
+}

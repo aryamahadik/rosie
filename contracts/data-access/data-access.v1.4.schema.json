@@ -1,0 +1,1611 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.4.schema.json",
+  "title": "DataAccessV1dot4",
+  "description": "K-05 v1.4, a minor version of the data-access calls (T-1160, from T-1140's handoff 1; DL-344). It only adds to v1.3 (data-access.v1.3.schema.json, frozen and unchanged, referred to here, which refers on to v1.2, v1.1 and v1): every v1.3 definition is here under its own name, by reference, and none changes, so every v1, v1.1, v1.2 and v1.3 exchange is a v1.4 exchange. Added: the seven reads the safety and hand-offs service makes (T-318's SafetyReader: actions/src/domain/safety/ports.ts; C-104), all but arrivedAt, whose home is T-1155's: a safety outcome by its event id and by its id, a safety hold by its id and the hold of one outcome (K-34 v1 safety_outcomes and safety_holds, never the sealed words), whether an outbox row is written (K-04 v1 outbox_rows, never its words), the business's owner and the handle they write from (K-04 v1 person_roles, person_handles and handles, never the address) and the business's time zone (K-04 v1 businesses.time_zone). Each runs on PostgreSQL's primary, uncached (arch 02 line 117; arch 10 lines 504, 538), under the call's own business scope, in the role its request names (arch 10 line 546; K-04 v1 rule 4; STATE notes 5 and 22), and answers in the shape the port's types give, so the wiring hands it to the service unchanged. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markPart.request"
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markPart.response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markPart.exchange"
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleTargets.exchange"
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sendState.response"
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/sendState.exchange"
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/fixedLineRowError"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.3.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "title": "NullableTurnId",
+      "description": "A turn's id (K-04 v1 turns.id; CQ-09: compared, never parsed), or null where the K-34 column is nullable (page or agent free text, which no turn carries). New in v1.4.",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "storedOutcome": {
+      "title": "StoredOutcome",
+      "description": "A K-34 v1 safety_outcomes row as the safety service reads it (StoredOutcome: actions/src/domain/safety/ports.ts), field for field under the port's names: the text's event id and source, the handle, person, business, booking and turn it names, when it was read, the timeout marker, the read's labels with their tenses, the danger words' kinds, what holds after code's rules, and whether a danger word lifted No to Unsure (K-02 v1 safetyResult's values, kept plain: K-34 default 5). Never sealed_words (each label's evidence words, who is at risk and who wrote it, and the danger words matched: K-34 README rule 6), and nothing else of the row (tries and danger_word_lists, which the port does not read): rosie_app holds SELECT on the whole table (migration 0016), so the barrier is the read's column list, which names these fifteen columns alone, and this closed object, which refuses an answer that carries more (README item 37; refuse-safety-outcome-with-sealed-words). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "safety_outcomes.id.",
+          "$ref": "#/$defs/id"
+        },
+        "eventId": {
+          "description": "safety_outcomes.event_id: the text's K-06 v1 event id, or the page or agent call's id (K-02 v1 safetyResult.eventId; one row per text: safety_outcomes_event_key).",
+          "$ref": "#/$defs/id"
+        },
+        "source": {
+          "description": "safety_outcomes.source (K-02 v1 safetyResult.source): text, page or agent.",
+          "enum": ["text", "page", "agent"]
+        },
+        "handleId": {
+          "description": "safety_outcomes.handle_id: the handle the text came from; null for page or agent free text with no handle.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "personId": {
+          "description": "safety_outcomes.person_id: the person whose key seals the words, when known.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": {
+          "description": "safety_outcomes.business_id: the scope's business, or null on the runtime side (a read never returns another business's row).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "description": "safety_outcomes.booking_id, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "turnId": {
+          "description": "safety_outcomes.turn_id: the turn whose commit wrote it, or null for page or agent free text.",
+          "$ref": "#/$defs/nullableTurnId"
+        },
+        "readAt": {
+          "description": "safety_outcomes.read_at: when the read gave its verdict, or 4 s passed with none (the record's commit time: record.ts default 6).",
+          "$ref": "#/$defs/utc"
+        },
+        "timedOut": {
+          "description": "safety_outcomes.timed_out (K-02 v1 safetyResult.timedOut).",
+          "type": "boolean"
+        },
+        "labels": {
+          "description": "safety_outcomes.labels: the read's labels in order, each a K-02 v1 safetyOutcome value; empty when timed out.",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/safetyOutcome"
+          }
+        },
+        "tenses": {
+          "description": "safety_outcomes.tenses: each label's tense, in the labels' order (K-02 v1 tense).",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/tense"
+          }
+        },
+        "dangerWordKinds": {
+          "description": "safety_outcomes.danger_word_kinds: each danger word's kind, in order (K-02 v1 dangerWords.kind): selfHarm (988 and 911) or other (911). The words themselves are sealed and never read.",
+          "type": "array",
+          "items": {
+            "enum": ["selfHarm", "other"]
+          }
+        },
+        "outcomes": {
+          "description": "safety_outcomes.outcomes: what holds after code's rules (K-02 v1 safetyResult.outcomes).",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/safetyOutcome"
+          }
+        },
+        "liftedToUnsure": {
+          "description": "safety_outcomes.lifted_to_unsure (K-02 v1 safetyResult.liftedToUnsure).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "eventId",
+        "source",
+        "handleId",
+        "personId",
+        "businessId",
+        "bookingId",
+        "turnId",
+        "readAt",
+        "timedOut",
+        "labels",
+        "tenses",
+        "dangerWordKinds",
+        "outcomes",
+        "liftedToUnsure"
+      ],
+      "additionalProperties": false
+    },
+    "storedHold": {
+      "title": "StoredHold",
+      "description": "A K-34 v1 safety_holds row as the safety service reads it (StoredHold: actions/src/domain/safety/ports.ts), every column under the port's names: the outcome that set it, the business, handle, person, booking and turn whose routine actions wait, its release rule (the words of K-09 v1 safetyHold.releaseRule: v1.3 releaseRule) and whether the plug-in's stop words block booking (A3-26), when it was held, and its release, if any: when, why (K-09 v1 releaseSafetyHold.why's words), by which turn and, for safe_readback, by which outcome's read; and the row's version, which a release compares and sets (K-34 README rule 2; limit 4). No column of safety_holds is sealed. Released and its reason come together or not at all, as K-34's safety_holds_released_pair holds them: a hold answered released with no reason, or a reason with no time, is refused (refuse-safety-hold-released-without-why), so a reader never takes a half release for an open hold or the other way round. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "safety_holds.id.",
+          "$ref": "#/$defs/id"
+        },
+        "safetyOutcomeId": {
+          "description": "safety_holds.safety_outcome_id: the outcome that set it (one hold per outcome: safety_holds_one_per_outcome).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "safety_holds.business_id: the scope's business, or null on the runtime side.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "handleId": {
+          "description": "safety_holds.handle_id: the handle whose routine actions wait.",
+          "$ref": "#/$defs/id"
+        },
+        "personId": {
+          "description": "safety_holds.person_id, or null when not known.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "description": "safety_holds.booking_id: the booking the held actions are about, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "turnId": {
+          "description": "safety_holds.turn_id: the turn whose routine actions wait, or null for page or agent free text.",
+          "$ref": "#/$defs/nullableTurnId"
+        },
+        "releaseRule": {
+          "description": "safety_holds.release_rule.",
+          "$ref": "#/$defs/releaseRule"
+        },
+        "blocksBooking": {
+          "description": "safety_holds.blocks_booking (A3-26).",
+          "type": "boolean"
+        },
+        "heldAt": {
+          "description": "safety_holds.held_at.",
+          "$ref": "#/$defs/utc"
+        },
+        "releasedAt": {
+          "description": "safety_holds.released_at: null while held, and always for never.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "releasedWhy": {
+          "description": "safety_holds.released_why, matching the rule (safety_holds_why_fits_rule), or null while held.",
+          "anyOf": [
+            {
+              "enum": ["outcome_message_sent", "booking_private", "safe_readback"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "releasedByTurnId": {
+          "description": "safety_holds.released_by_turn_id: the turn of the clear 'we're safe', or the turn that made the booking private; null while held.",
+          "$ref": "#/$defs/nullableTurnId"
+        },
+        "releasedByOutcomeId": {
+          "description": "safety_holds.released_by_outcome_id: for safe_readback, the safety read of the 'we're safe' text itself; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "version": {
+          "description": "safety_holds.version.",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": [
+        "id",
+        "safetyOutcomeId",
+        "businessId",
+        "handleId",
+        "personId",
+        "bookingId",
+        "turnId",
+        "releaseRule",
+        "blocksBooking",
+        "heldAt",
+        "releasedAt",
+        "releasedWhy",
+        "releasedByTurnId",
+        "releasedByOutcomeId",
+        "version"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "description": "Held: no release time.",
+        "type": "object",
+        "properties": {
+          "releasedAt": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "description": "Held: so no reason either.",
+        "type": "object",
+        "properties": {
+          "releasedWhy": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "description": "Released: so a reason too.",
+        "type": "object",
+        "properties": {
+          "releasedWhy": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ownerContact": {
+      "title": "OwnerContact",
+      "description": "The business's owner as a checked line to them is addressed (OwnerContact: actions/src/domain/safety/ports.ts; record.ts lineRows: to {personId, via: handleId}): the person of the business's one live owner role (K-04 v1 person_roles: role owner, ended_at null) and the handle they write from (person_handles: their phone handles first, then their email handles, each in handle id order: README item 42, default 59). Never the handle's address, a number or an email address (rule 7; K-04 handles.address: 'Traces never carry it'): the outbox row takes the handle by id (T-307's outboxRows). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "personId": {
+          "description": "person_roles.person_id of the business's one live owner role.",
+          "$ref": "#/$defs/id"
+        },
+        "handleId": {
+          "description": "handles.id of the handle the owner writes from (person_handles), by README default 59.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["personId", "handleId"],
+      "additionalProperties": false
+    },
+    "moreThanOneOwnerError": {
+      "title": "MoreThanOneOwnerError",
+      "description": "The business holds more than one live owner role (K-04 v1 person_roles with role owner and ended_at null, of different persons: person_roles_one_live_role is per person, so K-04 v1 does not refuse a second). The sources give a business one account owner (S2-02: 'One account owner'; S11-73: only the account owner closes or hands it over; S11-100: the old owner's access ends at the hand-over), so the read never picks one: a hand-over left half done would otherwise send the business's safety notice to an owner who no longer runs it. Nothing else is returned, and the safety service fails the call closed (README item 42, default 58; open gap 41). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "moreThanOneOwner"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["error", "businessId"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "title": "ReadSafetyOutcomeOfEventRequest",
+      "description": "A text's safety record by its event id (SafetyReader.outcomeOfEvent: K-34 v1 safety_outcomes by event_id, safety_outcomes_event_key), the record's key (K-09 v1 recordSafetyOutcome: 'the text's event id is the key; one outcome row per text'): recordSafetyOutcome reads it first, and a row found is a repeat, answered from the stored rows with nothing written (record.ts default 1). Scope and role: the call's own business, always stated. With a business it runs as the Tool API's role, rosie_app, on the call's own transaction under that business's scope, since safety_outcomes is business-scoped and rosie_app holds SELECT on it (migration 0016), and the read names the business too; with businessId null it runs on the runtime side and reads only rows with no business (v1.2 default 25; v1.3 item 34). A row of another business, or one with no business under a business scope, is not seen (README item 37). Reads: the primary, uncached. Repeat: safe, a read. Time budget: inside 'Gate and commit ≤ 300 ms' (arch 04 line 223) when a turn's commit runs the record; none in the sources for a record made alone. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The text's K-06 v1 event id, or the page or agent call's id (K-02 v1 safetyResult.eventId).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under (the Tool API call's caller.businessId), or null before there is one. Always stated, so the read never runs with no scope by omission (STATE note 22; CQ-70).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["eventId", "businessId"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "title": "ReadSafetyOutcomeOfEventResponse",
+      "description": "The text's record as one read of the primary saw it: safetyOutcome, its row under the scope, or null when the scope shows none: no record yet (the skeleton's turn 1: read-safety-outcome-of-event-s1-01), or another business's (read-safety-outcome-of-event-other-business). With a business, the business is found first (notFound otherwise), so null always means none in this business, never no such business. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "safetyOutcomeOfEvent"
+        },
+        "eventId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "safetyOutcome": {
+          "description": "The text's safety_outcomes row (storedOutcome), or null.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/storedOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "eventId", "businessId", "readAt", "safetyOutcome"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "title": "ReadSafetyOutcomeOfEventErrors",
+      "description": "notFound: the request's business does not exist, or its own scope does not show it (table businesses), so null is never answered under a business that is not there; transient. The call fails closed on either: the wiring maps both to a thrown error, never to null (README item 37). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "title": "ReadSafetyOutcomeOfEventExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readSafetyOutcomeOfEvent"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readSafetyOutcomeOfEvent.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readSafetyOutcomeOfEvent.response"
+            },
+            {
+              "$ref": "#/$defs/readSafetyOutcomeOfEvent.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcome.request": {
+      "title": "ReadSafetyOutcomeRequest",
+      "description": "A safety outcome by its id (SafetyReader.outcome: K-34 v1 safety_outcomes by id): a release reads the danger text's outcome its hold names, and the 'we're safe' read it is given (releasedByOutcomeId), to check that read holds no danger, came from the held handle's own chat and arrived after the danger text (release.ts defaults 12 and 13). Scope and role: as readSafetyOutcomeOfEvent (README item 38): rosie_app on the call's own transaction under the call's business, the business named in the read; with businessId null the runtime side, rows with no business only. Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "outcomeId": {
+          "description": "safety_outcomes.id (K-34 safety_holds.safety_outcome_id, or K-09 v1 releaseSafetyHold.releasedByOutcomeId).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), or null before there is one. Always stated (STATE note 22; CQ-70).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["outcomeId", "businessId"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcome.response": {
+      "title": "ReadSafetyOutcomeResponse",
+      "description": "safetyOutcome, the row under the scope (storedOutcome), or null when the scope shows none: no such row, another business's, or one with a business read with businessId null (read-safety-outcome-no-business). With a business, the business is found first (notFound otherwise). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "safetyOutcome"
+        },
+        "outcomeId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "safetyOutcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/storedOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "outcomeId", "businessId", "readAt", "safetyOutcome"],
+      "additionalProperties": false
+    },
+    "readSafetyOutcome.errors": {
+      "title": "ReadSafetyOutcomeErrors",
+      "description": "notFound: the request's business does not exist, or its own scope does not show it (table businesses); transient. The call fails closed on either, never reading null (README item 38). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readSafetyOutcome.exchange": {
+      "title": "ReadSafetyOutcomeExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readSafetyOutcome"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readSafetyOutcome.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readSafetyOutcome.response"
+            },
+            {
+              "$ref": "#/$defs/readSafetyOutcome.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readSafetyHold.request": {
+      "title": "ReadSafetyHoldRequest",
+      "description": "A safety hold by its id (SafetyReader.hold: K-34 v1 safety_holds by id), the hold a releaseSafetyHold names (K-09 v1 releaseSafetyHold.holdId): released already, it answers its first release (CQ-80); held, its rule, version and release fields decide the release (release.ts). Scope and role: rosie_app on the call's own transaction under the call's business, since safety_holds is business-scoped and rosie_app holds SELECT on it (migration 0016), the business named in the read; with businessId null the runtime side, rows with no business only (README item 39). Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "holdId": {
+          "description": "safety_holds.id (K-09 v1 releaseSafetyHold.holdId).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), or null before there is one. Always stated (STATE note 22; CQ-70).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["holdId", "businessId"],
+      "additionalProperties": false
+    },
+    "readSafetyHold.response": {
+      "title": "ReadSafetyHoldResponse",
+      "description": "hold, the row under the scope (storedHold), or null when the scope shows none: no such hold, or another business's (read-safety-hold-other-business), which a release answers notFound (release.ts). With a business, the business is found first (notFound otherwise). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "safetyHold"
+        },
+        "holdId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "hold": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/storedHold"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "holdId", "businessId", "readAt", "hold"],
+      "additionalProperties": false
+    },
+    "readSafetyHold.errors": {
+      "title": "ReadSafetyHoldErrors",
+      "description": "notFound: the request's business does not exist, or its own scope does not show it (table businesses); transient. The call fails closed on either (README item 39). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readSafetyHold.exchange": {
+      "title": "ReadSafetyHoldExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readSafetyHold"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readSafetyHold.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readSafetyHold.response"
+            },
+            {
+              "$ref": "#/$defs/readSafetyHold.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "title": "ReadSafetyHoldOfOutcomeRequest",
+      "description": "The hold one outcome set (SafetyReader.holdOfOutcome: K-34 v1 safety_holds by safety_outcome_id; at most one: safety_holds_one_per_outcome), open or released: a repeated record names it while it is open, and a released hold holds nothing (record.ts default 1). Scope and role: as readSafetyHold (README item 40). Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "outcomeId": {
+          "description": "safety_outcomes.id of the record (a repeat's stored outcome).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), or null before there is one. Always stated (STATE note 22; CQ-70).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["outcomeId", "businessId"],
+      "additionalProperties": false
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "title": "ReadSafetyHoldOfOutcomeResponse",
+      "description": "hold, the one hold the outcome set under the scope (storedHold), released or not, or null when it held nothing (a No read: read-safety-hold-of-outcome-none) or the scope shows none. One hold or null, never a list: K-34 holds one per outcome, with the strictest rule of its outcomes (refuse-safety-hold-of-outcome-two-holds). With a business, the business is found first (notFound otherwise). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "safetyHoldOfOutcome"
+        },
+        "outcomeId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "hold": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/storedHold"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "outcomeId", "businessId", "readAt", "hold"],
+      "additionalProperties": false
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "title": "ReadSafetyHoldOfOutcomeErrors",
+      "description": "notFound: the request's business does not exist, or its own scope does not show it (table businesses); transient. The call fails closed on either, never reading 'held nothing' (README item 40). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "title": "ReadSafetyHoldOfOutcomeExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readSafetyHoldOfOutcome"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readSafetyHoldOfOutcome.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readSafetyHoldOfOutcome.response"
+            },
+            {
+              "$ref": "#/$defs/readSafetyHoldOfOutcome.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readOutboxRowWritten.request": {
+      "title": "ReadOutboxRowWrittenRequest",
+      "description": "Whether an outbox row with this id is written (SafetyReader.outboxRowWritten: K-04 v1 outbox_rows by id): a repeated record names its checked line's row (made from the text's event id: ids.ts) only when the first record wrote it (record.ts repeatAnswer). Scope and role: rosie_app on the call's own transaction under the call's business, since outbox_rows is business-scoped and rosie_app holds SELECT on it (migration 0012), the business named in the read; with businessId null the runtime side, rows with no business only (README item 41). The read selects the row's id alone, never its plan or final parts (the message's words: K-03 v1 rowPlan, finalParts) nor any other column. Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "description": "outbox_rows.id.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), or null before there is one. Always stated (STATE note 22; CQ-70).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["outboxRowId", "businessId"],
+      "additionalProperties": false
+    },
+    "readOutboxRowWritten.response": {
+      "title": "ReadOutboxRowWrittenResponse",
+      "description": "written: true when the scope shows an outbox row with this id, false when it shows none (not written, or another business's: outbox-row-written-other-business). Nothing of the row is returned: never its words (refuse-outbox-row-written-returns-words). With a business, the business is found first (notFound otherwise), so false always means none in this business. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "outboxRowWritten"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "written": {
+          "description": "Whether the row is written.",
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "outboxRowId", "businessId", "readAt", "written"],
+      "additionalProperties": false
+    },
+    "readOutboxRowWritten.errors": {
+      "title": "ReadOutboxRowWrittenErrors",
+      "description": "notFound: the request's business does not exist, or its own scope does not show it (table businesses); transient. The call fails closed on either, never reading false (README item 41). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readOutboxRowWritten.exchange": {
+      "title": "ReadOutboxRowWrittenExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readOutboxRowWritten"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readOutboxRowWritten.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readOutboxRowWritten.response"
+            },
+            {
+              "$ref": "#/$defs/readOutboxRowWritten.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readBusinessOwner.request": {
+      "title": "ReadBusinessOwnerRequest",
+      "description": "The call's business's owner and the handle they write from (SafetyReader.ownerOf): whom a checked line to the owner goes to (A3-48: a threat's line goes to the owner; S13-10: no safety message to the one who threatens; record.ts lineRows). The request names one business, the call's own: the business it runs under and whose owner it reads, so no call reads another business's owner. Scope and role: as rosie_job, with rosie.business_id set to the business and confirmed by requireBusinessScope() before the first read (STATE note 22; T-1094's note N2), since person_handles and handles are tables only the runtime side holds (migration 0012: rosie_app holds no grant on them), as v1.3's readOutboxRow and readFixedLineFacts run (items 35, 36); person_roles is read with the business named too, and of handles only id and kind are read, never the address (README item 42). Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), whose owner is read. Never null: a business with none has no owner, and the safety service builds no line to an owner then (record.ts lineRows).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["businessId"],
+      "additionalProperties": false
+    },
+    "readBusinessOwner.response": {
+      "title": "ReadBusinessOwnerResponse",
+      "description": "owner, the business's one live owner role's person with the handle they write from (ownerContact), or null when the business has no live owner role (business-owner-none) or its owner writes from no handle, so nothing can reach them; the safety service then builds no line to the owner and refuses the record (safetyLineNotBuilt: fail closed). More than one live owner role answers moreThanOneOwner, never one of them (README item 42, default 58). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "businessOwner"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ownerContact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["result", "businessId", "readAt", "owner"],
+      "additionalProperties": false
+    },
+    "readBusinessOwner.errors": {
+      "title": "ReadBusinessOwnerErrors",
+      "description": "notFound: the business does not exist, or its own scope does not show it (table businesses); moreThanOneOwner: the business holds more than one live owner role (default 58); transient. The call fails closed on each: the wiring maps them to a thrown error, never to null (README item 42). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/moreThanOneOwnerError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readBusinessOwner.exchange": {
+      "title": "ReadBusinessOwnerExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readBusinessOwner"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readBusinessOwner.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readBusinessOwner.response"
+            },
+            {
+              "$ref": "#/$defs/readBusinessOwner.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readBusinessZone.request": {
+      "title": "ReadBusinessZoneRequest",
+      "description": "The call's business's time zone (SafetyReader.businessZone: K-04 v1 businesses.time_zone), the IANA zone 'that day' is read in for a harm report (K-34 v1 harm_reports.day_zone; CQ-05's default: K-34 default 4; record.ts default 10). The request names one business, the call's own, as readBusinessOwner's does. Scope and role: rosie_app on the call's own transaction under that business's scope, whose businesses policy shows rosie_app the scope's own row alone (migration 0012) (README item 43). Reads: the primary, uncached. Repeat: safe, a read. Time budget: as readSafetyOutcomeOfEvent. New in v1.4.",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "The business the call runs under (caller.businessId), whose zone is read. Never null: with no business there is no zone, and no harm report is filed (record.ts default 10).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["businessId"],
+      "additionalProperties": false
+    },
+    "readBusinessZone.response": {
+      "title": "ReadBusinessZoneResponse",
+      "description": "timeZone, businesses.time_zone, which K-04 v1 never leaves null: a business the scope does not show answers notFound, never a null zone (refuse-business-zone-null). New in v1.4.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "businessZone"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "timeZone": {
+          "description": "businesses.time_zone (K-04 businesses_time_zone_form).",
+          "$ref": "#/$defs/zone"
+        }
+      },
+      "required": ["result", "businessId", "readAt", "timeZone"],
+      "additionalProperties": false
+    },
+    "readBusinessZone.errors": {
+      "title": "ReadBusinessZoneErrors",
+      "description": "notFound: the business does not exist, or its own scope does not show it (table businesses); transient. The call fails closed on either (the safety service refuses the harm report: harmReportNeedsBusiness) (README item 43). New in v1.4.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readBusinessZone.exchange": {
+      "title": "ReadBusinessZoneExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readBusinessZone"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readBusinessZone.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readBusinessZone.response"
+            },
+            {
+              "$ref": "#/$defs/readBusinessZone.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}
