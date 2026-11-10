@@ -2,6 +2,8 @@
 // added by T-051): what an exchange states that one JSON Schema cannot check across its parts.
 
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { isDeepStrictEqual } from "node:util";
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
 // passed its schema (contracts/scripts/check-fixtures.mjs). QA's contract test (T-088) and the Tool API mock (C-186)
 // read the same statements. README "Named rules". Rules are only ever added: a later minor version adds a rule under a
@@ -773,6 +775,113 @@ export function givesJourneySixKeys(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.6 (T-1173): compose input's term facts (README "v1.6"). These two read the contracts' own files beside this one:
+// K-01's bundle v0 (the bundle the skeleton's fixtures run on: README v1.5 "Scope") and K-03's fixtures, never anything
+// else, synchronously, so `npm run contracts:check` can load this file with require (scripts/check-fixtures.mjs).
+
+/** contracts/, the folder above this file's own. */
+const CONTRACTS = new URL("../", import.meta.url);
+
+/** A contracts-relative JSON file, parsed. */
+const contractJson = (file) => JSON.parse(readFileSync(new URL(file, CONTRACTS), "utf8"));
+
+/** K-01's bundle v0, whose step cards hold the lines a term fact copies (K-01 step.say[].elements.card.lines). */
+export const BUNDLE_V0_FILE = "bundle/fixtures/bundle-v0-skeleton.json";
+
+/** K-03's fixtures, and the K-03 version whose composeInput K-09 v1.6's compose input answers. */
+const K03_FIXTURES = "message-plan/fixtures";
+export const K03_VERSION = "v1.1";
+
+/** A slot as a compiled line writes it ({{name}}, {{name:example}}, {{name:example|other words}}: K-03 slottedText). */
+const NAMES_A_SLOT = /\{\{/;
+
+/** A term fact of K-03 v1.1's input (termFact): a value and its source line, never a slot. */
+const isTermFact = (fact) =>
+  fact !== null && typeof fact === "object" && Object.hasOwn(fact, "source") && !Object.hasOwn(fact, "slot");
+
+/**
+ * The lines of a step's card in a bundle: every line of every card its messages hold (K-01 step.say[].elements.card
+ * .lines), in order, from each of the bundle's flows that holds the step; undefined when none holds it.
+ */
+export function cardLinesOf(bundle, step) {
+  const holding = Object.values(bundle.flows ?? {}).filter((flow) => flow?.steps?.[step] !== undefined);
+  if (holding.length === 0) return undefined;
+  return holding.flatMap((flow) =>
+    (flow.steps[step].say ?? []).flatMap((message) => message?.elements?.card?.lines ?? []),
+  );
+}
+
+/** The input a composeInput exchange answered compose with, or undefined. */
+function composedInput(exchange) {
+  return exchange.call === "composeInput" && exchange.outcome?.result === "compose"
+    ? exchange.outcome.input
+    : undefined;
+}
+
+/**
+ * termFactsFromCard: a composeInput exchange answered compose gives a term fact only as its step's card states it.
+ * Each term fact's value is, word for word, a line of the card of the input's step (masterText.step) in bundle v0, and
+ * that line names no slot: a card line with a slot is no term fact, its values reach the composer as slot facts (CQ-86's
+ * default; README v1.6 default 137; K-03 README "v1.1": code copies the line word for word, with its source line, from
+ * the bundle the row was made with). The schema cannot see the bundle, so a term fact whose words differ from the
+ * card's line passes it; this rule refuses it. An input with no term fact passes.
+ */
+export function termFactsFromCard(exchange) {
+  const input = composedInput(exchange);
+  if (input === undefined) return ["termFactsFromCard reads a composeInput exchange answered compose"];
+  const terms = input.facts.map((fact, at) => ({ fact, at })).filter(({ fact }) => isTermFact(fact));
+  if (terms.length === 0) return [];
+  const step = input.masterText.step;
+  const lines = cardLinesOf(contractJson(BUNDLE_V0_FILE), step);
+  if (lines === undefined) return [`bundle v0 holds no step ${step}, so no card of its states a term`];
+  const problems = [];
+  for (const { fact, at } of terms) {
+    if (!lines.includes(fact.value)) {
+      problems.push(
+        `facts[${at}]: ${JSON.stringify(fact.value)} is no line of ${step}'s card in bundle v0, word for word`,
+      );
+    } else if (NAMES_A_SLOT.test(fact.value)) {
+      problems.push(
+        `facts[${at}]: ${step}'s card line ${JSON.stringify(fact.value)} names a slot, so it is no term fact`,
+      );
+    }
+  }
+  return problems;
+}
+
+/**
+ * inputIsK03Fixture: a composeInput exchange answered compose gives, word for word, K-03 v1.1's accepted composeInput
+ * fixture of the same row and turn (contracts/message-plan/fixtures/index.json): K-09's fixtures reuse K-03's inputs word
+ * for word (README "Fixtures"), and this compares the two files rather than trusting a copy: the same values, key for
+ * key in K-03's order. Exactly one such K-03 fixture must exist. Its term facts are held to the step's card too
+ * (termFactsFromCard).
+ */
+export function inputIsK03Fixture(exchange) {
+  const input = composedInput(exchange);
+  if (input === undefined) return ["inputIsK03Fixture reads a composeInput exchange answered compose"];
+  const problems = termFactsFromCard(exchange);
+  const twins = contractJson(`${K03_FIXTURES}/index.json`)
+    .fixtures.filter(
+      (entry) => entry.version === K03_VERSION && entry.def === "composeInput" && entry.expect === "accept",
+    )
+    .map((entry) => ({ file: entry.file, input: contractJson(`${K03_FIXTURES}/${entry.file}`) }))
+    .filter((twin) => twin.input.row === input.row && twin.input.turn === input.turn);
+  if (twins.length !== 1) {
+    problems.push(
+      `K-03 ${K03_VERSION} has ${twins.length} accepted composeInput fixtures of row ${input.row} and turn ${input.turn}, not one`,
+    );
+    return problems;
+  }
+  const [twin] = twins;
+  if (!isDeepStrictEqual(input, twin.input)) {
+    problems.push(`the input is not ${K03_FIXTURES}/${twin.file} word for word`);
+  } else if (JSON.stringify(input) !== JSON.stringify(twin.input)) {
+    problems.push(`the input holds ${K03_FIXTURES}/${twin.file}'s values, but not in its keys' order`);
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -783,4 +892,6 @@ export const rules = Object.freeze({
   givesJourneyFourKeys,
   givesJourneyFiveKeys,
   givesJourneySixKeys,
+  termFactsFromCard,
+  inputIsK03Fixture,
 });
