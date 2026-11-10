@@ -157,7 +157,8 @@ export function standaloneModule(schemas, definitions) {
     return `runtime_${name}`;
   });
   // A require Ajv wrote is code, require("...") (a schema's own words sit in JSON strings, their quotes escaped).
-  if (/\brequire\("/.test(body)) throw new Error("the code requires a module other than Ajv's run-time helpers");
+  if (/\brequire\("/.test(body))
+    throw new Error("the code requires a module other than Ajv's run-time helpers");
   const imports = [...helpers]
     .sort()
     .map((name) => `import runtime_${name}_module from "ajv/dist/runtime/${name}.js";`);
