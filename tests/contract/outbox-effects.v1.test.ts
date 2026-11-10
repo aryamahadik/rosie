@@ -19,9 +19,9 @@
 //      the named rule after the schema takes them), none is left out, and the number checked is the number of entries;
 //      an accepted fixture is accepted by every later minor version too (a minor version only adds);
 //   2. the named rule runs, none skipped: lifeChain (outbox-effects.rules.mjs) runs on every entry that names it and on
-//      every accepted fixture, and each accepted fixture passes it; it fires on a damaged copy the schema still takes
-//      for each check the README gives it ("The retry rules" and "lifeChain also checks"), and its constants are the
-//      README's numbers;
+//      every accepted fixture, and each accepted fixture passes it; it fires on damaged copies the schema still takes,
+//      at least one for each clause of the README's "`lifeChain` also checks" and for retry rules 1, 3, 4, 5 and 8
+//      (rule 2 is the refused 4006 fixture's, part 3), and its constants are the README's numbers;
 //   3. each refusal is tied to its reason (DL-124's mend-then-accept proof): the schema's errors name the field the
 //      entry names and no other place, or the rule gives its one named line; put right as the entry says ("The same
 //      ... passes"), the copy is accepted by the schema and passes lifeChain, and where an accepted twin exists the copy
