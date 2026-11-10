@@ -43,12 +43,11 @@ export interface WaitingChoice {
   readonly task: "T-1147";
 }
 
-/** The fixture's choices main's frontier cannot give yet (T-315 round 3's report; DL-346): each waits for its task. */
-export const WAITING: readonly WaitingChoice[] = [
-  // The sign-up door to S1-01 (K-02 v1.1 default 9): T-1147 wires T-293's hubs-and-doors source into its slot and
-  // offers the door when the guard finds no target and the pinned bundle holds S1-01 (ADR-013 section 3).
-  { choiceId: "c-01", kind: "door", door: "signUp", step: "S1-01", slot: "hubsAndDoors", task: "T-1147" },
-];
+/**
+ * The fixture's choices main's frontier cannot give yet (T-315 round 3's report; DL-346): each waits for its task. None
+ * since T-1147 wired T-293's hubs-and-doors source into its slot, which offers c-01, the sign-up door to S1-01.
+ */
+export const WAITING: readonly WaitingChoice[] = [];
 
 /**
  * The frontier's slots main has not built (frontier/assemble/registry.ts), in their order: the frontier logs each on

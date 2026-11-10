@@ -22,21 +22,34 @@
 //      booking already made only once the handle passed the code check; an owner command and an unclear owner text or
 //      HELP for an owner; a team change for the business side. A door whose step is offered as a hub this turn is left
 //      out: its cases are listed, and a hub case is chosen, not entered.
+//   4. The sign-up door (T-1147; K-02 v1.1 default 9; ADR-013 sections 2 and 3), the door to S1-01 for a first text from
+//      a number nobody here knows yet: offered only when the guard found no target and the read holds none either (no
+//      role, no open question, no booking: K-05 v1.2 targets-first-text.json), after K-01's five doors, as K-02 v1.1's
+//      door list orders it. It is labelled with the title of the section its step opens, without its number ("1.
+//      Business onboarding" gives "Business onboarding"), defined by its step's first sentence (K-02 v1 default 3), about
+//      the business alone, with no field. K-01 v1's routing tables hold no entry for it (K-02 v1.1 open gap; K-09 v1.5
+//      open gap 120), so until a K-01 minor version names it in routingTables.doors its step is the first step of section
+//      1 of the turn's flow graph (ADR-013 section 3), which K-02 v1.1 holds to S1-01.
+// Every door is offered only when the pinned bundle holds its step (K-01 README: "a step a bundle does not hold is not
+// reachable"): on bundle v0, which holds S1-01 and S1-02 alone, the sign-up door is the one door (K-09 v1.5 default 129).
 //
 // No target (K-09 v1 guardTargets.noTarget: "nothing fits as a target: the doors are offered"; arch 02 line 115 "No
-// target: the doors"): the doors alone. No business named yet (the read ran with no business, K-05 v1.2 readTurnState
-// businessId null, as read-turn-state-first-text.json shows, or the call names none): nothing here, since every one of
-// these entries acts on a business (K-02 v1 target.businessId) and none may stand in for search, which comes first, or
-// for the one ask for a name that named-only work gets (S13-20, an always-on rule decide reads in the cached prefix).
+// target: the doors"): the doors alone, the sign-up door among them. No business named yet (the read ran with no
+// business, K-05 v1.2 readTurnState businessId null, as read-turn-state-first-text.json shows, or the call names none):
+// nothing here, since every one of these entries acts on a business (K-02 v1 target.businessId) and none may stand in for
+// search, which comes first, or for the one ask for a name that named-only work gets (S13-20, an always-on rule decide
+// reads in the cached prefix).
 //
 // Each choice's stakes come from its walk (assemble/bundle.ts ownStakes): a hub case's from its branch on; a door's from
-// its step on, as code's walk after enter goes (arch 03 line 191). The door's definition is read from the pinned flow
-// graph through the bundles port, since the frontier's step view (assemble/types.ts BundleStep) holds no `does`; the
-// port is read once per call, and only when a door is to be offered.
+// its step on, as code's walk after enter goes (arch 03 line 191). A door's definition, and the sign-up door's step and
+// label, are read from the pinned flow graph as stored, through the bundles port, since the frontier's views
+// (assemble/types.ts BundleStep, FlowView) hold no `does` and no sections; the port is read once per call, and only when
+// a door is to be offered.
 //
 // What is not offered is logged by its ids (assemble/log.ts: labels only), with the events of the frontier's closed list
-// (assemble/types.ts FrontierEvent): a hub or door step a whole bundle does not hold, a hub step with no card or a door
-// step with no `does` (frontier_step_missing); a flow graph not read for this call (frontier_bundle_missing); a hub case
+// (assemble/types.ts FrontierEvent): a hub or door step a whole bundle does not hold, a hub step with no card, a door
+// step with no `does`, or a flow graph with no section 1 to give the sign-up door its step (frontier_step_missing); a
+// flow graph not read for this call (frontier_bundle_missing); a hub case
 // whose card gives no definition (frontier_option_unusable); a target booking that cannot be labelled by its date and
 // time (frontier_question_unlabelled). A step a partial bundle does not hold is not logged: it is not reachable there by
 // K-01's own rule (contracts/bundle README, fixtures), and bundle v0 holds none of these steps.
@@ -52,7 +65,10 @@
 //     (K-05 v1.2 handleTargets), which a code typed back makes the handle's too (D75, D100);
 //   - who is the owner and who the team: K-05 v1.2 item 31's classes (owner; admin, staff and own_business);
 //   - a hub case's fields are its branch's answer fields, else the hub step's gives keys as text fields (T-291's rule
-//     for an option); a door carries none.
+//     for an option); a door carries none;
+//   - "no target" for the sign-up door is both sides': the guard's (noTarget, with no role, open question or booking
+//     listed) and the read's (no role, no live open question, no booking here), so a handle either side gives a target
+//     gets no sign-up door (fail closed: the door starts a business's onboarding, for a number nobody here knows yet).
 
 import { findStep, ownStakes } from "../../assemble/bundle";
 import type {
@@ -81,8 +97,14 @@ export const HUBS_AND_DOORS = "hubsAndDoors";
 
 /** A hub's key: the target booking's stage, or the writer's role (K-01 v1 routingTables.hubs; K-02 v1 choice.hub). */
 export type HubKey = NonNullable<Choice["hub"]>;
-/** A door's key (K-01 v1 routingTables.doors): K-02 v1.1 choice.door but signUp, the sixth, which T-1147 offers. */
+/** A door's key (K-01 v1 routingTables.doors): K-02 v1.1 choice.door but signUp, the sixth, which K-01 v1 lacks. */
 export type DoorKey = Exclude<NonNullable<Choice["door"]>, "signUp">;
+
+/** The sign-up door's key (K-02 v1.1 choice.door, default 9): the door to S1-01. */
+export const SIGN_UP = "signUp" satisfies NonNullable<Choice["door"]>;
+
+/** The section whose first step the sign-up door enters until K-01 names it in routingTables.doors (ADR-013 section 3). */
+const SIGN_UP_SECTION = 1;
 
 type BookingHead = TurnState["bookings"][number];
 type Role = TurnState["roles"][number]["role"];
@@ -412,52 +434,121 @@ function doorsOf(
   });
 }
 
-/** The first sentence of each step's `does` in one flow graph of the pinned bundle, read through the port. */
-async function firstSentencesOf(
+/**
+ * Whether nothing here is the writer's target (see the defaults above): the guard found none (K-09 v1 guardTargets:
+ * noTarget, and no role, open question or booking listed), and the read holds none either (K-05 v1.2 readTurnState: no
+ * role, no live open question, no booking), as a new number's first text reads (K-05 v1.2 targets-first-text.json).
+ */
+function noTargetAtAll(input: FrontierInput): boolean {
+  const { targets } = input.request;
+  const { state } = input;
+  return (
+    targets.noTarget &&
+    targets.roles.length === 0 &&
+    targets.openQuestionIds.length === 0 &&
+    targets.bookingIds.length === 0 &&
+    state.roles.length === 0 &&
+    state.openQuestions.length === 0 &&
+    state.bookings.length === 0
+  );
+}
+
+/** One flow graph of the pinned bundle as stored (K-01 v1 flowGraph), read through the port: its steps and sections. */
+interface StoredGraph {
+  readonly steps: Readonly<Record<string, unknown>>;
+  readonly sections: readonly unknown[];
+}
+
+/** One flow graph of the pinned bundle as stored, read through the port; null when the port answers no such graph. */
+async function storedGraphOf(
   port: FrontierBundles,
   bundleId: BundleId,
   flow: FlowLetter,
-  ids: readonly string[],
-): Promise<Map<string, string> | null> {
+): Promise<StoredGraph | null> {
   const graph = await port.flow(bundleId, flow);
   if (!isRecord(graph) || graph.contract !== "bundle.v1" || graph.flow !== flow || !isRecord(graph.steps)) {
     return null;
   }
-  const steps = graph.steps;
-  const out = new Map<string, string>();
-  for (const id of ids) {
-    const step = Object.hasOwn(steps, id) ? steps[id] : undefined;
-    if (!isRecord(step) || typeof step.does !== "string") continue;
-    const sentence = firstSentence(step.does);
-    if (sentence !== "") out.set(id, sentence);
-  }
-  return out;
+  return { steps: graph.steps, sections: Array.isArray(graph.sections) ? graph.sections : [] };
 }
 
-/** The doors, each defined by its step's first sentence (a door whose step has none is logged and left out). */
-async function offerDoors(call: Call, hubSteps: ReadonlySet<string>): Promise<DraftChoice[]> {
-  const doors = doorsOf(call, hubSteps);
-  const first = doors[0];
-  if (first === undefined || call.flow === null) return [];
-  const { input } = call;
-  const sentences = await firstSentencesOf(
-    call.port,
-    call.bundle.bundleId,
-    call.flow.flow,
-    doors.map((door) => door.step.id),
-  );
-  if (sentences === null) {
-    input.log.warn("frontier_bundle_missing", { source: HUBS_AND_DOORS, step: first.step.id });
+/** The first sentence of a step's `does` in the stored graph (K-02 v1 default 3), or null when it has none. */
+function definitionOf(graph: StoredGraph, id: string): string | null {
+  const step = Object.hasOwn(graph.steps, id) ? graph.steps[id] : undefined;
+  if (!isRecord(step) || typeof step.does !== "string") return null;
+  const sentence = firstSentence(step.does);
+  return sentence === "" ? null : sentence;
+}
+
+/**
+ * Section 1 of the stored graph (K-01 v1 flowGraph.sections): its first step, the sign-up door's step until K-01 names
+ * one, and its title without its number, the door's label (K-02 v1.1 default 9); null when the graph has no such section.
+ */
+function sectionOneOf(graph: StoredGraph): { step: string; label: string } | null {
+  const section = graph.sections.find((each) => isRecord(each) && each.n === SIGN_UP_SECTION);
+  if (!isRecord(section) || typeof section.title !== "string" || !Array.isArray(section.steps)) return null;
+  const first: unknown = section.steps[0];
+  if (typeof first !== "string" || !STEP_ID.test(first)) return null;
+  const title = section.title.trim();
+  const number = `${String(SIGN_UP_SECTION)}.`;
+  const label = (title.startsWith(number) ? title.slice(number.length) : title).trim();
+  return label === "" ? null : { step: first, label };
+}
+
+/** A door to offer: its key, its step and the flow graph holding it, and its label. */
+interface DoorEntry {
+  readonly key: NonNullable<Choice["door"]>;
+  readonly step: BundleStep;
+  readonly flow: FlowView;
+  readonly label: string;
+}
+
+/** The sign-up door (see the header), when the pinned bundle holds its step: none otherwise, logged as a door's is. */
+function signUpDoor(call: Call, graph: StoredGraph): DoorEntry[] {
+  if (call.flow === null) return [];
+  const section = sectionOneOf(graph);
+  if (section === null) {
+    call.input.log.warn("frontier_step_missing", { source: HUBS_AND_DOORS });
     return [];
   }
+  const found = findStep(call.bundle, section.step, call.flow.flow);
+  if (found === null) {
+    stepMissing(call, section.step);
+    return [];
+  }
+  return [{ key: SIGN_UP, ...found, label: section.label }];
+}
+
+/**
+ * The doors, K-01's in its order and then the sign-up door, each defined by its step's first sentence (a door whose step
+ * has none is logged and left out).
+ */
+async function offerDoors(call: Call, hubSteps: ReadonlySet<string>): Promise<DraftChoice[]> {
+  const { input, flow } = call;
+  const doors = doorsOf(call, hubSteps);
+  const signUp = noTargetAtAll(input);
+  if (flow === null || (doors.length === 0 && !signUp)) return [];
+  const graph = await storedGraphOf(call.port, call.bundle.bundleId, flow.flow);
+  if (graph === null) {
+    const first = doors[0];
+    input.log.warn("frontier_bundle_missing", {
+      source: HUBS_AND_DOORS,
+      ...(first === undefined ? {} : { step: first.step.id }),
+    });
+    return [];
+  }
+  const entries: DoorEntry[] = [
+    ...doors.map((door) => ({ ...door, label: DOOR_NAMES[door.key] })),
+    ...(signUp ? signUpDoor(call, graph) : []),
+  ];
   const target = businessTarget(input);
-  return doors.flatMap(({ key, step, flow }): DraftChoice[] => {
-    const definition = sentences.get(step.id);
-    if (definition === undefined) {
+  return entries.flatMap(({ key, step, flow: held, label }): DraftChoice[] => {
+    const definition = definitionOf(graph, step.id);
+    if (definition === null) {
       input.log.warn("frontier_step_missing", { source: HUBS_AND_DOORS, step: step.id });
       return [];
     }
-    const reasons = doorStakes(call, flow, step.id);
+    const reasons = doorStakes(call, held, step.id);
     return [
       {
         kind: "door",
@@ -466,7 +557,7 @@ async function offerDoors(call: Call, hubSteps: ReadonlySet<string>): Promise<Dr
         anytimeRow: null,
         door: key,
         hub: null,
-        label: DOOR_NAMES[key],
+        label,
         definition,
         step: step.id,
         target: { ...target },

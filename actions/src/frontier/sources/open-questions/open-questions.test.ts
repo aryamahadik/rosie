@@ -13,6 +13,7 @@ import { createToolApi } from "../../../tool-api/tool-api";
 import { createToolApiValidator } from "../../../tool-api/validator";
 import { createFrontierChecker } from "../../assemble/check";
 import { frontierHandlers } from "../../assemble/handler";
+import { SLOT_NAMES } from "../../assemble/registry";
 import {
   BUNDLE_V0,
   MASTER_A6_01,
@@ -33,7 +34,8 @@ import {
   type FakeRepo,
   type TurnSeed,
 } from "../../assemble/test-support";
-import type { Choice, Context, OpenQuestionRow, Time } from "../../assemble/types";
+import type { Choice, Context, OpenQuestionRow, SourceSlot, Time } from "../../assemble/types";
+import { openQuestionsSource } from "./open-questions";
 
 type Json = Record<string, unknown>;
 
@@ -103,6 +105,16 @@ function request(openQuestionIds: string[], bundleId = MINI_A_ID): Json {
   };
 }
 
+/**
+ * The registry's slots with this source alone built (DL-361): these tests are about the open questions, not the hubs and
+ * doors T-1147 wired, which offer A3-51's new-booking door on bundle-mini-a. The other slots offer nothing and are
+ * logged missing, as they were before that wiring.
+ */
+const OPEN_QUESTIONS_ALONE: readonly SourceSlot[] = SLOT_NAMES.map((name) => ({
+  name,
+  source: name === "openQuestions" ? openQuestionsSource : null,
+}));
+
 async function callFrontier(
   body: Json,
   seed: TurnSeed,
@@ -113,7 +125,12 @@ async function callFrontier(
   const api = createToolApi({
     validator,
     scope: frontierScope(repo),
-    handlers: frontierHandlers<FakeRepo>({ bundles: fakeBundles(...documents), log: log.sink, checker }),
+    handlers: frontierHandlers<FakeRepo>({
+      bundles: fakeBundles(...documents),
+      sources: OPEN_QUESTIONS_ALONE,
+      log: log.sink,
+      checker,
+    }),
   });
   const { trace } = traceFor(body);
   const answer = await api.call("buildFrontier", structuredClone(body), trace);

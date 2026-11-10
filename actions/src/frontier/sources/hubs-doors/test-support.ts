@@ -1,13 +1,16 @@
-// Inputs for the hubs-and-doors source's tests (T-293), for the tests only. Never imported by the Worker.
+// Inputs for the hubs-and-doors source's tests (T-293, T-1147), for the tests only. Never imported by the Worker.
 //
 // The bundles are K-01 v1's sample bundles (bundle-mini-a.json: A3-51 and A7-02; bundle-mini-b.json: B3-40 and B7-05;
-// bundle-v0-skeleton.json: S1-01 and S1-02 alone) and the whole of fixture set v1's two master flows as the merged bundle
-// emitter compiles them (T-149, compiler/src/emit buildBundle, with no trade, as actions/src/homes/registry/test-support.ts
-// builds them): every hub and door step with its card, branches and words, the master's own (rule 9).
-// The stored state is K-05 v1.2 readTurnState's own fixtures (read-turn-state-alex.json, read-turn-state-first-text.json)
-// and Sam's state at S1-02 (assemble/test-support.ts samSeed), each held to K-05 v1.2's frozen schema here. Names and
-// values come only from the master's sample cast and K-04's seeds (Sam, Alex M., Lee's Barbershop, Lee Home Services; the
-// 555-01xx range).
+// bundle-v0-skeleton.json: S1-01 and S1-02 alone), bundle v0 as bundles/v0 publishes it (T-1146's rebuild, its id read
+// from its own manifest) and the whole of fixture set v1's two master flows as the merged bundle emitter compiles them
+// (T-149, compiler/src/emit buildBundle, with no trade, as actions/src/homes/registry/test-support.ts builds them): every
+// hub and door step with its card, branches and words, the master's own (rule 9).
+// The stored state is K-05 v1.2 readTurnState's own fixtures (read-turn-state-alex.json, read-turn-state-first-text.json),
+// Sam's state at S1-02 (assemble/test-support.ts samSeed) and Sam's first text as K-09 v1.5's build-frontier-s1-01.json
+// gives it, each held to K-05 v1.2's frozen schema here. Names and values come only from the master's sample cast and
+// K-04's seeds (Sam, Alex M., Lee's Barbershop, Lee Home Services; the 555-01xx range).
+
+import { readFileSync } from "node:fs";
 
 import { buildBundle } from "../../../../../compiler/src/emit";
 import { readBundle, readManifest } from "../../assemble/bundle";
@@ -23,7 +26,9 @@ import {
   samSeed,
   type BundleDocument,
   type FakeBundles,
+  type FrontierExchange,
   type LogCapture,
+  type TurnSeed,
 } from "../../assemble/test-support";
 import {
   bundleKey,
@@ -105,6 +110,50 @@ export function withPartial(document: BundleDocument, partial: boolean): BundleD
   if (partial) copy.manifest.partial = true;
   else delete copy.manifest.partial;
   return copy;
+}
+
+/** Whether a bundle document's flow graph holds a step, as stored. */
+export function holdsStep(document: BundleDocument, flow: FlowLetter, id: string): boolean {
+  const graph = document.flows[flow];
+  return isRecord(graph) && isRecord(graph.steps) && Object.hasOwn(graph.steps, id);
+}
+
+/** A copy of a bundle document whose flow graph no longer holds a step (its sections still name it). */
+export function withoutStep(document: BundleDocument, flow: FlowLetter, id: string): BundleDocument {
+  if (!holdsStep(document, flow, id)) throw new Error(`flow ${flow} holds no step ${id}`);
+  const copy = structuredClone(document);
+  const graph = copy.flows[flow] as { steps: Json };
+  graph.steps = Object.fromEntries(Object.entries(graph.steps).filter(([key]) => key !== id));
+  return copy;
+}
+
+/** A flow graph's sections as stored (K-01 v1 flowGraph.sections). */
+export function storedSections(
+  document: BundleDocument,
+  flow: FlowLetter,
+): { n: number; title: string; steps: string[] }[] {
+  const graph = document.flows[flow];
+  const sections: unknown[] = isRecord(graph) && Array.isArray(graph.sections) ? graph.sections : [];
+  return sections.flatMap((section) =>
+    isRecord(section) &&
+    typeof section.n === "number" &&
+    typeof section.title === "string" &&
+    Array.isArray(section.steps)
+      ? [{ n: section.n, title: section.title, steps: section.steps.map(String) }]
+      : [],
+  );
+}
+
+/** Bundle v0 as bundles/v0 publishes it (T-1146's rebuild): its manifest and flow A's graph, its id its manifest's. */
+export function publishedBundleV0(): BundleDocument {
+  const read = (file: string): Json => {
+    const value: unknown = JSON.parse(
+      readFileSync(new URL(`../../../../../bundles/v0/bundle/${file}`, import.meta.url), "utf8"),
+    );
+    if (!isRecord(value)) throw new Error(`bundles/v0/bundle/${file} is not a K-01 v1 value`);
+    return value;
+  };
+  return { manifest: read("manifest.json"), flows: { A: read("flow/A.json") } };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -226,6 +275,39 @@ export function samState(change: (state: TurnState) => void = () => undefined): 
 /** A new number's first text, before there is a business: K-05 v1.2's read-turn-state-first-text.json. */
 export function firstTextState(): TurnState {
   return checkedState(fixtureState("read-turn-state-first-text.json"));
+}
+
+/**
+ * Sam's first text under Lee's Barbershop as K-05 v1.2 reads it (build-frontier-s1-01.json's note): his handle and person
+ * as first sight left them, his language not stored yet; no role, no open question, no booking and no phone row (K-05
+ * v1.2 targets-first-text.json).
+ */
+export function samFirstTextState(change: (state: TurnState) => void = () => undefined): TurnState {
+  return samState((state) => {
+    state.persons = state.persons.map((person) => ({ ...person, language: null }));
+    state.roles = [];
+    state.phone = null;
+    state.openQuestions = [];
+    state.bookings = [];
+    change(state);
+  });
+}
+
+/** The same stored state for the frontier's fake K-05 v1.2 readTurnState (assemble/test-support.ts fakeRepo). */
+export function samFirstTextSeed(): TurnSeed {
+  const seed = samSeed();
+  return {
+    ...seed,
+    persons: seed.persons.map((person) => ({ ...person, language: null })),
+    roles: [],
+    phone: null,
+    openQuestions: [],
+  };
+}
+
+/** K-09 v1.5's build-frontier-s1-01.json, turn 1 (Sam's first text), freshly parsed (a test may change its copy). */
+export function s101Exchange(): FrontierExchange {
+  return contractFixture("tool-api/fixtures/build-frontier-s1-01.json") as FrontierExchange;
 }
 
 // ---------------------------------------------------------------------------------------------------------------
