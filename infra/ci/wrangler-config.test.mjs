@@ -46,8 +46,11 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
     assert.match(kv.id, /^0{32}$/);
   });
 
-  it("leaves env.staging without its own copy and adds no other storage binding", () => {
-    assert.equal(config.env.staging.kv_namespaces, undefined);
+  it("gives env.staging its own BUNDLES binding and adds no other storage binding", () => {
+    assert.deepEqual(
+      config.env.staging.kv_namespaces.map((kv) => kv.binding),
+      ["BUNDLES"],
+    );
     for (const k of ["hyperdrive", "d1_databases"]) {
       assert.equal(config[k], undefined);
     }
@@ -119,8 +122,8 @@ describe("wrangler.jsonc clock-sweep cron trigger (T-278)", () => {
     assert.deepEqual(config.triggers, { crons: ["* * * * *"] });
   });
 
-  it("leaves env.staging without its own copy", () => {
-    assert.equal(config.env.staging.triggers, undefined);
+  it("gives env.staging its own copy of the cron", () => {
+    assert.deepEqual(config.env.staging.triggers, config.triggers);
   });
 
   it("adds no production route or key", () => {
@@ -143,8 +146,8 @@ describe("wrangler.jsonc retry queue (T-279)", () => {
     assert.deepEqual(Object.keys(config.queues).sort(), ["consumers", "producers"]);
   });
 
-  it("leaves env.staging without its own copy and adds no production route or key", () => {
-    assert.equal(config.env.staging.queues, undefined);
+  it("gives env.staging its own copy of the queues and adds no production route or key", () => {
+    assert.deepEqual(config.env.staging.queues, config.queues);
     assert.equal(config.routes, undefined);
     assert.equal(config.route, undefined);
     assert.deepEqual(config.secrets, { required: [] });
@@ -173,7 +176,7 @@ describe("wrangler.jsonc HandleActor binding", () => {
     assert.equal(config.routes, undefined);
     assert.equal(config.route, undefined);
     assert.deepEqual(config.secrets, { required: [] });
-    assert.equal(config.env.staging.durable_objects, undefined);
+    assert.deepEqual(config.env.staging.durable_objects, config.durable_objects);
     assert.deepEqual(
       config.env.staging.routes.map((r) => r.pattern),
       ["rosfield.com/test", "rosfield.com/test/*"],
