@@ -97,7 +97,8 @@ import {
   type SafetyResult,
 } from "./rules";
 
-export type RecordRequest = RequestOf<"recordSafetyOutcome">;
+/** K-09 v1's request: v1.5 also takes v1.1's record on arrival (caller.kind actorOnArrival), not built here (notBuilt). */
+export type RecordRequest = Exclude<RequestOf<"recordSafetyOutcome">, { caller: { kind: "actorOnArrival" } }>;
 export type RecordResponse = ResponseOf<"recordSafetyOutcome">;
 export type RecordError = ErrorsOf<"recordSafetyOutcome">;
 export type RecordAnswer = RecordResponse | RecordError;

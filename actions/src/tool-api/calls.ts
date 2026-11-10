@@ -1,9 +1,16 @@
 // The calls the Tool API registers (T-290, T-1150; C-074): every call K-09 v1 holds (contracts/tool-api, v1's
-// `$defs/callName`; the calls v1.1 to v1.4 add are their journey lanes'), the types K-09 v1.5's generated module gives
-// each call's request, response and errors under the same names (`npm run contracts:types`; ADR-005: generated into
+// `$defs/callName`; the calls v1.1 to v1.4 add are their journey lanes'), each call's request, response and errors as
+// K-09 v1.5 defines them, from its generated module (`npm run contracts:types`; ADR-005: generated into
 // contracts/generated/, never committed), and the K-08 hop each call's span takes. v1.5 holds every v1 definition under
 // its own name and accepts every v1 exchange (README "v1.5"; DL-340), so gateAndCommit's turn may carry the service and
 // the chat id of the turn's last text (default 135) and buildFrontier's context may offer the sign-up door (K-02 v1.1).
+//
+// The generator names the first copy of a title plainly and numbers the later ones. Where v1.1 changed a definition,
+// recordSafetyOutcome's and releaseSafetyHold's requests (each also takes the handle actor's record or release on
+// arrival) and recordSafetyOutcome's and recordStopOrStart's responses (gives and hold.version; businessesTold), the plain
+// name is v1's copy and v1.5's own is numbered, a number that shifts between generations. So those four are read off the
+// call's v1.5 exchange, which has no numbered duplicate, never by a numbered name (DL-350), and calls.test.ts pins every
+// call's three types to its exchange's, so typecheck fails on a drift.
 //
 // The types are imported as types only, so nothing here loads the generated module at run time; the validator
 // (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions.
@@ -80,7 +87,7 @@ interface Shapes<Request, Response, Errors> {
   errors: Errors;
 }
 
-/** Each call's request, response and errors, as K-09 v1.5's generated module names them. */
+/** Each call's request, response and errors: K-09 v1.5's, the four v1.1 changed read off their exchanges. */
 export interface CallTypes {
   buildFrontier: Shapes<K09.BuildFrontierRequest, K09.BuildFrontierResponse, K09.BuildFrontierErrors>;
   closestEntries: Shapes<K09.ClosestEntriesRequest, K09.ClosestEntriesResponse, K09.ClosestEntriesErrors>;
@@ -88,18 +95,18 @@ export interface CallTypes {
   composeInput: Shapes<K09.ComposeInputRequest, K09.ComposeInputResponse, K09.ComposeInputErrors>;
   finalizeMessage: Shapes<K09.FinalizeMessageRequest, K09.FinalizeMessageResponse, K09.FinalizeMessageErrors>;
   recordSafetyOutcome: Shapes<
-    K09.RecordSafetyOutcomeRequest,
-    K09.RecordSafetyOutcomeResponse,
+    K09.RecordSafetyOutcomeExchange["request"],
+    Exclude<K09.RecordSafetyOutcomeExchange["outcome"], K09.RecordSafetyOutcomeErrors>,
     K09.RecordSafetyOutcomeErrors
   >;
   releaseSafetyHold: Shapes<
-    K09.ReleaseSafetyHoldRequest,
+    K09.ReleaseSafetyHoldExchange["request"],
     K09.ReleaseSafetyHoldResponse,
     K09.ReleaseSafetyHoldErrors
   >;
   recordStopOrStart: Shapes<
     K09.RecordStopOrStartRequest,
-    K09.RecordStopOrStartResponse,
+    Exclude<K09.RecordStopOrStartExchange["outcome"], K09.RecordStopOrStartErrors>,
     K09.RecordStopOrStartErrors
   >;
   setRecordFlag: Shapes<K09.SetRecordFlagRequest, K09.SetRecordFlagResponse, K09.SetRecordFlagErrors>;
