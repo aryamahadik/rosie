@@ -1,5 +1,5 @@
 // The AI layer over every model-contract fixture, on the recorded-model double (T-376; BP starting shape M2: "AI layer
-// ... against the model contract's fixtures and a recorded-model double"): npm run test:unit -- ai/test/fixtures-run.
+// ... against the model contract's fixtures and a recorded-model double"): npm run test:unit -- ai/src/fixtures-run.
 //
 // Every K-02 fixture (v1 and v1.1) and every K-03 v1 fixture, as their indexes list them, is run through the stage its
 // definition belongs to, built as the Worker builds it, with the real AI gateway, prompt layout and checks:
@@ -28,7 +28,7 @@
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { createPromptCache, type PromptCache } from "../src/cache";
+import { createPromptCache, type PromptCache } from "../cache";
 import {
   CHECK_NAMES,
   SLOT_NAMES,
@@ -40,9 +40,9 @@ import {
   type ComposeProblem,
   type Composer,
   type MessagePlan,
-} from "../src/composer";
-import { GATEWAY_BUNDLE as COMPOSER_BUNDLE, PROMPTS as COMPOSER_PROMPTS } from "../src/composer/test-support";
-import { ContextRefusedError, type DecideContext } from "../src/context";
+} from "../composer";
+import { GATEWAY_BUNDLE as COMPOSER_BUNDLE, PROMPTS as COMPOSER_PROMPTS } from "../composer/test-support";
+import { ContextRefusedError, type DecideContext } from "../context";
 import {
   createDecider,
   type DecidePart,
@@ -51,7 +51,7 @@ import {
   type Decider,
   type DecideTurnAnswer,
   type RereadAnswer,
-} from "../src/decide";
+} from "../decide";
 import {
   WRITTEN_CONTEXTS,
   bundleOf,
@@ -61,7 +61,7 @@ import {
   rolesOf,
   twoStep,
   writtenRecordings,
-} from "../src/decide/test-support";
+} from "../decide/test-support";
 import {
   ALLOWED_MODELS,
   HAIKU_MODEL,
@@ -69,7 +69,7 @@ import {
   SONNET_MODEL,
   costMicroUsd,
   type ModelCall,
-} from "../src/gateway";
+} from "../gateway";
 import {
   RecordingRefusedError,
   canonicalJson,
@@ -81,16 +81,12 @@ import {
   type ModelContract,
   type PlanContract,
   type RecordedModel,
-} from "../src/recorded-double";
-import { CONTRACTS_ROOT } from "../src/recorded-double/contract";
-import { JOIN_TURN_ID, bundleV0 } from "../src/recorded-double/test-support";
-import { createRouter, type RoutingBundle, type RoutingPolicy, type TurnRoute } from "../src/routing";
-import { SAFETY_VERDICT_MS, createSafetyReader, type SafetyResult } from "../src/safety";
-import {
-  BUNDLE as SAFETY_BUNDLE,
-  K02_DANGER_WORDS,
-  PROMPTS as SAFETY_PROMPTS,
-} from "../src/safety/test-support";
+} from "../recorded-double";
+import { CONTRACTS_ROOT } from "../recorded-double/contract";
+import { JOIN_TURN_ID, bundleV0 } from "../recorded-double/test-support";
+import { createRouter, type RoutingBundle, type RoutingPolicy, type TurnRoute } from "../routing";
+import { SAFETY_VERDICT_MS, createSafetyReader, type SafetyResult } from "../safety";
+import { BUNDLE as SAFETY_BUNDLE, K02_DANGER_WORDS, PROMPTS as SAFETY_PROMPTS } from "../safety/test-support";
 import {
   bundleIdProblems,
   openTrace,
@@ -98,8 +94,8 @@ import {
   type BundleId,
   type Span,
   type TraceContext,
-} from "../../runtime/src/trace";
-import { schemaErrors } from "../../runtime/src/trace/test-support";
+} from "../../../runtime/src/trace";
+import { schemaErrors } from "../../../runtime/src/trace/test-support";
 import {
   LoggedDouble,
   RECORDINGS,
@@ -167,7 +163,7 @@ const WAITING: Readonly<
 > = {
   "K-03 plan-s1-02.json": {
     waitsFor:
-      "a recording of K-03 v1.1's input-s1-02-v1.1.json, whose term facts hold the plan's 15 and $2; the double holds the plan only for K-03 v1 inputs with no facts (input-s1-02.json, the JOIN run's composer-inputs/join-s1-02.json), and its composer loader reads K-03 v1 alone",
+      "T-1175 (DL-355): a recording of K-03 v1.1's input-s1-02-v1.1.json, whose term facts hold the plan's 15 and $2; the double holds the plan only for K-03 v1 inputs with no facts (input-s1-02.json, the JOIN run's composer-inputs/join-s1-02.json), and its composer loader reads K-03 v1 alone",
     meanwhile: S1_02_LITERALS,
   },
 };
@@ -834,7 +830,7 @@ const PLANS_GIVEN = new Map<string, boolean[]>();
 
 describe("the composer (C-118): every row the double holds, one Haiku call each", () => {
   it.each(COMPOSER_RECORDINGS.map((recording) => [recording.id, recording] as const))(
-    "%s: the double's plan passes T-375's four reader checks against its input, and leaves the composer as its K-03 plan, or is refused as K-03 says",
+    "%s: the double's plan passes T-375's four reader checks against its input, and leaves the composer as its K-03 plan, or, for plan-s1-02.json (WAITING on T-1175), is refused for its two literals (literalValue x2)",
     async (_id, recording) => {
       const input = requestOf(recording) as ComposeInput;
       const file = must(recording.seed?.fixture, "the recording's seed");
@@ -869,7 +865,7 @@ describe("the composer (C-118): every row the double holds, one Haiku call each"
     },
   );
 
-  it("each accepted K-03 v1 plan is given by a row the double holds, but for the ones WAITING names, which no row gives yet", () => {
+  it("each accepted K-03 v1 plan is given by a row the double holds, but for the ones WAITING names (plan-s1-02.json, WAITING on T-1175), which no row gives yet", () => {
     const files = (
       planFixture("index.json") as {
         fixtures: { file: string; version: string; def: string; expect: string }[];

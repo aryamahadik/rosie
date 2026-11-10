@@ -17,10 +17,10 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { fakeCachingApi, type FakeUsage } from "../src/cache/test-support";
-import { composeInputText, type ComposeInput } from "../src/composer";
-import { choiceIdsOf, stepOf, userOf, type StepAnswers } from "../src/decide/test-support";
-import type { FetchLike } from "../src/gateway";
+import { fakeCachingApi, type FakeUsage } from "../cache/test-support";
+import { composeInputText, type ComposeInput } from "../composer";
+import { choiceIdsOf, stepOf, userOf, type StepAnswers } from "../decide/test-support";
+import type { FetchLike } from "../gateway";
 import {
   canonicalJson,
   requestKey,
@@ -28,12 +28,12 @@ import {
   type JsonObject,
   type RecordedComposer,
   type RecordedModel,
-} from "../src/recorded-double";
-import { textOfTurn } from "../src/safety/test-support";
-import type { TurnRoute } from "../src/routing";
+} from "../recorded-double";
+import { textOfTurn } from "../safety/test-support";
+import type { TurnRoute } from "../routing";
 
-/** The repository root: this file is ai/test/double-transport.ts. */
-export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+/** The repository root: this file is ai/src/fixtures-run/double-transport.ts. */
+export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 export const readJson = (file: string): unknown =>
   JSON.parse(readFileSync(path.join(REPO_ROOT, file), "utf8")) as unknown;
