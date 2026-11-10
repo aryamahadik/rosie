@@ -1,0 +1,65 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-26T15:00:05Z",
+    "note": "A practice whose one kind of work turns the sensitive switch on in flow A only: Lee Associates, the flow A business of fixture set v1's therapist demo shop (test-kit/shops/therapist.json, which turns the switch on), with one kind of work, therapist, listing sensitive in pf_switches_a and nothing in pf_switches_b. One flow is enough, so the read answers businessSensitive true (README item 45, default 66), and the caller fills the row in its sensitive form. The row is Alex's first reply from the practice: a quick reply about no booking that asks no question, so its line is null, as K-04's out-alex-first reads at the barbershop (read-outbox-row-no-question.json), planned at version 1. Alex holds no role there and no question is open with him there: his customer roles at the barbershop and the yoga studio, and A7-03, are other businesses' and are not read. His phone's flags are K-04's seed values, and the text's safety row is not written, so its outcomes are null. No frozen seed holds a business with a sensitive kind of work, so the database side writes these five rows itself before the read, in this order: businesses biz-lee-associates (name and display name Lee Associates, status live, time zone America/New_York, text hours 08:00 to 20:00, version 1); companies company-lee-associates (owner person-sam, name Lee Associates, business biz-lee-associates, version 1); company_kinds company-lee-associates and therapist (business biz-lee-associates, trade name null, pf_facts planbill, forms, plans, video, children and firststeps as therapist.json lists them, pf_switches_a sensitive, pf_switches_b empty, version 1); turns turn-alex-lee-associates-first (handle-alex, event ids evt-alex-lee-associates-0001, state committed, the bundle of K-04's seed-bundle-registry.json, trace trace-alex-lee-associates-0001, no joined traces, tries 1, committed at 2026-10-26T15:00:03Z, version 1); outbox_rows out-alex-lee-associates-first (that turn, to handle-alex and person-alex, business biz-lee-associates, no booking, channel imessage, send class quick_reply, versions read empty, no question, no plan and no final parts, state planned, the same bundle and trace, version 1)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-lee-associates-first",
+    "businessId": "biz-lee-associates"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "out-alex-lee-associates-first",
+    "businessId": "biz-lee-associates",
+    "readAt": "2026-10-26T15:00:05Z",
+    "row": {
+      "turnId": "turn-alex-lee-associates-first",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": null,
+    "recipient": {
+      "handleId": "handle-alex",
+      "kind": "phone",
+      "personId": "person-alex",
+      "name": "Alex M.",
+      "storedLanguage": "en",
+      "roles": [],
+      "phone": {
+        "stopped": false,
+        "chatOpen": true,
+        "chatWay": "imessage",
+        "pollVotedAt": "2026-10-23T14:06:10Z",
+        "version": 3
+      }
+    },
+    "answers": {
+      "handleId": "handle-alex",
+      "texts": [{ "eventId": "evt-alex-lee-associates-0001", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lee-associates",
+        "name": "Lee Associates",
+        "displayName": "Lee Associates",
+        "timeZone": "America/New_York",
+        "version": 1
+      },
+      "booking": null,
+      "question": null
+    },
+    "businessSensitive": true,
+    "openQuestions": []
+  }
+}
