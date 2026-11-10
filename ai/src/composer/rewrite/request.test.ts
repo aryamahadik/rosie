@@ -249,8 +249,8 @@ describe("a request the composer cannot rewrite is refused before any call, nami
 });
 
 describe("the rewrite as the model reads it: the composer's prompt, the row's input, the plan to fix and what failed as data, then the task", () => {
-  it("the system prompt is the composer's own, unchanged (T-372's composer-3): a rewrite and a compose call lay out the same bytes", () => {
-    expect(COMPOSER_PROMPT_VERSION).toBe("composer-3");
+  it("the system prompt is the composer's own, unchanged by the rewrite (composer-4 since T-375): a rewrite and a compose call lay out the same bytes", () => {
+    expect(COMPOSER_PROMPT_VERSION).toBe("composer-4");
     const turn = rewriteTurnText(A7_17_INPUT, TWO_QUESTIONS_PLAN, TWO_QUESTIONS_TOLD);
     const rewrite = PROMPTS.layout({ purpose: "rewrite", turn });
     const compose = PROMPTS.layout({ purpose: "compose", turn: composeInputText(A7_17_INPUT) });

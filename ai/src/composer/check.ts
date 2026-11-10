@@ -16,7 +16,11 @@
 //                   some fact's value. Dates and prices written in words are the check's alone (README line 87;
 //                   DL-163): a day or month name, or a day said in words, is held by a fact's value with the same word;
 //                   a price in words ("two dollars", "dos dólares") by a fact's value with the same amount of money, in
-//                   digits or in words.
+//                   digits or in words;
+//   readerProblems  (T-375, ./relay) what the reader must and must not read: a relayed sender quoted through
+//                   {{relay.quote}}, once, never typed; on a gentle row (grief, safety or sensitive work) no sample
+//                   service or name and no "!"; the plan in the row's language. Run last, on a plan that keeps to its
+//                   formats and its facts.
 //
 // Structured outputs keep a model to its schema, but a refusal or a cut-off answer may not match it (T-360 finding 4),
 // and no grammar knows the row's allowed formats or facts, so every answer is checked. The Worker cannot run Ajv (it
@@ -30,6 +34,7 @@
 // may reach a log (K-08 README line 75: never a message's words in a span or a log line).
 
 import formatsContract from "../../../contracts/common/formats.v1.schema.json";
+import { readerProblems } from "./relay";
 import {
   CHANNELS,
   FORMATS,
@@ -693,11 +698,15 @@ export function literalProblems(plan: MessagePlan, input: ComposeInput): Compose
 
 /**
  * Every check a model's answer passes before it leaves the AI layer, for the row it answers: K-03's plan first; only a
- * whole plan is then held to the row (its allowed formats, then its facts).
+ * whole plan is then held to the row (its allowed formats, then its facts); and only a plan that keeps to both is held
+ * to its reader (T-375: the relay's quote, sensitive work, the tone and the language). Each stage that fails gives its
+ * problems alone.
  */
 export function planAgainstInput(answer: unknown, input: ComposeInput): ComposeProblem[] {
   const shape = planProblems(answer);
   if (shape.length > 0) return shape;
   const plan = answer as MessagePlan;
-  return [...allowedFormatProblems(plan, input), ...literalProblems(plan, input)];
+  const held = [...allowedFormatProblems(plan, input), ...literalProblems(plan, input)];
+  if (held.length > 0) return held;
+  return readerProblems(plan, input);
 }

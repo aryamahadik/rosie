@@ -1,9 +1,37 @@
 // The composer (C-118, T-373): one Haiku call per outbox row, its K-03 v1.1 input in (slot facts and term facts), the
 // row's K-03 message plan out (compose.ts), checked before it leaves the AI layer (check.ts), in K-03's own plan schema
 // (schema.ts). Its system prompt is T-372's (prompt/). Its one rewrite, told what failed, then 'use the fallback', is
-// T-374's (rewrite/).
+// T-374's (rewrite/). Its relays, translation, sensitive work, tone tags and language are T-375's (relay/).
 
 export { COMPOSE_EFFORT, COMPOSE_ROLE, createComposer } from "./compose";
+export {
+  CHECKED_LANGUAGES,
+  CODE_READINGS,
+  CRISIS_READINGS,
+  EXCLAMATION,
+  LEAST_OTHER_WORDS,
+  PERSON_SLOTS,
+  PRIVATE_DETAIL,
+  PRIVATE_TAGS,
+  QUOTE_RUN,
+  QUOTE_SLOT,
+  SECURE_PAGE_READING,
+  SERVICE_SLOTS,
+  SHORTEST_QUOTE,
+  SMALL_WORDS,
+  gentleRow,
+  isCodeReading,
+  languageProblems,
+  quoteOf,
+  quoteProblems,
+  readerProblems,
+  sensitiveProblems,
+  serviceHidden,
+  smallWordCounts,
+  toneProblems,
+  withPrivateDetails,
+  type CheckedLanguage,
+} from "./relay";
 export {
   CHECK_WORDS,
   FIXED_LINES_RULE,
