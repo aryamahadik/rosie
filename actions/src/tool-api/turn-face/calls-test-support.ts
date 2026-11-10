@@ -85,16 +85,6 @@ export function commitS101(): CommitS101 {
 }
 
 /**
- * What main's commit answers beyond commit-s1-01.json, named and never faked: `written` lists the core action's own row,
- * the text's safety record, before the rows the fixture states. K-09 v1.5 default 134 leaves the core action's rows out
- * of `written` ("named in its response", as recordSafetyOutcome's outcomeId names it), while T-305's commit hands on
- * K-05 commitTurn's list whole (actions/src/commit, outside this card). Emptied once the commit leaves it out.
- */
-export const CORE_ROW_IN_WRITTEN: readonly Json[] = [
-  { table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 },
-];
-
-/**
  * commit-s1-01.json's request with its decided context taken from the frontier's answer (each call's output feeding the
  * next: DL-322), or the fixture's own context when the frontier gave none (main's frontier fails closed while its door
  * waits: T-315's WAITING), so the commit always reads the context the turn's frontier gives, or would give.

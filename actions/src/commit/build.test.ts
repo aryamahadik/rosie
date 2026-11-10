@@ -5,11 +5,21 @@
 // linq_chat_id (K-04 threads). Through the Tool API base with its K-09 v1.5 validator, the gate's scripted limits (never
 // the stubs changed) and the commit's port doubles (test-support.ts), the walk's double handing over the rows
 // commit-s1-01.json's given.stated.writes states (default 136). Values come only from the contracts' fixtures (rule 9).
+//
+// T-1194: rowsNamedBy, the rows a unit's writes name by table and id, which the commit's answer leaves out of `written`
+// for a core action (commit.ts default 9).
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Span } from "../../../runtime/src/trace";
-import { copy, decidedOf, fixtureScript, gateExchange, scriptedLimits } from "../gate/framework/test-support";
+import {
+  callContext,
+  copy,
+  decidedOf,
+  fixtureScript,
+  gateExchange,
+  scriptedLimits,
+} from "../gate/framework/test-support";
 import type { GateRequest, SetupKey } from "../gate/framework";
 import { createToolApi, createToolApiValidator } from "../tool-api";
 import {
@@ -19,10 +29,19 @@ import {
   stringsIn,
   traceFor,
 } from "../tool-api/test-support";
-import { buildCommitRequest, k05TurnRow } from "./build";
+import { buildCommitRequest, k05TurnRow, questionClock, rowsNamedBy } from "./build";
 import { gateAndCommit } from "./commit";
 import { CommitRefusedError } from "./errors";
-import { contractChecks, doublePorts, eventLogRowsOf, k05Fake, noWrites, whyOfChoice } from "./test-support";
+import {
+  contractChecks,
+  doublePorts,
+  effectAtCommit,
+  eventLogRowsOf,
+  k05Fake,
+  noWrites,
+  samKindsWrites,
+  whyOfChoice,
+} from "./test-support";
 import type {
   CommitDeps,
   CommitPorts,
@@ -241,6 +260,109 @@ describe("buildCommitRequest writes K-05's turn row with K-05 v1's seven fields 
     for (const row of eventLogRowsOf(built, "2026-10-19T18:05:05Z")) {
       expect(contractChecks().k08("eventLogRow", row), String(row.id)).toEqual([]);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// rowsNamedBy: the rows a unit's writes name (T-1194)
+
+describe("rowsNamedBy names the rows one unit's writes write, by table and id, as K-05 names them in `written`", () => {
+  /**
+   * One unit with a row in every list: S1-02's walk (samKindsWrites: three picked kinds, S1-04's question, S1-02's
+   * question closed and its clock cancelled, one reply), with a hold released by its id and a phone stopped by its number
+   * (K-04 phones' key), K-05's own fixtures' reservations (commit-reservation-lost.json's confirm,
+   * commit-alex-cancels-while-sending.json's release) and effects (K-07 effect-charge.json's row,
+   * commit-lets-go-outage-effect.json's let-go).
+   */
+  function everyList(): UnitWrites {
+    const writes = samKindsWrites();
+    return {
+      ...writes,
+      state: [
+        ...writes.state,
+        {
+          op: "update",
+          table: "safety_holds",
+          key: { id: "hold-alex-0203" },
+          expectVersion: 1,
+          set: { released_why: "safe_readback" },
+        },
+        {
+          op: "update",
+          table: "phones",
+          key: { number: "+15555550131" },
+          expectVersion: 3,
+          set: { stopped: true },
+        },
+      ],
+      reservations: {
+        confirm: [{ id: "rsv-alex-saved-avery", expectVersion: 1, bookingId: "booking-alex-avery-nov14" }],
+        release: [{ id: "rsv-alex-riley-nov14", expectVersion: 2, why: "cancelled" }],
+      },
+      effects: {
+        write: [effectAtCommit("effect-charge.json")],
+        letGo: [{ effectId: "eff-cal-riley-alex-nov14-write", expectVersion: 8 }],
+      },
+    };
+  }
+
+  it("each state row by its id or its key's one column, the question it asks with the commit's clock row, the question it closes, the clock it cancels, the reservations and the effects; never its outbox row", () => {
+    const writes = everyList();
+    expect(rowsNamedBy(writes)).toEqual([
+      { table: "picked_kinds", rowId: "pick-sam-barbershop" },
+      { table: "picked_kinds", rowId: "pick-sam-plumbing" },
+      { table: "picked_kinds", rowId: "pick-sam-electrical" },
+      { table: "safety_holds", rowId: "hold-alex-0203" },
+      { table: "phones", rowId: "+15555550131" },
+      { table: "open_questions", rowId: "oq-s1-04-sam" },
+      { table: "clock_rows", rowId: "clock-oq-s1-04-sam" },
+      { table: "open_questions", rowId: "oq-s1-02" },
+      { table: "clock_rows", rowId: "clock-oq-s1-02" },
+      { table: "reservations", rowId: "rsv-alex-saved-avery" },
+      { table: "reservations", rowId: "rsv-alex-riley-nov14" },
+      { table: "effects", rowId: "eff-alex-grooms-deposit" },
+      { table: "effects", rowId: "eff-cal-riley-alex-nov14-write" },
+    ]);
+    // The question's clock row is the one the commit writes for it (questionClock), and the reply is K-05's outboxRows'.
+    const [ask] = writes.asks;
+    if (ask === undefined) throw new Error("S1-02's walk asks S1-04");
+    expect(questionClock(ask.question, ask.safeDefault).id).toBe("clock-oq-s1-04-sam");
+    expect(rowsNamedBy(writes).map((row) => row.rowId)).not.toContain("out-s1-04-sam");
+  });
+
+  it("names the rows K-05's fake lists for the unit, but the saved-time clock row K-05 adds to a booked reservation", async () => {
+    const writes = { ...samKindsWrites(), reservations: everyList().reservations };
+    const k05 = k05Fake();
+    await k05.commitTurn(
+      buildCommitRequest({
+        turn: requestTurn(),
+        zone: "America/New_York",
+        businessId: "biz-lees-barbershop",
+        actor: { personId: "person-sam", roleAt: () => null },
+        units: [{ writes, answer: null }],
+      }),
+      callContext(),
+    );
+    const listed = (k05.commits[0]?.written ?? []).map((row) => ({ table: row.table, rowId: row.rowId }));
+    const named = rowsNamedBy(writes);
+    expect(
+      listed.filter((row) => !named.some((each) => JSON.stringify(each) === JSON.stringify(row))),
+    ).toEqual([{ table: "clock_rows", rowId: "rsv-alex-saved-avery/saved-time" }]);
+    expect(named.every((row) => listed.some((each) => JSON.stringify(each) === JSON.stringify(row)))).toBe(
+      true,
+    );
+  });
+
+  it("names no row for an insert with no `id` (a table keyed by another column) or a write that names its row by nothing", () => {
+    const writes: UnitWrites = {
+      ...noWrites({ step: "S1-09", choice: null }),
+      state: [
+        { op: "insert", table: "business_setup", values: { business_id: "biz-lees-barbershop" } },
+        { op: "update", table: "pauses", key: { id: "" }, expectVersion: 1, set: { cleared_at: null } },
+      ],
+    };
+    expect(rowsNamedBy(writes)).toEqual([]);
+    expect(rowsNamedBy(noWrites({ step: "A3-22", choice: null }))).toEqual([]);
   });
 });
 

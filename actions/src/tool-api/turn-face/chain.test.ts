@@ -28,7 +28,6 @@ import {
 } from "../../frontier/assemble/test-support";
 import { fixture, traceFor } from "../test-support";
 import {
-  CORE_ROW_IN_WRITTEN,
   callDoubles,
   commitRequestAfter,
   commitS101,
@@ -101,18 +100,19 @@ async function frontierThenCommit(chain: ReturnType<typeof chainOf>): Promise<vo
   const { context } = frontier as unknown as { context: Json };
   expect(context.choices).toEqual(frontierExchange.outcome.context.choices);
 
-  // 2. Gate and commit on the frontier's context: commit-s1-01.json's outcome (CORE_ROW_IN_WRITTEN apart).
+  // 2. Gate and commit on the frontier's context: commit-s1-01.json's whole outcome, `written` included (T-1194).
   const request = commitRequestAfter(context);
   if (request.input.kind !== "decided") throw new Error("turn 1 is decided");
   expect(request.input.decided.context).toEqual({ ...frontierExchange.outcome.context, recentMessages: [] });
   const committed = await chain.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
   expect(validator.check("gateAndCommit", "response", committed)).toEqual([]);
-  const stated = commitS101().outcome as Json & { written: { written: Json[] } };
-  expect(committed).toEqual({
-    ...stated,
-    written: { ...stated.written, written: [...CORE_ROW_IN_WRITTEN, ...stated.written.written] },
-  });
+  const stated = commitS101().outcome;
+  expect(committed).toEqual(stated);
+  // One K-05 commit, which still writes Sam's safety record beside the rows `written` lists.
   expect(chain.commit.k05.requests).toHaveLength(1);
+  expect(chain.commit.k05.commits.map((commit) => commit.written)).toEqual([
+    [{ table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 }, ...stated.written.written],
+  ]);
 }
 
 /** The row read compose input and finalize get is the commit's own: its row, turn, bundle, question and recipient. */

@@ -11,6 +11,9 @@
 // T-1193 (DL-376): the handle actor's turn records the gate (one span per part, with its limits) and the commit itself,
 // so the face's gateAndCommit leaves no span of the base's; the same handlers on a base called without the face's option
 // give the same commit and record the base's one gate span, labels only.
+//
+// T-1194: the answer's `written` leaves the safety record's row out, as commit-s1-01.json's does (K-09 v1.5 default 134),
+// so the whole answer equals the fixture's; K-05's one commit still writes the record.
 
 import { describe, expect, it } from "vitest";
 
@@ -22,7 +25,6 @@ import { traceFor } from "../test-support";
 import { createToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
 import {
-  CORE_ROW_IN_WRITTEN,
   bundleV0,
   callDoubles,
   commitContextOf,
@@ -88,14 +90,9 @@ describe("gateAndCommit through the turn face: commit-s1-01.json, turn 1 (K-09 v
     const doubles = callDoubles();
     const { answer, spans } = await commitThrough(doubles.calls, commitRequestAfter(undefined));
     const result = committed(answer);
-    // Every field as the fixture states it; `written` too, but for the core action's row main's commit lists first
-    // (CORE_ROW_IN_WRITTEN: named, never faked).
-    const { written, ...rest } = result as unknown as Json & { written: { written: Json[] } };
-    const { written: stated, ...statedRest } = exchange.outcome as unknown as Json & {
-      written: { written: Json[]; outboxRows: Json[]; promoted: Json[] };
-    };
-    expect(rest).toEqual(statedRest);
-    expect(written).toEqual({ ...stated, written: [...CORE_ROW_IN_WRITTEN, ...stated.written] });
+    // Every field as the fixture states it, `written` included: the rows the walk wrote, the core action's left out and
+    // named in its response instead (K-09 v1.5 default 134; T-1194).
+    expect(result).toEqual(exchange.outcome);
 
     // One K-05 commit, its turn row K-05's seven fields alone (default 135), the record's row and entry among its writes.
     expect(doubles.k05.requests).toHaveLength(1);
@@ -107,6 +104,16 @@ describe("gateAndCommit through the turn face: commit-s1-01.json, turn 1 (K-09 v
     expect(sent.turn).toMatchObject({ id: "turn-s1-01-sam", traceId: "trace-sam-0000" });
     expect(sent.writes.events.map((entry) => entry.kind)).toContain("safety_outcome.recorded");
     expect(sent.writes.outboxRows.map((row) => row.id)).toEqual(["outbox-s1-02-sam-1"]);
+    // The safety record is still written, by that same commit: K-05 wrote its row first, then the rows `written` lists.
+    expect(doubles.k05.commits).toEqual([
+      {
+        turnId: "turn-s1-01-sam",
+        written: [
+          { table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 },
+          ...exchange.outcome.written.written,
+        ],
+      },
+    ]);
 
     // No span of the base's on the turn's trace: the turn records the gate and the commit itself, and the face tells the
     // base so (T-1193). The base's own gate span, without the face's option, is the next test's.
