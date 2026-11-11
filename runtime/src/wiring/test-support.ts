@@ -44,8 +44,7 @@
 //                booking, phone row or language), answering as T-315's integration test shows the real readTurnState
 //                answers on those rows under Lee's Barbershop's scope, and refusing a read that names another business
 //                than the call's scope, as T-219's readTurnStateIn does
-//   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
-//                clocks/arming-support's question facts and actor directory
+//   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result
 //   turnFace     turn/test-support fakeTurnFace (closest entries) and safety/test-support fakeCore
 //   composeInput joined (T-560): the root binds @rosie/actions' turn face's composeInput through its real compose-input
 //                port (./real.ts realComposeInput), its inbound text the words the gate port's face holds for the turn.
@@ -83,13 +82,18 @@
 //                K-05 commitTurn double wrote, the plans and final parts finalize wrote into them (`fakeFinalizeData`) and
 //                test owner 1's seeded rows (no phone row until his text opens his chat at receipt), answering as
 //                db/repo/outbox.ts and send-state.ts answer on them
-//   dataAccess   turn/test-support fakeRows (the commit's one row) and clocks/arming-support's K-05 armClock and
-//                cancelClock
+//   dataAccess   turn/test-support fakeRows (the commit's one row)
 //   linqSend     joined (T-563): the root binds K-11 sendPart through its real Linq send port (./real.ts realLinqSend).
 //                What it is fed comes from here: `FakeLinqLine`, @rosie/adapters' Linq double (T-411) behind a line that
 //                answers a moment after the send starts and keeps every request the port handed on; and the retry queue
 //                the dispatcher's waits go on (`fakeRetryQueue`, RootOptions.retryQueue), whose due messages a test hands
 //                to the root's door
+//   arming       joined (T-564): the root binds the clock arming's calls and reads through its real arming port (./real.ts
+//                realArming), which the receipt door's clock arming (T-255) runs on. What it is fed comes from here:
+//                `fakeArmingCalls`, K-05 v1 item 5's armClock and cancelClock as doubles over the clock rows and open
+//                questions the K-05 commitTurn double wrote (each move kept beside the row the commit wrote, never in it),
+//                answering as db/repo/clocks.ts answers on them; the question's facts from those rows and test owner 1's
+//                seeded business (its zone); and the actor name of each handle the key double knows
 //   linqDirect   safety/test-support fakeDirect (no D-017 hop)
 //
 // One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures and the Linq
@@ -109,7 +113,11 @@ import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/s
 import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import type { FixedLineFactsRead, OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createLinqDouble, type LinqDouble } from "@rosie/adapters/linq/double";
-import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
+import {
+  createLinqWebhookDouble,
+  eventFromDoubleEvent,
+  type LinqWebhookDouble,
+} from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import joinComposeInputJson from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import composerRecordingsV11 from "@rosie/ai/recordings/composer.v1.1.json";
@@ -149,6 +157,12 @@ import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
 import type { OpenChatOnTextOutcome, OpenChatOnTextRequest } from "@rosie/db/repo/chat-open";
+import type {
+  ArmClockOutcome as K05ArmClockOutcome,
+  ArmClockRequest as K05ArmClockRequest,
+  CancelClockOutcome as K05CancelClockOutcome,
+  CancelClockRequest as K05CancelClockRequest,
+} from "@rosie/db/repo/clocks";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
@@ -182,8 +196,9 @@ import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
 import type { CommitContext, CommitTurnRef } from "../actor";
 import { turnIdOf } from "../actor/lease";
 import { BUNDLE_B } from "../bundle/test-support";
-import { wireArming, type WiredArming } from "../clocks/arming-support";
+import type { NotFoundError as ClockNotFoundError, QuestionFacts } from "../clocks/types";
 import { yieldToOthers } from "../dispatch/test-support";
+import { actorNameOf } from "../gateway";
 import type { LinqAccepted, LinqFailed, LinqSendRequest } from "../dispatch/types";
 import type { RetryMessage, RetryQueue, RetrySendOptions } from "../queues";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
@@ -211,6 +226,7 @@ import type {
 } from "../turn/types";
 import type { Ports } from "./ports";
 import type {
+  ArmingCalls,
   BundleReadCalls,
   CommitTurnCall,
   ComposeReads,
@@ -3732,6 +3748,25 @@ export class FakeLinqLine {
   get keysInOrder(): string[] {
     return [...new Set(this.requests.map((request) => request.idempotencyKey))];
   }
+
+  /**
+   * Linq's delivery receipt for a part the double accepted (T-564): the double's own (T-411 fakeDelivered: its message
+   * id, the part's chat and key), carried as a K-06 delivered event by T-412's eventFromDoubleEvent, from the number the
+   * part went to, by the service it went by, under `eventId`. Its time is the double's, to the whole second K-06 writes,
+   * never before the part's acceptance. Post it with the part's key, which a receipt echoes (K-11 partKey).
+   */
+  deliveredReceipt(partKey: string, eventId: string): LinqEvent {
+    const sent = this.requests.find((request) => request.idempotencyKey === partKey);
+    if (sent === undefined) throw new Error("no part was sent under that key");
+    const faked = this.double.fakeDelivered(partKey);
+    const at = new Date(Math.ceil(Date.parse(faked.at) / 1000) * 1000)
+      .toISOString()
+      .replace(/\.\d{3}Z$/u, "Z");
+    return eventFromDoubleEvent(
+      { ...faked, at },
+      { eventId, receivedAt: at, traceId: `trace-${eventId}`, handle: sent.to, service: sent.service },
+    ).event;
+  }
 }
 
 /** One message the retry queue double took: the message as the binding carries it (as JSON), its delay and when it is due. */
@@ -3784,6 +3819,254 @@ export function fakeRetryQueue(now: () => number): FakeRetryQueue {
   };
 }
 
+// ---- K-05 v1 item 5's armClock and cancelClock and the arming's reads, as doubles: the clock arming (T-564) ----------
+
+/** A clock row's K-04 states (clock_rows.state). */
+export type ClockRowState = "waiting" | "armed" | "fired" | "cancelled";
+
+/** A clock row as the arming's calls moved it (K-04 clock_rows), beside the row the commit wrote, never in it. */
+export interface ArmedClockRow {
+  state: ClockRowState;
+  version: number;
+  armedAt: string | null;
+  dueAt: string | null;
+  dueZone: string | null;
+  cancelledAt: string | null;
+}
+
+export interface FakeArmingCalls {
+  /**
+   * What the root's real arming port is fed (RootOptions.armingCalls): K-05 v1 item 5's armClock and cancelClock over the
+   * rows the commit wrote, the question's facts and the actor name of a handle.
+   */
+  readonly calls: ArmingCalls;
+  /** Every armClock request and its answer, in order. */
+  readonly arms: DispatchCall<K05ArmClockRequest, K05ArmClockOutcome>[];
+  /** Every cancelClock request and its answer, in order. */
+  readonly cancels: DispatchCall<K05CancelClockRequest, K05CancelClockOutcome>[];
+  /** Every question whose facts were read, in order. */
+  readonly factReads: string[];
+  /** Every handle whose actor was named, in order. */
+  readonly actorReads: string[];
+  /** A clock row as the arming's calls left it, or as the commit wrote it; null for a row no commit wrote. */
+  clockRow(id: string): Readonly<ArmedClockRow> | null;
+  /**
+   * An open question's status as the arming left it (waiting to open with its row's arming: K-05 default 8), or as the
+   * commit wrote it; null for a question no commit wrote.
+   */
+  questionStatus(id: string): string | null;
+}
+
+const CLOCK_ROW_STATES: readonly string[] = ["waiting", "armed", "fired", "cancelled"];
+
+/**
+ * K-05 v1 item 5 (README item 5; arm-clock.json, cancel-clock.json) and the clock arming's two reads, as doubles over the
+ * clock rows and open questions the K-05 commitTurn double wrote (`written`) and test owner 1's seeded rows, answering as
+ * db/repo/clocks.ts answers on them (its defaults 1 to 4), each move kept beside the row the commit wrote, never in it:
+ *
+ *   armClock      named by its row, or by its question (the question's rows of kind question: the live one, waiting or
+ *                 armed, with the lowest id, else the lowest id); waiting moves to armed with the request's due time and
+ *                 zone, armed at its deliveredAt, its version one up, and its question from waiting to open (default 2:
+ *                 only while waiting); an armed row answers its first arming, repeated (a later receipt never moves it);
+ *                 a fired or cancelled one clockClosed; no such row notFound clock_rows (named as the request named it),
+ *                 no such question notFound open_questions.
+ *   cancelClock   a waiting or armed row moves to cancelled, compared on its version; a cancelled row answers its
+ *                 cancellation, repeated; a fired one alreadyFired; another version versionChanged. The arming never
+ *                 withdraws a question: a request that does is refused (thrown), as this double holds no such path.
+ *   questionFacts the question's Clock line as its commit wrote it (K-04 open_questions.clock), its business's zone as the
+ *                 seed holds it (K-04 businesses.time_zone), no visit (the skeleton's seed holds no booking: a question on
+ *                 a booking is refused, thrown), and its never-delivered row with the version as it stands, when its
+ *                 commit made one (none in turn 1: STATE note 37).
+ *   actorNameOf   the actor name the gateway gives a handle the key double knows (actorNameOf over its kind and
+ *                 address); null for any other.
+ */
+export function fakeArmingCalls(
+  written: Pick<FakeTurnRows, "rows">,
+  handleOf: (handleId: string) => { readonly kind: string; readonly address: string } | null,
+): FakeArmingCalls {
+  const moved = new Map<string, ArmedClockRow>();
+  const opened = new Map<string, string>();
+  const clockRows = (): WrittenRow[] => [...(written.rows.get("clock_rows")?.values() ?? [])];
+  const questionOf = (id: string): WrittenRow | undefined => written.rows.get("open_questions")?.get(id);
+  /** A question's status as it stands: the arming's move of it, else as the commit wrote it; null for none written. */
+  const statusOf = (id: string): string | null => {
+    const known = opened.get(id);
+    if (known !== undefined) return known;
+    const status = questionOf(id)?.values.status;
+    return typeof status === "string" ? status : null;
+  };
+
+  /** The row as it stands: the arming's move of it, else as the commit wrote it. */
+  const standing = (row: WrittenRow): ArmedClockRow => {
+    const known = moved.get(row.id);
+    if (known !== undefined) return known;
+    const state = String(row.values.state);
+    if (!CLOCK_ROW_STATES.includes(state)) throw new Error(`a clock row the commit wrote has no K-04 state`);
+    const due = dueOf(row.values);
+    const given = row.values.due;
+    const made: ArmedClockRow = {
+      state: state as ClockRowState,
+      version: row.version,
+      armedAt: isRecord(given) && typeof given.armedAt === "string" ? given.armedAt : null,
+      dueAt: due.dueAt,
+      dueZone: due.dueZone,
+      cancelledAt: null,
+    };
+    moved.set(row.id, made);
+    return made;
+  };
+
+  const notFound = (table: string, rowId: string): ClockNotFoundError => ({
+    error: "notFound",
+    table,
+    rowId,
+  });
+
+  const armedAnswer = (row: WrittenRow, state: ArmedClockRow, repeated: boolean): K05ArmClockOutcome => ({
+    result: "armed",
+    repeated,
+    clock: {
+      clockRowId: row.id,
+      version: state.version,
+      armedAt: state.armedAt ?? "",
+      dueAt: state.dueAt ?? "",
+      dueZone: state.dueZone ?? "",
+      handleId: typeof row.values.handleId === "string" ? row.values.handleId : null,
+    },
+  });
+
+  const armClockOf = (request: K05ArmClockRequest): K05ArmClockOutcome => {
+    let row: WrittenRow | undefined;
+    if ("clockRowId" in request) {
+      row = written.rows.get("clock_rows")?.get(request.clockRowId);
+      if (row === undefined) return notFound("clock_rows", request.clockRowId);
+    } else {
+      const questionId = request.openQuestionId;
+      if (questionOf(questionId) === undefined) return notFound("open_questions", questionId);
+      const rows = clockRows()
+        .filter((each) => each.values.kind === "question" && each.values.openQuestionId === questionId)
+        .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+      row = rows.find((each) => ["waiting", "armed"].includes(standing(each).state)) ?? rows[0];
+      if (row === undefined) return notFound("clock_rows", questionId);
+    }
+    const state = standing(row);
+    if (state.state === "armed") return armedAnswer(row, state, true);
+    if (state.state === "fired" || state.state === "cancelled") {
+      return { error: "clockClosed", clockRowId: row.id, state: state.state };
+    }
+    state.state = "armed";
+    state.version += 1;
+    state.armedAt = request.deliveredAt;
+    state.dueAt = request.dueAt;
+    state.dueZone = request.dueZone;
+    const questionId = row.values.openQuestionId;
+    if (typeof questionId === "string" && statusOf(questionId) === "waiting") opened.set(questionId, "open");
+    return armedAnswer(row, state, false);
+  };
+
+  const cancelClockOf = (request: K05CancelClockRequest): K05CancelClockOutcome => {
+    if (request.withdrawQuestion !== null) {
+      throw new Error(
+        "the skeleton's cancelClock double withdraws no question (the arming never asks it to)",
+      );
+    }
+    const row = written.rows.get("clock_rows")?.get(request.clockRowId);
+    if (row === undefined) return notFound("clock_rows", request.clockRowId);
+    const state = standing(row);
+    if (state.state === "fired") return { error: "alreadyFired", clockRowId: row.id, firedAt: "" };
+    if (state.state === "cancelled") {
+      return {
+        result: "cancelled",
+        clockRowId: row.id,
+        version: state.version,
+        cancelledAt: state.cancelledAt ?? request.at,
+        repeated: true,
+      };
+    }
+    if (state.version !== request.expectVersion) {
+      return {
+        error: "versionChanged",
+        changed: [
+          {
+            table: "clock_rows",
+            rowId: row.id,
+            readVersion: request.expectVersion,
+            currentVersion: state.version,
+          },
+        ],
+      };
+    }
+    state.state = "cancelled";
+    state.version += 1;
+    state.cancelledAt = request.at;
+    return {
+      result: "cancelled",
+      clockRowId: row.id,
+      version: state.version,
+      cancelledAt: request.at,
+      repeated: false,
+    };
+  };
+
+  const factsOf = (openQuestionId: string): QuestionFacts | ClockNotFoundError => {
+    const question = questionOf(openQuestionId);
+    if (question === undefined) return notFound("open_questions", openQuestionId);
+    const values = question.values;
+    if (values.bookingId !== null && values.bookingId !== undefined) {
+      throw new Error("the skeleton's question facts double holds no booking");
+    }
+    const businessId = values.businessId;
+    const zone = typeof businessId === "string" ? SEEDED.businesses.get(businessId)?.values.time_zone : null;
+    const never = clockRows().find(
+      (row) => row.values.kind === "never_delivered" && row.values.openQuestionId === openQuestionId,
+    );
+    return {
+      openQuestionId,
+      clockLine: typeof values.clock === "string" ? values.clock : null,
+      businessZone: typeof zone === "string" ? zone : null,
+      visit: null,
+      neverDelivered: never === undefined ? null : { clockRowId: never.id, version: standing(never).version },
+    };
+  };
+
+  const fake: FakeArmingCalls = {
+    arms: [],
+    cancels: [],
+    factReads: [],
+    actorReads: [],
+    calls: {
+      async armClock(request) {
+        await yieldToOthers(1);
+        const answer = armClockOf(request);
+        fake.arms.push({ request: structuredClone(request), answer: structuredClone(answer) });
+        return answer;
+      },
+      async cancelClock(request) {
+        await yieldToOthers(1);
+        const answer = cancelClockOf(request);
+        fake.cancels.push({ request: structuredClone(request), answer: structuredClone(answer) });
+        return answer;
+      },
+      async questionFacts(openQuestionId) {
+        await yieldToOthers(1);
+        fake.factReads.push(openQuestionId);
+        return structuredClone(factsOf(openQuestionId));
+      },
+      actorNameOf(handleId) {
+        fake.actorReads.push(handleId);
+        const handle = handleOf(handleId);
+        return Promise.resolve(handle === null ? null : actorNameOf(handle));
+      },
+    },
+    clockRow(id) {
+      const row = written.rows.get("clock_rows")?.get(id);
+      return row === undefined ? null : { ...standing(row) };
+    },
+    questionStatus: statusOf,
+  };
+  return fake;
+}
+
 // ---- the walking skeleton's turn -----------------------------------------------------------------------------------
 
 /** The row commit-s1-02.json writes (S1-04's question to Sam): the one the turn composes and the dispatcher sends. */
@@ -3825,13 +4108,14 @@ type JoinedPort =
   | "finalize"
   | "outbox"
   | "sendState"
-  | "linqSend";
+  | "linqSend"
+  | "arming";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
    * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input, the
-   * composer, finalize, the outbox, the send state and the Linq send, which the root builds (./real.ts).
+   * composer, finalize, the outbox, the send state, the Linq send and the clock arming, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -3928,7 +4212,12 @@ export interface SkeletonFakes {
    * test clock: a test hands its due messages to the queue's consumer, which runs them through the root's door.
    */
   readonly retryQueue: FakeRetryQueue;
-  readonly arming: WiredArming;
+  /**
+   * The clock arming's calls and reads (RootOptions.armingCalls: `arming.calls`; T-564): K-05 armClock and cancelClock as
+   * doubles over the clock rows and open questions the K-05 commitTurn double wrote, each move kept beside the row the
+   * commit wrote, the question's facts from those rows and the seeded business, and each known handle's actor name.
+   */
+  readonly arming: FakeArmingCalls;
   /**
    * Sets a text's safety result before it is sent: safety-no.json under its event id, what the turn's commit records
    * (K-09 README default 5). The read on arrival is the joined one (T-554): `models`, over the recorded-model double.
@@ -3996,7 +4285,9 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   // The Linq send is joined (T-563): the Linq double behind a line that answers a moment after the send starts (DL-349).
   const linq = new FakeLinqLine(() => clock.utc());
   const retryQueue = fakeRetryQueue(() => clock.now());
-  const arming = wireArming();
+  // The clock arming is joined (T-564): its K-05 doubles arm the clock rows the commit wrote, and name the actors of the
+  // handles the key double knows.
+  const arming = fakeArmingCalls(turnRows, (handleId) => handleKeys.handleOf(handleId));
   const secret = testWebhookSecret();
   const webhooks = createLinqWebhookDouble({ secret });
   const linqInputs: LinqVerifyInputs = {
@@ -4023,13 +4314,12 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
             ),
         },
       },
-      arming: { facts: arming.facts.reader, directory: arming.actors.directory },
     },
     turnFace: {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       safetyCore: core,
     },
-    dataAccess: { rows: rowsOf(rows), clocks: arming.data.data },
+    dataAccess: { rows: rowsOf(rows) },
     linqDirect: direct,
   };
 

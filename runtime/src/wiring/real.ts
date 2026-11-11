@@ -136,6 +136,14 @@
 //                field, and its answer comes back as K-11's: accepted with its message id, or failed with its kind,
 //                status, code and Retry-After, which the dispatcher's retry rules read (T-258); an answer K-11 does not
 //                name is no answer, so the part waits under its own key.
+//   arming       T-564: the clock arming at a part's first delivery receipt (T-255's clockArming, which the root's
+//                receipt door hands each part K-05 markPart newly marked delivered), over K-05 v1 item 5's armClock and
+//                cancelClock (T-197, db/repo/clocks.ts, each called as (sql, request) as rosie_job), the question's facts
+//                the due rule reads (no K-05 call returns them yet: K-05 open gap 25) and the actor name of a K-04 handle,
+//                with their database bound, handed in by the root (RootOptions.armingCalls): in a test, K-05 doubles over
+//                the rows the commit wrote (the question's clock row, waiting until its first receipt) and test owner 1's
+//                seeded rows; nothing in the Worker until T-567, so every arming there fails closed and nothing is armed.
+//                Each answer goes to the arming as K-05 gives it: the arming checks it field by field (T-255).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
@@ -196,6 +204,12 @@ import type {
   ReadBundleValueResult,
 } from "@rosie/db/repo/bundles";
 import type { OpenChatOnTextOutcome, OpenChatOnTextRequest, TextService } from "@rosie/db/repo/chat-open";
+import type {
+  ArmClockOutcome as K05ArmClockOutcome,
+  ArmClockRequest as K05ArmClockRequest,
+  CancelClockOutcome as K05CancelClockOutcome,
+  CancelClockRequest as K05CancelClockRequest,
+} from "@rosie/db/repo/clocks";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 import type {
@@ -225,6 +239,13 @@ import {
   type PinnedBundle,
 } from "../bundle/types";
 import { asListed, BundleReader, flowOf, keyOf, readManifest, sameBundle } from "../bundle/values";
+import type {
+  ArmClockAnswer,
+  CancelClockAnswer,
+  NotFoundError as ClockNotFoundError,
+  QuestionFacts,
+  TransientError as ClockTransientError,
+} from "../clocks/types";
 import type {
   ChatTarget,
   ClaimedRow,
@@ -260,6 +281,7 @@ import type {
   TurnDecide,
 } from "../turn/types";
 import type {
+  ArmingPort,
   ComposeInputPort,
   FinalizePort,
   FrontierPort,
@@ -382,6 +404,11 @@ export interface RealInputs {
    * handed in), so every send fails closed and nothing leaves.
    */
   readonly linqSend?: LinqSendCall | null | undefined;
+  /**
+   * What the clock arming reads and writes with its database bound (T-564): null or left out where none is bound (the
+   * Worker until T-567), so every arming fails closed and nothing is armed.
+   */
+  readonly arming?: ArmingCalls | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -435,6 +462,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
     outbox: realOutbox({ calls: inputs.outbox ?? null }),
     sendState: realSendState({ call: inputs.sendState ?? null }),
     linqSend: realLinqSend({ call: inputs.linqSend ?? null }),
+    arming: realArming({ calls: inputs.arming ?? null }),
   };
 }
 
@@ -2121,6 +2149,59 @@ export function realLinqSend(inputs: LinqSendInputs): LinqSend {
         const answer: unknown = await call(linqRequestOf(request));
         return linqAnswerOf(answer);
       },
+    },
+  };
+}
+
+// ---- arming: the clock arming at a part's first delivery receipt (T-564; C-055; K-05 v1 item 5) ------------------------
+
+/**
+ * What the clock arming reads and writes with its database bound (T-564), on the runtime side, as rosie_job:
+ *   - K-05 v1 item 5's armClock and cancelClock (T-197, db/repo/clocks.ts, each called as (sql, request));
+ *   - the question's facts the due rule reads (T-255's QuestionFacts: the Clock line as it applies, its business's zone,
+ *     its visit, its never-delivered row), which no K-05 call returns yet (K-05 open gap 25), read here as one call;
+ *   - the actor name of a K-04 handle (actorNameOf over its kind and address, as the gateway names the handle's actor),
+ *     or null when K-04 holds no such handle.
+ */
+export interface ArmingCalls {
+  readonly armClock: (request: K05ArmClockRequest) => Promise<K05ArmClockOutcome>;
+  readonly cancelClock: (request: K05CancelClockRequest) => Promise<K05CancelClockOutcome>;
+  readonly questionFacts: (
+    openQuestionId: string,
+  ) => Promise<QuestionFacts | ClockNotFoundError | ClockTransientError>;
+  readonly actorNameOf: (handleId: string) => Promise<string | null>;
+}
+
+/** What the real arming port is fed: the arming's calls with their database bound, or null where none is bound. */
+export interface ArmingInputs {
+  readonly calls: ArmingCalls | null;
+}
+
+/**
+ * The arming port (T-564): what T-255's clock arming reads and writes (ArmingOptions' data, facts and directory) over the
+ * calls the root is handed (RootOptions.armingCalls). armClock arms the question's clock row with the due time the due
+ * rule gave and opens its question in one transaction, a repeat answering its first arming (a later receipt never moves
+ * the row); cancelClock cancels the question's never-delivered row once it is delivered. Each request goes to K-05 as the
+ * arming made it, and each answer comes back as K-05 gives it, which the arming checks field by field. With no database
+ * bound every call fails closed (NoDatabaseError) before anything is read or written: the arming reports that it failed,
+ * and nothing is armed. Nothing here logs: a question's facts can hold a visit's address.
+ */
+export function realArming(inputs: ArmingInputs): ArmingPort {
+  const { calls } = inputs;
+  const none = (call: string): Promise<never> => Promise.reject(new NoDatabaseError(call));
+  return {
+    data: {
+      armClock: (request): Promise<ArmClockAnswer> =>
+        calls === null ? none("armClock") : calls.armClock(request),
+      cancelClock: (request): Promise<CancelClockAnswer> =>
+        calls === null ? none("cancelClock") : calls.cancelClock(request),
+    },
+    facts: {
+      questionFacts: (openQuestionId) =>
+        calls === null ? none("questionFacts") : calls.questionFacts(openQuestionId),
+    },
+    directory: {
+      actorNameOf: (handleId) => (calls === null ? none("actorNameOf") : calls.actorNameOf(handleId)),
     },
   };
 }

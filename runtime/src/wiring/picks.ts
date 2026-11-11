@@ -51,8 +51,13 @@
 // under its row-part-try key, fed in a test by @rosie/adapters' Linq double (T-411), which records each part once per
 // key, and by no Linq line on staging until one is handed in (staging's test-phone line, or J-08's real line), so every
 // send there fails closed and nothing leaves. The direct line (linqDirect), split from it by T-563, is no D-017 hop: on
-// its fake in a test and closed elsewhere. Every other port of the Worker's environments stays closed: each call
-// fails, as
+// its fake in a test and closed elsewhere. And arming (T-564), the clock arming at a part's first delivery receipt, split
+// from stateReads and dataAccess: K-05 v1 item 5's armClock and cancelClock with their database bound, the question's
+// facts the due rule reads and the actor name of a handle, fed in a test by K-05 doubles over the rows the commit wrote
+// (the question's clock row, waiting until its first receipt) and test owner 1's seeded rows, and by no database on
+// staging until T-567, so every arming there fails closed and nothing is armed. stateReads and dataAccess keep what is
+// not joined: on their fakes in a test, closed elsewhere. Every other port of the Worker's environments stays closed: each
+// call fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
@@ -87,7 +92,7 @@ export const PICKS: readonly PortPick[] = [
   { port: "bundles", test: "real", staging: "real", production: "closed" }, // T-556
   { port: "targets", test: "real", staging: "real", production: "closed" }, // T-556
   { port: "frontier", test: "real", staging: "real", production: "closed" }, // T-557
-  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-564
+  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // not joined (T-564: arming split off)
   { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
   { port: "decide", test: "real", staging: "real", production: "closed" }, // T-558
   { port: "gate", test: "real", staging: "real", production: "closed" }, // T-559
@@ -96,8 +101,9 @@ export const PICKS: readonly PortPick[] = [
   { port: "finalize", test: "real", staging: "real", production: "closed" }, // T-561
   { port: "outbox", test: "real", staging: "real", production: "closed" }, // T-562
   { port: "sendState", test: "real", staging: "real", production: "closed" }, // T-562
-  { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-564
+  { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // not joined (T-564: arming split off)
   { port: "linqSend", test: "real", staging: "real", production: "closed" }, // T-563
+  { port: "arming", test: "real", staging: "real", production: "closed" }, // T-564
   { port: "linqDirect", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
 ];
 

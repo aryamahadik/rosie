@@ -14,6 +14,7 @@ export {
 export { PinnedRuns } from "./pinned-runs";
 export {
   PORTS,
+  type ArmingPort,
   type ComposeInputPort,
   type DataAccess,
   type FinalizePort,
@@ -43,6 +44,7 @@ export {
   NoSafetyReaderError,
   NotComposeInputError,
   NotFinalizeError,
+  realArming,
   realBundles,
   realChatOpen,
   realComposeInput,
@@ -65,6 +67,8 @@ export {
   sendStateOf,
   TurnIdError,
   USE_FALLBACK,
+  type ArmingCalls,
+  type ArmingInputs,
   type BundleReadCalls,
   type ChatOpenInputs,
   type CommitTurnCall,
