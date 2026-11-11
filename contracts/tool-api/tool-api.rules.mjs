@@ -882,6 +882,88 @@ export function inputIsK03Fixture(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.8 (T-1219): an unmapped turn's end at the gate (README "v1.8"). This reads K-02's fixtures beside this file, as
+// v1.6's rules read K-01's and K-03's, synchronously.
+
+/** K-02's fixtures, and the K-02 version whose contextAndDecide K-09 v1.8's gateAndCommit takes. */
+const K02_FIXTURES = "model/fixtures";
+export const K02_VERSION = "v1.2";
+
+/** Limits 1 to 6, none run: what the gate logs for a part no limit ran for (K-08 v1 limitResult; README v1.8). */
+const noLimitRun = () => [1, 2, 3, 4, 5, 6].map((limit) => ({ limit, result: "notChecked", outcome: null }));
+
+/**
+ * unmappedEndAsked: a gateAndCommit exchange whose decided result holds K-02 v1.2's unmapped end (decideResult.end
+ * oneQuestion: CQ-162 (a), "a turn still unmapped ends in one question with nothing changed") is answered asked once
+ * for the turn (README v1.8 defaults 142 to 145): committed, with end asked, and one part result per part decide kept,
+ * in decide's order: `part` its index, `choiceId` the kept part's choice for choose and enter (else null), asked, with
+ * limits 1 to 6 each notChecked and no outcome (no limit ran), no stop, no key and nothing it depends on. Its decided
+ * pair is, word for word, K-02 v1.2's accepted contextAndDecide fixture of the same turn
+ * (contracts/model/fixtures/index.json; exactly one must exist), as K-09's fixtures carry K-02's: the same values, key
+ * for key in K-02's order.
+ * The schema ties end to the request's end and refuses a written row, a planner verb, a limit run or a part that goes on
+ * that end; it cannot count the answer's parts against decide's or read K-02's files, and this rule does.
+ */
+export function unmappedEndAsked(exchange) {
+  const decide = decideOf(exchange);
+  if (exchange.call !== "gateAndCommit" || decide?.end !== "oneQuestion") {
+    return ["unmappedEndAsked reads a gateAndCommit exchange whose decided result holds the unmapped end"];
+  }
+  const problems = [];
+  const decided = exchange.request.input.decided;
+  const twins = contractJson(`${K02_FIXTURES}/index.json`)
+    .fixtures.filter(
+      (entry) =>
+        entry.version === K02_VERSION && entry.def === "contextAndDecide" && entry.expect === "accept",
+    )
+    .map((entry) => ({ file: entry.file, pair: contractJson(`${K02_FIXTURES}/${entry.file}`) }))
+    .filter((twin) => twin.pair.context?.turnId === decided.context?.turnId);
+  if (twins.length !== 1) {
+    problems.push(
+      `K-02 ${K02_VERSION} has ${twins.length} accepted contextAndDecide fixtures of turn ${decided.context?.turnId}, not one`,
+    );
+  } else {
+    const [twin] = twins;
+    if (!isDeepStrictEqual(decided, twin.pair)) {
+      problems.push(`the decided pair is not ${K02_FIXTURES}/${twin.file} word for word`);
+    } else if (JSON.stringify(decided) !== JSON.stringify(twin.pair)) {
+      problems.push(
+        `the decided pair holds ${K02_FIXTURES}/${twin.file}'s values, but not in its keys' order`,
+      );
+    }
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result !== "committed" || outcome.end !== "asked") {
+    problems.push("the unmapped end is answered committed, with end asked");
+    return problems;
+  }
+  const parts = Array.isArray(outcome.parts) ? outcome.parts : [];
+  if (parts.length !== decide.parts.length) {
+    problems.push(`${parts.length} part results answer the ${decide.parts.length} parts decide kept`);
+  }
+  decide.parts.forEach((kept, at) => {
+    const answered = parts[at];
+    if (answered === undefined) return;
+    const verb = kept.part?.verb;
+    const expected = {
+      part: at,
+      choiceId: verb === "choose" || verb === "enter" ? kept.part.choice : null,
+      result: "asked",
+      limits: noLimitRun(),
+      stoppedBy: null,
+      gives: [],
+      dependsOnPart: null,
+    };
+    if (!isDeepStrictEqual(answered, expected)) {
+      problems.push(
+        `parts[${at}] is not decide's part ${at} asked with no limit run: ${JSON.stringify(answered)}`,
+      );
+    }
+  });
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -894,4 +976,5 @@ export const rules = Object.freeze({
   givesJourneySixKeys,
   termFactsFromCard,
   inputIsK03Fixture,
+  unmappedEndAsked,
 });

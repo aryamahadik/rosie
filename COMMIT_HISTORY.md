@@ -2,9 +2,110 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 378, [`cb7c9ca`](https://github.com/aryamahadik/rosie/commit/cb7c9ca), 2026-11-11 13:58:39 UTC.
+- **Through:** commit 383, [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), 2026-11-11 14:39:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 383. docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387) (\#390)
+
+- **Commit:** [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), by Arya Mahadik, 2026-11-11 14:39:31 UTC
+- **Pull request:** [#390](https://github.com/aryamahadik/rosie/pull/390) from `task/commit-history-15`, merged 2026-11-11 14:39:31 UTC. It squashed 1 branch commit:
+  - `51f2c4f` docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 382. T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAndDecide, and its committed answer holds an unmapped turn's end (end asked: no limit run, no row written for any part, planner null); named rule unmappedEndAsked; 1 accepted and 3 refused fixtures (commit-s1-02-unmapped-end.json is K-02's pair-unmapped-all-refused.json answered asked); README defaults 142-145, open gaps 129-130, consumers' card lines; v1.7 stays T-054's (\#389)
+
+- **Commit:** [`a5e9df2`](https://github.com/aryamahadik/rosie/commit/a5e9df2), by Arya Mahadik, 2026-11-11 14:39:27 UTC
+- **Pull request:** [#389](https://github.com/aryamahadik/rosie/pull/389) from `task/T-1219`, merged 2026-11-11 14:39:27 UTC. It squashed 1 branch commit:
+  - `bf4dbe8` T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAnd…
+- **Files changed:** 9 (+938 −4), by folder:
+  - `contracts/tool-api/` README.md +55 −2, frozen.json +1 −1, tool-api.rules.mjs +83 −0, tool-api.v1.8.schema.json +790 −0
+  - `contracts/tool-api/fixtures/` commit-s1-02-unmapped-end.json +1 −0, index.json +5 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-unmapped-end-not-asked.json +1 −0, refuse-unmapped-end-part-not-kept.json +1 −0, refuse-unmapped-end-written.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 381. T-1222: contract test model.v1 reads K-02 v1.2's refused reads and checks an unmapped turn's end (\#388)
+
+- **Commit:** [`fcf31e9`](https://github.com/aryamahadik/rosie/commit/fcf31e9), by Arya Mahadik, 2026-11-11 14:39:23 UTC
+- **Pull request:** [#388](https://github.com/aryamahadik/rosie/pull/388) from `task/T-1222`, merged 2026-11-11 14:39:23 UTC. It squashed 1 branch commit:
+  - `4289764` T-1222: contract test model.v1 reads K-02 v1.2's refused reads and ch…
+- **Files changed:** 1 (+416 −19), by folder:
+  - `tests/contract/` model.v1.test.ts +416 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+checkDecide, the eight-verb check and the hand-off checks read a refusedRead, which has no output: agreed is false when the first or check read is refused, and the language follows default 15. checkDecide also checks the unmapped end: end set exactly when a read is refused, only after the re-read, no part going, the kept parts by default 14 (the last K-02 read's, in its order; none when every read was refused). Section 4 adds 18 tests: refuse-go-with-refused-read.json is refused for its go part alone and accepted once that part is oneQuestion; both named rules hold on both v1.2 pairs; each new check holds on the v1.2 fixtures and fires on a damaged copy. The 133 earlier tests keep their names and assertions; the eight-verb test reads a read's parts through readParts.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 380. docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385) (\#387)
+
+- **Commit:** [`2e0b89b`](https://github.com/aryamahadik/rosie/commit/2e0b89b), by Arya Mahadik, 2026-11-11 14:16:55 UTC
+- **Pull request:** [#387](https://github.com/aryamahadik/rosie/pull/387) from `task/commit-history-14`, merged 2026-11-11 14:16:55 UTC. It squashed 1 branch commit:
+  - `51761a3` docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 379. T-564: join hop 13, the double's delivery receipt marks the part delivered and arms S1-02's clock; the walking skeleton is joined end to end (\#386)
+
+- **Commit:** [`1415609`](https://github.com/aryamahadik/rosie/commit/1415609), by Arya Mahadik, 2026-11-11 14:16:51 UTC
+- **Pull request:** [#386](https://github.com/aryamahadik/rosie/pull/386) from `task/T-564`, merged 2026-11-11 14:16:51 UTC. It squashed 3 branch commits:
+  - `04dd09f` T-564: join hop 13 in the wiring: the arming port (K-05 v1 item 5 arm…
+  - `1e90dc3` T-564 (work in progress, NEED): e2e row 13: JOINED\_THROUGH clockArmed…
+  - `5308dc6` T-564: e2e rows 11 and 12 read the run's end state (DL-466, Need 1): …
+- **Files changed:** 14 (+1225 −83), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +5 −5, hop13.worker.test.ts +490 −0, index.ts +4 −0, picks.ts +10 −4, ports.ts +29 −14, real.ts +81 −0, root.test.ts +50 −10, root.ts +31 −8, root.worker.test.ts +14 −17, test-support.ts +302 −12
+  - `tests/e2e/skeleton/` README.md +4 −2, root-run.ts +32 −2, skeleton.worker.test.ts +172 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-564: join hop 13 in the wiring: the arming port (K-05 v1 item 5 armClock and cancelClock, the question's facts, a handle's actor name), split from stateReads and dataAccess, real in test and staging over RootOptions.armingCalls, closed in production; the receipt door's clock arming runs on it; K-05 doubles over the commit's rows; hop13.worker.test.ts proves the double's receipt marks the part delivered and arms S1-02's clock at T-255's due time on the JOIN's trace, a second receipt arms nothing more, and no database fails closed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-564 (work in progress, NEED): e2e row 13: JOINED_THROUGH clockArmed, row 13's CLAIMS, root-run.ts feeds the arming doubles and delivers the Linq double's receipt before the trace is collected, README's join 13 lines; the trace judge passes receive to clockArmed, but rows 11 and 12's existing claims (partMarks only 'sent', row state 'sent') fail now that the run's receipt marks the part delivered: they are outside the DL-433 grant
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-564: e2e rows 11 and 12 read the run's end state (DL-466, Need 1): the sent mark asserted once, with the same request and answer, over the marks other than row 13's one delivered mark; the row delivered under claim 1; the length check beside row 13's mark. Rows 1 to 13 pass with JOINED_THROUGH clockArmed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 378. docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383) (\#385)
 
