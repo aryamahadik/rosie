@@ -61,7 +61,8 @@
     "predeploy:staging": "npm run build:validators",
     "deploy:staging": "bash infra/scripts/deploy-staging.sh",
     "rollback:staging": "bash infra/scripts/rollback-staging.sh",
-    "check:staging": "bash infra/scripts/post-deploy-check.sh"
+    "check:staging": "bash infra/scripts/post-deploy-check.sh",
+    "seed:staging": "bash infra/scripts/seed-staging.sh"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.6.0",
