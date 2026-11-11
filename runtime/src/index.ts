@@ -35,6 +35,7 @@ import { wireWorker, workerRoot } from "./wiring";
 
 // The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
 export { HandleActor } from "./actor";
+export { TestPhoneLine } from "./wiring/test-phone/line";
 
 // The retry queue's consumer (T-256, runtime/src/queues): the Workers runtime hands it each batch of RETRY_QUEUE.
 import { retryQueueHandler } from "./queues";
