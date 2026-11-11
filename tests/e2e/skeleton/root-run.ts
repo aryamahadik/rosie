@@ -30,6 +30,11 @@
 //                       1's seeded rows (no phone row), for the dispatcher's claim and limit 8's read at send;
 //   join 12, send       K-11 sendPart through the root's Linq send port to @rosie/adapters' Linq double (T-411), the one
 //                       the local target collects its parts from, and the retry queue the dispatcher's waits go on.
+//   join 13, arming     K-05 v1 item 5's armClock and cancelClock, the question's facts and each handle's actor name, as
+//                       doubles over the rows the commit wrote and test owner 1's seeded rows, for T-255's clock arming at
+//                       a part's first delivery receipt; and that receipt: before the target collects a trace, the Linq
+//                       double's delivered event for each part it accepted reaches the gateway, once, echoing the part's
+//                       key, as Linq reports a part delivered a moment after it accepts it.
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
 // root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
@@ -133,7 +138,10 @@ export function actorOf(handle: { readonly kind: string; readonly address: strin
 }
 
 export interface RootRun {
-  /** T-465's local target, posting through root.linqWebhook. */
+  /**
+   * T-465's local target, posting through root.linqWebhook. Before it collects a trace, the Linq double's delivery
+   * receipt for each part it accepted reaches the gateway, once (join 13).
+   */
   readonly target: LocalTarget;
   /** The doubles every port is fed, and the rows they keep. */
   readonly fakes: SkeletonFakes;
@@ -186,6 +194,8 @@ export function startRootRun(): RootRun {
       // Join 12: each part to the Linq double, and the retry queue a row's next try goes on.
       linqSendCall: fakes.linq.call,
       retryQueue: fakes.retryQueue,
+      // Join 13: the clock arming's K-05 calls and reads, over the rows the commit wrote.
+      armingCalls: fakes.arming.calls,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     restore = root.install();
@@ -196,8 +206,28 @@ export function startRootRun(): RootRun {
     target.close();
     throw error;
   }
+  // Join 13: the Linq double's delivery receipt for each part it accepted, through the gateway, once, echoing the part's
+  // key (FakeLinqLine.deliveredReceipt: the double's own fakeDelivered as a K-06 delivered event).
+  const receipted = new Set<string>();
+  const deliverReceipts = async (): Promise<void> => {
+    for (const key of fakes.linq.accepted.keys()) {
+      if (receipted.has(key)) continue;
+      receipted.add(key);
+      const eventId = `evt-linq-delivered-${String(receipted.size).padStart(4, "0")}`;
+      const answer = await target.sendEvent(fakes.linq.deliveredReceipt(key, eventId), { partKey: key });
+      if (answer.gatewayStatus !== 200) {
+        throw new Error(`the gateway answered a delivery receipt ${String(answer.gatewayStatus)}`);
+      }
+    }
+  };
   return {
-    target,
+    target: {
+      ...target,
+      async collect(traceId, options) {
+        await deliverReceipts();
+        return target.collect(traceId, options);
+      },
+    },
     fakes,
     root,
     gateCalls: watched.calls,
