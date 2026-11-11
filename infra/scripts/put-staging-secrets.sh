@@ -16,7 +16,9 @@
 #     so the key of another tool on this Mac is never put on staging.
 #   - is never printed, logged, exported, put on a command line or written to a file: it is held in one shell variable
 #     and goes down one pipe to cf.sh. No here-document or here-string is used (bash 3.2 writes those to a temporary
-#     file), and tracing is switched off first, whatever the caller's shell asked for.
+#     file), and tracing is switched off first, whatever the caller's shell asked for. So is allexport, and the
+#     script's own variables are dropped before anything is read, so a variable of the same name in the caller's
+#     environment never makes one of them an exported one (the note above `unset -v` below).
 #   - is never shown by wrangler either: what wrangler prints is kept off the terminal, dropped after a put that worked
 #     and printed after one that failed with the value taken out; and wrangler's own debug log is told to leave request
 #     bodies out (WRANGLER_LOG_SANITIZE).
@@ -39,7 +41,18 @@
 # Exit: 0 every name set; 1 refused, or a put failed; 2 misuse (an argument it does not take), found before anything is
 # read; 3 one or more names missing, the others set.
 set +x
+set +a
 set -euo pipefail
+# No variable of this script starts out marked for export, or with the caller's text in it, whatever names the caller's
+# environment holds. bash marks every variable it inherits for export, and under allexport (bash -a, or handed down in
+# SHELLOPTS) every variable as it is set; a variable marked so goes to every command started from here, cf.sh and
+# wrangler among them, with whatever it holds then. So allexport is switched off above, and every name this script and
+# lib.sh's load_dev_var keep a variable of their own under is dropped here, before anything is read: value, line and
+# said (a value, a line of .dev.vars, wrangler's words) and the rest (names, counts, a path, the --env argument).
+# BASH_REMATCH, where load_dev_var's match leaves the value, goes with them; bash keeps it as an array from the first
+# match on, and never exports an array. A new variable, here or in load_dev_var, goes on this line too:
+# put-staging-secrets.test.mjs fails until it does.
+unset -v value said line name file bad status missing env_name env_count BASH_REMATCH
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # The secrets staging's Worker reads, by name.

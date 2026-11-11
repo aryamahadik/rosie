@@ -511,6 +511,99 @@ describe("put-staging-secrets.sh never traces and writes no file", () => {
   });
 });
 
+describe("put-staging-secrets.sh hands no variable of its own on to what it starts", () => {
+  // The names the script, and lib.sh's load_dev_var that reads .dev.vars for it, keep variables of their own under.
+  // value, line and said hold a value, a line of .dev.vars and wrangler's words; the others hold names, counts, a path
+  // and the --env argument.
+  const OWN_NAMES = [
+    "bad",
+    "env_count",
+    "env_name",
+    "file",
+    "line",
+    "missing",
+    "name",
+    "said",
+    "status",
+    "value",
+  ];
+
+  /**
+   * The same names, read from the two files: every name in small letters that the script or load_dev_var assigns,
+   * loops over or declares local. (The names in capitals are the script's fixed texts and paths.)
+   */
+  function ownNames() {
+    const code = (file) =>
+      readFileSync(path.join(SCRIPTS, file), "utf8")
+        .split("\n")
+        .filter((line) => !/^\s*#/.test(line))
+        .join("\n");
+    const loader = /^load_dev_var\(\) \{\n([\s\S]*?)\n\}$/m.exec(code("lib.sh"));
+    assert.ok(loader, "lib.sh no longer holds: load_dev_var() { ... }");
+    const text = `${code("put-staging-secrets.sh")}\n${loader[1]}`;
+    const names = new Set();
+    // name=..., first on its line or after ;, && or ||.
+    for (const [, name] of text.matchAll(/(?:^|;|&&|\|\|)[ \t]*([a-z_][a-z0-9_]*)=/gm)) names.add(name);
+    // for name in ...
+    for (const [, name] of text.matchAll(/\bfor[ \t]+([a-z_][a-z0-9_]*)[ \t]+in\b/g)) names.add(name);
+    // local name="..." other: each word of the declaration, up to its =.
+    for (const [, words] of text.matchAll(/^[ \t]*local[ \t]+(.+)$/gm)) {
+      for (const word of words.split(/[ \t]+/)) names.add(word.replace(/=.*$/, ""));
+    }
+    return [...names].sort();
+  }
+
+  /**
+   * Fails unless a run put every value, on standard input alone, and for every put wrangler's environment holds no
+   * value and no variable under any of `names`, whatever its text.
+   */
+  function assertNothingHandedOn(rig, result, names, what) {
+    assert.equal(result.status, 0, `${what}: ${result.output}`);
+    assert.equal(result.stdout, ALL_SET, what);
+    assert.equal(result.stderr, "", what);
+    const calls = rig.calls();
+    assert.deepEqual(
+      calls.map((call) => call.stdin),
+      NAMES.map((name) => VALUES[name]),
+      what,
+    );
+    for (const [index, name] of NAMES.entries()) {
+      const call = calls[index];
+      assertOnlyOnStdin(call, `${what}, ${name}`);
+      assert.deepEqual(
+        names.filter((own) => call.envNames.includes(own)),
+        [],
+        `${what}, ${name}: wrangler's environment has a variable of the script's own`,
+      );
+    }
+  }
+
+  it("a caller's environment that already holds value, said, line and every other name the script works with", (t) => {
+    assert.deepEqual(
+      ownNames(),
+      OWN_NAMES,
+      "put-staging-secrets.sh or lib.sh's load_dev_var works with another variable: add its name to the script's unset line and to OWN_NAMES",
+    );
+    // BASH_REMATCH too: bash leaves there what load_dev_var's match took from a line of .dev.vars.
+    const names = [...OWN_NAMES, "BASH_REMATCH"];
+    // bash marks every variable it inherits for export, so each of these would go on to cf.sh and wrangler with
+    // whatever the script next kept in it.
+    const caller = Object.fromEntries(names.map((name) => [name, `t568 made-up caller text, ${name}`]));
+    const rig = checkout(t, { devVars: devVars() });
+    assertNothingHandedOn(rig, rig.run([], caller), names, "the caller's variables");
+  });
+
+  it("allexport from the caller (bash -a, or handed down in SHELLOPTS), which marks every variable as it is set", (t) => {
+    for (const [what, extra, options] of [
+      ["bash -a", {}, { bash: ["-a"] }],
+      ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, {}],
+    ]) {
+      const rig = checkout(t, { devVars: devVars() });
+      assertNothingHandedOn(rig, rig.run([], extra, options), OWN_NAMES, what);
+    }
+  });
+});
+
 describe("put-staging-secrets.sh's names are the ones the runtime reads", () => {
   const source = (file) => readFileSync(path.join(REPO, file), "utf8");
   /** The value of `export const <constant> = "<NAME>";` in a source file. */
