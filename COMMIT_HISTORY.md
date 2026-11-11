@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 403, [`16af5be`](https://github.com/aryamahadik/rosie/commit/16af5be), 2026-11-11 18:07:36 UTC.
+- **Through:** commit 405, [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), 2026-11-11 18:32:00 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 405. docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410) (\#412)
+
+- **Commit:** [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), by Arya Mahadik, 2026-11-11 18:32:00 UTC
+- **Pull request:** [#412](https://github.com/aryamahadik/rosie/pull/412) from `task/commit-history-25`, merged 2026-11-11 18:32:00 UTC. It squashed 1 branch commit:
+  - `8d63ff2` docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 404. T-522: the staging-only guard for staging's test tools (web/src/staging/guard): stagingOnlyRoutes and stagingOnly answer the shell's 404 and never call a tool's handler unless ENVIRONMENT is exactly staging, read from the shell's config alone and failing closed; isStagingOnlyRefusal and refusedPage show K-21 v1's stagingOnly refusal as refused (403, in the frame); tests with spy handlers for every route, GET, POST and HEAD (\#411)
+
+- **Commit:** [`10e6c73`](https://github.com/aryamahadik/rosie/commit/10e6c73), by Arya Mahadik, 2026-11-11 18:31:55 UTC
+- **Pull request:** [#411](https://github.com/aryamahadik/rosie/pull/411) from `task/T-522`, merged 2026-11-11 18:31:56 UTC. It squashed 1 branch commit:
+  - `f59f51d` T-522: the staging-only guard for staging's test tools (web/src/stagi…
+- **Files changed:** 6 (+973 −0), by folder:
+  - `web/src/staging/guard/` README.md +14 −0, guard.test.ts +555 −0, guard.ts +66 −0, index.ts +16 −0, refusal.test.ts +274 −0, refusal.ts +48 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 403. docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408) (\#410)
 
