@@ -26,14 +26,15 @@ import webhookEvent from "../../../../contracts/port-stripe/fixtures/webhook-eve
 import payoutFailed from "../../../../contracts/port-stripe/fixtures/webhook-payout-failed.json";
 import { readContractJson } from "../../trace/test-support";
 import { unconfiguredProviders } from ".";
-import { handleCalendarWebhook } from "./calendar-webhook";
-import { handleStripeWebhook } from "./stripe-webhook";
+import { CALENDAR_BODY_LIMIT_BYTES, handleCalendarWebhook } from "./calendar-webhook";
+import { handleStripeWebhook, STRIPE_BODY_LIMIT_BYTES } from "./stripe-webhook";
 import {
   businessLookupDouble,
   calendarPortDouble,
   captureLogLines,
   endpointOf,
   googlePushRequest,
+  graphBodyRequest,
   graphNotificationsRequest,
   graphValidationRequest,
   providerEventStoreFake,
@@ -285,5 +286,44 @@ describe("the calendar doors", () => {
       expect(problems(K08, "span", spanOf(line))).toEqual([]);
       expect(problems(K16, "calendar.span", spanOf(line))).toEqual([]);
     }
+  });
+});
+
+describe("a body over its door's cap (T-1195)", () => {
+  it("is answered 413 with a span K-08 accepts, and K-16's calendar.span at the calendar doors, nothing handed to a port", async () => {
+    const logLines = captureLogLines();
+    const deps = depsAt(webhookEvent.given.now);
+    const overStripe = "x".repeat(STRIPE_BODY_LIMIT_BYTES + 1);
+    const overCalendar = "x".repeat(CALENDAR_BODY_LIMIT_BYTES + 1);
+    const push = googlePushRequest(google.request, deps.calendar.verifierOf(google.request.channelId));
+
+    const sent = [
+      await handleStripeWebhook(
+        stripeRequest(stripePath("businesses"), await signedHeaderOf(webhookEvent), overStripe),
+        "businesses",
+        deps,
+        WHERE,
+      ),
+      await handleCalendarWebhook(
+        new Request(push.url, { method: "POST", headers: push.headers, body: overCalendar }),
+        "google",
+        deps,
+        WHERE,
+      ),
+      await handleCalendarWebhook(graphBodyRequest(overCalendar), "microsoft", deps, WHERE),
+    ];
+
+    expect(sent.map((response) => response.status)).toEqual([413, 413, 413]);
+    expect(deps.stripe.requests).toHaveLength(0);
+    expect(deps.calendar.requests).toHaveLength(0);
+    expect(deps.events.calls).toHaveLength(0);
+    const spans = providerSpans(logLines());
+    expect(spans.map((span) => [span.provider, span.outcome, span.error_code])).toEqual([
+      ["stripe", "refused", "bodyTooLarge"],
+      ["google_calendar", "refused", "bodyTooLarge"],
+      ["microsoft_calendar", "refused", "bodyTooLarge"],
+    ]);
+    for (const line of spans) expect(problems(K08, "span", spanOf(line))).toEqual([]);
+    for (const line of spans.slice(1)) expect(problems(K16, "calendar.span", spanOf(line))).toEqual([]);
   });
 });
