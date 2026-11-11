@@ -11,6 +11,12 @@
 // and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret. The answer rules it shares
 // with the Stripe and calendar doors are answer.ts's.
 //
+// A number's chat opens at receipt (T-1213; K-05 v1.7 item 46; chat-open.ts): a text or photo a phone handle sends through
+// Linq goes to K-05 openChatOnText after the key call and before the actor's door, once per webhook. Its answer decides:
+// a result, the text goes on; notFound or notAPhone (or a call the gateway cannot make as K-05 takes it), the text is
+// stored all the same, the refusal its receive span's error code; transient, or a port that throws, 503 with nothing
+// stored (chatOpenTransient, chatOpenFailed), so Linq's retry, a repeat to K-05, comes again.
+//
 // The scrub span (K-08 v1 hop `scrub`, T-1096): an event its actor wrote ("Sealed event", 02-contracts section 11) shows
 // its scrub as the trace's second hop, after receive, as trace-skeleton.json does. The context numbers a span when it is
 // recorded, and receive ends only with the answer, so the scrub's own start and time are kept and its span is recorded
@@ -31,6 +37,7 @@ import {
   type WebhookEnvironment,
 } from "./answer";
 import { LINQ_BODY_LIMIT_BYTES, bodyLimitOf, readCappedText } from "./body";
+import { openChatAtReceipt, type ChatAtReceipt } from "./chat-open";
 import { HandoffError, prepareHandoff, type Prepared, type ScrubDone } from "./hand-off";
 import type { GatewayDeps, StoreAnswer, VerifyWebhookResult } from "./types";
 
@@ -119,6 +126,7 @@ export async function handleLinqWebhook(
       got = { kind: event.kind, service: event.service };
       let prepared: Prepared | undefined;
       let stored: StoreAnswer | undefined;
+      let chat: ChatAtReceipt = { kind: "none" };
       let stage = "prepare";
       let code = "handoffFailed";
       try {
@@ -127,24 +135,39 @@ export async function handleLinqWebhook(
           { event, partKey, traceId: context.traceId, bundleId, now },
           deps.keys,
         );
-        stage = "handoff";
-        stored =
-          prepared.door === "actor"
-            ? await deps.actor.accept(prepared.handoff)
-            : await deps.receipts.accept(prepared.handoff);
+        if (prepared.door === "actor") {
+          // The number's chat opens before its actor is reached, with the handle id the key call answered (chat-open.ts).
+          stage = "chat";
+          chat = await openChatAtReceipt(deps.chats, event, prepared.handleId);
+        }
+        if (chat.kind === "transient") {
+          // Nothing was written: 503, so Linq sends it again, a repeat to K-05 by the text's event id.
+          code = "chatOpenTransient";
+        } else {
+          stage = "handoff";
+          stored =
+            prepared.door === "actor"
+              ? await deps.actor.accept(prepared.handoff)
+              : await deps.receipts.accept(prepared.handoff);
+        }
       } catch (error) {
         logFailure(context.traceId, stage, error);
         if (stage === "prepare") code = error instanceof HandoffError ? error.code : "sealFailed";
+        else if (stage === "chat") code = "chatOpenFailed";
       }
+      // A refusal never keeps a text from its actor: the text was stored, and the refusal is the span's error code.
+      const refused = chat.kind === "refused" ? chat.code : null;
       // 200 only for a positive answer of the door: anything else, an unknown word included, is 503.
       if (stored === "duplicate") {
         answer = { status: 200 };
         outcome = "dropped";
         decided = { signatureValid: true, knownEventId: true, answered: 200 };
+        errorCode = refused;
       } else if (stored === "written") {
         answer = { status: 200 };
         outcome = "ok";
         decided = { signatureValid: true, knownEventId: false, answered: 200 };
+        errorCode = refused;
         if (prepared?.door === "actor") scrubbed = prepared.scrub;
       } else {
         decided = { signatureValid: true, answered: 503 };

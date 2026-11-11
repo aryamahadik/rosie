@@ -29,6 +29,7 @@ export {
 } from "./ports";
 export {
   CHAT_MEMORY,
+  ChatOpenRequestError,
   chatTargetOf,
   ClaimedRowError,
   claimedRowOf,
@@ -42,6 +43,7 @@ export {
   NotComposeInputError,
   NotFinalizeError,
   realBundles,
+  realChatOpen,
   realComposeInput,
   realComposer,
   realDecide,
@@ -62,6 +64,7 @@ export {
   TurnIdError,
   USE_FALLBACK,
   type BundleReadCalls,
+  type ChatOpenInputs,
   type CommitTurnCall,
   type ComposeInputInputs,
   type ComposeReads,
@@ -79,6 +82,7 @@ export {
   type HandleTargetsCall,
   type KeyObjectStore,
   type LinqVerifyInputs,
+  type OpenChatOnTextCall,
   type OutboxCalls,
   type OutboxInputs,
   type ParkTurnCall,
