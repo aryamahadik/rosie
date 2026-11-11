@@ -14,6 +14,12 @@
 // T-1193 (DL-376): the handle actor's turn records each row's fillAndChecks itself, so the face's compose input and
 // finalize leave no span of the base's; the same handlers on a base called without the face's option give the same
 // answers and record the base's one fillAndChecks span each, never the words.
+//
+// T-1190 (DL-391, DL-395, DL-402): the row read is K-05 v1.6's, and the sensitive switch is the business's own
+// (businessSensitive, item 45) for a row about no booking: only false is off. So S1-02's row at the barbershop that holds
+// its barber kind of work (read-outbox-row-s1-02-not-sensitive.json) gives compose-input-s1-02-v1.6.json's input word for
+// word, routine, and the JOIN row gives T-1175's recording 4 request; null, the field left out and true are on (gentle,
+// the display name); a row about a booking stays on; a read that fails is never read as on, off or null.
 
 import { describe, expect, it } from "vitest";
 
@@ -32,7 +38,13 @@ import {
   commitRequestAfter,
   composeS102,
   firstTextFacts,
+  joinComposeInput,
+  joinComposeRequest,
+  joinHeldTurn,
+  joinRow,
+  outboxRowNoKinds,
   outboxRowS102,
+  outboxRowSwitchLeftOut,
   outboxRowTurnOne,
   publishedBundleV0,
   readOfRequest,
@@ -44,8 +56,16 @@ import {
   type RowDoubles,
 } from "./calls-test-support";
 import { NOTHING_OPEN_AT } from "./commit";
-import { TurnFaceRefusedError } from "./errors";
-import { composeRowOf, lineToOf, readerOfRow, safetyLinesFor, type OutboxRowRead } from "./rows";
+import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
+import {
+  composeRowOf,
+  finalizeRowOf,
+  lineToOf,
+  readerOfRow,
+  safetyLinesFor,
+  sensitiveOf,
+  type OutboxRowRead,
+} from "./rows";
 import { callHandlers, createTurnFace, type TurnFace } from "./turn-face";
 
 type Json = Record<string, unknown>;
@@ -134,15 +154,17 @@ function exchangeOf(given: Json, request: unknown, outcome: unknown): Json {
   return { call: "rowReader", given, request, outcome };
 }
 
-describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-outbox-row-s1-02.json)", () => {
-  it("gives compose-input-s1-02.json's input from the row, the bundle and the words the runtime handed in; gentle while the sensitive switch is treated as on (DL-326 note b)", async () => {
+describe("compose input through the turn face on S1-02's row (K-05 v1.6 read-outbox-row-s1-02-not-sensitive.json)", () => {
+  it("gives compose-input-s1-02-v1.6.json's input word for word from the row, the bundle and the words the runtime handed in: routine, the barbershop's switch off (T-1190)", async () => {
     const doubles = rowDoubles();
     const face = await faceAfterTurnOne(doubles);
     const { request, outcome } = composeExchange();
     const { trace, spans } = traceFor(request);
     const answer = await face.composeInput(structuredClone(request), trace);
     expect(validator.check("composeInput", "response", answer)).toEqual([]);
-    expect(answer).toEqual({ result: "compose", input: { ...outcome.input, situation: "gentle" } });
+    expect(outboxRowS102().businessSensitive).toBe(false);
+    expect(outcome.input.situation).toBe("routine");
+    expect(answer).toEqual({ result: "compose", input: outcome.input });
     expect(doubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
     // No span of the base's: the turn records the row's fillAndChecks itself, and the face tells the base so (T-1193).
     // The base's own span, without the face's option and never with the words, is the next test's.
@@ -196,13 +218,13 @@ describe("compose input through the turn face on S1-02's row (K-05 v1.3 read-out
     expect(outcome.input.inbound).not.toBeNull();
   });
 
-  it("turn 1's row as it runs, to Sam who holds no role yet, gives the same input: read as the owner by S1-02's sign-up line (K-05 v1.5 item 44), addressed as Sam", async () => {
+  it("turn 1's row as it runs, to Sam who holds no role yet, gives the same input: read as the owner by S1-02's sign-up line (K-05 v1.5 item 44), addressed as Sam, routine at the seed's barbershop (T-1190)", async () => {
     const doubles = rowDoubles({ row: outboxRowTurnOne() });
     const face = await faceAfterTurnOne(doubles);
     const { request, outcome } = composeExchange();
     const answer = await face.composeInput(structuredClone(request), traceFor(request).trace);
     expect(validator.check("composeInput", "response", answer)).toEqual([]);
-    expect(answer).toEqual({ result: "compose", input: { ...outcome.input, situation: "gentle" } });
+    expect(answer).toEqual({ result: "compose", input: outcome.input });
     // Sam's stored name is "Sam Lee"; Rosie addresses him by its first word (default 4), as K-09's fixture does.
     expect(outboxRowTurnOne().recipient.name).toBe("Sam Lee");
     expect(answer).toMatchObject({ input: { audience: { role: "owner", name: "Sam" } } });
@@ -495,7 +517,7 @@ describe("finalize through the turn face with finalize-pass.json's plan on S1-02
     for (const line of lines) expect(JSON.stringify(spans)).not.toContain(line);
   });
 
-  it("the opener names the business as limit 7 shows it: the display name, while the switch is treated as on (DL-326 note b)", async () => {
+  it("the opener names the business as limit 7 shows it: the display name, under the switch (businessSensitive true)", async () => {
     const row = rowUnderPublishedV0(
       rowWith((each) => {
         const business = each.slotSource.business;
@@ -503,6 +525,7 @@ describe("finalize through the turn face with finalize-pass.json's plan on S1-02
         return {
           ...each,
           slotSource: { ...each.slotSource, business: { ...business, displayName: "Lee's" } },
+          businessSensitive: true,
         };
       }),
     );
@@ -556,5 +579,218 @@ describe("finalize through the turn face with finalize-pass.json's plan on S1-02
     });
     const called = await finalizeOn(rowDoubles({ row: noClock, facts: firstTextFacts() }));
     expect(called.thrown).toMatchObject({ name: "TurnFaceRefusedError", fault: "noClockRow" });
+  });
+});
+
+describe("the sensitive switch: K-05 v1.6's businessSensitive for a row about no booking (T-1190; item 45; DL-391, DL-395, DL-402)", () => {
+  /** The read with the barbershop's display name apart from its name, so the two forms of biz.name tell apart. */
+  function displayNameApart(read: OutboxRowRead): OutboxRowRead {
+    const business = read.slotSource.business;
+    if (business === null) throw new Error("the row names its business");
+    return { ...read, slotSource: { ...read.slotSource, business: { ...business, displayName: "Lee's" } } };
+  }
+
+  /** The answers the switch comes in, each on S1-02's row: false, null, the field left out and true (DL-395). */
+  function switchCases(): { label: string; read: OutboxRowRead; on: boolean }[] {
+    return [
+      { label: "false (read-outbox-row-s1-02-not-sensitive.json)", read: outboxRowS102(), on: false },
+      { label: "null (read-outbox-row-s1-02-no-kinds.json)", read: outboxRowNoKinds(), on: true },
+      // A v1.3 to v1.5 answer: no v1.6 answer, handed in as one only to show the field left out reads as on.
+      {
+        label: "left out (read-outbox-row-s1-02.json)",
+        read: outboxRowSwitchLeftOut() as OutboxRowRead,
+        on: true,
+      },
+      { label: "true", read: { ...outboxRowS102(), businessSensitive: true }, on: true },
+    ];
+  }
+
+  /** What one read gives through the face: compose input after turn 1, finalize's business name and its sent text. */
+  async function throughTheFace(read: OutboxRowRead) {
+    const { request, outcome } = composeExchange();
+    const composed = await (
+      await faceAfterTurnOne(rowDoubles({ row: read }))
+    ).composeInput(structuredClone(request), traceFor(request).trace);
+    expect(validator.check("composeInput", "response", composed)).toEqual([]);
+    const finalizeRow = await finalizeRowOf(rowDoubles({ row: read }).binding, structuredClone(read));
+    const doubles = rowDoubles({
+      row: rowUnderPublishedV0(read),
+      facts: firstTextFacts(),
+      bundle: publishedBundleV0(),
+    });
+    const finalize = finalizeExchange().request;
+    const finalized = (await faceOf(doubles).finalizeMessage(
+      structuredClone(finalize),
+      traceFor(finalize).trace,
+    )) as unknown as Json & { checks: { checked: { sends: { text: string }[] } }[] };
+    expect(validator.check("finalizeMessage", "response", finalized)).toEqual([]);
+    expect(finalized.outcome).toBe("send");
+    return {
+      composed,
+      routine: { result: "compose", input: outcome.input },
+      gentle: { result: "compose", input: { ...outcome.input, situation: "gentle" } },
+      businessName: finalizeRow.checks.businessName,
+      sensitive: finalizeRow.source.sensitive,
+      text: finalized.checks[0]?.checked.sends[0]?.text ?? "",
+    };
+  }
+
+  const OPENER = "This is Rosie, the automated booking assistant for";
+
+  it("a business with the switch off (false) gives routine and biz.name: compose-input-s1-02-v1.6.json's input word for word, and the opener names Lee's Barbershop", async () => {
+    const read = displayNameApart(outboxRowS102());
+    expect(read.businessSensitive).toBe(false);
+    const seen = await throughTheFace(read);
+    expect(seen.composed).toEqual(seen.routine);
+    expect(seen.sensitive).toBe(false);
+    expect(seen.businessName).toBe("Lee's Barbershop");
+    expect(seen.text.startsWith(`${OPENER} Lee's Barbershop.`)).toBe(true);
+  });
+
+  it("one with it on (true) gives gentle and the display name", async () => {
+    const read = displayNameApart({ ...outboxRowS102(), businessSensitive: true });
+    const seen = await throughTheFace(read);
+    expect(seen.composed).toEqual(seen.gentle);
+    expect(seen.sensitive).toBe(true);
+    expect(seen.businessName).toBe("Lee's");
+    expect(seen.text.startsWith(`${OPENER} Lee's.`)).toBe(true);
+    expect(seen.text).not.toContain("Lee's Barbershop");
+  });
+
+  it("one with no stored setting gives on (fail closed): null (no kinds of work: read-outbox-row-s1-02-no-kinds.json) and the field left out (a v1.3 to v1.5 answer, default 67) each give gentle and the display name", async () => {
+    const leftOut = outboxRowSwitchLeftOut();
+    expect(Object.hasOwn(leftOut, "businessSensitive")).toBe(false);
+    for (const read of [outboxRowNoKinds(), leftOut as OutboxRowRead]) {
+      expect(read.businessSensitive ?? null).toBeNull();
+      const seen = await throughTheFace(displayNameApart(read));
+      expect(seen.composed).toEqual(seen.gentle);
+      expect(seen.sensitive).toBe(true);
+      expect(seen.businessName).toBe("Lee's");
+      expect(seen.text.startsWith(`${OPENER} Lee's.`)).toBe(true);
+      expect(seen.text).not.toContain("Lee's Barbershop");
+    }
+  });
+
+  it("only an answer of exactly false is off: false, null, the field left out and true, through the switch, compose input's row and finalize's row (the security review's N1)", async () => {
+    const cases = switchCases();
+    expect(cases.map((each) => each.read.businessSensitive)).toEqual([false, null, undefined, true]);
+    for (const { label, read, on } of cases) {
+      expect(sensitiveOf(read), label).toBe(on);
+      const doubles = rowDoubles({ row: read });
+      expect((await composeRowOf(doubles.binding, structuredClone(read))).source.sensitive, label).toBe(on);
+      expect((await finalizeRowOf(doubles.binding, structuredClone(read))).source.sensitive, label).toBe(on);
+    }
+  });
+
+  it("a row about a booking stays on whatever the business's switch (item 35's table; open gap 30), and the call still answers notBuilt for it (default 7)", async () => {
+    const a703 = (
+      contractFile("data-access/fixtures/read-outbox-row-a7-03.json") as {
+        outcome: Omit<OutboxRowRead, "businessSensitive">;
+      }
+    ).outcome;
+    expect(a703.row.bookingId).not.toBeNull();
+    expect(a703.slotSource.booking).not.toBeNull();
+    const s102 = outboxRowS102();
+    const booking = a703.slotSource.booking;
+    const aboutABooking: OutboxRowRead[] = [
+      { ...a703, businessSensitive: false },
+      { ...s102, row: { ...s102.row, bookingId: a703.row.bookingId } },
+      { ...s102, slotSource: { ...s102.slotSource, booking } },
+    ];
+    for (const read of aboutABooking) {
+      expect(read.businessSensitive).toBe(false);
+      expect(sensitiveOf(read)).toBe(true);
+    }
+    const { request } = composeExchange();
+    for (const read of aboutABooking.slice(1)) {
+      const answer = await faceOf(rowDoubles({ row: read })).composeInput(
+        structuredClone(request),
+        traceFor(request).trace,
+      );
+      expect(answer).toEqual({ error: "notBuilt", call: "composeInput" });
+    }
+  });
+
+  it("a read error is thrown, never read as off: a read that fails fails compose input and finalize, nothing composed or written; an error answer K-05 never gives is thrown too", async () => {
+    // As db/repo's readOutboxRow throws a failed read's own error (T-1197: a revoked SELECT, 42501).
+    const failed = Object.assign(new Error("readOutboxRow failed"), { code: "42501" });
+    const { request } = composeExchange();
+    const composeDoubles = rowDoubles({ readFails: failed });
+    const composed = await settle(
+      faceOf(composeDoubles).composeInput(structuredClone(request), traceFor(request).trace),
+    );
+    expect(composed).toEqual({ thrown: failed });
+    expect(composeDoubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
+
+    const finalizeDoubles = rowDoubles({ readFails: failed, facts: firstTextFacts() });
+    const finalize = finalizeExchange().request;
+    const finalized = await settle(
+      faceOf(finalizeDoubles).finalizeMessage(structuredClone(finalize), traceFor(finalize).trace),
+    );
+    expect(finalized).toEqual({ thrown: failed });
+    expect(finalizeDoubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
+    expect(finalizeDoubles.plans).toEqual([]);
+
+    const unknown = await settle(
+      faceOf(rowDoubles({ row: { error: "brokenRecord" } })).composeInput(
+        structuredClone(request),
+        traceFor(request).trace,
+      ),
+    );
+    expect(unknown.thrown).toBeInstanceOf(TurnFaceReadError);
+    expect(unknown.thrown).toMatchObject({ read: "readOutboxRow", code: "brokenRecord" });
+  });
+
+  it("K-05's transientError fails the call, never read as on, off or null: compose input and finalize answer their own transient, with no row and nothing written (DL-402 note a)", async () => {
+    // A transient answer carries no row and no switch; one that also carried a switch would still not be read as one.
+    const transient = { error: "transient", sqlstate: "40001" };
+    const withSwitch = { ...transient, businessSensitive: false };
+    const { request } = composeExchange();
+    for (const row of [transient, withSwitch]) {
+      const composed = await faceOf(rowDoubles({ row })).composeInput(
+        structuredClone(request),
+        traceFor(request).trace,
+      );
+      expect(composed).toEqual(transient);
+
+      const doubles = rowDoubles({ row, facts: firstTextFacts() });
+      const finalize = finalizeExchange().request;
+      const finalized = await faceOf(doubles).finalizeMessage(
+        structuredClone(finalize),
+        traceFor(finalize).trace,
+      );
+      expect(finalized).toEqual(transient);
+      expect(doubles.reads).toEqual(["readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop"]);
+      expect(doubles.plans).toEqual([]);
+    }
+  });
+
+  it("the JOIN row's compose input equals T-1175's recording 4 request (ai/recordings/composer-inputs/join-s1-02.json): compose-input-s1-02-v1.6.json's input except row, turn and inbound", async () => {
+    const recording = joinComposeInput();
+    const { turnId, turn } = joinHeldTurn();
+    const read = joinRow();
+    // The run's own ids: its turn the recording's, its row the walk's for that turn (K-09 v1.5 default 131).
+    expect(recording.turn).toBe(turnId);
+    expect(recording.row).toBe(read.outboxRowId);
+    expect(read.businessSensitive).toBe(false);
+
+    const doubles = rowDoubles({ row: read, bundle: publishedBundleV0() });
+    // The words the run's gateAndCommit hands the face (its context's one text, JOIN), held as the face holds a turn's.
+    doubles.held.hold(turnId, turn);
+    const request = joinComposeRequest();
+    const answer = await faceOf(doubles).composeInput(structuredClone(request), traceFor(request).trace);
+    expect(validator.check("composeInput", "response", answer)).toEqual([]);
+    expect(answer).toEqual({ result: "compose", input: recording });
+    expect(doubles.reads).toEqual([`readOutboxRow ${recording.row}@biz-lees-barbershop`]);
+
+    // ...which is compose-input-s1-02-v1.6.json's input but for the run's row, turn and inbound text: routine.
+    const { outcome } = composeExchange();
+    expect({
+      ...outcome.input,
+      row: recording.row,
+      turn: recording.turn,
+      inbound: recording.inbound,
+    }).toEqual(recording);
+    expect(recording.situation).toBe("routine");
   });
 });

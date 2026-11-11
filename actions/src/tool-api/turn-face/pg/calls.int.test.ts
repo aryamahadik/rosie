@@ -17,12 +17,17 @@
 // open question, its clock row and one outbox row with its final parts, all under one turn id and one trace id, nothing
 // written twice on replay. Finalize writes final parts only on a bundle that carries the privacy link (T-314; K-09 v1.5
 // open gap 121), so that turn is pinned to bundle v0 as bundles/v0 publishes it (T-1146), its own schema's registry row.
+//
+// T-1190: the seed gives the barbershop its barber kind of work with no switch on (T-1197; CQ-185), so K-05 v1.6's
+// readOutboxRow reads the row's sensitive switch as false, and compose input gives compose-input-s1-02-v1.6.json's input
+// word for word, routine, as T-1175's recording 4 has it.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { handleSealingKey } from "../../../../../db/repo/handle-keys";
 import { seal, unsealText, type WrappingKeys } from "../../../../../db/repo/sealing";
 import { inRuntimeTransaction } from "../../../../../db/repo/targets";
+import { readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import { TEST_OWNER_1 } from "../../../../../db/seeds/skeleton";
 import type { GateAndCommitRequest } from "../../../commit";
 import { S1_01_IDS } from "../../../commit/core/test-support";
@@ -36,7 +41,13 @@ import {
   type BundleDocument,
 } from "../../../frontier/assemble/test-support";
 import { fixture, traceFor } from "../../test-support";
-import { SAM_KEY, commitRequestAfter, commitS101, publishedBundleV0 } from "../calls-test-support";
+import {
+  SAM_KEY,
+  commitRequestAfter,
+  commitS101,
+  composeS102,
+  publishedBundleV0,
+} from "../calls-test-support";
 import { NOTHING_OPEN_AT } from "../commit";
 import { TurnFaceRefusedError } from "../errors";
 import type { GateAndCommitCallAnswer, TurnFace } from "../turn-face";
@@ -291,6 +302,14 @@ describe("the card's integration line: one turn from gate and commit to finalize
         result: "compose",
         input: { row: ROW, audience: { role: "owner", name: "Sam" } },
       });
+      // T-1190: the seed's barbershop holds its barber kind of work, no switch on, so the read gives the switch false
+      // and the row is routine: compose-input-s1-02-v1.6.json's input word for word.
+      const read = await readOutboxRow(whole.runtime, {
+        outboxRowId: ROW,
+        businessId: TEST_OWNER_1.businessId,
+      });
+      expect(read).toMatchObject({ result: "outboxRow", outboxRowId: ROW, businessSensitive: false });
+      expect(first.composed).toEqual({ result: "compose", input: composeS102().outcome.input });
       expect(validator.check("finalizeMessage", "response", first.finalized)).toEqual([]);
       const finalized = first.finalized as unknown as Json & {
         finalParts: { fixedLines: string[]; sends: { text: string }[] };

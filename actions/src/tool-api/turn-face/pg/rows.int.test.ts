@@ -9,8 +9,9 @@
 // (K-01 v1's bundle-v0-skeleton.json, which the row pins) through the frontier's fake bundles.
 //
 // The proofs: compose input gives K-09's compose-input-s1-02.json's request the input K-09 v1.6's twin states (T-1174:
-// S1-02's card lines as term facts), gentle while the sensitive switch is treated as on (DL-326 note b), with the
-// inbound words only once the runtime handed them through gateAndCommit;
+// S1-02's card lines as term facts), gentle: this world holds no kinds of work (K-04's seeds alone), so K-05 v1.6's
+// readOutboxRow answers the sensitive switch null, which reads as on (read-outbox-row-s1-02-no-kinds.json; default 67;
+// T-1190), with the inbound words only once the runtime handed them through gateAndCommit;
 // finalize with finalize-pass.json's plan refuses Rosie's first text whole on bundle v0, lineNotInBundle for privacyLink
 // (K-09 v1.5 open gap 121), and writes nothing; on bundle v0 as published (T-1146) it writes the row's final parts.
 
@@ -19,6 +20,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { commitTurn } from "../../../../../db/repo/commit-turn";
 import { handleSealingKey } from "../../../../../db/repo/handle-keys";
 import type { WrappingKeys } from "../../../../../db/repo/sealing";
+import { readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import { S1_01_IDS } from "../../../commit/core/test-support";
 import { k05Exchange } from "../../../commit/test-support";
 import {
@@ -40,6 +42,7 @@ import { pgTurnCalls, pgTurnFace } from "./index";
 const SLOW = { timeout: 60_000 };
 const POOL = 4;
 const ROW = "outbox-s1-02-sam-1";
+const BARBERSHOP = "biz-lees-barbershop";
 
 type Json = Record<string, unknown>;
 
@@ -102,10 +105,13 @@ const compose = (): { request: Json; outcome: { input: Json } } => composeS102()
 
 describe("compose input and finalize on PostgreSQL, on the row turn 1's commit wrote (T-1141)", () => {
   it(
-    "compose input gives compose-input-s1-02-v1.6.json's input for compose-input-s1-02.json's request (gentle: DL-326 note b), its inbound words only once the runtime handed them through gateAndCommit",
+    "compose input gives compose-input-s1-02-v1.6.json's input for compose-input-s1-02.json's request (gentle: no kinds of work, so the switch reads null, on: T-1190), its inbound words only once the runtime handed them through gateAndCommit",
     SLOW,
     async () => {
       const { request, outcome } = compose();
+      // No company_kinds row names the barbershop here: the read answers null, never false (K-05 v1.6 item 45).
+      const read = await readOutboxRow(cdb.runtime, { outboxRowId: ROW, businessId: BARBERSHOP });
+      expect(read).toMatchObject({ result: "outboxRow", outboxRowId: ROW, businessSensitive: null });
       const before = await face.composeInput(structuredClone(request), traceFor(request).trace);
       expect(validator.check("composeInput", "response", before)).toEqual([]);
       expect(before).toEqual({

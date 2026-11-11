@@ -8,8 +8,10 @@
 // Round 2 (DL-364, DL-365, DL-370): the frontier gives the fixture's whole frontier (T-1147), the gate passes the sign-up
 // door with commit-s1-01.json's six limit answers (T-1183), and the row, to Sam who holds no role yet, is read by S1-02's
 // sign-up line as the owner (K-05 v1.5 item 44, T-1184). The row read answers only a row the commit wrote, as K-05
-// answers it after that commit on T-1148's seed (row-reader-s1-02-no-role.json's given: read-outbox-row-s1-02.json with
-// recipient.roles empty), and its row, turn, bundle, question, recipient, channel and send class are the commit's own.
+// answers it after that commit on T-1148's seed (row-reader-s1-02-no-role.json's given: K-05 v1.6's
+// read-outbox-row-s1-02-not-sensitive.json with recipient.roles empty, the seed's barbershop holding its barber kind of
+// work since T-1197, so its switch reads off: T-1190), and its row, turn, bundle, question, recipient, channel and send
+// class are the commit's own.
 //
 // T-1193 (DL-376): on the turn's one trace, the face's only span is the frontier's, the base's as before (CQ-159); gate
 // and commit, compose input and finalize leave none of the base's, since the handle actor's turn records those hops.
@@ -157,14 +159,16 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
 
     // 3. Compose input on that commit's row (compose-input-s1-02.json's request names it): Sam, with no role, read as the
     // owner by S1-02's sign-up line and addressed as Sam; the words he sent, handed in by gateAndCommit; S1-02's card
-    // lines as term facts (K-09 v1.6, T-1174); gentle while the sensitive switch is treated as on (DL-326 note b).
+    // lines as term facts (K-09 v1.6, T-1174); routine, since the seed's barbershop holds its barber kind of work with no
+    // switch on, so K-05 v1.6 reads the switch off (T-1190): compose-input-s1-02-v1.6.json's input word for word.
     expect(compose.request.outboxRowId).toBe(ROW);
     const composed = await chain.face.composeInput(
       structuredClone(compose.request),
       traceFor(compose.request).trace,
     );
     expect(validator.check("composeInput", "response", composed)).toEqual([]);
-    expect(composed).toEqual({ result: "compose", input: { ...compose.outcome.input, situation: "gentle" } });
+    expect(row.businessSensitive).toBe(false);
+    expect(composed).toEqual({ result: "compose", input: compose.outcome.input });
     expect(composed).toMatchObject({ input: { audience: { role: "owner", name: "Sam" } } });
 
     // 4. Finalize with finalize-pass.json's plan on the same row: refused whole on the turn's pin (open gap 121), and
