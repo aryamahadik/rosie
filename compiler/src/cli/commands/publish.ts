@@ -17,6 +17,8 @@
 // The client is built inside the publish's try (T-1179), where postgres.js parses each URL it reads: a URL that does
 // not parse is thrown as a DatabaseUrlError, which holds no part of it, never as Node's ERR_INVALID_URL, whose `input`
 // holds the whole string and is printed by Node when a caller that runs publish.run directly does not catch it.
+// Once the client is built, a publish that fails prints one line, naming only its error's kind and a fixed text
+// (T-1202): the error's message and fields can name the database's host, port, user and database name.
 //
 // Exit: 0 published, or already published with the same bytes; 1 refused or failed; 2 misuse. A database URL that
 // does not parse is thrown, and the CLI prints its message (exit 1).
@@ -91,6 +93,27 @@ function urlRefusal(): DatabaseUrlError {
   const names =
     replica === undefined || replica === "" ? "DATABASE_URL" : "DATABASE_URL or DATABASE_REPLICA_URL";
   return new DatabaseUrlError(`refused: ${names} does not parse as a URL; nothing was read or written`);
+}
+
+/** A code as Node, postgres.js and PostgreSQL write one (ENOTFOUND, CONNECT_TIMEOUT, a SQLSTATE such as 28P01). */
+const PLAIN_CODE = /^[0-9A-Z][0-9A-Z_]{0,39}$/;
+/** A name as an error class has one (Error, TypeError, PostgresError). */
+const PLAIN_NAME = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
+
+/**
+ * The kind of the error a publish failed with, the only part of it its line names (T-1202): its code when that is a
+ * plain code, else its name when that is a plain name, else "unknown". Its message and its other fields are never read.
+ * They name the database's host and port (getaddrinfo ENOTFOUND <host>, connect ECONNREFUSED <address>:<port>, the
+ * hostname, address and port fields) or its user and database name (PostgreSQL's own refusals, such as 28P01 and
+ * 28000). client.redact took out only the URL, its user and its password, and from a URL Node's parser refuses (a
+ * multi-host one postgres.js reads) only the whole string.
+ */
+function failureKind(error: unknown): string {
+  if (typeof error !== "object" || error === null) return "unknown";
+  const { code, name } = error as { code?: unknown; name?: unknown };
+  if (typeof code === "string" && PLAIN_CODE.test(code)) return code;
+  if (typeof name === "string" && PLAIN_NAME.test(name)) return name;
+  return "unknown";
 }
 
 const USAGE = "usage: publish <bundle dir> [--kv <file>]";
@@ -185,8 +208,9 @@ async function run(args: string[], io: CliIo): Promise<number> {
       io.err("nothing was written");
       return 1;
     }
-    const message = error instanceof Error ? error.message : String(error);
-    io.err(`the publish failed: ${client.redact(message, [client.resolvePrimaryUrl()])}`);
+    io.err(
+      `the publish failed (${failureKind(error)}): its message is not printed, since it can name the database's host, port, user or database name`,
+    );
     return 1;
   } finally {
     await db?.close();

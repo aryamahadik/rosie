@@ -6,6 +6,7 @@
 // user, password, host and database are *_t1179 names on .invalid hosts, never a real key. A URL that does not parse
 // means no client is built and no database is reached, so the one thing a publish could write is the KV bulk file.
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { createServer, type AddressInfo, type Socket } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { inspect } from "node:util";
@@ -185,6 +186,202 @@ describe("publish.run's other errors from building the client are thrown as they
     expect(thrown).toBeInstanceOf(Error);
     expect((thrown as Error).name).toBe("Error");
     expect((thrown as Error).message).toBe((expected as Error).message);
+    expect(existsSync(kv)).toBe(false);
+  });
+});
+
+// T-1202: once a client is built, a publish that fails prints one line naming only its error's kind (its code, else its
+// name) and a fixed text. The error's message and fields are never printed: they name the database's host and port
+// (getaddrinfo ENOTFOUND <host>; connect ECONNREFUSED <address>:<port>; the hostname, address and port fields) or, in
+// PostgreSQL's own refusals, its user and database name. client.redact took out only the URL, its user and its password,
+// and from a URL that Node's URL parser refuses only the whole string. Every URL here is made up: *_t1202 names on a
+// .invalid host, which never resolves (RFC 6761), or on this machine's 127.0.0.1, where port 1 refuses a connection at
+// once and the test runs a stand-in for PostgreSQL. Nothing is reached but this machine and its name lookup.
+const T1202 = {
+  user: "publish_owner_t1202",
+  password: "Pw7t1202Kq",
+  host: "db-t1202.example.invalid",
+  database: "t1202_publish_db",
+};
+
+/** The one line a publish prints when it fails after its client is built: the error's kind, then a fixed text. */
+const failureLine = (kind: string): string =>
+  `the publish failed (${kind}): its message is not printed, since it can name the database's host, port, user or database name`;
+
+/** The kind the lines name, read back from the first one. */
+const kindIn = (lines: readonly string[]): string =>
+  /^the publish failed \(([^)]*)\): /.exec(lines[0] ?? "")?.[1] ?? "";
+
+/** The parts `lines` hold. A part of digits alone (a port) counts only where it stands as a whole number. */
+function partsHeld(lines: readonly string[], parts: readonly string[]): string[] {
+  const text = lines.join("\n");
+  return parts.filter((part) =>
+    /^[0-9]+$/.test(part) ? new RegExp(`(?<![0-9])${part}(?![0-9])`).test(text) : text.includes(part),
+  );
+}
+
+/**
+ * A PostgreSQL ErrorResponse message: the byte E, its length (4 bytes, the length's own included), then each field as
+ * its type byte and its text ending in a zero byte, then a zero byte.
+ */
+function errorResponse(fields: readonly (readonly [string, string])[]): Uint8Array {
+  const body = new TextEncoder().encode(`${fields.map(([type, text]) => `${type}${text}\0`).join("")}\0`);
+  const message = new Uint8Array(5 + body.length);
+  const view = new DataView(message.buffer);
+  view.setUint8(0, "E".charCodeAt(0));
+  view.setUint32(1, 4 + body.length);
+  message.set(body, 5);
+  return message;
+}
+
+interface RefusingDatabase {
+  port: number;
+  /** The names and values of each startup message received: user, database and the rest. */
+  startups: Record<string, string>[];
+  close(): Promise<void>;
+}
+
+/**
+ * A stand-in for PostgreSQL on 127.0.0.1, at a port the system picks. Each connection's startup message is answered as
+ * PostgreSQL answers a client its pg_hba.conf has no entry for: a FATAL 28000 whose message names the client's address
+ * and the user and database the client sent. Then the connection is closed.
+ */
+async function refusingDatabase(): Promise<RefusingDatabase> {
+  const startups: Record<string, string>[] = [];
+  const sockets = new Set<Socket>();
+  const server = createServer((socket) => {
+    sockets.add(socket);
+    socket.on("close", () => sockets.delete(socket));
+    socket.on("error", () => undefined);
+    let received = new Uint8Array(0);
+    let answered = false;
+    socket.on("data", (chunk: Uint8Array) => {
+      const joined = new Uint8Array(received.length + chunk.length);
+      joined.set(received);
+      joined.set(chunk, received.length);
+      received = joined;
+      // The startup message: its length (4 bytes, its own included), the protocol version (4 bytes), then names and
+      // values, each ending in a zero byte.
+      if (answered || received.length < 8) return;
+      const length = new DataView(received.buffer).getUint32(0);
+      if (received.length < length) return;
+      answered = true;
+      const words = new TextDecoder().decode(received.subarray(8, length)).split("\0");
+      const startup: Record<string, string> = {};
+      for (let k = 0; k + 1 < words.length; k += 2) {
+        const [name, value] = [words[k], words[k + 1]];
+        if (name !== undefined && name !== "" && value !== undefined) startup[name] = value;
+      }
+      startups.push(startup);
+      const user = startup.user ?? "";
+      const database = startup.database ?? "";
+      socket.end(
+        errorResponse([
+          ["S", "FATAL"],
+          ["V", "FATAL"],
+          ["C", "28000"],
+          [
+            "M",
+            `no pg_hba.conf entry for host "127.0.0.1", user "${user}", database "${database}", no encryption`,
+          ],
+        ]),
+      );
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as AddressInfo;
+  return {
+    port,
+    startups,
+    close: () =>
+      new Promise<void>((resolve) => {
+        for (const socket of sockets) socket.destroy();
+        server.close(() => {
+          resolve();
+        });
+      }),
+  };
+}
+
+describe("publish.run with a built client whose database cannot be reached (T-1202)", () => {
+  const notFound = `postgres://${T1202.user}:${T1202.password}@${T1202.host}:6543/${T1202.database}`;
+  const refused = `postgres://${T1202.user}:${T1202.password}@127.0.0.1:1/${T1202.database}`;
+  const cases: [string, string, string[], RegExp][] = [
+    [
+      "a .invalid host, not found (ENOTFOUND, or EAI_AGAIN where no name server answers)",
+      notFound,
+      [notFound, T1202.user, T1202.password, T1202.host, "6543", T1202.database],
+      /^(ENOTFOUND|EAI_AGAIN)$/,
+    ],
+    [
+      "port 1 of 127.0.0.1, which refuses the connection (ECONNREFUSED)",
+      refused,
+      [refused, T1202.user, T1202.password, "127.0.0.1", "1", T1202.database],
+      /^ECONNREFUSED$/,
+    ],
+  ];
+
+  it.each(cases)(
+    "%s: exit 1, and its one line names the error's kind and holds no part of the URL",
+    async (_, url, parts, kind) => {
+      vi.stubEnv("DATABASE_URL", url);
+      const kv = join(tempDir("kv"), "bundle.kv.json");
+      const run = capture();
+
+      expect(await publish.run([dir, "--kv", kv], run.io)).toBe(1);
+      expect(partsHeld(run.err, parts)).toEqual([]);
+      expect(kindIn(run.err)).toMatch(kind);
+      expect(run.err).toEqual([failureLine(kindIn(run.err))]);
+      expect(run.out).toEqual([]);
+      expect(existsSync(kv)).toBe(false);
+    },
+  );
+
+  it("through the CLI: exit 1, and the same one line", async () => {
+    vi.stubEnv("DATABASE_URL", notFound);
+    const kv = join(tempDir("kv"), "bundle.kv.json");
+    const run = capture();
+
+    expect(await main(["publish", dir, "--kv", kv], run.io)).toBe(1);
+    expect(
+      partsHeld(run.err, [notFound, T1202.user, T1202.password, T1202.host, "6543", T1202.database]),
+    ).toEqual([]);
+    expect(kindIn(run.err)).toMatch(/^(ENOTFOUND|EAI_AGAIN)$/);
+    expect(run.err).toEqual([failureLine(kindIn(run.err))]);
+    expect(run.out).toEqual([]);
+    expect(existsSync(kv)).toBe(false);
+  });
+});
+
+describe("publish.run with a multi-host URL that Node's URL parser refuses (T-1202)", () => {
+  let database: RefusingDatabase;
+
+  beforeAll(async () => {
+    database = await refusingDatabase();
+  });
+
+  afterAll(async () => {
+    await database.close();
+  });
+
+  it("its database refuses the URL's user by name: the line holds no user, nor any other part of the URL", async () => {
+    const port = String(database.port);
+    // postgres.js reads the hosts after the @ itself and connects to the first one; Node's URL parser refuses the , in
+    // the port, so client.redact could take out only the whole string.
+    const url = `postgres://${T1202.user}:${T1202.password}@127.0.0.1:${port},${T1202.host}:${port}/${T1202.database}`;
+    expect(URL.canParse(url)).toBe(false);
+    vi.stubEnv("DATABASE_URL", url);
+    const kv = join(tempDir("kv"), "bundle.kv.json");
+    const run = capture();
+
+    expect(await publish.run([dir, "--kv", kv], run.io)).toBe(1);
+    // The stand-in was sent the URL's user and database, and its refusal named both.
+    expect(database.startups[0]).toMatchObject({ user: T1202.user, database: T1202.database });
+    expect(
+      partsHeld(run.err, [url, T1202.user, T1202.password, "127.0.0.1", T1202.host, port, T1202.database]),
+    ).toEqual([]);
+    expect(run.err).toEqual([failureLine("28000")]);
+    expect(run.out).toEqual([]);
     expect(existsSync(kv)).toBe(false);
   });
 });
