@@ -59,6 +59,13 @@ function link(target, file) {
   symlinkSync(target, file);
 }
 
+// Letters outside ASCII, built from their code points so that this file stays ASCII and none of them hides
+// behind the letter it looks like: U+017F (long s) and U+212A (Kelvin sign), which this Mac's volume folds to s
+// and k (DL-456), and U+00E9 (e with an acute accent).
+const LONG_S = String.fromCodePoint(0x17f);
+const KELVIN_SIGN = String.fromCodePoint(0x212a);
+const E_ACUTE = String.fromCodePoint(0xe9);
+
 // The branches of the throwaway origin and what each changes from main (a { link } is a symbolic link).
 const BRANCHES = {
   "task/T-1-code": { "runtime/src/index.ts": "export default { fetch: () => new Response('T-1') };\n" },
@@ -108,6 +115,26 @@ const BRANCHES = {
   "task/T-18-generated-link": { "actions/src/tool-api/generated": { link: "../../../../outside" } },
   // One of main's files made a link.
   "task/T-19-file-to-link": { "runtime/src/index.ts": { link: "../../../outside/index.ts" } },
+  // Paths with characters outside printable ASCII (DL-456). git's icase folds ASCII letters only, but this Mac's
+  // volume also folds U+017F (long s) to s and U+212A (Kelvin sign) to k: to node and npm these are a
+  // node_modules folder and a package.json (as in T-15 and T-16) that no guarded entry matches.
+  "task/T-20-node-modules-long-s": {
+    [`actions/src/tool-api/generated/node_module${LONG_S}/ajv/dist/runtime/equal.js`]:
+      "module.exports = () => true;\n",
+  },
+  "task/T-21-package-json-kelvin": {
+    [`actions/src/tool-api/generated/pac${KELVIN_SIGN}age.json`]:
+      '{ "name": "ajv", "exports": { "./dist/runtime/*": "./runtime/*" } }\n',
+  },
+  // Other paths outside printable ASCII: an accented letter; a tab and a newline in one name, which the
+  // NUL-separated read keeps whole; and an accented letter in a guarded path.
+  "task/T-22-accented": { [`runtime/src/caf${E_ACUTE}.ts`]: "export {};\n" },
+  "task/T-23-control-characters": { "runtime/src/a\tb\nc.ts": "export {};\n" },
+  "task/T-24-guarded-accented": { [`infra/scripts/caf${E_ACUTE}.sh`]: "#!/usr/bin/env bash\n" },
+  // A space (0x20) and a tilde (0x7E), the two ends of printable ASCII: nothing to refuse. DEL (0x7F), just past
+  // the end: refused.
+  "task/T-25-space-tilde": { "runtime/src/a b~.ts": "export {};\n" },
+  "task/T-27-delete-character": { "runtime/src/del\u007f.ts": "export {};\n" },
 };
 
 describe("deploy-preview.sh", () => {
@@ -175,6 +202,24 @@ describe("deploy-preview.sh", () => {
     git(seed, "commit", "-q", "-m", "orphan");
     git(seed, "push", "-q", "origin", "task/T-9-orphan");
     git(seed, "switch", "-q", "-f", "main");
+    // A path outside printable ASCII that main had when a branch left it and that the branch removes, so it is
+    // on the base side of the branch's diff only. main then removes it too: its tip, like the repository's main
+    // (DL-456), holds no such path.
+    const resume = path.join(seed, "runtime", "src", `r${E_ACUTE}sum${E_ACUTE}.ts`);
+    write(resume, "export {};\n");
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main gains a path outside printable ASCII");
+    git(seed, "switch", "-q", "-c", "task/T-26-removes-accented", "main");
+    rmSync(resume);
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "task/T-26-removes-accented");
+    git(seed, "push", "-q", "origin", "task/T-26-removes-accented");
+    shas["task/T-26-removes-accented"] = git(seed, "rev-parse", "HEAD");
+    git(seed, "switch", "-q", "main");
+    rmSync(resume);
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main removes it again");
+    git(seed, "push", "-q", "origin", "main");
 
     // The lead's checkout, with its own (fake) wrangler; fake npm and wrangler first on PATH.
     const main = path.join(dir, "rosie");
@@ -438,5 +483,104 @@ describe("deploy-preview.sh", () => {
     assert.equal(existsSync(result.calls[0].cwd), false, "the temporary worktree is removed");
     const worktrees = fixture.git(fixture.main, "worktree", "list", "--porcelain").match(/^worktree /gm);
     assert.equal(worktrees?.length, 1, "only the lead's checkout is left as a worktree");
+  });
+
+  // A path holding a byte outside printable ASCII (0x20 to 0x7E), on either side of the branch's diff, is refused
+  // wherever it is (DL-456). The diff is read NUL-separated, and each path is named whole, quoted as git quotes it.
+  const NONASCII_HEADER =
+    "paths with characters outside printable ASCII, which this Mac could take for files that control the" +
+    " install, the build or the deploy (each quoted as git quotes it):\n";
+  const nonascii = [
+    [
+      "task/T-20-node-modules-long-s",
+      String.raw`"actions/src/tool-api/generated/node_module\305\277/ajv/dist/runtime/equal.js"`,
+    ],
+    ["task/T-21-package-json-kelvin", String.raw`"actions/src/tool-api/generated/pac\342\204\252age.json"`],
+    ["task/T-22-accented", String.raw`"runtime/src/caf\303\251.ts"`],
+    ["task/T-23-control-characters", String.raw`"runtime/src/a\tb\nc.ts"`],
+    ["task/T-26-removes-accented", String.raw`"runtime/src/r\303\251sum\303\251.ts"`],
+    ["task/T-27-delete-character", String.raw`"runtime/src/del\177.ts"`],
+  ];
+  for (const [branch, quoted] of nonascii) {
+    it(`refuses ${branch}, whose diff against origin/main touches ${quoted}, without PREVIEW_ALLOW_INFRA=1`, () => {
+      assert.equal(
+        fixture.git(fixture.main, "diff", "--name-only", `origin/main...${fixture.shas[branch]}`),
+        quoted,
+        "the branch changes that one path, which git itself shows quoted so",
+      );
+      const result = fixture.run(branch);
+      assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+      assert.ok(
+        result.stderr.includes(` add, change or remove ${NONASCII_HEADER}  ${quoted}\nReview them`),
+        `the refusal names ${quoted}, whole and quoted, and nothing else: ${result.stderr}`,
+      );
+      assert.doesNotMatch(
+        result.stderr,
+        /touch files that control|symbolic links/,
+        "no guarded name and no link: the path alone refuses it",
+      );
+      assert.match(result.stderr, /PREVIEW_ALLOW_INFRA=1/);
+      assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
+      assert.equal(result.branchCfRan, false);
+    });
+  }
+
+  it("names a guarded path outside printable ASCII in both lists, quoted alike", () => {
+    const quoted = String.raw`"infra/scripts/caf\303\251.sh"`;
+    const result = fixture.run("task/T-24-guarded-accented");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        `with the Rosfield sign-in before review:\n  ${quoted}\n` +
+          `and they add, change or remove ${NONASCII_HEADER}  ${quoted}\nReview them`,
+      ),
+      result.stderr,
+    );
+    assert.deepEqual(result.calls, []);
+  });
+
+  it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed path outside printable ASCII, listing it once, quoted", () => {
+    const result = fixture.run("task/T-24-guarded-accented", { PREVIEW_ALLOW_INFRA: "1" });
+    assertPreviewed(result, "task/T-24-guarded-accented", "task-t-24-guarded-accented");
+    assert.ok(
+      result.stdout.includes(`used as reviewed:\n  ${String.raw`"infra/scripts/caf\303\251.sh"`}\n[`),
+      `the path is listed once, though both checks name it: ${result.stdout}`,
+    );
+  });
+
+  it("previews a branch whose new path holds a space and a tilde, the two ends of printable ASCII", () => {
+    assertPreviewed(fixture.run("task/T-25-space-tilde"), "task/T-25-space-tilde", "task-t-25-space-tilde");
+  });
+
+  it("names such a path quoted even when the lead's git config turns git's own quoting off (core.quotePath)", () => {
+    const branch = "task/T-20-node-modules-long-s";
+    const quotePathOff = {
+      GIT_CONFIG_COUNT: "1",
+      GIT_CONFIG_KEY_0: "core.quotePath",
+      GIT_CONFIG_VALUE_0: "false",
+    };
+    const shown = execFileSync("git", ["diff", "--name-only", `origin/main...${fixture.shas[branch]}`], {
+      cwd: fixture.main,
+      env: cleanEnv(fixture.home, quotePathOff),
+      encoding: "utf8",
+    });
+    assert.equal(
+      shown,
+      `actions/src/tool-api/generated/node_module${LONG_S}/ajv/dist/runtime/equal.js\n`,
+      "with that setting, git itself prints the name's bytes as they are",
+    );
+    const result = fixture.run(branch, quotePathOff);
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        `${NONASCII_HEADER}  ${String.raw`"actions/src/tool-api/generated/node_module\305\277/ajv/dist/runtime/equal.js"`}\n`,
+      ),
+      result.stderr,
+    );
+    assert.ok(
+      !(result.stdout + result.stderr).includes(LONG_S),
+      "no byte of the name reaches the terminal as it is",
+    );
+    assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
   });
 });
