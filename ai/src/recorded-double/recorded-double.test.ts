@@ -599,7 +599,9 @@ describe("turn 1 (K-02 v1.1): the recordings the README names, every context pin
   it("pins every context it knows by its K-02 version, each accepted by its own version's schema", () => {
     expect(MODEL_VERSIONS).toEqual(["v1", "v1.1"]);
     const frozen = readJson(path.join(CONTRACT_DIR, "model", "frozen.json")) as { frozen: string[] };
-    expect(frozen.frozen).toEqual([...MODEL_VERSIONS]);
+    // K-02 v1.2 (T-1157, an unmapped turn's end) is frozen beside them; it changes no model-facing definition, so the
+    // double keeps reading v1 and v1.1 (contracts/model/README.md "v1.2", "Who reads v1.2").
+    expect(frozen.frozen).toEqual([...MODEL_VERSIONS, "v1.2"]);
     // K-02's context fixtures by version: v1's two and v1.1's turn 1; no other version holds one.
     expect(acceptedOf("context", "v1")).toEqual(["context-s1-02.json", "context-two-requests.json"]);
     expect(acceptedOf("context", "v1.1")).toEqual(["context-s1-01.json"]);
