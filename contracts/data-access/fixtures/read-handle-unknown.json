@@ -1,0 +1,16 @@
+{
+  "call": "readHandle",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "An id no handle row holds (K-04's seed-person-roles.json holds handle-sam to handle-tomas and handle-alex-email): handle null, never an error, which the directory reads as no actor (actorNameOf null), so the arming tells no actor and the minute sweep fires the row once it is missed (runtime/src/clocks/arming.ts: noActor). A clock row's handle_id refers to a handle row (clock_rows_handle_fk), so only a broken record or a mistaken caller meets this."
+  },
+  "request": {
+    "handleId": "handle-nobody-0001"
+  },
+  "outcome": {
+    "handleId": "handle-nobody-0001",
+    "handle": null
+  }
+}

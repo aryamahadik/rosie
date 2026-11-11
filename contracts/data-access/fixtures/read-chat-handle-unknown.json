@@ -1,0 +1,16 @@
+{
+  "call": "readChatHandle",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "A receipt for a chat no thread holds: only S1-01's commit writes a number's chat thread (open gap 48), so a reply to someone whose first text wrote none, such as Dee W.'s, lands on a chat id this database does not know (linq-chat-demo-dee, an example). Both fields are null: the adapter answers receiptHandleUnknown, the gateway answers 503 and Linq retries (QUESTIONS.md CQ-61), so the receipt is never placed on a guessed handle. Nothing is written."
+  },
+  "request": {
+    "linqChatId": "linq-chat-demo-dee"
+  },
+  "outcome": {
+    "handleId": null,
+    "handle": null
+  }
+}
