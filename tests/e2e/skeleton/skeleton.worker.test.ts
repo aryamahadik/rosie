@@ -1,10 +1,11 @@
-// The walking skeleton's end-to-end test (C-148; build prompt section 10, D-017), in its prefix form (T-1103; CQ-78), run
-// inside workerd through the Worker's own composition root (T-1149; DL-332). One JOIN webhook goes in through T-465's local
-// target, posted to runtime/src/wiring's root.linqWebhook with the HandleActor installed and every joined port fed its
-// double (./root-run.ts), and runs as far as its turn's reply. Its spans are collected by the trace id the gateway answered
-// with and judged by T-465's checkHops (through T-551's judgePrefixRun); the actor's inbox, safety state and batches, and
-// the rows the K-05 doubles wrote, are read back; and each joined row of 02-contracts section 11, up to the prefix, is held
-// to what its join proved (CLAIMS). Each hop join (T-552 to T-563) proves its own prefix with it:
+// The walking skeleton's end-to-end test (C-148; build prompt section 10, D-017), run inside workerd through the Worker's
+// own composition root (T-1149; DL-332). One JOIN webhook goes in through T-465's local target, posted to
+// runtime/src/wiring's root.linqWebhook with the HandleActor installed and every joined port fed its double
+// (./root-run.ts), and runs as far as its turn's reply and its delivery receipt. Its spans are collected by the trace id
+// the gateway answered with and judged by T-465's checkHops (through T-551's judgePrefixRun); the actor's inbox, safety
+// state and batches, and the rows the K-05 doubles wrote, are read back; and each joined row of 02-contracts section 11,
+// up to the prefix, is held to what its join proved (CLAIMS). The first test keeps its prefix form (T-1103; CQ-78), with
+// which each hop join (T-552 to T-563) proved its own prefix:
 //
 //   npm run test:contract -- tests/contract/<the hop's contract test> --reporter=json --outputFile=<report.json>
 //   SKELETON_UPTO=<name> CONTRACT_REPORT=<report.json> npm run test:e2e -- skeleton
@@ -16,7 +17,8 @@
 //   CONTRACT_REPORT the hop fails, naming the report it lacks (T-551 default 4). A name that is no hop of section 11, or a
 //   file that is not Vitest's JSON report, fails this test, naming it.
 // - SKELETON_UPTO unset (`npm run test:e2e`, as the merge check runs it): T-465's check over every hop joined so far, from
-//   receive to JOINED_THROUGH, with every joined row's claims, and no contract report read.
+//   receive to JOINED_THROUGH, on the whole judged trace, with every joined row's claims and D-017's automated tests, and
+//   no contract report read. The twenty runs below judge the full path whatever SKELETON_UPTO says.
 // - What the merged runtime does not write yet is judged around by name, and each such gap is asserted to still hold
 //   (./gaps.ts). T-1108 closed three: each text has one receive span, the gateway's; the batch hop is judged with the
 //   rest; and the trace is one run by seq across its writers, its hops, by seq as written, in the order they started. One
