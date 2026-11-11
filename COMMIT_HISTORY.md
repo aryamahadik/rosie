@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 405, [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), 2026-11-11 18:32:00 UTC.
+- **Through:** commit 407, [`c4c76b7`](https://github.com/aryamahadik/rosie/commit/c4c76b7), 2026-11-11 19:03:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 407. docs: COMMIT\_HISTORY.md through commit 405 (f317e1c, \#412) (\#415)
+
+- **Commit:** [`c4c76b7`](https://github.com/aryamahadik/rosie/commit/c4c76b7), by Arya Mahadik, 2026-11-11 19:03:34 UTC
+- **Pull request:** [#415](https://github.com/aryamahadik/rosie/pull/415) from `task/commit-history-26`, merged 2026-11-11 19:03:35 UTC. It squashed 1 branch commit:
+  - `cc39635` docs: COMMIT\_HISTORY.md through commit 405 (f317e1c, \#412)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 406. T-1124 (round 2 of 2): the Hyperdrive spike's final findings from the live run on staging: the configuration T-567 binds, each question with its query and result, the commit timings beside 300 ms, and the limits of one run (\#413)
+
+- **Commit:** [`96a5789`](https://github.com/aryamahadik/rosie/commit/96a5789), by Arya Mahadik, 2026-11-11 19:03:30 UTC
+- **Pull request:** [#413](https://github.com/aryamahadik/rosie/pull/413) from `task/T-1124-r2`, merged 2026-11-11 19:03:30 UTC. It squashed 1 branch commit:
+  - `a7e387d` T-1124 (round 2 of 2): the Hyperdrive spike's final findings from the…
+- **Files changed:** 1 (+378 −60), by folder:
+  - `infra/spikes/hyperdrive-host/` FINDINGS.md +378 −60
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The round 2 builder's text, written by the lead because the builder's Write was refused (as in round 1), then formatted with Prettier. No script changed.
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 405. docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410) (\#412)
 
