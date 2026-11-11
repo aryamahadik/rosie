@@ -1,6 +1,6 @@
 # infra/ci
 
-The CI scripts: the guards `ci.yml` and `merge-check.yml` run (`test-guard.mjs`, `migration-guard.mjs`, `contract-freeze-guard.mjs`), the tests of the guards, the PreToolUse hook and the `infra/scripts` shell scripts (`npm run test:ci-scripts`), and the local merge-check below. Owner: the release engineer.
+The CI scripts: the guards `ci.yml` and `merge-check.yml` run (`test-guard.mjs`, `migration-guard.mjs`, `contract-freeze-guard.mjs`), the tests of the guards, the PreToolUse hook, the `infra/scripts` shell scripts and the validators' build in `infra/build` (`npm run test:ci-scripts`), and the local merge-check below. Owner: the release engineer.
 
 ## The local merge-check (T-1111, DL-190)
 
