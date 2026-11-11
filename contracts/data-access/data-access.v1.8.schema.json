@@ -1,0 +1,1242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.8.schema.json",
+  "title": "DataAccessV1dot8",
+  "description": "K-05 v1.8, a minor version of the data-access calls (T-1102, from T-1099's handoff; DL-130, renumbered by DL-344, DL-364, DL-391, DL-438 and DL-450). It only adds to v1.7 (data-access.v1.7.schema.json, frozen and unchanged, referred to here, which refers on to v1.6, v1.5, v1.4, v1.3, v1.2, v1.1 and v1): every v1.7 definition is here under its own name, the unchanged ones by reference; the changed ones, sendState.response and sendState.exchange, take two new optional fields in the answer's textsConsent, so every v1 to v1.7 exchange is a v1.8 exchange. Added: sendState's texts consent row says who gave the yes and for which booking (README item 47; RULES 7.1, 7.5; S13-32, MASTER-FLOW-A lines 7214, 7215 and 7242): fromContact, true only when the row is a yes the person sent by text from the contact it covers (K-29 v1 consents.channel text, written by a turn of that same handle: consents.turn_id and K-04 v1 turns.handle_id; or, with no turn, a START, recorded on return from that number's own text: business_id null, which K-29 v1 allows only on a STOP's or a START's row, and K-09 v1's START rule), false for every other row (a yes the business entered, a page's, an outside AI's or an email's, a yes by text from another handle, a row that withdraws); and bookingId, K-29 v1 consents.booking_id as stored (the booking a fresh yes covers; null for START's yes for every business). Both are read in sendState's own transaction from K-29 v1 consents and K-04 v1 turns, with the grants rosie_job holds (0012, 0013): K-29 v1's row holds both facts, so no K-29 minor version, column, grant, index or migration is added. A v1.8 call always writes them: sendState.v1dot8Response is its answer with both required. The stopped flag stays the phone's (K-04 phones.stopped), never derived from a consent row. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    },
+    {
+      "$ref": "#/$defs/rowReader.exchange"
+    },
+    {
+      "$ref": "#/$defs/openChatOnText.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markPart.request"
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markPart.response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markPart.exchange"
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleTargets.exchange"
+    },
+    "textsConsentRead": {
+      "title": "TextsConsentRead",
+      "description": "The newest texts consent row for the recipient's contact that covers the row's business, its business's or every business's (K-05 v1.2 item 28, default 35: by at, a tie to the lower id), as v1.2 gives it (consentId, businessId, revoked and at, unchanged), with two fields more (v1.8, T-1102; README item 47): fromContact, who gave it, and bookingId, the booking it was given for, each read from K-29 v1's own row. Both are optional here only so that every v1.2 to v1.7 answer, which has neither, is a v1.8 answer: a v1.8 call always writes both (textsConsentV1dot8, in sendState.v1dot8Response), and a consumer reads an answer without them as not known, so no yes lifts a stop (T-1099: limit 8's notKnown). A row that withdraws (revoked) is no yes: its fromContact is false, never true, so no reader that skips revoked takes a STOP for the person's own yes (refuse-send-state-stop-read-as-own-yes; README default 82). New in v1.8.",
+      "type": "object",
+      "properties": {
+        "consentId": {
+          "description": "K-29 v1 consents.id.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "K-29 v1 consents.business_id: the business the yes is for, or null on a STOP's or a START's row, which covers every business (D102; RULES 7.2, 7.5).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "revoked": {
+          "description": "K-29 v1 consents.revoked: true for a row that withdraws (a STOP in any words, or a switch away from this contact: K-29 README, 'Revoked is a row, not an edit').",
+          "type": "boolean"
+        },
+        "at": {
+          "description": "K-29 v1 consents.at: when the yes was given or the stop came.",
+          "$ref": "#/$defs/utc"
+        },
+        "fromContact": {
+          "description": "Whether the row is a yes the person sent from the contact it covers, by text (RULES 7.1: 'Never on someone else's word'; RULES 7.5 and S13-32 line 7242: 'from that number'; S13-32 line 7215: 'The business's word counts only for someone who gave the business their number for this booking'). Source (README item 47, default 78): K-29 v1 consents, read with the row, and K-04 v1 turns: true only when revoked is false, channel is text, and either turn_id names a turns row whose handle_id is the row's own handle_id (a turn batches one handle's texts, so a yes given by text in it came from that handle), or turn_id is null and business_id is null (only a STOP's or a START's row may have no business, K-29 consents_every_business_only_texts, and one that does not withdraw is a START, which K-09 v1 records only from the phone's own START text, in its turn or on return by its actor: recordStopOrStart; start-recorded.json). False for every other row: a yes the business entered ('1 Yes' by the owner's text is a turn of the owner's handle; the Today page's is channel page), a page's, an outside AI's or an email's, a yes by text from another handle, a yes no turn wrote that is not a START (README default 79), an email contact's row (default 80), and a row that withdraws (default 82). Reason: limit 8 counts a texts yes newer than the stop as turning texts back on only when it is the person's own word sent from the number that stopped (T-1099; C-125), and v1.2's row could not say who gave it, so every yes read as not known. New in v1.8.",
+          "type": "boolean"
+        },
+        "bookingId": {
+          "description": "The booking the yes was given for: K-29 v1 consents.booking_id as stored (README item 47, default 81): the person's own number given for this booking (RULES 7.1), the terms ticked for it, or a fresh yes on a new booking from that number (RULES 7.5), which turns only that booking's texts back on (S13-32 line 7242); null on a row that names no booking: START's and STOP's rows for every business, and a yes given for the business rather than one booking. Whether that booking was made after the stop is stored nowhere, so it is not read (README default 83, open gap 52). Reason: limit 8 lifts a stop for a row only when the person's own fresh yes names that row's booking (T-1099; C-125). New in v1.8.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["consentId", "businessId", "revoked", "at"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "revoked": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fromContact": {
+            "description": "A row that withdraws is no yes, so it is never the person's own yes (README default 82).",
+            "const": false
+          }
+        }
+      }
+    },
+    "textsConsentV1dot8": {
+      "title": "TextsConsentV1dot8",
+      "description": "The texts consent row as a v1.8 call writes it (README item 47): every field of textsConsentRead, by reference, with fromContact and bookingId always stated, never left out, and a row that withdraws never the person's own yes. textsConsentRead takes the two as optional only so that v1.2 to v1.7's answers stay valid; this is the shape a v1.8 producer's answers are checked against (db/repo's sendState), so no consumer meets a v1.8 answer that leaves out who gave a yes or for which booking (refuse-send-state-yes-source-left-out, refuse-send-state-booking-left-out). New in v1.8.",
+      "type": "object",
+      "properties": {
+        "consentId": {
+          "$ref": "#/$defs/textsConsentRead/properties/consentId"
+        },
+        "businessId": {
+          "$ref": "#/$defs/textsConsentRead/properties/businessId"
+        },
+        "revoked": {
+          "$ref": "#/$defs/textsConsentRead/properties/revoked"
+        },
+        "at": {
+          "$ref": "#/$defs/textsConsentRead/properties/at"
+        },
+        "fromContact": {
+          "$ref": "#/$defs/textsConsentRead/properties/fromContact"
+        },
+        "bookingId": {
+          "$ref": "#/$defs/textsConsentRead/properties/bookingId"
+        }
+      },
+      "required": ["consentId", "businessId", "revoked", "at", "fromContact", "bookingId"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "revoked": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fromContact": {
+            "description": "A row that withdraws is no yes, so it is never the person's own yes (README default 82).",
+            "const": false
+          }
+        }
+      }
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "title": "SendStateResponse",
+      "description": "What limit 8 reads about a row's recipient, all from one read of the primary (one transaction), as v1.2 answers it (README item 28: each field by reference to v1.2's own definition of it, which v1.3 to v1.7 keep unchanged), with textsConsent's two fields more (v1.8, T-1102; README item 47): fromContact and bookingId, optional here only so that every v1.2 to v1.7 answer is a v1.8 answer. A v1.8 call always writes them (sendState.v1dot8Response). The stopped flag is phone.stopped, K-04 phones.stopped as stored, never derived from textsConsent (STATE note 10; T-1099; README default 84); fromContact and bookingId describe the consent row alone. Limit 8's rules on it, and what each flag holds back, are C-125's.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/result"
+        },
+        "outboxRowId": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/outboxRowId"
+        },
+        "rowState": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/rowState"
+        },
+        "rowVersion": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/rowVersion"
+        },
+        "readAt": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/readAt"
+        },
+        "recipient": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/recipient"
+        },
+        "phone": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/phone"
+        },
+        "chat": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/chat"
+        },
+        "textsConsent": {
+          "description": "The newest texts consent row for this contact that covers the row's business, its business's or every business's (K-29 v1 consents_handle_kind_at_idx: 'limit 8's texts check read a contact's newest texts row'; RULES 7.1, 7.2; K-05 v1.2 default 35), by at, a tie to the lower id, with who gave it and for which booking (v1.8: fromContact, bookingId); null when there is none. For an email contact it is the stop record, since only a phone carries the stopped flag. Changed in v1.8.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/textsConsentRead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "audience": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/audience"
+        },
+        "zone": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/zone"
+        },
+        "visitZone": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/visitZone"
+        },
+        "businessZone": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/businessZone"
+        },
+        "textHours": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/textHours"
+        },
+        "textHoursOverride": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/textHoursOverride"
+        },
+        "currentVersions": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/currentVersions"
+        },
+        "booking": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/booking"
+        },
+        "pauses": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/pauses"
+        },
+        "openQuestion": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/openQuestion"
+        },
+        "closed": {
+          "$ref": "data-access.v1.2.schema.json#/$defs/sendState.response/properties/closed"
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "rowState",
+        "rowVersion",
+        "readAt",
+        "recipient",
+        "phone",
+        "chat",
+        "textsConsent",
+        "audience",
+        "zone",
+        "visitZone",
+        "businessZone",
+        "textHours",
+        "textHoursOverride",
+        "currentVersions",
+        "booking",
+        "pauses",
+        "openQuestion",
+        "closed"
+      ],
+      "additionalProperties": false
+    },
+    "sendState.v1dot8Response": {
+      "title": "SendStateV1dot8Response",
+      "description": "sendState's answer as a v1.8 call writes it (README item 47): every field of sendState.response, by reference, with textsConsent, when there is one, in its v1.8 shape (textsConsentV1dot8: fromContact and bookingId always stated, never left out). sendState.response takes the two as optional only so that v1.2 to v1.7's answers stay valid; this is the definition a v1.8 producer's answers are checked against (db/repo's sendState), so no consumer meets a v1.8 answer that leaves out who gave a yes, which it would read as not known (refuse-send-state-yes-source-left-out, refuse-send-state-booking-left-out). New in v1.8.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/sendState.response/properties/result"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/sendState.response/properties/outboxRowId"
+        },
+        "rowState": {
+          "$ref": "#/$defs/sendState.response/properties/rowState"
+        },
+        "rowVersion": {
+          "$ref": "#/$defs/sendState.response/properties/rowVersion"
+        },
+        "readAt": {
+          "$ref": "#/$defs/sendState.response/properties/readAt"
+        },
+        "recipient": {
+          "$ref": "#/$defs/sendState.response/properties/recipient"
+        },
+        "phone": {
+          "$ref": "#/$defs/sendState.response/properties/phone"
+        },
+        "chat": {
+          "$ref": "#/$defs/sendState.response/properties/chat"
+        },
+        "textsConsent": {
+          "description": "The newest texts consent row covering this contact here, as sendState.response gives it, with who gave it and for which booking always stated; null when there is none.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/textsConsentV1dot8"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "audience": {
+          "$ref": "#/$defs/sendState.response/properties/audience"
+        },
+        "zone": {
+          "$ref": "#/$defs/sendState.response/properties/zone"
+        },
+        "visitZone": {
+          "$ref": "#/$defs/sendState.response/properties/visitZone"
+        },
+        "businessZone": {
+          "$ref": "#/$defs/sendState.response/properties/businessZone"
+        },
+        "textHours": {
+          "$ref": "#/$defs/sendState.response/properties/textHours"
+        },
+        "textHoursOverride": {
+          "$ref": "#/$defs/sendState.response/properties/textHoursOverride"
+        },
+        "currentVersions": {
+          "$ref": "#/$defs/sendState.response/properties/currentVersions"
+        },
+        "booking": {
+          "$ref": "#/$defs/sendState.response/properties/booking"
+        },
+        "pauses": {
+          "$ref": "#/$defs/sendState.response/properties/pauses"
+        },
+        "openQuestion": {
+          "$ref": "#/$defs/sendState.response/properties/openQuestion"
+        },
+        "closed": {
+          "$ref": "#/$defs/sendState.response/properties/closed"
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "rowState",
+        "rowVersion",
+        "readAt",
+        "recipient",
+        "phone",
+        "chat",
+        "textsConsent",
+        "audience",
+        "zone",
+        "visitZone",
+        "businessZone",
+        "textHours",
+        "textHoursOverride",
+        "currentVersions",
+        "booking",
+        "pauses",
+        "openQuestion",
+        "closed"
+      ],
+      "additionalProperties": false
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "title": "SendStateExchange",
+      "description": "One sendState request with its outcome, as v1.2: an answer, or one of sendState's errors, v1.2's and unchanged. The answer a v1.8 call gives is sendState.v1dot8Response, fromContact and bookingId always among textsConsent's fields (README item 47); sendState.response, which takes them as optional, also takes an answer of v1.2 to v1.7, so every v1.2 to v1.7 exchange is a v1.8 exchange. The two answer branches overlap, which anyOf allows: the first names what a v1.8 producer writes. Changed in v1.8.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "sendState"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/sendState.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sendState.v1dot8Response"
+            },
+            {
+              "$ref": "#/$defs/sendState.response"
+            },
+            {
+              "$ref": "#/$defs/sendState.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/fixedLineRowError"
+    },
+    "businessSensitive": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/businessSensitive"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/nullableTurnId"
+    },
+    "storedOutcome": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/storedOutcome"
+    },
+    "storedHold": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/storedHold"
+    },
+    "ownerContact": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/ownerContact"
+    },
+    "moreThanOneOwnerError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/moreThanOneOwnerError"
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcome.request"
+    },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcome.errors"
+    },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHold.request"
+    },
+    "readSafetyHold.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHold.response"
+    },
+    "readSafetyHold.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHold.errors"
+    },
+    "readSafetyHold.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHold.exchange"
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessOwner.request"
+    },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessOwner.errors"
+    },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessZone.request"
+    },
+    "readBusinessZone.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessZone.response"
+    },
+    "readBusinessZone.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessZone.errors"
+    },
+    "readBusinessZone.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/readBusinessZone.exchange"
+    },
+    "rowReader.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowReader.request"
+    },
+    "rowReader.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowReader.response"
+    },
+    "noReaderError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/noReaderError"
+    },
+    "rowReader.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowReader.errors"
+    },
+    "rowReader.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/rowReader.exchange"
+    },
+    "textService": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/textService"
+    },
+    "chatPhoneOpen": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/chatPhoneOpen"
+    },
+    "chatPhoneStopped": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/chatPhoneStopped"
+    },
+    "chatOpenValues": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/chatOpenValues"
+    },
+    "chatClosedValues": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/chatClosedValues"
+    },
+    "chatOpenedEvent": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/chatOpenedEvent"
+    },
+    "notAPhoneError": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/notAPhoneError"
+    },
+    "openChatOnText.request": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.request"
+    },
+    "openChatOnText.inserted": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.inserted"
+    },
+    "openChatOnText.opened": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.opened"
+    },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.stopped"
+    },
+    "openChatOnText.repeated": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.repeated"
+    },
+    "openChatOnText.response": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.response"
+    },
+    "openChatOnText.errors": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.errors"
+    },
+    "openChatOnText.exchange": {
+      "$ref": "data-access.v1.7.schema.json#/$defs/openChatOnText.exchange"
+    }
+  }
+}

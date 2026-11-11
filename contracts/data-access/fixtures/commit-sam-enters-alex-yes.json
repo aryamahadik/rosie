@@ -1,0 +1,121 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "A booking the business adds (K-09 v1.1 confirmBusinessBooking, A3-30, as j3-confirm-business-booking-yes.json writes it): Sam booked Alex's Nov 28 haircut with Riley by text, and his '1 Yes, send the link' to the read-back 'Did Alex agree to messages from Rosie?' is the business's word that Alex gave his number for this booking (S13-32 line 7215). So the commit writes the booking as the reply leaves it and Alex's texts yes for his mobile on it, given by text but in Sam's turn, on Sam's handle: the business's word, never Alex's own. Alex is not stopped, so K-09 v1.1 writes the row (default 50 writes none for a stopped mobile). The BOOK turn before it (the head at entry, the held time and the read-back's open question) is left out: no read here reads them. Needs K-29's consents table migrated."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-sam-yes-alex-nov28",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0035"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0035",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+    "writes": {
+      "state": [
+        {
+          "op": "insert",
+          "table": "bookings",
+          "values": {
+            "id": "booking-alex-riley-nov28",
+            "business_id": "biz-lees-barbershop",
+            "flow": "A",
+            "stage": "booked",
+            "booker_person_id": "person-sam",
+            "served_person_id": "person-alex",
+            "payer_person_id": "person-alex"
+          }
+        },
+        {
+          "op": "insert",
+          "table": "consents",
+          "values": {
+            "id": "consent-alex-texts-nov28",
+            "person_id": "person-alex",
+            "business_id": "biz-lees-barbershop",
+            "kind": "texts",
+            "revoked": false,
+            "handle_id": "handle-alex",
+            "booking_id": "booking-alex-riley-nov28",
+            "exact_words": "Book this for Alex M.? Did Alex agree to messages from Rosie? Haircut, Sat Nov 28, 11:00am with Riley. For Alex, 18 or older. Alex M., mobile on file. 1 Yes, send the link 2 Not yet 3 Change it",
+            "words_sha256": "664e48f89a9e0e0233b765b66c47b04ca7477646a7e8bbcc64ef30ddd6a2e6ac",
+            "at": "2026-11-07T15:06:40Z",
+            "channel": "text",
+            "turn_id": "turn-sam-yes-alex-nov28"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-booking-alex-riley-nov28",
+          "kind": "booking.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-sam",
+          "actorRole": "owner",
+          "tableName": "bookings",
+          "rowId": "booking-alex-riley-nov28",
+          "oldValues": null,
+          "newValues": { "stage": "booked" },
+          "sealed": null,
+          "why": { "step": "A3-30" },
+          "approvedBy": {
+            "kind": "ownerYes",
+            "person_id": "person-sam",
+            "role": "owner",
+            "open_question_id": "oq-a3-30-alex-nov28",
+            "option_id": "A3-30/1",
+            "event_id": "evt-sam-0035"
+          },
+          "proofs": null
+        },
+        {
+          "id": "log-consent-alex-texts-nov28",
+          "kind": "consent.given",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-sam",
+          "actorRole": "owner",
+          "tableName": "consents",
+          "rowId": "consent-alex-texts-nov28",
+          "oldValues": null,
+          "newValues": { "kind": "texts", "revoked": false, "business_id": "biz-lees-barbershop", "channel": "text" },
+          "sealed": null,
+          "why": { "step": "A3-30" },
+          "approvedBy": {
+            "kind": "ownerYes",
+            "person_id": "person-sam",
+            "role": "owner",
+            "open_question_id": "oq-a3-30-alex-nov28",
+            "option_id": "A3-30/1",
+            "event_id": "evt-sam-0035"
+          },
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-sam-yes-alex-nov28",
+    "committedAt": "2026-11-07T15:06:40Z",
+    "repeated": false,
+    "committed": {
+      "written": [{ "table": "bookings", "rowId": "booking-alex-riley-nov28", "version": 1 }],
+      "outboxRows": [],
+      "promoted": []
+    }
+  }
+}
