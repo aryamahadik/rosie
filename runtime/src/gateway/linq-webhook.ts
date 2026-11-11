@@ -200,8 +200,9 @@ export async function handleLinqWebhook(
  * Records K-08's scrub span for an event its actor wrote, after receive's: its own start and time, the event id, and
  * how many card numbers and Social Security numbers the scrub swapped (`cardNumbersTagged`, `ssnsTagged`, as
  * trace-skeleton.json names them). A span the contract refuses is never logged, and the answer does not change for it.
+ * The email door writes a reply's scrub span through it too (T-265, ./email).
  */
-function recordScrub(context: TraceContext, scrub: ScrubDone, eventId: string | undefined): void {
+export function recordScrub(context: TraceContext, scrub: ScrubDone, eventId: string | undefined): void {
   try {
     context.record({
       hop: "scrub",

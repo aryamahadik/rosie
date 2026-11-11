@@ -1,5 +1,7 @@
 // Rosie's Worker. Routes (factory spec 6; T-241; T-275; T-266): GET {BASE_PATH}/health, and the gateway's webhooks, each a
-// POST under BASE_PATH: /webhooks/linq; Stripe's /webhooks/stripe/rosfield and /webhooks/stripe/businesses; the calendars'
+// POST under BASE_PATH: /webhooks/linq; Resend's /webhooks/resend, for email's delivery events and inbound replies (T-265;
+// closed, answering 503, until the composition root binds the email port); Stripe's /webhooks/stripe/rosfield and
+// /webhooks/stripe/businesses; the calendars'
 // /webhooks/calendar/google and /webhooks/calendar/microsoft. And the page entry: the web app's K-21 v1 page and console
 // calls, each a POST to {BASE_PATH}/page-api/<call>, handed to the action layer's handler for that call; a staging-only
 // call answers stagingOnly wherever ENVIRONMENT is not staging (runtime/src/gateway/pages).
@@ -21,14 +23,17 @@ import { servePage } from "@rosie/web/src/shell/serve";
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
+  emailDepsOf,
   handleLinqWebhook,
   handlePageCall,
   handleProviderWebhook,
+  handleResendWebhook,
   LINQ_WEBHOOK_PATH,
   pageDepsOf,
   pageRouteOf,
   providerDepsOf,
   providerRouteOf,
+  RESEND_WEBHOOK_PATH,
   type GatewayDeps,
 } from "./gateway";
 import { wireWorker, workerRoot } from "./wiring";
@@ -134,6 +139,14 @@ export function createWorker(
         return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
       }
       return linqWebhook(request, env);
+    }
+
+    // The Resend webhook door (T-265): email's delivery events and inbound replies, through the gateway's email port.
+    if (pathname === `${basePath}${RESEND_WEBHOOK_PATH}`) {
+      if (request.method !== "POST") {
+        return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
+      }
+      return handleResendWebhook(request, emailDepsOf(gatewayDeps(env)), { environment, version });
     }
 
     const route = pathname.startsWith(basePath) ? providerRouteOf(pathname.slice(basePath.length)) : null;

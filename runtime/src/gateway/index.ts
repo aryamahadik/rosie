@@ -1,8 +1,10 @@
 // The gateway (C-044): the Linq webhook entry (T-241, linq-webhook.ts), the Stripe and calendar webhook doors (T-275,
-// providers/) and the page entry for the web app's page and console calls (T-266, pages/), with the answer rules they
-// share (answer.ts) and the capped body read the Linq entry and the page entry read through (T-1180, body.ts).
+// providers/), the Resend webhook door for email's delivery events and inbound replies (T-265, email/) and the page entry
+// for the web app's page and console calls (T-266, pages/), with the answer rules they share (answer.ts) and the capped
+// body read the Linq entry and the page entry read through (T-1180, body.ts).
 
 import { DEFAULT_BUNDLE_ID } from "./answer";
+import { unconfiguredEmail, type EmailDeps } from "./email";
 import { unconfiguredPages, type PageDeps } from "./pages";
 import { unconfiguredProviders, type ProviderDeps } from "./providers";
 import type { GatewayDeps } from "./types";
@@ -29,6 +31,19 @@ export {
   TEXT_SERVICES,
   type ChatAtReceipt,
 } from "./chat-open";
+export {
+  EMAIL_BODY_LIMIT_BYTES,
+  RESEND_WEBHOOK_PATH,
+  handleResendWebhook,
+  unconfiguredEmail,
+  type EmailDeps,
+  type EmailPort,
+  type EmailReadRequest,
+  type EmailReadResult,
+  type EmailRejectReason,
+  type EmailVerifyRequest,
+  type EmailVerifyResult,
+} from "./email";
 export {
   ACTOR_KINDS,
   HandoffError,
@@ -109,7 +124,7 @@ export const LINQ_WEBHOOK_PATH = "/webhooks/linq";
 /**
  * The gateway's doors until the Linq adapter (T-413) and the actor (T-243) exist: each answers by failing, so the
  * route answers 503 and accepts nothing. A webhook is never accepted unverified, and Linq's retries cover the gap.
- * The provider doors (T-275) and the page handlers (T-266) are unconfigured the same way.
+ * The provider doors (T-275), the page handlers (T-266) and the email port (T-265) are unconfigured the same way.
  */
 export function unconfiguredGateway(): GatewayDeps {
   const notYet = (door: string): Promise<never> =>
@@ -122,6 +137,24 @@ export function unconfiguredGateway(): GatewayDeps {
     bundleId: () => DEFAULT_BUNDLE_ID,
     providers: unconfiguredProviders(),
     pages: unconfiguredPages(),
+    email: unconfiguredEmail(),
+  };
+}
+
+/**
+ * The email webhook door's dependencies from the gateway's (T-265): its email port (closed when left out, so the route
+ * answers 503 until the composition root binds it), the same door to the handle's actor, receipt door and key store the
+ * Linq entry writes through, its bundle id, clock and body cap (EMAIL_BODY_LIMIT_BYTES when left out).
+ */
+export function emailDepsOf(deps: GatewayDeps): EmailDeps {
+  return {
+    email: deps.email ?? unconfiguredEmail(),
+    actor: deps.actor,
+    receipts: deps.receipts,
+    keys: deps.keys,
+    bundleId: deps.bundleId,
+    ...(deps.now === undefined ? {} : { now: deps.now }),
+    ...(deps.emailBodyLimitBytes === undefined ? {} : { emailBodyLimitBytes: deps.emailBodyLimitBytes }),
   };
 }
 
