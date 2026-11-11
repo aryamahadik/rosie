@@ -2,6 +2,8 @@
 
 The CI scripts: the guards `ci.yml` and `merge-check.yml` run (`test-guard.mjs`, `migration-guard.mjs`, `contract-freeze-guard.mjs`), the tests of the guards, the PreToolUse hook, the `infra/scripts` shell scripts and the validators' build in `infra/build` (`npm run test:ci-scripts`), and the local merge-check below. Owner: the release engineer.
 
+`put-staging-secrets.test.mjs` tests `infra/scripts/put-staging-secrets.sh` (`npm run secrets:staging`, T-568) in a throwaway checkout with a made-up `.dev.vars`, the real `cf.sh` and a stand-in for wrangler: each value reaches wrangler on standard input only, the output holds names with `set` or `missing` and never a value, any `--env` but staging is refused before a value is read, and the script's names are the ones the runtime reads.
+
 ## The local merge-check (T-1111, DL-190)
 
 GitHub Actions refuses to start jobs on this account (DL-165, DL-186), so the merge-check runs on the build Mac instead, with the same checks. The lead runs it once per branch before a merge (DL-063, DL-065), one run at a time and not beside heavy builder runs (DL-164):
