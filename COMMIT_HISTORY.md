@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 352, [`4283580`](https://github.com/aryamahadik/rosie/commit/4283580), 2026-11-11 07:33:59 UTC.
+- **Through:** commit 354, [`e1bfb1e`](https://github.com/aryamahadik/rosie/commit/e1bfb1e), 2026-11-11 08:31:48 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 354. docs: COMMIT\_HISTORY.md through commit 352 (4283580, \#359) (\#361)
+
+- **Commit:** [`e1bfb1e`](https://github.com/aryamahadik/rosie/commit/e1bfb1e), by Arya Mahadik, 2026-11-11 08:31:48 UTC
+- **Pull request:** [#361](https://github.com/aryamahadik/rosie/pull/361) from `task/commit-history-3`, merged 2026-11-11 08:31:49 UTC. It squashed 1 branch commit:
+  - `8131fc4` docs: COMMIT\_HISTORY.md through commit 352 (4283580, \#359)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 353. T-202: db/seeds/staging-core.ts, staging's seeded core rows for T-201's runner (--set staging-core): the 245 demo shops' business heads in America/New\_York, row for row as core.ts writes them, and for each test phone of K-21's roster but tp-01 (left out for the skeleton seed, DL-341) a person with the customer role at the barber, a handle and a phone row whose chat stays at the table's defaults; numbers read at run time from STAGING\_TEST\_PHONES, else the fixed fake 555-01xx handles the test-phone page sends as (NQ-DB-2); idempotent, refuses a clash or an unreadable variable naming no number; staging-core.int.test.ts proves it, the runner run, core with skeleton in either order, and a grep test (\#360)
+
+- **Commit:** [`121fdff`](https://github.com/aryamahadik/rosie/commit/121fdff), by Arya Mahadik, 2026-11-11 08:31:44 UTC
+- **Pull request:** [#360](https://github.com/aryamahadik/rosie/pull/360) from `task/T-202`, merged 2026-11-11 08:31:45 UTC. It squashed 1 branch commit:
+  - `ee550db` T-202: db/seeds/staging-core.ts, staging's seeded core rows for T-201…
+- **Files changed:** 2 (+1458 −0), by folder:
+  - `db/seeds/` staging-core.int.test.ts +1045 −0, staging-core.ts +413 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 352. docs: COMMIT\_HISTORY.md through commit 350 (7f552c9, \#357) (\#359)
 
