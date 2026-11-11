@@ -249,6 +249,14 @@
       "source": "README 'v1.1' default 10; arch 03 line 183; arch 02 line 119; D-017 ('decide (two reads)'); K-08 v1 trace-skeleton.json (decideReads: enter S1-01, reads agree, no re-read)"
     },
     {
+      "file": "pair-unmapped-all-refused.json",
+      "version": "v1.2",
+      "def": "contextAndDecide",
+      "expect": "accept",
+      "shows": "An unmapped turn's end (v1.2), on the turn of refuse-option-not-offered.json: both Haiku reads choose c-99, which S1-02's frontier does not offer, so the AI layer's validator refuses each (refusedRead, part 0 unmapped); the one Sonnet re-read is refused too; so the turn ends in one question with nothing changed (end oneQuestion): no part, agreed false, language null. The named rules hold on the pair, as a refused read holds no output.",
+      "source": "README 'v1.2' defaults 12 to 15; CQ-162 (a) and its default; T-370 default 5 and its RereadUnmapped (refused first, check, reread; end oneQuestion); arch 02 line 119; arch 06 line 289; Q-41"
+    },
+    {
       "file": "invalid/refuse-unknown-verb.json",
       "version": "v1",
       "def": "decideRead",
@@ -297,6 +305,14 @@
       "expect": "refuse",
       "shows": "A context with 61 choices: the frontier is never more than 60.",
       "source": "arch 01 line 69; arch 03 line 167"
+    },
+    {
+      "file": "invalid/refuse-go-with-refused-read.json",
+      "version": "v1.2",
+      "def": "contextAndDecide",
+      "expect": "refuse",
+      "shows": "The first Haiku read is refused (part 0 unmapped); the check read and the Sonnet re-read both choose 'All on the list' with Sam's kinds, and the result lets that part go. On a turn with a refused read no part goes, agreed parts included, so v1.2's schema refuses it; with the part's outcome oneQuestion it is accepted. The named rules hold on the pair.",
+      "source": "README 'v1.2' defaults 12 and 14; CQ-162 (a)'s default; T-370 default 5 ('Any refused read ... ends the whole turn in one question with nothing changed, agreed parts included')"
     }
   ]
 }
