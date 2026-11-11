@@ -1,6 +1,6 @@
 # The walking skeleton's end-to-end test (C-148, D-017)
 
-The run goes through the Worker's own composition root, inside workerd (T-1149, DL-332). `skeleton.worker.test.ts` sends one JOIN webhook (Sam, test owner 1, from the master's sample cast) through T-465's local target to `runtime/src/wiring`'s `root.linqWebhook`, with the HandleActor installed and every joined port fed its double (`root-run.ts`), and runs it as far as its turn's reply. T-465's `checkHops` judges its trace, through T-551's `judgePrefixRun`. The actor's inbox, safety state and batches, and the rows the K-05 doubles wrote, are read back. It is in its prefix form (T-1103, CQ-78). T-466 completes it later.
+The run goes through the Worker's own composition root, inside workerd (T-1149, DL-332). `skeleton.worker.test.ts` sends one JOIN webhook (Sam, test owner 1, from the master's sample cast) through T-465's local target to `runtime/src/wiring`'s `root.linqWebhook`, with the HandleActor installed and every joined port fed its double (`root-run.ts`), and runs it as far as its turn's reply and its delivery receipt. T-465's `checkHops` judges its trace, through T-551's `judgePrefixRun`. The actor's inbox, safety state and batches, and the rows the K-05 doubles wrote, are read back. Its first test keeps the prefix form each hop join used (T-1103, CQ-78); with `SKELETON_UPTO` unset it is the full test, with D-017's automated tests (T-466, below), and twenty more runs of it give the same result.
 
 `skeleton.test.ts` is its half in Node: it checks the JOIN (`join.ts`) against K-06 v1 with Ajv's compiler, which cannot run inside workerd. `npm run test:e2e` runs both, in the `e2e` project (Node) and the `e2e-workers` project (workerd).
 
@@ -40,7 +40,16 @@ Joins 1 to 13 (T-552 to T-564): receive, scrub with the actor's inbox entry, the
 
 ## With SKELETON_UPTO unset
 
-`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to clockArmed, with every joined row's claims. No contract report is read. Nothing is skipped.
+`npm run test:e2e` (the merge check) runs T-465's check over every hop joined so far, from receive to clockArmed, on the whole judged trace (no span stands after the last hop's, so none is cut off), with every joined row's claims and D-017's automated tests. No contract report is read. Nothing is skipped.
+
+## D-017's automated tests (T-466)
+
+Build prompt section 10, D-017's card ("Automated tests"), on the local target with every double and no model called (the recorded-model double). Run by `npm run test:e2e -- skeleton`.
+
+1. **One JOIN webhook gives exactly 1 outbox row and 1 send to the Linq double, whose words ask S1-02's first sign-up question.** `fullPathOf`, read once the turn has replied and its receipt is in, before any row's claim sends anything more: K-04's outbox rows, as the K-05 doubles hold every row the commits wrote, are the JOIN turn's one S1-02 row; the Linq line was handed one request and the double recorded one part, and T-465's `checkParts` over the collected run counts one send, no part twice and no key twice; the part's words ask plan-s1-02.json's question exactly once, and that question ends S1-02's own master words, as compose input read them from bundle v0 for the turn's one row. Rows 8, 10 and 12 hold the row and the words field for field.
+2. **The trace shows every hop of 02-contracts section 11 once, in order, under one trace id and one bundle id.** Section 11's rows hold K-08's trace-skeleton.json hop for hop, and no hop is left out (`NOT_WRITTEN` is empty). As written, by seq, the JOIN's trace shows each of those hops once, in that order, each starting no earlier than the hop before it, and every problem T-465's `checkHops` names is gap modelCallOrder's (below); judged in start order, `checkRun` finds nothing on the whole trace. Every span, the model calls' own too, names bundle v0's id. In the whole log (`root-run.ts` `spans()`), no span of the JOIN's event or turn is on another trace: the only other trace is the receipt's own webhook's, one receive span; the receipt's delivered and clockArmed spans are on the JOIN's trace (row 13).
+3. **The same webhook sent again (same event id) adds no outbox row and no send, and exactly one span: dropped at receipt.** Row 12, measured right around the repeat: the whole log gains one span, the repeat's receive on a trace of its own, as trace-duplicate-webhook.json draws it (dropped, the event id known, naming the JOIN's trace as the first), and the JOIN's trace gains none; nothing else changes (`heldOf`: outbox rows, K-04 rows, turns, commits, event-log entries, the actor's inbox, safety reads and batches, claims, the line's requests, the double's parts, chat-opened entries, the phone row's version); and T-465's `checkRepeat` finds nothing.
+4. **Twenty consecutive runs give the same result** (build prompt 5.2). The file's second block is twenty named cases (`RUNS`), each the whole test with no prefix (every row's claims and the three tests above) through a fresh composition root and a fresh actor (afterEach's `reset`), each inside its own 30 s limit (`TEST_MS`), and each run's result (`RunResult`: no time, trace id, word or number) must equal `expectedResult`'s, built from the fixtures and the run's own ids. On the build Mac each run takes about 60 to 120 ms, so the twenty take about 2 s. They judge the full path whatever `SKELETON_UPTO` says; the first test alone follows it.
 
 ## Known gaps (`gaps.ts`)
 
@@ -48,18 +57,11 @@ The runtime's own trace test names what the merged runtime does not write yet (`
 
 T-1108 closed three. `actorReceive`: each text has one receive span, the gateway's, which says the text was sealed and written to its actor. `batchSpans`: the batch window writes the batch span, so the batch hop is judged with the rest. `seqPerWriter`: the trace is one run by seq across its writers, and by seq, as written, its hops stand in the order they started. Nothing is set aside or left out any more. One narrower gap is left:
 
-- `modelCallOrder`: a model call's own portCall span is not in start order by seq. The safety read's span takes its place when the read ends, after its model call's span. And `@rosie/ai`'s gateway stamps a model call's span on `Date.now()`, not on the run's clock, which the run moves on for the quiet close. So T-465's `checkHops` judges the trace in the order its spans started, numbered again. Neither writer is one of the runtime's trace writers: T-1108's handoff names the task.
+- `modelCallOrder`: a model call's own portCall span is not in start order by seq. The safety read's span takes its place when the read ends, after its model call's span. And `@rosie/ai`'s gateway stamps a model call's span on `Date.now()`, not on the run's clock, which the run moves on for the quiet close. So T-465's `checkHops` judges the trace in the order its spans started, numbered again. Neither writer is one of the runtime's trace writers: T-1108's handoff names the task. As written, the run sets aside only the places the gap names, each at most once (`MODEL_CALL_ORDER_PLACES`): the safety read after its own model call, decide's first model call after decideReads, the composer's model call after compose. Any other problem as written, or a span out of start order anywhere else, fails the run.
 
 ## Inside workerd
 
 - The trace is checked against K-08 with the code T-1144 prebuilds for the Worker (K-08 v1.1's span, which is v1's). Ajv's compiler cannot run in workerd. `npm run test:e2e` builds that code first.
-- The local target starts capturing log lines before the root is composed, because the root binds its span sinks to `console.log` at that moment.
+- The run (`root-run.ts`) starts capturing log lines before the root is composed, because the root binds its span sinks to `console.log` at that moment. The local target reads each trace from that capture by its id, and `spans()` hands over the whole log, every trace's, so a test sees all a webhook added (T-466).
 - The actor writes no receive span of its own (T-1108): a text's one receive span is the gateway's, as K-08 shows. The actor stores the text and starts its safety read in one step, in which no clock moves, so the read's start is the inbox entry's instant. It is timed on the gateway's own readings, which are exact: after its scrub, before its answer.
 - Since the send join (T-563) the dispatcher sends through the root's Linq send port to the Linq double the local target collects its parts from, so T-465's check reads the part sent and finds no part sent twice.
-
-T-466 then completes the file with D-017's automated tests:
-
-- exactly 1 outbox row, and 1 send to the Linq double carrying S1-02's question;
-- every hop once, in order, under one trace id and one bundle id;
-- the repeated webhook adds nothing;
-- 20 consecutive runs give the same result.
