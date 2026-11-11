@@ -63,7 +63,8 @@
     "rollback:staging": "bash infra/scripts/rollback-staging.sh",
     "check:staging": "bash infra/scripts/post-deploy-check.sh",
     "seed:staging": "bash infra/scripts/seed-staging.sh",
-    "secrets:staging": "bash infra/scripts/put-staging-secrets.sh"
+    "secrets:staging": "bash infra/scripts/put-staging-secrets.sh",
+    "secrets:staging:make": "bash infra/scripts/make-staging-secrets.sh"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.6.0",
