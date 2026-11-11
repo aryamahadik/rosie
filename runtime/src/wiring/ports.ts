@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the fifteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the sixteen
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -23,14 +23,19 @@
 //   stateReads   other reads of stored state: who a handle is, each text's safety  T-562, T-564
 //                result, the safety read's bundle lines and stopped flag, a
 //                recipient's chat and send state, a question's facts
-//   turnFace     the rest of K-09's turn face (closest entries, compose input)     T-560
+//   turnFace     the rest of K-09's turn face (closest entries: meaning search)    no D-017 hop
 //                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
 //                decider, one per bundle for both
 //   gate         K-09 gateAndCommit through @rosie/actions' turn face: the gate    T-559
 //                and one commit (K-05 commitTurn through the turn-row port),
 //                under the turn id, on the turn's pinned bundle
-//   composer     K-03's message plan and its one rewrite                           T-560
+//   composeInput K-09 composeInput through @rosie/actions' turn face: a committed  T-560
+//                row's K-03 composer input, only what limit 7 lets its reader see,
+//                never the frontier, its inbound text the words the turn's gate
+//                request handed in
+//   composer     K-03's message plan and its one rewrite through @rosie/ai's       T-560
+//                composer, one per bundle for both
 //   finalize     K-09 finalizeMessage: slots, fixed lines, the claim check and     T-561
 //                the message checks
 //   dataAccess   K-05 writes: the turn's plans, the outbox claim and marks, the     T-562, T-564
@@ -65,7 +70,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The fifteen ports, in D-017's turn order (02-contracts section 11). */
+/** The sixteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -78,6 +83,7 @@ export const PORTS = [
   "turnFace",
   "decide",
   "gate",
+  "composeInput",
   "composer",
   "finalize",
   "dataAccess",
@@ -134,12 +140,22 @@ export type FrontierPort = Pick<TurnFace, "buildFrontier">;
 export type GatePort = Pick<TurnFace, "gateAndCommit">;
 
 /**
- * K-09's turn face less the frontier, the gate and finalize (each its own port), and the K-09 shared-core calls the safety
- * read makes. The frontier's span flag is the root's to set, from the frontier port's binding.
+ * K-09 composeInput (T-560): a committed outbox row's K-03 composer input through @rosie/actions' turn face, with only what
+ * limit 7 lets its reader see and never the frontier, read under the call's business from K-05 v1.6 readOutboxRow and the
+ * bundle the row was committed under; its inbound text is the words the turn's own gateAndCommit request handed in
+ * (decided.context.texts, as the face holds them: T-1141's held.ts), sent as they are. The turn records the row's
+ * fillAndChecks span and the Tool API base records none for this call (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag
+ * is set for it.
+ */
+export type ComposeInputPort = Pick<TurnFace, "composeInput">;
+
+/**
+ * K-09's turn face less the frontier, the gate, compose input and finalize (each its own port), and the K-09 shared-core
+ * calls the safety read makes. The frontier's span flag is the root's to set, from the frontier port's binding.
  */
 export interface TurnFacePort extends Omit<
   TurnFace,
-  "buildFrontier" | "gateAndCommit" | "finalizeMessage" | "recordsFrontierSpan"
+  "buildFrontier" | "gateAndCommit" | "composeInput" | "finalizeMessage" | "recordsFrontierSpan"
 > {
   readonly safetyCore: SafetyCore;
 }
@@ -186,6 +202,9 @@ export interface Ports {
   readonly decide: TurnDecide;
   /** K-09 gateAndCommit through @rosie/actions' turn face (T-559): the gate and the turn's one commit under its id. */
   readonly gate: GatePort;
+  /** K-09 composeInput through @rosie/actions' turn face (T-560): each committed row's K-03 composer input. */
+  readonly composeInput: ComposeInputPort;
+  /** K-03's plan for each row and its one rewrite through @rosie/ai's composer (T-560), one per bundle for both. */
   readonly composer: TurnComposer;
   readonly finalize: FinalizePort;
   readonly dataAccess: DataAccess;

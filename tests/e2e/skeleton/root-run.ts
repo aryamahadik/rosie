@@ -18,7 +18,10 @@
 //   join 7, decide      @rosie/ai's decider (T-369's createDecider with T-370's re-read), one per bundle, over the
 //                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347);
 //   join 8, gate        @rosie/actions' turn face's gateAndCommit (T-1141), its reads over test owner 1's seeded rows
-//                       and what the K-05 commitTurn double wrote, its one commit through the root's turn-row port.
+//                       and what the K-05 commitTurn double wrote, its one commit through the root's turn-row port;
+//   join 9, compose     @rosie/actions' turn face's composeInput (T-1141), over a K-05 v1.6 readOutboxRow double over
+//                       what the commit wrote and test owner 1's seeded rows, and @rosie/ai's composer over the
+//                       recorded-model double's composer models: T-1175's recording 4, the JOIN run's S1-02 row (DL-347).
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate calls are watched on their way to the root's own
 // gateAndCommit (watchGate), which changes nothing they are sent or answer. The spans are the log lines the target
@@ -164,6 +167,8 @@ export function startRootRun(): RootRun {
       frontierScope: fakes.frontier.scope,
       deciders: fakes.decide.deciders,
       gateReads: fakes.gate.reads,
+      composeReads: fakes.compose.reads,
+      composers: fakes.composer.composers,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     restore = root.install();

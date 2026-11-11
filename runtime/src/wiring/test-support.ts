@@ -42,8 +42,12 @@
 //   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
 //                dispatch/test-support FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor
 //                directory
-//   turnFace     turn/test-support fakeTurnFace (closest entries, compose input from the S1-02 fixtures) and
-//                safety/test-support fakeCore
+//   turnFace     turn/test-support fakeTurnFace (closest entries) and safety/test-support fakeCore
+//   composeInput joined (T-560): the root binds @rosie/actions' turn face's composeInput through its real compose-input
+//                port (./real.ts realComposeInput), its inbound text the words the gate port's face holds for the turn.
+//                What its reads are fed comes from here: `fakeComposeReads`, the Tool API's business scope and a K-05
+//                v1.6 readOutboxRow double over the rows the K-05 commitTurn double wrote and test owner 1's seeded rows
+//                (T-1148 with T-1197's barber kind of work: businessSensitive false)
 //   gate         joined (T-559): the root binds @rosie/actions' turn face's gateAndCommit through its real gate port
 //                (./real.ts realGate), its one commit through the root's turn-row port (`fakeTurnRows`). What its reads
 //                are fed comes from here: `fakeGateReads`, the Tool API's business scope and K-05 v1.3 and v1.4's reads
@@ -56,7 +60,12 @@
 //                as they are (recording 2 is the JOIN run's own; DL-347), decide-reads-disagree.json's three reads on its
 //                context, and the reads a test records for its own turn of test owner 1's (`recordTurn`); it keeps each
 //                context decide is given (the frontier's answer) and each call it answers
-//   composer     turn/test-support fakeComposer (finalize-pass.json's plan)
+//   composer     joined (T-560): the root binds @rosie/ai's composer and its one rewrite through its real composer port
+//                (./real.ts realComposer), one per bundle. What it is fed comes from here: `fakeComposerModels`, the
+//                composer (T-373 createComposer) for bundle v0 as bundles/v0 publishes it (its composer prompt), over a
+//                fake Messages API whose answers come from the recorded-model double: ai/recordings' composer.v1.1.json
+//                as it is (recording 4 is the JOIN run's S1-02 row; DL-347) and the plans a test records for its own
+//                turn of test owner 1's (`recordTurn`)
 //   finalize     the same fakeTurnFace (finalize-pass.json)
 //   dataAccess   turn/test-support fakeRows (the commit's one row), dispatch/test-support FakeOutboxStore, and
 //                clocks/arming-support's K-05 armClock and cancelClock
@@ -71,16 +80,23 @@ import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/
 import type { StoredHold, StoredOutcome } from "@rosie/actions/src/domain/safety/ports";
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
 import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
+import type { OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
+import joinComposeInputJson from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
+import composerRecordingsV11 from "@rosie/ai/recordings/composer.v1.1.json";
 import joinRunContextJson from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import recordingsV11 from "@rosie/ai/recordings/recordings.v1.1.json";
 import { createPromptCache, type CacheBundle, type CacheFlow } from "@rosie/ai/src/cache/index";
+import { createComposer } from "@rosie/ai/src/composer/compose";
+import { composeInputText, type ComposeInput as AiComposeInput } from "@rosie/ai/src/composer/prompt";
+import type { Composer } from "@rosie/ai/src/composer/types";
 import { unescapeData } from "@rosie/ai/src/context/tags";
 import { createDecider } from "@rosie/ai/src/decide/two-reads";
 import type { Decider } from "@rosie/ai/src/decide/types";
 import { KEY_VARIABLE, type FetchLike } from "@rosie/ai/src/gateway/index";
-import { createRecordedModel } from "@rosie/ai/src/recorded-double/double";
+import { COMPOSER_KIND } from "@rosie/ai/src/recorded-double/composer-types";
+import { createRecordedComposer, createRecordedModel } from "@rosie/ai/src/recorded-double/double";
 import { NoRecordingError } from "@rosie/ai/src/recorded-double/errors";
 import { canonicalJson, requestKey } from "@rosie/ai/src/recorded-double/key";
 import type { RecordedModel } from "@rosie/ai/src/recorded-double/types";
@@ -99,6 +115,8 @@ import contextS101 from "@rosie/contracts/model/fixtures/context-s1-01.json";
 import decideReadsDisagree from "@rosie/contracts/model/fixtures/decide-reads-disagree.json";
 import decideS101Enter from "@rosie/contracts/model/fixtures/decide-s1-01-enter.json";
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
+import inputS102V11 from "@rosie/contracts/message-plan/fixtures/input-s1-02-v1.1.json";
+import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
@@ -126,11 +144,8 @@ import type { BundleId, TraceContext } from "../trace";
 import { setTurnDeps } from "../turn/turn";
 import {
   a7_17Context,
-  composerOf,
-  fakeComposer,
   fakeRows,
   fakeTurnFace,
-  planned,
   rowsOf,
   safetyNoFor,
   SAM,
@@ -143,6 +158,8 @@ import type { Ports } from "./ports";
 import type {
   BundleReadCalls,
   CommitTurnCall,
+  ComposeReads,
+  Composers,
   Deciders,
   FrontierScope,
   GateReads,
@@ -1910,6 +1927,473 @@ export function fakeDecideModels(log: string[] = []): FakeDecideModels {
   return models;
 }
 
+// ---- K-05 v1.6 readOutboxRow under compose input's scope, as a double: what the commit wrote (T-560) --------------
+
+/**
+ * Lee's Barbershop's sensitive switch as T-1197's skeleton seed stores its kinds of work (K-23 company_kinds: one, barber,
+ * with no plug-in switch on): K-05 v1.6 item 45's businessSensitive, false.
+ */
+const SEEDED_SENSITIVE: ReadonlyMap<string, boolean> = new Map([[TEST_OWNER_1.businessId, false]]);
+
+/** One readOutboxRow compose input made through the double: the row it asked for, under the business it named. */
+export interface ComposeRowRead {
+  readonly outboxRowId: string;
+  readonly businessId: string;
+}
+
+export interface FakeComposeReads {
+  /** What the root's real compose-input port is fed (RootOptions.composeReads): the scope and readOutboxRow over the doubles. */
+  readonly reads: ComposeReads;
+  /** Each compose input call's business scope, in order (the Tool API's own: rosie_app on PostgreSQL). */
+  readonly scopes: string[];
+  /** Every readOutboxRow, in order (each the runtime side's own transaction under the named business). */
+  readonly rowReads: ComposeRowRead[];
+}
+
+/** A clock row's due time as the commit wrote it (K-05 v1 clockNew.due), or none for a clock written waiting. */
+function dueOf(values: Readonly<Record<string, unknown>>): { dueAt: string | null; dueZone: string | null } {
+  const due = values.due;
+  if (!isRecord(due) || typeof due.dueAt !== "string" || typeof due.dueZone !== "string") {
+    return { dueAt: null, dueZone: null };
+  }
+  return { dueAt: due.dueAt, dueZone: due.dueZone };
+}
+
+/**
+ * K-05 v1.6 readOutboxRow (T-1138, T-1197; README items 35 and 45) as a double over the rows the K-05 commitTurn double
+ * wrote (`written`: each turn, its outbox rows, open questions and clock rows, and the safety record's outcomes) and test
+ * owner 1's seeded rows (T-1148 with T-1197's barber kind of work: Lee's Barbershop's head, Sam Lee with no role, no
+ * language stored and no phone row), answering as db/repo/turn-face-reads.ts's readOutboxRow answers on those rows: the
+ * row under the request's business (notFound for a row the business does not hold; fixedLineRow for a safety row), at
+ * its turn's bundle, its line the question it asks (line 0), its recipient as stored, its turn's texts each with its
+ * safety outcome under the business, the business head, the question with its clock row, the business's sensitive switch
+ * (false: the barber kind, no switch on), and no other question gone to the handle (no part of a turn's reply has gone
+ * before it is composed). A row about a booking, or one to a recipient the seed does not hold, is refused (thrown): the
+ * double holds no booking and no other person. Each call's scope is the Tool API's own, its repo scoped to the call's
+ * business. `log` gets "composeInput:<row>" for each read, as the stand-in turn face logged its compose input.
+ */
+export function fakeComposeReads(
+  written: Pick<FakeTurnRows, "rows" | "turns">,
+  now: () => number = Date.now,
+  log: string[] = [],
+): FakeComposeReads {
+  const scopes: string[] = [];
+  const rowReads: ComposeRowRead[] = [];
+  const rowsOf = (table: string): WrittenRow[] => [...(written.rows.get(table)?.values() ?? [])];
+  const refused = (what: string): Promise<never> =>
+    Promise.reject(new Error(`the skeleton's readOutboxRow double holds no ${what}`));
+
+  /** The question the row asks, with its clock row (a waiting or armed one first), under the row's business. */
+  const questionOf = (questionId: string, businessId: string): Record<string, unknown> | null => {
+    const question = written.rows.get("open_questions")?.get(questionId);
+    if (question?.values.businessId !== businessId) return null;
+    const clocks = rowsOf("clock_rows")
+      .filter(
+        (row) =>
+          row.values.openQuestionId === questionId &&
+          row.values.kind === "question" &&
+          row.values.businessId === businessId,
+      )
+      .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const clock = clocks.find((row) => ["waiting", "armed"].includes(String(row.values.state))) ?? clocks[0];
+    const values = question.values;
+    return {
+      id: question.id,
+      step: values.step,
+      status: values.status,
+      options: values.options,
+      readback: values.readback ?? null,
+      clock: values.clock ?? null,
+      // K-04 open_questions.ask_count: 1 when the commit opens the question.
+      askCount: 1,
+      version: question.version,
+      clockRow:
+        clock === undefined
+          ? null
+          : { id: clock.id, state: clock.values.state, ...dueOf(clock.values), version: clock.version },
+    };
+  };
+
+  const reads: ComposeReads = {
+    scope: {
+      withBusiness: (businessId, work) => {
+        scopes.push(businessId);
+        const repo: GateCallRepo = { scopedTo: businessId };
+        return work(repo);
+      },
+    },
+    readOutboxRow(request) {
+      rowReads.push({ outboxRowId: request.outboxRowId, businessId: request.businessId });
+      log.push(`composeInput:${request.outboxRowId}`);
+      const row = written.rows.get("outbox_rows")?.get(request.outboxRowId);
+      if (row?.values.businessId !== request.businessId) {
+        return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId });
+      }
+      const values = row.values;
+      if (values.sendClass === "safety") {
+        return Promise.resolve({ error: "fixedLineRow", outboxRowId: row.id, sendClass: "safety" });
+      }
+      const turn = written.turns.get(row.turnId);
+      if (turn === undefined) return refused("turn for the row");
+      if (values.bookingId !== null) return refused("booking");
+      if (values.recipientHandleId !== TEST_OWNER_1.handleId) return refused("other recipient");
+      const person = SEEDED.persons.get(String(values.recipientPersonId));
+      const business = SEEDED.businesses.get(request.businessId);
+      if (person === undefined || business === undefined) return refused("other person or business");
+      const questionId = values.openQuestionId;
+      const question = typeof questionId === "string" ? questionOf(questionId, request.businessId) : null;
+      if (typeof questionId === "string" && question === null) return refused("question for the row");
+      const outcomeOf = (eventId: string): WrittenRow | undefined =>
+        rowsOf("safety_outcomes").find(
+          (outcome) =>
+            outcome.values.event_id === eventId && outcome.values.business_id === request.businessId,
+        );
+      const answer = {
+        result: "outboxRow",
+        outboxRowId: row.id,
+        businessId: request.businessId,
+        readAt: utcSeconds(now()),
+        row: {
+          turnId: row.turnId,
+          bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
+          state: "planned",
+          version: row.version,
+          channel: values.channel,
+          sendClass: values.sendClass,
+          bookingId: null,
+          openQuestionId: questionId ?? null,
+          copyOfRowId: values.copyOfRowId ?? null,
+          hasPlan: false,
+          finalParts: null,
+        },
+        // The step that asks, line 0; a row that asks no question has none.
+        line: question === null ? null : { step: question.step, index: 0, from: "openQuestion" },
+        recipient: {
+          handleId: TEST_OWNER_1.handleId,
+          kind: TEST_OWNER_1.handle.kind,
+          personId: TEST_OWNER_1.personId,
+          name: person.values.name,
+          storedLanguage: person.values.language ?? null,
+          roles: [],
+          phone: null,
+        },
+        answers: {
+          handleId: turn.handleId,
+          texts: turn.eventIds.map((eventId) => {
+            const outcome = outcomeOf(eventId);
+            return {
+              eventId,
+              outcomes: outcome?.values.outcomes ?? null,
+              tenses: outcome?.values.tenses ?? null,
+            };
+          }),
+        },
+        slotSource: {
+          business: {
+            id: request.businessId,
+            name: business.values.name,
+            displayName: business.values.display_name,
+            timeZone: business.values.time_zone,
+            version: business.version,
+          },
+          booking: null,
+          question,
+        },
+        businessSensitive: SEEDED_SENSITIVE.get(request.businessId) ?? null,
+        openQuestions: [],
+      };
+      return Promise.resolve(answer as unknown as OutboxRowRead);
+    },
+  };
+  return { reads, scopes, rowReads };
+}
+
+// ---- @rosie/ai's composer over the recorded-model double (T-560) ----------------------------------------------------
+
+/** One composer recording the double holds: its id, the K-03 v1.1 input it is keyed on, and the plan it answers. */
+export interface ComposerRecording {
+  readonly id: string;
+  readonly input: unknown;
+  readonly plan: unknown;
+}
+
+/** A composer recording as ai/recordings writes it (T-1175's composer.v1.1.json): its request, and a seed or the plan. */
+interface ComposerRecordingSpec {
+  readonly id: string;
+  readonly kind: string;
+  readonly request: Readonly<Record<string, unknown>>;
+  readonly seed?: { readonly fixture: string };
+  readonly output?: unknown;
+}
+
+/** The K-03 fixtures a composer recording here may name, by file (the double's own loader reads them from disk). */
+const PLAN_FIXTURES: Readonly<Record<string, unknown>> = {
+  "input-s1-02-v1.1.json": inputS102V11,
+  "plan-s1-02.json": planS102,
+};
+
+/** ai/recordings' composer inputs a recording may name, by path (recording 4's: the JOIN run's S1-02 row). */
+const COMPOSER_INPUT_FILES: Readonly<Record<string, unknown>> = {
+  "composer-inputs/join-s1-02.json": joinComposeInputJson,
+};
+
+function composerFile(files: Readonly<Record<string, unknown>>, file: string): unknown {
+  const value = files[file];
+  if (value === undefined) throw new Error(`the composer double is given no ${file}`);
+  return structuredClone(value);
+}
+
+/**
+ * The double's composer recordings on K-03 v1.1 (ai/recordings/composer.v1.1.json; T-1175, DL-355), keyed as its loader
+ * keys them (the sha256 of the input's canonical JSON), never copied: composer-s1-02-v1.1 on input-s1-02-v1.1.json, and
+ * recording 4, composer-join-s1-02, on the JOIN run's own S1-02 row (composer-inputs/join-s1-02.json: its turn id T-248's
+ * hash of evt-sam-0000, its row that turn's, replying to the text JOIN at its time), each seeded from plan-s1-02.json.
+ */
+function shippedComposerRecordings(): ComposerRecording[] {
+  const file = composerRecordingsV11 as unknown as { readonly recordings: readonly ComposerRecordingSpec[] };
+  return file.recordings.map((spec) => {
+    const { request } = spec;
+    const named = Object.keys(request).length === 1;
+    const input =
+      named && typeof request.fixture === "string"
+        ? composerFile(PLAN_FIXTURES, request.fixture)
+        : named && typeof request.file === "string"
+          ? composerFile(COMPOSER_INPUT_FILES, request.file)
+          : structuredClone(request);
+    const plan =
+      spec.seed === undefined ? structuredClone(spec.output) : composerFile(PLAN_FIXTURES, spec.seed.fixture);
+    return { id: spec.id, input, plan };
+  });
+}
+
+/** One Messages API call the composer double answered: the model asked, and the recording it was answered from. */
+export interface ComposerModelCall {
+  readonly model: string;
+  readonly recording: string;
+}
+
+export interface FakeComposerModels {
+  /**
+   * What the root's real composer port is fed (RootOptions.composers): @rosie/ai's composer (T-373 createComposer, with
+   * T-374's rewrite) for each bundle the double holds, calling a fake Messages API answered by the recorded-model double.
+   */
+  readonly composers: Composers;
+  /** Each input a composer was given, in order: what its call is keyed on. */
+  readonly inputs: unknown[];
+  /** Each rewrite a composer was asked, in order. */
+  readonly rewrites: unknown[];
+  /** Every Messages API call the double answered, in order. */
+  readonly calls: ComposerModelCall[];
+  /** Every request the double holds no recording for, with what differs from the nearest recording's input. */
+  readonly misses: string[];
+  /** Every bundle a composer was asked for (`<hash>/<build>`), in order: the port's one composer per bundle. */
+  readonly asked: string[];
+  /** While true, every call answers 529 (overloaded) before any recording is read: the models are down. */
+  down: boolean;
+  /** Keeps a text the Linq double signed this run: its words and send time, for `recordTurn`. */
+  saw(event: LinqInboundEvent): void;
+  /**
+   * Records the plan for the S1-02 row of a turn over these texts (in arrival order), as recording 4 holds the JOIN run's:
+   * its input is recording 4's with the turn's own id (T-248's hash of the event ids), that turn's row (K-09 v1.5 default
+   * 131) and, as its inbound, the words and send time of the turn's last text as the Linq double signed it; its answer
+   * plan-s1-02.json's. It may be called before the texts are sent: the recording is made at the first composer request
+   * after they are all signed.
+   */
+  recordTurn(eventIds: readonly string[]): void;
+  /** Holds one more recording: a test's own input and the plan it answers. */
+  hold(recording: ComposerRecording): void;
+}
+
+/** A composer request's per-turn part: the row's tagged input (compose) or the rewrite's (T-364's layout), as sent. */
+function turnTextOf(body: Record<string, unknown>): string {
+  const messages = body.messages;
+  const first: unknown = Array.isArray(messages) ? (messages as unknown[])[0] : undefined;
+  return isRecord(first) && typeof first.content === "string" ? first.content : "";
+}
+
+/**
+ * @rosie/ai's composer for each bundle (T-373's call, T-374's one rewrite and T-375's reader checks: the real composer,
+ * its prompt layout and the AI gateway), over K-01's manifests (bundle v0 as bundles/v0 publishes it, with its composer
+ * prompt), calling a fake Messages API whose every answer comes from the recorded-model double (T-004's
+ * createRecordedComposer), keyed as its loader keys a composer recording: the input's canonical JSON. It holds
+ * ai/recordings' composer.v1.1.json recordings as they are (recording 4 is the JOIN run's S1-02 row, keyed on the ids the
+ * runtime produces; DL-347) and what a test records. A call is answered only when its user message is exactly the tagged
+ * input (ai/src/composer/prompt composeInputText) of an input a composer was given and is composing now, so the wire
+ * request is that input's; a request with no recording is a miss: kept, with what differs, and answered 404, so the call
+ * fails loudly, never with a made-up plan. The double holds no rewrite recordings (T-374's handoff 3; T-1071), so a
+ * rewrite's call is a miss. `log` gets "compose:<row>" and "rewrite:<row>" as the stand-in composer logged them. The key
+ * is made up for each run, never Anthropic's.
+ */
+export function fakeComposerModels(log: string[] = []): FakeComposerModels {
+  const held = new Map<string, { output: unknown }>();
+  const ids = new Map<string, string>();
+  const recordings: ComposerRecording[] = [];
+  const recorded = createRecordedComposer(held);
+  const env = { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` };
+  const signed = new Map<string, { words: string; sentAt: string }>();
+  // The turns a test recorded whose plans are not held yet (`recordTurn`): each one's event ids, in arrival order.
+  const turns: string[][] = [];
+  // The inputs being composed now, by the tagged text their call sends.
+  const composing = new Map<string, AiComposeInput>();
+  let bundles: ReadonlyMap<string, DecideBundle> | null = null;
+
+  const hold = (recording: ComposerRecording): void => {
+    const key = requestKey(COMPOSER_KIND, recording.input);
+    const known = ids.get(key);
+    if (known !== undefined) {
+      if (canonicalJson(held.get(key)?.output) !== canonicalJson(recording.plan))
+        throw new Error(`${recording.id} is keyed on ${known}'s input with another plan`);
+      return;
+    }
+    held.set(key, { output: structuredClone(recording.plan) });
+    ids.set(key, recording.id);
+    recordings.push(recording);
+  };
+  for (const recording of shippedComposerRecordings()) hold(recording);
+
+  const answered = (output: unknown): Response =>
+    new Response(
+      JSON.stringify({
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        usage: USAGE,
+      }),
+      { status: 200 },
+    );
+  const failed = (status: number, type: string): Response =>
+    new Response(JSON.stringify({ type: "error", error: { type } }), { status });
+  const miss = (why: string): Response => {
+    models.misses.push(why);
+    return failed(404, "not_found_error");
+  };
+
+  /** What differs between an input and the nearest recording's, for a miss's message: field names and places only. */
+  const nearest = (input: unknown): string => {
+    let best: { id: string; paths: string[] } | null = null;
+    for (const recording of recordings) {
+      const paths = differingPaths(input, recording.input);
+      if (best === null || paths.length < best.paths.length) best = { id: recording.id, paths };
+    }
+    return best === null ? "no recording" : `${best.id} differs at ${best.paths.join(", ")}`;
+  };
+
+  const fetch: FetchLike = async (_url, init) => {
+    const body = JSON.parse(typeof init.body === "string" ? init.body : "{}") as Record<string, unknown>;
+    const model = typeof body.model === "string" ? body.model : "";
+    if (models.down) return failed(529, "overloaded_error");
+    const input = composing.get(turnTextOf(body));
+    if (input === undefined) {
+      return miss(
+        "a composer request whose message is no input being composed (a rewrite: the double holds no rewrite recordings, T-1071)",
+      );
+    }
+    await recordTurns();
+    let plan: unknown;
+    try {
+      plan = await recorded.composer(input as unknown as Parameters<typeof recorded.composer>[0]);
+    } catch (error) {
+      if (error instanceof NoRecordingError)
+        return miss(`no plan is recorded for the input: ${nearest(input)}`);
+      throw error;
+    }
+    models.calls.push({ model, recording: ids.get(requestKey(COMPOSER_KIND, input)) ?? "" });
+    return answered(plan);
+  };
+
+  /** The composer, its calls watched only to know which input each request is for; nothing it is sent changes. */
+  const watched = (composer: Composer): Composer =>
+    Object.freeze({
+      async compose(input, options) {
+        models.inputs.push(structuredClone(input));
+        log.push(`compose:${String((input as { row?: unknown }).row)}`);
+        let text: string | null = null;
+        try {
+          text = composeInputText(input);
+        } catch {
+          // An input the composer cannot lay out: it refuses it before any call, so no request is answered for it.
+        }
+        if (text !== null) composing.set(text, input);
+        try {
+          return await composer.compose(input, options);
+        } finally {
+          if (text !== null) composing.delete(text);
+        }
+      },
+      rewrite(request, options) {
+        models.rewrites.push(structuredClone(request));
+        log.push(`rewrite:${String((request.input as { row?: unknown }).row)}`);
+        return composer.rewrite(request, options);
+      },
+    } satisfies Composer);
+
+  const models: FakeComposerModels = {
+    inputs: [],
+    rewrites: [],
+    calls: [],
+    misses: [],
+    asked: [],
+    down: false,
+    composers(bundleId) {
+      const key = bundleTextOf(bundleId);
+      models.asked.push(key);
+      bundles ??= decideBundles();
+      const bundle = bundles.get(key);
+      if (bundle === undefined) throw new Error(`the composer double holds no bundle ${key}`);
+      const composer = createComposer({
+        bundle: { bundleId: bundle.routing.bundleId, models: bundle.routing.models },
+        prompts: createPromptCache(bundle.cache),
+        env,
+        fetch,
+      });
+      return watched(composer);
+    },
+    saw(event) {
+      if (event.kind === "text" && typeof event.body === "string" && typeof event.sentAt === "string") {
+        signed.set(event.eventId, { words: event.body, sentAt: event.sentAt });
+      }
+    },
+    recordTurn(eventIds) {
+      if (eventIds.length === 0) throw new Error("a turn has at least one text");
+      turns.push([...eventIds]);
+    },
+    hold,
+  };
+
+  /** Each turn a test recorded, its texts all signed by now, held as its S1-02 row's plan (`recordTurn`), one at a time. */
+  let recording: Promise<void> = Promise.resolve();
+  const recordTurns = (): Promise<void> => {
+    recording = recording.catch(() => undefined).then(holdRecordedTurns);
+    return recording;
+  };
+  const holdRecordedTurns = async (): Promise<void> => {
+    const base = structuredClone(joinComposeInputJson);
+    const zone = base.inbound.sentAt.zone;
+    for (const eventIds of turns.splice(0)) {
+      const texts = eventIds.flatMap((eventId) => {
+        const text = signed.get(eventId);
+        return text === undefined ? [] : [text];
+      });
+      const last = texts.at(-1);
+      if (last === undefined || texts.length < eventIds.length) {
+        turns.push(eventIds);
+        continue;
+      }
+      const turnId = await turnIdOf(eventIds);
+      const input = {
+        ...base,
+        row: `outbox-s1-02-${turnId}-1`,
+        turn: turnId,
+        inbound: { text: last.words, sentAt: { utc: last.sentAt, zone } },
+      };
+      hold({ id: `turn-${turnId}-compose`, input, plan: structuredClone(planS102) });
+    }
+  };
+  return models;
+}
+
 // ---- T-185's release-flag read, as a fake --------------------------------------------------------------------------
 
 export interface FakeFlags extends ReleaseFlags {
@@ -1951,7 +2435,6 @@ export const SKELETON_ROW = commitS102.outcome.written.outboxRows[0]?.id ?? "out
 export const SAM_CHAT = "linq-chat-demo-sam";
 
 const FIXTURE_ROW = composeInputS102.request.outboxRowId;
-const FIXTURE_TURN = composeInputS102.request.caller.turnId;
 const S1_02_TURN = commitS102.request.turn.id;
 
 /** Sam's ids as K-04 names them, for the safety read's calls. */
@@ -1979,13 +2462,15 @@ type JoinedPort =
   | "targets"
   | "frontier"
   | "decide"
-  | "gate";
+  | "gate"
+  | "composeInput"
+  | "composer";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
-   * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide and the gate, which the root builds
-   * (./real.ts).
+   * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input and the
+   * composer, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -2031,6 +2516,7 @@ export interface SkeletonFakes {
   /**
    * @rosie/ai's decide over the recorded-model double, for the root's real decide port (RootOptions.deciders:
    * `decide.deciders`): each context decide was given (the frontier's answer), each re-read, each model call it answered.
+   * A turn its `recordTurn` records is recorded for the composer too (`composer.recordTurn`), so it goes on to its reply.
    */
   readonly decide: FakeDecideModels;
   /**
@@ -2039,6 +2525,16 @@ export interface SkeletonFakes {
    * through the turn-row port, to `turnRows`, which keeps every row it wrote.
    */
   readonly gate: FakeGateReads;
+  /**
+   * Compose input's reads as doubles over what the K-05 commitTurn double wrote and test owner 1's seeded rows, for the
+   * root's real compose-input port (RootOptions.composeReads: `compose.reads`): each call's scope and every row read.
+   */
+  readonly compose: FakeComposeReads;
+  /**
+   * @rosie/ai's composer over the recorded-model double, for the root's real composer port (RootOptions.composers:
+   * `composer.composers`): each input it was given, each rewrite, each model call it answered and each miss.
+   */
+  readonly composer: FakeComposerModels;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
@@ -2070,15 +2566,18 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
 
   const face = fakeTurnFace();
   const decide = fakeDecideModels(face.log);
-  const composer = fakeComposer(face.log);
+  // Compose input and the composer are joined (T-560): their doubles log to the face's log as the stand-ins did.
+  const compose = fakeComposeReads(turnRows, () => clock.now(), face.log);
+  const composer = fakeComposerModels(face.log);
+  // A turn a test records for decide goes the JOIN run's way to its reply: its two reads as recording 2 holds the JOIN
+  // run's, so it commits S1-01 and S1-02's row, and that row's plan as recording 4 holds the JOIN run's.
+  const recordReads = decide.recordTurn.bind(decide);
+  decide.recordTurn = (eventIds) => {
+    recordReads(eventIds);
+    composer.recordTurn(eventIds);
+  };
   const rows = fakeRows(face.log);
-  face.composeInput = (request) =>
-    swap(composeInputS102.outcome, [
-      [FIXTURE_ROW, request.outboxRowId],
-      [FIXTURE_TURN, request.caller.turnId],
-    ]) as never;
   face.finalize = (request) => swap(finalizePass.outcome, [[FIXTURE_ROW, request.outboxRowId]]) as never;
-  composer.compose = () => planned(finalizePass.request.plan.plan);
   // The turn's rows with no plan yet (K-05 unplannedRows): the outbox rows the K-05 double's commit wrote for that turn
   // (the joined gate's, T-559), each as committed, in commit order.
   rows.unplanned = (turnId) => ({
@@ -2148,10 +2647,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     },
     turnFace: {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
-      composeInput: (request, trace) => turnFace.composeInput(request, trace),
       safetyCore: core,
     },
-    composer: composerOf(composer),
     finalize: { finalizeMessage: (request, trace) => turnFace.finalizeMessage(request, trace) },
     dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
     linqSend: { parts: linq, direct },
@@ -2163,8 +2660,9 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     linqInputs,
     webhooks,
     sign: (event, partKey = null) => {
-      // The text's words and send time, for a turn over it that a test records with decide's double.
+      // The text's words and send time, for a turn over it that a test records with decide's and the composer's doubles.
       decide.saw(event);
+      composer.saw(event);
       return webhooks.sign({ event: { ...event, receivedAt: utcSeconds(clock.now()) }, partKey });
     },
     handleKeys,
@@ -2175,6 +2673,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     frontier,
     decide,
     gate,
+    compose,
+    composer,
     core,
     direct,
     face,

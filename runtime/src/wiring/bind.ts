@@ -67,6 +67,7 @@ export function bindPorts(
       turnFace: take("turnFace"),
       decide: take("decide"),
       gate: take("gate"),
+      composeInput: take("composeInput"),
       composer: take("composer"),
       finalize: take("finalize"),
       dataAccess: take("dataAccess"),

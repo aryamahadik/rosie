@@ -69,7 +69,24 @@
 //                1's seeded rows); nothing in the Worker until T-567, so every gate there fails closed before anything is
 //                read or written. The plug-in's stop words are the barbershop's, named here (PLUGIN_LISTS_NO_STOP_WORDS,
 //                DL-344), and nobody is told until T-319 (NOT_TOLD_YET). The turn records the gate's and the commit's
-//                spans; the face tells the base so (TURN_RECORDS_GATE), and the base records none (T-1193; DL-376).
+//                spans; the face tells the base so (TURN_RECORDS_GATE), and the base records none (T-1193; DL-376). The
+//                face holds each committed turn's words as its request handed them in (held.ts), for compose input.
+//   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
+//                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
+//                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
+//                (RootOptions.composeReads: the Tool API's business scope and K-05 v1.6 readOutboxRow on the runtime
+//                side; in a test, a K-05 double over the rows the commit wrote and test owner 1's seeded rows); nothing in
+//                the Worker until T-567, so every compose input there fails closed before anything is read. Its bundle is
+//                the one the turn's run pinned (as the gate's), and its inbound text the words the turn's gate request
+//                handed in, held by the gate port's face (one HeldTurns per root). The turn records the row's
+//                fillAndChecks span; the face tells the base so (TURN_RECORDS_FILL_AND_CHECKS), and the base records none.
+//   composer     T-560: @rosie/ai's composer (T-373 createComposer, with T-374's one rewrite and T-375's reader checks;
+//                C-118), one per bundle for both, handed in by the root (RootOptions.composers): in a test, over a fake
+//                Messages API answered by the recorded-model double (T-1175's recording 4 for the JOIN run); in the
+//                Worker, none until the bundle's manifest (its models and its composer prompt) can be read there and the
+//                model key is set by name (J-02; smoke-size calls only, DL-027), so every compose and rewrite there fails
+//                closed before any model call. The answers are mapped as T-374's handoff maps the rewrite (DL-309). Each
+//                model call writes its own portCall span into the turn's trace; the compose span stays the turn's.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
@@ -95,6 +112,8 @@ import {
   type SafetyReads,
   type TurnCommitBinding,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
+import { HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
+import { composeInputDeps, type RowBinding, type RowData } from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createTurnFace } from "@rosie/actions/src/tool-api/turn-face/turn-face";
 import { createToolApiValidator, type ToolApiValidator } from "@rosie/actions/src/tool-api/validator";
 import {
@@ -102,6 +121,12 @@ import {
   type ParseLookups,
   type VerifyWebhookResult as AdapterVerifyResult,
 } from "@rosie/adapters/linq/webhook";
+import type {
+  ComposeInput as AiComposeInput,
+  MessagePlan as AiMessagePlan,
+} from "@rosie/ai/src/composer/prompt";
+import type { CheckName, RewriteAnswer, Told } from "@rosie/ai/src/composer/rewrite/types";
+import type { ComposeAnswer, Composer } from "@rosie/ai/src/composer/types";
 import { RereadRefusedError } from "@rosie/ai/src/decide/errors";
 import type {
   DecideContext as AiDecideContext,
@@ -140,13 +165,18 @@ import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
 import { openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
 import type {
   BuildFrontierAnswer,
+  ComposeInputAnswer,
+  ComposerAnswer,
   DecideAnswer,
   DecideResult,
   GateAndCommitAnswer,
+  MessagePlan,
   ParkTurnAnswer,
+  RewriteRequest,
+  TurnComposer,
   TurnDecide,
 } from "../turn/types";
-import type { FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
+import type { ComposeInputPort, FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -223,12 +253,25 @@ export interface RealInputs {
    * bound: the Worker until T-567), the root's turn-row port's commitTurn, and the bundles it reads (as the frontier's).
    * Left out, every gate fails closed.
    */
-  readonly gate?: GateInputs | undefined;
+  readonly gate?: Omit<GateInputs, "held"> | undefined;
+  /**
+   * What compose input reads (T-560): its reads with their database bound (null where none is bound: the Worker until
+   * T-567) and the bundles it reads (as the gate's). Left out, every compose input fails closed.
+   */
+  readonly composeInput?: Omit<ComposeInputInputs, "held"> | undefined;
+  /**
+   * @rosie/ai's composer for each bundle (T-560): null or left out where none can be built (the Worker, until its bundle's
+   * manifest and the model key can be read there), so every compose and rewrite fails closed.
+   */
+  readonly composers?: Composers | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
 export function realPorts(inputs: RealInputs): Partial<Ports> {
   const bundles = realBundles({ calls: inputs.bundleReads ?? null });
+  // The words of each turn the gate committed, as its request handed them in, held for its rows' inbound text (T-1141's
+  // held.ts): one memory per root, the isolate's own and bounded, shared by the gate port and the compose-input port.
+  const held = new HeldTurns();
   return {
     linqVerify: linqVerify(inputs),
     sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
@@ -246,14 +289,22 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       pinnedOf: inputs.frontierBundles?.pinnedOf ?? (() => null),
     }),
     decide: realDecide({ deciders: inputs.deciders ?? null }),
-    gate: realGate(
-      inputs.gate ?? {
+    gate: realGate({
+      ...(inputs.gate ?? {
         reads: null,
         commitTurn: () => Promise.reject(new NoDatabaseError("commitTurn")),
         bundles: () => bundles,
         pinnedOf: () => null,
-      },
-    ),
+      }),
+      held,
+    }),
+    composeInput: realComposeInput({
+      reads: inputs.composeInput?.reads ?? null,
+      bundles: inputs.composeInput?.bundles ?? (() => bundles),
+      pinnedOf: inputs.composeInput?.pinnedOf ?? (() => null),
+      held,
+    }),
+    composer: realComposer({ composers: inputs.composers ?? null }),
   };
 }
 
@@ -922,6 +973,12 @@ export interface GateInputs {
   readonly bundles: () => BundleDeps;
   /** The bundle the run whose trace this is pinned (./pinned-runs.ts), or null for a trace that is no pinned run's. */
   readonly pinnedOf: (trace: TraceContext) => PinnedBundle | null;
+  /**
+   * Where the face holds each committed turn's words and language, as its request handed them in (decided.context.texts;
+   * T-1141's held.ts), for its rows' inbound text: the compose-input port reads the same memory (realPorts shares one).
+   * Left out, nothing is held, so no row is given an inbound text.
+   */
+  readonly held?: HeldTurns;
 }
 
 /** The scope where no database is bound: each gate fails closed before anything is read or written, inside the base. */
@@ -977,7 +1034,12 @@ export function realGate(inputs: GateInputs): GatePort {
         scope: NO_FRONTIER_SCOPE,
         bundles,
         validator,
-        calls: { scope: reads?.scope ?? NO_GATE_SCOPE, commit: turnCommitDeps(binding) },
+        calls: {
+          scope: reads?.scope ?? NO_GATE_SCOPE,
+          commit: turnCommitDeps(binding),
+          // A committed turn's texts and language, as the request hands them in, held for its rows (compose input).
+          ...(inputs.held === undefined ? {} : { held: inputs.held }),
+        },
       });
       const answer = await face.gateAndCommit(request, at, trace);
       // The same K-09 gateAndCommit answer in two hand-written forms: @rosie/actions' generated one, and the turn's
@@ -1004,3 +1066,238 @@ const NO_SAFETY_READS: SafetyReads<unknown> = {
 
 /** The sealer where no database is bound: it seals nothing (never reached: the scope fails first). */
 const NO_SEALER: WordsSealer = { seal: noRead("sealingKey") };
+
+// ---- composeInput: K-09 composeInput through @rosie/actions' turn face (T-560; C-074, C-090) ---------------------------
+
+/**
+ * What compose input reads with its database bound (T-560; @rosie/actions' turn-face/pg/calls.ts names each one on
+ * PostgreSQL): the Tool API's own business scope, one transaction per call whose row-level security scope is the call's
+ * business (rosie_app: pgCallScope, as the gate's), and K-05 v1.6 readOutboxRow on the runtime side, a read-only
+ * transaction of its own under the call's business (rosie_job: pgRowData's readOutboxRow, never readOutboxRowIn).
+ */
+export interface ComposeReads<Repo = unknown> {
+  readonly scope: BusinessScope<Repo>;
+  readonly readOutboxRow: RowData["readOutboxRow"];
+}
+
+/** What the real compose-input port is fed. */
+export interface ComposeInputInputs {
+  /** Compose input's reads with their database bound; null where none is bound, so every compose input fails closed. */
+  readonly reads: ComposeReads | null;
+  /** The bound bundle port, read at each call: for a row committed under a bundle the turn did not pin. */
+  readonly bundles: () => BundleDeps;
+  /** The bundle the run whose trace this is pinned (./pinned-runs.ts), or null for a trace that is no pinned run's. */
+  readonly pinnedOf: (trace: TraceContext) => PinnedBundle | null;
+  /**
+   * The turns the gate port's face holds the words of, as each gate request handed them in (T-1141's held.ts; realPorts
+   * shares one): a committed turn's row gets the words of the text it replies to as its inbound text, sent as they are.
+   */
+  readonly held: HeldTurns;
+}
+
+/** The scope where no database is bound: each compose input fails closed before anything is read, inside the base. */
+const NO_COMPOSE_SCOPE: BusinessScope<unknown> = {
+  withBusiness: () => Promise.reject(new NoDatabaseError("composeInput")),
+};
+
+/** A call the compose-input port never makes (the gate's commit, finalize's reads and writes): the message names it. */
+export class NotComposeInputError extends Error {
+  constructor(call: string) {
+    super(`${call} is never made through the compose-input port`);
+    this.name = "NotComposeInputError";
+  }
+}
+
+/** The compose-input face makes no commit: gateAndCommit is the gate port's, so its commit is never asked for. */
+const NO_COMMIT = (): never => {
+  throw new NotComposeInputError("gateAndCommit");
+};
+
+/**
+ * K-05's row data as compose input reads it (@rosie/actions' RowBinding.data): readOutboxRow alone, with its database
+ * bound, or failing closed where none is. Finalize's read and writes (readFixedLineFacts, writePlan, cancelClock) are the
+ * finalize port's (T-561): compose input never makes them, and here each is refused.
+ */
+function composeRowData(reads: ComposeReads | null): RowData {
+  const notHere = (call: string) => (): Promise<never> => Promise.reject(new NotComposeInputError(call));
+  return {
+    readOutboxRow: (request) =>
+      reads === null ? Promise.reject(new NoDatabaseError("readOutboxRow")) : reads.readOutboxRow(request),
+    readFixedLineFacts: notHere("readFixedLineFacts"),
+    writePlan: notHere("writePlan"),
+    cancelClock: notHere("cancelClock"),
+  };
+}
+
+/**
+ * The compose-input port (T-560): K-09 composeInput through @rosie/actions' turn face (createTurnFace with its calls: the
+ * Tool API base with K-09 v1.6's checks for this call and the call's own business scope, ComposeReads.scope; T-309's
+ * compose input with T-1174's term facts over T-1141's row binding, composeInputDeps). For one committed outbox row it
+ * reads the row through K-05 v1.6 readOutboxRow (its reader by K-05 v1.5's rowReader, its sensitive switch by v1.6 item
+ * 45), the step's master line and card from the bundle the row was committed under (the run's pinned bundle, read KV
+ * first and PostgreSQL's copy on a miss, as the gate reads it), and answers K-03 v1.1's composer input: only what limit 7
+ * lets its reader see, never the frontier (an input K-03 refuses is thrown, never sent), its inbound text the words of the
+ * text it replies to as the turn's gateAndCommit request handed them in (decided.context.texts, held by the gate port's
+ * face: `held`), only to their own sender. An email copy answers emailCopy; a fixed line's, closed or planned row its
+ * K-09 error. The base records no span: the turn records the row's fillAndChecks span itself
+ * (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for this hop. With no reads bound every call goes to the base
+ * all the same and fails closed there, before anything is read. The validator is made at the first call and kept: inside
+ * workerd, T-1144's prebuilt standalone code (composeInput by K-09 v1.6: T-1189); under Node, Ajv over the frozen
+ * schemas. Nothing here logs: the input holds a person's words, which go to the composer only.
+ */
+export function realComposeInput(inputs: ComposeInputInputs): ComposeInputPort {
+  let validator: ToolApiValidator | null = null;
+  return {
+    async composeInput(request, trace) {
+      validator ??= createToolApiValidator();
+      const reads = inputs.reads;
+      const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const rows: RowBinding = { data: composeRowData(reads), bundles, held: inputs.held };
+      const face = createTurnFace<FrontierRepo>({
+        // The frontier is its own port's: this face's frontier is never called.
+        scope: NO_FRONTIER_SCOPE,
+        bundles,
+        validator,
+        calls: {
+          scope: reads?.scope ?? NO_COMPOSE_SCOPE,
+          commit: NO_COMMIT,
+          compose: composeInputDeps(rows),
+        },
+      });
+      const answer = await face.composeInput(request, trace);
+      // The same K-09 composeInput answer in two hand-written forms: @rosie/actions' generated one, and the turn's
+      // (../turn/types.ts), which reads the input's row and turn, or the email copy's text row, and checks them itself
+      // (compose.ts composeInputOf).
+      return answer as unknown as ComposeInputAnswer;
+    },
+  };
+}
+
+// ---- composer: @rosie/ai's composer and its one rewrite (T-560; C-118) -------------------------------------------------
+
+/**
+ * @rosie/ai's composer for one bundle (T-373 `createComposer`, with T-374's one rewrite and T-375's reader checks), built
+ * over that bundle's K-01 v1 manifest (its id, its two models and its composer prompt), the model key read by name at
+ * each call. A throw (or a rejection) means no composer can be built for that bundle: the call fails before any model
+ * call.
+ */
+export type Composers = (bundleId: BundleId) => Composer | Promise<Composer>;
+
+/** A compose or rewrite asked for where no composer is bound (the Worker, until it can build one). Names nothing else. */
+export class NoComposerError extends Error {
+  constructor() {
+    super("no composer is bound here");
+    this.name = "NoComposerError";
+  }
+}
+
+/** What the real composer port is fed: @rosie/ai's composer for each bundle, or null where none is bound. */
+export interface ComposerInputs {
+  readonly composers: Composers | null;
+}
+
+/**
+ * The rewrite's 'use the fallback' (T-374: the one rewrite failed too, or its answer was refused) as the turn takes it: a
+ * label. The turn leaves the row unsent on it until it treats it as it treats modelsDown (T-374's handoff 1; DL-309).
+ */
+export const USE_FALLBACK = "useFallback";
+
+/** A refused input, plan or request goes back as the first check that refused it: a K-08 label, never a place or a word. */
+function refusedCode(problems: readonly { readonly check: string }[]): string {
+  return problems[0]?.check ?? "refused";
+}
+
+/** @rosie/ai's compose or rewrite answer as the turn takes it (../turn/types.ts ComposerAnswer), with every model call. */
+function composerAnswerOf(answer: ComposeAnswer | RewriteAnswer): ComposerAnswer {
+  switch (answer.status) {
+    case "ok":
+      // The same K-03 v1 plan in two hand-written forms: @rosie/ai's, and the turn's (../turn/types.ts), which checks
+      // its formats, lines, question, page type and thread target itself (compose.ts isPlan).
+      return {
+        result: "planned",
+        plan: answer.plan as unknown as MessagePlan,
+        modelCalls: answer.modelCalls,
+      };
+    case "modelsDown":
+      return { error: MODELS_DOWN, modelCalls: answer.modelCalls };
+    case "refused":
+      return { error: refusedCode(answer.problems), modelCalls: answer.modelCalls };
+    case "useFallback":
+      return { error: USE_FALLBACK, modelCalls: answer.modelCalls };
+  }
+}
+
+/**
+ * What the one rewrite is told (T-374's handoff 1; DL-309): rewriteTold of the attempt the composer wrote, which the turn
+ * reads off finalize's answer as each failed check with its detail (compose.ts failedChecksOf), every filled value
+ * already written as its {{slot}} there (K-09 README default 32; DL-158 ruling c). A failed check with no detail tells
+ * nothing, as rewriteTold leaves it out; the AI layer checks the rest (each a K-03 check name, once, in words).
+ */
+function toldOf(failed: RewriteRequest["failed"]): Told[] {
+  return failed.flatMap((check) =>
+    check.detail === null ? [] : [{ check: check.check as CheckName, detail: check.detail }],
+  );
+}
+
+/**
+ * The composer port (T-560): the turn's composer call per outbox row and its one rewrite (T-252's `TurnComposer`) through
+ * @rosie/ai's composer for the turn's pinned bundle (the trace's bundle id, the one the row was committed under). One
+ * composer per bundle serves both, built at its bundle's first call and kept; one that could not be built is not kept,
+ * so the next call asks again. A composer of another bundle than the trace's is refused by the AI gateway before any
+ * model call (GatewayConfigError), so nothing is composed on it. The answers:
+ *
+ *   compose  ok           {result: "planned", plan, modelCalls}: K-03's plan, checked against its input by the AI layer
+ *            refused      {error: the first refusing check (frontier, input, literalValue, ...), modelCalls}: an input
+ *                         carrying the frontier is refused before any call (refuse-frontier-in-input.json)
+ *            modelsDown   {error: "modelsDown", modelCalls}
+ *   rewrite  the request as T-374's handoff maps it: {input, plan, attempt: "composed", told: the failed checks with their
+ *            details}, the plan the composer gave, never the final parts; its answers as compose's, and 'use the fallback'
+ *            {error: "useFallback", modelCalls}, never a second rewrite
+ *
+ * Each model call writes its own portCall span into the turn's trace (the AI gateway's, one per attempt: labels and
+ * counts only); the turn records the compose and rewriteOrFallback spans with the model calls each answer carries (DL-357:
+ * a sum of cost or tokens counts the portCall spans only). No composer bound, or one that cannot be built: the call fails
+ * before any model call. Nothing here logs or writes a span: an input's and a plan's words go to the model only, never
+ * into a span, a log or an error.
+ */
+export function realComposer(inputs: ComposerInputs): TurnComposer {
+  const built = new Map<string, Promise<Composer>>();
+
+  const composerOf = (bundleId: BundleId): Promise<Composer> => {
+    const composers = inputs.composers;
+    if (composers === null) return Promise.reject(new NoComposerError());
+    const key = `${bundleId.hash}/${String(bundleId.build)}`;
+    const known = built.get(key);
+    if (known !== undefined) return known;
+    // Kept from this call on, so a call made while the composer is still being built waits for the same one; the
+    // factory runs after it is kept, so even one that throws at once is not kept.
+    const building = Promise.resolve().then(() => composers(bundleId));
+    built.set(key, building);
+    void building.catch(() => {
+      if (built.get(key) === building) built.delete(key);
+    });
+    return building;
+  };
+
+  return {
+    async compose(input, trace) {
+      const composer = await composerOf(trace.bundleId);
+      // The same K-03 v1.1 composer input in two hand-written forms: the turn's, which rides through untouched, and
+      // @rosie/ai's, which the composer checks again before any call (check.ts inputProblems).
+      return composerAnswerOf(await composer.compose(input as unknown as AiComposeInput, { trace }));
+    },
+    async rewrite(request, trace) {
+      const composer = await composerOf(trace.bundleId);
+      const answer = await composer.rewrite(
+        {
+          input: request.input as unknown as AiComposeInput,
+          plan: request.plan as unknown as AiMessagePlan,
+          attempt: "composed",
+          told: toldOf(request.failed),
+        },
+        { trace },
+      );
+      return composerAnswerOf(answer);
+    },
+  };
+}
