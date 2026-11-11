@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 414, [`58acd53`](https://github.com/aryamahadik/rosie/commit/58acd53), 2026-11-11 20:00:56 UTC.
+- **Through:** commit 417, [`601d9b5`](https://github.com/aryamahadik/rosie/commit/601d9b5), 2026-11-11 23:11:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 417. docs: COMMIT\_HISTORY.md through commit 414 (58acd53, \#422) (\#423)
+
+- **Commit:** [`601d9b5`](https://github.com/aryamahadik/rosie/commit/601d9b5), by Arya Mahadik, 2026-11-11 23:11:40 UTC
+- **Pull request:** [#423](https://github.com/aryamahadik/rosie/pull/423) from `task/commit-history-29`, merged 2026-11-11 23:11:40 UTC. It squashed 1 branch commit:
+  - `243d592` docs: COMMIT\_HISTORY.md through commit 414 (58acd53, \#422)
+- **Files changed:** 1 (+78 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +78 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 416. T-466: the walking skeleton's end-to-end test: one JOIN, exactly one row and one send, every hop once in order, a repeat changes nothing, twenty runs alike (\#425)
+
+- **Commit:** [`db64a04`](https://github.com/aryamahadik/rosie/commit/db64a04), by Arya Mahadik, 2026-11-11 23:11:35 UTC
+- **Pull request:** [#425](https://github.com/aryamahadik/rosie/pull/425) from `task/T-466`, merged 2026-11-11 23:11:36 UTC. It squashed 2 branch commits:
+  - `4e167a2` T-466: the walking skeleton's end-to-end test completes D-017's autom…
+  - `ec6349b` T-466: the skeleton test's header and README name both forms (the fir…
+- **Files changed:** 3 (+527 −121), by folder:
+  - `tests/e2e/skeleton/` README.md +13 −11, root-run.ts +26 −5, skeleton.worker.test.ts +488 −105
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-466: the walking skeleton's end-to-end test completes D-017's automated tests: one JOIN webhook gives exactly 1 outbox row and 1 send asking S1-02's question once, every hop of section 11 once and in order under one trace id and one bundle id with only gap modelCallOrder's three named places set aside, the same webhook again adds nothing but its one dropped span (judged on the whole log), and twenty consecutive runs through fresh roots give the same result
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-466: the skeleton test's header and README name both forms (the first test's prefix form, D-017's full path) and the twenty runs' measured times
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 415. T-1242: on staging the state reads and the plan calls are real ports over new RootOptions inputs (bundleSafety, the bundle's BundleSafety with the pin's check through Root.pin; handleDirectory; stoppedFlags; turnDirectory; turnSafety; planCalls), each failing closed while null (NoStateReadError, NoDatabaseError), so the deployed Worker behaves as before; GateReads gains an optional words field; root.ts's and hop2's stale T-566/T-567 text corrected and hop2's dead actor-span filter removed (\#424)
+
+- **Commit:** [`3af572c`](https://github.com/aryamahadik/rosie/commit/3af572c), by Arya Mahadik, 2026-11-11 23:11:31 UTC
+- **Pull request:** [#424](https://github.com/aryamahadik/rosie/pull/424) from `task/T-1242`, merged 2026-11-11 23:11:32 UTC. It squashed 1 branch commit:
+  - `90d6019` T-1242: on staging the state reads and the plan calls are real ports …
+- **Files changed:** 7 (+1187 −109), by folder:
+  - `runtime/src/wiring/` hop2.worker.test.ts +12 −12, picks.ts +8 −4, ports.ts +15 −11, real.ts +302 −2, root.test.ts +5 −2, root.ts +174 −78, state-reads.worker.test.ts +671 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 414. docs: COMMIT\_HISTORY.md through commit 410 (53198c6, \#417) (\#422)
 
