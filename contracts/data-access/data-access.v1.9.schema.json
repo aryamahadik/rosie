@@ -1,0 +1,1198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.9.schema.json",
+  "title": "DataAccessV1dot9",
+  "description": "K-05 v1.9, a minor version of the data-access calls (T-1226, from join 13's round 1 Need 2 and STATE note 38; DL-466; QUESTIONS.md CQ-201). It only adds to v1.8 (data-access.v1.8.schema.json, frozen and unchanged, referred to here, which refers on to v1.7, v1.6, v1.5, v1.4, v1.3, v1.2, v1.1 and v1): every v1.8 definition is here under its own name, the unchanged ones by reference; the changed ones, markPart.response and markPart.exchange, take one new optional field, repeatedDelivery, so every v1 to v1.8 exchange is a v1.9 exchange. Added: markPart's answer to a delivery receipt that repeats one already recorded says what it repeats (README item 48; arch 02 lines 109 and 127): whether that recorded delivery was the row's first (firstOfRow: no other part try of the row holds an earlier K-04 v1 outbox_parts.delivered_at) and when it was delivered (deliveredAt, the delivered_at the part holds), so the caller hands a repeat of the row's first delivery to the clock arming, whose armClock is safe to repeat (README item 5), and a crash between markPart's commit and armClock no longer loses the arming. firstDelivery keeps v1's meaning: the mark that records the row's first delivery says it, and a repeat never does. The call reads only the delivered_at of the row's parts, which it already locks (README item 15), so no column, grant, index or migration is added. A v1.9 call always writes the field: markPart.v1dot9Response is its answer with the field required. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    },
+    {
+      "$ref": "#/$defs/rowReader.exchange"
+    },
+    {
+      "$ref": "#/$defs/openChatOnText.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markPart.request"
+    },
+    "repeatedDelivery": {
+      "title": "RepeatedDelivery",
+      "description": "The delivery a repeated delivery receipt repeats, as the record holds it (README item 48). A delivered mark whose part is already delivered changes nothing and answers repeated (README item 4); this says whether the delivery it repeats was the row's first and when it was delivered, so the caller hands a repeat of the row's first delivery to the clock arming (arch 02 line 127: the question's clock row arms at its first delivery receipt; README item 5: armClock is safe to repeat). Reason: a crash between markPart's commit and armClock leaves the clock waiting, and the receipt Linq sends again (arch 02 line 109: 'Write fails: 503, and the provider retries') was a repeat that said nothing of what it repeats, so the dispatcher handed it to no one and the arming was lost (STATE note 38; QUESTIONS.md CQ-201). New in v1.9.",
+      "type": "object",
+      "properties": {
+        "firstOfRow": {
+          "description": "Whether the delivery this receipt repeats was the row's first: true when no other part try of the row (any part, any try: K-04 v1 outbox_parts by outbox_row_id) holds a delivered_at earlier than this part try's own, a tie counting as first; false when one does (README default 85). Read from the times the record holds, since K-04 v1 stores when each part try was delivered (outbox_parts.delivered_at), not the order the receipts were recorded in; it is the firstDelivery the recorded mark answered whenever the receipts were recorded in the order of their own times (open gap 54). The caller hands the repeat to the clock arming only when it is true.",
+          "type": "boolean"
+        },
+        "deliveredAt": {
+          "description": "When the repeated delivery was delivered: this part try's outbox_parts.delivered_at as stored, the at the recorded mark wrote (K-06 v1 status.at), never the repeat's own at (README default 86). The clock arming counts from it (arch 02 line 127; armClock's deliveredAt, K-04 clock_rows.armed_at), so the arming a repeat hands on is the one the crash lost, and no second report of a part moves a clock's time.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["firstOfRow", "deliveredAt"],
+      "additionalProperties": false
+    },
+    "markPart.response": {
+      "title": "MarkPartResponse",
+      "description": "Marked, as v1 and v1.1 answer it (README items 4 and 15: each field by reference to v1.1's own definition of it, which v1.2 to v1.8 keep unchanged), with one field more (v1.9, T-1226; README item 48): repeatedDelivery, optional here only so that every v1 to v1.8 answer is a v1.9 answer. A repeat (a second receipt, a second sent or a second failure for the same key) changes nothing and says repeated. firstDelivery keeps v1's meaning, true only on the mark that records the row's first delivery, so a repeat never says it (README default 88). repeatedDelivery is an object exactly on a delivered mark that repeats a recorded delivery, and null on every other answer (markPart.exchange holds the tie to the request); an answer without it is one of v1 to v1.8, which a caller reads as not known, handing nothing on (README default 89). A v1.9 call always writes it (markPart.v1dot9Response).",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/result"
+        },
+        "outboxRowId": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/outboxRowId"
+        },
+        "partNo": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/partNo"
+        },
+        "tryNo": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/tryNo"
+        },
+        "attempts": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/attempts"
+        },
+        "repeated": {
+          "description": "The mark repeats one already recorded: nothing is written (README item 4). Unchanged from v1.",
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/repeated"
+        },
+        "firstDelivery": {
+          "description": "True only on the mark that records the row's first delivery: no part of the row was delivered before (README item 4), so the caller arms the question's clock (arch 02 line 127). Unchanged from v1: false on every repeat, which records nothing (README default 88); a repeat of the row's first delivery says so in repeatedDelivery.",
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/firstDelivery"
+        },
+        "openQuestionId": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/openQuestionId"
+        },
+        "nextKey": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/nextKey"
+        },
+        "row": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/row"
+        },
+        "followUpRows": {
+          "$ref": "data-access.v1.1.schema.json#/$defs/markPart.response/properties/followUpRows"
+        },
+        "repeatedDelivery": {
+          "description": "On a delivered mark that repeats a recorded delivery (repeated true): that delivery, whether it was the row's first and when it was delivered (README item 48). Null on every other answer: a delivered mark that records a delivery, whose firstDelivery says whether it is the row's first, and every attempt, sent and failed mark, a repeat or not, since only a delivery receipt arms a clock (arch 02 line 127; README default 87). New in v1.9.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/repeatedDelivery"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "partNo",
+        "tryNo",
+        "attempts",
+        "repeated",
+        "firstDelivery",
+        "openQuestionId",
+        "nextKey"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "repeatedDelivery": {
+            "type": "object"
+          }
+        },
+        "required": ["repeatedDelivery"]
+      },
+      "then": {
+        "properties": {
+          "repeated": {
+            "description": "An answer that names the delivery it repeats is a repeat.",
+            "const": true
+          },
+          "firstDelivery": {
+            "description": "A repeat records nothing, so it never says firstDelivery (README default 88).",
+            "const": false
+          }
+        }
+      }
+    },
+    "markPart.v1dot9Response": {
+      "title": "MarkPartV1dot9Response",
+      "description": "markPart's answer as a v1.9 call writes it (README item 48): every field of markPart.response, by reference, with row, which every call from v1.1 writes (README item 15), and repeatedDelivery always stated, never left out: an object on a delivered mark that repeats a recorded delivery, null on every other answer. markPart.response takes the two as optional only so that v1 to v1.8's answers stay valid; this is the definition a v1.9 producer's answers are checked against (db/repo's markPart, T-1227), so no consumer meets a v1.9 answer to a repeat that leaves out what it repeats, which it would read as not known and hand nothing on (refuse-mark-repeat-delivery-left-out). New in v1.9.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/markPart.response/properties/result"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/markPart.response/properties/outboxRowId"
+        },
+        "partNo": {
+          "$ref": "#/$defs/markPart.response/properties/partNo"
+        },
+        "tryNo": {
+          "$ref": "#/$defs/markPart.response/properties/tryNo"
+        },
+        "attempts": {
+          "$ref": "#/$defs/markPart.response/properties/attempts"
+        },
+        "repeated": {
+          "$ref": "#/$defs/markPart.response/properties/repeated"
+        },
+        "firstDelivery": {
+          "$ref": "#/$defs/markPart.response/properties/firstDelivery"
+        },
+        "openQuestionId": {
+          "$ref": "#/$defs/markPart.response/properties/openQuestionId"
+        },
+        "nextKey": {
+          "$ref": "#/$defs/markPart.response/properties/nextKey"
+        },
+        "row": {
+          "$ref": "#/$defs/markPart.response/properties/row"
+        },
+        "followUpRows": {
+          "$ref": "#/$defs/markPart.response/properties/followUpRows"
+        },
+        "repeatedDelivery": {
+          "$ref": "#/$defs/markPart.response/properties/repeatedDelivery"
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "partNo",
+        "tryNo",
+        "attempts",
+        "repeated",
+        "firstDelivery",
+        "openQuestionId",
+        "nextKey",
+        "row",
+        "repeatedDelivery"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "repeatedDelivery": {
+            "type": "object"
+          }
+        },
+        "required": ["repeatedDelivery"]
+      },
+      "then": {
+        "properties": {
+          "repeated": {
+            "description": "An answer that names the delivery it repeats is a repeat.",
+            "const": true
+          },
+          "firstDelivery": {
+            "description": "A repeat records nothing, so it never says firstDelivery (README default 88).",
+            "const": false
+          }
+        }
+      }
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "title": "MarkPartExchange",
+      "description": "One markPart request with its outcome, as v1 to v1.8: an answer, or one of markPart's errors (v1.1's, unchanged). The answer a v1.9 call gives is markPart.v1dot9Response, repeatedDelivery always among its fields (README item 48); markPart.response, which takes it as optional, also takes an answer of v1 to v1.8, so every v1 to v1.8 exchange is a v1.9 exchange. The two answer branches overlap, which anyOf allows: the first names what a v1.9 producer writes. The exchange ties the field to its request: a delivered mark answered repeated states the delivery it repeats (an object, never null), and a mark that is not a delivery states none (null). Changed in v1.9.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "markPart"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/markPart.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/markPart.v1dot9Response"
+            },
+            {
+              "$ref": "#/$defs/markPart.response"
+            },
+            {
+              "$ref": "#/$defs/markPart.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "outcome": {
+                "const": "delivered"
+              }
+            },
+            "required": ["outcome"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "if": {
+              "type": "object",
+              "properties": {
+                "repeated": {
+                  "const": true
+                }
+              },
+              "required": ["repeated"]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "repeatedDelivery": {
+                  "description": "A delivery receipt answered repeated states the delivery it repeats, never null (README item 48), so a v1.9 answer never leaves the caller to guess whether to hand it to the clock arming (refuse-mark-delivered-repeat-null).",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "repeatedDelivery": {
+                "description": "An attempt, sent or failed mark repeats no delivery, so it states none (README default 87).",
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleTargets.exchange"
+    },
+    "textsConsentRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/textsConsentRead"
+    },
+    "textsConsentV1dot8": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/textsConsentV1dot8"
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendState.response"
+    },
+    "sendState.v1dot8Response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendState.v1dot8Response"
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/sendState.exchange"
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/fixedLineRowError"
+    },
+    "businessSensitive": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/businessSensitive"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/nullableTurnId"
+    },
+    "storedOutcome": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/storedOutcome"
+    },
+    "storedHold": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/storedHold"
+    },
+    "ownerContact": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/ownerContact"
+    },
+    "moreThanOneOwnerError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/moreThanOneOwnerError"
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcome.request"
+    },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcome.errors"
+    },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHold.request"
+    },
+    "readSafetyHold.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHold.response"
+    },
+    "readSafetyHold.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHold.errors"
+    },
+    "readSafetyHold.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHold.exchange"
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessOwner.request"
+    },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessOwner.errors"
+    },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessZone.request"
+    },
+    "readBusinessZone.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessZone.response"
+    },
+    "readBusinessZone.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessZone.errors"
+    },
+    "readBusinessZone.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/readBusinessZone.exchange"
+    },
+    "rowReader.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowReader.request"
+    },
+    "rowReader.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowReader.response"
+    },
+    "noReaderError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/noReaderError"
+    },
+    "rowReader.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowReader.errors"
+    },
+    "rowReader.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/rowReader.exchange"
+    },
+    "textService": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/textService"
+    },
+    "chatPhoneOpen": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/chatPhoneOpen"
+    },
+    "chatPhoneStopped": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/chatPhoneStopped"
+    },
+    "chatOpenValues": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/chatOpenValues"
+    },
+    "chatClosedValues": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/chatClosedValues"
+    },
+    "chatOpenedEvent": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/chatOpenedEvent"
+    },
+    "notAPhoneError": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/notAPhoneError"
+    },
+    "openChatOnText.request": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.request"
+    },
+    "openChatOnText.inserted": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.inserted"
+    },
+    "openChatOnText.opened": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.opened"
+    },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.stopped"
+    },
+    "openChatOnText.repeated": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.repeated"
+    },
+    "openChatOnText.response": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.response"
+    },
+    "openChatOnText.errors": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.errors"
+    },
+    "openChatOnText.exchange": {
+      "$ref": "data-access.v1.8.schema.json#/$defs/openChatOnText.exchange"
+    }
+  }
+}

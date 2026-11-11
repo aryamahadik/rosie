@@ -1,0 +1,28 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-delivered-by-key.json"],
+    "now": "2026-10-23T14:05:14Z",
+    "note": "STATE note 38's crash: mark-a7-03-delivered-by-key committed A7-03's first delivery, and the dispatcher went down before it handed that answer to the clock arming, so no armClock ran (arm-clock-a7-03-after-4006 never happened in this chain) and the gateway never answered Linq. Linq sends the words' receipt again (arch 02 line 109: 'Write fails: 503, and the provider retries'), the same event: the same message id, time and echoed key. The part now holds that message id, so it is found by it; it is already delivered, so the mark is a repeat and nothing is written, and the row stays sending at version 5 with the poll pending. firstDelivery stays false, as every repeat answers it. repeatedDelivery names what it repeats: no other part try of the row holds a delivered_at, so it was the row's first delivery, at 14:05:04Z as stored. The caller hands it to the clock arming as a first delivery from that time, whose armClock request is arm-clock-a7-03-after-4006's: the arming the crash lost."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0301",
+    "at": "2026-10-23T14:05:04Z",
+    "idempotencyKey": "out-a7-03-alex/1/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": true,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "sending", "version": 5 },
+    "repeatedDelivery": { "firstOfRow": true, "deliveredAt": "2026-10-23T14:05:04Z" }
+  }
+}

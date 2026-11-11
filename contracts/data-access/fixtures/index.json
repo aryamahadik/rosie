@@ -1719,6 +1719,54 @@
       "expect": "refuse",
       "shows": "Alex's STOP row answered as his own yes (fromContact true): a row that withdraws is no yes, so it is never the person's own yes, and no reader that skips revoked could take a STOP for a yes that lifts it (put right, it is send-state-stop-row's outcome)",
       "source": "RULES 7.2, 7.5; MC C1; K-29 v1 consents.revoked; T-1099 (limit 8 reads revoked first); K-05 v1.8 item 47, default 82"
+    },
+    {
+      "file": "mark-a7-03-delivered-repeat.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A crash after A7-03's first delivery was marked and before its clock armed: Linq sends the words' receipt again, a repeat that writes nothing and says firstDelivery false, and names what it repeats, the row's first delivery at 14:05:04Z, so the caller hands it to the clock arming that the crash lost",
+      "source": "STATE note 38; join 13's round 1 Need 2 (T-564); QUESTIONS.md CQ-201; arch 02 lines 109 ('Linq retries for 30 minutes') and 127 ('arms at its first delivery receipt'); K-04 v1 outbox_parts.delivered_at; K-05 v1 items 4 and 5; K-05 v1.9 item 48, defaults 85 and 86"
+    },
+    {
+      "file": "mark-a7-03-poll-delivered.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A7-03's poll is delivered after its words: the row's second delivery, so firstDelivery is false and the row moves sent to delivered; it records a delivery and repeats none, so repeatedDelivery is null",
+      "source": "arch 02 line 127; K-07 v1 partMove sent to delivered, rowMove sent to delivered, rule 4 (the second send waits for the words' receipt); K-05 v1 item 4, v1.1 item 15; K-05 v1.9 item 48, default 87"
+    },
+    {
+      "file": "mark-a7-03-poll-delivered-repeat.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq sends the poll's receipt again: a repeat of a later part's delivery, at 14:05:06Z, after the words' at 14:05:04Z, so firstOfRow is false and nothing is handed to the clock arming",
+      "source": "arch 02 lines 109 and 127; K-04 v1 outbox_parts.delivered_at; K-05 v1 items 4 and 5; K-05 v1.9 item 48, default 85"
+    },
+    {
+      "file": "invalid/refuse-mark-repeat-delivery-left-out.json",
+      "version": "v1.9",
+      "def": "markPart.v1dot9Response",
+      "expect": "refuse",
+      "shows": "The words' repeated receipt answered with repeatedDelivery left out: a v1.9 call always states it, so no consumer meets a repeat whose delivery it cannot place and reads as not known (put right, it is mark-a7-03-delivered-repeat's outcome)",
+      "source": "STATE note 38; QUESTIONS.md CQ-201; K-05 v1.9 item 48, default 89"
+    },
+    {
+      "file": "invalid/refuse-mark-repeat-says-first-delivery.json",
+      "version": "v1.9",
+      "def": "markPart.response",
+      "expect": "refuse",
+      "shows": "The words' repeated receipt answered with firstDelivery true beside the delivery it repeats: firstDelivery keeps v1's meaning, the mark that records the row's first delivery, and a repeat records nothing, so it never says it (put right, it is mark-a7-03-delivered-repeat's outcome)",
+      "source": "K-05 v1 item 4 ('records delivered_at once and says firstDelivery when no part of the row was delivered before'), markPart.response; build prompt 6.4 (a changed meaning is a breaking change); K-05 v1.9 item 48, default 88"
+    },
+    {
+      "file": "invalid/refuse-mark-delivered-repeat-null.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "refuse",
+      "shows": "The poll's repeated receipt answered with repeatedDelivery null: a delivery receipt answered repeated always states the delivery it repeats, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming (put right, it is mark-a7-03-poll-delivered-repeat's)",
+      "source": "arch 02 line 127; STATE note 38; K-05 v1.9 item 48, default 87"
     }
   ]
 }
