@@ -2,9 +2,125 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 372, [`6f86957`](https://github.com/aryamahadik/rosie/commit/6f86957), 2026-11-11 13:20:52 UTC.
+- **Through:** commit 376, [`4b69e2d`](https://github.com/aryamahadik/rosie/commit/4b69e2d), 2026-11-11 13:36:09 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 376. docs: COMMIT\_HISTORY.md through commit 372 (6f86957, \#379) (\#383)
+
+- **Commit:** [`4b69e2d`](https://github.com/aryamahadik/rosie/commit/4b69e2d), by Arya Mahadik, 2026-11-11 13:36:09 UTC
+- **Pull request:** [#383](https://github.com/aryamahadik/rosie/pull/383) from `task/commit-history-12`, merged 2026-11-11 13:36:10 UTC. It squashed 1 branch commit:
+  - `0b32dc3` docs: COMMIT\_HISTORY.md through commit 372 (6f86957, \#379)
+- **Files changed:** 1 (+63 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +63 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 375. T-1215: the Tool API validators' build reads only inside contracts/; a $ref or fixture entry leaving it is refused with no content printed (\#382)
+
+- **Commit:** [`d3b6b07`](https://github.com/aryamahadik/rosie/commit/d3b6b07), by Arya Mahadik, 2026-11-11 13:36:05 UTC
+- **Pull request:** [#382](https://github.com/aryamahadik/rosie/pull/382) from `task/T-1215`, merged 2026-11-11 13:36:05 UTC. It squashed 2 branch commits:
+  - `5224117` T-1215: the Tool API validators' build reads only inside contracts/: …
+  - `6f323a2` T-1215: infra/ci/README.md names the validators' build among what npm…
+- **Files changed:** 3 (+415 −33), by folder:
+  - `infra/build/` tool-api-validators.mjs +131 −32
+  - `infra/ci/` README.md +1 −1, tool-api-validators.test.mjs +283 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1215: the Tool API validators' build reads only inside contracts/: every $ref and every fixture index's file entry is resolved (.., absolute paths, then symbolic links; real paths compared) and one that leads outside contracts/ is refused before anything is read from it; a file that is not JSON fails naming the file only, never its first characters; main's contracts build byte-identical; infra/ci/tool-api-validators.test.mjs (12 tests)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1215: infra/ci/README.md names the validators' build among what npm run test:ci-scripts tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 374. T-1216: K-05 v1.8 sendState in db/repo, fromContact and bookingId from the covering consent row (\#381)
+
+- **Commit:** [`b8fb4b6`](https://github.com/aryamahadik/rosie/commit/b8fb4b6), by Arya Mahadik, 2026-11-11 13:36:00 UTC
+- **Pull request:** [#381](https://github.com/aryamahadik/rosie/pull/381) from `task/T-1216`, merged 2026-11-11 13:36:01 UTC. It squashed 5 branch commits:
+  - `56eec29` T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the …
+  - `0ad6fa9` T-1102: K-05 v1.8 wording: a staff member's ready text is the core ac…
+  - `63dc12e` T-1102: K-05 v1.8 item 47: a clock turn records no yes, so a turn's t…
+  - `39af240` Merge branch 'task/T-1102' into task/T-1216
+  - `4699bbf` T-1216: K-05 v1.8 sendState in db/repo: the texts row says who gave t…
+- **Files changed:** 3 (+537 −122), by folder:
+  - `db/repo/` commit-turn.int.test.ts +5 −1, send-state.int.test.ts +411 −71, send-state.ts +121 −50
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the yes (fromContact) and for which booking (bookingId), read from K-29 v1 consents and K-04 v1 turns; 8 accepted and 3 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1102: K-05 v1.8 wording: a staff member's ready text is the core action K-09 names; fromContact's no-business rule cites K-29's business_id column
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1102: K-05 v1.8 item 47: a clock turn records no yes, so a turn's text-channel yes is its handle's
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1216: K-05 v1.8 sendState in db/repo: the texts row says who gave the yes (fromContact) and for which booking (bookingId), read by the covering row's id with its turn's handle in sendState's one read-only rosie_job transaction, typed SendStateV1Dot8Response; all 9 sendState fixtures at v1dot8Response, 7 own tests, commitTurn's pinned list at 20
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 373. T-1102: freeze K-05 v1.8, sendState's texts consent says who gave the yes (fromContact) and for which booking (bookingId) (\#380)
+
+- **Commit:** [`2d49d0a`](https://github.com/aryamahadik/rosie/commit/2d49d0a), by Arya Mahadik, 2026-11-11 13:35:56 UTC
+- **Pull request:** [#380](https://github.com/aryamahadik/rosie/pull/380) from `task/T-1102`, merged 2026-11-11 13:35:57 UTC. It squashed 3 branch commits:
+  - `56eec29` T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the …
+  - `0ad6fa9` T-1102: K-05 v1.8 wording: a staff member's ready text is the core ac…
+  - `63dc12e` T-1102: K-05 v1.8 item 47: a clock turn records no yes, so a turn's t…
+- **Files changed:** 15 (+2221 −4), by folder:
+  - `contracts/data-access/` README.md +71 −3, data-access.v1.8.schema.json +1242 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` commit-alex-ready-text.json +85 −0, commit-alex-start.json +113 −0, commit-sam-books-alex-nov21.json +132 −0, commit-sam-enters-alex-yes.json +121 −0, index.json +88 −0, send-state-business-yes.json +58 −0, send-state-own-start.json +58 −0, send-state-own-yes-one-booking.json +58 −0, send-state-stop-row.json +58 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-send-state-booking-left-out.json +45 −0, refuse-send-state-stop-read-as-own-yes.json +46 −0, refuse-send-state-yes-source-left-out.json +45 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the yes (fromContact) and for which booking (bookingId), read from K-29 v1 consents and K-04 v1 turns; 8 accepted and 3 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1102: K-05 v1.8 wording: a staff member's ready text is the core action K-09 names; fromContact's no-business rule cites K-29's business_id column
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1102: K-05 v1.8 item 47: a clock turn records no yes, so a turn's text-channel yes is its handle's
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 372. docs: COMMIT\_HISTORY.md through commit 370 (1ab5a50, \#377) (\#379)
 
