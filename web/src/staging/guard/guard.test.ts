@@ -134,10 +134,9 @@ const PRODUCTION_CONFIG = readWebConfig(testVars("production"));
 
 /**
  * Asks every route of the tool with GET, POST and HEAD and holds each answer to "the tool does not exist here": the
- * shell's 404 page, as an unknown address gets it. With the guard alone, a method a route does not take gets the
- * shell's 405 page before any handler (guard.ts, "One limit"). Gives the number of requests it sent.
+ * shell's 404 page, as an unknown address gets it. Gives the number of requests it sent.
  */
-async function expectNoTool(shell: WebShell, basePath: string, tool: Tool, listed: boolean): Promise<number> {
+async function expectNoTool(shell: WebShell, basePath: string, tool: Tool): Promise<number> {
   const unknown = await shell.fetch(ask(`${basePath}/dummy-unknown-address`, "GET"));
   expect(unknown.status).toBe(404);
   let sent = 0;
@@ -146,10 +145,6 @@ async function expectNoTool(shell: WebShell, basePath: string, tool: Tool, liste
       const what = `${method} ${addressOf(basePath, route)}`;
       const response = await shell.fetch(ask(addressOf(basePath, route), method));
       sent += 1;
-      if (listed && !takes(route, method)) {
-        expect(response.status, what).toBe(405);
-        continue;
-      }
       expect(response.status, what).toBe(404);
       expect([...response.headers], what).toEqual([...unknown.headers]);
       expect(await response.text(), what).toBe(method === "HEAD" ? "" : notFoundPage(basePath));
@@ -170,7 +165,7 @@ describe("with ENVIRONMENT=production every staging tool route answers 404 and t
             vars: { ...testVars("staging"), ENVIRONMENT: value, BASE_PATH: basePath },
           });
           expect(config.environment).toBe(value);
-          const sent = await expectNoTool(shell, basePath, tool, !marked);
+          const sent = await expectNoTool(shell, basePath, tool);
           expect(sent).toBe(tool.routes.length * METHODS.length);
           expect(tool.calls()).toBe(0);
           for (const spy of tool.spies.values()) expect(spy).not.toHaveBeenCalled();

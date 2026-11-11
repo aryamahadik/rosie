@@ -11,4 +11,3 @@ Rules:
 
 - The guard reads only the config the shell hands a handler, never the request, and it fails closed.
 - Keep the tool's folder marked `stagingOnly: true` in `web/src/routes.ts`. `guard.test.ts` fails when a staging-only folder lists a route that is not guarded, or when a guarded route sits in a folder without the mark.
-- A method a route does not take gets the shell's 405 before any handler runs; only the mark in `routes.ts` makes that a 404.
