@@ -65,7 +65,16 @@
 // port, each send within a time limit far below the claim's 60 s. The dispatcher records the dispatch span itself. A
 // number's text opens its chat at receipt through the chat-open port (T-1213: K-05 v1.7 openChatOnText over
 // RootOptions.chatOpenCall), the gateway's call after the key call and before the actor, with the handle's K-04 id the
-// key call answered, so the phone row limit 8 reads at send holds the chat open. Never logged by the root: a word, a
+// key call answered, so the phone row limit 8 reads at send holds the chat open. Each part the Linq door lets through goes
+// to the Linq line through the Linq send port (T-563: K-11 v1 sendPart over RootOptions.linqSendCall, @rosie/adapters'
+// Linq double in a test) under its K-07 key '<row>/<part>/<try>', so a part sent again under its key is one message. A
+// row the dispatcher leaves waiting for its next try goes on the retry queue (T-258's retries, joined here: DL-315), as
+// T-256's producer puts it on RootOptions.retryQueue (the RETRY_QUEUE binding in the Worker); when the job comes due, the
+// queue's consumer hands it to the dispatcher's send door (`install()` sets the queue's ports), which runs the
+// recipient's rows again with the same ports, each row on the trace this isolate sent it on, else on its own trace id: no
+// answer, the same key under a re-claim about 60 s later; 4001 or 4006, a new key only after a minute with no receipt; no
+// new job once 15 minutes of tries have passed (CQ-152). The checked safety line the actor sends straight through Linq
+// while PostgreSQL is down is a port of its own (linqDirect), which no hop joins. Never logged by the root: a word, a
 // number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
@@ -74,15 +83,26 @@ import { setBundleDeps } from "../bundle/pin";
 import type { BundleRegistry } from "../bundle/types";
 import { ArmingMemory, clockArming } from "../clocks/arming";
 import type { ClockActorRpc } from "../clocks/types";
-import { handleDeliveryReceipt, runDispatch } from "../dispatch/dispatcher";
+import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatch/dispatcher";
+import { dispatchSendDoor, queueRetries, retryBodyOf } from "../dispatch/retry";
+import type { ClaimedRow } from "../dispatch/types";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
-import type { WebhookEnvironment } from "../gateway/answer";
+import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
 import { unconfiguredPages } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setGuardDeps } from "../guard/targets";
+import {
+  JobMemory,
+  retryQueueOf,
+  setQueueDeps,
+  type DeadLetterStore,
+  type QueueDeps,
+  type RetryQueue,
+  type SendDoor,
+} from "../queues";
 import { setSafetyDeps } from "../safety";
 import type { SafetyDeps } from "../safety/types";
-import { logSink, openTrace, type BundleId, type LogContext, type TraceContext } from "../trace";
+import { isLabel, logSink, openTrace, type BundleId, type LogContext, type TraceContext } from "../trace";
 import { setTurnDeps, turnHooks } from "../turn/turn";
 import type { TurnDeps, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
@@ -102,6 +122,7 @@ import {
   type GateReads,
   type HandleSealingKeyCall,
   type HandleTargetsCall,
+  type LinqSendCall,
   type LinqVerifyInputs,
   type OpenChatOnTextCall,
   type OutboxCalls,
@@ -249,6 +270,20 @@ export interface RootOptions {
    * Worker until T-567), so every read fails closed and nothing is sent.
    */
   readonly sendStateCall?: SendStateCall | null;
+  /**
+   * K-11 v1 sendPart with its Linq line bound (T-563; ./real.ts LinqSendCall): each part the dispatcher sends, through the
+   * root's Linq door. In a test, @rosie/adapters' Linq double (T-411), which records each part once per idempotency key;
+   * null or left out where no line is bound (the Worker until one is handed in: staging's test-phone line, or J-08's real
+   * line), so every send fails closed (NoLinqLineError) and nothing leaves.
+   */
+  readonly linqSendCall?: LinqSendCall | null;
+  /**
+   * The retry queue's producer (runtime/src/queues RetryQueue: the RETRY_QUEUE binding, retryQueueOf(env), in the Worker),
+   * where a row the dispatcher leaves waiting for its next try is put (T-258; DL-315), and where the queue's consumer puts
+   * each next try of a job. In a test, a double that keeps each message with its delay; null or left out where none is
+   * bound (staging until T-566), so each wait reports noQueue and the row waits for the next run that claims it.
+   */
+  readonly retryQueue?: RetryQueue | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -277,7 +312,13 @@ export interface Root {
   readonly safety: SafetyDeps;
   /** The outbox dispatcher, as the turn wakes it. */
   readonly dispatcher: TurnDispatcher;
-  /** Puts the actor's ports in place for this isolate; returns the function that puts the earlier ones back. */
+  /**
+   * The retry queue's ports (runtime/src/queues QueueDeps), as `install()` sets them for the isolate: each send job goes
+   * through the dispatcher's send door (T-258), which runs the job's recipient's rows again; no job kind and no dead-letter
+   * writer is joined yet.
+   */
+  readonly queue: QueueDeps;
+  /** Puts the actor's ports and the retry queue's in place for this isolate; returns the function that puts the earlier ones back. */
   install(): () => void;
 }
 
@@ -336,6 +377,8 @@ export function composeRoot(options: RootOptions): Root {
       // The dispatcher's claim and marks, and limit 8's send state, each with its database bound (T-562).
       outbox: options.outboxCalls ?? null,
       sendState: options.sendStateCall ?? null,
+      // Each part the dispatcher sends, to the Linq line (T-563).
+      linqSend: options.linqSendCall ?? null,
     }),
     closed: closedPorts(),
   });
@@ -350,26 +393,58 @@ export function composeRoot(options: RootOptions): Root {
   const door = new LinqDoor();
   const dispatchStore = door.watch(ports.outbox);
   const dispatchLinq = door.door(ports.linqSend.parts);
+  // Where a row left waiting for its next try is put (T-258; DL-315): the retry queue, through T-256's producer.
+  const retries = queueRetries(options.retryQueue ?? null, now);
+  /** The dispatcher's ports for one run, each claimed row sent on the trace `traceFor` gives it. */
+  const dispatchDeps = (traceFor: DispatchDeps["traceFor"]): DispatchDeps => ({
+    store: dispatchStore,
+    linq: dispatchLinq,
+    recipients: ports.sendState.recipients,
+    sendState: ports.sendState.sendState,
+    environment: options.vars.ENVIRONMENT,
+    traceFor,
+    now: utc,
+    claimer: claimerOf(),
+    retries,
+  });
 
   const dispatcher: TurnDispatcher = {
     async wake(request, trace) {
       await runDispatch(
-        {
-          store: dispatchStore,
-          linq: dispatchLinq,
-          recipients: ports.sendState.recipients,
-          sendState: ports.sendState.sendState,
-          environment: options.vars.ENVIRONMENT,
-          traceFor: (row) => {
-            rowTraces.keep(row.outboxRowId, trace);
-            return trace;
-          },
-          now: utc,
-          claimer: claimerOf(),
-        },
+        dispatchDeps((row) => {
+          rowTraces.keep(row.outboxRowId, trace);
+          return trace;
+        }),
         { recipientHandleId: request.handleId },
       );
     },
+  };
+
+  // The retry queue's door to the dispatcher (T-258's dispatchSendDoor; DL-315): a due send job runs its recipient's rows
+  // again with the same ports, each claimed row on the trace this isolate sent it on, else on a trace opened under the
+  // row's own trace id (one trace id from the webhook to the delivery receipt), with the active bundle id read once for
+  // the try (bundle v0's stand-in when it cannot be read, as at receipt).
+  const sends: SendDoor = {
+    async retrySend(send) {
+      const body = retryBodyOf(send.body);
+      const known = body === null ? null : rowTraces.forRow(body.outboxRowId);
+      const bundleId =
+        known?.bundleId ?? (await readBundleId({ bundleId: () => activeBundleId(ports.bundles.registry) }));
+      const traceFor = (row: ClaimedRow): TraceContext => {
+        const trace = rowTraces.forRow(row.outboxRowId) ?? rowTraceOf(row, bundleId, log, now);
+        rowTraces.keep(row.outboxRowId, trace);
+        return trace;
+      };
+      return dispatchSendDoor(dispatchDeps(traceFor)).retrySend(send);
+    },
+  };
+  // The retry queue's ports for this isolate: send jobs through the door, this root's own ledger (one root per isolate's
+  // env), and no job kind or dead-letter writer joined yet (NO_DEAD_LETTERS).
+  const queue: QueueDeps = {
+    sends,
+    jobs: new Map(),
+    deadLetters: NO_DEAD_LETTERS,
+    ledger: new JobMemory(),
   };
 
   const turn: TurnDeps = {
@@ -408,7 +483,7 @@ export function composeRoot(options: RootOptions): Root {
     core: ports.turnFace.safetyCore,
     directory: ports.stateReads.safety.directory,
     keys: ports.sealing,
-    direct: ports.linqSend.direct,
+    direct: ports.linqDirect,
     clock: { now, after: (ms) => clock.after(ms) },
     isStopped: (actorName) => ports.stateReads.safety.isStopped(actorName),
   };
@@ -482,6 +557,7 @@ export function composeRoot(options: RootOptions): Root {
     turn,
     safety,
     dispatcher,
+    queue,
     install() {
       const restores = [
         setBatchHooks({ clock: { now } }),
@@ -490,6 +566,8 @@ export function composeRoot(options: RootOptions): Root {
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
         setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
+        // The retry queue's ports (T-256): its send jobs reach the dispatcher's door (T-258; DL-315).
+        setQueueDeps(queue),
       ];
       return () => {
         for (const restore of restores.reverse()) restore();
@@ -578,6 +656,13 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // nothing and nothing is sent, and a receipt is not marked (answered 503, so Linq sends it again).
     outboxCalls: null,
     sendStateCall: null,
+    // No Linq line is handed in yet (T-563): every send fails closed (./real.ts NoLinqLineError) and nothing leaves. On
+    // staging the line is the test-phone line's Linq double (./test-phone lineLinqSend over testPhoneLineOf(env
+    // .TEST_PHONE_LINE)), bound with the database by T-567; the real Linq line is J-08's. No row is claimed before then.
+    linqSendCall: null,
+    // The RETRY_QUEUE binding where the environment has one (T-279; none on staging until T-566, so each wait there
+    // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
+    retryQueue: retryQueueOf(env),
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as
@@ -653,6 +738,31 @@ function deliveredStatusOf(handoff: ActorHandoff): { messageId: string; at: stri
     throw new WiringError("a delivered receipt with no status");
   }
   return { messageId: status.messageId, at: status.at };
+}
+
+/**
+ * The retry queue's dead-letter writer while none is joined (K-37 v1 dead_letters on the runtime side; no D-017 hop joins
+ * it): every insert is refused, so a job's fifth failed try is never lost but comes back after a minute (T-256's handOn).
+ * No job kind is joined either: only the dispatcher's send jobs run, and a send never becomes a dead letter.
+ */
+export const NO_DEAD_LETTERS: DeadLetterStore = {
+  put: () => Promise.resolve({ error: "noDeadLetterStore" }),
+};
+
+/**
+ * A retried row's own trace, where this isolate did not send it (T-563): opened under the trace id the row carries (one
+ * trace id from the webhook to the delivery receipt; K-08), as a receipt's is, with the bundle id the retry read and the
+ * row's recipient as its handle (never a number).
+ */
+function rowTraceOf(row: ClaimedRow, bundleId: BundleId, log: LogContext, now: () => number): TraceContext {
+  return openTrace({
+    openedBy: "textWebhook",
+    bundleId,
+    incomingTraceId: row.traceId,
+    ...(isLabel(row.recipientHandleId) ? { handleRef: row.recipientHandleId } : {}),
+    sink: logSink(log),
+    now,
+  });
 }
 
 /** The receipt's own trace, under the id and bundle id the gateway opened it with (CQ-102: no row's trace is known). */

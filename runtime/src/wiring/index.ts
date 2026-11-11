@@ -39,6 +39,7 @@ export {
   NoComposerError,
   NoDatabaseError,
   NoDeciderError,
+  NoLinqLineError,
   NoSafetyReaderError,
   NotComposeInputError,
   NotFinalizeError,
@@ -50,6 +51,7 @@ export {
   realFinalize,
   realFrontier,
   realGate,
+  realLinqSend,
   realOutbox,
   realPorts,
   realSafetyRead,
@@ -81,6 +83,8 @@ export {
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type KeyObjectStore,
+  type LinqSendCall,
+  type LinqSendInputs,
   type LinqVerifyInputs,
   type OpenChatOnTextCall,
   type OutboxCalls,
@@ -99,6 +103,7 @@ export {
 export { LinqDoor, NOT_LINQ_PORT, PORT_MEMORY, SEND_TIMEOUT, SEND_TIMEOUT_MS } from "./linq-door";
 export {
   composeRoot,
+  NO_DEAD_LETTERS,
   unwireWorker,
   WORKER_CLOCK,
   wiredRoot,

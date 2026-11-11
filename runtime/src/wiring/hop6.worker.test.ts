@@ -208,6 +208,8 @@ function rig(log: MockInstance, fed: { frontier?: boolean } = {}): Rig {
     finalizeData: fakes.finalize.data,
     outboxCalls: fakes.dispatch.outbox,
     sendStateCall: fakes.dispatch.sendState,
+    // The Linq send port (T-563) over @rosie/adapters' Linq double.
+    linqSendCall: fakes.linq.call,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();

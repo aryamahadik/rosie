@@ -127,6 +127,15 @@
 //                closed and nothing is sent. phone.stopped, phone.stopAt and textsConsent go across unchanged, and the
 //                stopped flag is never derived from a consent row (STATE note 10; T-1099). A number with no phone row has
 //                no open chat that Rosie knows of, so its rows wait for the chat (limit 8's waitingChat; MC C9).
+//   linqSend     T-563: K-11 v1 sendPart (C-206; C-211), each part the dispatcher sends through the root's Linq door
+//                (./linq-door.ts), under its K-07 key '<row>/<part>/<try>', with its Linq line bound, handed in by the root
+//                (RootOptions.linqSendCall): in a test, @rosie/adapters' Linq double (T-411), which records each part once
+//                per key and answers a repeated key with its first answer, as Linq does (K-11 'Repeating it'); nothing in
+//                the Worker until a line is handed in (staging's test-phone line, ./test-phone lineLinqSend, or J-08's real
+//                line), so every send there fails closed before anything leaves. The request goes to the line field for
+//                field, and its answer comes back as K-11's: accepted with its message id, or failed with its kind,
+//                status, code and Retry-After, which the dispatcher's retry rules read (T-258); an answer K-11 does not
+//                name is no answer, so the part waits under its own key.
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
@@ -220,6 +229,9 @@ import type {
   ChatTarget,
   ClaimedRow,
   FinalParts as DispatchFinalParts,
+  LinqAccepted,
+  LinqFailed,
+  LinqSendRequest,
   MarkPartResponse,
   OutboxStore,
   PlannedSend,
@@ -252,6 +264,7 @@ import type {
   FinalizePort,
   FrontierPort,
   GatePort,
+  LinqSend,
   Ports,
   SendStatePort,
   TurnRowPort,
@@ -364,6 +377,11 @@ export interface RealInputs {
    * so every send-state read fails closed and nothing is sent.
    */
   readonly sendState?: SendStateCall | null | undefined;
+  /**
+   * K-11 v1 sendPart with its Linq line bound (T-563): null or left out where no line is bound (the Worker until one is
+   * handed in), so every send fails closed and nothing leaves.
+   */
+  readonly linqSend?: LinqSendCall | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -416,6 +434,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
     }),
     outbox: realOutbox({ calls: inputs.outbox ?? null }),
     sendState: realSendState({ call: inputs.sendState ?? null }),
+    linqSend: realLinqSend({ call: inputs.linqSend ?? null }),
   };
 }
 
@@ -1951,4 +1970,157 @@ export function realSendState(inputs: SendStateInputs): SendStatePort {
     },
   };
   return { sendState, recipients };
+}
+
+// ---- linqSend: K-11 v1 sendPart, each part the dispatcher sends (T-563; C-124; C-206, C-211) ---------------------------
+
+/**
+ * K-11 v1 sendPart with its Linq line bound (T-563): one part into an existing chat, in K-11's request and answer shapes as
+ * the dispatcher writes and reads them (../dispatch/types.ts). The Linq adapter's send on a real line (C-206; J-08), or,
+ * in a test, @rosie/adapters' Linq double (T-411; C-211), which records each part once per idempotency key.
+ */
+export type LinqSendCall = (request: LinqSendRequest) => Promise<LinqAccepted | LinqFailed>;
+
+/** What the real Linq send port is fed: the Linq line, or null where none is bound. */
+export interface LinqSendInputs {
+  readonly call: LinqSendCall | null;
+}
+
+/** A send where no Linq line is bound (the Worker until one is handed in). The message names the call only. */
+export class NoLinqLineError extends Error {
+  constructor() {
+    super("no Linq line is bound here for sendPart");
+    this.name = "NoLinqLineError";
+  }
+}
+
+/** The request as K-11 v1 sendPart takes it: its fourteen fields, each copied, nothing added. */
+function linqRequestOf(request: LinqSendRequest): LinqSendRequest {
+  return {
+    idempotencyKey: request.idempotencyKey,
+    to: request.to,
+    chatId: request.chatId,
+    service: request.service,
+    kind: request.kind,
+    text: request.text,
+    calendarFile:
+      request.calendarFile === null
+        ? null
+        : {
+            action: request.calendarFile.action,
+            fileName: request.calendarFile.fileName,
+            ics: request.calendarFile.ics,
+          },
+    options: [...request.options],
+    link: request.link,
+    photo: null,
+    tapback: null,
+    threadedReplyTo:
+      request.threadedReplyTo === null ? null : { messageId: request.threadedReplyTo.messageId },
+    typing: null,
+    overrideOptout: request.overrideOptout,
+  };
+}
+
+/**
+ * An answer K-11 does not name, read as no answer (K-11 transient with no status): the dispatcher keeps the part pending
+ * under its own key (K-07 rule 1), and Linq answers a repeat of the key with the first message, so nothing goes twice.
+ */
+const NO_ANSWER: LinqFailed = {
+  result: "failed",
+  kind: "transient",
+  httpStatus: null,
+  code: "noAnswer",
+  reason: "the Linq line gave no answer K-11 names",
+  retryAfterSeconds: null,
+  providerMessageId: null,
+};
+
+const FAILURE_KINDS: readonly LinqFailed["kind"][] = [
+  "optedOut",
+  "mayStillDeliver",
+  "rateLimited",
+  "refused",
+  "transient",
+];
+
+const SERVICES: readonly string[] = ["imessage", "rcs", "sms"];
+
+const textOrNull = (value: unknown): value is string | null => value === null || typeof value === "string";
+const numberOrNull = (value: unknown): value is number | null =>
+  value === null || (typeof value === "number" && Number.isFinite(value));
+const isFailureKind = (value: unknown): value is LinqFailed["kind"] =>
+  typeof value === "string" && (FAILURE_KINDS as readonly string[]).includes(value);
+const isService = (value: unknown): value is LinqAccepted["service"] =>
+  value === null || (typeof value === "string" && SERVICES.includes(value));
+const isTextList = (value: unknown): value is readonly string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === "string");
+
+/**
+ * The line's answer as K-11 v1 gives it, field for field: accepted with its message id, chat, service and time, or failed
+ * with its kind, status, code, reason, Retry-After and message id. Anything else is no answer (NO_ANSWER).
+ */
+function linqAnswerOf(answer: unknown): LinqAccepted | LinqFailed {
+  if (typeof answer !== "object" || answer === null) return NO_ANSWER;
+  const given = answer as Record<string, unknown>;
+  if (
+    given.result === "accepted" &&
+    textOrNull(given.providerMessageId) &&
+    (given.providerOptionIds === null || isTextList(given.providerOptionIds)) &&
+    typeof given.chatId === "string" &&
+    isService(given.service) &&
+    typeof given.acceptedAt === "string"
+  ) {
+    return {
+      result: "accepted",
+      providerMessageId: given.providerMessageId,
+      providerOptionIds: given.providerOptionIds === null ? null : [...given.providerOptionIds],
+      chatId: given.chatId,
+      service: given.service,
+      acceptedAt: given.acceptedAt,
+    };
+  }
+  if (
+    given.result === "failed" &&
+    isFailureKind(given.kind) &&
+    numberOrNull(given.httpStatus) &&
+    textOrNull(given.code) &&
+    typeof given.reason === "string" &&
+    numberOrNull(given.retryAfterSeconds) &&
+    textOrNull(given.providerMessageId)
+  ) {
+    return {
+      result: "failed",
+      kind: given.kind,
+      httpStatus: given.httpStatus,
+      code: given.code,
+      reason: given.reason,
+      retryAfterSeconds: given.retryAfterSeconds,
+      providerMessageId: given.providerMessageId,
+    };
+  }
+  return NO_ANSWER;
+}
+
+/**
+ * The Linq send port (T-563): the dispatcher's LinqPort over the Linq line (RootOptions.linqSendCall). Each part the
+ * root's Linq door lets through (a row whose claim names the linq port, within the send's time limit: ./linq-door.ts)
+ * goes to the line as K-11 v1 sendPart, field for field, under its K-07 key '<row>/<part>/<try>', so the line answers a
+ * repeated key with its first answer and the person gets one message (K-11 'Repeating it'). The answer comes back as K-11
+ * gives it, which the dispatcher marks and its retry rules read (T-258): no answer, the same key; a reported failure, a
+ * new key; 4001 or 4006, a new key only after a minute with no receipt; 403 2024, never again on Linq. An answer K-11 does
+ * not name is no answer (the same key). With no line bound every send fails closed (NoLinqLineError) before anything
+ * leaves. Nothing here logs: a request holds a number and a person's words.
+ */
+export function realLinqSend(inputs: LinqSendInputs): LinqSend {
+  const { call } = inputs;
+  return {
+    parts: {
+      async sendPart(request) {
+        if (call === null) throw new NoLinqLineError();
+        const answer: unknown = await call(linqRequestOf(request));
+        return linqAnswerOf(answer);
+      },
+    },
+  };
 }

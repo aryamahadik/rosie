@@ -85,8 +85,12 @@
 //                db/repo/outbox.ts and send-state.ts answer on them
 //   dataAccess   turn/test-support fakeRows (the commit's one row) and clocks/arming-support's K-05 armClock and
 //                cancelClock
-//   linqSend     dispatch/test-support FakeLinq (accepting a part a moment after its send starts) and safety/test-support
-//                fakeDirect
+//   linqSend     joined (T-563): the root binds K-11 sendPart through its real Linq send port (./real.ts realLinqSend).
+//                What it is fed comes from here: `FakeLinqLine`, @rosie/adapters' Linq double (T-411) behind a line that
+//                answers a moment after the send starts and keeps every request the port handed on; and the retry queue
+//                the dispatcher's waits go on (`fakeRetryQueue`, RootOptions.retryQueue), whose due messages a test hands
+//                to the root's door
+//   linqDirect   safety/test-support fakeDirect (no D-017 hop)
 //
 // One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures and the Linq
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
@@ -104,6 +108,7 @@ import type {
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
 import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import type { FixedLineFactsRead, OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
+import { createLinqDouble, type LinqDouble } from "@rosie/adapters/linq/double";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import joinComposeInputJson from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
@@ -178,7 +183,9 @@ import type { CommitContext, CommitTurnRef } from "../actor";
 import { turnIdOf } from "../actor/lease";
 import { BUNDLE_B } from "../bundle/test-support";
 import { wireArming, type WiredArming } from "../clocks/arming-support";
-import { FakeLinq, yieldToOthers } from "../dispatch/test-support";
+import { yieldToOthers } from "../dispatch/test-support";
+import type { LinqAccepted, LinqFailed, LinqSendRequest } from "../dispatch/types";
+import type { RetryMessage, RetryQueue, RetrySendOptions } from "../queues";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
 import type { BundleId, TraceContext } from "../trace";
@@ -214,6 +221,7 @@ import type {
   GateReads,
   HandleSealingKeyCall,
   HandleTargetsCall,
+  LinqSendCall,
   LinqVerifyInputs,
   OpenChatOnTextCall,
   OutboxCalls,
@@ -2889,6 +2897,9 @@ const WALKED_STATES: ReadonlySet<string> = new Set([
   "waiting_chat",
 ]);
 
+/** The row states a delivered or failed mark may change a part of (db/repo/outbox.ts PART_OUT_ROW_STATES, default 1). */
+const PART_OUT_ROW_STATES: ReadonlySet<string> = new Set(["sending", "sent", "checked", "delivered"]);
+
 /** K-04 open_questions statuses that close a question (K-05 v1.2 default 32). */
 const CLOSED_QUESTION: ReadonlySet<string> = new Set(["answered", "defaulted", "withdrawn"]);
 
@@ -2986,7 +2997,8 @@ export function seededHandles(seeded: readonly SeededHandle[] = [TEST_OWNER_1]):
  *                   recipient, or every recipient with open rows earliest commit order first, each under its own lock
  *                   held across the call's await (pg_try_advisory_xact_lock: a recipient another claim holds is skipped),
  *                   its open rows walked in commit order: a waiting_chat row passed, a held row whose time is ahead passed
- *                   and listed, a sending row with a live claim or a row with no final parts stopping the walk; a checked
+ *                   and listed, a sending row with a live claim, a row with no final parts or a row whose part's latest
+ *                   try failed with no next try (defaults 5 and 13: a 4001 or 4006 in its minute) stopping the walk; a checked
  *                   or held row, or a sending row whose claim lapsed, claimed: sending, its version raised, its parts'
  *                   tries written (try 1 under '<row>/<part>/1'; a pending try's attempts raised at a re-claim), its claim
  *                   written (claim 1, or the next number, lapsing 60 s on), handed out with the final parts finalize
@@ -2996,8 +3008,11 @@ export function seededHandles(seeded: readonly SeededHandle[] = [TEST_OWNER_1]):
  *                   of the row's recipient, as `phones` holds it (null for none);
  *   markPartV12     K-05 items 15 and 31 (mark-sent.json, mark-delivered.json, mark-delivered-by-key.json): sent on a
  *                   pending part of a sending row, delivered by the message id or else by the echoed key of a part that
- *                   holds none, failed (with retry, the next try as words); a repeat changes nothing; the row follows its
- *                   parts' latest tries and its version rises with each mark that changes a part;
+ *                   holds none, failed (with retry, the next try as words, the highest try + 1, any Retry-After held in
+ *                   the claim) while the row is sending, sent, checked or delivered; a failure for a part already failed
+ *                   answers its next try's key, or with retry and none written writes it then (default 8: K-07
+ *                   outbox-4006-new-key.json); any other repeat changes nothing; the row follows its parts' latest tries
+ *                   and its version rises with each mark that changes a part;
  *   markRowV12      K-05 items 4 and 16 (mark-held-for-text-hours.json, mark-waiting-chat.json): only a sending row,
  *                   compare-and-set on its version; waitingChat also lets the claim go;
  *   sendState       K-05 item 28 (send-state-owner.json's form): the row's state and version now, the recipient (test
@@ -3160,6 +3175,10 @@ export function fakeDispatchData(
           } else if (state.state !== "checked" && state.state !== "held") {
             break;
           }
+          // A part whose latest try failed with no next try (a 4001 or 4006 waiting for its receipt, or for its minute)
+          // stops the walk unclaimed (db/repo defaults 5 and 13): no new dispatcher knows when the minute ends, and
+          // nothing is sent twice. Its receipt, or a failed mark with retry (its next try), moves it.
+          if (latestPartTries(state.parts).some((part) => part.state === "failed")) break;
           const plan = plans.get(row.id);
           if (plan === undefined) break;
           claimed.push(take(row, plan, request));
@@ -3270,22 +3289,55 @@ export function fakeDispatchData(
         break;
       case "failed": {
         if (part.state === "delivered") return wrong("outbox_parts", part.key, part.state);
+        const highest = Math.max(
+          ...state.parts.filter((each) => each.partNo === part.partNo).map((each) => each.tryNo),
+        );
+        const keyOfTry = (tryNo: number): string => `${row.id}/${String(part.partNo)}/${String(tryNo)}`;
         if (part.state === "failed") {
-          repeated = true;
-          break;
+          // A repeat (db/repo default 8): its next try's key once one is written; with none and retry false, no key.
+          // With none and retry true, the next try is written now, the failed try left as it is: a 4001 or 4006 whose
+          // minute passed with no receipt (K-07 retry rule 2; outbox-4006-new-key.json: try 2 written by markPart).
+          if (highest > part.tryNo) {
+            repeated = true;
+            nextKey = keyOfTry(highest);
+            break;
+          }
+          if (!request.retry) {
+            repeated = true;
+            break;
+          }
         }
-        part.state = "failed";
+        // A failed mark changes a part only while its row is sending, sent, checked or delivered (db/repo default 1),
+        // refused before anything moves.
+        if (!PART_OUT_ROW_STATES.has(state.state)) return wrong("outbox_rows", row.id, state.state);
+        if (part.state !== "failed") {
+          part.state = "failed";
+          // The failure's message id, kept when the part holds none (db/repo default 17).
+          if (part.messageId === null && typeof request.providerMessageId === "string") {
+            part.messageId = request.providerMessageId;
+          }
+        }
         if (request.retry) {
-          const tryNo = part.tryNo + 1;
-          nextKey = `${row.id}/${String(part.partNo)}/${String(tryNo)}`;
+          // Default 8: the next try under a new key, the part's highest try + 1, pending, attempts 1.
+          nextKey = keyOfTry(highest + 1);
           state.parts.push({
             partNo: part.partNo,
-            tryNo,
+            tryNo: highest + 1,
             key: nextKey,
             attempts: 1,
             state: "pending",
             messageId: null,
           });
+          // The provider's Retry-After, held in the row's claim with the next try (db/repo default 18).
+          const notBefore = request.nextTryNotBefore ?? null;
+          if (notBefore !== null) {
+            if (state.claim === null) {
+              throw new Error(
+                "markPart: the row has no claim to hold its next try's Retry-After (default 18)",
+              );
+            }
+            state.claim = { ...state.claim, nextTryNotBefore: notBefore };
+          }
         }
         break;
       }
@@ -3619,6 +3671,119 @@ export function fakeDispatchData(
   return double;
 }
 
+// ---- K-11 sendPart through @rosie/adapters' Linq double, and the retry queue: the dispatcher's sends (T-563) -------------
+
+/** The answer of a send Linq took but whose answer never came back: no answer, K-11 transient with no status. */
+const LOST_ANSWER: LinqFailed = {
+  result: "failed",
+  kind: "transient",
+  httpStatus: null,
+  code: null,
+  reason: "A server or network error.",
+  retryAfterSeconds: null,
+  providerMessageId: null,
+};
+
+/**
+ * The Linq line the root's real Linq send port is fed in a test (RootOptions.linqSendCall: `call`): @rosie/adapters' Linq
+ * double (T-411; C-211) behind it, which checks each request against K-11, records each part once per idempotency key
+ * (`double.sentRequests()`), answers a repeated key with its first answer, as Linq does (K-11 'Repeating it'), and takes
+ * the failures a test scripts on it (`double.failNextSend`: 4001, 4006, a 2024, a rate limit, a refusal, a transient
+ * error). The line answers a moment after the send starts, never at the same instant, as over the network, so a row's
+ * dispatch span starts before its providerAccepted span (DL-349); and it can lose the double's answer on its way back
+ * (`loseNextAnswers`): Linq took the part, and the dispatcher hears no answer (K-11 transient with no status), as when a
+ * send outlives the root's time limit. It keeps every request the port handed it, repeats included, in order.
+ */
+export class FakeLinqLine {
+  /** The Linq double behind the line, on the test clock. */
+  readonly double: LinqDouble;
+  /** Every request the root's Linq send port handed the line, in order, repeats included. */
+  readonly requests: LinqSendRequest[] = [];
+  /** The first acceptance each key got from the double (one message per key, however many sends named it). */
+  readonly accepted = new Map<string, LinqAccepted>();
+  #lost = 0;
+
+  constructor(now: () => string) {
+    this.double = createLinqDouble({ now });
+  }
+
+  /** The next `count` sends reach the double, and their answers are lost on the way back (no answer). */
+  loseNextAnswers(count = 1): void {
+    this.#lost += count;
+  }
+
+  /** K-11 sendPart as the root's real Linq send port calls it (RootOptions.linqSendCall). */
+  readonly call: LinqSendCall = async (request) => {
+    this.requests.push(structuredClone(request));
+    // Linq answers a moment after the send starts, never at the same instant (DL-349).
+    await flush(1);
+    const answer = this.double.sendPart(request);
+    if (answer.result === "accepted" && !this.accepted.has(request.idempotencyKey)) {
+      this.accepted.set(request.idempotencyKey, structuredClone(answer));
+    }
+    if (this.#lost > 0) {
+      this.#lost -= 1;
+      return { ...LOST_ANSWER };
+    }
+    return answer;
+  };
+
+  /** The keys in the order the first request named them. */
+  get keysInOrder(): string[] {
+    return [...new Set(this.requests.map((request) => request.idempotencyKey))];
+  }
+}
+
+/** One message the retry queue double took: the message as the binding carries it (as JSON), its delay and when it is due. */
+export interface QueuedRetry {
+  readonly message: RetryMessage;
+  readonly options: RetrySendOptions;
+  /** When it was sent (epoch milliseconds, the test clock's). */
+  readonly sentAt: number;
+  /** When the queue would deliver it: sent plus its delay. */
+  readonly dueAt: number;
+}
+
+/** The RETRY_QUEUE producer binding as a double (RootOptions.retryQueue), on the test clock. */
+export interface FakeRetryQueue extends RetryQueue {
+  /** Every message it took, in order. */
+  readonly sent: QueuedRetry[];
+  /** Takes the messages due by `at` (epoch milliseconds) off the queue, in the order sent, as the queue delivers them. */
+  due(at: number): QueuedRetry[];
+}
+
+/**
+ * The retry queue's producer binding as a double: it keeps each message with its delay and when it was sent, and `due`
+ * gives the ones the queue would deliver by a given time, as Cloudflare Queues hold a message for its delaySeconds. A test
+ * hands them to the queue's consumer (runtime/src/queues consumeRetries), which runs each through the root's door.
+ */
+export function fakeRetryQueue(now: () => number): FakeRetryQueue {
+  const sent: QueuedRetry[] = [];
+  let waiting: QueuedRetry[] = [];
+  return {
+    sent,
+    send(message, options) {
+      // As the binding does: the message goes as JSON, so what is delivered is a copy.
+      const copy = JSON.parse(JSON.stringify(message)) as RetryMessage;
+      const at = now();
+      const entry: QueuedRetry = {
+        message: copy,
+        options: { ...options },
+        sentAt: at,
+        dueAt: at + options.delaySeconds * 1000,
+      };
+      sent.push(entry);
+      waiting.push(entry);
+      return Promise.resolve(undefined);
+    },
+    due(at) {
+      const ready = waiting.filter((entry) => entry.dueAt <= at);
+      waiting = waiting.filter((entry) => entry.dueAt > at);
+      return ready;
+    },
+  };
+}
+
 // ---- the walking skeleton's turn -----------------------------------------------------------------------------------
 
 /** The row commit-s1-02.json writes (S1-04's question to Sam): the one the turn composes and the dispatcher sends. */
@@ -3659,13 +3824,14 @@ type JoinedPort =
   | "composer"
   | "finalize"
   | "outbox"
-  | "sendState";
+  | "sendState"
+  | "linqSend";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
    * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input, the
-   * composer, finalize, the outbox and the send state, which the root builds (./real.ts).
+   * composer, finalize, the outbox, the send state and the Linq send, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -3747,14 +3913,21 @@ export interface SkeletonFakes {
   readonly dispatch: FakeDispatchData;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
-  /** The direct send through Linq the safety read uses only while the core is down. */
+  /** The direct send through Linq the safety read uses only while the core is down (the linqDirect port). */
   readonly direct: FakeDirect;
   readonly face: FakeTurnFace;
   /**
-   * The Linq port the dispatcher sends each part through (K-11 sendPart, joined by T-563). It accepts a part a moment
-   * after the send starts, as over the network, so a row's dispatch span starts before its providerAccepted span (DL-349).
+   * The Linq line the root's real Linq send port sends each part through (K-11 sendPart, joined by T-563;
+   * RootOptions.linqSendCall: `linq.call`): @rosie/adapters' Linq double behind it (`linq.double`), which records each part
+   * once per key. It answers a part a moment after the send starts, as over the network, so a row's dispatch span starts
+   * before its providerAccepted span (DL-349).
    */
-  readonly linq: FakeLinq;
+  readonly linq: FakeLinqLine;
+  /**
+   * The retry queue the dispatcher puts a row's next try on (RootOptions.retryQueue: `retryQueue`; T-258, DL-315), on the
+   * test clock: a test hands its due messages to the queue's consumer, which runs them through the root's door.
+   */
+  readonly retryQueue: FakeRetryQueue;
   readonly arming: WiredArming;
   /**
    * Sets a text's safety result before it is sent: safety-no.json under its event id, what the turn's commit records
@@ -3820,9 +3993,9 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     () => clock.now(),
     (handleId) => handleKeys.handleOf(handleId),
   );
-  const linq = new FakeLinq(() => clock.utc());
-  // Linq accepts a part a moment after the send starts, never at the same instant (DL-349).
-  linq.beforeAnswer = () => flush(1);
+  // The Linq send is joined (T-563): the Linq double behind a line that answers a moment after the send starts (DL-349).
+  const linq = new FakeLinqLine(() => clock.utc());
+  const retryQueue = fakeRetryQueue(() => clock.now());
   const arming = wireArming();
   const secret = testWebhookSecret();
   const webhooks = createLinqWebhookDouble({ secret });
@@ -3857,7 +4030,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       safetyCore: core,
     },
     dataAccess: { rows: rowsOf(rows), clocks: arming.data.data },
-    linqSend: { parts: linq, direct },
+    linqDirect: direct,
   };
 
   return {
@@ -3887,6 +4060,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     direct,
     face,
     linq,
+    retryQueue,
     arming,
     known(eventId) {
       answers[eventId] = safetyNoFor(eventId);

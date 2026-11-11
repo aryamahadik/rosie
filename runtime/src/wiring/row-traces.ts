@@ -34,4 +34,9 @@ export class RowTraces {
     const outboxRowId = partKey.split("/")[0] ?? "";
     return this.traces.get(outboxRowId) ?? null;
   }
+
+  /** The trace a row was sent on, or null when this isolate sent no such row (a retry run's row: T-563). */
+  forRow(outboxRowId: string): TraceContext | null {
+    return this.traces.get(outboxRowId) ?? null;
+  }
 }

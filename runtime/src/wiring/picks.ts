@@ -47,7 +47,11 @@
 // database bound, the gateway's call at receipt that opens a number's chat before its actor is reached, fed in a test by
 // the K-05 double over test owner 1's seeded handle and the handles the key call made (writing the phone row the outbox
 // and send-state doubles read), and by no database on staging until T-567, so every text that opens a chat there is
-// answered 503, as every seal there already is. Every other port of the Worker's environments stays closed: each call
+// answered 503, as every seal there already is; and linqSend (T-563), K-11 sendPart for each part the dispatcher sends,
+// under its row-part-try key, fed in a test by @rosie/adapters' Linq double (T-411), which records each part once per
+// key, and by no Linq line on staging until one is handed in (staging's test-phone line, or J-08's real line), so every
+// send there fails closed and nothing leaves. The direct line (linqDirect), split from it by T-563, is no D-017 hop: on
+// its fake in a test and closed elsewhere. Every other port of the Worker's environments stays closed: each call
 // fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
@@ -93,7 +97,8 @@ export const PICKS: readonly PortPick[] = [
   { port: "outbox", test: "real", staging: "real", production: "closed" }, // T-562
   { port: "sendState", test: "real", staging: "real", production: "closed" }, // T-562
   { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-564
-  { port: "linqSend", test: "fake", staging: "closed", production: "closed" }, // T-563
+  { port: "linqSend", test: "real", staging: "real", production: "closed" }, // T-563
+  { port: "linqDirect", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
 ];
 
 /**
