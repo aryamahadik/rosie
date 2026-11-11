@@ -2,9 +2,97 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 417, [`601d9b5`](https://github.com/aryamahadik/rosie/commit/601d9b5), 2026-11-11 23:11:40 UTC.
+- **Through:** commit 420, [`2f113ee`](https://github.com/aryamahadik/rosie/commit/2f113ee), 2026-11-11 23:32:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 420. docs: COMMIT\_HISTORY.md through commit 417 (601d9b5, \#423) (\#427)
+
+- **Commit:** [`2f113ee`](https://github.com/aryamahadik/rosie/commit/2f113ee), by Arya Mahadik, 2026-11-11 23:32:08 UTC
+- **Pull request:** [#427](https://github.com/aryamahadik/rosie/pull/427) from `task/commit-history-30`, merged 2026-11-11 23:32:09 UTC. It squashed 1 branch commit:
+  - `3a344df` docs: COMMIT\_HISTORY.md through commit 417 (601d9b5, \#423)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 419. T-1240: K-05 v1.10 names three reads for the first staging turn: the question's facts, a handle's kind and address, a chat's handle (\#426)
+
+- **Commit:** [`df4c9a8`](https://github.com/aryamahadik/rosie/commit/df4c9a8), by Arya Mahadik, 2026-11-11 23:32:05 UTC
+- **Pull request:** [#426](https://github.com/aryamahadik/rosie/pull/426) from `task/T-1240`, merged 2026-11-11 23:32:05 UTC. It squashed 2 branch commits:
+  - `e1474a3` T-1240: K-05 v1.10, frozen: readQuestionFacts (the clock arming's que…
+  - `eb28895` T-1240: README v1.10 fixes: businesses is migration 0002, idsOf is Ha…
+- **Files changed:** 17 (+1684 −9), by folder:
+  - `contracts/data-access/` README.md +79 −8, data-access.v1.10.schema.json +1289 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +104 −0, read-chat-handle-alex.json +19 −0, read-chat-handle-sam.json +19 −0, read-chat-handle-unknown.json +16 −0, read-handle-alex-email.json +19 −0, read-handle-sam.json +19 −0, read-handle-unknown.json +16 −0, read-question-facts-a7-03.json +22 −0, read-question-facts-s1-02.json +19 −0, read-question-facts-unknown.json +17 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-chat-handle-email.json +7 −0, refuse-question-facts-caller-business.json +20 −0, refuse-question-facts-visit-address.json +11 −0, refuse-read-handle-phone-not-e164.json +7 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1240: K-05 v1.10, frozen: readQuestionFacts (the clock arming's question facts: Clock line, business zone, the booking's earliest held or booked start, the never-delivered row), readHandle (a handle's kind and address, for the gateway's actorNameOf) and readChatHandle (a Linq chat's phone handle for a receipt, or none), each as rosie_job on the runtime side, primary uncached, no column; 9 accepted and 4 refused fixtures; the party read left as open gap 55 with its two readings
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1240: README v1.10 fixes: businesses is migration 0002, idsOf is HandleDirectory's, DL-494's follow-up card 4 is owed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 418. T-520: sign-in by code for owners, staff and testers, with no password; the shell gains a POST Origin check and a 16 KiB body cap (\#414)
+
+- **Commit:** [`0c1a15f`](https://github.com/aryamahadik/rosie/commit/0c1a15f), by Arya Mahadik, 2026-11-11 23:32:01 UTC
+- **Pull request:** [#414](https://github.com/aryamahadik/rosie/pull/414) from `task/T-520`, merged 2026-11-11 23:32:01 UTC. It squashed 6 branch commits:
+  - `386a307` T-520: sign-in by code for owners, staff, Rosie's team and testers (s…
+  - `289333d` Merge branch 'main' into task/T-520
+  - `79d3c43` T-520 round 2 (work in progress, unchecked): the shell's staging-firs…
+  - `ca3ac1f` Merge branch 'main' into task/T-520
+  - `1b4d3b4` T-520: round 2: outside staging the shell's table holds no staging to…
+  - `349b1d2` T-520: round 2 under DL-499 (option 1, the rule wins): T-522's expect…
+- **Files changed:** 18 (+3138 −39), by folder:
+  - `web/src/auth/` consoles.ts +73 −0, cookies.ts +164 −0, no-password.test.ts +170 −0, pages.ts +308 −0, routes.ts +5 −4, sign-in.test.ts +929 −0, sign-in.ts +368 −0, test-support.ts +221 −0
+  - `web/src/shell/` error-pages.ts +15 −3, post-guard.test.ts +301 −0, post-guard.ts +85 −0, shell.test.ts +9 −2, shell.ts +37 −9, staging-first.test.ts +435 −0
+  - `web/src/staging/guard/` README.md +0 −1, guard.test.ts +10 −10, guard.ts +0 −5, refusal.test.ts +8 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-520: sign-in by code for owners, staff, Rosie's team and testers (signInStart, signInCheck, signOut pages with no script and no password, the 15-minute pause held per attempt, session and device cookies), and the shell's POST origin check and body cap
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-520 round 2 (work in progress, unchecked): the shell's staging-first order and T-522 test headers as the builder left them when the account's model limit stopped the run at about 19:46Z Nov 11; no check is known to have passed on it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-520: round 2: outside staging the shell's table holds no staging tool route (a folder marked staging only, or a route behind the staging-only guard whatever its folder's mark), so the address gets an unknown address's answer for every method and any Origin, header or body, before the POST guards; tests for the order in both layers; sign-in reads staging through isStagingConfig; T-522's staging posts carry a same-origin Origin
+
+T-522's guard.test.ts:149-151 still pins the 405 its guard alone gave (its 'One limit'), which this rule closes: 17 cases fail there until the lead rules (NEED).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-520: round 2 under DL-499 (option 1, the rule wins): T-522's expectNoTool holds every method on a guarded route outside staging to an unknown address's answer (its listed argument and 405 branch dropped), and guard.ts and the guard's README drop the One limit words the shell no longer has; web/src whole passes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 417. docs: COMMIT\_HISTORY.md through commit 414 (58acd53, \#422) (\#423)
 
