@@ -2,9 +2,69 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 389, [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), 2026-11-11 15:42:09 UTC.
+- **Through:** commit 392, [`5471539`](https://github.com/aryamahadik/rosie/commit/5471539), 2026-11-11 16:04:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 392. docs: COMMIT\_HISTORY.md through commit 389 (665b035, \#396) (\#399)
+
+- **Commit:** [`5471539`](https://github.com/aryamahadik/rosie/commit/5471539), by Arya Mahadik, 2026-11-11 16:04:46 UTC
+- **Pull request:** [#399](https://github.com/aryamahadik/rosie/pull/399) from `task/commit-history-19`, merged 2026-11-11 16:04:46 UTC. It squashed 1 branch commit:
+  - `5ed8b1c` docs: COMMIT\_HISTORY.md through commit 389 (665b035, \#396)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 391. T-574: staging-only listing call, server side: K-21 v1 testRoster over ports (the roster and the seeded rows), refused outside staging; test-roster.json's response from the contracts' seed rows (\#398)
+
+- **Commit:** [`bb1c85a`](https://github.com/aryamahadik/rosie/commit/bb1c85a), by Arya Mahadik, 2026-11-11 16:04:42 UTC
+- **Pull request:** [#398](https://github.com/aryamahadik/rosie/pull/398) from `task/T-574`, merged 2026-11-11 16:04:42 UTC. It squashed 1 branch commit:
+  - `a36a2b4` T-574: staging-only listing call, server side: K-21 v1 testRoster ove…
+- **Files changed:** 9 (+1850 −0), by folder:
+  - `actions/src/page-calls/staging/test-state/` errors.ts +32 −0, handlers.ts +259 −0, index.ts +36 −0, request.test.ts +89 −0, request.ts +77 −0, test-state.test.ts +695 −0, test-state.worker.test.ts +183 −0, test-support.ts +265 −0, types.ts +214 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 390. T-261: allowed formats, what this phone allows now for the composer (text alone when nothing tells the channel; never bold or read receipts) (\#397)
+
+- **Commit:** [`01667c6`](https://github.com/aryamahadik/rosie/commit/01667c6), by Arya Mahadik, 2026-11-11 16:04:38 UTC
+- **Pull request:** [#397](https://github.com/aryamahadik/rosie/pull/397) from `task/T-261`, merged 2026-11-11 16:04:38 UTC. It squashed 3 branch commits:
+  - `24b2311` T-261 (work in progress, unchecked): the allowed-formats module as it…
+  - `c6d32f2` Merge branch 'main' into task/T-261
+  - `9815a8a` T-261: allowed formats checked against the card and its Reads: every …
+- **Files changed:** 7 (+1632 −0), by folder:
+  - `runtime/src/formats/` capability.test.ts +287 −0, capability.ts +115 −0, formats.test.ts +723 −0, formats.ts +223 −0, index.ts +14 −0, test-support.ts +101 −0, types.ts +169 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-261 (work in progress, unchecked): the allowed-formats module as its builder left it when the lead stopped the loop at 14:47Z Nov 11; no check has run on it
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-261: allowed formats checked against the card and its Reads: every format but text needs a Linq chat that exists, a check still out keeps no old answer behind it, the hand-written shapes are held to K-03, K-06 and K-11 by the tests
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 389. docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394) (\#396)
 
