@@ -13,6 +13,11 @@
 // Linq's direct send (the safety read's double), the handle's key store and its directory answer whatever `down` says: the
 // actor reaches them without PostgreSQL. The clock is the safety read's fake clock, started at a given instant. Test values
 // only: the master's sample cast, the fixtures' ids and phones in the fictional 555-01xx range (rule 9).
+//
+// T-1208 adds one fault per replay step, so the core can fail a single STOP or START record on return while the one before
+// it is taken: recordStopOrStart failing for one text (`stopFails`: a throw, or K-09's `transient`), and the handle's key
+// store failing for the down path's next key reads (`keyReads`), as each record's replay reads the key before it opens
+// the record's box.
 
 import type { CommitContext, CommitTurnAnswer, CommitTurnRequest } from "../../actor";
 import { fakeToolApi, type FakeToolApi } from "../../actor/copies/test-support";
@@ -60,6 +65,16 @@ export interface DbFakes {
   down: boolean;
   /** How many of the next recordSafetyOutcome calls fail as PostgreSQL unreachable, for them alone (a blip). */
   failRecords: number;
+  /**
+   * How the next recordStopOrStart for each text named (by its event id) fails, once, for it alone (T-1208): `throw`, as
+   * PostgreSQL unreachable (no answer), or `transient`, K-09's error (nothing written). The fault is used up by that call.
+   */
+  readonly stopFails: Map<string, "throw" | "transient">;
+  /**
+   * The outcomes of the down path's next reads of the handle's key, in order (T-1208): false fails one as the key store
+   * not answering, true lets it answer. Once the list is used up, every read answers. The safety read's reads are apart.
+   */
+  readonly keyReads: boolean[];
   readonly safetyDeps: SafetyDeps;
   readonly outageDeps: DbOutageDeps;
   readonly bundleDeps: BundleDeps;
@@ -110,6 +125,8 @@ export function dbFakes(
     probes: [],
     log,
     failRecords: 0,
+    stopFails: new Map(),
+    keyReads: [],
     get down() {
       return core.down;
     },
@@ -147,12 +164,24 @@ export function dbFakes(
         fakes.probes.push(clock.now());
         return core.down ? unreachable() : Promise.resolve(true);
       },
-      keys,
+      keys: {
+        getOrCreateKey(handle) {
+          if (fakes.keyReads.shift() === false) {
+            return Promise.reject(new Error("the key store is not answering"));
+          }
+          return keys.getOrCreateKey(handle);
+        },
+      },
       direct,
       directory: { idsOf: () => Promise.resolve(options.ids) },
       core: {
         recordStopOrStart(request) {
           if (core.down) return unreachable();
+          const fault = fakes.stopFails.get(request.inboundEventId);
+          if (fault !== undefined) {
+            fakes.stopFails.delete(request.inboundEventId);
+            return fault === "throw" ? unreachable() : Promise.resolve({ error: "transient" });
+          }
           const known = firstAnswers.get(request.caller.requestId);
           if (known !== undefined) return Promise.resolve({ ...known, repeated: true });
           stops.push(structuredClone(request));

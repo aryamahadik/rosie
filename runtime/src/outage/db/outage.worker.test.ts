@@ -5,7 +5,7 @@
 // shared core, K-05's bundle reads and the turn's commit through the lease. The actor's clock, the safety read's and the
 // stored schedule's are one fake clock; the platform's alarm is run at each step. Test method: T-1128's. Test values only:
 // the master's sample cast (Sam), the frozen fixtures' ids, phones in the fictional 555-01xx range (rule 9).
-import { reset, runDurableObjectAlarm } from "cloudflare:test";
+import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -17,6 +17,7 @@ import {
   setCopyDeps,
   setLeaseHooks,
   setSafetyDeps,
+  turnIdOf,
   type CommitTurnRequest,
   type CopiesView,
   type HandleActor,
@@ -24,6 +25,7 @@ import {
   type ReplayReport,
   type TurnEntry,
 } from "../../actor";
+import type { ActorCopies } from "../../actor/copies/copies";
 import { SAM_TIMER } from "../../actor/copies/test-support";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
@@ -597,5 +599,206 @@ describe("on return: danger first, then stops, then the rest, each write once", 
     // The held turn ran again with the try it had.
     expect((await rig.actor.readTurns()).find((turn) => turn.eventIds.join() === R1)?.tries).toBe(1);
     expect(rig.f.direct.sent).toHaveLength(3);
+  });
+});
+
+describe("on return, only the answer for the STOP note's own text replaces it (T-1208, DL-431)", () => {
+  const FIRST_STOP = "evt-sam-0410";
+  const START_TEXT = "evt-sam-0411";
+  const LAST_STOP = "evt-sam-0412";
+  const WAITING = "evt-sam-0413";
+  const UNREAD = "evt-sam-0414";
+  const LATER_START = "evt-sam-0415";
+
+  const anyTime = expect.any(Number) as number;
+  /** The actor's own STOP note: stopped, with no version (its record waits in the write-on-return queue). */
+  const NOTE = { stopped: true, phoneVersion: null, turnId: null, setAt: anyTime };
+
+  /** The STOP and START records the core took, in order: kind and text. */
+  const recorded = (rig: Rig): [string, string][] =>
+    rig.f.stops.map((stop) => [stop.kind, stop.inboundEventId]);
+
+  /** A read of Sam's phone row sent now, as the actor's copies send one (T-1206's re-read), inside the actor. */
+  const readPhoneRow = (): Promise<string> =>
+    runInDurableObject(stub(), (instance) =>
+      (instance as unknown as { copies: ActorCopies }).copies.rereadStopped(SAM.party.handleId),
+    );
+
+  const notBackWays: { way: string; fail: (f: DbFakes) => void }[] = [
+    { way: "the core throws", fail: (f) => f.stopFails.set(LAST_STOP, "throw") },
+    { way: "the core answers transient", fail: (f) => f.stopFails.set(LAST_STOP, "transient") },
+    {
+      way: "the key store throws",
+      // The replay reads the handle's key for each record in turn: it answers for START's, and not for STOP's.
+      fail: (f) => f.keyReads.push(true, false),
+    },
+  ];
+
+  it.each(notBackWays)(
+    "START then STOP in one outage; on return START's record is written and STOP's answers notBack ($way): the flag stays stopped, no outage line goes (the down path's or the safety read's), and a read of the phone row sent then never replaces the note; STOP's record, written on the next ask, replaces it and the flag stays stopped by version; a read sent after that ends it",
+    async ({ fail }) => {
+      const rig = rigFor({
+        [PRIME]: safetyNoFor(PRIME),
+        [START_TEXT]: safetyNoFor(START_TEXT),
+        [LAST_STOP]: safetyNoFor(LAST_STOP),
+        [WAITING]: safetyNoFor(WAITING),
+      });
+      // The copies' read of the phone row (T-1206) reaches the Tool API double's row of Sam's phone.
+      restores.push(setCopyDeps({ timers: rig.f.api.source, phones: rig.f.api.phones }));
+      await prime(rig);
+      rig.f.down = true;
+      await rig.arrive(START_TEXT, "START");
+      await rig.arrive(LAST_STOP, "STOP");
+
+      // Both taken by the actor at once, in arrival order: replied to, their records queued in the stop rank, the STOP's
+      // note copied last.
+      expect(rig.f.direct.sent.map((send) => send.idempotencyKey)).toEqual([
+        `keyword:${START_TEXT}:startReply`,
+        `keyword:${LAST_STOP}:stopReply`,
+      ]);
+      let copies = await rig.actor.readCopies();
+      expect(copies.returns.map((entry) => [entry.rank, entry.key])).toEqual([
+        ["stop", `recordStopOrStart:${START_TEXT}`],
+        ["stop", `recordStopOrStart:${LAST_STOP}`],
+      ]);
+      expect(copies.stopped).toEqual(NOTE);
+
+      // PostgreSQL answers again. The replay writes START's record (v4), whose answer is for another text, and STOP's
+      // answers notBack: the replay stops there, and PostgreSQL is still known down while a stop write waits.
+      fail(rig.f);
+      rig.f.down = false;
+      await rig.tick(PROBE_MS);
+      expect(recorded(rig)).toEqual([["start", START_TEXT]]);
+      copies = await rig.actor.readCopies();
+      expect(copies.stopped).toEqual(NOTE);
+      expect(copies.returns).toEqual([
+        expect.objectContaining({ key: `recordStopOrStart:${LAST_STOP}`, tries: 1, refused: null }),
+      ]);
+      expect((await rig.actor.readOutage()).down).not.toBeNull();
+
+      // A read of the phone row sent now finds the START (v4): the note's own record is not written yet, so it stays.
+      rig.f.api.phone.stopped = false;
+      rig.f.api.phone.version = 4;
+      expect(await readPhoneRow()).toBe("older");
+      expect((await rig.actor.readCopies()).stopped).toEqual(NOTE);
+
+      // A text waits 20 s, and another gets no verdict in 4 s: no outage line goes to the number whose last word is STOP,
+      // neither the down path's nor the safety read's timeout rule's (through the core, which answers again).
+      await rig.arrive(WAITING, "Test words: wait, can I still come at 3?");
+      await rig.tick(3000);
+      await rig.arrive(UNREAD, "Test words: hello?", false);
+      await rig.tick(4000);
+      await rig.tick(OUTAGE_WAIT_MS - 7000);
+      expect(outageSends(rig)).toEqual([]);
+      expect(rig.f.core.fixed).toEqual([]);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: START_TEXT, kind: "start", keyword: "handled" }),
+        expect.objectContaining({ eventId: LAST_STOP, kind: "stop", keyword: "handled" }),
+        expect.objectContaining({ eventId: WAITING, kind: "other", line: "stopped" }),
+        expect.objectContaining({ eventId: UNREAD, kind: "other", line: null }),
+      ]);
+      expect((await rig.actor.readCopies()).stopped).toEqual(NOTE);
+
+      // The next ask, 30 s on: STOP's record is written now (v5), and its answer, for the note's own text, replaces the
+      // note. The flag stays stopped, by version.
+      await rig.tick(PROBE_MS - OUTAGE_WAIT_MS);
+      expect(recorded(rig)).toEqual([
+        ["start", START_TEXT],
+        ["stop", LAST_STOP],
+      ]);
+      copies = await rig.actor.readCopies();
+      expect(copies.returns).toEqual([]);
+      expect(copies.stopped).toEqual({ stopped: true, phoneVersion: 5, turnId: null, setAt: anyTime });
+      expect(outageSends(rig)).toEqual([]);
+      expect(rig.f.core.fixed).toEqual([]);
+
+      // A read sent after it finds Sam's START (v6, written since): taken by its version, it ends the stop.
+      rig.f.api.phone.version = 6;
+      expect(await readPhoneRow()).toBe("copied");
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: false,
+        phoneVersion: 6,
+        turnId: null,
+        setAt: anyTime,
+      });
+    },
+  );
+
+  it("the queue [STOP, START, STOP]: on return the first STOP's answer and START's answer never replace the note, so the flag reads stopped while the last STOP's record waits; the last STOP's own answer does, stopped by version; a later turn's START ends it", async () => {
+    const rig = rigFor({
+      [PRIME]: safetyNoFor(PRIME),
+      [FIRST_STOP]: safetyNoFor(FIRST_STOP),
+      [START_TEXT]: safetyNoFor(START_TEXT),
+      [LAST_STOP]: safetyNoFor(LAST_STOP),
+      [WAITING]: safetyNoFor(WAITING),
+      [LATER_START]: safetyNoFor(LATER_START),
+    });
+    await prime(rig);
+    rig.f.down = true;
+    await rig.arrive(FIRST_STOP, "STOP");
+    await rig.arrive(START_TEXT, "START");
+    await rig.arrive(LAST_STOP, "STOP");
+    expect(rig.f.direct.sent.map((send) => send.idempotencyKey)).toEqual([
+      `keyword:${FIRST_STOP}:stopReply`,
+      `keyword:${START_TEXT}:startReply`,
+      `keyword:${LAST_STOP}:stopReply`,
+    ]);
+    let copies = await rig.actor.readCopies();
+    expect(copies.returns.map((entry) => [entry.rank, entry.key])).toEqual([
+      ["stop", `recordStopOrStart:${FIRST_STOP}`],
+      ["stop", `recordStopOrStart:${START_TEXT}`],
+      ["stop", `recordStopOrStart:${LAST_STOP}`],
+    ]);
+    expect(copies.stopped).toEqual(NOTE);
+
+    // Back: the replay writes the first STOP's record (v4) and START's (v5); the core answers transient for the last
+    // STOP's. Neither answer is for the note's own text, whatever its kind or version: the flag still reads stopped.
+    rig.f.stopFails.set(LAST_STOP, "transient");
+    rig.f.down = false;
+    await rig.tick(PROBE_MS);
+    expect(recorded(rig)).toEqual([
+      ["stop", FIRST_STOP],
+      ["start", START_TEXT],
+    ]);
+    expect((await rig.actor.readCopies()).stopped).toEqual(NOTE);
+
+    // A text waits 20 s meanwhile: no outage line to the number whose last word is STOP.
+    await rig.arrive(WAITING, "Test words: is my 3pm still on?");
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(outageSends(rig)).toEqual([]);
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: WAITING, kind: "other", line: "stopped" }),
+    );
+    expect((await rig.actor.readCopies()).stopped).toEqual(NOTE);
+
+    // The next ask: the last STOP's record is written (v6), and its answer, for the note's own text, replaces the note.
+    // The queued text's turn then commits.
+    await rig.tick(PROBE_MS - OUTAGE_WAIT_MS);
+    await until(() => rig.f.log.includes(`commit:${WAITING}`), "the queued text's commit", 10_000);
+    await rig.settle();
+    expect(recorded(rig)).toEqual([
+      ["stop", FIRST_STOP],
+      ["start", START_TEXT],
+      ["stop", LAST_STOP],
+    ]);
+    copies = await rig.actor.readCopies();
+    expect(copies.returns).toEqual([]);
+    expect(copies.stopped).toEqual({ stopped: true, phoneVersion: 6, turnId: null, setAt: anyTime });
+
+    // A later turn's START (the one phone row: the replay's last STOP wrote v6, so the START writes v7) ends it.
+    rig.f.api.phone.stopped = true;
+    rig.f.api.phone.version = 6;
+    rig.f.api.stopWrites.push(false);
+    const later = await turnIdOf([LATER_START]);
+    await rig.arrive(LATER_START, "START");
+    await rig.tick(3000);
+    await until(() => rig.f.log.includes(`commit:${LATER_START}`), "the later turn's commit", 10_000);
+    await rig.settle();
+    expect((await rig.actor.readCopies()).stopped).toEqual({
+      stopped: false,
+      phoneVersion: 7,
+      turnId: later,
+      setAt: anyTime,
+    });
   });
 });
