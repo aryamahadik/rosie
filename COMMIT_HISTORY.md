@@ -2,9 +2,83 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 407, [`c4c76b7`](https://github.com/aryamahadik/rosie/commit/c4c76b7), 2026-11-11 19:03:34 UTC.
+- **Through:** commit 410, [`53198c6`](https://github.com/aryamahadik/rosie/commit/53198c6), 2026-11-11 19:41:22 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 410. docs: COMMIT\_HISTORY.md through commit 407 (c4c76b7, \#415) (\#417)
+
+- **Commit:** [`53198c6`](https://github.com/aryamahadik/rosie/commit/53198c6), by Arya Mahadik, 2026-11-11 19:41:22 UTC
+- **Pull request:** [#417](https://github.com/aryamahadik/rosie/pull/417) from `task/commit-history-27`, merged 2026-11-11 19:41:22 UTC. It squashed 1 branch commit:
+  - `6fb1b0e` docs: COMMIT\_HISTORY.md through commit 407 (c4c76b7, \#415)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 409. T-1228: the dispatcher hands a repeated receipt of the row's first delivery to the clock arming (K-05 v1.9 repeatedDelivery.firstOfRow, at the stored deliveredAt), so a crash between markPart's commit and armClock no longer loses the arming; realOutbox.markPart carries repeatedDelivery across and lets a thrown markPartV12 surface; doc lines for K-05 v1.8's consent row (\#418)
+
+- **Commit:** [`e85915b`](https://github.com/aryamahadik/rosie/commit/e85915b), by Arya Mahadik, 2026-11-11 19:41:18 UTC
+- **Pull request:** [#418](https://github.com/aryamahadik/rosie/pull/418) from `task/T-1228`, merged 2026-11-11 19:41:18 UTC. It squashed 1 branch commit:
+  - `03cb6a9` T-1228: the dispatcher hands a repeated receipt of the row's first de…
+- **Files changed:** 7 (+716 −32), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +51 −5, dispatcher.worker.test.ts +15 −9, receipt-repeat.worker.test.ts +559 −0, test-support.ts +36 −3, types.ts +44 −10
+  - `runtime/src/dispatch/limit8/` limit8.ts +6 −5
+  - `runtime/src/wiring/` real.ts +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 408. T-1108: the runtime's trace writers write the batch and joined-turn spans, one receive span per event, and seq across a trace's writers, as K-08 draws them (\#416)
+
+- **Commit:** [`5af066c`](https://github.com/aryamahadik/rosie/commit/5af066c), by Arya Mahadik, 2026-11-11 19:41:14 UTC
+- **Pull request:** [#416](https://github.com/aryamahadik/rosie/pull/416) from `task/T-1108`, merged 2026-11-11 19:41:14 UTC. It squashed 3 branch commits:
+  - `620f4a3` T-1108 (work in progress, unchecked): the trace writers' changes as t…
+  - `26f7ab0` Merge branch 'main' into task/T-1108
+  - `af27af2` T-1108: the batch and joined-turn spans, one receive span per event w…
+- **Files changed:** 21 (+1986 −425), by folder:
+  - `runtime/src/actor/` batch.ts +193 −3, handle-actor.ts +168 −46, handle-actor.worker.test.ts +343 −39
+  - `runtime/src/bundle/` pin.worker.test.ts +12 −9
+  - `runtime/src/gateway/` actor-door.ts +13 −3, linq-webhook.ts +77 −19, linq-webhook.worker.test.ts +140 −0, types.ts +13 −0
+  - `runtime/src/gateway/email/` resend-webhook.ts +48 −11, resend-webhook.worker.test.ts +57 −0
+  - `runtime/src/trace/` context.test.ts +308 −0, context.ts +166 −17, hop-check.ts +2 −1, index.ts +5 −0
+  - `runtime/src/turn/` lease-turn.worker.test.ts +6 −1
+  - `runtime/src/wiring/` hop2.worker.test.ts +15 −10
+  - `runtime/test/` trace-e2e.worker.test.ts +141 −87
+  - `tests/e2e/skeleton/` README.md +5 −5, gaps.test.ts +160 −98, gaps.ts +22 −38, skeleton.worker.test.ts +92 −38
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1108 (work in progress, unchecked): the trace writers' changes as their builder left them when the lead stopped the run at 17:38Z Nov 11 to clear the Mac for the Hyperdrive spike's create step; no check is known to have passed on it
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1108: the batch and joined-turn spans, one receive span per event with sealedToActor and firstTrace, and one count of places (seq) across a trace's writers; the draft checked against the card and K-08 and reworked
+
+trace: a trace id's writers in one isolate share one count (beginSeq, resumeSeq, takeSeq, TraceContext.shareSeq and reserve); a hop takes its place as it starts; toTrace reads by seq; closeBatch takes a place per text and leaves an id that is no label out of the span. gateway (Linq and email doors): the one receive span says sealedToActor, a repeat's names firstTrace as the actor's door answers it; the door's places are taken before the hand-off and told to the actor (seqBefore); a shared count opens only once the signature has passed. actor: no receive span of its own; the count is kept in storage as its sinks write, never lowered, and brought back only for traces still in flight; the batch window takes the batch spans' places before the pin and writes them after it (the turn's under the pinned bundle id, a joined text's under its own), once per turn id, a restart's from the close that restarted it.
+
+tests: K-08's shape in runtime/test/trace-e2e (GAPS keeps clockHops, clockTurnId, clockJobId, receiptTrace), new unit and worker tests beside the code, the actor, hop2, pin and lease-turn tests moved from the closed gaps' old shape to K-08's, and tests/e2e/skeleton's three closed gaps taken off (one narrower gap, modelCallOrder, stays named).
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 407. docs: COMMIT\_HISTORY.md through commit 405 (f317e1c, \#412) (\#415)
 
