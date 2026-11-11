@@ -10,6 +10,9 @@
 #                    empty secret
 # The names are the ones staging's Worker reads, each beside the code that reads it. The model key is the one scoped to
 # Rosie's workspace (DL-027), so no workspace id is a secret: no code reads one.
+# SEALING_WRAP_KEY and LINQ_WEBHOOK_SECRET are staging's own: nobody is given them, so they need no line in .dev.vars.
+# make-staging-secrets.sh (npm run secrets:staging:make, T-1236) makes them in place and keeps them nowhere else; they
+# still print as missing here, since this script reads .dev.vars alone.
 #
 # A value:
 #   - comes from .dev.vars alone. A variable of the same name in the caller's shell is dropped before the file is read,
