@@ -1631,6 +1631,94 @@
       "expect": "refuse",
       "shows": "A call carrying the number beside the handle id: the request names the handle by its K-04 id and the call reads the number from K-04 handles, so no number travels in an exchange (put right, it is open-chat-first-text-sam's request)",
       "source": "rule 7; arch 10 line 516; K-08 v1 default 3 (a phone row is named by its handle id, never its number); K-05 v1.2 item 28 (sendState reads everything else from the row); K-05 v1.7 item 46"
+    },
+    {
+      "file": "send-state-stop-row.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "send-state-stopped in its v1.8 form: after Alex's STOP the newest texts row covering him is the STOP for every business, which withdraws, so it is no yes (fromContact false) and names no booking; the stopped flag is the phone's, as stored",
+      "source": "T-1099's handoff; RULES 7.2; K-29 v1 consents (revoked, booking_id), seed-consent-stop-row.json; K-05 v1.2 send-state-stopped.json, item 28, default 35; STATE note 10; K-05 v1.8 item 47, defaults 82 and 84"
+    },
+    {
+      "file": "commit-sam-enters-alex-yes.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A booking the business adds: Sam's '1 Yes, send the link' to A3-30's read-back writes Alex's Nov 28 haircut and Alex's texts yes for his mobile on it, given by text in Sam's turn on Sam's handle, the business's word for a mobile that is not stopped",
+      "source": "S13-32 line 7215 ('The business's word counts only for someone who gave the business their number for this booking'); K-09 v1.1 confirmBusinessBooking, j3-confirm-business-booking-yes.json, default 50; K-29 v1 consents (channel, turn_id, booking_id); K-08 v1 booking.created, consent.given, approvalOwnerYes; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-business-yes.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Sam's '1 Yes': the newest texts row covering Alex is the business-entered yes for the Nov 28 booking, by text but from Sam's turn on Sam's handle, so fromContact is false and bookingId names Nov 28; Alex is not stopped, and were he, this yes would never turn his texts back on",
+      "source": "T-1099's handoff (notFromContact); RULES 7.1 ('Never on someone else's word'); S13-32 lines 7214, 7215; K-29 v1 consents.channel, turn_id, handle_id, booking_id; K-04 v1 turns.handle_id; K-05 v1.8 item 47, defaults 78 and 81"
+    },
+    {
+      "file": "commit-alex-start.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex's own START from his number, committed in his turn after his STOP: the phone's flag cleared with its chat open again and its START time, the START row for every business with his own words, and the start reply, in one commit",
+      "source": "RULES 7.5, 4.1b ('turning texts back on sets it again'); MC C1; K-09 v1 recordStopOrStart (START only from the phone's own START text), README default 29; K-04 v1 phones.start_at; DL-193; K-29 v1 README ('START ... is a new row with revoked false'); K-08 v1 phone.started, consent.given; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-own-start.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Alex's own START: not stopped, the chat open again, and the newest texts row covering him is the START, his own word from that number by text in his own turn (fromContact true), for every business, so it names no booking (bookingId null)",
+      "source": "RULES 7.5; S13-32 line 7242 ('Only START, or a fresh yes on a new booking sent from that number'); K-09 v1 start-recorded.json; K-29 v1 consents (business_id null only for a STOP or a START); K-04 v1 turns.handle_id; K-05 v1.8 item 47, defaults 78 and 81"
+    },
+    {
+      "file": "commit-sam-books-alex-nov21.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A new booking after Alex's STOP: Sam's '1 Accept' to Alex's request walks to writeBooking, which writes the Nov 21 booking, its confirmation by email (his chat is closed by the STOP) and its chat link with the ready text and short code, and no texts consent, since nothing from Alex's own number has said yes",
+      "source": "K-09 v1.4 writeBooking, j6-write-booking-after-ok-turn.json, defaults 92 and 119; MC C9; RULES 4.1b, 7.5; K-29 v1 chat_links; K-08 v1 booking.created, K-08 v1.1 chat_link.issued; K-05 v1 item 1"
+    },
+    {
+      "file": "commit-alex-ready-text.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex sends the Nov 21 link's ready text from his own number after his STOP: his turn records his fresh yes on that new booking as a texts row naming the booking and the link, with the ready text as the words shown, and the link's use; the phone is not written, so the STOP stands",
+      "source": "RULES 7.5, 7.1 ('a yes on a forwarded link'), 4.1b; S13-32 line 7242; MC C9; K-29 v1 README ('A ready text that gives a yes adds a consent row of kind texts naming the link'), chat_links.used_at; QUESTIONS.md CQ-74 (only START clears the flag); K-05 v1.7 item 46; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-own-yes-one-booking.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Alex's own fresh yes for the new Nov 21 booking: still stopped, and the newest texts row covering him is that yes, his own word from that number (fromContact true) naming the one booking it covers (bookingId Nov 21), so the Nov 14 row stays dropped and only Nov 21's rows pass the stop check, to wait for the chat",
+      "source": "T-1099's handoff (otherBooking); RULES 7.5; S13-32 line 7242 ('turns that booking's texts back on'); K-04 v1 phones.stopped, phones_stop_closes_chat; QUESTIONS.md CQ-74; K-29 v1 consents.booking_id; K-05 v1.8 item 47, defaults 78, 81 and 83"
+    },
+    {
+      "file": "invalid/refuse-send-state-yes-source-left-out.json",
+      "version": "v1.8",
+      "def": "sendState.v1dot8Response",
+      "expect": "refuse",
+      "shows": "Sam's business-entered yes answered with who gave it left out: a v1.8 read always states fromContact, so no consumer meets a yes it cannot place (put right, it is send-state-business-yes's outcome)",
+      "source": "T-1099's handoff (a missing fromContact reads as notKnown); RULES 7.1; S13-32 line 7215; K-05 v1.8 item 47, default 78"
+    },
+    {
+      "file": "invalid/refuse-send-state-booking-left-out.json",
+      "version": "v1.8",
+      "def": "sendState.v1dot8Response",
+      "expect": "refuse",
+      "shows": "Alex's own fresh yes answered with its booking left out: a v1.8 read always states bookingId, null for a yes that names none, so no consumer meets a yes whose booking it cannot tell (put right, it is send-state-own-yes-one-booking's outcome)",
+      "source": "T-1099's handoff (a missing bookingId reads as notKnown); RULES 7.5; S13-32 line 7242; K-29 v1 consents.booking_id; K-05 v1.8 item 47, default 81"
+    },
+    {
+      "file": "invalid/refuse-send-state-stop-read-as-own-yes.json",
+      "version": "v1.8",
+      "def": "sendState.response",
+      "expect": "refuse",
+      "shows": "Alex's STOP row answered as his own yes (fromContact true): a row that withdraws is no yes, so it is never the person's own yes, and no reader that skips revoked could take a STOP for a yes that lifts it (put right, it is send-state-stop-row's outcome)",
+      "source": "RULES 7.2, 7.5; MC C1; K-29 v1 consents.revoked; T-1099 (limit 8 reads revoked first); K-05 v1.8 item 47, default 82"
     }
   ]
 }

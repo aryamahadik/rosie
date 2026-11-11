@@ -1,0 +1,132 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:10:00Z",
+    "note": "A new booking after Alex's STOP: Alex asked through his own AI for Saturday Nov 21 at 2pm with Riley, and Sam's '1 Accept' by text walks to writeBooking in Sam's same turn (K-09 v1.4 A6-02 and A6-10, as j6-write-booking-after-ok-turn.json writes them). The commit writes the booking and A6-14's confirmation, which goes by email, since Alex's chat is closed by his STOP ('into their open chat, else by email'), and the booking's chat link, issued because his mobile is a Linq contact whose chat is not open, given in the confirmation email and to his AI (K-09 v1.4 default 119; MC C9; RULES 4.1b: 'Hey, send me further updates about my booking' and a short booking ref). No texts consent is written: his AI's request records none (K-09 README default 92), and a stopped mobile gets none without START or a fresh yes sent from that number (RULES 7.5). The request, its held time and the K-30 rows writeBooking also writes are left out: no read here reads them. The ownerYes names A6-02's question by an example id."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-sam-accept-alex-nov21",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0036"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0036",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+    "writes": {
+      "state": [
+        {
+          "op": "insert",
+          "table": "bookings",
+          "values": {
+            "id": "booking-alex-riley-nov21",
+            "business_id": "biz-lees-barbershop",
+            "flow": "A",
+            "stage": "booked",
+            "booker_person_id": "person-alex",
+            "served_person_id": "person-alex",
+            "payer_person_id": "person-alex"
+          }
+        },
+        {
+          "op": "insert",
+          "table": "chat_links",
+          "values": {
+            "id": "chatlink-alex-nov21",
+            "short_code": "9T3M",
+            "purpose": "booking",
+            "business_id": "biz-lees-barbershop",
+            "booking_id": "booking-alex-riley-nov21",
+            "person_id": "person-alex",
+            "phone_number": "+15555550101",
+            "ready_text": "Hey, send me further updates about my booking. Ref 9T3M",
+            "given_via": ["confirmation_email", "customer_ai"],
+            "issued_at": "2026-11-07T15:10:00Z"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-nov21-confirmation",
+          "recipientHandleId": "handle-alex-email",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov21",
+          "channel": "email",
+          "sendClass": "routine",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov21", "version": 1 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-booking-alex-riley-nov21",
+          "kind": "booking.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-sam",
+          "actorRole": "owner",
+          "tableName": "bookings",
+          "rowId": "booking-alex-riley-nov21",
+          "oldValues": null,
+          "newValues": { "stage": "booked" },
+          "sealed": null,
+          "why": { "step": "A6-10" },
+          "approvedBy": {
+            "kind": "ownerYes",
+            "person_id": "person-sam",
+            "role": "owner",
+            "open_question_id": "oq-a6-02-alex-nov21",
+            "option_id": "A6-02/1",
+            "event_id": "evt-sam-0036"
+          },
+          "proofs": null
+        },
+        {
+          "id": "log-chatlink-alex-nov21-issued",
+          "kind": "chat_link.issued",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "chat_links",
+          "rowId": "chatlink-alex-nov21",
+          "oldValues": null,
+          "newValues": {
+            "purpose": "booking",
+            "booking_id": "booking-alex-riley-nov21",
+            "given_via": ["confirmation_email", "customer_ai"]
+          },
+          "sealed": null,
+          "why": { "step": "A6-14" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-sam-accept-alex-nov21",
+    "committedAt": "2026-11-07T15:10:00Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "bookings", "rowId": "booking-alex-riley-nov21", "version": 1 },
+        { "table": "chat_links", "rowId": "chatlink-alex-nov21", "version": 1 }
+      ],
+      "outboxRows": [{ "id": "out-alex-nov21-confirmation", "commitSeq": 4 }],
+      "promoted": []
+    }
+  }
+}
