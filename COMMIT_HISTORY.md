@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 385, [`ec654b7`](https://github.com/aryamahadik/rosie/commit/ec654b7), 2026-11-11 15:01:00 UTC.
+- **Through:** commit 387, [`d5d1fce`](https://github.com/aryamahadik/rosie/commit/d5d1fce), 2026-11-11 15:24:32 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 387. docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392) (\#394)
+
+- **Commit:** [`d5d1fce`](https://github.com/aryamahadik/rosie/commit/d5d1fce), by Arya Mahadik, 2026-11-11 15:24:32 UTC
+- **Pull request:** [#394](https://github.com/aryamahadik/rosie/pull/394) from `task/commit-history-17`, merged 2026-11-11 15:24:32 UTC. It squashed 1 branch commit:
+  - `66ba9fd` docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 386. T-1217: the send-state port maps K-05 v1.8's fromContact and bookingId across unchanged, left out when the answer has none; the v1.8 fixtures run through the port and limit 8 (\#393)
+
+- **Commit:** [`34af696`](https://github.com/aryamahadik/rosie/commit/34af696), by Arya Mahadik, 2026-11-11 15:24:26 UTC
+- **Pull request:** [#393](https://github.com/aryamahadik/rosie/pull/393) from `task/T-1217`, merged 2026-11-11 15:24:27 UTC. It squashed 1 branch commit:
+  - `16865c5` T-1217: the send-state port maps K-05 v1.8's fromContact and bookingI…
+- **Files changed:** 2 (+414 −23), by folder:
+  - `runtime/src/wiring/` real.ts +44 −23, send-state-yes.worker.test.ts +370 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 385. docs: COMMIT\_HISTORY.md through commit 383 (ea324b2, \#390) (\#392)
 
