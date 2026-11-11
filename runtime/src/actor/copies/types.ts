@@ -76,6 +76,12 @@ export interface StoppedWrite {
    * commits' marks it may end (T-1206, DL-427). Left out for any other write.
    */
   readonly opened?: number | null;
+  /**
+   * The text it is for, by its event id (T-1208, DL-431): for the actor's own note, the text whose STOP or START it took;
+   * for the write-on-return replay's answer, the text whose queued record it wrote. Over the actor's own STOP note, a
+   * replay's answer is taken only when it is for the note's own text. Left out for any other write.
+   */
+  readonly eventId?: string | null;
 }
 
 /** One line as the safety read's bundle gives it now (K-01 v1 `fixedLine`, or an outcome step's checked `say`). */

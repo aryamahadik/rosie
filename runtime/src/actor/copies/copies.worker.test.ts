@@ -2010,6 +2010,108 @@ describe("an earlier turn's answer never replaces the actor's own STOP note (T-1
   });
 });
 
+// ---- only the replay's answer for the note's own text replaces the actor's own STOP note (T-1208 round 2, DL-431) -------
+
+/** Sam's texts the actor takes in one outage: a STOP, a START, and a last STOP, whose note the copy keeps. */
+const QUEUED_STOP = "evt-sam-0601";
+const QUEUED_START = "evt-sam-0602";
+const NOTED_STOP = "evt-sam-0603";
+
+/** A read of Sam's phone row through these copies, answering this flag and version (T-1206's re-read). */
+async function phoneReadOf(copies: ActorCopies, stopped: boolean, phoneVersion: number): Promise<unknown> {
+  const restore = setCopyDeps({
+    timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+    phones: { stoppedFlag: () => Promise.resolve({ result: "phone", stopped, phoneVersion }) },
+  });
+  try {
+    return await copies.rereadStopped("handle-sam");
+  } finally {
+    restore();
+  }
+}
+
+describe("only the replay's answer for the note's own text replaces the actor's own STOP note (T-1208 round 2, DL-431)", () => {
+  it("over the note of the last of Sam's STOP, START and STOP, kept through an eviction: the replay's answers for the first STOP and for the START never replace it, whatever their kind or version, nor do an answer naming no text, an earlier turn's answer or a read sent before the note's record is written; the last STOP's own answer does, and the flag stays stopped by version; a read sent after that ends it", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), async (_, state) => {
+      const host = { storage: state.storage, now: () => 1000, turnsOpened: () => 3 };
+      const copies = new ActorCopies(host);
+      const reads: Record<string, unknown> = {};
+      // Turn 3 copied a START (v3). In an outage the actor takes Sam's STOP, START and STOP, each noted with its text.
+      copies.noteStopped({ stopped: false, phoneVersion: 3, turnId: "turn-3", opened: 3 });
+      copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null, eventId: QUEUED_STOP });
+      copies.noteStopped({ stopped: false, phoneVersion: null, turnId: null, eventId: QUEUED_START });
+      reads.note = copies.noteStopped({
+        stopped: true,
+        phoneVersion: null,
+        turnId: null,
+        eventId: NOTED_STOP,
+      });
+      // The actor is evicted: a new instance reads the note, and the text it was taken for, from its storage.
+      const after = new ActorCopies(host);
+      reads.refused = [
+        // The replay writes the records in the order queued: the first STOP's answer (v4) and the START's (v5) are for
+        // other texts.
+        after.noteStopped({ stopped: true, phoneVersion: 4, turnId: null, eventId: QUEUED_STOP }),
+        after.noteStopped({ stopped: false, phoneVersion: 5, turnId: null, eventId: QUEUED_START }),
+        // An answer with no turn that names no text, and an earlier turn's late START, whatever their version.
+        after.noteStopped({ stopped: false, phoneVersion: 9, turnId: null }),
+        after.noteStopped({ stopped: false, phoneVersion: 10, turnId: "turn-3", opened: 3 }),
+      ];
+      // A read sent while the last STOP's record still waits finds the START (v5): the note's own record is not written.
+      reads.early = await phoneReadOf(after, false, 5);
+      reads.afterRefused = after.readStopped();
+      // The last STOP's own answer (v6) replaces the note: the flag stays stopped, now by version.
+      reads.own = after.noteStopped({ stopped: true, phoneVersion: 6, turnId: null, eventId: NOTED_STOP });
+      reads.afterOwn = after.readStopped();
+      // A read sent after it finds Sam's START (v7): taken by its version, it ends the stop.
+      reads.fresh = await phoneReadOf(after, false, 7);
+      reads.afterFresh = after.readStopped();
+      return reads;
+    });
+    expect(result.note).toBe(true);
+    expect(result.refused).toEqual([false, false, false, false]);
+    expect(result.early).toBe("older");
+    expect(result.afterRefused).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.own).toBe(true);
+    expect(result.afterOwn).toEqual({ stopped: true, phoneVersion: 6, turnId: null, setAt: 1000 });
+    expect(result.fresh).toBe("copied");
+    expect(result.afterFresh).toEqual({ stopped: false, phoneVersion: 7, turnId: null, setAt: 1000 });
+  });
+
+  it("a STOP note that names no text (taken before the note kept one) is replaced by no replay answer for a text, failing closed; a turn the lease opened after it still replaces it, and a START note still takes any versioned write", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), (_, state) => {
+      let opened = 4;
+      const copies = new ActorCopies({ storage: state.storage, now: () => 1000, turnsOpened: () => opened });
+      const reads: Record<string, unknown> = {};
+      copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null });
+      reads.replays = [
+        copies.noteStopped({ stopped: true, phoneVersion: 5, turnId: null, eventId: NOTED_STOP }),
+        copies.noteStopped({ stopped: false, phoneVersion: 6, turnId: null, eventId: QUEUED_START }),
+      ];
+      reads.afterReplays = copies.readStopped();
+      opened = 5;
+      reads.later = copies.noteStopped({ stopped: false, phoneVersion: 7, turnId: "turn-5", opened: 5 });
+      reads.afterLater = copies.readStopped();
+      // A START note, its text named: the replay's answer for another text (a STOP) is taken, the stricter reading.
+      copies.noteStopped({ stopped: false, phoneVersion: null, turnId: null, eventId: QUEUED_START });
+      reads.startNote = copies.noteStopped({
+        stopped: true,
+        phoneVersion: 8,
+        turnId: null,
+        eventId: QUEUED_STOP,
+      });
+      reads.afterStartNote = copies.readStopped();
+      return reads;
+    });
+    expect(result.replays).toEqual([false, false]);
+    expect(result.afterReplays).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.later).toBe(true);
+    expect(result.afterLater).toEqual({ stopped: false, phoneVersion: 7, turnId: "turn-5", setAt: 1000 });
+    expect(result.startNote).toBe(true);
+    expect(result.afterStartNote).toEqual({ stopped: true, phoneVersion: 8, turnId: null, setAt: 1000 });
+  });
+});
+
 // ---- the checked safety lines (K-01) ------------------------------------------------------------------------------------
 
 interface FixedLineFixture {

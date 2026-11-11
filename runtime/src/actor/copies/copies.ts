@@ -17,8 +17,10 @@
 //     or from a turn the lease opened after it (the lease's turn order, never versions alone: the copy never holds the
 //     lost commit's version). A late answer from an earlier turn ends none, whatever its version. The actor's own STOP
 //     note (taken while PostgreSQL was down, with no version: its record waits in the write-on-return queue) is replaced
-//     by a versioned write only from a turn the lease opened after the note, or from the replay that writes the queued
-//     records, never by an earlier turn's answer, whatever its version, nor by a row read (T-1208; DL-427's turn order);
+//     by a versioned write only from a turn the lease opened after the note, or from the replay's answer for the note's
+//     own text (the note keeps that text's event id), never by an earlier turn's answer, whatever its version, nor by the
+//     replay's answer for any other queued text, whatever its kind or version, nor by a row read (T-1208; DL-427's turn
+//     order; DL-431);
 //   - the checked safety lines (K-01 v1): every line the safety read can send (911, 988 and 911, the danger question, the
 //     outage line, and each outcome step's own line), copied from the safety read's bundle each time a text is written
 //     (`refreshLines`). A line the bundle gives no words for now keeps the words copied before: a bundle that cannot be
@@ -272,6 +274,14 @@ export function createCopyTables(sql: SqlStorage): void {
   );
   // Since when the timers' copy is behind a write it was told of (its reload failed): absent when it is not.
   sql.exec("CREATE TABLE IF NOT EXISTS copy_meta (k TEXT PRIMARY KEY, v INTEGER NOT NULL)");
+  // The text the actor's own note was taken for (T-1208, DL-431): one row at most, its event id; none while the copy holds
+  // a versioned write, or a note that named no text. A table of its own, so a copy made before it gains it as it starts.
+  sql.exec(
+    `CREATE TABLE IF NOT EXISTS copy_note (
+       one INTEGER PRIMARY KEY CHECK (one = 1),
+       event_id TEXT NOT NULL
+     )`,
+  );
   // The pinned bundle's keyword list and the stop and start replies (T-270): one row at most, the sources' words only.
   sql.exec(
     `CREATE TABLE IF NOT EXISTS copy_keywords (
@@ -375,6 +385,10 @@ const NOTE_TURNS = "noteTurnsOpened";
 /** A turn order as the lease keeps it: 0 (no turn opened yet) or more. */
 const isOrder = (value: unknown): value is number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0;
+
+/** The text a write names (`StoppedWrite.eventId`: an event id), or null when it names none. */
+const textOf = (write: StoppedWrite): string | null =>
+  typeof write.eventId === "string" && write.eventId !== "" ? write.eventId : null;
 
 /** The stopped flag of a re-read's answer (K-04 phones.stopped and version); null when the answer is not K-04's row. */
 function stoppedFlagOf(answer: unknown): { stopped: boolean; phoneVersion: number } | null {
@@ -519,12 +533,13 @@ export class ActorCopies {
 
   /**
    * Copies a stopped flag that was written; true when the copy took it. The actor's own note (no version) is always taken,
-   * with the order of the last turn the lease had opened then (`CopiesHost.turnsOpened`). A write with the phone row's
-   * version is taken unless the copy holds a later version, or holds the actor's own STOP note: that is replaced only by a
-   * commit's answer from a turn the lease opened after the note (by `opened`, never by versions alone: DL-427), or by the
-   * write-on-return replay's answer (a write with no turn: the queued records written in the order queued), never by an
-   * earlier turn's late answer, whatever its version, nor by a turn's answer the lease gave no order (T-1208). A write
-   * taken while the stop rank is held is kept, and read once the hold is let go. A write ends the lost commits' marks
+   * with the order of the last turn the lease had opened then (`CopiesHost.turnsOpened`) and the text it was taken for
+   * (`eventId`). A write with the phone row's version is taken unless the copy holds a later version, or holds the actor's
+   * own STOP note: that is replaced only by a commit's answer from a turn the lease opened after the note (by `opened`,
+   * never by versions alone: DL-427), or by the write-on-return replay's answer for the note's own text (a write with no
+   * turn, by `eventId`: DL-431), never by an earlier turn's late answer, whatever its version, nor by the replay's answer
+   * for any other queued text, whatever its kind or version, nor by a turn's answer the lease gave no order (T-1208). A
+   * write taken while the stop rank is held is kept, and read once the hold is let go. A write ends the lost commits' marks
    * (T-1206) that DL-427's rule 1 lets it end, and no other: the actor's own note ends every mark; a commit's answer, with
    * the order the lease opened its turn in (`opened`), ends the marks of the lost turns opened no later than its own (the
    * lost turn's own answer come late, or a later turn's), taken or not, never one of a turn opened after it, whatever its
@@ -565,6 +580,11 @@ export class ActorCopies {
         if (opened !== null) {
           this.sql.exec("INSERT INTO copy_meta (k, v) VALUES (?, ?)", NOTE_TURNS, opened);
         }
+        // And the text it was taken for (DL-431), so only the replay's answer for that text replaces a STOP note: none for
+        // a versioned write.
+        this.sql.exec("DELETE FROM copy_note WHERE one = 1");
+        const text = write.phoneVersion === null ? textOf(write) : null;
+        if (text !== null) this.sql.exec("INSERT INTO copy_note (one, event_id) VALUES (1, ?)", text);
       }
       if (ended.kind === "all") this.sql.exec("DELETE FROM copy_lost_commits");
       else if (ended.kind === "openedBy") {
@@ -592,8 +612,10 @@ export class ActorCopies {
    *     (the lease's turn order, never versions alone: DL-427), since that turn's commit was sent after the queue was
    *     replayed (../lease.ts `beforeCommit`), the note's record first. An earlier turn's late answer is refused whatever
    *     its version, and so is every answer while the note's order is not known. The write-on-return replay's answer (no
-   *     turn) is taken: the queued STOP and START records written in the order queued, the note's own among them. A turn's
-   *     answer the lease gave no order is refused;
+   *     turn) is taken only when it is for the note's own text (DL-431: the same event id, or neither naming a text): the
+   *     answer for any other queued text is refused, whatever its kind or version, since the note's own record may still
+   *     wait behind it (a core that does not answer for it stops the replay there). A note that names no text is
+   *     replaced by no answer for a text (fails closed). A turn's answer the lease gave no order is refused;
    *   - over a START note, a versioned write is taken: a STOP it may bring reads stricter, never looser.
    */
   private keepsCopy(write: StoppedWrite, ends: LostEnds, copied: StoppedCopy | null): boolean {
@@ -605,13 +627,21 @@ export class ActorCopies {
       const after = this.noteTurnsOpened();
       return after === null || ends.opened <= after;
     }
-    return write.turnId !== null;
+    return write.turnId !== null || textOf(write) !== this.noteText();
   }
 
   /** The order of the last turn the lease had opened when the actor's own note was taken (T-1208), or null when not known. */
   private noteTurnsOpened(): number | null {
     const row = this.sql.exec<{ v: number }>("SELECT v FROM copy_meta WHERE k = ?", NOTE_TURNS).toArray()[0];
     return row !== undefined && isOrder(row.v) ? row.v : null;
+  }
+
+  /** The text the actor's own note was taken for (its event id, DL-431), or null when it named none. */
+  private noteText(): string | null {
+    return (
+      this.sql.exec<{ event_id: string }>("SELECT event_id FROM copy_note WHERE one = 1").toArray()[0]
+        ?.event_id ?? null
+    );
   }
 
   /** The order of the last turn the lease has opened now (`CopiesHost.turnsOpened`), or null when it cannot say. */

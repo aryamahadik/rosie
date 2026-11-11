@@ -357,9 +357,10 @@ export class DbOutage {
 
   /**
    * Sends one queued STOP or START record when the queue replays it (K-09 recordStopOrStart, caller actorOnReturn): taken,
-   * the actor's copy of the stopped flag takes the phone row's version; the core not answering (a throw, `transient`, or the
-   * handle's key not to be had) is `notBack`; any other error is the core's refusal (its code, a label). A box that does not
-   * open is refused as `unopened`.
+   * the actor's copy of the stopped flag takes the phone row's version, for the record's own text (its event id: over the
+   * actor's own STOP note, only the answer for the note's own text replaces it, T-1208); the core not answering (a throw,
+   * `transient`, or the handle's key not to be had) is `notBack`; any other error is the core's refusal (its code, a
+   * label). A box that does not open is refused as `unopened`.
    */
   async replayStopOrStart(write: QueuedWrite): Promise<ReplayStep> {
     const set = deps;
@@ -367,7 +368,8 @@ export class DbOutage {
     const prefix = `${STOP_OR_START_CALL}:`;
     if (write.call !== STOP_OR_START_CALL || !write.key.startsWith(prefix))
       return { refused: "notStopOrStart" };
-    const entry = this.host.texts([write.key.slice(prefix.length)])[0];
+    const eventId = write.key.slice(prefix.length);
+    const entry = this.host.texts([eventId])[0];
     if (entry === undefined) return { refused: "unopened" };
     const handle = entry.event.handle;
     let sealingKey: SealingKey;
@@ -401,7 +403,12 @@ export class DbOutage {
     if (!isRecord(answer) || typeof answer.stopped !== "boolean" || !Number.isInteger(version)) {
       return { refused: "badAnswer" };
     }
-    this.host.copies.noteStopped({ stopped: answer.stopped, phoneVersion: version as number, turnId: null });
+    this.host.copies.noteStopped({
+      stopped: answer.stopped,
+      phoneVersion: version as number,
+      turnId: null,
+      eventId,
+    });
     return "written";
   }
 
@@ -648,8 +655,14 @@ export class DbOutage {
           leftBefore = true;
           continue;
         }
-        // Taken: the stopped flag first, so nothing goes to a number that asked to stop from here on.
-        this.host.copies.noteStopped({ stopped: row.kind === "stop", phoneVersion: null, turnId: null });
+        // Taken: the stopped flag first, so nothing goes to a number that asked to stop from here on. The note keeps this
+        // text's event id: only the replay's answer for this text's own record replaces a STOP note (T-1208).
+        this.host.copies.noteStopped({
+          stopped: row.kind === "stop",
+          phoneVersion: null,
+          turnId: null,
+          eventId: row.event_id,
+        });
         this.sql.exec(
           "UPDATE outage_texts SET keyword = 'handling', due_ms = ? WHERE event_id = ?",
           this.host.now(),
