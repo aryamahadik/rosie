@@ -1,0 +1,85 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-sam-books-alex-nov21.json"],
+    "now": "2026-11-07T15:30:00Z",
+    "note": "Alex sends the Nov 21 booking's ready text from his own number: a fresh yes on a new booking sent from that number (RULES 7.5; S13-32 line 7242; RULES 7.1, 'a yes on a forwarded link'). The actor matches its short code to the link (K-29: matching a sent ready text to its link is runtime work), and his turn's commit records the yes as a K-29 texts row for his mobile, naming the booking and the link, with the ready text as the words shown (K-29: 'A ready text that gives a yes adds a consent row of kind texts naming the link'), and the link's use. The STOP stands: only START clears the flag (QUESTIONS.md CQ-74's default), so the phone is not written, and a text from a stopped number opens no chat (K-05 v1.7 item 46: openChatOnText answers stopped). K-08 v1.1 names no kind for a link's use (K-09 README: S2-05's link write has none), so only the yes is logged. The guard's reply, which CQ-74's default gives, is not this fixture's. Needs K-29's tables migrated."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-ready-text-nov21",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0019"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0019",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "chat_links", "rowId": "chatlink-alex-nov21", "version": 1 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "chat_links",
+          "key": { "id": "chatlink-alex-nov21" },
+          "expectVersion": 1,
+          "set": { "used_at": "2026-11-07T15:30:00Z" }
+        },
+        {
+          "op": "insert",
+          "table": "consents",
+          "values": {
+            "id": "consent-alex-nov21-own-yes",
+            "person_id": "person-alex",
+            "business_id": "biz-lees-barbershop",
+            "kind": "texts",
+            "revoked": false,
+            "handle_id": "handle-alex",
+            "booking_id": "booking-alex-riley-nov21",
+            "exact_words": "Hey, send me further updates about my booking. Ref 9T3M",
+            "words_sha256": "0467edc9bddd31f8a88db6e0568bbc1ebbeda9ac889afbe2e4222f904ad095d0",
+            "at": "2026-11-07T15:30:00Z",
+            "channel": "text",
+            "chat_link_id": "chatlink-alex-nov21",
+            "turn_id": "turn-alex-ready-text-nov21"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-consent-alex-nov21-own-yes",
+          "kind": "consent.given",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": "customer",
+          "tableName": "consents",
+          "rowId": "consent-alex-nov21-own-yes",
+          "oldValues": null,
+          "newValues": { "kind": "texts", "revoked": false, "business_id": "biz-lees-barbershop", "channel": "text" },
+          "sealed": null,
+          "why": { "step": "S13-32" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-ready-text-nov21",
+    "committedAt": "2026-11-07T15:30:00Z",
+    "repeated": false,
+    "committed": {
+      "written": [{ "table": "chat_links", "rowId": "chatlink-alex-nov21", "version": 2 }],
+      "outboxRows": [],
+      "promoted": []
+    }
+  }
+}
