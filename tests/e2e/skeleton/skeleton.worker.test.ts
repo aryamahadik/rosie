@@ -48,6 +48,7 @@ import {
   SAM_CHAT,
   TEST_OWNER_1,
   TEST_OWNER_1_BUSINESS_NAME,
+  type EventLogRow,
 } from "../../../runtime/src/wiring/test-support";
 import { checkHops, checkRun, isModelCallSpan, readReceipt, type Collected, type SentText } from "../_driver";
 import {
@@ -438,7 +439,8 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // (waiting, unarmed), 1 outbox row and the event-log entries, under one turn id and one trace id, each row id built from
   // the turn's own id (default 131), each value commit-s1-01.json's given.stated.writes states but for the ids and the chat
   // id, which are the run's. The thread and the outbox row took the JOIN event's chat id and service, which the request's
-  // turn carried (default 135), and no span or event-log entry's values hold the chat id.
+  // turn carried (default 135). No span holds the chat id, and no event-log entry holds it, the JOIN's number in any
+  // form or its words, even inside a longer value at any depth (T-1200, from T-559's security review note a).
   8: (facts) => {
     const fixture = commitS101 as unknown as {
       readonly given: {
@@ -551,14 +553,32 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(
       new Set([...turnRows.rows.values()].flatMap((table) => [...table.values()].map((row) => row.turnId))),
     ).toEqual(new Set([facts.turnId]));
-    // The chat id's one home is the thread row: no span and no event-log entry's values hold it.
+    // The chat id's one home is the thread row: no span holds it. No event-log entry holds it, the JOIN's number in any
+    // form or its words either, even inside a longer value at any depth (an entry's sealed copy is read as the bytes it
+    // seals; T-1200). The check fires on damaged copies of the run's entries that hold the number in a label and as a
+    // count (T-087's shapes), or the words in a sentence and in plain where the sealed copy is.
     const chatId = String(JOIN.chatId);
     expect(stringsOf(facts.collected.spans).filter((text) => text.includes(chatId))).toEqual([]);
+    const secrets = [chatId, ...SECRETS];
+    const entryHolders = (entries: readonly EventLogRow[]): string[] =>
+      holdersOf(entries.map(withSealedBytes), secrets, "event-log entry");
+    const damaged = (change: Record<string, unknown>): EventLogRow[] =>
+      turnRows.eventLog.map((row, at) => (at === 0 ? { ...row, ...change } : row));
+    const national = JOIN.handle.address.slice(1);
+    const local = JOIN.handle.address.slice(2);
+    expect(entryHolders(damaged({ new_values: { kind: "chat", handle: `handle-${national}` } }))).toEqual(
+      holding("event-log entry 1", secrets, national, local),
+    );
+    expect(entryHolders(damaged({ why: { step: "A3-22", tries: [{ count: Number(national) }] } }))).toEqual(
+      holding("event-log entry 1", secrets, national, local),
+    );
     expect(
-      stringsOf(turnRows.eventLog.map((row) => [row.old_values, row.new_values])).filter((text) =>
-        text.includes(chatId),
-      ),
-    ).toEqual([]);
+      entryHolders(damaged({ new_values: { labels: ["No"], quote: `Sam texted ${JOIN_TEXT}` } })),
+    ).toEqual(holding("event-log entry 1", secrets, JOIN_TEXT));
+    expect(entryHolders(damaged({ sealed_values: btoa(JSON.stringify({ evidence: JOIN_TEXT })) }))).toEqual(
+      holding("event-log entry 1", secrets, JOIN_TEXT),
+    );
+    expect(entryHolders(turnRows.eventLog)).toEqual([]);
     // The gate's reads ran under Lee's Barbershop's scope, once.
     expect(facts.run.fakes.gate.scopes).toEqual([TEST_OWNER_1.businessId]);
     return Promise.resolve();
@@ -569,7 +589,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Barbershop's scope, gives the composer exactly T-1175's recording 4 (S1-02's row, routine, S1-02's four card terms
   // as its facts, the JOIN as its inbound text, no frontier); @rosie/ai's composer, over the recorded-model double,
   // answers it from recording 4 with one Haiku call. One compose span for the one row, its plan plan-s1-02.json's shape,
-  // its model call under bundles/v0's pinned id and the JOIN's hashed turn id, on its own portCall span too.
+  // its model call under bundles/v0's pinned id and the JOIN's hashed turn id, on its own portCall span too. No span
+  // holds a word the composer was given or wrote, the JOIN's words, its number or its chat id, even inside a longer
+  // value (T-1200, from T-560's security review note a).
   9: async (facts) => {
     const row = `outbox-s1-02-${facts.turnId}-1`;
     const plan = planS102 as unknown as {
@@ -629,6 +651,34 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(facts.run.fakes.compose.rowReads).toEqual([
       { outboxRowId: row, businessId: TEST_OWNER_1.businessId },
     ]);
+    // No span holds a word the composer was given or wrote (the master line, the card's terms, the plan's lines and
+    // its question), the JOIN's words, its number in any form or its chat id, even inside a longer value at any depth
+    // (T-1200). The check fires on a damaged copy of the run's spans whose compose span holds the plan's question.
+    const given = joinComposeInput as unknown as {
+      readonly masterText: { readonly text: string };
+      readonly facts: readonly { readonly value: string }[];
+    };
+    const written = planS102 as unknown as {
+      readonly lines: readonly { readonly text: string }[];
+      readonly question: { readonly text: string };
+    };
+    const secrets = [
+      String(JOIN.chatId),
+      ...SECRETS,
+      given.masterText.text,
+      ...given.facts.map((fact) => fact.value),
+      ...written.lines.map((line) => line.text),
+      written.question.text,
+    ];
+    const spans = facts.collected.spans;
+    const at = spans.findIndex((span) => span.hop === "compose");
+    const damaged = spans.map((span, k) =>
+      k === at ? { ...span, decided: { ...span.decided, said: `Rosie: ${written.question.text}` } } : span,
+    );
+    expect(holdersOf(damaged, secrets, "span")).toEqual(
+      holding(`span ${String(at + 1)}`, secrets, written.question.text),
+    );
+    expect(holdersOf(spans, secrets, "span")).toEqual([]);
   },
 
   // Row 10, "Code fills slots and fixed lines; claim check and message checks" (K-09 finalizeMessage, K-03 final parts;
@@ -803,6 +853,59 @@ function stringsOf(value: unknown, into: string[] = []): string[] {
   else if (typeof value === "object" && value !== null)
     for (const item of Object.values(value)) stringsOf(item, into);
   return into;
+}
+
+/**
+ * Every text a value holds, at any depth: each string, and each number as its digits (T-087's checkNoRawNumberOrText
+ * shapes: a number inside a label, and a number as a count). Rows 8 and 9 read it (T-1200).
+ */
+function textsOf(value: unknown, into: string[] = []): string[] {
+  if (typeof value === "string") into.push(value);
+  else if (typeof value === "number") into.push(String(value));
+  else if (Array.isArray(value)) for (const item of value as unknown[]) textsOf(item, into);
+  else if (typeof value === "object" && value !== null)
+    for (const item of Object.values(value)) textsOf(item, into);
+  return into;
+}
+
+/**
+ * An event-log entry with its sealed copy (K-05 v1 sealedValues, base64) read as the text of the bytes it carries. The
+ * letters of base64 spell a short word such as JOIN by chance (about once in 100,000 runs of this copy), and sealed bytes
+ * almost never do (about once in 30 million), while words in plain would show in them.
+ */
+function withSealedBytes(entry: EventLogRow): EventLogRow {
+  const sealed = entry.sealed_values;
+  if (typeof sealed !== "string") return entry;
+  const bytes = Uint8Array.from(atob(sealed), (char) => char.charCodeAt(0));
+  return { ...entry, sealed_values: new TextDecoder().decode(bytes) };
+}
+
+/**
+ * Each item that holds a secret, even inside a longer value, at any depth (textsOf), named by `name` and its place, and
+ * by the secret's place in `secrets`, never the secret (K-08 v1 README). Each line of a secret, of 4 characters or more
+ * as leaks() reads one, is matched as written: K-08's own labels, such as the outcome joinedTurn, hold the letters of
+ * JOIN in another case and are no words.
+ */
+function holdersOf(items: readonly unknown[], secrets: readonly string[], name: string): string[] {
+  const lines = secrets.map((secret) =>
+    secret
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length >= 4),
+  );
+  return items.flatMap((item, index) => {
+    const texts = textsOf(item);
+    return lines.flatMap((parts, at) =>
+      parts.some((part) => texts.some((text) => text.includes(part)))
+        ? [`${name} ${String(index + 1)} holds secret ${String(at + 1)}`]
+        : [],
+    );
+  });
+}
+
+/** What holdersOf answers when the item `name` holds each of `held`: a damaged copy's expected lines. */
+function holding(name: string, secrets: readonly string[], ...held: readonly string[]): string[] {
+  return held.map((secret) => `${name} holds secret ${String(secrets.indexOf(secret) + 1)}`);
 }
 
 /** The JOIN's number in each form a number could leak in, and its words. */
