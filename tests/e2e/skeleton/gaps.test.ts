@@ -1,8 +1,12 @@
-// The skeleton's known gaps (T-1149, ./gaps.ts) judge around only what they name. On a trace written as the merged runtime
-// writes one (K-08 trace-skeleton.json's spans through the guard, with no batch span, the handle actor's own receive span,
-// and each writer's own seq), T-465's checkHops finds nothing once the actor's span is set aside and the spans are put in
-// the order they started; and it still names a hop missing, repeated, out of order or on another trace, a batch span once
-// one is written, and every actor receive span is handed back. Run by `npm run test:e2e -- skeleton`.
+// The skeleton's known gaps (T-1149, ./gaps.ts) judge around only what they name. T-1108 closed three of them: on a trace
+// written as the merged runtime writes one now (K-08 trace-skeleton.json's spans through the guard: one receive span, the
+// gateway's; the batch span; one run by seq across the writers, whatever order their lines are written in), T-465's
+// checkHops finds nothing, as written: nothing is set aside, numbered again or left out. And it still names what the
+// closed gaps used to be, were one to come back: a trace whose writers each count from 1, a second receive span beside
+// the gateway's, a trace with no batch span; and a hop missing, repeated, out of order, starting before the one seq puts
+// before it, or on another trace. The one gap left (modelCallOrder) is a model call's own span out of start order by seq:
+// judgedTraceOf puts the spans in the order they started, numbers them again and changes nothing else. Run by
+// `npm run test:e2e -- skeleton`.
 
 import { describe, expect, it } from "vitest";
 
@@ -10,7 +14,7 @@ import type { Span, Trace } from "../../../contracts/generated/event-trace/event
 import { checkHops } from "../_driver";
 import { prefixOf, type SkeletonHop } from "../_driver/prefix";
 import { skeleton } from "../_driver/prefix/test-support";
-import { GAPS, NOT_WRITTEN, isActorReceive, judgedTraceOf, stillHolds, writtenHops } from "./gaps";
+import { GAPS, NOT_WRITTEN, judgedTraceOf, stillHolds, writtenHops } from "./gaps";
 
 /** trace-skeleton.json's span of `hop`, copied. */
 function span(hop: SkeletonHop): Span {
@@ -24,11 +28,46 @@ function after(hop: SkeletonHop, ms: number): string {
   return new Date(Date.parse(span(hop).at) + ms).toISOString();
 }
 
-/** The handle actor's own receive span, as runtime/src/actor/handle-actor.ts writes it: at the hand-off's end. */
+/** A trace of `spans`, with trace-skeleton.json's own fields. */
+function traceOf(spans: readonly Span[]): Trace {
+  const [first, ...rest] = spans;
+  if (first === undefined) throw new Error("no span");
+  return { ...structuredClone(skeleton), spans: [first, ...rest] };
+}
+
+/**
+ * Hops 1 to 5 as the merged runtime writes them, in the order their lines are written: the safety read first (it ends
+ * while the gateway still waits for its actor), then the gateway's receive and scrub (logged once the hand-off is
+ * answered), then the batch window's span and the turn's lease and guard. Each keeps the place it took as it started, so
+ * by seq they are trace-skeleton.json's: receive 1, scrub 2, safetyRead 3, batch 4, lease 5, guard 6.
+ */
+function written(): Trace {
+  return traceOf([
+    span("safetyRead"),
+    span("receive"),
+    span("scrub"),
+    span("batch"),
+    span("lease"),
+    span("guard"),
+  ]);
+}
+
+/** The same spans as each writer numbered them before T-1108: every writer's own count from 1. */
+function perWriter(): Trace {
+  return traceOf([
+    { ...span("safetyRead"), seq: 1 },
+    { ...span("receive"), seq: 1 },
+    { ...span("scrub"), seq: 2 },
+    { ...span("batch"), seq: 1 },
+    { ...span("lease"), seq: 1 },
+    { ...span("guard"), seq: 2 },
+  ]);
+}
+
+/** The handle actor's own receive span, as it wrote one before T-1108: at its door, as the hand-off reached it. */
 function actorReceive(): Span {
   return {
     ...span("receive"),
-    seq: 1,
     at: after("safetyRead", 2),
     ms: 2,
     got: { door: "handleActor", route: "inbox", kind: "text" },
@@ -36,122 +75,145 @@ function actorReceive(): Span {
   };
 }
 
-/**
- * Hops 1 to 5 as the merged runtime writes them, in the order their lines are written: the actor's receive, the safety read
- * (each its writer's seq 1), the gateway's receive and scrub (1, 2, logged once the hand-off is answered), then the turn's
- * lease and guard (1, 2). No batch span.
- */
-function written(): Trace {
-  const spans: Span[] = [
-    actorReceive(),
-    { ...span("safetyRead"), seq: 1 },
-    { ...span("receive"), seq: 1 },
-    { ...span("scrub"), seq: 2 },
-    { ...span("lease"), seq: 1 },
-    { ...span("guard"), seq: 2 },
-  ];
-  const [first, ...rest] = spans;
-  if (first === undefined) throw new Error("no span");
-  return { ...structuredClone(skeleton), spans: [first, ...rest] };
+/** `spans` in the order given, numbered 1, 2, 3 ...: a trace built with one fault and no other. */
+function numbered(spans: readonly Span[]): Trace {
+  return traceOf(spans.map((one, index) => ({ ...one, seq: index + 1 })));
 }
 
-/** Hops 1 to 5, through the guard, less the ones nothing writes yet: what the run judges. */
+/** The skeleton's spans through the guard, in seq order. */
+function inOrder(): Span[] {
+  return [...written().spans].sort((a, b) => a.seq - b.seq);
+}
+
+/** Hops 1 to 5, through the guard: what the run judges. Every one has a writer. */
 const JUDGED: readonly SkeletonHop[] = writtenHops(prefixOf("guard")?.hops ?? []);
 
-/** `trace` with the span of `hop` changed by `change`. */
-function changed(trace: Trace, hop: SkeletonHop, change: (span: Span) => Span): Trace {
-  const spans = trace.spans.map((one) => (one.hop === hop && !isActorReceive(one) ? change(one) : one));
-  const [first, ...rest] = spans;
-  if (first === undefined) throw new Error("no span");
-  return { ...trace, spans: [first, ...rest] };
-}
+const kindsOf = (trace: Trace): string[] => checkHops(trace, JUDGED).problems.map((problem) => problem.kind);
 
 describe("the skeleton's known gaps", () => {
-  it("name each gap by its task, and leave out of the hops judged only the batch hop, which nothing writes yet", () => {
-    expect(Object.keys(GAPS)).toEqual(["actorReceive", "seqPerWriter", "batchSpans"]);
-    expect(stillHolds("batchSpans")).toBe(
-      `known gap batchSpans (T-1108) no longer holds, so take it off tests/e2e/skeleton/gaps.ts: ${GAPS.batchSpans.what}`,
+  it("name each gap by its task, and leave no hop out of the hops judged: the batch hop is judged with the rest", () => {
+    expect(Object.keys(GAPS)).toEqual(["modelCallOrder"]);
+    expect(stillHolds("modelCallOrder")).toBe(
+      `known gap modelCallOrder (${GAPS.modelCallOrder.task}) no longer holds, so take it off tests/e2e/skeleton/gaps.ts: ${GAPS.modelCallOrder.what}`,
     );
-    expect(NOT_WRITTEN).toEqual({ batch: "batchSpans" });
-    expect(JUDGED).toEqual(["receive", "scrub", "safetyRead", "lease", "guard"]);
-    expect(isActorReceive(actorReceive())).toBe(true);
-    expect(skeleton.spans.filter(isActorReceive)).toEqual([]);
+    expect(NOT_WRITTEN).toEqual({});
+    expect(JUDGED).toEqual(["receive", "scrub", "safetyRead", "batch", "lease", "guard"]);
+    expect(JUDGED).toEqual(prefixOf("guard")?.hops);
+    // The three gaps T-1108 closed are no longer named.
+    for (const closed of ["actorReceive", "seqPerWriter", "batchSpans"]) {
+      expect(Object.keys(GAPS)).not.toContain(closed);
+    }
+    // K-08 draws one receive span, the gateway's, and none with the actor's door.
+    expect(skeleton.spans.filter((one) => one.hop === "receive")).toHaveLength(1);
+    expect(skeleton.spans.filter((one) => one.got?.door === "handleActor")).toEqual([]);
   });
 
-  it("as written, the trace is no one run by seq: T-465's checkHops names it (gap seqPerWriter)", () => {
-    expect(checkHops(written(), JUDGED).problems.filter((problem) => problem.kind === "seq")).not.toEqual([]);
-  });
-
-  it("set the actor's receive span aside, put the rest in the order they started, number them 1, 2, 3 ... and change nothing else", () => {
+  it("as written, the trace is one run by seq across its writers: T-465's checkHops finds nothing, with nothing set aside, numbered again or left out", () => {
     const trace = written();
-    const judged = judgedTraceOf(trace);
-    expect(judged.actorReceives).toEqual([actorReceive()]);
-    expect(judged.trace.spans.map((one) => [one.seq, one.hop])).toEqual([
+    // Written in another order than they started in, and read by seq.
+    expect(trace.spans.map((one) => one.hop)).not.toEqual(JUDGED);
+    const report = checkHops(trace, JUDGED);
+    expect(report.problems).toEqual([]);
+    expect(report.hops).toEqual(JUDGED);
+    expect(inOrder().map((one) => [one.seq, one.hop])).toEqual([
       [1, "receive"],
       [2, "scrub"],
       [3, "safetyRead"],
-      [4, "lease"],
-      [5, "guard"],
+      [4, "batch"],
+      [5, "lease"],
+      [6, "guard"],
     ]);
-    for (const one of judged.trace.spans) {
-      const before = trace.spans.find((other) => other.hop === one.hop && !isActorReceive(other));
+  });
+
+  it("a trace whose writers each count from 1 is named: seq is no one run (what gap seqPerWriter judged around)", () => {
+    expect(kindsOf(perWriter()).filter((kind) => kind === "seq")).not.toEqual([]);
+    expect(kindsOf(written()).filter((kind) => kind === "seq")).toEqual([]);
+  });
+
+  it("spans that started at one instant keep the order seq gives them", () => {
+    const sameInstant = traceOf(
+      written().spans.map((one) => (one.hop === "guard" ? { ...one, at: span("lease").at } : one)),
+    );
+    const report = checkHops(sameInstant, JUDGED);
+    expect(report.problems).toEqual([]);
+    expect(report.hops).toEqual(["receive", "scrub", "safetyRead", "batch", "lease", "guard"]);
+  });
+
+  it("still let T-465's checkHops name a hop missing, repeated, out of order, starting too early or on another trace", () => {
+    expect(kindsOf(numbered(inOrder().filter((one) => one.hop !== "safetyRead")))).toEqual(["missing"]);
+
+    const guard = span("guard");
+    expect(kindsOf(numbered([...inOrder(), { ...guard, at: after("guard", 5) }]))).toEqual(["repeated"]);
+
+    // The guard numbered before the lease, and starting no later: out of the turn's order.
+    const beforeLease = inOrder().filter((one) => one.hop !== "lease" && one.hop !== "guard");
+    const lease = span("lease");
+    expect(kindsOf(numbered([...beforeLease, { ...guard, at: lease.at }, lease]))).toEqual(["outOfOrder"]);
+
+    // The guard numbered after the lease but starting before it: by seq, time goes back.
+    const early = written().spans.map((one) =>
+      one.hop === "guard" ? { ...one, at: after("lease", -1) } : one,
+    );
+    expect(kindsOf(traceOf(early))).toEqual(["time"]);
+
+    const elsewhere = written().spans.map((one) =>
+      one.hop === "scrub" ? { ...one, trace_id: "trace-other" } : one,
+    );
+    expect(kindsOf(traceOf(elsewhere))).toEqual(["traceId"]);
+  });
+
+  it("gap modelCallOrder: a model call's span numbered before the hop it ran inside is named as written, and judgedTraceOf puts the spans in the order they started, numbers them again and changes nothing else", () => {
+    // The safety read's model call, written (and so numbered) before the read's own span, which started first.
+    const call: Span = {
+      ...span("safetyRead"),
+      hop: "portCall",
+      provider: "anthropic",
+      call: "messages",
+      attempt: 1,
+      at: after("safetyRead", 5),
+    };
+    const [receive, scrub, read, ...rest] = inOrder();
+    if (receive === undefined || scrub === undefined || read === undefined) throw new Error("no span");
+    const asWritten = numbered([receive, scrub, call, read, ...rest]);
+    expect(checkHops(asWritten, JUDGED).problems).toEqual([
+      expect.objectContaining({ kind: "time", hop: "safetyRead" }),
+    ]);
+
+    const judged = judgedTraceOf(asWritten);
+    expect(judged.spans.map((one) => [one.seq, one.hop])).toEqual([
+      [1, "receive"],
+      [2, "scrub"],
+      [3, "safetyRead"],
+      [4, "portCall"],
+      [5, "batch"],
+      [6, "lease"],
+      [7, "guard"],
+    ]);
+    // No span is set aside or changed but for its place.
+    expect(judged.spans).toHaveLength(asWritten.spans.length);
+    for (const one of judged.spans) {
+      const before = asWritten.spans.find((other) => other.hop === one.hop);
       expect(one).toEqual({ ...before, seq: one.seq });
     }
-    expect({ ...judged.trace, spans: [] }).toEqual({ ...trace, spans: [] });
-    expect(checkHops(judged.trace, JUDGED).problems).toEqual([]);
+    expect({ ...judged, spans: [] }).toEqual({ ...asWritten, spans: [] });
+    expect(checkHops(judged, JUDGED).problems).toEqual([]);
+    // A trace already in start order by seq is judged as it is.
+    expect(judgedTraceOf(written()).spans).toEqual(inOrder());
   });
 
-  it("keep their writer's seq, then the trace's order, for spans that started at one instant", () => {
-    const sameInstant = changed(written(), "guard", (one) => ({ ...one, at: span("lease").at }));
-    expect(judgedTraceOf(sameInstant).trace.spans.map((one) => one.hop)).toEqual([
-      "receive",
-      "scrub",
-      "safetyRead",
-      "lease",
-      "guard",
-    ]);
-  });
-
-  it("still let T-465's checkHops name a hop missing, repeated, out of order or on another trace", () => {
-    const trace = written();
-    const without = { ...trace, spans: trace.spans.filter((one) => one.hop !== "safetyRead") } as Trace;
-    expect(checkHops(judgedTraceOf(without).trace, JUDGED).problems.map((problem) => problem.kind)).toEqual([
-      "missing",
-    ]);
-
-    const guard = trace.spans.find((one) => one.hop === "guard");
-    if (guard === undefined) throw new Error("no guard span");
-    const twice = { ...trace, spans: [...trace.spans, { ...guard, seq: 3, at: after("guard", 5) }] } as Trace;
-    expect(checkHops(judgedTraceOf(twice).trace, JUDGED).problems.map((problem) => problem.kind)).toEqual([
-      "repeated",
-    ]);
-
-    const early = changed(trace, "guard", (one) => ({ ...one, at: after("lease", -1) }));
-    expect(checkHops(judgedTraceOf(early).trace, JUDGED).problems.map((problem) => problem.kind)).toEqual([
-      "outOfOrder",
-    ]);
-
-    const elsewhere = changed(trace, "scrub", (one) => ({ ...one, trace_id: "trace-other" }));
-    expect(checkHops(judgedTraceOf(elsewhere).trace, JUDGED).problems.map((problem) => problem.kind)).toEqual(
-      ["traceId"],
-    );
-  });
-
-  it("name a batch span as unexpected once one is written (the gap's task then takes batch off NOT_WRITTEN)", () => {
-    const trace = written();
-    const batch = { ...span("batch"), seq: 3, at: after("safetyRead", 900) };
-    const withBatch = { ...trace, spans: [...trace.spans, batch] } as Trace;
-    expect(checkHops(judgedTraceOf(withBatch).trace, JUDGED).problems).toEqual([
-      expect.objectContaining({ kind: "unexpected", hop: "batch" }),
+  it("a trace with no batch span is named: the batch hop is judged (what gap batchSpans left out)", () => {
+    const withoutBatch = numbered(inOrder().filter((one) => one.hop !== "batch"));
+    expect(checkHops(withoutBatch, JUDGED).problems).toEqual([
+      expect.objectContaining({ kind: "missing", hop: "batch" }),
     ]);
   });
 
-  it("hand every actor receive span back, so a second one is seen", () => {
-    const trace = written();
-    const twice = {
-      ...trace,
-      spans: [...trace.spans, { ...actorReceive(), at: after("safetyRead", 5) }],
-    } as Trace;
-    expect(judgedTraceOf(twice).actorReceives).toHaveLength(2);
+  it("a second receive span, the actor's own beside the gateway's, is named: one receive span per text (what gap actorReceive set aside)", () => {
+    const [receive, scrub, read, ...rest] = inOrder();
+    if (receive === undefined || scrub === undefined || read === undefined) throw new Error("no span");
+    const twice = numbered([receive, scrub, read, actorReceive(), ...rest]);
+    expect(checkHops(twice, JUDGED).problems).toEqual([
+      expect.objectContaining({ kind: "repeated", hop: "receive" }),
+    ]);
   });
 });

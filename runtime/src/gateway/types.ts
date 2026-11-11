@@ -85,6 +85,13 @@ export interface SealedHandoff {
   bundleId: BundleId;
   /** The name of the handle's Durable Object (`actorNameOf(event.handle)`): every event of a handle names the same one. */
   actorName: string;
+  /**
+   * How many places (K-08 `seq`) the gateway takes on this trace before the actor's writers: its receive and scrub spans
+   * and, for an email reply, the read's port call between them (T-1108). The actor's first span on the trace takes the
+   * next place, so the trace is one run by seq whoever writes. Left out (a hand-off built by hand), the actor's writers
+   * start the count.
+   */
+  seqBefore?: number;
 }
 
 /** The answer of a door that stores: `written`, or `duplicate` (its event id is already known; nothing was written). */
@@ -100,6 +107,12 @@ export type StoreAnswer = "written" | "duplicate";
  */
 export interface ActorStub {
   accept(handoff: SealedHandoff): Promise<StoreAnswer>;
+  /**
+   * The trace id the event of this hand-off first arrived under, as its actor stored it, or null when the actor holds no
+   * such event (T-1108). The gateway asks only after `accept` answered "duplicate", for the dropped receive span's
+   * `firstTrace` (K-08 trace-duplicate-webhook.json). Left out, or a throw: the span names none, and the answer stands.
+   */
+  firstTrace?(handoff: SealedHandoff): Promise<string | null>;
 }
 
 /**

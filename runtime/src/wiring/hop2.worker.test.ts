@@ -3,7 +3,7 @@
 // HandleActor namespace (exports.HandleActor in the pool, standing in for env.HANDLE_ACTOR until T-566 binds it on
 // staging) and the skeleton flag on, and each webhook goes in through root.linqWebhook. K-06's text-imessage.json, signed
 // by the Linq double, is verified, scrubbed, sealed under the handle's key and handed to that handle's Durable Object: one
-// entry in its ordered inbox, the words only sealed (unreadable without the key), one actor span after the gateway's;
+// entry in its ordered inbox, the words only sealed (unreadable without the key), one receive span, the gateway's (T-1108);
 // duplicate-event.json adds no entry and is answered 200. The key is the one the root's real sealing port gets from K-05
 // v1.2 handleSealingKey, here the K-05 double answering as the handle-key-*.json fixtures (DL-313 ruling 4, DL-324): a
 // key object that cannot be exported. With no K-05 call handed in, as on staging until T-567 binds its database, the
@@ -63,7 +63,7 @@ const REPEAT = structuredClone(duplicateFixture) as unknown as LinqInboundEvent;
 const ACTOR = actorNameOf(TEXT.handle);
 const BODY = TEXT.body ?? "";
 
-/** The handle actor's own receive span, which it writes when the gateway's hand-off reaches it. */
+/** A receive span of the handle actor's own, as it wrote one at its door before T-1108: the trace now holds none. */
 const actorSpan = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
 
 /** The webhook as Linq posts it to {BASE_PATH}/webhooks/linq: the three headers and the raw body. */
@@ -127,7 +127,7 @@ afterEach(async () => {
 });
 
 describe("hop 2 joined: a verified text reaches the HandleActor through its namespace, sealed under the handle's key", () => {
-  it("text-imessage.json: 200, one entry in the handle's ordered inbox, its words sealed and unreadable without the key, one actor span after the gateway's", async () => {
+  it("text-imessage.json: 200, one entry in the handle's ordered inbox, its words sealed and unreadable without the key, one receive span, the gateway's, saying it was sealed to its actor", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const run = rig(log);
 
@@ -161,17 +161,22 @@ describe("hop 2 joined: a verified text reaches the HandleActor through its name
     ).rejects.toThrow();
     expect((await openWords(sealed, key, ACTOR, TEXT.eventId)).body).toBe(BODY);
 
+    // K-08 trace-skeleton.json: one receive span per text, the gateway's, at seq 1, which says the text was sealed and
+    // written to its actor (decided.sealedToActor), then scrub at seq 2. The actor writes no span of its own for the
+    // hand-off (T-1108): the hand-off is the receive span's, which starts before the scrub and ends after it.
     const trace = spansOfTrace(run.spans(), traceId);
     const gateway = trace.filter((span) => !actorSpan(span));
     const actor = trace.filter(actorSpan);
-    expect(gateway.map((span) => [span.hop, span.outcome])).toEqual([
-      ["receive", "ok"],
-      ["scrub", "ok"],
+    expect(gateway.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "ok"],
+      [2, "scrub", "ok"],
     ]);
-    expect(actor).toHaveLength(1);
-    const [handed] = actor;
-    if (handed === undefined) throw new Error("no actor span");
-    for (const span of gateway) expect(Date.parse(handed.at)).toBeGreaterThanOrEqual(Date.parse(span.at));
+    expect(actor).toHaveLength(0);
+    const [receive, scrub] = gateway;
+    if (receive === undefined || scrub === undefined) throw new Error("no receive or scrub span");
+    expect(receive.decided).toMatchObject({ signatureValid: true, knownEventId: false, sealedToActor: true });
+    expect(Date.parse(scrub.at)).toBeGreaterThanOrEqual(Date.parse(receive.at));
+    expect(Date.parse(receive.at) + receive.ms).toBeGreaterThanOrEqual(Date.parse(scrub.at) + scrub.ms);
     expect(JSON.stringify(run.spans())).not.toContain(BODY);
   });
 

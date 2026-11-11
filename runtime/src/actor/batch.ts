@@ -27,9 +27,30 @@
 //
 // The lease (T-248, lease.ts) takes each closed, released batch once, in order. A hand-off is at least once: one that
 // throws is tried again later with the same batch id, and the lease takes a batch id it has seen as already handed. Never
-// logged or put in a span: a text's words (K-08 README line 75). Nothing here logs.
+// logged or put in a span: a text's words (K-08 README line 75).
+//
+// The batch hop's spans (T-1108; K-08 v1 hop `batch`; CQ-06): when the lease opens a turn, the window writes the turn's
+// batch span on the first text's trace (how the batch closed, the turn, its texts' event ids and the other texts' traces)
+// and, on each other text's trace, the batch span that ends it, outcome joinedTurn, naming the turn and its trace
+// (`beginSpans`, through runtime/src/trace closeBatch). The turn is named there and not at the close, because only the
+// lease knows it: a batch that closes while a turn runs restarts that turn under a new id, and batches that waited open
+// the next turn together (lease.ts). Once per turn id, kept in storage, so a rerun after a lapse writes none again. The
+// spans' places (K-08 `seq`) are taken as the run starts, before its pin's lease span takes its own, and the spans are
+// written once the pin has answered: the turn's span carries the bundle id pinned for the turn, as every span that
+// carries the turn on its trace does (arch 10 line 548: "the bundle id on every turn"), and a joined text's the id that
+// text arrived under, its trace's own. A span's time is the text's wait: from the end of its safety work, which the
+// window notes as the actor tells it (`afterSafety`), to the close. Labels, ids and counts only.
 
-import { readInbox, type InboxEntry } from "./inbox";
+import {
+  closeBatch,
+  openTrace,
+  takeSeq,
+  type BatchClosedBy,
+  type BatchedText,
+  type BundleId,
+  type SpanSink,
+} from "../trace";
+import { readInbox, readInboxEvents, type InboxEntry } from "./inbox";
 
 /** 3 s after the latest text. */
 export const QUIET_MS = 3000;
@@ -41,6 +62,30 @@ export const MAX_TEXTS = 3;
 export const RELEASE_RETRY_MS = 1000;
 
 export type CloseReason = "quiet" | "third" | "max" | "danger";
+
+/**
+ * How a batch closed, as its batch span names it (K-08 v1 `decided.closedBy`): trace-skeleton.json's `threeSecondsQuiet`
+ * and trace-batch-three-texts.json's `thirdText`; K-08 draws no span for the 6 s close or a danger close, which take
+ * runtime/src/trace's `maxWait` and this window's own `danger`.
+ */
+export const CLOSED_BY: Readonly<Record<CloseReason, BatchClosedBy>> = {
+  quiet: "threeSecondsQuiet",
+  third: "thirdText",
+  max: "maxWait",
+  danger: "danger",
+};
+
+const isCloseReason = (reason: string): reason is CloseReason => Object.hasOwn(CLOSED_BY, reason);
+
+/**
+ * The batch hop's spans of one turn, their places taken, waiting for the turn's pin (T-1108). `write` writes them, once
+ * per turn id: the turn's span under `pinned`, the bundle id pinned for the turn (the id its first text arrived under
+ * when none was pinned), and each joined text's under the id that text arrived under. It never throws: a span that
+ * cannot be written changes nothing, and the turn runs all the same.
+ */
+export interface PendingBatchSpans {
+  write(pinned: BundleId | null): void;
+}
 
 /** What the turn lease is handed: the texts of one batch in arrival order, with how and when it closed. */
 export interface ClosedBatch {
@@ -132,6 +177,8 @@ export interface BatchHost {
    * "unwired" when no turn can run yet, so the batch stays stored here and nothing polls. A throw: tried again later.
    */
   lease(batch: ClosedBatch): Promise<"taken" | "unwired">;
+  /** Where the batch hop's spans go: one JSON log line each (T-1108). */
+  spanSink(): SpanSink;
 }
 
 interface ItemRow extends Record<string, SqlStorageValue> {
@@ -168,7 +215,22 @@ export function createBatchTables(sql: SqlStorage): void {
        handed INTEGER NOT NULL DEFAULT 0
      )`,
   );
+  // When each text's safety work ended, on the actor's clock: where its wait in the window is counted from (T-1108).
+  sql.exec("CREATE TABLE IF NOT EXISTS batch_reads (event_id TEXT PRIMARY KEY, read_ms INTEGER NOT NULL)");
+  // The turns whose batch spans are written: once per turn id (T-1108). And the texts a written batch span took: one of
+  // them in a later turn (a restart) was that turn's until its close.
+  sql.exec("CREATE TABLE IF NOT EXISTS batch_spans (turn_id TEXT PRIMARY KEY)");
+  sql.exec("CREATE TABLE IF NOT EXISTS batch_span_texts (event_id TEXT PRIMARY KEY)");
   createScheduleTable(sql);
+}
+
+/** One text of a turn, as the window knows it: when its safety work ended, and how and when its batch closed. */
+interface WaitRow extends Record<string, SqlStorageValue> {
+  event_id: string;
+  read_ms: number | null;
+  batch_id: number | null;
+  reason: string | null;
+  closed_ms: number | null;
 }
 
 export class BatchWindow {
@@ -244,8 +306,136 @@ export class BatchWindow {
    * been read, with the danger's hold open: the hold binds the turn's commit, not the hand-off (CQ-65 as DL-119 replaced it).
    */
   afterSafety(eventId: string): void {
+    this.noteRead(eventId);
     if (!this.host.isDanger(eventId)) return;
     if (this.openItems().some((item) => item.event_id === eventId)) this.close("danger");
+  }
+
+  // ---- the batch hop's spans (T-1108) ----------------------------------------------------------------------------
+
+  /**
+   * Notes when a text of the window's safety work ended: its batch span starts there. A text read again (a late verdict,
+   * a re-read) keeps the latest end, so its span never starts before a read that came before its turn.
+   */
+  private noteRead(eventId: string): void {
+    try {
+      this.sql.exec(
+        `INSERT OR REPLACE INTO batch_reads (event_id, read_ms)
+         SELECT event_id, ? FROM batch_items WHERE event_id = ?`,
+        hooks.clock.now(),
+        eventId,
+      );
+    } catch {
+      // Not noted: the text's batch span starts at the close.
+    }
+  }
+
+  /**
+   * Begins the batch hop's spans for a run of a turn the lease opens (K-08 v1 hop `batch`; CQ-06): on the first text's
+   * trace, the batch span with how the batch closed, the turn, its texts' event ids and the other texts' traces; on each
+   * other text's trace, the batch span that ends it, outcome joinedTurn, naming the turn and the turn's trace. `eventIds`
+   * are the turn's texts. Each span's place on its trace is taken now, so the pin's lease span comes after it, and the
+   * spans are written by the answer's `write` once the pin has answered (the turn's span goes under the pinned bundle
+   * id). Each starts where its text's safety work ended (the close, when that was not noted) and lasts until the turn's
+   * last batch closed: a turn of several batches (a restart, or batches that waited together) is closed by its last one.
+   * A text a replaced turn's span already took starts at that close, so by seq no span on its trace starts before the
+   * replaced turn's. Null when the turn's spans are written already (once per turn id: a rerun writes none again) or
+   * there is none to write. It never throws.
+   */
+  beginSpans(turnId: string, eventIds: readonly string[]): PendingBatchSpans | null {
+    try {
+      if (this.spansWritten(turnId)) return null;
+      const entries = readInboxEvents(this.sql, eventIds);
+      const waits = this.sql
+        .exec<WaitRow>(
+          `SELECT i.event_id, r.read_ms, i.batch_id, b.reason, b.closed_ms
+           FROM batch_items i
+           LEFT JOIN batches b ON b.batch_id = i.batch_id
+           LEFT JOIN batch_reads r ON r.event_id = i.event_id
+           WHERE i.event_id IN (SELECT value FROM json_each(?))`,
+          JSON.stringify(eventIds),
+        )
+        .toArray();
+      // The turn's last batch to close: how it closed and when.
+      const last = waits
+        .filter((wait) => wait.batch_id !== null)
+        .sort((a, b) => (b.batch_id ?? 0) - (a.batch_id ?? 0))[0];
+      const reason = last?.reason ?? null;
+      const closedAt = last?.closed_ms ?? null;
+      if (entries.length === 0 || reason === null || closedAt === null || !isCloseReason(reason)) return null;
+      // A text an earlier turn's batch span already took (a restart carries the replaced turn's texts on): that turn
+      // worked on it until this close, so its span starts there, after every span that turn started on its trace.
+      const carried = new Set(
+        this.sql
+          .exec<{ event_id: string }>(
+            "SELECT event_id FROM batch_span_texts WHERE event_id IN (SELECT value FROM json_each(?))",
+            JSON.stringify(eventIds),
+          )
+          .toArray()
+          .map((row) => row.event_id),
+      );
+      // One span per trace: the first text's carries the turn, and each other trace ends at its own. (Each webhook opens
+      // its own trace; texts handed in under one trace id share its span.)
+      const spans: { entry: InboxEntry; seq: number | undefined; waitedFrom: number }[] = [];
+      const traced = new Set<string>();
+      for (const entry of entries) {
+        if (traced.has(entry.traceId)) continue;
+        traced.add(entry.traceId);
+        const read = waits.find((wait) => wait.event_id === entry.event.eventId)?.read_ms ?? closedAt;
+        spans.push({
+          entry,
+          seq: takeSeq(entry.traceId),
+          waitedFrom: carried.has(entry.event.eventId) ? closedAt : read,
+        });
+      }
+      const closedBy = CLOSED_BY[reason];
+      return {
+        write: (pinned) => {
+          try {
+            // Once per turn id: a run that began them too (a rerun after a lapse while this one still waited for its
+            // pin) writes none again.
+            if (this.spansWritten(turnId)) return;
+            this.sql.exec("INSERT OR IGNORE INTO batch_spans (turn_id) VALUES (?)", turnId);
+            const sink = this.host.spanSink();
+            const texts = spans.map((span, place): BatchedText => ({
+              context: openTrace({
+                openedBy: "textWebhook",
+                // The turn's trace carries the turn's pinned bundle from here on; a joined text's trace never meets
+                // the pin and keeps the id its text arrived under.
+                bundleId: place === 0 ? (pinned ?? span.entry.bundleId) : span.entry.bundleId,
+                incomingTraceId: span.entry.traceId,
+                sink,
+                now: () => hooks.clock.now(),
+              }),
+              eventId: span.entry.event.eventId,
+              waitedFrom: span.waitedFrom,
+              ...(span.seq === undefined ? {} : { seq: span.seq }),
+            }));
+            closeBatch({
+              turnId,
+              closedBy,
+              texts,
+              closedAt,
+              eventIds: entries.map((entry) => entry.event.eventId),
+            });
+            this.sql.exec(
+              "INSERT OR IGNORE INTO batch_span_texts (event_id) SELECT value FROM json_each(?)",
+              JSON.stringify(entries.map((entry) => entry.event.eventId)),
+            );
+          } catch {
+            // No batch span for this turn; nothing else changes.
+          }
+        },
+      };
+    } catch {
+      // No batch span for this turn; nothing else changes.
+      return null;
+    }
+  }
+
+  /** True once the batch hop's spans of this turn id are written. */
+  private spansWritten(turnId: string): boolean {
+    return this.sql.exec("SELECT 1 FROM batch_spans WHERE turn_id = ?", turnId).toArray().length > 0;
   }
 
   // ---- the schedule and the alarm --------------------------------------------------------------------------------
