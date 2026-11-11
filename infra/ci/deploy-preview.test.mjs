@@ -7,7 +7,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, symlinkSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
@@ -52,9 +52,10 @@ writeFileSync(path.join(out, "validators.js"), "export const definitions = {};\n
 console.log("tool-api validators: written to " + path.relative(process.cwd(), out));
 `;
 
-/** A symbolic link at file to target, as a branch can commit one. */
+/** A symbolic link at file to target, in place of any file there, as a branch can commit one. */
 function link(target, file) {
   mkdirSync(path.dirname(file), { recursive: true });
+  rmSync(file, { force: true });
   symlinkSync(target, file);
 }
 
@@ -92,6 +93,21 @@ const BRANCHES = {
   },
   // A link named node_modules, to a folder of the branch's own.
   "task/T-14-node-modules-link": { "actions/src/tool-api/node_modules": { link: "../../../runtime/src" } },
+  // The same names in other letter case, which this Mac's volume ignores (DL-453): to node and npm they are a
+  // node_modules folder, a package.json (whose name and exports point the generated code's ajv imports at the
+  // branch's files) and an .npmrc. None of them is a name main has, so each is a new file on any volume.
+  "task/T-15-node-modules-case": {
+    "actions/src/tool-api/generated/Node_Modules/ajv/dist/runtime/equal.js": "module.exports = () => true;\n",
+  },
+  "task/T-16-package-json-case": {
+    "actions/src/tool-api/generated/PACKAGE.JSON":
+      '{ "name": "ajv", "exports": { "./dist/runtime/*": "./runtime/*" } }\n',
+  },
+  "task/T-17-npmrc-case": { ".NPMRC": "registry=https://registry.example.invalid/\n" },
+  // A link where the build writes its files, to a folder outside the checkout (DL-453).
+  "task/T-18-generated-link": { "actions/src/tool-api/generated": { link: "../../../../outside" } },
+  // One of main's files made a link.
+  "task/T-19-file-to-link": { "runtime/src/index.ts": { link: "../../../outside/index.ts" } },
 };
 
 describe("deploy-preview.sh", () => {
@@ -277,6 +293,9 @@ describe("deploy-preview.sh", () => {
     ["task/T-12-build-script", "infra/build/tool-api-validators.mjs"],
     ["task/T-13-node-modules", "actions/src/tool-api/generated/node_modules/ajv/dist/runtime/equal.js"],
     ["task/T-14-node-modules-link", "actions/src/tool-api/node_modules"],
+    ["task/T-15-node-modules-case", "actions/src/tool-api/generated/Node_Modules/ajv/dist/runtime/equal.js"],
+    ["task/T-16-package-json-case", "actions/src/tool-api/generated/PACKAGE.JSON"],
+    ["task/T-17-npmrc-case", ".NPMRC"],
   ];
   for (const [branch, file] of guarded) {
     it(`refuses ${branch}, whose diff against origin/main touches ${file}, without PREVIEW_ALLOW_INFRA=1`, () => {
@@ -288,6 +307,54 @@ describe("deploy-preview.sh", () => {
       assert.equal(result.branchCfRan, false);
     });
   }
+
+  // A symbolic link in the branch's diff is refused wherever it is (mode 120000 in git diff --raw, DL-453).
+  const LINKS_HEADER = "symbolic links, which could point the build at folders outside its worktree:\n";
+  const links = [
+    ["task/T-18-generated-link", "actions/src/tool-api/generated"],
+    ["task/T-19-file-to-link", "runtime/src/index.ts"],
+  ];
+  for (const [branch, file] of links) {
+    it(`refuses ${branch}, whose diff against origin/main makes ${file} a symbolic link, without PREVIEW_ALLOW_INFRA=1`, () => {
+      const result = fixture.run(branch);
+      assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+      assert.ok(
+        result.stderr.includes(`${LINKS_HEADER}  ${file}\n`),
+        `the refusal names ${file} as a link: ${result.stderr}`,
+      );
+      assert.doesNotMatch(
+        result.stderr,
+        /touch files that control/,
+        "no guarded file changed: the link alone refuses it",
+      );
+      assert.match(result.stderr, /PREVIEW_ALLOW_INFRA=1/);
+      assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
+      assert.equal(result.branchCfRan, false);
+    });
+  }
+
+  it("names a link called node_modules both as a guarded file and as a link", () => {
+    const result = fixture.run("task/T-14-node-modules-link");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        "with the Rosfield sign-in before review:\n  actions/src/tool-api/node_modules\n" +
+          `and they add, change or remove ${LINKS_HEADER}  actions/src/tool-api/node_modules\n`,
+      ),
+      result.stderr,
+    );
+    assert.deepEqual(result.calls, []);
+  });
+
+  it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed link, listing it once", () => {
+    const result = fixture.run("task/T-14-node-modules-link", { PREVIEW_ALLOW_INFRA: "1" });
+    assertPreviewed(result, "task/T-14-node-modules-link", "task-t-14-node-modules-link");
+    assert.match(
+      result.stdout,
+      /used as reviewed:\n {2}actions\/src\/tool-api\/node_modules\n\[/,
+      "the link is listed once, though both checks name it",
+    );
+  });
 
   it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed infra change, still with the checkout's cf.sh", () => {
     const result = fixture.run("task/T-3-infra", { PREVIEW_ALLOW_INFRA: "1" });

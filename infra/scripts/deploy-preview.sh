@@ -10,7 +10,10 @@
 #     controls the install, the build or the deploy: wrangler.jsonc (or a wrangler.json or wrangler.toml),
 #     infra/, .github/, any package.json, package-lock.json or npm-shrinkwrap.json, .npmrc, and anything
 #     named node_modules or inside one, at any depth (step 2's imports would load it in place of what npm ci
-#     installed). The lead reviews that diff and reruns with PREVIEW_ALLOW_INFRA=1 to preview it anyway;
+#     installed), each in any letter case (this Mac's volume ignores case, so a PACKAGE.JSON is package.json
+#     to npm and node); or when they add, change or remove a symbolic link, which could point the build's
+#     writes or its cleanup at any folder on this Mac. The lead reviews that diff and reruns with
+#     PREVIEW_ALLOW_INFRA=1 to preview it anyway;
 #  1. it checks that commit out in a temporary worktree (removed afterwards) and installs it with
 #     npm ci --ignore-scripts, so no install script runs;
 #  2. the Tool API's standalone validators built there (T-1153, T-1144): node runs the worktree's own
@@ -40,10 +43,13 @@ schema="$(preview_schema "$slug")"
 # The files whose changes the lead reviews before a preview runs the branch's install and build here. The
 # validators' code imports Ajv's run-time helpers by package name, which node looks up in every node_modules
 # from actions/src/tool-api/generated/ up, so a node_modules the branch adds (a folder, a link of that name, or
-# anything in one) would run in place of the installed package.
-GUARDED_PATHS=(wrangler.jsonc wrangler.json wrangler.toml infra .github .npmrc
-  ':(glob)**/package.json' ':(glob)**/package-lock.json' ':(glob)**/npm-shrinkwrap.json'
-  ':(glob)**/node_modules' ':(glob)**/node_modules/**')
+# anything in one) would run in place of the installed package. Every entry ignores letter case (icase), as
+# this Mac's volume does: a branch's Node_Modules, PACKAGE.JSON or .NPMRC is the same folder or file to node and
+# npm as node_modules, package.json or .npmrc.
+GUARDED_PATHS=(':(glob,icase)wrangler.jsonc' ':(glob,icase)wrangler.json' ':(glob,icase)wrangler.toml'
+  ':(glob,icase)infra' ':(glob,icase).github' ':(glob,icase).npmrc'
+  ':(glob,icase)**/package.json' ':(glob,icase)**/package-lock.json' ':(glob,icase)**/npm-shrinkwrap.json'
+  ':(glob,icase)**/node_modules' ':(glob,icase)**/node_modules/**')
 
 work="$(mktemp -d)"
 tree="$work/tree"
@@ -72,21 +78,32 @@ log "preview: branch $branch, alias $slug, schema $schema, commit $sha"
 base="$(git -C "$ROOT" merge-base "$main_sha" "$sha")" ||
   die "$branch has no history in common with origin/main; refusing to preview it"
 changed="$(git -C "$ROOT" diff --no-renames --name-only "$base" "$sha" -- "${GUARDED_PATHS[@]}")"
-if [[ -n "$changed" ]]; then
+# Its symbolic links: every entry of its raw diff with mode 120000 on either side. A link, say at
+# actions/src/tool-api/generated, would point the build's writes and its cleanup at any folder on this Mac.
+links="$(git -C "$ROOT" diff --no-renames --raw "$base" "$sha" |
+  awk -F '\t' '{ split($1, mode, " "); if (mode[1] == ":120000" || mode[2] == "120000") print $2 }')"
+if [[ -n "$changed" || -n "$links" ]]; then
   if [[ "${PREVIEW_ALLOW_INFRA:-}" != "1" ]]; then
     {
-      printf '%s: refusing to preview %s: its changes since origin/main touch files that control the' \
-        "$(basename "$0")" "$branch"
-      printf ' install, the build or the deploy, which would run here with the Rosfield sign-in before'
-      printf ' review:\n'
-      printf '%s\n' "$changed" | sed 's/^/  /'
+      printf '%s: refusing to preview %s: its changes since origin/main' "$(basename "$0")" "$branch"
+      if [[ -n "$changed" ]]; then
+        printf ' touch files that control the install, the build or the deploy, which would run here with the'
+        printf ' Rosfield sign-in before review:\n'
+        printf '%s\n' "$changed" | sed 's/^/  /'
+      fi
+      if [[ -n "$links" ]]; then
+        [[ -z "$changed" ]] || printf 'and they'
+        printf ' add, change or remove symbolic links, which could point the build at folders outside its'
+        printf ' worktree:\n'
+        printf '%s\n' "$links" | sed 's/^/  /'
+      fi
       printf 'Review them (git diff %s %s -- <file>), then rerun with PREVIEW_ALLOW_INFRA=1' "$base" "$sha"
       printf ' to preview anyway.\n'
     } >&2
     exit 1
   fi
   log "preview: NOTICE: PREVIEW_ALLOW_INFRA=1, so these changed files are used as reviewed:"
-  printf '%s\n' "$changed" | sed 's/^/  /'
+  printf '%s\n' "$changed" "$links" | awk '$0 != "" && !seen[$0]++ { print "  " $0 }'
 fi
 
 log "preview: check out $sha in a temporary worktree and install it (npm ci --ignore-scripts)"
