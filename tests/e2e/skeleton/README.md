@@ -44,17 +44,17 @@ Joins 1 to 13 (T-552 to T-564): receive, scrub with the actor's inbox entry, the
 
 ## Known gaps (`gaps.ts`)
 
-The runtime's own trace test names what the merged runtime does not write yet (`runtime/test/trace-e2e.worker.test.ts` GAPS, DL-168). T-1108 closes all three below. The run judges around each gap by name and asserts that it still holds, so a writer that lands fails the run, and its task takes the gap off `gaps.ts`.
+The runtime's own trace test names what the merged runtime does not write yet (`runtime/test/trace-e2e.worker.test.ts` GAPS, DL-168). The run judges around each gap by name and asserts that it still holds, so a writer that lands fails the run, and its task takes the gap off `gaps.ts`.
 
-- `actorReceive`: the handle actor writes its own receive span beside the gateway's. That span is the actor's inbox entry: it is set aside from the hops `checkHops` counts and judged on its own.
-- `seqPerWriter`: seq restarts at 1 in each writer. The trace is judged in the order its spans started, numbered again.
-- `batchSpans`: nothing writes the batch span. The batch hop is left out of the hops judged, and `SKELETON_UPTO=batch` fails, naming the gap.
+T-1108 closed three. `actorReceive`: each text has one receive span, the gateway's, which says the text was sealed and written to its actor. `batchSpans`: the batch window writes the batch span, so the batch hop is judged with the rest. `seqPerWriter`: the trace is one run by seq across its writers, and by seq, as written, its hops stand in the order they started. Nothing is set aside or left out any more. One narrower gap is left:
+
+- `modelCallOrder`: a model call's own portCall span is not in start order by seq. The safety read's span takes its place when the read ends, after its model call's span. And `@rosie/ai`'s gateway stamps a model call's span on `Date.now()`, not on the run's clock, which the run moves on for the quiet close. So T-465's `checkHops` judges the trace in the order its spans started, numbered again. Neither writer is one of the runtime's trace writers: T-1108's handoff names the task.
 
 ## Inside workerd
 
 - The trace is checked against K-08 with the code T-1144 prebuilds for the Worker (K-08 v1.1's span, which is v1's). Ajv's compiler cannot run in workerd. `npm run test:e2e` builds that code first.
 - The local target starts capturing log lines before the root is composed, because the root binds its span sinks to `console.log` at that moment.
-- The actor's inbox entry's span starts when the hand-off reaches the actor, as K-08 says: the actor reads its clock once as the call begins and stamps the span from that reading when it answers (T-1170). The inbox entry is timed on the gateway's own readings, which are exact: after its scrub, before its answer. The safety read starts no earlier than the inbox entry, since the actor stores the text and starts its read in one step, and before the gateway's answer.
+- The actor writes no receive span of its own (T-1108): a text's one receive span is the gateway's, as K-08 shows. The actor stores the text and starts its safety read in one step, in which no clock moves, so the read's start is the inbox entry's instant. It is timed on the gateway's own readings, which are exact: after its scrub, before its answer.
 - Since the send join (T-563) the dispatcher sends through the root's Linq send port to the Linq double the local target collects its parts from, so T-465's check reads the part sent and finds no part sent twice.
 
 T-466 then completes the file with D-017's automated tests:

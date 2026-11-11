@@ -40,6 +40,13 @@
 // start and time: a `portCall` span for each read of a reply (provider resend, call readReply), and, for a reply its actor
 // wrote, the `scrub` span (counts only), as the Linq entry writes it (T-1096). Never logged, put in a span or answered: an
 // address, a subject, a word of the email, a Message-ID, a header, the body, a failure's reason, a key.
+//
+// One receive span per reply, the door's, as K-08 states it and as the Linq entry writes it (T-1108): written to its
+// actor, it says `sealedToActor`; dropped as a known event id, it names the trace the reply first arrived under
+// (`firstTrace`), which the actor's door answers. A reply's trace is one run by seq whoever writes on it: receive takes
+// place 1 as it starts, and the read's port call and the scrub take places 2 and 3 before the hand-off, which tells the
+// actor how many places the door took (`seqBefore`), so the actor's writers go on from 4. The trace's one count opens
+// once the signature has passed, never for an unsigned request.
 
 import { isLabel, type BundleId, type Outcome, type SpanFacts, type TraceContext } from "../../trace";
 import {
@@ -52,7 +59,7 @@ import {
 } from "../answer";
 import { bodyLimitOf, readCappedText } from "../body";
 import { HandoffError, prepareHandoff, type ScrubDone } from "../hand-off";
-import { recordScrub } from "../linq-webhook";
+import { firstTraceOf, recordScrub } from "../linq-webhook";
 import {
   answerOf,
   dropped,
@@ -66,7 +73,7 @@ import {
   written,
   type Verdict,
 } from "../providers/common";
-import type { InboundEvent } from "../types";
+import type { InboundEvent, SealedHandoff } from "../types";
 import type { EmailDeps, EmailRejectReason } from "./types";
 
 // Svix's headers (K-12 `verifyWebhook.request`; README spike row 9). The Headers API reads them in any case.
@@ -228,6 +235,8 @@ interface ReadDone {
   /** Resend's error name for a failed read (K-12 `readReply.errors.code`), kept only when it is a label. */
   code: string | null;
   errorCode: string | null;
+  /** The span's place, when it was taken before the hand-off to the actor (T-1108); the next place when left out. */
+  seq?: number;
 }
 
 /** What the spans name beside the verdict: labels, counts and times only, each set once it is known. */
@@ -238,6 +247,8 @@ interface SpanNotes {
   read?: ReadDone;
   /** The scrub of a reply its actor wrote: its span follows receive's. */
   scrub?: ScrubDone;
+  /** The scrub span's place, taken before the hand-off to the actor (T-1108). */
+  scrubSeq?: number;
 }
 
 /** What one webhook's steps share: the door's dependencies, the trace, the receipt time and the failure log. */
@@ -250,6 +261,8 @@ interface Receipt {
   bundleId: BundleId;
   notes: SpanNotes;
   onError: (stage: string, error: unknown) => void;
+  /** Takes the next place (K-08 `seq`) on the webhook's trace, for a span recorded after receive's (T-1108). */
+  takePlace: () => number;
 }
 
 /**
@@ -263,13 +276,14 @@ export async function handleResendWebhook(
 ): Promise<Response> {
   const bundleId = await readBundleId(deps);
   const context = openWebhookTrace(deps, bundleId, where, "textWebhook");
+  // Receive takes the trace's first place as it starts (T-1108).
   const timing = context.start("receive");
   const notes: SpanNotes = { got: {} };
   const onError = (stage: string, error: unknown): void => {
     logFailure(context.traceId, stage, error);
   };
 
-  const verdict = await decide(request, deps, context.traceId, bundleId, notes, onError);
+  const verdict = await decide(request, deps, context, bundleId, notes, onError);
 
   let received = false;
   try {
@@ -288,13 +302,14 @@ export async function handleResendWebhook(
   }
   // Only after a kept receive span: a read's or a scrub's span alone would stand first in a trace that has no receive.
   if (received && notes.read !== undefined) recordRead(context, notes.read, notes.eventId);
-  if (received && notes.scrub !== undefined) recordScrub(context, notes.scrub, notes.eventId);
+  if (received && notes.scrub !== undefined) recordScrub(context, notes.scrub, notes.eventId, notes.scrubSeq);
   return respond(answerOf(verdict), context.traceId);
 }
 
 /**
  * Records the `portCall` span of one read of a reply, after receive's: provider resend, call readReply, its own start
- * and time, and how it ended in labels. A span the contract refuses is never logged, and the answer does not change.
+ * and time, and how it ended in labels, at the place taken for it before the hand-off when one was (T-1108). A span the
+ * contract refuses is never logged, and the answer does not change.
  */
 function recordRead(context: TraceContext, read: ReadDone, eventId: string | undefined): void {
   try {
@@ -302,6 +317,7 @@ function recordRead(context: TraceContext, read: ReadDone, eventId: string | und
       hop: "portCall",
       at: new Date(read.startedAt).toISOString(),
       ms: read.ms,
+      ...(read.seq === undefined ? {} : { seq: read.seq }),
       outcome: read.outcome,
       provider: "resend",
       call: "readReply",
@@ -319,11 +335,12 @@ function recordRead(context: TraceContext, read: ReadDone, eventId: string | und
 async function decide(
   request: Request,
   deps: EmailDeps,
-  traceId: string,
+  context: TraceContext,
   bundleId: BundleId,
   notes: SpanNotes,
   onError: (stage: string, error: unknown) => void,
 ): Promise<Verdict> {
+  const traceId = context.traceId;
   const now = deps.now ?? Date.now;
   const nowMs = now();
   // The body under its cap (../body.ts), before any signature check: one over it is never read whole or verified, and
@@ -366,7 +383,9 @@ async function decide(
     return dropped({ signatureValid: true, ignoredType: true });
   }
 
-  // The signature passed and the webhook is one Rosie uses: its id names the event from here on.
+  // The signature passed and the webhook is one Rosie uses: its id names the event from here on, and the trace's writers
+  // share one count of places, after receive's (T-1108). Only a signed webhook opens one.
+  context.shareSeq();
   if (isLabel(headers.webhookId)) notes.eventId = headers.webhookId;
   const receipt: Receipt = {
     deps,
@@ -377,6 +396,7 @@ async function decide(
     bundleId,
     notes,
     onError,
+    takePlace: () => context.reserve(),
   };
   return reading.kind === "receipt"
     ? storeReceipt(reading.event, reading.rfcMessageId, receipt)
@@ -511,13 +531,15 @@ async function storeReply(receivedEmailId: string, receipt: Receipt): Promise<Ve
     };
     return ended.verdict;
   }
-  notes.read = { startedAt, ms, outcome: "ok", result: "event", code: null, errorCode: null };
+  const read: ReadDone = { startedAt, ms, outcome: "ok", result: "event", code: null, errorCode: null };
+  notes.read = read;
 
   const { event, passed } = withSenderCheck(reading.event);
   notes.got.kind = event.kind;
   notes.got.service = event.service;
   let stored: unknown;
   let scrub: ScrubDone | undefined;
+  let handed: SealedHandoff | undefined;
   let stage = "prepare";
   let code = "handoffFailed";
   try {
@@ -536,11 +558,26 @@ async function storeReply(receivedEmailId: string, receipt: Receipt): Promise<Ve
     if (prepared.door !== "actor") throw new HandoffError("unroutable");
     scrub = prepared.scrub;
     stage = "handoff";
-    stored = await deps.actor.accept(prepared.handoff);
+    // The read's and the scrub's places are taken now, in the order they started, and the actor is told how many
+    // places the door took before it (T-1108).
+    read.seq = receipt.takePlace();
+    notes.scrubSeq = receipt.takePlace();
+    handed = { ...prepared.handoff, seqBefore: notes.scrubSeq };
+    stored = await deps.actor.accept(handed);
   } catch (error) {
     receipt.onError(stage, error);
     if (stage === "prepare") code = error instanceof HandoffError ? error.code : "sealFailed";
   }
-  if (stored === "written" && scrub !== undefined) notes.scrub = scrub;
-  return storedVerdict(stored, code, { signatureValid: true, senderCheckPassed: passed });
+  const decided: SpanFacts = { signatureValid: true, senderCheckPassed: passed };
+  if (stored === "written") {
+    if (scrub !== undefined) notes.scrub = scrub;
+    // Sealed and written to its actor, as K-08's receive span says of a text (trace-skeleton.json).
+    return written({ ...decided, knownEventId: false, sealedToActor: true });
+  }
+  if (stored === "duplicate") {
+    // The trace the reply first arrived under, from its actor's stored event (K-08 trace-duplicate-webhook.json).
+    const firstTrace = handed === undefined ? null : await firstTraceOf(deps.actor, handed, receipt.traceId);
+    return dropped({ ...decided, knownEventId: true, ...(firstTrace === null ? {} : { firstTrace }) });
+  }
+  return failed(code, decided);
 }

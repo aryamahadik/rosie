@@ -227,8 +227,13 @@ describe("the turn loop as the lease's turn", () => {
         ]);
 
         // Every span of the turn carries its turn id and the pinned bundle id, passes K-08, and no line holds the words.
-        const spans = spansOf(log).filter((span) => span.turn_id === turnId);
+        // Read as K-08 reads a trace, in order by seq (README "Traces"): the first to carry the turn's id is the batch
+        // span, before the lease's (trace-skeleton.json: batch at seq 4, lease at seq 5; T-1108).
+        const spans = spansOf(log)
+          .filter((span) => span.turn_id === turnId)
+          .sort((a, b) => Number(a.seq) - Number(b.seq));
         expect(spans.map((span) => span.hop)).toEqual([
+          "batch",
           "lease",
           "guard",
           "frontier",
