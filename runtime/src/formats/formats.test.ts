@@ -1,15 +1,16 @@
 // T-261 (C-128), run by `npm run test:unit -- runtime/src/formats`: for each outbox row, what this phone allows right
 // now (arch 07 line 365, "How the AI picks the format", and the formats table, lines 377 to 393), never bold, read
 // receipts (MC 8 'iPhone tests') or arch 07 line 393's Never row. First the card's list, in its order; then the channel
-// rules and each format's rule of the table. The capability check is K-11 v1's, answered by the Linq double (C-211) and
-// by capability.json, since no Linq line serves the new build yet (J-08). Phones and handles are K-04 v1's seed rows
-// (Alex has voted in a poll, Riley has not, Tomás's chat is RCS, Ben's chat is closed); the answered text is K-06 v1's
-// text-imessage.json; the typed options are msgtext.js's form of A6-02's buttons as bundle-mini-a.json writes it.
-// Test values only (rule 9).
+// rules, each format's rule of the table, and the shapes held to their contracts. The capability check is K-11 v1's,
+// answered by the Linq double (C-211) and by capability.json, since no Linq line serves the new build yet (J-08). Phones
+// and handles are K-04 v1's seed rows (Alex has voted in a poll, Riley has not, Tomás's chat is RCS, Ben's chat is
+// closed); the answered text is K-06 v1's text-imessage.json; the typed options are msgtext.js's text form of its own
+// example buttons (msgtext.js lines 9 and 64). Test values only (rule 9).
 import { createLinqDouble, type LinqDouble } from "@rosie/adapters/linq/double";
 import inboundEventV1 from "@rosie/contracts/inbound-event/inbound-event.v1.schema.json";
 import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import messagePlanV1 from "@rosie/contracts/message-plan/message-plan.v1.schema.json";
+import portLinqV1 from "@rosie/contracts/port-linq/port-linq.v1.schema.json";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CAPABILITY_CACHE_MS, CapabilityCache } from "./capability";
@@ -47,13 +48,17 @@ import type {
   FormatsRow,
   InboundKind,
   InboundService,
+  LinqService,
   PhoneRecipient,
   Recipient,
   Situation,
   StepFacts,
 } from "./types";
 
-/** msgtext.js's text form of A6-02's buttons Accept, Another time, Decline (bundle-mini-a.json's plainText). */
+/**
+ * msgtext.js's text form of the buttons Accept, Another time, Decline (its own example, line 9; smsText, line 64:
+ * "Reply", each button's number and label, a closing period).
+ */
 const TYPED = "Reply 1 Accept, 2 Another time, 3 Decline.";
 
 /** A step with each element the table reads: a closed question of 3 options, a secure link, a confirmation's file. */
@@ -412,23 +417,43 @@ describe("the channel, first that tells (arch 07 line 365)", () => {
     expect(allowed.channel).toBe(channel);
     expect(allowed.channelFrom).toBe(channel === null ? "checkFailed" : "capabilityCheck");
   });
+
+  it("a check that names iMessage as the service but says the number takes none cannot tell: text alone", async () => {
+    const { linq, cache } = setUp();
+    linq.setCapability(RILEY, { result: "checked", imessage: false, service: "imessage" });
+
+    const allowed = await allowedFormatsFor({ to: riley(), answers: null, step: EVERY_ELEMENT }, cache);
+
+    expect(allowed).toMatchObject({ channel: null, channelFrom: "checkFailed", formats: ["text"] });
+  });
 });
 
-/** A rule of the table: whether a channel, a step and the text a row replies to allow the format. */
-type Rule = (channel: Channel | null, step: StepFacts, reply: AnsweredText | null) => boolean;
+/** A rule of the table: whether a channel, a step, the text a row replies to and an existing chat allow the format. */
+type Rule = (
+  channel: Channel | null,
+  step: StepFacts,
+  reply: AnsweredText | null,
+  inChat: boolean,
+) => boolean;
 
 /** Each format as the table allows it (arch 07 lines 377 to 393), written out from the table. */
 const TABLE: Readonly<Record<Format, Rule>> = {
   text: () => true,
-  poll: (channel, step) =>
-    channel === "imessage" && step.optionCount >= POLL_OPTIONS.min && step.optionCount <= POLL_OPTIONS.max,
-  linkCard: (channel, step) =>
+  poll: (channel, step, _reply, inChat) =>
+    inChat &&
+    channel === "imessage" &&
+    step.optionCount >= POLL_OPTIONS.min &&
+    step.optionCount <= POLL_OPTIONS.max,
+  linkCard: (channel, step, _reply, inChat) =>
+    inChat &&
     (channel === "imessage" || channel === "rcs") &&
     (step.pageTypes.length > 0 ||
       step.allowedLinks.includes("link.secure") ||
       step.allowedLinks.includes("link.pay")),
-  calendarFile: (channel, step) => channel === "imessage" && step.calendarFile !== "none",
-  tapback: (channel, step, reply) =>
+  calendarFile: (channel, step, _reply, inChat) =>
+    inChat && channel === "imessage" && step.calendarFile !== "none",
+  tapback: (channel, step, reply, inChat) =>
+    inChat &&
     channel === "imessage" &&
     reply !== null &&
     (reply.kind === "text" || reply.kind === "photo") &&
@@ -439,9 +464,9 @@ const TABLE: Readonly<Record<Format, Rule>> = {
 
 /** Code's own formats as the table allows them (arch 07 lines 385, 389). */
 const CODE_TABLE: Readonly<Record<CodeFormat, Rule>> = {
-  typingDots: (channel, _step, reply) => channel === "imessage" && reply !== null,
-  threadedReply: (channel, step, reply) =>
-    channel === "imessage" && reply !== null && step.openQuestionCount >= 2,
+  typingDots: (channel, _step, reply, inChat) => inChat && channel === "imessage" && reply !== null,
+  threadedReply: (channel, step, reply, inChat) =>
+    inChat && channel === "imessage" && reply !== null && step.openQuestionCount >= 2,
 };
 
 /** Every step the sweep reads: each count, list, file, tag and flag the table looks at. */
@@ -466,34 +491,60 @@ function everyStep(): StepFacts[] {
   return steps;
 }
 
+/** The rows whose lists differ from the table's, over every step, channel and one of these replies; and how many it read. */
+function sweep(to: Recipient, replies: readonly (AnsweredText | null)[]): { wrong: string[]; rows: number } {
+  const inChat = to.kind === "phone" && to.chatOpen;
+  const wrong: string[] = [];
+  let rows = 0;
+  for (const step of everyStep()) {
+    for (const channel of [null, ...CHANNELS]) {
+      for (const answers of replies) {
+        rows += 1;
+        const reply = answers?.fromHandleId === to.handleId ? answers : null;
+        const listed = formatsOn(channel, { to, answers, step });
+        const formats = FORMATS.filter((format) => TABLE[format](channel, step, reply, inChat));
+        const code = CODE_FORMATS.filter((format) => CODE_TABLE[format](channel, step, reply, inChat));
+        if (listed.formats.join() !== formats.join() || listed.codeFormats.join() !== code.join()) {
+          wrong.push(JSON.stringify({ channel, step, answers, listed }));
+        }
+      }
+    }
+  }
+  return { wrong, rows };
+}
+
 describe("each format as the table allows it (arch 07 lines 377 to 393)", () => {
   it("lists a format exactly when the table allows it, over every channel, step and reply", () => {
     const to = riley();
-    const replies: (AnsweredText | null)[] = [
+    const { wrong, rows } = sweep(to, [
       null,
       ...(["text", "photo", "pollVote", "reaction", "edit"] as const).map((kind) =>
         textFrom(to, "imessage", kind),
       ),
       answeredOf(textImessage),
-    ];
-    const wrong: string[] = [];
-    let rows = 0;
-    for (const step of everyStep()) {
-      for (const channel of [null, ...CHANNELS]) {
-        for (const answers of replies) {
-          rows += 1;
-          const reply = answers?.fromHandleId === to.handleId ? answers : null;
-          const listed = formatsOn(channel, { to, answers, step });
-          const formats = FORMATS.filter((format) => TABLE[format](channel, step, reply));
-          const code = CODE_FORMATS.filter((format) => CODE_TABLE[format](channel, step, reply));
-          if (listed.formats.join() !== formats.join() || listed.codeFormats.join() !== code.join()) {
-            wrong.push(JSON.stringify({ channel, step, answers, listed }));
-          }
-        }
-      }
-    }
+    ]);
+
     expect(wrong.slice(0, 5)).toEqual([]);
     expect(rows).toBeGreaterThan(100_000);
+  });
+
+  it("with no chat, or to an email address, lists text alone whatever channel is named", () => {
+    const ben = seedPhone(BEN);
+    expect(ben.chatOpen).toBe(false);
+
+    for (const to of [ben, SAM_EMAIL]) {
+      const own: AnsweredText = { fromHandleId: to.handleId, service: "imessage", kind: "text" };
+      const { wrong, rows } = sweep(to, [null, own]);
+      expect(wrong.slice(0, 5)).toEqual([]);
+      expect(rows).toBeGreaterThan(10_000);
+    }
+    // Rosie never opens a chat (arch 07 line 369): even a "thanks!" on iMessage with every element gets words alone.
+    for (const step of [EVERY_ELEMENT, THANKS]) {
+      expect(formatsOn("imessage", { to: ben, answers: textFrom(ben, "imessage"), step })).toEqual({
+        formats: ["text"],
+        codeFormats: [],
+      });
+    }
   });
 
   it("a poll needs a closed question of 2 to 5 options, on iMessage", () => {
@@ -505,6 +556,7 @@ describe("each format as the table allows it (arch 07 lines 377 to 393)", () => 
     const pollAt = (count: number): boolean => formatsOn("imessage", row(count)).formats.includes("poll");
 
     expect([0, 1, 2, 5, 6].map(pollAt)).toEqual([false, false, true, true, false]);
+    expect(pollAt(2.5)).toBe(false);
     expect(formatsOn("rcs", row(3)).formats).not.toContain("poll");
   });
 
@@ -595,6 +647,41 @@ describe("a plan outside the list goes as text alone (arch 07 line 365)", () => 
   });
 });
 
+/** Each hand-written union's members: TypeScript refuses a missing or an extra key, so the keys are the union itself. */
+const FORMAT_NAMES: Record<Format, true> = {
+  text: true,
+  poll: true,
+  linkCard: true,
+  calendarFile: true,
+  tapback: true,
+};
+const CHANNEL_NAMES: Record<Channel, true> = { imessage: true, rcs: true, sms: true, email: true };
+const LINQ_SERVICE_NAMES: Record<LinqService, true> = { imessage: true, rcs: true, sms: true };
+const INBOUND_SERVICE_NAMES: Record<InboundService, true> = {
+  imessage: true,
+  rcs: true,
+  sms: true,
+  email: true,
+};
+const INBOUND_KIND_NAMES: Record<InboundKind, true> = {
+  text: true,
+  photo: true,
+  reaction: true,
+  pollVote: true,
+  voteRemoved: true,
+  edit: true,
+  delivered: true,
+  sent: true,
+  failed: true,
+};
+const SITUATION_NAMES: Record<Situation, true> = {
+  gentle: true,
+  problem: true,
+  moneyOrConsent: true,
+  routine: true,
+};
+const CALENDAR_FILE_NAMES: Record<CalendarFile, true> = { none: true, new: true, move: true, cancel: true };
+
 describe("what it gives and never does", () => {
   it("logs nothing, so no number or chat id reaches a log", async () => {
     const methods = ["log", "info", "warn", "error", "debug", "trace"] as const;
@@ -620,5 +707,17 @@ describe("what it gives and never does", () => {
 
     expect(allowed.formats.length).toBeGreaterThanOrEqual(minItems);
     for (const format of allowed.formats) expect(messagePlanV1.$defs.format.enum).toContain(format);
+  });
+
+  it.each<[string, Readonly<Record<string, true>>, readonly string[]]>([
+    ["K-03 v1 format", FORMAT_NAMES, messagePlanV1.$defs.format.enum],
+    ["K-03 v1 channel", CHANNEL_NAMES, messagePlanV1.$defs.channel.enum],
+    ["K-03 v1 situation", SITUATION_NAMES, messagePlanV1.$defs.situation.enum],
+    ["K-03 v1 calendarFile", CALENDAR_FILE_NAMES, messagePlanV1.$defs.calendarFile.enum],
+    ["K-06 v1 service", INBOUND_SERVICE_NAMES, inboundEventV1.$defs.service.enum],
+    ["K-06 v1 kind", INBOUND_KIND_NAMES, inboundEventV1.$defs.kind.enum],
+    ["K-11 v1 service", LINQ_SERVICE_NAMES, portLinqV1.$defs.service.enum],
+  ])("its hand-written shape of %s holds the contract's list, no more and no less", (_name, names, list) => {
+    expect(Object.keys(names).sort()).toEqual([...list].sort());
   });
 });

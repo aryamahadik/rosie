@@ -5,16 +5,16 @@
 //
 // The channel, first that tells (arch 07 line 365):
 //   1. an email row: email, which takes text alone (its own row with typed options: arch 07 line 371);
-//   2. no chat with Rosie's number (K-04 phones.chat_open): text alone. Rosie never opens a chat (arch 07 line 369;
-//      RULES 4.1b; K-11 sendPart goes only into an existing chat), so such a text is the SMS port's, which takes words
-//      alone;
+//   2. no chat with Rosie's number (K-04 phones.chat_open, which STOP clears): text alone, and Linq is asked nothing.
+//      Rosie never opens a chat (arch 07 line 369; RULES 4.1b; K-11 sendPart goes only into an existing chat), so such
+//      a text is the SMS port's, which takes words alone; whether it goes at all is limit 8's (MC C9: no SMS provider);
 //   3. the service of the text the row replies to, when its own recipient sent it (HANDOFF 6; K-06 `service`, as the
 //      actor stored it). A chat Linq reports as SMS gets text only, and one it reports as RCS text and link cards (CQ-11
 //      as DL-031 answered it; K-11 v1 README open gap 8);
 //   4. else Linq's capability check, kept 10 minutes (./capability.ts);
 //   5. else text alone: the check failed, or could not tell (arch 07 line 365, DD).
 //
-// Then each format, as the table allows it:
+// Then each format, as the table allows it, every one but text only in a Linq chat that exists:
 //   text          always;
 //   poll          iMessage, in an existing chat, for a closed question with 2 to 5 options (line 379);
 //   link card     iMessage or RCS, for an action on a secure page: a page type the step allows, or a secure-page link
@@ -146,8 +146,9 @@ function tapbackFits(reply: AnsweredText | null, step: StepFacts): boolean {
 }
 
 /**
- * The formats and code formats a row's channel allows with its step and turn (the table, arch 07 lines 377 to 393). A
- * Linq channel is only ever known in an existing chat (see channelOf), so the poll's "in an existing chat" holds here.
+ * The formats and code formats a row's channel allows with its step and turn (the table, arch 07 lines 377 to 393).
+ * Every format but text goes into a Linq chat that exists (the poll's "in an existing chat", line 379; Rosie never opens
+ * one, line 369), so a row to a phone with no chat, or to an email address, gets text alone whatever channel is named.
  */
 export function formatsOn(
   channel: Channel | null,
@@ -155,10 +156,12 @@ export function formatsOn(
 ): Pick<AllowedFormats, "formats" | "codeFormats"> {
   const step = row.step;
   const reply = replyTo(row);
-  const imessage = channel === "imessage";
+  const inChat = row.to.kind === "phone" && row.to.chatOpen;
+  const imessage = inChat && channel === "imessage";
+  const rcs = inChat && channel === "rcs";
   const allowed = new Set<Format>(["text"]);
   if (imessage && pollFits(step)) allowed.add("poll");
-  if ((imessage || channel === "rcs") && securePageAction(step)) allowed.add("linkCard");
+  if ((imessage || rcs) && securePageAction(step)) allowed.add("linkCard");
   if (imessage && step.calendarFile !== "none") allowed.add("calendarFile");
   if (imessage && tapbackFits(reply, step)) allowed.add("tapback");
 

@@ -5,14 +5,28 @@
 // fictional 555-01xx (rule 9); the clock is a fake one, started at capability.json's own moment.
 import { createLinqDouble } from "@rosie/adapters/linq/double";
 import capabilityFixture from "@rosie/contracts/port-linq/fixtures/capability.json";
+import portLinqV1 from "@rosie/contracts/port-linq/port-linq.v1.schema.json";
 import { describe, expect, it } from "vitest";
 
 import { CAPABILITY_CACHE_MS, CapabilityCache } from "./capability";
 import { AVERY, RILEY, TOMAS, fakeClock, fixturePort } from "./test-support";
 import type { CapabilityAnswer, CapabilityCheckPort } from "./types";
 
-/** A port whose one answer the test gives when it chooses, to hold a check out. */
-function heldPort(): {
+/** K-11 v1 capabilityCheck.response for a number that takes iMessage. */
+const checkedFor = (phone: string): CapabilityAnswer => ({
+  result: "checked",
+  phone,
+  imessage: true,
+  service: "imessage",
+  checkedAt: capabilityFixture.given.now,
+  cacheSeconds: 600,
+});
+
+/**
+ * A port whose one answer the test gives when it chooses, to hold a check out. With `heldFor`, only that number's check
+ * is held, and every other number is answered at once as taking iMessage.
+ */
+function heldPort(heldFor?: string): {
   port: CapabilityCheckPort;
   asked: string[];
   answer: (outcome: CapabilityAnswer) => void;
@@ -27,6 +41,7 @@ function heldPort(): {
     port: {
       capabilityCheck: ({ phone }) => {
         asked.push(phone);
+        if (heldFor !== undefined && phone !== heldFor) return checkedFor(phone);
         return new Promise<CapabilityAnswer>((resolve) => {
           give = resolve;
         });
@@ -54,8 +69,10 @@ describe("the capability check's cache (arch 07 line 365; K-11 v1 capabilityChec
       cached: false,
     });
     expect(asked).toEqual([TOMAS]);
-    // The fixture's cacheSeconds is the 10 minutes the cache keeps it.
-    expect(capabilityFixture.outcome.cacheSeconds * 1000).toBe(CAPABILITY_CACHE_MS);
+    // K-11's cacheSeconds, in the schema and in the fixture, is the 10 minutes the cache keeps it.
+    const cacheSeconds = portLinqV1.$defs["capabilityCheck.response"].properties.cacheSeconds.const;
+    expect(cacheSeconds * 1000).toBe(CAPABILITY_CACHE_MS);
+    expect(capabilityFixture.outcome.cacheSeconds).toBe(cacheSeconds);
     expect(CAPABILITY_CACHE_MS).toBe(10 * 60 * 1000);
   });
 
@@ -198,14 +215,7 @@ describe("the capability check's cache (arch 07 line 365; K-11 v1 capabilityChec
     const first = cache.lookup(RILEY);
     const second = cache.lookup(RILEY);
     expect(held.asked).toEqual([RILEY]);
-    held.answer({
-      result: "checked",
-      phone: RILEY,
-      imessage: true,
-      service: "imessage",
-      checkedAt: capabilityFixture.given.now,
-      cacheSeconds: 600,
-    });
+    held.answer(checkedFor(RILEY));
 
     await expect(first).resolves.toEqual(IMESSAGE);
     await expect(second).resolves.toEqual({ ...IMESSAGE, cached: true });
@@ -249,5 +259,29 @@ describe("the capability check's cache (arch 07 line 365; K-11 v1 capabilityChec
     clock.advance(CAPABILITY_CACHE_MS);
     await cache.lookup(RILEY);
     expect(cache.size).toBe(1);
+  });
+
+  it("a check still out keeps no old answer behind it, and is kept itself once it answers", async () => {
+    const clock = fakeClock();
+    const held = heldPort(RILEY);
+    const cache = new CapabilityCache(held.port, { now: clock.now });
+
+    // Riley's check is out, first in the cache; Tomás's answer is kept behind it.
+    const slow = cache.lookup(RILEY);
+    await cache.lookup(TOMAS);
+    expect(cache.size).toBe(2);
+
+    // Ten minutes on, Tomás's answer is old: a lookup for another number drops it, though Riley's check is still out.
+    clock.advance(CAPABILITY_CACHE_MS);
+    await cache.lookup(AVERY);
+    expect(cache.size).toBe(2);
+    await expect(cache.lookup(TOMAS)).resolves.toEqual(IMESSAGE);
+    expect(held.asked).toEqual([RILEY, TOMAS, AVERY, TOMAS]);
+
+    held.answer(checkedFor(RILEY));
+    await expect(slow).resolves.toEqual(IMESSAGE);
+    await expect(cache.lookup(RILEY)).resolves.toEqual({ ...IMESSAGE, cached: true });
+    expect(cache.size).toBe(3);
+    expect(held.asked).toEqual([RILEY, TOMAS, AVERY, TOMAS]);
   });
 });

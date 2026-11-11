@@ -101,10 +101,14 @@ export class CapabilityCache implements CapabilityLookup {
     }
   }
 
-  /** Drops the answers 10 minutes old from the front (the oldest), up to the first live answer or check still out. */
+  /**
+   * Drops the answers 10 minutes old from the front (the oldest), up to the first live answer. A check still out is
+   * passed over, never dropped, so one that is slow to answer keeps no old answer behind it.
+   */
   #dropOld(now: number): void {
     for (const [phone, entry] of this.#entries) {
-      if (entry.kind === "out" || now < entry.until) return;
+      if (entry.kind === "out") continue;
+      if (now < entry.until) return;
       this.#entries.delete(phone);
     }
   }
