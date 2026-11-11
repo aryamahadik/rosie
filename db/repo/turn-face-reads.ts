@@ -813,7 +813,7 @@ export async function readFixedLineFactsIn(
       from outbox_rows r
       where r.recipient_handle_id = ${handleId}
         and r.business_id is null
-        and r.commit_seq < (select o.commit_seq from outbox_rows o where o.id = ${outboxRowId})
+        and r.commit_seq < (select o.commit_seq from outbox_rows o where o.id = ${outboxRowId} and o.business_id is null)
         and r.final_parts -> 'fixedLines' @> jsonb_build_array(${OPENER_LINE}::text)
       order by r.commit_seq
       limit 1
