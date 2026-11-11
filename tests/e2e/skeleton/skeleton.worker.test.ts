@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 10 (T-552 to T-561), receive to finalize. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 11 (T-552 to T-562), receive to dispatch. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -69,8 +69,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 10's, finalize filling slots and fixed lines with the claim and message checks (T-561). */
-const JOINED_THROUGH: SkeletonHop = "fillAndChecks";
+/** The last hop joined on main: join 11's, the outbox dispatcher's claim and limit 8 (T-562). */
+const JOINED_THROUGH: SkeletonHop = "dispatch";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -706,6 +706,90 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(
       stringsOf(facts.collected.spans).filter((value) =>
         [opener, optOutLine, privacyLink, ...lines].some((line) => value.includes(line)),
+      ),
+    ).toEqual([]);
+    return Promise.resolve();
+  },
+
+  // Row 11, "Outbox dispatcher, limit 8" (K-05, K-07; T-562; ADR-013 section 6: commit-s1-01.json's row, quick_reply,
+  // K-09 v1.5 default 133; DL-312, DL-317, DL-433): the dispatcher the turn woke claims the JOIN turn's one row once, in
+  // commit order, through K-05 v1.2's claim (claim 1, from checked, by the linq port), with the final parts finalize wrote
+  // into it: S13-01's opener, the plan's words, Q-30's STOP, HELP and rates line, and the privacy link alone on the last
+  // line. Limit 8 reads Sam's send state once, before any send. Test owner 1's seed holds no phone row, and turn 1's commit
+  // writes none (T-1148: "the number has none until turn 1 commits"; commit-s1-01.json writes the thread alone), so no
+  // open chat is known and the row waits for the chat (K-05 markRow waitingChat: its claim let go, no clock): nothing is
+  // renewed or sent. One dispatch span, the dispatcher's own, for the row, started after the turn's fillAndChecks span.
+  // The reply in the same turn going at 11pm (Q-15), a stopped phone's row dropped, and two dispatchers claiming at once
+  // are proven in runtime/src/wiring/hop11.worker.test.ts, on Sam's phone row as K-05's send-state-owner.json holds it.
+  // The order rule join 12 meets: a sent part's providerAccepted span starts at Linq's acceptance, inside its row's
+  // dispatch span and after its start (the Linq double accepts a moment after the send starts: DL-349), so judged by
+  // start time it follows the dispatch span.
+  11: (facts) => {
+    const row = `outbox-s1-02-${facts.turnId}-1`;
+    const { dispatch, finalize, linq } = facts.run.fakes;
+    const written = finalize.plans.get(row);
+    if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
+    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
+    const optOutLine = bundleV0FixedLine("optOutLine");
+    const privacyLink = bundleV0FixedLine("privacyLink");
+
+    // One claim, for the JOIN turn's recipient: the row claimed once, from checked, by the linq port, as quick_reply.
+    expect(dispatch.claims.map((call) => call.request.recipientHandleId)).toEqual([TEST_OWNER_1.handleId]);
+    const answer = dispatch.claims[0]?.answer;
+    if (answer === undefined || "error" in answer)
+      throw new Error("the JOIN turn's claim was not answered claimed");
+    expect(
+      answer.claimed.map((claimed) => [
+        claimed.outboxRowId,
+        claimed.claimedFrom,
+        claimed.port,
+        claimed.sendClass,
+        claimed.claim.claimNo,
+      ]),
+    ).toEqual([[row, "checked", "linq", "quick_reply", 1]]);
+    // The dispatcher was handed the final parts finalize wrote, which carry the first text's lines word for word.
+    expect(answer.claimed[0]?.finalParts).toEqual(written.finalParts);
+    const text = written.finalParts.sends[0].text ?? "";
+    expect(written.finalParts.sends).toHaveLength(1);
+    expect(text.startsWith(`${opener} `)).toBe(true);
+    expect(text.split("\n").slice(-2)).toEqual([optOutLine, privacyLink]);
+
+    // Limit 8 read Sam's send state once, before any send: no phone row (so no open chat), Sam's chat with its Linq id.
+    expect(dispatch.stateReads.map((call) => call.request.outboxRowId)).toEqual([row]);
+    expect(dispatch.stateReads[0]?.answer).toMatchObject({
+      result: "sendState",
+      rowState: "sending",
+      phone: null,
+      chat: { linqChatId: JOIN.chatId },
+      audience: "customer",
+    });
+    // So the row waits for the chat: marked waitingChat at its claimed version, its claim let go; nothing renewed or sent.
+    expect(dispatch.rowMarks.map((call) => [call.request.outcome, call.request.expectVersion])).toEqual([
+      ["waitingChat", answer.claimed[0]?.version],
+    ]);
+    expect(dispatch.row(row)).toMatchObject({ state: "waiting_chat", claim: null });
+    expect(dispatch.renewals).toEqual([]);
+    expect(dispatch.partMarks).toEqual([]);
+    expect(linq.requests).toEqual([]);
+    expect(facts.collected.spans.filter((span) => span.hop === "providerAccepted")).toEqual([]);
+
+    // One dispatch span for the row, the dispatcher's: limit 8 held it for the chat, claim 1, no part sent.
+    const span = onlySpan(facts, "dispatch");
+    expect(span).toMatchObject({
+      outcome: "held",
+      error_code: null,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      limits: [{ limit: 8, result: "fail", outcome: "waitingChat" }],
+      got: { parts: 1, partsSent: 0 },
+      decided: { result: "waitingChat", claimNo: 1 },
+      rows: [{ table: "outbox_rows", id: row }],
+    });
+    expect(Date.parse(span.at)).toBeGreaterThanOrEqual(Date.parse(onlySpan(facts, "fillAndChecks").at));
+    // No span holds a word of the final parts.
+    expect(
+      stringsOf(facts.collected.spans).filter((value) =>
+        text.split("\n").some((line) => value.includes(line)),
       ),
     ).toEqual([]);
     return Promise.resolve();

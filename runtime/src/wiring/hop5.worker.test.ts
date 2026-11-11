@@ -52,6 +52,7 @@ import {
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  withSamPhoneRow,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -178,7 +179,8 @@ interface Rig {
  * ports installed; the gate (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port.
  */
 function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = {}): Rig {
-  const fakes = skeletonFakes();
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
+  const fakes = withSamPhoneRow(skeletonFakes());
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -197,6 +199,8 @@ function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = 
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
     finalizeData: fakes.finalize.data,
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();

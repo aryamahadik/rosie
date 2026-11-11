@@ -24,7 +24,10 @@
 //                       recorded-model double's composer models: T-1175's recording 4, the JOIN run's S1-02 row (DL-347);
 //   join 10, finalize   @rosie/actions' turn face's finalizeMessage (T-1141: T-313's finalize, T-314's fixed lines), over
 //                       K-05 doubles of readOutboxRow, readFixedLineFacts, writePlan and cancelClock over what the commit
-//                       wrote and test owner 1's seeded rows, which keep the plan and final parts written into the row.
+//                       wrote and test owner 1's seeded rows, which keep the plan and final parts written into the row;
+//   join 11, dispatch   K-05 v1.2's claimOutboxV12, renewClaim, markPartV12 and markRowV12 and its sendState as one double
+//                       over the rows the commit wrote, the plans and final parts finalize wrote into them and test owner
+//                       1's seeded rows (no phone row), for the dispatcher's claim and limit 8's read at send.
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
 // root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
@@ -173,6 +176,8 @@ export function startRootRun(): RootRun {
       composeReads: fakes.compose.reads,
       composers: fakes.composer.composers,
       finalizeData: fakes.finalize.data,
+      outboxCalls: fakes.dispatch.outbox,
+      sendStateCall: fakes.dispatch.sendState,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     restore = root.install();

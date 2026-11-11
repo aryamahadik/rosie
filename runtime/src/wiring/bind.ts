@@ -70,6 +70,8 @@ export function bindPorts(
       composeInput: take("composeInput"),
       composer: take("composer"),
       finalize: take("finalize"),
+      outbox: take("outbox"),
+      sendState: take("sendState"),
       dataAccess: take("dataAccess"),
       linqSend: take("linqSend"),
     },

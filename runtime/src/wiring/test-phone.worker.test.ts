@@ -23,7 +23,6 @@ import testPhonePartsJson from "@rosie/contracts/page-api/fixtures/test-phone-pa
 import testPhoneSendJson from "@rosie/contracts/page-api/fixtures/test-phone-send.json";
 import sendCopy from "@rosie/contracts/port-email/fixtures/send-copy-of-text.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
-import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import { createExecutionContext, reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
@@ -37,7 +36,7 @@ import {
 } from "@rosie/actions/src/page-calls/staging/test-phone/index";
 import type { SendEmailRequest } from "@rosie/adapters/email/double";
 
-import type { HandleActor } from "../actor";
+import { turnIdOf, type HandleActor } from "../actor";
 import { actorNameOf, PAGE_CALLS, pagePathOf, type PageCallName } from "../gateway";
 import { createWorker } from "../index";
 import { SAM } from "../turn/test-support";
@@ -58,8 +57,8 @@ import {
   fakeFlags,
   SAM_CHAT,
   SAM_TRADES_TEXT,
-  SKELETON_ROW,
   skeletonFakes,
+  withSamPhoneRow,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -226,7 +225,8 @@ interface RigOptions {
 }
 
 async function rig(options: RigOptions = {}): Promise<Run> {
-  const fakes = skeletonFakes();
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
+  const fakes = withSamPhoneRow(skeletonFakes());
   const reads = await testPhoneReads();
   const line = countingLine(testPhoneLineOf(lineNamespace()), reads.reached);
   const testPhone: TestPhoneInputs =
@@ -253,6 +253,9 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
     finalizeData: fakes.finalize.data,
+    // The outbox and send-state ports (T-562) over one K-05 double: the dispatcher claims the row the turn committed.
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
     flags: fakeFlags(options.flagOn === false ? [] : [SKELETON_FLAG]),
     testPhone,
   });
@@ -402,11 +405,15 @@ describe("testPhoneParts on staging: test-phone-parts.json lists what the double
         await settle(samActor);
         await run.fakes.clock.advance(3000);
         await runDurableObjectAlarm(actorOf(samActor));
-        const sends = finalizePass.outcome.finalParts.sends;
+        // The turn's dispatcher claims the row the turn committed and sends the final parts finalize wrote into it (T-562).
+        const row = `outbox-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
         await waitFor(
-          async () => (await run.line.partsTo(SAM_NUMBER)).length === sends.length,
+          async () => (await run.line.partsTo(SAM_NUMBER)).length > 0,
           "the dispatcher's parts in the line",
         );
+        const sends = run.fakes.finalize.plans.get(row)?.finalParts.sends ?? [];
+        expect(sends.length).toBeGreaterThan(0);
+        expect(await run.line.partsTo(SAM_NUMBER)).toHaveLength(sends.length);
         // The email rows' stand-in: K-12's send-copy-of-text.json through the line's email double, to tp-01's own person
         // (the JSON's purpose types as a plain string).
         const copy = { ...sendCopy.request, to: SAM_EMAIL } as SendEmailRequest;
@@ -441,7 +448,7 @@ describe("testPhoneParts on staging: test-phone-parts.json lists what the double
           sends.map(
             (send, index): unknown =>
               expect.objectContaining({
-                idempotencyKey: `${SKELETON_ROW}/${String(index + 1)}/1`,
+                idempotencyKey: `${row}/${String(index + 1)}/1`,
                 to: SAM_NUMBER,
                 chatId: SAM_CHAT,
                 text: send.text,
