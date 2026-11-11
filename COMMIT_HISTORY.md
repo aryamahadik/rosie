@@ -2,9 +2,61 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 380, [`2e0b89b`](https://github.com/aryamahadik/rosie/commit/2e0b89b), 2026-11-11 14:16:55 UTC.
+- **Through:** commit 383, [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), 2026-11-11 14:39:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 383. docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387) (\#390)
+
+- **Commit:** [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), by Arya Mahadik, 2026-11-11 14:39:31 UTC
+- **Pull request:** [#390](https://github.com/aryamahadik/rosie/pull/390) from `task/commit-history-15`, merged 2026-11-11 14:39:31 UTC. It squashed 1 branch commit:
+  - `51f2c4f` docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 382. T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAndDecide, and its committed answer holds an unmapped turn's end (end asked: no limit run, no row written for any part, planner null); named rule unmappedEndAsked; 1 accepted and 3 refused fixtures (commit-s1-02-unmapped-end.json is K-02's pair-unmapped-all-refused.json answered asked); README defaults 142-145, open gaps 129-130, consumers' card lines; v1.7 stays T-054's (\#389)
+
+- **Commit:** [`a5e9df2`](https://github.com/aryamahadik/rosie/commit/a5e9df2), by Arya Mahadik, 2026-11-11 14:39:27 UTC
+- **Pull request:** [#389](https://github.com/aryamahadik/rosie/pull/389) from `task/T-1219`, merged 2026-11-11 14:39:27 UTC. It squashed 1 branch commit:
+  - `bf4dbe8` T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAnd…
+- **Files changed:** 9 (+938 −4), by folder:
+  - `contracts/tool-api/` README.md +55 −2, frozen.json +1 −1, tool-api.rules.mjs +83 −0, tool-api.v1.8.schema.json +790 −0
+  - `contracts/tool-api/fixtures/` commit-s1-02-unmapped-end.json +1 −0, index.json +5 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-unmapped-end-not-asked.json +1 −0, refuse-unmapped-end-part-not-kept.json +1 −0, refuse-unmapped-end-written.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 381. T-1222: contract test model.v1 reads K-02 v1.2's refused reads and checks an unmapped turn's end (\#388)
+
+- **Commit:** [`fcf31e9`](https://github.com/aryamahadik/rosie/commit/fcf31e9), by Arya Mahadik, 2026-11-11 14:39:23 UTC
+- **Pull request:** [#388](https://github.com/aryamahadik/rosie/pull/388) from `task/T-1222`, merged 2026-11-11 14:39:23 UTC. It squashed 1 branch commit:
+  - `4289764` T-1222: contract test model.v1 reads K-02 v1.2's refused reads and ch…
+- **Files changed:** 1 (+416 −19), by folder:
+  - `tests/contract/` model.v1.test.ts +416 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+checkDecide, the eight-verb check and the hand-off checks read a refusedRead, which has no output: agreed is false when the first or check read is refused, and the language follows default 15. checkDecide also checks the unmapped end: end set exactly when a read is refused, only after the re-read, no part going, the kept parts by default 14 (the last K-02 read's, in its order; none when every read was refused). Section 4 adds 18 tests: refuse-go-with-refused-read.json is refused for its go part alone and accepted once that part is oneQuestion; both named rules hold on both v1.2 pairs; each new check holds on the v1.2 fixtures and fires on a damaged copy. The 133 earlier tests keep their names and assertions; the eight-verb test reads a read's parts through readParts.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 380. docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385) (\#387)
 
