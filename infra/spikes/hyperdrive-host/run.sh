@@ -19,8 +19,9 @@
 #    CF_BUILD_DIR, as deploy-preview.sh does. cf.sh checks that file as it checks its own (the Rosfield account, and
 #    env.staging.name exactly rosie-staging). The checkout's wrangler.jsonc is never read or written here.
 #  - The database URL is used by `create` alone. lib.sh's load_dev_var reads STAGING_DATABASE_URL by name; this
-#    script takes it out of its environment at once and keeps it in one shell variable. It travels to: cf.sh and
-#    wrangler as the one --connection-string argument (wrangler has no other way to take it), from wrangler to
+#    script takes it out of its environment at once and keeps it in one shell variable, which is never marked for
+#    export, whatever the caller's environment holds (the unset below; run.test.mjs checks it). It travels to: cf.sh
+#    and wrangler as the one --connection-string argument (wrangler has no other way to take it), from wrangler to
 #    Cloudflare's API over HTTPS, and to two short node processes in their environment (never as an argument): one
 #    reads the host's name to refuse a pooled host, one removes the URL from wrangler's output when the create
 #    fails. It is never printed, logged, echoed or written to a file, and this script refuses to run under xtrace.
@@ -34,6 +35,21 @@ if [[ "$-" == *x* || "${SHELLOPTS:-}" == *xtrace* ]]; then
   echo "run.sh: refused: xtrace (set -x) is on; it would print the database URL" >&2
   exit 1
 fi
+# No variable that holds a secret here is marked for export, whatever the caller's environment holds. bash marks every
+# variable it finds in its environment for export, and a `local` takes the export mark of a same-named variable it
+# shadows: with `url` in the caller's environment, the database URL would be in the environment of every child process
+# the create step starts. So each such name is unset here, before it holds anything and before any child starts, and
+# allexport (set -a, or SHELLOPTS in the environment) is turned off, so no mark comes later either:
+#  - url, created, listing, text: the database URL, wrangler's raw output, the list's text (each origin's host and
+#    user) and the text of deployments status, in this script's functions;
+#  - token: the run's probe token;
+#  - line, value: lib.sh's load_dev_var reads the variables file through them. No child process starts while they hold
+#    a value; they are unset here all the same (lib.sh is outside this card);
+#  - arg, key, env_name, word, words, command_words, changes_worker: the names cf.sh gives its arguments and their
+#    parts. cf.sh is a child of this script, and a name it finds in its environment stays marked for export there:
+#    its `for arg in "$@"` would hand --connection-string=<value> to its own sed and tr.
+set +a
+unset -v url created listing text token line value arg key env_name word words command_words changes_worker
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/../../scripts/lib.sh"
 
@@ -99,13 +115,22 @@ live_version() {
   node "$HERE/helpers.mjs" live-version <<<"$text" || true
 }
 
+# need_version <version>: stops the step when the serving version could not be read before the probe. With nothing to
+# compare with afterwards, the run could not show that it left staging alone, so nothing is started.
+need_version() {
+  [[ -n "$1" ]] || die "stopped: the version that serves staging could not be read before the probe, so the" \
+    "before-and-after check could not be made. Nothing was started or uploaded. Check with:" \
+    "npm run cf -- deployments status --env staging"
+}
+
 # same_version <before> <after>: the proof that a probe left staging alone. Fails when the version that serves staging
-# is not the one that served before the probe.
+# is not the one that served before the probe, and when either could not be read: unknown never counts as the same.
 same_version() {
   if [[ -z "$1" || -z "$2" ]]; then
-    log "staging: NOTICE: the serving version could not be read (before: ${1:-unknown}, after: ${2:-unknown});" \
-      "check with: npm run cf -- deployments status --env staging"
-    return 0
+    log "staging: FAILED: the serving version could not be read after the probe (before: ${1:-unknown}, after:" \
+      "${2:-unknown}), so nothing shows that staging still serves the same version. Check with:" \
+      "npm run cf -- deployments status --env staging"
+    return 1
   fi
   if [[ "$1" != "$2" ]]; then
     log "staging: the serving version CHANGED during the probe: $1 before, $2 after. The probe deploys nothing, so" \
@@ -134,7 +159,8 @@ step_create() {
   fi
   load_dev_var STAGING_DATABASE_URL
   url="${STAGING_DATABASE_URL:-}"
-  # From here the value is in one shell variable, not in the environment a child process is given.
+  # From here the value is in one shell variable, not in the environment a child process is given: `url` was unset at
+  # the top of this script, so this local has no export mark to take from the caller's environment.
   unset STAGING_DATABASE_URL
   [[ -n "$url" ]] || die "STAGING_DATABASE_URL is not set: run this from the code folder, which holds it by name"
   kind="$(PROBE_URL="$url" node "$HERE/helpers.mjs" host-kind)" ||
@@ -213,6 +239,7 @@ call_probe() {
 # step_dev <local|remote>: the probe's Worker as a wrangler dev session, then the probe through it.
 step_dev() {
   local mode="$1" id="00000000000000000000000000000000" row base="http://127.0.0.1:$PORT" before="" passed=1
+  local unchanged=1
   local args=(dev --env staging --ip 127.0.0.1 "--port=$PORT" --show-interactive-dev-session=false)
   if [[ "$mode" == "remote" ]]; then
     row="$(hyperdrive_row "$NAME")"
@@ -221,7 +248,8 @@ step_dev() {
     args+=(--remote)
     log "probe: $NAME is id $id, caching ${row#*$'\t'}"
     before="$(live_version)"
-    log "staging: serves version ${before:-unknown} before the probe"
+    need_version "$before"
+    log "staging: serves version $before before the probe"
   fi
   if curl --silent --output /dev/null --max-time 2 "$base/"; then
     die "port $PORT on 127.0.0.1 already answers: set PROBE_PORT to a free port"
@@ -242,24 +270,27 @@ step_dev() {
   log "$mode: the probe's Worker answers on $base"
   call_probe "$base" || passed=0
   if [[ "$mode" == "remote" ]]; then
-    same_version "$before" "$(live_version)" || passed=0
+    same_version "$before" "$(live_version)" || unchanged=0
   fi
   if [[ "$passed" -ne 1 ]]; then
     show_log "$work/dev.log"
     die "the probe did not pass (its result and the end of wrangler's log are above)"
   fi
+  [[ "$unchanged" -eq 1 ]] ||
+    die "the step fails: the before-and-after check of the version that serves staging did not hold (above)"
   log "$mode: done, the probe passed and its schema is dropped"
 }
 
 # The fallback: a version of rosie-staging that only this script's requests can run, for 15 minutes. An upload is
 # not a deploy: staging's traffic, routes, cron and queues stay on the version that serves now.
 step_upload() {
-  local row id expires output url version before passed=1
+  local row id expires output url version before passed=1 unchanged=1
   row="$(hyperdrive_row "$NAME")"
   [[ -n "$row" ]] || die "no Hyperdrive configuration is named $NAME: run the create step first"
   id="${row%%$'\t'*}"
   before="$(live_version)"
-  log "staging: serves version ${before:-unknown} before the probe"
+  need_version "$before"
+  log "staging: serves version $before before the probe"
   work="$(mktemp -d)"
   token="$(new_token)"
   expires="$((($(date +%s) + 900) * 1000))"
@@ -287,8 +318,10 @@ step_upload() {
     die "the preview did not answer /ready within 90 s"
   fi
   call_probe "$url" || passed=0
-  same_version "$before" "$(live_version)" || passed=0
+  same_version "$before" "$(live_version)" || unchanged=0
   [[ "$passed" -eq 1 ]] || die "the probe did not pass (its result is above)"
+  [[ "$unchanged" -eq 1 ]] ||
+    die "the step fails: the before-and-after check of the version that serves staging did not hold (above)"
   log "probe-upload: done, the probe passed and its schema is dropped"
 }
 
