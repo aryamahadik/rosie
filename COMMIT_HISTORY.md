@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 368, [`cecb92e`](https://github.com/aryamahadik/rosie/commit/cecb92e), 2026-11-11 12:16:51 UTC.
+- **Through:** commit 370, [`1ab5a50`](https://github.com/aryamahadik/rosie/commit/1ab5a50), 2026-11-11 12:39:33 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 370. docs: COMMIT\_HISTORY.md through commit 368 (cecb92e, \#375) (\#377)
+
+- **Commit:** [`1ab5a50`](https://github.com/aryamahadik/rosie/commit/1ab5a50), by Arya Mahadik, 2026-11-11 12:39:33 UTC
+- **Pull request:** [#377](https://github.com/aryamahadik/rosie/pull/377) from `task/commit-history-10`, merged 2026-11-11 12:39:34 UTC. It squashed 1 branch commit:
+  - `231bb14` docs: COMMIT\_HISTORY.md through commit 368 (cecb92e, \#375)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 369. T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/adapters' Linq double (K-11 sendPart, real in test and staging, closed in production; the direct safety line split off as linqDirect), T-258's retries wired (DispatchDeps.retries on RootOptions.retryQueue, setQueueDeps with the dispatcher's send door), the K-05 double following db/repo defaults 1, 5, 8, 13, 17 and 18; e2e row 12 (JOINED\_THROUGH providerAccepted) and hop12.worker.test.ts prove one send per row-part-try key (\#376)
+
+- **Commit:** [`9a56e3a`](https://github.com/aryamahadik/rosie/commit/9a56e3a), by Arya Mahadik, 2026-11-11 12:39:29 UTC
+- **Pull request:** [#376](https://github.com/aryamahadik/rosie/pull/376) from `task/T-563`, merged 2026-11-11 12:39:29 UTC. It squashed 1 branch commit:
+  - `ac08082` T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/a…
+- **Files changed:** 21 (+1500 −73), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +2 −4, hop11.worker.test.ts +2 −0, hop12.worker.test.ts +644 −0, hop5.worker.test.ts +2 −0, hop6.worker.test.ts +2 −0, hop7.worker.test.ts +2 −0, index.ts +5 −0, linq-send.test.ts +126 −0, picks.ts +7 −2, ports.ts +15 −7, real.ts +172 −0, root.test.ts +51 −9, root.ts +129 −19, root.worker.test.ts +2 −0, row-traces.ts +5 −0, test-phone.worker.test.ts +4 −2, test-support.ts +196 −22
+  - `tests/e2e/skeleton/` README.md +5 −4, root-run.ts +8 −1, skeleton.worker.test.ts +120 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 368. docs: COMMIT\_HISTORY.md through commit 366 (358f9a6, \#373) (\#375)
 
