@@ -5,12 +5,22 @@
 // /webhooks/calendar/google and /webhooks/calendar/microsoft. And the page entry: the web app's K-21 v1 page and console
 // calls, each a POST to {BASE_PATH}/page-api/<call>, handed to the action layer's handler for that call; a staging-only
 // call answers stagingOnly wherever ENVIRONMENT is not staging (runtime/src/gateway/pages).
-// Then, last before the 404, web's pages (T-1171, T-1192): @rosie/web's servePage answers GET and HEAD at a page's exact
-// path under BASE_PATH, and 405 to any other method there. Today that is the privacy notice at {BASE_PATH}/privacy
-// (rosfield.com/test/privacy on staging), the address on the last line of Rosie's first text (RULES 4.3). Its answer is
-// sent as web made it (web/src/shell/serve.ts): static HTML whose headers set no cookie and whose content security
-// policy allows nothing but the page's own style. It has no trace id and no log line: a page reads nothing from the
-// request, and nothing about the reader is logged.
+// Then, last before the 404, web's pages (T-1171, T-1192, T-1234): the web app shell (@rosie/web, T-511;
+// web/src/shell/shell.ts), made from the Worker's vars (ENVIRONMENT, BASE_PATH, LINK_HOST), answers each address under
+// BASE_PATH that one of its routes takes. That is the privacy notice at {BASE_PATH}/privacy (rosfield.com/test/privacy on
+// staging), the address on the last line of Rosie's first text (RULES 4.3), and every route a feature folder lists
+// (web/src/routes.ts), staging's test tools only where ENVIRONMENT is exactly staging. So a route the web lane adds is
+// served with no change here. The shell's answer is sent as web made it, as every shell page is (CQ-209 (a)): GET and
+// HEAD get the page, any method the route does not take the shell's 405 page; the headers set no cookie and the content
+// security policy allows nothing but the page's own style; the request's trace id is in x-trace-id, and one JSON log
+// line holds that id, the route's fixed label and the status, and nothing of the request or the reader.
+// An address no route of the shell takes goes on to the Worker's own 404, which is as it was: the shell's `serve` gives
+// null there and logs nothing.
+// A page's K-21 calls reach the page entry in process, through the same answer the /page-api route gives, never by a
+// fetch back to the Worker: no address is fetched, so no redirect can be followed, and an answer that is not the
+// entry's 200 gives the page no outcome (T-511's security note a).
+// A page request the shell itself cannot answer gets a plain 500 with its trace id and that one log line: vars the
+// shell cannot be made from, or a failure outside a route's handler, where the shell has no 500 page of its own.
 // Every other request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
 // Each webhook opens its own id at receipt, and each page call its own, keeping a valid incoming one (runtime/src/gateway);
@@ -19,7 +29,10 @@
 // The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
 // for the Worker's environment. The Worker's Linq route is the root's, behind the skeleton flag (T-552, T-553).
 
-import { servePage } from "@rosie/web/src/shell/serve";
+import { pageEntryTransport, type PageApiTransport } from "@rosie/web/src/client/client";
+import { readWebConfig, WebConfigError, type WebConfig } from "@rosie/web/src/shell/config";
+import { createWebShell, type PageLogLine, type ShellDeps, type WebShell } from "@rosie/web/src/shell/shell";
+import { CONFIG_LABEL } from "@rosie/web/src/shell/worker";
 
 import { clockActorsOf, sweepClocks, type ClockActors } from "./clocks";
 import {
@@ -35,6 +48,7 @@ import {
   providerRouteOf,
   RESEND_WEBHOOK_PATH,
   type GatewayDeps,
+  type PageCallName,
 } from "./gateway";
 import { wireWorker, workerRoot } from "./wiring";
 
@@ -54,6 +68,13 @@ declare global {
       BASE_PATH: string;
       /** PostgreSQL schema: empty on staging, preview_<slug> on a branch preview. */
       DB_SCHEMA: string;
+      /**
+       * The host every link starts with, a bare host such as rosfield.com (wrangler.jsonc vars in every environment,
+       * T-1235). Only the web shell reads it, checked with ENVIRONMENT and BASE_PATH (web/src/shell/config.ts): where
+       * it is missing or no host, web's pages answer a plain 500 and every other route answers as ever. So the type
+       * lets it be missing, as an env built by hand for a route that serves no page leaves it out.
+       */
+      LINK_HOST?: string;
       /** The commit a deploy came from (`--var GIT_SHA:<sha>`); missing when run locally. */
       GIT_SHA?: string;
     }
@@ -79,8 +100,34 @@ function jsonResponse(status: number, body: Record<string, unknown>, traceId: st
 }
 
 /**
- * The health answer, web's pages and the 404 are synchronous (the health tests read them without waiting); the webhooks
- * and the page calls answer later.
+ * The label the page log line gives a page request the shell failed to answer: a failure of the shell's own, outside a
+ * route's handler. A handler's own failure is the shell's 500 page, under the route's label.
+ */
+const SHELL_FAILED_LABEL = "shellFailed";
+
+/**
+ * The answer to a page request the shell gave no answer to: a plain 500 with the trace id in x-trace-id, and the
+ * shell's one log line for it (web/src/shell/shell.ts PageLogLine): the trace id, a fixed label and the status, and
+ * nothing of the request or of what was thrown. The words and the headers are those of web's own entry for vars it
+ * cannot run on (web/src/shell/worker.ts).
+ */
+function pageFailed(traceId: string, route: string, log: (line: string) => void): Response {
+  const line: PageLogLine = { level: "error", msg: "page", trace_id: traceId, route, status: 500 };
+  log(JSON.stringify(line));
+  return new Response("The page could not be shown.\n", {
+    status: 500,
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-trace-id": traceId,
+    },
+  });
+}
+
+/**
+ * The health answer and the 404 are synchronous (the health tests read them without waiting); the webhooks, the page
+ * calls and web's pages answer later.
  * The Workers runtime always passes the execution context, so its call is the second form.
  */
 export interface RosieWorker {
@@ -95,10 +142,31 @@ export interface RosieWorker {
 /** The Worker's answer to one POST on the Linq webhook path. */
 export type LinqWebhookRoute = (request: Request, env: Cloudflare.Env) => Promise<Response>;
 
+/** The Worker's answer to one K-21 call's POST on the page entry's path. */
+export type PageCallRoute = (request: Request, call: PageCallName, env: Cloudflare.Env) => Promise<Response>;
+
+/**
+ * What web's pages are served from beside the Worker's vars (T-1234). The Worker that is deployed hands in none of it,
+ * so it serves web's own lists; a test hands in routes of its own.
+ */
+export interface WebPages {
+  /**
+   * The shell's parts other than its config and its transport (web/src/shell/shell.ts ShellDeps): the static pages and
+   * the feature folders' route modules (web/src/routes.ts when left out), the log (console.log) and the trace id maker.
+   */
+  shell?: Omit<ShellDeps, "config" | "transport">;
+  /**
+   * A K-21 call's POST, answered: by default the gateway's page entry with the Worker's doors (handlePageCall). The
+   * /page-api route and a page's own calls, in process, both go through it.
+   */
+  pageCall?: PageCallRoute;
+}
+
 /**
  * The Worker with the gateway's doors (the Linq adapter, the handle actor, and the Stripe and calendar doors' ports and
  * store) supplied by `gatewayDeps`, the sweep's HandleActor namespace by `clockActors` (the HANDLE_ACTOR binding by
- * default), and the Linq webhook POST answered by `linqWebhook` (by default the gateway's Linq entry with those doors).
+ * default), the Linq webhook POST answered by `linqWebhook` (by default the gateway's Linq entry with those doors), and
+ * web's pages served from `web` (by default web's own routes, and the gateway's page entry for a page's calls).
  */
 export function createWorker(
   gatewayDeps: (env: Cloudflare.Env) => GatewayDeps,
@@ -108,7 +176,70 @@ export function createWorker(
       environment: env.ENVIRONMENT,
       version: env.GIT_SHA ?? "unknown",
     }),
+  web: WebPages = {},
 ): RosieWorker {
+  const pageCall: PageCallRoute =
+    web.pageCall ??
+    ((request, call, env) =>
+      handlePageCall(request, call, pageDepsOf(gatewayDeps(env)), {
+        environment: env.ENVIRONMENT,
+        version: env.GIT_SHA ?? "unknown",
+      }));
+
+  /**
+   * How a page's K-21 calls reach the page entry (web/src/client/client.ts pageEntryTransport): in process, through
+   * `pageCall`, the answer the /page-api route gives, never by a fetch back to the Worker. So nothing is ever fetched
+   * at the address below and no redirect can be followed, with a body or without (T-511's security note a): the
+   * transport takes the entry's 200 alone as an outcome, and throws for any other status, a 3xx among them, as refused
+   * at the edge. The address is built from the config alone (LINK_HOST and BASE_PATH), never from the page request.
+   * A call's name is web's (web/src/client/calls.ts) handed to the gateway's as it is: both are K-21 v1's list, and the
+   * type check fails here if web ever names a call the gateway does not route.
+   */
+  const pageTransport = (config: WebConfig, env: Cloudflare.Env): PageApiTransport => ({
+    send: (call, request, traceId) =>
+      pageEntryTransport({
+        baseUrl: `https://${config.linkHost}${config.basePath}`,
+        send: (posted) => pageCall(posted, call, env),
+      }).send(call, request, traceId),
+  });
+
+  // One shell for each env the runtime hands in (an isolate keeps one), made by the first request that reaches web's
+  // pages: a request the routes before them answer never needs the shell's vars.
+  const shells = new WeakMap<Cloudflare.Env, WebShell>();
+  const shellOf = (env: Cloudflare.Env): WebShell => {
+    const made = shells.get(env);
+    if (made !== undefined) return made;
+    const config = readWebConfig(env);
+    const shell = createWebShell({ ...web.shell, config, transport: pageTransport(config, env) });
+    shells.set(env, shell);
+    return shell;
+  };
+  const logPage =
+    web.shell?.log ??
+    ((line: string) => {
+      console.log(line);
+    });
+
+  /**
+   * web's answer to the request when a route of the shell takes its address (shell.serve), else null, and the Worker's
+   * 404 answers. A page request the shell itself cannot answer gets `pageFailed`'s plain 500 under the request's trace
+   * id: vars the shell cannot be made from (WebConfigError, under the label web's own entry logs: no page is known
+   * without them, so every request that comes this far gets it), a route list the shell refuses, and anything thrown
+   * outside a route's handler, where the shell has no 500 page of its own (T-511's security note d: a handler's
+   * Response whose body was already read).
+   */
+  const pageOf = (request: Request, env: Cloudflare.Env, traceId: string): Promise<Response> | null => {
+    let served: Promise<Response> | null;
+    try {
+      served = shellOf(env).serve(request);
+    } catch (error) {
+      const label = error instanceof WebConfigError ? CONFIG_LABEL : SHELL_FAILED_LABEL;
+      return Promise.resolve(pageFailed(traceId, label, logPage));
+    }
+    if (served === null) return null;
+    return served.catch(() => pageFailed(traceId, SHELL_FAILED_LABEL, logPage));
+  };
+
   const scheduled = (
     controller: ScheduledController,
     env: Cloudflare.Env,
@@ -160,12 +291,12 @@ export function createWorker(
       });
     }
 
-    const pageCall = pathname.startsWith(basePath) ? pageRouteOf(pathname.slice(basePath.length)) : null;
-    if (pageCall !== null) {
+    const call = pathname.startsWith(basePath) ? pageRouteOf(pathname.slice(basePath.length)) : null;
+    if (call !== null) {
       if (request.method !== "POST") {
         return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
       }
-      return handlePageCall(request, pageCall, pageDepsOf(gatewayDeps(env)), { environment, version });
+      return pageCall(request, call, env);
     }
 
     if (request.method === "GET" && pathname === `${basePath}/health`) {
@@ -177,8 +308,8 @@ export function createWorker(
       );
     }
 
-    // web's pages (T-1192): web's answer, sent as it is; a path that is no page's goes on to the 404.
-    const page = servePage(request, env.BASE_PATH);
+    // web's pages (T-1192, T-1234): the shell's answer, sent as it is; an address no route takes goes on to the 404.
+    const page = pageOf(request, env, traceId);
     if (page !== null) return page;
 
     console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
