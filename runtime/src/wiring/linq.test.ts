@@ -124,6 +124,8 @@ async function rig(options: RigOptions = {}): Promise<Rig> {
     clock,
     flags,
     handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over the dispatch double: a text opens its number's chat before the actor.
+    chatOpenCall: fakes.dispatch.openChat,
     // The receipt door's store (T-562): a receipt that got past the verify would be marked here.
     outboxCalls: fakes.dispatch.outbox,
     sendStateCall: fakes.dispatch.sendState,

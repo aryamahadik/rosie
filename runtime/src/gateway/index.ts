@@ -18,6 +18,18 @@ export {
 export { handleLinqWebhook } from "./linq-webhook";
 export { durableObjectActor, type ActorNamespace, type HandleActorRpc } from "./actor-door";
 export {
+  CHAT_KINDS,
+  CHAT_REQUEST_REFUSED,
+  ChatOpenError,
+  chatRequestOf,
+  isRefusedRequest,
+  NO_HANDLE_ID,
+  openChatAtReceipt,
+  opensChat,
+  TEXT_SERVICES,
+  type ChatAtReceipt,
+} from "./chat-open";
+export {
   ACTOR_KINDS,
   HandoffError,
   RECEIPT_KINDS,
@@ -68,6 +80,7 @@ export {
   actorNameOf,
   openWords,
   sealWords,
+  type HandleKey,
   type HandleRef,
   type SealedBox,
   type SealedWords,
@@ -76,6 +89,9 @@ export {
 export type {
   ActorHandoff,
   ActorStub,
+  ChatOpenAnswer,
+  ChatOpenPort,
+  ChatOpenRequest,
   GatewayDeps,
   InboundEvent,
   LinqPort,

@@ -146,8 +146,13 @@ function arrivalOf(facts: Facts): { readonly from: number; readonly to: number }
  */
 const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 1, "Webhook in, signature checked" (K-11; T-552): the gateway verified the Linq double's signature, and took the
-  // JOIN as a new event id.
-  1: (facts) => {
+  // JOIN as a new event id. And at receipt the JOIN opened Sam's chat (K-05 v1.7 openChatOnText; T-1213, DL-444): one call,
+  // after the key call and before the actor's inbox entry, naming his handle by the id the key call answered (test owner
+  // 1's seeded handle-sam) and, from the K-06 event, its id, service, receipt time and trace, never the number. K-04 then
+  // holds his phone row, inserted once: chat open since the receipt, by iMessage, not stopped, version 1, its number read
+  // from the handle, with one phone.chat_opened entry (no turn, the event id as its job id, the JOIN's trace, no bundle),
+  // as open-chat-first-text-sam.json writes turn 1's. No entry holds the number, the chat id or the JOIN's words.
+  1: async (facts) => {
     expect(onlySpan(facts, "receive")).toMatchObject({
       outcome: "ok",
       event_id: JOIN.eventId,
@@ -163,7 +168,71 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       knownEventId: false,
       droppedAtReceipt: false,
     });
-    return Promise.resolve();
+
+    const { dispatch } = facts.run.fakes;
+    const [stored] = await facts.actor.inbox();
+    if (stored === undefined) throw new Error("no inbox entry");
+    const [opened, ...again] = dispatch.chatOpens;
+    expect(again).toEqual([]);
+    if (opened === undefined) throw new Error("the JOIN opened no chat at receipt");
+    const receivedAt = String(stored.event.receivedAt);
+    expect(opened.request).toEqual({
+      eventId: JOIN.eventId,
+      handleId: TEST_OWNER_1.handleId,
+      service: JOIN.service,
+      receivedAt,
+      traceId: facts.sent.traceId,
+    });
+    expect(opened.answer).toMatchObject({
+      result: "inserted",
+      handleId: TEST_OWNER_1.handleId,
+      phone: { chatOpen: true, chatWay: JOIN.service, stopped: false, version: 1 },
+      event: {
+        id: `${JOIN.eventId}/chat-opened`,
+        kind: "phone.chat_opened",
+        actorKind: "provider",
+        tableName: "phones",
+        rowId: TEST_OWNER_1.handleId,
+        oldValues: null,
+        newValues: { chat_open: true, chat_way: JOIN.service },
+      },
+    });
+    const answered = opened.answer as { readonly phone: { readonly chatOpenAt: string } };
+    expect(Date.parse(answered.phone.chatOpenAt)).toBe(Date.parse(receivedAt));
+    // Before the actor's inbox entry: the call had ended when the hand-off reached the actor.
+    expect(opened.endedAt).toBeLessThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
+    // K-04's phone row, inserted once, as the dispatcher's doubles read it: its number the handle's own address.
+    expect(dispatch.phones.get(TEST_OWNER_1.handleId)).toEqual({
+      number: JOIN.handle.address,
+      stopped: false,
+      stopAt: null,
+      chatOpen: true,
+      chatWay: JOIN.service,
+      linqContactAddedAt: null,
+      pollVotedAt: null,
+      optoutLineDeliveredAt: null,
+      version: 1,
+    });
+    // One phone.chat_opened entry, with no turn: the event id as its job id, the JOIN's trace, no bundle.
+    expect(dispatch.chatEntries).toMatchObject([
+      {
+        id: `${JOIN.eventId}/chat-opened`,
+        kind: "phone.chat_opened",
+        turn_id: null,
+        job_id: JOIN.eventId,
+        trace_id: facts.sent.traceId,
+        bundle_hash: null,
+        bundle_build: null,
+        business_id: null,
+        actor_kind: "provider",
+        table_name: "phones",
+        row_id: TEST_OWNER_1.handleId,
+        old_values: null,
+        why: { provider_event: { provider: "linq", event_id: JOIN.eventId } },
+      },
+    ]);
+    expect(holdersOf(dispatch.chatEntries, [String(JOIN.chatId), ...SECRETS], "chat entry")).toEqual([]);
+    expect(holdersOf([opened.request, opened.answer], [String(JOIN.chatId), ...SECRETS], "call")).toEqual([]);
   },
 
   // Row 2, "Sealed event" (K-06; T-553): scrubbed (nothing to tag), sealed under the handle's key, and one entry in its
@@ -762,20 +831,21 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   },
 
   // Row 11, "Outbox dispatcher, limit 8" (K-05, K-07; T-562; ADR-013 section 6: commit-s1-01.json's row, quick_reply,
-  // K-09 v1.5 default 133; DL-312, DL-317, DL-433): the dispatcher the turn woke claims the JOIN turn's one row once, in
-  // commit order, through K-05 v1.2's claim (claim 1, from checked, by the linq port), with the final parts finalize wrote
-  // into it: S13-01's opener, the plan's words, Q-30's STOP, HELP and rates line, and the privacy link alone on the last
-  // line. Limit 8 reads Sam's send state once, before any send. Test owner 1's seed holds no phone row, and turn 1's commit
-  // writes none (T-1148: "the number has none until turn 1 commits"; commit-s1-01.json writes the thread alone), so no
-  // open chat is known and the row waits for the chat (K-05 markRow waitingChat: its claim let go, no clock): nothing is
-  // renewed or sent. One dispatch span, the dispatcher's own, for the row, started after the turn's fillAndChecks span.
-  // The reply in the same turn going at 11pm (Q-15), a stopped phone's row dropped, and two dispatchers claiming at once
-  // are proven in runtime/src/wiring/hop11.worker.test.ts, on Sam's phone row as K-05's send-state-owner.json holds it.
-  // The order rule join 12 meets: a sent part's providerAccepted span starts at Linq's acceptance, inside its row's
-  // dispatch span and after its start (the Linq double accepts a moment after the send starts: DL-349), so judged by
-  // start time it follows the dispatch span.
+  // K-09 v1.5 default 133; DL-312, DL-317, DL-433; T-1213, DL-444): the dispatcher the turn woke claims the JOIN turn's one
+  // row once, in commit order, through K-05 v1.2's claim (claim 1, from checked, by the linq port), with the final parts
+  // finalize wrote into it: S13-01's opener, the plan's words, Q-30's STOP, HELP and rates line, and the privacy link alone
+  // on the last line. The JOIN opened Sam's chat at receipt (row 1: K-05 v1.7 openChatOnText), so limit 8 reads Sam's
+  // send state with his phone row, not stopped, its chat open by iMessage, and lets the reply in the same turn go (Q-15);
+  // the claim is renewed just before the part goes, with Sam's phone row read beside it (not stopped, chat open), and the
+  // one words part is handed to the root's FakeLinq under its key, to Sam's chat, then marked sent. No waitingChat: no row
+  // is marked. One dispatch span, the dispatcher's own, for the row, started after the turn's fillAndChecks span. The reply
+  // at 11pm (Q-15), a stopped phone's row dropped, and two dispatchers claiming at once are proven in
+  // runtime/src/wiring/hop11.worker.test.ts. The order rule join 12 meets: the part's providerAccepted span (row 12's hop,
+  // not judged here) starts at Linq's acceptance, inside the row's dispatch span and after its start (the Linq double
+  // accepts a moment after the send starts: DL-349), so judged by start time it follows the dispatch span.
   11: (facts) => {
     const row = `outbox-s1-02-${facts.turnId}-1`;
+    const key = `${row}/1/1`;
     const { dispatch, finalize, linq } = facts.run.fakes;
     const written = finalize.plans.get(row);
     if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
@@ -804,38 +874,73 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(text.startsWith(`${opener} `)).toBe(true);
     expect(text.split("\n").slice(-2)).toEqual([optOutLine, privacyLink]);
 
-    // Limit 8 read Sam's send state once, before any send: no phone row (so no open chat), Sam's chat with its Linq id.
-    expect(dispatch.stateReads.map((call) => call.request.outboxRowId)).toEqual([row]);
-    expect(dispatch.stateReads[0]?.answer).toMatchObject({
+    // Limit 8 read Sam's send state before the send: his phone row as the JOIN opened it at receipt (not stopped, chat
+    // open by iMessage, version 1) and Sam's chat with its Linq id; then the dispatcher read the stopped flag once more,
+    // just before the send (its own re-read, T-259). Limit 8 passed: no row was marked, waitingChat least of all.
+    const read = {
       result: "sendState",
+      outboxRowId: row,
       rowState: "sending",
-      phone: null,
+      phone: { stopped: false, chatOpen: true, chatWay: JOIN.service, version: 1 },
       chat: { linqChatId: JOIN.chatId },
       audience: "customer",
-    });
-    // So the row waits for the chat: marked waitingChat at its claimed version, its claim let go; nothing renewed or sent.
-    expect(dispatch.rowMarks.map((call) => [call.request.outcome, call.request.expectVersion])).toEqual([
-      ["waitingChat", answer.claimed[0]?.version],
-    ]);
-    expect(dispatch.row(row)).toMatchObject({ state: "waiting_chat", claim: null });
-    expect(dispatch.renewals).toEqual([]);
-    expect(dispatch.partMarks).toEqual([]);
-    expect(linq.requests).toEqual([]);
-    expect(facts.collected.spans.filter((span) => span.hop === "providerAccepted")).toEqual([]);
+    };
+    expect(dispatch.stateReads.map((call) => call.answer)).toMatchObject([read, read]);
+    expect(dispatch.rowMarks).toEqual([]);
 
-    // One dispatch span for the row, the dispatcher's: limit 8 held it for the chat, claim 1, no part sent.
+    // The claim renewed just before the part went, Sam's phone row read beside it: not stopped, chat open.
+    expect(dispatch.renewals.map((call) => call.answer)).toMatchObject([
+      {
+        result: "renewed",
+        outboxRowId: row,
+        claim: { claimNo: 1 },
+        recipient: { stopped: false, chatOpen: true, version: 1 },
+      },
+    ]);
+    // The one words part, handed to the root's FakeLinq under its key, to Sam's chat by iMessage, with the final parts'
+    // words; then marked sent, and the row sent under its one claim.
+    expect(linq.keysInOrder).toEqual([key]);
+    expect(linq.requests).toMatchObject([
+      {
+        idempotencyKey: key,
+        to: TEST_OWNER_1.handle.address,
+        chatId: JOIN.chatId,
+        service: JOIN.service,
+        kind: "words",
+        text,
+        overrideOptout: false,
+      },
+    ]);
+    expect(dispatch.partMarks.map((call) => [call.request.outcome, call.answer])).toMatchObject([
+      ["sent", { result: "marked", outboxRowId: row, repeated: false, row: { state: "sent" } }],
+    ]);
+    expect(dispatch.row(row)).toMatchObject({ state: "sent", claim: { claimNo: 1 } });
+
+    // One dispatch span for the row, the dispatcher's: limit 8 passed, claim 1, the one part sent by Linq.
     const span = onlySpan(facts, "dispatch");
     expect(span).toMatchObject({
-      outcome: "held",
+      outcome: "ok",
       error_code: null,
       turn_id: facts.turnId,
       bundle_id: BUNDLE_V0,
-      limits: [{ limit: 8, result: "fail", outcome: "waitingChat" }],
-      got: { parts: 1, partsSent: 0 },
-      decided: { result: "waitingChat", claimNo: 1 },
+      provider: "linq",
+      call: "sendPart",
+      attempt: 1,
+      limits: [{ limit: 8, result: "pass", outcome: null }],
+      got: { parts: 1, partsSent: 1 },
+      decided: { result: "sent", claimNo: 1 },
       rows: [{ table: "outbox_rows", id: row }],
     });
     expect(Date.parse(span.at)).toBeGreaterThanOrEqual(Date.parse(onlySpan(facts, "fillAndChecks").at));
+    // The order rule join 12 meets: the part's providerAccepted span starts after the dispatch span, inside it.
+    const [accepted, ...moreAccepted] = facts.judged.trace.spans.filter(
+      (each) => each.hop === "providerAccepted",
+    );
+    expect(moreAccepted).toEqual([]);
+    if (accepted === undefined) throw new Error("no providerAccepted span for the sent part");
+    expect(accepted.rows).toEqual([{ table: "outbox_parts", id: key }]);
+    expect(Date.parse(accepted.at)).toBeGreaterThan(Date.parse(span.at));
+    expect(Date.parse(accepted.at)).toBeLessThanOrEqual(Date.parse(span.at) + span.ms);
     // No span holds a word of the final parts.
     expect(
       stringsOf(facts.collected.spans).filter((value) =>

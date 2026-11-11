@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the eighteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the nineteen
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -8,6 +8,8 @@
 //   linqVerify   K-11 verifyWebhook: the gateway's signature check and parse       T-552
 //   sealing      the handle's sealing key: the gateway seals, the safety read      T-553
 //                and the turn open
+//   chatOpen     K-05 v1.7 openChatOnText: a number's text opens its chat at       T-1213
+//                receipt, before its actor is reached
 //   safetyRead   K-02's safety read on each raw text, on arrival                   T-554
 //   turnRow      K-05's two calls that write a turn's one row (K-04 turns), once   T-555
 //                per turn id: the commit (item 1) and the park (item 12)
@@ -64,7 +66,7 @@ import type {
   SendStateReader,
 } from "../dispatch/types";
 import type { SealingKeyStore } from "../gateway/seal";
-import type { LinqPort as LinqVerifyCall } from "../gateway/types";
+import type { ChatOpenPort, LinqPort as LinqVerifyCall } from "../gateway/types";
 import type { HandleTargetsPort } from "../guard/types";
 import type { DirectLineSender, SafetyCore, SafetyDeps, SafetyReadPort } from "../safety/types";
 import type {
@@ -77,10 +79,11 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The eighteen ports, in D-017's turn order (02-contracts section 11). */
+/** The nineteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
+  "chatOpen",
   "safetyRead",
   "turnRow",
   "bundles",
@@ -207,6 +210,11 @@ export interface LinqSend {
 export interface Ports {
   readonly linqVerify: LinqVerifyCall;
   readonly sealing: SealingKeyStore;
+  /**
+   * K-05 v1.7 openChatOnText (T-1213; item 46): the gateway's call at receipt, once per text or photo a phone handle sends
+   * through Linq, after the key call and before the actor, with the handle's K-04 id the key call answered.
+   */
+  readonly chatOpen: ChatOpenPort;
   readonly safetyRead: SafetyReadPort;
   readonly turnRow: TurnRowPort;
   /**

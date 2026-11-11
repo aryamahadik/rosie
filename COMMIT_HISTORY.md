@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 361, [`5c22bf5`](https://github.com/aryamahadik/rosie/commit/5c22bf5), 2026-11-11 09:56:40 UTC.
+- **Through:** commit 363, [`8606bac`](https://github.com/aryamahadik/rosie/commit/8606bac), 2026-11-11 10:54:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 363. docs: COMMIT\_HISTORY.md through commit 361 (5c22bf5, \#368) (\#370)
+
+- **Commit:** [`8606bac`](https://github.com/aryamahadik/rosie/commit/8606bac), by Arya Mahadik, 2026-11-11 10:54:46 UTC
+- **Pull request:** [#370](https://github.com/aryamahadik/rosie/pull/370) from `task/commit-history-7`, merged 2026-11-11 10:54:46 UTC. It squashed 1 branch commit:
+  - `90e08e8` docs: COMMIT\_HISTORY.md through commit 361 (5c22bf5, \#368)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 362. T-1214: K-05 contract test covers v1.7 (openChatOnText): WRITTEN\_FOR, mends of the 3 refused fixtures and the entry rule; its database side through db/repo/chat-open.ts (\#369)
+
+- **Commit:** [`5842c6c`](https://github.com/aryamahadik/rosie/commit/5842c6c), by Arya Mahadik, 2026-11-11 10:54:42 UTC
+- **Pull request:** [#369](https://github.com/aryamahadik/rosie/pull/369) from `task/T-1214`, merged 2026-11-11 10:54:42 UTC. It squashed 1 branch commit:
+  - `2f0843d` T-1214: K-05 contract test covers v1.7 (openChatOnText): WRITTEN\_FOR,…
+- **Files changed:** 2 (+495 −51), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +360 −36, data-access.v1.test.ts +135 −15
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 361. docs: COMMIT\_HISTORY.md through commit 359 (bfabe45, \#366) (\#368)
 

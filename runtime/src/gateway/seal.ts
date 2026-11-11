@@ -25,6 +25,12 @@ export interface HandleRef {
  */
 export type SealingKey = Uint8Array | CryptoKey;
 
+/** A handle's data key with the K-04 id of the handle, as one key call answers both (K-05 v1.2 item 29: handleId). */
+export interface HandleKey {
+  readonly key: SealingKey;
+  readonly handleId: string;
+}
+
 /**
  * The handle's sealing key store. `getOrCreateKey` answers the handle's data key (AES-256), making it on first sight:
  * the key object K-05 v1.2 `handleSealingKey` hands over (the real port, T-553), or 32 raw bytes (every double's). A
@@ -32,6 +38,12 @@ export type SealingKey = Uint8Array | CryptoKey;
  */
 export interface SealingKeyStore {
   getOrCreateKey(handle: HandleRef): Promise<SealingKey>;
+  /**
+   * The same key call, answering the handle's K-04 id beside its key (K-05 v1.2 handleSealingKey's handleId): the gateway
+   * hands that id to K-05 v1.7 openChatOnText at receipt (T-1213; ./chat-open.ts). Left out by a store that knows no K-04
+   * id, as the gateway's own doubles are: a text then opens no chat. A throw means no key, as for `getOrCreateKey`.
+   */
+  getOrCreateHandleKey?(handle: HandleRef): Promise<HandleKey>;
 }
 
 /** The sealed form stored in place of the words. */
