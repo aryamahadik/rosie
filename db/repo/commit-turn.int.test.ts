@@ -552,11 +552,13 @@ describe("the runtime side the commit runs on (K-05 README 'Scope'; T-191)", () 
 });
 
 describe("commitTurn: each K-05 commit fixture's request gives its response (K-05 v1 and v1.1, item 1)", () => {
-  it("the index lists sixteen commitTurn exchanges, each valid against data-access v1.1 and the version it is listed under (Ajv strict)", () => {
+  it("the index lists twenty commitTurn exchanges, each valid against data-access v1.1 and the version it is listed under (Ajv strict)", () => {
     expect([...COMMIT_FIXTURES].sort()).toEqual([
       "commit-adds-dee-booking.json",
       "commit-alex-cancels-while-sending.json",
+      "commit-alex-ready-text.json",
       "commit-alex-safety.json",
+      "commit-alex-start.json",
       "commit-alex-stop.json",
       "commit-evening-notice.json",
       "commit-first.json",
@@ -565,6 +567,8 @@ describe("commitTurn: each K-05 commit fixture's request gives its response (K-0
       "commit-repeat-same-turn.json",
       "commit-reservation-lost.json",
       "commit-s1-01-sam.json",
+      "commit-sam-books-alex-nov21.json",
+      "commit-sam-enters-alex-yes.json",
       "commit-sam-quick-reply.json",
       "commit-supersedes-waiting.json",
       "commit-version-changed.json",
