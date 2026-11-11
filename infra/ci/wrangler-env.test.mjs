@@ -1,6 +1,7 @@
 // Tests for wrangler.jsonc's env.production (T-1003): its own Worker and resource names (none shared with staging),
 // the pinned account, the same binding names as the top level, no route (it stays a comment until the user says yes),
-// and no key or secret value in the file. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
+// and no key or secret value in the file. Also (T-1235) the link host, LINK_HOST, in each environment, and
+// env.staging's own FILES bucket. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
 
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -10,6 +11,8 @@ import { describe, it } from "node:test";
 import { REPO } from "./script-harness.mjs";
 
 const ROSFIELD_ACCOUNT_ID = "ecb06e7bc9129fa81104d331e9652362";
+// The host every link starts with (T-1235), set as the var LINK_HOST in each environment: a bare host, no scheme.
+const LINK_HOST = "rosfield.com";
 
 // Strip // and /* */ comments outside strings, then trailing commas, then parse.
 function parseJsonc(text) {
@@ -81,6 +84,8 @@ function productionProblems(config) {
   if (prod.routes !== undefined || prod.route !== undefined) problems.push("env.production has a route");
   if (prod.vars?.ENVIRONMENT !== "production")
     problems.push("env.production.vars.ENVIRONMENT is not production");
+  // The link host (T-1235): the bare host production's links start with (Q-51's default; DL-014).
+  if (prod.vars?.LINK_HOST !== LINK_HOST) problems.push(`env.production.vars.LINK_HOST is not ${LINK_HOST}`);
   if (JSON.stringify(prod.secrets) !== JSON.stringify({ required: [] }))
     problems.push("secrets.required is not []");
   for (const [k, v] of Object.entries(prod.vars ?? {})) {
@@ -170,6 +175,18 @@ describe("wrangler.jsonc env.production (T-1003)", () => {
     );
   });
 
+  it("sets LINK_HOST in each environment, and gives env.staging its own FILES bucket, never production's (T-1235)", () => {
+    assert.equal(config.vars.LINK_HOST, LINK_HOST);
+    assert.equal(config.env.staging.vars.LINK_HOST, LINK_HOST);
+    assert.equal(config.env.production.vars.LINK_HOST, LINK_HOST);
+    assert.deepEqual(config.env.staging.r2_buckets, [
+      { binding: "FILES", bucket_name: "rosie-staging-files" },
+    ]);
+    assert.deepEqual(config.env.production.r2_buckets, [
+      { binding: "FILES", bucket_name: "rosie-production-files" },
+    ]);
+  });
+
   it("holds no var that looks like a key and no secret value anywhere in the file", () => {
     assert.deepEqual(config.env.production.secrets, { required: [] });
     const patterns = [
@@ -246,6 +263,18 @@ describe("env.production checks catch a broken copy", () => {
       broken((c) => (c.env.production.secrets = { required: ["X"] })),
       [],
     );
+  });
+  it("fail when production's LINK_HOST is missing, another host, or not a bare host", () => {
+    const problem = [`env.production.vars.LINK_HOST is not ${LINK_HOST}`];
+    assert.deepEqual(
+      broken((c) => delete c.env.production.vars.LINK_HOST),
+      problem,
+    );
+    assert.deepEqual(
+      broken((c) => (c.env.production.vars.LINK_HOST = "links.example.test")),
+      problem,
+    );
+    assert.ok(broken((c) => (c.env.production.vars.LINK_HOST = "https://rosfield.com")).includes(problem[0]));
   });
   it("fail when a binding is missing", () => {
     assert.notDeepEqual(

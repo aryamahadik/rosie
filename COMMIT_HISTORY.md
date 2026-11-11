@@ -2,9 +2,195 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 396, [`035381d`](https://github.com/aryamahadik/rosie/commit/035381d), 2026-11-11 17:11:04 UTC.
+- **Through:** commit 405, [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), 2026-11-11 18:32:00 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 405. docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410) (\#412)
+
+- **Commit:** [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), by Arya Mahadik, 2026-11-11 18:32:00 UTC
+- **Pull request:** [#412](https://github.com/aryamahadik/rosie/pull/412) from `task/commit-history-25`, merged 2026-11-11 18:32:00 UTC. It squashed 1 branch commit:
+  - `8d63ff2` docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 404. T-522: the staging-only guard for staging's test tools (web/src/staging/guard): stagingOnlyRoutes and stagingOnly answer the shell's 404 and never call a tool's handler unless ENVIRONMENT is exactly staging, read from the shell's config alone and failing closed; isStagingOnlyRefusal and refusedPage show K-21 v1's stagingOnly refusal as refused (403, in the frame); tests with spy handlers for every route, GET, POST and HEAD (\#411)
+
+- **Commit:** [`10e6c73`](https://github.com/aryamahadik/rosie/commit/10e6c73), by Arya Mahadik, 2026-11-11 18:31:55 UTC
+- **Pull request:** [#411](https://github.com/aryamahadik/rosie/pull/411) from `task/T-522`, merged 2026-11-11 18:31:56 UTC. It squashed 1 branch commit:
+  - `f59f51d` T-522: the staging-only guard for staging's test tools (web/src/stagi…
+- **Files changed:** 6 (+973 −0), by folder:
+  - `web/src/staging/guard/` README.md +14 −0, guard.test.ts +555 −0, guard.ts +66 −0, index.ts +16 −0, refusal.test.ts +274 −0, refusal.ts +48 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 403. docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408) (\#410)
+
+- **Commit:** [`16af5be`](https://github.com/aryamahadik/rosie/commit/16af5be), by Arya Mahadik, 2026-11-11 18:07:36 UTC
+- **Pull request:** [#410](https://github.com/aryamahadik/rosie/pull/410) from `task/commit-history-24`, merged 2026-11-11 18:07:37 UTC. It squashed 1 branch commit:
+  - `148ac7f` docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 402. T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDelivery (a repeated delivery receipt says firstOfRow and the stored deliveredAt; null on every other answer), read in its one transaction from the locked part tries with no write; a delivered part with no delivered\_at fails loudly (\#409)
+
+- **Commit:** [`322c1a3`](https://github.com/aryamahadik/rosie/commit/322c1a3), by Arya Mahadik, 2026-11-11 18:07:32 UTC
+- **Pull request:** [#409](https://github.com/aryamahadik/rosie/pull/409) from `task/T-1227`, merged 2026-11-11 18:07:33 UTC. It squashed 1 branch commit:
+  - `eb89288` T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDeliv…
+- **Files changed:** 2 (+570 −18), by folder:
+  - `db/repo/` outbox.int.test.ts +486 −6, outbox.ts +84 −12
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 401. docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406) (\#408)
+
+- **Commit:** [`74b9746`](https://github.com/aryamahadik/rosie/commit/74b9746), by Arya Mahadik, 2026-11-11 17:44:56 UTC
+- **Pull request:** [#408](https://github.com/aryamahadik/rosie/pull/408) from `task/commit-history-23`, merged 2026-11-11 17:44:57 UTC. It squashed 1 branch commit:
+  - `3dc3fc3` docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406)
+- **Files changed:** 1 (+90 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +90 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 400. T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wrangler.jsonc, and env.staging's own FILES binding on rosie-staging-files, which settles wrangler's r2\_buckets warning; the two config tests pin both (\#407)
+
+- **Commit:** [`19fdbb4`](https://github.com/aryamahadik/rosie/commit/19fdbb4), by Arya Mahadik, 2026-11-11 17:44:52 UTC
+- **Pull request:** [#407](https://github.com/aryamahadik/rosie/pull/407) from `task/T-1235`, merged 2026-11-11 17:44:53 UTC. It squashed 1 branch commit:
+  - `8661ad4` T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wran…
+- **Files changed:** 3 (+168 −10), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +123 −7, wrangler-env.test.mjs +30 −1
+  - `/` wrangler.jsonc +15 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 399. docs: COMMIT\_HISTORY.md through commit 396 (035381d, \#403) (\#406)
+
+- **Commit:** [`f9c0032`](https://github.com/aryamahadik/rosie/commit/f9c0032), by Arya Mahadik, 2026-11-11 17:26:36 UTC
+- **Pull request:** [#406](https://github.com/aryamahadik/rosie/pull/406) from `task/commit-history-22`, merged 2026-11-11 17:26:36 UTC. It squashed 1 branch commit:
+  - `9d0f284` docs: COMMIT\_HISTORY.md through commit 396 (035381d, \#403)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 398. T-1124 (round 1 of 2): the Hyperdrive spike's probe and run script, proved locally; the database URL never reaches a child's environment (\#405)
+
+- **Commit:** [`54219e0`](https://github.com/aryamahadik/rosie/commit/54219e0), by Arya Mahadik, 2026-11-11 17:26:32 UTC
+- **Pull request:** [#405](https://github.com/aryamahadik/rosie/pull/405) from `task/T-1124`, merged 2026-11-11 17:26:32 UTC. It squashed 6 branch commits:
+  - `2a0ee9e` T-1124: Hyperdrive host spike, round 1: the probe (extensions, EXCLUD…
+  - `dff1726` T-1124: README names the probe step's own last line (remote: done) an…
+  - `5bf3fda` T-1124: FINDINGS.md, round 1 of 2: the builder's own text, written to…
+  - `cdb48b1` Merge branch 'main' into task/T-1124
+  - `8b7924c` T-1124: test of run.sh's create step and version check, with a stand-…
+  - `6443890` T-1124: round 1 fix (DL-482): run.sh unsets every name that holds the…
+- **Files changed:** 11 (+2268 −0), by folder:
+  - `infra/spikes/hyperdrive-host/` FINDINGS.md +104 −0, README.md +93 −0, helpers.mjs +169 −0, local.mjs +48 −0, probe.mjs +595 −0, probe.test.mjs +316 −0, redact.mjs +11 −0, run.sh +335 −0, run.test.mjs +403 −0, standin-wrangler.mjs +86 −0, worker.mjs +108 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1124: Hyperdrive host spike, round 1: the probe (extensions, EXCLUDE, compare-and-set timings, transaction hold, read after write; all in schema spike_hyperdrive, dropped on failure too), its Worker and Node entries, the run script through cf.sh (status, local, create, probe, probe-upload), helpers, tests and README; proved on the local rosie-pg from Node and through wrangler dev's local Hyperdrive stand-in
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1124: README names the probe step's own last line (remote: done) and its before and after version lines
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1124: FINDINGS.md, round 1 of 2: the builder's own text, written to the file by the lead because the builder's Write was refused (DL-064); local measurements and the hosts' documents only, nothing from staging yet
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1124: test of run.sh's create step and version check, with a stand-in for wrangler behind the real cf.sh (red by design here: run.sh is still 5bf3fda's; the fix follows)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1124: round 1 fix (DL-482): run.sh unsets every name that holds the database URL, wrangler's output, the list or the token, and cf.sh's argument names, before anything holds a value, and turns allexport off; the version check fails closed (unknown before stops the step, unknown after fails it); README says what a remote session keeps and what worker.mjs reads
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 397. T-511: web app shell (Worker entry, error pages, trace id and one log line per page request, config with the link host), typed K-21 v1 client on the Tool API mock, and one empty route module per feature folder (\#404)
+
+- **Commit:** [`dcb13fe`](https://github.com/aryamahadik/rosie/commit/dcb13fe), by Arya Mahadik, 2026-11-11 17:26:27 UTC
+- **Pull request:** [#404](https://github.com/aryamahadik/rosie/pull/404) from `task/T-511`, merged 2026-11-11 17:26:28 UTC. It squashed 1 branch commit:
+  - `c71f335` T-511: web app shell (Worker entry, error pages, trace id and one log…
+- **Files changed:** 31 (+2781 −16), by folder:
+  - `web/` README.md +42 −4
+  - `web/src/auth/` routes.ts +6 −0
+  - `web/src/client/` calls.ts +116 −0, client.test.ts +310 −0, client.ts +118 −0, test-support.ts +43 −0
+  - `web/src/console/owner/` routes.ts +6 −0
+  - `web/src/console/team/fire-now/` routes.ts +8 −0
+  - `web/src/console/team/paging/` routes.ts +6 −0
+  - `web/src/console/team/shell/` routes.ts +6 −0
+  - `web/src/console/team/text-hours/` routes.ts +8 −0
+  - `web/src/link/` routes.ts +6 −0
+  - `web/src/pages/booking/` routes.ts +6 −0
+  - `web/src/pages/id-upload/` routes.ts +6 −0
+  - `web/src/pages/secure/` routes.ts +6 −0
+  - `web/src/` routes.ts +44 −5
+  - `web/src/shell/` config.test.ts +131 −0, config.ts +80 −0, error-pages.ts +59 −0, k21-client.test.ts +197 −0, route.test.ts +135 −0, route.ts +202 −0, routes.test.ts +136 −0, serve.ts +17 −7, shell.test.ts +562 −0, shell.ts +216 −0, test-support.ts +87 −0, trace.ts +18 −0, worker.test.ts +117 −0, worker.ts +79 −0
+  - `web/src/staging/test-phone/send/` routes.ts +8 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 396. docs: COMMIT\_HISTORY.md through commit 394 (0770355, \#400) (\#403)
 

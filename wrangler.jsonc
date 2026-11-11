@@ -37,15 +37,18 @@
   // The private files bucket (FILES; the R2 adapter, T-438, reads and writes ID files through it; Master
   // Corrections C10). The bucket is rosie-staging-files, the only one that exists (infra/scripts/create-r2-bucket.sh
   // makes it with no public access: no r2.dev URL, no custom domain). For local runs and dry runs, which simulate it
-  // without touching the real bucket. No env.staging copy yet: T-566's card names none, so the task that first uses
-  // the bucket on staging adds it (NQ-RT-5).
+  // without touching the real bucket. env.staging repeats it (T-1235), since wrangler does not pass it down.
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
   // No Hyperdrive binding yet: it comes with the task that needs it.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
+  // LINK_HOST is the host every link starts with (T-1235; the web shell reads it, T-511): a bare host, with no
+  // scheme and no path. A link is https://<LINK_HOST><BASE_PATH>/<short code>. The domain is rosfield.com (Q-51's
+  // default: the link host is a config value; DL-014). Not inherited: repeated in each environment.
   "vars": {
     "ENVIRONMENT": "production",
     "BASE_PATH": "",
     "DB_SCHEMA": "",
+    "LINK_HOST": "rosfield.com",
   },
   // The secrets the Worker needs, by name. Only these reach local runs and tests from .dev.vars; none in D-000,
   // so keys stay out of tests (build prompt 5.1). Not inherited: repeated in each environment.
@@ -56,10 +59,13 @@
     "staging": {
       "name": "rosie-staging",
       // DB_SCHEMA stays empty on staging; each branch preview sets it to preview_<slug> at upload.
+      // LINK_HOST with BASE_PATH is rosfield.com/test, the route below, so staging's links are
+      // https://rosfield.com/test/<short code> and come back to this Worker (DL-023, DL-036).
       "vars": {
         "ENVIRONMENT": "staging",
         "BASE_PATH": "/test",
         "DB_SCHEMA": "",
+        "LINK_HOST": "rosfield.com",
       },
       "secrets": {
         "required": [],
@@ -97,6 +103,10 @@
         "producers": [{ "queue": "rosie-retry", "binding": "RETRY_QUEUE" }],
         "consumers": [{ "queue": "rosie-retry", "max_retries": 5, "dead_letter_queue": "rosie-retry-dlq" }],
       },
+      // Staging's private files bucket (T-1235; T-441 made it, DL-027): the staging Worker is the one the R2 adapter
+      // (T-438) stores ID files from, and the Vitest Workers pool runs this environment, so its tests get FILES too,
+      // simulated locally. Bound by name; the bucket has no r2.dev URL and no custom domain.
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
     },
     // The production environment (T-1003). Written, never deployed: no production deploy script, workflow or secret
     // exists, and nothing below is created on Cloudflare until the user says yes (Q-51: one account for now, so every
@@ -108,10 +118,13 @@
       // Not reachable on a workers.dev address or a preview URL; production answers only on its route once approved.
       "workers_dev": false,
       "preview_urls": false,
+      // LINK_HOST: production's links are https://rosfield.com/<short code> (Q-51; A4-42). A var only: it opens no
+      // route, and the route below stays a comment.
       "vars": {
         "ENVIRONMENT": "production",
         "BASE_PATH": "",
         "DB_SCHEMA": "",
+        "LINK_HOST": "rosfield.com",
       },
       // Names only, no values. Live keys are set by the CTO from his own login at M8 (none exists before then).
       "secrets": {

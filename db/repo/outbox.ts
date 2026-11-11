@@ -14,7 +14,8 @@
 //              renewal and re-claim, the row after a mark, a failure's message id and Retry-After, waitingChat, the
 //              port, the phone read with the renewal, a receipt found by its part's key), and its answer always carries
 //              the new fields, so it is a v1.1 answer with v1.2's fields added (K-05 v1.2: every v1.1 exchange is a
-//              v1.2 exchange). Only these write outbox_claims (default 20).
+//              v1.2 exchange). Only these write outbox_claims (default 20). markPartV12's answer is K-05 v1.9's from
+//              T-1227: it also states repeatedDelivery, what a repeated delivery receipt repeats (v1.9 item 48).
 // writePlan and unplannedRows are the same in every version.
 //
 //   writePlan      Locks the row. A row that holds a plan answers alreadyPlanned, checked before its version (after a
@@ -72,7 +73,14 @@
 //                  holds the receipt's message id, the part under the key is the receipt's if it holds no message id of
 //                  its own (a 4001 or 4006 gave none), and the receipt's id is stored on it, so a later receipt finds it
 //                  the first way and a receipt after a 4001 or 4006 moves failed to delivered (K-05 default 39). A part
-//                  under the key that holds another message id is not the receipt's (notFound).
+//                  under the key that holds another message id is not the receipt's (notFound). From K-05 v1.9 (item
+//                  48; T-1227) every answer also states repeatedDelivery. On a receipt that repeats a recorded
+//                  delivery it is what the receipt repeats, read in the same transaction from the row's part tries
+//                  as they stand locked, with no write: firstOfRow, true when no other part try of the row holds an
+//                  earlier delivered_at (a tie counts as first: K-05 default 85), and deliveredAt, the part try's
+//                  stored delivered_at, never the repeat's own time (default 86). On every other answer it is null
+//                  (default 87). firstDelivery keeps v1's meaning: a repeat never says it (default 88). So the
+//                  answer is K-05 v1.9's markPart.v1dot9Response.
 //   markRow        Limit 8's outcome at send (arch 06 line 313), compare-and-set on the row's version: held sets held_until
 //                  (the row returns to the open rows, claimed again once it passes), droppedStopped and withdrawn close
 //                  it, and stale clears plan and final_parts, so unplannedRows lists it and it is composed again from
@@ -175,9 +183,15 @@
 //  20. Only the v1.2 calls write outbox_claims; the v1 calls keep T-196's behaviour and answers unchanged, so a row a v1
 //      claim holds has no claim row and a v1.2 claim takes it again at once (K-05 default 20). The two are never run
 //      against one outbox: the dispatcher (T-562) calls the v1.2 calls only.
+//  21. markPartV12 reads repeatedDelivery (K-05 v1.9 item 48) only for a delivery receipt that repeats a recorded
+//      delivery, from the delivered_at of the row's part tries, whatever their state. A delivered part try of the row
+//      that holds no delivered_at (no K-05 call writes one, and K-04 v1 has no CHECK against it), the repeated one or
+//      another, is thrown with nothing written: which delivery was the row's first cannot be read from it, and it is
+//      never answered by a guess (T-1226's reviews). The v1 call reads none of this and answers as before.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
+import type * as K05v19 from "../../contracts/generated/data-access/data-access.v1.9";
 import { commitSeqOf, instantOf, transientOrScrubbed } from "./clocks";
 import type { Sql } from "./scope";
 import { assertRequestShape, inRuntimeTransaction, utc, utcOrNull } from "./targets";
@@ -360,8 +374,14 @@ export interface RowAfter {
   state: RowState;
   version: number;
 }
-/** K-05 v1.1 markPart.response as a v1.2 call always writes it: v1's fields and the row after the mark. */
-export type MarkPartV12Response = MarkPartResponse & { row: RowAfter };
+/** K-05 v1.9 repeatedDelivery (item 48): the delivery a repeated receipt repeats, whether the row's first, and when. */
+export type RepeatedDelivery = K05v19.RepeatedDelivery;
+/**
+ * markPartV12's answer, K-05 v1.9's markPart.v1dot9Response (T-1227): v1's fields, the row after the mark, which a v1.2
+ * call always writes (v1.1 item 15), and repeatedDelivery, always stated: what a repeated delivery receipt repeats,
+ * and null on every other answer (v1.9 item 48).
+ */
+export type MarkPartV12Response = K05v19.MarkPartV1Dot9Response;
 export type MarkPartV12Outcome = MarkPartV12Response | MarkPartError;
 
 export type MarkRowV12Request = K05v12.MarkRowRequest;
@@ -1725,13 +1745,43 @@ async function holdNextTry(tx: Sql, rowId: string, notBefore: Date): Promise<voi
   }
 }
 
-/** A mark's answer as v1 gives it, and the row after the mark, which v1.1 adds to it. */
+/** A mark's answer as v1 gives it, the row after the mark, which v1.1 adds to it, and what v1.9 says of a repeat. */
 interface PartMarked {
   readonly answer: MarkPartResponse;
   readonly row: RowAfter;
+  /** K-05 v1.9 item 48: the delivery a repeated receipt repeats; null on every other mark, and where it is not read. */
+  readonly repeatedDelivery: RepeatedDelivery | null;
 }
 
-async function markPartIn(tx: Sql, mark: MarkChecked): Promise<PartMarked | MarkPartError> {
+/**
+ * The delivery a repeated delivery receipt repeats (K-05 v1.9 item 48), from the row's part tries as markPartIn holds
+ * them, locked: `part` is the delivered part try the receipt names, `parts` every part try of its row. firstOfRow: no
+ * other part try of the row, of either part and any try, holds a delivered_at earlier than this one's, a tie counting
+ * as first (K-05 default 85). deliveredAt: this part try's delivered_at as stored, never the repeat's own time (default
+ * 86). A delivered part try that holds no delivered_at is thrown, never answered by a guess (default 21 above).
+ */
+function repeatedDeliveryOf(part: PartRow, parts: readonly PartRow[]): RepeatedDelivery {
+  const deliveredAt = part.delivered_at;
+  if (deliveredAt === null || parts.some((one) => one.state === "delivered" && one.delivered_at === null)) {
+    throw new Error(
+      "markPart: a delivered part holds no delivered_at, so the delivery a receipt repeats cannot be read",
+    );
+  }
+  const firstOfRow = parts.every(
+    (one) => one.delivered_at === null || one.delivered_at.getTime() >= deliveredAt.getTime(),
+  );
+  return { firstOfRow, deliveredAt: utc(deliveredAt) };
+}
+
+/**
+ * One mark in the caller's transaction. `reads.repeatedDelivery`: whether a repeated delivery receipt's answer says
+ * what it repeats (K-05 v1.9's markPartV12), or not (the v1 call, whose answer has no place for it).
+ */
+async function markPartIn(
+  tx: Sql,
+  mark: MarkChecked,
+  reads: { readonly repeatedDelivery: boolean },
+): Promise<PartMarked | MarkPartError> {
   const found = await findPart(tx, mark);
   if (found === null) {
     const rowId = mark.outcome === "delivered" ? mark.providerMessageId : mark.key;
@@ -1783,6 +1833,10 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<PartMarked | Mark
     return {
       answer: marked(true, false, part.attempts, decision.repeat.nextKey),
       row: { state: row.state, version: row.version },
+      // Only a delivery receipt says what it repeats (K-05 v1.9 item 48, default 87): a repeated sent or failure, null.
+      // Nothing is written: the read is of the part tries this transaction already holds, locked.
+      repeatedDelivery:
+        reads.repeatedDelivery && mark.outcome === "delivered" ? repeatedDeliveryOf(part, parts) : null,
     };
   }
   const { change } = decision;
@@ -1881,6 +1935,8 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<PartMarked | Mark
   return {
     answer: marked(false, firstDelivery, attempts, nextKey),
     row: { state: rowTo, version: moved.version },
+    // A mark that records something repeats no delivery (K-05 v1.9 default 87).
+    repeatedDelivery: null,
   };
 }
 
@@ -1894,7 +1950,9 @@ async function markPartIn(tx: Sql, mark: MarkChecked): Promise<PartMarked | Mark
 export async function markPart(sql: Sql, request: MarkPartRequest): Promise<MarkPartOutcome> {
   const checked = checkMarkPart(request);
   try {
-    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markPartIn(tx, checked));
+    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) =>
+      markPartIn(tx, checked, { repeatedDelivery: false }),
+    );
     return "answer" in marked ? marked.answer : marked;
   } catch (error) {
     return transientOrScrubbed(MARK_PART, error);
@@ -1904,15 +1962,29 @@ export async function markPart(sql: Sql, request: MarkPartRequest): Promise<Mark
 /**
  * K-05 v1.2's markPart (v1.1 item 15, v1.2 item 31): markPart, its answer carrying the row's state and version after
  * the mark; a failure's message id and Retry-After kept (the part's linq_message_id, the claim's next_try_not_before);
- * a receipt found by its part's key when no part holds its message id. One transaction on the primary, on the runtime
- * side; pass the client's primary handle, run as rosie_job. Answers marked, notFound, wrongState or transient. Throws
- * for a request it cannot carry out (a safety line's followUps among them: default 19); nothing is written then either.
+ * a receipt found by its part's key when no part holds its message id. From K-05 v1.9 (item 48; T-1227) its answer also
+ * states repeatedDelivery on every mark: for a delivery receipt that repeats a recorded delivery, whether that delivery
+ * was the row's first (no other part try of the row holds an earlier delivered_at; a tie counts as first) and its
+ * stored delivered_at, read in this one transaction from the part tries it locks, with nothing written; null on every
+ * other answer. firstDelivery stays false on a repeat. One transaction on the primary, on the runtime side; pass the
+ * client's primary handle, run as rosie_job. Answers marked, notFound, wrongState or transient. Throws for a request it
+ * cannot carry out (a safety line's followUps among them: default 19) and for a delivered part that holds no
+ * delivered_at (default 21); nothing is written then either.
  */
 export async function markPartV12(sql: Sql, request: MarkPartV12Request): Promise<MarkPartV12Outcome> {
   const checked = checkMarkPartV12(request);
   try {
-    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) => markPartIn(tx, checked));
-    return "answer" in marked ? { ...marked.answer, row: { ...marked.row } } : marked;
+    const marked = await inRuntimeTransaction(sql, { readOnly: false }, (tx) =>
+      markPartIn(tx, checked, { repeatedDelivery: true }),
+    );
+    if (!("answer" in marked)) {
+      return marked;
+    }
+    return {
+      ...marked.answer,
+      row: { ...marked.row },
+      repeatedDelivery: marked.repeatedDelivery,
+    } satisfies MarkPartV12Response;
   } catch (error) {
     return transientOrScrubbed(MARK_PART, error);
   }
