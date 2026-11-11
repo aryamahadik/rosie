@@ -151,7 +151,9 @@ describe("the skeleton's known gaps", () => {
     expect(kindsOf(numbered([...beforeLease, { ...guard, at: lease.at }, lease]))).toEqual(["outOfOrder"]);
 
     // The guard numbered after the lease but starting before it: by seq, time goes back.
-    const early = written().spans.map((one) => (one.hop === "guard" ? { ...one, at: after("lease", -1) } : one));
+    const early = written().spans.map((one) =>
+      one.hop === "guard" ? { ...one, at: after("lease", -1) } : one,
+    );
     expect(kindsOf(traceOf(early))).toEqual(["time"]);
 
     const elsewhere = written().spans.map((one) =>

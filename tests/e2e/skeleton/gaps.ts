@@ -15,8 +15,8 @@ import type { SkeletonHop } from "../_driver/prefix";
 
 export const GAPS = {
   modelCallOrder: {
-    task: "T-1108's NEED (the safety read's span and @rosie/ai's gateway)",
-    what: "seq is one run 1, 2, 3 ... across the trace's writers, and by seq the hops stand in the order they started; but a model call's own portCall span does not: the safety read's span takes its place when the read ends, after its model call's span (runtime/src/safety/arrival.ts), and @rosie/ai's gateway stamps a model call's span on Date.now(), not on the trace's clock, which this run moves on for the quiet close (ai/src/gateway/gateway.ts), so by seq three spans start before the span before them. T-465's checkHops judges the trace in the order its spans started, numbered 1, 2, 3 ... again",
+    task: "a new task, named in T-1108's handoff: the safety read's span, and the clock of @rosie/ai's model-call spans",
+    what: "seq is one run 1, 2, 3 ... across the trace's writers, and by seq the hops stand in the order they started; but a model call's own portCall span does not: the safety read's span takes its place when the read ends, after its model call's span (runtime/src/safety/arrival.ts), and @rosie/ai's gateway stamps a model call's span on Date.now(), not on the trace's clock, which this run moves on for the quiet close (ai/src/gateway/gateway.ts), so by seq a span starts before the span before it in up to three places: the safety read after its own call, decide's first call after decideReads, the composer's call after compose. T-465's checkHops judges the trace in the order its spans started, numbered 1, 2, 3 ... again",
   },
 } as const;
 

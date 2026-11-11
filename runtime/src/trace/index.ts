@@ -9,6 +9,7 @@ export {
   openTrace,
   resumeSeq,
   seqOf,
+  takeSeq,
   traceIdFromHeader,
   type BatchClosedBy,
   type BatchResult,

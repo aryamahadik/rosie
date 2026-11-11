@@ -41,10 +41,12 @@
 // The trace (T-1108; K-08 v1): the gateway writes each inbound event's one receive span, and the actor none of its own. A
 // text's trace is one run by seq whoever writes on it: as the actor stores a text it begins the trace's count after the
 // places the gateway took (the hand-off's `seqBefore`), so the safety read, the batch window and the turn go on from there
-// (runtime/src/trace beginSeq). The count is kept in the actor's storage as each of its writers' spans is written, and a
-// new instance brings every kept count back, so an eviction between two hops never numbers a span twice. When the lease
-// opens a turn, the batch window writes the batch hop's spans before the bundle is pinned (batch.ts recordSpans). For an
-// event id it already holds, the actor tells the gateway which trace the event first arrived under (`firstTraceOf`).
+// (runtime/src/trace beginSeq). The count is kept in the actor's storage as each span that goes through the actor's own
+// sink is written (the safety read's, the batch window's, the pin's and, on the pin's trace, the turn's), and a new
+// instance brings back the count of each trace that can still have a hop to come, so an eviction between two of those
+// hops never numbers a span twice. When the lease starts a run of a turn, the batch window takes the batch hop's places
+// before the bundle is pinned and writes its spans once the pin has answered (batch.ts beginSpans). For an event id it
+// already holds, the actor tells the gateway which trace the event first arrived under (`firstTraceOf`).
 //
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). This file opens no
 // sealed box: the safety read does, and the PostgreSQL-down path, to read a STOP or a START, each with the handle's key.
@@ -177,6 +179,19 @@ export class ActorRefusal extends Error {
  */
 export const TRACE_SEQ_KEPT = 64;
 
+/**
+ * Keeps the last place taken on a trace whose count the actor began, in the actor's storage; never lowers it. A span of a
+ * trace it did not begin changes nothing; nor does a write the storage refuses (a span written from outside the actor's
+ * own step: a delivery receipt's, on the turn's trace, from the gateway's request).
+ */
+function keepTraceSeq(sql: SqlStorage, traceId: string, seq: number): void {
+  try {
+    sql.exec("UPDATE trace_seq SET seq = MAX(seq, ?) WHERE trace_id = ?", seq, traceId);
+  } catch {
+    // Not kept: the count goes on in memory.
+  }
+}
+
 function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
   const { event } = handoff;
   if (typeof event.eventId !== "string" || event.eventId === "") throw new ActorRefusal("noEventId");
@@ -203,8 +218,6 @@ export class HandleActor extends DurableObject {
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
     createInboxTables(ctx.storage.sql);
-    // Each kept trace's count of places, brought back before any writer of this instance records a span (T-1108).
-    this.resumeTraceSeqs();
     // The actor's own copies and its write-on-return queue (T-269), before the safety read, which queues its records there.
     // The copies weigh a turn's answer against the actor's own STOP note by the lease's turn order (T-1208).
     this.copies = new ActorCopies({
@@ -297,6 +310,9 @@ export class HandleActor extends DurableObject {
         this.lend(work);
       },
     });
+    // The count of places of each trace that can still have a hop to come, brought back before any writer of this
+    // instance records a span (T-1108).
+    this.resumeTraceSeqs();
     // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read,
     // and reads again every text whose re-read is due (DL-127). A failure here must not keep the actor from starting.
     this.resumeSafetyGuarded();
@@ -668,12 +684,21 @@ export class HandleActor extends DurableObject {
 
   /**
    * Pins a run's bundle (T-249), and copies its keyword list and stop and start replies (T-270); a copy that fails changes
-   * nothing. First, the batch window writes the batch hop's spans for the turn, once per turn id (T-1108): the turn is
-   * open and its texts are known, and the pin's lease span comes after them.
+   * nothing. Around the pin, the batch window writes the batch hop's spans for the turn, once per turn id (T-1108): the
+   * turn is open and its texts are known, so their places are taken first and the pin's lease span comes after them; they
+   * are written once the pin has answered, the turn's under the bundle id it pinned (the id its first text arrived under
+   * when it pinned none), whatever the pin answered.
    */
   private async pinAndCopy(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null> {
-    if (!signal.aborted) this.batch.recordSpans(request.turnId, this.turnEventIds(request.turnId));
-    const pinned = await this.pins.pin(request, signal);
+    const batchSpans = signal.aborted
+      ? null
+      : this.batch.beginSpans(request.turnId, this.turnEventIds(request.turnId));
+    let pinned: TurnPin | null = null;
+    try {
+      pinned = await this.pins.pin(request, signal);
+    } finally {
+      batchSpans?.write(pinned?.bundleId ?? null);
+    }
     if (pinned !== null) {
       try {
         this.copies.refreshKeywords(pinned.bundle.manifest);
@@ -794,62 +819,90 @@ export class HandleActor extends DurableObject {
 
   /**
    * Where the spans of the actor's writers go (the safety read, the batch window, the pin and the turn on its trace, a
-   * park): one JSON log line each, and the trace's count kept in the actor's storage as each is written.
+   * park): one JSON log line each, and the trace's count kept in the actor's storage as each is written. The sink holds
+   * the storage alone, never the actor: a turn's trace, and its sink with it, outlives the run (the composition root keeps
+   * each sent row's trace for its delivery receipt).
    */
   private spanSink(): SpanSink {
     const log = logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" });
+    const sql = this.ctx.storage.sql;
     return (span) => {
       log(span);
-      this.keepTraceSeq(span.trace_id, span.seq);
+      keepTraceSeq(sql, span.trace_id, span.seq);
     };
   }
 
   /**
    * A text is stored: its trace's count begins after the places the gateway took (the hand-off's `seqBefore`; none for a
-   * hand-off built by hand), here and in the actor's storage. Only the newest TRACE_SEQ_KEPT traces are kept.
+   * hand-off built by hand), here and in the actor's storage. A trace this actor has begun already (a second event handed
+   * in under one trace id) goes on from the count kept for it, never back. Only the newest TRACE_SEQ_KEPT traces are kept.
    */
   private beginTraceSeq(handoff: SealedHandoff): void {
     const before: unknown = handoff.seqBefore;
     const taken = typeof before === "number" && Number.isInteger(before) && before > 0 ? before : 0;
-    beginSeq(handoff.traceId, taken);
     try {
       const sql = this.ctx.storage.sql;
-      sql.exec("INSERT OR REPLACE INTO trace_seq (trace_id, seq) VALUES (?, ?)", handoff.traceId, taken);
+      const kept = sql
+        .exec<{ seq: number }>("SELECT seq FROM trace_seq WHERE trace_id = ?", handoff.traceId)
+        .toArray()[0];
+      if (kept !== undefined) {
+        resumeSeq(handoff.traceId, Math.max(kept.seq, taken));
+        return;
+      }
+      beginSeq(handoff.traceId, taken);
+      sql.exec("INSERT INTO trace_seq (trace_id, seq) VALUES (?, ?)", handoff.traceId, taken);
       sql.exec(
         "DELETE FROM trace_seq WHERE rowid NOT IN (SELECT rowid FROM trace_seq ORDER BY rowid DESC LIMIT ?)",
         TRACE_SEQ_KEPT,
       );
     } catch {
-      // Not kept: the count goes on in memory.
+      // Not kept: the count begins, and goes on, in memory.
+      beginSeq(handoff.traceId, taken);
     }
   }
 
   /**
-   * Keeps the last place taken on a trace whose count the actor began; never lowers it. A span of a trace it did not
-   * begin, or one written outside the actor's own step (a delivery receipt's, on the turn's trace), changes nothing.
+   * Makes the table of kept counts, and brings back, for this instance's writers, the count of each trace that can still
+   * have a hop to come (`textsInFlight`). A trace whose turn is done is left where it is: every start of every actor
+   * would otherwise put its finished traces back into the isolate's memory of counts, and push live ones out of it. A
+   * failure here keeps nothing back.
    */
-  private keepTraceSeq(traceId: string, seq: number): void {
-    try {
-      this.ctx.storage.sql.exec(
-        "UPDATE trace_seq SET seq = MAX(seq, ?) WHERE trace_id = ?",
-        seq,
-        traceId,
-      );
-    } catch {
-      // Not kept: the count goes on in memory.
-    }
-  }
-
-  /** Makes the table of kept counts, and brings each back for this instance's writers. A failure here keeps nothing back. */
   private resumeTraceSeqs(): void {
     try {
       const sql = this.ctx.storage.sql;
       sql.exec("CREATE TABLE IF NOT EXISTS trace_seq (trace_id TEXT PRIMARY KEY, seq INTEGER NOT NULL)");
-      const kept = sql.exec<{ trace_id: string; seq: number }>("SELECT trace_id, seq FROM trace_seq").toArray();
-      for (const row of kept) resumeSeq(row.trace_id, row.seq);
+      const kept = sql
+        .exec<{ trace_id: string; seq: number }>("SELECT trace_id, seq FROM trace_seq")
+        .toArray();
+      if (kept.length === 0) return;
+      const live = new Set(readInboxEvents(sql, this.textsInFlight()).map((entry) => entry.traceId));
+      for (const row of kept) if (live.has(row.trace_id)) resumeSeq(row.trace_id, row.seq);
     } catch {
       // The actor starts all the same; its writers count from what this isolate holds.
     }
+  }
+
+  /**
+   * The event ids of the texts that can still have a hop to come: not read yet or under a hold (the safety read reads
+   * them again), not handed to the lease yet, waiting there for the next turn, or in the turn that holds the lease
+   * (running, committing, replying or being parked).
+   */
+  private textsInFlight(): string[] {
+    const holder = this.ctx.storage.sql
+      .exec<{ items: string }>(
+        "SELECT t.items FROM turn_lease l JOIN lease_turns t ON t.turn_id = l.turn_id WHERE l.one = 1",
+      )
+      .toArray()
+      .flatMap((row) => (JSON.parse(row.items) as { eventId: string }[]).map((item) => item.eventId));
+    return [
+      ...new Set([
+        ...this.safety.unreadTexts(),
+        ...this.safety.openHolds().map((hold) => hold.eventId),
+        ...this.batch.pendingEventIds(),
+        ...this.lease.pendingEventIds(),
+        ...holder,
+      ]),
+    ];
   }
 
   /** The event ids of a turn's texts, as the lease keeps them (lease.ts lease_turns.items); none for a turn it does not hold. */

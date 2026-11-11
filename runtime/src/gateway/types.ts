@@ -87,8 +87,9 @@ export interface SealedHandoff {
   actorName: string;
   /**
    * How many places (K-08 `seq`) the gateway takes on this trace before the actor's writers: its receive and scrub spans
-   * (T-1108). The actor's first span on the trace takes the next place, so the trace is one run by seq whoever writes.
-   * Left out (a hand-off built by hand), the actor's writers start the count.
+   * and, for an email reply, the read's port call between them (T-1108). The actor's first span on the trace takes the
+   * next place, so the trace is one run by seq whoever writes. Left out (a hand-off built by hand), the actor's writers
+   * start the count.
    */
   seqBefore?: number;
 }

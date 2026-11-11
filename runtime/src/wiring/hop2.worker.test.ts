@@ -63,7 +63,7 @@ const REPEAT = structuredClone(duplicateFixture) as unknown as LinqInboundEvent;
 const ACTOR = actorNameOf(TEXT.handle);
 const BODY = TEXT.body ?? "";
 
-/** The handle actor's own receive span, which it writes when the gateway's hand-off reaches it. */
+/** A receive span of the handle actor's own, as it wrote one at its door before T-1108: the trace now holds none. */
 const actorSpan = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
 
 /** The webhook as Linq posts it to {BASE_PATH}/webhooks/linq: the three headers and the raw body. */

@@ -17,13 +17,16 @@
 // One run by seq across a trace's writers (T-1108; K-08 v1 README: a trace is read "by filtering on trace_id and
 // ordering by seq"). A text's trace has several writers, each with its own context over the one trace id: the gateway
 // (receive, scrub), then, in the handle's actor, the safety read, the batch window and the turn (the pin's context). A
-// context alone numbers its own spans 1, 2, 3; so the writers of one trace share its count. `beginSeq` (the gateway, as
-// it opens a webhook's trace; the actor, as it stores a text, with the places the gateway took before it) makes every
-// context this isolate opens over that trace id take its places from one count, and `resumeSeq` brings a count back
-// after a restart without ever lowering it. A trace nobody began keeps each context's own count, as before. A place is
-// taken when a hop starts (`start`, or `reserve` for a hop that records its span by itself), not when its span is
-// written, so a span recorded inside a longer hop comes after it (the gateway's receive, which ends after the actor's
-// first hops; the dispatcher's dispatch, around the part's providerAccepted): by seq, the spans are in start order.
+// context alone numbers its own spans 1, 2, 3; so the writers of one trace share its count. `beginSeq` (the actor, as it
+// stores a text, with the places the gateway took before it; a webhook's door shares its own context's count the same
+// way, `shareSeq`, once the signature has passed) makes every context this isolate opens over that trace id take its
+// places from one count, and `resumeSeq` brings a count back after a restart without ever lowering it. A trace nobody
+// began keeps each context's own count, as before. A place is taken when a hop starts (`start`, or `reserve` for a hop
+// that records its span by itself; `takeSeq` when the span's context is not open yet), not when its span is written,
+// so a span recorded inside a longer hop comes after it (the gateway's receive, which ends after the actor's first
+// hops; the dispatcher's dispatch, around the part's providerAccepted): by seq, the spans are in start order. The count
+// lives in this isolate's memory: a writer in another isolate (the gateway before its hand-off, the actor after it) is
+// told the places taken so far and goes on from there.
 
 import {
   TraceError,
@@ -97,9 +100,13 @@ export const SHARED_SEQ_TRACES = 4096;
 /** The last place taken on each trace whose writers share one count, by trace id (this isolate's memory). */
 const sharedSeq = new Map<string, number>();
 
+/** A trace id as a context keeps it (trimmed, lowercased), so a count is found whichever way its id was written. */
+const keyOf = (traceId: string): string => traceId.trim().toLowerCase();
+
 function keepSeq(traceId: string, taken: number): void {
-  sharedSeq.delete(traceId);
-  sharedSeq.set(traceId, taken);
+  const key = keyOf(traceId);
+  sharedSeq.delete(key);
+  sharedSeq.set(key, taken);
   while (sharedSeq.size > SHARED_SEQ_TRACES) {
     const oldest = sharedSeq.keys().next().value;
     if (oldest === undefined) break;
@@ -120,12 +127,26 @@ export function beginSeq(traceId: string, taken = 0): void {
 
 /** Brings a trace's count back (a restart: the count as it was stored). It never lowers a count this isolate holds. */
 export function resumeSeq(traceId: string, taken: number): void {
-  keepSeq(traceId, Math.max(sharedSeq.get(traceId) ?? 0, placesOf(taken)));
+  keepSeq(traceId, Math.max(sharedSeq.get(keyOf(traceId)) ?? 0, placesOf(taken)));
 }
 
 /** The last place taken on a trace whose writers share one count, or null for a trace nobody began here. */
 export function seqOf(traceId: string): number | null {
-  return sharedSeq.get(traceId) ?? null;
+  return sharedSeq.get(keyOf(traceId)) ?? null;
+}
+
+/**
+ * Takes the next place on a trace whose writers share one count, for a span whose context is not open yet: it is
+ * recorded later with that place (`SpanFields.seq`, `BatchedText.seq`), under a bundle id known only then (the batch
+ * span, which waits for the turn's pin). Undefined for a trace nobody began here: its span then takes its own context's
+ * next place, as before.
+ */
+export function takeSeq(traceId: string): number | undefined {
+  const key = keyOf(traceId);
+  const taken = sharedSeq.get(key);
+  if (taken === undefined) return undefined;
+  sharedSeq.set(key, taken + 1);
+  return taken + 1;
 }
 
 const TRACE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
@@ -306,14 +327,25 @@ export class TraceContext {
    */
   reserve(): number {
     const seq = this.nextSeq();
-    if (sharedSeq.has(this.traceId)) sharedSeq.set(this.traceId, seq);
+    const key = keyOf(this.traceId);
+    if (sharedSeq.has(key)) sharedSeq.set(key, seq);
     else this.own = seq;
     return seq;
   }
 
   /** The place the next span takes: the trace's shared count plus one, or this context's own. */
   private nextSeq(): number {
-    return (sharedSeq.get(this.traceId) ?? this.own) + 1;
+    return (sharedSeq.get(keyOf(this.traceId)) ?? this.own) + 1;
+  }
+
+  /**
+   * Makes the count this context kept by itself the trace's one count from here on (as `beginSeq`, after the places
+   * this context has taken). A webhook's door calls it once the signature has passed, so only a provider's own event
+   * opens a shared count: a request anyone can send never pushes another trace's count out of this isolate's memory. A
+   * trace whose writers share a count already is left as it is.
+   */
+  shareSeq(): void {
+    if (!sharedSeq.has(keyOf(this.traceId))) keepSeq(this.traceId, this.own);
   }
 
   /**
@@ -354,7 +386,10 @@ export class TraceContext {
     this.ended = true;
   }
 
-  /** The trace as K-08 v1's `trace` document. At least one span must have been kept. */
+  /**
+   * The trace as K-08 v1's `trace` document: the spans this context kept, in order by seq (a hop that took its place as
+   * it started may have been kept after a span recorded inside it). At least one span must have been kept.
+   */
   toTrace(): Trace {
     if (this.kept.length === 0) throw new TraceError(`trace ${this.traceId} has no span yet`);
     return {
@@ -365,7 +400,7 @@ export class TraceContext {
       job_id: this.jobId,
       handle_ref: this.handle,
       joined_trace_ids: [...this.joined],
-      spans: this.kept.map((span) => ({ ...span })),
+      spans: [...this.kept].sort((a, b) => a.seq - b.seq).map((span) => ({ ...span })),
     };
   }
 }
@@ -384,6 +419,11 @@ export interface BatchedText {
    * batch window: the text's safety read is another writer's). Left out, it is read from the context's last kept span.
    */
   waitedFrom?: number | null;
+  /**
+   * The batch span's place, when it was taken before this context was opened (`takeSeq`: the batch window takes it
+   * before the turn's pin and writes the span after it). Left out, the span takes the next place.
+   */
+  seq?: number;
 }
 
 /**
@@ -444,19 +484,26 @@ export function closeBatch(options: CloseBatchOptions): BatchResult {
   };
 
   for (const text of options.texts) text.context.setTurn(options.turnId);
+  // A place taken before the text's context was opened is the span's; left out, the span takes the next place.
+  const placed = (text: BatchedText): { seq?: number } => (text.seq === undefined ? {} : { seq: text.seq });
 
+  // An id that is no label (a provider's event id of digits alone, say, or a trace id with no letter in it) is counted
+  // and not named, as the gateway leaves one off its spans: the span is kept, where naming it would have the contract
+  // refuse the whole span.
+  const namedTraces = joinedTraceIds.filter(isLabel);
   const eventIds = [...(options.eventIds ?? options.texts.map((text) => text.eventId))];
   first.context.record({
     hop: "batch",
     ...waited(first),
+    ...placed(first),
     outcome: "ok",
-    got: { texts: eventIds.length, eventIds },
+    got: { texts: eventIds.length, eventIds: eventIds.filter(isLabel) },
     // The other texts' traces are named only when there are some, as K-08 draws both (trace-skeleton.json's batch span
     // of one text names none; trace-batch-three-texts.json's names two).
     decided: {
       closedBy: options.closedBy,
       turn: options.turnId,
-      ...(joinedTraceIds.length > 0 ? { joinedTraces: joinedTraceIds } : {}),
+      ...(joinedTraceIds.length > 0 ? { joinedTraces: namedTraces } : {}),
     },
   });
   first.context.listJoined(joinedTraceIds);
@@ -465,9 +512,10 @@ export function closeBatch(options: CloseBatchOptions): BatchResult {
     text.context.record({
       hop: "batch",
       ...waited(text),
+      ...placed(text),
       outcome: "joinedTurn",
-      eventId: text.eventId,
-      decided: { turn: options.turnId, turnTrace: turnTraceId },
+      ...(isLabel(text.eventId) ? { eventId: text.eventId } : {}),
+      decided: { turn: options.turnId, ...(isLabel(turnTraceId) ? { turnTrace: turnTraceId } : {}) },
     });
     text.context.end();
   }

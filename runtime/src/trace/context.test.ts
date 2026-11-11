@@ -11,6 +11,7 @@ import {
   openTrace,
   resumeSeq,
   seqOf,
+  takeSeq,
   traceIdFromHeader,
   type SpanFields,
   type TraceContext,
@@ -578,7 +579,11 @@ describe("a batch of three texts (CQ-06; trace-batch-three-texts.json)", () => {
 
 describe("one run by seq across a trace's writers (T-1108; K-08 v1 README: a trace is read by ordering by seq)", () => {
   /** A writer's own context over one trace id, as the gateway, the safety read, the batch window and the pin each open one. */
-  function writer(traceId: string, logged: Span[], clock = fakeClock("2026-10-19T14:01:50.100Z")): TraceContext {
+  function writer(
+    traceId: string,
+    logged: Span[],
+    clock = fakeClock("2026-10-19T14:01:50.100Z"),
+  ): TraceContext {
     return openTrace({
       openedBy: "textWebhook",
       bundleId: BUNDLE,
@@ -696,5 +701,122 @@ describe("one run by seq across a trace's writers (T-1108; K-08 v1 README: a tra
     expect(() => context.record({ hop: "guard", ...hop, got: { text: "two words" } })).toThrow(TraceError);
     expect(seqOf(traceId)).toBe(2);
     expect(context.record({ hop: "guard", ...hop }).seq).toBe(3);
+  });
+
+  it("a place taken before a span's context is open (takeSeq) is that span's: a batch span written once its bundle is known comes before the lease span recorded meanwhile", () => {
+    const turnTrace = "0a1b2c3d-0000-4000-8000-000000000008";
+    const joinedTrace = "0a1b2c3d-0000-4000-8000-000000000009";
+    const logged: Span[] = [];
+    // A trace nobody began has no place to take: its span takes its own context's next place, as before.
+    expect(takeSeq(turnTrace)).toBeUndefined();
+    expect(seqOf(turnTrace)).toBeNull();
+    // Each text's receive, scrub and safety read took places 1 to 3.
+    beginSeq(turnTrace, 3);
+    beginSeq(joinedTrace, 3);
+    const turnPlace = takeSeq(turnTrace);
+    const joinedPlace = takeSeq(joinedTrace);
+    if (turnPlace === undefined || joinedPlace === undefined) throw new Error("no place taken");
+    expect([turnPlace, joinedPlace, seqOf(turnTrace), seqOf(joinedTrace)]).toEqual([4, 4, 4, 4]);
+    // The pin answers and records its lease span, at the next place; then the batch spans are written.
+    const pin = writer(turnTrace, logged);
+    pin.setTurn("turn-alex-three-1");
+    pin.record({ hop: "lease", ...hop });
+    closeBatch({
+      turnId: "turn-alex-three-1",
+      closedBy: "thirdText",
+      texts: [
+        { context: writer(turnTrace, logged), eventId: "evt-alex-0003", seq: turnPlace },
+        { context: writer(joinedTrace, logged), eventId: "evt-alex-0004", seq: joinedPlace },
+      ],
+    });
+    expect(logged.map((span) => [span.trace_id, span.seq, span.hop, span.outcome])).toEqual([
+      [turnTrace, 5, "lease", "ok"],
+      [turnTrace, 4, "batch", "ok"],
+      [joinedTrace, 4, "batch", "joinedTurn"],
+    ]);
+    expect([seqOf(turnTrace), seqOf(joinedTrace)]).toEqual([5, 4]);
+  });
+
+  it("a webhook's door shares its own count once the signature has passed: the places it took alone stand, and every writer goes on from them", () => {
+    const logged: Span[] = [];
+    const clock = fakeClock("2026-10-19T14:01:50.100Z");
+    const door = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE,
+      sink: (span) => {
+        logged.push(span);
+      },
+      now: clock.now,
+    });
+    // Until the signature has passed the door's context counts alone: nothing is kept for its trace.
+    const receive = door.start("receive");
+    expect(seqOf(door.traceId)).toBeNull();
+    door.shareSeq();
+    expect(seqOf(door.traceId)).toBe(1);
+    const scrub = door.reserve();
+    // Another writer in this isolate (a receipt's hooks, the handle's actor) goes on from the door's places.
+    writer(door.traceId, logged, clock).record({ hop: "guard", ...hop });
+    receive.finish({ outcome: "ok", provider: "linq" });
+    door.record({ hop: "scrub", ms: 1, outcome: "ok", seq: scrub });
+    expect([...logged].sort((a, b) => a.seq - b.seq).map((span) => [span.seq, span.hop])).toEqual([
+      [1, "receive"],
+      [2, "scrub"],
+      [3, "guard"],
+    ]);
+    // Shared already: sharing again changes nothing.
+    door.shareSeq();
+    expect(seqOf(door.traceId)).toBe(3);
+  });
+
+  it("a trace id is one count however it is written, and a context's own trace document reads in order by seq", () => {
+    const traceId = "0A1B2C3D-0000-4000-8000-00000000000A";
+    const logged: Span[] = [];
+    beginSeq(` ${traceId} `, 2);
+    expect(seqOf(traceId.toLowerCase())).toBe(2);
+    const context = writer(traceId, logged);
+    expect(context.traceId).toBe(traceId.toLowerCase());
+    const dispatch = context.start("dispatch");
+    context.record({ hop: "providerAccepted", ms: 0, outcome: "ok", provider: "linq" });
+    dispatch.finish({ outcome: "ok", provider: "linq", call: "sendPart", attempt: 1 });
+    // Kept in the order written; the trace document reads by seq (K-08: "the spans of one trace id in order").
+    expect(context.spans.map((span) => [span.seq, span.hop])).toEqual([
+      [4, "providerAccepted"],
+      [3, "dispatch"],
+    ]);
+    const trace = context.toTrace();
+    expect(trace.spans.map((span) => [span.seq, span.hop])).toEqual([
+      [3, "dispatch"],
+      [4, "providerAccepted"],
+    ]);
+    expect(schemaErrors("trace", trace)).toEqual([]);
+  });
+
+  it("a batch span counts an id that is no label and does not name it, so the span is kept", () => {
+    const first = openTrace({ openedBy: "textWebhook", bundleId: BUNDLE });
+    // A trace id with no letter in it, and a provider's event id of digits alone: each reads as a number, which no span
+    // may carry (K-08: never a long run of digits).
+    const digits = "11111111-2222-4333-8444-555555555555";
+    const joined = openTrace({ openedBy: "textWebhook", bundleId: BUNDLE, newId: () => digits });
+    const result = closeBatch({
+      turnId: "turn-alex-9",
+      closedBy: "thirdText",
+      texts: [
+        { context: first, eventId: "evt-alex-0009" },
+        { context: joined, eventId: "0000000" },
+      ],
+    });
+    expect(result).toEqual({ turnTraceId: first.traceId, joinedTraceIds: [digits] });
+    expect(first.spans.map((span) => [span.hop, span.got, span.decided])).toEqual([
+      [
+        "batch",
+        { texts: 2, eventIds: ["evt-alex-0009"] },
+        { closedBy: "thirdText", turn: "turn-alex-9", joinedTraces: [] },
+      ],
+    ]);
+    // The trace itself still lists the text that joined it.
+    expect(first.toTrace().joined_trace_ids).toEqual([digits]);
+    expect(joined.spans).toMatchObject([{ hop: "batch", outcome: "joinedTurn" }]);
+    expect(joined.spans[0]).not.toHaveProperty("event_id");
+    for (const context of [first, joined]) expect(schemaErrors("trace", context.toTrace())).toEqual([]);
   });
 });

@@ -306,6 +306,63 @@ describe("an inbound reply (K-12 'Inbound replies'; K-06 email-reply-check-passe
     expect(log.spans().filter((span) => span.hop === "scrub")).toHaveLength(1);
   });
 
+  it("the reply's one receive span is the door's, as K-08 states it (T-1108): sealedToActor once its actor wrote it, places 1 to 3 taken before the hand-off, which tells the actor so; a repeat names the trace the reply first arrived under", async () => {
+    const log = captureLog();
+    const world = worldAt(replyPassed.given.now);
+    const webhook = await signedReply(world.double, replyPassed.outcome.event);
+    // The actor's door as the gateway's is over the real actor: it answers the trace a stored event first arrived under.
+    const asked: string[] = [];
+    const actor: EmailDeps["actor"] = {
+      accept: (handoff) => world.actor.accept(handoff),
+      firstTrace(handoff) {
+        asked.push(handoff.event.eventId);
+        const stored = world.actor.written.find((one) => one.event.eventId === handoff.event.eventId);
+        return Promise.resolve(stored?.traceId ?? null);
+      },
+    };
+    const deps = { ...world.deps, actor };
+
+    const first = await handleResendWebhook(resendRequest(webhook), deps, WHERE);
+    const second = await handleResendWebhook(resendRequest(webhook), deps, WHERE);
+
+    expect([first.status, second.status]).toEqual([200, 200]);
+    const firstTrace = first.headers.get("x-trace-id");
+    const repeatTrace = second.headers.get("x-trace-id");
+    expect(repeatTrace).not.toBe(firstTrace);
+    const spans = log.spans();
+    // trace-skeleton.json's receive: decided.sealedToActor. The read's port call and the scrub follow it by seq, and
+    // the hand-off says the door took those three places, so the actor's first span is the fourth.
+    const written = spans.filter((span) => span.trace_id === firstTrace);
+    expect(written.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "ok"],
+      [2, "portCall", "ok"],
+      [3, "scrub", "ok"],
+    ]);
+    expect(written[0]?.decided).toEqual({
+      signatureValid: true,
+      senderCheckPassed: true,
+      knownEventId: false,
+      sealedToActor: true,
+      answered: 200,
+    });
+    expect(world.actor.calls.map((handoff) => handoff.seqBefore)).toEqual([3, 3]);
+    // trace-duplicate-webhook.json's receive: dropped, the event id known, decided.firstTrace. Asked only for the repeat.
+    const repeat = spans.filter((span) => span.trace_id === repeatTrace);
+    expect(repeat.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "dropped"],
+      [2, "portCall", "ok"],
+    ]);
+    expect(repeat[0]?.decided).toEqual({
+      signatureValid: true,
+      senderCheckPassed: true,
+      knownEventId: true,
+      firstTrace,
+      answered: 200,
+    });
+    expect(asked).toEqual([replyPassed.outcome.event.eventId]);
+    for (const span of spans) expect(spanProblems(span)).toEqual([]);
+  });
+
   it("an automatic reply is 200 and dropped: nothing is written, so no loop of automatic emails starts", async () => {
     const log = captureLog();
     const world = worldAt(replyPassed.given.now);

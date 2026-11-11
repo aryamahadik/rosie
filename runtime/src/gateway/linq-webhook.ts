@@ -18,21 +18,23 @@
 // stored (chatOpenTransient, chatOpenFailed), so Linq's retry, a repeat to K-05, comes again.
 //
 // The scrub span (K-08 v1 hop `scrub`, T-1096): an event its actor wrote ("Sealed event", 02-contracts section 11) shows
-// its scrub as the trace's second hop, after receive, as trace-skeleton.json does. The context numbers a span when it is
-// recorded, and receive ends only with the answer, so the scrub's own start and time are kept and its span is recorded
-// right after receive's: receive is seq 1 and starts first, scrub is seq 2 and lies between receive's start and the
-// hand-off. It holds counts only (how many card numbers and Social Security numbers were swapped), never a word or a
-// digit. Every other answer ends the trace at receive: a known event id is dropped at receipt with nothing after it
-// (trace-duplicate-webhook.json), a receipt goes to the dispatcher's door with no words (its own trace is its receive),
-// and a failure (503) or a refusal stores nothing.
+// its scrub as the trace's second hop, after receive, as trace-skeleton.json does. Receive ends only with the answer,
+// so the scrub's own start and time are kept and its span is recorded right after receive's: receive is seq 1 and
+// starts first, scrub is seq 2 and lies between receive's start and the hand-off (each takes its place before the
+// hand-off, T-1108 below). It holds counts only (how many card numbers and Social Security numbers were swapped), never
+// a word or a digit. Every other answer ends the trace at receive: a known event id is dropped at receipt with nothing
+// after it (trace-duplicate-webhook.json), a receipt goes to the dispatcher's door with no words (its own trace is its
+// receive), and a failure (503) or a refusal stores nothing.
 //
 // One receive span per inbound event, the gateway's, as K-08 states it (T-1108): written to its actor, it says
 // `sealedToActor` (trace-skeleton.json); dropped as a known event id, it names the trace the event first arrived under
 // (`firstTrace`, trace-duplicate-webhook.json), which the actor's door answers from the stored event. The trace is one run
-// by seq whoever writes on it: its count begins here, receive takes place 1 as it starts and the scrub place 2 before the
-// hand-off, which tells the actor how many places the gateway took (`seqBefore`), so the actor's writers go on from 3.
+// by seq whoever writes on it: receive takes place 1 as it starts and the scrub place 2 before the hand-off, which tells
+// the actor how many places the gateway took (`seqBefore`), so the actor's writers go on from 3. Where a writer shares
+// this isolate (a receipt's hooks), it takes its places from the trace's one count, which opens once the signature has
+// passed (`shareSeq`), never for an unsigned request.
 
-import { beginSeq, isLabel, type TraceContext } from "../trace";
+import { isLabel, type TraceContext } from "../trace";
 import {
   labelFacts,
   logFailure,
@@ -45,7 +47,7 @@ import {
 import { LINQ_BODY_LIMIT_BYTES, bodyLimitOf, readCappedText } from "./body";
 import { openChatAtReceipt, type ChatAtReceipt } from "./chat-open";
 import { HandoffError, prepareHandoff, type Prepared, type ScrubDone } from "./hand-off";
-import type { GatewayDeps, SealedHandoff, StoreAnswer, VerifyWebhookResult } from "./types";
+import type { ActorStub, GatewayDeps, SealedHandoff, StoreAnswer, VerifyWebhookResult } from "./types";
 
 // The webhook's headers by Linq's standard names (K-11 README spike row 2). The adapter's wire format is T-413's; these
 // three names only fill K-11's request fields, and a missing one becomes "" (the schema's own rule for `signature`).
@@ -65,8 +67,7 @@ export async function handleLinqWebhook(
   const now = deps.now ?? Date.now;
   const bundleId = await readBundleId(deps);
   const context = openWebhookTrace(deps, bundleId, where, "textWebhook");
-  // The trace's one count of places begins here, and receive takes the first as it starts (T-1108).
-  beginSeq(context.traceId);
+  // Receive takes the trace's first place as it starts (T-1108).
   const timing = context.start("receive");
   const receivedAt = new Date(now()).toISOString();
 
@@ -134,6 +135,9 @@ export async function handleLinqWebhook(
       const { event, partKey } = verified;
       eventId = event.eventId;
       got = { kind: event.kind, service: event.service };
+      // Linq's own event: from here on the trace's writers share one count of places, after receive's (T-1108). Only a
+      // signed event opens one, so a request anyone can send never takes room in this isolate's memory of counts.
+      context.shareSeq();
       let prepared: Prepared | undefined;
       let stored: StoreAnswer | undefined;
       let handed: SealedHandoff | undefined;
@@ -177,7 +181,8 @@ export async function handleLinqWebhook(
         answer = { status: 200 };
         outcome = "dropped";
         // The trace the event first arrived under, from its actor's stored event (K-08 trace-duplicate-webhook.json).
-        const firstTrace = handed === undefined ? null : await firstTraceOf(deps, handed, context.traceId);
+        const firstTrace =
+          handed === undefined ? null : await firstTraceOf(deps.actor, handed, context.traceId);
         decided = {
           signatureValid: true,
           knownEventId: true,
@@ -224,12 +229,17 @@ export async function handleLinqWebhook(
 
 /**
  * The trace a known event first arrived under, as its actor's door answers it (T-1108): null when the door has no such
- * call, cannot answer, or answers something that is no label. The answer to the webhook never changes for it.
+ * call, cannot answer, or answers something that is no label. The answer to the webhook never changes for it. The email
+ * door asks it for a repeated reply too (./email).
  */
-async function firstTraceOf(deps: GatewayDeps, handoff: SealedHandoff, traceId: string): Promise<string | null> {
-  if (deps.actor.firstTrace === undefined) return null;
+export async function firstTraceOf(
+  actor: ActorStub,
+  handoff: SealedHandoff,
+  traceId: string,
+): Promise<string | null> {
+  if (actor.firstTrace === undefined) return null;
   try {
-    const first = await deps.actor.firstTrace(handoff);
+    const first = await actor.firstTrace(handoff);
     return isLabel(first) ? first : null;
   } catch (error) {
     logFailure(traceId, "firstTrace", error);

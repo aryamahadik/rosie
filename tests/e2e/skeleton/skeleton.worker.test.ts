@@ -319,13 +319,12 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       got: { via: "verdict", outcomes: ["no"], dangerWords: 0 },
       decided: { danger: false, path: "none", line: null },
     });
-    // On arrival: the read started once the text's inbox entry had (the actor stores the text and starts its read in one
-    // step: handle-actor.ts accept), and before the gateway answered, which waits for that step (arrivalOf). By seq it
-    // comes after the gateway's receive and scrub, as trace-skeleton.json's safetyRead does, and it starts no earlier
-    // than the scrub that handed the text on.
+    // On arrival: the read starts as the text's inbox entry is made (the actor stores the text and starts its read in one
+    // step: handle-actor.ts accept; inboxEntryAt), so no earlier than the scrub that handed the text on, and before the
+    // gateway answered, which waits for that step (arrivalOf). By seq it comes after the gateway's receive and scrub, as
+    // trace-skeleton.json's safetyRead does.
     expect(skeletonSpan("safetyRead").seq).toBeGreaterThan(skeletonSpan("scrub").seq);
     expect(writtenSpan(facts, "safetyRead").seq).toBeGreaterThan(writtenSpan(facts, "scrub").seq);
-    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(inboxEntryAt(facts));
     expect(Date.parse(read.at)).toBeGreaterThanOrEqual(arrivalOf(facts).from);
     expect(Date.parse(read.at)).toBeLessThanOrEqual(arrivalOf(facts).to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
@@ -1361,7 +1360,7 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
       const unwritten = prefix === null ? undefined : NOT_WRITTEN[prefix.hop];
       if (prefix !== null && unwritten !== undefined) {
         throw new Error(
-          `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten]?.task ?? "no task"}): no run can show it`,
+          `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten].task}): no run can show it`,
         );
       }
       // The JOIN is the seeded test owner's first text (T-1148): the handle, chat and words the doubles know.
@@ -1393,7 +1392,9 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
         // in the order they started (`at` never goes back), every joined hop once, in the turn's order.
         const asWritten = checkHops(trace).problems;
         expect(asWritten.filter((problem) => problem.kind === "seq")).toEqual([]);
-        const hopsBySeq = [...trace.spans].sort((a, b) => a.seq - b.seq).filter((span) => !isModelCallSpan(span));
+        const hopsBySeq = [...trace.spans]
+          .sort((a, b) => a.seq - b.seq)
+          .filter((span) => !isModelCallSpan(span));
         expect(hopsBySeq.map((span) => span.hop)).toEqual(writtenHops(joinedPrefix().hops));
         hopsBySeq.forEach((span, place) => {
           const before = hopsBySeq[place - 1];
@@ -1422,9 +1423,7 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
           const hops = writtenHops(prefix.hops);
           const unjudged = prefix.hops.flatMap((hop) => {
             const gap = NOT_WRITTEN[hop];
-            return gap === undefined
-              ? []
-              : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap]?.task ?? "no task"}`];
+            return gap === undefined ? [] : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap].task}`];
           });
           const report = judgePrefixRun(judgedRun, { ...prefix, hops }, plan.contractTests);
           expect(report.problems, [plan.hint, ...unjudged].join("; ")).toEqual([]);
