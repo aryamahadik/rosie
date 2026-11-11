@@ -2267,7 +2267,8 @@ const OPENER = "opener";
  *                       the final parts written together, the row checked and its version raised; alreadyPlanned when the
  *                       row holds a plan (checked before the version), versionChanged, notFound; a plan or final parts
  *                       of another row or channel refused (thrown), nothing written;
- *   cancelClock         K-05 v1 item 5 (cancel-clock.json): the question's clock row cancelled, the question withdrawn.
+ *   cancelClock         K-05 v1 item 5 (cancel-clock.json): the question's clock row cancelled at its next version, as
+ *                       K-05 answers it (the double keeps only that version; the question's withdrawal is not kept).
  *
  * The doubles keep what they write beside `written`, never in it, so the commit's rows stay as the commit wrote them.
  * Each call's scope is the Tool API's own, its repo scoped to the call's business.

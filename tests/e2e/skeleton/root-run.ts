@@ -28,9 +28,8 @@
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
 // root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
-// they are sent or answer. The spans are the log lines the target
-// captures; the actor's inbox, safety state, batches and turns are read inside its Durable Object, and the K-05 doubles
-// keep the rows they wrote.
+// they are sent or answer. The spans are the log lines the target captures; the actor's inbox, safety state, batches
+// and turns are read inside its Durable Object, and the K-05 doubles keep the rows they wrote.
 //
 // Inside workerd, Ajv's compiler cannot run and contracts/ is not on disk, so the trace is checked against K-08 by the code
 // T-1144 prebuilds for the Worker (prebuiltTraceCheck). Test values only (rule 9): the master's sample cast, the fictional
