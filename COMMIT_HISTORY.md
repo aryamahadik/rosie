@@ -2,9 +2,86 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 410, [`53198c6`](https://github.com/aryamahadik/rosie/commit/53198c6), 2026-11-11 19:41:22 UTC.
+- **Through:** commit 414, [`58acd53`](https://github.com/aryamahadik/rosie/commit/58acd53), 2026-11-11 20:00:56 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 414. docs: COMMIT\_HISTORY.md through commit 410 (53198c6, \#417) (\#422)
+
+- **Commit:** [`58acd53`](https://github.com/aryamahadik/rosie/commit/58acd53), by Arya Mahadik, 2026-11-11 20:00:56 UTC
+- **Pull request:** [#422](https://github.com/aryamahadik/rosie/pull/422) from `task/commit-history-28`, merged 2026-11-11 20:00:56 UTC. It squashed 1 branch commit:
+  - `58b1797` docs: COMMIT\_HISTORY.md through commit 410 (53198c6, \#417)
+- **Files changed:** 1 (+75 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +75 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 413. T-1234: the Worker serves the web shell: page requests go to the shell, its K-21 client reaches the page entry in process, and every other door answers as before (\#421)
+
+- **Commit:** [`a57250c`](https://github.com/aryamahadik/rosie/commit/a57250c), by Arya Mahadik, 2026-11-11 20:00:51 UTC
+- **Pull request:** [#421](https://github.com/aryamahadik/rosie/pull/421) from `task/T-1234`, merged 2026-11-11 20:00:52 UTC. It squashed 2 branch commits:
+  - `75f0158` T-1234: pin the Worker's answers byte for byte before it serves the s…
+  - `ff318ec` T-1234: the Worker hands page requests to the web shell (shell.serve …
+- **Files changed:** 2 (+1129 −44), by folder:
+  - `runtime/src/` index.ts +146 −15, index.worker.test.ts +983 −29
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1234: pin the Worker's answers byte for byte before it serves the shell (health, the 404, each door's 405 and POST, the page entry), passing on main's servePage Worker
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1234: the Worker hands page requests to the web shell (shell.serve in place of servePage), with a page's K-21 calls reaching the page entry in process; LINK_HOST typed in the Worker's env; the privacy page is served as every shell page, with x-trace-id and one log line; a page request the shell cannot answer gets a traced, logged 500
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 412. T-1236: make-staging-secrets.sh (npm run secrets:staging:make) makes staging's own SEALING\_WRAP\_KEY and LINQ\_WEBHOOK\_SECRET in place: it lists staging's names first, never replaces a held name, leaves a name with a local value to secrets:staging, and hands each fresh value over on standard input only. Its tests run behind the real cf.sh with stand-ins (\#420)
+
+- **Commit:** [`19ab9b5`](https://github.com/aryamahadik/rosie/commit/19ab9b5), by Arya Mahadik, 2026-11-11 20:00:47 UTC
+- **Pull request:** [#420](https://github.com/aryamahadik/rosie/pull/420) from `task/T-1236`, merged 2026-11-11 20:00:48 UTC. It squashed 1 branch commit:
+  - `fd0e795` T-1236: make-staging-secrets.sh (npm run secrets:staging:make) makes …
+- **Files changed:** 5 (+1538 −1), by folder:
+  - `infra/ci/` README.md +2 −0, make-staging-secrets.test.mjs +1201 −0
+  - `infra/scripts/` make-staging-secrets.sh +330 −0, put-staging-secrets.sh +3 −0
+  - `/` package.json +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 411. T-1232: K-05's contract test covers v1.9 (markPart's repeatedDelivery): the fixture part adds v1.9 to WRITTEN\_FOR with a mend for each of its 3 refused fixtures, put right to the twin the README names; the database side runs db/repo's markPartV12 against each v1.9 fixture after A7-03's chain, each answer judged by markPart.v1dot9Response and as a markPart.exchange, a repeat writing nothing (\#419)
+
+- **Commit:** [`bdd444a`](https://github.com/aryamahadik/rosie/commit/bdd444a), by Arya Mahadik, 2026-11-11 20:00:43 UTC
+- **Pull request:** [#419](https://github.com/aryamahadik/rosie/pull/419) from `task/T-1232`, merged 2026-11-11 20:00:43 UTC. It squashed 1 branch commit:
+  - `d09ab02` T-1232: K-05's contract test covers v1.9 (markPart's repeatedDelivery…
+- **Files changed:** 2 (+403 −65), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +346 −44, data-access.v1.test.ts +57 −21
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 410. docs: COMMIT\_HISTORY.md through commit 407 (c4c76b7, \#415) (\#417)
 
