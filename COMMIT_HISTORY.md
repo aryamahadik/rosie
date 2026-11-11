@@ -2,9 +2,71 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 370, [`1ab5a50`](https://github.com/aryamahadik/rosie/commit/1ab5a50), 2026-11-11 12:39:33 UTC.
+- **Through:** commit 372, [`6f86957`](https://github.com/aryamahadik/rosie/commit/6f86957), 2026-11-11 13:20:52 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 372. docs: COMMIT\_HISTORY.md through commit 370 (1ab5a50, \#377) (\#379)
+
+- **Commit:** [`6f86957`](https://github.com/aryamahadik/rosie/commit/6f86957), by Arya Mahadik, 2026-11-11 13:20:52 UTC
+- **Pull request:** [#379](https://github.com/aryamahadik/rosie/pull/379) from `task/commit-history-11`, merged 2026-11-11 13:20:52 UTC. It squashed 1 branch commit:
+  - `51be72f` docs: COMMIT\_HISTORY.md through commit 370 (1ab5a50, \#377)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 371. T-1153: deploy-preview.sh builds the Tool API's validators before the upload; step 0 refuses guarded paths in any ASCII case, links and paths outside printable ASCII (\#378)
+
+- **Commit:** [`cc34842`](https://github.com/aryamahadik/rosie/commit/cc34842), by Arya Mahadik, 2026-11-11 13:20:48 UTC
+- **Pull request:** [#378](https://github.com/aryamahadik/rosie/pull/378) from `task/T-1153`, merged 2026-11-11 13:20:48 UTC. It squashed 6 branch commits:
+  - `dacb63f` T-1153: deploy-preview.sh builds the Tool API's validators in the wor…
+  - `4b68f49` Merge branch 'main' into task/T-1153
+  - `1d92164` Merge branch 'main' into task/T-1153
+  - `91d9e56` T-1153: deploy-preview.sh's guarded paths ignore letter case, and a s…
+  - `b06c689` T-1153: deploy-preview.sh refuses a branch whose diff holds a path wi…
+  - `5057695` Merge branch 'main' into task/T-1153
+- **Files changed:** 2 (+414 −24), by folder:
+  - `infra/ci/` deploy-preview.test.mjs +325 −5
+  - `infra/scripts/` deploy-preview.sh +89 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1153: deploy-preview.sh builds the Tool API's validators in the worktree after npm ci and before the upload
+
+node runs the worktree's own infra/build/tool-api-validators.mjs (infra/ is guarded), never an npm script
+of the branch's; a failed build stops the preview before anything is migrated or uploaded. GUARDED_PATHS
+adds **/node_modules and **/node_modules/**: the generated code imports Ajv's run-time helpers by package
+name, so a node_modules a branch commits would otherwise run during the build's self-check. Tests: the build
+after npm ci and before the upload, a failing build with no upload, and the three new refusals.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1153: deploy-preview.sh's guarded paths ignore letter case, and a symbolic link in a branch's diff is refused (DL-453 round 2)
+
+Every GUARDED_PATHS entry is now :(glob,icase), since this Mac's volume ignores case: a branch's Node_Modules, PACKAGE.JSON or .NPMRC is refused as node_modules, package.json and .npmrc are. Step 0 also refuses any entry of the branch's git diff --raw with mode 120000 on either side, so a link (say at actions/src/tool-api/generated) cannot point the build's writes or its cleanup outside the worktree; the lead can still preview a reviewed link with PREVIEW_ALLOW_INFRA=1, and its notice lists each path once. Tests: refusals for Node_Modules, PACKAGE.JSON and .NPMRC; a link where the build writes and one of main's files made a link, each named as a link; a link named node_modules named as both; a reviewed link previewed. The 20 earlier tests are unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1153: deploy-preview.sh refuses a branch whose diff holds a path with a byte outside printable ASCII (DL-456 round 3)
+
+git's icase folds ASCII letters only, but this Mac's volume also folds U+017F to s and U+212A to k, so a node_modules or package.json spelt with them passed step 0. Step 0 now pipes git diff --no-renames --raw -z <base> <sha> into node, which reads it NUL-separated and byte by byte and lists every path, on either side of an entry, that holds a byte outside 0x20-0x7E. Such a branch is refused under its own 'paths with characters outside printable ASCII' line, each path quoted as git quotes paths whatever core.quotePath says; PREVIEW_ALLOW_INFRA=1 lifts it after review, as for guarded files and links, and the notice lists each path once. Output that git diff --raw -z should never give stops the script. main holds no such path (git ls-files -z and git ls-tree -r -z main: 3502 paths). Tests: refusals for generated/node_module(U+017F)/ajv/dist/runtime/equal.js, generated/pac(U+212A)age.json, an accented name, a tab and a newline in one name, DEL and a removed path; a guarded accented path named in both lists and previewed once reviewed; a space and a tilde previewed; the quoting with core.quotePath off. The 27 earlier tests are unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 370. docs: COMMIT\_HISTORY.md through commit 368 (cecb92e, \#375) (\#377)
 
