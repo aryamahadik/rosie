@@ -2,11 +2,12 @@
 // `node --test "infra/ci/*.test.mjs"`. They build a throwaway origin (a bare repository in the system temp
 // folder, never the real one) with a main branch and task branches, clone it as the lead's checkout, and run
 // the checkout's deploy-preview.sh with fake npm and wrangler commands that only record their calls
-// (script-harness.mjs). No STAGING_DATABASE_URL is set, so no migration runs.
+// (script-harness.mjs), and a fake validators' build in main's infra/build/ that records its run the same way
+// (FAKE_BUILD). No STAGING_DATABASE_URL is set, so no migration runs.
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
@@ -23,7 +24,49 @@ import {
 
 const WRANGLER_JSONC = readFileSync(path.join(REPO, "wrangler.jsonc"), "utf8");
 
-// The branches of the throwaway origin and what each changes from main.
+// The contract the fake build reads.
+const CONTRACT = "contracts/tool-api/tool-api.v1.5.schema.json";
+
+// main's infra/build/tool-api-validators.mjs in the throwaway origin, in place of the real build (T-1144), which
+// needs Ajv and the contracts. It records its run as the fake tools record theirs, one JSON line in $FAKE_LOG:
+// the script node ran, its arguments, its folder and the folder it writes, actions/src/tool-api/generated/
+// beside the script's own checkout, as the real build's. Like the real build, it fails (exit 1, nothing
+// written) when a contract it reads does not parse.
+const FAKE_BUILD = String.raw`import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const script = fileURLToPath(import.meta.url);
+const root = path.resolve(path.dirname(script), "..", "..");
+const out = path.join(root, "actions", "src", "tool-api", "generated");
+const call = { tool: "tool-api-validators", args: process.argv.slice(2), cwd: process.cwd(), script, out };
+appendFileSync(process.env.FAKE_LOG, JSON.stringify(call) + "\n");
+try {
+  JSON.parse(readFileSync(path.join(root, ${JSON.stringify(CONTRACT)}), "utf8"));
+} catch (error) {
+  console.log("FAIL tool-api validators: " + error.message);
+  process.exit(1);
+}
+mkdirSync(out, { recursive: true });
+writeFileSync(path.join(out, "validators.js"), "export const definitions = {};\n");
+console.log("tool-api validators: written to " + path.relative(process.cwd(), out));
+`;
+
+/** A symbolic link at file to target, in place of any file there, as a branch can commit one. */
+function link(target, file) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  rmSync(file, { force: true });
+  symlinkSync(target, file);
+}
+
+// Letters outside ASCII, built from their code points so that this file stays ASCII and none of them hides
+// behind the letter it looks like: U+017F (long s) and U+212A (Kelvin sign), which this Mac's volume folds to s
+// and k (DL-456), and U+00E9 (e with an acute accent).
+const LONG_S = String.fromCodePoint(0x17f);
+const KELVIN_SIGN = String.fromCodePoint(0x212a);
+const E_ACUTE = String.fromCodePoint(0xe9);
+
+// The branches of the throwaway origin and what each changes from main (a { link } is a symbolic link).
 const BRANCHES = {
   "task/T-1-code": { "runtime/src/index.ts": "export default { fetch: () => new Response('T-1') };\n" },
   "task/T-2-wrangler": {
@@ -45,6 +88,53 @@ const BRANCHES = {
   "task/T-10-shrinkwrap": {
     "npm-shrinkwrap.json": '{ "name": "rosie", "lockfileVersion": 3, "packages": {} }\n',
   },
+  // A contract that does not parse (contracts/ is not guarded): the validators' build fails in the worktree.
+  "task/T-11-contract": { [CONTRACT]: '{ "title": \n' },
+  // A branch build script: deploy-preview.sh must never run it unreviewed.
+  "task/T-12-build-script": {
+    "infra/build/tool-api-validators.mjs": 'console.log("the branch build script ran");\n',
+  },
+  // Ajv's run-time helper in a node_modules the branch adds, where the generated code's import would find it.
+  "task/T-13-node-modules": {
+    "actions/src/tool-api/generated/node_modules/ajv/dist/runtime/equal.js": "module.exports = () => true;\n",
+  },
+  // A link named node_modules, to a folder of the branch's own.
+  "task/T-14-node-modules-link": { "actions/src/tool-api/node_modules": { link: "../../../runtime/src" } },
+  // The same names in other letter case, which this Mac's volume ignores (DL-453): to node and npm they are a
+  // node_modules folder, a package.json (whose name and exports point the generated code's ajv imports at the
+  // branch's files) and an .npmrc. None of them is a name main has, so each is a new file on any volume.
+  "task/T-15-node-modules-case": {
+    "actions/src/tool-api/generated/Node_Modules/ajv/dist/runtime/equal.js": "module.exports = () => true;\n",
+  },
+  "task/T-16-package-json-case": {
+    "actions/src/tool-api/generated/PACKAGE.JSON":
+      '{ "name": "ajv", "exports": { "./dist/runtime/*": "./runtime/*" } }\n',
+  },
+  "task/T-17-npmrc-case": { ".NPMRC": "registry=https://registry.example.invalid/\n" },
+  // A link where the build writes its files, to a folder outside the checkout (DL-453).
+  "task/T-18-generated-link": { "actions/src/tool-api/generated": { link: "../../../../outside" } },
+  // One of main's files made a link.
+  "task/T-19-file-to-link": { "runtime/src/index.ts": { link: "../../../outside/index.ts" } },
+  // Paths with characters outside printable ASCII (DL-456). git's icase folds ASCII letters only, but this Mac's
+  // volume also folds U+017F (long s) to s and U+212A (Kelvin sign) to k: to node and npm these are a
+  // node_modules folder and a package.json (as in T-15 and T-16) that no guarded entry matches.
+  "task/T-20-node-modules-long-s": {
+    [`actions/src/tool-api/generated/node_module${LONG_S}/ajv/dist/runtime/equal.js`]:
+      "module.exports = () => true;\n",
+  },
+  "task/T-21-package-json-kelvin": {
+    [`actions/src/tool-api/generated/pac${KELVIN_SIGN}age.json`]:
+      '{ "name": "ajv", "exports": { "./dist/runtime/*": "./runtime/*" } }\n',
+  },
+  // Other paths outside printable ASCII: an accented letter; a tab and a newline in one name, which the
+  // NUL-separated read keeps whole; and an accented letter in a guarded path.
+  "task/T-22-accented": { [`runtime/src/caf${E_ACUTE}.ts`]: "export {};\n" },
+  "task/T-23-control-characters": { "runtime/src/a\tb\nc.ts": "export {};\n" },
+  "task/T-24-guarded-accented": { [`infra/scripts/caf${E_ACUTE}.sh`]: "#!/usr/bin/env bash\n" },
+  // A space (0x20) and a tilde (0x7E), the two ends of printable ASCII: nothing to refuse. DEL (0x7F), just past
+  // the end: refused.
+  "task/T-25-space-tilde": { "runtime/src/a b~.ts": "export {};\n" },
+  "task/T-27-delete-character": { "runtime/src/del\u007f.ts": "export {};\n" },
 };
 
 describe("deploy-preview.sh", () => {
@@ -66,6 +156,8 @@ describe("deploy-preview.sh", () => {
     const seed = path.join(dir, "seed");
     git(dir, "init", "-q", "-b", "main", seed);
     for (const script of ["deploy-preview.sh", "lib.sh", "cf.sh"]) copyScript(script, seed);
+    write(path.join(seed, "infra", "build", "tool-api-validators.mjs"), FAKE_BUILD);
+    write(path.join(seed, CONTRACT), '{ "title": "K-09 v1.5, as the fixture holds it" }\n');
     write(path.join(seed, "wrangler.jsonc"), WRANGLER_JSONC);
     write(path.join(seed, "package.json"), '{ "name": "rosie", "private": true }\n');
     write(
@@ -83,8 +175,12 @@ describe("deploy-preview.sh", () => {
     const shas = {};
     for (const [branch, changes] of Object.entries(BRANCHES)) {
       git(seed, "switch", "-q", "-c", branch, "main");
-      for (const [file, content] of Object.entries(changes)) write(path.join(seed, file), content);
-      git(seed, "add", "-A");
+      for (const [file, content] of Object.entries(changes)) {
+        if (typeof content === "string") write(path.join(seed, file), content);
+        else link(content.link, path.join(seed, file));
+      }
+      // --force: .gitignore ignores node_modules/ here, as in the repository, and a branch can still commit one.
+      git(seed, "add", "-A", "--force");
       git(seed, "commit", "-q", "-m", branch);
       git(seed, "push", "-q", "origin", branch);
       shas[branch] = git(seed, "rev-parse", "HEAD");
@@ -106,6 +202,24 @@ describe("deploy-preview.sh", () => {
     git(seed, "commit", "-q", "-m", "orphan");
     git(seed, "push", "-q", "origin", "task/T-9-orphan");
     git(seed, "switch", "-q", "-f", "main");
+    // A path outside printable ASCII that main had when a branch left it and that the branch removes, so it is
+    // on the base side of the branch's diff only. main then removes it too: its tip, like the repository's main
+    // (DL-456), holds no such path.
+    const resume = path.join(seed, "runtime", "src", `r${E_ACUTE}sum${E_ACUTE}.ts`);
+    write(resume, "export {};\n");
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main gains a path outside printable ASCII");
+    git(seed, "switch", "-q", "-c", "task/T-26-removes-accented", "main");
+    rmSync(resume);
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "task/T-26-removes-accented");
+    git(seed, "push", "-q", "origin", "task/T-26-removes-accented");
+    shas["task/T-26-removes-accented"] = git(seed, "rev-parse", "HEAD");
+    git(seed, "switch", "-q", "main");
+    rmSync(resume);
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main removes it again");
+    git(seed, "push", "-q", "origin", "main");
 
     // The lead's checkout, with its own (fake) wrangler; fake npm and wrangler first on PATH.
     const main = path.join(dir, "rosie");
@@ -221,6 +335,12 @@ describe("deploy-preview.sh", () => {
     ["task/T-7-workspace-package", "runtime/package.json"],
     ["task/T-8-npmrc", ".npmrc"],
     ["task/T-10-shrinkwrap", "npm-shrinkwrap.json"],
+    ["task/T-12-build-script", "infra/build/tool-api-validators.mjs"],
+    ["task/T-13-node-modules", "actions/src/tool-api/generated/node_modules/ajv/dist/runtime/equal.js"],
+    ["task/T-14-node-modules-link", "actions/src/tool-api/node_modules"],
+    ["task/T-15-node-modules-case", "actions/src/tool-api/generated/Node_Modules/ajv/dist/runtime/equal.js"],
+    ["task/T-16-package-json-case", "actions/src/tool-api/generated/PACKAGE.JSON"],
+    ["task/T-17-npmrc-case", ".NPMRC"],
   ];
   for (const [branch, file] of guarded) {
     it(`refuses ${branch}, whose diff against origin/main touches ${file}, without PREVIEW_ALLOW_INFRA=1`, () => {
@@ -232,6 +352,54 @@ describe("deploy-preview.sh", () => {
       assert.equal(result.branchCfRan, false);
     });
   }
+
+  // A symbolic link in the branch's diff is refused wherever it is (mode 120000 in git diff --raw, DL-453).
+  const LINKS_HEADER = "symbolic links, which could point the build at folders outside its worktree:\n";
+  const links = [
+    ["task/T-18-generated-link", "actions/src/tool-api/generated"],
+    ["task/T-19-file-to-link", "runtime/src/index.ts"],
+  ];
+  for (const [branch, file] of links) {
+    it(`refuses ${branch}, whose diff against origin/main makes ${file} a symbolic link, without PREVIEW_ALLOW_INFRA=1`, () => {
+      const result = fixture.run(branch);
+      assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+      assert.ok(
+        result.stderr.includes(`${LINKS_HEADER}  ${file}\n`),
+        `the refusal names ${file} as a link: ${result.stderr}`,
+      );
+      assert.doesNotMatch(
+        result.stderr,
+        /touch files that control/,
+        "no guarded file changed: the link alone refuses it",
+      );
+      assert.match(result.stderr, /PREVIEW_ALLOW_INFRA=1/);
+      assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
+      assert.equal(result.branchCfRan, false);
+    });
+  }
+
+  it("names a link called node_modules both as a guarded file and as a link", () => {
+    const result = fixture.run("task/T-14-node-modules-link");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        "with the Rosfield sign-in before review:\n  actions/src/tool-api/node_modules\n" +
+          `and they add, change or remove ${LINKS_HEADER}  actions/src/tool-api/node_modules\n`,
+      ),
+      result.stderr,
+    );
+    assert.deepEqual(result.calls, []);
+  });
+
+  it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed link, listing it once", () => {
+    const result = fixture.run("task/T-14-node-modules-link", { PREVIEW_ALLOW_INFRA: "1" });
+    assertPreviewed(result, "task/T-14-node-modules-link", "task-t-14-node-modules-link");
+    assert.match(
+      result.stdout,
+      /used as reviewed:\n {2}actions\/src\/tool-api\/node_modules\n\[/,
+      "the link is listed once, though both checks name it",
+    );
+  });
 
   it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed infra change, still with the checkout's cf.sh", () => {
     const result = fixture.run("task/T-3-infra", { PREVIEW_ALLOW_INFRA: "1" });
@@ -262,5 +430,157 @@ describe("deploy-preview.sh", () => {
     const npm = result.calls.find((call) => call.tool === "npm");
     assert.ok(npm, "npm ci ran in a worktree");
     assert.equal(existsSync(npm.cwd), false, "the temporary worktree is removed");
+  });
+
+  it("builds the Tool API's validators after npm ci and before the upload, with node and the worktree's guarded build script", () => {
+    const result = fixture.run("task/T-1-code");
+    assertPreviewed(result, "task/T-1-code", "task-t-1-code");
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators", "main-wrangler"],
+      "npm ci, then the build, then the upload; npm runs once, so no npm script ran the build",
+    );
+    const [install, build, upload] = result.calls;
+    const tree = install.cwd;
+    assert.equal(build.cwd, tree, "the build runs in the temporary worktree");
+    assert.equal(
+      build.script,
+      path.join(tree, "infra", "build", "tool-api-validators.mjs"),
+      "node runs the worktree's infra/ copy (held to origin/main's by the guard), not the lead's checkout's",
+    );
+    assert.deepEqual(build.args, [], "no --out: the build's own output folder");
+    assert.equal(
+      build.out,
+      path.join(tree, "actions", "src", "tool-api", "generated"),
+      "the generated folder beside the worktree's validator.ts",
+    );
+    assert.equal(upload.cwd, tree, "the upload bundles the same worktree, after the build wrote into it");
+    assert.match(result.stdout, /tool-api validators: written to actions\/src\/tool-api\/generated\n/);
+  });
+
+  it("stops when the validators' build fails: nothing is migrated or uploaded, and the worktree is removed", () => {
+    const result = fixture.run("task/T-11-contract");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators"],
+      "no upload after the failed build",
+    );
+    assert.match(result.stdout, /FAIL tool-api validators: /, "the build's own failure is shown");
+    assert.ok(
+      result.stderr.includes(
+        `the Tool API's validators did not build for task/T-11-contract (${fixture.shas["task/T-11-contract"]}):` +
+          " nothing was migrated or uploaded",
+      ),
+      result.stderr,
+    );
+    assert.doesNotMatch(
+      result.stdout,
+      /no preview schema was migrated/,
+      "it stops before the migration step",
+    );
+    assert.doesNotMatch(result.stdout, /Preview URL/);
+    assert.equal(existsSync(result.calls[0].cwd), false, "the temporary worktree is removed");
+    const worktrees = fixture.git(fixture.main, "worktree", "list", "--porcelain").match(/^worktree /gm);
+    assert.equal(worktrees?.length, 1, "only the lead's checkout is left as a worktree");
+  });
+
+  // A path holding a byte outside printable ASCII (0x20 to 0x7E), on either side of the branch's diff, is refused
+  // wherever it is (DL-456). The diff is read NUL-separated, and each path is named whole, quoted as git quotes it.
+  const NONASCII_HEADER =
+    "paths with characters outside printable ASCII, which this Mac could take for files that control the" +
+    " install, the build or the deploy (each quoted as git quotes it):\n";
+  const nonascii = [
+    [
+      "task/T-20-node-modules-long-s",
+      String.raw`"actions/src/tool-api/generated/node_module\305\277/ajv/dist/runtime/equal.js"`,
+    ],
+    ["task/T-21-package-json-kelvin", String.raw`"actions/src/tool-api/generated/pac\342\204\252age.json"`],
+    ["task/T-22-accented", String.raw`"runtime/src/caf\303\251.ts"`],
+    ["task/T-23-control-characters", String.raw`"runtime/src/a\tb\nc.ts"`],
+    ["task/T-26-removes-accented", String.raw`"runtime/src/r\303\251sum\303\251.ts"`],
+    ["task/T-27-delete-character", String.raw`"runtime/src/del\177.ts"`],
+  ];
+  for (const [branch, quoted] of nonascii) {
+    it(`refuses ${branch}, whose diff against origin/main touches ${quoted}, without PREVIEW_ALLOW_INFRA=1`, () => {
+      assert.equal(
+        fixture.git(fixture.main, "diff", "--name-only", `origin/main...${fixture.shas[branch]}`),
+        quoted,
+        "the branch changes that one path, which git itself shows quoted so",
+      );
+      const result = fixture.run(branch);
+      assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+      assert.ok(
+        result.stderr.includes(` add, change or remove ${NONASCII_HEADER}  ${quoted}\nReview them`),
+        `the refusal names ${quoted}, whole and quoted, and nothing else: ${result.stderr}`,
+      );
+      assert.doesNotMatch(
+        result.stderr,
+        /touch files that control|symbolic links/,
+        "no guarded name and no link: the path alone refuses it",
+      );
+      assert.match(result.stderr, /PREVIEW_ALLOW_INFRA=1/);
+      assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
+      assert.equal(result.branchCfRan, false);
+    });
+  }
+
+  it("names a guarded path outside printable ASCII in both lists, quoted alike", () => {
+    const quoted = String.raw`"infra/scripts/caf\303\251.sh"`;
+    const result = fixture.run("task/T-24-guarded-accented");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        `with the Rosfield sign-in before review:\n  ${quoted}\n` +
+          `and they add, change or remove ${NONASCII_HEADER}  ${quoted}\nReview them`,
+      ),
+      result.stderr,
+    );
+    assert.deepEqual(result.calls, []);
+  });
+
+  it("with PREVIEW_ALLOW_INFRA=1 previews a reviewed path outside printable ASCII, listing it once, quoted", () => {
+    const result = fixture.run("task/T-24-guarded-accented", { PREVIEW_ALLOW_INFRA: "1" });
+    assertPreviewed(result, "task/T-24-guarded-accented", "task-t-24-guarded-accented");
+    assert.ok(
+      result.stdout.includes(`used as reviewed:\n  ${String.raw`"infra/scripts/caf\303\251.sh"`}\n[`),
+      `the path is listed once, though both checks name it: ${result.stdout}`,
+    );
+  });
+
+  it("previews a branch whose new path holds a space and a tilde, the two ends of printable ASCII", () => {
+    assertPreviewed(fixture.run("task/T-25-space-tilde"), "task/T-25-space-tilde", "task-t-25-space-tilde");
+  });
+
+  it("names such a path quoted even when the lead's git config turns git's own quoting off (core.quotePath)", () => {
+    const branch = "task/T-20-node-modules-long-s";
+    const quotePathOff = {
+      GIT_CONFIG_COUNT: "1",
+      GIT_CONFIG_KEY_0: "core.quotePath",
+      GIT_CONFIG_VALUE_0: "false",
+    };
+    const shown = execFileSync("git", ["diff", "--name-only", `origin/main...${fixture.shas[branch]}`], {
+      cwd: fixture.main,
+      env: cleanEnv(fixture.home, quotePathOff),
+      encoding: "utf8",
+    });
+    assert.equal(
+      shown,
+      `actions/src/tool-api/generated/node_module${LONG_S}/ajv/dist/runtime/equal.js\n`,
+      "with that setting, git itself prints the name's bytes as they are",
+    );
+    const result = fixture.run(branch, quotePathOff);
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.ok(
+      result.stderr.includes(
+        `${NONASCII_HEADER}  ${String.raw`"actions/src/tool-api/generated/node_module\305\277/ajv/dist/runtime/equal.js"`}\n`,
+      ),
+      result.stderr,
+    );
+    assert.ok(
+      !(result.stdout + result.stderr).includes(LONG_S),
+      "no byte of the name reaches the terminal as it is",
+    );
+    assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
   });
 });
