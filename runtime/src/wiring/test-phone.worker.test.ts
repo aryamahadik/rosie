@@ -39,7 +39,6 @@ import type { SendEmailRequest } from "@rosie/adapters/email/double";
 
 import type { HandleActor } from "../actor";
 import { actorNameOf, PAGE_CALLS, pagePathOf, type PageCallName } from "../gateway";
-import { pagePost } from "../gateway/pages/test-support";
 import { createWorker } from "../index";
 import { SAM } from "../turn/test-support";
 import {
@@ -112,6 +111,20 @@ function lineNamespace(): LineNamespace {
 async function settle(actorName: string): Promise<void> {
   await actorOf(actorName).safetyIdle();
   await actorOf(actorName).batchIdle();
+}
+
+/**
+ * A page call's POST as the page sends it, with its JSON body and, when given, its trace id: the gateway pages' own
+ * `pagePost` (../gateway/pages/test-support), written here so this file does not import that module and its 40-odd K-21
+ * fixtures. The Workers pool sends a test file's runner, in one message, every module of the file's graph that the run
+ * has already transformed (Vitest's warm modules), and this file's graph holds the Tool API's generated validators: with
+ * those fixtures in it too, that message closed the runner's socket ("Worker exited unexpectedly") whenever the pages
+ * test had run before this file (DL-420).
+ */
+function pagePost(path: string, body: unknown, options: { traceId?: string } = {}): Request {
+  const headers = new Headers({ "content-type": "application/json" });
+  if (options.traceId !== undefined) headers.set("x-trace-id", options.traceId);
+  return new Request(`https://rosie.test${path}`, { method: "POST", headers, body: JSON.stringify(body) });
 }
 
 /** Polls an async check until it holds, or fails naming what it waited for. */
