@@ -4,6 +4,7 @@
 // - Sealing the event and writing it to the handle's actor is T-243's; the scrub is T-242's (runtime/src/scrub).
 
 import type { BundleId } from "../trace";
+import type { EmailPort } from "./email/types";
 import type { PageHandlers } from "./pages/types";
 import type { ProviderDoors } from "./providers/types";
 import type { HandleRef, SealedBox, SealingKeyStore } from "./seal";
@@ -50,6 +51,13 @@ export interface ActorHandoff {
   partKey: string | null;
   traceId: string;
   bundleId: BundleId;
+  /**
+   * For an email's delivery event only (T-265; K-12 v1 `verifyWebhook.response` rfcMessageId): the Message-ID of Rosie's
+   * email the receipt reports on, which later emails in the booking's thread name, or null when Resend gives none (an
+   * email that never went). K-06 v1 has no field for it, so it rides beside the event, never in it. Left out for a Linq
+   * receipt.
+   */
+  rfcMessageId?: string | null;
 }
 
 /**
@@ -175,4 +183,17 @@ export interface GatewayDeps {
    * is LINQ_BODY_LIMIT_BYTES (256 KiB).
    */
   linqBodyLimitBytes?: number;
+  /**
+   * The email port's verify and read (T-265, email/; K-12 v1 verifyWebhook and readReply): the email adapter (C-213),
+   * which reads RESEND_WEBHOOK_SECRET and RESEND_RECEIVING_KEY by name. Left out, each call answers by failing, so the
+   * Resend webhook route answers 503 and reads, writes and hands on nothing until the composition root binds it. The
+   * door writes through this gateway's own `actor`, `receipts` and `keys`.
+   */
+  email?: EmailPort;
+  /**
+   * The most bytes a Resend webhook's body may have (a config value, T-265; body.ts): over it, the webhook is answered
+   * 413 before its body is read whole, and nothing is verified, read or handed on. Left out, or not a whole number from
+   * 0, it is EMAIL_BODY_LIMIT_BYTES (256 KiB).
+   */
+  emailBodyLimitBytes?: number;
 }
