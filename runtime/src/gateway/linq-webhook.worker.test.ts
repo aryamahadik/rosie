@@ -12,6 +12,7 @@ import deliveredAfter4006 from "../../../contracts/port-linq/fixtures/verify-del
 import verifyOk from "../../../contracts/port-linq/fixtures/verify-ok.json";
 import staleTimestamp from "../../../contracts/port-linq/fixtures/verify-stale-timestamp.json";
 import duplicateEvent from "../../../contracts/inbound-event/fixtures/duplicate-event.json";
+import { seqOf } from "../trace";
 import { LINQ_BODY_LIMIT_BYTES } from "./body";
 import { handleLinqWebhook } from "./linq-webhook";
 import { countedStream, fakeKeyStore, postOf, xBytes } from "./test-support";
@@ -349,6 +350,145 @@ describe("POST /webhooks/linq", () => {
     expect(text).not.toContain("5555550101");
     expect(text).not.toContain(verifyOk.request.signature);
   });
+});
+
+describe("one receive span per inbound event, as K-08 states it, and the trace's places before the hand-off (T-1108)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const spansOf = (lines: Record<string, unknown>[]): Record<string, unknown>[] =>
+    lines.filter((line) => line.msg === "span");
+
+  /** verify-ok's webhook again, as Linq's retry of it: the same event id under another body. */
+  const repeated: Fixture = {
+    request: { ...verifyOk.request, raw: `${verifyOk.request.raw} ` },
+    outcome: { result: "event", httpStatus: 200, event: duplicateEvent, partKey: null },
+  };
+
+  it("a text written to its actor: the receive span says sealedToActor at seq 1 (trace-skeleton.json), the scrub is seq 2, and the hand-off tells the actor the gateway took 2 places", async () => {
+    const logLines = captureLogLines();
+    const actor = actorStub();
+
+    const response = await handleLinqWebhook(webhookOf(verifyOk), depsOf(portDouble(ALL), actor), WHERE);
+
+    expect(response.status).toBe(200);
+    const spans = spansOf(logLines());
+    expect(spans.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "ok"],
+      [2, "scrub", "ok"],
+    ]);
+    expect(spans[0]?.decided).toEqual({
+      signatureValid: true,
+      knownEventId: false,
+      sealedToActor: true,
+      answered: 200,
+    });
+    expect(actor.written.map((handoff) => handoff.seqBefore)).toEqual([2]);
+    // Linq's own event opened the trace's one count: a writer in this isolate goes on from the gateway's two places.
+    expect(seqOf(response.headers.get("x-trace-id") ?? "")).toBe(2);
+  });
+
+  it.each([
+    ["a bad signature", badSignature, 401],
+    ["a stale timestamp", staleTimestamp, 401],
+  ])(
+    "%s opens no count for its trace: only a signed event takes room in the isolate's memory of counts",
+    async (_name, fixture, status) => {
+      const logLines = captureLogLines();
+
+      const response = await handleLinqWebhook(
+        webhookOf(fixture),
+        depsOf(portDouble(ALL), actorStub()),
+        WHERE,
+      );
+
+      expect(response.status).toBe(status);
+      const traceId = response.headers.get("x-trace-id") ?? "";
+      expect(traceId).toMatch(UUID);
+      expect(seqOf(traceId)).toBeNull();
+      // Its one receive span still stands at place 1.
+      expect(spansOf(logLines()).map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+        [1, "receive", "refused"],
+      ]);
+    },
+  );
+
+  it("a receipt has no words to seal and no actor: its receive span says neither, and its hand-off names no places", async () => {
+    const logLines = captureLogLines();
+    const actor = actorStub();
+    const receipts = receiptsStub();
+
+    await handleLinqWebhook(webhookOf(deliveredAfter4006), depsOf(portDouble(ALL), actor, receipts), WHERE);
+
+    const spans = spansOf(logLines());
+    expect(spans.map((span) => [span.seq, span.hop, span.outcome])).toEqual([[1, "receive", "ok"]]);
+    expect(spans[0]?.decided).toEqual({ signatureValid: true, knownEventId: false, answered: 200 });
+    expect(receipts.written).toHaveLength(1);
+    expect(receipts.written[0]).not.toHaveProperty("seqBefore");
+  });
+
+  it("a known event id: the dropped receive span names the trace the event first arrived under (trace-duplicate-webhook.json), as its actor's door answers it, and nothing follows it", async () => {
+    const logLines = captureLogLines();
+    const stub = actorStub();
+    const asked: string[] = [];
+    const actor: ActorStub = {
+      accept: (handoff) => stub.accept(handoff),
+      firstTrace(handoff) {
+        asked.push(handoff.event.eventId);
+        const stored = stub.written.find((one) => one.event.eventId === handoff.event.eventId);
+        return Promise.resolve(stored?.traceId ?? null);
+      },
+    };
+    const deps = depsOf(portDouble([...ALL, repeated]), actor);
+
+    const first = await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE);
+    const second = await handleLinqWebhook(webhookOf(repeated), deps, WHERE);
+
+    expect([first.status, second.status]).toEqual([200, 200]);
+    const firstTrace = first.headers.get("x-trace-id");
+    const repeatTrace = second.headers.get("x-trace-id");
+    expect(repeatTrace).not.toBe(firstTrace);
+    const repeat = spansOf(logLines()).filter((span) => span.trace_id === repeatTrace);
+    expect(repeat.map((span) => [span.seq, span.hop, span.outcome])).toEqual([[1, "receive", "dropped"]]);
+    expect(repeat[0]?.decided).toEqual({
+      signatureValid: true,
+      knownEventId: true,
+      firstTrace,
+      answered: 200,
+    });
+    // Asked once, for the repeat only: an event its actor wrote has no first trace to ask for.
+    expect(asked).toEqual(["evt-alex-0001"]);
+  });
+
+  it.each([
+    ["has no such call", undefined],
+    ["cannot answer", (): Promise<string | null> => Promise.reject(new Error("the actor gave no answer"))],
+    ["holds no such event", (): Promise<string | null> => Promise.resolve(null)],
+    ["answers what is no label", (): Promise<string | null> => Promise.resolve("two words")],
+  ])(
+    "a known event id whose actor's door %s: the dropped span names no first trace, and the answer is 200 all the same",
+    async (_name, firstTrace) => {
+      const logLines = captureLogLines();
+      const stub = actorStub();
+      const actor: ActorStub = {
+        accept: (handoff) => stub.accept(handoff),
+        ...(firstTrace === undefined ? {} : { firstTrace }),
+      };
+      const deps = depsOf(portDouble([...ALL, repeated]), actor);
+
+      await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE);
+      const second = await handleLinqWebhook(webhookOf(repeated), deps, WHERE);
+
+      expect(second.status).toBe(200);
+      const repeat = receiveSpans(logLines()).filter(
+        (span) => span.trace_id === second.headers.get("x-trace-id"),
+      );
+      expect(repeat.map((span) => span.outcome)).toEqual(["dropped"]);
+      expect(repeat[0]?.decided).toEqual({ signatureValid: true, knownEventId: true, answered: 200 });
+      expect(JSON.stringify(logLines())).not.toContain("two words");
+    },
+  );
 });
 
 describe("the Linq webhook's body cap (T-1180)", () => {

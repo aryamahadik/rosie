@@ -411,7 +411,10 @@ describe("a delivery receipt marks the part delivered and hands it to clock armi
     return { store: t.store, clockArming: t.arming, trace };
   }
 
-  it("marks by Linq's message id, arms on the first delivery and again for the second part, never twice for one", async () => {
+  // T-1228: the fake store answers a repeat as K-05 v1.9 does (item 48), so the repeated receipt of the row's first
+  // delivery is handed on again, as the first was. That the clock still arms once is proved on the clock row in
+  // receipt-repeat.worker.test.ts.
+  it("marks by Linq's message id and hands on the first delivery, its repeat as the first again, and the second part", async () => {
     const t = setup([twoParts]);
     await runDispatch(t.deps("dispatcher-1"));
     const deps = receiptDeps(t);
@@ -446,15 +449,18 @@ describe("a delivery receipt marks the part delivered and hands it to clock armi
       partNo: 2,
       firstDelivery: false,
     });
+    const firstDelivered = {
+      outboxRowId: "out-a7-03-alex",
+      partNo: 1,
+      tryNo: 1,
+      firstDelivery: true,
+      openQuestionId: "question-alex-new-time",
+      deliveredAt: at,
+    };
     expect(t.arming.delivered).toEqual([
-      {
-        outboxRowId: "out-a7-03-alex",
-        partNo: 1,
-        tryNo: 1,
-        firstDelivery: true,
-        openQuestionId: "question-alex-new-time",
-        deliveredAt: at,
-      },
+      firstDelivered,
+      // The repeat: nothing was written, and it is handed on as the row's first delivery at the stored time.
+      firstDelivered,
       {
         outboxRowId: "out-a7-03-alex",
         partNo: 2,
