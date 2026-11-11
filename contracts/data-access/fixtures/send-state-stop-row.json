@@ -1,0 +1,58 @@
+{
+  "call": "sendState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:06:37Z",
+    "note": "send-state-stopped in its v1.8 form (run instead of it): limit 8's read for Alex's confirmation after his STOP committed. The newest texts row covering this contact is the STOP row for every business, which withdraws, so it is no yes: fromContact false (README default 82) and no booking (K-29: a STOP's row names none). The stopped flag is the phone's, as stored (README default 84). The confirmation is neither a safety line nor a stop reply, so limit 8 drops it (markRow droppedStopped) and nothing is sent."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley"
+  },
+  "outcome": {
+    "result": "sendState",
+    "outboxRowId": "out-alex-booked-riley",
+    "rowState": "sending",
+    "rowVersion": 3,
+    "readAt": "2026-11-07T15:06:37Z",
+    "recipient": { "handleId": "handle-alex", "kind": "phone", "address": "+15555550101", "personId": "person-alex" },
+    "phone": {
+      "number": "+15555550101",
+      "stopped": true,
+      "stopAt": "2026-11-07T15:06:36Z",
+      "chatOpen": false,
+      "chatWay": "imessage",
+      "linqContactAddedAt": "2026-10-12T16:20:00Z",
+      "pollVotedAt": "2026-10-23T14:06:10Z",
+      "optoutLineDeliveredAt": "2026-10-12T16:20:00Z",
+      "version": 4
+    },
+    "chat": null,
+    "textsConsent": {
+      "consentId": "consent-alex-stop",
+      "businessId": null,
+      "revoked": true,
+      "at": "2026-11-07T15:06:36Z",
+      "fromContact": false,
+      "bookingId": null
+    },
+    "audience": "customer",
+    "zone": "America/New_York",
+    "visitZone": null,
+    "businessZone": "America/New_York",
+    "textHours": { "start": "08:00", "end": "20:00" },
+    "textHoursOverride": false,
+    "currentVersions": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+    "booking": {
+      "id": "booking-alex-riley-nov14",
+      "stage": "booked",
+      "servedPersonId": "person-alex",
+      "private": false,
+      "deceased": false,
+      "version": 1
+    },
+    "pauses": [],
+    "openQuestion": null,
+    "closed": { "booking": false, "question": false }
+  }
+}
