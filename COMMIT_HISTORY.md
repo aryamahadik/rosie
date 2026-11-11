@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 350, [`7f552c9`](https://github.com/aryamahadik/rosie/commit/7f552c9), 2026-11-11 07:12:52 UTC.
+- **Through:** commit 352, [`4283580`](https://github.com/aryamahadik/rosie/commit/4283580), 2026-11-11 07:33:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 352. docs: COMMIT\_HISTORY.md through commit 350 (7f552c9, \#357) (\#359)
+
+- **Commit:** [`4283580`](https://github.com/aryamahadik/rosie/commit/4283580), by Arya Mahadik, 2026-11-11 07:33:59 UTC
+- **Pull request:** [#359](https://github.com/aryamahadik/rosie/pull/359) from `task/commit-history-2`, merged 2026-11-11 07:33:59 UTC. It squashed 1 branch commit:
+  - `992e1b7` docs: COMMIT\_HISTORY.md through commit 350 (7f552c9, \#357)
+- **Files changed:** 1 (+17 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +17 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 351. T-562: join hop 11, the dispatcher claims the row on PostgreSQL and checks limit 8 (\#358)
+
+- **Commit:** [`4c548fa`](https://github.com/aryamahadik/rosie/commit/4c548fa), by Arya Mahadik, 2026-11-11 07:33:55 UTC
+- **Pull request:** [#358](https://github.com/aryamahadik/rosie/pull/358) from `task/T-562`, merged 2026-11-11 07:33:55 UTC. It squashed 2 branch commits:
+  - `f154065` T-562: join hop 11, the dispatcher claims through K-05 v1.2's outbox …
+  - `7fe47e5` T-562: a renewal answered with no recipient at all is unreadable too …
+- **Files changed:** 22 (+2415 −103), by folder:
+  - `runtime/src/wiring/` bind.ts +2 −0, closed.ts +10 −10, dispatch.test.ts +436 −0, hop11.worker.test.ts +476 −0, hop3.worker.test.ts +4 −6, hop5.worker.test.ts +5 −1, hop6.worker.test.ts +5 −1, hop7.worker.test.ts +5 −1, index.ts +14 −0, linq-door.ts +114 −0, linq.test.ts +4 −1, picks.ts +11 −3, ports.ts +36 −14, real.ts +400 −1, root.test.ts +45 −3, root.ts +43 −6, root.worker.test.ts +50 −10, test-phone.worker.test.ts +14 −7, test-support.ts +644 −33
+  - `tests/e2e/skeleton/` README.md +4 −2, root-run.ts +6 −1, skeleton.worker.test.ts +87 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-562: join hop 11, the dispatcher claims through K-05 v1.2's outbox calls and reads limit 8's send state through sendState; the Linq door refuses a non-linq row and times a send out far below the claim
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-562: a renewal answered with no recipient at all is unreadable too (the K-05 README's consumer note), with its test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 350. docs: COMMIT\_HISTORY.md, every commit on main (1 to 349, through 3cd4827) with its pull request, squashed branch commits, files and message; the closed pull requests; regenerated after each merge (DL-436) (\#357)
 
