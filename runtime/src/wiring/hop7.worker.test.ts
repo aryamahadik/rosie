@@ -381,7 +381,9 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
         // Each call's own portCall span (the AI gateway's), answered at its first attempt; the AI layer records no hop
         // span of its own, so decideReads is the hop's one span.
         const decideCalls = trace.filter(
-          (span) => modelCall(span) && span.model_calls?.some((call) => call.purpose !== "safetyRead"),
+          (span) =>
+            modelCall(span) &&
+            span.model_calls?.some((call) => call.purpose !== "safetyRead" && call.purpose !== "compose"),
         );
         expect(callsOf(decideCalls)).toEqual(callsOf([decide]));
         expect(decideCalls.map((span) => [span.attempt, span.outcome, span.decided])).toEqual(

@@ -383,7 +383,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     ];
     expect(byPurpose(decide.model_calls ?? [])).toEqual(twoHaikuReads);
     const decideCalls = facts.judged.trace.spans.filter(
-      (span) => isModelCallSpan(span) && span.model_calls?.some((call) => call.purpose !== "safetyRead"),
+      (span) =>
+        isModelCallSpan(span) &&
+        span.model_calls?.some((call) => call.purpose !== "safetyRead" && call.purpose !== "compose"),
     );
     expect(byPurpose(decideCalls.flatMap((span) => span.model_calls ?? []))).toEqual(twoHaikuReads);
     expect(decideCalls.map((span) => [span.attempt, span.outcome])).toEqual(decideCalls.map(() => [1, "ok"]));
