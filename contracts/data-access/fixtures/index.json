@@ -1765,7 +1765,7 @@
       "version": "v1.9",
       "def": "markPart.exchange",
       "expect": "refuse",
-      "shows": "The poll's repeated receipt answered with repeatedDelivery null: a delivery receipt answered repeated always states the delivery it repeats, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming (put right, it is mark-a7-03-poll-delivered-repeat's)",
+      "shows": "The poll's repeated receipt answered with repeatedDelivery null: a delivery receipt answered repeated always states the delivery it repeats, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming (put right, its outcome is mark-a7-03-poll-delivered-repeat's)",
       "source": "arch 02 line 127; STATE note 38; K-05 v1.9 item 48, default 87"
     }
   ]
