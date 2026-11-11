@@ -90,4 +90,16 @@ export {
 } from "./root";
 export { ROW_MEMORY, RowTraces } from "./row-traces";
 export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";
+export {
+  NoTestPhoneLineError,
+  TEST_PHONE_LINE_NAME,
+  lineLinqSend,
+  testPhoneLineOf,
+  testPhonePages,
+  type TestPhoneInputs,
+  type TestPhoneLine,
+  type TestPhoneLineNamespace,
+  type TestPhoneLinePort,
+  type TestPhonePageDeps,
+} from "./test-phone";
 export { lastTextSourceOf, TurnChats, withTextSource, type TextSource } from "./turn-chats";

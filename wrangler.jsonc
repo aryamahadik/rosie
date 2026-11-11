@@ -74,10 +74,18 @@
       // environment. infra/scripts/create-staging-bindings.sh made the KV namespace and both queues on the Rosfield
       // account through cf.sh; the deploy makes the HandleActor class (the top level's migration tag) and the cron.
       // The Vitest Workers pool runs this environment, so its tests get these bindings, simulated locally.
+      // Staging alone also binds TEST_PHONE_LINE, the test-phone page's TestPhoneLine (T-1186, DL-379), with its own
+      // migration tag: never at the top level or in env.production, which never wire the test-phone page (DL-373 gap d).
       "durable_objects": {
-        "bindings": [{ "name": "HANDLE_ACTOR", "class_name": "HandleActor" }],
+        "bindings": [
+          { "name": "HANDLE_ACTOR", "class_name": "HandleActor" },
+          { "name": "TEST_PHONE_LINE", "class_name": "TestPhoneLine" },
+        ],
       },
-      "migrations": [{ "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] }],
+      "migrations": [
+        { "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] },
+        { "tag": "v2-test-phone-line", "new_sqlite_classes": ["TestPhoneLine"] },
+      ],
       // rosie-staging-bundles, the staging bundle namespace (T-249's pin reads the step graph from it).
       "kv_namespaces": [{ "binding": "BUNDLES", "id": "17ea09bea3b1445fad51c02dc6f37210" }],
       // The clock sweep's minute (T-254).
