@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/model/model.v1.2.schema.json",
+  "title": "Model v1.2",
+  "description": "K-02 v1.2, a minor version that only adds (T-1157; CQ-162 (a); DL-342; README 'v1.2'): a decide result can hold an unmapped turn's end. A read the AI layer's validator refused (an unmapped read: arch 02 line 119; arch 06 line 289, 'a part is unmapped') keeps its place among the reads as a refusedRead, with no output; the turn's one re-read runs first, and the turn then ends in one question with nothing changed (CQ-162 (a)'s default: 'a turn still unmapped ends in one question with nothing changed'; T-370 default 5). v1.1's decideResult holds only K-02 reads, so it cannot hold that end, and T-370's turn ended in an error with no question. Every v1.1 definition is here under its own name: the unchanged ones by $ref to model.v1.1.schema.json, frozen and unchanged; refusedRead is new; decideResult adds the refused read, the optional end and its rules, and contextAndDecide carries v1.2's decide result. So every v1 and v1.1 payload is a v1.2 payload. The model-facing definitions (decideRead, safetyRead, plannerOutput) are v1's, unchanged: the model never writes a refused read or the end; code records them. Owner: the architect. Photo reading (F14, T-070) is v1.3, not here.",
+  "$defs": {
+    "language": { "$ref": "model.v1.1.schema.json#/$defs/language" },
+    "nonEmptyText": { "$ref": "model.v1.1.schema.json#/$defs/nonEmptyText" },
+    "stakes": { "$ref": "model.v1.1.schema.json#/$defs/stakes" },
+    "choiceKind": { "$ref": "model.v1.1.schema.json#/$defs/choiceKind" },
+    "stakesReason": { "$ref": "model.v1.1.schema.json#/$defs/stakesReason" },
+    "target": { "$ref": "model.v1.1.schema.json#/$defs/target" },
+    "choice": { "$ref": "model.v1.1.schema.json#/$defs/choice" },
+    "openQuestion": { "$ref": "model.v1.1.schema.json#/$defs/openQuestion" },
+    "stepCard": { "$ref": "model.v1.1.schema.json#/$defs/stepCard" },
+    "factValue": { "$ref": "model.v1.1.schema.json#/$defs/factValue" },
+    "fact": { "$ref": "model.v1.1.schema.json#/$defs/fact" },
+    "attachment": { "$ref": "model.v1.1.schema.json#/$defs/attachment" },
+    "text": { "$ref": "model.v1.1.schema.json#/$defs/text" },
+    "person": { "$ref": "model.v1.1.schema.json#/$defs/person" },
+    "recentMessage": { "$ref": "model.v1.1.schema.json#/$defs/recentMessage" },
+    "context": { "$ref": "model.v1.1.schema.json#/$defs/context" },
+    "fieldValue": { "$ref": "model.v1.1.schema.json#/$defs/fieldValue" },
+    "field": { "$ref": "model.v1.1.schema.json#/$defs/field" },
+    "quote": { "$ref": "model.v1.1.schema.json#/$defs/quote" },
+    "choose": { "$ref": "model.v1.1.schema.json#/$defs/choose" },
+    "enter": { "$ref": "model.v1.1.schema.json#/$defs/enter" },
+    "ask": { "$ref": "model.v1.1.schema.json#/$defs/ask" },
+    "noneFits": { "$ref": "model.v1.1.schema.json#/$defs/noneFits" },
+    "passOn": { "$ref": "model.v1.1.schema.json#/$defs/passOn" },
+    "handOffAbout": { "$ref": "model.v1.1.schema.json#/$defs/handOffAbout" },
+    "handOff": { "$ref": "model.v1.1.schema.json#/$defs/handOff" },
+    "redact": { "$ref": "model.v1.1.schema.json#/$defs/redact" },
+    "noOp": { "$ref": "model.v1.1.schema.json#/$defs/noOp" },
+    "decidePart": { "$ref": "model.v1.1.schema.json#/$defs/decidePart" },
+    "decideRead": { "$ref": "model.v1.1.schema.json#/$defs/decideRead" },
+    "read": { "$ref": "model.v1.1.schema.json#/$defs/read" },
+    "refusedRead": {
+      "title": "RefusedRead",
+      "description": "v1.2: one decide read whose answer the AI layer's validator refused, an unmapped read (arch 02 line 119; arch 06 line 289: 'Reads disagree, a part is unmapped, or a value fails its words'; T-369's unmapped answer, T-370's RereadUnmapped). The model answered, but its answer is not a K-02 read: it fails decideRead, or a named rule against the turn's context (optionOffered, quoteInText). It keeps its place among the reads, with the model that answered and its role, and holds no output: the refused answer is never handed on, so no unmapped choice or quote reaches the gate, and the named rules read only K-02 reads (model.rules.mjs reads a read's output, and a refused read has none). Labels only, never the model's words (README v1.2 default 13). Not model-facing: code records it.",
+      "type": "object",
+      "properties": {
+        "model": {
+          "description": "The model whose answer was refused, the one that answered (contracts/bundle modelRole: haiku or sonnet; T-368 default 2: a fallback read counts as a read by the model that answered).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+        },
+        "role": {
+          "description": "Its place in the turn, as a K-02 read's: first, check or reread (arch 02 line 119; arch 06 lines 285 to 289).",
+          "type": "string",
+          "enum": ["first", "check", "reread"]
+        },
+        "refused": {
+          "description": "What the AI layer's validator refused, as labels (README v1.2 default 13). The validator's own problem lines stay in the AI layer.",
+          "type": "object",
+          "properties": {
+            "unmappedParts": {
+              "description": "The parts of the refused answer that failed, each once, 0-based in the text's order as the answer gave them (arch 06 line 289: 'a part is unmapped'; T-369's DecideReadRefused.unmappedParts); empty when the answer failed as a whole rather than part by part.",
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "required": ["unmappedParts"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["model", "role", "refused"],
+      "additionalProperties": false
+    },
+    "resultPart": { "$ref": "model.v1.1.schema.json#/$defs/resultPart" },
+    "decideResult": {
+      "title": "DecideResult",
+      "description": "What decide returns to the gate for one turn (C-115, C-116 to C-080; 02-contracts K-02 'What decide returns'): the reads, whether they agreed, whether the re-read ran, and each part with its outcome, as v1, with one addition (README 'v1.2'): an unmapped turn's end. A read the AI layer refused stays in its place among the reads as a refusedRead; the turn's one re-read runs first (Q-41), and then the whole turn ends in one question with nothing changed: end is oneQuestion, no part goes, agreed parts included, and the parts may be none (CQ-162 (a)'s default; T-370 default 5; arch 06 line 289). A result with no refused read is exactly v1's, so every v1 and v1.1 decide result is a v1.2 decide result. Assembled by code around the model's reads; not model-facing.",
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "description": "The turn (arch 01 line 59).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "bundleId": {
+          "description": "The bundle the turn ran on (arch 01 line 87).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+        },
+        "stakes": {
+          "description": "The turn's stakes: high when the target question, or the first read's pick, is high (arch 01 line 79).",
+          "$ref": "#/$defs/stakes"
+        },
+        "routing": {
+          "description": "Which model read first and which checked: Haiku twice on low stakes; on high stakes Sonnet first with Haiku checking, Q-26's default (arch 02 line 119; arch 06 lines 285 and 287; contracts/bundle readPair).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/readPair"
+        },
+        "reads": {
+          "description": "The reads in the order they ran: first and check, then the re-read if it ran (arch 02 line 119; arch 06 line 289: once per turn). v1.2: each is a K-02 read, or a refusedRead in its place when the AI layer's validator refused its answer (README 'v1.2').",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/read"
+              },
+              {
+                "$ref": "#/$defs/refusedRead"
+              }
+            ]
+          }
+        },
+        "agreed": {
+          "description": "Whether the first and check reads agreed on every choice and every field value (arch 02 line 119: 'Two reads must agree on every choice and every field value'). A refused read agrees with nothing: false when the first or check read is a refusedRead (README v1.2 default 15).",
+          "type": "boolean"
+        },
+        "reread": {
+          "description": "Whether the one Sonnet re-read ran: on a disagreement, an unmapped part or a value that fails its words, or after meaning search (arch 02 line 119; arch 03 line 189; Q-41: the re-read runs before the one question). True on every unmapped end (end).",
+          "type": "boolean"
+        },
+        "language": {
+          "description": "The text's language the reads agreed on, or null when they did not (CQ-07 default: the two decide reads, which must agree). A refused read reports no language, so only K-02 reads count: on an unmapped end, the language two K-02 reads of the turn agree on, else null (README v1.2 default 15).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/language"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parts": {
+          "description": "Each part of the text with its outcome (arch 02 line 119). At least one, as in v1, on every turn with no refused read. On an unmapped end (end), every part ends in one question, kept for the trace and the question: the parts of the turn's last K-02 read in its order, or none when every read was refused (README v1.2 default 14).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resultPart"
+          }
+        },
+        "end": {
+          "description": "v1.2: set on an unmapped turn's end, and only there: a read of the turn is a refusedRead, the one re-read has run, and so the whole turn ends in one question and nothing changes for any part, agreed parts included (CQ-162 (a)'s default: 'a turn still unmapped ends in one question with nothing changed'; T-370 default 5; arch 06 line 289: 'Still unclear: one question; nothing changes for that part'). One question for the turn, not one per part. Absent on every other result, as in v1.",
+          "type": "string",
+          "enum": ["oneQuestion"]
+        }
+      },
+      "required": [
+        "turnId",
+        "bundleId",
+        "stakes",
+        "routing",
+        "reads",
+        "agreed",
+        "reread",
+        "language",
+        "parts"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "reread": {
+          "description": "A re-read is the third read; without one there are two (arch 06 line 289: once per turn).",
+          "if": {
+            "properties": {
+              "reread": {
+                "description": "arch 06 line 289.",
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reads": {
+                "description": "arch 06 line 289.",
+                "type": "array",
+                "minItems": 3
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reads": {
+                "description": "arch 06 line 289.",
+                "type": "array",
+                "maxItems": 2
+              }
+            }
+          }
+        },
+        "reads": {
+          "description": "A turn with a refused read ends in one question and lets no part go (CQ-162 (a); T-370 default 5; README 'v1.2'); a turn with none has at least one part, as in v1.",
+          "if": {
+            "properties": {
+              "reads": {
+                "description": "Some read is a refusedRead.",
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "required": ["refused"]
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["end"],
+            "properties": {
+              "parts": {
+                "description": "No part goes on a turn with a refused read, agreed parts included (CQ-162 (a); T-370 default 5).",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "outcome": {
+                      "description": "CQ-162 (a).",
+                      "const": "oneQuestion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "parts": {
+                "description": "arch 02 line 119.",
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "end": {
+          "description": "The unmapped end comes only after the one re-read (Q-41's default: the re-read runs before the one question; CQ-162 (a): 'T-370 re-reads an unmapped turn'), and only on a turn with a refused read.",
+          "properties": {
+            "reread": {
+              "description": "Q-41.",
+              "const": true
+            },
+            "reads": {
+              "description": "CQ-162 (a).",
+              "type": "array",
+              "contains": {
+                "type": "object",
+                "required": ["refused"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "contextAndDecide": {
+      "title": "ContextAndDecide",
+      "description": "A context with the decide result made from it, as the gate reads them together (C-080; arch 03 line 185), as v1.1, with one change: the decide result is v1.2's, so it may hold refused reads and an unmapped turn's end (README 'v1.2'). The two named rules hold across the pair as in v1 (contracts/model/model.rules.mjs: optionOffered, quoteInText); they read the parts of each read's output and of the result, and a refused read has no output, so a pair with refused reads holds both rules when the parts it keeps do. Every v1 and v1.1 pair is a v1.2 pair.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "decide": {
+          "$ref": "#/$defs/decideResult"
+        }
+      },
+      "required": ["context", "decide"],
+      "additionalProperties": false
+    },
+    "safetyOutcome": { "$ref": "model.v1.1.schema.json#/$defs/safetyOutcome" },
+    "tense": { "$ref": "model.v1.1.schema.json#/$defs/tense" },
+    "safetyLabel": { "$ref": "model.v1.1.schema.json#/$defs/safetyLabel" },
+    "safetyRead": { "$ref": "model.v1.1.schema.json#/$defs/safetyRead" },
+    "safetyResult": { "$ref": "model.v1.1.schema.json#/$defs/safetyResult" },
+    "plannerAnswer": { "$ref": "model.v1.1.schema.json#/$defs/plannerAnswer" },
+    "plannerAsk": { "$ref": "model.v1.1.schema.json#/$defs/plannerAsk" },
+    "plannerPassOn": { "$ref": "model.v1.1.schema.json#/$defs/plannerPassOn" },
+    "plannerHandOff": { "$ref": "model.v1.1.schema.json#/$defs/plannerHandOff" },
+    "plannerLogGap": { "$ref": "model.v1.1.schema.json#/$defs/plannerLogGap" },
+    "plannerOutput": { "$ref": "model.v1.1.schema.json#/$defs/plannerOutput" }
+  }
+}

@@ -1,8 +1,8 @@
 // The AI layer over every model-contract fixture, on the recorded-model double (T-376; BP starting shape M2: "AI layer
 // ... against the model contract's fixtures and a recorded-model double"): npm run test:unit -- ai/src/fixtures-run.
 //
-// Every K-02 fixture (v1 and v1.1) and every K-03 v1 fixture, as their indexes list them, is run through the stage its
-// definition belongs to, built as the Worker builds it, with the real AI gateway, prompt layout and checks:
+// Every K-02 fixture (v1, v1.1 and v1.2) and every K-03 v1 fixture, as their indexes list them, is run through the stage
+// its definition belongs to, built as the Worker builds it, with the real AI gateway, prompt layout and checks:
 //
 //   K-02 safetyResult       the safety read (C-113, T-365, T-366): each text the double holds, with K-02's danger words;
 //                           the two timeout fixtures with both tries getting no answer (no verdict in 4 s, fake clock);
@@ -12,6 +12,9 @@
 //   K-02 refused            the context with 61 choices is refused before any call; each refused read and each pair a
 //                           named rule refuses is answered as a model might, and refused by decide's validator at every
 //                           read, the AI layer's own re-read included, so nothing leaves as a K-02 result;
+//   K-02 v1.2's pairs       an unmapped turn's end (T-1157): the AI layer reaches it on refuse-option-not-offered.json's
+//                           turn but gives no K-02 result for it yet, so the accepted pair waits for T-1158; v1.2's
+//                           schema refuses the refused one;
 //   K-02 plannerOutput      none of this card's four stages (the planner, C-117, is not built): the double replays each,
 //                           checked against K-02, and refuses to hold refuse-planner-books.json;
 //   K-03 composeInput, plan the composer (C-118, T-373 to T-375): each row the double holds gives its plan, or is refused
@@ -26,6 +29,10 @@
 // with the requests the transport got. Fixtures the double cannot reproduce yet are named in WAITING, with what they
 // wait for. Names and values are the master's sample cast (rule 9).
 
+import { readdirSync } from "node:fs";
+import path from "node:path";
+
+import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { createPromptCache, type PromptCache } from "../cache";
@@ -107,6 +114,7 @@ import {
   keysOf,
   modelFixture,
   planFixture,
+  readJson,
   requestOf,
   safetyTransport,
   seededFrom,
@@ -156,10 +164,16 @@ const S1_02_LITERALS: readonly ComposeProblem[] = [
 
 /**
  * Accepted fixtures the AI layer cannot give on the double yet, each with what it waits for. When the recording lands,
- * the run expects the fixture given. None waits now: plan-s1-02.json waited on T-1175 (DL-355), which recorded it for
- * K-03 v1.1's input-s1-02-v1.1.json and for the JOIN run's input (recording 4), whose term facts hold its 15 and $2.
+ * the run expects the fixture given. plan-s1-02.json waited on T-1175 (DL-355), which recorded it for K-03 v1.1's
+ * input-s1-02-v1.1.json and for the JOIN run's input (recording 4), whose term facts hold its 15 and $2. K-02 v1.2's
+ * accepted pair (T-1157) waits for decide's code for it: the AI layer reaches its end, but gives it as no K-02 result.
  */
-const WAITING: Readonly<Record<string, { readonly waitsFor: string }>> = {};
+const WAITING: Readonly<Record<string, { readonly waitsFor: string }>> = {
+  "K-02 pair-unmapped-all-refused.json": {
+    waitsFor:
+      "T-1158: decide gives an unmapped turn's end as K-02 v1.2's decide result (each refused read in its place, end oneQuestion), where the AI layer now ends the turn as RereadUnmapped with no result",
+  },
+};
 
 /**
  * Rows the double holds whose plan the composer refuses, each for the reason K-03 names, with the pair K-03 refuses: v1's
@@ -747,6 +761,109 @@ describe("decide refuses every K-02 fixture K-02 refuses, at every read, the AI 
   );
 });
 
+// ---- K-02 v1.2 (T-1157): an unmapped turn's end ----------------------------------------------------------------------------
+
+/**
+ * K-02 v1.2, by a validator of its own, built as T-081's contract test builds it: the AI layer and its double read v1 and
+ * v1.1 (MODEL_VERSIONS; v1.2 changes no model-facing definition), so `model` cannot read v1.2's two fixtures.
+ */
+const V1_2_ID = (readJson("contracts/model/model.v1.2.schema.json") as { $id: string }).$id;
+const v1dot2 = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
+for (const folder of ["common", "bundle", "model"]) {
+  const dir = path.join(CONTRACTS_ROOT, folder);
+  for (const name of readdirSync(dir).filter((entry) => entry.endsWith(".schema.json")))
+    v1dot2.addSchema(readJson(`contracts/${folder}/${name}`) as object);
+}
+/** The problems K-02 v1.2 finds in `value` as `$defs/<def>`, one line each; empty when accepted. */
+function v1dot2Problems(def: string, value: unknown): string[] {
+  const validate = must(v1dot2.getSchema(`${V1_2_ID}#/$defs/${def}`), `K-02 v1.2's ${def}`);
+  if (validate(value) as boolean) return [];
+  return (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? "is invalid"}`);
+}
+
+/** K-02 v1.2's decide result on an unmapped end, as far as this run reads it (contracts/model/README.md "v1.2"). */
+interface UnmappedEnd {
+  readonly turnId: string;
+  readonly bundleId: BundleId;
+  readonly stakes: string;
+  readonly routing: { readonly first: string; readonly second: string };
+  readonly reads: readonly {
+    readonly model: string;
+    readonly role: string;
+    readonly refused: { readonly unmappedParts: readonly number[] };
+  }[];
+  readonly end: string;
+}
+
+describe("K-02 v1.2 (T-1157): an unmapped turn's end, which the AI layer reaches but gives as no K-02 result yet", () => {
+  /** v1's refused pair whose turn v1.2's two fixtures are on: both its reads choose c-99, which S1-02's frontier does not offer. */
+  const NOT_OFFERED = "invalid/refuse-option-not-offered.json";
+
+  it("pair-unmapped-all-refused.json: on refuse-option-not-offered.json's turn, both reads and the one re-read refused, the AI layer ends the turn in one question with nothing changed, every label as the fixture records it, but with no K-02 result, as v1.1 cannot hold it: WAITING names T-1158", async () => {
+    const file = "pair-unmapped-all-refused.json";
+    const pair = modelFixture(file) as { context: DecideContext; decide: UnmappedEnd };
+    expect(v1dot2Problems("contextAndDecide", pair)).toEqual([]);
+    expect(model.validate("contextAndDecide", pair)).not.toEqual([]);
+    const notOffered = modelFixture(NOT_OFFERED) as { context: DecideContext; decide: DecideResult };
+    expect(pair.context).toEqual(notOffered.context);
+    const from = (role: "first" | "check"): ReadSource => ({
+      refused: NOT_OFFERED,
+      read: must(
+        notOffered.decide.reads.find((read) => read.role === role),
+        `the ${role} read`,
+      ).output,
+    });
+    const run = await decideTurn(
+      pair.context,
+      sampleBundle(pair.context),
+      { first: from("first"), check: from("check") },
+      { from: from("first"), why: "unmapped" },
+    );
+    if (run.decided.status !== "unmapped" || run.reread?.status !== "unmapped")
+      throw new Error("the turn and its re-read are unmapped");
+    const { decide } = pair;
+    // Every label the fixture records is in the AI layer's answer: the turn, its bundle, stakes and read pair; each read
+    // refused, in the order they ran, with the model that answered it and the parts that failed; and the end.
+    expect(run.reread).toMatchObject({
+      turnId: decide.turnId,
+      bundleId: decide.bundleId,
+      stakes: decide.stakes,
+      routing: decide.routing,
+      refused: decide.reads.map((read) => read.role),
+      end: decide.end,
+    });
+    const answers = [...run.decided.answers, run.reread.reread];
+    expect(
+      answers.map((answer) => [
+        answer.modelCalls.find((call) => call.outcome === "ok")?.role,
+        answer.status === "refused" ? answer.unmappedParts : answer.status,
+      ]),
+    ).toEqual(decide.reads.map((read) => [read.model, read.refused.unmappedParts]));
+    // With every read refused, no K-02 read is left to keep a part or agree on a language (README v1.2 defaults 14, 15).
+    expect(decide).toMatchObject({ agreed: false, reread: true, language: null, parts: [] });
+    // But the AI layer gives that end as no K-02 result: the result it gives is v1.1's, which holds no refused read.
+    expect(run.reread).not.toHaveProperty("result");
+    expect(WAITING[`K-02 ${file}`]?.waitsFor).toMatch(/^T-1158: /u);
+    mark("K-02", file, "waiting");
+  });
+
+  it("invalid/refuse-go-with-refused-read.json: v1.2's schema refuses it for its one part that goes on a turn with a refused read, and takes it once that part ends in one question; v1.1, the version the AI layer gives, refuses it too; both named rules hold on it", () => {
+    const file = "invalid/refuse-go-with-refused-read.json";
+    const pair = modelFixture(file) as {
+      context: DecideContext;
+      decide: { parts: { outcome: string }[] };
+    };
+    expect(pair.decide.parts.map((part) => part.outcome)).toEqual(["go"]);
+    expect(v1dot2Problems("contextAndDecide", pair)).not.toEqual([]);
+    expect(model.validate("contextAndDecide", pair)).not.toEqual([]);
+    for (const [name, rule] of Object.entries(model.rules)) expect(rule(pair), name).toEqual([]);
+    const fixed = structuredClone(pair);
+    must(fixed.decide.parts[0], "its part that goes").outcome = "oneQuestion";
+    expect(v1dot2Problems("contextAndDecide", fixed)).toEqual([]);
+    mark("K-02", file, "refused");
+  });
+});
+
 describe("the planner's K-02 answers: none of this card's four stages (C-117 is not built)", () => {
   const PLANNER_RECORDINGS = RECORDINGS.filter((recording) => recording.kind === "plannerOutput");
 
@@ -1079,7 +1196,7 @@ describe("the double's call log is the run's only transport, and every fixture i
     );
   });
 
-  it("every K-02 fixture (v1 and v1.1) and every K-03 v1 fixture came out as its index says: each accepted one given or taken, but for those WAITING and NOT_A_STAGE name; each refused one refused", () => {
+  it("every K-02 fixture (v1, v1.1 and v1.2) and every K-03 v1 fixture came out as its index says: each accepted one given or taken, but for those WAITING and NOT_A_STAGE name; each refused one refused", () => {
     const k02 = model.fixtures.entries.map((entry) => ({
       key: `K-02 ${entry.file}`,
       def: entry.def ?? "",
@@ -1092,7 +1209,7 @@ describe("the double's call log is the run's only transport, and every fixture i
     ).fixtures
       .filter((entry) => entry.version === "v1")
       .map((entry) => ({ key: `K-03 ${entry.file}`, def: entry.def, expect: entry.expect }));
-    expect(k02).toHaveLength(37);
+    expect(k02).toHaveLength(39);
     expect(k03).toHaveLength(21);
     for (const entry of [...k02, ...k03]) {
       const verdict = VERDICTS.get(entry.key);
