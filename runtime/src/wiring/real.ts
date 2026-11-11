@@ -1712,8 +1712,12 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
         at: request.at,
       });
       if ("error" in answer) return answer;
-      // No phone row read with the renewal: unreadable, so nothing is sent (never "not stopped").
-      if (answer.recipient === null) return { error: "notFound", table: "phones", rowId: answer.outboxRowId };
+      // No phone row read with the renewal (null, or no recipient at all, as a v1.1 answer has none): unreadable, so
+      // nothing is sent, never "not stopped" (the K-05 README's consumer note for T-562).
+      const phone: unknown = (answer as { readonly recipient?: unknown }).recipient;
+      if (phone === null || phone === undefined) {
+        return { error: "notFound", table: "phones", rowId: answer.outboxRowId };
+      }
       return { result: "renewed", outboxRowId: answer.outboxRowId, claim: { ...answer.claim } };
     },
     async markPart(request) {

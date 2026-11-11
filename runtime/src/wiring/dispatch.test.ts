@@ -170,6 +170,20 @@ describe("the outbox port: the dispatcher's OutboxStore over K-05 v1.2's four ou
       table: "phones",
       rowId: request.outboxRowId,
     });
+    // A renewal answered with no recipient at all (v1.1's shape, which v1.2's schema still accepts) is unreadable too.
+    const v11Shape = {
+      result: renewClaimReadsPhone.outcome.result,
+      outboxRowId: renewClaimReadsPhone.outcome.outboxRowId,
+      claim: renewClaimReadsPhone.outcome.claim,
+    };
+    const noRecipient = realOutbox({
+      calls: outboxCalls({ renew: v11Shape as unknown as RenewClaimOutcome }),
+    });
+    expect(await noRecipient.renewClaim(request)).toEqual({
+      error: "notFound",
+      table: "phones",
+      rowId: request.outboxRowId,
+    });
   });
 
   it("marks a part and a row through markPartV12 and markRowV12, the row after the mark handed back; errors pass through", async () => {
