@@ -13,7 +13,12 @@
 //                chat lookup a receipt needs (Sam's chat is Sam's number)
 //   sealing      joined (T-553): the root binds K-05 v1.2 handleSealingKey through its real sealing port (./real.ts
 //                realSealing). What it is fed comes from here: `fakeHandleKeys`, a K-05 double answering as the
-//                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run
+//                handle-key-*.json fixtures, each key a non-exportable AES-256-GCM key object made for the run, test owner
+//                1's seeded handle found under its own id (handle-key-person-no-key.json)
+//   chatOpen     joined (T-1213): the root binds K-05 v1.7 openChatOnText through its real chat-open port (./real.ts
+//                realChatOpen). What it is fed comes from here: `fakeDispatchData`'s openChat, a K-05 double answering as
+//                db/repo/chat-open.ts answers, over the key double's handles, writing the phone row the sendState and
+//                renewClaim doubles read
 //   safetyRead   joined (T-554): the root binds @rosie/ai's safety read through its real port (./real.ts
 //                realSafetyRead). What it is fed comes from here: `fakeSafetyModels`, the safety read (T-365) built over
 //                a fake Messages API whose answers come from the recorded-model double (T-004) holding the skeleton's
@@ -76,7 +81,8 @@
 //   sendState    its real outbox port and K-05 v1.2 sendState through its real send-state port (./real.ts realOutbox,
 //                realSendState). What both are fed comes from here: `fakeDispatchData`, one K-05 double over the rows the
 //                K-05 commitTurn double wrote, the plans and final parts finalize wrote into them (`fakeFinalizeData`) and
-//                test owner 1's seeded rows (no phone row), answering as db/repo/outbox.ts and send-state.ts answer on them
+//                test owner 1's seeded rows (no phone row until his text opens his chat at receipt), answering as
+//                db/repo/outbox.ts and send-state.ts answer on them
 //   dataAccess   turn/test-support fakeRows (the commit's one row) and clocks/arming-support's K-05 armClock and
 //                cancelClock
 //   linqSend     dispatch/test-support FakeLinq (accepting a part a moment after its send starts) and safety/test-support
@@ -137,6 +143,7 @@ import inputS102V11 from "@rosie/contracts/message-plan/fixtures/input-s1-02-v1.
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
+import type { OpenChatOnTextOutcome, OpenChatOnTextRequest } from "@rosie/db/repo/chat-open";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
@@ -208,6 +215,7 @@ import type {
   HandleSealingKeyCall,
   HandleTargetsCall,
   LinqVerifyInputs,
+  OpenChatOnTextCall,
   OutboxCalls,
   SafetyReaders,
   SendStateCall,
@@ -288,39 +296,59 @@ export interface FakeHandleKeys {
   readonly requests: HandleSealingKeyRequest[];
   /** The key object handed out for a handle's address, for a test that opens a box itself; throws when none was made. */
   keyOf(address: string): CryptoKey;
+  /**
+   * K-04's handles row by its id, as the double's world holds it: a seeded handle (its seed wrote it), or one a first
+   * sight wrote; null for any other id. The K-05 v1.7 double reads its handles here (fakeDispatchData's openChat).
+   */
+  handleOf(handleId: string): { readonly kind: string; readonly address: string } | null;
   /** When set, every call answers it with no key, as K-05's constraint or transient answer. */
   failWith: ConstraintError | TransientError | null;
 }
 
 /** A number's handle, person and key as the K-05 double made them at its first sight. */
 interface SightedHandle {
+  handle: { readonly kind: string; readonly address: string };
   handleId: string;
   personId: string;
   createdAt: string;
   key: CryptoKey;
+  /** True when the handle and its person were the seed's, so this call made the key alone. */
+  seeded: boolean;
 }
 
 /**
  * K-05 v1.2 handleSealingKey as a double answering as the handle-key-*.json fixtures do: at a number's first sight its
  * handle and person take the request's new ids and a key is made (handle-key-first-sight.json); each later call for that
- * number finds them and writes nothing (handle-key-first-sight-repeat.json). The key is a random AES-256-GCM key object,
- * for encrypt and decrypt, that cannot be exported (T-182's form), made for the run; its createdAt is `now`'s. A number's
- * first sight is kept from its first call on, so a call made while it is still being made waits for it and finds it, as
- * K-05's one transaction per call does (two webhooks of a new number at once give one handle and one key).
+ * number finds them and writes nothing (handle-key-first-sight-repeat.json). A seeded handle (`seeded`: a handle and its
+ * one person a seed wrote with no key, as T-1148's seed writes test owner 1's) keeps its seeded ids, and its first call
+ * makes the key alone (handle-key-person-no-key.json). The key is a random AES-256-GCM key object, for encrypt and
+ * decrypt, that cannot be exported (T-182's form), made for the run; its createdAt is `now`'s. A number's first sight is
+ * kept from its first call on, so a call made while it is still being made waits for it and finds it, as K-05's one
+ * transaction per call does (two webhooks of a new number at once give one handle and one key).
  */
-export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
+export function fakeHandleKeys(
+  now: () => number = Date.now,
+  seeded: readonly SeededHandle[] = [],
+): FakeHandleKeys {
   const known = new Map<string, SightedHandle>();
   const sighted = new Map<string, Promise<SightedHandle>>();
   const requests: HandleSealingKeyRequest[] = [];
-  const firstSight = async (request: HandleSealingKeyRequest): Promise<SightedHandle> => ({
-    handleId: request.newHandleId,
-    personId: request.newPersonId,
-    createdAt: utcSeconds(now()),
-    key: (await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
-      "encrypt",
-      "decrypt",
-    ])) as CryptoKey,
-  });
+  const seedOf = (address: string): SeededHandle | undefined =>
+    seeded.find((entry) => entry.handle.address === address);
+  const firstSight = async (request: HandleSealingKeyRequest): Promise<SightedHandle> => {
+    const seed = seedOf(request.handle.address);
+    return {
+      handle: { kind: request.handle.kind, address: request.handle.address },
+      handleId: seed?.handleId ?? request.newHandleId,
+      personId: seed?.personId ?? request.newPersonId,
+      createdAt: utcSeconds(now()),
+      key: (await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+        "encrypt",
+        "decrypt",
+      ])) as CryptoKey,
+      seeded: seed !== undefined,
+    };
+  };
   const keys: FakeHandleKeys = {
     requests,
     failWith: null,
@@ -328,6 +356,12 @@ export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
       const entry = known.get(address);
       if (entry === undefined) throw new Error("no key was made for that handle");
       return entry.key;
+    },
+    handleOf(handleId) {
+      const seed = seeded.find((entry) => entry.handleId === handleId);
+      if (seed !== undefined) return { kind: seed.handle.kind, address: seed.handle.address };
+      const made = [...known.values()].find((entry) => entry.handleId === handleId);
+      return made === undefined ? null : { kind: made.handle.kind, address: made.handle.address };
     },
     async call(request) {
       requests.push(structuredClone(request));
@@ -344,7 +378,7 @@ export function fakeHandleKeys(now: () => number = Date.now): FakeHandleKeys {
           result: "key",
           handleId: entry.handleId,
           personId: entry.personId,
-          created: { handle: made, person: made, key: made },
+          created: { handle: made && !entry.seeded, person: made && !entry.seeded, key: made },
           key: { wrappingKeyName: request.wrappingKeyName, createdAt: entry.createdAt, version: 1 },
         },
         dataKey: entry.key,
@@ -2784,9 +2818,10 @@ export interface FakeDispatchData {
   /** What the root's real send-state port is fed (RootOptions.sendStateCall): K-05 v1.2 sendState over the double. */
   readonly sendState: SendStateCall;
   /**
-   * Each handle's phone row as K-05 reads it (K-04 phones, by handle id). Test owner 1's seed holds none (T-1148: "a phone
-   * row: the number has none until turn 1 commits"), and turn 1's commit writes none (commit-s1-01.json), so it starts
-   * empty; a test that needs one sets it, as K-05's own fixtures hold it.
+   * Each handle's phone row as K-05 reads it (K-04 phones, by handle id). Test owner 1's seed holds none (T-1148), and
+   * turn 1's commit writes none (commit-s1-01.json), so it starts empty; since T-1213 a number's text writes it at
+   * receipt (`openChat`: K-05 v1.7 openChatOnText, through the root's chat-open port). A test that needs another sets it
+   * before the text, as K-05's own fixtures hold it.
    */
   readonly phones: Map<string, PhoneRead>;
   /** Every claimOutboxV12, renewClaim, markPartV12 and markRowV12 and its answer, in order. */
@@ -2800,12 +2835,35 @@ export interface FakeDispatchData {
   row(id: string): Readonly<DispatchedRow> | null;
   /** When set, the next claimOutboxV12 answers it instead (a lost connection): nothing is claimed. */
   failNextClaim: TransientError | null;
+  /**
+   * What the root's real chat-open port is fed (RootOptions.chatOpenCall): K-05 v1.7 openChatOnText over the double
+   * (T-1213), which writes the phone row `phones` holds, the one the sendState and renewClaim doubles read.
+   */
+  readonly openChat: OpenChatOnTextCall;
+  /** Every openChatOnText call, its answer and when it ended on the double's clock, in order. */
+  readonly chatOpens: ChatOpenCall[];
+  /** The phone.chat_opened entries openChatOnText appended (K-08 v1 eventLogRow in K-04's column names), in order. */
+  readonly chatEntries: EventLogRow[];
+  /**
+   * Each phone row's chat_open_at (K-04 phones), by handle id, beside `phones` (K-05 v1.2 phoneRead holds none): set when
+   * the double inserts or opens a chat; a row a test sets in `phones` alone reads null here.
+   */
+  readonly chatOpenedAt: Map<string, string | null>;
+  /** When set, the next openChatOnText answers it instead (a lost connection): nothing is written. */
+  failNextChatOpen: TransientError | null;
+}
+
+/** One openChatOnText call the double answered: the request as sent, its answer, and when it ended (epoch ms). */
+export interface ChatOpenCall extends DispatchCall<OpenChatOnTextRequest, OpenChatOnTextOutcome> {
+  /** When the answer was given, on the double's clock: the call ended no later than this. */
+  readonly endedAt: number;
 }
 
 /**
  * Sam's phone row as K-05 v1.2's send-state-owner.json reads it from K-04's seeds: chat open on iMessage, not stopped,
  * the opt-out line delivered before. Test owner 1's skeleton seed holds no phone row (T-1148), and turn 1's commit writes
- * none, so a test that needs one sets this.
+ * none; since T-1213 his text inserts one at receipt (the chat-open port, `openChat`), so a test that needs this one
+ * instead (its opt-out line delivered, its version 2) sets it before the text, which then finds it open.
  */
 export function samPhoneRow(): PhoneRead {
   return structuredClone(sendStateOwner.outcome.phone) as PhoneRead;
@@ -2813,7 +2871,8 @@ export function samPhoneRow(): PhoneRead {
 
 /**
  * The fakes with Sam's phone row set (samPhoneRow), for a rig whose test waits for the turn's reply to be sent: since
- * T-562 joined limit 8 at send, a row to a number with no phone row waits for the chat and nothing is sent.
+ * T-562 joined limit 8 at send, a row to a number with no phone row waits for the chat and nothing is sent (a rig fed the
+ * chat-open port, T-1213, gets one at receipt all the same).
  */
 export function withSamPhoneRow(fakes: SkeletonFakes): SkeletonFakes {
   fakes.dispatch.phones.set(TEST_OWNER_1.handleId, samPhoneRow());
@@ -2856,12 +2915,72 @@ function hoursAndMinutesOf(value: unknown, what: string): string {
   return value.slice(0, 5);
 }
 
+/** The fields K-05 v1.7 openChatOnText takes, and no other (db/repo/chat-open.ts FIELDS). */
+const CHAT_OPEN_FIELDS: readonly string[] = ["eventId", "handleId", "service", "receivedAt", "traceId"];
+/** K-08 v1 safeId, and its refusal of a run that reads as a number (db/repo/chat-open.ts). */
+const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9_.:/#-]*$/u;
+const READS_AS_NUMBER = /^[0-9().+ -]{7,}$/u;
+/** common/formats.v1 utc. */
+const UTC_FORM = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$/u;
+
+/**
+ * Refuses a request db/repo's openChatOnText refuses before anything is read, as it refuses it: a TypeError naming the
+ * field, never a value (a sixth field such as the number, a missing field, an id that is no K-08 safe id or reads as a
+ * number, a service that is not Linq's, a time that is not UTC, an empty trace id).
+ */
+function checkChatOpenRequest(request: unknown): void {
+  const call = "openChatOnText";
+  if (!isRecord(request)) throw new TypeError(`${call}: the request is an object`);
+  if (Object.keys(request).some((key) => !CHAT_OPEN_FIELDS.includes(key))) {
+    throw new TypeError(`${call}: the request takes only ${CHAT_OPEN_FIELDS.join(", ")}`);
+  }
+  for (const field of CHAT_OPEN_FIELDS) {
+    if (!Object.hasOwn(request, field)) throw new TypeError(`${call}: the request needs ${field}`);
+  }
+  for (const field of ["eventId", "handleId"]) {
+    const value = request[field];
+    if (typeof value !== "string" || !SAFE_ID.test(value) || READS_AS_NUMBER.test(value)) {
+      throw new TypeError(`${call}: ${field} is a K-08 safe id, never a number, an address or words`);
+    }
+  }
+  if (typeof request.service !== "string" || !["imessage", "rcs", "sms"].includes(request.service)) {
+    throw new TypeError(`${call}: service is imessage, rcs or sms`);
+  }
+  const { receivedAt, traceId } = request;
+  if (typeof receivedAt !== "string" || !UTC_FORM.test(receivedAt) || Number.isNaN(Date.parse(receivedAt))) {
+    throw new TypeError(`${call}: receivedAt is a UTC time`);
+  }
+  if (typeof traceId !== "string" || traceId === "" || traceId.includes("\u0000")) {
+    throw new TypeError(`${call}: traceId is a non-empty id`);
+  }
+}
+
+/** A phone.chat_opened entry's old or new values (K-08 v1 old_values, new_values), or its K-05 answer. */
+type ChatValues = Readonly<Record<string, unknown>>;
+
+/** An instant as db/repo answers one (targets.ts utc): UTC, ending in Z, with no zero fraction. */
+function storedUtc(at: string): string {
+  return new Date(Date.parse(at)).toISOString().replace(".000Z", "Z");
+}
+
+/** K-04's handles row by id, as the double's world holds it (kind and address), or null for none. */
+export type HandleTable = (handleId: string) => { readonly kind: string; readonly address: string } | null;
+
+/** The handles a seed wrote, by id: by default test owner 1's (T-1148). */
+export function seededHandles(seeded: readonly SeededHandle[] = [TEST_OWNER_1]): HandleTable {
+  return (handleId) => {
+    const found = seeded.find((entry) => entry.handleId === handleId);
+    return found === undefined ? null : { kind: found.handle.kind, address: found.handle.address };
+  };
+}
+
 /**
  * K-05 v1.2's four outbox calls (T-1135, db/repo/outbox.ts: claimOutboxV12, renewClaim, markPartV12, markRowV12) and its
  * sendState (T-220, db/repo/send-state.ts) as one double over the rows the K-05 commitTurn double wrote (`written`), the
  * plans finalize wrote into them (`plans`: a row holding one is checked at its version, else planned) and test owner 1's
  * seeded rows (T-1148: Lee's Barbershop's head, Sam with no role and no phone row), answering as the database calls answer
- * on those rows:
+ * on those rows; with K-05 v1.7's openChatOnText (T-1212, db/repo/chat-open.ts), which writes the phone rows the others
+ * read:
  *
  *   claimOutboxV12  K-05 items 3, 13 and 30 (claim-in-order-with-port.json, claim-held-lets-later-pass.json): the named
  *                   recipient, or every recipient with open rows earliest commit order first, each under its own lock
@@ -2885,19 +3004,33 @@ function hoursAndMinutesOf(value: unknown, what: string): string {
  *                   owner 1's handle, kind phone), the phone row `phones` holds for it (none in the seed), the chat thread
  *                   the commit wrote for the handle with its Linq chat id, no texts consent row, the audience customer
  *                   (Sam holds no role: K-05 default 31), the business's zone and text hours from the seed, no override,
- *                   the row's read versions as they stand, the question's status and closed.
+ *                   the row's read versions as they stand, the question's status and closed;
+ *   openChat        K-05 v1.7 item 46 (the open-chat-*.json fixtures), as db/repo/chat-open.ts runs it: a request it
+ *                   refuses before reading anything throws its TypeError, naming the field; the handle by id from `handles`
+ *                   (K-04 handles: the seeded ones and those the key call wrote), none notFound, an email handle notAPhone;
+ *                   no phone row: one inserted, its number the handle's address (never the request's), chat open since the
+ *                   receipt by the request's service, not stopped, version 1, with its phone.chat_opened entry; else, in
+ *                   this order, the text's own entry found: repeated, the row as it stands (one closed and not stopped
+ *                   throws, as db/repo's does); stopped: stopped; open: alreadyOpen, each writing nothing; else the chat
+ *                   opens (chat_open_at kept where set, the way the request's, the version up by one) with its entry. The
+ *                   entry is K-08 v1's eventLogRow in K-04's column names: id '<event id>/chat-opened', no turn, the event
+ *                   id as its job id, the request's trace, no bundle, actor provider, table phones, row the handle id,
+ *                   why the provider event (linq and the event id).
  *
  * The double keeps what it moves beside `written`, never in it. Each call yields first, as a call over the network does,
- * so calls from two dispatchers interleave.
+ * so calls from two dispatchers interleave; openChat's work after it runs whole, as under the phone row's lock.
  */
 export function fakeDispatchData(
   written: Pick<FakeTurnRows, "rows" | "turns">,
   plans: ReadonlyMap<string, StoredPlan>,
   now: () => number = Date.now,
+  handles: HandleTable = seededHandles(),
 ): FakeDispatchData {
   const moved = new Map<string, DispatchedRow>();
   const locks = new Set<string>();
   const phones = new Map<string, PhoneRead>();
+  const chatOpenedAt = new Map<string, string | null>();
+  const chatEntries: EventLogRow[] = [];
   const outboxRows = (): WrittenRow[] => [...(written.rows.get("outbox_rows")?.values() ?? [])];
   const outboxRow = (id: string): WrittenRow | undefined => written.rows.get("outbox_rows")?.get(id);
   const recipientOf = (row: WrittenRow): string => String(row.values.recipientHandleId);
@@ -3307,6 +3440,138 @@ export function fakeDispatchData(
     };
   };
 
+  /** A phone row as an openChatOnText answer gives it: its chat, its time and way, stopped, its version; never its number. */
+  const chatPhoneOf = (handleId: string, row: PhoneRead): Record<string, unknown> => ({
+    chatOpen: row.chatOpen,
+    chatOpenAt: chatOpenedAt.get(handleId) ?? null,
+    chatWay: row.chatWay,
+    stopped: row.stopped,
+    version: row.version,
+  });
+
+  const openChatOf = async (request: OpenChatOnTextRequest): Promise<OpenChatOnTextOutcome> => {
+    await yieldToOthers(1);
+    if (double.failNextChatOpen !== null) {
+      const failed = double.failNextChatOpen;
+      double.failNextChatOpen = null;
+      return failed;
+    }
+    checkChatOpenRequest(request);
+    const { eventId, handleId, service, receivedAt, traceId } = request;
+    const handle = handles(handleId);
+    if (handle === null) return { error: "notFound", table: "handles", rowId: handleId };
+    if (handle.kind !== "phone") return { error: "notAPhone", handleId };
+    const entryId = `${eventId}/chat-opened`;
+    // The entry: K-05 v1.7's chatOpenedEvent, and as K-04's event_log holds it (K-08 v1 eventLogRow).
+    const eventOf = (oldValues: ChatValues | null, newValues: ChatValues): ChatValues => ({
+      id: entryId,
+      kind: "phone.chat_opened",
+      zone: null,
+      businessId: null,
+      actorKind: "provider",
+      actorPersonId: null,
+      actorRole: null,
+      tableName: "phones",
+      rowId: handleId,
+      oldValues,
+      newValues,
+      sealed: null,
+      why: { provider_event: { provider: "linq", event_id: eventId } },
+      approvedBy: null,
+      proofs: null,
+    });
+    const append = (oldValues: ChatValues | null, newValues: ChatValues): void => {
+      chatEntries.push({
+        id: entryId,
+        at: utcSeconds(now()),
+        zone: null,
+        turn_id: null,
+        job_id: eventId,
+        trace_id: traceId,
+        bundle_hash: null,
+        bundle_build: null,
+        business_id: null,
+        actor_kind: "provider",
+        actor_person_id: null,
+        actor_role: null,
+        kind: "phone.chat_opened",
+        table_name: "phones",
+        row_id: handleId,
+        old_values: oldValues,
+        new_values: newValues,
+        sealed_values: null,
+        sealed_for_person_id: null,
+        why: { provider_event: { provider: "linq", event_id: eventId } },
+        approved_by: null,
+        proofs: null,
+      });
+    };
+    const answerOf = (value: unknown): OpenChatOnTextOutcome => value as OpenChatOnTextOutcome;
+
+    const row = phones.get(handleId);
+    if (row === undefined) {
+      // No phone row: inserted, its number the handle's own address, never the request's.
+      const at = storedUtc(receivedAt);
+      phones.set(handleId, {
+        number: handle.address,
+        stopped: false,
+        stopAt: null,
+        chatOpen: true,
+        chatWay: service,
+        linqContactAddedAt: null,
+        pollVotedAt: null,
+        optoutLineDeliveredAt: null,
+        version: 1,
+      });
+      chatOpenedAt.set(handleId, at);
+      const newValues = { chat_open: true, chat_open_at: at, chat_way: service };
+      append(null, newValues);
+      return answerOf({
+        result: "inserted",
+        handleId,
+        phone: { chatOpen: true, chatOpenAt: at, chatWay: service, stopped: false, version: 1 },
+        event: eventOf(null, newValues),
+      });
+    }
+    // Under the row's lock, in this order: the text's own entry, stopped, open; each writes nothing.
+    if (chatEntries.some((entry) => entry.id === entryId)) {
+      if (!row.stopped && !row.chatOpen) {
+        throw new Error("openChatOnText: this text's entry exists, and its row is closed and not stopped");
+      }
+      return answerOf({ result: "repeated", handleId, phone: chatPhoneOf(handleId, row), event: null });
+    }
+    if (row.stopped) {
+      return answerOf({ result: "stopped", handleId, phone: chatPhoneOf(handleId, row), event: null });
+    }
+    if (row.chatOpen) {
+      return answerOf({ result: "alreadyOpen", handleId, phone: chatPhoneOf(handleId, row), event: null });
+    }
+    // Closed and not stopped: the chat opens, its first time kept where it is set.
+    const before = chatOpenedAt.get(handleId) ?? null;
+    const at = before ?? storedUtc(receivedAt);
+    const changesWay = row.chatWay !== service;
+    const opened: PhoneRead = { ...row, chatOpen: true, chatWay: service, version: row.version + 1 };
+    phones.set(handleId, opened);
+    chatOpenedAt.set(handleId, at);
+    const oldValues = {
+      chat_open: false,
+      ...(before === null ? { chat_open_at: null } : {}),
+      ...(changesWay ? { chat_way: row.chatWay } : {}),
+    };
+    const newValues = {
+      chat_open: true,
+      ...(before === null ? { chat_open_at: at } : {}),
+      ...(changesWay ? { chat_way: service } : {}),
+    };
+    append(oldValues, newValues);
+    return answerOf({
+      result: "opened",
+      handleId,
+      phone: chatPhoneOf(handleId, opened),
+      event: eventOf(oldValues, newValues),
+    });
+  };
+
   const kept = <Request, Answer>(
     calls: DispatchCall<Request, Answer>[],
     answering: (request: Request) => Promise<Answer>,
@@ -3337,6 +3602,19 @@ export function fakeDispatchData(
       return row === undefined ? null : stateOf(row);
     },
     failNextClaim: null,
+    async openChat(request) {
+      const answer = await openChatOf(request);
+      double.chatOpens.push({
+        request: structuredClone(request),
+        answer: structuredClone(answer),
+        endedAt: now(),
+      });
+      return answer;
+    },
+    chatOpens: [],
+    chatEntries,
+    chatOpenedAt,
+    failNextChatOpen: null,
   };
   return double;
 }
@@ -3369,6 +3647,7 @@ function swap<T>(value: T, pairs: readonly (readonly [string, string])[]): T {
 type JoinedPort =
   | "linqVerify"
   | "sealing"
+  | "chatOpen"
   | "safetyRead"
   | "turnRow"
   | "bundles"
@@ -3459,8 +3738,11 @@ export interface SkeletonFakes {
   readonly finalize: FakeFinalizeData;
   /**
    * K-05 v1.2's outbox calls and sendState as one double over the rows the K-05 commitTurn double wrote, the plans
-   * finalize wrote into them and test owner 1's seeded rows (no phone row), for the root's real outbox and send-state
-   * ports (RootOptions.outboxCalls: `dispatch.outbox`; RootOptions.sendStateCall: `dispatch.sendState`).
+   * finalize wrote into them and test owner 1's seeded rows (no phone row until a text opens its chat), for the root's
+   * real outbox and send-state ports (RootOptions.outboxCalls: `dispatch.outbox`; RootOptions.sendStateCall:
+   * `dispatch.sendState`), with K-05 v1.7 openChatOnText over the same phone rows, for the root's real chat-open port
+   * (RootOptions.chatOpenCall: `dispatch.openChat`; T-1213), its handles the key double's (test owner 1's seeded handle,
+   * and each one a first sight wrote).
    */
   readonly dispatch: FakeDispatchData;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
@@ -3483,7 +3765,9 @@ export interface SkeletonFakes {
 
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
 export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
-  const handleKeys = fakeHandleKeys(() => clock.now());
+  // Test owner 1's handle and person are the seed's (T-1148), with no key: the key call finds them and makes the key
+  // (handle-key-person-no-key.json), so the handle id it answers is handle-sam, the one the turn and the dispatcher name.
+  const handleKeys = fakeHandleKeys(() => clock.now(), [TEST_OWNER_1]);
   const models = fakeSafetyModels(skeletonSafetyDouble());
   const turnRows = fakeTurnRows();
   const bundleReads = fakeBundleReads();
@@ -3528,8 +3812,14 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const turnFace = turnFaceOf(face);
 
   // The outbox and send state are joined (T-562): one K-05 double reads the rows the commit wrote, with the final parts
-  // finalize wrote into them, so the dispatcher claims and sends those final parts (DL-433).
-  const dispatch = fakeDispatchData(turnRows, finalize.plans, () => clock.now());
+  // finalize wrote into them, so the dispatcher claims and sends those final parts (DL-433). The chat open is joined
+  // (T-1213): the same double's openChatOnText writes the phone rows it reads, its handles the key double's.
+  const dispatch = fakeDispatchData(
+    turnRows,
+    finalize.plans,
+    () => clock.now(),
+    (handleId) => handleKeys.handleOf(handleId),
+  );
   const linq = new FakeLinq(() => clock.utc());
   // Linq accepts a part a moment after the send starts, never at the same instant (DL-349).
   linq.beforeAnswer = () => flush(1);

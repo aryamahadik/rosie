@@ -43,8 +43,12 @@
 // markRowV12; never T-196's v1 calls), and limit 8's read of the recipient's send state at send over K-05 v1.2 sendState,
 // with the chat the send goes to, fed in a test by one K-05 double over the rows the commit wrote, the plans finalize
 // wrote into them and test owner 1's seeded rows, and by no database on staging until T-567, so every claim and every
-// send-state read there fails closed and nothing is sent. Every other port of the Worker's environments stays closed:
-// each call fails, as
+// send-state read there fails closed and nothing is sent; and chatOpen (T-1213), K-05 v1.7 openChatOnText with its
+// database bound, the gateway's call at receipt that opens a number's chat before its actor is reached, fed in a test by
+// the K-05 double over test owner 1's seeded handle and the handles the key call made (writing the phone row the outbox
+// and send-state doubles read), and by no database on staging until T-567, so every text that opens a chat there is
+// answered 503, as every seal there already is. Every other port of the Worker's environments stays closed: each call
+// fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
@@ -73,6 +77,7 @@ export interface PortPick {
 export const PICKS: readonly PortPick[] = [
   { port: "linqVerify", test: "real", staging: "real", production: "closed" }, // T-552
   { port: "sealing", test: "real", staging: "real", production: "closed" }, // T-553
+  { port: "chatOpen", test: "real", staging: "real", production: "closed" }, // T-1213
   { port: "safetyRead", test: "real", staging: "real", production: "closed" }, // T-554
   { port: "turnRow", test: "real", staging: "real", production: "closed" }, // T-555
   { port: "bundles", test: "real", staging: "real", production: "closed" }, // T-556

@@ -12,7 +12,15 @@
 //                handed in by the root (RootOptions.handleKey): the K-05 double in a test; nothing in the Worker until
 //                T-567 binds its database, so every seal there fails closed and the gateway answers 503. New ids on every
 //                call, the wrapping key by its name (SEALING_WRAP_KEY), and the data key as the key object K-05 hands
-//                over, never bytes (README default 27).
+//                over, never bytes (README default 27). The same call answers the handle's K-04 id beside its key
+//                (getOrCreateHandleKey), which the gateway hands to the chat-open port (T-1213).
+//   chatOpen     T-1213: K-05 v1.7 openChatOnText (T-1212, db/repo/chat-open.ts; item 46), a number's text opening its
+//                chat at receipt, with its database bound, handed in by the root (RootOptions.chatOpenCall): in a test,
+//                the K-05 double over test owner 1's seeded handle and the handles the key call made, writing the phone
+//                row the sendState and renewClaim doubles read; nothing in the Worker until T-567 binds its database, so
+//                every call there fails closed and the gateway answers 503, as every seal there already does. The
+//                gateway's request goes to K-05 as it is (the event id, the handle's K-04 id, the service, the receipt
+//                time and the trace; never the number), and K-05's answer comes back as its result or its error's name.
 //   safetyRead   T-554: @rosie/ai's safety read (T-365 createSafetyReader, with T-366's danger-word rules; C-113) for
 //                the bundle each text names, handed in by the root (RootOptions.safetyReaders): in a test, over a fake
 //                Messages API answered by the recorded-model double (T-004); in the Worker, none until the bundle's
@@ -178,6 +186,7 @@ import type {
   ReadBundleValueRequest,
   ReadBundleValueResult,
 } from "@rosie/db/repo/bundles";
+import type { OpenChatOnTextOutcome, OpenChatOnTextRequest, TextService } from "@rosie/db/repo/chat-open";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 import type {
@@ -219,7 +228,7 @@ import type {
   SendStateReader,
 } from "../dispatch/types";
 import type { HandleRef } from "../gateway/seal";
-import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
+import type { ChatOpenPort, InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
 import { MODELS_DOWN } from "../outage/ai";
 import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
@@ -280,6 +289,12 @@ export interface RealInputs {
    * out where no database is bound (the Worker until T-567), so every seal fails closed.
    */
   readonly handleKey?: HandleSealingKeyCall | null | undefined;
+  /**
+   * K-05 v1.7 openChatOnText with its database bound (T-1213), which the chat-open port sends each text's request to;
+   * null or left out where no database is bound (the Worker until T-567), so every call fails closed and the gateway
+   * answers 503 for a text that opens a chat.
+   */
+  readonly chatOpen?: OpenChatOnTextCall | null | undefined;
   /** Epoch milliseconds: the adapter's clock for a request whose receipt time is not a time (the gateway always gives one). */
   readonly now: () => number;
   /**
@@ -361,6 +376,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
   return {
     linqVerify: linqVerify(inputs),
     sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
+    chatOpen: realChatOpen({ call: inputs.chatOpen ?? null }),
     safetyRead: realSafetyRead(
       inputs.safetyRead === undefined
         ? { readers: null, dangerWords: () => [], sink: () => undefined, now: inputs.now }
@@ -468,29 +484,88 @@ export interface SealingInputs {
 /** The handle's key as K-05 hands it over. A throw means no key, so the gateway answers 503 and writes nothing. */
 export interface KeyObjectStore {
   getOrCreateKey(handle: HandleRef): Promise<CryptoKey>;
+  /** The same one call, with the handle's K-04 id its answer names (K-05 v1.2 item 29: handleId), for the chat open. */
+  getOrCreateHandleKey(handle: HandleRef): Promise<{ key: CryptoKey; handleId: string }>;
 }
 
 /**
  * The handle's sealing key from K-05 v1.2 item 29 (get or create a handle's sealing key): new handle and person ids on
  * every call, never built from the address (an id built from it would meet 23505 on every retry once a number's keys were
- * erased twice); the wrapping key by its name; the data key as the key object K-05 hands over, never bytes. With no
- * database bound, a constraint or transient answer, or a handle kind K-04 does not hold, it throws: fails closed.
+ * erased twice); the wrapping key by its name; the data key as the key object K-05 hands over, never bytes, with the
+ * handle's K-04 id the answer names where the caller asks for it (the gateway's chat open, T-1213). With no database
+ * bound, a constraint or transient answer, or a handle kind K-04 does not hold, it throws: fails closed.
  */
 export function realSealing(inputs: SealingInputs): KeyObjectStore {
   const newId = inputs.newId ?? ((): string => crypto.randomUUID());
+  const handleKey = async (handle: HandleRef): Promise<{ key: CryptoKey; handleId: string }> => {
+    const call = inputs.handleKey;
+    if (call === null) throw new NoDatabaseError("handleSealingKey");
+    if (handle.kind !== "phone" && handle.kind !== "email") throw new SealingKeyError("badHandle");
+    const answer = await call({
+      handle: { kind: handle.kind, address: handle.address },
+      newHandleId: `handle-${newId()}`,
+      newPersonId: `person-${newId()}`,
+      wrappingKeyName: SEALING_WRAP_KEY,
+    });
+    if (answer.dataKey === null) throw new SealingKeyError(answer.outcome.error);
+    return { key: answer.dataKey, handleId: answer.outcome.handleId };
+  };
   return {
     async getOrCreateKey(handle) {
-      const call = inputs.handleKey;
-      if (call === null) throw new NoDatabaseError("handleSealingKey");
-      if (handle.kind !== "phone" && handle.kind !== "email") throw new SealingKeyError("badHandle");
+      return (await handleKey(handle)).key;
+    },
+    getOrCreateHandleKey: handleKey,
+  };
+}
+
+// ---- chatOpen: K-05 v1.7 openChatOnText, a number's text opens its chat at receipt (T-1213; C-044; item 46) -----------
+
+/** K-05 v1.7 openChatOnText (T-1212, db/repo/chat-open.ts) with its database bound, as rosie_job on the runtime side. */
+export type OpenChatOnTextCall = (request: OpenChatOnTextRequest) => Promise<OpenChatOnTextOutcome>;
+
+/** What the real chat-open port is fed: K-05's call with its database bound, or null where none is bound. */
+export interface ChatOpenInputs {
+  readonly call: OpenChatOnTextCall | null;
+}
+
+/** A service the gateway would never send (it sends none but Linq's three: ../gateway/chat-open.ts). Names no value. */
+export class ChatOpenRequestError extends Error {
+  constructor(what: string) {
+    super(`openChatOnText takes no such request: ${what}`);
+    this.name = "ChatOpenRequestError";
+  }
+}
+
+/** Linq's three services, the ones K-05 v1.7 textService takes. */
+function textServiceOf(service: string): TextService {
+  if (service === "imessage" || service === "rcs" || service === "sms") return service;
+  throw new ChatOpenRequestError("a service that is not imessage, rcs or sms");
+}
+
+/**
+ * The chat-open port (T-1213): the gateway's ChatOpenPort over K-05 v1.7 openChatOnText (T-1212's db/repo call, bound as
+ * (sql, request) over a rosie_job client by T-567). The gateway's request goes to K-05 field for field: the text's event
+ * id, its handle's K-04 id (the key call's), the service, the receipt time and the trace, never the number, which K-05
+ * reads from the handle's row. K-05's answer comes back as the gateway reads it: its result (inserted, opened,
+ * alreadyOpen, stopped, repeated), or its error's name (notFound, notAPhone, transient), never the phone row, its entry or
+ * a SQLSTATE. A throw passes through unchanged (db/repo throws a database error it names no answer for with its SQLSTATE,
+ * table and constraint alone: T-1212's handoff; CQ-196), and the gateway answers 503 for it. With no call bound every call
+ * fails closed (NoDatabaseError), so the gateway answers 503 and stores nothing. Nothing here logs.
+ */
+export function realChatOpen(inputs: ChatOpenInputs): ChatOpenPort {
+  const { call } = inputs;
+  return {
+    async openChatOnText(request) {
+      if (call === null) throw new NoDatabaseError("openChatOnText");
       const answer = await call({
-        handle: { kind: handle.kind, address: handle.address },
-        newHandleId: `handle-${newId()}`,
-        newPersonId: `person-${newId()}`,
-        wrappingKeyName: SEALING_WRAP_KEY,
+        eventId: request.eventId,
+        handleId: request.handleId,
+        service: textServiceOf(request.service),
+        receivedAt: request.receivedAt,
+        traceId: request.traceId,
       });
-      if (answer.dataKey === null) throw new SealingKeyError(answer.outcome.error);
-      return answer.dataKey;
+      if ("error" in answer) return { error: answer.error };
+      return { result: answer.result };
     },
   };
 }

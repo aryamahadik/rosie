@@ -181,6 +181,8 @@ function rig(log: MockInstance): Run {
     clock: fakes.clock,
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over the dispatch double: each text opens its number's chat before the actor.
+    chatOpenCall: fakes.dispatch.openChat,
     safetyReaders: fakes.models.readers,
     // The bundle and targets ports (T-556) on their K-05 doubles: bundle v0 as bundles/v0 publishes it is active.
     bundleReads: fakes.bundleReads.calls,
@@ -271,7 +273,7 @@ describe("through the composition root, every port on its fake: a text's webhook
         run.fakes.known("evt-sam-0001");
         run.fakes.decide.recordTurn(["evt-sam-0001"]);
         // Sam's phone row as K-05 reads it (send-state-owner.json: chat open on iMessage, not stopped), so limit 8 lets the
-        // turn's reply go (T-562); test owner 1's own seed holds none, and a row to it waits for the chat (hop11's tests).
+        // turn's reply go (T-562); his text's chat open at receipt (T-1213) finds it open and leaves it as it is.
         run.fakes.dispatch.phones.set(SAM.party.handleId, samPhoneRow());
         const traceId = await run.post(samText("evt-sam-0001", words));
         await settle(SAM_ACTOR);
