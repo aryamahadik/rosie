@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 357, [`109e822`](https://github.com/aryamahadik/rosie/commit/109e822), 2026-11-11 08:53:56 UTC.
+- **Through:** commit 359, [`bfabe45`](https://github.com/aryamahadik/rosie/commit/bfabe45), 2026-11-11 09:08:11 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 359. docs: COMMIT\_HISTORY.md through commit 357 (109e822, \#364) (\#366)
+
+- **Commit:** [`bfabe45`](https://github.com/aryamahadik/rosie/commit/bfabe45), by Arya Mahadik, 2026-11-11 09:08:11 UTC
+- **Pull request:** [#366](https://github.com/aryamahadik/rosie/pull/366) from `task/commit-history-5`, merged 2026-11-11 09:08:11 UTC. It squashed 1 branch commit:
+  - `a77f87e` docs: COMMIT\_HISTORY.md through commit 357 (109e822, \#364)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 358. T-1200: join 8's and 9's leak checks: substrings at any depth, every console method, an Error's own fields (\#365)
+
+- **Commit:** [`45e8a9d`](https://github.com/aryamahadik/rosie/commit/45e8a9d), by Arya Mahadik, 2026-11-11 09:08:07 UTC
+- **Pull request:** [#365](https://github.com/aryamahadik/rosie/pull/365) from `task/T-1200`, merged 2026-11-11 09:08:07 UTC. It squashed 3 branch commits:
+  - `d84f4cb` T-1200: join 8's and 9's leak checks state the rule outright: no even…
+  - `8266ed4` Merge branch 'main' into task/T-1200
+  - `b15e7ec` T-1200: round 2 (DL-444): hop8's and hop9's textOf read every part a …
+- **Files changed:** 3 (+376 −34), by folder:
+  - `runtime/src/wiring/` hop8.worker.test.ts +153 −17, hop9.worker.test.ts +113 −10
+  - `tests/e2e/skeleton/` skeleton.worker.test.ts +110 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1200: join 8's and 9's leak checks state the rule outright: no event-log entry, safety record row or line handed to console.log, info, warn or error holds the cast's number, the chat id or the JOIN's (and the composer's) words, even inside a longer value at any depth, each check first shown firing on damaged copies of the run's own; CLAIMS rows 8 and 9 say the same
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1200: round 2 (DL-444): hop8's and hop9's textOf read every part a console method was handed as JSON writes it, and an Error's own fields beside its name, message and cause, at any depth, so an Error carrying the chat id or the number in a field of its own (a class field, a database error's detail) is caught bare and nested in an object; damaged copies of each, handed to console.error and console.info, fire before the real run gives []
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 357. docs: COMMIT\_HISTORY.md through commit 354 (e1bfb1e, \#361) (\#364)
 
