@@ -4,7 +4,9 @@
 // A run claims the sendable rows (K-05 v1.1 `claimOutbox`: each recipient's rows in commit order, a row held for text
 // hours passed so later rows go), then sends each claimed row's parts through the Linq port, one recipient after
 // another's rows but all recipients at once, and records each part: `markPart` sent on Linq's acceptance, failed on a
-// reported failure. A delivery receipt (`handleDeliveryReceipt`) marks the part delivered and hands it to clock arming.
+// reported failure. A delivery receipt (`handleDeliveryReceipt`) marks the part delivered and hands it to clock arming;
+// a repeated receipt of the row's first delivery is handed on again (K-05 v1.9 item 48; T-1228), so an arming a crash
+// lost is made by the provider's retry.
 //
 // What makes a part go exactly once, however many runs there are (K-05 v1.1 items 3, 13, 14):
 //   1. `claimOutbox` takes each recipient under a lock keyed on the recipient's handle and moves the row to `sending`
@@ -761,7 +763,10 @@ export interface ReceiptDeps {
 export type ReceiptResult =
   /** The part is marked delivered and handed to clock arming. */
   | { result: "delivered"; outboxRowId: string; partNo: 1 | 2; firstDelivery: boolean }
-  /** A receipt for a part already delivered: nothing changed, nothing was handed on. */
+  /**
+   * A receipt for a part already delivered: nothing was written. A repeat of the row's first delivery was handed to
+   * clock arming again (K-05 v1.9 item 48), which arms a clock once; any other repeat was handed to no one.
+   */
   | { result: "repeated"; outboxRowId: string; partNo: 1 | 2 }
   /**
    * No part holds this message id, and none under the echoed key is waiting for it (no key echoed, no part under it, or
@@ -772,10 +777,33 @@ export type ReceiptResult =
   | { result: "storeError" };
 
 /**
- * Marks a part delivered and hands it to clock arming once (arch 02 line 127). The part is found by Linq's message id,
+ * The stored time of the row's first delivery when `answer` is a repeat of it (K-05 v1.9 item 48): `repeated`, with
+ * `repeatedDelivery.firstOfRow` true. Null for every other answer: a mark that records a delivery, a repeat of a later
+ * part's delivery, `repeatedDelivery` null, an answer without it (v1 to v1.8) and one whose field cannot be read. A
+ * missing field is never read as a first delivery (default 89), and the time is never the receipt's own (default 86).
+ */
+function repeatedFirstDeliveryAt(answer: MarkPartResponse): Utc | null {
+  if (!answer.repeated) return null;
+  const repeats: unknown = answer.repeatedDelivery;
+  if (typeof repeats !== "object" || repeats === null) return null;
+  const { firstOfRow, deliveredAt } = repeats as { firstOfRow?: unknown; deliveredAt?: unknown };
+  return firstOfRow === true && typeof deliveredAt === "string" ? deliveredAt : null;
+}
+
+/**
+ * Marks a part delivered and hands it to clock arming (arch 02 line 127). The part is found by Linq's message id,
  * else by the key the receipt echoes when the part holds no message id (K-05 v1.2 item 31): a part that failed with 4001
  * or 4006 named none, and its receipt within the minute moves it to delivered, so no new key goes (K-07 rule 2; K-11
  * verify-delivered-after-4006.json).
+ *
+ * A repeated receipt writes nothing. One that repeats the row's first delivery (K-05 v1.9 item 48) is handed to clock
+ * arming again, as a first delivery at the stored time, named by the answer's row, part, try and question: a crash
+ * between markPart's commit and the arming left the clock unarmed and Linq unanswered, so Linq's retry is the arming's
+ * second chance (STATE note 38). The arming is safe to repeat (K-05 armClock), so a clock already armed stays armed
+ * once. Any other repeat is handed to no one.
+ *
+ * A store call that throws (markPart cannot read what a repeat repeats) and an arming that throws both reject here,
+ * with nothing handed on after the throw: the caller answers Linq 503 and Linq sends the receipt again.
  */
 export async function handleDeliveryReceipt(
   deps: ReceiptDeps,
@@ -802,13 +830,31 @@ export async function handleDeliveryReceipt(
     return unmatched ? { result: "unmatched", partKey: receipt.partKey } : { result: "storeError" };
   }
 
+  const repeatedFirstAt = repeatedFirstDeliveryAt(answer);
   timer.finish({
     outcome: "ok",
     provider: "linq",
-    got: { firstDelivery: answer.firstDelivery, repeated: answer.repeated },
+    got: {
+      firstDelivery: answer.firstDelivery,
+      repeated: answer.repeated,
+      // A label only, set when the repeat is handed on: the stored time stays out of the span.
+      ...(repeatedFirstAt === null ? {} : { firstOfRow: true }),
+    },
     rows: [{ table: "outbox_rows", id: answer.outboxRowId }],
   });
-  if (answer.repeated) return { result: "repeated", outboxRowId: answer.outboxRowId, partNo: answer.partNo };
+  if (answer.repeated) {
+    if (repeatedFirstAt !== null) {
+      await deps.clockArming.partDelivered({
+        outboxRowId: answer.outboxRowId,
+        partNo: answer.partNo,
+        tryNo: answer.tryNo,
+        firstDelivery: true,
+        openQuestionId: answer.openQuestionId,
+        deliveredAt: repeatedFirstAt,
+      });
+    }
+    return { result: "repeated", outboxRowId: answer.outboxRowId, partNo: answer.partNo };
+  }
 
   await deps.clockArming.partDelivered({
     outboxRowId: answer.outboxRowId,

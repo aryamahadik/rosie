@@ -1848,6 +1848,8 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
     },
     async markPart(request) {
       if (calls === null) return none("markPart");
+      // A throw of markPartV12 (a delivered part try with no delivery time: db/repo outbox.ts default 21) is not caught
+      // here: it is no answer, so it reaches the dispatcher's caller as it is and the receipt is not answered as done.
       const answer = await calls.markPartV12(markPartRequestOf(request));
       if ("error" in answer) return answer;
       const marked: MarkPartResponse = {
@@ -1861,6 +1863,9 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
         openQuestionId: answer.openQuestionId,
         nextKey: answer.nextKey,
         row: { state: answer.row.state, version: answer.row.version },
+        // K-05 v1.9 item 48, as the store gives it: what a repeated delivery receipt repeats, null on every other
+        // answer. Nothing is derived here; the dispatcher reads it (T-1228).
+        repeatedDelivery: answer.repeatedDelivery,
       };
       return marked;
     },
