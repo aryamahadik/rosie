@@ -9,10 +9,11 @@
 //      4.12; arch 02 line 125); any other row is dropped, and its question takes step 9's never-delivered path (T-255).
 //      A texts yes newer than the stop turns texts back on only when it is the person's own word sent from the number
 //      that stopped (T-1099; RULES 7.1, 7.5; S13-32 lines 7213 to 7215, 7242): a START, or a fresh yes for this row's
-//      booking. A yes the business entered ('1 Yes' by text or on the Today page, which writes a texts row newer than
-//      the STOP that K-05 v1.2 default 35 reads as the covering row), or one whose record does not say who gave it
-//      (K-05 v1.2's textsConsent as frozen), never does: the row is dropped. A row the person's own yes lifted goes on
-//      to the checks below, where a stopped phone's closed chat holds it (K-04 phones_stop_closes_chat).
+//      booking. K-05 v1.8's textsConsent says who gave the yes and for which booking (item 47: fromContact and
+//      bookingId). A yes the business entered ('1 Yes' by text or on the Today page, which writes a texts row newer
+//      than the STOP that K-05 default 35 reads as the covering row), or one whose record does not say who gave it (an
+//      answer before v1.8, which has neither field), never does: the row is dropped. A row the person's own yes lifted
+//      goes on to the checks below, where a stopped phone's closed chat holds it (K-04 phones_stop_closes_chat).
 //   2. Not stopped and no open chat: every row waits, whatever its class (a safety line too) and audience (customer,
 //      owner, team), with no text and no clock: Rosie never writes first (RULES 4.1b; MC C9; CQ-37).
 //   3. A safety line and a stop reply then go at any hour, with no check of versions.
@@ -72,7 +73,7 @@ export const isSmsPort = (row: ClaimedRow): boolean => row.port === "sms";
 
 /** Why a stopped phone's newest texts row, a yes, did not lift the stop: a label for the span, never words or numbers. */
 export type YesRefused =
-  /** The record does not say who gave it, its booking or when the stop came (K-05 v1.2 as frozen): fail closed. */
+  /** The record does not say who gave it, its booking or when the stop came (as before K-05 v1.8): fail closed. */
   | "notKnown"
   /** Not the person's own text from that number: the business's '1 Yes' (by text or on the Today page), a page's. */
   | "notFromContact"
