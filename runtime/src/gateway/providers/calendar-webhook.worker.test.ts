@@ -17,9 +17,9 @@ import validation from "../../../../contracts/port-calendar/fixtures/notificatio
 import microsoft from "../../../../contracts/port-calendar/fixtures/notification-microsoft.json";
 import wrongVerifier from "../../../../contracts/port-calendar/fixtures/notification-rejected.json";
 import { unconfiguredGateway } from "..";
-import { present } from "../test-support";
+import { countedStream, postOf, present, xBytes } from "../test-support";
 import { unconfiguredProviders } from ".";
-import { handleCalendarWebhook } from "./calendar-webhook";
+import { CALENDAR_BODY_LIMIT_BYTES, handleCalendarWebhook, type CalendarSource } from "./calendar-webhook";
 import {
   calendarPath,
   calendarPortDouble,
@@ -741,5 +741,271 @@ describe("the Worker's calendar routes", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("x-trace-id")).toMatch(UUID);
+  });
+});
+
+describe("the calendar doors' body cap (T-1195; ../body.ts, as the page entry and the Linq webhook since T-1180)", () => {
+  // The gateway never reads the context; the Workers runtime's own context has members this test cannot build.
+  const context = {
+    waitUntil: () => undefined,
+    passThroughOnException: () => undefined,
+    props: {},
+  } as unknown as ExecutionContext;
+
+  /** notification-microsoft's POST as Graph sends it, its JSON followed by spaces to exactly `bytes` bytes. */
+  async function paddedGraph(port: CalendarPortDouble, bytes: number): Promise<Request> {
+    const raw = await graphRequest(port, microsoft).text();
+    return graphBodyRequest(raw + " ".repeat(bytes - new TextEncoder().encode(raw).byteLength));
+  }
+
+  /** A request's headers, but for any length it declares: the copy's body is another. */
+  function headersOf(request: Request): Record<string, string> {
+    const own: Record<string, string> = {};
+    request.headers.forEach((value, name) => {
+      if (name !== "content-length") own[name] = value;
+    });
+    return own;
+  }
+
+  /** A push of this source with the fixture's own headers and address on a streamed body, with these headers besides. */
+  function streamedPush(
+    port: CalendarPortDouble,
+    source: CalendarSource,
+    stream: ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Request {
+    const sent = source === "google" ? googleRequest(port, google.request) : graphRequest(port, microsoft);
+    return postOf(stream, { ...headersOf(sent), ...headers }, sent.url);
+  }
+
+  /** A copy of a push with this body in place of its own. */
+  function withBody(request: Request, body: string): Request {
+    return new Request(request.url, { method: "POST", headers: headersOf(request), body });
+  }
+
+  it("Graph's notifications one byte over the cap: 413 with the trace id, never checked, nothing stored, only a refused span logged", async () => {
+    const logLines = captureLogLines();
+    const { port, store, deps } = worldAt(microsoft.given.now);
+
+    const response = await handleCalendarWebhook(
+      await paddedGraph(port, CALENDAR_BODY_LIMIT_BYTES + 1),
+      "microsoft",
+      deps,
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    const traceId = response.headers.get("x-trace-id");
+    expect(traceId).toMatch(UUID);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ ok: false, error: "payload_too_large", trace_id: traceId });
+    expect(port.requests).toEqual([]);
+    expect(store.calls).toEqual([]);
+    const lines = logLines();
+    expect(lines).toHaveLength(1);
+    const spans = providerSpans(lines);
+    expect(spans).toMatchObject([
+      {
+        trace_id: traceId,
+        hop: "providerWebhook",
+        provider: "microsoft_calendar",
+        call: "verifyNotification",
+        outcome: "refused",
+        error_code: "bodyTooLarge",
+      },
+    ]);
+    expect(spans[0]?.got).toEqual({});
+    expect(spans[0]?.decided).toEqual({});
+    expectClosedSpanFacts(spans[0]);
+    const text = JSON.stringify(lines);
+    expect(text).not.toContain(port.verifierOf("graph-sub-sam-01"));
+    expect(text).not.toContain("graph-notif-demo-0001");
+    expect(text).not.toContain("tenantId");
+  });
+
+  it("Graph's notifications exactly at the cap: read whole, checked as sent and stored", async () => {
+    captureLogLines();
+    const { port, store, deps } = worldAt(microsoft.given.now);
+
+    const response = await handleCalendarWebhook(
+      await paddedGraph(port, CALENDAR_BODY_LIMIT_BYTES),
+      "microsoft",
+      deps,
+      WHERE,
+    );
+
+    expect(response.status).toBe(200);
+    expect(port.requests).toHaveLength(1);
+    expect(port.requests[0]).toMatchObject({
+      kind: "notifications",
+      notifications: [
+        { notificationId: "graph-notif-demo-0001", clientState: port.verifierOf("graph-sub-sam-01") },
+      ],
+    });
+    expect(store.rows.map((row) => row.providerEventId)).toEqual(["graph-notif-demo-0001"]);
+  });
+
+  it("Google's push and Graph's handshake carry no body: one sent over the cap anyway is 413, never checked, the token never echoed", async () => {
+    const logLines = captureLogLines();
+    const { port, store, deps } = worldAt(google.given.now);
+    const over = "x".repeat(CALENDAR_BODY_LIMIT_BYTES + 1);
+
+    const fromGoogle = await handleCalendarWebhook(
+      withBody(googleRequest(port, google.request), over),
+      "google",
+      deps,
+      WHERE,
+    );
+    const handshake = await handleCalendarWebhook(
+      withBody(graphValidationRequest(validation.request.validationToken), over),
+      "microsoft",
+      deps,
+      WHERE,
+    );
+
+    expect(fromGoogle.status).toBe(413);
+    expect(handshake.status).toBe(413);
+    expect(handshake.headers.get("content-type")).toBe("application/json; charset=utf-8");
+    expect(await handshake.text()).not.toContain(validation.request.validationToken);
+    expect(port.requests).toEqual([]);
+    expect(store.calls).toEqual([]);
+    const spans = providerSpans(logLines());
+    expect(spans.map((span) => [span.provider, span.error_code])).toEqual([
+      ["google_calendar", "bodyTooLarge"],
+      ["microsoft_calendar", "bodyTooLarge"],
+    ]);
+    for (const span of spans) expectClosedSpanFacts(span);
+  });
+
+  it("a body under the cap at Google's door changes nothing: the push is read from its headers, checked and stored", async () => {
+    captureLogLines();
+    const { port, store, deps } = worldAt(google.given.now);
+
+    const response = await handleCalendarWebhook(
+      withBody(googleRequest(port, google.request), '{"a":"body Google never sends"}'),
+      "google",
+      deps,
+      WHERE,
+    );
+
+    expect(response.status).toBe(200);
+    expect(port.requests).toMatchObject([
+      {
+        kind: "push",
+        channelId: "gcal-channel-riley-03",
+        channelToken: port.verifierOf("gcal-channel-riley-03"),
+      },
+    ]);
+    expect(store.rows.map((row) => row.providerEventId)).toEqual(["gcal-channel-riley-03:7"]);
+  });
+
+  it.each(["google", "microsoft"] as const)(
+    "%s: a declared length over the cap is answered 413 before a byte of the body is read, never checked",
+    async (source) => {
+      captureLogLines();
+      const { port, store, deps } = worldAt(source === "google" ? google.given.now : microsoft.given.now);
+      const stream = countedStream(1024, () => xBytes(1024));
+
+      const response = await handleCalendarWebhook(
+        streamedPush(port, source, stream.stream, {
+          "content-length": String(CALENDAR_BODY_LIMIT_BYTES + 1),
+        }),
+        source,
+        deps,
+        WHERE,
+      );
+
+      expect(response.status).toBe(413);
+      expect(stream.pulled()).toBe(0);
+      expect(port.requests).toEqual([]);
+      expect(store.calls).toEqual([]);
+    },
+  );
+
+  it.each(["google", "microsoft"] as const)(
+    "%s: a body that declares no length is cut off at the chunk that takes it over the cap: a 1 GiB body is never read whole",
+    async (source) => {
+      captureLogLines();
+      const { port, store, deps } = worldAt(source === "google" ? google.given.now : microsoft.given.now);
+      const stream = countedStream(1024 * 1024, () => xBytes(1024));
+
+      const response = await handleCalendarWebhook(
+        streamedPush(port, source, stream.stream),
+        source,
+        deps,
+        WHERE,
+      );
+
+      expect(response.status).toBe(413);
+      expect(stream.pulled()).toBeGreaterThan(CALENDAR_BODY_LIMIT_BYTES / 1024);
+      expect(stream.pulled()).toBeLessThan((2 * CALENDAR_BODY_LIMIT_BYTES) / 1024);
+      expect(stream.cancelled()).toBe(true);
+      expect(port.requests).toEqual([]);
+      expect(store.calls).toEqual([]);
+    },
+  );
+
+  it("over the cap, 413 comes before the clock: a clock that is not a number is 503 under it", async () => {
+    captureLogLines();
+    const answer = async (bytes: number): Promise<{ status: number; checked: number }> => {
+      const world = worldAt(microsoft.given.now);
+      const response = await handleCalendarWebhook(
+        await paddedGraph(world.port, bytes),
+        "microsoft",
+        { ...world.deps, now: () => Number.NaN },
+        WHERE,
+      );
+      return { status: response.status, checked: world.port.requests.length };
+    };
+
+    expect(await answer(CALENDAR_BODY_LIMIT_BYTES)).toEqual({ status: 503, checked: 0 });
+    expect(await answer(CALENDAR_BODY_LIMIT_BYTES + 1)).toEqual({ status: 413, checked: 0 });
+  });
+
+  it("its cap is its own config value: ProviderDoors.calendarBodyLimitBytes sets it, the Stripe door's does not, a mistyped value leaves the default, and a push with no body passes any cap", async () => {
+    captureLogLines();
+    const graphAnswer = async (more: Partial<ProviderDeps>): Promise<number> => {
+      const world = worldAt(microsoft.given.now);
+      const request = graphRequest(world.port, microsoft);
+      return (await handleCalendarWebhook(request, "microsoft", { ...world.deps, ...more }, WHERE)).status;
+    };
+    const googleAnswer = async (more: Partial<ProviderDeps>): Promise<number> => {
+      const world = worldAt(google.given.now);
+      const request = googleRequest(world.port, google.request);
+      return (await handleCalendarWebhook(request, "google", { ...world.deps, ...more }, WHERE)).status;
+    };
+    const probe = worldAt(microsoft.given.now);
+    const size = new TextEncoder().encode(await graphRequest(probe.port, microsoft).text()).byteLength;
+
+    expect(await graphAnswer({ calendarBodyLimitBytes: size - 1 })).toBe(413);
+    expect(await graphAnswer({ calendarBodyLimitBytes: size })).toBe(200);
+    expect(await graphAnswer({ stripeBodyLimitBytes: 1 })).toBe(200);
+    expect(await graphAnswer({ calendarBodyLimitBytes: Number.NaN })).toBe(200);
+    expect(await graphAnswer({ calendarBodyLimitBytes: -1 })).toBe(200);
+    expect(await googleAnswer({ calendarBodyLimitBytes: 0 })).toBe(200);
+  });
+
+  it("through the Worker's routes: GatewayDeps.providers carries the cap, and the Worker with none set refuses a body one byte over 64 KiB", async () => {
+    captureLogLines();
+    const world = worldAt(microsoft.given.now);
+    const routed = createWorker(() => ({
+      ...unconfiguredGateway(),
+      now: () => Date.parse(microsoft.given.now),
+      providers: { ...world.deps, calendarBodyLimitBytes: 64 },
+    }));
+
+    const capped = await routed.fetch(graphRequest(world.port, microsoft), env, context);
+    const overDefault = await worker.fetch(
+      await paddedGraph(world.port, CALENDAR_BODY_LIMIT_BYTES + 1),
+      env,
+      context,
+    );
+
+    expect(capped.status).toBe(413);
+    expect(capped.headers.get("x-trace-id")).toMatch(UUID);
+    expect(world.port.requests).toEqual([]);
+    expect(world.store.calls).toEqual([]);
+    expect(overDefault.status).toBe(413);
+    expect(await overDefault.json()).toMatchObject({ ok: false, error: "payload_too_large" });
   });
 });

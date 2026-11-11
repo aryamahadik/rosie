@@ -21,7 +21,10 @@
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
-//     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own.
+//     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own;
+//   - the gateway's page entry (T-266): on staging, when the root is handed their inputs, the test-phone page's two calls
+//     (T-1186, ./test-phone), T-565's handlers over the session, roster and phone reads and staging's test-phone line,
+//     which posts through the Linq route above; every other page call stays unconfigured (503).
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
 // have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets, frontier
@@ -56,6 +59,7 @@ import type { ClockActorRpc } from "../clocks/types";
 import { handleDeliveryReceipt, runDispatch } from "../dispatch/dispatcher";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
 import type { WebhookEnvironment } from "../gateway/answer";
+import { unconfiguredPages } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setGuardDeps } from "../guard/targets";
 import { setSafetyDeps } from "../safety";
@@ -82,6 +86,7 @@ import {
 } from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
+import { testPhonePages, type TestPhoneInputs } from "./test-phone";
 import { TurnChats } from "./turn-chats";
 
 /** The HandleActor namespace as the root uses it: the gateway's door to each handle's actor, and the clock arming's way to it. */
@@ -174,6 +179,12 @@ export interface RootOptions {
   readonly gateReads?: GateReads | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
+  /**
+   * What the test-phone page's two calls reach (T-1186; ./test-phone): the session, roster and phone reads with their
+   * database bound, and staging's test-phone line. Bound into the gateway's page entry only where ENVIRONMENT is staging,
+   * as {...unconfiguredPages(), testPhoneSend, testPhoneParts}; left out or null, every page call stays unconfigured.
+   */
+  readonly testPhone?: TestPhoneInputs | null;
 }
 
 export interface Root {
@@ -336,6 +347,11 @@ export function composeRoot(options: RootOptions): Root {
     },
   };
 
+  const flags = options.flags ?? null;
+  const linqWebhook = (request: Request): Promise<Response> =>
+    skeletonLinqRoute(request, { gateway, flags, where });
+  const testPhone = options.testPhone ?? null;
+
   const gateway: GatewayDeps = {
     linq: ports.linqVerify,
     actor: options.actors === null ? closedActorDoor() : durableObjectActor(options.actors),
@@ -343,16 +359,28 @@ export function composeRoot(options: RootOptions): Root {
     keys: ports.sealing,
     bundleId: () => activeBundleId(ports.bundles.registry),
     now,
+    // The test-phone page's two calls, on staging only (T-1186): anywhere else the page entry refuses them first.
+    ...(testPhone !== null && options.vars.ENVIRONMENT === "staging"
+      ? {
+          pages: {
+            ...unconfiguredPages(),
+            ...testPhonePages({
+              inputs: testPhone,
+              webhookSecret: () => options.linq?.webhookSecret(),
+              linqWebhook,
+              now,
+            }),
+          },
+        }
+      : {}),
   };
-
-  const flags = options.flags ?? null;
 
   return {
     environment: options.environment,
     bindings,
     ports,
     gateway,
-    linqWebhook: (request) => skeletonLinqRoute(request, { gateway, flags, where }),
+    linqWebhook,
     turn,
     safety,
     dispatcher,
@@ -431,6 +459,11 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and the gate's reads): every
     // gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
     gateReads: null,
+    // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
+    // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
+    // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as
+    // testPhoneLineOf(env.TEST_PHONE_LINE), and the root binds both calls on staging.
+    testPhone: null,
   });
   workerRoots.set(env, root);
   return root;
