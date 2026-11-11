@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 8 (T-552 to T-559), receive to the commit. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 9 (T-552 to T-560), receive to the composer. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -30,8 +30,10 @@ import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, inject, it } from "vitest";
 
+import joinComposeInput from "../../../ai/recordings/composer-inputs/join-s1-02.json";
 import { HAIKU_MODEL } from "../../../ai/src/gateway/index";
 import traceSkeleton from "../../../contracts/event-trace/fixtures/trace-skeleton.json";
+import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS101Enter from "../../../contracts/model/fixtures/decide-s1-01-enter.json";
 import buildFrontierS101 from "../../../contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "../../../contracts/tool-api/fixtures/commit-s1-01.json";
@@ -60,8 +62,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 8's, the gate and its one commit (T-559). */
-const JOINED_THROUGH: SkeletonHop = "commit";
+/** The last hop joined on main: join 9's, the composer returning that row's plan (T-560). */
+const JOINED_THROUGH: SkeletonHop = "compose";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -551,6 +553,73 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // The gate's reads ran under Lee's Barbershop's scope, once.
     expect(facts.run.fakes.gate.scopes).toEqual([TEST_OWNER_1.businessId]);
     return Promise.resolve();
+  },
+
+  // Row 9, "The composer returns that row's plan" (K-09 compose input, K-03 plan; T-560; ADR-013 section 6; DL-347,
+  // DL-355, DL-357): @rosie/actions' turn face's composeInput, reading the JOIN turn's one outbox row once under Lee's
+  // Barbershop's scope, gives the composer exactly T-1175's recording 4 (S1-02's row, routine, S1-02's four card terms
+  // as its facts, the JOIN as its inbound text, no frontier); @rosie/ai's composer, over the recorded-model double,
+  // answers it from recording 4 with one Haiku call. One compose span for the one row, its plan plan-s1-02.json's shape,
+  // its model call under bundles/v0's pinned id and the JOIN's hashed turn id, on its own portCall span too.
+  9: async (facts) => {
+    const row = `outbox-s1-02-${facts.turnId}-1`;
+    const plan = planS102 as unknown as {
+      readonly formats: readonly string[];
+      readonly lines: readonly object[];
+      readonly question: { readonly optionIds: readonly string[] } | null;
+    };
+    // One compose span for the one outbox row, the turn's: S1-02's, routine, on the JOIN's service.
+    const compose = onlySpan(facts, "compose");
+    expect(compose).toMatchObject({
+      outcome: "ok",
+      error_code: null,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      business_id: TEST_OWNER_1.businessId,
+      got: {
+        row,
+        channel: JOIN.service,
+        situation: "routine",
+        allowedFormats: ["text"],
+        facts: 4,
+        options: 0,
+        inbound: true,
+      },
+      decided: {
+        formats: plan.formats,
+        lines: plan.lines.length,
+        question: plan.question !== null,
+        optionIds: plan.question?.optionIds.length ?? 0,
+      },
+    });
+    // The plan the turn handed on is plan-s1-02.json's, on the row and its channel.
+    expect(facts.run.fakes.face.finalizeCalls.map((call) => [call.outboxRowId, call.plan])).toEqual([
+      [row, { row, channel: JOIN.service, copyOf: null, plan: planS102 }],
+    ]);
+    // The composer's request is recording 4's, field for field (keyed on the runtime's ids: DL-347), with no frontier.
+    expect(facts.run.fakes.composer.misses).toEqual([]);
+    expect(facts.run.fakes.composer.inputs).toEqual([joinComposeInput]);
+    expect(facts.run.fakes.composer.inputs[0]).not.toHaveProperty("frontier");
+    expect(facts.run.fakes.composer.calls).toEqual([
+      { model: HAIKU_MODEL, recording: "composer-join-s1-02" },
+    ]);
+    // Its one model call, Haiku for compose, on the compose span and on its own portCall span, under bundles/v0's pinned
+    // id and the turn id T-248's hash of evt-sam-0000 (DL-357).
+    expect(facts.turnId).toBe(await turnIdOf(["evt-sam-0000"]));
+    expect(compose.model_calls?.map((call) => [call.model, call.purpose, call.outcome])).toEqual([
+      [HAIKU_MODEL, "compose", "ok"],
+    ]);
+    const composeCalls = facts.judged.trace.spans.filter(
+      (span) => isModelCallSpan(span) && (span.model_calls ?? []).some((call) => call.purpose === "compose"),
+    );
+    expect(composeCalls.map((span) => [span.bundle_id, span.turn_id, span.attempt, span.outcome])).toEqual([
+      [BUNDLE_V0, facts.turnId, 1, "ok"],
+    ]);
+    // Compose input read the row once, under Lee's Barbershop's scope.
+    expect(facts.run.fakes.compose.scopes).toEqual([TEST_OWNER_1.businessId]);
+    expect(facts.run.fakes.compose.rowReads).toEqual([
+      { outboxRowId: row, businessId: TEST_OWNER_1.businessId },
+    ]);
   },
 };
 

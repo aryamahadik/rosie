@@ -44,8 +44,14 @@
 // the gate's reads (RootOptions.gateReads), the run's pinned bundle and the turn-row port's commitTurn, under the turn id;
 // the root puts the service and Linq chat id of the run's last text on the request's turn, copied from its K-06 event
 // (./turn-chats.ts; K-09 v1.5 default 135), and the turn keeps recording the gate and commit spans while the Tool API
-// base records none (TURN_RECORDS_GATE; DL-376), so no flag is set for them either. Never logged by the root: a word, a
-// number, a key, a chat id.
+// base records none (TURN_RECORDS_GATE; DL-376), so no flag is set for them either. Each committed row's compose input
+// goes through the compose-input port (T-560): @rosie/actions' turn face over compose input's reads
+// (RootOptions.composeReads) and the run's pinned bundle, its inbound text the words the turn's gate request handed in,
+// as the gate port's face holds them; and its plan, and its one rewrite, through the composer port (T-560): @rosie/ai's
+// composer for the turn's bundle (RootOptions.composers), which records only its model calls' portCall spans. The turn
+// records the compose span and every fillAndChecks span while the Tool API base records none
+// (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for them. Never logged by the root: a word, a number, a key,
+// a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -71,6 +77,8 @@ import { PinnedRuns } from "./pinned-runs";
 import {
   realPorts,
   type BundleReadCalls,
+  type ComposeReads,
+  type Composers,
   type Deciders,
   type FrontierScope,
   type GateReads,
@@ -172,6 +180,21 @@ export interface RootOptions {
    * gate fails closed and nothing commits. Its one commitTurn is the turn-row port's (`turnRows`).
    */
   readonly gateReads?: GateReads | null;
+  /**
+   * What compose input reads with its database bound (T-560; ./real.ts ComposeReads): the Tool API's own business scope
+   * (rosie_app) and K-05 v1.6 readOutboxRow on the runtime side (rosie_job). On local PostgreSQL, @rosie/actions'
+   * pgCallScope over a rosie_app client and pgRowData's readOutboxRow over a rosie_job client (turn-face/pg/calls.ts); in a
+   * test, a K-05 double over the rows the commit wrote and test owner 1's seeded rows; null or left out where no database
+   * is bound (the Worker until T-567), so every compose input fails closed and no row is composed.
+   */
+  readonly composeReads?: ComposeReads | null;
+  /**
+   * @rosie/ai's composer for each bundle (T-560; ./real.ts Composers): each row's plan and its one rewrite. In a test, over
+   * a fake Messages API answered by the recorded-model double; null or left out where none can be built (the Worker, until
+   * its bundle's manifest can be read there and the model key is set by name: J-02), so every compose and rewrite fails
+   * closed before any model call and no row gets a plan.
+   */
+  readonly composers?: Composers | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
 }
@@ -236,6 +259,13 @@ export function composeRoot(options: RootOptions): Root {
         bundles: () => ports.bundles,
         pinnedOf: (trace) => pinnedRuns.of(trace),
       },
+      // Compose input's reads, and the bundle the row was committed under: the run's pinned one, else the bundle port.
+      composeInput: {
+        reads: options.composeReads ?? null,
+        bundles: () => ports.bundles,
+        pinnedOf: (trace) => pinnedRuns.of(trace),
+      },
+      composers: options.composers,
     }),
     closed: closedPorts(),
   });
@@ -281,7 +311,8 @@ export function composeRoot(options: RootOptions): Root {
       // neither (K-09 v1.5 default 135). The turn records the gate and commit spans; the real gate port's base records none.
       gateAndCommit: (request, at, trace) =>
         ports.gate.gateAndCommit(turnChats.onTurn(request, trace), at, trace),
-      composeInput: (request, trace) => ports.turnFace.composeInput(request, trace),
+      // The turn records the row's fillAndChecks span; the real compose-input port's base records none (DL-376).
+      composeInput: (request, trace) => ports.composeInput.composeInput(request, trace),
       finalizeMessage: (request, trace) => ports.finalize.finalizeMessage(request, trace),
     },
     ai: ports.decide,
@@ -431,6 +462,13 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and the gate's reads): every
     // gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
     gateReads: null,
+    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and readOutboxRow): every
+    // compose input fails closed inside the Tool API base, before anything is read, so no row is composed.
+    composeReads: null,
+    // No composer until the bundle's manifest (T-566's BUNDLES, T-567's database) and the model key (J-02; smoke-size
+    // calls only, DL-027) can be read in the Worker: every compose and rewrite fails closed before any model call
+    // (./real.ts NoComposerError), so no row gets a plan and nothing is sent for it.
+    composers: null,
   });
   workerRoots.set(env, root);
   return root;

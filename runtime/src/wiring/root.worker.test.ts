@@ -17,8 +17,11 @@
 // which holds the reads this test records for its turn), whose model-call spans sit in the trace beside the safety read's.
 // Since T-559 joined the gate, the turn's gate and one commit go through @rosie/actions' turn face over the gate's reads'
 // doubles (fakeGateReads), its commit through the turn-row port to the K-05 double (fakeTurnRows), whose rows the turn
-// then composes. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher,
-// and the root's receipt door marks the part delivered and arms its clock.
+// then composes. Since T-560 joined compose input and the composer, each row's composer input comes from @rosie/actions'
+// turn face over a K-05 readOutboxRow double (fakeComposeReads), and its plan from @rosie/ai's composer over the
+// recorded-model double (fakeComposerModels, which holds the plan of the turn this test records), whose model-call span
+// sits in the trace beside decide's. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the
+// root's dispatcher, and the root's receipt door marks the part delivered and arms its clock.
 //
 // The trace is judged as T-260's runtime trace test judges it (runtime/test/trace-e2e.worker.test.ts, which passes
 // unchanged beside this file), with T-260's hop check (runtime/src/trace/hop-check.ts) against K-08 v1's
@@ -187,6 +190,10 @@ function rig(log: MockInstance): Run {
     // The gate port (T-559) over its reads' doubles, its one commit through the turn-row port to the K-05 double.
     turnRows: fakes.turnRows.calls,
     gateReads: fakes.gate.reads,
+    // The compose-input and composer ports (T-560): compose input over its K-05 double, the composer over the
+    // recorded-model double, which holds the plan of the turn this test records.
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
   });
   const restoreRoot = root.install();
   const watched = watchGate(root);
@@ -318,14 +325,22 @@ describe("through the composition root, every port on its fake: a text's webhook
         expect(calls.filter((call) => call[2] === "safetyRead")).toEqual([[1, "ok", "safetyRead"]]);
         expect(run.fakes.models.calls).toEqual([{ model: "claude-haiku-5-5", text: words }]);
         // The turn's decide (T-558): two Haiku reads, each its step 1 and its one part's step 2, each call answered at
-        // its first attempt by the recorded-model double; no other model call.
+        // its first attempt by the recorded-model double; then the composer's one Haiku call for the turn's row (T-560),
+        // answered by the same double; no other model call.
         expect(
           calls
             .filter((call) => call[2] !== "safetyRead")
             .map((call) => call.join())
             .sort(),
-        ).toEqual(["1,ok,decideCheck", "1,ok,decideCheck", "1,ok,decideFirst", "1,ok,decideFirst"]);
+        ).toEqual([
+          "1,ok,compose",
+          "1,ok,decideCheck",
+          "1,ok,decideCheck",
+          "1,ok,decideFirst",
+          "1,ok,decideFirst",
+        ]);
         expect(run.fakes.decide.misses).toEqual([]);
+        expect(run.fakes.composer.misses).toEqual([]);
 
         // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v0's).
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(

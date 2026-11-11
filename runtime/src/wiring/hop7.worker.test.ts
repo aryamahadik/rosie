@@ -237,6 +237,8 @@ function rig(log: MockInstance, fed: { deciders?: boolean } = {}): Rig {
     frontierScope: fakes.frontier.scope,
     deciders: fed.deciders === false ? null : fakes.decide.deciders,
     gateReads: fakes.gate.reads,
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restoreRoot = root.install();
