@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 12 (T-552 to T-563), receive to providerAccepted. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 13 (T-552 to T-564), receive to clockArmed. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -37,8 +37,10 @@ import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS101Enter from "../../../contracts/model/fixtures/decide-s1-01-enter.json";
 import buildFrontierS101 from "../../../contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "../../../contracts/tool-api/fixtures/commit-s1-01.json";
+import seedBusinessHead from "../../../contracts/db-schema/core/fixtures/seed-business-head.json";
 import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/event-trace.v1";
 import { QUIET_MS, turnIdOf } from "../../../runtime/src/actor";
+import { dueOf } from "../../../runtime/src/clocks/due";
 import { actorNameOf, openWords } from "../../../runtime/src/gateway";
 import { SEALING_WRAP_KEY } from "../../../runtime/src/wiring";
 import {
@@ -70,8 +72,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 12's, the send to the Linq double (T-563). */
-const JOINED_THROUGH: SkeletonHop = "providerAccepted";
+/** The last hop joined on main: join 13's, the delivery receipt and the clock it arms (T-564), the skeleton's last. */
+const JOINED_THROUGH: SkeletonHop = "clockArmed";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -898,7 +900,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       },
     ]);
     // The one words part, handed to the root's FakeLinq under its key, to Sam's chat by iMessage, with the final parts'
-    // words; then marked sent, and the row sent under its one claim.
+    // words; then marked sent, and the row sent under its one claim. Row 13's receipt runs before the trace is judged
+    // (root-run.ts), so the marks also hold its one delivered mark (row 13 asserts it), and the run ends with the row
+    // delivered under the same claim.
     expect(linq.keysInOrder).toEqual([key]);
     expect(linq.requests).toMatchObject([
       {
@@ -911,10 +915,14 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
         overrideOptout: false,
       },
     ]);
-    expect(dispatch.partMarks.map((call) => [call.request.outcome, call.answer])).toMatchObject([
+    expect(
+      dispatch.partMarks
+        .filter((call) => call.request.outcome !== "delivered")
+        .map((call) => [call.request.outcome, call.answer]),
+    ).toMatchObject([
       ["sent", { result: "marked", outboxRowId: row, repeated: false, row: { state: "sent" } }],
     ]);
-    expect(dispatch.row(row)).toMatchObject({ state: "sent", claim: { claimNo: 1 } });
+    expect(dispatch.row(row)).toMatchObject({ state: "delivered", claim: { claimNo: 1 } });
 
     // One dispatch span for the row, the dispatcher's: limit 8 passed, claim 1, the one part sent by Linq.
     const span = onlySpan(facts, "dispatch");
@@ -1000,7 +1008,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // Accepted by the double, and the part marked sent with the message id it gave.
     const accepted = linq.accepted.get(key);
     if (accepted?.providerMessageId == null) throw new Error("the Linq double accepted no part");
-    expect(dispatch.partMarks.map((call) => call.request)).toMatchObject([
+    expect(
+      dispatch.partMarks.filter((call) => call.request.outcome !== "delivered").map((call) => call.request),
+    ).toMatchObject([
       { outcome: "sent", idempotencyKey: key, providerMessageId: accepted.providerMessageId },
     ]);
 
@@ -1057,14 +1067,167 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(dispatch.claims.slice(claimsBefore).map((call) => call.answer)).toEqual([
       { result: "claimed", claimed: [], passedHeld: [] },
     ]);
-    // Still one send: the double's one record, the line handed one request, the part marked once.
+    // Still one send: the double's one record, the line handed one request, the part marked sent once (row 13's
+    // delivered mark aside).
     expect(linq.double.sentRequests()).toHaveLength(1);
     expect(linq.requests).toHaveLength(1);
-    expect(dispatch.partMarks).toHaveLength(1);
+    expect(dispatch.partMarks.filter((call) => call.request.outcome !== "delivered")).toHaveLength(1);
     // No span holds a word of the part.
     expect(
       stringsOf(facts.collected.spans).filter((value) => lines.some((line) => value.includes(line))),
     ).toEqual([]);
+  },
+
+  // Row 13, "Delivery receipt; the clock arms" (K-06 delivered, K-05 arm; T-564; ADR-013 section 6: K-09 README v1.5
+  // default 134; arch 02 line 127; STATE note 37): the Linq double's delivery receipt for the JOIN turn's one part reached
+  // the gateway before the trace was collected (root-run.ts), echoing the part's key. The receipt door marked the part
+  // delivered through K-05 markPart (found by the message id the double gave: the row's first delivery, naming S1-02's
+  // question) and handed it to T-255's clock arming over the root's arming port, which armed S1-02's clock row, the one
+  // the commit made, through K-05 armClock named by its question: at step 9's due time with no Clock line and no visit,
+  // 8pm the day after delivery in Lee's Barbershop's zone. Its question opened, no never-delivered row was cancelled (the
+  // commit's own, none for turn 1: note 37), and Sam's actor was named for its alarm. One delivered span and one
+  // clockArmed span, on the JOIN's trace (one trace id from the webhook to the receipt) and bundle v0, after the part's
+  // providerAccepted span, labels and counts only. Then a second delivered event for the same part arms nothing more:
+  // K-05 answers it repeated. Linq's repeats and the arming failing closed with no database are proven in
+  // runtime/src/wiring/hop13.worker.test.ts.
+  13: async (facts) => {
+    const row = `outbox-s1-02-${facts.turnId}-1`;
+    const key = `${row}/1/1`;
+    const question = `oq-s1-02-${facts.turnId}-1`;
+    const clock = `clock-${question}`;
+    const { arming, dispatch, linq } = facts.run.fakes;
+    const seeded = seedBusinessHead as unknown as {
+      readonly rows: readonly {
+        readonly table: string;
+        readonly values: Readonly<Record<string, unknown>>;
+      }[];
+    };
+    const zone = seeded.rows.find(
+      (each) => each.table === "businesses" && each.values.id === TEST_OWNER_1.businessId,
+    )?.values.time_zone;
+    if (typeof zone !== "string") throw new Error("the seed gives Lee's Barbershop no zone");
+    const accepted = linq.accepted.get(key);
+    if (accepted?.providerMessageId == null) throw new Error("the Linq double accepted no part");
+
+    // The double's own receipt for the part, once: its message id, Sam's chat, the part's key.
+    const receipts = linq.double.events().filter((event) => event.kind === "delivered");
+    expect(receipts).toMatchObject([
+      { kind: "delivered", partKey: key, messageId: accepted.providerMessageId, chatId: JOIN.chatId },
+    ]);
+    // K-05 markPart: the part delivered, found by its message id, the row's first delivery, naming S1-02's question.
+    const marks = dispatch.partMarks.filter((call) => call.request.outcome === "delivered");
+    expect(marks.map((call) => [call.request, call.answer])).toMatchObject([
+      [
+        { outcome: "delivered", providerMessageId: accepted.providerMessageId, idempotencyKey: key },
+        {
+          result: "marked",
+          outboxRowId: row,
+          partNo: 1,
+          tryNo: 1,
+          repeated: false,
+          firstDelivery: true,
+          openQuestionId: question,
+          row: { state: "delivered" },
+        },
+      ],
+    ]);
+    const [mark] = marks;
+    if (mark?.request.outcome !== "delivered") throw new Error("no delivered mark");
+    const deliveredAt = mark.request.at;
+
+    // K-05 armClock, once, named by S1-02's question, at T-255's due time from the delivered time: step 9's default with
+    // no Clock line and no visit (K-09 README v1.5 default 134), 8pm the day after delivery in the business's zone.
+    expect(arming.factReads).toEqual([question]);
+    const due = dueOf({ deliveredAt, clockLine: null, visitStartsAt: null, zone });
+    expect(due.branch).toBe("noVisit");
+    const wall = new Intl.DateTimeFormat("en-CA", {
+      timeZone: zone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    });
+    const local = (utc: string): string => wall.format(new Date(utc));
+    const dayAfter = new Date(Date.parse(`${local(deliveredAt).slice(0, 10)}T00:00:00Z`) + 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    expect(local(due.dueAt)).toBe(`${dayAfter}, 20:00`);
+    expect(arming.arms.map((call) => [call.request, call.answer])).toEqual([
+      [
+        { openQuestionId: question, deliveredAt, dueAt: due.dueAt, dueZone: zone },
+        {
+          result: "armed",
+          repeated: false,
+          clock: {
+            clockRowId: clock,
+            version: 2,
+            armedAt: deliveredAt,
+            dueAt: due.dueAt,
+            dueZone: zone,
+            handleId: TEST_OWNER_1.handleId,
+          },
+        },
+      ],
+    ]);
+    // The commit's clock row, armed beside what the commit wrote; its question open; nothing cancelled; Sam's actor named.
+    expect(arming.clockRow(clock)).toMatchObject({ state: "armed", version: 2, dueAt: due.dueAt });
+    expect(arming.questionStatus(question)).toBe("open");
+    expect(arming.cancels).toEqual([]);
+    expect(arming.actorReads).toEqual([TEST_OWNER_1.handleId]);
+
+    // One delivered and one clockArmed span, on the JOIN's trace and bundle v0, after the part's providerAccepted span.
+    const accept = onlySpan(facts, "providerAccepted");
+    const delivered = onlySpan(facts, "delivered");
+    const armed = onlySpan(facts, "clockArmed");
+    expect(delivered).toMatchObject({
+      trace_id: facts.sent.traceId,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      outcome: "ok",
+      provider: "linq",
+      error_code: null,
+      got: { firstDelivery: true, repeated: false },
+      rows: [{ table: "outbox_rows", id: row }],
+    });
+    expect(armed).toMatchObject({
+      trace_id: facts.sent.traceId,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      outcome: "ok",
+      error_code: null,
+      got: { firstDelivery: true, partNo: 1, tryNo: 1 },
+      decided: {
+        result: "armed",
+        branch: "noVisit",
+        zoneFrom: "business",
+        clockLineUnread: false,
+        neverDelivered: "none",
+        synced: true,
+      },
+      rows: [{ table: "clock_rows", id: clock }],
+    });
+    expect(Date.parse(delivered.at)).toBeGreaterThanOrEqual(Date.parse(accept.at));
+    expect(Date.parse(armed.at)).toBeGreaterThanOrEqual(Date.parse(delivered.at));
+    // No span holds the due time, even inside a longer value, and neither span of this hop holds the zone.
+    expect(stringsOf(facts.collected.spans).filter((value) => value.includes(due.dueAt))).toEqual([]);
+    expect(stringsOf([delivered, armed]).filter((value) => value.includes(zone))).toEqual([]);
+
+    // A second delivered event for the same part (Linq sends the webhook again): K-05 answers it repeated, and nothing
+    // more is armed.
+    const again = await facts.run.target.sendEvent(linq.deliveredReceipt(key, "evt-linq-delivered-0001"), {
+      partKey: key,
+    });
+    expect(again.gatewayStatus).toBe(200);
+    expect(
+      dispatch.partMarks.filter((call) => call.request.outcome === "delivered").map((call) => call.answer),
+    ).toMatchObject([
+      { result: "marked", outboxRowId: row, repeated: false, firstDelivery: true },
+      { result: "marked", outboxRowId: row, repeated: true, firstDelivery: false },
+    ]);
+    expect(arming.arms).toHaveLength(1);
+    expect(arming.clockRow(clock)).toMatchObject({ state: "armed", version: 2, dueAt: due.dueAt });
   },
 };
 

@@ -75,6 +75,7 @@ export function bindPorts(
       sendState: take("sendState"),
       dataAccess: take("dataAccess"),
       linqSend: take("linqSend"),
+      arming: take("arming"),
       linqDirect: take("linqDirect"),
     },
     bindings: PORTS.map((port) => ({ port, implementation: pickOf(picks, port, environment) })),

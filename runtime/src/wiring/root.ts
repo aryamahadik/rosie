@@ -20,8 +20,9 @@
 //     Object reading each at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
-//   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255), on the trace
-//     its row was sent on when this isolate knows it (./row-traces.ts), else on the receipt's own;
+//   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255) through the
+//     arming port (T-564), on the trace its row was sent on when this isolate knows it (./row-traces.ts), else on the
+//     receipt's own;
 //   - the gateway's page entry (T-266): on staging, when the root is handed their inputs, the test-phone page's two calls
 //     (T-1186, ./test-phone), T-565's handlers over the session, roster and phone reads and staging's test-phone line,
 //     which posts through the Linq route above; every other page call stays unconfigured (503).
@@ -73,9 +74,14 @@
 // queue's consumer hands it to the dispatcher's send door (`install()` sets the queue's ports), which runs the
 // recipient's rows again with the same ports, each row on the trace this isolate sent it on, else on its own trace id: no
 // answer, the same key under a re-claim about 60 s later; 4001 or 4006, a new key only after a minute with no receipt; no
-// new job once 15 minutes of tries have passed (CQ-152). The checked safety line the actor sends straight through Linq
-// while PostgreSQL is down is a port of its own (linqDirect), which no hop joins. Never logged by the root: a word, a
-// number, a key, a chat id.
+// new job once 15 minutes of tries have passed (CQ-152). A delivery receipt reaches the receipt door, which marks its
+// part delivered through the outbox port and hands each part K-05 newly marked delivered to T-255's clock arming over
+// the arming port (T-564: K-05 v1 item 5's armClock and cancelClock, the question's facts and the actor name of a handle,
+// over RootOptions.armingCalls): at the row's first delivery its question's clock row arms at step 9's due time (arch 02
+// line 127), the handle's actor is told, and the clockArmed span goes on the trace the row was sent on. The question's
+// never-delivered row is its commit's own (STATE note 37): the arming only cancels one the commit made. The checked safety
+// line the actor sends straight through Linq while PostgreSQL is down is a port of its own (linqDirect), which no hop
+// joins. Never logged by the root: a word, a number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -113,6 +119,7 @@ import type { PortName, Ports } from "./ports";
 import { PinnedRuns } from "./pinned-runs";
 import {
   realPorts,
+  type ArmingCalls,
   type BundleReadCalls,
   type ComposeReads,
   type Composers,
@@ -284,6 +291,14 @@ export interface RootOptions {
    * bound (staging until T-566), so each wait reports noQueue and the row waits for the next run that claims it.
    */
   readonly retryQueue?: RetryQueue | null;
+  /**
+   * What the clock arming reads and writes with its database bound (T-564; ./real.ts ArmingCalls): db/repo/clocks.ts's
+   * armClock and cancelClock, each called as (sql, request) over a rosie_job client, the question's facts the due rule
+   * reads and the actor name of a K-04 handle. In a test, K-05 doubles over the rows the commit wrote and test owner 1's
+   * seeded rows; null or left out where no database is bound (the Worker until T-567), so every arming fails closed and
+   * nothing is armed.
+   */
+  readonly armingCalls?: ArmingCalls | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -379,6 +394,8 @@ export function composeRoot(options: RootOptions): Root {
       sendState: options.sendStateCall ?? null,
       // Each part the dispatcher sends, to the Linq line (T-563).
       linqSend: options.linqSendCall ?? null,
+      // The clock arming's calls and reads at a part's first delivery receipt (T-564).
+      arming: options.armingCalls ?? null,
     }),
     closed: closedPorts(),
   });
@@ -496,12 +513,13 @@ export function composeRoot(options: RootOptions): Root {
         {
           // The store the dispatcher's parts were marked sent in: a receipt finds its part there (T-562).
           store: ports.outbox,
+          // The arming port (T-564): K-05 armClock and cancelClock, the question's facts, the actor name of a handle.
           clockArming: clockArming({
-            data: ports.dataAccess.clocks,
-            facts: ports.stateReads.arming.facts,
+            data: ports.arming.data,
+            facts: ports.arming.facts,
             // No geo port is joined: a flow B visit's zone falls back to the business's (CQ-05, CQ-08).
             geo: null,
-            directory: ports.stateReads.arming.directory,
+            directory: ports.arming.directory,
             actors: options.actors,
             log,
             trace,
@@ -663,6 +681,11 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // The RETRY_QUEUE binding where the environment has one (T-279; none on staging until T-566, so each wait there
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
+    // No database is bound until T-567 (its rosie_job client gives db/repo/clocks.ts's armClock and cancelClock): every
+    // arming fails closed (./real.ts NoDatabaseError), so nothing is armed; and no receipt reaches it there yet, since
+    // the outbox port marks no part delivered with no database bound (the receipt is answered 503, and Linq sends it
+    // again).
+    armingCalls: null,
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as
