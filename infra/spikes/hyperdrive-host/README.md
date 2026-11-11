@@ -1,0 +1,90 @@
+# T-1124 spike: the staging PostgreSQL host through Hyperdrive
+
+A probe for the CTO and T-567 (J-06, ADR-007): does staging's PostgreSQL host, reached from a Worker through Hyperdrive with caching off, give the three extensions, refuse an overlapping insert, commit a one-row compare-and-set inside architecture 04's 300 ms, and hold a transaction across Hyperdrive's pool. `FINDINGS.md` holds the answers. Nothing here is product code: no file outside this folder imports it, and nothing here is deployed.
+
+## Files
+
+| File             | What it is                                                                                                                                                                              |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `probe.mjs`      | The probe: every query and the timing loops. It gets its database clients from its caller and never sees, prints or returns a connection string.                                        |
+| `worker.mjs`     | The Worker that runs the probe through the `HYPERDRIVE` binding. It answers only requests that carry the run's random token. Never deployed.                                            |
+| `local.mjs`      | The same probe from plain Node, against the local rosie-pg only (it refuses any host that is not this machine).                                                                         |
+| `run.sh`         | The run script: one step per call (below). The only file that calls wrangler, and only through `infra/scripts/cf.sh`.                                                                   |
+| `helpers.mjs`    | What `run.sh` needs from node: reading `hyperdrive list` (only the id and the caching cell leave it), the pooled-host check, the spike's wrangler config, the run's token, the verdict. |
+| `redact.mjs`     | Removes a secret from text on stdin; `run.sh` passes wrangler's output through it before showing any of it.                                                                             |
+| `probe.test.mjs` | Checks of the probe and of the helpers: `node --test infra/spikes/hyperdrive-host/probe.test.mjs` (needs `npm run db:up`). Not part of `npm test`.                                      |
+| `FINDINGS.md`    | The findings note.                                                                                                                                                                      |
+
+## What the probe runs
+
+Every table lives in the schema `spike_hyperdrive`. The probe drops that schema before it starts (a run that died earlier) and at the end, on failure too, then checks `pg_namespace` and reports `cleanup.schema_dropped`. It creates no extension and changes nothing outside that schema.
+
+| Step               | Query                                                                                                                                                                                                                                                                                           | Passes when                                                                                                                                                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `connect`          | `select 1` on each of the two clients (4 connections, and 1)                                                                                                                                                                                                                                    | both answer; the first query's time is reported                                                                                                                                          |
+| `server`           | `server_version`, `pg_is_in_recovery()`, `synchronous_commit`, `synchronous_standby_names`, isolation, `search_path`                                                                                                                                                                            | reported, not judged                                                                                                                                                                     |
+| `extensions`       | `select extname, extversion, extnamespace from pg_extension where extname in ('postgis', 'btree_gist', 'pgcrypto')`                                                                                                                                                                             | all three are there                                                                                                                                                                      |
+| `postgis`          | three `geography(Point, 4326)` rows under a gist index; `ST_DWithin(geog, point, 16093.44)`; `PostGIS_Version()`; `digest('spike_hyperdrive', 'sha256')`                                                                                                                                        | the two places within 10 miles come back in order, and pgcrypto's digest equals the runtime's own SHA-256                                                                                |
+| `exclude`          | `exclude using gist (worker_id with =, during with &&)`; insert 15:00 to 16:00, then 15:30 to 16:30 for the same worker, then a back-to-back hour, then the same time for another worker                                                                                                        | the overlapping insert is refused with SQLSTATE 23P01; the other two are accepted                                                                                                        |
+| `cas`              | `update state set version = version + 1 where id = 1 and version = $read returning version`, timed in three shapes: alone (1 round trip); inside `begin` / `insert into turn (turn_id primary key)` / `commit` (4 round trips); and the same transaction with both statements sent together     | every commit moves the row once; a commit with an older version changes nothing; the same turn id again is refused (23505) and leaves the version alone; each shape has 50 or more times |
+| `reads`            | `select version, last_turn from state where id = 1`                                                                                                                                                                                                                                             | 50 or more times, reported beside 150 ms                                                                                                                                                 |
+| `read_after_write` | `update ... returning version`, then the same `select version ... where id = 2`, 20 times                                                                                                                                                                                                       | no read is older than the write before it (a cached answer would be)                                                                                                                     |
+| `transaction`      | `begin`; `set_config(marker, 'held', true)`; an insert; `select ... for update`; then 5 rounds of `pg_backend_pid()`, `txid_current()`, `current_setting(marker)` while 3 other queries run through the pool; from a second client, a count and `select ... for update nowait`; then a rollback | one backend and one transaction id inside; the SET LOCAL value held; the row unseen outside; the lock held (55P03); after the rollback the row is gone, the lock free, no value leaked   |
+| `cleanup`          | `drop schema if exists spike_hyperdrive cascade`, then a count in `pg_namespace`                                                                                                                                                                                                                | the schema is gone                                                                                                                                                                       |
+
+Timings are `performance.now()` around each awaited commit: p50 and p95 by nearest rank, after 5 untimed warm-up commits per shape, 60 timed commits per shape by default (`PROBE_COMMITS`, 50 to 200). Inside a Worker the clock moves only when I/O completes and is whole milliseconds, so a Worker's times are whole numbers.
+
+## The steps, in order
+
+Run each from the code folder (the checkout that holds `STAGING_DATABASE_URL` by name), one command per call. The header of `run.sh` lists the same steps.
+
+1. `bash infra/spikes/hyperdrive-host/run.sh status`
+   - Runs `cf.sh hyperdrive list` (a read). Prints one line: either `status: no Hyperdrive configuration is named rosie-staging-hyperdrive on the Rosfield account` or `status: rosie-staging-hyperdrive exists: id <32 hex>, caching disabled`. Changes nothing.
+2. `npm run db:up`, then `bash infra/spikes/hyperdrive-host/run.sh local` (a rehearsal; skip it if step 4 is all that is wanted)
+   - Starts `cf.sh dev --env staging` from a temporary config whose `HYPERDRIVE` binding points at the local rosie-pg (wrangler's local stand-in for Hyperdrive), runs the probe through it, prints the probe's JSON and `local: done, the probe passed and its schema is dropped`. Touches nothing at Cloudflare and nothing on staging.
+3. `bash infra/spikes/hyperdrive-host/run.sh create`
+   - Lists first. If `rosie-staging-hyperdrive` is there, prints `create: ... already exists: not created again (id ..., caching ...)` and stops. Otherwise runs `cf.sh hyperdrive create rosie-staging-hyperdrive --connection-string=<value> --caching-disabled --update-config=false`, lists again, and prints `create: rosie-staging-hyperdrive created: id <32 hex>, caching disabled`.
+   - Changes: one new Hyperdrive configuration on the Rosfield account, the one staging keeps (T-567 binds its id). It cannot be removed through `cf.sh`. Cloudflare may connect to the staging database to check the origin when it creates the configuration (not checked here). No table, row or Worker changes.
+   - It refuses, and creates nothing, when `STAGING_DATABASE_URL` is unset, is not a `postgres://` URL, or names a pooled host (`-pooler`): Cloudflare's Neon page says to give Hyperdrive the direct connection string.
+4. `bash infra/spikes/hyperdrive-host/run.sh probe`
+   - Reads the configuration's id from the list, writes a temporary wrangler config that binds it, starts `cf.sh dev --env staging --remote` from it, waits for the Worker, calls `/probe` with the run's token, prints the probe's JSON, calls `/cleanup`, stops the session and removes the temporary folder. Ends with `probe: done, the probe passed and its schema is dropped`, or exits 1 with the result and the end of wrangler's log.
+   - Changes: on the staging database, the schema `spike_hyperdrive` is created and dropped (about 800 statements at 60 commits per shape). At Cloudflare, one preview session that ends with the script. No version, no deployment.
+5. Only if step 4 fails because a remote session cannot use the binding, and after the security reviewer's yes: `bash infra/spikes/hyperdrive-host/run.sh probe-upload`
+   - Runs `cf.sh versions upload --env staging --preview-alias spike-hyperdrive` from the same temporary config, prints the version id and the preview URL, then runs the probe and the cleanup through that URL.
+   - Changes: one more version in rosie-staging's version list, tagged `spike-t1124`, and the preview alias `spike-hyperdrive`. Neither can be removed through `cf.sh`. The version takes no traffic, answers only requests that carry the run's token, and refuses everything 15 minutes after the upload.
+   - Not tried: whether Cloudflare accepts a version of rosie-staging that does not export the HandleActor and TestPhoneLine classes. If it refuses the upload, nothing changed; stop there.
+6. `bash infra/spikes/hyperdrive-host/run.sh status` once more, for the card: the id and `caching disabled`.
+
+## Where the database URL travels
+
+Only step 3 uses it.
+
+1. `lib.sh`'s `load_dev_var STAGING_DATABASE_URL` reads it by name into `run.sh`'s environment.
+2. `run.sh` copies it to one shell variable and unsets the environment variable at once, so no later child process inherits it.
+3. `helpers.mjs host-kind`, a short node process, gets it in its environment (`PROBE_URL`) and prints one word, `pooled` or `direct`.
+4. `cf.sh` gets it as the one argument `--connection-string=<value>`. Its option reader cuts each option at the first `=` before it looks at the name, so only `--connection-string` passes through its `sed`; it prints an option only when it refuses that option's name, and this name is not on its list. It then `exec`s wrangler with the same arguments.
+5. Wrangler (4.158.0, read in `node_modules/wrangler/wrangler-dist/cli.js`) parses it with `new URL()`, ignores the query string, and sends host, port, scheme, database, user and password to Cloudflare's API over HTTPS. Its success output is the configuration's id; its own error messages for a bad string show an example, not the value.
+6. If the create fails, `redact.mjs` gets it in its environment (`PROBE_REDACT`) and removes the URL, password, user and host from wrangler's output before that output is shown.
+
+It is never printed, logged, echoed or written to a file by these scripts, and `run.sh` refuses to run under `set -x`. Two things to know:
+
+- While the create call runs (seconds), the value is in the argument list of two processes on the build Mac (`bash cf.sh`, then wrangler's `node`), which `ps` shows to that Mac's users. Wrangler takes the origin only as arguments (`--connection-string`, or `--origin-password`).
+- Wrangler writes a debug log under its own sign-in folder when a command fails. With `WRANGLER_LOG_SANITIZE=true` (its default, set explicitly for this call) it leaves out request bodies; `WRANGLER_SEND_METRICS=false` is set for this call too. That folder is closed to agents, so what else such a log holds was not checked.
+
+Steps 4 and 5 never have the URL: the Worker reads `env.HYPERDRIVE.connectionString`, which Hyperdrive supplies. The Worker returns no part of it, and every error message passes through a redactor made from it. `hyperdrive list` shows each origin's host, user and database (never a password); `run.sh` reads that table and prints only the id and the caching cell.
+
+## Why the deployed rosie-staging Worker is not touched
+
+- No step runs `deploy`, `versions deploy`, `rollback`, `triggers` or `secret`.
+- Step 4 is a `wrangler dev --remote` session. By wrangler 4.158.0's code, such a session posts the probe's code to the script's `edge-preview` endpoint and gets back a preview token; requests reach that code only through wrangler's proxy on `127.0.0.1` with that token. It calls no version or deployment endpoint, so the version that serves staging, its routes, cron, queue consumer and bindings stay as they are. The session ends when the script ends.
+- Steps 4 and 5 check it: each reads `deployments status --env staging` before and after the probe, prints both version ids, and fails if the version that serves staging is not the one from before.
+- The wrangler config for the session is written to a temporary folder and handed to `cf.sh` as `CF_BUILD_DIR`, as `deploy-preview.sh` does. It holds only the account id, `env.staging.name` (`rosie-staging`, which `cf.sh` requires), the probe's entry file and the `HYPERDRIVE` binding. The checkout's `wrangler.jsonc` is never read or changed, and the temporary folder holds no variables file, so the Worker gets no key.
+- Step 5, the fallback, is `versions upload`: an upload, not a deploy, exactly as `deploy-preview.sh` step 4.
+
+## What could stop a step
+
+- `cf.sh` lets every call here through as it is today (`hyperdrive list`, `hyperdrive create`, `dev` with `CF_BUILD_DIR`, `versions upload` with `CF_BUILD_DIR`). One thing to weigh: its header says `CF_BUILD_DIR` is "only for versions upload", while its code refuses `CF_BUILD_DIR` only for a command that changes a Worker other than `versions upload`, so `dev` passes. If that should be explicit, the smallest change is one line of that header (outside this card).
+- The guard reads the command line it is given, `bash infra/spikes/hyperdrive-host/run.sh <step>`, which holds nothing it refuses. `.claude/settings.json` has no allow entry for that command.
+- `npm run cf -- <command> --help` exits 1 with "Unknown argument: <path of wrangler.jsonc>" for every command (wrangler 4.158.0's help with `--config` in front). The help text still prints. Nothing here depends on it.
+- Not known until step 3 runs: whether the Rosfield sign-in may create a Hyperdrive configuration. `hyperdrive list` works with it; `whoami` lists no scope named for Hyperdrive.
+- Not known until step 4 runs: whether a remote session binds Hyperdrive on this account. Cloudflare's local-development page says that under `wrangler dev --remote` "Hyperdrive's connection pooling and query caching are active".
