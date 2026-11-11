@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 354, [`e1bfb1e`](https://github.com/aryamahadik/rosie/commit/e1bfb1e), 2026-11-11 08:31:48 UTC.
+- **Through:** commit 357, [`109e822`](https://github.com/aryamahadik/rosie/commit/109e822), 2026-11-11 08:53:56 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 357. docs: COMMIT\_HISTORY.md through commit 354 (e1bfb1e, \#361) (\#364)
+
+- **Commit:** [`109e822`](https://github.com/aryamahadik/rosie/commit/109e822), by Arya Mahadik, 2026-11-11 08:53:56 UTC
+- **Pull request:** [#364](https://github.com/aryamahadik/rosie/pull/364) from `task/commit-history-4`, merged 2026-11-11 08:53:56 UTC. It squashed 1 branch commit:
+  - `c637e3d` docs: COMMIT\_HISTORY.md through commit 354 (e1bfb1e, \#361)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 356. T-1210: checkDatabaseUrl refuses a second @, a comma, or %2C in the host within a URL's authority, so a URL Node reads as local never sends postgres.js to another host first; db-url tests pin both refusals, that neither names any part of the URL, and that each URL still taken (a password with %40 or %2C included) names one host to Node and postgres.js alike (\#363)
+
+- **Commit:** [`cac4bab`](https://github.com/aryamahadik/rosie/commit/cac4bab), by Arya Mahadik, 2026-11-11 08:53:51 UTC
+- **Pull request:** [#363](https://github.com/aryamahadik/rosie/pull/363) from `task/T-1210`, merged 2026-11-11 08:53:52 UTC. It squashed 1 branch commit:
+  - `3b0771d` T-1210: checkDatabaseUrl refuses a second @, a comma, or %2C in the h…
+- **Files changed:** 2 (+124 −22), by folder:
+  - `infra/ci/` db-url.test.mjs +92 −2
+  - `infra/scripts/` db-url.mjs +32 −20
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 355. T-1211: K-05 v1.7, openChatOnText: a number's text opens its chat at receipt (the gateway, after handleSealingKey and before the actor): it inserts a missing phone row with its chat open, opens a closed chat that is not stopped, never touches a stopped row, writes no other column, appends one phone.chat\_opened entry and is repeat-safe by the event id; 6 accepted and 3 refused fixtures; README item 46, defaults 70 to 77, gaps 48 to 51; T-1102's consent fields move to v1.8 (DL-438) (\#362)
+
+- **Commit:** [`9f49d15`](https://github.com/aryamahadik/rosie/commit/9f49d15), by Arya Mahadik, 2026-11-11 08:53:47 UTC
+- **Pull request:** [#362](https://github.com/aryamahadik/rosie/pull/362) from `task/T-1211`, merged 2026-11-11 08:53:47 UTC. It squashed 1 branch commit:
+  - `2c5fe47` T-1211: K-05 v1.7, openChatOnText: a number's text opens its chat at …
+- **Files changed:** 13 (+1797 −12), by folder:
+  - `contracts/data-access/` README.md +94 −11, data-access.v1.7.schema.json +1379 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +72 −0, open-chat-alex-already-open.json +28 −0, open-chat-apple-id-email.json +21 −0, open-chat-ben-stopped.json +28 −0, open-chat-dee-closed-chat.json +44 −0, open-chat-first-text-sam-repeat.json +28 −0, open-chat-first-text-sam.json +44 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-open-chat-no-event.json +6 −0, refuse-open-chat-stopped-number.json +44 −0, refuse-open-chat-with-number.json +8 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 354. docs: COMMIT\_HISTORY.md through commit 352 (4283580, \#359) (\#361)
 
