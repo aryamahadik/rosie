@@ -16,7 +16,9 @@
 //     and the one trace id, each row id built by K-09 v1.5 default 131 from the turn's own id, each row's values those
 //     commit-s1-01.json's given.stated.writes states but for the ids (the chat id is the stand-in both use). The request's
 //     turn carried the JOIN event's service and chat id (default 135): the thread row and the outbox row took them, the
-//     walk's one source. No span, log line or event-log entry's values holds the chat id.
+//     walk's one source. No span, event-log entry, safety record row or log line (console.log, info, warn or error)
+//     holds the chat id, the cast's number in any form or the JOIN's words, even inside a longer value (T-1200, from
+//     T-559's security review notes a and b).
 //   - Hard invariant (exactly once): the same gateAndCommit again under the same turn id answers the first commit,
 //     repeated, and writes nothing.
 //   - Concurrency: two actors (two roots over one K-05) forced to commit the same turn id in parallel give one commit.
@@ -46,6 +48,7 @@ import {
   skeletonFakes,
   TEST_OWNER_1,
   watchGate,
+  type EventLogRow,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -121,6 +124,15 @@ const [JOIN_TEXT_OF_RECORDING] = JOIN_CONTEXT.texts;
 /** The fictional numbers this file's texts come from, in each form a number could leak in. */
 const CAST_NUMBERS = ["0100"].flatMap((line) => [`+1555555${line}`, `1555555${line}`, `555555${line}`]);
 
+/** The JOIN's words, as recording 2 sends them. */
+const JOIN_WORDS = JOIN_CONTEXT.texts.map((text) => text.words);
+
+/**
+ * What no event-log entry, safety record row or log line holds, even inside a longer value (K-08 v1 README: never the
+ * raw number or words; T-1200): the chat id, whose one home is the thread row, the cast's numbers and the JOIN's words.
+ */
+const SECRETS = [SAM_CHAT, ...CAST_NUMBERS, ...JOIN_WORDS];
+
 const OWNER_ACTOR = actorNameOf(TEST_OWNER_1.handle);
 
 function namespace(): Namespace {
@@ -190,11 +202,24 @@ const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got
 /** A model call's own span beside the hops: a portCall to provider anthropic, one per attempt. */
 const modelCall = (span: Span): boolean => span.hop === "portCall" && span.provider === "anthropic";
 
+/**
+ * A part a console method was handed, as text: an Error, at any depth, by its name, its message and its cause, which
+ * JSON writes as {}.
+ */
+function textOf(part: unknown): string {
+  if (typeof part === "string") return part;
+  if (part instanceof Error) {
+    const cause = part.cause === undefined ? [] : [textOf(part.cause)];
+    return [`${part.name}: ${part.message}`, ...cause].join(" ");
+  }
+  return JSON.stringify(part, (_key, value: unknown) => (value instanceof Error ? textOf(value) : value));
+}
+
+/** One line as a console method was handed it, as text. */
+const lineOf = (parts: readonly unknown[]): string => parts.map(textOf).join(" ");
+
 /** Every line a console method was handed, as text. */
-const linesOf = (spy: MockInstance): string[] =>
-  spy.mock.calls.map((call: unknown[]) =>
-    call.map((part) => (typeof part === "string" ? part : JSON.stringify(part))).join(" "),
-  );
+const linesOf = (spy: MockInstance): string[] => spy.mock.calls.map((call: unknown[]) => lineOf(call));
 
 /** The root for "test", every joined port fed its double (the gate's reads among them), composed over `fakes`. */
 function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId> | null): Root {
@@ -303,13 +328,57 @@ function countsOf(fakes: SkeletonFakes): Json {
   };
 }
 
-/** Every string a value holds, at any depth. */
-function stringsOf(value: unknown, into: string[] = []): string[] {
+/**
+ * Every text a value holds, at any depth: each string, and each number as its digits (T-087's checkNoRawNumberOrText
+ * shapes: a number inside a label, and a number as a count).
+ */
+function textsOf(value: unknown, into: string[] = []): string[] {
   if (typeof value === "string") into.push(value);
-  else if (Array.isArray(value)) for (const item of value as unknown[]) stringsOf(item, into);
+  else if (typeof value === "number") into.push(String(value));
+  else if (Array.isArray(value)) for (const item of value as unknown[]) textsOf(item, into);
   else if (typeof value === "object" && value !== null)
-    for (const item of Object.values(value)) stringsOf(item, into);
+    for (const item of Object.values(value)) textsOf(item, into);
   return into;
+}
+
+/**
+ * An event-log entry with its sealed copy (K-05 v1 sealedValues, base64) read as the text of the bytes it carries. The
+ * letters of base64 spell a short word such as JOIN by chance (about once in 100,000 runs of this copy), and sealed bytes
+ * almost never do (about once in 30 million), while words in plain would show in them.
+ */
+function withSealedBytes(entry: EventLogRow): EventLogRow {
+  const sealed = entry.sealed_values;
+  if (typeof sealed !== "string") return entry;
+  const bytes = Uint8Array.from(atob(sealed), (char) => char.charCodeAt(0));
+  return { ...entry, sealed_values: new TextDecoder().decode(bytes) };
+}
+
+/**
+ * Each item that holds a secret, even inside a longer value, at any depth (textsOf), named by `name` and its place, and
+ * by the secret's place in `secrets`, never the secret (K-08 v1 README). Each line of a secret, of 4 characters or more
+ * as leaks() reads one, is matched as written: K-08's own labels, such as the outcome joinedTurn, hold the letters of
+ * JOIN in another case and are no words.
+ */
+function holdersOf(items: readonly unknown[], secrets: readonly string[], name: string): string[] {
+  const lines = secrets.map((secret) =>
+    secret
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length >= 4),
+  );
+  return items.flatMap((item, index) => {
+    const texts = textsOf(item);
+    return lines.flatMap((parts, at) =>
+      parts.some((part) => texts.some((text) => text.includes(part)))
+        ? [`${name} ${String(index + 1)} holds secret ${String(at + 1)}`]
+        : [],
+    );
+  });
+}
+
+/** What holdersOf answers when the item `name` holds each of `held`: a damaged copy's expected lines. */
+function holding(name: string, secrets: readonly string[], ...held: readonly string[]): string[] {
+  return held.map((secret) => `${name} holds secret ${String(secrets.indexOf(secret) + 1)}`);
 }
 
 afterEach(async () => {
@@ -320,13 +389,15 @@ afterEach(async () => {
 
 describe("hop 8 joined: the gate and one commit through @rosie/actions' turn face, under the turn id", () => {
   it(
-    "the JOIN: hops 1 to 8 once each; one gate span with commit-s1-01.json's limits and one commit span with its rows; K-04 holds exactly 1 turn row (K-05's seven fields alone), 1 thread row, 1 open question, 1 clock row (waiting, unarmed), 1 outbox row and the event-log entries, under one turn id and one trace id, each id built from the turn's own id and each value commit-s1-01.json's; the request's turn carried the JOIN event's service and chat id; no span, log line or event-log value holds the chat id",
+    "the JOIN: hops 1 to 8 once each; one gate span with commit-s1-01.json's limits and one commit span with its rows; K-04 holds exactly 1 turn row (K-05's seven fields alone), 1 thread row, 1 open question, 1 clock row (waiting, unarmed), 1 outbox row and the event-log entries, under one turn id and one trace id, each id built from the turn's own id and each value commit-s1-01.json's; the request's turn carried the JOIN event's service and chat id; no span, event-log entry, safety record row or log line (console.log, info, warn or error) holds the chat id, the number or the JOIN's words, even inside a longer value",
     { timeout: TEST_MS },
     async () => {
       const fetch = vi.fn();
       vi.stubGlobal("fetch", fetch);
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
       const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+      const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
       const run = rig(log);
       try {
         const { turnId, traceId } = await runJoin(run);
@@ -473,7 +544,6 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
           },
         ]);
         expect(run.fakes.gate.sealedFor).toEqual([TEST_OWNER_1.personId]);
-        expect(stringsOf(outcomes)).not.toContain("JOIN");
 
         // The event log: one entry per row, each under the turn id, its trace and its bundle.
         const logRows = run.fakes.turnRows.eventLog;
@@ -496,14 +566,55 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
           new Set([TEST_OWNER_1.businessId]),
         );
 
-        // The chat id's one home is the thread row: no span, log line or event-log entry's values hold it.
+        // The chat id's one home is the thread row, and the JOIN's words are only sealed: no span holds them or a
+        // number. No event-log entry, safety record row or line handed to console.log, info, warn or error holds
+        // them either, even inside a longer value at any depth (an entry's sealed copy is read as the bytes it
+        // seals; T-1200).
         expect(leaks(run.spans(), [SAM_CHAT, ...CAST_NUMBERS, "JOIN"])).toEqual([]);
-        expect([...linesOf(log), ...linesOf(warn)].filter((line) => line.includes(SAM_CHAT))).toEqual([]);
+        const entryHolders = (entries: readonly EventLogRow[]): string[] =>
+          holdersOf(entries.map(withSealedBytes), SECRETS, "event-log entry");
+        const rowHolders = (rows: readonly WrittenRow[]): string[] => holdersOf(rows, SECRETS, "safety row");
+        const lines = { log: linesOf(log), info: linesOf(info), warn: linesOf(warn), error: linesOf(error) };
+        const lineHolders = (by: Readonly<Record<string, readonly string[]>>): string[] =>
+          Object.entries(by).flatMap(([method, written]) =>
+            holdersOf(written, SECRETS, `console.${method} line`),
+          );
+        // Each check fires on a damaged copy of this run's own that holds a secret inside a longer value: the
+        // number in a label and as a count (T-087's shapes), the chat id in a label, the words in a sentence and in
+        // plain where the sealed copy is, and an Error handed to console.error (JSON writes one as {}).
+        const damaged = (index: number, change: Json): EventLogRow[] =>
+          logRows.map((row, at) => (at === index ? { ...row, ...change } : row));
         expect(
-          stringsOf(logRows.map((row) => [row.old_values, row.new_values])).filter((text) =>
-            text.includes(SAM_CHAT),
-          ),
-        ).toEqual([]);
+          entryHolders(damaged(1, { new_values: { kind: "chat", handle: "handle-15555550100" } })),
+        ).toEqual(holding("event-log entry 2", SECRETS, "15555550100", "5555550100"));
+        expect(entryHolders(damaged(0, { why: { step: "A3-22", tries: [{ count: 15555550100 }] } }))).toEqual(
+          holding("event-log entry 1", SECRETS, "15555550100", "5555550100"),
+        );
+        expect(
+          entryHolders(damaged(2, { why: { step: "S1-01", choice: `onboarding ${SAM_CHAT}` } })),
+        ).toEqual(holding("event-log entry 3", SECRETS, SAM_CHAT));
+        expect(
+          entryHolders(damaged(0, { new_values: { labels: ["No"], quote: "Sam texted JOIN" } })),
+        ).toEqual(holding("event-log entry 1", SECRETS, "JOIN"));
+        expect(entryHolders(damaged(0, { sealed_values: btoa('{"evidence":"JOIN"}') }))).toEqual(
+          holding("event-log entry 1", SECRETS, "JOIN"),
+        );
+        expect(
+          rowHolders(outcomes.map((row) => ({ ...row, values: { ...row.values, labels: ["No: JOIN"] } }))),
+        ).toEqual(holding("safety row 1", SECRETS, "JOIN"));
+        expect(
+          lineHolders({ ...lines, error: [lineOf([new Error("refused +15555550100")]), ...lines.error] }),
+        ).toEqual(holding("console.error line 1", SECRETS, "+15555550100", "15555550100", "5555550100"));
+        expect(
+          lineHolders({
+            ...lines,
+            info: [lineOf(["finalize_attempt", { quote: "Sam texted JOIN" }]), ...lines.info],
+          }),
+        ).toEqual(holding("console.info line 1", SECRETS, "JOIN"));
+        // Then none holds one in the run.
+        expect(entryHolders(logRows)).toEqual([]);
+        expect(rowHolders(outcomes)).toEqual([]);
+        expect(lineHolders(lines)).toEqual([]);
         expect(fetch).not.toHaveBeenCalled();
       } finally {
         run.restore();
