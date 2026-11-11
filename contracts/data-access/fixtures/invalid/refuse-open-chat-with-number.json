@@ -1,0 +1,8 @@
+{
+  "eventId": "evt-sam-s1-01",
+  "handleId": "handle-sam",
+  "phoneNumber": "+15555550100",
+  "service": "imessage",
+  "receivedAt": "2026-10-19T18:05:01Z",
+  "traceId": "trace-sam-0000"
+}

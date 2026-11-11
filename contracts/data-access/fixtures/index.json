@@ -1559,6 +1559,78 @@
       "expect": "refuse",
       "shows": "The practice's switch answered per flow, as its kind of work stores it (on in flow A, off in flow B), instead of the business's one value: the read answers true, false or null, never a value a consumer could read as off for the flow a row is read in (put right, it is read-outbox-row-practice-sensitive's outcome)",
       "source": "DL-391 (true when any kind of work lists it in either flow); K-23 v1 company_kinds pf_switches_a, pf_switches_b; SPEC-master 5b; RULES 4.6; K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "open-chat-first-text-sam.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's text from handle-sam, which holds no phone row (as test owner 1's seed holds it): the call inserts the row at receipt, before the text reaches the actor, its chat open since the text's receipt by iMessage, not stopped, version 1, with one phone.chat_opened entry (no old values, the event id as its job id, Linq's event as its why), so limit 8 finds the chat open when turn 1's reply is claimed",
+      "source": "T-562 handoff 1; DL-438; QUESTIONS.md CQ-194; RULES 4.1b; MC C9; K-04 v1 phones (0004: chat_open, chat_open_at, chat_way), seed-person-roles.json; db/seeds/skeleton.ts (T-1148); ADR-013 section 1 (evt-sam-s1-01, trace-sam-0000); K-06 v1 service, receivedAt, traceId; K-08 v1 phone.chat_opened, why.provider_event; K-05 v1.7 item 46"
+    },
+    {
+      "file": "open-chat-first-text-sam-repeat.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "The same text again, as a webhook Linq sends twice: the call finds the text's own entry under the row's lock and answers repeated, the row as it stands, nothing written (no second row or entry, version 1)",
+      "source": "arch 02 line 109 (a write that fails answers 503; Linq retries for 30 minutes); CQ-194 (repeat-safe by the event id); K-05 v1.7 item 46, default 76"
+    },
+    {
+      "file": "open-chat-alex-already-open.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A later text on Alex's open chat: nothing written, the first text's time and the chat's way kept, the version unchanged",
+      "source": "K-04 v1 phones.chat_open_at ('When the mobile first texted Rosie's number'), seed-phone-chat-open.json; arch 07 line 365 (a reply's channel is its text's service); K-09 v1.5 default 132; K-05 v1.7 item 46, default 72"
+    },
+    {
+      "file": "open-chat-dee-closed-chat.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "Dee W.'s first text, the ready text her booking's chat link types, on the phone row Sam's booking wrote with no chat open: the closed chat, not stopped, opens (version 2, her text's time and way), with one phone.chat_opened entry holding the closed chat's old values, before the turn that answers her supersedes her waiting notice",
+      "source": "RULES 4.1b ('When they send it, the chat opens and is saved'); MC C9; K-05 v1.1 commit-adds-dee-booking.json, mark-waiting-chat.json, commit-supersedes-waiting.json; K-07 v1 waiting_chat; K-05 v1.7 item 46, default 74"
+    },
+    {
+      "file": "open-chat-ben-stopped.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A text from Ben T.'s stopped number: a text is not START, so nothing is written in any column and the version stays 3; only START, through recordStopOrStart, clears the stop and opens the chat",
+      "source": "RULES 4.1b ('STOP clears it; turning texts back on (7.5) sets it again'), 7.5; K-04 v1 phones_stop_closes_chat, seed-phone-stopped.json; K-09 v1 recordStopOrStart; CQ-194; K-05 v1.7 item 46 ('The stop and the text')"
+    },
+    {
+      "file": "open-chat-apple-id-email.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A caller naming Sam's email handle, as for an Apple ID email that texts by iMessage: an email opens no mobile's chat and has no phone row, so the call answers notAPhone and writes nothing",
+      "source": "RULES 4.1b (a first text from an Apple ID email gets a code to the booking's mobile first); S13-45; K-04 v1 handles.kind; K-22 v1 seed-owner-id-upload.json (handle-sam-email); K-05 v1.7 item 46, default 77"
+    },
+    {
+      "file": "invalid/refuse-open-chat-stopped-number.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "refuse",
+      "shows": "A text that opens Ben T.'s stopped number's chat by clearing his stop: its entry names stopped, a column the call never writes, since only START clears a stop (put right, it is open-chat-ben-stopped's outcome: nothing written)",
+      "source": "RULES 4.1b, 7.5; K-04 v1 phones_stop_closes_chat; K-09 v1 recordStopOrStart; CQ-194 (it never touches a stopped row); T-1211's security review line; K-05 v1.7 item 46"
+    },
+    {
+      "file": "invalid/refuse-open-chat-no-event.json",
+      "version": "v1.7",
+      "def": "openChatOnText.request",
+      "expect": "refuse",
+      "shows": "A call naming no event: the text's event id is the key a repeat is known by and the entry's why, so a call without it is refused (put right, it is open-chat-first-text-sam's request)",
+      "source": "CQ-194 (repeat-safe by the event id); K-06 v1 eventId; K-08 v1 why.provider_event; K-05 v1.7 item 46"
+    },
+    {
+      "file": "invalid/refuse-open-chat-with-number.json",
+      "version": "v1.7",
+      "def": "openChatOnText.request",
+      "expect": "refuse",
+      "shows": "A call carrying the number beside the handle id: the request names the handle by its K-04 id and the call reads the number from K-04 handles, so no number travels in an exchange (put right, it is open-chat-first-text-sam's request)",
+      "source": "rule 7; arch 10 line 516; K-08 v1 default 3 (a phone row is named by its handle id, never its number); K-05 v1.2 item 28 (sendState reads everything else from the row); K-05 v1.7 item 46"
     }
   ]
 }

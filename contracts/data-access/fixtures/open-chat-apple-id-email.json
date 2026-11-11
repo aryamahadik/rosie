@@ -1,0 +1,21 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-owner-id-upload.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:01Z",
+    "note": "A caller names an email handle: K-22's seed-owner-id-upload.json gives Sam handle-sam-email beside handle-sam, as when an Apple ID email texts by iMessage. An email opens no mobile's chat (RULES 4.1b: 'A first text from an Apple ID email or another phone gets a code to the booking's mobile first'; S13-45), and K-04 holds no phone row for it, so the call answers notAPhone and writes nothing. The gateway makes the call for phone handles only (item 46), so this answer is a caller's fault, and the text still goes on to its safety read and its turn (README default 77). evt-sam-email-0001 and trace-sam-0041 are example ids."
+  },
+  "request": {
+    "eventId": "evt-sam-email-0001",
+    "handleId": "handle-sam-email",
+    "service": "imessage",
+    "receivedAt": "2026-10-27T09:00:01Z",
+    "traceId": "trace-sam-0041"
+  },
+  "outcome": {
+    "error": "notAPhone",
+    "handleId": "handle-sam-email"
+  }
+}

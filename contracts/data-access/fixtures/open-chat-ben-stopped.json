@@ -1,0 +1,28 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-phone-stopped.json"],
+    "after": [],
+    "now": "2026-11-10T16:30:01Z",
+    "note": "Ben T. texts again after his STOP (K-04's seed-phone-stopped.json: stopped since 2026-10-20T13:00:00Z, chat closed, version 3). A text is not START: the row is stopped, so nothing is written, in any column, and the version stays 3. Only START, through K-09 recordStopOrStart from his own START text, clears the stop and opens the chat (RULES 4.1b, 7.5). evt-ben-0030 and trace-ben-0030 are example ids."
+  },
+  "request": {
+    "eventId": "evt-ben-0030",
+    "handleId": "handle-ben",
+    "service": "imessage",
+    "receivedAt": "2026-11-10T16:30:01Z",
+    "traceId": "trace-ben-0030"
+  },
+  "outcome": {
+    "result": "stopped",
+    "handleId": "handle-ben",
+    "phone": {
+      "chatOpen": false,
+      "chatOpenAt": "2026-10-05T17:00:00Z",
+      "chatWay": "imessage",
+      "stopped": true,
+      "version": 3
+    },
+    "event": null
+  }
+}
