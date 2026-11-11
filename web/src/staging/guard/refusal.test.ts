@@ -131,11 +131,14 @@ function webOn(
   };
 }
 
-/** The tester presses Fire now: a POST to the tool's route, under the tests' trace id. */
-const press = (basePath: string): Request =>
+/** What a POST to a route that is meant to answer carries: this site's own Origin (shell/post-guard.ts; T-520). */
+const SAME_ORIGIN = { origin: `https://${TEST_LINK_HOST}` };
+
+/** The tester presses Fire now: a POST to the tool's route, under the tests' trace id, with the headers given. */
+const press = (basePath: string, headers: Record<string, string> = {}): Request =>
   new Request(`https://${TEST_LINK_HOST}${basePath}${FIRE_NOW_PATH}`, {
     method: "POST",
-    headers: { "x-trace-id": TRACE_ID },
+    headers: { "x-trace-id": TRACE_ID, ...headers },
   });
 
 describe("a server refusal in refuse-fire-now-in-production.json's shape is shown as refused", () => {
@@ -168,7 +171,7 @@ describe("a server refusal in refuse-fire-now-in-production.json's shape is show
     const { request } = exchangeOf(REFUSED_BY_SCHEMA);
     const { outcomes, module } = fireNowTool(request, true);
     const { shell, transport, basePath, lines } = webOn("staging", "production", module);
-    const response = await shell.fetch(press(basePath));
+    const response = await shell.fetch(press(basePath, SAME_ORIGIN));
     // The call went to the mock as the fixture holds it, and the server refused it.
     expect(transport.sent).toEqual([{ call: "fireNow", request, traceId: TRACE_ID }]);
     expect(outcomes).toEqual([{ error: "stagingOnly" }]);
@@ -205,7 +208,7 @@ describe("a server refusal in refuse-fire-now-in-production.json's shape is show
     const fired = exchangeOf(FIRED_ON_STAGING);
     const { outcomes, module } = fireNowTool(fired.request, true);
     const { shell, basePath } = webOn("staging", "staging", module);
-    const response = await shell.fetch(press(basePath));
+    const response = await shell.fetch(press(basePath, SAME_ORIGIN));
     expect(outcomes).toEqual([fired.outcome]);
     expect(response.status).toBe(200);
     const html = await response.text();

@@ -100,6 +100,9 @@ function ask(address: string, method: Method, headers: Record<string, string> = 
   });
 }
 
+/** What a POST to a route that is meant to answer carries: this site's own Origin (shell/post-guard.ts; T-520). */
+const SAME_ORIGIN = { origin: `https://${TEST_LINK_HOST}` };
+
 /** The shell's 404 page for the tests' trace id. */
 const notFoundPage = (basePath: string): string =>
   renderErrorPage({ status: 404, basePath, traceId: TRACE_ID });
@@ -212,7 +215,9 @@ describe("with ENVIRONMENT=staging the routes answer", () => {
         for (const method of METHODS.filter((asked) => takes(route, asked))) {
           const what = `${method} ${addressOf("/test", route)}`;
           spy.mockClear();
-          const response = await shell.fetch(ask(addressOf("/test", route), method));
+          const response = await shell.fetch(
+            ask(addressOf("/test", route), method, method === "POST" ? SAME_ORIGIN : {}),
+          );
           sent += 1;
           expect(response.status, what).toBe(200);
           expect(response.headers.get("x-trace-id"), what).toBe(TRACE_ID);
@@ -259,7 +264,7 @@ describe("with ENVIRONMENT=staging the routes answer", () => {
       },
     ]);
     const { shell } = testShell({ modules: [{ folder: "staging/example", stagingOnly: true, routes }] });
-    const answered = await shell.fetch(ask("/test/staging/own", "POST"));
+    const answered = await shell.fetch(ask("/test/staging/own", "POST", SAME_ORIGIN));
     expect(answered.status).toBe(303);
     expect(answered.headers.get("location")).toBe("/test/staging/next");
     expect(await answered.text()).toBe("made by the tool");

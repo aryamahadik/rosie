@@ -1,6 +1,8 @@
 // The two guards every POST route gets before its handler runs (T-520; DL-487; K-21 v1 README, "The cookies",
 // default 21: "the web app's server checks every call that writes for its own origin"). The shell (shell.ts) runs them
-// for every POST a route takes, so each form task inherits them and no handler can leave them out.
+// for every POST a route takes, so each form task inherits them and no handler can leave them out. They run only for a
+// route that is there: outside staging a staging tool's route is not, and the shell answers that first, as it answers
+// an unknown address, so neither guard ever says that such a route exists (T-520 round 2; DL-491).
 //
 // 1. The origin check. A form on another site can post to this one, and the browser would send this site's cookies
 //    with it; `form-action 'self'` in a page's content security policy only limits where this site's own forms post.

@@ -3,12 +3,16 @@
 // It serves web's static pages (web/src/routes.ts PAGE_ROUTES: the privacy notice, with the bytes and headers servePage
 // gives it) and the routes of every feature folder (ROUTE_MODULES; route.ts). For one request:
 //   1. Its trace id: the incoming x-trace-id when it is a valid id, else a new one (trace.ts).
-//   2. The route at its path under BASE_PATH, an exact path before a :name path. A folder marked staging only has no
-//      routes unless ENVIRONMENT is exactly "staging" (build prompt 9.4: never in production).
-//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. A POST that is not from this
-//      site's own origin: the 403 page; one whose body is over the cap: the 413 page (post-guard.ts; T-520), both
-//      before any handler runs. Else the route's handler answers; a throw, or an answer that is no Response, gives
-//      the 500 page. Each error page shows the trace id.
+//   2. The route at its path under BASE_PATH, an exact path before a :name path. Staging's test tools exist only when
+//      ENVIRONMENT is exactly "staging" (build prompt 9.4: never in production), read from the config alone and
+//      failing closed (staging/guard isStagingConfig). Anywhere else a folder marked staging only has no routes, and
+//      a route behind the staging-only guard (staging/guard isGuarded) is not there either, whatever its folder says.
+//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. A guarded route outside
+//      staging: the 404 page again, the answer of an unknown address, decided before the POST guards look at the
+//      request (T-520 round 2; DL-491), so no Origin, header or body changes it and none of the body is read. A POST
+//      that is not from this site's own origin: the 403 page; one whose body is over the cap: the 413 page
+//      (post-guard.ts; T-520), both before any handler runs. Else the route's handler answers; a throw, or an answer
+//      that is no Response, gives the 500 page. Each error page shows the trace id.
 //   4. HEAD gets GET's answer with no body.
 // Every answer carries the trace id in x-trace-id, and one JSON log line is written for it: the trace id, the route's
 // label and the status, nothing else. A label is fixed letters from the code (route.ts), and the trace id is always a
@@ -25,6 +29,7 @@
 import { envelopeOf } from "../client/calls";
 import { createPageApiClient, type PageApiTransport } from "../client/client";
 import { PAGE_ROUTES, ROUTE_MODULES, type PageRoute } from "../routes";
+import { isGuarded, isStagingConfig } from "../staging/guard";
 import type { WebConfig } from "./config";
 import { renderErrorPage, type ErrorStatus } from "./error-pages";
 import { renderPage } from "./frame";
@@ -112,11 +117,15 @@ export function createWebShell(deps: ShellDeps): WebShell {
       console.log(line);
     });
   const modules = deps.modules ?? ROUTE_MODULES;
-  // Staging's test tools are listed only on staging: anywhere else their addresses are like any unknown address.
+  // Staging's test tools exist only on staging, read once from the config alone and failing closed. Anywhere else
+  // their addresses are like any unknown address: a folder marked staging only is not listed, and a route behind the
+  // staging-only guard is not there (`absent`), whatever its folder's mark.
+  const staging = isStagingConfig(config);
   const table = routeTable([
     ...(deps.pages ?? PAGE_ROUTES).map(staticRoute),
-    ...modules.filter((module) => config.staging || !module.stagingOnly).flatMap((module) => module.routes),
+    ...modules.filter((module) => staging || !module.stagingOnly).flatMap((module) => module.routes),
   ]);
+  const absent = (route: ShellRoute): boolean => !staging && isGuarded(route);
 
   /** The request's path under BASE_PATH, or null when it is not under it. */
   const pathOf = (url: URL): string | null => {
@@ -218,6 +227,13 @@ export function createWebShell(deps: ShellDeps): WebShell {
     const path = pathOf(url);
     const match = path === null ? null : table.match(path);
     if (path === null || match === null) return null;
+    // Outside staging a guarded route is not there (build prompt 9.4; DL-491): its answer is an unknown address's,
+    // null here and the 404 page from fetch. It is decided here, before the POST guards see the request, so the
+    // answer is the same with any Origin, header or body, and none of the body is read. One case is left to
+    // answerRoute: a method the route does not take still gets the 405 page first, the limit of the guard alone that
+    // T-522's tests hold (staging/guard/guard.ts, "One limit"); the folder's mark closes it, since such a folder's
+    // routes are not listed at all.
+    if (absent(match.route) && takes(match.route, request.method)) return null;
     return answerRoute(request, url, path, match, traceIdOf(request, deps.newTraceId));
   };
 
