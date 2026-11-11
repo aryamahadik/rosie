@@ -161,6 +161,8 @@ function rig(log: MockInstance): Rig {
     clock: fakes.clock,
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over its K-05 double: each text opens its number's chat before the actor is reached.
+    chatOpenCall: fakes.dispatch.openChat,
     safetyReaders: fakes.models.readers,
     turnRows: fakes.turnRows.calls,
     bundleReads: fakes.bundleReads.calls,

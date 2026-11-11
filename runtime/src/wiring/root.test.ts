@@ -1,10 +1,10 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560, T-561), under
-// Node (Vitest project "unit"): the ports the root binds in each environment, each once and none left unbound; the check
-// that refuses a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed
-// implementation the Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on
-// staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's
-// targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561 finalize;
-// production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560, T-561, T-562,
+// T-1213), under Node (Vitest project "unit"): the ports the root binds in each environment, each once and none left
+// unbound; the check that refuses a port bound twice or left unbound; each bound port handed to the part that calls it;
+// and the closed implementation the Worker's environments still bind for every port no join has reached (T-552 joined the
+// Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and
+// the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561
+// finalize, T-562 the outbox and the send state, T-1213 the chat open; production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
@@ -66,6 +66,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
   test: [
     "linqVerify",
     "sealing",
+    "chatOpen",
     "safetyRead",
     "turnRow",
     "bundles",
@@ -82,6 +83,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
   staging: [
     "linqVerify",
     "sealing",
+    "chatOpen",
     "safetyRead",
     "turnRow",
     "bundles",
@@ -136,10 +138,11 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's eighteen ports in its turn order", () => {
+  it("names D-017's nineteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
+      "chatOpen",
       "safetyRead",
       "turnRow",
       "bundles",
@@ -163,7 +166,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox and send state to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, chat open, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox and send state to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -212,6 +215,8 @@ describe("the ports the root binds", () => {
     }
     expect(root.gateway.linq).toBe(root.ports.linqVerify);
     expect(root.gateway.keys).toBe(root.ports.sealing);
+    // The gateway opens a number's chat at receipt through the chat-open port (T-1213), never a fake.
+    expect(root.gateway.chats).toBe(root.ports.chatOpen);
     expect(root.safety.keys).toBe(root.ports.sealing);
     expect(root.turn.keys).toBe(root.ports.sealing);
     expect(root.safety.read).toBe(root.ports.safetyRead);
@@ -513,12 +518,35 @@ describe("the Worker's environments", () => {
     ).rejects.toThrow(new NoDatabaseError("claimOutbox"));
     expect(spans).toEqual([]);
   });
+
+  it("fails the chat-open port closed with no database bound (until T-567): the gateway's chat open, and the key call that gives its handle id, reach nothing", async () => {
+    const { gateway, ports } = workerRoot(workerEnv("staging"));
+    const request = {
+      eventId: "evt-sam-s1-01",
+      handleId: "handle-sam",
+      service: "imessage",
+      receivedAt: "2026-10-19T18:05:01Z",
+      traceId: "trace-sam-0000",
+    };
+
+    expect(gateway.chats).toBe(ports.chatOpen);
+    await expect(ports.chatOpen.openChatOnText(request)).rejects.toThrow(
+      new NoDatabaseError("openChatOnText"),
+    );
+    await expect(
+      ports.sealing.getOrCreateHandleKey?.({ kind: "phone", address: "+15555550100" }),
+    ).rejects.toThrow(new NoDatabaseError("handleSealingKey"));
+  });
 });
 
 describe("a closed port", () => {
   it("fails every call at once, naming its port and no value", async () => {
     const closed = closedPorts();
 
+    await expect(closed.sealing.getOrCreateHandleKey?.({ kind: "phone", address: "x" })).rejects.toThrow(
+      new NotJoinedError("sealing"),
+    );
+    await expect(closed.chatOpen.openChatOnText({} as never)).rejects.toThrow(new NotJoinedError("chatOpen"));
     await expect(closed.safetyRead.read({} as never)).rejects.toThrow(new NotJoinedError("safetyRead"));
     await expect(closed.turnRow.commitTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));
     await expect(closed.turnRow.parkTurn({} as never)).rejects.toThrow(new NotJoinedError("turnRow"));

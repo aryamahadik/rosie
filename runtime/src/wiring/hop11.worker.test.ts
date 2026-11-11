@@ -4,10 +4,11 @@
 // test environment as hop 10's tests compose it, now with the two ports this hop joins: the outbox, the dispatcher's
 // claim, renewal and marks over K-05 v1.2's claimOutboxV12, renewClaim, markPartV12 and markRowV12, and the send state,
 // limit 8's read at send over K-05 v1.2 sendState, both fed one K-05 double over the rows the commit wrote, the plans and
-// final parts finalize wrote into them and test owner 1's seeded rows (./test-support.ts fakeDispatchData). Test owner
-// 1's seed holds no phone row (T-1148), so these tests give Sam the phone row K-05's send-state-owner.json reads for him
-// (chat open on iMessage, not stopped), as a number has once it has texted Rosie; the skeleton's own run, with none,
-// waits for the chat (tests/e2e/skeleton CLAIMS row 11).
+// final parts finalize wrote into them and test owner 1's seeded rows (./test-support.ts fakeDispatchData). These tests
+// give Sam the phone row K-05's send-state-owner.json reads for him (chat open on iMessage, not stopped), or a stopped
+// one, before the JOIN; the JOIN's own chat open at receipt (T-1213, the same double's openChatOnText) then finds it open,
+// or stopped, and leaves it as it is. The skeleton's own run, from no phone row, has the JOIN insert it at receipt
+// (tests/e2e/skeleton CLAIMS rows 1 and 11).
 //
 //   - The JOIN at 11pm in Lee's Barbershop's zone, past its text hours (08:00 to 20:00): the turn's dispatcher claims the
 //     row once, in commit order (claim 1, from checked, by the linq port), with the final parts finalize wrote; limit 8
@@ -143,6 +144,8 @@ function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>): 
     clock: fakes.clock,
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over the same K-05 double: the JOIN finds the phone row each test sets, and leaves it.
+    chatOpenCall: fakes.dispatch.openChat,
     safetyReaders: fakes.models.readers,
     turnRows: fakes.turnRows.calls,
     bundleReads: fakes.bundleReads.calls,

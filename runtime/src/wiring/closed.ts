@@ -26,7 +26,8 @@ const failNow = (port: PortName): never => {
 export function closedPorts(): Ports {
   return {
     linqVerify: { verifyWebhook: () => fail("linqVerify") },
-    sealing: { getOrCreateKey: () => fail("sealing") },
+    sealing: { getOrCreateKey: () => fail("sealing"), getOrCreateHandleKey: () => fail("sealing") },
+    chatOpen: { openChatOnText: () => fail("chatOpen") },
     safetyRead: { read: () => fail("safetyRead") },
     turnRow: { commitTurn: () => fail("turnRow"), parkTurn: () => fail("turnRow") },
     bundles: {

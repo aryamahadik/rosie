@@ -2,13 +2,17 @@
 //   1. check the event's shape and pick its door (K-06 README "Routing");
 //   2. scrub the words (T-242, runtime/src/scrub: K-06 v1.1's card number and Social Security number rule), timed and
 //      counted for K-08's scrub span (T-1096; the caller writes it, see linq-webhook.ts);
-//   3. for the handle's actor only: seal the scrubbed words under the handle's key.
+//   3. for the handle's actor only: seal the scrubbed words under the handle's key. A text that opens its number's chat
+//      (./chat-open.ts: a text or photo a phone handle sends through Linq) asks the key call for the handle's K-04 id too,
+//      where the key store gives one (K-05 v1.2 handleSealingKey's handleId), so the caller can open the chat with it
+//      before the actor is reached (T-1213; K-05 v1.7 item 46).
 // Nothing is written here, and nothing is written before the signature is verified (the caller verifies first). The
 // actor receives a `SealedHandoff` and so never an unscrubbed or an unsealed body; a receipt, which has no words, goes
 // scrubbed to the dispatcher's door.
 
 import { scrubInbound } from "../scrub/scrub";
-import { actorNameOf, sealWords, type SealingKeyStore } from "./seal";
+import { opensChat } from "./chat-open";
+import { actorNameOf, sealWords, type SealingKey, type SealingKeyStore } from "./seal";
 import type { ActorHandoff, InboundEvent, SealedEvent, SealedHandoff } from "./types";
 import type { BundleId } from "../trace";
 
@@ -52,7 +56,16 @@ export interface ScrubDone {
 }
 
 export type Prepared =
-  | { door: "actor"; handoff: SealedHandoff; scrub: ScrubDone }
+  | {
+      door: "actor";
+      handoff: SealedHandoff;
+      scrub: ScrubDone;
+      /**
+       * The handle's K-04 id, as the key call answered it for a text that opens its number's chat (./chat-open.ts); null
+       * for every other event, and where the key store gives no id.
+       */
+      handleId: string | null;
+    }
   | { door: "receipts"; handoff: ActorHandoff; scrub: ScrubDone };
 
 export interface PrepareInput {
@@ -124,9 +137,28 @@ function withoutWords(event: InboundEvent, sealed: SealedEvent["sealed"]): Seale
 }
 
 /**
- * Builds the hand-off for a verified event, with what its scrub did (`scrub`, for K-08's scrub span). Throws
- * `HandoffError` for an event it cannot route or read, and whatever the key store or WebCrypto throws for a seal that
- * fails; the caller answers 503 for each, with nothing written.
+ * The handle's key, and its K-04 id when the event opens its number's chat and the store gives one (one key call either
+ * way); no key call for an event with no words that opens no chat.
+ */
+async function keyOf(
+  keys: SealingKeyStore,
+  handle: { kind: string; address: string },
+  opens: boolean,
+  hasWords: boolean,
+): Promise<{ key: SealingKey | null; handleId: string | null }> {
+  if (opens && keys.getOrCreateHandleKey !== undefined) {
+    const found = await keys.getOrCreateHandleKey(handle);
+    return { key: found.key, handleId: found.handleId };
+  }
+  if (!hasWords) return { key: null, handleId: null };
+  return { key: await keys.getOrCreateKey(handle), handleId: null };
+}
+
+/**
+ * Builds the hand-off for a verified event, with what its scrub did (`scrub`, for K-08's scrub span) and, for a text that
+ * opens its number's chat, the handle's K-04 id the key call answered. Throws `HandoffError` for an event it cannot route
+ * or read, and whatever the key store or WebCrypto throws for a seal that fails; the caller answers 503 for each, with
+ * nothing written.
  */
 export async function prepareHandoff(input: PrepareInput, keys: SealingKeyStore): Promise<Prepared> {
   const { event, partKey, traceId, bundleId } = input;
@@ -153,14 +185,21 @@ export async function prepareHandoff(input: PrepareInput, keys: SealingKeyStore)
 
   const actorName = actorNameOf({ kind: handle.kind, address: handle.address });
   const words = wordsOf(scrubbed);
+  const hasWords = words.body !== null || words.subject !== null;
+  const { key, handleId } = await keyOf(
+    keys,
+    { kind: handle.kind, address: handle.address },
+    opensChat(event),
+    hasWords,
+  );
   let sealed: SealedEvent["sealed"] = null;
-  if (words.body !== null || words.subject !== null) {
-    const key = await keys.getOrCreateKey({ kind: handle.kind, address: handle.address });
+  if (hasWords && key !== null) {
     sealed = await sealWords(words, key, actorName, event.eventId);
   }
   return {
     door: "actor",
     handoff: { event: withoutWords(scrubbed, sealed), partKey, traceId, bundleId, actorName },
     scrub,
+    handleId,
   };
 }

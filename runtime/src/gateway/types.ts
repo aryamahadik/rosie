@@ -102,12 +102,52 @@ export interface ReceiptSink {
   accept(handoff: ActorHandoff): Promise<StoreAnswer>;
 }
 
+/**
+ * K-05 v1.7 openChatOnText's request as the gateway makes it at receipt (T-1213; K-05 README item 46): the text's event
+ * id, its handle by the K-04 id the key call answered (K-05 v1.2 handleSealingKey), and, from the K-06 event, the service
+ * Linq reports, the time the gateway received it and its trace. Never the number: K-05 reads it from the handle's row.
+ */
+export interface ChatOpenRequest {
+  readonly eventId: string;
+  readonly handleId: string;
+  readonly service: string;
+  readonly receivedAt: string;
+  readonly traceId: string;
+}
+
+/**
+ * K-05 v1.7 openChatOnText's answer as the gateway reads it: one of its five results (the chat inserted or opened now,
+ * open already, a stopped number left as it is, or this text's repeat), each of which lets the text go on to its actor;
+ * a refusal, notFound or notAPhone, the caller's fault, after which the text is stored all the same (default 77); or
+ * transient, nothing written. Never the phone row, its entry or the number.
+ */
+export type ChatOpenAnswer =
+  | { readonly result: "inserted" | "opened" | "alreadyOpen" | "stopped" | "repeated" }
+  | { readonly error: "notFound" | "notAPhone" | "transient" };
+
+/**
+ * The port the gateway opens a number's chat through at receipt (T-1213; K-05 v1.7 item 46; ./chat-open.ts): once for
+ * each text or photo a phone handle sends through Linq, after the key call and before the actor's door. A throw is no
+ * answer: the gateway answers 503 and stores nothing.
+ */
+export interface ChatOpenPort {
+  openChatOnText(request: ChatOpenRequest): Promise<ChatOpenAnswer>;
+}
+
 export interface GatewayDeps {
   linq: LinqPort;
   actor: ActorStub;
   receipts: ReceiptSink;
   /** The handle's sealing key (NQ-RT-1); a fake in tests until D-017. */
   keys: SealingKeyStore;
+  /**
+   * K-05 v1.7 openChatOnText at receipt (T-1213; ./chat-open.ts): a number's text opens its chat before its actor is
+   * reached. The composition root always binds it (runtime/src/wiring: real in test and staging, closed in production,
+   * with no database in the Worker until T-567, so there it fails closed and the gateway answers 503, as every seal does).
+   * Left out (a gateway built by hand, as the gateway's own doubles build it), no chat is opened: the text is stored as
+   * before T-1213, and rows to its number wait for the chat (limit 8 fails closed).
+   */
+  chats?: ChatOpenPort;
   /** The active bundle id read at receipt (K-08 v1 README default 1). */
   bundleId: () => BundleId | Promise<BundleId>;
   /** Epoch milliseconds; Date.now in the Worker. */

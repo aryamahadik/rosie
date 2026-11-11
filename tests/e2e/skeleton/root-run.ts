@@ -166,6 +166,7 @@ export function startRootRun(): RootRun {
       clock: fakes.clock,
       linq: { ...fakes.linqInputs, webhookSecret: () => secret },
       handleKey: fakes.handleKeys.call,
+      chatOpenCall: fakes.dispatch.openChat,
       safetyReaders: fakes.models.readers,
       turnRows: fakes.turnRows.calls,
       bundleReads: fakes.bundleReads.calls,

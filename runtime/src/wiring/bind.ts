@@ -58,6 +58,7 @@ export function bindPorts(
     ports: {
       linqVerify: take("linqVerify"),
       sealing: take("sealing"),
+      chatOpen: take("chatOpen"),
       safetyRead: take("safetyRead"),
       turnRow: take("turnRow"),
       bundles: take("bundles"),
