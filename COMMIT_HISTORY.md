@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 366, [`358f9a6`](https://github.com/aryamahadik/rosie/commit/358f9a6), 2026-11-11 11:16:41 UTC.
+- **Through:** commit 368, [`cecb92e`](https://github.com/aryamahadik/rosie/commit/cecb92e), 2026-11-11 12:16:51 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 368. docs: COMMIT\_HISTORY.md through commit 366 (358f9a6, \#373) (\#375)
+
+- **Commit:** [`cecb92e`](https://github.com/aryamahadik/rosie/commit/cecb92e), by Arya Mahadik, 2026-11-11 12:16:51 UTC
+- **Pull request:** [#375](https://github.com/aryamahadik/rosie/pull/375) from `task/commit-history-9`, merged 2026-11-11 12:16:52 UTC. It squashed 1 branch commit:
+  - `2cf133c` docs: COMMIT\_HISTORY.md through commit 366 (358f9a6, \#373)
+- **Files changed:** 1 (+55 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +55 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 367. T-1157: K-02 v1.2, a decide result can hold an unmapped turn's one-question end (\#374)
+
+- **Commit:** [`70d91ce`](https://github.com/aryamahadik/rosie/commit/70d91ce), by Arya Mahadik, 2026-11-11 12:16:48 UTC
+- **Pull request:** [#374](https://github.com/aryamahadik/rosie/pull/374) from `task/T-1157`, merged 2026-11-11 12:16:48 UTC. It squashed 3 branch commits:
+  - `35b7a47` T-1157: K-02 v1.2, frozen: a decide result holds an unmapped turn's e…
+  - `398f3f2` Merge branch 'main' into task/T-1157
+  - `a3ccbf9` T-1157: round 2 (DL-455): K-02 v1.2 beside v1 and v1.1 in the 3 tests…
+- **Files changed:** 9 (+1070 −18), by folder:
+  - `ai/src/fixtures-run/` fixtures-run.test.ts +124 −7
+  - `ai/src/recorded-double/` recorded-double.test.ts +3 −1
+  - `contracts/model/` README.md +57 −5, frozen.json +1 −1, model.v1.2.schema.json +272 −0
+  - `contracts/model/fixtures/` index.json +16 −0, pair-unmapped-all-refused.json +273 −0
+  - `contracts/model/fixtures/invalid/` refuse-go-with-refused-read.json +320 −0
+  - `contracts/scripts/` model-contract.test.mjs +4 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1157: K-02 v1.2, frozen: a decide result holds an unmapped turn's end (refused reads in place, end oneQuestion, no part goes), with its pair fixtures, README and change log
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1157: round 2 (DL-455): K-02 v1.2 beside v1 and v1.1 in the 3 tests that pin K-02's frozen list or index size (G1 model-contract.test.mjs: frozen list and a v1.3 guard add; G2 recorded-double.test.ts: frozen is MODEL_VERSIONS plus v1.2; G3 fixtures-run.test.ts: 39 entries, pair-unmapped-all-refused.json waiting for T-1158, refuse-go-with-refused-read.json refused by v1.2's schema); README round-2 notes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 366. docs: COMMIT\_HISTORY.md through commit 363 (8606bac, \#370) (\#373)
 
