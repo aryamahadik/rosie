@@ -1,15 +1,15 @@
 // T-553's join, hop 2 of D-017 (C-044, C-046; build prompt section 10, D-017; 02-contracts section 11, 'Sealed event'),
 // in the Workers runtime. The composition root is composed for the test environment as T-552's tests compose it, with the
-// HandleActor namespace (exports.HandleActor in the pool, standing in for env.HANDLE_ACTOR until T-566 binds it on
-// staging) and the skeleton flag on, and each webhook goes in through root.linqWebhook. K-06's text-imessage.json, signed
-// by the Linq double, is verified, scrubbed, sealed under the handle's key and handed to that handle's Durable Object: one
-// entry in its ordered inbox, the words only sealed (unreadable without the key), one receive span, the gateway's (T-1108);
+// HandleActor namespace (exports.HandleActor in the pool, the class env.HANDLE_ACTOR binds on staging since T-566) and the
+// skeleton flag on, and each webhook goes in through root.linqWebhook. K-06's text-imessage.json, signed by the Linq
+// double, is verified, scrubbed, sealed under the handle's key and handed to that handle's Durable Object: one entry in
+// its ordered inbox, the words only sealed (unreadable without the key), one receive span, the gateway's (T-1108);
 // duplicate-event.json adds no entry and is answered 200. The key is the one the root's real sealing port gets from K-05
 // v1.2 handleSealingKey, here the K-05 double answering as the handle-key-*.json fixtures (DL-313 ruling 4, DL-324): a
-// key object that cannot be exported. With no K-05 call handed in, as on staging until T-567 binds its database, the
-// verified text is answered 503 and nothing reaches the inbox. The actor's own ports are not installed: hop 2 ends at the
-// inbox (the safety read is T-554's). Then the Worker's wiring (DL-313 ruling 2): its actor ports are wired on its first
-// request where HANDLE_ACTOR is bound, and nothing is wired where it is not. Test values only (rule 9).
+// key object that cannot be exported. With no K-05 call handed in, as on staging until the part of T-1154 that binds it,
+// the verified text is answered 503 and nothing reaches the inbox. The actor's own ports are not installed: hop 2 ends
+// at the inbox (the safety read is T-554's). Then the Worker's wiring (DL-313 ruling 2): its actor ports are wired on its
+// first request where HANDLE_ACTOR is bound, and nothing is wired where it is not. Test values only (rule 9).
 import duplicateFixture from "@rosie/contracts/inbound-event/fixtures/duplicate-event.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import { createExecutionContext, reset, runInDurableObject } from "cloudflare:test";
@@ -193,12 +193,12 @@ describe("hop 2 joined: a verified text reaches the HandleActor through its name
     expect(inbox.map((entry) => [entry.event.eventId, entry.traceId])).toEqual([
       [TEXT.eventId, traceIdOf(first)],
     ]);
-    const repeat = spansOfTrace(run.spans(), traceIdOf(again)).filter((span) => !actorSpan(span));
+    const repeat = spansOfTrace(run.spans(), traceIdOf(again));
     expect(repeat.map((span) => [span.hop, span.outcome])).toEqual([["receive", "dropped"]]);
     expect(repeat[0]?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
   });
 
-  it("with no K-05 call handed in (staging's root until T-567 binds its database): the verified text is answered 503 and nothing reaches the inbox", async () => {
+  it("with no K-05 call handed in (staging's root until the part of T-1154 that binds it): the verified text is answered 503 and nothing reaches the inbox", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const fakes = skeletonFakes();
     const root = composeRoot({
@@ -222,7 +222,7 @@ describe("hop 2 joined: a verified text reaches the HandleActor through its name
 });
 
 describe("the Worker's wiring (DL-313 ruling 2): its actor ports are wired on its first request, only where HANDLE_ACTOR is bound", () => {
-  /** The Worker's env as the pool gives it (wrangler.jsonc's staging, no HANDLE_ACTOR), with or without the binding. */
+  /** A Worker's env of the pool's vars (wrangler.jsonc's staging), with or without the HandleActor binding staging has. */
   function workerEnv(bound: boolean): Cloudflare.Env {
     const vars = { ENVIRONMENT: env.ENVIRONMENT, BASE_PATH: env.BASE_PATH, DB_SCHEMA: env.DB_SCHEMA };
     if (!bound) return vars;
@@ -267,7 +267,7 @@ describe("the Worker's wiring (DL-313 ruling 2): its actor ports are wired on it
     await expect(root.gateway.actor.accept(noEventId)).rejects.toThrow("noEventId");
   });
 
-  it("with no HANDLE_ACTOR (the pool's env, and staging's until T-566): nothing is wired, and the gateway's door to the actor stays closed", async () => {
+  it("with no HANDLE_ACTOR (an env built without it; staging and the pool bind it since T-566): nothing is wired, and the gateway's door to the actor stays closed", async () => {
     vi.spyOn(console, "log").mockImplementation(() => undefined);
     const unbound = workerEnv(false);
     const root = workerRoot(unbound);
