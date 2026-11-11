@@ -7,7 +7,9 @@
 //     writes nothing and answers its first commit, `repeated`, with no rows (K-05 v1 commitResult). Its `source` is the
 //     reload of a handle's live timers from the same rows (running or missed, the pro's handle). With `timersByCore` set
 //     (T-1198), a core action writes the timer rows instead: its result names them in its own words and `written` leaves
-//     them out, as the commit answers since T-1194 (actions/src/commit default 9; K-09 v1.5 default 134).
+//     them out, as the commit answers since T-1194 (actions/src/commit default 9; K-09 v1.5 default 134). With
+//     `loseNextAnswer` set (T-1203), the next first commit writes its rows but its answer is lost on the way back (the
+//     call throws: the lease's `noAnswer`), so only the repeat of that turn id answers, with no rows.
 //   - `SAM_TIMER` is K-34's seed timer (seed-safety-timer.json): Sam alone on Alex's move survey, due 11:20am New York
 //     time, Morgan Lee the contact who said yes, the job's address sealed under Alex's key (stand-in bytes).
 // Test values only: the master's sample cast and the frozen fixtures' ids (rule 9).
@@ -52,6 +54,11 @@ export interface FakeToolApi {
    * (actions/src/commit default 9). The rows are written all the same.
    */
   timersByCore: string | null;
+  /**
+   * True: the next first commit goes through (its rows are written) but its answer is lost on the way back, as the call
+   * throws (the lease's `noAnswer`); the answer is not in `answers`. Set back to false once used.
+   */
+  loseNextAnswer: boolean;
   /** Every reload's handle id, in order. */
   readonly reloads: string[];
   /** While true the reload throws (no answer), as a core with PostgreSQL down does. */
@@ -70,6 +77,7 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
     answers: [],
     writes: [],
     timersByCore: null,
+    loseNextAnswer: false,
     reloads: [],
     reloadDown: false,
     commit(request) {
@@ -129,6 +137,11 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
         },
       };
       first.set(request.turn.id, structuredClone(answer));
+      if (fake.loseNextAnswer) {
+        // Committed, rows and all, but the answer never comes back.
+        fake.loseNextAnswer = false;
+        return Promise.reject(new Error("the answer was lost on the way back"));
+      }
       fake.answers.push(structuredClone(answer));
       return Promise.resolve(answer);
     },

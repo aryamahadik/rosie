@@ -414,8 +414,11 @@ const TIMER_EVENTS = ["evt-sam-0301", "evt-sam-0302", "evt-sam-0303", "evt-sam-0
 interface TimerRig {
   readonly api: FakeToolApi;
   readonly actor: CopiesRpc;
-  /** A text arrives, its batch closes and its turn commits once through the lease (the Tool API double answers). */
-  text(eventId: string): Promise<void>;
+  /**
+   * A text arrives, its batch closes and its turn commits through the lease (the Tool API double answers): once, or
+   * `commits` times (2: the first answer was lost, and the same request was sent again).
+   */
+  text(eventId: string, commits?: number): Promise<void>;
 }
 
 /** The commit a turn of Sam's sends through its lease: the turn, with Sam's K-04 handle id (K-05 v1 turn). */
@@ -441,10 +444,13 @@ async function withTimerRig(body: (rig: TimerRig) => Promise<void>): Promise<voi
   const restores = [
     setSafetyDeps(h.deps),
     setBatchHooks({ clock: h.clock }),
-    // The turn's work commits once through the lease; the commit hook is the Tool API double.
+    // The turn's work commits through the lease; the commit hook is the Tool API double. An answer lost on the way
+    // (`noAnswer`) is sent again once, as the same request, as the turn does (../../turn/turn.ts `sendWithResend`).
     setLeaseHooks({
       runTurn: async (turn) => {
-        await turn.commit(samCommit(turn));
+        const request = samCommit(turn);
+        const answer = await turn.commit(request);
+        if ("error" in answer && answer.error === "noAnswer") await turn.commit(request);
       },
       commit: (request, at) => api.commit(request, at),
     }),
@@ -457,11 +463,11 @@ async function withTimerRig(body: (rig: TimerRig) => Promise<void>): Promise<voi
     get actor(): CopiesRpc {
       return actorOf(SAM_PARTY);
     },
-    async text(eventId) {
+    async text(eventId, commits = 1) {
       await arrive(SAM_PARTY, eventId, "TIMER 2 hours", "2026-10-27T13:20:00Z");
       await h.clock.advance(3000);
       await runDurableObjectAlarm(stubOf(SAM_PARTY));
-      sent += 1;
+      sent += commits;
       await until(() => api.commits.length === sent, "the turn's commit");
       await actorOf(SAM_PARTY).safetyIdle();
       await actorOf(SAM_PARTY).batchIdle();
@@ -669,6 +675,54 @@ describe("the actor's copy of each live safety timer (K-34 safety_timers)", () =
       copies = await rig.actor.readCopies();
       expect(copies.timers).toEqual([]);
       expect(copies.timersStale).toBe(false);
+    });
+  });
+
+  it("a repeat after a lost first answer reloads the copy (T-1203): the first commit wrote Sam's timer row but its answer was lost, and the repeat answers with written []; a repeat with no timer written reloads harmlessly", async () => {
+    await withTimerRig(async (rig) => {
+      // The first commit writes Sam's timer row (its answer would list it), but the answer is lost on the way back: the
+      // turn sends the same request again, and the repeat answers its first commit with no rows (K-05 v1 commitResult).
+      const turnId = await turnIdOf(["evt-sam-0301"]);
+      rig.api.writes.push(structuredClone(SAM_TIMER));
+      rig.api.loseNextAnswer = true;
+      await rig.text("evt-sam-0301", 2);
+      expect(rig.api.commits.map((commit) => commit.turn.id)).toEqual([turnId, turnId]);
+      expect(rig.api.timers.get(SAM_TIMER.id)).toEqual(SAM_TIMER);
+      expect(rig.api.answers).toHaveLength(1);
+      expect(rig.api.answers[0]).toMatchObject({
+        result: "committed",
+        repeated: true,
+        committed: { repeated: true, core: [], written: { written: [], outboxRows: [], promoted: [] } },
+      });
+      // The actor reloaded Sam's live timers on the repeat: the copy holds the row.
+      expect(rig.api.reloads).toEqual(["handle-sam"]);
+      let copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+      expect(copies.timersStale).toBe(false);
+
+      // A first commit that wrote no timer row, its answer lost too: the repeat reloads, and the copy stays as it was.
+      rig.api.writes.push(null);
+      rig.api.loseNextAnswer = true;
+      await rig.text("evt-sam-0302", 2);
+      expect(rig.api.answers).toHaveLength(2);
+      expect(rig.api.answers[1]).toMatchObject({
+        repeated: true,
+        committed: { repeated: true, core: [], written: { written: [] } },
+      });
+      expect(rig.api.reloads).toEqual(["handle-sam", "handle-sam"]);
+      copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+      expect(copies.timersStale).toBe(false);
+
+      // A first answer that comes back keeps rules 1 and 2: it wrote no timer row, so nothing reloads.
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0303");
+      expect(rig.api.answers[2]).toMatchObject({
+        repeated: false,
+        committed: { repeated: false, core: [], written: { written: [] } },
+      });
+      expect(rig.api.reloads).toHaveLength(2);
+      expect((await rig.actor.readCopies()).timers).toEqual([copyOf(SAM_TIMER)]);
     });
   });
 });
@@ -1473,6 +1527,34 @@ const TIMER_BY_CORE = {
   error: null,
 };
 
+/**
+ * Core results that are not K-09's coreResult, by DL-413's fail-safe shapes: not a record, or no string call; no error
+ * field; error null but a response that is not a record; an error that is not K-09's refusal (a JSON object with its own
+ * "error" code). Where one has a call, it is mostly one of K-09's own, whose well-formed result reads no.
+ */
+const NOT_K09_RESULTS: unknown[] = [
+  // Not a record, or no string call.
+  "not a result",
+  null,
+  7,
+  [{ call: "recordSafetyOutcome", response: {}, error: null }],
+  { response: { timerId: SAM_TIMER.id, version: 1 }, error: null },
+  { call: 7, response: {}, error: null },
+  // No error field.
+  { call: LATER_TIMER_CALL },
+  { call: "recordSafetyOutcome", response: {} },
+  { call: "recordSafetyOutcome", response: {}, error: undefined },
+  // Error null, but a response that is not a record.
+  { call: "recordSafetyOutcome", response: null, error: null },
+  { call: "releaseSafetyHold", error: null },
+  { call: "sendFixedLine", response: [], error: null },
+  { call: LATER_TIMER_CALL, response: "written", error: null },
+  // An error that is not K-09's refusal.
+  { call: "recordSafetyOutcome", response: null, error: "transient" },
+  { call: "recordSafetyOutcome", response: null, error: {} },
+  { call: "recordSafetyOutcome", response: null, error: { error: 7 } },
+];
+
 describe("what a commit gives the copies: a safety timer a core action wrote (T-1198)", () => {
   it("learns of it from the core results, never from `written` alone: a later core action's result that went through reads written, though K-09's `written` leaves its rows out; refused, it wrote nothing", () => {
     const record = safetyRecordFor("evt-sam-0301");
@@ -1486,10 +1568,13 @@ describe("what a commit gives the copies: a safety timer a core action wrote (T-
     // Refused, the core action wrote nothing: nothing to reload.
     const refused = { call: LATER_TIMER_CALL, response: null, error: { error: "transient" } };
     expect(readCommit(samCommitted([record, refused], [])).timersWritten).toBe(false);
-    // A core result that is not K-09's shape gives nothing.
+    // A core result that is not K-09's shape cannot say what it wrote: it reloads (fails safe, DL-413), each one alone.
     expect(
       readCommit(samCommitted([{ call: LATER_TIMER_CALL }, "not a result", null], [])).timersWritten,
-    ).toBe(false);
+    ).toBe(true);
+    for (const result of NOT_K09_RESULTS) {
+      expect(readCommit(samCommitted([record, result], [])).timersWritten, JSON.stringify(result)).toBe(true);
+    }
     // `written` still tells: a timer row the walk wrote, in K-09's answer.
     expect(
       readCommit(samCommitted([record], [{ table: "safety_timers", rowId: SAM_TIMER.id, version: 2 }]))
@@ -1505,5 +1590,68 @@ describe("what a commit gives the copies: a safety timer a core action wrote (T-
     }
     // stop-recorded.json as it stands: its safety record and STOP went through, and `written` names Ben's phone row.
     expect(readCommit(stopRecorded.outcome).timersWritten).toBe(false);
+  });
+});
+
+// ---- an answer the copies cannot read, and a repeat (T-1198 round 2, T-1203; DL-413) ------------------------------------
+
+describe("what a commit gives the copies: an answer it cannot read, and a repeat (DL-413)", () => {
+  it("an answer in K-09's shape that cannot be read reloads (fails safe): core results missing or not a list, `repeated` not a boolean, rows not a list, or a row that names no table", () => {
+    const first = samCommitted([], []);
+    const without = (key: string): Json =>
+      Object.fromEntries(Object.entries(first).filter(([name]) => name !== key));
+    // In K-09's shape, a first answer with nothing written: nothing to reload.
+    expect(readCommit(first)).toEqual({ stopped: null, timersWritten: false });
+    // Its core results missing, or not a list.
+    expect(readCommit(without("core"))).toEqual({ stopped: null, timersWritten: true });
+    for (const core of ["not a list", null, {}, 7]) {
+      expect(readCommit({ ...first, core }).timersWritten, JSON.stringify(core)).toBe(true);
+    }
+    // `repeated` missing or not a boolean: it may be a repeat (T-1203).
+    expect(readCommit(without("repeated")).timersWritten).toBe(true);
+    expect(readCommit({ ...first, repeated: "no" }).timersWritten).toBe(true);
+    // The rows (`written.written`) missing or not a list.
+    expect(readCommit({ ...first, written: { outboxRows: [], promoted: [] } }).timersWritten).toBe(true);
+    expect(
+      readCommit({ ...first, written: { written: "none", outboxRows: [], promoted: [] } }).timersWritten,
+    ).toBe(true);
+    // A row that names no table, in K-09's answer or K-05's own; a row that names another table reads no.
+    const noTable: unknown[] = [null, "safety_timers", { rowId: SAM_TIMER.id, version: 1 }, { table: 7 }];
+    for (const row of noTable) {
+      expect(readCommit(samCommitted([], [row])).timersWritten, JSON.stringify(row)).toBe(true);
+      expect(readCommit({ written: [row], outboxRows: [], promoted: [] }).timersWritten).toBe(true);
+    }
+    expect(
+      readCommit(samCommitted([], [{ table: "phones", rowId: "handle-sam", version: 2 }])).timersWritten,
+    ).toBe(false);
+    // A null answer, and one whose `written` is in neither shape, read as before (the earlier test above).
+  });
+
+  it("a repeat reloads (T-1203): it answers its first commit with no rows, and that first answer may have been lost with the rows it named; a first answer keeps rules 1 and 2", () => {
+    const record = safetyRecordFor("evt-sam-0301");
+    // A repeat with no rows and no core result that may have written a timer: it reloads all the same.
+    expect(readCommit(samCommitted([], [], true))).toEqual({ stopped: null, timersWritten: true });
+    expect(readCommit(samCommitted([record], [], true)).timersWritten).toBe(true);
+    for (const call of K09_CORE_CALLS) {
+      const result = { call, response: {}, error: null };
+      expect(readCommit(samCommitted([result], [], true)).timersWritten, call).toBe(true);
+    }
+    // stop-recorded.json repeated (no rows): its stopped flag is copied as before, and the timers reload.
+    const stopRepeat = {
+      ...stopRecorded.outcome,
+      repeated: true,
+      written: { ...stopRecorded.outcome.written, written: [] },
+    };
+    expect(readCommit(stopRepeat)).toEqual({
+      stopped: { stopped: true, phoneVersion: 4 },
+      timersWritten: true,
+    });
+    // The same answers, first: rules 1 and 2 decide, and none of them may have written a timer.
+    expect(readCommit(samCommitted([], [])).timersWritten).toBe(false);
+    expect(readCommit(samCommitted([record], [])).timersWritten).toBe(false);
+    expect(readCommit(stopRecorded.outcome)).toEqual({
+      stopped: { stopped: true, phoneVersion: 4 },
+      timersWritten: false,
+    });
   });
 });
