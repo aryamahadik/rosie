@@ -27,6 +27,14 @@
 // composeInput.response holds K-03 v1.1's input, so K-03 v1.1's file is among the files validators.js is built from,
 // but the definition compose input checks is K-03's own.
 //
+// It reads only inside contracts/ (T-1215; T-1153's security review, new task 2), since the preview runs it on a
+// branch before review (infra/scripts/deploy-preview.sh). Every $ref and every fixture index's file entry is resolved
+// as a path from where it is written, ".." and an absolute path followed and then every symbolic link, and one that
+// leads outside contracts/ (their real paths compared) fails the build before anything is read from it: the FAIL line
+// names who names it, never anything of the target. A file that is not JSON fails naming the file only, never its
+// first characters. So a branch's contract cannot make the build print a file from outside contracts/ or copy one
+// into ajv-answers.js.
+//
 // It writes into actions/src/tool-api/generated/, which is git-ignored, never edited and never committed (ADR-005):
 //   validators.js     the standalone code: one validate function per definition, `definitions` (each by its $ref)
 //                     and `build` (Ajv's version, the options, the schema ids and files, each file's sha256);
@@ -147,13 +155,84 @@ const HELPERS = new Set(["ucs2length", "equal"]);
 
 const IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-const readJson = (contractsDir, file) =>
-  JSON.parse(readFileSync(path.join(contractsDir, ...file.split("/")), "utf8"));
-
 const isRecord = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** The files a schema's $refs name, relative to contracts/ (a $ref inside the same file names none). */
-function referencedFiles(file, schema) {
+/** How a refusal ends: the build reads nothing outside contracts/, so it can print or copy nothing of it. */
+const REFUSED = "refused, and nothing was read from it";
+
+/** Whether the absolute path `target` lies inside the folder `folder` (not the folder itself). */
+function isInside(folder, target) {
+  const relative = path.relative(folder, target);
+  return (
+    relative !== "" &&
+    relative !== ".." &&
+    !relative.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(relative)
+  );
+}
+
+/**
+ * The file `reference` leads to, followed from the folder `from` as a path is: ".." and an absolute path first, then
+ * every symbolic link on the way. `contracts` is contracts/'s real path; `from` and the file returned are relative to
+ * contracts/, "/"-separated. Returns { file, real }: the file, the name the build records, and its real path, the one
+ * the build reads. It throws before anything is read when the file lies outside contracts/ (their real paths
+ * compared) or is not there, naming `what` (who names it, and how) and nothing of the target.
+ */
+function contractFile(contracts, from, reference, what) {
+  if (typeof reference !== "string" || reference === "") throw new Error(`${what} names no file`);
+  const named = path.resolve(contracts, from, reference);
+  if (!isInside(contracts, named)) throw new Error(`${what} leads outside contracts/: ${REFUSED}`);
+  let real;
+  try {
+    real = realpathSync(named);
+  } catch (error) {
+    throw new Error(`${what} leads to no file in contracts/`, { cause: error });
+  }
+  if (!isInside(contracts, real)) {
+    throw new Error(`${what} leads outside contracts/ through a symbolic link: ${REFUSED}`);
+  }
+  return { file: path.relative(contracts, named).split(path.sep).join("/"), real };
+}
+
+/**
+ * A file contractFile resolved, read and parsed: { text, value }. A file that is not JSON fails naming the file only,
+ * since JSON.parse's own message quotes the text's first characters.
+ */
+function readContractJson({ file, real }) {
+  const text = readFileSync(real, "utf8");
+  let value;
+  try {
+    value = JSON.parse(text);
+  } catch {
+    throw new Error(`${file} is not valid JSON`);
+  }
+  return { text, value };
+}
+
+/**
+ * Each entry of the fixture index `index` (relative to contracts/) with the file it names, resolved from the index's
+ * folder by contractFile: { entry, file, real }. Every entry is resolved, whether the build reads its file or not, so
+ * an index that names a file outside contracts/ fails the build.
+ */
+function fixtureEntries(contractsDir, index) {
+  const contracts = realpathSync(contractsDir);
+  const { value } = readContractJson(
+    contractFile(contracts, "", index, `the fixture index ${JSON.stringify(index)}`),
+  );
+  const from = path.posix.dirname(index);
+  return value.fixtures.map((entry) => ({
+    entry,
+    ...contractFile(contracts, from, entry.file, `${index}'s file ${JSON.stringify(entry.file)}`),
+  }));
+}
+
+/**
+ * Each $ref of a schema that names another file, as { from, reference, what }: the folder it is followed from
+ * (relative to contracts/), the path as written, and how an error names it. A $ref by $id (contracts/README.md
+ * convention 2) is followed from contracts/ itself, a relative one from the schema's own folder; one inside the same
+ * file names none, and one by any other URL leads outside contracts/.
+ */
+function referencesOf(file, schema) {
   const found = [];
   const walk = (value) => {
     if (Array.isArray(value)) {
@@ -162,10 +241,14 @@ function referencedFiles(file, schema) {
       for (const [key, inner] of Object.entries(value)) {
         if (key === "$ref" && typeof inner === "string") {
           const target = inner.split("#")[0];
-          if (target.startsWith(ID_PREFIX)) found.push(target.slice(ID_PREFIX.length));
-          else if (/^[a-z]+:/i.test(target))
-            throw new Error(`${file} refers to ${target}, outside contracts/`);
-          else if (target !== "") found.push(path.posix.join(path.posix.dirname(file), target));
+          const what = `${file}'s $ref ${JSON.stringify(target)}`;
+          if (target.startsWith(ID_PREFIX)) {
+            found.push({ from: "", reference: target.slice(ID_PREFIX.length), what });
+          } else if (/^[a-z]+:/i.test(target)) {
+            throw new Error(`${what} leads outside contracts/: ${REFUSED}`);
+          } else if (target !== "") {
+            found.push({ from: path.posix.dirname(file), reference: target, what });
+          }
         } else {
           walk(inner);
         }
@@ -180,21 +263,30 @@ function referencedFiles(file, schema) {
  * K-09 v1.5 and v1.6, K-08 v1.1 and every schema file their $refs reach (K-09 v1, whose call list the Tool API keeps,
  * K-02 v1.1, the frontier's, and K-03 v1.1, whose input v1.6's composeInput answers, among them), each with its text's
  * sha256, sorted by file. Given other `roots` (compose input's MESSAGE_PLAN_FILES), those files and every file their
- * $refs reach instead.
+ * $refs reach instead. Each root and each $ref is resolved by contractFile when it is found, so one that leads outside
+ * contracts/ fails the build before it is read.
  */
 export function readSchemas(
   contractsDir = CONTRACTS_DIR,
   roots = [TOOL_API_FILE, COMPOSE_INPUT_TOOL_API_FILE, EVENT_TRACE_FILE],
 ) {
+  const contracts = realpathSync(contractsDir);
   const read = new Map();
-  const queue = [...roots];
+  const queue = roots.map((file) =>
+    contractFile(contracts, "", file, `the schema file ${JSON.stringify(file)}`),
+  );
   while (queue.length > 0) {
-    const file = queue.shift();
-    if (read.has(file)) continue;
-    const text = readFileSync(path.join(contractsDir, ...file.split("/")), "utf8");
-    const schema = JSON.parse(text);
-    read.set(file, { file, schema, sha256: createHash("sha256").update(text).digest("hex") });
-    queue.push(...referencedFiles(file, schema));
+    const found = queue.shift();
+    if (read.has(found.file)) continue;
+    const { text, value: schema } = readContractJson(found);
+    read.set(found.file, {
+      file: found.file,
+      schema,
+      sha256: createHash("sha256").update(text).digest("hex"),
+    });
+    for (const { from, reference, what } of referencesOf(found.file, schema)) {
+      queue.push(contractFile(contracts, from, reference, what));
+    }
   }
   return [...read.values()].sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
 }
@@ -374,11 +466,15 @@ export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
     }
   };
 
-  for (const entry of readJson(contractsDir, TOOL_API_INDEX).fixtures) {
+  // Every entry of the three indexes is resolved before any fixture is read (fixtureEntries).
+  const toolApiEntries = fixtureEntries(contractsDir, TOOL_API_INDEX);
+  const eventTraceEntries = fixtureEntries(contractsDir, EVENT_TRACE_INDEX);
+  const modelEntries = fixtureEntries(contractsDir, MODEL_INDEX);
+  for (const { entry, ...found } of toolApiEntries) {
     const [call, part] = entry.def.split(".");
     if (!calls.has(call) || !(part === "exchange" || PARTS.includes(part))) continue;
-    const source = `tool-api/fixtures/${entry.file}`;
-    fixtures[source] = readJson(contractsDir, source);
+    const source = found.file;
+    fixtures[source] = readContractJson(found).value;
     const about = { version: entry.version, def: entry.def, expect: entry.expect };
     if (part === "exchange") {
       check(about, source, ["request"], toolApiRef(call, "request"));
@@ -393,16 +489,16 @@ export function ajvAnswers(schemas, definitions, contractsDir = CONTRACTS_DIR) {
     }
   }
   const spanRef = `${eventTrace.$id}#/$defs/span`;
-  for (const entry of readJson(contractsDir, EVENT_TRACE_INDEX).fixtures) {
+  for (const { entry, ...found } of eventTraceEntries) {
     if (entry.def !== "span") continue;
-    const source = `event-trace/fixtures/${entry.file}`;
-    fixtures[source] = readJson(contractsDir, source);
+    const source = found.file;
+    fixtures[source] = readContractJson(found).value;
     check({ version: entry.version, def: entry.def, expect: entry.expect }, source, [], spanRef);
   }
-  for (const entry of readJson(contractsDir, MODEL_INDEX).fixtures) {
+  for (const { entry, ...found } of modelEntries) {
     if (!MODEL_PARTS.includes(entry.def)) continue;
-    const source = `model/fixtures/${entry.file}`;
-    fixtures[source] = readJson(contractsDir, source);
+    const source = found.file;
+    fixtures[source] = readContractJson(found).value;
     const about = { version: entry.version, def: entry.def, expect: entry.expect };
     if (entry.def === "context") checkContext(about, source, []);
     else check(about, source, [], modelRef(entry.def));
@@ -424,17 +520,20 @@ export function composeInputAnswers(schemas, definitions, contractsDir = CONTRAC
   const checkInput = (about, source, at) => {
     for (const { ref } of definitions) check(about, source, at, ref);
   };
-  for (const entry of readJson(contractsDir, MESSAGE_PLAN_INDEX).fixtures) {
+  // Every entry of both indexes is resolved before any fixture is read (fixtureEntries).
+  const messagePlanEntries = fixtureEntries(contractsDir, MESSAGE_PLAN_INDEX);
+  const toolApiEntries = fixtureEntries(contractsDir, TOOL_API_INDEX);
+  for (const { entry, ...found } of messagePlanEntries) {
     const at = INPUT_PLACES[entry.def];
     if (at === undefined) continue;
-    const source = `message-plan/fixtures/${entry.file}`;
-    fixtures[source] = readJson(contractsDir, source);
+    const source = found.file;
+    fixtures[source] = readContractJson(found).value;
     checkInput({ version: entry.version, def: entry.def, expect: entry.expect }, source, at);
   }
-  for (const entry of readJson(contractsDir, TOOL_API_INDEX).fixtures) {
+  for (const { entry, ...found } of toolApiEntries) {
     if (entry.def !== `${COMPOSE_INPUT_DEFINITION}.exchange`) continue;
-    const source = `tool-api/fixtures/${entry.file}`;
-    const exchange = readJson(contractsDir, source);
+    const source = found.file;
+    const exchange = readContractJson(found).value;
     if (!isRecord(exchange.outcome?.input)) continue;
     fixtures[source] = exchange;
     checkInput({ version: entry.version, def: entry.def, expect: entry.expect }, source, [
