@@ -45,6 +45,8 @@ import {
   type FakeRow,
 } from "../../guard/replies/test-support";
 import { fakeTargets } from "../../guard/test-support";
+import { OUTAGE_WAIT_MS, PROBE_MS, setDbOutageDeps, type OutageView } from "../../outage/db";
+import { dbFakes, idsOf, type DbFakes } from "../../outage/db/test-support";
 import { fixtureBundle, harness, type Harness } from "../../safety/test-support";
 import type { SafetyResult } from "../../safety/types";
 import { setTurnDeps, turnHooks, turnReplyCore } from "../../turn";
@@ -1608,6 +1610,505 @@ describe("only DL-427's rule 1 ends a lost commit's mark (T-1206 round 2)", () =
     expect(result.stale).toBe(true);
     expect(result.reload).toBe("refreshed");
     expect(result.staleAfterReload).toBe(false);
+  });
+});
+
+// ---- an earlier turn's answer never replaces the actor's own STOP note (T-1208) -----------------------------------------
+
+/** Sam's texts: a first routine turn, his START (T0), the STOP the actor takes in the outage, a text after it, a later START. */
+const NOTE_PRIME = "evt-sam-0511";
+const NOTE_START = "evt-sam-0512";
+const NOTE_STOP = "evt-sam-0513";
+const NOTE_AFTER = "evt-sam-0514";
+const NOTE_LATER = "evt-sam-0515";
+
+/** The actor's calls over RPC, with the PostgreSQL-down path's (T-270). */
+interface OutageRpc extends CopiesRpc {
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
+}
+
+interface NoteRig {
+  readonly f: DbFakes;
+  readonly actor: OutageRpc;
+  /** A text of Sam's arrives through the gateway's door; its safety read and the down path's check settle. */
+  arrive(eventId: string, body: string): Promise<void>;
+  /** The fake clock moves and the alarm runs; the safety read and the down path settle, never a turn's run (it may wait). */
+  tick(ms: number): Promise<void>;
+  /** All the actor's lent work settles, the turns' runs included: only while no commit answer is held. */
+  settle(): Promise<void>;
+}
+
+/**
+ * Sam's handle in the real actor, with the PostgreSQL-down path wired (T-270's doubles, ../../outage/db/test-support.ts):
+ * the real safety read, batch window, lease and bundle pin; each turn commits once through the lease, to the Tool API double
+ * behind the down switch; the copies as production wires them today (no re-read of the phone row: wiring/ports.ts).
+ */
+async function withNoteRig(body: (rig: NoteRig) => Promise<void>): Promise<void> {
+  const events = [NOTE_PRIME, NOTE_START, NOTE_STOP, NOTE_AFTER, NOTE_LATER];
+  const f = dbFakes(keys, Object.fromEntries(events.map((id) => [id, safetyNoFor(id)])), {
+    start: Date.parse("2026-10-27T14:00:00Z"),
+    ids: idsOf(SAM.party),
+  });
+  const restores = [
+    setSafetyDeps(f.safetyDeps),
+    setBatchHooks({ clock: f.clock }),
+    setLeaseHooks({
+      runTurn: async (turn) => {
+        await turn.commit(samCommit(turn));
+      },
+      commit: (request, at) => f.commit(request, at),
+    }),
+    setBundleDeps(f.bundleDeps),
+    setCopyDeps({ timers: f.api.source }),
+    setDbOutageDeps(f.outageDeps),
+  ];
+  const actor = stubOf(SAM_PARTY) as unknown as OutageRpc;
+  const quiet = async (): Promise<void> => {
+    await actor.safetyIdle();
+    await actor.outageIdle();
+  };
+  const rig: NoteRig = {
+    f,
+    actor,
+    async arrive(eventId, body) {
+      await arrive(SAM_PARTY, eventId, body, new Date(f.clock.now()).toISOString());
+      await quiet();
+    },
+    async tick(ms) {
+      await f.clock.advance(ms);
+      await runDurableObjectAlarm(stubOf(SAM_PARTY));
+      await quiet();
+    },
+    async settle() {
+      for (let round = 0; round < 3; round += 1) {
+        await quiet();
+        await actor.batchIdle();
+      }
+    },
+  };
+  try {
+    await body(rig);
+  } finally {
+    restores.reverse().forEach((restore) => {
+      restore();
+    });
+  }
+}
+
+/** Waits until the lease's turn `turnId` reads as `ready` says, polling (no lent work is awaited: a held answer may be one). */
+async function turnReads(
+  actor: CopiesRpc,
+  turnId: string,
+  ready: (turn: TurnEntry) => boolean,
+  what: string,
+): Promise<void> {
+  const started = Date.now();
+  for (;;) {
+    const turn = (await actor.readTurns()).find((entry) => entry.turnId === turnId);
+    if (turn !== undefined && ready(turn)) return;
+    if (Date.now() - started > 10_000) throw new Error(`gave up waiting for ${what}`);
+    await flush();
+  }
+}
+
+describe("an earlier turn's answer never replaces the actor's own STOP note (T-1208)", () => {
+  it("T-270's rule does not close it: T0's START (v3) has a slow run-1 answer and T0 finishes on its rerun's repeat; in the outage the actor then takes Sam's STOP; T0's slow START arrives, and the flag still reads stopped, so no outage line goes to the stopped number; on return the replay writes the STOP, and a later turn's START ends it", async () => {
+    await withNoteRig(async (rig) => {
+      // While PostgreSQL answers, a first turn pins bundle A (the actor copies its keyword list) and commits.
+      await rig.arrive(NOTE_PRIME, "Test words: can I get a cut this week?");
+      await rig.tick(3000);
+      await until(() => rig.f.log.includes(`commit:${NOTE_PRIME}`), "the first turn's commit");
+      await rig.settle();
+
+      // T0: Sam's START goes to its turn (PostgreSQL answers), whose run-1 commit records it (phone v3); its answer is slow.
+      const slow = hold(true);
+      rig.f.api.stopWrites.push(false);
+      rig.f.api.slowNextAnswer = slow;
+      const t0 = await turnIdOf([NOTE_START]);
+      await rig.arrive(NOTE_START, "START");
+      await rig.tick(3000);
+      await until(() => rig.f.api.commits.length === 2, "T0's run-1 commit");
+      expect(rig.f.api.phone).toMatchObject({ stopped: false, version: 3 });
+
+      // T0's lease lapses: its rerun's commit gets the repeat (START, v3), copied, and T0 finishes.
+      await rig.tick(LEASE_MS);
+      // The answers so far: the first turn's, then the repeat's (T0's own first answer is still on its way).
+      await until(() => rig.f.api.answers.length === 2, "the repeat's answer");
+      await turnReads(rig.actor, t0, (turn) => turn.state === "committed", "T0 finished as committed");
+      expect(rig.f.api.answers[1]).toMatchObject({ turnId: t0, repeated: true });
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: false,
+        phoneVersion: 3,
+        turnId: t0,
+        setAt: anyTime,
+      });
+
+      // PostgreSQL goes down, and Sam texts STOP. No STOP or START waits with the lease (T0 has finished), so T-270's rule
+      // lets the actor take it at once: the flag copied (no version), the stop reply sent, its record queued.
+      rig.f.down = true;
+      await rig.arrive(NOTE_STOP, "STOP");
+      expect(rig.f.direct.sent.map((send) => send.idempotencyKey)).toEqual([
+        `keyword:${NOTE_STOP}:stopReply`,
+      ]);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: NOTE_STOP, kind: "stop", keyword: "handled" }),
+      ]);
+      const note = { stopped: true, phoneVersion: null, turnId: null, setAt: anyTime };
+      expect((await rig.actor.readCopies()).stopped).toEqual(note);
+
+      // T0's slow run-1 answer (START, v3) arrives now: T0 opened before the note, so it never replaces it.
+      slow.closed = false;
+      await until(() => rig.f.api.answers.length === 3, "T0's slow answer");
+      await rig.settle();
+      expect(rig.f.api.answers[2]).toMatchObject({ turnId: t0, repeated: false });
+      expect((await rig.actor.readCopies()).stopped).toEqual(note);
+
+      // A text after it waits 20 s: never an outage line to the number that said STOP (outage/db/outage.ts:16).
+      await rig.arrive(NOTE_AFTER, "Test words: wait, can I still come at 3?");
+      await rig.tick(OUTAGE_WAIT_MS);
+      expect(rig.f.direct.sent.map((send) => send.fixedLineId)).toEqual(["stopReply"]);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: NOTE_STOP, keyword: "handled" }),
+        expect.objectContaining({ eventId: NOTE_AFTER, kind: "other", line: "stopped" }),
+      ]);
+
+      // PostgreSQL is back: the replay writes the STOP's record (phone v4) and the copy takes its version; then the queued
+      // text's turn commits.
+      rig.f.down = false;
+      await rig.tick(PROBE_MS);
+      await until(() => rig.f.log.includes(`commit:${NOTE_AFTER}`), "the queued text's commit");
+      await rig.settle();
+      expect(rig.f.stops.map((stop) => [stop.kind, stop.inboundEventId])).toEqual([["stop", NOTE_STOP]]);
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: true,
+        phoneVersion: 4,
+        turnId: null,
+        setAt: anyTime,
+      });
+
+      // A later turn's START (the one phone row: the replay's STOP wrote v4, so the START writes v5) ends it.
+      rig.f.api.phone.stopped = true;
+      rig.f.api.phone.version = 4;
+      rig.f.api.stopWrites.push(false);
+      const later = await turnIdOf([NOTE_LATER]);
+      await rig.arrive(NOTE_LATER, "START");
+      await rig.tick(3000);
+      await until(() => rig.f.log.includes(`commit:${NOTE_LATER}`), "the later turn's commit");
+      await rig.settle();
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: false,
+        phoneVersion: 5,
+        turnId: later,
+        setAt: anyTime,
+      });
+    });
+  });
+
+  it("by the lease's turn order, never by versions alone: over the actor's own STOP note, an earlier turn's answer, the turn open as the note was taken, a turn with no order and a row read never replace it; a later turn's answer does; with the lease's order not known, only the replay of its record does, and a read sent after that is taken by its version; a START note takes any versioned write", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), async (_, state) => {
+      // The lease's order of the last turn it opened, as the actor reads it; a read that throws is "not known".
+      let opened = 4;
+      let readable = true;
+      const copies = new ActorCopies({
+        storage: state.storage,
+        now: () => 1000,
+        turnsOpened: () => {
+          if (!readable) throw new Error("the lease's turns cannot be read");
+          return opened;
+        },
+      });
+      const phoneRead = async (stopped: boolean, phoneVersion: number): Promise<unknown> => {
+        const restore = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+          phones: { stoppedFlag: () => Promise.resolve({ result: "phone", stopped, phoneVersion }) },
+        });
+        try {
+          return await copies.rereadStopped("handle-sam");
+        } finally {
+          restore();
+        }
+      };
+      const reads: Record<string, unknown> = {};
+      // Turn 3 copied a START (v3). Turn 4 is open (its commit sent) when the actor takes Sam's STOP in an outage.
+      copies.noteStopped({ stopped: false, phoneVersion: 3, turnId: "turn-3", opened: 3 });
+      reads.note = copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null });
+      reads.refused = [
+        // An earlier turn's late answer, a START at a higher version.
+        copies.noteStopped({ stopped: false, phoneVersion: 9, turnId: "turn-3", opened: 3 }),
+        // The turn that was open as the note was taken: opened before it.
+        copies.noteStopped({ stopped: false, phoneVersion: 10, turnId: "turn-4", opened: 4 }),
+        // A turn's answer the lease gave no order.
+        copies.noteStopped({ stopped: false, phoneVersion: 11, turnId: "turn-x" }),
+      ];
+      // A row read: the note's record may still wait in the write-on-return queue.
+      reads.read = await phoneRead(false, 12);
+      reads.afterRefused = copies.readStopped();
+      // A turn the lease opened after the note: its commit went after the queue was replayed. It ends the note.
+      opened = 5;
+      reads.later = copies.noteStopped({ stopped: false, phoneVersion: 13, turnId: "turn-5", opened: 5 });
+      reads.afterLater = copies.readStopped();
+      // Another STOP note, taken while the lease's order cannot be read: no turn's answer replaces it, not even a later one.
+      readable = false;
+      copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null });
+      readable = true;
+      opened = 6;
+      reads.unknownLater = copies.noteStopped({
+        stopped: false,
+        phoneVersion: 14,
+        turnId: "turn-6",
+        opened: 6,
+      });
+      reads.afterUnknown = copies.readStopped();
+      // The replay writes the note's own record (no turn): taken. A read sent after that is fresh, and taken by version.
+      reads.replay = copies.noteStopped({ stopped: true, phoneVersion: 15, turnId: null });
+      reads.afterReplay = copies.readStopped();
+      reads.fresh = await phoneRead(false, 16);
+      reads.afterFresh = copies.readStopped();
+      // A START note takes an earlier turn's STOP: the stricter reading, never looser.
+      opened = 7;
+      copies.noteStopped({ stopped: false, phoneVersion: null, turnId: null });
+      reads.startNote = copies.noteStopped({ stopped: true, phoneVersion: 17, turnId: "turn-6", opened: 6 });
+      reads.afterStartNote = copies.readStopped();
+      return reads;
+    });
+    expect(result.note).toBe(true);
+    expect(result.refused).toEqual([false, false, false]);
+    expect(result.read).toBe("older");
+    expect(result.afterRefused).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.later).toBe(true);
+    expect(result.afterLater).toEqual({ stopped: false, phoneVersion: 13, turnId: "turn-5", setAt: 1000 });
+    expect(result.unknownLater).toBe(false);
+    expect(result.afterUnknown).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.replay).toBe(true);
+    expect(result.afterReplay).toEqual({ stopped: true, phoneVersion: 15, turnId: null, setAt: 1000 });
+    expect(result.fresh).toBe("copied");
+    expect(result.afterFresh).toEqual({ stopped: false, phoneVersion: 16, turnId: null, setAt: 1000 });
+    expect(result.startNote).toBe(true);
+    expect(result.afterStartNote).toEqual({ stopped: true, phoneVersion: 17, turnId: "turn-6", setAt: 1000 });
+  });
+
+  it("a committed STOP whose copy write fails (the storage refuses the flag's copy and the marks) holds a lost mark for its turn in memory: the flag still reads stopped, and the phone row is read again; once the storage takes writes, the next re-read (DL-427 rule 1) ends the mark", async () => {
+    await withParkRig(async (rig) => {
+      // A full disk: the actor's storage refuses every write of the flag's copy and of the lost commits' marks.
+      await runInDurableObject(stubOf(SAM_PARTY), (_, state) => {
+        state.storage.sql.exec(
+          "CREATE TRIGGER copy_stopped_full BEFORE INSERT ON copy_stopped BEGIN SELECT RAISE(ABORT, 'the storage is full'); END",
+        );
+        state.storage.sql.exec(
+          "CREATE TRIGGER copy_lost_full BEFORE INSERT ON copy_lost_commits BEGIN SELECT RAISE(ABORT, 'the storage is full'); END",
+        );
+      });
+      const storedMarks = (): Promise<string[]> =>
+        runInDurableObject(stubOf(SAM_PARTY), (_, state) =>
+          state.storage.sql
+            .exec<{ turn_id: string }>("SELECT turn_id FROM copy_lost_commits ORDER BY noted")
+            .toArray()
+            .map((row) => row.turn_id),
+        );
+
+      // A turn commits Sam's STOP (phone v3); its answer comes back, but the copy cannot take it.
+      rig.api.writes.push(null);
+      rig.api.stopWrites.push(true);
+      await rig.text("evt-sam-0301");
+      const stopTurn = await turnIdOf(["evt-sam-0301"]);
+      expect(rig.api.answers).toHaveLength(1);
+      expect(rig.api.phone).toMatchObject({ stopped: true, version: 3 });
+      // The mark is held in memory (the storage refused it too), and the phone row was read again by the commit's handle
+      // id: the read's copy write failed as well, so the mark stays and the flag reads stopped.
+      expect(await storedMarks()).toEqual([]);
+      expect(rig.api.phoneReads).toEqual(["handle-sam"]);
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: true,
+        phoneVersion: null,
+        turnId: null,
+        setAt: anyTime,
+        lost: { turnId: stopTurn, since: anyTime },
+      });
+
+      // The storage takes writes again. The next commit writes no flag: the mark is read again from the phone row (STOP, v3),
+      // which ends it.
+      await runInDurableObject(stubOf(SAM_PARTY), (_, state) => {
+        state.storage.sql.exec("DROP TRIGGER copy_stopped_full");
+        state.storage.sql.exec("DROP TRIGGER copy_lost_full");
+      });
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0302");
+      expect(rig.api.phoneReads).toEqual(["handle-sam", "handle-sam"]);
+      expect((await rig.actor.readCopies()).stopped).toEqual({
+        stopped: true,
+        phoneVersion: 3,
+        turnId: null,
+        setAt: anyTime,
+      });
+    });
+  });
+
+  it("a timers reload ends only the stale marks noted before it was sent (the review's note d): one sent before a lost commit's mark and answering after it leaves the timers stale; one sent after the mark ends it; a mark held only in memory the same way", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), async (instance, state) => {
+      // The reload's source: the first read answers only when the test lets it; the others at once, with Sam's timer row.
+      let sent = 0;
+      let answer: (value: unknown) => void = () => undefined;
+      const restore = setCopyDeps({
+        timers: {
+          liveTimers: () => {
+            sent += 1;
+            if (sent > 1) return Promise.resolve({ result: "timers", timers: [structuredClone(SAM_TIMER)] });
+            return new Promise((resolve) => {
+              answer = resolve as (value: unknown) => void;
+            });
+          },
+        },
+      });
+      const reads: Record<string, unknown> = {};
+      try {
+        const { copies } = insideOf(instance);
+        // A commit's reload is sent; before it answers, a park answers alreadyCommitted and marks the timers stale.
+        const early = copies.refreshTimers("handle-sam");
+        await until(() => sent === 1, "the early reload's send");
+        copies.markTimersStale();
+        answer({ result: "timers", timers: [] });
+        reads.early = await early;
+        reads.afterEarly = { stale: copies.timersStale(), timers: copies.readTimers().length };
+        // The reload sent after the mark ends it.
+        reads.late = await copies.refreshTimers("handle-sam");
+        reads.afterLate = { stale: copies.timersStale(), timers: copies.readTimers().length };
+
+        // The same with a mark the storage cannot keep (DL-427 ruling 4): held in memory, ended only by a reload sent after it.
+        const storage = {
+          sql: {
+            exec: (query: string, ...bindings: unknown[]) => {
+              if (query.startsWith("INSERT OR IGNORE INTO copy_meta")) throw new Error("the storage is full");
+              return state.storage.sql.exec(query, ...(bindings as SqlStorageValue[]));
+            },
+          },
+          transactionSync: <T>(work: () => T): T => state.storage.transactionSync(work),
+        } as unknown as DurableObjectStorage;
+        const memory = new ActorCopies({ storage, now: () => 1000 });
+        sent = 0;
+        const held = memory.refreshTimers("handle-sam");
+        await until(() => sent === 1, "the early reload's send (memory)");
+        memory.markTimersStale();
+        answer({ result: "timers", timers: [] });
+        reads.memoryEarly = await held;
+        reads.memoryAfterEarly = memory.timersStale();
+        reads.memoryLate = await memory.refreshTimers("handle-sam");
+        reads.memoryAfterLate = memory.timersStale();
+      } finally {
+        restore();
+      }
+      return reads;
+    });
+    expect(result.early).toBe("refreshed");
+    expect(result.afterEarly).toEqual({ stale: true, timers: 0 });
+    expect(result.late).toBe("refreshed");
+    expect(result.afterLate).toEqual({ stale: false, timers: 1 });
+    expect(result.memoryEarly).toBe("refreshed");
+    expect(result.memoryAfterEarly).toBe(true);
+    expect(result.memoryLate).toBe("refreshed");
+    expect(result.memoryAfterLate).toBe(false);
+  });
+});
+
+// ---- only the replay's answer for the note's own text replaces the actor's own STOP note (T-1208 round 2, DL-431) -------
+
+/** Sam's texts the actor takes in one outage: a STOP, a START, and a last STOP, whose note the copy keeps. */
+const QUEUED_STOP = "evt-sam-0601";
+const QUEUED_START = "evt-sam-0602";
+const NOTED_STOP = "evt-sam-0603";
+
+/** A read of Sam's phone row through these copies, answering this flag and version (T-1206's re-read). */
+async function phoneReadOf(copies: ActorCopies, stopped: boolean, phoneVersion: number): Promise<unknown> {
+  const restore = setCopyDeps({
+    timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+    phones: { stoppedFlag: () => Promise.resolve({ result: "phone", stopped, phoneVersion }) },
+  });
+  try {
+    return await copies.rereadStopped("handle-sam");
+  } finally {
+    restore();
+  }
+}
+
+describe("only the replay's answer for the note's own text replaces the actor's own STOP note (T-1208 round 2, DL-431)", () => {
+  it("over the note of the last of Sam's STOP, START and STOP, kept through an eviction: the replay's answers for the first STOP and for the START never replace it, whatever their kind or version, nor do an answer naming no text, an earlier turn's answer or a read sent before the note's record is written; the last STOP's own answer does, and the flag stays stopped by version; a read sent after that ends it", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), async (_, state) => {
+      const host = { storage: state.storage, now: () => 1000, turnsOpened: () => 3 };
+      const copies = new ActorCopies(host);
+      const reads: Record<string, unknown> = {};
+      // Turn 3 copied a START (v3). In an outage the actor takes Sam's STOP, START and STOP, each noted with its text.
+      copies.noteStopped({ stopped: false, phoneVersion: 3, turnId: "turn-3", opened: 3 });
+      copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null, eventId: QUEUED_STOP });
+      copies.noteStopped({ stopped: false, phoneVersion: null, turnId: null, eventId: QUEUED_START });
+      reads.note = copies.noteStopped({
+        stopped: true,
+        phoneVersion: null,
+        turnId: null,
+        eventId: NOTED_STOP,
+      });
+      // The actor is evicted: a new instance reads the note, and the text it was taken for, from its storage.
+      const after = new ActorCopies(host);
+      reads.refused = [
+        // The replay writes the records in the order queued: the first STOP's answer (v4) and the START's (v5) are for
+        // other texts.
+        after.noteStopped({ stopped: true, phoneVersion: 4, turnId: null, eventId: QUEUED_STOP }),
+        after.noteStopped({ stopped: false, phoneVersion: 5, turnId: null, eventId: QUEUED_START }),
+        // An answer with no turn that names no text, and an earlier turn's late START, whatever their version.
+        after.noteStopped({ stopped: false, phoneVersion: 9, turnId: null }),
+        after.noteStopped({ stopped: false, phoneVersion: 10, turnId: "turn-3", opened: 3 }),
+      ];
+      // A read sent while the last STOP's record still waits finds the START (v5): the note's own record is not written.
+      reads.early = await phoneReadOf(after, false, 5);
+      reads.afterRefused = after.readStopped();
+      // The last STOP's own answer (v6) replaces the note: the flag stays stopped, now by version.
+      reads.own = after.noteStopped({ stopped: true, phoneVersion: 6, turnId: null, eventId: NOTED_STOP });
+      reads.afterOwn = after.readStopped();
+      // A read sent after it finds Sam's START (v7): taken by its version, it ends the stop.
+      reads.fresh = await phoneReadOf(after, false, 7);
+      reads.afterFresh = after.readStopped();
+      return reads;
+    });
+    expect(result.note).toBe(true);
+    expect(result.refused).toEqual([false, false, false, false]);
+    expect(result.early).toBe("older");
+    expect(result.afterRefused).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.own).toBe(true);
+    expect(result.afterOwn).toEqual({ stopped: true, phoneVersion: 6, turnId: null, setAt: 1000 });
+    expect(result.fresh).toBe("copied");
+    expect(result.afterFresh).toEqual({ stopped: false, phoneVersion: 7, turnId: null, setAt: 1000 });
+  });
+
+  it("a STOP note that names no text (taken before the note kept one) is replaced by no replay answer for a text, failing closed; a turn the lease opened after it still replaces it, and a START note still takes any versioned write", async () => {
+    const result = await runInDurableObject(stubOf(SAM_PARTY), (_, state) => {
+      let opened = 4;
+      const copies = new ActorCopies({ storage: state.storage, now: () => 1000, turnsOpened: () => opened });
+      const reads: Record<string, unknown> = {};
+      copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null });
+      reads.replays = [
+        copies.noteStopped({ stopped: true, phoneVersion: 5, turnId: null, eventId: NOTED_STOP }),
+        copies.noteStopped({ stopped: false, phoneVersion: 6, turnId: null, eventId: QUEUED_START }),
+      ];
+      reads.afterReplays = copies.readStopped();
+      opened = 5;
+      reads.later = copies.noteStopped({ stopped: false, phoneVersion: 7, turnId: "turn-5", opened: 5 });
+      reads.afterLater = copies.readStopped();
+      // A START note, its text named: the replay's answer for another text (a STOP) is taken, the stricter reading.
+      copies.noteStopped({ stopped: false, phoneVersion: null, turnId: null, eventId: QUEUED_START });
+      reads.startNote = copies.noteStopped({
+        stopped: true,
+        phoneVersion: 8,
+        turnId: null,
+        eventId: QUEUED_STOP,
+      });
+      reads.afterStartNote = copies.readStopped();
+      return reads;
+    });
+    expect(result.replays).toEqual([false, false]);
+    expect(result.afterReplays).toEqual({ stopped: true, phoneVersion: null, turnId: null, setAt: 1000 });
+    expect(result.later).toBe(true);
+    expect(result.afterLater).toEqual({ stopped: false, phoneVersion: 7, turnId: "turn-5", setAt: 1000 });
+    expect(result.startNote).toBe(true);
+    expect(result.afterStartNote).toEqual({ stopped: true, phoneVersion: 8, turnId: null, setAt: 1000 });
   });
 });
 
