@@ -2,11 +2,12 @@
 // `node --test "infra/ci/*.test.mjs"`. They build a throwaway origin (a bare repository in the system temp
 // folder, never the real one) with a main branch and task branches, clone it as the lead's checkout, and run
 // the checkout's deploy-preview.sh with fake npm and wrangler commands that only record their calls
-// (script-harness.mjs). No STAGING_DATABASE_URL is set, so no migration runs.
+// (script-harness.mjs), and a fake validators' build in main's infra/build/ that records its run the same way
+// (FAKE_BUILD). No STAGING_DATABASE_URL is set, so no migration runs.
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
@@ -23,7 +24,41 @@ import {
 
 const WRANGLER_JSONC = readFileSync(path.join(REPO, "wrangler.jsonc"), "utf8");
 
-// The branches of the throwaway origin and what each changes from main.
+// The contract the fake build reads.
+const CONTRACT = "contracts/tool-api/tool-api.v1.5.schema.json";
+
+// main's infra/build/tool-api-validators.mjs in the throwaway origin, in place of the real build (T-1144), which
+// needs Ajv and the contracts. It records its run as the fake tools record theirs, one JSON line in $FAKE_LOG:
+// the script node ran, its arguments, its folder and the folder it writes, actions/src/tool-api/generated/
+// beside the script's own checkout, as the real build's. Like the real build, it fails (exit 1, nothing
+// written) when a contract it reads does not parse.
+const FAKE_BUILD = String.raw`import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const script = fileURLToPath(import.meta.url);
+const root = path.resolve(path.dirname(script), "..", "..");
+const out = path.join(root, "actions", "src", "tool-api", "generated");
+const call = { tool: "tool-api-validators", args: process.argv.slice(2), cwd: process.cwd(), script, out };
+appendFileSync(process.env.FAKE_LOG, JSON.stringify(call) + "\n");
+try {
+  JSON.parse(readFileSync(path.join(root, ${JSON.stringify(CONTRACT)}), "utf8"));
+} catch (error) {
+  console.log("FAIL tool-api validators: " + error.message);
+  process.exit(1);
+}
+mkdirSync(out, { recursive: true });
+writeFileSync(path.join(out, "validators.js"), "export const definitions = {};\n");
+console.log("tool-api validators: written to " + path.relative(process.cwd(), out));
+`;
+
+/** A symbolic link at file to target, as a branch can commit one. */
+function link(target, file) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  symlinkSync(target, file);
+}
+
+// The branches of the throwaway origin and what each changes from main (a { link } is a symbolic link).
 const BRANCHES = {
   "task/T-1-code": { "runtime/src/index.ts": "export default { fetch: () => new Response('T-1') };\n" },
   "task/T-2-wrangler": {
@@ -45,6 +80,18 @@ const BRANCHES = {
   "task/T-10-shrinkwrap": {
     "npm-shrinkwrap.json": '{ "name": "rosie", "lockfileVersion": 3, "packages": {} }\n',
   },
+  // A contract that does not parse (contracts/ is not guarded): the validators' build fails in the worktree.
+  "task/T-11-contract": { [CONTRACT]: '{ "title": \n' },
+  // A branch build script: deploy-preview.sh must never run it unreviewed.
+  "task/T-12-build-script": {
+    "infra/build/tool-api-validators.mjs": 'console.log("the branch build script ran");\n',
+  },
+  // Ajv's run-time helper in a node_modules the branch adds, where the generated code's import would find it.
+  "task/T-13-node-modules": {
+    "actions/src/tool-api/generated/node_modules/ajv/dist/runtime/equal.js": "module.exports = () => true;\n",
+  },
+  // A link named node_modules, to a folder of the branch's own.
+  "task/T-14-node-modules-link": { "actions/src/tool-api/node_modules": { link: "../../../runtime/src" } },
 };
 
 describe("deploy-preview.sh", () => {
@@ -66,6 +113,8 @@ describe("deploy-preview.sh", () => {
     const seed = path.join(dir, "seed");
     git(dir, "init", "-q", "-b", "main", seed);
     for (const script of ["deploy-preview.sh", "lib.sh", "cf.sh"]) copyScript(script, seed);
+    write(path.join(seed, "infra", "build", "tool-api-validators.mjs"), FAKE_BUILD);
+    write(path.join(seed, CONTRACT), '{ "title": "K-09 v1.5, as the fixture holds it" }\n');
     write(path.join(seed, "wrangler.jsonc"), WRANGLER_JSONC);
     write(path.join(seed, "package.json"), '{ "name": "rosie", "private": true }\n');
     write(
@@ -83,8 +132,12 @@ describe("deploy-preview.sh", () => {
     const shas = {};
     for (const [branch, changes] of Object.entries(BRANCHES)) {
       git(seed, "switch", "-q", "-c", branch, "main");
-      for (const [file, content] of Object.entries(changes)) write(path.join(seed, file), content);
-      git(seed, "add", "-A");
+      for (const [file, content] of Object.entries(changes)) {
+        if (typeof content === "string") write(path.join(seed, file), content);
+        else link(content.link, path.join(seed, file));
+      }
+      // --force: .gitignore ignores node_modules/ here, as in the repository, and a branch can still commit one.
+      git(seed, "add", "-A", "--force");
       git(seed, "commit", "-q", "-m", branch);
       git(seed, "push", "-q", "origin", branch);
       shas[branch] = git(seed, "rev-parse", "HEAD");
@@ -221,6 +274,9 @@ describe("deploy-preview.sh", () => {
     ["task/T-7-workspace-package", "runtime/package.json"],
     ["task/T-8-npmrc", ".npmrc"],
     ["task/T-10-shrinkwrap", "npm-shrinkwrap.json"],
+    ["task/T-12-build-script", "infra/build/tool-api-validators.mjs"],
+    ["task/T-13-node-modules", "actions/src/tool-api/generated/node_modules/ajv/dist/runtime/equal.js"],
+    ["task/T-14-node-modules-link", "actions/src/tool-api/node_modules"],
   ];
   for (const [branch, file] of guarded) {
     it(`refuses ${branch}, whose diff against origin/main touches ${file}, without PREVIEW_ALLOW_INFRA=1`, () => {
@@ -262,5 +318,58 @@ describe("deploy-preview.sh", () => {
     const npm = result.calls.find((call) => call.tool === "npm");
     assert.ok(npm, "npm ci ran in a worktree");
     assert.equal(existsSync(npm.cwd), false, "the temporary worktree is removed");
+  });
+
+  it("builds the Tool API's validators after npm ci and before the upload, with node and the worktree's guarded build script", () => {
+    const result = fixture.run("task/T-1-code");
+    assertPreviewed(result, "task/T-1-code", "task-t-1-code");
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators", "main-wrangler"],
+      "npm ci, then the build, then the upload; npm runs once, so no npm script ran the build",
+    );
+    const [install, build, upload] = result.calls;
+    const tree = install.cwd;
+    assert.equal(build.cwd, tree, "the build runs in the temporary worktree");
+    assert.equal(
+      build.script,
+      path.join(tree, "infra", "build", "tool-api-validators.mjs"),
+      "node runs the worktree's infra/ copy (held to origin/main's by the guard), not the lead's checkout's",
+    );
+    assert.deepEqual(build.args, [], "no --out: the build's own output folder");
+    assert.equal(
+      build.out,
+      path.join(tree, "actions", "src", "tool-api", "generated"),
+      "the generated folder beside the worktree's validator.ts",
+    );
+    assert.equal(upload.cwd, tree, "the upload bundles the same worktree, after the build wrote into it");
+    assert.match(result.stdout, /tool-api validators: written to actions\/src\/tool-api\/generated\n/);
+  });
+
+  it("stops when the validators' build fails: nothing is migrated or uploaded, and the worktree is removed", () => {
+    const result = fixture.run("task/T-11-contract");
+    assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators"],
+      "no upload after the failed build",
+    );
+    assert.match(result.stdout, /FAIL tool-api validators: /, "the build's own failure is shown");
+    assert.ok(
+      result.stderr.includes(
+        `the Tool API's validators did not build for task/T-11-contract (${fixture.shas["task/T-11-contract"]}):` +
+          " nothing was migrated or uploaded",
+      ),
+      result.stderr,
+    );
+    assert.doesNotMatch(
+      result.stdout,
+      /no preview schema was migrated/,
+      "it stops before the migration step",
+    );
+    assert.doesNotMatch(result.stdout, /Preview URL/);
+    assert.equal(existsSync(result.calls[0].cwd), false, "the temporary worktree is removed");
+    const worktrees = fixture.git(fixture.main, "worktree", "list", "--porcelain").match(/^worktree /gm);
+    assert.equal(worktrees?.length, 1, "only the lead's checkout is left as a worktree");
   });
 });

@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 # Preview of one branch (factory spec 6; build prompt 5.3; DL-024): npm run deploy:preview -- <branch>
 # Runs on the build Mac, where the Rosfield sign-in is, before anyone has reviewed the branch, so nothing of
-# the branch's runs here unreviewed: its install scripts are skipped, its infra/ (migrate.mjs, cf.sh) must be
-# unchanged from origin/main, and the upload uses this checkout's cf.sh and wrangler. Its code runs only on
-# Cloudflare (the preview), and its migrations run with its own schema as the search path. It deploys the
-# branch's pushed commit, never this checkout's files:
+# the branch's runs here unreviewed: its install scripts are skipped, no npm script of its runs, its infra/
+# (migrate.mjs, cf.sh, build/tool-api-validators.mjs) must be unchanged from origin/main, and the upload uses
+# this checkout's cf.sh and wrangler. Its code runs only on Cloudflare (the preview), and its migrations run
+# with its own schema as the search path. It deploys the branch's pushed commit, never this checkout's files:
 #  0. it fetches origin/<branch> and origin/main and refuses the branch, listing the files, when its own
 #     changes (its diff against origin/main from their merge base, as in a pull request) touch a file that
 #     controls the install, the build or the deploy: wrangler.jsonc (or a wrangler.json or wrangler.toml),
-#     infra/, .github/, any package.json, package-lock.json or npm-shrinkwrap.json, .npmrc. The lead reviews
-#     that diff and reruns with PREVIEW_ALLOW_INFRA=1 to preview it anyway;
+#     infra/, .github/, any package.json, package-lock.json or npm-shrinkwrap.json, .npmrc, and anything
+#     named node_modules or inside one, at any depth (step 2's imports would load it in place of what npm ci
+#     installed). The lead reviews that diff and reruns with PREVIEW_ALLOW_INFRA=1 to preview it anyway;
 #  1. it checks that commit out in a temporary worktree (removed afterwards) and installs it with
 #     npm ci --ignore-scripts, so no install script runs;
-#  2. migrations into the branch's own schema on the staging database, when STAGING_DATABASE_URL is set
+#  2. the Tool API's standalone validators built there (T-1153, T-1144): node runs the worktree's own
+#     infra/build/tool-api-validators.mjs, which step 0 holds to origin/main's, never an npm script of the
+#     branch's. It writes the git-ignored actions/src/tool-api/generated/ (from the branch's contracts/) that
+#     validator.ts imports, so the Worker has its prebuilt code. A failed build stops the preview: nothing is
+#     migrated or uploaded;
+#  3. migrations into the branch's own schema on the staging database, when STAGING_DATABASE_URL is set
 #     (skipped with a notice when it is not);
-#  3. a Worker version of that commit uploaded to rosie-staging under the preview alias <slug> by THIS
+#  4. a Worker version of that commit uploaded to rosie-staging under the preview alias <slug> by THIS
 #     checkout's cf.sh and wrangler (never the branch's), with CF_BUILD_DIR=<worktree>: cf.sh checks the
 #     worktree's wrangler.jsonc as it checks its own, then uploads from there with DB_SCHEMA and GIT_SHA (that
 #     commit) set (an upload, not a deploy: staging traffic keeps its current version);
-#  4. the preview URL printed.
+#  5. the preview URL printed.
 # <slug>: the branch in lower case, [a-z0-9-] only, at most 40 characters. Schema: preview_<slug> with "_"
 # for "-".
 set -euo pipefail
@@ -31,9 +37,13 @@ git check-ref-format --branch "$branch" >/dev/null 2>&1 || die "\"$branch\" is n
 slug="$(branch_slug "$branch")"
 schema="$(preview_schema "$slug")"
 
-# The files whose changes the lead reviews before a preview runs the branch's install and build here.
+# The files whose changes the lead reviews before a preview runs the branch's install and build here. The
+# validators' code imports Ajv's run-time helpers by package name, which node looks up in every node_modules
+# from actions/src/tool-api/generated/ up, so a node_modules the branch adds (a folder, a link of that name, or
+# anything in one) would run in place of the installed package.
 GUARDED_PATHS=(wrangler.jsonc wrangler.json wrangler.toml infra .github .npmrc
-  ':(glob)**/package.json' ':(glob)**/package-lock.json' ':(glob)**/npm-shrinkwrap.json')
+  ':(glob)**/package.json' ':(glob)**/package-lock.json' ':(glob)**/npm-shrinkwrap.json'
+  ':(glob)**/node_modules' ':(glob)**/node_modules/**')
 
 work="$(mktemp -d)"
 tree="$work/tree"
@@ -82,6 +92,13 @@ fi
 log "preview: check out $sha in a temporary worktree and install it (npm ci --ignore-scripts)"
 git -C "$ROOT" worktree add --quiet --detach "$tree" "$sha"
 (cd "$tree" && npm ci --ignore-scripts --no-audit --no-fund --loglevel=error)
+
+# Step 2: the worktree's own build script (infra/ is guarded above), run by node itself, so no npm script of
+# the branch's runs; it writes the generated folder beside the worktree's validator.ts. Before the database
+# key is loaded, and before anything is migrated or uploaded.
+log "preview: build the Tool API's validators in the worktree (node infra/build/tool-api-validators.mjs)"
+(cd "$tree" && node infra/build/tool-api-validators.mjs) ||
+  die "the Tool API's validators did not build for $branch ($sha): nothing was migrated or uploaded"
 
 load_dev_var STAGING_DATABASE_URL
 if [[ -n "${STAGING_DATABASE_URL:-}" ]]; then
