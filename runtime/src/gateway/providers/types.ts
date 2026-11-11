@@ -219,7 +219,7 @@ export interface ProviderDoors {
   /**
    * The most bytes a calendar push's body may have, at Google's door and Graph's (a config value, T-1195; ../body.ts):
    * over it, the push is answered 413 before its body is read whole and before it is checked, and nothing is stored.
-   * Left out, or not a whole number from 0, it is CALENDAR_BODY_LIMIT_BYTES (64 KiB).
+   * Left out, or not a whole number from 0, it is CALENDAR_BODY_LIMIT_BYTES (256 KiB, T-1201).
    */
   calendarBodyLimitBytes?: number;
 }

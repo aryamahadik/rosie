@@ -57,11 +57,14 @@ import type {
 export type CalendarSource = "google" | "microsoft";
 
 /**
- * The calendar doors' cap in bytes: 64 KiB, the card's default (T-1195), since K-16's spike findings from Google's and
- * Microsoft's documents give no size (rows 2, 9 to 11): Google's push and Graph's handshake have no body, and Rosie asks
- * Graph for basic notifications only, of which K-16's largest push (two lifecycle notices) is under 3 KB, fixture whole.
+ * The calendar doors' cap in bytes: 256 KiB, the Stripe door's and the Linq webhook's (T-1201; T-1195 had 64 KiB). K-16's
+ * spike findings from Google's and Microsoft's documents give no size (rows 2, 9 to 11). Google's push and Graph's
+ * handshake have no body, but Graph posts several notifications in one POST with no stated count, and sends again
+ * anything answered without a 2xx for up to 4 hours (row 10): a batch over the cap would be refused on every try and then
+ * lost, a calendar change missed. Rosie asks Graph for basic notifications only; K-16's largest push (two lifecycle
+ * notices) is under 3 KB, fixture whole.
  */
-export const CALENDAR_BODY_LIMIT_BYTES = 64 * 1024;
+export const CALENDAR_BODY_LIMIT_BYTES = 256 * 1024;
 
 /** K-07 v1's provider for each source's events (K-16 `calendarProviderEvent.provider`). */
 const EVENT_PROVIDER = {

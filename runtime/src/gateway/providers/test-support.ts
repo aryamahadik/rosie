@@ -9,6 +9,8 @@
 //   - the calendar port (K-16 v1 verifyNotification): a verifier made at test time for each watch, compared with the
 //     push's; a match answers the outcome of the K-16 fixture holding the same push, with the request's receipt time and
 //     trace, as the adapters do; a mismatch answers K-16's verifierMismatch;
+//   - a Graph batch (T-1201): one POST of many change notifications in K-16's shape, as an exchange the calendar double
+//     answers like a fixture (K-16 README spike row 10: several per POST, from different subscriptions);
 //   - K-05 v1.1 recordProviderEvent: written once by (provider, provider event id); a repeat writes nothing and answers
 //     the stored row's receivedAt and effectId, whatever the repeat's body (K-05 item 23; provider-event-recorded.json,
 //     provider-event-duplicate.json);
@@ -23,6 +25,7 @@ import type {
   CalendarPort,
   CalendarPushRequest,
   CalendarVerifyResult,
+  GraphChangeType,
   ProviderEvent,
   ProviderEventRecorded,
   ProviderEventStore,
@@ -378,6 +381,81 @@ export function graphValidationRequest(token: string): Request {
     `https://rosie.test${calendarPath("microsoft")}?validationToken=${encodeURIComponent(token)}`,
     { method: "POST", headers: { "content-type": "text/plain" }, body: "" },
   );
+}
+
+/** A K-16 verifyNotification exchange of one Graph POST of change notifications, as graphBatchExchange makes it. */
+export interface GraphBatchExchange extends CalendarExchange {
+  call: "verifyNotification";
+  given: { now: string; note: string; verifier: "valid" };
+  request: {
+    provider: "microsoft";
+    kind: "notifications";
+    notifications: Json[];
+    receivedAt: string;
+    traceId: string;
+  };
+  outcome: { result: "accepted"; httpStatus: 200; events: ProviderEvent[]; unknownWatches: number };
+}
+
+/** A batch's i-th subscription: Sam's and Maya's Outlook links in turn (K-16 README "The double", its world). */
+function batchWatchOf(index: number): { subscriptionId: string; calendarLinkId: string } {
+  return index % 2 === 0
+    ? { subscriptionId: "graph-sub-sam-01", calendarLinkId: "callink-sam-microsoft" }
+    : { subscriptionId: "graph-sub-maya-01", calendarLinkId: "callink-maya-microsoft" };
+}
+
+/** A batch's i-th change: created, updated and deleted in turn (K-16 graphNotice.changeType). */
+function batchChangeOf(index: number): GraphChangeType {
+  const turn = index % 3;
+  if (turn === 0) return "created";
+  return turn === 1 ? "updated" : "deleted";
+}
+
+/**
+ * One Graph POST of `count` basic change notifications in K-16's shape (README spike row 10: "several per POST, from
+ * different subscriptions", with no stated count), as a K-16 exchange in notification-microsoft.json's form: the i-th is
+ * change notification graph-notif-batch-<i>, for Sam's and Maya's subscriptions in turn, and the check stores each once
+ * under its notification id with notice changed. Test values only: K-16's cast, readable stand-in ids, and each
+ * clientState made at test time (given.verifier valid).
+ */
+export function graphBatchExchange(count: number, now: string): GraphBatchExchange {
+  const traceId = "trace-graph-batch-0001";
+  const notifications: Json[] = [];
+  const events: ProviderEvent[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const watch = batchWatchOf(index);
+    const changeType = batchChangeOf(index);
+    const notificationId = `graph-notif-batch-${String(index + 1).padStart(4, "0")}`;
+    notifications.push({
+      notificationId,
+      subscriptionId: watch.subscriptionId,
+      clientState: "made-at-test-time",
+      changeType,
+      lifecycleEvent: null,
+      subscriptionExpirationDateTime: "2026-11-13T09:20:30Z",
+    });
+    events.push({
+      provider: "microsoft_calendar",
+      providerEventId: notificationId,
+      eventType: changeType,
+      occurredAt: null,
+      receivedAt: now,
+      businessId: null,
+      effectId: null,
+      payload: { calendarLinkId: watch.calendarLinkId, watchId: watch.subscriptionId, notice: "changed" },
+      traceId,
+    });
+  }
+  return {
+    call: "verifyNotification",
+    given: {
+      now,
+      note: `Graph posts ${String(count)} basic change notifications in one POST, for Sam's and Maya's subscriptions in turn. Every clientState matches the one made for its subscription, so each is stored once under its notification id and the gateway answers 200.`,
+      verifier: "valid",
+    },
+    request: { provider: "microsoft", kind: "notifications", notifications, receivedAt: now, traceId },
+    outcome: { result: "accepted", httpStatus: 200, events, unknownWatches: 0 },
+  };
 }
 
 // ---- logs and spans -----------------------------------------------------------------------------------------------

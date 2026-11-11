@@ -16,15 +16,16 @@ import lifecycle from "../../../../contracts/port-calendar/fixtures/notification
 import validation from "../../../../contracts/port-calendar/fixtures/notification-microsoft-validation.json";
 import microsoft from "../../../../contracts/port-calendar/fixtures/notification-microsoft.json";
 import wrongVerifier from "../../../../contracts/port-calendar/fixtures/notification-rejected.json";
-import { unconfiguredGateway } from "..";
+import { LINQ_BODY_LIMIT_BYTES, unconfiguredGateway } from "..";
 import { countedStream, postOf, present, xBytes } from "../test-support";
-import { unconfiguredProviders } from ".";
+import { STRIPE_BODY_LIMIT_BYTES, unconfiguredProviders } from ".";
 import { CALENDAR_BODY_LIMIT_BYTES, handleCalendarWebhook, type CalendarSource } from "./calendar-webhook";
 import {
   calendarPath,
   calendarPortDouble,
   captureLogLines,
   googlePushRequest,
+  graphBatchExchange,
   graphBodyRequest,
   graphNotificationsRequest,
   graphValidationRequest,
@@ -985,7 +986,7 @@ describe("the calendar doors' body cap (T-1195; ../body.ts, as the page entry an
     expect(await googleAnswer({ calendarBodyLimitBytes: 0 })).toBe(200);
   });
 
-  it("through the Worker's routes: GatewayDeps.providers carries the cap, and the Worker with none set refuses a body one byte over 64 KiB", async () => {
+  it("through the Worker's routes: GatewayDeps.providers carries the cap, and the Worker with none set refuses a body one byte over 256 KiB", async () => {
     captureLogLines();
     const world = worldAt(microsoft.given.now);
     const routed = createWorker(() => ({
@@ -1007,5 +1008,75 @@ describe("the calendar doors' body cap (T-1195; ../body.ts, as the page entry an
     expect(world.store.calls).toEqual([]);
     expect(overDefault.status).toBe(413);
     expect(await overDefault.json()).toMatchObject({ ok: false, error: "payload_too_large" });
+  });
+
+  it("its default is 256 KiB, 262,144 bytes, the Stripe door's and the Linq webhook's (T-1201): Graph's batches have no stated size", () => {
+    expect(CALENDAR_BODY_LIMIT_BYTES).toBe(262144);
+    expect(CALENDAR_BODY_LIMIT_BYTES).toBe(STRIPE_BODY_LIMIT_BYTES);
+    expect(CALENDAR_BODY_LIMIT_BYTES).toBe(LINQ_BODY_LIMIT_BYTES);
+  });
+
+  it("through the Worker's routes with no cap set: Graph's notifications at the default cap are read whole, checked and stored, and one byte more is 413, never checked", async () => {
+    captureLogLines();
+    const world = worldAt(microsoft.given.now);
+    const routed = createWorker(() => ({
+      ...unconfiguredGateway(),
+      now: () => Date.parse(microsoft.given.now),
+      providers: world.deps,
+    }));
+
+    const atCap = await routed.fetch(await paddedGraph(world.port, CALENDAR_BODY_LIMIT_BYTES), env, context);
+    const over = await routed.fetch(
+      await paddedGraph(world.port, CALENDAR_BODY_LIMIT_BYTES + 1),
+      env,
+      context,
+    );
+
+    expect(atCap.status).toBe(200);
+    expect(over.status).toBe(413);
+    expect(world.port.requests).toHaveLength(1);
+    expect(world.store.rows.map((row) => row.providerEventId)).toEqual(["graph-notif-demo-0001"]);
+  });
+
+  it("a Graph batch of 100 notifications in K-16's shape, from two subscriptions, is read whole under the cap: every notice checked, each stored once, 200", async () => {
+    const logLines = captureLogLines();
+    const batch = graphBatchExchange(100, microsoft.given.now);
+    const { port, store, deps } = worldAt(microsoft.given.now, [...ALL, batch]);
+    const raw = await graphNotificationsRequest(batch.request.notifications, port.verifierOf).text();
+
+    const response = await handleCalendarWebhook(graphBodyRequest(raw), "microsoft", deps, WHERE);
+
+    expect(new TextEncoder().encode(raw).byteLength).toBeLessThanOrEqual(CALENDAR_BODY_LIMIT_BYTES);
+    expect(response.status).toBe(200);
+    const traceId = response.headers.get("x-trace-id");
+    expect(await response.json()).toEqual({ ok: true, trace_id: traceId });
+    const receivedAt = "2026-11-08T16:00:00.000Z";
+    expect(port.requests).toEqual([
+      {
+        provider: "microsoft",
+        kind: "notifications",
+        notifications: batch.request.notifications.map((notice) => ({
+          ...notice,
+          clientState: port.verifierOf(String(notice.subscriptionId)),
+        })),
+        receivedAt,
+        traceId,
+      },
+    ]);
+    expect(store.rows).toHaveLength(100);
+    expect(store.rows).toEqual(batch.outcome.events.map((event) => ({ ...event, receivedAt, traceId })));
+    const spans = providerSpans(logLines());
+    expect(spans).toHaveLength(1);
+    expect(spans[0]).toMatchObject({
+      trace_id: traceId,
+      provider: "microsoft_calendar",
+      call: "verifyNotification",
+      outcome: "ok",
+      decided: { result: "accepted", stored: 100, unknownWatches: 0 },
+      error_code: null,
+    });
+    // Two subscriptions and two links: the span names neither, only the count.
+    expect(spans[0]?.got).toEqual({ notices: 100 });
+    expectClosedSpanFacts(spans[0]);
   });
 });
