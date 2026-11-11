@@ -1767,6 +1767,110 @@
       "expect": "refuse",
       "shows": "The poll's repeated receipt answered with repeatedDelivery null: a delivery receipt answered repeated always states the delivery it repeats, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming (put right, its outcome is mark-a7-03-poll-delivered-repeat's)",
       "source": "arch 02 line 127; STATE note 38; K-05 v1.9 item 48, default 87"
+    },
+    {
+      "file": "read-question-facts-s1-02.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the clock arming reads S1-02's question to Sam as its first delivery receipt comes, by the id markPart answers: no Clock line, Lee's Barbershop's zone (America/New_York), no visit and no never-delivered row, so the due rule gives 8pm the day after delivery",
+      "source": "ADR-013; K-09 v1.5 default 134; arch 02 line 127; runtime/src/clocks/types.ts QuestionFacts; QUESTIONS.md CQ-200; STATE note 37; K-04 v1 open_questions.clock, businesses.time_zone; K-05 v1.10 item 49"
+    },
+    {
+      "file": "read-question-facts-a7-03.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "A question about a booking: A7-03's 24-hour Clock line, the barbershop's zone and the haircut's visit, flow A, starting at its booked reservation's 15:00:00Z, the earliest of its held or booked times, with the saved and waiting times of no booking left out; so the clock arms 24 h from the delivery, as arm-clock-a7-03-after-4006 arms it",
+      "source": "tour lines 423 to 427; arch 02 line 127 ('the visit's start, which always comes first'); S13-35; RULES 2.1; K-04 v1 bookings.flow, reservations.during, reservations_booking_idx; K-05 v1.10 item 49, defaults 90 and 91"
+    },
+    {
+      "file": "read-question-facts-unknown.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "A question no row holds is notFound, with nothing written, so the clock arming arms nothing and reports it",
+      "source": "runtime/src/clocks/arming.ts (questionNotFound); K-05 v1 notFoundError; K-05 v1.10 item 49"
+    },
+    {
+      "file": "read-handle-sam.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "The handle of S1-02's clock row, test owner 1's handle-sam, read by id as K-04 stores it: a phone at tp-01's number, from which the directory names Sam's actor with the gateway's own rule (phone:+15555550100)",
+      "source": "QUESTIONS.md CQ-200; runtime/src/gateway/seal.ts actorNameOf; runtime/src/wiring/real.ts ArmingCalls.actorNameOf; K-04 v1 handles; K-06 v1 handle; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "read-handle-alex-email.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "An email handle read by id: kind email and the lower-case address as K-04 stores them, so its actor is named email:alex@example.com, as the gateway names it",
+      "source": "arch 01 line 55; arch 10 line 502 (one actor per handle); K-04 v1 handles_address_form; K-06 v1 handle; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "read-handle-unknown.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "An id no handle row holds answers handle null, never an error, which the directory reads as no actor, so the arming tells none and the minute sweep fires the row once it is missed",
+      "source": "runtime/src/wiring/real.ts ArmingCalls.actorNameOf ('null when K-04 holds no such handle'); runtime/src/clocks/arming.ts (noActor); K-05 v1.10 item 50, default 95"
+    },
+    {
+      "file": "read-chat-handle-sam.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the receipt for Sam's reply carries the chat id turn 1's commit wrote on S1-01's thread, which names handle-sam and its number, the handle the receipt's event carries",
+      "source": "ADR-013 section 4; K-09 v1.5 commit-s1-01.json, default 135; QUESTIONS.md CQ-61; adapters/src/linq/webhook/parse.ts receiptHandle; K-04 v1 threads.linq_chat_id, threads_linq_chat_key; K-05 v1.10 item 51, default 94"
+    },
+    {
+      "file": "read-chat-handle-alex.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "K-06's delivered receipt names linq-chat-demo-alex, the chat K-04's seed holds for Alex's phone: the read gives handle-alex and +15555550101, the handle that receipt's event carries",
+      "source": "K-06 v1 delivered.json; K-04 v1 seed-thread-messages.json (thread-alex-chat); QUESTIONS.md CQ-61; K-05 v1.10 item 51"
+    },
+    {
+      "file": "read-chat-handle-unknown.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "A chat id no thread holds, as for a reply to someone whose first text wrote no chat thread: both fields null, so the gateway answers 503 and Linq retries, and the receipt is never placed on a guessed handle",
+      "source": "QUESTIONS.md CQ-61 ('the adapter answers 503 for a receipt it cannot place'); arch 02 line 109; K-05 open gap 48; K-05 v1.10 item 51, defaults 94 and 95"
+    },
+    {
+      "file": "invalid/refuse-question-facts-caller-business.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "refuse",
+      "shows": "A facts request naming a business beside the question: the read takes the business, its zone and the booking from the question's own row, so no caller names another business's (put right, with the question named alone, it is read-question-facts-s1-02)",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-05 v1.10 item 49"
+    },
+    {
+      "file": "invalid/refuse-question-facts-visit-address.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.response",
+      "expect": "refuse",
+      "shows": "A7-03's facts answered with a visit address: v1.10 reads no visit address or zone, K-30's tables not being migrated, and no K-05 answer carries an address (put right, it is read-question-facts-a7-03's outcome)",
+      "source": "rule 7; K-30 v1 (frozen, not migrated); K-05 v1.2 default 34; K-05 v1.10 item 49, default 91"
+    },
+    {
+      "file": "invalid/refuse-read-handle-phone-not-e164.json",
+      "version": "v1.10",
+      "def": "readHandle.response",
+      "expect": "refuse",
+      "shows": "Sam's phone handle answered with its number in another form than E.164: the answer is the address K-04 stores, the form the gateway names the actor by, so a number written another way would name an actor that holds none of his texts (put right, it is read-handle-sam's outcome)",
+      "source": "K-04 v1 handles_address_form; K-06 v1 handle; runtime/src/gateway/seal.ts actorNameOf; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "invalid/refuse-chat-handle-email.json",
+      "version": "v1.10",
+      "def": "readChatHandle.response",
+      "expect": "refuse",
+      "shows": "Alex's chat answered with his email handle: a Linq chat's handle is a phone, the number the receipt's event carries, so the answer names a phone handle or none (put right, it is read-chat-handle-alex's outcome)",
+      "source": "K-06 v1 ('A Linq event comes from a phone'); arch 01 line 55; adapters/src/linq/webhook/parse.ts receiptHandle; K-05 v1.10 item 51, default 94"
     }
   ]
 }

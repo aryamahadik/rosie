@@ -1,0 +1,19 @@
+{
+  "call": "readQuestionFacts",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "The walking skeleton's turn 1 (ADR-013): turn-s1-01-sam committed S1-02's question to Sam, oq-s1-02-sam-1, at Lee's Barbershop, about no booking, with no Clock line (step 9's default: K-09 v1.5 default 134) and its question clock row waiting, and made no never-delivered row (STATE note 37). When outbox-s1-02-sam-1's first delivery receipt comes, the dispatcher hands markPart's firstDelivery to the clock arming (T-564's hop 13), which reads these facts by the openQuestionId markPart answers: the question's own Clock line (null), its business's zone (biz-lees-barbershop's America/New_York, from K-04's seed-business-head.json, which seed-person-roles.json loads first, as T-1148's db/seeds/skeleton.ts holds it), no visit and no never-delivered row. Nothing the read reads changes between the commit and the receipt, so it is read here right after the commit. The due rule then gives 8pm the day after delivery in America/New_York (noVisit), as T-564's hop 13 arms it. Sam's three owner roles in seed-person-roles.json (the skeleton's seed gives none) are not read."
+  },
+  "request": {
+    "openQuestionId": "oq-s1-02-sam-1"
+  },
+  "outcome": {
+    "openQuestionId": "oq-s1-02-sam-1",
+    "clockLine": null,
+    "businessZone": "America/New_York",
+    "visit": null,
+    "neverDelivered": null
+  }
+}

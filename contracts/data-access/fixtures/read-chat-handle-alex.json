@@ -1,0 +1,19 @@
+{
+  "call": "readChatHandle",
+  "given": {
+    "k04Seeds": ["seed-thread-messages.json"],
+    "after": [],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "K-06 v1's delivered.json: Linq's receipt for A7-03's words, delivered at 14:05:04Z, carries the chat id linq-chat-demo-alex. K-04's seed-thread-messages.json holds that chat, thread-alex-chat, with handle-alex, a phone, so the read names it and its number, +15555550101, the handle that fixture's event carries. Alex's email thread, which holds no chat id, is not read."
+  },
+  "request": {
+    "linqChatId": "linq-chat-demo-alex"
+  },
+  "outcome": {
+    "handleId": "handle-alex",
+    "handle": {
+      "kind": "phone",
+      "address": "+15555550101"
+    }
+  }
+}

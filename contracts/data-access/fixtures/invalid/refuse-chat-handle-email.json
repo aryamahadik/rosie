@@ -1,0 +1,7 @@
+{
+  "handleId": "handle-alex-email",
+  "handle": {
+    "kind": "email",
+    "address": "alex@example.com"
+  }
+}

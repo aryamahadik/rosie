@@ -1,0 +1,19 @@
+{
+  "call": "readHandle",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "A handle of kind email has its own actor too (arch 10 line 502: one actor per handle; arch 01 line 55): a clock row owned by Alex's email handle, handle-alex-email in K-04's seed-person-roles.json, is handed to the actor actorNameOf names from this answer, email:alex@example.com, the one the gateway writes his email replies to. The kind and the address are K-04's as stored, in K-06 v1's handle shape."
+  },
+  "request": {
+    "handleId": "handle-alex-email"
+  },
+  "outcome": {
+    "handleId": "handle-alex-email",
+    "handle": {
+      "kind": "email",
+      "address": "alex@example.com"
+    }
+  }
+}

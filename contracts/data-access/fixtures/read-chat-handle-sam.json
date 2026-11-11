@@ -1,0 +1,19 @@
+{
+  "call": "readChatHandle",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "The walking skeleton's turn 1 (ADR-013): the delivered receipt for Sam's reply, outbox-s1-02-sam-1, carries Linq's chat id, linq-chat-demo-sam, not his number, so the gateway's Linq verify asks for the chat's handle before it builds the receipt's K-06 event. Turn 1's commit wrote S1-01's thread with that chat id (K-09 v1.5 commit-s1-01.json given.stated.writes; README v1.5 default 135), a row no K-05 exchange writes, since K-05's commit-s1-01-sam leaves the thread out, so this exchange's database side writes it itself before the read: threads id thread-s1-01-sam-1, handle_id handle-sam, kind chat, booking_id null, linq_chat_id linq-chat-demo-sam, reply_address null, version 1. The chat names handle-sam, a phone at tp-01's number (K-04's seed-person-roles.json; T-1148's db/seeds/skeleton.ts), which the adapter takes as the receipt's handle. The number is never logged or put in a span or an entry, nor is the chat id."
+  },
+  "request": {
+    "linqChatId": "linq-chat-demo-sam"
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "handle": {
+      "kind": "phone",
+      "address": "+15555550100"
+    }
+  }
+}

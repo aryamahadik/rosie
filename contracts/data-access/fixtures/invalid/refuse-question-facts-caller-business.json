@@ -1,0 +1,20 @@
+{
+  "call": "readQuestionFacts",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "Refused: the request names a business beside the question, the yoga studio's. The read takes the business, its zone and the booking from the question's own row, so no caller can name another business's zone or visit for a question (README item 49). Put right, with the question named alone, it is read-question-facts-s1-02."
+  },
+  "request": {
+    "openQuestionId": "oq-s1-02-sam-1",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "openQuestionId": "oq-s1-02-sam-1",
+    "clockLine": null,
+    "businessZone": "America/New_York",
+    "visit": null,
+    "neverDelivered": null
+  }
+}
