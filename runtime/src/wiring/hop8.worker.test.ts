@@ -213,6 +213,8 @@ function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId> | 
     frontierScope: fakes.frontier.scope,
     deciders: fakes.decide.deciders,
     gateReads: fakes.gate.reads,
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
     flags: fakeFlags([SKELETON_FLAG]),
   });
 }

@@ -1,22 +1,29 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559), under Node (Vitest
-// project "unit"): the ports the root binds in each environment, each once and none left unbound; the check that refuses
-// a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed implementation the
-// Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on staging, T-553 the
-// sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's targets, T-557 the
-// frontier, T-558 decide, T-559 the gate; production takes no join yet).
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560), under Node
+// (Vitest project "unit"): the ports the root binds in each environment, each once and none left unbound; the check that
+// refuses a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed
+// implementation the Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on
+// staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's
+// targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer; production takes no
+// join yet).
+import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
+import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
+import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
 import { openTrace, type Span } from "../trace";
 import type {
   BuildFrontierRequest,
+  ComposeInput,
+  ComposeInputRequest,
   DecideContext,
   DecideResult,
   GateAndCommitRequest,
+  MessagePlan,
   ParkTurnRequest,
 } from "../turn/types";
 import {
@@ -26,6 +33,7 @@ import {
   environmentOf,
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
+  NoComposerError,
   NoDatabaseError,
   NoDeciderError,
   NotJoinedError,
@@ -63,6 +71,8 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "frontier",
     "decide",
     "gate",
+    "composeInput",
+    "composer",
   ],
   staging: [
     "linqVerify",
@@ -74,9 +84,17 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "frontier",
     "decide",
     "gate",
+    "composeInput",
+    "composer",
   ],
   production: [],
 };
+
+/** compose-input-s1-02.json's request (S1-02's row of turn 1) on a trace of its own: its caller's trace id that trace's. */
+function composeOneOn(traceId: string): ComposeInputRequest {
+  const request = structuredClone(composeInputS102.request) as unknown as ComposeInputRequest;
+  return { ...request, caller: { ...request.caller, traceId } };
+}
 
 /**
  * commit-s1-01.json's request (turn 1's gateAndCommit, its turn carrying the service and chat id of Sam's text) on a
@@ -104,7 +122,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's fifteen ports in its turn order", () => {
+  it("names D-017's sixteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -117,6 +135,7 @@ describe("the ports the root binds", () => {
       "turnFace",
       "decide",
       "gate",
+      "composeInput",
       "composer",
       "finalize",
       "dataAccess",
@@ -128,7 +147,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide and gate to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input and composer to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -186,9 +205,10 @@ describe("the ports the root binds", () => {
     expect(root.safety.direct).toBe(fakes.ports.linqSend.direct);
     expect(root.turn.directory).toBe(fakes.ports.stateReads.turn.directory);
     expect(root.turn.safety).toBe(fakes.ports.stateReads.turn.safety);
-    // The turn's decide and its one re-read go to the joined decide port (T-558), never to a fake.
+    // The turn's decide and its one re-read go to the joined decide port (T-558), never to a fake; its composer and the
+    // one rewrite to the joined composer port (T-560).
     expect(root.turn.ai).toBe(root.ports.decide);
-    expect(root.turn.composer).toBe(fakes.ports.composer);
+    expect(root.turn.composer).toBe(root.ports.composer);
     // The turn's plan calls go to the data-access port; its park writes the turn's one row through the turn-row port
     // (T-555), never through the data-access port's fake.
     const park = await leasePark();
@@ -199,7 +219,7 @@ describe("the ports the root binds", () => {
     expect(root.turn.dispatcher).toBe(root.dispatcher);
   });
 
-  it("puts the turn face and finalize together as the turn's Tool API, each call to its own port", async () => {
+  it("puts compose input and finalize together as the turn's Tool API, each call to its own port: compose input to the joined port (with no reads handed in, it fails closed inside the Tool API base, with no span), finalize to its fake", async () => {
     const fakes = skeletonFakes();
     const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
     const caller = {
@@ -211,8 +231,20 @@ describe("the ports the root binds", () => {
       traceId: "trace-wiring",
     };
     const trace = {} as Parameters<Ports["finalize"]["finalizeMessage"]>[1];
+    const spans: Span[] = [];
+    const composeTrace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    const compose = composeOneOn(composeTrace.traceId);
+    composeTrace.setTurn(compose.caller.turnId);
 
-    await root.turn.toolApi.composeInput({ caller, outboxRowId: "out-wiring" }, trace);
+    await expect(root.turn.toolApi.composeInput(compose, composeTrace)).rejects.toThrow(
+      new NoDatabaseError("composeInput"),
+    );
+    expect(spans).toEqual([]);
+    expect(fakes.compose.scopes).toEqual([]);
     await root.turn.toolApi.finalizeMessage(
       {
         caller,
@@ -229,7 +261,7 @@ describe("the ports the root binds", () => {
       trace,
     );
 
-    expect(fakes.face.log).toEqual(["composeInput:out-wiring", "finalize:composed:out-wiring"]);
+    expect(fakes.face.log).toEqual(["finalize:composed:out-wiring"]);
   });
 });
 
@@ -260,13 +292,14 @@ describe("a port bound twice or left unbound is refused, naming the port", () =>
   });
 
   it("refuses a port whose picked implementation is not at hand", () => {
-    // The composer: a port no join has reached yet, so the test environment picks its fake (decide is joined, T-558).
+    // Finalize: a port no join has reached yet (T-561), so the test environment picks its fake (the composer is joined,
+    // T-560).
     const partial = Object.fromEntries(
-      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "composer"),
+      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "finalize"),
     ) as Partial<Ports>;
 
     expect(() => bindPorts(PICKS, "test", { ...sets, fake: partial })).toThrow(
-      new WiringError("left unbound in test: composer (no fake implementation)"),
+      new WiringError("left unbound in test: finalize (no fake implementation)"),
     );
   });
 
@@ -391,6 +424,53 @@ describe("the Worker's environments", () => {
     // The turn records the gate and commit spans around the call; the base records none for it (DL-376).
     expect(spans).toEqual([]);
   });
+
+  it("fails compose input closed with no database bound (until T-567): inside the Tool API base, before anything is read, with no span", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    const request = composeOneOn(trace.traceId);
+    trace.setTurn(request.caller.turnId);
+
+    await expect(root.turn.toolApi.composeInput(request, trace)).rejects.toThrow(
+      new NoDatabaseError("composeInput"),
+    );
+    // The turn records the row's fillAndChecks span; the base records none for compose input (DL-376).
+    expect(spans).toEqual([]);
+  });
+
+  it("fails the composer and its rewrite closed with no composer bound (until J-02): before any model call, with no span", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    // Recording 4's request (K-02 README "v1.1"): the JOIN run's S1-02 row, as compose input gives it on bundle v0.
+    const input = structuredClone(joinComposeInput) as unknown as ComposeInput;
+    trace.setTurn(input.turn);
+    const plan = structuredClone(planS102) as unknown as MessagePlan;
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    try {
+      await expect(root.turn.composer.compose(input, trace)).rejects.toThrow(new NoComposerError());
+      await expect(
+        root.turn.composer.rewrite(
+          { input, plan, failed: [{ check: "oneQuestion", detail: "two questions" }] },
+          trace,
+        ),
+      ).rejects.toThrow(new NoComposerError());
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(fetch).not.toHaveBeenCalled();
+    expect(spans).toEqual([]);
+  });
 });
 
 describe("a closed port", () => {
@@ -415,6 +495,15 @@ describe("a closed port", () => {
     );
     await expect(closed.gate.gateAndCommit({} as never, {} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("gate"),
+    );
+    await expect(closed.composeInput.composeInput({} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("composeInput"),
+    );
+    await expect(closed.composer.compose({} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("composer"),
+    );
+    await expect(closed.composer.rewrite({} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("composer"),
     );
     await expect(closed.dataAccess.outbox.claimOutbox({} as never)).rejects.toThrow(
       new NotJoinedError("dataAccess"),

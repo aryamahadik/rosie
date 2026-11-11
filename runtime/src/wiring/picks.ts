@@ -27,7 +27,13 @@
 // can be read there (J-02), so every decide and re-read there fails closed before any model call; gate (T-559), K-09
 // gateAndCommit through @rosie/actions' turn face (the gate, then one K-05 commitTurn through the turn-row port, under the
 // turn id, on the turn's pinned bundle), its reads fed in a test by the K-05 doubles over test owner 1's seeded rows and
-// by no database on staging until T-567, so every gate there fails closed and nothing commits. Every other port of
+// by no database on staging until T-567, so every gate there fails closed and nothing commits; composeInput (T-560), K-09
+// composeInput through @rosie/actions' turn face (each committed row's K-03 composer input from K-05 v1.6 readOutboxRow
+// and the row's pinned bundle, its inbound text the words the turn's gate request handed in), fed in a test by a K-05
+// double over the rows the commit wrote and test owner 1's seeded rows and by no database on staging until T-567, so
+// every compose input there fails closed; and composer (T-560), @rosie/ai's composer and its one rewrite, one per bundle,
+// over the recorded-model double in a test and over no composer on staging until the bundle's manifest and the model key
+// can be read there (J-02), so every compose and rewrite there fails closed before any model call. Every other port of
 // the Worker's environments stays closed: each call fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
@@ -63,10 +69,11 @@ export const PICKS: readonly PortPick[] = [
   { port: "targets", test: "real", staging: "real", production: "closed" }, // T-556
   { port: "frontier", test: "real", staging: "real", production: "closed" }, // T-557
   { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
-  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-560
+  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
   { port: "decide", test: "real", staging: "real", production: "closed" }, // T-558
   { port: "gate", test: "real", staging: "real", production: "closed" }, // T-559
-  { port: "composer", test: "fake", staging: "closed", production: "closed" }, // T-560
+  { port: "composeInput", test: "real", staging: "real", production: "closed" }, // T-560
+  { port: "composer", test: "real", staging: "real", production: "closed" }, // T-560
   { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561
   { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
   { port: "linqSend", test: "fake", staging: "closed", production: "closed" }, // T-563

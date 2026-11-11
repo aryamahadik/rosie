@@ -168,6 +168,8 @@ function rig(log: MockInstance): Rig {
     frontierScope: fakes.frontier.scope,
     deciders: fakes.decide.deciders,
     gateReads: fakes.gate.reads,
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restore = root.install();
