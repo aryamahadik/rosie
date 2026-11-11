@@ -38,8 +38,10 @@
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
 // root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
-// they are sent or answer. The spans are the log lines the target captures; the actor's inbox, safety state, batches
-// and turns are read inside its Durable Object, and the K-05 doubles keep the rows they wrote.
+// they are sent or answer. The spans are the log lines the run captures from before the root is composed, which the
+// target reads a trace from by its id, and which the run hands over whole (`spans`), every trace's, so a test can see
+// everything a webhook added to the log (T-466); the actor's inbox, safety state, batches and turns are read inside its
+// Durable Object, and the K-05 doubles keep the rows they wrote.
 //
 // Inside workerd, Ajv's compiler cannot run and contracts/ is not on disk, so the trace is checked against K-08 by the code
 // T-1144 prebuilds for the Worker (prebuiltTraceCheck). Test values only (rule 9): the master's sample cast, the fictional
@@ -49,6 +51,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 
 import { createToolApiValidator } from "../../../actions/src/tool-api/validator";
+import type { Span } from "../../../contracts/generated/event-trace/event-trace.v1";
 import type { HandleActor } from "../../../runtime/src/actor";
 import { actorNameOf } from "../../../runtime/src/gateway";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "../../../runtime/src/wiring";
@@ -59,7 +62,14 @@ import {
   type SkeletonFakes,
   type WatchedGateCall,
 } from "../../../runtime/src/wiring/test-support";
-import { createLocalTarget, makeTestWebhookSecret, type LocalTarget, type TraceCheck } from "../_driver";
+import {
+  captureConsoleLog,
+  createLocalTarget,
+  makeTestWebhookSecret,
+  spansOfLogLines,
+  type LocalTarget,
+  type TraceCheck,
+} from "../_driver";
 
 type Namespace = DurableObjectNamespace<HandleActor>;
 
@@ -148,7 +158,12 @@ export interface RootRun {
   readonly root: Root;
   /** Each gateAndCommit the turn handed the root, as the turn made it, with the gate port's answer (watchGate). */
   readonly gateCalls: readonly WatchedGateCall[];
-  /** Puts the actor's earlier ports back and stops the target's log capture. */
+  /**
+   * Every span the run has logged so far, on every trace, in the order its lines were written: the whole log the target
+   * reads each trace from (T-465's spansOfLogLines over the captured lines).
+   */
+  spans(): Span[];
+  /** Puts the actor's earlier ports back and stops the run's log capture. */
   close(): void;
 }
 
@@ -156,13 +171,16 @@ export interface RootRun {
 export function startRootRun(): RootRun {
   const fakes = skeletonFakes();
   const secret = makeTestWebhookSecret();
-  // The target first: its log capture is in place before the root binds its span sinks to console.log.
+  // The log capture first: it is in place before the root binds its span sinks to console.log. The target reads each
+  // trace from it, and the run hands it over whole (`spans`).
+  const log = captureConsoleLog();
   const target = createLocalTarget({
     gateway: (request) => root.linqWebhook(request),
     basePath: env.BASE_PATH,
     webhookSecret: secret,
     // Join 12: the Linq double the dispatcher sends to, whose parts the target collects.
     linq: fakes.linq.double,
+    spans: log.reader,
     now: () => fakes.clock.now(),
     traceCheck: prebuiltTraceCheck(),
   });
@@ -204,6 +222,7 @@ export function startRootRun(): RootRun {
   } catch (error) {
     // Nothing is left capturing console.log when the root cannot be composed.
     target.close();
+    log.stop();
     throw error;
   }
   // Join 13: the Linq double's delivery receipt for each part it accepted, through the gateway, once, echoing the part's
@@ -231,8 +250,10 @@ export function startRootRun(): RootRun {
     fakes,
     root,
     gateCalls: watched.calls,
+    spans: () => spansOfLogLines(log.lines),
     close() {
       target.close();
+      log.stop();
       watched.restore();
       restore();
     },
