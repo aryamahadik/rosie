@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 394, [`0770355`](https://github.com/aryamahadik/rosie/commit/0770355), 2026-11-11 16:49:06 UTC.
+- **Through:** commit 396, [`035381d`](https://github.com/aryamahadik/rosie/commit/035381d), 2026-11-11 17:11:04 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 396. docs: COMMIT\_HISTORY.md through commit 394 (0770355, \#400) (\#403)
+
+- **Commit:** [`035381d`](https://github.com/aryamahadik/rosie/commit/035381d), by Arya Mahadik, 2026-11-11 17:11:04 UTC
+- **Pull request:** [#403](https://github.com/aryamahadik/rosie/pull/403) from `task/commit-history-21`, merged 2026-11-11 17:11:05 UTC. It squashed 1 branch commit:
+  - `8a0248e` docs: COMMIT\_HISTORY.md through commit 394 (0770355, \#400)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 395. T-568: staging secrets by name: each value piped to wrangler on standard input, never shown, staging only (\#402)
+
+- **Commit:** [`e33d147`](https://github.com/aryamahadik/rosie/commit/e33d147), by Arya Mahadik, 2026-11-11 17:10:59 UTC
+- **Pull request:** [#402](https://github.com/aryamahadik/rosie/pull/402) from `task/T-568`, merged 2026-11-11 17:10:59 UTC. It squashed 3 branch commits:
+  - `0dba368` T-568: put-staging-secrets.sh puts staging's Worker secrets by name f…
+  - `47b9993` Merge branch 'main' into task/T-568
+  - `534d4ed` T-568: put-staging-secrets.sh starts with none of its own variables i…
+- **Files changed:** 4 (+838 −1), by folder:
+  - `infra/ci/` README.md +2 −0, put-staging-secrets.test.mjs +655 −0
+  - `infra/scripts/` put-staging-secrets.sh +179 −0
+  - `/` package.json +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-568: put-staging-secrets.sh puts staging's Worker secrets by name from the build Mac through cf.sh on standard input, printing only each name with set or missing; its test, the README line and npm run secrets:staging
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-568: put-staging-secrets.sh starts with none of its own variables inherited or marked for export (allexport off, its names and load_dev_var's unset before any read); two test cases that fail on round 1's script
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 394. docs: COMMIT\_HISTORY.md through commit 392 (5471539, \#399) (\#400)
 
