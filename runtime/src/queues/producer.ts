@@ -8,8 +8,8 @@
 //   - `runJob`: runs a job's first try where it starts (a sweep, a daily job) and hands a failure on the same way. The
 //     ledger keys it by the job key, so the same job started twice runs once.
 //
-// The RETRY_QUEUE binding is the release engineer's (wrangler.jsonc, T-279; NQ-RT-5); env.staging has no copy until
-// T-566, so there `retryQueueOf` gives null and nothing is enqueued (answered `noQueue`).
+// The RETRY_QUEUE binding is the release engineer's (wrangler.jsonc, T-279; NQ-RT-5); env.staging repeats it since
+// T-566. Where an environment has no copy, `retryQueueOf` gives null and nothing is enqueued (answered `noQueue`).
 
 import { isolateJobs } from "./ledger";
 import { isErrorLabel, isUtc, jobProblem, lastTryOf, nextMessageOf, retryAfterOf, utcOf } from "./message";
@@ -27,7 +27,7 @@ import {
 declare global {
   namespace Cloudflare {
     interface Env {
-      /** The retry queue's producer (wrangler.jsonc, T-279). Missing where the environment has no copy (env.staging until T-566). */
+      /** The retry queue's producer (wrangler.jsonc, T-279; env.staging repeats it since T-566). Missing where the environment has no copy. */
       RETRY_QUEUE?: Queue;
     }
   }

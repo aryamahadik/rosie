@@ -3,14 +3,18 @@
 // {BASE_PATH}/privacy, with its headers as web sets them, while the Linq webhook, the page entry and the other routes
 // before it answer as they did. The Worker gets wrangler.jsonc's staging vars (ENVIRONMENT "staging", BASE_PATH "/test")
 // and GIT_SHA "test-sha" from vitest.config.ts. A reader's values are made up (rule 9): a documentation IP address and
-// dummy tokens.
+// dummy tokens. And the retry queue's entry (T-1223): a retry batch that is the first event an isolate sees wires the
+// isolate first, as a request does, so its try runs at once and is never answered "unwired"; its ids are made up too.
 import { renderPrivacyPage } from "@rosie/web/src/pages/privacy/page";
 import { contentSecurityPolicy, pageHeaders } from "@rosie/web/src/shell/serve";
 import { createExecutionContext } from "cloudflare:test";
 import { env } from "cloudflare:workers";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import worker from "./index";
+import { queueDeps, SEND_SPACING_S, type RetryMessage } from "./queues";
+import { batchOf, fakeClock, fakeQueue, type FakeQueue } from "./queues/test-support";
+import { unwireWorker, wiredRoot, workerRoot } from "./wiring";
 
 const TRACE_ID = "4f1c2b7a-9d3e-4c5f-8a6b-1e2d3c4b5a69";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -291,5 +295,165 @@ describe("the routes before web's pages answer as they did (T-1192 adds the page
     expect(response.status).toBe(405);
     expect(response.headers.get("x-trace-id")).toBe(TRACE_ID);
     expect(await response.json()).toEqual({ ok: false, error: "method_not_allowed", trace_id: TRACE_ID });
+  });
+});
+
+/** The HandleActor namespace env.staging binds (T-566), which the pool's env carries. */
+function handleActorBinding(): DurableObjectNamespace {
+  const namespace = env.HANDLE_ACTOR;
+  if (namespace === undefined) throw new Error("env.staging binds no HANDLE_ACTOR");
+  return namespace;
+}
+
+/**
+ * The Worker's env for a retry batch: env.staging's vars and HandleActor binding under ENVIRONMENT `environment`, with the
+ * retry queue's producer a double (../queues/test-support), so the next try a batch hands on is read here and never
+ * reaches the pool's own queue.
+ */
+function retryEnv(environment: string, retryQueue: FakeQueue): Cloudflare.Env {
+  return {
+    ENVIRONMENT: environment,
+    BASE_PATH: env.BASE_PATH,
+    DB_SCHEMA: env.DB_SCHEMA,
+    GIT_SHA: "test-sha",
+    HANDLE_ACTOR: handleActorBinding(),
+    RETRY_QUEUE: retryQueue as unknown as Queue,
+  };
+}
+
+const RETRY_MESSAGE_ID = "0ft1223retry";
+
+/**
+ * A send job's second try as the dispatcher's run leaves it on the queue (runtime/src/dispatch/retry plan.ts: a row's
+ * part that got no answer, run again under the same key), due now. Ids and labels only, made up (rule 9).
+ */
+function sendRetry(at: number): RetryMessage {
+  return {
+    v: 1,
+    job: {
+      key: "retry-out-t1223-row/1/1#1",
+      kind: "send",
+      businessId: "biz-t1223",
+      traceId: TRACE_ID,
+      body: {
+        outboxRowId: "out-t1223-row",
+        recipientHandleId: "handle-t1223",
+        failedKey: "out-t1223-row/1/1",
+        chain: "rerun",
+        code: "noAnswer",
+      },
+    },
+    try: 2,
+    firstTriedAt: new Date(at - 10_000).toISOString(),
+    notBefore: new Date(at).toISOString(),
+    lastError: "SendFailed:noAnswer",
+  };
+}
+
+/** The retry queue's log lines (runtime/src/queues consumer.ts): one per message handled. */
+function retryLines(lines: unknown[]): unknown[] {
+  return lines.filter(
+    (line) => typeof line === "object" && line !== null && (line as { msg?: unknown }).msg === "retryQueue",
+  );
+}
+
+describe("the retry queue's entry wires the isolate first, as the fetch entry does (T-1223)", () => {
+  beforeEach(() => {
+    // The earlier tests' requests wired this isolate: unwire it, so the batch meets it as a fresh isolate would.
+    unwireWorker();
+  });
+
+  afterEach(() => {
+    unwireWorker();
+    vi.restoreAllMocks();
+  });
+
+  it("a retry batch that is the first event the isolate sees: the queue entry wires staging's root once, and the try runs at once through the dispatcher's door, never answered unwired", async () => {
+    const logLines = captureLogLines();
+    const retryQueue = fakeQueue(fakeClock("2026-11-11T12:00:00Z"));
+    const vars = retryEnv("staging", retryQueue);
+    const at = Date.now();
+    const due = sendRetry(at);
+    // Nothing is wired and the isolate has no retry queue ports: before T-1223 this batch was answered "unwired".
+    expect(wiredRoot()).toBeNull();
+    expect(queueDeps()).toBeNull();
+    const root = workerRoot(vars);
+    const install = vi.spyOn(root, "install");
+
+    const { batch, result, retries } = batchOf([{ id: RETRY_MESSAGE_ID, body: due }], at);
+    await worker.queue(batch, vars);
+
+    expect(install).toHaveBeenCalledTimes(1);
+    expect(wiredRoot()).toBe(root);
+    expect(queueDeps()).toBe(root.queue);
+    // The try ran: the door ran the recipient's rows again, whose claim staging's outbox refuses until T-567 binds its
+    // database (NoDatabaseError), so the next try went on the queue at once and the message was acked, not held a minute.
+    const handled = await result();
+    expect(handled.explicitAcks).toEqual([RETRY_MESSAGE_ID]);
+    expect(handled.retryMessages).toEqual([]);
+    expect(retries).toEqual([]);
+    expect(retryLines(logLines())).toEqual([
+      {
+        level: "info",
+        msg: "retryQueue",
+        trace_id: TRACE_ID,
+        job_id: due.job.key,
+        job_kind: "send",
+        try: 2,
+        message_id: RETRY_MESSAGE_ID,
+        outcome: "queuedNext",
+        error_code: "NoDatabaseError:threw",
+        retry_in_s: null,
+        environment: "staging",
+        version: "test-sha",
+      },
+    ]);
+    expect(retryQueue.sent.map((sent) => sent.options)).toEqual([
+      { contentType: "json", delaySeconds: SEND_SPACING_S },
+    ]);
+    expect(retryQueue.sent[0]?.message).toEqual({
+      ...due,
+      try: 3,
+      notBefore: expect.any(String) as unknown,
+      lastError: "NoDatabaseError:threw",
+    });
+
+    // A request after it finds the isolate wired: the fetch entry does not wire it again.
+    const health = await worker.fetch(
+      new Request(`https://rosie.test${env.BASE_PATH}/health`),
+      vars,
+      createExecutionContext(),
+    );
+    expect(health.status).toBe(200);
+    expect(install).toHaveBeenCalledTimes(1);
+  });
+
+  it("production: the queue entry wires production's root, every port closed as the fetch entry binds it, so the try claims and sends nothing", async () => {
+    const logLines = captureLogLines();
+    const retryQueue = fakeQueue(fakeClock("2026-11-11T12:00:00Z"));
+    const vars = retryEnv("production", retryQueue);
+    const at = Date.now();
+    const due = sendRetry(at);
+    expect(wiredRoot()).toBeNull();
+    expect(queueDeps()).toBeNull();
+    const root = workerRoot(vars);
+    expect(root.environment).toBe("production");
+    expect(root.bindings.filter((binding) => binding.implementation !== "closed")).toEqual([]);
+
+    const { batch, result } = batchOf([{ id: RETRY_MESSAGE_ID, body: due }], at);
+    await worker.queue(batch, vars);
+
+    expect(wiredRoot()).toBe(root);
+    expect(queueDeps()).toBe(root.queue);
+    // The door's claim reaches production's closed outbox port (NotJoinedError): nothing is claimed or sent.
+    expect((await result()).explicitAcks).toEqual([RETRY_MESSAGE_ID]);
+    expect(retryLines(logLines())).toEqual([
+      expect.objectContaining({
+        outcome: "queuedNext",
+        error_code: "NotJoinedError:threw",
+        environment: "production",
+      }),
+    ]);
+    expect(retryQueue.sent.map((sent) => sent.message.lastError)).toEqual(["NotJoinedError:threw"]);
   });
 });
