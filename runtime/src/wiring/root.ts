@@ -62,8 +62,11 @@
 // final parts finalize wrote, and reads limit 8's send state and the recipient's chat through the send-state port (T-562:
 // K-05 v1.2 sendState over RootOptions.sendStateCall) before any send; the receipt door marks a part delivered through the
 // same outbox port. The root's Linq door (./linq-door.ts) lets only a row whose claim names the linq port reach the Linq
-// port, each send within a time limit far below the claim's 60 s. The dispatcher records the dispatch span itself. Never
-// logged by the root: a word, a number, a key, a chat id.
+// port, each send within a time limit far below the claim's 60 s. The dispatcher records the dispatch span itself. A
+// number's text opens its chat at receipt through the chat-open port (T-1213: K-05 v1.7 openChatOnText over
+// RootOptions.chatOpenCall), the gateway's call after the key call and before the actor, with the handle's K-04 id the
+// key call answered, so the phone row limit 8 reads at send holds the chat open. Never logged by the root: a word, a
+// number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -100,6 +103,7 @@ import {
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type LinqVerifyInputs,
+  type OpenChatOnTextCall,
   type OutboxCalls,
   type SafetyReaders,
   type SendStateCall,
@@ -149,6 +153,14 @@ export interface RootOptions {
    * (./real.ts); null or left out where no database is bound, so every seal fails closed and the gateway answers 503.
    */
   readonly handleKey?: HandleSealingKeyCall | null;
+  /**
+   * K-05 v1.7 openChatOnText with its database bound (T-1213; ./real.ts OpenChatOnTextCall): db/repo/chat-open.ts's
+   * openChatOnText over a rosie_job client, the gateway's call at receipt for each text or photo a phone handle sends
+   * through Linq. In a test, the K-05 double over test owner 1's seeded handle and the handles the key call made, which
+   * writes the phone row the outbox and send-state doubles read; null or left out where no database is bound (the Worker
+   * until T-567), so every call fails closed and the gateway answers 503 for such a text, with nothing stored.
+   */
+  readonly chatOpenCall?: OpenChatOnTextCall | null;
   /**
    * @rosie/ai's safety read for each bundle (T-554; ./real.ts SafetyReaders): in a test, over the recorded-model double;
    * null or left out where none can be built (the Worker, until its bundle's manifest and model key can be read there),
@@ -286,6 +298,7 @@ export function composeRoot(options: RootOptions): Root {
     real: realPorts({
       linq: options.linq,
       handleKey: options.handleKey,
+      chatOpen: options.chatOpenCall ?? null,
       now,
       safetyRead: {
         readers: options.safetyReaders ?? null,
@@ -440,6 +453,8 @@ export function composeRoot(options: RootOptions): Root {
     actor: options.actors === null ? closedActorDoor() : durableObjectActor(options.actors),
     receipts,
     keys: ports.sealing,
+    // A number's text opens its chat after the key call and before the actor (T-1213; K-05 v1.7 item 46).
+    chats: ports.chatOpen,
     bundleId: () => activeBundleId(ports.bundles.registry),
     now,
     // The test-phone page's two calls, on staging only (T-1186): anywhere else the page entry refuses them first.
@@ -520,6 +535,10 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
     // No database is bound until T-567: the sealing port fails closed (./real.ts NoDatabaseError).
     handleKey: null,
+    // No database is bound until T-567 (its rosie_job client gives db/repo/chat-open.ts's openChatOnText): every call
+    // fails closed (./real.ts NoDatabaseError), so a text that opens a chat is answered 503 with nothing stored, as its
+    // seal already is.
+    chatOpenCall: null,
     // No safety read until the bundle's manifest (T-555's bundle reads, T-566's BUNDLES on staging) and the model key
     // (J-02; DL-027) can be read in the Worker: every read fails closed (./real.ts NoSafetyReaderError), so the actor
     // applies its no-verdict rule.

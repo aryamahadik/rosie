@@ -240,6 +240,8 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     clock: fakes.clock,
     linq: fakes.linqInputs,
     handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over the dispatch double: each text opens its number's chat before the actor.
+    chatOpenCall: fakes.dispatch.openChat,
     safetyReaders: fakes.models.readers,
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
