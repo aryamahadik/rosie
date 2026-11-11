@@ -332,11 +332,20 @@ describe("wrangler.jsonc's env.staging binds what create-staging-bindings.sh mak
     );
   });
 
-  it("repeats the top level's HandleActor binding, its migration and the one-minute cron, which the deploy makes", () => {
-    assert.deepEqual(staging.durable_objects, config.durable_objects);
-    assert.deepEqual(staging.durable_objects.bindings, [{ name: "HANDLE_ACTOR", class_name: "HandleActor" }]);
-    assert.deepEqual(staging.migrations, config.migrations);
-    assert.deepEqual(staging.migrations, [{ tag: "v1-handle-actor", new_sqlite_classes: ["HandleActor"] }]);
+  it("repeats the top level's HandleActor binding, its migration and the one-minute cron, and adds staging's test-phone line with its migration, all of which the deploy makes", () => {
+    // Staging alone adds the test-phone page's TestPhoneLine (T-1186, DL-379, DL-388) after HandleActor.
+    const line = { name: "TEST_PHONE_LINE", class_name: "TestPhoneLine" };
+    const lineMigration = { tag: "v2-test-phone-line", new_sqlite_classes: ["TestPhoneLine"] };
+    assert.deepEqual(staging.durable_objects, { bindings: [...config.durable_objects.bindings, line] });
+    assert.deepEqual(staging.durable_objects.bindings, [
+      { name: "HANDLE_ACTOR", class_name: "HandleActor" },
+      line,
+    ]);
+    assert.deepEqual(staging.migrations, [...config.migrations, lineMigration]);
+    assert.deepEqual(staging.migrations, [
+      { tag: "v1-handle-actor", new_sqlite_classes: ["HandleActor"] },
+      lineMigration,
+    ]);
     assert.deepEqual(staging.triggers, { crons: ["* * * * *"] });
   });
 });
