@@ -17,6 +17,7 @@
 import { linkUrl, type WebConfig } from "../shell/config";
 import { escapeHtml } from "../shell/frame";
 import type { RoutePage } from "../shell/route";
+import { isStagingConfig } from "../staging/guard";
 import { SIGNED_IN_AS_WORDS, type ConsoleLink, type SignedInAs } from "./consoles";
 
 /** The sign-in page's path under BASE_PATH: the form that starts a sign-in. */
@@ -123,7 +124,7 @@ export function startPage(
     "<h1>Sign in</h1>",
     ...problemLine(problem),
     p(
-      `Owners, admins, staff and Rosie's team sign in the same way, with a code.${config.staging ? " So do testers on staging." : ""} There is no password.`,
+      `Owners, admins, staff and Rosie's team sign in the same way, with a code.${isStagingConfig(config) ? " So do testers on staging." : ""} There is no password.`,
     ),
     formTo(config, SIGN_IN_PATH),
     hidden("requestId", form.requestId),

@@ -9,10 +9,13 @@
 // back, so a console never takes a role from the browser.
 //
 // The console paths are the feature folders' own names under web/src (console/owner, console/team, staging/test-phone);
-// each console's task serves its routes there.
+// each console's task serves its routes there. Whether this is staging is the staging-only guard's own reading of the
+// config (staging/guard isStagingConfig), the one the shell lists staging's test tools by, so a tester and the link to
+// the tools appear exactly where the tools exist and fail closed everywhere else (T-522's README).
 
 import type { ResponseOf } from "../client/calls";
 import type { WebConfig } from "../shell/config";
+import { isStagingConfig } from "../staging/guard";
 
 /** The signed-in person as signInCheck's signedIn answer gives them (K-21 v1 `SignedInPerson`). */
 export type SignedInPerson = Extract<ResponseOf<"signInCheck">, { result: "signedIn" }>["person"];
@@ -50,7 +53,7 @@ export interface ConsoleLink {
 export function signedInAs(person: SignedInPerson, config: WebConfig): SignedInAs[] {
   const held = new Set<SignedInAs>(person.roles.map((row) => row.role));
   if (person.team) held.add("team");
-  if (person.tester && config.staging) held.add("tester");
+  if (person.tester && isStagingConfig(config)) held.add("tester");
   return (Object.keys(SIGNED_IN_AS_WORDS) as SignedInAs[]).filter((as) => held.has(as));
 }
 
@@ -64,7 +67,7 @@ export function consolesFor(person: SignedInPerson, config: WebConfig): ConsoleL
   if (person.roles.length > 0)
     consoles.push({ kind: "business", path: BUSINESS_CONSOLE_PATH, words: "Your business console" });
   if (person.team) consoles.push({ kind: "team", path: TEAM_CONSOLE_PATH, words: "Rosie's team console" });
-  if (config.staging && (person.tester || person.team))
+  if (isStagingConfig(config) && (person.tester || person.team))
     consoles.push({ kind: "stagingTools", path: STAGING_TOOLS_PATH, words: "Staging's test tools" });
   return consoles;
 }

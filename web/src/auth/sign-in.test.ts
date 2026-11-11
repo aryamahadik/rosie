@@ -28,7 +28,7 @@ import {
   sessionCookie,
   sessionTokenOf,
 } from "./cookies";
-import { BAD_FORM, FIVE_WRONG, NEVER_ASKED, TRY_AGAIN, waitWords } from "./pages";
+import { BAD_FORM, FIVE_WRONG, NEVER_ASKED, TRY_AGAIN, startPage, waitWords } from "./pages";
 import { ROUTES } from "./routes";
 import {
   CHECK_OUTCOMES,
@@ -457,6 +457,31 @@ describe("a signed-in session carries the person's role to the consoles (owner, 
     expect(response.headers.getSetCookie()).toEqual([
       "__Secure-rosie-session=dummy-session-token-0001; Expires=Tue, 01 Dec 2026 00:00:00 GMT; Path=/; HttpOnly; Secure; SameSite=Lax",
     ]);
+  });
+
+  it("reads staging as the shell lists staging's tools: a config whose two values disagree is not staging", () => {
+    // Configs readWebConfig would never give (staging/guard isStagingConfig fails closed on them): no tester, no link to
+    // the tools, and the start page says nothing of testers.
+    const both = person(["owner"], { team: true, tester: true });
+    for (const config of [
+      { ...STAGING, environment: "production" },
+      { ...STAGING, environment: "Staging" },
+      { ...PRODUCTION, staging: true },
+      { ...STAGING, staging: false },
+    ]) {
+      const what = JSON.stringify(config);
+      expect(
+        consolesFor(both, config).map((open) => open.kind),
+        what,
+      ).toEqual(["business", "team"]);
+      expect(signedInAs(both, config), what).toEqual(["owner", "team"]);
+      expect(startPage(config, { requestId: "req-dummy-start-0001", link: null }).main, what).not.toContain(
+        "So do testers on staging.",
+      );
+    }
+    expect(startPage(STAGING, { requestId: "req-dummy-start-0001", link: null }).main).toContain(
+      "So do testers on staging.",
+    );
   });
 
   it("sign-in-already-signed-in.json: a later check of a signed-in attempt gives no token, so no cookie is set", async () => {

@@ -1,10 +1,12 @@
-// T-520 round 2's proofs for the order of the shell's checks (DL-491; build prompt 9.4): outside staging a staging
-// tool's route is not there, and the shell says so before its POST guards (post-guard.ts) look at the request. So the
-// answer is an unknown address's whatever the request carries (no Origin, another site's, this site's own, a body over
-// the cap): the 404 page from fetch and null from serve, never the guards' 403 or 413, with no handler called and none
-// of the body read. On staging, and for every route that is not guarded, the guards answer as they did. Beside them:
-// an unknown address still answers 404 to any POST. The tool is made up, written as a test tool's routes.ts would
-// write it, each handler a spy; every request value is made up (rule 9).
+// T-520 round 2's proofs for the order of the shell's checks (DL-491; build prompt 9.4). Outside staging a staging
+// tool's route is not in the shell's table, whether its folder is marked staging only (as web/src/routes.ts lists a
+// tool) or only the route itself is behind the staging-only guard (the folder's mark lost). So its address gets an
+// unknown address's answer for every method and whatever the request carries (no Origin, another site's, this site's
+// own, a body over the cap), decided before the POST guards (post-guard.ts) could look at the request: null from serve
+// and the 404 page from fetch, never the 403, 405 or 413 page, no Allow header, no handler called and none of the body
+// read. On staging, and for every route that is not guarded, the guards answer as before. Beside them: an unknown
+// address still answers 404 to any POST. The tool is made up, written as a test tool's routes.ts would write it, each
+// handler a spy; every request value is made up (rule 9).
 import { describe, expect, it, vi, type Mock } from "vitest";
 import { mockTransport } from "../client/test-support";
 import { stagingOnlyRoutes, type RouteHandler } from "../staging/guard";
@@ -13,7 +15,7 @@ import { renderErrorPage } from "./error-pages";
 import { POST_BODY_MAX_BYTES } from "./post-guard";
 import type { RouteMethod, RouteModule, ShellRoute } from "./route";
 import { createWebShell, type PageLogLine } from "./shell";
-import { TEST_LINK_HOST, TRACE_ID, rethrow, testShell, testVars } from "./test-support";
+import { TEST_LINK_HOST, TRACE_ID, get, rethrow, testShell, testVars } from "./test-support";
 
 const ORIGIN = `https://${TEST_LINK_HOST}`;
 
@@ -51,7 +53,10 @@ const folderOf = (tool: Tool, marked: boolean): RouteModule => ({
 });
 
 const LAYERS = [
-  { layers: "the folder's staging-only mark and the guard's mark, as web/src/routes.ts lists a tool", marked: true },
+  {
+    layers: "the folder's staging-only mark and the guard's mark, as web/src/routes.ts lists a tool",
+    marked: true,
+  },
   { layers: "the guard's mark alone, the folder's staging-only mark lost", marked: false },
 ];
 
@@ -62,6 +67,7 @@ const OUTSIDE_STAGING = [
   { where: 'ENVIRONMENT "staging " under /test', vars: { ...testVars("staging"), ENVIRONMENT: "staging " } },
 ];
 
+/** The methods every address is asked with: the two a route may take, HEAD, and three no route takes. */
 const METHODS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS"] as const;
 type Method = (typeof METHODS)[number];
 
@@ -83,10 +89,6 @@ type Body = (typeof BODIES)[number];
 /** GET and HEAD carry no body; every other method is asked with each. */
 const bodiesOf = (method: Method): readonly Body[] =>
   method === "GET" || method === "HEAD" ? ["no body"] : BODIES;
-
-/** True when the route takes the method: HEAD rides with GET (shell.ts). */
-const takes = (route: ShellRoute, method: Method): boolean =>
-  route.methods.some((taken) => taken === method || (taken === "GET" && method === "HEAD"));
 
 /** The route's address under the base path, its :item named. */
 const addressOf = (basePath: string, route: ShellRoute): string =>
@@ -147,26 +149,12 @@ describe("outside staging a guarded route answers as an unknown address does, be
         expect(config.staging).toBe(false);
         const { basePath } = config;
         let same = 0;
-        let limit = 0;
         for (const route of tool.routes) {
           for (const method of METHODS) {
             for (const { from, headers } of SENDERS) {
               for (const body of bodiesOf(method)) {
                 const what = `${method} ${addressOf(basePath, route)}, ${from}, ${body}`;
                 const asked = ask(addressOf(basePath, route), method, headers, body);
-                if (!marked && !takes(route, method)) {
-                  // The limit of the guard alone, which T-522's tests hold (staging/guard/guard.test.ts expectNoTool;
-                  // guard.ts, "One limit"): a method the route does not take gets the shell's method answer before
-                  // any other check. It is not this card's to change. Here: still no answer of the POST guards, and
-                  // nothing read.
-                  const response = await shell.fetch(asked.request);
-                  expect([403, 413], what).not.toContain(response.status);
-                  expect(response.status, what).toBeGreaterThanOrEqual(400);
-                  expect(asked.pulled(), what).toBe(0);
-                  expect(asked.request.bodyUsed, what).toBe(false);
-                  limit += 1;
-                  continue;
-                }
                 const unknown = ask(`${basePath}/dummy-unknown-address`, method, headers, body);
                 const before = rawLines().length;
                 // serve: null, as for an unknown address, and nothing logged.
@@ -185,7 +173,7 @@ describe("outside staging a guarded route answers as an unknown address does, be
                 expect(await expected.text(), what).toBe(page);
                 expect(await response.text(), what).toBe(page);
                 expect(rawLines().slice(before), what).toEqual([NOT_FOUND_LINE, NOT_FOUND_LINE]);
-                // Decided before any guard read the body.
+                // Decided before anything read the body.
                 expect(asked.pulled(), what).toBe(0);
                 expect(asked.request.bodyUsed, what).toBe(false);
                 same += 1;
@@ -193,24 +181,54 @@ describe("outside staging a guarded route answers as an unknown address does, be
             }
           }
         }
-        // 4 routes: GET and HEAD from 4 senders, and POST, PUT, DELETE and OPTIONS from 4 senders with 4 bodies each.
-        expect(same + limit).toBe(4 * (2 * 4 + 4 * 4 * 4));
-        // As web/src/routes.ts lists a tool, every method is an unknown address's. With the guard's mark alone, every
-        // method a route takes is: 2 GET routes' worth of GET and HEAD... counted below, route by route.
-        const taken = tool.routes.reduce(
-          (count, route) =>
-            count +
-            METHODS.filter((method) => takes(route, method)).reduce(
-              (cases, method) => cases + SENDERS.length * bodiesOf(method).length,
-              0,
-            ),
-          0,
-        );
-        expect(same).toBe(marked ? 4 * (2 * 4 + 4 * 4 * 4) : taken);
+        // 4 routes: GET and HEAD from 4 senders with no body, and POST, PUT, DELETE and OPTIONS from 4 senders with
+        // each of the 4 bodies.
+        expect(same).toBe(4 * (2 * 4 + 4 * 4 * 4));
         expect(tool.calls()).toBe(0);
         expect(transport.sent).toEqual([]);
       },
     );
+  });
+
+  it("takes the route out of the table, so its address is answered as if the tool had never been written", async () => {
+    // The guard's mark alone on a :name route, listed before a plain route that takes the same addresses as well.
+    const tool = vi.fn<RouteHandler>((context) => context.page({ title: "Tool", main: "<h1>Tool</h1>" }));
+    const plain = vi.fn<RouteHandler>((context) => context.page({ title: "Plain", main: "<h1>Plain</h1>" }));
+    const modules: RouteModule[] = [
+      {
+        folder: "staging/example-tool",
+        stagingOnly: false,
+        routes: stagingOnlyRoutes([
+          { label: "example.tool", path: "/staging/:name", methods: ["GET", "POST"], handle: tool },
+        ]),
+      },
+      {
+        folder: "example",
+        stagingOnly: false,
+        routes: [{ label: "example.plain", path: "/:first/:second", methods: ["GET"], handle: plain }],
+      },
+    ];
+    // On staging the tool, listed first, takes the address.
+    const onStaging = await testShell({ modules }).shell.fetch(get("/test/staging/dummy-name"));
+    expect(await onStaging.text()).toContain("<h1>Tool</h1>");
+    expect(tool).toHaveBeenCalledTimes(1);
+    expect(plain).not.toHaveBeenCalled();
+    // Anywhere else the plain route takes it, as it would with no tool at all; and the tool's own POST gets that
+    // route's 405, not the POST guards' 403.
+    const elsewhere = testShell({ environment: "production", modules });
+    const answered = await elsewhere.shell.fetch(get("/staging/dummy-name"));
+    expect(await answered.text()).toContain("<h1>Plain</h1>");
+    const posted = await elsewhere.shell.fetch(
+      ask("/staging/dummy-name", "POST", {}, "a small body").request,
+    );
+    expect(posted.status).toBe(405);
+    expect(posted.headers.get("allow")).toBe("GET, HEAD");
+    expect(tool).toHaveBeenCalledTimes(1);
+    expect(plain).toHaveBeenCalledTimes(1);
+    expect(elsewhere.lines().map((line) => [line.route, line.status])).toEqual([
+      ["example.plain", 200],
+      ["example.plain", 405],
+    ]);
   });
 
   it("is absent for a config whose two values disagree, with either mark alone: the check fails closed", async () => {
@@ -238,10 +256,12 @@ describe("outside staging a guarded route answers as an unknown address does, be
       });
       for (const address of ["/test/staging/example-tool/both", "/test/staging/example-plain"]) {
         for (const method of ["GET", "POST"] as const) {
-          const asked = ask(address, method, { origin: ORIGIN }, method === "POST" ? "a small body" : "no body");
-          expect(shell.serve(asked.request), `${method} ${address}`).toBeNull();
-          expect((await shell.fetch(asked.request)).status, `${method} ${address}`).toBe(404);
-          expect(asked.pulled()).toBe(0);
+          const what = `${environment}: ${method} ${address}`;
+          const body = method === "POST" ? "a small body" : "no body";
+          const asked = ask(address, method, { origin: ORIGIN }, body);
+          expect(shell.serve(asked.request), what).toBeNull();
+          expect((await shell.fetch(asked.request)).status, what).toBe(404);
+          expect(asked.pulled(), what).toBe(0);
         }
       }
       expect(tool.calls()).toBe(0);
@@ -307,7 +327,9 @@ describe("on staging a guarded route is there, and the POST guards answer for it
       const streamed = ask(SEND, "POST", { origin: ORIGIN }, "a body over the cap");
       const response = await shell.fetch(streamed.request);
       expect(response.status).toBe(413);
-      expect(await response.text()).toBe(renderErrorPage({ status: 413, basePath: "/test", traceId: TRACE_ID }));
+      expect(await response.text()).toBe(
+        renderErrorPage({ status: 413, basePath: "/test", traceId: TRACE_ID }),
+      );
       // 1 KiB chunks: read to the first byte past the 16 KiB cap and no further, of 1,024 chunks in all.
       expect(streamed.pulled()).toBe(POST_BODY_MAX_BYTES / 1024 + 1);
       expect(tool.calls()).toBe(2);
@@ -326,9 +348,11 @@ describe("on staging a guarded route is there, and the POST guards answer for it
     const page = await shell.fetch(ask("/test/staging/example-tool", "GET", {}, "no body").request);
     expect(page.status).toBe(200);
     expect(await page.text()).toContain("<h1>Tool example.tool.page</h1>");
-    const refused = await shell.fetch(ask(SEND, "PUT", { origin: ORIGIN }, "a small body").request);
-    expect(refused.status).toBe(405);
-    expect(refused.headers.get("allow")).toBe("POST");
+    const refused = ask(SEND, "PUT", { origin: ORIGIN }, "a small body");
+    const response = await shell.fetch(refused.request);
+    expect(response.status).toBe(405);
+    expect(response.headers.get("allow")).toBe("POST");
+    expect(refused.pulled()).toBe(0);
     expect(tool.calls()).toBe(1);
   });
 });
