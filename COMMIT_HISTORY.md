@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 392, [`5471539`](https://github.com/aryamahadik/rosie/commit/5471539), 2026-11-11 16:04:46 UTC.
+- **Through:** commit 394, [`0770355`](https://github.com/aryamahadik/rosie/commit/0770355), 2026-11-11 16:49:06 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 394. docs: COMMIT\_HISTORY.md through commit 392 (5471539, \#399) (\#400)
+
+- **Commit:** [`0770355`](https://github.com/aryamahadik/rosie/commit/0770355), by Arya Mahadik, 2026-11-11 16:49:06 UTC
+- **Pull request:** [#400](https://github.com/aryamahadik/rosie/pull/400) from `task/commit-history-20`, merged 2026-11-11 16:49:07 UTC. It squashed 1 branch commit:
+  - `9637e73` docs: COMMIT\_HISTORY.md through commit 392 (5471539, \#399)
+- **Files changed:** 1 (+61 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +61 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 393. T-265: the gateway's Resend webhook door: delivery events and inbound replies through the email port (K-12 v1), a reply read, scrubbed and sealed to the handle's actor with its sender check marked, a delivery event to the receipt door; closed until a root binds GatewayDeps.email (\#401)
+
+- **Commit:** [`c1ef392`](https://github.com/aryamahadik/rosie/commit/c1ef392), by Arya Mahadik, 2026-11-11 16:49:02 UTC
+- **Pull request:** [#401](https://github.com/aryamahadik/rosie/pull/401) from `task/T-265`, merged 2026-11-11 16:49:02 UTC. It squashed 1 branch commit:
+  - `8e332c2` T-265: the gateway's Resend webhook door: delivery events and inbound…
+- **Files changed:** 10 (+2206 −5), by folder:
+  - `runtime/src/gateway/email/` contracts.test.ts +175 −0, index.ts +29 −0, resend-webhook.ts +546 −0, resend-webhook.worker.test.ts +1031 −0, test-support.ts +253 −0, types.ts +99 −0
+  - `runtime/src/gateway/` index.ts +36 −3, linq-webhook.ts +2 −1, types.ts +21 −0
+  - `runtime/src/` index.ts +14 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 392. docs: COMMIT\_HISTORY.md through commit 389 (665b035, \#396) (\#399)
 
