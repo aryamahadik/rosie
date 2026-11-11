@@ -1,0 +1,8286 @@
+# Commit history
+
+Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
+
+- **Through:** commit 349, [`3cd4827`](https://github.com/aryamahadik/rosie/commit/3cd4827), 2026-11-11 06:50:42 UTC.
+- **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
+- **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 349. T-201: db/seeds/run.mjs seeds one set (db/seeds/\<set\>.ts, found by file name) into the schema DB\_SCHEMA names, idempotently, printing row counts per table and no part of the database URL; it seeds only a database on this machine or the one STAGING\_DATABASE\_URL names (never production, so --set skeleton is refused elsewhere, DL-341), and refuses a schema that is missing or lacks a migration, so no row reaches public; run.int.test.ts proves it (\#356)
+
+- **Commit:** [`3cd4827`](https://github.com/aryamahadik/rosie/commit/3cd4827), by Arya Mahadik, 2026-11-11 06:50:42 UTC
+- **Pull request:** [#356](https://github.com/aryamahadik/rosie/pull/356) from `task/T-201`, merged 2026-11-11 06:50:43 UTC. It squashed 1 branch commit:
+  - `4be60a4` T-201: db/seeds/run.mjs seeds one set (db/seeds/\<set\>.ts, found by fi…
+- **Files changed:** 2 (+788 −0), by folder:
+  - `db/seeds/` run.int.test.ts +511 −0, run.mjs +277 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 348. T-1208: an earlier write never replaces the actor's STOP note; STOP and timers fail closed when storage fails (\#355)
+
+- **Commit:** [`fb50f19`](https://github.com/aryamahadik/rosie/commit/fb50f19), by Arya Mahadik, 2026-11-11 06:50:38 UTC
+- **Pull request:** [#355](https://github.com/aryamahadik/rosie/pull/355) from `task/T-1208`, merged 2026-11-11 06:50:38 UTC. It squashed 3 branch commits:
+  - `ed34d8e` T-1208: an earlier turn's answer never replaces the actor's own STOP …
+  - `6f756cd` Merge branch 'main' into task/T-1208
+  - `9b0192d` T-1208: over the actor's own STOP note, only the write-on-return repl…
+- **Files changed:** 9 (+976 −51), by folder:
+  - `runtime/src/actor/copies/` copies.ts +148 −34, copies.worker.test.ts +501 −0, types.ts +6 −0
+  - `runtime/src/actor/` handle-actor.ts +36 −4
+  - `runtime/src/outage/db/` outage.ts +20 −7, outage.worker.test.ts +204 −1, test-support.ts +30 −1
+  - `runtime/src/safety/` arrival.ts +7 −3, safety.worker.test.ts +24 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1208: an earlier turn's answer never replaces the actor's own STOP note (by the lease's turn order: only a turn opened after the note, or the write-on-return replay, replaces it; a row read never does); a committed STOP whose copy write fails holds a lost mark for its turn (in memory when the storage cannot keep it) and the phone row is read again; the safety read's copySaysStopped reads stopped when the actor's copy throws; a timers reload ends only the stale marks noted before it was sent. Tests: the outage sequence through the real lease and down path (T-270's rule does not close it), the turn-order rule, the failed STOP write, the timers' reload order, and the safety read's withheld outage line.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1208: over the actor's own STOP note, only the write-on-return replay's answer for the note's own text replaces it (DL-431): the note keeps the event id of the text whose keyword set it, and the replay passes the event id of the text each answer is for; an answer for any other queued text never replaces the note, whatever its kind or version. Tests: START then STOP in one outage with STOP's replay answering notBack three ways (a core throw, transient, the key store's throw): the flag stays stopped and no outage line goes, a read sent then never replaces the note, STOP's record written later replaces it by version, and a read sent after that ends it; the queue [STOP, START, STOP]: only the last STOP's answer replaces the note, and a later turn's START ends it; the rule inside the actor, through an eviction; a note naming no text fails closed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 347. T-561: join hop 10, finalize fills slots and fixed lines, runs the checks and writes the final parts (\#354)
+
+- **Commit:** [`a55c5f9`](https://github.com/aryamahadik/rosie/commit/a55c5f9), by Arya Mahadik, 2026-11-11 06:07:16 UTC
+- **Pull request:** [#354](https://github.com/aryamahadik/rosie/pull/354) from `task/T-561`, merged 2026-11-11 06:07:16 UTC. It squashed 2 branch commits:
+  - `382bed9` T-561: join hop 10, finalize through @rosie/actions' turn face. The f…
+  - `878eb74` T-561: comment wording only: root-run.ts's watch note reflowed, and f…
+- **Files changed:** 20 (+1682 −172), by folder:
+  - `runtime/src/wiring/` finalize.test.ts +195 −0, hop10.worker.test.ts +669 −0, hop4.worker.test.ts +1 −0, hop5.worker.test.ts +1 −0, hop6.worker.test.ts +1 −0, hop7.worker.test.ts +1 −0, hop8.worker.test.ts +1 −0, hop9.worker.test.ts +11 −2, index.ts +4 −0, picks.ts +7 −3, ports.ts +9 −1, real.ts +181 −4, root.test.ts +52 −41, root.ts +32 −7, root.worker.test.ts +6 −2, test-phone.worker.test.ts +1 −0, test-support.ts +406 −100
+  - `tests/e2e/skeleton/` README.md +3 −2, root-run.ts +10 −6, skeleton.worker.test.ts +91 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-561: join hop 10, finalize through @rosie/actions' turn face. The finalize port is real for test and staging and closed in production: T-313's finalize with T-314's fixed lines over T-1141's row binding, under RootOptions.finalizeData (the Tool API's scope, K-05 readOutboxRow and readFixedLineFacts, T-196's writePlan, cancelClock; null in workerRoot until T-567), the run's pinned bundle and the one HeldTurns. The JOIN row's final parts carry S13-01's opener, Q-30's STOP, HELP and rates line and the privacy link alone last, written with the plan once; a typed price gets one rewrite, then the fallback, both in the trace (hop10). fakeFinalizeData; watchGate keeps the turn's finalize calls on the fake face. e2e: JOINED_THROUGH fillAndChecks and CLAIMS row 10; root-run feeds finalizeData and hands watchGate the face.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-561: comment wording only: root-run.ts's watch note reflowed, and fakeFinalizeData's cancelClock note says the double keeps only the clock row's version
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 346. T-1168: the turn face reads' column-list test pins each read's tables, refuses whole-row references and event\_log.sealed\_values and harm\_reports.sealed\_details, and checks each business's table names its business; readFixedLineFacts' commit\_seq subquery adds and o.business\_id is null (\#353)
+
+- **Commit:** [`5b6e81a`](https://github.com/aryamahadik/rosie/commit/5b6e81a), by Arya Mahadik, 2026-11-11 05:49:21 UTC
+- **Pull request:** [#353](https://github.com/aryamahadik/rosie/pull/353) from `task/T-1168`, merged 2026-11-11 05:49:21 UTC. It squashed 1 branch commit:
+  - `392bdec` T-1168: the turn face reads' column-list test pins each read's tables…
+- **Files changed:** 2 (+347 −12), by folder:
+  - `db/repo/` turn-face-reads.int.test.ts +346 −11, turn-face-reads.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 345. T-1202: the compiler's publish failure line holds no part of the database URL (\#347)
+
+- **Commit:** [`7e56d02`](https://github.com/aryamahadik/rosie/commit/7e56d02), by Arya Mahadik, 2026-11-11 05:00:48 UTC
+- **Pull request:** [#347](https://github.com/aryamahadik/rosie/pull/347) from `task/T-1202`, merged 2026-11-11 05:00:48 UTC. It squashed 2 branch commits:
+  - `e73619f` T-1179: compiler publish builds its database client inside its try; a…
+  - `8fa9df7` T-1202: compiler publish's failure line, once its client is built, na…
+- **Files changed:** 2 (+444 −5), by folder:
+  - `compiler/src/cli/commands/` publish.test.ts +387 −0, publish.ts +57 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1179: compiler publish builds its database client inside its try; a database URL that does not parse (Node's ERR_INVALID_URL, or a URIError) is thrown as a DatabaseUrlError with a fixed message and no input, cause or other part of the URL; the client's other errors are thrown as before. New test calls publish.run directly with made-up URLs (# or / in the password, a bad % escape, the replica's URL) and through the CLI
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1202: compiler publish's failure line, once its client is built, names only the error's kind (its code when plain, else its name, else unknown) and a fixed text, never its message or fields, so no host, port, database name, user, password or URL prints (client.redact left the host and database name, and the user for a multi-host URL Node's parser refuses). New tests call publish.run with a built client: a .invalid host (ENOTFOUND or EAI_AGAIN), port 1 of 127.0.0.1 (ECONNREFUSED), the CLI, and a multi-host URL whose stand-in database refuses the user by name (28000); none of the URL's parts print
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 344. T-1207: the Workers pool sends one module per message, so a large Workers test graph never crashes workerd (\#352)
+
+- **Commit:** [`b3a91fd`](https://github.com/aryamahadik/rosie/commit/b3a91fd), by Arya Mahadik, 2026-11-11 05:00:44 UTC
+- **Pull request:** [#352](https://github.com/aryamahadik/rosie/pull/352) from `task/T-1207`, merged 2026-11-11 05:00:45 UTC. It squashed 2 branch commits:
+  - `7fd96c0` T-1207: the workers and e2e-workers projects keep no module cache on …
+  - `44f4bda` T-1207: the guard's header and infra/ci/README say it runs (not colle…
+- **Files changed:** 4 (+325 −0), by folder:
+  - `infra/ci/` README.md +6 −0, workers-pool-messages.run.mjs +103 −0, workers-pool-messages.test.mjs +207 −0
+  - `/` vitest.config.ts +9 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1207: the workers and e2e-workers projects keep no module cache on disk (fsModuleCache: false), so the Workers pool sends a runner each module in a message of its own and never a test file's whole graph in one; infra/ci/workers-pool-messages.test.mjs checks workerd's runner-socket limit (33,554,432 bytes) and runs test-phone's and root.worker's Workers tests with every pool message measured, failing when a message carries several modules or passes 24 MiB
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1207: the guard's header and infra/ci/README say it runs (not collects) the two files, count the warm reply's 835 entries as some 420 modules, and name the flag measured but not taken (increase_websocket_message_size, 134,217,728 bytes)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 343. T-1206: a park answered alreadyCommitted reloads the actor's timer copies and re-reads the stopped flag (\#351)
+
+- **Commit:** [`7ae67b3`](https://github.com/aryamahadik/rosie/commit/7ae67b3), by Arya Mahadik, 2026-11-11 04:33:31 UTC
+- **Pull request:** [#351](https://github.com/aryamahadik/rosie/pull/351) from `task/T-1206`, merged 2026-11-11 04:33:31 UTC. It squashed 4 branch commits:
+  - `249c2f0` T-1206: a park answered alreadyCommitted tells the handle actor of th…
+  - `089299f` Merge branch 'main' into task/T-1206
+  - `8042ccb` T-1206: only DL-427's rule 1 ends a lost commit's mark: each lost com…
+  - `0036b98` T-1206: StoppedFlagSource says its read must be fresh, from the prima…
+- **Files changed:** 7 (+1361 −59), by folder:
+  - `runtime/src/actor/copies/` copies.ts +255 −23, copies.worker.test.ts +822 −1, index.ts +4 −0, test-support.ts +95 −4, types.ts +42 −0
+  - `runtime/src/actor/` handle-actor.ts +48 −14, lease.ts +95 −17
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1206: a park answered alreadyCommitted tells the handle actor of the commit whose answer was lost (lease.ts commitLost, with the K-04 handle id the turn's last commit named, kept as sent), before the turn finishes; the actor's stopped flag then reads stopped and its timers' copy is marked stale at once, and both are read again (the phone row's stopped flag through the copies' new optional phones source, the live timers reloaded), each later commit retrying until each read succeeds; a re-read never replaces the actor's own version-less note. Every other park and commit path is unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1206: only DL-427's rule 1 ends a lost commit's mark: each lost commit keeps its own mark with the order the lease opened its turn in (lease_turns.seq, now handed with committed and commitLost); a committed answer ends only the marks of lost turns opened no later than its own (a late answer from an earlier turn ends none, whatever its version), a re-read of the phone row only those noted before it was sent, the actor's own version-less note every mark, and nothing else; a mark (or the timers' stale mark) the storage cannot keep is held in memory. Tests: the security review's sequence, the same with both commits lost (two lost commits in a row), each of rule 1's paths, what ends nothing, and the in-memory marks.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1206: StoppedFlagSource says its read must be fresh, from the primary and never a cache, since a read the copy takes ends the lost commits' marks noted before it was sent (DL-427; the security review's note a)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 342. T-560: join hop 9, compose input and the composer's message plan (squashed onto main; replaces \#345) (\#346)
+
+- **Commit:** [`5d69f31`](https://github.com/aryamahadik/rosie/commit/5d69f31), by Arya Mahadik, 2026-11-11 03:15:12 UTC
+- **Pull request:** [#346](https://github.com/aryamahadik/rosie/pull/346) from `task/T-560-r3`, merged 2026-11-11 03:15:12 UTC. It squashed 3 branch commits:
+  - `c129446` T-560: join hop 9, compose input from the Tool API and the composer's…
+  - `d7b0cc5` Merge branch 'main' into task/T-560-r3
+  - `6470e6e` T-560: test-phone's worker test builds its page POST itself instead o…
+- **Files changed:** 21 (+1841 −72), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +1 −1, compose.test.ts +292 −0, hop4.worker.test.ts +2 −0, hop5.worker.test.ts +2 −0, hop6.worker.test.ts +2 −0, hop7.worker.test.ts +5 −1, hop8.worker.test.ts +2 −0, hop9.worker.test.ts +397 −0, index.ts +10 −0, picks.ts +10 −3, ports.ts +26 −7, real.ts +305 −8, root.test.ts +105 −16, root.ts +41 −3, root.worker.test.ts +19 −4, test-phone.worker.test.ts +16 −1, test-support.ts +521 −21
+  - `tests/e2e/skeleton/` README.md +3 −2, root-run.ts +6 −1, skeleton.worker.test.ts +75 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-560: join hop 9, compose input from the Tool API and the composer's message plan. composeInput and composer ports, real for test and staging and closed in production: compose input is the turn face's over RootOptions.composeReads, sharing one HeldTurns with the gate; the composer is @rosie/ai's over RootOptions.composers, its rewrite mapped as DL-309 says; workerRoot passes null for both until T-567 and J-02. The JOIN run's composer input equals recording 4; one compose span (S1-02, routine, plan-s1-02's shape); the frontier refused before any model call; CLAIMS row 9, and rows 7's filter leaves out the composer's call (DL-414). This is task/T-560 at 5eca696 (rounds 1 and 2; QA, the AI engineer and the security reviewer PASS) squashed onto main 1edba91 as one commit, because the merge-check's rebase cannot replay the branch's old join commit over T-1186's root.ts (DL-410, DL-417). No line differs from 5eca696.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-560: test-phone's worker test builds its page POST itself instead of importing the gateway pages' test support and its 40-odd K-21 fixtures. The Workers pool sends a file's runner every already-transformed module of its graph in one message (Vitest's warm modules); with those fixtures in test-phone's graph, beside the Tool API's generated validators, that message closed the runner's socket whenever the pages test ran first, as in the merge-check (DL-420). Same request, same assertions.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 341. T-1191: ci.yml's checks job gives every step its postgis service's DATABASE\_URL, as merge-check.yml's job does (it was on the CI script tests step alone), so npm test's contract project (K-05's database-side test, T-1169) finds the database on GitHub, where CI is set and db/repo never falls back to a local one (\#350)
+
+- **Commit:** [`0af7682`](https://github.com/aryamahadik/rosie/commit/0af7682), by Arya Mahadik, 2026-11-11 03:04:53 UTC
+- **Pull request:** [#350](https://github.com/aryamahadik/rosie/pull/350) from `task/T-1191`, merged 2026-11-11 03:04:53 UTC. It squashed 1 branch commit:
+  - `a6fc484` T-1191: ci.yml's checks job gives every step its postgis service's DA…
+- **Files changed:** 2 (+543 −3), by folder:
+  - `.github/workflows/` ci.yml +6 −3
+  - `infra/ci/` ci-contract-database.test.mjs +537 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+New infra/ci/ci-contract-database.test.mjs reads every workflow with the local merge-check's YAML reader, finds each run step that runs the contract project (vitest, npx, npm exec, or npm test and npm run through package.json's scripts with their pre and post scripts, arguments and workspaces) and checks that the env it runs with (workflow, job, step) has a DATABASE_URL reaching a PostGIS service of its own job: localhost, a published port, the service's user, password and database, and a pg_isready health check. It fails on the old ci.yml (rebuilt in the test; also shown on the real file before the fix) and on 14 changed copies of the workflows.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 340. T-1204: the handle actor hands readCommit the lease's repeated flag, so a repeat through any commit hook reloads the safety-timer copies (\#349)
+
+- **Commit:** [`1f11487`](https://github.com/aryamahadik/rosie/commit/1f11487), by Arya Mahadik, 2026-11-11 03:04:49 UTC
+- **Pull request:** [#349](https://github.com/aryamahadik/rosie/pull/349) from `task/T-1204`, merged 2026-11-11 03:04:49 UTC. It squashed 1 branch commit:
+  - `c1d799d` T-1204: the handle actor hands readCommit the lease's repeated flag, …
+- **Files changed:** 5 (+237 −43), by folder:
+  - `runtime/src/actor/copies/` copies.ts +15 −7, copies.worker.test.ts +159 −0, test-support.ts +54 −29, types.ts +3 −3
+  - `runtime/src/actor/` handle-actor.ts +6 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+handle-actor.ts afterCommit passed only answer.committed to readCommit, and K-05 v1's commitResult (data-access.v1.schema.json:716-727) has no repeated or core field, so a repeat through a K-05-shaped commit hook read only its empty rows and never reloaded the timer copies, hiding a timer row its lost first commit wrote. afterCommit now passes the lease's answer.repeated (lease.ts:124) beside the answer: readCommit(answer.committed, { repeated: answer.repeated }). readCommit takes it as an optional second argument: true, or any value that is not false, reloads whatever the answer's shape (T-1198's fail-safe rule, DL-413), and the stopped flag is read as before. False, or left out, the answer alone decides as before. On K-09's path the lease's flag is K-09's own (turn.ts commitThroughToolApi), so nothing changes there.
+
+Tests: through the real actor, a K-05-shaped commit hook whose first answer is lost after it wrote Sam's timer row: the repeat (repeated in the lease's answer alone, no rows) reloads Sam's live timers and the copy holds the row; first answers still read their rows (none: no reload, a moved timer: reload). readCommit: the lease's repeat reloads every answer shape (commit-repeat-same-turn.json, K-09's, null, written in neither shape) and keeps the stopped flag; commit-first.json reads no; a lease flag missing or not a boolean reloads; every K-09 answer, first or repeated, reads the same with the lease's flag as without it. The Tool API double gains answerShape k05 (K-05 v1 commitTurn.response, a repeat flagged on the lease's answer alone).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 339. T-1201: the calendar webhook doors' default body cap is 256 KiB (CALENDAR\_BODY\_LIMIT\_BYTES, 262,144 bytes), the Stripe door's and the Linq webhook's, so a Graph batch (several notifications per POST, no stated count, resent for up to 4 hours on anything but a 2xx: K-16 spike row 10) is not refused on every try. The tests at and over the cap follow the constant (one test title now says 256 KiB). New tests: the default pinned at 262,144 and equal to Stripe's and Linq's; through the Worker's routes with no cap set, Graph's notifications at the cap are read whole, checked and stored, one byte more is 413; a Graph batch of 100 notifications in K-16's shape from two subscriptions (test-support graphBatchExchange) is read, every notice checked and stored once, 200, and its exchange, the door's request, its 100 rows and its span pass K-16, K-07, K-05 v1.1 and K-08. (\#348)
+
+- **Commit:** [`3ed41e9`](https://github.com/aryamahadik/rosie/commit/3ed41e9), by Arya Mahadik, 2026-11-11 02:17:54 UTC
+- **Pull request:** [#348](https://github.com/aryamahadik/rosie/pull/348) from `task/T-1201`, merged 2026-11-11 02:17:55 UTC. It squashed 1 branch commit:
+  - `61013bf` T-1201: the calendar webhook doors' default body cap is 256 KiB (CALE…
+- **Files changed:** 5 (+197 −8), by folder:
+  - `runtime/src/gateway/providers/` calendar-webhook.ts +7 −4, calendar-webhook.worker.test.ts +74 −3, contracts.test.ts +37 −0, test-support.ts +78 −0, types.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 338. T-1198: the actor's readCommit learns of safety timers from the core results and fails safe (T-1203 folded in) (\#344)
+
+- **Commit:** [`8819277`](https://github.com/aryamahadik/rosie/commit/8819277), by Arya Mahadik, 2026-11-11 02:04:59 UTC
+- **Pull request:** [#344](https://github.com/aryamahadik/rosie/pull/344) from `task/T-1198`, merged 2026-11-11 02:04:59 UTC. It squashed 3 branch commits:
+  - `4c63a6f` T-1198: the actor's readCommit learns of safety timers from the commi…
+  - `4daef36` Merge branch 'main' into task/T-1198
+  - `7210f15` T-1198: round 2 (DL-413): readCommit fails safe, and a repeat reloads…
+- **Files changed:** 4 (+414 −29), by folder:
+  - `runtime/src/actor/copies/` copies.ts +82 −15, copies.worker.test.ts +275 −7, test-support.ts +51 −7, types.ts +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1198: the actor's readCommit learns of safety timers from the commit's core results, not from written alone
+
+Since T-1194 (actions/src/commit default 9; K-09 v1.5 default 134), K-09's written leaves every core action's rows out. readCommit now also counts a core result that went through (no error, a response) whose call is not one of K-09's 15 core actions, none of which writes a K-34 safety_timers row: a later core action that writes a timer reloads the actor's timer copies. A refused core action wrote nothing; a repeat's core results count, as it answers its first commit. Today's commits read as before.
+
+Tests: a core action writes Sam's timer that written leaves out and the actor still reloads and copies it (moved, then safe); readCommit on a later core action's result (refused, repeated, malformed); each of K-09 v1's core actions, read from the frozen schema, reads nothing. The Tool API double takes timersByCore and keeps its answers.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1198: round 2 (DL-413): readCommit fails safe, and a repeat reloads the timer copies (T-1203 folded in)
+
+A core result that is not K-09's coreResult now reloads the actor's safety-timer copies instead of reading no: not a record, no string call, no error field, an error that is not K-09's refusal (a JSON object with its own error code), or error null with a response that is not a record. A refused result still reads no. An answer in K-09's shape (written a record) reloads when its core results are missing or not a list, its repeated is not false, or its rows are not a list; a row that names no table reloads too. A repeat (K-09 repeated true) reloads, since its first answer, maybe lost, named the rows and the repeat answers with written []. A first answer keeps rules 1 and 2. A null answer and written in neither shape read as before.
+
+Tests: the malformed-shape assertion now expects the reload, for each of 16 shapes one at a time; K-09-shaped answers that cannot be read; repeats against first answers (each of K-09's 15 core calls, stop-recorded.json repeated); the actor test where the first commit writes Sam's timer row, its answer is lost and the repeat answers with written []: the copy reloads and holds the row; a repeat with no timer reloads and the copy stays as it was. The Tool API double gains loseNextAnswer, and the timer rig sends a lost answer's request again once, as turn.ts sendWithResend does.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 337. T-1186: the Worker answers the test-phone page's two calls on staging. T-565's testPhoneSend and testPhoneParts are bound into the gateway's page entry only where ENVIRONMENT is staging and a test phone is given (the Worker's own root gives none until T-567); the TestPhoneLine Durable Object keeps what the doubles sent across requests; index.ts exports TestPhoneLine and wrangler.jsonc binds TEST\_PHONE\_LINE and migrates v2-test-phone-line in env.staging alone; the two infra/ci tests check staging as the top level plus that line; the test-phone rig feeds the joined ports' fakes (deciders, gateReads, turnRows). This is task/T-1186 at 3c7dbca (rounds 1 to 6, QA and the security reviewer PASS) squashed onto main 0715db7 as one commit, because the merge-check's rebase replays the branch's old commits against main's squashed joins 7 and 8 (DL-410). No line differs from 3c7dbca. (\#342)
+
+- **Commit:** [`1edba91`](https://github.com/aryamahadik/rosie/commit/1edba91), by Arya Mahadik, 2026-11-11 00:29:40 UTC
+- **Pull request:** [#342](https://github.com/aryamahadik/rosie/pull/342) from `task/T-1186-r7`, merged 2026-11-11 00:29:41 UTC. It squashed 1 branch commit:
+  - `87cb63d` T-1186: the Worker answers the test-phone page's two calls on staging…
+- **Files changed:** 10 (+1086 −12), by folder:
+  - `infra/ci/` create-staging-bindings.test.mjs +14 −5, wrangler-config.test.mjs +63 −1
+  - `runtime/src/` index.ts +1 −0
+  - `runtime/src/wiring/` index.ts +12 −0, root.ts +37 −4, test-phone.worker.test.ts +604 −0
+  - `runtime/src/wiring/test-phone/` index.ts +17 −0, line.ts +148 −0, pages.ts +180 −0
+  - `/` wrangler.jsonc +10 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 336. T-1195: the Stripe and calendar webhook doors read their body through readCappedText (T-1180's body.ts) under their own config values, ProviderDoors.stripeBodyLimitBytes and calendarBodyLimitBytes, which GatewayDeps.providers carries (defaults 256 KiB and 64 KiB). A body over its door's cap answers 413 {ok:false,error:"payload\_too\_large",trace\_id} before any signature check (a declared length over it unread, a stream cancelled at the chunk that goes over), with only the refused span (bodyTooLarge) logged; every other answer comes in the order it came before the cap, and the verify gets the same text. Tests: each door over its cap 413 and never verified, at its cap verified as sent, declared length and 1 GiB stream, 413 before the header and clock checks, the config values, the Worker's routes, and the 413 spans held to K-08 span and K-16 calendar.span (\#341)
+
+- **Commit:** [`7f606e8`](https://github.com/aryamahadik/rosie/commit/7f606e8), by Arya Mahadik, 2026-11-11 00:29:36 UTC
+- **Pull request:** [#341](https://github.com/aryamahadik/rosie/pull/341) from `task/T-1195`, merged 2026-11-11 00:29:37 UTC. It squashed 1 branch commit:
+  - `d4f2279` T-1195: the Stripe and calendar webhook doors read their body through…
+- **Files changed:** 8 (+589 −25), by folder:
+  - `runtime/src/gateway/providers/` calendar-webhook.ts +35 −10, calendar-webhook.worker.test.ts +268 −2, common.ts +13 −2, contracts.test.ts +42 −2, index.ts +4 −1, stripe-webhook.ts +21 −5, stripe-webhook.worker.test.ts +190 −2, types.ts +16 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 335. T-1190: the turn face reads the business's sensitive switch (K-05 v1.6) (\#340)
+
+- **Commit:** [`0715db7`](https://github.com/aryamahadik/rosie/commit/0715db7), by Arya Mahadik, 2026-11-11 00:10:43 UTC
+- **Pull request:** [#340](https://github.com/aryamahadik/rosie/pull/340) from `task/T-1190`, merged 2026-11-11 00:10:44 UTC. It squashed 5 branch commits:
+  - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
+  - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
+  - `d3d7ec1` T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45)…
+  - `bcb1d80` T-1199: K-05's contract test covers v1.6 (DL-398). Fixture part, data…
+  - `2876aaf` T-1190: the turn face's readRow ports read the business's sensitive s…
+- **Files changed:** 6 (+469 −92), by folder:
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +141 −8, chain.test.ts +8 −4, rows.test.ts +244 −8, rows.ts +47 −68
+  - `actions/src/tool-api/turn-face/pg/` calls.int.test.ts +20 −1, rows.int.test.ts +9 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's sensitive switch, businessSensitive, read from K-23's company_kinds under the row's business (true when any kind of work lists sensitive in pf_switches_a or pf_switches_b, false when it has kinds and none does, null when it has none or the row has no business, which the caller reads as on); optional in readOutboxRow.response so every v1 to v1.5 exchange stays valid, required in the new readOutboxRow.v1dot6Response, which the exchange's outcome names first; 3 accepted fixtures (a barbershop false, a practice with the switch in flow A only true, the barbershop with no kinds of work null) and 2 refused (the switch left out, the switch per flow); README item 45, defaults 66 to 69, item 35's table row source, open gap 30 narrowed and gap 47 (turn 1 reads null under D-017's seed), consumers T-1197 and T-1190, change log; T-1102's consent fields renumbered to v1.7 (DL-391)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45), typed and checked as ReadOutboxRowV1Dot6Response: in its own read-only transaction as rosie_job under the row's business, reading company_kinds' business_id, pf_switches_a and pf_switches_b alone; true when any kind of work lists sensitive in either flow, false only when the business has kinds and each answers a plain no, null with none, with a NULL list element (never false) and for a row with no business (no company_kinds read, default 68); a failed read fails the call. turn-face-reads.int.test.ts runs every readOutboxRow fixture of v1.3 to v1.6 (pinned list of eight, each valid at its version and at v1.6; a v1.3 answer with the switch null, its world holding no kind of work), writes the practice fixture's five noted rows, and tests flow A only, flow B only, two kinds, the barbershop beside other businesses' kinds, NULL elements, no business, another business's scope, a failed read and the skeleton seed's barbershop (false). db/seeds/skeleton.ts gains the barbershop's company and barber kind of work, K-23 seed-company-two-kinds.json's rows value for value, no switch on (CQ-185)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1199: K-05's contract test covers v1.6 (DL-398). Fixture part, data-access.v1.test.ts: v1.6 joins WRITTEN_FOR, with a mend for each refused fixture (refuse-outbox-row-switch-left-out and refuse-outbox-row-switch-per-flow, fault businessSensitive: put right, each is read-outbox-row-practice-sensitive's outcome); the side list names T-1197 for the producer and T-1190 for the turn face. Database side, data-access.v1.db-side.test.ts: v1.6 joins DB_SIDE_VERSIONS, so the practice (true), the barbershop (false) and the barbershop with no kinds (null) run through db/repo's readOutboxRow; the practice's five rows are written as its note lists them, each checked against the note by name, value and order; an earlier readOutboxRow answer is compared whole with its fixture's outcome plus businessSensitive null (its world holds no company_kinds row, checked before the read), never with the field dropped, and judged at v1.6 (readOutboxRow.v1dot6Response, the exchange at v1.6); the twin check allows that one field where the refused fixture holds none and nothing else, shown firing; a refused answer may name readOutboxRow.v1dot6Response as its definition.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1190: the turn face's readRow ports read the business's sensitive switch from K-05 v1.6's readOutboxRow (item 45; DL-391, DL-395, DL-402). OutboxRowRead is now K-05 v1.6's ReadOutboxRowV1Dot6Response, which requires businessSensitive, and the ports' K-05 import moves to v1.6. sensitiveOf fills SlotSource.sensitive, which the claim check, the fill and the situation tag read: a row about a booking stays on; for a row about no booking only an answer of exactly false is off, and null, a field left out and true are on. K-05's transientError still fails the call with the call's own transient error (no row, no switch, never read as on, off or null); any other error answer, and a read that throws, is thrown. Tests: S1-02's row at the barbershop with its barber kind of work (read-outbox-row-s1-02-not-sensitive.json) gives compose-input-s1-02-v1.6.json's input word for word, routine; false gives routine and biz.name, true gives gentle and the display name, null (read-outbox-row-s1-02-no-kinds.json) and the field left out (v1.3's answer) give gentle and the display name; sensitiveOf and both rows on false, null, undefined and true; a row about a booking stays on; a failed read and an unknown error answer are thrown, a transientError fails compose input and finalize with nothing written; the JOIN row gives T-1175's recording 4 request (ai/recordings/composer-inputs/join-s1-02.json). On PostgreSQL the seed's barbershop reads false and turn 1 composes routine, and K-04's world with no kinds reads null and composes gentle.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 334. T-559: join hop 8, gate and one commit through the Tool API on local PostgreSQL (\#339)
+
+- **Commit:** [`6373696`](https://github.com/aryamahadik/rosie/commit/6373696), by Arya Mahadik, 2026-11-10 23:37:44 UTC
+- **Pull request:** [#339](https://github.com/aryamahadik/rosie/pull/339) from `task/T-559`, merged 2026-11-10 23:37:45 UTC. It squashed 4 branch commits:
+  - `f4ccf8d` T-559: join hop 8, the gate and one commit through @rosie/actions' tu…
+  - `b2e997e` T-559: the root's and the doubles' notes name the joined gate (fiftee…
+  - `a0596fc` Merge branch 'main' into task/T-559
+  - `1d4e6d8` T-559: round 2 (DL-397, grant 2): the skeleton e2e's root run feeds t…
+- **Files changed:** 21 (+2047 −126), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +1 −1, hop3.worker.test.ts +5 −2, hop4.worker.test.ts +9 −9, hop5.worker.test.ts +6 −4, hop6.worker.test.ts +7 −5, hop7.worker.test.ts +24 −15, hop8.worker.test.ts +655 −0, index.ts +5 −0, picks.ts +6 −2, ports.ts +24 −8, real.ts +156 −1, root.test.ts +67 −9, root.ts +54 −20, root.worker.test.ts +19 −4, test-support.ts +596 −32, turn-chats.test.ts +170 −0, turn-chats.ts +82 −0
+  - `tests/e2e/skeleton/` README.md +4 −3, root-run.ts +17 −7, skeleton.worker.test.ts +139 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-559: join hop 8, the gate and one commit through @rosie/actions' turn face, under the turn id. A gate port split from turnFace binds createTurnFace's gateAndCommit (T-1141) with turnCommitDeps over RootOptions.gateReads (the Tool API's business scope, K-05 v1.3 readOpenHolds, v1.4's safety reads, the read-only sealer; null in workerRoot until T-567, so every gate fails closed), the run's pinned bundle, the barbershop's stop words (DL-344) and NOT_TOLD_YET, its one K-05 commitTurn through the root's turn-row port (the turn id checked there). The root puts the service and Linq chat id of the run's last text on the request's turn, both or neither (turn-chats.ts, K-09 v1.5 default 135); the turn keeps its gate and commit spans and the base records none (DL-376). Test doubles: fakeTurnRows keeps every row a commit writes and its event log, answering from the request (repeat: the first commit, nothing written; one commit per turn id); fakeGateReads over test owner 1's seeded rows; watchGate observes the turn's gate requests. hop8.worker.test (JOIN: gate span with commit-s1-01.json's limits, commit span rows, exactly the turn, thread, question, clock, outbox rows and event log under one turn id and trace id, values commit-s1-01.json's; replay writes nothing; two actors in parallel give one commit; no text source fails closed), turn-chats.test, root.test; hop3 to hop7 and root.worker fed the gate. e2e: JOINED_THROUGH commit and CLAIMS row 8 (DL-349)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-559: the root's and the doubles' notes name the joined gate (fifteen ports; the Worker's gate fails closed with no database), and skeletonFakes drops the stand-in gate answer no port calls any more
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-559: round 2 (DL-397, grant 2): the skeleton e2e's root run feeds the joined gate its reads (gateReads: fakes.gate.reads), installs watchGate(root) after the install in place of the stand-in gate (restored before the root's ports) and exposes gateCalls; CLAIMS row 7 reads the result the gate was handed from facts.run.gateCalls; the README's join 8 lines: the gate and one commit's claims, joined so far (joins 1 to 8) and SKELETON_UPTO unset (receive to the commit). main merged in (T-086, T-087: K-07's and K-08's contract tests)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 333. T-1199: K-05's contract test covers v1.6 (fixture part and database side) (\#338)
+
+- **Commit:** [`796d7c9`](https://github.com/aryamahadik/rosie/commit/796d7c9), by Arya Mahadik, 2026-11-10 23:22:54 UTC
+- **Pull request:** [#338](https://github.com/aryamahadik/rosie/pull/338) from `task/T-1199`, merged 2026-11-10 23:22:55 UTC. It squashed 4 branch commits:
+  - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
+  - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
+  - `d3d7ec1` T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45)…
+  - `bcb1d80` T-1199: K-05's contract test covers v1.6 (DL-398). Fixture part, data…
+- **Files changed:** 2 (+433 −57), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +397 −42, data-access.v1.test.ts +36 −15
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's sensitive switch, businessSensitive, read from K-23's company_kinds under the row's business (true when any kind of work lists sensitive in pf_switches_a or pf_switches_b, false when it has kinds and none does, null when it has none or the row has no business, which the caller reads as on); optional in readOutboxRow.response so every v1 to v1.5 exchange stays valid, required in the new readOutboxRow.v1dot6Response, which the exchange's outcome names first; 3 accepted fixtures (a barbershop false, a practice with the switch in flow A only true, the barbershop with no kinds of work null) and 2 refused (the switch left out, the switch per flow); README item 45, defaults 66 to 69, item 35's table row source, open gap 30 narrowed and gap 47 (turn 1 reads null under D-017's seed), consumers T-1197 and T-1190, change log; T-1102's consent fields renumbered to v1.7 (DL-391)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45), typed and checked as ReadOutboxRowV1Dot6Response: in its own read-only transaction as rosie_job under the row's business, reading company_kinds' business_id, pf_switches_a and pf_switches_b alone; true when any kind of work lists sensitive in either flow, false only when the business has kinds and each answers a plain no, null with none, with a NULL list element (never false) and for a row with no business (no company_kinds read, default 68); a failed read fails the call. turn-face-reads.int.test.ts runs every readOutboxRow fixture of v1.3 to v1.6 (pinned list of eight, each valid at its version and at v1.6; a v1.3 answer with the switch null, its world holding no kind of work), writes the practice fixture's five noted rows, and tests flow A only, flow B only, two kinds, the barbershop beside other businesses' kinds, NULL elements, no business, another business's scope, a failed read and the skeleton seed's barbershop (false). db/seeds/skeleton.ts gains the barbershop's company and barber kind of work, K-23 seed-company-two-kinds.json's rows value for value, no switch on (CQ-185)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1199: K-05's contract test covers v1.6 (DL-398). Fixture part, data-access.v1.test.ts: v1.6 joins WRITTEN_FOR, with a mend for each refused fixture (refuse-outbox-row-switch-left-out and refuse-outbox-row-switch-per-flow, fault businessSensitive: put right, each is read-outbox-row-practice-sensitive's outcome); the side list names T-1197 for the producer and T-1190 for the turn face. Database side, data-access.v1.db-side.test.ts: v1.6 joins DB_SIDE_VERSIONS, so the practice (true), the barbershop (false) and the barbershop with no kinds (null) run through db/repo's readOutboxRow; the practice's five rows are written as its note lists them, each checked against the note by name, value and order; an earlier readOutboxRow answer is compared whole with its fixture's outcome plus businessSensitive null (its world holds no company_kinds row, checked before the read), never with the field dropped, and judged at v1.6 (readOutboxRow.v1dot6Response, the exchange at v1.6); the twin check allows that one field where the refused fixture holds none and nothing else, shown firing; a refused answer may name readOutboxRow.v1dot6Response as its definition.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 332. T-1197: readOutboxRow answers K-05 v1.6's sensitive switch; the skeleton seed's barber kind of work (\#337)
+
+- **Commit:** [`d1d27a3`](https://github.com/aryamahadik/rosie/commit/d1d27a3), by Arya Mahadik, 2026-11-10 23:22:50 UTC
+- **Pull request:** [#337](https://github.com/aryamahadik/rosie/pull/337) from `task/T-1197`, merged 2026-11-10 23:22:51 UTC. It squashed 3 branch commits:
+  - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
+  - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
+  - `d3d7ec1` T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45)…
+- **Files changed:** 4 (+673 −74), by folder:
+  - `db/repo/` turn-face-reads.int.test.ts +459 −45, turn-face-reads.ts +76 −17
+  - `db/seeds/` skeleton.int.test.ts +50 −3, skeleton.ts +88 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's sensitive switch, businessSensitive, read from K-23's company_kinds under the row's business (true when any kind of work lists sensitive in pf_switches_a or pf_switches_b, false when it has kinds and none does, null when it has none or the row has no business, which the caller reads as on); optional in readOutboxRow.response so every v1 to v1.5 exchange stays valid, required in the new readOutboxRow.v1dot6Response, which the exchange's outcome names first; 3 accepted fixtures (a barbershop false, a practice with the switch in flow A only true, the barbershop with no kinds of work null) and 2 refused (the switch left out, the switch per flow); README item 45, defaults 66 to 69, item 35's table row source, open gap 30 narrowed and gap 47 (turn 1 reads null under D-017's seed), consumers T-1197 and T-1190, change log; T-1102's consent fields renumbered to v1.7 (DL-391)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45), typed and checked as ReadOutboxRowV1Dot6Response: in its own read-only transaction as rosie_job under the row's business, reading company_kinds' business_id, pf_switches_a and pf_switches_b alone; true when any kind of work lists sensitive in either flow, false only when the business has kinds and each answers a plain no, null with none, with a NULL list element (never false) and for a row with no business (no company_kinds read, default 68); a failed read fails the call. turn-face-reads.int.test.ts runs every readOutboxRow fixture of v1.3 to v1.6 (pinned list of eight, each valid at its version and at v1.6; a v1.3 answer with the switch null, its world holding no kind of work), writes the practice fixture's five noted rows, and tests flow A only, flow B only, two kinds, the barbershop beside other businesses' kinds, NULL elements, no business, another business's scope, a failed read and the skeleton seed's barbershop (false). db/seeds/skeleton.ts gains the barbershop's company and barber kind of work, K-23 seed-company-two-kinds.json's rows value for value, no switch on (CQ-185)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 331. T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's sensitive switch, businessSensitive, read from K-23's company\_kinds under the row's business (true when any kind of work lists sensitive in pf\_switches\_a or pf\_switches\_b, false when it has kinds and none does, null when it has none or the row has no business, which the caller reads as on); optional in readOutboxRow.response so every v1 to v1.5 exchange stays valid, required in the new readOutboxRow.v1dot6Response, which the exchange's outcome names first; 3 accepted fixtures (a barbershop false, a practice with the switch in flow A only true, the barbershop with no kinds of work null) and 2 refused (the switch left out, the switch per flow); README item 45, defaults 66 to 69, item 35's table row source, open gap 30 narrowed and gap 47 (turn 1 reads null under D-017's seed), consumers T-1197 and T-1190, change log; T-1102's consent fields renumbered to v1.7 (DL-391) (\#334)
+
+- **Commit:** [`a84d48f`](https://github.com/aryamahadik/rosie/commit/a84d48f), by Arya Mahadik, 2026-11-10 23:22:46 UTC
+- **Pull request:** [#334](https://github.com/aryamahadik/rosie/pull/334) from `task/T-1196`, merged 2026-11-10 23:22:47 UTC. It squashed 1 branch commit:
+  - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
+- **Files changed:** 9 (+1431 −13), by folder:
+  - `contracts/data-access/` README.md +64 −12, data-access.v1.6.schema.json +1019 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +40 −0, read-outbox-row-practice-sensitive.json +65 −0, read-outbox-row-s1-02-no-kinds.json +69 −0, read-outbox-row-s1-02-not-sensitive.json +70 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-outbox-row-switch-left-out.json +51 −0, refuse-outbox-row-switch-per-flow.json +52 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 330. T-087: contract test event-trace.v1 (K-08 v1 and v1.1), the fixture part. Every entry of contracts/event-trace/fixtures/index.json is checked against the schema its version names (the T-003 harness and again here), the count equal to the entries, and every accepted v1 fixture against v1.1; each refused fixture is refused for the one field the README names and accepted with only that field put right (mend-then-accept, with its accepted twin); removing any required field, at any depth and along the branch each fixture takes, from a copy of each accepted fixture makes it refused. What the schema leaves to the test, each also firing on a damaged copy the schema still takes: the skeleton's hops once each in D-017's order; no raw number or text in a span; seq, at, trace, bundle, turn and job per trace; joined traces; a commit's one turn and trace; each kind's table from the README's kinds tables; reply time; model-call costs at the README's prices; no words, phone or email in a plain value at any depth; export rows; the invariant run; v1.1's columns per added kind (with the review item rows the README asks the test to build) and sealed bytes. SIDE\_CHECKS holds the README's 5 producer and 4 consumer sides (\#336)
+
+- **Commit:** [`6bfeb96`](https://github.com/aryamahadik/rosie/commit/6bfeb96), by Arya Mahadik, 2026-11-10 22:55:14 UTC
+- **Pull request:** [#336](https://github.com/aryamahadik/rosie/pull/336) from `task/T-087`, merged 2026-11-10 22:55:15 UTC. It squashed 1 branch commit:
+  - `09e3eb5` T-087: contract test event-trace.v1 (K-08 v1 and v1.1), the fixture p…
+- **Files changed:** 1 (+2214 −0), by folder:
+  - `tests/contract/` event-trace.v1.test.ts +2214 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 329. T-086: contract test outbox-effects.v1 (K-07 fixtures) (\#335)
+
+- **Commit:** [`9275ba4`](https://github.com/aryamahadik/rosie/commit/9275ba4), by Arya Mahadik, 2026-11-10 22:55:10 UTC
+- **Pull request:** [#335](https://github.com/aryamahadik/rosie/pull/335) from `task/T-086`, merged 2026-11-10 22:55:10 UTC. It squashed 2 branch commits:
+  - `f140cf7` T-086: K-07's contract test, the fixture part (tests/contract/outbox-…
+  - `87ae06d` T-086: the header states exactly which lifeChain clauses and retry ru…
+- **Files changed:** 1 (+1904 −0), by folder:
+  - `tests/contract/` outbox-effects.v1.test.ts +1904 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-086: K-07's contract test, the fixture part (tests/contract/outbox-effects.v1.test.ts). Every index entry checked against the schema its version names (T-003 harness and this file), count equal to the entries, refused ones refused by the schema or by lifeChain alone; lifeChain run on every entry that names it and every accepted fixture, firing on 24 damaged copies the schema still takes (README retry rules and 'lifeChain also checks'), its constants held to the README; each refusal tied to its reason (DL-124: errors name the fault and no other place, put right it is accepted and passes lifeChain, 6 twins matched; the proof shown firing on damaged mends); removing each required field, at any depth, refused for all 29 accepted fixtures, an unknown field refused, shown firing on a damaged schema; every state move allowed and no other (the README's three move tables equal the schema's moves, every fixture move in them, every table move in a fixture); SIDE_CHECKS holds 2 producer and 5 consumer sides as the README names them, with the doubles and the one-key run
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-086: the header states exactly which lifeChain clauses and retry rules the damaged copies cover (every 'lifeChain also checks' clause; retry rules 1, 3, 4, 5 and 8; rule 2 by the refused 4006 fixture)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 328. T-1194: the commit's written list leaves out core-action rows, as K-09 v1.5 default 134 and commit-s1-01.json do. committedOf filters K-05's written by the rows each core run's writes name (build.ts rowsNamedBy: a state insert by its K-04 id, an update by its key's one column, a question with its clock row, a close, a clock cancel, a reservation, an effect); the one K-05 request still writes them, and outboxRows, promoted and the base's span stay whole. T-1141's CORE\_ROW\_IN\_WRITTEN is gone: the turn face's commit and chain tests hold the whole answer to commit-s1-01.json's outcome and K-05's one commit to the safety record plus the listed rows. Tests: rowsNamedBy on every list and against the K-05 fake; crisis and threat records committed with none listed and their line in outboxRows; core.test.ts's turn-1 commit expects the record in K-05's commit, not in written (\#333)
+
+- **Commit:** [`cbcaa66`](https://github.com/aryamahadik/rosie/commit/cbcaa66), by Arya Mahadik, 2026-11-10 21:02:35 UTC
+- **Pull request:** [#333](https://github.com/aryamahadik/rosie/pull/333) from `task/T-1194`, merged 2026-11-10 21:02:35 UTC. It squashed 1 branch commit:
+  - `83e0fb7` T-1194: the commit's written list leaves out core-action rows, as K-0…
+- **Files changed:** 8 (+261 −35), by folder:
+  - `actions/src/commit/` build.test.ts +125 −3, build.ts +47 −0, commit.ts +24 −4, index.ts +2 −0
+  - `actions/src/commit/core/` core.test.ts +40 −2
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +0 −10, chain.test.ts +7 −7, commit.test.ts +16 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 327. T-558: join hop 7, decide (two reads, one Sonnet re-read) through @rosie/ai (\#331)
+
+- **Commit:** [`fa9347d`](https://github.com/aryamahadik/rosie/commit/fa9347d), by Arya Mahadik, 2026-11-10 20:26:28 UTC
+- **Pull request:** [#331](https://github.com/aryamahadik/rosie/pull/331) from `task/T-558`, merged 2026-11-10 20:26:28 UTC. It squashed 4 branch commits:
+  - `dd96f11` T-558: work in progress, interrupted by a network outage (about 13:20…
+  - `a821575` Merge branch 'main' into task/T-558
+  - `73e6007` T-558: round 1's tree checked and kept (the decide port bound to @ros…
+  - `90d79b4` T-558: round 2 (DL-382): the skeleton e2e's root run feeds the decide…
+- **Files changed:** 17 (+1817 −74), by folder:
+  - `runtime/src/wiring/` decide.test.ts +273 −0, hop3.worker.test.ts +19 −3, hop4.worker.test.ts +9 −1, hop5.worker.test.ts +6 −3, hop6.worker.test.ts +6 −1, hop7.worker.test.ts +621 −0, index.ts +5 −0, picks.ts +5 −2, ports.ts +2 −1, real.ts +165 −2, root.test.ts +42 −13, root.ts +25 −7, root.worker.test.ts +19 −6, test-support.ts +527 −25
+  - `tests/e2e/skeleton/` README.md +5 −4, root-run.ts +4 −1, skeleton.worker.test.ts +84 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-558: work in progress, interrupted by a network outage (about 13:20Z to 14:19Z); the lead's commit of the builder's tree as it was left, unchecked (DL-379)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-558: round 1's tree checked and kept (the decide port bound to @rosie/ai, one decider per bundle; hop7 and decide tests; earlier hops fed the deciders; e2e JOINED_THROUGH decideReads and CLAIMS row 7); decide.test.ts types traceFor as an arrow property (lint unbound-method); hop3 holds the turn's decide calls to exactly its two reads' four calls
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-558: round 2 (DL-382): the skeleton e2e's root run feeds the decide port its deciders (fakes.decide.deciders), with join 7 in root-run.ts's join list; CLAIMS row 3 keeps only the model-call spans whose calls are all safety reads (row 7 holds decide's four calls exactly); the README's join 7 lines: decide's claims, joined so far (joins 1 to 7) and SKELETON_UPTO unset (receive to decide's two reads)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 326. T-1176: the core's own danger line carries the danger question. recordSafetyOutcome's line (RecordLine, the plan's and the core run's line) adds K-01 safetyAsk, its words from the pinned bundle through a new SafetyWords port (SafetyDeps.words), in the handle actor's cases from the record's own labels: a label of unknown tense whose outcome is not No (K-34's stored labels and tenses on a repeat), placed on the same line after a space (lineWordsOf). Never after No, a known tense or a timed-out read. A threat's line to the owner and the outage line ask nothing. With no words port a line that asks answers notBuilt, and with no safetyAsk words the record is refused (noSafetyAsk). Tests in safety-ask.test.ts: the emergency and crisis lines of unknown tense carry it once, over, now, could restart, joke, No and timed-out reads carry none, and parity with checkedLineFor on K-02's 11 safety reads and their 8 unknown-tense versions (\#330)
+
+- **Commit:** [`12229f7`](https://github.com/aryamahadik/rosie/commit/12229f7), by Arya Mahadik, 2026-11-10 20:26:24 UTC
+- **Pull request:** [#330](https://github.com/aryamahadik/rosie/pull/330) from `task/T-1176`, merged 2026-11-10 20:26:25 UTC. It squashed 1 branch commit:
+  - `bdd7378` T-1176: the core's own danger line carries the danger question. recor…
+- **Files changed:** 8 (+907 −10), by folder:
+  - `actions/src/domain/safety/` errors.ts +6 −0, handlers.ts +18 −2, index.ts +9 −0, ports.ts +23 −1, record.ts +118 −7, rules.ts +34 −0, safety-ask.test.ts +637 −0, test-support.ts +62 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 325. T-1180: the page entry and the Linq webhook cap a request's body (413 before it is read whole, nothing logged), and the page span carries only K-21's own error names (\#329)
+
+- **Commit:** [`167bff3`](https://github.com/aryamahadik/rosie/commit/167bff3), by Arya Mahadik, 2026-11-10 20:26:20 UTC
+- **Pull request:** [#329](https://github.com/aryamahadik/rosie/pull/329) from `task/T-1180`, merged 2026-11-10 20:26:21 UTC. It squashed 2 branch commits:
+  - `b6b6838` T-1180: the page entry and the Linq webhook read their body under a c…
+  - `226ee1e` T-1180: the 413 ending joins the table of page entry spans held to K-…
+- **Files changed:** 15 (+1068 −46), by folder:
+  - `runtime/src/gateway/` answer.ts +5 −2, body.test.ts +131 −0, body.ts +95 −0, body.worker.test.ts +31 −0, index.ts +17 −2, linq-webhook.ts +16 −11, linq-webhook.worker.test.ts +143 −1, test-support.ts +80 −1, types.ts +12 −0
+  - `runtime/src/gateway/pages/` entry.ts +46 −23, errors.ts +58 −0, index.ts +4 −2, pages.test.ts +137 −1, pages.worker.test.ts +284 −2, types.ts +9 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1180: the page entry and the Linq webhook read their body under a cap (body.ts readCappedText; config values GatewayDeps.pageBodyLimitBytes, default 64 KiB, and linqBodyLimitBytes, default 256 KiB; a mistyped value keeps the default): a declared length over it is refused before a byte is read, else the stream is cancelled at the chunk that goes over; either answers 413 {ok:false,error:payload_too_large,trace_id} with no handler run and nothing verified or handed on, its span refused with error_code bodyTooLarge and nothing of the body logged; a staging-only call outside staging still answers stagingOnly unread. The pageRequest span takes a handler's error only when it is one of K-21 v1's 35 error names (pages/errors.ts, held to every <call>.errors through each $ref by pages.test.ts); any other value is written as unknownPageError, the answer still sent as it is. Tests: unit and workerd, every fixture under the cap
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1180: the 413 ending joins the table of page entry spans held to K-08 v1's span schema (Ajv)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 324. T-1193: the Tool API base takes a per-call option, CallOptions.callerRecordsHop, naming the hop its caller records itself: when it is the hop the call's span takes, the base records no span; the checks, scope, handler, answer and every error are unchanged, and any other hop, an empty option or none changes nothing (a page's pageRequest and an agent's agentApiRequest span stay). The turn face passes it for the handle actor's calls: gateAndCommit names the gate (TURN\_RECORDS\_GATE), composeInput and finalizeMessage fillAndChecks (TURN\_RECORDS\_FILL\_AND\_CHECKS), so the turn's per-part gate spans, its commit span and its one fillAndChecks span per row are the trace's only spans for those hops; buildFrontier passes none and keeps the base's span (CQ-159, T-557). Tests: tool-api.test.ts holds the three calls with and without the option on every accepted v1 exchange and seven refusal and failure paths each, an ended trace, other hops and every call without it; commit.test.ts, rows.test.ts and chain.test.ts show the face leaves no base span while the same handlers on a base without the option give the same answers and their one span, labels only; the turn's one trace keeps only the frontier span; calls.int.test.ts expects no base span (DL-376) (\#328)
+
+- **Commit:** [`db5090b`](https://github.com/aryamahadik/rosie/commit/db5090b), by Arya Mahadik, 2026-11-10 20:26:16 UTC
+- **Pull request:** [#328](https://github.com/aryamahadik/rosie/pull/328) from `task/T-1193`, merged 2026-11-10 20:26:17 UTC. It squashed 1 branch commit:
+  - `68fbd19` T-1193: the Tool API base takes a per-call option, CallOptions.caller…
+- **Files changed:** 8 (+487 −34), by folder:
+  - `actions/src/tool-api/` calls.ts +3 −1, tool-api.test.ts +241 −2, tool-api.ts +29 −8
+  - `actions/src/tool-api/turn-face/` chain.test.ts +42 −0, commit.test.ts +28 −1, rows.test.ts +81 −3, turn-face.ts +56 −12
+  - `actions/src/tool-api/turn-face/pg/` calls.int.test.ts +7 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 323. T-1192: the Worker serves web's pages last before its 404: runtime/src/index.ts calls servePage(request, env.BASE\_PATH) after the Linq webhook, the provider webhooks, the page entry and health, so GET {BASE\_PATH}/privacy (rosfield.com/test/privacy on staging) answers 200 with T-1171's privacy notice and web's headers as they are (its CSP, no set-cookie, no trace id, no log line); HEAD gives no body and any other method web's 405; every other path keeps the 404 JSON with its trace id. index.worker.test.ts proves it inside workerd, with the CSP's style hash taken there, /test/privacy/ and /privacy on staging still 404, env.BASE\_PATH followed, and the Linq route, the page entry and the other routes answering as before (\#327)
+
+- **Commit:** [`8c8553f`](https://github.com/aryamahadik/rosie/commit/8c8553f), by Arya Mahadik, 2026-11-10 15:29:53 UTC
+- **Pull request:** [#327](https://github.com/aryamahadik/rosie/pull/327) from `task/T-1192`, merged 2026-11-10 15:29:54 UTC. It squashed 1 branch commit:
+  - `55de3d8` T-1192: the Worker serves web's pages last before its 404: runtime/sr…
+- **Files changed:** 2 (+228 −5), by folder:
+  - `runtime/src/` index.ts +16 −3, index.worker.test.ts +212 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 322. T-1178: the One question check counts only the composed words. Each fixed line's source words (safetyAsk, the opt-out line, the privacy link, any other) and the typed options are taken out at their first place before the question marks are counted, so a composed question beside the danger question the inserter adds after a safety line passes, and two composed questions still fail with K-03's detail. checks.test.ts's one assertion that pinned the retired rule now asserts the card's, with a two-composed-questions counterpart; one-question.test.ts proves it alone, through the inserter and through the finalize call. (\#326)
+
+- **Commit:** [`e8844cb`](https://github.com/aryamahadik/rosie/commit/e8844cb), by Arya Mahadik, 2026-11-10 15:29:49 UTC
+- **Pull request:** [#326](https://github.com/aryamahadik/rosie/pull/326) from `task/T-1178`, merged 2026-11-10 15:29:49 UTC. It squashed 1 branch commit:
+  - `2b40c15` T-1178: the One question check counts only the composed words. Each f…
+- **Files changed:** 3 (+222 −6), by folder:
+  - `actions/src/finalize/checks/` checks.test.ts +9 −2, checks.ts +10 −4, one-question.test.ts +203 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 321. T-1189: the Worker's prebuilt validators check composeInput by K-09 v1.6: build:validators takes tool-api.v1.6 as a root and compiles composeInput's request, response and errors from v1.6 (every other call from v1.5), records its exchanges' answers against v1.6 and still holds every validator to Ajv's compiled answer before any file is placed; validator.ts drops its workerd branch (composeInput by v1.6 in Node and workerd alike) and reads one list, SCHEMA\_FILES, now holding v1.6 and K-03 v1.1, which the prebuilt code is held to (its v1.6 id and calls too); validator.worker.test.ts accepts compose-input-s1-02-v1.6.json, fixedLineRow and masterLineMissing in workerd and refuses a term fact with no source, the Function/eval trap at 0 calls; validator.test.ts pins the closure with v1.6 (\#324)
+
+- **Commit:** [`f9fae52`](https://github.com/aryamahadik/rosie/commit/f9fae52), by Arya Mahadik, 2026-11-10 13:07:41 UTC
+- **Pull request:** [#324](https://github.com/aryamahadik/rosie/pull/324) from `task/T-1189`, merged 2026-11-10 13:07:41 UTC. It squashed 1 branch commit:
+  - `c5994a5` T-1189: the Worker's prebuilt validators check composeInput by K-09 v…
+- **Files changed:** 4 (+307 −90), by folder:
+  - `actions/src/tool-api/` validator.test.ts +20 −11, validator.ts +27 −25, validator.worker.test.ts +182 −23
+  - `infra/build/` tool-api-validators.mjs +78 −31
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 320. T-1141: turn face, part 2: gate and commit, compose input and finalize for turn 1 on local PostgreSQL, the reader mapped as K-05 v1.5's rowReader; one turn id and trace id, replay writes nothing (\#325)
+
+- **Commit:** [`efbb504`](https://github.com/aryamahadik/rosie/commit/efbb504), by Arya Mahadik, 2026-11-10 13:07:36 UTC
+- **Pull request:** [#325](https://github.com/aryamahadik/rosie/pull/325) from `task/T-1141`, merged 2026-11-10 13:07:36 UTC. It squashed 8 branch commits:
+  - `49baecc` T-1141: the turn face's gate and commit, compose input and finalize b…
+  - `1886305` T-1141: compose input and finalize proven on PostgreSQL; the unit cha…
+  - `d307a76` Merge branch 'main' into task/T-1141
+  - `b068232` T-1141: round 2: the reader mapped exactly as K-05 v1.5 rowReader (it…
+  - `0654415` T-1141: the chain checks JOIN's targets are none (DL-365) and the int…
+  - `9a7f7e9` Merge branch 'main' into task/T-1141
+  - `c544753` T-1141: on main with T-1174 and T-1185: compose input answers compose…
+  - `0f51280` T-1141: the integration line also holds each call's span (gate, then …
+- **Files changed:** 19 (+3753 −48), by folder:
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +529 −0, chain.test.ts +215 −0, commit.test.ts +342 −0, commit.ts +435 −0, errors.ts +58 −0, held.ts +78 −0, index.ts +33 −3, rows.test.ts +482 −0, rows.ts +658 −0, turn-face.test.ts +4 −4, turn-face.ts +129 −28
+  - `actions/src/tool-api/turn-face/pg/` calls.int.test.ts +382 −0, calls.ts +123 −0, frontier.ts +9 −3, index.ts +3 −1, rows.int.test.ts +227 −0, sealer.ts +30 −0, test-support.ts +11 −5, turn-face.int.test.ts +5 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1141: the turn face's gate and commit, compose input and finalize bound (work in progress: limit 1 stops turn 1's sign-up door on main)
+
+createTurnFace gains gateAndCommit(request, at, trace), composeInput and finalizeMessage through the Tool API base under the Tool API's own scope (rosie_app). commit.ts binds the limits (limit 1 given the pinned bundle's step cards, note 65), writesOf, runCore with T-1161's safety reads, a read-only sealer, the pinned bundle's lines, PLUGIN_LISTS_NO_STOP_WORDS and NOT_TOLD_YET, and openHolds joined with the runtime's CommitContext. rows.ts binds both readRow ports and the fixed lines' facts to K-05 v1.3's readOutboxRow and readFixedLineFacts. pg/ wires them on PostgreSQL. Tests name what main cannot give yet (GATE_WAITING, READER_WAITING, SEALED_WAITING).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1141: compose input and finalize proven on PostgreSQL; the unit chain as far as main gives it
+
+pg/rows.int.test.ts: on the row K-05's turn 1 commit writes, compose input gives compose-input-s1-02.json's input (gentle while the sensitive switch is on, DL-326 b) with the inbound words only once gateAndCommit handed them; another business's scope reads notFound; finalize refuses Rosie's first text on bundle v0 (lineNotInBundle: privacyLink) and writes nothing; on bundle v0 as published with privacyLink (T-1146) it sends, its final parts carrying the opener and the privacy link, written by K-05's writePlan, and a repeat answers alreadyPlanned. chain.test.ts runs build-frontier-s1-01, commit-s1-01, compose input and finalize through one face, each step as far as main gives it. rows.test.ts asserts the input never carries the opt-out line (DL-245).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1141: round 2: the reader mapped exactly as K-05 v1.5 rowReader (item 44: by role, or a person with no role by S1-02's sign-up line, else noReader with why), READER_WAITING and GATE_WAITING gone; the unit chain from build-frontier-s1-01 through commit-s1-01 to compose input and finalize, and the integration line on PostgreSQL to the row's final parts with nothing written twice on replay; SEALED_WAITING kept, naming T-1185
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1141: the chain checks JOIN's targets are none (DL-365) and the integration test checks S1-01's thread carries the turn's chat id
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1141: on main with T-1174 and T-1185: compose input answers compose-input-s1-02.json's request as its K-09 v1.6 twin states it (term facts), the binding hands it the stored name for compose input to address, and K-05's fixedLineRow (no fixed line id) is refused, never guessed; SEALED_WAITING gone since T-1185: Sam's sealed words open with his key
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1141: the integration line also holds each call's span (gate, then fillAndChecks twice) to the turn's one turn id and trace id
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 319. T-1171: the privacy notice page at BASE\_PATH + /privacy (rosfield.com/test/privacy on staging), the address on the last line of Rosie's first text: Q-30's default stand-in words, each from a RULES line, shown as a draft and marked in source as waiting for Jay's words before production (noindex); the page frame's footer links every page to it (RULES 4.3, Q-30); servePage answers GET and HEAD there with no cookie, script, form, outside resource or reader data, under a CSP that loads only the frame's hashed inline style; not yet routed by the Worker (runtime/src/index.ts, outside the card) (\#322)
+
+- **Commit:** [`5f154d5`](https://github.com/aryamahadik/rosie/commit/5f154d5), by Arya Mahadik, 2026-11-10 12:45:17 UTC
+- **Pull request:** [#322](https://github.com/aryamahadik/rosie/pull/322) from `task/T-1171`, merged 2026-11-10 12:45:18 UTC. It squashed 1 branch commit:
+  - `f0e2678` T-1171: the privacy notice page at BASE\_PATH + /privacy (rosfield.com…
+- **Files changed:** 8 (+763 −1), by folder:
+  - `web/` README.md +8 −1
+  - `web/src/pages/privacy/` notice.ts +147 −0, page.ts +40 −0, privacy.test.ts +256 −0
+  - `web/src/` routes.ts +13 −0
+  - `web/src/shell/` frame.test.ts +107 −0, frame.ts +127 −0, serve.ts +65 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 318. T-1169: K-05's contract test covers v1.3 to v1.5: every v1.3 and v1.4 fixture run against db/repo on PostgreSQL in its role, v1.5's row reader with its three security cases, drift caught (\#321)
+
+- **Commit:** [`22810cf`](https://github.com/aryamahadik/rosie/commit/22810cf), by Arya Mahadik, 2026-11-10 12:45:13 UTC
+- **Pull request:** [#321](https://github.com/aryamahadik/rosie/pull/321) from `task/T-1169`, merged 2026-11-10 12:45:13 UTC. It squashed 2 branch commits:
+  - `a46067c` T-1169: K-05's contract test covers v1.3, v1.4 and v1.5 (T-1188 folde…
+  - `9dda4b4` T-1169: the README-list check asks only that some written-for version…
+- **Files changed:** 2 (+984 −25), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +565 −0, data-access.v1.test.ts +419 −25
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1169: K-05's contract test covers v1.3, v1.4 and v1.5 (T-1188 folded in, DL-373): WRITTEN_FOR to v1.5 with a mend for each of their 16 refused fixtures; C-089, C-090, C-093 and C-104 join SIDE_CHECKS, read from each version's Consumers list; v1.5's rowReader read as README item 44 says and three security cases (no person, lineTo null, a cust line, each read as owner) refused by the one rule each breaks; new data-access.v1.db-side.test.ts runs every v1.3 and v1.4 fixture, selected by version, through db/repo's own reads in their roles on local PostgreSQL (31 accepted give their outcome, 4 refused requests refused before any statement, 10 refused answers answered put right in their twin's state)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1169: the README-list check asks only that some written-for version points to its own Consumers list, not that every version from v1.3 on does, so a later minor version with none still selects by version (DL-125)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 317. T-557: join 6: the actor's frontier comes from the real Tool API over bundle v0 pinned at turn start (KV, else PostgreSQL); turn 1's one choice is the sign-up door; one frontier span per turn (\#323)
+
+- **Commit:** [`b11bea0`](https://github.com/aryamahadik/rosie/commit/b11bea0), by Arya Mahadik, 2026-11-10 12:45:09 UTC
+- **Pull request:** [#323](https://github.com/aryamahadik/rosie/pull/323) from `task/T-557`, merged 2026-11-10 12:45:09 UTC. It squashed 3 branch commits:
+  - `a1c84a1` T-557: join hop 6 (work in progress, NEED): the frontier port, split …
+  - `a6690ab` Merge branch 'main' into task/T-557
+  - `c37459d` T-557: one frontier span per turn (CQ-159, DL-372): TurnFace gains re…
+- **Files changed:** 21 (+1544 −83), by folder:
+  - `runtime/src/turn/` turn.ts +13 −5, types.ts +9 −1
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +1 −1, frontier.test.ts +243 −0, hop3.worker.test.ts +3 −1, hop4.worker.test.ts +3 −1, hop5.worker.test.ts +37 −8, hop6.worker.test.ts +583 −0, index.ts +5 −0, picks.ts +7 −3, pinned-runs.ts +34 −0, ports.ts +26 −6, real.ts +234 −5, root.test.ts +61 −12, root.ts +47 −17, root.worker.test.ts +4 −0, test-support.ts +180 −11
+  - `tests/e2e/skeleton/` README.md +4 −3, root-run.ts +4 −1, skeleton.worker.test.ts +45 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-557: join hop 6 (work in progress, NEED): the frontier port, split from the turn face, binds @rosie/actions' turn face (createTurnFace, pgTurnFace's face) over RootOptions.frontierScope (K-05 v1.2 readTurnState as rosie_job under the call's business; fails closed with none bound, inside the Tool API base) and the bundle the turn's run pinned (PinnedRuns), its base span naming each bundle part read and where from (got.bundleParts, got.bundleFrom); prebuilt validators in workerd; fakeFrontierScope over T-1148's rows; frontier.test.ts (6, Node), hop6.worker.test.ts (4); e2e JOINED_THROUGH frontier and row 6's claims. Waits for the turn's own frontier span to stop (CQ-159) and the e2e's root-run feed and row 5 line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-557: one frontier span per turn (CQ-159, DL-372): TurnFace gains recordsFrontierSpan (one flag per hop a port records itself), turn.ts buildFrontier starts no span of its own when it is true, and root.ts sets it where the frontier port binds real (test and staging; production's closed port leaves the turn's span), so the Tool API base's span, naming each bundle part and where it came from, is the hop's one span; TurnFacePort omits the flag; root.test.ts holds the flag per environment. The skeleton e2e feeds the joined frontier its scope (root-run.ts frontierScope), row 5's targets line reads the joined frontier's evidence (decide's context offers only the sign-up door, which T-1147 offers only with noTarget and empty lists), and the README and root-run.ts list join 6
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 316. T-565: the test-phone page's server calls, staging only (K-21 v1): testPhoneSend builds the roster phone's K-06 text, has the Linq double sign it (K-11 doubleWebhook) and posts it to the gateway's Linq entry, answering the event id, the trace the gateway opened and its status (test-phone-send.json; the event is test-phone-page.json byte for byte); testPhoneParts lists the Linq double's parts with their times and answers through a parts recorder on staging's send path, the email double's emails to the phone's own person, its stop state and chat link (test-phone-parts.json); anywhere ENVIRONMENT is not exactly staging both answer stagingOnly before reading the request or any port; a phone off the roster answers notTestPhone with nothing signed or posted; signInNeeded and notTester by the token's sha256; hand-written K-21 request checks held to Ajv; repeat-safe event ids from the session and requestId; unit and workerd tests; adapters exports ./email/double (\#320)
+
+- **Commit:** [`c99dfe5`](https://github.com/aryamahadik/rosie/commit/c99dfe5), by Arya Mahadik, 2026-11-10 12:04:03 UTC
+- **Pull request:** [#320](https://github.com/aryamahadik/rosie/pull/320) from `task/T-565`, merged 2026-11-10 12:04:03 UTC. It squashed 1 branch commit:
+  - `0c91fe0` T-565: the test-phone page's server calls, staging only (K-21 v1): te…
+- **Files changed:** 12 (+2266 −0), by folder:
+  - `actions/src/page-calls/staging/test-phone/` errors.ts +28 −0, handlers.ts +236 −0, ids.ts +30 −0, index.ts +52 −0, parts.ts +60 −0, request.test.ts +166 −0, request.ts +149 −0, test-phone.test.ts +786 −0, test-phone.worker.test.ts +213 −0, test-support.ts +359 −0, types.ts +186 −0
+  - `adapters/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 315. T-1185: commitTurn and fireClock write a state write's bytea value in K-04's hex text form as the bytes it spells (db/repo/bytea.ts), never as the string's own characters, so a safety record's sealed words open with the person's key. Any other form throws and nothing is written. The other bytea writes in db/repo already pass bytes. (\#319)
+
+- **Commit:** [`8e82b1d`](https://github.com/aryamahadik/rosie/commit/8e82b1d), by Arya Mahadik, 2026-11-10 12:03:59 UTC
+- **Pull request:** [#319](https://github.com/aryamahadik/rosie/pull/319) from `task/T-1185`, merged 2026-11-10 12:03:59 UTC. It squashed 1 branch commit:
+  - `ad6dc99` T-1185: commitTurn and fireClock write a state write's bytea value in…
+- **Files changed:** 6 (+571 −14), by folder:
+  - `db/repo/` bytea.test.ts +64 −0, bytea.ts +34 −0, clocks.int.test.ts +90 −0, clocks.ts +40 −7, commit-turn.int.test.ts +303 −0, commit-turn.ts +40 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 314. T-1174: compose input answers K-09 v1.6: S1-02's card lines as K-03 v1.1 term facts with their source lines (a fixed table for S1-02's four, the generic K-01 path elsewhere; default 137 on every step, slot facts then terms, default 141), fixedLineRow and masterLineMissing answered where T-309 threw, the reader addressed by the first word of the name, K-03 v1.1 the default check; the Tool API types and checks composeInput by v1.6 (types off v1.6's exchange, pinned), every other call on v1.5; the Worker's prebuilt validators still hold v1.5's composeInput (\#318)
+
+- **Commit:** [`6b537ed`](https://github.com/aryamahadik/rosie/commit/6b537ed), by Arya Mahadik, 2026-11-10 12:03:55 UTC
+- **Pull request:** [#318](https://github.com/aryamahadik/rosie/pull/318) from `task/T-1174`, merged 2026-11-10 12:03:56 UTC. It squashed 1 branch commit:
+  - `366a836` T-1174: compose input answers K-09 v1.6: S1-02's card lines as K-03 v…
+- **Files changed:** 19 (+954 −164), by folder:
+  - `actions/` README.md +1 −1
+  - `actions/src/compose-input/` build.ts +34 −15, check.test.ts +21 −12, check.ts +15 −13, check.worker.test.ts +2 −2, compose-input.test.ts +119 −24, errors.ts +6 −16, handler.ts +36 −17, index.ts +23 −3, master-line.ts +69 −30, term-facts.test.ts +193 −0, term-facts.ts +131 −0, test-support.ts +38 −4, types.ts +30 −12
+  - `actions/src/tool-api/` calls.test.ts +66 −4, calls.ts +19 −3, index.ts +3 −0, validator.test.ts +108 −4, validator.ts +40 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 313. T-1184: freeze K-05 v1.5: a row to someone with no role on the sign-up section is read by its step line's one audience (S1-02: the owner); every other no-role row refused; never stored as a role (\#317)
+
+- **Commit:** [`66af3c3`](https://github.com/aryamahadik/rosie/commit/66af3c3), by Arya Mahadik, 2026-11-10 11:38:37 UTC
+- **Pull request:** [#317](https://github.com/aryamahadik/rosie/pull/317) from `task/T-1184`, merged 2026-11-10 11:38:37 UTC. It squashed 3 branch commits:
+  - `2779ed2` T-1184: freeze K-05 v1.5, the sign-up reading (item 44): a row whose …
+  - `3412828` T-1184: K-05 README open gap 46 (the business a sign-up row is read u…
+  - `6f7e29d` T-1184: K-05 README v1.5 names its keywords beyond ADR-005's list (ro…
+- **Files changed:** 9 (+1647 −9), by folder:
+  - `contracts/data-access/` README.md +59 −8, data-access.v1.5.schema.json +1418 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +40 −0, row-reader-a5-05-tomas-no-role.json +23 −0, row-reader-s1-02-no-role.json +25 −0, row-reader-s1-02-owner.json +28 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-row-reader-no-role-outside-section-1.json +25 −0, refuse-row-reader-role-read-by-line.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1184: freeze K-05 v1.5, the sign-up reading (item 44): a row whose recipient, a person, holds no role is read by the audience of the step line it carries when its step is in section 1 of its flow (turn 1's outbox-s1-02-sam-1 read as the owner); a recipient with a role is read by it; every other row with no role is still refused (noReader). Stated as rowReader (the consumers' mapping of item 35's role and FinalizeRow.reader row, no database call); 3 accepted and 2 refused fixtures; item 35's table, defaults 62 to 65, gaps 44 and 45; T-1102's consent fields renumbered to v1.6 (DL-364)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1184: K-05 README open gap 46 (the business a sign-up row is read under: journey 1's lane, for the security reviewer); the freeze record and v1.5's leaves name gaps 44 to 46
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1184: K-05 README v1.5 names its keywords beyond ADR-005's list (rowReader.exchange's rules in dependentSchemas, if/then with allOf, not, minItems, maxItems; the generated type is wider than the schema, so consumers prove the mapping on the rowReader fixtures)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 312. T-1183: the gate passes K-02 v1.1's sign-up door: limit 1's changeOf answers anyone for the door K-02 v1.1 default 9 shapes (S1-01, no booking, no stake or field; any other sign-up door is unknown, so nobodyDecides), and turn 1's part gets commit-s1-01.json's six answers (limit 2 notChecked, limit 4 pass with nothing to compare, limit 6 pass with no value; 3 and 5 already notChecked), proven through the shipped registry with nothing read (limits.test.ts) and in each limit's fixture loop; K-01's five doors and a door the gate does not know answer as before (DL-364) (\#316)
+
+- **Commit:** [`91a8ad4`](https://github.com/aryamahadik/rosie/commit/91a8ad4), by Arya Mahadik, 2026-11-10 11:38:32 UTC
+- **Pull request:** [#316](https://github.com/aryamahadik/rosie/pull/316) from `task/T-1183`, merged 2026-11-10 11:38:33 UTC. It squashed 1 branch commit:
+  - `b43e882` T-1183: the gate passes K-02 v1.1's sign-up door: limit 1's changeOf …
+- **Files changed:** 12 (+602 −16), by folder:
+  - `actions/src/gate/framework/` test-support.ts +5 −1
+  - `actions/src/gate/limit-1/` allowed.test.ts +144 −0, allowed.ts +35 −2, test-support.ts +47 −0
+  - `actions/src/gate/limit-2/` index.ts +2 −2, owner-rules.test.ts +69 −1, owner-rules.ts +15 −3
+  - `actions/src/gate/limit-4/` versions.test.ts +47 −1, versions.ts +18 −3
+  - `actions/src/gate/limit-6/` re-parse.test.ts +68 −1, re-parse.ts +17 −2
+  - `actions/src/gate/` limits.test.ts +135 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 311. T-569: deploy steps 3 and 4: publish bundle v0 and switch the active id, then the flags with the skeleton flag on staging only; one shared database URL check and scrub; never production (\#315)
+
+- **Commit:** [`286206d`](https://github.com/aryamahadik/rosie/commit/286206d), by Arya Mahadik, 2026-11-10 11:10:03 UTC
+- **Pull request:** [#315](https://github.com/aryamahadik/rosie/pull/315) from `task/T-569`, merged 2026-11-10 11:10:03 UTC. It squashed 5 branch commits:
+  - `2f4fd85` T-569: deploy steps 3 and 4: publish-bundle.sh publishes a bundle (Po…
+  - `1a55349` T-569: flags.sh and publish-bundle.sh read no CI switch (DL-024: lib.…
+  - `a985945` T-569: publish-bundle.sh checks the database URL before anything read…
+  - `9b766ad` Merge branch 'main' into task/T-569
+  - `d49e210` T-569: one database URL check and scrub, infra/scripts/db-url.mjs (ro…
+- **Files changed:** 14 (+2077 −16), by folder:
+  - `infra/ci/` db-url.test.mjs +83 −0, deploy-staging.test.mjs +216 −0, flags.test.mjs +263 −0, publish-bundle.test.mjs +289 −0, release-harness.mjs +266 −0
+  - `infra/flags/` flags.mjs +247 −0, production.json +7 −0, staging.json +7 −0
+  - `infra/scripts/` db-url.mjs +116 −0, deploy-staging.sh +110 −9, flags.sh +88 −0, migrate.mjs +37 −4, migrate.test.mjs +53 −3, publish-bundle.sh +295 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-569: deploy steps 3 and 4: publish-bundle.sh publishes a bundle (PostgreSQL's copy, the KV bulk file into BUNDLES on staging) then switches the active bundle id; flags.sh applies the staging flag set (skeleton on; production's set has it off) and turns a flag off in one command; deploy-staging.sh runs both on the staging database and undoes them on a failure; the production environment is refused
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-569: flags.sh and publish-bundle.sh read no CI switch (DL-024: lib.test.mjs); --env local uses DATABASE_URL, else the local Docker database, on a host of this machine only
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-569: publish-bundle.sh checks the database URL before anything reads it, and builds the client and runs compiler publish only inside the catch that names the fault, so no path (--status, --activate, a publish) prints the URL, its user, password, host or database name, or an error's input property (security review of round 1, DL-356). Tests: a password with an unencoded #, the same after digits and a dev-vars line with a comment after the URL, through each path, and pins of flags.sh and deploy-staging.sh
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-569: one database URL check and scrub, infra/scripts/db-url.mjs (round 2's, moved), shared by publish-bundle.sh, flags.mjs and migrate.mjs (deploy steps 3, 4 and 1; DL-363): each checks its URL before any client is built and prints only the fault, or the code and message with the whole URL, user, password (as written and decoded), host, port and database name taken out, never an error's input. flags.mjs drops client.ts's redact; migrate.mjs refuses a URL that does not parse (exit 1) and scrubs every error it prints, its migrations unchanged. Tests: a password with # after digits, a refused connection and a host not found through flags.sh apply, off and list, migrate.mjs (apply and --status) and deploy-staging.sh step 1; db-url.test.mjs pins the parts and the scrub. v0WithBuild builds from v0's own build, since main's bundle v0 is now build 2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 310. T-1175: the double's composer loader reads K-03 v1.1 as T-1145 made it read K-02 v1.1 (loadPlanContract takes a version, v1 by default, frozen.json-gated; each composer file checked by its own version, loaded as one double; an input or id recorded twice across the files refused); new ai/recordings/composer.v1.1.json: input-s1-02-v1.1.json gives plan-s1-02.json, and recording 4 (the JOIN run's composer call) re-keyed on K-09 v1.6's compose input with the run's own ids (T-248's turn hash of evt-sam-0000, writes.ts row id), its four term facts S1-02's card lines in bundles/v0 as published under its pinned id; a v1 input with no term facts is still refused on plan-s1-02 (literalValue x2) and the JOIN run's v1 key gets NoRecordingError; T-376's suite turns plan-s1-02 from WAITING to given (57 to 58 passed). No live call: fetch stubbed and asserted never called (\#314)
+
+- **Commit:** [`0f0f18a`](https://github.com/aryamahadik/rosie/commit/0f0f18a), by Arya Mahadik, 2026-11-10 10:54:17 UTC
+- **Pull request:** [#314](https://github.com/aryamahadik/rosie/pull/314) from `task/T-1175`, merged 2026-11-10 10:54:17 UTC. It squashed 1 branch commit:
+  - `db68233` T-1175: the double's composer loader reads K-03 v1.1 as T-1145 made i…
+- **Files changed:** 12 (+718 −156), by folder:
+  - `ai/recordings/composer-inputs/` join-s1-02.json +18 −1
+  - `ai/recordings/` composer.v1.1.json +19 −0, composer.v1.json +1 −7, recordings.v1.1.json +1 −1
+  - `ai/src/fixtures-run/` double-transport.ts +6 −2, fixtures-run.test.ts +35 −18
+  - `ai/src/recorded-double/` composer-double.test.ts +425 −56, composer-recordings.ts +108 −49, composer-types.ts +4 −3, index.ts +12 −2, plan-contract.ts +56 −16, test-support.ts +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 309. T-418: the email double for K-12 v1 (C-213): sendEmail records each email once per idempotency key (Resend's 24 hours; another email under one key is refused 409 invalid\_idempotent\_request), refuses K-12's refused fixtures and the checks K-12 leaves to code, and answers any sendEmail failure the test chooses; verifyWebhook checks Svix signatures (id.timestamp.raw, HMAC-SHA256, 300 s) under a test key and reads Resend's delivered, bounced, suppressed, failed and received bodies; doubleWebhook fakes signed receipts of recorded emails and two-step inbound replies kept for readReply, which gives K-06 email-reply-check-passed and -failed byte for byte; doubleSentEmails lists the record for the test-phone page. 48 tests over all 21 K-12 fixtures. (\#313)
+
+- **Commit:** [`b3503c3`](https://github.com/aryamahadik/rosie/commit/b3503c3), by Arya Mahadik, 2026-11-10 10:54:12 UTC
+- **Pull request:** [#313](https://github.com/aryamahadik/rosie/pull/313) from `task/T-418`, merged 2026-11-10 10:54:13 UTC. It squashed 1 branch commit:
+  - `3c5ff67` T-418: the email double for K-12 v1 (C-213): sendEmail records each e…
+- **Files changed:** 6 (+2435 −0), by folder:
+  - `adapters/src/email/double/` double.test.ts +984 −0, double.ts +579 −0, index.ts +6 −0, types.ts +199 −0, validate.ts +354 −0, webhooks.ts +313 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 308. T-1147: the frontier offers K-02 v1.1's sign-up door to S1-01 when nothing targets the sender, only when the pinned bundle holds its step; T-293's hubs and doors source wired into the default registry (an AI change) (\#312)
+
+- **Commit:** [`062a26c`](https://github.com/aryamahadik/rosie/commit/062a26c), by Arya Mahadik, 2026-11-10 10:37:51 UTC
+- **Pull request:** [#312](https://github.com/aryamahadik/rosie/pull/312) from `task/T-1147`, merged 2026-11-10 10:37:51 UTC. It squashed 3 branch commits:
+  - `d0c2dab` T-1147: the sign-up door to S1-01 (K-02 v1.1 default 9) from T-293's …
+  - `1d652e6` Merge branch 'main' into task/T-1147
+  - `b3b24ae` T-1147: round 2 (DL-361): the three tests follow the wired registry. …
+- **Files changed:** 10 (+701 −76), by folder:
+  - `actions/src/frontier/assemble/` handler.test.ts +9 −6, handler.ts +6 −5, registry.ts +31 −8
+  - `actions/src/frontier/facts/` facts.test.ts +3 −0
+  - `actions/src/frontier/sources/hubs-doors/` hubs-doors.test.ts +12 −1, hubs-doors.ts +131 −40, sign-up.test.ts +395 −0, test-support.ts +90 −8
+  - `actions/src/frontier/sources/open-questions/` open-questions.test.ts +19 −2
+  - `actions/src/tool-api/turn-face/` test-support.ts +5 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1147: the sign-up door to S1-01 (K-02 v1.1 default 9) from T-293's hubs-and-doors source when the guard finds no target and the read holds none (no role, open question or booking), only when the pinned bundle holds its step: its step section 1's first step of the turn's flow graph, its label that section's title without its number, its definition S1-01's first sentence, read once through the bundles port; the source wired into its slot (registry.ts frontierSources(bundles), the handler's options.sources ?? frontierSources(options.bundles); FRONTIER_SOURCES the same slots on a port holding no bundle); c-01 off T-315's WAITING list. sign-up.test.ts (13): build-frontier-s1-01.json's whole answer on bundle v0 through the wired slot, the same choice on bundles/v0 (…/2, its id from its manifest), no door whose step the bundle lacks, none for a handle with a target. Known: 9 tests in 3 files outside May touch expect the registry's hubsAndDoors slot unbuilt (NEED)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1147: round 2 (DL-361): the three tests follow the wired registry. handler.test.ts expects hubsAndDoors built: only branchGates and anyTime logged frontier_source_missing, the registry's slots [openQuestions, null, hubsAndDoors, null] (two titles say so). open-questions.test.ts runs every call with its own source alone built (the registry's slot names, the other three unbuilt and logged missing as before, so its log assertion stays as it was); facts.test.ts's other-bookings test passes the openQuestions slot alone. No expected choice changed, nothing deleted, skipped or loosened, each file's test count the same.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 307. T-1170: the handle actor's receive span takes its at from one reading of the actor's clock as the call begins (K-08: when the hop started), its ms from then to the answer, so it starts no later than any span begun inside it (the safety read's, a receipt hook's); two Workers tests prove it on a receipt and on a text; the skeleton e2e's row 3 now holds the safety read to start no earlier than the inbox entry (entry.at \<= read.at, DL-352) (\#311)
+
+- **Commit:** [`fd0483c`](https://github.com/aryamahadik/rosie/commit/fd0483c), by Arya Mahadik, 2026-11-10 10:04:04 UTC
+- **Pull request:** [#311](https://github.com/aryamahadik/rosie/pull/311) from `task/T-1170`, merged 2026-11-10 10:04:05 UTC. It squashed 1 branch commit:
+  - `7abaddb` T-1170: the handle actor's receive span takes its at from one reading…
+- **Files changed:** 4 (+144 −16), by folder:
+  - `runtime/src/actor/` handle-actor.ts +12 −4, handle-actor.worker.test.ts +124 −2
+  - `tests/e2e/skeleton/` README.md +1 −1, skeleton.worker.test.ts +7 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 306. T-1165: compose input's K-03 checks run inside the Worker on prebuilt standalone validators: build:validators compiles K-03 v1's and v1.1's composeInput into compose-input-validators.js (its own module, same strict options, held to Ajv's compiled answer on every K-03 input fixture under both versions before it is placed); check.ts uses it in workerd and Ajv in Node, a checker per K-03 version (v1 by default); check.test.ts and check.worker.test.ts (Function/eval trap at 0 calls) (\#310)
+
+- **Commit:** [`0d7e131`](https://github.com/aryamahadik/rosie/commit/0d7e131), by Arya Mahadik, 2026-11-10 10:04:00 UTC
+- **Pull request:** [#310](https://github.com/aryamahadik/rosie/pull/310) from `task/T-1165`, merged 2026-11-10 10:04:01 UTC. It squashed 1 branch commit:
+  - `2029865` T-1165: compose input's K-03 checks run inside the Worker on prebuilt…
+- **Files changed:** 4 (+867 −61), by folder:
+  - `actions/src/compose-input/` check.test.ts +202 −0, check.ts +128 −22, check.worker.test.ts +307 −0
+  - `infra/build/` tool-api-validators.mjs +230 −39
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 305. T-1173: freeze K-09 v1.6: composeInput answers K-03 v1.1's composer input, so a row's input carries its step card's lines as term facts with their source lines; compose-input-s1-02-v1.6.json's input is K-03's input-s1-02-v1.1.json word for word (named rule inputIsK03Fixture compares the two files); errors fixedLineRow and masterLineMissing; rule termFactsFromCard; 3 accepted and 3 refused fixtures; defaults 137 to 141, open gaps 124 to 128; open gap 79 closed for S1-02's rows (\#309)
+
+- **Commit:** [`c3833f0`](https://github.com/aryamahadik/rosie/commit/c3833f0), by Arya Mahadik, 2026-11-10 09:50:12 UTC
+- **Pull request:** [#309](https://github.com/aryamahadik/rosie/pull/309) from `task/T-1173`, merged 2026-11-10 09:50:12 UTC. It squashed 1 branch commit:
+  - `2ef6908` T-1173: freeze K-09 v1.6: composeInput answers K-03 v1.1's composer i…
+- **Files changed:** 11 (+715 −6), by folder:
+  - `contracts/tool-api/` README.md +59 −4, frozen.json +1 −1, tool-api.rules.mjs +111 −0, tool-api.v1.6.schema.json +531 −0
+  - `contracts/tool-api/fixtures/` compose-input-fixed-line-row.json +1 −0, compose-input-master-line-missing.json +1 −0, compose-input-s1-02-v1.6.json +1 −0, index.json +7 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-term-fact-names-slot.json +1 −0, refuse-term-fact-no-source.json +1 −0, refuse-term-fact-not-card-line.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 304. T-021: freeze K-12 v1, the email port (Resend): send with its idempotency key, Svix-signed webhooks, the two-step inbound reply, the double's calls; spike findings recorded, read-only (\#308)
+
+- **Commit:** [`78b91de`](https://github.com/aryamahadik/rosie/commit/78b91de), by Arya Mahadik, 2026-11-10 09:28:26 UTC
+- **Pull request:** [#308](https://github.com/aryamahadik/rosie/pull/308) from `task/T-021`, merged 2026-11-10 09:28:27 UTC. It squashed 5 branch commits:
+  - `3624612` T-021: freeze K-12 v1, the email port (Resend): sendEmail, verifyWebh…
+  - `474da2f` T-021: K-12 README: the error body's source named as the resend-rs SD…
+  - `3f8af87` T-021: K-12 README: each Resend call is a K-08 portCall span with pro…
+  - `ff51f81` T-021: K-12 schema: failureCode's description quotes K-06 failure.cod…
+  - `47b44e6` T-021: K-12 README: the trace hops an email takes, as K-08 v1 names t…
+- **Files changed:** 38 (+2125 −0), by folder:
+  - `contracts/port-email/` README.md +212 −0, frozen.json +1 −0, port-email.v1.schema.json +792 −0
+  - `contracts/port-email/fixtures/` bounced.json +56 −0, delivered.json +53 −0, double-sent-emails.json +44 −0, double-signed-reply.json +55 −0, double-signed-webhook.json +55 −0, inbound-reply-failed-check.json +49 −0, inbound-reply-passed.json +49 −0, index.json +172 −0, reply-automatic-ignored.json +18 −0, send-code.json +32 −0, send-confirmation-with-chat-link.json +37 −0, send-copy-of-text.json +32 −0, send-daily-quota.json +35 −0, send-fallback-s12-10.json +32 −0, send-rate-limited.json +35 −0, verify-bad-signature.json +21 −0, verify-ignored-delivery-delayed.json +21 −0, verify-reply-received.json +22 −0
+  - `contracts/port-email/fixtures/invalid/` refuse-from-other-domain.json +32 −0, refuse-marketing-email.json +32 −0, refuse-no-reply-address.json +32 −0, refuse-subject-line-break.json +32 −0
+  - `contracts/port-email/vendor-samples/` error-daily-quota.json +9 −0, error-rate-limit.json +14 −0, received-email-check-failed.json +28 −0, received-email.json +30 −0, send-email-request-confirmation.json +13 −0, send-email-request-headers.json +4 −0, send-email-request.json +11 −0, send-email-response.json +3 −0, webhook-email-bounced.json +17 −0, webhook-email-delivered.json +12 −0, webhook-email-delivery-delayed.json +12 −0, webhook-email-received.json +16 −0, webhook-headers.json +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-021: freeze K-12 v1, the email port (Resend): sendEmail, verifyWebhook, readReply and the double's doubleWebhook and doubleSentEmails; 17 accepted and 4 refused fixtures (K-12's 8 and 2, the inbound events K-06's byte for byte); the spike's findings, defaults and open gaps in the README; recorded vendor samples; frozen.json v1 and the freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-021: K-12 README: the error body's source named as the resend-rs SDK's type; open gap 9 leaves the key after a 5xx to K-07
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-021: K-12 README: each Resend call is a K-08 portCall span with provider resend, and no span names an address, a subject, words or a code
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-021: K-12 schema: failureCode's description quotes K-06 failure.code exactly
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-021: K-12 README: the trace hops an email takes, as K-08 v1 names them (dispatch and providerAccepted for an outbox send, portCall for readReply and an email outside the outbox, receive for a webhook)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 303. T-266: the page entry routes K-21 v1's 26 page and console calls, each a POST to {BASE\_PATH}/page-api/\<call\>, to the action layer's handler for that call (GatewayDeps.pages; not-connected stubs answering 503 until C-074 joins them), under a pageRequest trace opened per request (a valid incoming x-trace-id kept, else a new one) and one K-08 pageRequest span per answer; the six staging-only calls answer K-21's stagingOnly, unread and with no handler run, wherever ENVIRONMENT is not exactly staging; a 200 carries only the call's outcome, a body that is no JSON object gets 400, a failed handler 503, another method 405 and an unknown path still the 404 JSON with its trace id; nothing of a request reaches a log or a span. Tests: every K-21 v1 fixture, accepted and refused, posted at its route (Workers, 57) and the call lists, spans and trace held to K-21's enums and K-08's schema (Node, 13) (\#307)
+
+- **Commit:** [`8c8df29`](https://github.com/aryamahadik/rosie/commit/8c8df29), by Arya Mahadik, 2026-11-10 09:28:22 UTC
+- **Pull request:** [#307](https://github.com/aryamahadik/rosie/pull/307) from `task/T-266`, merged 2026-11-10 09:28:23 UTC. It squashed 1 branch commit:
+  - `b1fd5d1` T-266: the page entry routes K-21 v1's 26 page and console calls, eac…
+- **Files changed:** 10 (+1509 −8), by folder:
+  - `runtime/src/gateway/` index.ts +34 −3, types.ts +7 −0
+  - `runtime/src/gateway/pages/` calls.ts +87 −0, entry.ts +232 −0, index.ts +60 −0, pages.test.ts +211 −0, pages.worker.test.ts +585 −0, test-support.ts +229 −0, types.ts +44 −0
+  - `runtime/src/` index.ts +20 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 302. T-376: the AI layer over every model-contract fixture on the recorded double: safety, two-read decide with its re-read, the composer, every refusal; one logged transport, no live call, every model-call span checked (\#306)
+
+- **Commit:** [`2ac86ff`](https://github.com/aryamahadik/rosie/commit/2ac86ff), by Arya Mahadik, 2026-11-10 09:28:18 UTC
+- **Pull request:** [#306](https://github.com/aryamahadik/rosie/pull/306) from `task/T-376`, merged 2026-11-10 09:28:19 UTC. It squashed 2 branch commits:
+  - `7ab7838` T-376: the AI layer over every model-contract fixture on the recorded…
+  - `0713f69` T-376: the fixtures run moved into ai/src/fixtures-run (DL-355 ruling…
+- **Files changed:** 2 (+1450 −0), by folder:
+  - `ai/src/fixtures-run/` double-transport.ts +357 −0, fixtures-run.test.ts +1093 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-376: the AI layer over every model-contract fixture on the recorded double (ai/test/fixtures-run.test.ts, ai/test/double-transport.ts): all 37 K-02 (v1, v1.1) and 21 K-03 v1 index entries through the safety read, two-read decide, the one re-read and the composer, plus T-1145's turn 1 recordings; one logged transport answering only from the double's call log (or a refused fixture's own answer, or none for a timeout), the global fetch stubbed and never called; every model-call span checked for model id, tokens, cached tokens, cost and bundle id, one span per request; plan-s1-02.json WAITING on a K-03 v1.1 recording
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-376: the fixtures run moved into ai/src/fixtures-run (DL-355 ruling 1): ai/test/fixtures-run.test.ts and ai/test/double-transport.ts renamed, with only what the move breaks fixed (the relative imports, REPO_ROOT three folders up, the header's command), so npm run test:unit -- ai/src/fixtures-run and npm test run it (1 file, 57 passed); no ai/test/ folder left; vitest.config.ts unchanged. plan-s1-02.json stays WAITING as built (ruling 2): its two rows' refusal (literalValue x2) is asserted unchanged, and T-1175 is named in the composer rows' and the coverage test's titles and in WAITING
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 301. T-1164: finalize's fixed-line inserter adds the danger question, K-01 safetyAsk, right after the row's safety line (safetyEmergency or safetyCrisis), once, when a text the row answers holds a label of unknown tense other than No (CQ-164 d, DL-344, arch 06 line 329, S13-24 rule 10), as the actor's direct path does (T-1143 checkedLineFor). FixedLineFacts gains answeredTexts, K-05 v1.3 readOutboxRow's answers.texts as read (each text's outcomes and tenses). asksIfInDanger reads them: a text asks when a tense is unknown and something other than No holds (default 1: readOutboxRow gives no label's own outcome, so a No label of unknown tense beside a danger outcome asks too, unknown reading as danger). dangerQuestionAfter puts it after the last safety line and drops a place the port gave it. Tests (34, safety-ask.test.ts, on K-02's own safety reads): a crisis line with an unknown tense gets it, through the finalize call and on the passed-on line too, every check passed. Over, now, could restart and joke get none, No gets none, a timed-out or unseen read gets none, no safety line gets none. Never twice: two texts, two lines, a port that lists it, inserting again. A bundle with no safetyAsk words refuses the row whole. Parity with the actor's checkedLineFor on all 11 K-02 safety reads and their unknown-tense twins. fixed-lines.test.ts unchanged. (\#305)
+
+- **Commit:** [`79ebf5c`](https://github.com/aryamahadik/rosie/commit/79ebf5c), by Arya Mahadik, 2026-11-10 09:28:14 UTC
+- **Pull request:** [#305](https://github.com/aryamahadik/rosie/pull/305) from `task/T-1164`, merged 2026-11-10 09:28:15 UTC. It squashed 1 branch commit:
+  - `0f0193b` T-1164: finalize's fixed-line inserter adds the danger question, K-01…
+- **Files changed:** 5 (+626 −8), by folder:
+  - `actions/src/finalize/fixed-lines/` index.ts +13 −2, insert.ts +51 −2, safety-ask.test.ts +489 −0, test-support.ts +40 −3, types.ts +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 300. T-566: env.staging bindings for the skeleton: HandleActor, the bundle KV, the retry queue with its dead letters and the minute cron, made idempotently on the pinned account (\#304)
+
+- **Commit:** [`4df1d8e`](https://github.com/aryamahadik/rosie/commit/4df1d8e), by Arya Mahadik, 2026-11-10 09:28:10 UTC
+- **Pull request:** [#304](https://github.com/aryamahadik/rosie/pull/304) from `task/T-566`, merged 2026-11-10 09:28:11 UTC. It squashed 2 branch commits:
+  - `3f93281` T-566: env.staging's own bindings: HANDLE\_ACTOR with its v1-handle-ac…
+  - `c2c95a2` T-566: round 2 (DL-352 ruling 1): the five infra/ci asserts that said…
+- **Files changed:** 5 (+516 −17), by folder:
+  - `infra/ci/` create-staging-bindings.test.mjs +342 −0, wrangler-config.test.mjs +10 −7, wrangler-env.test.mjs +4 −1
+  - `infra/scripts/` create-staging-bindings.sh +133 −0
+  - `/` wrangler.jsonc +27 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-566: env.staging's own bindings: HANDLE_ACTOR with its v1-handle-actor migration, BUNDLES on the KV namespace rosie-staging-bundles, RETRY_QUEUE on rosie-retry (5 tries, then rosie-retry-dlq) and the one-minute cron; infra/scripts/create-staging-bindings.sh makes the namespace and both queues on the Rosfield account through cf.sh (idempotent), with its test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-566: round 2 (DL-352 ruling 1): the five infra/ci asserts that said env.staging has no copy now check its copies. wrangler-config.test.mjs: env.staging.kv_namespaces binds ["BUNDLES"] (line 50), and env.staging.triggers, queues and durable_objects each deepEqual the top level (lines 123, 147, 176); wrangler-env.test.mjs: env.staging.kv_namespaces binds ["BUNDLES"] (line 162). The it() titles at wrangler-config.test.mjs lines 49, 122 and 146 now say what they check.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 299. T-1146: the bundle's privacyLink fixed line, and bundle v0 rebuilt with it (…/2, composer-4): a first text ends with the privacy notice alone on its last line (an AI change) (\#302)
+
+- **Commit:** [`46a1547`](https://github.com/aryamahadik/rosie/commit/46a1547), by Arya Mahadik, 2026-11-10 08:50:14 UTC
+- **Pull request:** [#302](https://github.com/aryamahadik/rosie/pull/302) from `task/T-1146`, merged 2026-11-10 08:50:14 UTC. It squashed 3 branch commits:
+  - `92f53ab` T-1146: the bundle's fixed lines (compiler/src/fixed-lines) and bundl…
+  - `faf8555` Merge branch 'main' into task/T-1146
+  - `f631271` T-1146: round 2 (DL-351): ai/recordings/contexts/join-s1-01.json's bu…
+- **Files changed:** 10 (+808 −23), by folder:
+  - `ai/recordings/contexts/` join-s1-01.json +1 −1
+  - `bundles/v0/` build.mjs +85 −16, bundle.kv.json +1 −1, check.mjs +53 −2, prompts.json +2 −2
+  - `bundles/v0/bundle/` manifest.json +1 −1
+  - `compiler/src/fixed-lines/` bundle-v0.test.ts +173 −0, index.ts +23 −0, lines.test.ts +230 −0, lines.ts +239 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1146: the bundle's fixed lines (compiler/src/fixed-lines) and bundle v0 rebuilt with them. buildFixedLines() gives K-01 v1's 13 accepted lines unchanged (contracts/bundle/fixtures/fixed-lines.json, their English optOutLine checked against msgtext.js's own stopLine), then optOutLine in Spanish from msgtext.js line 32 (WORDS.es stop, rates and help, joined by msgtext.js's stopLine, line 41), then privacyLink, Q-30's default stand-in 'Privacy notice: rosfield.com<BASE_PATH>/privacy', asWritten and never pendingJay, its source marking it for Jay to confirm before production; each id once per language, checked against K-01 v1 fixedLines; the base path read from wrangler.jsonc env.<name>.vars.BASE_PATH. Bundle v0 rebuilt as its second publish, baefa1e9c103b86fd9037a0703736bd6953024d491a6f6df096720b918cfc845/2 (flow/A.json byte for byte the same, so the same content hash; build 1 stays readable): build.mjs packs the module's list for staging (rosfield.com/test/privacy) in place of the build's K-01 stand-in, packs composer-4 (T-375) through prompts.json, and cuts with --replace (same id with other bytes refused); published to local PostgreSQL (inactive) with its KV bulk file. check.mjs gains step 9 (the fixed lines) and passes in full with --db. Tests: lines.test.ts (16: the Spanish line is msgtext.js line 32's words with its source, the English line line 31's, privacyLink's words, address and Q-30 marking in production and on staging, K-01's lines first and unchanged, Ajv on fixedLines, each id once per language, refusals) and bundle-v0.test.ts (6: T-314's inserter on the rebuilt bundle gives the opener, optOutLine, then privacyLink alone on the last line with every check passing, alone, through the finalize call and for a Spanish handle; K-01's sample list still refuses with lineNotInBundle, bundle v0 no longer does)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1146: round 2 (DL-351): ai/recordings/contexts/join-s1-01.json's bundleId.build 1 -> 2, the rebuilt bundle v0's id baefa1e9c103b86fd9037a0703736bd6953024d491a6f6df096720b918cfc845/2 as bundles/v0/bundle.kv.json publishes it; nothing else in the file changes (flow A is byte-identical, so alwaysOn.prefixSha256 stays). Main merged in first (no rebase) so T-1145's recorded-double tests run here: 92 passed with /2 (2 failed with /1)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 298. T-1162: the safety service records a harm outcome with 911 when the bundle holds no hotline, never refusing the record or failing the turn (CQ-164 c) (\#301)
+
+- **Commit:** [`756110e`](https://github.com/aryamahadik/rosie/commit/756110e), by Arya Mahadik, 2026-11-10 08:50:10 UTC
+- **Pull request:** [#301](https://github.com/aryamahadik/rosie/pull/301) from `task/T-1162`, merged 2026-11-10 08:50:10 UTC. It squashed 2 branch commits:
+  - `09e27f1` T-1162: the safety service records harm to a child or older adult wit…
+  - `f4004e3` T-1162: round 2 (DL-351): core.test.ts's harm test now expects the ca…
+- **Files changed:** 6 (+493 −25), by folder:
+  - `actions/src/commit/core/` core.test.ts +18 −6, lines.ts +2 −2
+  - `actions/src/domain/safety/` errors.ts +5 −3, harm-line.test.ts +414 −0, ports.ts +8 −3, record.ts +46 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1162: the safety service records harm to a child or older adult with no hotline in the pinned bundle with its at-once hold and safetyEmergency (911) as its line, as the actor's direct path does (T-1143, CQ-164 c, DL-344), never refusing it (noHotline retired). A bundle line giving A3-49's hotline is still used, and only then is the harm report filed (K-34 harm_reports_child_or_elder_has_hotline). A repeat names the report by the same rule. New harm-line.test.ts, 8 tests: bundle v0 pinned, raw and under the core's line rule, the turn committing through runCore and gateAndCommit, a repeat, the actor's 911 on return, a page's free text with K-01's lines only, and a bundle holding the hotline.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1162: round 2 (DL-351): core.test.ts's harm test now expects the card's answer with bundle v0 pinned through runCore: nothing throws (noHotline retired, CQ-164 c), the record with its at_once hold, safetyEmergency (911) as its line on one safety row to Alex's handle, told [] and no harm_reports row; its hotline-is-null assertion kept, no other line changed. lines.ts's comment (lines 20-21) now says a partial bundle's harm record stands with its hold and 911 and files no report.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 297. T-1161: K-05 v1.4's seven safety reads in db/repo/safety-reads.ts (readSafetyOutcomeOfEvent, readSafetyOutcome, readSafetyHold, readSafetyHoldOfOutcome, readOutboxRowWritten as rosie\_app on the call's business, with no business on the runtime side naming business\_id is null; readBusinessOwner as rosie\_job after requireBusinessScope(), handles' id and kind only, one live owner else null, two moreThanOneOwner, phone handle first; readBusinessZone as rosie\_app), each finding the business first, naming the business in every read, refusing a scope other than the request's and rosie\_app with no business; In variants for the call's own transaction. 39 integration tests on local PostgreSQL: all 18 v1.4 fixtures, each read under every other side and as the tables' owner, the null-business path, an email handle id sorting before the phone's, two live owners, an owner with no handle, and a column-list test over every statement sent that pins each read's tables and columns and refuses sealed columns, \* and whole-row references (\#300)
+
+- **Commit:** [`ca55e8c`](https://github.com/aryamahadik/rosie/commit/ca55e8c), by Arya Mahadik, 2026-11-10 08:50:06 UTC
+- **Pull request:** [#300](https://github.com/aryamahadik/rosie/pull/300) from `task/T-1161`, merged 2026-11-10 08:50:06 UTC. It squashed 1 branch commit:
+  - `14df810` T-1161: K-05 v1.4's seven safety reads in db/repo/safety-reads.ts (re…
+- **Files changed:** 2 (+2316 −0), by folder:
+  - `db/repo/` safety-reads.int.test.ts +1639 −0, safety-reads.ts +677 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 296. T-1150: the Tool API, the frontier's checks and the commit read K-09 v1.5 and K-02 v1.1 in Node and the Worker; types pinned per call; K-05's turn row has its seven fields alone (\#303)
+
+- **Commit:** [`d9cd060`](https://github.com/aryamahadik/rosie/commit/d9cd060), by Arya Mahadik, 2026-11-10 08:50:01 UTC
+- **Pull request:** [#303](https://github.com/aryamahadik/rosie/pull/303) from `task/T-1150`, merged 2026-11-10 08:50:02 UTC. It squashed 6 branch commits:
+  - `64ba1d3` T-1150: the Tool API's and the frontier's checks read K-09 v1.5 and K…
+  - `ad33947` T-1150: round 2 (DL-345): the Tool API's call types are K-09 v1.5's a…
+  - `3e76318` Merge branch 'main' into task/T-1150
+  - `f59f784` T-1150: round 3 (DL-347): main merged; T-1140's core.test.ts and core…
+  - `6572fd2` Merge branch 'main' into task/T-1150
+  - `ff43d22` T-1150: round 4 (DL-350): recordSafetyOutcome's and releaseSafetyHold…
+- **Files changed:** 26 (+1686 −244), by folder:
+  - `actions/` README.md +2 −2
+  - `actions/src/commit/` build.test.ts +376 −0, build.ts +28 −3, commit.ts +9 −2, types.ts +32 −14
+  - `actions/src/commit/core/` core.test.ts +1 −1, test-support.ts +1 −1
+  - `actions/src/commit/walk/` writes.ts +4 −3
+  - `actions/src/domain/safety/` handlers.ts +26 −4, record.ts +2 −1
+  - `actions/src/frontier/assemble/` assemble.ts +3 −3, check.test.ts +148 −0, check.ts +32 −28, check.worker.test.ts +201 −0, handler.ts +9 −8, test-support.ts +1 −1, types.ts +11 −8
+  - `actions/src/frontier/sources/hubs-doors/` hubs-doors.ts +2 −2
+  - `actions/src/gate/framework/` test-support.ts +1 −1, types.ts +22 −20
+  - `actions/src/tool-api/` calls.test.ts +198 −0, calls.ts +28 −14, validator.test.ts +245 −3, validator.ts +57 −21, validator.worker.test.ts +66 −29
+  - `infra/build/` tool-api-validators.mjs +181 −75
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1150: the Tool API's and the frontier's checks read K-09 v1.5 and K-02 v1.1 in Node and in the Worker (92 prebuilt validators, 419 checks held to Ajv's compiler); the commit writes K-05's turn row with its seven fields alone; the build stages its files until its check passes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1150: round 2 (DL-345): the Tool API's call types are K-09 v1.5's and the frontier's types K-02 v1.1's, so CommitTurnContext.request carries the turn's service and chat id through its type and a choice may hold the sign-up door; the gate framework reads v1.5 (SetupKey is v1.5's stepKey) and hubs-doors keeps K-01 v1's five doors; comments name v1.5 and v1.1; two type proofs (build.test.ts, check.test.ts) that fail to compile under v1 and K-02 v1
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1150: round 3 (DL-347): main merged; T-1140's core.test.ts and core/test-support.ts import K-09 v1.5 (their import lines only); commit.ts's turnRowOf hands CommitTurnContext.turn K-05's seven turn fields alone (k05TurnRow), so no port sees the request turn's service or chat id on the row, with a test beside build.test.ts's turn row tests; the stale setupKey and choice.door comments name K-09 v1.5's stepKey and K-02 v1.1's door
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1150: round 4 (DL-350): recordSafetyOutcome's and releaseSafetyHold's requests and recordSafetyOutcome's and recordStopOrStart's responses are read off their K-09 v1.5 exchanges, never by a numbered name, and calls.test.ts pins each of the 29 calls' request, response and errors to where v1.5 holds them, so typecheck names any drifted part on its call's line. record.ts's RecordRequest stays K-09 v1's request, and a record or release on arrival (caller.kind actorOnArrival) answers notBuilt before any port is made (handlers.ts), proved through the Tool API. Comments name K-09 v1.5 and K-02 v1.1 in gate/framework/types.ts and the walk's textSourceOf.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 295. T-1149: the skeleton's e2e prefix runs inside workerd through the real composition root, every joined hop once and in order up to the guard (\#299)
+
+- **Commit:** [`ea5bb6a`](https://github.com/aryamahadik/rosie/commit/ea5bb6a), by Arya Mahadik, 2026-11-10 08:09:17 UTC
+- **Pull request:** [#299](https://github.com/aryamahadik/rosie/pull/299) from `task/T-1149`, merged 2026-11-10 08:09:18 UTC. It squashed 4 branch commits:
+  - `58ff824` T-1149: the skeleton's e2e runs inside workerd through runtime/src/wi…
+  - `4e7aef5` T-1149: the skeleton README for the run inside workerd (plan, known g…
+  - `683c0c8` T-1149: infra/ci/vitest-timeouts.test.mjs pins the 8 projects Vitest …
+  - `66d7b04` T-1149: rows 2 and 3 time the actor's inbox entry and the safety read…
+- **Files changed:** 19 (+1276 −205), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +1 −1
+  - `/` package.json +1 −1, vitest.config.ts +19 −0
+  - `tests/e2e/_driver/` index.ts +2 −0, local-target.test.ts +27 −0, local-target.ts +20 −2, trace.ts +13 −2
+  - `tests/e2e/_driver/prefix/` global-setup.ts +10 −0, index.ts +2 −0, plan.test.ts +172 −0, plan.ts +96 −0, prefix.ts +22 −3
+  - `tests/e2e/skeleton/` README.md +33 −5, gaps.test.ts +157 −0, gaps.ts +69 −0, join.ts +34 −0, root-run.ts +172 −0, skeleton.test.ts +8 −191, skeleton.worker.test.ts +418 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1149: the skeleton's e2e runs inside workerd through runtime/src/wiring's composition root (e2e-workers project): T-465's local target posts to root.linqWebhook with the HandleActor installed and every joined port on its double; SKELETON_UPTO and CONTRACT_REPORT read in Node (plan.ts, global setup) and judged with judgePrefixRun; T-260's known gaps (T-1108) named and asserted
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1149: the skeleton README for the run inside workerd (plan, known gaps, what each joined row holds); the local target's trace check tested in Node; the rig stops its log capture when the root cannot be composed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1149: infra/ci/vitest-timeouts.test.mjs pins the 8 projects Vitest resolves: PROJECTS gains e2e-workers (DL-349 ruling 1, the one line granted); test:ci-scripts 471 of 471 pass
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1149: rows 2 and 3 time the actor's inbox entry and the safety read on the gateway's exact readings (after its scrub, before its answer), not on the actor's receive span's at less ms: the actor reads the clock once for ms and again for at (its end, T-1170), so at less ms came out 1 ms after the read's start and failed row 3's check in 2 of 5 runs (SKELETON_UPTO=lease on Nov 10); the README says how the entry is timed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 294. T-1145: the recorded double's turn 1 recordings: decide on context-s1-01 and the JOIN run, the safety reads of JOIN, the composer on the JOIN run, keyed on the runtime's own ids (\#298)
+
+- **Commit:** [`7de0634`](https://github.com/aryamahadik/rosie/commit/7de0634), by Arya Mahadik, 2026-11-10 07:07:11 UTC
+- **Pull request:** [#298](https://github.com/aryamahadik/rosie/pull/298) from `task/T-1145`, merged 2026-11-10 07:07:11 UTC. It squashed 2 branch commits:
+  - `209d49f` T-1145: the recorded-model double reads K-02 v1.1 and holds turn 1's …
+  - `8c8226d` T-1145: round 2 (DL-347): recordings 2 and 4 keyed on the JOIN run's …
+- **Files changed:** 12 (+1155 −91), by folder:
+  - `ai/recordings/composer-inputs/` join-s1-02.json +31 −0
+  - `ai/recordings/` composer.v1.json +7 −1, recordings.v1.1.json +49 −0
+  - `ai/recordings/contexts/` join-s1-01.json +66 −0
+  - `ai/src/recorded-double/` composer-double.test.ts +116 −8, composer-recordings.ts +6 −2, contract.ts +56 −15, index.ts +19 −4, recorded-double.test.ts +585 −13, recordings.ts +110 −44, test-support.ts +105 −0, types.ts +5 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1145: the recorded-model double reads K-02 v1.1 and holds turn 1's recordings. Each recordings file is checked against the K-02 version its contract names: recordings.v1.json stays K-02 v1's, and the new recordings.v1.1.json holds decide's first and check reads on context-s1-01.json (seeded from decide-s1-01-enter.json: both enter c-01, the sign-up door), the same two reads on the JOIN run's context (contexts/join-s1-01.json: context-s1-01.json with K-08 trace-skeleton.json's turn and event ids and the e2e's JOIN text and time; decide-s1-01-enter.json's reads with the quote JOIN) and the safety reads of JOIN and of the master's words (seeded from safety-no.json, each No); composer.v1.json gains the JOIN run's input (input-s1-02.json with only its inbound changed) answered with plan-s1-02.json. loadModelContract keeps v1 as its default and reads v1.1 when asked (v1 and v1.1 fixtures), never a version frozen.json does not list; loadRecordedModel loads both files as one double, refusing a request or an id recorded twice across them. Tests pin every known context by version and prove each recording, no re-read, loud misses and no fetch call
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1145: round 2 (DL-347): recordings 2 and 4 keyed on the JOIN run's own ids. contexts/join-s1-01.json is K-09 build-frontier-s1-01.json's frontier with the run's turn id (T-248's hash of evt-sam-0000, a056ef7b...), bundle v0 as bundles/v0/bundle.kv.json publishes it (baefa1e9.../1) with its flow A rules hash, and the e2e's JOIN at 14:01:49Z; composer-inputs/join-s1-02.json is input-s1-02.json for the run's row outbox-s1-02-<turn id>-1 (ADR-013 default 131) and turn, replying to JOIN. ai/src/recorded-double/test-support.ts computes each id by its rule; the tests hold both files to those ids, check the turn id against the lease's own turnIdOf, lay the context out with ai/src/context's buildContextPrompt on bundle v0's prompt cache for both reads (the fixtures' bundle is refused there), and show round 1's stand-in keys now get NoRecordingError. The answers stay the fixtures': decide-s1-01-enter.json's reads with the quote JOIN, plan-s1-02.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 293. T-315: the Tool API's turn face, the frontier hop for the skeleton's turn 1 on local PostgreSQL; fails closed (noChoices) with the sign-up door waiting for T-1147 (\#297)
+
+- **Commit:** [`f3c7fd0`](https://github.com/aryamahadik/rosie/commit/f3c7fd0), by Arya Mahadik, 2026-11-10 07:07:07 UTC
+- **Pull request:** [#297](https://github.com/aryamahadik/rosie/pull/297) from `task/T-315`, merged 2026-11-10 07:07:07 UTC. It squashed 4 branch commits:
+  - `5e6006c` T-315: the turn face's frontier hop (DL-319, DL-322) in actions/src/t…
+  - `b810aa1` Merge branch 'main' into task/T-315
+  - `f79293e` Merge branch 'main' into task/T-315-r4
+  - `8425a72` T-315: round 4 (DL-346), turn 1's frontier hop: build-frontier-s1-01.…
+- **Files changed:** 8 (+1038 −0), by folder:
+  - `actions/src/tool-api/turn-face/` index.ts +10 −0, test-support.ts +115 −0, turn-face.test.ts +249 −0, turn-face.ts +76 −0
+  - `actions/src/tool-api/turn-face/pg/` frontier.ts +95 −0, index.ts +3 −0, test-support.ts +56 −0, turn-face.int.test.ts +434 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-315: the turn face's frontier hop (DL-319, DL-322) in actions/src/tool-api/turn-face: createTurnFace runs K-09 v1 buildFrontier through the Tool API base with the frontier's handler and main's registry (no stand-in); pg/frontier.ts gives its business scope on PostgreSQL (one read-only transaction at repeatable read on the rosie_job client, rosie.business_id set to the caller's business before the repo is handed over and checked again at the end) and its repo (T-219's readTurnStateIn on that transaction, which requires that very scope before any read; transient on a lost connection; visit times answered as not read, K-05 v1.2 open gap 25), and pgTurnFace for join 6. Tests: unit 5 on build-frontier-s1-02.json (the fixture's frontier as far as main's sources give it, c-04 named as waiting for T-293 and c-05 for T-294 with their slots still empty, one read under the call's business, one labels-only span, refusals before any read); integration 7 on local PostgreSQL (the fixture's frontier under Lee's Barbershop's scope; under the yoga studio's scope only its own question, the barbershop's logged unread; a read naming another business refused before it reads; K-05 v1.2 shapes; one moment per call; nothing written; 42501 as rosie_app)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-315: round 4 (DL-346), turn 1's frontier hop: build-frontier-s1-01.json through the turn face fails closed (FrontierError noChoices, a failed frontier span, the scope rolled back) while the sign-up door c-01 waits for T-1147 (WAITING), the expectation being the fixture's frontier less WAITING; on local PostgreSQL over the fixture's given seed and T-1148's seedSkeleton, one readTurnState under biz-lees-barbershop gives the same answer in a read-only transaction that rolls back and writes nothing, and the yoga studio's call sees nothing of Lee's Barbershop (5 unit and 8 integration tests)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 292. T-1160: freeze K-05 v1.4: the safety service's seven reads over K-34 and K-04's existing tables, no sealed column, so turn 1's safety record can commit (\#296)
+
+- **Commit:** [`9360ad7`](https://github.com/aryamahadik/rosie/commit/9360ad7), by Arya Mahadik, 2026-11-10 06:41:15 UTC
+- **Pull request:** [#296](https://github.com/aryamahadik/rosie/pull/296) from `task/T-1160`, merged 2026-11-10 06:41:15 UTC. It squashed 2 branch commits:
+  - `312c533` T-1160: freeze K-05 v1.4, the safety service's seven reads (T-318's S…
+  - `562fdbf` T-1160: README item 37 names the runtime side's own filter: with no b…
+- **Files changed:** 30 (+2480 −7), by folder:
+  - `contracts/data-access/` README.md +81 −6, data-access.v1.4.schema.json +1611 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` business-owner-barbershop.json +21 −0, business-owner-none.json +18 −0, business-owner-phone-first.json +22 −0, business-zone-barbershop.json +18 −0, business-zone-no-business-row.json +17 −0, index.json +208 −0, outbox-row-written-alex-safety.json +20 −0, outbox-row-written-not-yet.json +20 −0, outbox-row-written-other-business.json +20 −0, read-safety-hold-alex-open.json +37 −0, read-safety-hold-alex-released.json +37 −0, read-safety-hold-of-outcome-alex-threat.json +37 −0, read-safety-hold-of-outcome-none.json +21 −0, read-safety-hold-other-business.json +21 −0, read-safety-outcome-alex-safe.json +37 −0, read-safety-outcome-no-business.json +21 −0, read-safety-outcome-of-event-alex.json +37 −0, read-safety-outcome-of-event-other-business.json +21 −0, read-safety-outcome-of-event-s1-01.json +20 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-business-owner-no-business.json +3 −0, refuse-business-owner-returns-number.json +10 −0, refuse-business-zone-null.json +6 −0, refuse-outbox-row-written-returns-words.json +23 −0, refuse-safety-hold-of-outcome-two-holds.json +42 −0, refuse-safety-hold-released-without-why.json +23 −0, refuse-safety-outcome-no-scope.json +3 −0, refuse-safety-outcome-with-sealed-words.json +24 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1160: freeze K-05 v1.4, the safety service's seven reads (T-318's SafetyReader, all but arrivedAt) over K-34's and K-04's existing tables: readSafetyOutcomeOfEvent and readSafetyOutcome (K-34 safety_outcomes as StoredOutcome, never sealed_words), readSafetyHold and readSafetyHoldOfOutcome (safety_holds as StoredHold, release time and reason together), readOutboxRowWritten (outbox_rows, its id alone), each as rosie_app under the call's business (null: the runtime side, rows with no business only); readBusinessOwner (person_roles, person_handles, handles by id and kind; rosie_job after requireBusinessScope(); one live owner, else null, more than one moreThanOneOwner; the phone handle first) and readBusinessZone (businesses.time_zone; rosie_app). With a business each finds the business first (notFound). 18 accepted and 8 refused fixtures, turn 1's No record's read of its own event among them (null); every v1 to v1.3 fixture valid under v1.4. README: items 37 to 43, defaults 55 to 61, gaps 40 to 43, consumers, freeze record, change log; T-1102's consent fields renamed v1.5 (DL-344). No schema change, no migration.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1160: README item 37 names the runtime side's own filter: with no business the read names business_id is null, since rosie_job with no scope sees every business's rows
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 291. T-375: the composer's relays, translation, sensitive work, tone tags and language (ai/src/composer/relay). Reader checks run last in planAgainstInput, on a plan that keeps to its formats and facts, each a typed refusal naming a check and a place: relayQuote (a row that gives relay.quote quotes it through {{relay.quote}} exactly once, CQ-109's default; no quote slot on a row that gives none; never typed: no 4-word run of the quote or of the master's sample quote outside the slot, code's readings excepted), sensitiveWork (on a gentle row, or one whose service limit 7 gave as nothing: no sample service or name typed, and no service-slot words after '\|' but the master line's, which the slot filler writes in place of the service), tone (no '!' or '¡' on a gentle row), language (on an en or es row no field reads as the other language by its small words, slots and Rosie's terms left out). The model reads private words only as 'a private detail': K-06's \[card number\] and \[SSN\] in \<conversation\>, \<inbound\> and a relay's quote; the input itself is unchanged. Prompt composer-4: rule 9 has the model translate a relay's quote into \<language\> beside the original, rule 8 adds the '¡', rule 11 the '\|' words, the language rule every own word in \<language\>, \<conversation\> its private words. Tests (28, recorded double plus the action layer's own slot filler; global fetch stubbed): plan-relay-private-a7-12.json reproduced with the quote in a slot; a Spanish text gets a Spanish plan, else the stored language; a relay into English keeps the original quote, and into Spanish; plan-sensitive.json shows no service and initials when filled with the switch on; 'your visit'; a gentle tag gives no '!'; private inbound words reach the model only as 'a private detail'; every prompt example and recorded plan passes the new checks. (\#295)
+
+- **Commit:** [`cba901f`](https://github.com/aryamahadik/rosie/commit/cba901f), by Arya Mahadik, 2026-11-10 06:20:37 UTC
+- **Pull request:** [#295](https://github.com/aryamahadik/rosie/pull/295) from `task/T-375`, merged 2026-11-10 06:20:37 UTC. It squashed 1 branch commit:
+  - `4b94333` T-375: the composer's relays, translation, sensitive work, tone tags …
+- **Files changed:** 19 (+1915 −27), by folder:
+  - `ai/src/composer/` check.ts +12 −3, compose.ts +7 −4, index.ts +29 −1, types.ts +22 −2
+  - `ai/src/composer/prompt/` prompt.test.ts +1 −1, prompt.ts +16 −8, render.ts +18 −6
+  - `ai/src/composer/relay/` check.ts +31 −0, checks.test.ts +239 −0, index.ts +27 −0, language.ts +303 −0, private.ts +24 −0, quote.ts +114 −0, relay.test.ts +585 −0, sensitive.ts +98 −0, test-support.ts +262 −0, tone.ts +27 −0, words.ts +98 −0
+  - `ai/src/composer/rewrite/` request.test.ts +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 290. T-1139: the commit's walk for bundle v0 (writesOf): createWritesOf({ bundles }) walks the turn's pinned flow graph from the part's choice (arch 03 line 191) and hands back K-05 v1's writes; commit-s1-01.json's sign-up door gives exactly its given.stated.writes (S1-01's thread, S1-02's question with its safe default, outbox-s1-02-sam-1 quick\_reply on the turn's service) with default 131's ids, gives thread; the request turn's service and chatId read with a runtime check, else fail closed (default 135); an open hold or unread text stops the walk at its first routine row; S1-02's branches walk only as far as bundle v0 holds them; a step or branch the bundle lacks is refused, never guessed; anything not built answers notBuilt (84 tests) (\#294)
+
+- **Commit:** [`89fc3c4`](https://github.com/aryamahadik/rosie/commit/89fc3c4), by Arya Mahadik, 2026-11-10 05:57:52 UTC
+- **Pull request:** [#294](https://github.com/aryamahadik/rosie/pull/294) from `task/T-1139`, merged 2026-11-10 05:57:52 UTC. It squashed 1 branch commit:
+  - `2ae62fc` T-1139: the commit's walk for bundle v0 (writesOf): createWritesOf({ …
+- **Files changed:** 7 (+2019 −0), by folder:
+  - `actions/src/commit/walk/` errors.ts +110 −0, graph.ts +262 −0, index.ts +28 −0, test-support.ts +249 −0, walk.test.ts +820 −0, walk.ts +165 −0, writes.ts +385 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 289. T-1138: K-05 v1.3's three reads in db/repo/turn-face-reads.ts: readOpenHolds (rosie\_app under the business's scope; with no business rosie\_job, refusing rosie\_app), readOutboxRow and readFixedLineFacts (rosie\_job after requireBusinessScope()), each naming its business besides the scope and selecting no sealed column; 38 integration tests on local PostgreSQL: every v1.3 fixture, other businesses' rows, the no-business path, the statements' column lists, and the handle-scoped scan over 25,000 rows (\#293)
+
+- **Commit:** [`6eb5222`](https://github.com/aryamahadik/rosie/commit/6eb5222), by Arya Mahadik, 2026-11-10 05:57:48 UTC
+- **Pull request:** [#293](https://github.com/aryamahadik/rosie/pull/293) from `task/T-1138`, merged 2026-11-10 05:57:49 UTC. It squashed 1 branch commit:
+  - `2f34e5c` T-1138: K-05 v1.3's three reads in db/repo/turn-face-reads.ts: readOp…
+- **Files changed:** 2 (+2408 −0), by folder:
+  - `db/repo/` turn-face-reads.int.test.ts +1601 −0, turn-face-reads.ts +807 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 288. T-556: join hop 5: the guard's keyword list comes from the pinned bundle and its targets from K-05 v1.2 handleTargets. Two new ports split from stateReads, bundles (K-05 v1 item 7 readActiveBundle and readBundleValue) and targets (handleTargets), each real for test and staging and closed in production; workerRoot feeds neither a database until T-567, so every pin and targets read fails closed. Test doubles: bundle v0 as bundles/v0 publishes it (bundle.kv.json) and test owner 1's seeded rows answering as targets-first-text.json. hop5.worker.test through root.linqWebhook: JOIN from the seeded test owner gives hops 1 to 5 once under one trace id and a guard span with no keyword and no target; a bare HELP from the same phone takes the code path with no model call after the guard; no targets read or no bundle reads fail closed. guard-reads.test: the ports, the doubles, the keyword list equal to K-01 keywords.json. (\#292)
+
+- **Commit:** [`765d6f9`](https://github.com/aryamahadik/rosie/commit/765d6f9), by Arya Mahadik, 2026-11-10 05:57:45 UTC
+- **Pull request:** [#292](https://github.com/aryamahadik/rosie/pull/292) from `task/T-556`, merged 2026-11-10 05:57:45 UTC. It squashed 1 branch commit:
+  - `7cbae92` T-556: join hop 5: the guard's keyword list comes from the pinned bun…
+- **Files changed:** 14 (+1181 −90), by folder:
+  - `runtime/src/wiring/` bind.ts +2 −0, closed.ts +7 −7, guard-reads.test.ts +251 −0, hop3.worker.test.ts +6 −1, hop4.worker.test.ts +6 −3, hop5.worker.test.ts +471 −0, index.ts +6 −0, picks.ts +8 −2, ports.ts +26 −12, real.ts +109 −5, root.test.ts +24 −12, root.ts +47 −21, root.worker.test.ts +9 −4, test-support.ts +209 −23
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 287. T-1140: the commit's runCore in actions/src/commit/core: createRunCore(deps) dispatches each K-09 v1 core action by name; recordSafetyOutcome and releaseSafetyHold run through T-318's safety service with every port it reads handed through (K-34's reads, the sealer, the pinned bundle's lines, the stop words, who is told), each checked as the turn's own call; the core's safety line follows T-1143's rule (every danger outcome gets a line, else safetyEmergency; a threat's goes only to the owner); every other or unknown core action, a port not wired, and a run that arms clock rows (until T-1156, DL-341) answer the commit's notBuilt, so nothing is written. 20 tests on commit-s1-01.json (K-09 v1.5), commit-s1-02.json, K-02's safety reads and bundle v0, with a same-bytes sealer double (\#291)
+
+- **Commit:** [`43d86f8`](https://github.com/aryamahadik/rosie/commit/43d86f8), by Arya Mahadik, 2026-11-10 05:47:15 UTC
+- **Pull request:** [#291](https://github.com/aryamahadik/rosie/pull/291) from `task/T-1140`, merged 2026-11-10 05:47:16 UTC. It squashed 1 branch commit:
+  - `078817d` T-1140: the commit's runCore in actions/src/commit/core: createRunCor…
+- **Files changed:** 6 (+1249 −0), by folder:
+  - `actions/src/commit/core/` core.test.ts +790 −0, core.ts +119 −0, errors.ts +36 −0, index.ts +7 −0, lines.ts +77 −0, test-support.ts +220 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 286. T-370: the turn's one Sonnet re-read: Decider.reread runs decide's one read once more (purpose reread, the policy's model, its own seed) when the turn loop asks (disagreed; valueFailsWords with the gate's parts and fields) or for an unmapped turn (CQ-162 a), at most once per decide of a turn (a ledger; a result holding the re-read refused; RereadRefusedError before any call); rereadResult gives K-02's result with reread true: agreed parts untouched, a named failing part confirmed only if the re-read gives it alike, a low-stakes difference settled when the re-read gives one read's part, every other part one question; the language settled by the re-read giving one of the two; a refused read ends the turn in one question with nothing changed (the AI layer's own unmapped answer, as K-02 v1 holds no refused read); requests checked as the turn's own before the claim. 30 tests on the recorded double: decide-reads-disagree.json and K-09's limit 6 pair word for word, no live call (\#290)
+
+- **Commit:** [`60a532c`](https://github.com/aryamahadik/rosie/commit/60a532c), by Arya Mahadik, 2026-11-10 05:08:24 UTC
+- **Pull request:** [#290](https://github.com/aryamahadik/rosie/pull/290) from `task/T-370`, merged 2026-11-10 05:08:24 UTC. It squashed 1 branch commit:
+  - `6762867` T-370: the turn's one Sonnet re-read: Decider.reread runs decide's on…
+- **Files changed:** 8 (+1714 −70), by folder:
+  - `ai/src/decide/` errors.ts +16 −3, index.ts +19 −3, reread.test.ts +1034 −0, reread.ts +263 −0, result.ts +164 −0, test-support.ts +56 −10, two-reads.ts +23 −51, types.ts +139 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 285. T-1148: test owner 1's seed for D-017 (db/seeds/skeleton.ts, the set skeleton): K-04 seed-business-head.json's biz-lees-barbershop row value for value, person-sam (Sam Lee, no language stored yet) and handle-sam at tp-01's fictional 555-0100, linked; no role, open question, booking, phone row or sealing key, so K-05 handleTargets for tp-01's handle answers as targets-first-text.json does. One transaction as rosie\_job with no business scope, insert only and idempotent; it refuses and writes nothing when another handle holds the number or the guard would find a target (K-04 seed-person-roles.json's owner roles, a T-202 customer role, turn 1's open question, a phone row, a booking, a second person on the handle). 18 integration tests, D-017's order (core, then skeleton) included (\#289)
+
+- **Commit:** [`42589dc`](https://github.com/aryamahadik/rosie/commit/42589dc), by Arya Mahadik, 2026-11-10 04:58:25 UTC
+- **Pull request:** [#289](https://github.com/aryamahadik/rosie/pull/289) from `task/T-1148`, merged 2026-11-10 04:58:25 UTC. It squashed 1 branch commit:
+  - `92831aa` T-1148: test owner 1's seed for D-017 (db/seeds/skeleton.ts, the set …
+- **Files changed:** 2 (+815 −0), by folder:
+  - `db/seeds/` skeleton.int.test.ts +555 −0, skeleton.ts +260 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 284. T-1143: every danger outcome gets a safety line with a partial bundle. checkedLineFor takes the outcome step's checked line, else the fixed line the sources give that outcome (988 and 911 for crisis words, 911 for every other outcome, and the danger words' line for Unsure), else 911, failing closed. A threat chosen first sends its writer nothing (S13-10, A3-48, DL-330), and a label of unknown tense still adds the danger question. Tests: rules.test.ts (the fallback per outcome, a full bundle's step winning, line order, the danger question, missing lines) and partial-bundle.test.ts (bundle v0 pinned: each outcome's line in v0's words, and the direct path on the real SafetyOnArrival over node:sqlite: the line goes once, its record names it on return, and the safetyRead span names it by K-01 id with no words, while a threat sends nothing and keeps its never hold) (\#288)
+
+- **Commit:** [`c05b1fa`](https://github.com/aryamahadik/rosie/commit/c05b1fa), by Arya Mahadik, 2026-11-10 04:58:21 UTC
+- **Pull request:** [#288](https://github.com/aryamahadik/rosie/pull/288) from `task/T-1143`, merged 2026-11-10 04:58:21 UTC. It squashed 1 branch commit:
+  - `c168e5a` T-1143: every danger outcome gets a safety line with a partial bundle…
+- **Files changed:** 3 (+788 −16), by folder:
+  - `runtime/src/safety/` partial-bundle.test.ts +450 −0, rules.test.ts +294 −0, rules.ts +44 −16
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 283. T-555: join hop 4: the batch window and turn lease run on the texts' real K-06 event ids, and the turns row is written by K-05's commit or park through a new turnRow port (picks: real for test and staging, closed in production), fed by RootOptions.turnRows (the K-05 double in tests, answering commit-first.json and park-turn.json), with workerRoot passing null so every commit and park fails closed until T-567. realTurnRow refuses a turn id that is not T-248's hash of its event ids before K-05 is reached. The turn's park writes through it, and gateThroughCommit stands in the Tool API's gate until T-559. Tests: hop4.worker.test through root.linqWebhook with the actor installed (two texts 2 s apart give one batch, one turn id and one row, a third text closes the batch at once, the same webhook twice in parallel gives one turn id, one lease and one row, three lapses park the turn under the same id), turn-row.test, root.test. The sealing double now gives one key to two first sights at once. (\#287)
+
+- **Commit:** [`b7c3779`](https://github.com/aryamahadik/rosie/commit/b7c3779), by Arya Mahadik, 2026-11-10 04:58:17 UTC
+- **Pull request:** [#287](https://github.com/aryamahadik/rosie/pull/287) from `task/T-555`, merged 2026-11-10 04:58:17 UTC. It squashed 1 branch commit:
+  - `14bce9f` T-555: join hop 4: the batch window and turn lease run on the texts' …
+- **Files changed:** 11 (+1049 −58), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +1 −1, hop4.worker.test.ts +443 −0, index.ts +6 −0, picks.ts +8 −6, ports.ts +37 −8, real.ts +82 −3, root.test.ts +39 −14, root.ts +30 −8, test-support.ts +208 −18, turn-row.test.ts +194 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 282. T-300: limit 2, owner rules: one shared rule evaluator; a price read once by its basis, a list price with no amount fails closed (round 2, DL-328) (\#286)
+
+- **Commit:** [`552aa00`](https://github.com/aryamahadik/rosie/commit/552aa00), by Arya Mahadik, 2026-11-10 04:46:48 UTC
+- **Pull request:** [#286](https://github.com/aryamahadik/rosie/pull/286) from `task/T-300`, merged 2026-11-10 04:46:48 UTC. It squashed 2 branch commits:
+  - `0d63f78` T-300: limit 2 (owner rules) through one evaluator search can import.…
+  - `d4b07cc` T-300: round 2 (DL-328): the evaluator fails closed on a price it can…
+- **Files changed:** 11 (+2497 −5), by folder:
+  - `actions/src/gate/limit-2/` facts.ts +95 −0, index.ts +78 −5, owner-rules.test.ts +448 −0, owner-rules.ts +122 −0, test-support.ts +126 −0
+  - `actions/src/rules/evaluator/` evaluate.ts +518 −0, evaluator.test.ts +542 −0, index.ts +37 −0, registry.ts +78 −0, test-support.ts +222 −0, types.ts +231 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-300: limit 2 (owner rules) through one evaluator search can import. actions/src/rules/evaluator: the K-26 v1 closed registry of 16 rule kinds (held to seed-rule-registry.json by a test); readRule refuses an unknown kind, a wrong value type, a bad value, scope or dates, and any refused row refuses the whole verdict, never ignored; rules in effect at the proposal's rulesAt, the most specific scope winning when flow and kind of work are known (else every scope must hold); minimum_job on the total with extras, a photo quote checked once priced, an hourly or at-visit price holding with the note minimumNotChecked; notice and months_offered saying what they allow; the OK rules never refusing (ownerOkFirst); deposit and fee caps; who may book; settings and notes holding nothing back. actions/src/gate/limit-2 replaces the fail-closed stub: pass_on and hand_off notChecked; a part that proposes nothing a rule governs (S1-02, S2-22) passes with nothing read, as commit-s1-02.json states; a part that may carry a rule is refused (notBuilt) until the walk and a K-26 rules read are wired; a broken rule fails with saidWhatRuleAllows and what it allows; nothing is saved. 47 tests, commit-limit-2-owner-rule.json through the gate as the fixture states (a 24-hour notice standing in for the owner's hours, which K-26 v1 keeps in K-27)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-300: round 2 (DL-328): the evaluator fails closed on a price it cannot read. ProposedPrice is a union by basis: a list price always has its amount; only a photo quote (null until priced) or a price set at the visit or by the hour may have none. readProposal reads the price once (readPrice): a photo quote not priced yet waits (notPricedYet, A4-05), an at-visit or hourly price passes noted minimumNotChecked, and a list price with no amount or a basis none of the sources names throws, so neither limit 2 nor search (which has no limit 2 around it) ever holds it, noted or not; minimumCheck goes unchecked only for those two reads. Tests: a 250 dollar minimum with a list price of no amount (extras none, 60 or 300 dollars) and with an unknown basis (priced or not) throws, with or without rules; a photo quote with no amount still waits and at-visit and hourly prices still pass noted; at limit 2 decide and check reject and the gate's call rolls back after limits 1 and 2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 281. T-1144: the Tool API's schema checks run inside the Worker: Ajv's standalone validators built by build:validators, checked against Ajv's compiler on all 316 checks, no new Function at run time (\#285)
+
+- **Commit:** [`3d6a743`](https://github.com/aryamahadik/rosie/commit/3d6a743), by Arya Mahadik, 2026-11-10 04:46:44 UTC
+- **Pull request:** [#285](https://github.com/aryamahadik/rosie/pull/285) from `task/T-1144`, merged 2026-11-10 04:46:44 UTC. It squashed 2 branch commits:
+  - `589712c` T-1144: the Tool API's schema checks run inside the Worker: npm run b…
+  - `556eece` T-1144: round 2 (DL-335): eslint.config.mjs's globalIgnores gains act…
+- **Files changed:** 7 (+789 −21), by folder:
+  - `/` .gitignore +4 −0, eslint.config.mjs +1 −0, package.json +11 −1, vitest.config.ts +6 −1
+  - `actions/src/tool-api/` validator.ts +95 −19, validator.worker.test.ts +251 −0
+  - `infra/build/` tool-api-validators.mjs +421 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1144: the Tool API's schema checks run inside the Worker: npm run build:validators (infra/build/tool-api-validators.mjs) compiles, ahead of time with validator.ts's strict Ajv 2020-12 options, Ajv standalone code for K-09 v1's 87 call definitions and K-08 v1.1's span into git-ignored actions/src/tool-api/generated/, with the compiler's own answers on 316 fixture checks, and fails unless the code gives each one; contracts:types, every vitest test script and deploy:staging run it first; validator.ts uses the prebuilt code inside workerd (refusing code built for other schemas or options) and Ajv's compiler in Node; validator.worker.test.ts holds it, inside workerd, to the compiler's verdicts, errors and problem lines and traps Function and eval to show no code is made; the workers project includes actions/src/**/*.worker.test.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1144: round 2 (DL-335): eslint.config.mjs's globalIgnores gains actions/src/tool-api/generated/ beside contracts/generated/, so npm run lint skips the git-ignored Ajv standalone code that build:validators writes (never edited or eslint-disabled); infra/build/tool-api-validators.mjs gets Prettier's wrap of its 113-column require check, which round 1 left unformatted
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 280. T-1137: freeze K-05 v1.3: readOpenHolds (gap 26), readOutboxRow (flow by default 53; words handed in by the runtime) and readFixedLineFacts for the skeleton's turn face; no migration (\#280)
+
+- **Commit:** [`10313b3`](https://github.com/aryamahadik/rosie/commit/10313b3), by Arya Mahadik, 2026-11-10 04:46:40 UTC
+- **Pull request:** [#280](https://github.com/aryamahadik/rosie/pull/280) from `task/T-1137`, merged 2026-11-10 04:46:41 UTC. It squashed 4 branch commits:
+  - `c2fc9f9` T-1137: freeze K-05 v1.3, three reads for the walking skeleton's acti…
+  - `bb1ef3f` T-1137: K-05 v1.3 README and schema wording: the v1.3 consumer list a…
+  - `3fbf02f` T-1137: K-05 v1.3 round 2 (DL-326): ComposeRow.flow for a row about n…
+  - `d728212` T-1137: K-05 v1.3 round 3 (DL-334): commit-s1-01-sam runs through db/…
+- **Files changed:** 24 (+2523 −23), by folder:
+  - `contracts/data-access/` README.md +123 −4, data-access.v1.3.schema.json +1517 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` commit-s1-01-sam.json +104 −0, fixed-line-facts-opener-row.json +23 −0, fixed-line-facts-other-business.json +18 −0, fixed-line-facts-s1-02.json +23 −0, fixed-line-facts-texted-before.json +23 −0, index.json +152 −0, read-open-holds-alex.json +48 −0, read-open-holds-other-business.json +27 −0, read-open-holds-s1-02.json +22 −0, read-outbox-row-a7-03.json +83 −0, read-outbox-row-no-question.json +70 −0, read-outbox-row-other-business.json +18 −0, read-outbox-row-s1-02.json +68 −0, read-outbox-row-safety-line.json +18 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-fixed-line-facts-caller-handle.json +5 −0, refuse-fixed-line-facts-returns-number.json +11 −0, refuse-open-holds-hold-with-words.json +20 −0, refuse-open-holds-no-scope.json +4 −0, refuse-outbox-row-returns-address.json +56 −0, refuse-outbox-row-returns-inbound-words.json +62 −0
+  - `db/repo/` commit-turn.int.test.ts +27 −18
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1137: freeze K-05 v1.3, three reads for the walking skeleton's action layer: readOpenHolds (the commit's OpenHolds: K-34's open holds on the turn's handle at the call's business, in K-09 safetyHold's names, and the named texts with no safety row; as rosie_app; closes open gap 26), readOutboxRow (compose input's and finalize's row: turn, bundle, step and line from its question, reader, the texts it answers by event id with their safety results, the slot source K-04 holds, the questions still open with their words as sent; a safety row answers fixedLineRow; as rosie_job after requireBusinessScope) and readFixedLineFacts (the opener mark and the phone's opt-out delivery; as rosie_job after requireBusinessScope). The words a row answers stay sealed: the runtime caller hands them in. Every v1.2 definition by reference, none changed; 13 accepted and 6 refused fixtures; README items 34 to 36, defaults 43 to 52, gaps 29 to 39
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1137: K-05 v1.3 README and schema wording: the v1.3 consumer list and the rules T-1141 and T-1138 must hold to move to section v1.3 (Consumers of v1.3), while Producers and consumers names only the components the contract test's side list holds (C-074, C-087, C-152) until QA's v1.3 task adds C-089, C-090 and C-093; the sensitive switch is filled as on for a row about a booking until it is read (gap 30); openHold's three fields are K-09 recordSafetyOutcome.response.hold's, cut to them
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1137: K-05 v1.3 round 2 (DL-326): ComposeRow.flow for a row about no booking gets a named source the compose call reaches, with no migration: item 35's table and default 53 give the flow a row's step is read in (an A or B step's own; a shared step's, the booking's for a row about a booking, else the first of A, then B, that the row's bundle lists whose graph holds the step), read by the caller from the row's bundle, as the step's links, checks and fallback text are; read-outbox-row-s1-02's note shows it on the skeleton's row (flow A, the one flow bundle-v0-skeleton lists); a question with no clock row is refused by finalize's port, never given FinalizeRow.question null (default 54); item 35's reason 1 reworded: the barrier to the sealed words is each read's column list and the schema's refusals, since rosie_job holds SELECT on the sealed tables and one Worker holds every secret, and T-1138's tests check that its SQL names none of those columns; three schema descriptions say the same; no definition, field or fixture outcome changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1137: K-05 v1.3 round 3 (DL-334): commit-s1-01-sam runs through db/repo's real commitTurn on local PostgreSQL in db/repo/commit-turn.int.test.ts, listed among the commit exchanges (sixteen), with every commit exchange and answer checked against the version its index entry lists as well as v1.1 (no check removed); the turn 1 chain agrees across K-05 and K-09: commit-s1-01-sam, read-outbox-row-s1-02 and the two refused fixtures made from it take K-09 v1.5 default 131's ids (oq-s1-02-sam-1, clock-oq-s1-02-sam-1, log-oq-s1-02-sam-1-opened) and the text and time of T-1142's commit-s1-01.json (evt-sam-s1-01, 18:05:05Z), so the question, clock row and text a read names are those that commit wrote and batched; README fixtures paragraph, index source and change log say so; no schema, definition or outcome shape changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 279. T-369: decide, two reads: createDecider runs the first and check reads per T-363's route (Haiku twice with two shuffles on low stakes, Sonnet first with Haiku checking on high) side by side through decide's one read, and agreeReads compares them part by part (paired in the text's order) on the verb, choose's question, the choice, every field value in order, an ask's questions as a set and a hand-off's about; the text's language must agree too (CQ-07), else the turn is not agreed and its language null. K-02's decideResult before the re-read: an agreed part is the first read's and goes; a part the reads differ on holds the last read's part with oneQuestion, marked notAgreed on low stakes (the re-read settles it, T-370) and oneQuestion on high stakes (arch 06 line 287). A refused read makes the turn unmapped, a read down on both models modelsDown; neither is compared. 48 tests on the recorded double and K-02's decide fixtures, no live call (\#284)
+
+- **Commit:** [`ca77306`](https://github.com/aryamahadik/rosie/commit/ca77306), by Arya Mahadik, 2026-11-10 03:59:57 UTC
+- **Pull request:** [#284](https://github.com/aryamahadik/rosie/pull/284) from `task/T-369`, merged 2026-11-10 03:59:57 UTC. It squashed 1 branch commit:
+  - `2742685` T-369: decide, two reads: createDecider runs the first and check read…
+- **Files changed:** 7 (+1406 −17), by folder:
+  - `ai/src/decide/` agree.test.ts +865 −0, agree.ts +120 −0, errors.ts +4 −1, index.ts +24 −2, test-support.ts +86 −12, two-reads.ts +154 −0, types.ts +153 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 278. T-318: the safety and hand-offs service: sealed outcomes, holds per arch 06 and K-34, release only by a safe read that arrived after the danger text, fail closed until each port is wired (\#283)
+
+- **Commit:** [`d36a558`](https://github.com/aryamahadik/rosie/commit/d36a558), by Arya Mahadik, 2026-11-10 03:59:52 UTC
+- **Pull request:** [#283](https://github.com/aryamahadik/rosie/pull/283) from `task/T-318`, merged 2026-11-10 03:59:53 UTC. It squashed 2 branch commits:
+  - `607b885` T-318: safety service in actions/src/domain/safety. recordSafetyOutco…
+  - `487e8bc` T-318: round 2 (DL-330). An after\_safe hold is released only by a cle…
+- **Files changed:** 10 (+3787 −0), by folder:
+  - `actions/src/domain/safety/` errors.ts +43 −0, handlers.ts +321 −0, ids.ts +45 −0, index.ts +91 −0, ports.ts +243 −0, record.ts +726 −0, release.ts +235 −0, rules.ts +176 −0, safety.test.ts +1535 −0, test-support.ts +372 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-318: safety service in actions/src/domain/safety. recordSafetyOutcome records each text's outcome (K-34 safety_outcomes: labels, tenses and outcomes plain; evidence words, who is at risk, who wrote it and the danger words sealed under the writer's key in sealed_words, and the entry's sealed under the same key), its hold with the strictest rule (at_once, when_private, after_safe, never), a threat's pauses on the person and the phone and unsafe at home's private booking through T-317's setRecordFlag plan (the when-private hold released in the same commit once private), the checked line as a send class safety row (T-307; a threat's to the owner), a harm report to Rosie's team for harm to a child or older adult, and who is told through the SafetyTelling port (T-319). releaseSafetyHold releases only by the rule that binds (the actor's stricter open hold of the same id: STATE note 21): at once after the message, once the booking is private, after a clear we're-safe read later in the held chat; never for a threat; a released hold answers its first release and is never un-released. Core runs for T-1140's runCore (recordSafetyOutcomeCore, releaseSafetyHoldCore, clock rows beside the unit), calls made alone and Tool API handlers; every port fails closed until its task lands (K-34 reads, the sealer, the bundle's lines, hand-offs). 25 tests: safety-outcome-hold.json's holds, a crisis turn held through gateAndCommit until a clear we're safe with redecideTurnId, the threat's pauses and call-off clocks as seed-threat-pause, unsafe at home private, the sealed column used and the words nowhere else, repeats and refusals.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-318: round 2 (DL-330). An after_safe hold is released only by a clear we're-safe whose text arrived after the danger text, compared by the texts' arrival, never read_at against held_at: never the hold's own read, a text of the hold's own turn or of the danger text's turn (the batch the actor closed at the danger text), nor a text of the releasing turn when that turn holds the danger text too (the batch after a hold written on arrival); otherwise only a text whose arrival (SafetyReader arrivedAt, K-06 receivedAt) is known and strictly later, else stillDanger. The stop-words port fails closed while unwired (STOP_WORDS_NOT_WIRED answers notBuilt; PLUGIN_LISTS_NO_STOP_WORDS is wired by name for a plug-in known to list none). A pause T-317 refuses is never dropped: the record answers its notFound (persons, phones or handles, by id) and writes nothing; any other refusal fails the call (pauseRefused). 5 new tests: same-batch we're-safe before crisis words never releases, in a later turn or from a page; a hold written on arrival not released by its batch's own earlier we're-safe and released by a later text; release only with both arrivals known and later; stop words unwired notBuilt and wired holding booking; a refused pause answered, nothing written. The three release tests fail on 607b885's release check.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 277. T-1142: the walking skeleton's one turn (Sam's first text to S1-02's question): K-02 v1.1's sign-up door, K-09 v1.5's turn 1 frontier and commit fixtures with the event's service and chat id on the turn, ADR-013 (\#282)
+
+- **Commit:** [`a18c6b6`](https://github.com/aryamahadik/rosie/commit/a18c6b6), by Arya Mahadik, 2026-11-10 03:59:48 UTC
+- **Pull request:** [#282](https://github.com/aryamahadik/rosie/pull/282) from `task/T-1142`, merged 2026-11-10 03:59:49 UTC. It squashed 4 branch commits:
+  - `7dcb803` T-1142: freeze K-02 v1.1 (the sign-up door to S1-01, with context-s1-…
+  - `366a8f0` T-1142: K-02 v1.1's contract tests beside v1 (DL-330 ruling 1): model…
+  - `e2fcb72` T-1142: K-02 README v1.1 'Contract test' says what the contract tests…
+  - `e7838ce` T-1142: round 3 (DL-333): K-09 v1.5's gateAndCommit request turn (gat…
+- **Files changed:** 17 (+1906 −46), by folder:
+  - `ai/src/recorded-double/` recorded-double.test.ts +13 −3
+  - `contracts/model/` README.md +49 −2, frozen.json +1 −1, model.v1.1.schema.json +601 −0
+  - `contracts/model/fixtures/` context-s1-01.json +66 −0, decide-s1-01-enter.json +58 −0, index.json +16 −0
+  - `contracts/scripts/` model-contract.test.mjs +4 −4
+  - `contracts/tool-api/` README.md +57 −2, frozen.json +1 −1, tool-api.v1.5.schema.json +800 −0
+  - `contracts/tool-api/fixtures/` build-frontier-s1-01.json +1 −0, commit-s1-01.json +1 −0, index.json +3 −1
+  - `docs/adr/` 0013-walking-skeleton-turn-one.md +186 −0, README.md +16 −15
+  - `tests/contract/` model.v1.test.ts +33 −17
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1142: freeze K-02 v1.1 (the sign-up door to S1-01, with context-s1-01 and decide-s1-01-enter) and K-09 v1.5 (buildFrontier, closestEntries and gateAndCommit take K-02 v1.1's context; build-frontier-s1-01 and commit-s1-01, which chain with compose-input-s1-02 and finalize-pass on outbox-s1-02-sam-1); ADR-013 names each skeleton hop's turn 1 fixture, the row ids, channel and send class, the double's recordings and the card lines that change
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1142: K-02 v1.1's contract tests beside v1 (DL-330 ruling 1): model-contract.test.mjs names frozen.json's list [v1, v1.1] and adds the minor version v1.2, which does not exist yet; model.v1.test.ts takes any frozen version in the index and checks each entry (accepted, refused by the schema or by a rule, and the required-field removal) against its own version's schema, following a minor version's $ref to v1 for the required fields, and expects all eight verbs; the recorded double's test pins its two contexts by version v1 (context-s1-01's recordings are T-1145's)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1142: K-02 README v1.1 'Contract test' says what the contract tests now check (each entry by its own version, eight verbs, frozen [v1, v1.1], the double's v1 contexts until T-1145), default 9 says the door's label is section 1's title without its number (1. Business onboarding gives Business onboarding), and a round 2 change log line; ADR-013 section 7 marks task 7 done here (DL-330) and names T-1145 and T-1146, and T-293's lines name the label
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1142: round 3 (DL-333): K-09 v1.5's gateAndCommit request turn (gateAndCommit.turn) takes the service and the Linq chat id of the turn's last text, both or neither, which the runtime caller copies from its K-06 event, refused on a clock's firing and never on buildFrontier's turn or in K-02's context (default 135; defaults 132 and 134 name them as the walk's sources); a gateAndCommit fixture's stated step may state the rows its part writes in K-05 v1's write shapes (gateAndCommit.given, statedWrites; default 136); commit-s1-01.json's turn carries imessage and linq-chat-demo-sam and its given.stated.writes states S1-01's thread, S1-02's question and outbox-s1-02-sam-1; ADR-013 sections 4 to 6 follow (hop 8; T-559, T-1139 and T-1141 lines)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 276. T-554: join hop 3: the actor's safety-read port bound to @rosie/ai's safety read through the composition root (picks: real for test and staging, production closed); realSafetyRead reads each raw text with the bound bundle port's danger words and writes its model-call spans into the text's trace; RootOptions.safetyReaders feeds it (the recorded-model double in tests; null in workerRoot, so every read fails closed with NoSafetyReaderError until the bundle's manifest and model key can be read there); tests: hop3.worker.test (JOIN reads No from one Haiku call, the safety span ends before the batch and the lease; with the double delaying past 4 s the danger-word text gets the safety line and a plain text the outage line), safety-read.test (T-004's loader, the danger-word lift, fail-closed cases, the root's bindings) (\#281)
+
+- **Commit:** [`83e9fea`](https://github.com/aryamahadik/rosie/commit/83e9fea), by Arya Mahadik, 2026-11-10 03:29:33 UTC
+- **Pull request:** [#281](https://github.com/aryamahadik/rosie/pull/281) from `task/T-554`, merged 2026-11-10 03:29:33 UTC. It squashed 1 branch commit:
+  - `9c96b1c` T-554: join hop 3: the actor's safety-read port bound to @rosie/ai's …
+- **Files changed:** 9 (+942 −37), by folder:
+  - `runtime/src/wiring/` hop3.worker.test.ts +337 −0, index.ts +4 −0, picks.ts +5 −2, real.ts +92 −1, root.test.ts +12 −9, root.ts +26 −6, root.worker.test.ts +24 −6, safety-read.test.ts +251 −0, test-support.ts +191 −13
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 275. T-293: frontier hubs by stage and door entries in actions/src/frontier/sources/hubs-doors: createHubsAndDoorsSource(bundles), the hubsAndDoors slot's source; the target booking's hub by its K-05 v1.2 stage (entry, booked, checked\_in, done) in its own flow, none in journeys 4-6 and 9, labelled by business, date and time; an owner's S11-12 and S11-53, the team's S11-42; full cards for hubs; the doors in K-01's order (A3-51/B3-40 for anyone, A3-43/B3-35 only after the code check, S11-12 and S11-21 for an owner, S11-42 for the business side), each its arch 03 name and its step's first sentence read through the bundles port; doors only with no target; nothing with no business named; stakes from each walk. 45 tests on bundle-mini-a, bundle-mini-b, bundle v0 and the compiled master, through T-291's assembler and buildFrontier. (\#279)
+
+- **Commit:** [`d1db9fe`](https://github.com/aryamahadik/rosie/commit/d1db9fe), by Arya Mahadik, 2026-11-10 02:47:19 UTC
+- **Pull request:** [#279](https://github.com/aryamahadik/rosie/pull/279) from `task/T-293`, merged 2026-11-10 02:47:19 UTC. It squashed 1 branch commit:
+  - `11a137b` T-293: frontier hubs by stage and door entries in actions/src/frontie…
+- **Files changed:** 6 (+1733 −0), by folder:
+  - `actions/src/frontier/sources/hubs-doors/` first-sentence.test.ts +52 −0, first-sentence.ts +34 −0, hubs-doors.test.ts +823 −0, hubs-doors.ts +514 −0, index.ts +14 −0, test-support.ts +296 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 274. T-553: join hop 2: the Linq webhook through workerRoot behind the skeleton flag; ports wired on the first request where HANDLE\_ACTOR is bound; the text sealed under K-05's handle key (non-exportable CryptoKey) before the HandleActor's inbox; 503 with no database (\#278)
+
+- **Commit:** [`4d9b468`](https://github.com/aryamahadik/rosie/commit/4d9b468), by Arya Mahadik, 2026-11-10 02:03:45 UTC
+- **Pull request:** [#278](https://github.com/aryamahadik/rosie/pull/278) from `task/T-553`, merged 2026-11-10 02:03:46 UTC. It squashed 4 branch commits:
+  - `9285dc3` T-553 (work in progress): the Worker's Linq webhook POST is routed th…
+  - `28c7a96` Merge branch 'main' into task/T-553
+  - `c4bd3fe` T-553 (round 2, work in progress): DL-313 rulings 1 to 4 as far as Ma…
+  - `f6c0c80` T-553 (round 3, DL-324): the sealing join finished. seal.ts: SealingK…
+- **Files changed:** 16 (+846 −73), by folder:
+  - `runtime/src/gateway/` linq-webhook.worker.test.ts +2 −2, seal.ts +45 −8
+  - `runtime/src/` index.ts +37 −9
+  - `runtime/src/outage/db/` outage.ts +9 −2
+  - `runtime/src/safety/` arrival.ts +2 −2
+  - `runtime/src/turn/` turn.ts +2 −2
+  - `runtime/src/wiring/` hop2.worker.test.ts +278 −0, index.ts +10 −0, linq.test.ts +6 −3, picks.ts +5 −3, real.ts +88 −2, root.test.ts +25 −16, root.ts +66 −13, root.worker.test.ts +3 −1, sealing.test.ts +189 −0, test-support.ts +79 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-553 (work in progress): the Worker's Linq webhook POST is routed through workerRoot(env).linqWebhook, so the skeleton flag and D-017's rollback gate the deployed route (T-552's security review): createWorker takes an optional linqWebhook route, by default the gateway's Linq entry with gatewayDeps(env) as before; the default Worker answers 404 while no release flags are bound. linq-webhook.worker.test.ts: its default-Worker case now expects 404 with the flag off instead of 503. Not done: the module-load install(), the sealing join and the actor binding (see the NEED report).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-553 (round 2, work in progress): DL-313 rulings 1 to 4 as far as May touch allows. seal.ts: sealWords and openWords also take T-182's non-exportable AES-256-GCM key object (SealingKey = Uint8Array | CryptoKey; any other key object refused, naming no key); the raw-bytes path unchanged. wiring/root.ts: the claimer's crypto.randomUUID() made at the first wake; workerRoot hands the gateway env.HANDLE_ACTOR where bound (closed door otherwise); wireWorker installs the actor's ports once, on the Worker's first request, only where HANDLE_ACTOR is bound (wiredRoot, unwireWorker). index.ts: the default Worker's fetch calls wireWorker before answering, nothing at module load. wiring/real.ts: realSealing, K-05 v1.2 handleSealingKey with its database bound (new ids on every call, SEALING_WRAP_KEY by name, the key object it hands over; no database bound, constraint, transient or an unknown handle kind throws, so the gateway answers 503), built and tested but not yet bound: SealingKeyStore still answers bytes (see the NEED). Tests: hop2.worker.test.ts through root.linqWebhook with the HandleActor namespace (one sealed inbox entry, unreadable without the key, one actor span after the gateway's; duplicate-event.json 200 and no second entry) and the Worker's wiring (bound: installed once on the first request; unbound: nothing wired, door closed); sealing.test.ts with a K-05 double answering as handle-key-first-sight and its repeat.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-553 (round 3, DL-324): the sealing join finished. seal.ts: SealingKeyStore answers SealingKey (the key object K-05 v1.2 handleSealingKey hands over, or a double's 32 bytes). turn.ts, arrival.ts and outage.ts: the sealing key they pass on is typed SealingKey, nothing else changed. picks.ts: sealing is real under test and on staging (production closed). real.ts: realPorts binds sealing to realSealing, fed K-05's call (RealInputs.handleKey; null or left out, every seal fails closed with NoDatabaseError). root.ts: RootOptions.handleKey hands it in; workerRoot passes null until T-567 binds a database, so the gateway answers 503 there. test-support.ts: the skeleton fakes give the K-05 double (handleKeys) in place of the fake key store; their port set omits the joined sealing. Tests: root.test JOINED (test and staging: linqVerify, sealing) and the closed seal now NoDatabaseError; linq.test, root.worker.test and hop2.worker.test take their keys from the K-05 double (hop2 checks the K-05 request: handle, handle- and person- ids, SEALING_WRAP_KEY; the key a non-exportable secret); hop2 adds staging's root with no K-05 call: 503, nothing in the inbox; sealing.test adds the root's binding (gateway, safety read and turn take K-05's key; handle-uuid and person-uuid ids) and the fail-closed root with no call.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 273. T-163: bundle v0 for the walking skeleton (D-007) in bundles/v0: S1-01 and S1-02 of flow A cut from the whole compiler build of fixture set v1 (every trade, Master Corrections in the run's order), marked partial, id baefa1e9c103b86fd9037a0703736bd6953024d491a6f6df096720b918cfc845/1; its manifest packs the AI layer's safety read, decide and composer prompts, Q-26's routing with claude-haiku-5-5 and claude-sonnet-5-5, and T-160's lint of the two steps (no failure); published to local PostgreSQL with its KV bulk file bundle.kv.json; build.mjs makes it and check.mjs proves the card's checks (K-01 v1, the skeleton's structure, step.js's words, the branches, the stop marker, the read-back) (\#277)
+
+- **Commit:** [`93f95aa`](https://github.com/aryamahadik/rosie/commit/93f95aa), by Arya Mahadik, 2026-11-10 01:42:07 UTC
+- **Pull request:** [#277](https://github.com/aryamahadik/rosie/pull/277) from `task/T-163`, merged 2026-11-10 01:42:07 UTC. It squashed 1 branch commit:
+  - `de9d732` T-163: bundle v0 for the walking skeleton (D-007) in bundles/v0: S1-0…
+- **Files changed:** 7 (+679 −0), by folder:
+  - `bundles/v0/` build.mjs +284 −0, bundle.kv.json +1 −0, check.mjs +357 −0, models.json +17 −0, prompts.json +18 −0
+  - `bundles/v0/bundle/flow/` A.json +1 −0
+  - `bundles/v0/bundle/` manifest.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 272. T-1096: the gateway writes K-08's scrub span between receive and the hand-off, with only the counts of card numbers and SSNs swapped, for an event its actor wrote; tests that expected receive alone now expect receive, then scrub (\#276)
+
+- **Commit:** [`5e7018c`](https://github.com/aryamahadik/rosie/commit/5e7018c), by Arya Mahadik, 2026-11-10 00:56:27 UTC
+- **Pull request:** [#276](https://github.com/aryamahadik/rosie/pull/276) from `task/T-1096`, merged 2026-11-10 00:56:27 UTC. It squashed 2 branch commits:
+  - `27eeafa` T-1096: the gateway writes K-08's scrub span. prepareHandoff times an…
+  - `b0e93b8` T-1096: round 2 (DL-315), the two tests outside the gateway now expec…
+- **Files changed:** 8 (+574 −32), by folder:
+  - `runtime/src/gateway/` hand-off.ts +52 −14, index.ts +8 −1, linq-webhook.ts +42 −4, scrub-span.worker.test.ts +455 −0
+  - `runtime/src/wiring/` linq.test.ts +4 −3
+  - `runtime/test/` trace-e2e.worker.test.ts +4 −3
+  - `tests/e2e/_driver/` local-target.test.ts +3 −3
+  - `tests/e2e/skeleton/` skeleton.test.ts +6 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1096: the gateway writes K-08's scrub span. prepareHandoff times and counts the scrub (ScrubDone: start, ms, card numbers and SSNs this scrub swapped); handleLinqWebhook records the scrub span right after the receive span for an event its actor wrote, so receive is seq 1 and starts first and scrub is seq 2, between receive's start and the hand-off, with decided cardNumbersTagged and ssnsTagged only (trace-skeleton.json's names), never a word or a digit. A known event id (trace-duplicate-webhook.json), a receipt, a failure and a refusal keep the receive span alone. Tests (scrub-span.worker.test.ts): receive, scrub, then the hand-off, each span valid against K-08 (spanProblems); T-465's checkHops passes both as the skeleton's first hops; a test card gives cardNumbersTagged 1 and no digit of it; SSNs, two cards and an email subject counted; the other answers end at receive. local-target.test.ts and skeleton.test.ts now allow the scrub hop (DL-142). Two tests outside May touch still expect the receive span alone: runtime/test/trace-e2e.worker.test.ts (gap scrubSpan) and runtime/src/wiring/linq.test.ts.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1096: round 2 (DL-315), the two tests outside the gateway now expect its scrub span. runtime/test/trace-e2e.worker.test.ts: gap scrubSpan off GAPS and NOT_WRITTEN, scrub judged after receive, and the turn-id lists before the lease and for a joined text gain the scrub span null (four nulls); every other gap stays on GAPS. runtime/src/wiring/linq.test.ts (T-552): two gateway spans, receive then scrub, in that order; the same webhook twice gives ["ok","ok","dropped"], the repeat still receive alone. npm test 199 files, 7044 passed; test:e2e 11 files, 677 passed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 271. T-363: model routing by stakes in ai/src/routing: createRouter(bundle) reads the K-01 v1 manifest's policy (checked as K-01 writes it; bundle id and model ids checked as the AI gateway checks them) and routes each turn by its K-02 stakes before any call: high when any choice is high (Sonnet first, Haiku checking, Q-26's default), else Haiku twice; a manifest saying Haiku first on high stakes is routed so (data, not code); each read gets its own seed, the check's always listing the choices in another order than the first's (stepped when a draw repeats it); the re-read's model is the policy's; a route names only haiku or sonnet as claude-haiku-5-5 or claude-sonnet-5-5 and is frozen. 23 tests: the 13 K-02 decide fixtures' stakes, routing and read models; one high choice anywhere; all 32 K-01 policies; refused policies and bundles; reads through decide's one read and the AI gateway on the recorded double (Sonnet then Haiku, Haiku twice in two orders, Haiku then Sonnet when switched), no live call (\#275)
+
+- **Commit:** [`1be0647`](https://github.com/aryamahadik/rosie/commit/1be0647), by Arya Mahadik, 2026-11-10 00:48:01 UTC
+- **Pull request:** [#275](https://github.com/aryamahadik/rosie/pull/275) from `task/T-363`, merged 2026-11-10 00:48:02 UTC. It squashed 1 branch commit:
+  - `135dfd3` T-363: model routing by stakes in ai/src/routing: createRouter(bundle…
+- **Files changed:** 6 (+1111 −0), by folder:
+  - `ai/src/routing/` errors.ts +18 −0, index.ts +24 −0, policy.ts +66 −0, route.ts +196 −0, routing.test.ts +698 −0, types.ts +109 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 270. T-1135: K-05 v1.1 items 13 to 16 and v1.2 items 30 to 32 in db/repo/outbox.ts, the dispatcher's send loop: claimOutboxV12 (each claim written to outbox\_claims, claim\_no 1 or raised, lapsing in 60 s, returned with claimedFrom and port: linq for imessage, rcs and sms, email for email; a sending row whose claim lapsed, or that has none, taken again once under the recipient's lock, keeping first\_try\_at and next\_try\_not\_before; a live claim stops the walk), renewClaim (the caller's claim on a sending row and a pending part, notYet before the Retry-After, lapses\_at = at + 60 s, first\_try\_at once, next\_try\_not\_before cleared, only the claim's version raised, and the recipient's phone row read FOR SHARE in the same transaction as recipient), markPartV12 (the row's state and version after the mark, a failure's message id and Retry-After kept, a receipt found by its part's key after a 4001 or 4006, failed to delivered) and markRowV12 (waitingChat: held\_until cleared, the claim deleted). T-196's v1 calls and their tests unchanged. Tests: the 21 v1.1 and v1.2 outbox fixtures and the refused ones, 20 parallel claimers over 1,000 rows with lapsed, live and missing claims, a STOP committing during a renewal, a receipt after a 4006 found by its key. (\#274)
+
+- **Commit:** [`4ad6309`](https://github.com/aryamahadik/rosie/commit/4ad6309), by Arya Mahadik, 2026-11-10 00:38:26 UTC
+- **Pull request:** [#274](https://github.com/aryamahadik/rosie/pull/274) from `task/T-1135`, merged 2026-11-10 00:38:26 UTC. It squashed 1 branch commit:
+  - `d924943` T-1135: K-05 v1.1 items 13 to 16 and v1.2 items 30 to 32 in db/repo/o…
+- **Files changed:** 2 (+2037 −138), by folder:
+  - `db/repo/` outbox.int.test.ts +1210 −0, outbox.ts +827 −138
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 269. T-258: dispatcher retries under K-07's key rules. runtime/src/dispatch/retry/: retryRuleFor picks each part's next try from K-11's kind (no answer: the same key under the next claim; a reported failure: markPart failed with retry, the new key, any Retry-After as the claim's nextTryNotBefore; 4001 or 4006: failed with no next try, the new key only after a minute with no receipt; 403 code 2024: never retried on Linq, a row the stop binds dropped as stopped); each wait a job on T-256's retry queue (retry-\<part key\>\#\<attempts\>), and dispatchSendDoor runs the recipient's rows again when it is due, writing a 4006's new key first unless its receipt came; the receipt finds a part by its echoed key (K-05 v1.2 item 31); override\_optout only on a safety line or a stop reply; no new job after 15 minutes of tries. Tests: error-4006, error-403-2024, error-rate-limit, send-override-optout and verify-delivered-after-4006 against the real queue and door, the row's tries equal to K-07 outbox-4006-new-key.json (\#273)
+
+- **Commit:** [`f9a7376`](https://github.com/aryamahadik/rosie/commit/f9a7376), by Arya Mahadik, 2026-11-10 00:21:37 UTC
+- **Pull request:** [#273](https://github.com/aryamahadik/rosie/pull/273) from `task/T-258`, merged 2026-11-10 00:21:37 UTC. It squashed 1 branch commit:
+  - `aa2a9ee` T-258: dispatcher retries under K-07's key rules. runtime/src/dispatc…
+- **Files changed:** 9 (+1592 −71), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +253 −29, index.ts +12 −1, test-support.ts +158 −39, types.ts +22 −2
+  - `runtime/src/dispatch/retry/` door.ts +87 −0, index.ts +27 −0, plan.ts +146 −0, retry.worker.test.ts +774 −0, rules.ts +113 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 268. T-309: compose input and the situation tag: one committed row to K-03 v1 input with only the facts limit 7 shows that reader, never the frontier, no opt-out line from the bundle's plainText (DL-245), and the tag in arch 07's order (a death stays gentle even with money) (\#272)
+
+- **Commit:** [`86ac675`](https://github.com/aryamahadik/rosie/commit/86ac675), by Arya Mahadik, 2026-11-09 23:36:15 UTC
+- **Pull request:** [#272](https://github.com/aryamahadik/rosie/pull/272) from `task/T-309`, merged 2026-11-09 23:36:16 UTC. It squashed 2 branch commits:
+  - `1d29d26` T-309: K-09 v1's compose-input call in actions/src/compose-input/: on…
+  - `7d93f85` T-309: the death-report tag test shows the money it names: the master…
+- **Files changed:** 11 (+1870 −0), by folder:
+  - `actions/src/compose-input/` build.ts +140 −0, check.ts +69 −0, compose-input.test.ts +553 −0, errors.ts +62 −0, handler.ts +107 −0, index.ts +75 −0, master-line.ts +139 −0, situation.test.ts +107 −0, situation.ts +93 −0, test-support.ts +326 −0, types.ts +199 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-309: K-09 v1's compose-input call in actions/src/compose-input/: one committed outbox row turned into K-03 v1's composer input. The row read on the primary inside the caller's business scope (port readRow, notBuilt until wired); a fixed-line row is never composed, a closed row answers rowClosed, a row holding a plan alreadyPlanned, an email copy emailCopy with its text row. The master line is the step's message text from the row's bundle, never its plainText or stop marker, and the bundle's opt-out line is taken out of every Rosie-written text (DL-245); facts only as limit 7 lets the reader see them (T-311's claimFacts over T-310's filler; no link or send-time slot; money only from the record's rows, DL-182); links kept only when shown and filled; the last 6 messages; inbound only in a reply to its sender; the situation tag the first that fits in arch 07 line 357's order (C-090); the input built field by field and held to K-03 v1, so a frontier never goes (refuse-frontier-in-input.json). Registered like buildFrontier: createComposeInputHandler and composeInputHandlers. Tests: compose-input-s1-02.json word for word from the S1-02 row; a stop-marked master text gives no opt-out line; a death report is gentle even with money.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-309: the death-report tag test shows the money it names: the master line's {{pay.back}} and the $35 price fact, still gentle
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 267. T-196: K-05 v1 items 2 to 4 in db/repo/outbox.ts: writePlan (plan and final parts together, planned or stale to checked, alreadyPlanned before the version), unplannedRows (a turn's rows with no plan, in commit order), claimOutbox (recipients earliest open commit\_seq first, each under a transaction advisory lock skipped when another claim holds it; held rows passed and reported, waiting rows passed, the walk stopped at sending, planned and stale rows; checked and due held rows claimed to sending with their parts' keys, attempts raised for a part never accepted), markPart and markRow (only K-07 v1's part and row moves, the row following its parts' latest tries; wrongState for any other move, so nothing goes from delivered back to sending or out of dropped\_stopped). ROW\_MOVES and PART\_MOVES are K-07's lists, checked against its schema. Tests: the 12 K-05 v1 outbox fixtures, 20 parallel claimers over 1,000 rows, held rows, refused moves, the crash and stale paths, two-part rows, a 4006 and a plain retry. (\#271)
+
+- **Commit:** [`0e29282`](https://github.com/aryamahadik/rosie/commit/0e29282), by Arya Mahadik, 2026-11-09 23:11:16 UTC
+- **Pull request:** [#271](https://github.com/aryamahadik/rosie/pull/271) from `task/T-196`, merged 2026-11-09 23:11:16 UTC. It squashed 1 branch commit:
+  - `33447aa` T-196: K-05 v1 items 2 to 4 in db/repo/outbox.ts: writePlan (plan and…
+- **Files changed:** 2 (+2743 −0), by folder:
+  - `db/repo/` outbox.int.test.ts +1428 −0, outbox.ts +1315 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 266. T-723: migration 0031, K-32 part 2: fees, memberships, packs, credits, plan charges, Rosfield's fees, pay links and reconciliation; a pack's credits never below zero; a pay link's code kept only as its hash, outside the Tool API's SELECT; part 1's three keys added (\#270)
+
+- **Commit:** [`8d3a725`](https://github.com/aryamahadik/rosie/commit/8d3a725), by Arya Mahadik, 2026-11-09 22:41:15 UTC
+- **Pull request:** [#270](https://github.com/aryamahadik/rosie/pull/270) from `task/T-723`, merged 2026-11-09 22:41:16 UTC. It squashed 3 branch commits:
+  - `4ebd6e7` T-723: migration 0031, K-32 part 2: memberships, pay\_links, packs, cr…
+  - `4442765` T-723: 0031's header says exactly what rule 7 and rule 1 hold: set-on…
+  - `bcb66d9` T-723: customers.int.test.ts's comment above the DL-225 list names K-…
+- **Files changed:** 7 (+4138 −40), by folder:
+  - `db/migrations/` 0031\_money\_fees\_packs.sql +883 −0
+  - `db/repo/` bookings-changes.int.test.ts +10 −1, customers.int.test.ts +6 −3, effects-schema.int.test.ts +4 −1, money-2.int.test.ts +2955 −0, money.int.test.ts +48 −15, rls.int.test.ts +232 −20
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-723: migration 0031, K-32 part 2: memberships, pay_links, packs, credits, booking_fees, plan_charges, rosfield_fees, reconciliation_runs and reconciliation_findings word for word; part 1's three keys (saved_cards_membership_fk, payments_booking_fee_fk, payments_plan_charge_fk) by validated ALTER TABLE; rule 5's policies, rule 6's grants (named UPDATE columns, rosfield_fees insert only, reconciliation select only for the Tool API, pay_links.code_sha256 outside its SELECT), rule 7's set-once triggers on 0030's money_set_once(); db/repo/money-2.int.test.ts (the seeds, 50 parallel uses of a pack's last credit, refused rows, probes); rls.int.test.ts K-32 part 2 lists and exceptions; DL-225 lines in money, effects-schema, bookings-changes and customers tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-723: 0031's header says exactly what rule 7 and rule 1 hold: set-once times with the state CHECKs (a failed plan charge only goes on to charged), and the other parts' keys without their business
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-723: customers.int.test.ts's comment above the DL-225 list names K-32's two tables that name a customer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 265. T-552: join hop 1 in the composition root: the gateway's verify port bound to @rosie/adapters' Linq verify (T-413) under test and on staging (production stays closed), its webhook secret read at each call (the Linq double's made-up secret in tests, LINQ\_WEBHOOK\_SECRET by name in the Worker; none set fails closed with 503); root.linqWebhook, the Linq webhook route behind the skeleton flag read through T-185's release-flag read (on: the gateway; off or no flags bound: 404 with the body unread, nothing verified and no actor opened; unreadable: 503); adapters/package.json exports ./linq/webhook, ./linq/double and ./linq/double-webhooks; test-support signs with the Linq double (T-412) instead of the fake verify; tests: double-signed-webhook.json 200 within 1 s with one gateway span, a bad signature 401 writing nothing, the flag off 404 opening no actor (\#T-552) (\#269)
+
+- **Commit:** [`cd206e3`](https://github.com/aryamahadik/rosie/commit/cd206e3), by Arya Mahadik, 2026-11-09 22:41:10 UTC
+- **Pull request:** [#269](https://github.com/aryamahadik/rosie/pull/269) from `task/T-552`, merged 2026-11-09 22:41:10 UTC. It squashed 1 branch commit:
+  - `1dbc052` T-552: join hop 1 in the composition root: the gateway's verify port …
+- **Files changed:** 11 (+842 −113), by folder:
+  - `adapters/` package.json +4 −1
+  - `runtime/src/wiring/` index.ts +9 −0, linq.test.ts +427 −0, picks.ts +15 −9, ports.ts +1 −1, real.ts +99 −0, root.test.ts +36 −13, root.ts +46 −12, root.worker.test.ts +25 −15, skeleton.ts +87 −0, test-support.ts +93 −62
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 264. T-374: the composer's one rewrite, told what failed, then use the fallback. ai/src/composer/rewrite/: rewrite({input, plan, attempt, told}) takes rewriteTold's shape (each failed K-03 check once, with its detail); attempt composed gets one call, purpose rewrite, on the composer's own cached system prompt (composer-3, unchanged) with the row's input as compose sent it, \<plan\_to\_fix\> and \<failed\_checks\> as data, and an untagged task keeping both rules (fixed lines and the opt-out line are code's, DL-245; never a money sentence of the model's own, DL-182); attempt rewrite is the second failure: useFallback with no call; an answer the AI layer refuses is useFallback (rewriteRefused); a request with any other field, a plan to fix the input does not allow or a malformed told is refused before any call. Haiku first at compose's effort, 6 s per attempt (the composer's stage). Tests: check-two-questions.json gives one rewrite whose prompt names One question; check-fallback.json gives useFallback and no third call; the 6 s timeout under fake timers; the cached prefix read; check-emoji.json answered by the double's own plan. (\#268)
+
+- **Commit:** [`0eaf71d`](https://github.com/aryamahadik/rosie/commit/0eaf71d), by Arya Mahadik, 2026-11-09 22:21:12 UTC
+- **Pull request:** [#268](https://github.com/aryamahadik/rosie/pull/268) from `task/T-374`, merged 2026-11-09 22:21:12 UTC. It squashed 1 branch commit:
+  - `90f08a7` T-374: the composer's one rewrite, told what failed, then use the fal…
+- **Files changed:** 12 (+1315 −4), by folder:
+  - `ai/src/composer/` compose.ts +6 −2, index.ts +31 −1, schema.ts +2 −0, types.ts +9 −1
+  - `ai/src/composer/rewrite/` index.ts +28 −0, request.test.ts +348 −0, request.ts +101 −0, rewrite.test.ts +426 −0, rewrite.ts +74 −0, test-support.ts +118 −0, turn.ts +69 −0, types.ts +103 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 263. T-510: the Tool API mock (C-186) in contracts/mock/: generate.mjs writes tool-api-mock.json from every accepted exchange fixture of the frozen versions, K-09 v1 to v1.4 and K-21 v1 to v1.2 (268 answers, each checked by the workspace's one validator and its named rule, refusing two fixtures that answer one request differently in one environment), formatted by the repository's Prettier settings; mock.mjs answers a fixture's request with a copy of its outcome in the environment its given names and otherwise throws ToolApiMockError naming the call, with the nearest fixture and where the request differs, never a default answer; mock.d.mts types it; contracts/package.json's check runs mock/\*.test.mjs and its mock script regenerates the file (--check tells a stale one); tests: every accepted exchange answered, loud errors, the two stated refusals, every other refused fixture, byte-identical regeneration and each held answer compared with its fixture file (\#267)
+
+- **Commit:** [`47ad786`](https://github.com/aryamahadik/rosie/commit/47ad786), by Arya Mahadik, 2026-11-09 20:42:26 UTC
+- **Pull request:** [#267](https://github.com/aryamahadik/rosie/pull/267) from `task/T-510`, merged 2026-11-09 20:42:27 UTC. It squashed 1 branch commit:
+  - `c16f126` T-510: the Tool API mock (C-186) in contracts/mock/: generate.mjs wri…
+- **Files changed:** 7 (+19678 −1), by folder:
+  - `contracts/mock/` generate.mjs +342 −0, generate.test.mjs +352 −0, mock.d.mts +70 −0, mock.mjs +252 −0, mock.test.mjs +446 −0, tool-api-mock.json +18214 −0
+  - `contracts/` package.json +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 262. T-295: frontier facts and the 60-choice cap. actions/src/frontier/facts/: each key once from its one home (homes list, checked: one home per key, never a person's name or contact; default none listed), the K-01 needs of the options' and hubs' steps about the turn's target, a second place for one key refused before it is read and its step flagged with the home's row and version, one read through the port with primary=true, cache=false (default K-05 v1.2 readTurnState). actions/src/frontier/cap/: over 60, each booking but the target collapses to one which-booking choice labelled by business, date and time; still over 60, tooManyChoices. handler.ts fills facts, flagged and collapsedBookingIds. Tests: 75 choices across 6 bookings, fixtures/two-homes-one-key.json, strong reads, 150 ms median over 50 runs. (\#266)
+
+- **Commit:** [`06d3df1`](https://github.com/aryamahadik/rosie/commit/06d3df1), by Arya Mahadik, 2026-11-09 20:26:44 UTC
+- **Pull request:** [#266](https://github.com/aryamahadik/rosie/pull/266) from `task/T-295`, merged 2026-11-09 20:26:44 UTC. It squashed 1 branch commit:
+  - `f4d38c2` T-295: frontier facts and the 60-choice cap. actions/src/frontier/fac…
+- **Files changed:** 14 (+1901 −17), by folder:
+  - `actions/src/frontier/assemble/` handler.test.ts +1 −1, handler.ts +43 −16
+  - `actions/src/frontier/cap/` cap.test.ts +357 −0, cap.ts +206 −0, index.ts +13 −0
+  - `actions/src/frontier/facts/` budget.test.ts +65 −0, facts.test.ts +391 −0, facts.ts +237 −0, homes.ts +155 −0, index.ts +39 −0, needs.ts +52 −0, read.ts +75 −0, test-support.ts +164 −0
+  - `actions/src/frontier/facts/fixtures/` two-homes-one-key.json +103 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 261. T-722: migration 0030, K-32 part 1: saved cards, payments with idempotency keys and effect ids, payment items, the append-only ledger and refunds; never a card hold, a Tool API write never makes a card payment paid, set-once money values; a two-column SELECT on effects for rule 5's checks (DL-298) (\#265)
+
+- **Commit:** [`9d49bb9`](https://github.com/aryamahadik/rosie/commit/9d49bb9), by Arya Mahadik, 2026-11-09 20:04:31 UTC
+- **Pull request:** [#265](https://github.com/aryamahadik/rosie/pull/265) from `task/T-722`, merged 2026-11-09 20:04:32 UTC. It squashed 2 branch commits:
+  - `0d4f72e` T-722: WIP migration 0030 (K-32 part 1): saved\_cards, payments, payme…
+  - `19a5045` T-722: round 2 (DL-298): 0030 grants rosie\_app SELECT of effects.id a…
+- **Files changed:** 5 (+3203 −15), by folder:
+  - `db/migrations/` 0030\_money\_payments\_ledger.sql +644 −0
+  - `db/repo/` bookings-changes.int.test.ts +8 −1, effects-schema.int.test.ts +61 −6, money.int.test.ts +2260 −0, rls.int.test.ts +230 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-722: WIP migration 0030 (K-32 part 1): saved_cards, payments, payment_items, ledger_lines and refunds word for word, the circular keys by ALTER TABLE ... ADD CONSTRAINT, money_set_once() and its three triggers, rule 6's grants and rule 5's policies as the frozen README states them; NEED: rule 5's effect_id and save_effect_id clauses need rosie_app to read effects, which DL-149 revoked, so every Tool API write to payments, refunds and saved_cards is refused (permission denied for table effects); test file and rls exceptions wait on the ruling
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-722: round 2 (DL-298): 0030 grants rosie_app SELECT of effects.id and effects.business_id alone, which K-32 rule 5's effect_id and save_effect_id checks read (rosie_app already reads bookings, booking_lines, booking_visits, consents and open_questions whole); db/repo/money.int.test.ts: part 1's five tables against the frozen table list, rules 5 to 7 word for word, the card's two seeds and two refused rows, 100 parallel writes with one idempotency key leave one payment, integer cents with a currency, and the ruling's effect tests; rls.int.test.ts: K-32's table lists and named exceptions (1) to (5); DL-225 lines in effects-schema.int.test.ts (truncate list, the Tool API's effects reads and column grants) and bookings-changes.int.test.ts (keys into booking_lines, money_set_once)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 260. T-270: PostgreSQL down in runtime/src/outage/db and the actor: while PostgreSQL is known down (a probe asked only when something waits on it, every 30 s while down) closed batches stay with the batch window in order and the lease holds its turn (a lapse counts no try and parks nothing); a text waiting 20 s gets the outage line once from the actor's copy straight through Linq under the safety read's own key, never to a stopped number, its record queued as T-271's outageLineRequest; a STOP or START in the batch window is taken at once from the copied keyword list (flag copied, reply through Linq, recordStopOrStart queued in the stop rank, never joining a turn), in arrival order and never ahead of one left to its turn; a running safety timer due fires once from its copy through a port; on return the write-on-return queue replays danger, then stops, then the rest before the lease resumes and the queued batches go on, and before any commit (CQ-104 f); the copies keep the pinned bundle's keyword list and stop and start replies; Workers tests with the data-access fake failing (\#264)
+
+- **Commit:** [`d0150fe`](https://github.com/aryamahadik/rosie/commit/d0150fe), by Arya Mahadik, 2026-11-09 19:42:19 UTC
+- **Pull request:** [#264](https://github.com/aryamahadik/rosie/pull/264) from `task/T-270`, merged 2026-11-09 19:42:19 UTC. It squashed 1 branch commit:
+  - `ac4bbe4` T-270: PostgreSQL down in runtime/src/outage/db and the actor: while …
+- **Files changed:** 10 (+2394 −34), by folder:
+  - `runtime/src/actor/copies/` copies.ts +81 −3, index.ts +3 −1, types.ts +19 −0
+  - `runtime/src/actor/` handle-actor.ts +100 −10, lease.ts +137 −20
+  - `runtime/src/outage/db/` index.ts +18 −0, outage.ts +1101 −0, outage.worker.test.ts +601 −0, test-support.ts +198 −0, types.ts +136 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 259. T-061: Freeze K-21 page and console calls v1.2: journey 4's screens 2 to 11, each page call naming the K-09 v1.2 call that serves it, read back before every confirm, bound yeses with their K-29 consent, and no other mobile's saved times or stopped state shown on a page (\#263)
+
+- **Commit:** [`ce87eda`](https://github.com/aryamahadik/rosie/commit/ce87eda), by Arya Mahadik, 2026-11-09 19:21:37 UTC
+- **Pull request:** [#263](https://github.com/aryamahadik/rosie/pull/263) from `task/T-061`, merged 2026-11-09 19:21:38 UTC. It squashed 3 branch commits:
+  - `b08a96d` T-061: freeze K-21 page and console calls v1.2 (journey 4 screens): p…
+  - `57c4ab2` T-061: K-21 v1.2 before review: each confirm's description says what …
+  - `175fe59` T-061: K-21 v1.2 round 2 (DL-296): the authority ask names its choice…
+- **Files changed:** 65 (+4882 −3), by folder:
+  - `contracts/page-api/` README.md +189 −1, frozen.json +1 −1, page-api.v1.2.schema.json +2713 −0
+  - `contracts/page-api/fixtures/` booking-name-confirm.json +32 −0, booking-name-read-back.json +35 −0, booking-pick-time.json +36 −0, booking-place-confirm.json +25 −0, booking-place-read-back.json +29 −0, booking-price-list.json +31 −0, booking-reach-confirm.json +31 −0, booking-reach-read-back.json +34 −0, booking-secure-link.json +38 −0, booking-service-haircut.json +48 −0, booking-teen-parent-link.json +31 −0, booking-teen-read-back.json +36 −0, booking-times-card.json +97 −0, booking-times-nobody-free.json +35 −0, booking-waitlist-ben-read-back.json +33 −0, booking-waitlist-joined.json +31 −0, booking-waitlist-read-back.json +29 −0, booking-waitlist-texts-off.json +31 −0, booking-who-for-confirm.json +30 −0, booking-who-for-read-back.json +36 −0, index.json +62 −1, photos-confirm.json +23 −0, photos-page-read.json +27 −0, photos-read-back.json +45 −0, photos-upload.json +25 −0, quote-owner-change-confirm.json +24 −0, quote-owner-change-read-back.json +38 −0, quote-owner-send-confirm.json +24 −0, quote-owner-send-read-back.json +38 −0, quote-page-read.json +31 −0, quote-price-confirm.json +24 −0, quote-price-read-back.json +33 −0, quotes-to-ok.json +46 −0, quotes-to-price.json +50 −0, secure-answers-confirm.json +23 −0, secure-answers-read-back.json +45 −0, secure-authority-confirm.json +23 −0, secure-authority-page-read.json +52 −0, secure-authority-paper-upload.json +25 −0, secure-authority-read-back.json +45 −0, secure-meets-pro-confirm.json +27 −0, secure-meets-pro-read-back.json +27 −0, secure-meets-pro-yes-confirm.json +28 −0, secure-meets-pro-yes-read-back.json +27 −0, secure-more-time-confirm.json +23 −0, secure-more-time-read-back.json +27 −0, secure-page-read.json +50 −0, secure-street-confirm.json +23 −0, secure-street-read-back.json +27 −0, swap-secure-answer.json +6 −0
+  - `contracts/page-api/fixtures/invalid/` refuse-booking-request-names-person.json +18 −0, refuse-cant-take-it-with-reason.json +21 −0, refuse-meets-pro-yes-committed-without-yes.json +28 −0, refuse-pick-names-price.json +11 −0, refuse-pick-saved-time-cap-ends.json +21 −0, refuse-quote-link-to-portal.json +30 −0, refuse-reach-shows-handles.json +31 −0, refuse-secure-request-names-person.json +27 −0, refuse-street-in-answer.json +28 −0, refuse-unscrubbed-secure-answer.json +6 −0, refuse-waitlist-committed-without-yes.json +31 −0, refuse-waitlist-texts-off-with-consent.json +31 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-061: freeze K-21 page and console calls v1.2 (journey 4 screens): page-api.v1.2.schema.json only adds to v1.1 (callName and pageWordsSwap take only new names); 14 calls for customer screens 2 to 11 (booking page after screen 1, secure page with its photos and quote pages), the pro's pricing page and Needs you's quote answers, each served by a K-09 v1.2 call or a page-only read; every change on a person's word read back first and made only on its yes (the times card the pick's read-back), a yes to messages bound to its K-29 consent's exact words; 42 accepted and 11 refused fixtures; README v1.2 section, defaults 46 to 63, open gaps 38 to 48, freeze record; frozen.json v1.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-061: K-21 v1.2 before review: each confirm's description says what serves it; the photos ask's basis (default 64) and the quote page's way and option named; the booking page sends no quote option (schema); fixtures for a nobody-free card and Needs you's changed price read back in A4-10's fixed words with its one yes (45 accepted, 11 refused)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-061: K-21 v1.2 round 2 (DL-296): the authority ask names its choice in full (authorityKind guardian, healthCareAgent, moneyPowerOfAttorney, labelled as A4-64 words them in README default 52's table) through pageAsk.authority (authorityAsk: the choices and whether the paper is asked), and a pageAnswer of kind authority carries the choice, what it covers in words and the paper's upload, which secureReadBack and secureConfirm carry to its K-30 row; on a page savedTimeCap answers cantTakeIt, never endsAt (bookingPick.errors; bookingConfirm.errors' description, N5; refuse-pick-saved-time-cap-ends.json); Ben's waitlist read-back has Dee's words, STOP line included; four authority fixtures (the ask, the paper's upload, its read-back, the yes), authority null on the other v1.2 asks and answers; defaults 52, 53, 57, 61 and 65, open gap 49 (49 accepted, 12 refused)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 258. T-744: the saved-time rules in actions/src/domain/reservations/: 10 minutes or the door's longer save, 10 more minutes once, C3's 15 minutes never extended, 2 per mobile or token, next in line; a save behind the asker's own row gets that row back (K-05, T-1134) (\#262)
+
+- **Commit:** [`da98d52`](https://github.com/aryamahadik/rosie/commit/da98d52), by Arya Mahadik, 2026-11-09 18:43:45 UTC
+- **Pull request:** [#262](https://github.com/aryamahadik/rosie/pull/262) from `task/T-744`, merged 2026-11-09 18:43:45 UTC. It squashed 4 branch commits:
+  - `9a465c3` T-744: reservations service (actions/src/domain/reservations): saves …
+  - `e3a5854` T-744: check the door facts without an unneeded type assertion (lint)…
+  - `9be352b` Merge branch 'main' into task/T-744
+  - `fd353cb` T-744: round 2 on T-1134's K-05 rules: the service takes K-05's own-r…
+- **Files changed:** 8 (+3110 −0), by folder:
+  - `actions/src/domain/reservations/` doors.ts +114 −0, index.ts +42 −0, pg.ts +45 −0, reservations.int.test.ts +359 −0, reservations.test.ts +1213 −0, service.ts +364 −0, test-support.ts +727 −0, types.ts +246 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-744: reservations service (actions/src/domain/reservations): saves a picked time for its door's length through K-05 reserve (standard 10, C3's ownAi 15 only for the customer's own AI booking at once with money before, longer saves up to their limits, every save ending by the visit's start per the clock home), held for the mobile or the agent token (DL-171), next in line when asked; lets it go at its end through K-05 release, promoting the first in line once; the one 10-minute extension only for the holder's own mobile, never on C3's door or for a token; a third saved time refused with only the asker's own two end times; unit tests on a fake clock against a K-05 double that answers K-05's item 6 fixtures, and 200 parallel saves on one slot on local PostgreSQL
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-744: check the door facts without an unneeded type assertion (lint), and name in the service header that the saved-time clock rows are K-05 reserve's and release's to write (lead card T-1084), with the service's defaults 4 to 7
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-744: round 2 on T-1134's K-05 rules: the service takes K-05's own-row answer for a save behind the asker's own slot (saved with that row's id and end, or next in line with that row) and answers a held row whose end has passed as timeTaken, never a live hold or extendable (default 8); the K-05 double keeps T-1134's two rules (own row back, nothing written; a let-go lets the released holder's own waiting rows go and promotes the first other holder, or nobody) and still answers K-05's 8 item-6 fixtures; tests of the reviewer's C3 scenario on the fake clock and on local PostgreSQL through the real K-05, a past end, a mobile after its one extension, rule (2) through the service, and C3 saves as token holds (DL-292, DL-294)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 257. T-721: migration 0029 (K-30 part 2): booking\_changes, quotes, quote\_options, owner\_oks, booking\_addresses, secure\_links, page\_answers and waitlist\_entries word for word, booking\_lines' two keys to them (ALTER TABLE ... ADD CONSTRAINT, validated), rule 5's policies with the exists clause, rule 6's grants (UPDATE of the end only on secure\_links and waitlist\_entries, code\_sha256 outside the Tool API's SELECT); db/repo/bookings-changes-2.int.test.ts (the five seeds whole, sealed answers and address, 50 parallel waitlist joins at positions 1 to 50, refused rows and probes); rls.int.test.ts's K-30 lists and named exceptions (1) to (3); four DL-225 lines in bookings-changes.int.test.ts (\#261)
+
+- **Commit:** [`1d2598e`](https://github.com/aryamahadik/rosie/commit/1d2598e), by Arya Mahadik, 2026-11-09 18:25:24 UTC
+- **Pull request:** [#261](https://github.com/aryamahadik/rosie/pull/261) from `task/T-721`, merged 2026-11-09 18:25:25 UTC. It squashed 1 branch commit:
+  - `a85c57a` T-721: migration 0029 (K-30 part 2): booking\_changes, quotes, quote\_o…
+- **Files changed:** 4 (+3750 −45), by folder:
+  - `db/migrations/` 0029\_bookings\_changes\_quotes\_links.sql +695 −0
+  - `db/repo/` bookings-changes-2.int.test.ts +2887 −0, bookings-changes.int.test.ts +24 −12, rls.int.test.ts +144 −33
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 256. T-1134: K-05 reserve and release keep one row per holder per slot: reserve with waitIfSaved, for a holder (the cap's: a mobile, or an agent token at one business) that already holds or waits on the slot, writes nothing and answers its own row as its first save got it (repeated); release lets go the released holder's own waiting rows in its line (let\_go) and promotes the first other holder, or nobody; both inside the call's one transaction under the slot's lock, with integration tests of the reviewer's C3 scenario, a mobile after its one extension, waiting behind another holder, and parallel saves (T-744 round 1 GAP 1; DL-292) (\#260)
+
+- **Commit:** [`e941cc2`](https://github.com/aryamahadik/rosie/commit/e941cc2), by Arya Mahadik, 2026-11-09 18:04:12 UTC
+- **Pull request:** [#260](https://github.com/aryamahadik/rosie/pull/260) from `task/T-1134`, merged 2026-11-09 18:04:13 UTC. It squashed 1 branch commit:
+  - `764113d` T-1134: K-05 reserve and release keep one row per holder per slot: re…
+- **Files changed:** 4 (+1016 −40), by folder:
+  - `db/repo/` reservation-rules.int.test.ts +653 −0, reservation-rules.ts +6 −2, reservations.int.test.ts +211 −0, reservations.ts +146 −38
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 255. T-477: gold-set volume sizing in evals/src/sizing and its table in evals/SIZING.md: for every row of section 08's table, the smallest volume at which its 95% interval clears its target, two-sided by default with the one-sided figure beside it, from T-480's library alone (381 two-sided and 268 one-sided for 99% danger recall; lower bound for at least, upper for at most; harmful wrong actions none below 500 turns; hard invariants no volume), with tests that check every figure as a literal and against T-480's interval (\#259)
+
+- **Commit:** [`15b1de2`](https://github.com/aryamahadik/rosie/commit/15b1de2), by Arya Mahadik, 2026-11-09 14:26:23 UTC
+- **Pull request:** [#259](https://github.com/aryamahadik/rosie/pull/259) from `task/T-477`, merged 2026-11-09 14:26:24 UTC. It squashed 1 branch commit:
+  - `06e6b98` T-477: gold-set volume sizing in evals/src/sizing and its table in ev…
+- **Files changed:** 4 (+752 −0), by folder:
+  - `evals/` SIZING.md +52 −0
+  - `evals/src/sizing/` index.ts +18 −0, sizing.test.ts +489 −0, sizing.ts +193 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 254. T-480: accuracy statistics in evals/src/stats: right out of total, the point estimate, the two-sided 95% Wilson interval (CQ-10; z for a one-sided bound beside it) and the status met, notYetProven or miss against a target's direction and sized volume, as K-10 v1's measureResult holds it (score, statusOf, wilsonInterval), with unit tests on the sources' figures (83 of 90, 157 of 160, 300 of 300, 381 of 381), the status rules of BP 8 and K-10 v1, its sample reports and its named rule reportNumbers (\#258)
+
+- **Commit:** [`3716c98`](https://github.com/aryamahadik/rosie/commit/3716c98), by Arya Mahadik, 2026-11-09 13:56:34 UTC
+- **Pull request:** [#258](https://github.com/aryamahadik/rosie/pull/258) from `task/T-480`, merged 2026-11-09 13:56:34 UTC. It squashed 1 branch commit:
+  - `faf322d` T-480: accuracy statistics in evals/src/stats: right out of total, th…
+- **Files changed:** 5 (+605 −0), by folder:
+  - `evals/src/stats/` index.ts +6 −0, interval.test.ts +83 −0, interval.ts +65 −0, score.test.ts +343 −0, score.ts +108 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 253. T-271: the AI-down path in runtime/src/outage/ai/ and runtime/src/turn/: the outage line once per waiting text and never to a stopped phone, 30 s retries until the models return, then one commit with danger first, then STOP, then the rest; a failure after the commit takes the step's fallback (\#257)
+
+- **Commit:** [`5645998`](https://github.com/aryamahadik/rosie/commit/5645998), by Arya Mahadik, 2026-11-09 13:50:12 UTC
+- **Pull request:** [#257](https://github.com/aryamahadik/rosie/pull/257) from `task/T-271`, merged 2026-11-09 13:50:12 UTC. It squashed 2 branch commits:
+  - `b721f5a` T-271: AI provider down: the outage line once per waiting text (never…
+  - `b1dda2b` T-271: the next try begins 30 s after the last one began, so a slow f…
+- **Files changed:** 9 (+1624 −16), by folder:
+  - `runtime/src/outage/ai/` index.ts +16 −0, lease.worker.test.ts +235 −0, outage.ts +269 −0, outage.worker.test.ts +757 −0, test-support.ts +106 −0, types.ts +117 −0
+  - `runtime/src/turn/` compose.ts +11 −3, index.ts +5 −2, turn.ts +108 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-271: AI provider down: the outage line once per waiting text (never to a stopped number), the turn retried every 30 s inside its lease until it commits once, its commit in the return order (danger records first, then stop records, then the rest), and a rewrite the models cannot make after the commit taking step 7's fallback (runtime/src/outage/ai, runtime/src/turn)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-271: the next try begins 30 s after the last one began, so a slow failing try does not push the cadence back or run into the lease's lapse; a test for it, and the aborted runs' waits passed in their tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 252. T-470: gold-set item store (evals/src/gold/store): writes and reads K-10 v1 items by set version, journey and flow under evals/gold/, refuses invalid items (K-10 goldItem with Ajv strict 2020-12, naming each fault and its field; human-labelled live turns, BP rule 9; another set version; an id rewritten), all or nothing, and keeps a manifest per set with each file's sha256 and the units of every section 08 measure over the set and per journey; tests on K-10's item fixtures via T-003's harness; evals/gold/README.md (\#256)
+
+- **Commit:** [`09e8669`](https://github.com/aryamahadik/rosie/commit/09e8669), by Arya Mahadik, 2026-11-09 13:38:23 UTC
+- **Pull request:** [#256](https://github.com/aryamahadik/rosie/pull/256) from `task/T-470`, merged 2026-11-09 13:38:23 UTC. It squashed 1 branch commit:
+  - `af9927e` T-470: gold-set item store (evals/src/gold/store): writes and reads K…
+- **Files changed:** 13 (+1980 −0), by folder:
+  - `evals/gold/` README.md +83 −0
+  - `evals/src/gold/store/` counts.test.ts +168 −0, counts.ts +109 −0, index.ts +43 −0, integrity.test.ts +349 −0, json.ts +38 −0, layout.ts +74 −0, manifest.ts +121 −0, store.test.ts +265 −0, store.ts +347 −0, test-support.ts +84 −0, validate.test.ts +122 −0, validate.ts +177 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 251. T-160: compiler lint writes K-01's lint report (lint-report.json), every hit beside it (lint-findings.json) and the journey ship list (journeys.json); report.ts builds the report and the ship list (journeyGates, shipList) for the emitter's manifest to read (\#255)
+
+- **Commit:** [`d72ec00`](https://github.com/aryamahadik/rosie/commit/d72ec00), by Arya Mahadik, 2026-11-09 12:45:20 UTC
+- **Pull request:** [#255](https://github.com/aryamahadik/rosie/pull/255) from `task/T-160`, merged 2026-11-09 12:45:20 UTC. It squashed 1 branch commit:
+  - `60ea91a` T-160: compiler lint writes K-01's lint report (lint-report.json), ev…
+- **Files changed:** 3 (+1310 −0), by folder:
+  - `compiler/src/cli/commands/` lint.ts +219 −0
+  - `compiler/src/lint/` report.test.ts +488 −0, report.ts +603 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 250. T-152: Bundle publishing: KV entries per bundle id and the PostgreSQL copy, never switching the active id (\#254)
+
+- **Commit:** [`ad90cd5`](https://github.com/aryamahadik/rosie/commit/ad90cd5), by Arya Mahadik, 2026-11-09 12:22:54 UTC
+- **Pull request:** [#254](https://github.com/aryamahadik/rosie/pull/254) from `task/T-152`, merged 2026-11-09 12:22:54 UTC. It squashed 2 branch commits:
+  - `948931f` T-152: compiler publish \<bundle dir\>: the KV bulk file keyed by bundl…
+  - `50ecbbf` T-152: the integration project's include gains compiler/\*\*/\*.int.test…
+- **Files changed:** 6 (+1035 −1), by folder:
+  - `compiler/src/cli/commands/` publish.ts +203 −0
+  - `compiler/src/publish/` index.ts +18 −0, publish.int.test.ts +346 −0, publish.test.ts +187 −0, publish.ts +280 −0
+  - `/` vitest.config.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-152: compiler publish <bundle dir>: the KV bulk file keyed by bundle id (one { key, value } entry per part, every key under bundle/<hash>/<build>/) and PostgreSQL's copy through K-05 publishBundleCopy, every part read back by bundle id (readBundleValue) and compared byte for byte; a repeat writes nothing new, other bytes under the id are refused with nothing written, and the active bundle id is never switched (the deploy script's step 3); with unit tests and integration tests against local PostgreSQL
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-152: the integration project's include gains compiler/**/*.int.test.ts (DL-282), so npm run test:integration -- compiler/src/publish finds and runs publish.int.test.ts (7 tests) against local PostgreSQL
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 249. T-053: Freeze K-09 Tool API v1.4: journey 6's calls (\#253)
+
+- **Commit:** [`cd27707`](https://github.com/aryamahadik/rosie/commit/cd27707), by Arya Mahadik, 2026-11-09 11:33:24 UTC
+- **Pull request:** [#253](https://github.com/aryamahadik/rosie/pull/253) from `task/T-053`, merged 2026-11-09 11:33:24 UTC. It squashed 3 branch commits:
+  - `dfc7451` T-053: Freeze K-09 Tool API v1.4: journey 6's calls (askOwnerFirst, s…
+  - `9fb5b76` T-053: writeBooking's lapses as deadline clock rows (the page's clock…
+  - `e6aba24` T-053: round 2 (DL-275), README only: default 116 names the one K-02 …
+- **Files changed:** 44 (+5477 −4), by folder:
+  - `contracts/tool-api/` README.md +179 −2, frozen.json +1 −1, tool-api.rules.mjs +127 −0, tool-api.v1.4.schema.json +2741 −0
+  - `contracts/tool-api/fixtures/` index.json +40 −1, j6-ask-owner-page.json +58 −0, j6-booking-paid-job.json +84 −0, j6-charge-failed-now-job.json +52 −0, j6-charge-failed-pay-link-job.json +99 −0, j6-clash-ask-job.json +48 −0, j6-clash-keep-turn.json +38 −0, j6-customer-no-thanks-turn.json +73 −0, j6-customer-take-turn.json +44 −0, j6-none-works-turn.json +67 −0, j6-on-call-ask-page.json +52 −0, j6-on-call-cant-turn.json +81 −0, j6-on-call-take-turn.json +48 −0, j6-owner-accept-turn.json +46 −0, j6-owner-another-time-turn.json +60 −0, j6-owner-decline-page.json +70 −0, j6-owner-offer-read-back-turn.json +62 −0, j6-owner-offer-sent-turn.json +60 −0, j6-pay-link-paid-job.json +84 −0, j6-pick-next-time-page.json +96 −0, j6-staff-told-job.json +31 −0, j6-taken-moment-ago-page.json +74 −0, j6-write-booking-after-ok-turn.json +90 −0, j6-write-booking-agent-d104.json +91 −0, j6-write-booking-c3-paid-job.json +88 −0, j6-write-booking-charging-page.json +58 −0, j6-write-booking-sent-now-turn.json +98 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-j6-booked-while-charging.json +57 −0, refuse-j6-booked-without-code.json +63 −0, refuse-j6-charge-without-consent.json +57 −0, refuse-j6-clash-title-shown.json +49 −0, refuse-j6-code-to-agent.json +64 −0, refuse-j6-on-call-offer-routine.json +48 −0, refuse-j6-owner-accept-on-silence.json +46 −0, refuse-j6-owner-answer-from-agent.json +46 −0, refuse-j6-paid-from-page.json +23 −0, refuse-j6-pay-link-url-to-ai.json +63 −0, refuse-j6-staff-told-from-page.json +31 −0, refuse-j6-staff-told-stated-as-code.json +31 −0, refuse-j6-taken-but-charged.json +59 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-053: Freeze K-09 Tool API v1.4: journey 6's calls (askOwnerFirst, sendToOnCall, writeBooking, recordStaffTold, askAboutClash), booked and code by writeBooking and staff_told by recordStaffTold, every charge bound to its consent, 26 accepted and 13 refused fixtures, givesJourneySixKeys
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-053: writeBooking's lapses as deadline clock rows (the page's clock, the pay link's deadline, the next times' 'C, or no reply'); the two ticked_terms consents, the card typed for a payment now and the sent-now pro's notice stated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-053: round 2 (DL-275), README only: default 116 names the one K-02 option choice decide is offered for A6-04's and B6-06's typed time (choiceId and question the open question's id, label and branch 'What time can you offer?' as asked, not null since K-02 v1 holds an option's branch to a string, A6-04's first sentence its definition, fields offered_time and offered_person, stakes high for unknown, walk askOwnerFirst offerTime); default 114: each choice's branch its bundle label word for word ('2 No thanks, or no reply'), and A6-11's next times one choice each, labelled as sent, whose option id writeBooking's pick.optionId carries
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 248. T-720: Migration 0028: the bookings and changes part (K-30), part 1 (\#252)
+
+- **Commit:** [`c42d1b9`](https://github.com/aryamahadik/rosie/commit/c42d1b9), by Arya Mahadik, 2026-11-09 11:26:15 UTC
+- **Pull request:** [#252](https://github.com/aryamahadik/rosie/pull/252) from `task/T-720`, merged 2026-11-09 11:26:15 UTC. It squashed 2 branch commits:
+  - `7d4bb98` T-720: Migration 0028: the bookings and changes part (K-30), part 1: …
+  - `0f7ace6` T-720: probes of the table list's checks, unique and composite keys o…
+- **Files changed:** 3 (+3183 −8), by folder:
+  - `db/migrations/` 0028\_bookings\_changes\_details.sql +501 −0
+  - `db/repo/` bookings-changes.int.test.ts +2540 −0, rls.int.test.ts +142 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-720: Migration 0028: the bookings and changes part (K-30), part 1: booking_details with rule 6's set-once trigger, booking_visits with the sealed check-in code, booking_lines with the price copied in (no update of the copy), the terms snapshot (booking_terms, booking_terms_rules), row-level security with rule 5's exists clause; booking_lines' two keys to part 2's tables left for T-721
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-720: probes of the table list's checks, unique and composite keys on part 1's five tables (29 refused by the constraint each names, 5 passing without the fault)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 247. T-217: seed the demo shops' customers from fixture set v1 (db/seeds/customers.ts): for each of the 245 demo shops, one customer per way K-28 v1 allows (texts, textsonly, email), each a person of their own with a fictional 555-01xx mobile in area codes neither the owners nor the team use (K-04 handle, phone row and own link), the email way's customer an example.com email too, a live customer role written in the same commit (K-28 rule 7), 18 or older, added when fixture set v1 was made; the cast is never read (MC C6), no name or email comes from a fixture, no block, booking or consent is made; refuses before the core and setup seeds, and is idempotent; with its integration tests (\#251)
+
+- **Commit:** [`1a96f0b`](https://github.com/aryamahadik/rosie/commit/1a96f0b), by Arya Mahadik, 2026-11-09 11:14:06 UTC
+- **Pull request:** [#251](https://github.com/aryamahadik/rosie/pull/251) from `task/T-217`, merged 2026-11-09 11:14:07 UTC. It squashed 1 branch commit:
+  - `9882238` T-217: seed the demo shops' customers from fixture set v1 (db/seeds/c…
+- **Files changed:** 2 (+1348 −0), by folder:
+  - `db/seeds/` customers.int.test.ts +835 −0, customers.ts +513 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 246. T-726: seed the demo shops' map points and zones from the geo double (db/seeds/setup-points.ts): each of the 245 setup-seed locations gets the double's exact point for its address, filling only the empty map\_point as rosie\_job (version raised once); its 244 flow B travel areas stay centred on that point, and a centre of its own is checked against the double; each point's IANA zone must be its business's (K-23 v1 holds none per location); refuses before core or setup-business, and any not-found, partial or other point; idempotent; with its integration tests (\#250)
+
+- **Commit:** [`acbc458`](https://github.com/aryamahadik/rosie/commit/acbc458), by Arya Mahadik, 2026-11-09 10:47:34 UTC
+- **Pull request:** [#250](https://github.com/aryamahadik/rosie/pull/250) from `task/T-726`, merged 2026-11-09 10:47:35 UTC. It squashed 1 branch commit:
+  - `f28c284` T-726: seed the demo shops' map points and zones from the geo double …
+- **Files changed:** 2 (+1258 −0), by folder:
+  - `db/seeds/` setup-points.int.test.ts +799 −0, setup-points.ts +459 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 245. T-215: seed the demo shops' availability and bill cards from fixture set v1 (db/seeds/setup-availability.ts): each shop's opening hours from its demo listing (test-mixed-A and -B take the one listing hours every shop gives), one weekly class for each of the 33 shops whose facts list classes, selling its first list-priced service, with 90 days of scheduled sessions as K-04 class-session resources with 12-seat counters, and a live bill card per shop in the Stripe double's stand-in ids; no time off, busy block, calendar link or document, which no file gives; refuses before the core, setup, kinds, services and staff seeds, and is idempotent; with its integration tests (\#249)
+
+- **Commit:** [`abaff06`](https://github.com/aryamahadik/rosie/commit/abaff06), by Arya Mahadik, 2026-11-09 10:26:14 UTC
+- **Pull request:** [#249](https://github.com/aryamahadik/rosie/pull/249) from `task/T-215`, merged 2026-11-09 10:26:15 UTC. It squashed 1 branch commit:
+  - `10a931a` T-215: seed the demo shops' availability and bill cards from fixture …
+- **Files changed:** 2 (+1906 −0), by folder:
+  - `db/seeds/` setup-availability.int.test.ts +892 −0, setup-availability.ts +1014 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 244. T-211: Migration 0027: the customers part (K-28) (\#248)
+
+- **Commit:** [`712ad8e`](https://github.com/aryamahadik/rosie/commit/712ad8e), by Arya Mahadik, 2026-11-09 10:18:59 UTC
+- **Pull request:** [#248](https://github.com/aryamahadik/rosie/pull/248) from `task/T-211`, merged 2026-11-09 10:19:00 UTC. It squashed 1 branch commit:
+  - `2d04033` T-211: Migration 0027: the customers part (K-28)
+- **Files changed:** 3 (+2208 −2), by folder:
+  - `db/migrations/` 0027\_customers.sql +217 −0
+  - `db/repo/` customers.int.test.ts +1979 −0, rls.int.test.ts +12 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+customers and customer_blocks as K-28 v1's frozen table list gives them, the version trigger on both, row-level security in T-191's pattern on both, and rule 5's table grants: SELECT, INSERT and UPDATE on both for rosie_app and rosie_job, no DELETE. customer_blocks.address is bytea, sealed under its row's person_id (T-182). customers.int.test.ts checks the catalog against the table list, the four seeds (the card's three and the first-time sender's), the four refused fixtures, rules 1 to 7, the sealed address and one-rule probes. rls.int.test.ts: K-28's tables join ALL_TABLES; the grant matrix takes them under its generic rule, with no named exception.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 243. T-1132: the emitter emits each trade words op that would put back words a Master Correction replaced with the correction applied, each change tagged MC:\<id\> (emit/words-corrections.ts correctWordsOps; emitBundle returns them as corrected), compileTrade stops the build naming the trade, flow, step and correction when one is left (assertWordsKeepCorrections), and corrections/parity.shard-9.test.ts sweeps all 243 trades in the run's order against the corrected build, stop markers included (\#247)
+
+- **Commit:** [`ba2557c`](https://github.com/aryamahadik/rosie/commit/ba2557c), by Arya Mahadik, 2026-11-09 10:11:23 UTC
+- **Pull request:** [#247](https://github.com/aryamahadik/rosie/pull/247) from `task/T-1132`, merged 2026-11-09 10:11:24 UTC. It squashed 1 branch commit:
+  - `b24e562` T-1132: the emitter emits each trade words op that would put back wor…
+- **Files changed:** 7 (+747 −13), by folder:
+  - `compiler/src/corrections/` parity.shard-9.test.ts +127 −2
+  - `compiler/src/emit/` corrected-words.test.ts +128 −0, emit.ts +27 −11, index.ts +9 −0, trade.ts +7 −0, words-corrections.test.ts +176 −0, words-corrections.ts +273 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 242. T-1133: Limit 6's count and time readers agree on which number is which (carries T-1130) (\#246)
+
+- **Commit:** [`f0c4229`](https://github.com/aryamahadik/rosie/commit/f0c4229), by Arya Mahadik, 2026-11-09 10:11:19 UTC
+- **Pull request:** [#246](https://github.com/aryamahadik/rosie/pull/246) from `task/T-1133`, merged 2026-11-09 10:11:20 UTC. It squashed 9 branch commits:
+  - `cc15e5d` T-1130: the count reader starts and ends a count at round 7's number …
+  - `786dc15` T-1130: tests: each form T-304's last review found fails at limit 6 a…
+  - `cf2c45a` T-1130: what joins is built, not listed: every mark but a sentence ma…
+  - `ebaca24` T-1130: only a count written as a party stands between a day and its …
+  - `10c227c` T-1130: round 2 (DL-251), each fix from one definition: a cue's openi…
+  - `12c5156` T-1130: round 2 tests: every probe of round 1's security review fails…
+  - `50d067b` T-1133: one precedence rule between the count reader and the time rea…
+  - `5f911a3` T-1133: tests: every probe of the re-judge's items 1, 1b and 2 (with …
+  - `25d4132` T-1133: the comparison holds every cut main refused refused here at l…
+- **Files changed:** 10 (+3413 −163), by folder:
+  - `actions/src/gate/limit-6/` precedence.test.ts +635 −0, re-parse.test.ts +781 −0, re-parse.ts +73 −9
+  - `actions/src/values/` numbers.ts +31 −1, parties.test.ts +293 −0, parties.ts +113 −0, phrase.ts +239 −79, reparse.ts +6 −7, times.ts +421 −57, values.test.ts +821 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1130: the count reader starts and ends a count at round 7's number edge; the time reader learns at 3.5, 3:30:15, at 1530, around 3.30, at ~3, quoted and bracketed cued hours, tmrw. and Thursday: 3; a time's phrase joins across an asterisk, a square bracket, a quote mark, an emoji or a count between day and time; the number join takes a bracket; a count takes a number a range word joins; the residual headers shrink
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1130: tests: each form T-304's last review found fails at limit 6 and the gate, each whole passes with its own reading; three T-304 assertions move 'tomorrow at 3.5' out of their no-clock lists, as the card's 'at 3.5' requires
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1130: what joins is built, not listed: every mark but a sentence mark joins a time, a day and its bare hour, and amounts or counts, an arrow joins no time; with them the same forms: 3.5pm, 3.30.15, 330pm, ~3.30, at around 3, any opening mark after a cue, an underscore as a mark, a party's lead words and ppl or pax between day and time; tests at limit 6 and the gate
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1130: only a count written as a party stands between a day and its time (a whole number with its unit or lead words, or of at most two digits or in words), so a number the time reader leaves unread as a time stays a piece of the phrase: tomorrow 3.30 at 7pm is refused, as on main
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1130: round 2 (DL-251), each fix from one definition: a cue's opening marks are the joining marks, any number, with or without a space (GAP A); the time reader and the phrase builder share one joining mark, so a letter of any script is a letter in both (GAP B); every count between a day and a time keeps the phrase whole, and only a party (a unit, for/para or lead words, or words) counts as read, which closes N1 (GAP C); the residual headers name round 2's words no reader knows and N2's class
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1130: round 2 tests: every probe of round 1's security review fails at limit 6 and the gate, before and after the re-read, and each whole passes with its own reading or is several (GAP A, GAP C, N1 and the review's other probes); GAP B: a letter of any script gives what an ASCII letter gives, at limit 6, the gate and the readers, and the hour meant across it is refused
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1133: one precedence rule between the count reader and the time reader (DL-259): a counted party (a count with its unit or party lead words, or joined to one by a range or choice word; values/parties.ts) is never an hour, cued or bare; an hour only T-1130's reach finds (an approximate word or a mark after a cue, three or four digits or tenths of an hour after one, a mark main did not take beside a day) is one only with its own time evidence; main's reach reads as main read it, a party there declined and kept an unread piece of the day's phrase; a count range between a day and a time is blanked whole with its joining words (GAP 1); a counted party beside a day is never its bare hour (GAP 2); no reading of the cited words or the phrase takes an hour the whole text does not (noText); the number edge and the number join's mark move to numbers.ts, the time cues to times.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1133: tests: every probe of the re-judge's items 1, 1b and 2 (with their controls and their class) and of round 2's GAPs 1 and 2 is refused at limit 6 and the gate, before and after the re-read, and each whole passes with its own reading or is several; a comparison test holds every cut main refused refused here; the readers' precedence (parties, rule 1, rule 2, main's reach) and T-1130's kept readings ('3:30', '3.5', '10/24', '1,200', '$3.50', 'at 1530', 'at 3.5', 'tomorrow for 2 at 7pm') at the reader
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1133: the comparison holds every cut main refused refused here at limit 6, after the re-read and at the gate, with main's outcome as main's readers give it (GAP 1's controls passed on main, which had no step 2b; 'tomorrow - 12' as Sun 00:00 is noText there); item 1b's whole is several; a comment names numbers.ts for the number join's mark
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 241. T-1050: The 67 numbered judgment rules: each flow emits them by number, every reference resolves, and a lint rule (\#245)
+
+- **Commit:** [`8c1b759`](https://github.com/aryamahadik/rosie/commit/8c1b759), by Arya Mahadik, 2026-11-09 09:42:47 UTC
+- **Pull request:** [#245](https://github.com/aryamahadik/rosie/pull/245) from `task/T-1050`, merged 2026-11-09 09:42:47 UTC. It squashed 2 branch commits:
+  - `2165485` T-1050: the 67 numbered judgment rules compiled per flow from S13-23 …
+  - `a41096c` T-1050: a step cite with 's reads as a step cite; the test names both…
+- **Files changed:** 6 (+1258 −0), by folder:
+  - `compiler/src/lint/` judgment-rule-ref.test.ts +267 −0, judgment-rule-ref.ts +130 −0
+  - `compiler/src/routing/judgment-rules/` index.ts +27 −0, judgment-rules.test.ts +473 −0, refs.ts +196 −0, rules.ts +165 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1050: the 67 numbered judgment rules compiled per flow from S13-23 to S13-29, S13-53 and S13-54 (MC R6), every 'judgment rule N' or 'rule N' reference resolved, and the lint rule judgment-rule-out-of-range for a reference that does not resolve, with its own test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1050: a step cite with 's reads as a step cite; the test names both readings of the card's 87 and the record's 9 home cites per flow
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 240. T-210: Migration 0026: the documents and licenses part (K-35), with no checked column (\#244)
+
+- **Commit:** [`ca51190`](https://github.com/aryamahadik/rosie/commit/ca51190), by Arya Mahadik, 2026-11-09 08:47:40 UTC
+- **Pull request:** [#244](https://github.com/aryamahadik/rosie/pull/244) from `task/T-210`, merged 2026-11-09 08:47:41 UTC. It squashed 1 branch commit:
+  - `6aefb9e` T-210: Migration 0026: the documents and licenses part (K-35), with n…
+- **Files changed:** 3 (+2970 −3), by folder:
+  - `db/migrations/` 0026\_documents\_licenses.sql +466 −0
+  - `db/repo/` documents-licenses.int.test.ts +2437 −0, rls.int.test.ts +67 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+documents, document_files, document_texts, document_signers and document_signatures as K-35 v1's frozen table list gives them, the version trigger on documents, rule 11's documents_signed_by_all_once trigger and its security-invoker function (search_path pinned), row-level security in T-191's pattern on all five, and rule 5's grants: SELECT and INSERT on all five for both roles, UPDATE of documents' shown_on_listing, signed_by_all_at, withdrawn_at, withdrawn_why, withdrawn_by_person_id and version only. documents-licenses.int.test.ts checks the catalog against the table list, the two seeds, the eight refused fixtures, rules 5 and 11 and one-rule probes. rls.int.test.ts: K-35's tables join the table lists and the grant matrix, and the column-grant test gains the named K-35 exception (K-35 rule 5; DL-256).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 239. T-052: Freeze K-09 Tool API v1.3: journey 5's calls (\#243)
+
+- **Commit:** [`cb7642c`](https://github.com/aryamahadik/rosie/commit/cb7642c), by Arya Mahadik, 2026-11-09 08:37:32 UTC
+- **Pull request:** [#243](https://github.com/aryamahadik/rosie/pull/243) from `task/T-052`, merged 2026-11-09 08:37:33 UTC. It squashed 4 branch commits:
+  - `bb31a96` T-052: K-09 Tool API v1.3, journey 5 calls (showMoneyBefore, settleOf…
+  - `f6378f7` T-052: refundAtOnce's double charge commits through K-05 v1.1 reconci…
+  - `d807ded` T-052: round 2 (DL-252): the full price's card at A5-16 and B5-13 kep…
+  - `6778260` T-052: round 3 (DL-257): a pack bought on the page carries the custom…
+- **Files changed:** 46 (+5332 −4), by folder:
+  - `contracts/tool-api/` README.md +237 −2, frozen.json +1 −1, tool-api.rules.mjs +90 −0, tool-api.v1.3.schema.json +2716 −0
+  - `contracts/tool-api/fixtures/` index.json +42 −1, j5-ask-owner-page.json +54 −0, j5-buy-membership-page.json +74 −0, j5-buy-pack-page.json +66 −0, j5-card-form-page.json +41 −0, j5-card-saved-yes-page.json +57 −0, j5-deposit-yes-page.json +58 −0, j5-document-send-page.json +33 −0, j5-document-sign-page.json +40 −0, j5-full-price-card-request-page.json +45 −0, j5-full-price-yes-page.json +62 −0, j5-let-go-page.json +52 −0, j5-let-go-turn.json +56 −0, j5-money-before-page.json +54 −0, j5-nothing-yes-agent.json +55 −0, j5-nothing-yes-texts-off-page.json +59 −0, j5-nothing-yes-turn.json +55 −0, j5-owner-book-turn.json +53 −0, j5-pay-link-agent.json +60 −0, j5-pay-page-deposit-yes-page.json +73 −0, j5-pay-page-money-before-page.json +68 −0, j5-pay-page-yes-page.json +78 −0, j5-plan-agree-turn.json +54 −0, j5-refund-second-charge-job.json +49 −0, j5-use-credit-page.json +54 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-j5-book-on-silence.json +51 −0, refuse-j5-card-yes-no-consent.json +57 −0, refuse-j5-deposit-card-not-kept.json +41 −0, refuse-j5-deposit-gives-paid-full.json +53 −0, refuse-j5-deposit-stated-as-full-price.json +58 −0, refuse-j5-deposit-yes-from-agent.json +49 −0, refuse-j5-full-price-keep-from-caller.json +45 −0, refuse-j5-hold-branch.json +44 −0, refuse-j5-membership-buy-no-saved-card.json +65 −0, refuse-j5-pack-buy-no-consent.json +66 −0, refuse-j5-pack-buy-without-yes.json +61 −0, refuse-j5-pay-link-from-page.json +51 −0, refuse-j5-pay-page-yes-without-pay-link.json +64 −0, refuse-j5-plan-yes-from-agent.json +52 −0, refuse-j5-refund-from-console.json +42 −0, refuse-j5-sign-for-someone.json +40 −0, refuse-j5-yes-texts-off-with-consent.json +57 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-052: K-09 Tool API v1.3, journey 5 calls (showMoneyBefore, settleOffer, signDocument, takeMoneyBefore giving money_before, card_saved, deposit_paid and paid_full, refundAtOnce for S12-26), only adding to v1.2; the named rule givesJourneyFiveKeys; 18 accepted and 11 refused fixtures; README section v1.3 with defaults 87 to 102 and open gaps 90 to 101; frozen v1.3
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-052: refundAtOnce's double charge commits through K-05 v1.1 reconciliationRefund, its listed writer; only a second payment's refund at once waits (open gap 96, default 101)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-052: round 2 (DL-252): the full price's card at A5-16 and B5-13 kept on a request by the stored approval, never the caller (CardForm keep null); C3's pay page in its order, its yes standing on a live pay link (payBy, payLinkId) with card_saved left to the payment's success (J5_PAY_LINK_LATER); a membership bought on the page billed monthly with its saved card (savedCardId), a plan billed monthly not offered; A5-05's 2 No thanks in a chat as letGo from the turn; the words of C3's pay-link rows; 6 accepted and 3 refused fixtures; defaults 103 to 108 and open gaps 102 to 104; the security reviewer in the freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-052: round 3 (DL-257): a pack bought on the page carries the customer's own yes to it (PackItem termsYes, MembershipItem's form, wordsDiffer applies), written in the buy's commit as a K-29 ticked_terms consent and answered (settleOffer.response holds consentId for every buy); C-018 finds a pack payment's bound yes through its charge's effect.created event-log row (default 110, open gap 105); a yes to a card, a deposit or the full price answers its consent (takeMoneyBefore.response); consents stay out of written; 3 refused fixtures, j5-buy-pack-page changed; defaults 109 and 110
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 238. T-727: seed the demo shops' staff from fixture set v1 (db/seeds/setup-staff.ts): a joined, bookable team of two per flow whose shop file names staff, each with a fictional mobile and the staff role; every team member and owner takes the shop's kind of work; one on-call person in each flow B shop whose facts list sentnow; with its integration tests (joined and bookable, one on-call person, traced to fixture set v1, a no-real-phone grep test, idempotent) (\#242)
+
+- **Commit:** [`237e69e`](https://github.com/aryamahadik/rosie/commit/237e69e), by Arya Mahadik, 2026-11-09 08:04:02 UTC
+- **Pull request:** [#242](https://github.com/aryamahadik/rosie/pull/242) from `task/T-727`, merged 2026-11-09 08:04:03 UTC. It squashed 1 branch commit:
+  - `8fb67ad` T-727: seed the demo shops' staff from fixture set v1 (db/seeds/setup…
+- **Files changed:** 2 (+1563 −0), by folder:
+  - `db/seeds/` setup-staff.int.test.ts +849 −0, setup-staff.ts +714 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 237. T-366: code's danger-word rules after the safety read (ai/src/safety/lift.ts): a trade's danger word lifts No to Unsure when its tense is now, could restart or unknown, never lowering a verdict, and no verdict in 4 s gives K-02's timeout marker with the danger words found, else the plain marker; the call takes the bundle's danger words; lift.test.ts covers the card's cases (\#241)
+
+- **Commit:** [`0486a7b`](https://github.com/aryamahadik/rosie/commit/0486a7b), by Arya Mahadik, 2026-11-09 08:03:58 UTC
+- **Pull request:** [#241](https://github.com/aryamahadik/rosie/pull/241) from `task/T-366`, merged 2026-11-09 08:03:58 UTC. It squashed 1 branch commit:
+  - `95d0dc8` T-366: code's danger-word rules after the safety read (ai/src/safety/…
+- **Files changed:** 6 (+864 −29), by folder:
+  - `ai/src/safety/` index.ts +12 −2, lift.test.ts +666 −0, lift.ts +98 −0, read.ts +32 −19, test-support.ts +26 −1, types.ts +30 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 236. T-209: Migration 0025: the platform billing part (K-33) (\#240)
+
+- **Commit:** [`350e55b`](https://github.com/aryamahadik/rosie/commit/350e55b), by Arya Mahadik, 2026-11-09 07:32:26 UTC
+- **Pull request:** [#240](https://github.com/aryamahadik/rosie/pull/240) from `task/T-209`, merged 2026-11-09 07:32:27 UTC. It squashed 1 branch commit:
+  - `ca16721` T-209: Migration 0025: the platform billing part (K-33)
+- **Files changed:** 4 (+2423 −4), by folder:
+  - `db/migrations/` 0025\_platform\_billing.sql +333 −0
+  - `db/repo/` effects-schema.int.test.ts +1 −1, platform-billing.int.test.ts +2030 −0, rls.int.test.ts +59 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+bill_cards, monthly_bills and monthly_bill_lines as K-33 v1's frozen table list gives them (44 columns, 11 foreign keys, 23 CHECKs, 5 unique constraints, 1 partial unique index, 7 indexes), the version trigger on all three, row-level security in T-191's pattern on all three, and README rule 2's grants: rosie_job SELECT, INSERT, UPDATE on all three; rosie_app SELECT and INSERT on bill_cards with UPDATE of removed_at and version, SELECT on monthly_bills, SELECT on monthly_bill_lines with UPDATE of questioned_at, questioned_by_person_id, question and version. platform-billing.int.test.ts checks the catalog against the table list, the four seeds, the five refused fixtures, rule 2's privileges and 50 one-rule probes. rls.int.test.ts: K-33's tables join the table lists and the grant matrix, and the column-grant test gains the named K-33 exception (K-33 rule 2; DL-250). effects-schema.int.test.ts: its cleanup truncate list gains monthly_bills and monthly_bill_lines (DL-225's precedent), since K-33's frozen monthly_bills refers to effects.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 235. T-214: seed the demo shops' services, ways, list price rules, owner rules and price OK limits from fixture set v1 (db/seeds/setup-services-rules.ts), with its integration tests (\#239)
+
+- **Commit:** [`6433e7a`](https://github.com/aryamahadik/rosie/commit/6433e7a), by Arya Mahadik, 2026-11-09 07:19:17 UTC
+- **Pull request:** [#239](https://github.com/aryamahadik/rosie/pull/239) from `task/T-214`, merged 2026-11-09 07:19:18 UTC. It squashed 1 branch commit:
+  - `39316a6` T-214: seed the demo shops' services, ways, list price rules, owner r…
+- **Files changed:** 2 (+1993 −0), by folder:
+  - `db/seeds/` setup-services-rules.int.test.ts +966 −0, setup-services-rules.ts +1027 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 234. T-208: Migration 0024: the availability part (K-27) (\#238)
+
+- **Commit:** [`6335016`](https://github.com/aryamahadik/rosie/commit/6335016), by Arya Mahadik, 2026-11-09 06:32:03 UTC
+- **Pull request:** [#238](https://github.com/aryamahadik/rosie/pull/238) from `task/T-208`, merged 2026-11-09 06:32:03 UTC. It squashed 2 branch commits:
+  - `93f6e81` T-208: migration 0024\_availability.sql builds K-27 v1's seven tables …
+  - `9b1377e` T-208: rls.int.test.ts: K-27's three named exceptions (DL-247, K-27 r…
+- **Files changed:** 3 (+3162 −9), by folder:
+  - `db/migrations/` 0024\_availability.sql +635 −0
+  - `db/repo/` availability.int.test.ts +2393 −0, rls.int.test.ts +134 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-208: migration 0024_availability.sql builds K-27 v1's seven tables (weekly_hours, time_off, classes, class_sessions, calendar_links with its tokens sealed per person, calendar_link_shares, busy_blocks with no title column), its three EXCLUDEs over 0001's btree_gist, the version trigger on all seven, row-level security on all seven (T-191's pattern on the four plain tables; README rule 5's policies and column grants on the shares, links and busy blocks), and the grants; availability.int.test.ts proves the catalog against the table list, the five seeds, all eight refused fixtures, RLS, grants, the probes and the sealing round trip; rls.int.test.ts takes K-27's table list and grant matrix
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-208: rls.int.test.ts: K-27's three named exceptions (DL-247, K-27 rule 5): calendar_links and busy_blocks join POLICY_TABLES, with the policies of calendar_link_shares, calendar_links and busy_blocks held by name; the made-only-when-missing counts (on 58, policies 127); rosie_app's 23 column grants on calendar_links (never tokens) and calendar_link_shares, every grantee on those two tables held to exactly them
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 233. T-1116: The emitted bundle and the lint use T-141's per-person stop placement (\#237)
+
+- **Commit:** [`d8e234b`](https://github.com/aryamahadik/rosie/commit/d8e234b), by Arya Mahadik, 2026-11-09 06:00:17 UTC
+- **Pull request:** [#237](https://github.com/aryamahadik/rosie/pull/237) from `task/T-1116`, merged 2026-11-09 06:00:18 UTC. It squashed 3 branch commits:
+  - `b529848` T-1116: the emitted bundle and the lint place the opt-out line as wal…
+  - `5879920` T-1116: a list of a step a trade adds is held by the last words op at…
+  - `3577c17` T-1116: parity-placement.test.mjs lets corrections hold parity.shard-…
+- **Files changed:** 13 (+1270 −57), by folder:
+  - `compiler/src/corrections/` parity.shard-9.test.ts +272 −0, stops.test.ts +52 −4, stops.ts +32 −13
+  - `compiler/src/emit/` emit.test.ts +238 −1, emit.ts +21 −6, flow.ts +36 −8, index.ts +14 −0, stop-marks.test.ts +128 −0, stop-marks.ts +357 −0, trade.ts +85 −13
+  - `compiler/src/lint/` runner.ts +10 −4
+  - `compiler/src/path/` words.ts +22 −5
+  - `infra/ci/` parity-placement.test.mjs +3 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1116: the emitted bundle and the lint place the opt-out line as walkStops does: emit/stop-marks.ts walks every path of each bundle trade (its ops over the corrected master) and sets each message's stop marker (true, first or none) in the master graphs, words ops and added steps; walkPath takes a settle rule and the lint walks with walkStops (sets followed); chatTexts reads one core path; the 243-trade sweep is corrections/parity.shard-9.test.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1116: a list of a step a trade adds is held by the last words op at that step that writes it (auto-body rewrites variants of its own steps A8-x01 to A8-x09), found by the full 243-trade build; Tracer has no parameter property, so the CLI's strip-only TypeScript runs it; the cross-check test gets a 120 s resource limit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1116: parity-placement.test.mjs lets corrections hold parity.shard-1..9 (the 243-trade sweep is shard 9) while overlay and slots stay exactly 1..8, still one deepEqual per folder, and the test title says so (round 2, DL-241; lines 54 to 61 only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 232. T-1119: ci.yml's checks job gets merge-check.yml's postgis service (same image, env, port, health check) and its CI script tests step merge-check.yml's DATABASE\_URL; infra/ci/ci-postgres-service.test.mjs pins both, parses ci.yml with the local merge-check's YAML reader, and shows the checks failing on copies without them (\#236)
+
+- **Commit:** [`d727faa`](https://github.com/aryamahadik/rosie/commit/d727faa), by Arya Mahadik, 2026-11-09 06:00:14 UTC
+- **Pull request:** [#236](https://github.com/aryamahadik/rosie/pull/236) from `task/T-1119`, merged 2026-11-09 06:00:14 UTC. It squashed 1 branch commit:
+  - `9429fac` T-1119: ci.yml's checks job gets merge-check.yml's postgis service (s…
+- **Files changed:** 2 (+139 −0), by folder:
+  - `.github/workflows/` ci.yml +19 −0
+  - `infra/ci/` ci-postgres-service.test.mjs +120 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 231. T-1131: every Vitest project gets the 30 s resource guard: the root test options set testTimeout and hookTimeout 30\_000 (DL-236, not part of any test's claim), so workers, contract, scenario and e2e no longer run at Vitest's 5 s default; vitest-timeouts.test.mjs pins the root limits and that each project, as Vitest itself resolves it, is at least 30000 (\#235)
+
+- **Commit:** [`e746870`](https://github.com/aryamahadik/rosie/commit/e746870), by Arya Mahadik, 2026-11-09 06:00:10 UTC
+- **Pull request:** [#235](https://github.com/aryamahadik/rosie/pull/235) from `task/T-1131`, merged 2026-11-09 06:00:11 UTC. It squashed 1 branch commit:
+  - `434155e` T-1131: every Vitest project gets the 30 s resource guard: the root t…
+- **Files changed:** 2 (+57 −9), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +52 −9
+  - `/` vitest.config.ts +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 230. T-304: Limit 6 (Values): re-parse from source words; dates in the visit's zone (\#234)
+
+- **Commit:** [`5cff492`](https://github.com/aryamahadik/rosie/commit/5cff492), by Arya Mahadik, 2026-11-09 05:09:02 UTC
+- **Pull request:** [#234](https://github.com/aryamahadik/rosie/pull/234) from `task/T-304-r7`, merged 2026-11-09 05:09:03 UTC. It squashed 9 branch commits:
+  - `e4d9755` T-304: Limit 6 (Values): re-parse every value from its source words; …
+  - `f2b1eed` T-304: a bare number is an hour only right beside its day, and a rang…
+  - `4f4a535` T-304: round 2 (DL-184): words count only whole, at word edges (one s…
+  - `5be5729` T-304: round 3 (DL-189): word edges judged on the folded text the rea…
+  - `8b61294` T-304: round 3: the whole value phrase also takes the day a time is o…
+  - `c95b308` T-304: round 4 (DL-199): the readers define the whole value phrase (t…
+  - `db991a2` T-304: round 5 (DL-209): a bare hour the reader reads beside a day (s…
+  - `9b468e0` T-304: round 6 (DL-217): a sentence mark with no digit right after it…
+  - `9483ac6` T-304: round 7 (DL-228): the number edge by construction in the time …
+- **Files changed:** 16 (+7293 −8), by folder:
+  - `actions/src/gate/framework/` checks.test.ts +118 −0, checks.ts +12 −2
+  - `actions/src/gate/limit-6/` facts.ts +114 −0, index.ts +105 −6, re-parse.test.ts +1554 −0, re-parse.ts +356 −0, test-support.ts +738 −0
+  - `actions/src/values/` index.ts +75 −0, money.ts +309 −0, numbers.ts +271 −0, phrase.ts +354 −0, reparse.ts +351 −0, times.ts +801 −0, values.test.ts +1813 −0, words.ts +169 −0, zone.ts +153 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-304: Limit 6 (Values): re-parse every value from its source words; dates from the send time in the visit's zone; a shared value reader in actions/src/values
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: a bare number is an hour only right beside its day, and a range on any hour read is several
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 2 (DL-184): words count only whole, at word edges (one shared helper in actions/src/values, used by limit 6 and the gate's quote check); a value failing on a door, an any-time row or a hub case changes nothing at askCount >= 2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 3 (DL-189): word edges judged on the folded text the readers read (NFKC marks, every apostrophe and dash, invisible characters out, a mark before a letter or digit joins), in limit 6 and the gate's quote check; a number's value re-read from its whole value phrase (units, phrase words, zones), every piece read
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 3: the whole value phrase also takes the day a time is on, noon or midnight, today-or-tomorrow, and cents after an amount
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 4 (DL-199): the readers define the whole value phrase (their own spans of the whole text, joined by spaces, commas, cues or range words; an unread number a range word joins or right after is part of it); readers learn other currencies, scale words, per-units, dozens, a comma before a zone or after a count, the fullwidth range mark; an underscore joins words; G1-G10 and N1-N4 fail, whole forms read; residual in the headers (CQ-121)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 5 (DL-209): a bare hour the reader reads beside a day (spaces or commas, either side) or after a part-of-day word joins the day's phrase whatever other time the text holds, when the reader takes it reading that phrase with the hour alone (H1-H3 differ at limit 6 and the gate; the whole 'Thursday, 3' passes as 3pm or 3am, CQ-119); the readers learn a bare hour after a part-of-day word, a currency code before a sign or a currency word after one ('MXN $40', '40$ CAD'), and M, MM, B, bn right after an amount; the sentence-mark residual in the phrase.ts header beside CQ-121's words
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 6 (DL-217): a sentence mark with no digit right after it ends a cued or bare hour, as a comma does (times.ts CUED_TIME and BARE_NUMBER lookaheads), so P1 'tomorrow' of 'can you do tomorrow at 3.', P2 'mañana' of 'puedo mañana a las 3.', P3 'Thursday' of 'my 2pm doesn't work. can we do Thursday, 3.' and P4 'tomorrow morning' of 'can you do tomorrow morning, 9.' differ at limit 6 and fail at the gate while each whole passes; '3.30' and '3.5' keep their readings. Defaults: the same mark glued before a time hides it no more ('hmm...3pm tomorrow', '2pm,3 tomorrow'); an am or pm after a period or a cued worded hour is read ('3.pm', 'at three pm'). N-b joins the residual in the phrase.ts and re-parse.ts headers beside CQ-121's words
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-304: round 7 (DL-228): the number edge by construction in the time reader (a mark is part of a number only with a digit right before and after it: NUMBER_START and NUMBER_END in every lookahead and lookbehind), so Q1-Q4, 'tomorrow at 3:' and 'Update:3pm tomorrow' differ at limit 6 and fail at the gate while each whole passes, and '3:30', '3.5', '10/24', '1,200' and a 3.50 amount keep their readings; a weekday's short form takes its period (2a: 'Thurs. 3pm'), an hour with a period and two minute digits after a cue or before am or pm is hours and minutes (2b: 'at 3.30', '3.30pm'), and '+' joins counts (2c); defaults: the comma joins digits only as a thousands mark, and a number glued to a phrase by one mark between two digits must be read
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 229. T-212: the kinds seed: K-24's catalog from the 243 trade files (243 kinds, 486 kind\_flows, MC C5's fills for insurance's facts and the 12 trades with no pf.settings) and each of the 243 demo shops' kinds with the trade file's 11 plug-in text blocks stored whole, byte for byte; both sets checked against their sha256 lists first; idempotent; db/seeds/kinds.int.test.ts proves it (\#233)
+
+- **Commit:** [`ef72c83`](https://github.com/aryamahadik/rosie/commit/ef72c83), by Arya Mahadik, 2026-11-09 05:08:59 UTC
+- **Pull request:** [#233](https://github.com/aryamahadik/rosie/pull/233) from `task/T-212`, merged 2026-11-09 05:08:59 UTC. It squashed 1 branch commit:
+  - `0eb1338` T-212: the kinds seed: K-24's catalog from the 243 trade files (243 k…
+- **Files changed:** 2 (+1586 −0), by folder:
+  - `db/seeds/` kinds.int.test.ts +833 −0, kinds.ts +753 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 228. T-207: Migration 0023: rules part (K-26) with the closed registry of rule kinds and trade facts (\#232)
+
+- **Commit:** [`5caab5c`](https://github.com/aryamahadik/rosie/commit/5caab5c), by Arya Mahadik, 2026-11-09 04:59:12 UTC
+- **Pull request:** [#232](https://github.com/aryamahadik/rosie/pull/232) from `task/T-207`, merged 2026-11-09 04:59:12 UTC. It squashed 2 branch commits:
+  - `82f357d` T-207: migration 0023\_rules.sql builds K-26 v1's five tables (trade\_f…
+  - `3631369` T-207: 0023's header names where each check left to code comes from (…
+- **Files changed:** 3 (+2580 −2), by folder:
+  - `db/migrations/` 0023\_rules.sql +481 −0
+  - `db/repo/` rls.int.test.ts +12 −2, rules.int.test.ts +2087 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-207: migration 0023_rules.sql builds K-26 v1's five tables (trade_facts, plugin_switches, rule_kinds, rules, price_ok_limits) with the two EXCLUDEs over 0001's btree_gist, the version trigger on rules and price_ok_limits, row-level security in T-191's pattern on those two, SELECT-only grants on the three closed registries and their seed (seed-rule-registry.json word for word: 28 facts, 6 switches, 16 rule kinds); rules.int.test.ts proves the catalog against the table list, the registry seed row for row, the four seeds, both refused fixtures, RLS, grants and 45 one-rule probes; rls.int.test.ts takes K-26's table list and the registries' SELECT for both roles
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-207: 0023's header names where each check left to code comes from (K-26 README 'Which part owns what' and 'Effective dates and scope'; K-23 README for S1-04's company kinds); comments only
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 227. T-593: Money home (S13-55) as code: money words follow what the booking took, the four ways, one fee, never a charge on silence (\#231)
+
+- **Commit:** [`2e90af7`](https://github.com/aryamahadik/rosie/commit/2e90af7), by Arya Mahadik, 2026-11-09 04:03:02 UTC
+- **Pull request:** [#231](https://github.com/aryamahadik/rosie/pull/231) from `task/T-593-r8`, merged 2026-11-09 04:03:02 UTC. It squashed 11 branch commits:
+  - `35a7787` T-593: Money home (S13-55) as code: money slot rows follow what the b…
+  - `07418ec` T-593: Errors name labels only; each money proof builds the master co…
+  - `f4b924f` T-593: Scratch probe of the master corpus (removed in the next commit…
+  - `e1b3ebe` Revert "T-593: Scratch probe of the master corpus (removed in the nex…
+  - `338e5a1` T-593: Round 2 (DL-179): card holds and charges on silence read by me…
+  - `56a69bb` T-593: Round 3 (DL-182): the money-topic gate replaces meaning-readin…
+  - `d051c7a` T-593: Round 4 (DL-187): one money word, sign or slot makes a money s…
+  - `8a336f1` T-593: Round 5 (DL-194): a money word in either form (the folded form…
+  - `2e38fdd` T-593: Round 6 (DL-204): a sentence that holds a character that hides…
+  - `68029c8` T-593: Round 7 (DL-214): ruling 1d reads a word as letters, digits, @…
+  - `a73a203` T-593: Round 8 (DL-224): every class of DL-204 1 (bidi and C0 or C1 c…
+- **Files changed:** 9 (+5716 −0), by folder:
+  - `actions/src/homes/money/` claims.ts +430 −0, gate.ts +1194 −0, home.ts +70 −0, index.ts +66 −0, lines.ts +89 −0, money.test.ts +2835 −0, money.ts +543 −0, record.ts +166 −0, test-support.ts +323 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-593: Money home (S13-55) as code: money slot rows follow what the booking took, the four ways, one fee, never a card hold or a charge on silence
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Errors name labels only; each money proof builds the master comparison it reads, so it runs alone
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Scratch probe of the master corpus (removed in the next commit: rm is not on the allow list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* Revert "T-593: Scratch probe of the master corpus (removed in the next commit: rm is not on the allow list)"
+
+This reverts commit d723867f1fcb67332902e3fb413e1bb3d29d6e46.
+
+* T-593: Round 2 (DL-179): card holds and charges on silence read by meaning after the apostrophe folding; charged, you paid and a signed schedule's share need money the booking took
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 3 (DL-182): the money-topic gate replaces meaning-reading: a money sentence passes only as an approved line (both records' rows, S13-55's lines, a master message text, slots standing for their values), a denial included, else neverHold, neverChargeOnSilence or moneyNotFromRecord; deposit paid, paid in full and refunded said as statements need money taken
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 4 (DL-187): one money word, sign or slot makes a money sentence, each sentence judged alone, passing only as an approved line (neverHold, neverChargeOnSilence or moneyNotFromRecord); words read as a person reads them; approved lines filled per sentence and never re-split, a slot value holding a sentence end refused; a past statement is a statement, refunded in any form and the depositPaid, paidInFull and backToCard points need money taken; residual named in the header
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 5 (DL-194): a money word in either form (the folded form or the reading form in lower case) makes a money sentence, trademark marks (TM, SM, R, C) ending a word; bidi controls removed before reading and an override read as it shows; a word split by a hair, thin, narrow or braille-blank space read joined; auth begins a money stem and a hold word; every currency sign and the codes USD, EUR, GBP, CHF, CAD and AUD count; the claim check reads the same folded forms, and a refund said as a noun needs money taken
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 6 (DL-204): a sentence that holds a character that hides a word (a bidi control, a compatibility letter, a Latin small capital or a negative circled or squared letter, a word mixing Latin with another script) is a money sentence; money emoji are money signs; every space separator but U+0020 is read joined and split; a word mixing letters and digits is read with digits as letters; bidi text read as its controls show it; the closed-form residual in gate.ts's header
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 7 (DL-214): ruling 1d reads a word as letters, digits, @ and $ together in every text a sentence is read from (as written, joined and split), so a word mixing Latin with another script's letters makes a money sentence with a digit between or none; a C0 or C1 control character other than tab, LF and CR (and DEL) makes a money sentence, is read joined and split, never ends, trims or folds out of a sentence, and a slot value holding one stands for no slot; U+02BC and U+02BB fold as apostrophes; the widened closed-form residual in gate.ts's header
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-593: Round 8 (DL-224): every class of DL-204 1 (bidi and C0 or C1 controls, compatibility letters, the closed lists, mixed-script words) is judged in every text a sentence is read from (as written, joined, split) on the reading form as written and in lower case, on lowerForm and on plainForm, so no fold erases a letter a class looks for: the Greek ypogegrammeni and the 14 Arabic forms NFKD reads as a space and marks now make a mixed-script word; every default-ignorable code point is a hidden character of 1a, left out of the plain form so the words it parts read joined, and U+FEFF never ends, trims or folds out of a sentence; the residual in gate.ts's header gains a word mixing two scripts other than Latin
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 226. T-1118: the integration project gets the unit project's 30 s resource guard (testTimeout and hookTimeout 30\_000; T-1118, DL-227: a guard on the build Mac's emulated PostgreSQL, not part of any test's claim), keeping fileParallelism false and T-1117's root maxWorkers; vitest-timeouts.test.mjs pins the integration project's 30 s limits (\#230)
+
+- **Commit:** [`96d1f9f`](https://github.com/aryamahadik/rosie/commit/96d1f9f), by Arya Mahadik, 2026-11-09 03:40:27 UTC
+- **Pull request:** [#230](https://github.com/aryamahadik/rosie/pull/230) from `task/T-1118`, merged 2026-11-09 03:40:27 UTC. It squashed 1 branch commit:
+  - `67f7dbc` T-1118: the integration project gets the unit project's 30 s resource…
+- **Files changed:** 2 (+18 −7), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +14 −7
+  - `/` vitest.config.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 225. T-206: Migration 0022: services and prices part (K-25): services, service money per path, price rules with effective dates, item services (\#229)
+
+- **Commit:** [`ec653f9`](https://github.com/aryamahadik/rosie/commit/ec653f9), by Arya Mahadik, 2026-11-09 02:59:06 UTC
+- **Pull request:** [#229](https://github.com/aryamahadik/rosie/pull/229) from `task/T-206`, merged 2026-11-09 02:59:07 UTC. It squashed 3 branch commits:
+  - `926f939` T-206: migration 0022\_services\_prices.sql builds K-25 v1's five table…
+  - `6aa105e` T-206: services-prices.int.test.ts checks only K-25's own foreign key…
+  - `129180d` T-206: kinds-of-work.int.test.ts line 830 expects the foreign keys th…
+- **Files changed:** 4 (+2557 −2), by folder:
+  - `db/migrations/` 0022\_services\_prices.sql +387 −0
+  - `db/repo/` kinds-of-work.int.test.ts +5 −1, rls.int.test.ts +12 −1, services-prices.int.test.ts +2153 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-206: migration 0022_services_prices.sql builds K-25 v1's five tables (services, service_money, item_services, price_rules, price_rule_ties) with price_rules_one_in_effect (EXCLUDE through btree_gist from 0001), the version trigger on the four versioned tables, row-level security in T-191's pattern on all five and DELETE on item_services for rosie_app alone (README rule 6); services-prices.int.test.ts proves the catalog against the table list, the five seeds, the four refused fixtures, effective dates, RLS and grants; rls.int.test.ts takes K-25's table list and the item_services DELETE for rosie_app
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-206: services-prices.int.test.ts checks only K-25's own foreign keys (README rule 1), not that no other table refers to its tables, so K-26 v1.1, K-30 and K-32 can add keys to services without breaking it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-206: kinds-of-work.int.test.ts line 830 expects the foreign keys that refer to kinds to be exactly kind_flows_kind_fk, picked_kinds_kind_fk and services_kind_fk, still toEqual on the sorted names, since K-25 v1 makes services.kind_id a key to kinds (DL-225); nothing else in that file changes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 224. T-141: Master Corrections layer: C9 (no SMS, Rosie never writes first), C10 (ID upload), R4, and stop-first lines per Q-30 (\#228)
+
+- **Commit:** [`930e6e2`](https://github.com/aryamahadik/rosie/commit/930e6e2), by Arya Mahadik, 2026-11-09 02:52:22 UTC
+- **Pull request:** [#228](https://github.com/aryamahadik/rosie/pull/228) from `task/T-141-r3`, merged 2026-11-09 02:52:23 UTC. It squashed 5 branch commits:
+  - `baf5e29` T-141: C9 (no SMS, Rosie never writes first), C10 (ID upload), R4 rea…
+  - `0c6102a` T-141: round 2 (DL-207): framework.test.ts expects CORRECTIONS ids \[C…
+  - `478a2ce` T-141: round 3 (DL-211): a chat belongs to a person, not a role word.…
+  - `5dfa4e6` T-141: round 3: c9.test.ts header names the steps that wrote first be…
+  - `e2f217f` T-141: round 3: stops.test.ts header says what the sweep covers (ever…
+- **Files changed:** 11 (+2000 −4), by folder:
+  - `compiler/src/corrections/` c10.test.ts +158 −0, c10.ts +155 −0, c9.test.ts +290 −0, c9.ts +422 −0, framework.test.ts +2 −2, framework.ts +3 −1, parity.ts +1 −1, r4.test.ts +55 −0, r4.ts +22 −0, stops.test.ts +506 −0, stops.ts +386 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-141: C9 (no SMS, Rosie never writes first), C10 (ID upload), R4 reading rule, stop-first lines per Q-30; C9 and C10 registered
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-141: round 2 (DL-207): framework.test.ts expects CORRECTIONS ids [C1, C2, C9, C10] (lines 186 and 215, still toStrictEqual); parity.ts line 102 builds its allowed-tag pattern from the corrections that ran (done.corrections, CORRECTIONS by default, through tagOf)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-141: round 3 (DL-211): a chat belongs to a person, not a role word. stops.ts keys each chat by the person on the walk: on S1-09's helper branch S1-77 names the helper, whose chat the signup chat is, and S1-77's unnamed messages are the real owner's, so S1-77's text to the real owner carries the line and the helper's chat has it once; S1-10's text from the mobile opens that mobile's chat, whose first reply (the secure ID check) carries it. The walk keeps each chat's statuses per reading, exact with no cap (firstTexts' cap of 48 dropped walks). Tests state who each message goes to apart from the walk's records: the helper path, S1-10, and a sweep with its own walk over 17 trades; c9's walk check covers S1-77 and S1-10
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-141: round 3: c9.test.ts header names the steps that wrote first before C9 (comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-141: round 3: stops.test.ts header says what the sweep covers (every money path of 17 trades, every path of barber; comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 223. T-1117: every Vitest run uses at most VITEST\_MAX\_WORKERS workers (a positive whole number, else 3), set once as the root test options' maxWorkers so every project shares it (DL-215, a resource guard on the build Mac); integration keeps fileParallelism false and every project its timeouts; vitest-timeouts.test.mjs loads the config under ten settings of the variable and pins the cap and that no project sets its own (\#227)
+
+- **Commit:** [`3d756a6`](https://github.com/aryamahadik/rosie/commit/3d756a6), by Arya Mahadik, 2026-11-09 01:42:40 UTC
+- **Pull request:** [#227](https://github.com/aryamahadik/rosie/pull/227) from `task/T-1117`, merged 2026-11-09 01:42:41 UTC. It squashed 1 branch commit:
+  - `fcc66a1` T-1117: every Vitest run uses at most VITEST\_MAX\_WORKERS workers (a p…
+- **Files changed:** 2 (+62 −3), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +55 −3
+  - `/` vitest.config.ts +7 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 222. T-213: Seed the demo shops' business setup: business fields, companies, locations, places, owner staff row and ID upload record (\#225)
+
+- **Commit:** [`3e3e3ea`](https://github.com/aryamahadik/rosie/commit/3e3e3ea), by Arya Mahadik, 2026-11-09 01:04:49 UTC
+- **Pull request:** [#225](https://github.com/aryamahadik/rosie/pull/225) from `task/T-213`, merged 2026-11-09 01:04:49 UTC. It squashed 2 branch commits:
+  - `b424e61` T-213: seed the demo shops' business setup from fixture set v1: busin…
+  - `e1fb232` T-213: give the setup seed test's schema drops the 120 s guard its se…
+- **Files changed:** 2 (+1818 −0), by folder:
+  - `db/seeds/` setup-business.int.test.ts +917 −0, setup-business.ts +901 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-213: seed the demo shops' business setup from fixture set v1: business fields, companies and kinds, flow defaults, locations with flow B travel areas, the owner's staff row and sealed ID upload record, with its integration test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-213: give the setup seed test's schema drops the 120 s guard its setup hooks have
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 221. T-205: migration 0021\_kinds\_of\_work.sql builds K-24 v1's six tables (kinds, kind\_flows, picked\_kinds, picked\_kind\_texts, new\_work\_drafts, new\_work\_draft\_blocks) with the version trigger on all six, row-level security in T-191's pattern on the four business-scoped tables and the catalog read-only to the Tool API; kinds-of-work.int.test.ts proves the catalog against the table list, the three seeds, the byte-for-byte text block, RLS, grants and the five refused fixtures; rls.int.test.ts takes K-24's table list and the catalog's SELECT for rosie\_app (\#226)
+
+- **Commit:** [`ff97818`](https://github.com/aryamahadik/rosie/commit/ff97818), by Arya Mahadik, 2026-11-09 01:04:45 UTC
+- **Pull request:** [#226](https://github.com/aryamahadik/rosie/pull/226) from `task/T-205`, merged 2026-11-09 01:04:46 UTC. It squashed 1 branch commit:
+  - `2cf71a7` T-205: migration 0021\_kinds\_of\_work.sql builds K-24 v1's six tables (…
+- **Files changed:** 3 (+2057 −2), by folder:
+  - `db/migrations/` 0021\_kinds\_of\_work.sql +337 −0
+  - `db/repo/` kinds-of-work.int.test.ts +1705 −0, rls.int.test.ts +15 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 220. T-550: the composition root (runtime/src/wiring) binds D-017's ten ports once per environment, every port on its fake under test and still closed on the Worker's staging and production; it builds the gateway, the actor's ports and the dispatcher from them, and the Worker takes its gateway from it; tests list the bindings, refuse a port bound twice or left unbound, and run T-260's trace check through the root (\#224)
+
+- **Commit:** [`e96c751`](https://github.com/aryamahadik/rosie/commit/e96c751), by Arya Mahadik, 2026-11-09 00:47:54 UTC
+- **Pull request:** [#224](https://github.com/aryamahadik/rosie/pull/224) from `task/T-550`, merged 2026-11-09 00:47:54 UTC. It squashed 1 branch commit:
+  - `8e2828a` T-550: the composition root (runtime/src/wiring) binds D-017's ten po…
+- **Files changed:** 11 (+1533 −4), by folder:
+  - `runtime/src/` index.ts +7 −4
+  - `runtime/src/wiring/` bind.ts +79 −0, closed.ts +94 −0, index.ts +33 −0, picks.ts +51 −0, ports.ts +113 −0, root.test.ts +217 −0, root.ts +278 −0, root.worker.test.ts +325 −0, row-traces.ts +37 −0, test-support.ts +299 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 219. T-019: Freeze K-10 v1: Eval-set format (\#223)
+
+- **Commit:** [`d1aebf6`](https://github.com/aryamahadik/rosie/commit/d1aebf6), by Arya Mahadik, 2026-11-09 00:47:50 UTC
+- **Pull request:** [#223](https://github.com/aryamahadik/rosie/pull/223) from `task/T-019`, merged 2026-11-09 00:47:50 UTC. It squashed 2 branch commits:
+  - `f98f642` T-019: Freeze K-10 v1, the eval-set format: gold-set items and the ac…
+  - `584cb3d` T-019: K-10 v1 round 2 (DL-201): the report names its run by bundle a…
+- **Files changed:** 21 (+5409 −0), by folder:
+  - `contracts/eval-set/` README.md +217 −0, eval-set.rules.mjs +202 −0, eval-set.v1.schema.json +1361 −0, frozen.json +1 −0
+  - `contracts/eval-set/fixtures/` index.json +138 −0, item-danger-crisis.json +76 −0, item-false-alarm-gas-leak.json +69 −0, item-high-stakes-a6-02-accept.json +113 −0, item-low-stakes-s1-02.json +83 −0, item-spanish.json +83 −0, item-two-requests.json +101 −0, item-typo.json +83 −0, item-whole-chat-j1.json +109 −0, report-code-only-change.json +565 −0, report-journey-1-sample.json +243 −0, report-met-at-volume.json +243 −0, report-regressions.json +588 −0
+  - `contracts/eval-set/fixtures/invalid/` refuse-item-without-field-values.json +83 −0, refuse-report-baseline-is-run.json +565 −0, refuse-report-met-below-volume.json +243 −0, refuse-report-met-unsized.json +243 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-019: Freeze K-10 v1, the eval-set format: gold-set items and the accuracy report, the named rule reportNumbers (Wilson interval, statuses, cost, changed effects), 10 accepted and 3 refused fixtures, README freeze record, frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-019: K-10 v1 round 2 (DL-201): the report names its run by bundle and commit and its baseline by lastPassingBundleId with lastPassingCommit; rule 8 compares (bundle, commit) pairs; trade may be null; code-only, met-at-volume and baseline-is-run fixtures; below-volume refused for one reason; samples fitted to bundle and seed; six README lines; freeze record re-dated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 218. T-317 + T-1115: Record flags and STOP, START and work-phone answers as consent rows; slot 1 runs limit 1 whole behind the flags check (\#222)
+
+- **Commit:** [`3944dc8`](https://github.com/aryamahadik/rosie/commit/3944dc8), by Arya Mahadik, 2026-11-08 22:23:17 UTC
+- **Pull request:** [#222](https://github.com/aryamahadik/rosie/pull/222) from `task/T-1115-with-T-317`, merged 2026-11-08 22:23:17 UTC. It squashed 4 branch commits:
+  - `e523fe3` T-317: record flags and STOP, START and work-phone answers as consent…
+  - `3b549ce` T-317: test the flags calls through the Tool API base and a flag set …
+  - `f16c7b3` T-317: round 2 (DL-193): a START written on return with no known time…
+  - `b6a31dc` T-1115: slot 1 runs limit 1 whole behind the record flags check: flag…
+- **Files changed:** 16 (+5184 −5), by folder:
+  - `actions/src/domain/flags/` errors.ts +31 −0, flags.test.ts +2000 −0, handlers.ts +299 −0, ids.ts +49 −0, index.ts +92 −0, reads.ts +117 −0, record-flag.ts +333 −0, stop-start.ts +708 −0, stopped.ts +305 −0, test-support.ts +461 −0, writes.ts +176 −0
+  - `actions/src/gate/flags/` flags.test.ts +347 −0, flags.ts +227 −0, index.ts +18 −0
+  - `actions/src/gate/limit-1/` allowed.test.ts +13 −2
+  - `actions/src/gate/` limits.ts +8 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-317: record flags and STOP, START and work-phone answers as consent rows; the gate checks flags before limits
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-317: test the flags calls through the Tool API base and a flag set as a turn's core action
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-317: round 2 (DL-193): a START written on return with no known time never beats a STOP; every STOP and START moves its own time, so the newest word decides in any order; a work phone's no answer counts only from the clock row its STOP armed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1115: slot 1 runs limit 1 whole behind the record flags check: flagsFirst keeps every member of the limit it wraps ({ ...one, limit: 1, flags, check }, FlagsFirstLimit and FlagsFirstRegistry generic over slot 1's own type, so LIMITS[0].decide is limit 1's decide with its type); check unchanged; the slot-1 test says slot 1 is limit 1 behind the flags; a flags test shows a wrapped member is kept and a held part still fails with ASKED_DECIDER without running the wrapped check (DL-202)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 217. T-1114: the parity project gets the unit project's 30 s testTimeout and hookTimeout (resource guard, DL-200), pinned by vitest-timeouts.test.mjs (\#221)
+
+- **Commit:** [`7be2201`](https://github.com/aryamahadik/rosie/commit/7be2201), by Arya Mahadik, 2026-11-08 22:08:40 UTC
+- **Pull request:** [#221](https://github.com/aryamahadik/rosie/pull/221) from `task/T-1114-rebased`, merged 2026-11-08 22:08:41 UTC. It squashed 1 branch commit:
+  - `4ab16d9` T-1114: the parity project gets the unit project's 30 s testTimeout a…
+- **Files changed:** 2 (+12 −1), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +8 −1
+  - `/` vitest.config.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 216. T-1112: The runner clock's sleepUntil returns only once the instant has come: each time its timer fires it reads the time again and waits for the time left (timer and now are ports), an abort clears the pending timer, waits past 2^31-1 ms go in parts; tests for an early timer, an abort mid-wait and a 30-day wait (\#219)
+
+- **Commit:** [`1496488`](https://github.com/aryamahadik/rosie/commit/1496488), by Arya Mahadik, 2026-11-08 22:06:39 UTC
+- **Pull request:** [#219](https://github.com/aryamahadik/rosie/pull/219) from `task/T-1112`, merged 2026-11-08 22:06:39 UTC. It squashed 1 branch commit:
+  - `998cd00` T-1112: The runner clock's sleepUntil returns only once the instant h…
+- **Files changed:** 2 (+182 −11), by folder:
+  - `actions/src/effects/runner/` clock.ts +54 −11, schedule.test.ts +128 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 215. T-1113: the integration project runs its files one at a time (fileParallelism: false), pinned by an infra/ci test (\#216)
+
+- **Commit:** [`4da33fb`](https://github.com/aryamahadik/rosie/commit/4da33fb), by Arya Mahadik, 2026-11-08 22:06:34 UTC
+- **Pull request:** [#216](https://github.com/aryamahadik/rosie/pull/216) from `task/T-1113`, merged 2026-11-08 22:06:35 UTC. It squashed 1 branch commit:
+  - `a41747e` T-1113: the integration project runs its files one at a time (filePar…
+- **Files changed:** 2 (+23 −2), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +19 −2
+  - `/` vitest.config.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 214. T-1111: local merge-check on the build Mac: infra/ci/local-merge-check.mjs runs merge-check.yml's own steps (read from the YAML at origin/main) in a fresh clone rebased onto origin/main, against a throwaway database in the local rosie-pg, with its tests, README and the merge-check:local and test:ci-scripts scripts (\#214)
+
+- **Commit:** [`c80eecb`](https://github.com/aryamahadik/rosie/commit/c80eecb), by Arya Mahadik, 2026-11-08 22:06:31 UTC
+- **Pull request:** [#214](https://github.com/aryamahadik/rosie/pull/214) from `task/T-1111`, merged 2026-11-08 22:06:31 UTC. It squashed 1 branch commit:
+  - `e3da542` T-1111: local merge-check on the build Mac: infra/ci/local-merge-chec…
+- **Files changed:** 4 (+1856 −0), by folder:
+  - `infra/ci/` README.md +66 −0, local-merge-check.mjs +1250 −0, local-merge-check.test.mjs +538 −0
+  - `/` package.json +2 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 213. T-373: Composer call: one Haiku call per outbox row, message plan out (\#187)
+
+- **Commit:** [`e283da9`](https://github.com/aryamahadik/rosie/commit/e283da9), by Arya Mahadik, 2026-11-08 22:06:27 UTC
+- **Pull request:** [#187](https://github.com/aryamahadik/rosie/pull/187) from `task/T-373`, merged 2026-11-08 22:06:27 UTC. It squashed 3 branch commits:
+  - `950de40` T-373: composer call: one Haiku call per outbox row through the AI ga…
+  - `55f8d2f` T-373: round 2 on K-03 v1.1: the composer takes term facts (input che…
+  - `466e6fd` T-373: round 3 (DL-163): prices in words are literals, held only by a…
+- **Files changed:** 14 (+2848 −22), by folder:
+  - `ai/src/composer/` check.test.ts +763 −0, check.ts +703 −0, compose.test.ts +650 −0, compose.ts +89 −0, index.ts +53 −0, schema.ts +154 −0, test-support.ts +170 −0, types.ts +112 −0
+  - `ai/src/composer/prompt/` examples.ts +3 −3, index.ts +4 −0, prompt.test.ts +82 −0, prompt.ts +19 −5, render.ts +16 −6, types.ts +30 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-373: composer call: one Haiku call per outbox row through the AI gateway, K-03 v1 plan out as structured output; typed refusals for a frontier input, a format outside allowed_formats, a hold slot and a literal number, date or price no fact holds
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-373: round 2 on K-03 v1.1: the composer takes term facts (input check against v1.1's composeInput), its literal check reads facts[].value of slot and term facts and holds numbers exactly as numbersHeldByFacts (whole digit runs); input-s1-02-v1.1 gives plan-s1-02 on the double's S1-02 plan, v1's input-s1-02 is refused for its two literals; render writes a term fact as a fact with its source, never a slot; prompt composer-2 names term facts in <facts> and rule 5
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-373: round 3 (DL-163): prices in words are literals, held only by a fact's value with the same amount in digits or words (five dollars a booking refused on the S1-02 twin, two dollars held); English month names join the date words beside the Spanish ones and the English and Spanish day names (See you in October refused unless a fact holds October); the input check refuses a term fact whose words hold {{; render writes a term fact as <term>, its words alone, never its source (prompt composer-3)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 212. T-439: Geo double: fixed points and zones for the test addresses, not found for any other, the errors a test sets, one K-08 span per call (K-17 v1) (\#198)
+
+- **Commit:** [`59f392e`](https://github.com/aryamahadik/rosie/commit/59f392e), by Arya Mahadik, 2026-11-08 22:06:23 UTC
+- **Pull request:** [#198](https://github.com/aryamahadik/rosie/pull/198) from `task/T-439`, merged 2026-11-08 22:06:23 UTC. It squashed 1 branch commit:
+  - `8b92af2` T-439: Geo double: fixed points and zones for the test addresses, not…
+- **Files changed:** 6 (+1029 −0), by folder:
+  - `adapters/src/geo/double/` double.test.ts +505 −0, double.ts +206 −0, index.ts +11 −0, types.ts +92 −0, validate.ts +78 −0, world.ts +137 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 211. T-1110: Stripe harness opens each effect run's trace under a fixed id, so the scan for card digits never meets a random UUID; guard test that the scanned text is the same on every run (\#210)
+
+- **Commit:** [`a6b2ae6`](https://github.com/aryamahadik/rosie/commit/a6b2ae6), by Arya Mahadik, 2026-11-08 22:06:19 UTC
+- **Pull request:** [#210](https://github.com/aryamahadik/rosie/pull/210) from `task/T-1110`, merged 2026-11-08 22:06:19 UTC. It squashed 1 branch commit:
+  - `7701293` T-1110: Stripe harness opens each effect run's trace under a fixed id…
+- **Files changed:** 2 (+49 −4), by folder:
+  - `actions/src/effects/stripe/` stripe-kinds.test.ts +18 −1, test-support.ts +31 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 210. T-314: fixed-line inserter: S13-01 opener, opt-out line and privacy link on a first text (Q-30), the code text, safety lines, checked terms and the handling line, word for word outside the length counts, as finalize's insertFixedLines port (\#211)
+
+- **Commit:** [`5ab6203`](https://github.com/aryamahadik/rosie/commit/5ab6203), by Arya Mahadik, 2026-11-08 22:06:15 UTC
+- **Pull request:** [#211](https://github.com/aryamahadik/rosie/pull/211) from `task/T-314`, merged 2026-11-08 22:06:15 UTC. It squashed 1 branch commit:
+  - `7fda515` T-314: fixed-line inserter: S13-01 opener, opt-out line and privacy l…
+- **Files changed:** 6 (+968 −0), by folder:
+  - `actions/src/finalize/fixed-lines/` errors.ts +53 −0, fixed-lines.test.ts +480 −0, index.ts +39 −0, insert.ts +165 −0, test-support.ts +156 −0, types.ts +75 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 209. T-1105: The message checks' details never quote a piece of a glued value (\#203)
+
+- **Commit:** [`cd9973d`](https://github.com/aryamahadik/rosie/commit/cd9973d), by Arya Mahadik, 2026-11-08 22:06:11 UTC
+- **Pull request:** [#203](https://github.com/aryamahadik/rosie/pull/203) from `task/T-1105`, merged 2026-11-08 22:06:11 UTC. It squashed 2 branch commits:
+  - `481431b` T-1105: Values and Never-in-a-message details never quote a piece of …
+  - `c2433e8` T-1105: Values places read in the send text before anything is taken …
+- **Files changed:** 3 (+525 −46), by folder:
+  - `actions/src/finalize/checks/` checks.test.ts +200 −0, checks.ts +82 −27, values.ts +243 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1105: Values and Never-in-a-message details never quote a piece of a glued filled value
+
+Where a scan cuts into a filled value without holding all of it (a value glued to a letter or digit, such as 11:00amx, 88 Elm St, Springfieldx or CodeAB12), the fault names the check and the slot instead of the piece; a detail that would still hold a piece a scan split off is cut down to the check's name. A value held whole, glued or not, is quoted as before, for T-313's finalize scrub; a digit-only code is read whole and gives what it gives today. Existing checks tests are unchanged; six new tests.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1105: Values places read in the send text before anything is taken out, so a glued value keeps its place when a value inside it or an unclosed '{{' head is marked out (round 2, DL-176)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 208. T-306: commit path on local PostgreSQL: the commit's K-05 port on T-195's commitTurn (actions/src/commit/pg), with integration tests: all or nothing on a refused last row, 100 parallel commits of one turn id, two turns on one booking version (\#208)
+
+- **Commit:** [`99b9ef9`](https://github.com/aryamahadik/rosie/commit/99b9ef9), by Arya Mahadik, 2026-11-08 22:06:06 UTC
+- **Pull request:** [#208](https://github.com/aryamahadik/rosie/pull/208) from `task/T-306`, merged 2026-11-08 22:06:07 UTC. It squashed 1 branch commit:
+  - `888ba5f` T-306: commit path on local PostgreSQL: the commit's K-05 port on T-1…
+- **Files changed:** 4 (+1079 −0), by folder:
+  - `actions/src/commit/pg/` commit-turn.int.test.ts +714 −0, commit-turn.ts +59 −0, index.ts +4 −0, test-support.ts +302 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 207. T-299: Limit 1 (Allowed): protect-only on anyone's word; adds need the decider's own yes (\#215)
+
+- **Commit:** [`d6a3a77`](https://github.com/aryamahadik/rosie/commit/d6a3a77), by Arya Mahadik, 2026-11-08 22:06:03 UTC
+- **Pull request:** [#215](https://github.com/aryamahadik/rosie/pull/215) from `task/T-299`, merged 2026-11-08 22:06:03 UTC. It squashed 3 branch commits:
+  - `eaa4838` T-299: Limit 1 (Allowed): protect-only on anyone's word; any other ch…
+  - `288ab10` T-299: Round 2 (DL-183): a choice about no booking is the sender's ow…
+  - `85c91d4` T-299: Round 3 (DL-188): a step's side is read from its card in the t…
+- **Files changed:** 5 (+3498 −5), by folder:
+  - `actions/src/gate/limit-1/` allowed.test.ts +1211 −0, allowed.ts +752 −0, facts.ts +296 −0, index.ts +172 −5, test-support.ts +1067 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-299: Limit 1 (Allowed): protect-only on anyone's word; any other change needs the decider's own yes (T-308), proven by S13-45's one rule first; unproven sender gets T-322's code (proofCodeSent), wrong person a question in the decider's own chat (askedDecider); fails closed without codes or a database
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-299: Round 2 (DL-183): a choice about no booking is the sender's own record only at listed customer-side steps (A4-82, A4-23, A7-98 and twins) and a business matter anywhere else (S12-24's 'Let it book' from Sam's new mobile gets the code; staff, an admin without the power and a customer are refused), search entries alike; row 1 keeps a new visit's times cards and pick (K-09 commit-limit-5-taken.json); a business role with no part in a booking decides only its fee or refund, the rest goes to the booking's decider whatever proves the role; nobody to ask gives the step's safe default, never an empty ask
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-299: Round 3 (DL-188): a step's side is read from its card in the turn's bundle (K-01 who and to; new StepCards port, none shipped yet, so unread steps are the business's); a business step stays the business's whoever answers (A10-09's '1 Refund it' refused for Alex on his own haircut, Pat without the money power, and Sam's new mobile; Sam and Pat with the money power pass), a party who also holds a business role is asked which role, never passed; A7-02's 'The business can't give it' read through its branch stays the business's; row 1 covers journey 4's customer steps about no booking yet and A3-51's meaning-search entries
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 206. T-302: limit 4, Versions: replaces the fail-closed stub with compare-and-set on every row the read-back showed (K-04 open\_questions.versions\_read; limit 5's rows left to it), reloaded at the gate and sent with the commit; unchanged passes, changed but possible gives today's facts and a fresh yes, impossible says what changed, a second conflict on one question goes to a person with a review item (K-09 v1 limit4Outcome); 31 unit tests on K-05 commit-version-changed.json, K-09 commit-limit-4-changed.json, two turns on one booking version against a compare-and-set K-05 fake, and a second conflict (\#205)
+
+- **Commit:** [`14af477`](https://github.com/aryamahadik/rosie/commit/14af477), by Arya Mahadik, 2026-11-08 22:05:59 UTC
+- **Pull request:** [#205](https://github.com/aryamahadik/rosie/pull/205) from `task/T-302`, merged 2026-11-08 22:06:00 UTC. It squashed 1 branch commit:
+  - `a644118` T-302: limit 4, Versions: replaces the fail-closed stub with compare-…
+- **Files changed:** 5 (+1891 −5), by folder:
+  - `actions/src/gate/limit-4/` facts.ts +63 −0, index.ts +96 −5, test-support.ts +634 −0, versions.test.ts +767 −0, versions.ts +331 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 205. T-303: Limit 5 (Reserved): a held reservation for the worker, room, vehicle or seat (\#199)
+
+- **Commit:** [`823e374`](https://github.com/aryamahadik/rosie/commit/823e374), by Arya Mahadik, 2026-11-08 22:05:56 UTC
+- **Pull request:** [#199](https://github.com/aryamahadik/rosie/pull/199) from `task/T-303`, merged 2026-11-08 22:05:56 UTC. It squashed 2 branch commits:
+  - `84beddf` T-303: limit 5 (Reserved): a booking part passes only while each save…
+  - `aa7f335` T-303: limit 5 test: a saved time ending between the gate's now and t…
+- **Files changed:** 7 (+2648 −5), by folder:
+  - `actions/src/gate/limit-5/` facts.ts +110 −0, index.ts +132 −5, reserved.test.ts +1001 −0, reserved.ts +242 −0, test-support.ts +859 −0, types.ts +172 −0, window.ts +132 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-303: limit 5 (Reserved): a booking part passes only while each saved time it books is still held for it (held, its end after the gate's now, at the part's business, for its booking or the turn's mobile), else the next open times soonest first with 10 minutes on the page or 2 of their text hours ending before the visit, or nothing booked when none; ports for the walk's saved times, the reservation read on the call's transaction and C-131's search (unbuilt ones fail closed); 56 unit tests on K-09 commit-limit-5-taken.json, K-05 commit-reservation-lost.json through gateAndCommit, and two turns on one held slot against a K-05 fake
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-303: limit 5 test: a saved time ending between the gate's now and the commit, its clock not fired, is refused by K-05's own clock and never booked
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 204. T-591: Clock home (S13-35) as code: deadlines from the visit inside text hours, one reminder per booked time (\#206)
+
+- **Commit:** [`97e45da`](https://github.com/aryamahadik/rosie/commit/97e45da), by Arya Mahadik, 2026-11-08 22:05:52 UTC
+- **Pull request:** [#206](https://github.com/aryamahadik/rosie/pull/206) from `task/T-591`, merged 2026-11-08 22:05:53 UTC. It squashed 2 branch commits:
+  - `840c317` T-591: Clock home (S13-35) as code: deadlines by the visit inside tex…
+  - `6d6d366` T-591: Round 2 (DL-180): text hours end before 8pm as limit 8 reads t…
+- **Files changed:** 8 (+1489 −0), by folder:
+  - `runtime/src/clocks/home/` deadline.ts +273 −0, home.test.ts +690 −0, index.ts +62 −0, instants.ts +26 −0, module.ts +51 −0, reminder.ts +168 −0, shown.ts +90 −0, text-hours.ts +129 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-591: Clock home (S13-35) as code: deadlines by the visit inside text hours, one reminder per booked time, the urgent clock for a job sent now
+
+runtime/src/clocks/home: fitDeadline, homeDueOf and homeNeverDeliveredDueOf hold step 9's due rule
+and any step's deadline to the visit's start and the person's text hours (9am to 8pm, 8am for the
+owner and team); urgentDue gives a job sent now the plug-in's urgent clock at any hour, never past the
+arrival estimate; reminderOf and remindersOf give one reminder per booked time (10am the day before,
+6pm the evening before that when free cancel ends before 1pm the day before); textHoursAfter adds N
+text hours; shownTimes gives a deadline's time in the person's zone too; clockHomeModule for the home
+registry. Pure functions with 35 unit tests across the Nov 1 change.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-591: Round 2 (DL-180): text hours end before 8pm as limit 8 reads them; 7:59pm the last minute, 8:00pm moves back to 7:59pm, the grid held to limit 8's own check
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 203. T-256: Queues for retries only, 5 tries, then the dead-letter queue (\#213)
+
+- **Commit:** [`7252211`](https://github.com/aryamahadik/rosie/commit/7252211), by Arya Mahadik, 2026-11-08 22:05:49 UTC
+- **Pull request:** [#213](https://github.com/aryamahadik/rosie/pull/213) from `task/T-256`, merged 2026-11-08 22:05:49 UTC. It squashed 3 branch commits:
+  - `cf37d5b` T-256: Retry queue producer and consumer: retries only, sends after a…
+  - `3c00042` T-256: Job bodies carry ids only (K-37 rule 4) and are measured in by…
+  - `da91df8` T-256: A queue delay from a time that cannot be read is 0, never NaN
+- **Files changed:** 13 (+2590 −1), by folder:
+  - `runtime/src/` index.ts +6 −1
+  - `runtime/src/queues/` consumer.ts +268 −0, dead-letter.ts +53 −0, index.ts +45 −0, labels.worker.test.ts +219 −0, ledger.ts +80 −0, message.ts +212 −0, producer.ts +164 −0, producer.worker.test.ts +256 −0, queues.worker.test.ts +620 −0, run.ts +190 −0, test-support.ts +302 −0, types.ts +175 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-256: Retry queue producer and consumer: retries only, sends after any Retry-After, other jobs 5 tries then one K-37 dead-letter row, each try run once by job key
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-256: Job bodies carry ids only (K-37 rule 4) and are measured in bytes; tests for both
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-256: A queue delay from a time that cannot be read is 0, never NaN
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 202. T-275: Gateway: Stripe and calendar webhooks verified through their ports and stored once by event id (\#200)
+
+- **Commit:** [`165c8c1`](https://github.com/aryamahadik/rosie/commit/165c8c1), by Arya Mahadik, 2026-11-08 22:05:45 UTC
+- **Pull request:** [#200](https://github.com/aryamahadik/rosie/pull/200) from `task/T-275`, merged 2026-11-08 22:05:45 UTC. It squashed 1 branch commit:
+  - `3d2c103` T-275: Gateway: Stripe and calendar webhooks verified through their p…
+- **Files changed:** 14 (+3461 −86), by folder:
+  - `runtime/src/gateway/` answer.ts +92 −0, index.ts +33 −3, linq-webhook.ts +15 −75, types.ts +6 −0
+  - `runtime/src/gateway/providers/` calendar-webhook.ts +426 −0, calendar-webhook.worker.test.ts +745 −0, common.ts +141 −0, contracts.test.ts +289 −0, index.ts +80 −0, stripe-webhook.ts +303 −0, stripe-webhook.worker.test.ts +689 −0, test-support.ts +394 −0, types.ts +217 −0
+  - `runtime/src/` index.ts +31 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Stripe's two endpoints (rosfield, businesses) verify through K-14 v1 verifyWebhook; the door itself refuses odd input before any HMAC (missing header, no single t= of whole seconds, no v1=, more than 5 v1= entries, a t= outside 300 s, a clock that is not a number): 401, nothing stored. Google's and Graph's pushes are read into K-16 v1 verifyNotification's request (Graph's handshake answered text/plain with its token). Each verified event is stored once as a K-07 v1 provider event through K-05 v1.1 recordProviderEvent (a port, faked from provider-event-duplicate.json): a duplicate is 200 with nothing more stored, a failed write 503. Payloads are scrubbed before the write; a live Stripe event off production (a test one on production) is dropped. One providerWebhook span per answer. T-241's answer rules move to gateway/answer.ts, shared by the Linq door unchanged.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 201. T-269: Actor-local copies: stopped flag, checked safety lines, running safety timers (\#190)
+
+- **Commit:** [`68b6335`](https://github.com/aryamahadik/rosie/commit/68b6335), by Arya Mahadik, 2026-11-08 22:05:41 UTC
+- **Pull request:** [#190](https://github.com/aryamahadik/rosie/pull/190) from `task/T-269`, merged 2026-11-08 22:05:41 UTC. It squashed 2 branch commits:
+  - `fc716d3` T-269: actor-local copies: the stopped flag set from each committed a…
+  - `56ac944` T-269: round 2 (DL-167): in the danger and stop ranks a refused write…
+- **Files changed:** 11 (+2750 −66), by folder:
+  - `runtime/src/actor/copies/` copies.ts +454 −0, copies.worker.test.ts +1389 −0, index.ts +34 −0, return-queue.ts +321 −0, test-support.ts +118 −0, types.ts +137 −0
+  - `runtime/src/actor/` handle-actor.ts +111 −5, index.ts +18 −2, lease.ts +22 −0
+  - `runtime/src/safety/` arrival.ts +142 −59, index.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-269: actor-local copies: the stopped flag set from each committed answer before the run is answered (so before the reply goes; START clears it), the checked safety lines copied from the safety read's bundle on every written text, each live safety timer's due time, sealed address and emergency contact reloaded after a commit that wrote a K-34 timer row, and the write-on-return queue (danger, stops, then the rest; each once; the safety read's records now wait there)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-269: round 2 (DL-167): in the danger and stop ranks a refused write holds its rank, so nothing queued after it in that rank is written before it and the rest follow in queued order once it is taken (a replay can never lift a stop); the stop rank, once a refusal holds it, keeps the actor's copy reading stopped until every stop or start record queued is written in order; the round 1 test that pinned START before the earlier STOP now asserts the queued order, with the reviewer's mirror case (older START refused with versionChanged, newer STOP: phones.stopped ends true)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 200. T-260: Runtime trace check end to end: every runtime hop once, in order (\#188)
+
+- **Commit:** [`55125fe`](https://github.com/aryamahadik/rosie/commit/55125fe), by Arya Mahadik, 2026-11-08 22:05:37 UTC
+- **Pull request:** [#188](https://github.com/aryamahadik/rosie/pull/188) from `task/T-260`, merged 2026-11-08 22:05:38 UTC. It squashed 4 branch commits:
+  - `ea6d393` T-260: scratch Vitest config that ran runtime/test/\*\* in the Workers …
+  - `7f218d9` T-260: remove the scratch Vitest config (the root workers project sho…
+  - `84b23c8` T-260: runtime trace check end to end: K-06 webhooks through the gate…
+  - `de078e0` T-260: round 2 (DL-168): the workers project includes runtime/test/\*\*…
+- **Files changed:** 4 (+1306 −1), by folder:
+  - `runtime/src/trace/` hop-check.test.ts +198 −0, hop-check.ts +234 −0
+  - `runtime/test/` trace-e2e.worker.test.ts +873 −0
+  - `/` vitest.config.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-260: scratch Vitest config that ran runtime/test/** in the Workers pool for the self-check (reverted next)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-260: remove the scratch Vitest config (the root workers project should include runtime/test/** instead)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-260: runtime trace check end to end: K-06 webhooks through the gateway, actor, lease, guard, turn fakes, dispatcher with limit 8 and a receipt that arms a clock, judged against K-08 v1's four traces by runtime/src/trace/hop-check.ts (one trace id, one bundle id, each hop once, in order; no raw number or words), with the hops not written yet named and checked
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-260: round 2 (DL-168): the workers project includes runtime/test/**/*.worker.test.ts, so npm run test:workers -- runtime/test/trace-e2e and npm test run the four cases; the hops with no writer become one named list of known gaps (GAPS), each with its task (a T-1096; b, c, d and the receive span's sealedToActor and firstTrace T-1108; e and the clock firing's turn id and job id form T-1109; f CQ-102) and each asserted to still hold
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 199. T-151: KV size spike: measure.mjs prints each bundle value's bytes and each K-01 key against Cloudflare KV's limits (25 MiB value, 512 B key), checked against miniflare's KVLimits (\#204)
+
+- **Commit:** [`c03b80b`](https://github.com/aryamahadik/rosie/commit/c03b80b), by Arya Mahadik, 2026-11-08 22:05:34 UTC
+- **Pull request:** [#204](https://github.com/aryamahadik/rosie/pull/204) from `task/T-151`, merged 2026-11-08 22:05:34 UTC. It squashed 1 branch commit:
+  - `adaebb0` T-151: KV size spike: measure.mjs prints each bundle value's bytes an…
+- **Files changed:** 1 (+310 −0), by folder:
+  - `compiler/spikes/kv-size/` measure.mjs +310 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 198. T-159: Lint: a button whose whole text is a guard keyword, with its own test (\#197)
+
+- **Commit:** [`196e8b5`](https://github.com/aryamahadik/rosie/commit/196e8b5), by Arya Mahadik, 2026-11-08 22:05:30 UTC
+- **Pull request:** [#197](https://github.com/aryamahadik/rosie/pull/197) from `task/T-159`, merged 2026-11-08 22:05:30 UTC. It squashed 2 branch commits:
+  - `ab8006c` T-159: lint rule guard-keyword-button: fails a button whose whole tex…
+  - `123763b` T-159: guard-keyword header: what is not read, stated by its sources …
+- **Files changed:** 2 (+527 −0), by folder:
+  - `compiler/src/lint/` guard-keyword.test.ts +340 −0, guard-keyword.ts +187 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-159: lint rule guard-keyword-button: fails a button whose whole text, trimmed and in any case, is START, HELP or one of the 16 opt-out words, read from T-134's keyword list (K-01's own check; Q-14's default); one file in the T-153 runner, tested alone on refuse-guard-keyword-button.json and the master (only S1-37's 'Start', both flows; the YES and NO buttons not reported), against K-01's keywordButton and msgtext.js line 95
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-159: guard-keyword header: what is not read, stated by its sources (msgtext.js lines 5, 7, 8, 13; line 95 and K-01 read neither)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 197. T-158: Lint rule loop (Q-39 default): fails each step on a cycle of relative t references, or of code's walk through a flow-switch end, where no step on it asks, waits or ends; splits read as T-291's frontier reads them from T-145's tags; 12 tests incl. refuse-loop.json's walk and K-01 schema check (\#186)
+
+- **Commit:** [`5a3871a`](https://github.com/aryamahadik/rosie/commit/5a3871a), by Arya Mahadik, 2026-11-08 22:05:27 UTC
+- **Pull request:** [#186](https://github.com/aryamahadik/rosie/pull/186) from `task/T-158`, merged 2026-11-08 22:05:27 UTC. It squashed 1 branch commit:
+  - `7695f04` T-158: Lint rule loop (Q-39 default): fails each step on a cycle of r…
+- **Files changed:** 2 (+864 −0), by folder:
+  - `compiler/src/lint/` loop.test.ts +351 −0, loop.ts +513 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 196. T-157: lint rule lookup-without-field: a lookup branch naming no field fails anywhere; for a trade, a lookup whose needs key, record field or path field is given on none of the paths that reach it fails, on some but not all warns; walks every trade path (listed money paths, booking values, record fixtures, with its facts and switches) as lib.js walkCombo does; its own test (\#185)
+
+- **Commit:** [`d5997bc`](https://github.com/aryamahadik/rosie/commit/d5997bc), by Arya Mahadik, 2026-11-08 22:05:23 UTC
+- **Pull request:** [#185](https://github.com/aryamahadik/rosie/pull/185) from `task/T-157`, merged 2026-11-08 22:05:23 UTC. It squashed 1 branch commit:
+  - `c42e542` T-157: lint rule lookup-without-field: a lookup branch naming no fiel…
+- **Files changed:** 2 (+963 −0), by folder:
+  - `compiler/src/lint/` lookup-field.test.ts +520 −0, lookup-field.ts +443 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 195. T-156: lint rule choice-without-definition: fails a choice whose card gives it no definition (K-01's own check), lists each decision that states no Means line as a warning for its stand-ins (NQ-PB-3); one file in the T-153 runner, tested alone on refuse-choice-without-definition.json, bundle-mini-a/b, aba and the master (48 listed, 173 choices) (\#194)
+
+- **Commit:** [`0a5908d`](https://github.com/aryamahadik/rosie/commit/0a5908d), by Arya Mahadik, 2026-11-08 22:05:19 UTC
+- **Pull request:** [#194](https://github.com/aryamahadik/rosie/pull/194) from `task/T-156`, merged 2026-11-08 22:05:20 UTC. It squashed 1 branch commit:
+  - `1dcc809` T-156: lint rule choice-without-definition: fails a choice whose card…
+- **Files changed:** 2 (+615 −0), by folder:
+  - `compiler/src/lint/` no-definition.test.ts +489 −0, no-definition.ts +126 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 194. T-155: lint rule no-safe-default-or-clock: fails a question whose card has neither a safe default nor a clock (K-01's own check), lists each decision that relies on step 9's default as a warning (NQ-PB-3); one file in the T-153 runner, tested alone on refuse-no-safe-default-or-clock.json, bundle-mini-a/b and the master (13 Clock lines, 197 listed) (\#191)
+
+- **Commit:** [`f1af1fd`](https://github.com/aryamahadik/rosie/commit/f1af1fd), by Arya Mahadik, 2026-11-08 22:05:16 UTC
+- **Pull request:** [#191](https://github.com/aryamahadik/rosie/pull/191) from `task/T-155`, merged 2026-11-08 22:05:16 UTC. It squashed 1 branch commit:
+  - `243c795` T-155: lint rule no-safe-default-or-clock: fails a question whose car…
+- **Files changed:** 2 (+463 −0), by folder:
+  - `compiler/src/lint/` no-default-or-clock.test.ts +372 −0, no-default-or-clock.ts +91 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 193. T-150: bundle id (content hash of the stored values plus a build number) and every input K-01 names with its sha256, through compiler build --build \<n\> (\#193)
+
+- **Commit:** [`70897de`](https://github.com/aryamahadik/rosie/commit/70897de), by Arya Mahadik, 2026-11-08 22:05:12 UTC
+- **Pull request:** [#193](https://github.com/aryamahadik/rosie/pull/193) from `task/T-150`, merged 2026-11-08 22:05:12 UTC. It squashed 1 branch commit:
+  - `1513755` T-150: bundle id (content hash of the stored values plus a build numb…
+- **Files changed:** 10 (+1335 −15), by folder:
+  - `compiler/src/bundle-id/` cli.test.ts +88 −0, content-hash.test.ts +180 −0, content-hash.ts +161 −0, index.ts +41 −0, inputs.test.ts +264 −0, inputs.ts +210 −0, numbered.test.ts +223 −0, numbered.ts +88 −0
+  - `compiler/src/cli/commands/` build.ts +71 −9
+  - `compiler/src/emit/` standins.ts +9 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 192. T-084: Contract test data-access.v1: every K-05 v1, v1.1 and v1.2 fixture against the schema of its version, each refusal tied to its reason, the schema not vacuous, fixture-level README rules, and the side list (\#217)
+
+- **Commit:** [`4f8bad9`](https://github.com/aryamahadik/rosie/commit/4f8bad9), by Arya Mahadik, 2026-11-08 22:05:07 UTC
+- **Pull request:** [#217](https://github.com/aryamahadik/rosie/pull/217) from `task/T-084`, merged 2026-11-08 22:05:08 UTC. It squashed 1 branch commit:
+  - `6855840` T-084: Contract test data-access.v1: every K-05 v1, v1.1 and v1.2 fix…
+- **Files changed:** 1 (+1595 −0), by folder:
+  - `tests/contract/` data-access.v1.test.ts +1595 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 191. T-088: Contract test tool-api.v1: every K-09 fixture checked against its own version's schema (v1, v1.1, later minors by version), each refusal tied to its reason by mend-then-accept, required fields read from the schemas made refused, the README's rule statements modeled, DL-123's two checks, the side list (\#212)
+
+- **Commit:** [`663c7b4`](https://github.com/aryamahadik/rosie/commit/663c7b4), by Arya Mahadik, 2026-11-08 22:05:03 UTC
+- **Pull request:** [#212](https://github.com/aryamahadik/rosie/pull/212) from `task/T-088`, merged 2026-11-08 22:05:04 UTC. It squashed 1 branch commit:
+  - `fe02502` T-088: Contract test tool-api.v1: every K-09 fixture checked against …
+- **Files changed:** 1 (+1769 −0), by folder:
+  - `tests/contract/` tool-api.v1.test.ts +1769 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 190. T-083: Contract test db-schema.core.v1: K-04 Database schema: core part fixtures (\#209)
+
+- **Commit:** [`dc4e203`](https://github.com/aryamahadik/rosie/commit/dc4e203), by Arya Mahadik, 2026-11-08 22:04:59 UTC
+- **Pull request:** [#209](https://github.com/aryamahadik/rosie/pull/209) from `task/T-083`, merged 2026-11-08 22:05:00 UTC. It squashed 2 branch commits:
+  - `82ce92a` T-083: contract test db-schema.core.v1: K-04 fixtures checked against…
+  - `a800e26` T-083: round 2: model README rule 2 (every update raises a versioned …
+- **Files changed:** 1 (+2497 −0), by folder:
+  - `tests/contract/` db-schema.core.v1.test.ts +2497 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-083: contract test db-schema.core.v1: K-04 fixtures checked against a model of the table list, refusals tied to their reasons, not vacuous, README rules, side list
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-083: round 2: model README rule 2 (every update raises a versioned row's version by one; 23514 <table>_version_raised before row-level security's check, as migration 0002), safe for an additive v1.1 (each version's fixtures load after the earlier versions', SQL read per version), K-03 channel list, rule 9 numbers and emails, owners per side, producer needs carry DL-110 (5)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 189. T-219: readTurnState, the frontier's read of a turn's stored state on the primary, uncached, under the business scope (K-05 v1.2 item 26) (\#207)
+
+- **Commit:** [`6a45c11`](https://github.com/aryamahadik/rosie/commit/6a45c11), by Arya Mahadik, 2026-11-08 22:04:56 UTC
+- **Pull request:** [#207](https://github.com/aryamahadik/rosie/pull/207) from `task/T-219`, merged 2026-11-08 22:04:56 UTC. It squashed 1 branch commit:
+  - `dcf601e` T-219: readTurnState, the frontier's read of a turn's stored state on…
+- **Files changed:** 2 (+2321 −0), by folder:
+  - `db/repo/` turn-state.int.test.ts +1388 −0, turn-state.ts +933 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+db/repo/turn-state.ts: readTurnState and readTurnStateIn as rosie_job, under the request's business scope (requireBusinessScope) or on the runtime side with no business; open questions through liveOpenQuestionsOfHandle; facts only from FACT_HOMES (K-04 v1 core's versioned one-key tables, sealed columns out). db/repo/turn-state.int.test.ts: the six K-05 v1.2 fixtures, row-level security per business, fresh reads after commits, the no-business path, unknownFact, value forms, request shape.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 188. T-198: Data access: door lengths, the third-saved-time limit, next in line, release promotes, extend once (\#196)
+
+- **Commit:** [`38dac24`](https://github.com/aryamahadik/rosie/commit/38dac24), by Arya Mahadik, 2026-11-08 22:04:52 UTC
+- **Pull request:** [#196](https://github.com/aryamahadik/rosie/pull/196) from `task/T-198`, merged 2026-11-08 22:04:53 UTC. It squashed 3 branch commits:
+  - `c1016e0` T-198: reservation rules: extend() gives 10 more minutes once, never …
+  - `5664d35` T-198: name the lock order exactly: commitTurn's (clock row, slot, ro…
+  - `a2e20ac` T-198: round 2 (DL-173): extend counts the holder's other saved times…
+- **Files changed:** 2 (+2011 −0), by folder:
+  - `db/repo/` reservation-rules.int.test.ts +1633 −0, reservation-rules.ts +378 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-198: reservation rules: extend() gives 10 more minutes once, never on the ownAi door, moving the saved-time clock row; reserve() refuses an unknown door; the card's six K-05 fixtures, the cap of 2 under 50 parallel third attempts, the first in line promoted once under 100 parallel releases, and 50 parallel extends, on a real database as the Tool API's role
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-198: name the lock order exactly: commitTurn's (clock row, slot, row); reserve and release take no clock row lock until T-1084
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-198: round 2 (DL-173): extend counts the holder's other saved times under the cap lock and answers notHeld with 2 already; every agent-token hold is neverExtended; reserve-then-extend races for a mobile, a token and a promotion (first try waits or answers transient) and from-1 parallel cap tests at the cap's lock
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 187. T-197: K-05 clock calls (armClock, cancelClock, dueClocks with dueForHandle and dueForSweep, fireClock once per row) and parkTurn with K-37's parked\_turns row, each with its integration tests (\#189)
+
+- **Commit:** [`a1efaa1`](https://github.com/aryamahadik/rosie/commit/a1efaa1), by Arya Mahadik, 2026-11-08 22:04:48 UTC
+- **Pull request:** [#189](https://github.com/aryamahadik/rosie/pull/189) from `task/T-197`, merged 2026-11-08 22:04:49 UTC. It squashed 1 branch commit:
+  - `ae0f093` T-197: K-05 clock calls (armClock, cancelClock, dueClocks with dueFor…
+- **Files changed:** 4 (+3782 −0), by folder:
+  - `db/repo/` clocks.int.test.ts +1168 −0, clocks.ts +2004 −0, park.int.test.ts +439 −0, park.ts +171 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 186. T-204: Migration 0020: people and access part (K-22): staff details, the owner's ID upload record, admins, sessions, proof codes, contact changes (\#192)
+
+- **Commit:** [`19404d1`](https://github.com/aryamahadik/rosie/commit/19404d1), by Arya Mahadik, 2026-11-08 22:04:45 UTC
+- **Pull request:** [#192](https://github.com/aryamahadik/rosie/pull/192) from `task/T-204`, merged 2026-11-08 22:04:45 UTC. It squashed 4 branch commits:
+  - `452728e` T-204: Migration 9999\_people\_access (K-22 v1.1): eleven tables, rules…
+  - `1947700` T-204: rls.int.test.ts: K-22's four named exceptions (DL-169): polici…
+  - `907cd50` T-204: round 3 (DL-170): check\_proof\_code answers expired for a NULL …
+  - `c5563c8` T-204: number the migration 0020 at merge (lead, DL-095)
+- **Files changed:** 3 (+3992 −11), by folder:
+  - `db/migrations/` 0020\_people\_access.sql +893 −0
+  - `db/repo/` people-access.int.test.ts +2885 −0, rls.int.test.ts +214 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-204: Migration 9999_people_access (K-22 v1.1): eleven tables, rules 4, 5 and 8 policies, grants and five definer calls; integration test; rls table lists and grant matrix
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-204: rls.int.test.ts: K-22's four named exceptions (DL-169): policies of contact_changes, page_links, proof_codes and sessions; made-only-when-missing counts; rosie_app's 63 column grants; the five definer calls kept out of FUNCTIONS
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-204: round 3 (DL-170): check_proof_code answers expired for a NULL time before any update; proof_code_limits answers paused with no end for any NULL argument; tests that the five definer calls fail closed on NULL and that no edge input makes check_proof_code raise
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-204: number the migration 0020 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 185. T-060: Freeze K-21 page and console calls v1.1: journey 3 screens (\#195)
+
+- **Commit:** [`347c4af`](https://github.com/aryamahadik/rosie/commit/347c4af), by Arya Mahadik, 2026-11-08 22:04:41 UTC
+- **Pull request:** [#195](https://github.com/aryamahadik/rosie/pull/195) from `task/T-060`, merged 2026-11-08 22:04:41 UTC. It squashed 3 branch commits:
+  - `848306a` T-060: freeze K-21 page-api v1.1, journey 3's booking page (screen 1,…
+  - `e24ad04` T-060: page-api v1.1 round 2 on the lead's rulings DL-166: the page e…
+  - `c39b8b3` T-060: page-api v1.1 round 3 on the lead's rulings DL-172: a code is …
+- **Files changed:** 22 (+1777 −3), by folder:
+  - `contracts/page-api/` README.md +137 −1, frozen.json +1 −1, page-api.rules.mjs +55 −0, page-api.v1.1.schema.json +927 −0
+  - `contracts/page-api/fixtures/` booking-check-code-no-match.json +20 −0, booking-check-code-wrong.json +20 −0, booking-check-start.json +23 −0, booking-page-not-listed.json +19 −0, booking-page-own-line.json +27 −0, booking-page-safety-first.json +27 −0, booking-page-start.json +22 −0, index.json +18 −1, listing-barbershop.json +289 −0, listing-kind-not-live.json +20 −0, listing-not-listed.json +17 −0, swap-card-number.json +6 −0
+  - `contracts/page-api/fixtures/invalid/` refuse-booking-check-says-matched.json +28 −0, refuse-booking-start-names-booker.json +10 −0, refuse-listing-checked-badge.json +69 −0, refuse-listing-code-without-kind.json +7 −0, refuse-opened-after-emergency.json +29 −0, refuse-unscrubbed-card.json +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-060: freeze K-21 page-api v1.1, journey 3's booking page (screen 1, with A3-43's check) and public listing (FS 6.3): publicPage envelope with no session or link; readListing (page-only), startBookingRequest (K-09 v1.1 recordSafetyOutcome then openRequest at door page), bookingCheckStart (checkBookingFirst), bookingCheckCode (proveCode); requestRef and checkId kept on the server, bound to the device token; 7 accepted and 3 refused fixtures; README v1.1 section and freeze record; frozen.json v1, v1.1
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-060: page-api v1.1 round 2 on the lead's rulings DL-166: the page entry swaps card numbers and Social Security numbers in typed words first (pageWordsSwap, named rule scrubbedPassedOn in page-api.rules.mjs); only customer columns on the listing (no location kind, no paper owner, no tip line); the opened answer's go-on safetyLine, with safetyFirst for any line until K-09's minor version, stop words and a threat answered (cannotBookHere); the live check first; each service's length; one listing per kind of work (the listing code names the business and a kind part; trade name, kind name, the kind's services and papers); no fixture answers checked until K-09 gives the page server the code id; photo labels, the barbershop's live seed, the travel fee; README defaults 39 to 45, open gaps 32 to 36; 10 accepted and 6 refused v1.1 fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-060: page-api v1.1 round 3 on the lead's rulings DL-172: a code is live only when its business and its kind of work are both live, by K-09 v1 readSetup's per-kind rule, else notListed with nothing read or written (publicPage, notListedError, listingCode; README defaults 24, 37 and 40, the T-117 list, open gap 35's reads; new fixture listing-kind-not-live: Lee Electric's code while Electrical is not live); round 2's code-right fixture renamed with git mv to booking-check-code-no-match (a code that does not match answers wrong and counts the try, default 29), its index entry, notes and every v1.1 line leaving what a right code answers to open gap 34; default 45's reason is A3-48; startBookingRequest.errors maps recordSafetyOutcome's errors; requestId's way to each K-09 call said once and open gap 22 names where the try counts are kept; default 38's flow from the kind's ways; default 33 rounds travelArea.miles down; open gap 37 on a team member's papers; 11 accepted and 6 refused v1.1 fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 184. T-040: Freeze K-31 v1: Database schema: the visit (\#202)
+
+- **Commit:** [`81356e3`](https://github.com/aryamahadik/rosie/commit/81356e3), by Arya Mahadik, 2026-11-08 22:04:37 UTC
+- **Pull request:** [#202](https://github.com/aryamahadik/rosie/pull/202) from `task/T-040`, merged 2026-11-08 22:04:37 UTC. It squashed 2 branch commits:
+  - `09fa908` T-040: Freeze K-31 v1 (db-schema/visit): table list of 8 tables, 6 se…
+  - `462636a` T-040: K-31 v1 round 2 (DL-174): customer\_state and stopped\_found sec…
+- **Files changed:** 23 (+3833 −0), by folder:
+  - `contracts/db-schema/visit/` README.md +200 −0, frozen.json +1 −0, visit.v1.tables.json +2083 −0
+  - `contracts/db-schema/visit/fixtures/` index.json +156 −0, seed-check-in.json +45 −0, seed-done.json +125 −0, seed-late-fan-out.json +266 −0, seed-no-show.json +83 −0, seed-price-at-visit.json +220 −0, seed-visit-check.json +159 −0
+  - `contracts/db-schema/visit/fixtures/invalid/` refuse-check-in-rewritten.json +23 −0, refuse-clock-mark-names-person.json +54 −0, refuse-code-after-third-wrong-try.json +41 −0, refuse-cross-business-visit-read.json +18 −0, refuse-first-step-result-in-stopped-why.json +57 −0, refuse-late-without-question.json +49 −0, refuse-mark-on-other-business-visit.json +40 −0, refuse-no-show-asked-before-safe.json +35 −0, refuse-no-visit-after-reply.json +45 −0, refuse-owner-reads-visit-check.json +18 −0, refuse-price-line-rewritten.json +22 −0, refuse-price-shown-before-owner-ok.json +50 −0, refuse-turned-away-reason-in-side.json +43 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-040: Freeze K-31 v1 (db-schema/visit): table list of 8 tables, 6 seeds and 9 refused rows, README with the freeze record, frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-040: K-31 v1 round 2 (DL-174): customer_state and stopped_found secure-page only, split from side and stopped_why; not_met after any reply; a no-show marked by a clock's silence names no person; four refused fixtures; README rules 7, 8 and 10, visit_done per flow, defaults 15 to 18, open gaps
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 183. T-051: Freeze K-09 Tool API v1.2: journey 4 calls (\#201)
+
+- **Commit:** [`0589709`](https://github.com/aryamahadik/rosie/commit/0589709), by Arya Mahadik, 2026-11-08 22:04:33 UTC
+- **Pull request:** [#201](https://github.com/aryamahadik/rosie/pull/201) from `task/T-051`, merged 2026-11-08 22:04:34 UTC. It squashed 5 branch commits:
+  - `17fabbb` T-051: Freeze K-09 v1.2: journey 4's calls (matchService, setWhoFor, …
+  - `8d0bdbb` T-051: K-09 v1.2 round 2 (DL-162): the owner's changed price stored b…
+  - `5479c8f` T-051: K-09 v1.2 round 2: the person served's band when not the booke…
+  - `8802522` T-051: K-09 v1.2 round 3 (DL-171): one rule for who a saved time is h…
+  - `a7294eb` T-051: K-09 v1.2 round 4 (DL-175), README only: default 86 names the …
+- **Files changed:** 64 (+6560 −7), by folder:
+  - `contracts/tool-api/` README.md +259 −3, frozen.json +1 −1, tool-api.rules.mjs +158 −2, tool-api.v1.2.schema.json +3781 −0
+  - `contracts/tool-api/fixtures/` index.json +60 −1, j4-add-customer-agent.json +41 −0, j4-ask-photos-agent.json +55 −0, j4-check-address-page.json +38 −0, j4-check-place-area-street-agent.json +43 −0, j4-check-place-area-turn.json +44 −0, j4-extend-time-agent-hold-page.json +24 −0, j4-extend-time-ownai-refused.json +24 −0, j4-extend-time-page.json +43 −0, j4-join-waitlist-texts-off-page.json +39 −0, j4-join-waitlist-turn.json +38 −0, j4-match-service-agent.json +55 −0, j4-meets-pro-link-page.json +37 −0, j4-meets-pro-page.json +35 −0, j4-meets-pro-someone-else-page.json +38 −0, j4-meets-pro-yes-page.json +48 −0, j4-page-answers-access.json +42 −0, j4-page-answers-flow-a.json +45 −0, j4-photos-page.json +43 −0, j4-place-other-flow-agent.json +46 −0, j4-price-at-visit-agent.json +38 −0, j4-price-list-agent.json +38 −0, j4-quote-change-confirm-turn.json +54 −0, j4-quote-change-turn.json +52 −0, j4-quote-price-page.json +51 −0, j4-quote-see-first-turn.json +64 −0, j4-quote-send-page.json +62 −0, j4-quote-send-turn.json +57 −0, j4-reach-card-agent.json +33 −0, j4-save-time-agent-instant.json +64 −0, j4-save-time-agent.json +64 −0, j4-save-time-turn.json +49 −0, j4-secure-link-agent.json +45 −0, j4-secure-link-turn.json +44 −0, j4-show-times-agent.json +92 −0, j4-show-times-turn.json +95 −0, j4-who-for-agent.json +44 −0, j4-who-for-not-allowed-page.json +47 −0, j4-who-for-teen-parent-link-agent.json +53 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-j4-add-customer-without-way.json +13 −0, refuse-j4-agent-hold-extendable.json +64 −0, refuse-j4-agent-hold-extended.json +15 −0, refuse-j4-ai-time-extendable.json +21 −0, refuse-j4-area-kept-from-street-match.json +12 −0, refuse-j4-area-without-way.json +12 −0, refuse-j4-change-without-price.json +21 −0, refuse-j4-link-url-in-turn.json +40 −0, refuse-j4-meets-pro-link-texted.json +13 −0, refuse-j4-meets-pro-yes-texts-off-with-consent.json +13 −0, refuse-j4-ownai-door-from-page.json +63 −0, refuse-j4-page-answers-from-agent.json +16 −0, refuse-j4-parent-link-keeps-person.json +23 −0, refuse-j4-quote-priced-by-agent.json +18 −0, refuse-j4-reach-card-calls-only.json +13 −0, refuse-j4-reach-card-unbound-agent.json +13 −0, refuse-j4-service-stated-as-who-for.json +55 −0, refuse-j4-street-address-from-agent.json +12 −0, refuse-j4-waitlist-any-unbounded.json +15 −0, refuse-j4-waitlist-texts-off-with-consent.json +10 −0, refuse-j4-waitlist-yes-from-agent.json +15 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-051: Freeze K-09 v1.2: journey 4's calls (matchService, setWhoFor, setReachWay, addCustomer, setPrice, quoteFromPhotos, showTimes, saveTime, joinWaitlist, sendSecureLink, checkPlace, saveSecurePage), each journey 4 key written by one call named with its step ids, the named rule givesJourneyFourKeys, 20 accepted and 9 refused fixtures, frozen v1.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-051: K-09 v1.2 round 2 (DL-162): the owner's changed price stored before its read-back (quoteFromPhotos change, changeReadBack); linkIssued for the links the master gives (a teen's parent link, see first's times link, the photos link by via and its page, the pricing page's quote message through a clock row); the meets-pro adult's own link, mobile, texts yes and meets_pro_person_id; C3's 15 minutes only for an AI's instant money booking, with extendTime; A4-80 by screen 2's categories; both flows' ways and the place pick, checkPlace naming its way; addCustomer's way and band; a bounded waitlist with a texts-off answer; an AI's place kept only as a matched town or ZIP; the rule's turn branch; 17 accepted and 10 refused fixtures added; frozen v1.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-051: K-09 v1.2 round 2: the person served's band when not the booker stays with the request (open gap 54), CQ-74 and Q-01 for a stopped mobile's waitlist yes, v1.1 open gap 27 marked closed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-051: K-09 v1.2 round 3 (DL-171): one rule for who a saved time is held for (an agent caller's save for its agent token from its own authentication, a page's or a turn's for the booker's mobile on file, mobileRequired with none), the same in saveTime's and extendTime's descriptions, default 61 and the save fixtures' notes; extendTime decides from that stored holder, extends only a mobile's hold (heldFor phoneNumber) and refuses every agent-token hold with notExtendable until the hold's door is recorded (open gap 85), so an AI's standard save answers extendable false; refuse-j4-meets-pro-link-texted asked in a turn; stale shows fixed; see-first writes B4-101's open question and clock row; defaults 78 to 80 and open gaps 86, 87; 1 accepted and 2 refused fixtures added
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-051: K-09 v1.2 round 4 (DL-175), README only: default 86 names the option choices of A4-94's and B4-101's see-first question ('1 Book a visit', '2 No thanks') and of A4-10's and B4-11's read-back ('1 Send it', '2 Type another price') for C-075 and C-115 in a turn, each with its label as sent, its definition from defaults 79 and 80, its walk, and no field but typeAnother's new price (new_options, from which code builds newOptions); open gap 88 names the K-01 minor version that gives those four steps their splits; default 80 gains C-118's fixed read-back wording, since the yes binds to the stored words; open gap 89 for several options or a range in a changed price; no schema, fixture or index change
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 182. T-203: Migration 0019: business setup part (K-23): business fields, companies, locations, places and things (\#184)
+
+- **Commit:** [`9f2bd25`](https://github.com/aryamahadik/rosie/commit/9f2bd25), by Arya Mahadik, 2026-11-08 14:06:21 UTC
+- **Pull request:** [#184](https://github.com/aryamahadik/rosie/pull/184) from `task/T-203`, merged 2026-11-08 14:06:21 UTC. It squashed 2 branch commits:
+  - `2198064` T-203: migration 9999\_business\_setup.sql (0019 at merge): K-23 v1's n…
+  - `2c1e706` T-203: number the migration 0019 at merge (lead, DL-095)
+- **Files changed:** 3 (+1619 −1), by folder:
+  - `db/migrations/` 0019\_business\_setup.sql +453 −0
+  - `db/repo/` business-setup.int.test.ts +1157 −0, rls.int.test.ts +9 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-203: migration 9999_business_setup.sql (0019 at merge): K-23 v1's nine business setup tables, exactly as the frozen table list states them (business_setup, flow_defaults, companies, company_kinds, business_photos, business_faqs, locations with PostGIS map points and a GiST index, places_or_things, new_booking_pauses), the version trigger on each, row-level security in T-191's pattern and select, insert and update to both roles with each grant's reader named; business-setup.int.test.ts checks the catalog against the table list, loads the six seeds alone and together with K-04's, scopes every table by business and refuses the four refused fixtures for their one reason; rls.int.test.ts's table list adds K-23
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-203: number the migration 0019 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 181. T-326: Stripe effect kinds: charges, saved cards, refunds, pay links, with the effect id stored on the object (\#183)
+
+- **Commit:** [`a01c6c5`](https://github.com/aryamahadik/rosie/commit/a01c6c5), by Arya Mahadik, 2026-11-08 13:56:45 UTC
+- **Pull request:** [#183](https://github.com/aryamahadik/rosie/pull/183) from `task/T-326`, merged 2026-11-08 13:56:45 UTC. It squashed 2 branch commits:
+  - `5e38f37` T-326: Stripe effect kinds: save a card, charges, refunds, pay links,…
+  - `f0727f5` T-326: Stripe kinds answer as soon as the runner stops waiting (a cal…
+- **Files changed:** 11 (+2859 −0), by folder:
+  - `actions/src/effects/stripe/` answer.test.ts +206 −0, answer.ts +114 −0, index.ts +38 −0, late-try.test.ts +187 −0, late-try.ts +138 −0, port.ts +80 −0, request.test.ts +362 −0, request.ts +302 −0, stripe-kinds.test.ts +1039 −0, stripe-kinds.ts +147 −0, test-support.ts +246 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-326: Stripe effect kinds: save a card, charges, refunds, pay links, dispute evidence and the monthly charge through K-14 v1 on each row's one key, built from the claimed row alone (a hold never built), a decline never retried, a late try's look-up by effect id, tested on the Stripe double
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-326: Stripe kinds answer as soon as the runner stops waiting (a call or the writing time that never comes back), and refuse an odd port request or answer result without throwing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 180. T-253: Crash in the middle of a turn: rerun, resume, park after the third (\#182)
+
+- **Commit:** [`c8dec4c`](https://github.com/aryamahadik/rosie/commit/c8dec4c), by Arya Mahadik, 2026-11-08 13:54:03 UTC
+- **Pull request:** [#182](https://github.com/aryamahadik/rosie/pull/182) from `task/T-253`, merged 2026-11-08 13:54:03 UTC. It squashed 2 branch commits:
+  - `1962564` T-253: Crash in the middle of a turn: a committed turn holds its leas…
+  - `5d1d1cd` T-253: crash tests check the holds at the rerun's commit and fail on …
+- **Files changed:** 9 (+1730 −63), by folder:
+  - `runtime/src/actor/` handle-actor.ts +30 −3, index.ts +10 −1, lease.ts +288 −36
+  - `runtime/src/turn/` crash.worker.test.ts +974 −0, index.ts +7 −3, park.ts +233 −0, test-support.ts +62 −6, turn.ts +41 −9, types.ts +85 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-253: Crash in the middle of a turn: a committed turn holds its lease until its reply ends (a rerun composes only rows with no plan), a third lapse with no commit parks the turn through K-05 parkTurn and wakes the dispatcher for its one row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-253: crash tests check the holds at the rerun's commit and fail on assertions, not timeouts; room for a busy machine
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 179. T-255: Clock arming at the first delivery receipt and step 9's due rule: a pure due rule in the right zone (flow A the business's, flow B the visit address's, across DST), the never-delivered deadline, and the arming the receipt path calls (K-05 armClock by the question, a second receipt arms nothing twice, the never-delivered row cancelled, the actor's syncClocks) (\#181)
+
+- **Commit:** [`80df806`](https://github.com/aryamahadik/rosie/commit/80df806), by Arya Mahadik, 2026-11-08 13:45:24 UTC
+- **Pull request:** [#181](https://github.com/aryamahadik/rosie/pull/181) from `task/T-255`, merged 2026-11-08 13:45:24 UTC. It squashed 1 branch commit:
+  - `10160f7` T-255: Clock arming at the first delivery receipt and step 9's due ru…
+- **Files changed:** 10 (+2494 −5), by folder:
+  - `runtime/src/clocks/` actors.ts +4 −3, arming-support.ts +440 −0, arming.test.ts +440 −0, arming.ts +464 −0, arming.worker.test.ts +100 −0, due.test.ts +497 −0, due.ts +231 −0, index.ts +35 −0, types.ts +186 −2, zone.ts +97 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 178. T-313: Finalize call: options, slots, claim check, message checks; one rewrite, fallback, passed on (\#180)
+
+- **Commit:** [`163d9a9`](https://github.com/aryamahadik/rosie/commit/163d9a9), by Arya Mahadik, 2026-11-08 13:22:36 UTC
+- **Pull request:** [#180](https://github.com/aryamahadik/rosie/pull/180) from `task/T-313`, merged 2026-11-08 13:22:37 UTC. It squashed 2 branch commits:
+  - `1c6808a` T-313: finalize call: options, slots, claim check and message checks …
+  - `3ebf80b` T-313: round 2 (DL-158): (a) Rosie's own fixed terms (the row's step …
+- **Files changed:** 15 (+2629 −6), by folder:
+  - `actions/src/finalize/checks/` checks.test.ts +29 −1, reading.ts +14 −5, types.ts +7 −0
+  - `actions/src/finalize/` index.ts +414 −0
+  - `actions/src/finalize/rewrite/` attempt.ts +99 −0, errors.ts +69 −0, fallback.ts +131 −0, finalize.test.ts +765 −0, index.ts +45 −0, parts.test.ts +190 −0, parts.ts +165 −0, passed-on.ts +62 −0, test-support.ts +376 −0, told.ts +74 −0, types.ts +189 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-313: finalize call: options, slots, claim check and message checks on a plan; one rewrite told what failed by slot names and reasons; the step's fallback through the same checks; the passed-on line with the question withdrawn (K-05 v1 cancelClock) and one review item; final parts written with K-05 v1 writePlan through ports (fake repo in tests); never a fixed-line row, never stopReply; labels-only notes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-313: round 2 (DL-158): (a) Rosie's own fixed terms (the row's step card lines that name no slot) leave the Shape and Length counts like slot values, Values still reads them, so finalize-pass.json gives send word for word; (b) the step's fallback is never cut: a slot the reader may never see stays as written and Values fails on its '{{', so finalize-passed-on.json's path is the fixture's (slotValues as K-03 defines them, each fixture error named); (c) no filled value in the answer's check details or the rewrite's request: every place of each value written as its slot, glued or not, longest first, a detail still holding one cut down to its check's name
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 177. T-291: Frontier assembler and open-question choices from stored state (\#179)
+
+- **Commit:** [`5b8cc73`](https://github.com/aryamahadik/rosie/commit/5b8cc73), by Arya Mahadik, 2026-11-08 13:03:18 UTC
+- **Pull request:** [#179](https://github.com/aryamahadik/rosie/pull/179) from `task/T-291`, merged 2026-11-08 13:03:19 UTC. It squashed 2 branch commits:
+  - `5981730` T-291: Frontier assembler and open-question choices from stored state
+  - `c9de2ca` T-291: Stakes walk stops only where someone is asked, a clock waits o…
+- **Files changed:** 17 (+3250 −0), by folder:
+  - `actions/src/frontier/assemble/` assemble.test.ts +179 −0, assemble.ts +153 −0, bundle.test.ts +269 −0, bundle.ts +405 −0, check.ts +51 −0, frame.ts +106 −0, handler.test.ts +244 −0, handler.ts +220 −0, log.ts +64 −0, no-model-client.test.ts +119 −0, registry.ts +22 −0, test-support.ts +591 −0, types.ts +253 −0
+  - `actions/src/frontier/` index.ts +41 −0
+  - `actions/src/frontier/sources/open-questions/` index.ts +4 −0, open-questions.test.ts +363 −0, open-questions.ts +166 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-291: Frontier assembler and open-question choices from stored state
+
+buildFrontier registered on the T-290 Tool API base: the turn's stored state read once through K-05 v1.2
+readTurnState under the call's business (a repo port with fixture fakes), the pinned bundle's flow graphs, and a
+closed choice list assembled from pluggable source slots in order (open questions built; branch gates, hubs and
+doors, any-time rows not yet: each fails closed, offers nothing and is logged). Every open question sent to this
+handle gives one option per message branch its card defines, labelled by business, date and time, from the bundle
+it was asked under, with stakes from its walk. Returns K-02 v1 context, checked; labels only in logs and spans;
+no model client imported under actions/src/frontier (a test scans the imports).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-291: Stakes walk stops only where someone is asked, a clock waits or the path ends: a split code settles (every branch a lookup) is counted and walked down every branch, a list's end goes where its branch rejoins, a split the walk cannot classify is unknown; tests on A5-04, A6-10 and the master's A6-01
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 176. T-301: limit 3, the exact yes: replaces the fail-closed stub with the decider's own yes bound to the read-back's exact text and versions (K-04 open\_questions read through K-05 v1.2; who decides from T-308); refuses tapbacks, relayed yeses, stale read-backs, unbound own-AI and page yeses, and money parts with no read-back tied to their booking; fresh read-back once, then the step's safe default with an owner notice (K-09 v1 limit3Outcome); 74 unit tests on K-09 commit-limit-3-no-exact-yes.json, K-06 poll-vote, reaction and edit-after-commit, and K-04's seeds (\#178)
+
+- **Commit:** [`df82bdf`](https://github.com/aryamahadik/rosie/commit/df82bdf), by Arya Mahadik, 2026-11-08 12:55:20 UTC
+- **Pull request:** [#178](https://github.com/aryamahadik/rosie/pull/178) from `task/T-301`, merged 2026-11-08 12:55:20 UTC. It squashed 1 branch commit:
+  - `dcf5b77` T-301: limit 3, the exact yes: replaces the fail-closed stub with the…
+- **Files changed:** 5 (+2306 −5), by folder:
+  - `actions/src/gate/limit-3/` exact-yes.test.ts +795 −0, exact-yes.ts +434 −0, facts.ts +186 −0, index.ts +118 −5, test-support.ts +773 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 175. T-1094: Migration 0018: the definer functions answer only what K-05 needs; chat\_links kept as issued; rosie\_app off effects and provider\_events (\#177)
+
+- **Commit:** [`2c9fa83`](https://github.com/aryamahadik/rosie/commit/2c9fa83), by Arya Mahadik, 2026-11-08 12:54:11 UTC
+- **Pull request:** [#177](https://github.com/aryamahadik/rosie/pull/177) from `task/T-1094`, merged 2026-11-08 12:54:11 UTC. It squashed 3 branch commits:
+  - `8fda5ec` T-1094: narrow the definer functions and chat\_links' update grant; a …
+  - `8f9f2df` T-1094: round 2 (DL-149): a trigger keeps chat\_links' code and ready …
+  - `c5a5e72` T-1094: number the migration 0018 at merge (lead, DL-095)
+- **Files changed:** 7 (+778 −69), by folder:
+  - `db/migrations/` 0018\_core\_rls\_narrow.sql +134 −0
+  - `db/repo/` consent.int.test.ts +219 −16, effects-schema.int.test.ts +87 −31, reservations.int.test.ts +80 −0, reservations.ts +16 −11, rls.int.test.ts +208 −9, scope.ts +34 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1094: narrow the definer functions and chat_links' update grant; a business-scoped handle read; Tool API paths refuse an empty scope
+
+Migration 9999_core_rls_narrow.sql (0017 at merge), expand only:
+- reservations_booked_overlap (CREATE OR REPLACE, same signature): the resource
+  matches only within the caller's business scope; a worker's booked time at any
+  business (FS line 743). Another business's room answers nothing.
+- handles_id_of_mobile(text): security definer, bound when made, search_path
+  pinned; the handle id of one mobile, or null for an unknown number, a non-mobile
+  address or no scope. EXECUTE to rosie_app only.
+- chat_links: UPDATE narrowed to given_via, owner_retold_at, used_at and version
+  for both roles, so ready_text stays as issued (K-29 line 71).
+
+scope.ts: requireBusinessScope() and BusinessScopeError; withBusiness refuses a
+callback that ends with its scope emptied or changed (rolled back).
+reservations.ts: stale clock_rows comment corrected; overlap docs updated.
+Tests: rls (grant matrix, column grants, definer list, handle read, empty scope
+on rosie_job), reservations (room and worker probes), consent (chat_links grant).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1094: round 2 (DL-149): a trigger keeps chat_links' code and ready text as issued and lets given_via only grow, for every role and the owner; rosie_app loses SELECT, INSERT and UPDATE on effects and provider_events; grant matrices and refusal tests updated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1094: number the migration 0018 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 174. T-154: lint rules L5 to L8 (twin drift, cut names, no safe default line, banned old-rule phrases), one file each in the T-153 runner, each tested alone against the vendored lib.js; L1 to L8 on the uncorrected master give lintSteps' hits: 0 errors, the 24 allowed (\#176)
+
+- **Commit:** [`2111495`](https://github.com/aryamahadik/rosie/commit/2111495), by Arya Mahadik, 2026-11-08 12:54:07 UTC
+- **Pull request:** [#176](https://github.com/aryamahadik/rosie/pull/176) from `task/T-154`, merged 2026-11-08 12:54:08 UTC. It squashed 1 branch commit:
+  - `5ff8303` T-154: lint rules L5 to L8 (twin drift, cut names, no safe default li…
+- **Files changed:** 8 (+1227 −0), by folder:
+  - `compiler/src/lint/` l5.test.ts +183 −0, l5.ts +145 −0, l6.test.ts +180 −0, l6.ts +163 −0, l7.test.ts +147 −0, l7.ts +61 −0, l8.test.ts +175 −0, l8.ts +173 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 173. T-307: Messages and consent service base: outbox rows, consent rows, reach way, chat-open and stopped flags (\#175)
+
+- **Commit:** [`5dae3a3`](https://github.com/aryamahadik/rosie/commit/5dae3a3), by Arya Mahadik, 2026-11-08 12:38:43 UTC
+- **Pull request:** [#175](https://github.com/aryamahadik/rosie/pull/175) from `task/T-307`, merged 2026-11-08 12:38:43 UTC. It squashed 2 branch commits:
+  - `858e8ed` T-307: Messages and consent service base: outbox rows (one message, o…
+  - `36b6865` T-307: a yes's from-handle, whenever given, must be the person's own …
+- **Files changed:** 7 (+2545 −0), by folder:
+  - `actions/src/domain/messages-consent/` consent.ts +220 −0, index.ts +63 −0, messages-consent.test.ts +1096 −0, messages-consent.ts +528 −0, outbox.ts +126 −0, reads.ts +90 −0, test-support.ts +422 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-307: Messages and consent service base: outbox rows (one message, one recipient, one channel, send class, every version the read-back showed; no text row to a mobile with no open chat, reported to the caller; a stopped mobile gets only a safety line or the stop's one reply; never an SMS port), consent rows (a yes bound to its read-back, a STOP or START as a new row for every business, edits refused), and each person's reach way, chat-open and stopped flags and stored language
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-307: a yes's from-handle, whenever given, must be the person's own (RULES 7.1); the yes's words are the read-back limit 3 bound it to
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 172. T-1104: Freeze K-03 v1.1: Rosie's own fixed terms reach the composer as facts (\#174)
+
+- **Commit:** [`4ed0839`](https://github.com/aryamahadik/rosie/commit/4ed0839), by Arya Mahadik, 2026-11-08 11:55:47 UTC
+- **Pull request:** [#174](https://github.com/aryamahadik/rosie/pull/174) from `task/T-1104`, merged 2026-11-08 11:55:48 UTC. It squashed 2 branch commits:
+  - `85def0d` T-1104: Freeze K-03 v1.1: Rosie's own fixed terms reach the composer …
+  - `5a61bf8` T-1104: K-03's v1 contract test reads v1's entries of the shared fixt…
+- **Files changed:** 10 (+788 −28), by folder:
+  - `contracts/message-plan/` README.md +61 −2, frozen.json +1 −1, message-plan.rules.mjs +58 −0, message-plan.v1.1.schema.json +292 −0
+  - `contracts/message-plan/fixtures/` index.json +35 −0, input-and-plan-s1-02.json +69 −0, input-s1-02-v1.1.json +48 −0
+  - `contracts/message-plan/fixtures/invalid/` refuse-plan-s1-02-on-v1-input.json +52 −0, refuse-term-no-fact-holds.json +69 −0
+  - `tests/contract/` message-plan.v1.test.ts +103 −25
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1104: Freeze K-03 v1.1: Rosie's own fixed terms reach the composer as term facts with their source lines; inputAndPlan and the named rule numbersHeldByFacts; input-s1-02's v1.1 twin, its pair with plan-s1-02, and two refused pairs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1104: K-03's v1 contract test reads v1's entries of the shared fixtures index and runs the named rules through checkContractFixtures, as inbound-event.v1.test.ts does; v1's counts and checks unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 171. T-586: home registry: the ten homes resolve to their one module (clock to the runtime's due rule), an unknown home fails the build, the home wins over a step's claims with the difference logged by label, and a step following an unbuilt home is held (\#173)
+
+- **Commit:** [`2046c44`](https://github.com/aryamahadik/rosie/commit/2046c44), by Arya Mahadik, 2026-11-08 11:55:44 UTC
+- **Pull request:** [#173](https://github.com/aryamahadik/rosie/pull/173) from `task/T-586`, merged 2026-11-08 11:55:44 UTC. It squashed 1 branch commit:
+  - `5428808` T-586: home registry: the ten homes resolve to their one module (cloc…
+- **Files changed:** 5 (+1003 −0), by folder:
+  - `actions/src/homes/registry/` homes.ts +55 −0, index.ts +19 −0, registry.test.ts +391 −0, registry.ts +420 −0, test-support.ts +118 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 170. T-252: Turn loop, second half: compose each committed outbox row in parallel (K-09 composeInput, the composer, finalizeMessage with at most one rewrite; fallback and passed-on inside finalize), an email copy takes its text row's plan through K-05 writePlan with no composer call, a fixed line's row is never composed, the dispatcher woken once per committed turn (\#171)
+
+- **Commit:** [`417ce38`](https://github.com/aryamahadik/rosie/commit/417ce38), by Arya Mahadik, 2026-11-08 11:55:41 UTC
+- **Pull request:** [#171](https://github.com/aryamahadik/rosie/pull/171) from `task/T-252`, merged 2026-11-08 11:55:41 UTC. It squashed 1 branch commit:
+  - `b7e8618` T-252: Turn loop, second half: compose each committed outbox row in p…
+- **Files changed:** 6 (+2314 −27), by folder:
+  - `runtime/src/turn/` compose.ts +785 −0, compose.worker.test.ts +1027 −0, index.ts +12 −3, test-support.ts +191 −3, turn.ts +43 −11, types.ts +256 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 169. T-323: Effects runner core: claim effect rows, one key, 5 retries in 10 minutes, then the outage row (\#172)
+
+- **Commit:** [`7177974`](https://github.com/aryamahadik/rosie/commit/7177974), by Arya Mahadik, 2026-11-08 11:46:40 UTC
+- **Pull request:** [#172](https://github.com/aryamahadik/rosie/pull/172) from `task/T-323`, merged 2026-11-08 11:46:41 UTC. It squashed 2 branch commits:
+  - `ae820e6` T-323: Effects runner core: claim effect rows, run each kind's port o…
+  - `cd389ad` T-323: Effects runner: a run after an outage (serviceBack's claim) go…
+- **Files changed:** 13 (+2952 −0), by folder:
+  - `actions/src/effects/` kinds.ts +124 −0
+  - `actions/src/effects/runner/` clock.ts +44 −0, entry.test.ts +109 −0, entry.ts +121 −0, errors.ts +40 −0, index.ts +37 −0, kinds.test.ts +92 −0, runner.test.ts +951 −0, runner.ts +462 −0, schedule.test.ts +86 −0, schedule.ts +54 −0, test-support.ts +657 −0, types.ts +175 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-323: Effects runner core: claim effect rows, run each kind's port on the row's one key, 5 tries in 10 minutes then the outage row, a decline never tried again, each result recorded with its effect.result entry and effectRun span; fake clock, fake port and a fake repo with K-05 v1.1 claim semantics
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-323: Effects runner: a run after an outage (serviceBack's claim) goes on the same key as a new run
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 168. T-581: Migration 0017: notifications part (K-36): pages to Rosie's team with acknowledgement, owner alerts and hand-offs (\#170)
+
+- **Commit:** [`a75da3f`](https://github.com/aryamahadik/rosie/commit/a75da3f), by Arya Mahadik, 2026-11-08 11:46:37 UTC
+- **Pull request:** [#170](https://github.com/aryamahadik/rosie/pull/170) from `task/T-581`, merged 2026-11-08 11:46:38 UTC. It squashed 2 branch commits:
+  - `e40b4a5` T-581: Migration for K-36 v1 notifications: hand\_offs (row-level secu…
+  - `973474b` T-581: number the migration 0017 at merge (lead, DL-095)
+- **Files changed:** 3 (+2265 −2), by folder:
+  - `db/migrations/` 0017\_notifications.sql +246 −0
+  - `db/repo/` rls.int.test.ts +14 −2
+  - `db/test/` notifications.int.test.ts +2005 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-581: Migration for K-36 v1 notifications: hand_offs (row-level security on business_id, 0012's two policies), team_pages (Tool API insert only) and team_page_recipients (rosie_job only), every column, key, check and index as the frozen list, partial uniques as partial unique indexes, version triggers on all three; 59 integration tests in db/test; rls test table lists and grant matrix
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-581: number the migration 0017 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 167. T-254: clock rows: each actor's one alarm at its earliest row (a clockRow entry in the shared stored schedule), a one-minute sweep on the Worker's scheduled handler that fires missed rows through their handle's actor and handle-less rows as jobs, and one fire-once path for the alarm, the sweep and staging's Fire now that runs the step's clock branch as a clock turn (K-09 gateAndCommit, input.kind clock; K-05 fireClock once, repeated on a repeat), each firing under its own trace id; Workers tests on K-05's due and fire fixtures (\#169)
+
+- **Commit:** [`79e1fd2`](https://github.com/aryamahadik/rosie/commit/79e1fd2), by Arya Mahadik, 2026-11-08 11:38:40 UTC
+- **Pull request:** [#169](https://github.com/aryamahadik/rosie/pull/169) from `task/T-254`, merged 2026-11-08 11:38:40 UTC. It squashed 1 branch commit:
+  - `e063f04` T-254: clock rows: each actor's one alarm at its earliest row (a cloc…
+- **Files changed:** 11 (+1862 −5), by folder:
+  - `runtime/src/actor/` handle-actor.ts +35 −2
+  - `runtime/src/clocks/` actor-clocks.ts +220 −0, actors.ts +43 −0, clocks.worker.test.ts +465 −0, fire-now.ts +59 −0, fire.ts +380 −0, index.ts +16 −0, sweep.ts +150 −0, test-support.ts +268 −0, types.ts +195 −0
+  - `runtime/src/` index.ts +31 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 166. T-251: Turn loop, first half: frontier, decide, re-read, gate and commit (\#168)
+
+- **Commit:** [`5b0bfdf`](https://github.com/aryamahadik/rosie/commit/5b0bfdf), by Arya Mahadik, 2026-11-08 10:26:35 UTC
+- **Pull request:** [#168](https://github.com/aryamahadik/rosie/pull/168) from `task/T-251`, merged 2026-11-08 10:26:36 UTC. It squashed 3 branch commits:
+  - `5ef42d6` T-251: Turn loop, first half: inside the lease, the guard, K-09 build…
+  - `5d9bb88` T-251: A run replaced during its valueFailsWords re-read sends the tu…
+  - `5064976` T-251: Keep the keyword committer registry private to the turn module…
+- **Files changed:** 7 (+3252 −0), by folder:
+  - `runtime/src/turn/` index.ts +18 −0, keywords.ts +45 −0, lease-turn.worker.test.ts +411 −0, test-support.ts +586 −0, turn.ts +999 −0, turn.worker.test.ts +864 −0, types.ts +329 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-251: Turn loop, first half: inside the lease, the guard, K-09 buildFrontier, K-02 decide with its one re-read (and closestEntries when nothing fits), then gate and commit through the lease with its CommitContext passed on unchanged; keyword-only turns through T-267's replies with each text's recordSafetyOutcome in the one commit; ports tested against fixture fakes and inside the real actor
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-251: A run replaced during its valueFailsWords re-read sends the turn to the gate no second time (test)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-251: Keep the keyword committer registry private to the turn module (only turnReplyCore is exported)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 165. T-1088: A safety read cut off by the actor's eviction resumes from an alarm; holds bind commits (\#162)
+
+- **Commit:** [`70294ba`](https://github.com/aryamahadik/rosie/commit/70294ba), by Arya Mahadik, 2026-11-08 09:23:24 UTC
+- **Pull request:** [#162](https://github.com/aryamahadik/rosie/pull/162) from `task/T-1088`, merged 2026-11-08 09:23:25 UTC. It squashed 6 branch commits:
+  - `69ba52c` T-1088: a safety read cut off by the actor's eviction resumes from a …
+  - `89620e1` T-1088: test that the safety alarm firing past the deadline while a r…
+  - `2755419` T-1088: round 2 (DL-127): a text under an open unread hold is read ag…
+  - `159d36b` T-1088: round 3 (DL-132): a danger outcome stays open until its line …
+  - `965c5a0` T-1088: round 4 (DL-144): a danger's hold is written from every outco…
+  - `26d1831` T-1088: round 5 (DL-146): the text's row is marked danger in the same…
+- **Files changed:** 13 (+3451 −137), by folder:
+  - `runtime/src/actor/` batch.ts +39 −20, batch.worker.test.ts +133 −15, handle-actor.ts +162 −32, index.ts +3 −1, lease.ts +55 −9, lease.worker.test.ts +276 −8
+  - `runtime/src/gateway/` hand-off.worker.test.ts +12 −2
+  - `runtime/src/safety/` arrival.ts +739 −49, index.ts +5 −1, resume.worker.test.ts +1958 −0, rules.ts +5 −0, safety.worker.test.ts +53 −0, types.ts +11 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1088: a safety read cut off by the actor's eviction resumes from a stored alarm (read again with the time left, or past 4 s the timeout rule at once and a re-read for a late verdict, in arrival order, through the actor's settle path); a timedOut answer before the deadline takes the deadline's rule (DL-112); holds bind commits, not hand-offs (DL-119): a batch waits only for its own unread texts, LeasedTurn.holds, the commit hook is handed the holds open at commit time; lease.onAlarm syncs its entry with no lease held; routineHeld() counts a waiting text with no safety row; the gateway log test matches the whole card number (DL-116)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+# Conflicts:
+#	runtime/src/actor/handle-actor.ts
+#	runtime/src/actor/index.ts
+#	runtime/src/actor/lease.ts
+#	runtime/src/actor/lease.worker.test.ts
+
+* T-1088: test that the safety alarm firing past the deadline while a read's work still runs sends no second read and comes back in 1 s
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1088: round 2 (DL-127): a text under an open unread hold is read again every 30 s from a stored entry until a verdict lands, so an eviction that loses its late answer cannot leave it held for good; a timedOut or failed answer keeps the hold and sets the next re-read; on return the other held texts are read at once, in arrival order; the 1 s alarm for hanging work backs off to 30 s once the line's 5 s budget is spent; alarm() and the constructor guard the safety resume; a key store that throws at once makes the words unreadable (the outage line); CommitContext carries the unread event ids; holds read after T-249's pin; batch.ts comment; the hand-off test's line 262 matches the whole card number
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1088: round 3 (DL-132): a danger outcome stays open until its line has gone and its record is kept (safety_pending, noted before the hold or any send, cleared once the core answers or the direct line and its record are kept); a text left open by an eviction or a failed line stays scheduled like an unread hold's re-read; a cut-off read whose verdict had found danger takes no timeout rule and is read again at once; a resumed or late danger verdict for it goes through sendDanger again with the same idempotency key, so the line goes once and the record is kept; applyLate drops an answer only once the outcome is complete and lifts the unread hold only then; any other answer is not used (the first verdict stands), though a danger word still gets its line; a hold written again is never looser; the core call is wrapped so a synchronous throw still writes the hold and sends the line (note b); rereadDue skips a text whose read is out (note a); 7 Workers tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1088: round 4 (DL-144): a danger's hold is written from every outcome kept for the text (the strictest rule of them all) when the danger is noted, before the core is called, in place of an unread hold; the core's hold then takes its place, never looser; a resume or re-read writes it again if it is missing; the batch's held() no longer counts an open danger, so its batch and later ones (a STOP's included) go on while its hold binds the commit (CQ-65); on return only a text that no longer waits makes others due, and never an open danger, so each keeps its 30 s re-read; 5 Workers tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1088: round 5 (DL-146): the text's row is marked danger in the same noting step that writes the danger's hold (markDanger, beside markDangerPending and holdFromOutcomes, before the core is called), so on the late path a text whose timeout-rule outage line failed (lineFailed, danger 0) counts as read once its hold is written; an eviction during the late danger's send no longer leaves held() keeping its batch, and every later one (a STOP's included), back while the re-reads say No; 1 Workers test (isStopped throws at 4 s, late An emergency at 6 s, the core hangs, the cut, re-reads say No: the batch goes on with the after_safe hold, a later STOP's batch reaches its turn and commits with holds [after_safe] and unread [], routineHeld stays true)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 164. T-149: Bundle emitter: manifest, per-flow graphs, record, routing, shared lists and one compiled overlay per trade (\#167)
+
+- **Commit:** [`8001958`](https://github.com/aryamahadik/rosie/commit/8001958), by Arya Mahadik, 2026-11-08 08:56:18 UTC
+- **Pull request:** [#167](https://github.com/aryamahadik/rosie/pull/167) from `task/T-149`, merged 2026-11-08 08:56:19 UTC. It squashed 4 branch commits:
+  - `d6341f1` T-149: bundle emitter and compiler build: manifest, per-flow graphs (…
+  - `1645e9e` T-149: build prints the lint marks per rule; tests for the K-01 mappi…
+  - `9507db4` T-149: build reads the written directory back and checks it: K-01 v1 …
+  - `3184acd` T-149: a trade's wordless message \[from, to, elements\] gets the words…
+- **Files changed:** 15 (+2869 −0), by folder:
+  - `compiler/src/cli/commands/` build.ts +198 −0
+  - `compiler/src/emit/` cli.test.ts +204 −0, emit.test.ts +469 −0, emit.ts +324 −0, flow.ts +135 −0, index.ts +81 −0, read.ts +97 −0, shared-list.ts +21 −0, shared-lists.test.ts +153 −0, shared-lists.ts +159 −0, standins.ts +220 −0, steps.ts +272 −0, trade.ts +238 −0, validate.test.ts +111 −0, validate.ts +187 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-149: bundle emitter and compiler build: manifest, per-flow graphs (corrections and slotting run), record, routing, shared lists from each module's shared-list.ts, one compiled overlay per trade, checked against K-01 v1 with Ajv, byte-identical builds, named stand-ins for what other tasks give
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-149: build prints the lint marks per rule; tests for the K-01 mappings (settings per flow, a one-label screen row, timing false, flow B's type step)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-149: build reads the written directory back and checks it: K-01 v1 with Ajv, and each file's size and sha256 against the manifest's storage table
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-149: a trade's wordless message [from, to, elements] gets the words '' before the stages read it (page types, effects, fallback); stand-ins return one shape; the step walk checks every id once
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 163. T-195: Data access: commit a turn, all or nothing, unique on the turn id (K-05 v1.1) (\#166)
+
+- **Commit:** [`b0a6431`](https://github.com/aryamahadik/rosie/commit/b0a6431), by Arya Mahadik, 2026-11-08 08:56:15 UTC
+- **Pull request:** [#166](https://github.com/aryamahadik/rosie/pull/166) from `task/T-195`, merged 2026-11-08 08:56:15 UTC. It squashed 2 branch commits:
+  - `634b6cc` T-195: commitTurn at K-05 v1.1: one transaction as rosie\_job with the…
+  - `c1a00d4` T-195: the per write scope proved for inserts too: a recording rosie\_…
+- **Files changed:** 2 (+2632 −0), by folder:
+  - `db/repo/` commit-turn.int.test.ts +1172 −0, commit-turn.ts +1460 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-195: commitTurn at K-05 v1.1: one transaction as rosie_job with the scope set per write, unique on the turn id (a repeat answers the first commit, a parked turn turnParked), the locks then the compares (reservationLost, versionChanged with every changed row, wrongState for an effect let go not in outage), then the turn's state, open questions, clock rows, outbox rows with no plan, reservation confirms and releases (promotion included, saved-time clock rows), effects, waiting rows and event-log entries; database refusals answer constraint, other database errors leave as SQLSTATE only; 33 integration tests: all 15 commit fixtures (v1, v1.1, v1.2) against data-access v1.1 with Ajv strict, 50 parallel calls with one turn id, limits 4 and 5, a backend killed mid-transaction, a late refusal, per write scope, p95 52 ms
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-195: the per write scope proved for inserts too: a recording rosie_job client shows each insert and update of a two-business turn under its own business, the turn and a no-business entry on the runtime side
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 162. T-267: guard fixed replies: STOP, START and HELP recorded through K-09's core actions in the keyword turn's one commit, their words written into their rows by code (K-01's lines, Q-01's draft while pendingJay), never the composer; the stop reply carries stopReply so limit 8 sends it with override\_optout; each business told gets RULES 7.5's one line; Workers and unit tests (\#165)
+
+- **Commit:** [`1e84f4e`](https://github.com/aryamahadik/rosie/commit/1e84f4e), by Arya Mahadik, 2026-11-08 08:29:13 UTC
+- **Pull request:** [#165](https://github.com/aryamahadik/rosie/pull/165) from `task/T-267`, merged 2026-11-08 08:29:14 UTC. It squashed 1 branch commit:
+  - `27de44a` T-267: guard fixed replies: STOP, START and HELP recorded through K-0…
+- **Files changed:** 8 (+2534 −1), by folder:
+  - `runtime/src/guard/` index.ts +38 −1
+  - `runtime/src/guard/replies/` index.ts +22 −0, replies.test.ts +243 −0, replies.ts +523 −0, replies.worker.test.ts +923 −0, test-support.ts +411 −0, types.ts +263 −0, words.ts +111 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 161. T-1103: Skeleton end-to-end test in its prefix form (tests/e2e/skeleton): one JOIN webhook (Sam, test owner 1, the sample cast) through T-465's local target with every double, judged by T-551's checkSkeletonRun; under SKELETON\_UPTO the hop's contract tests are read from the Vitest JSON report CONTRACT\_REPORT names, and with none the hop fails closed, naming it; an unknown name fails, named; unset it asserts only what T-465's driver proves today (200 and the receive hop once), skips nothing, and its header says T-466 completes it (\#164)
+
+- **Commit:** [`ab19177`](https://github.com/aryamahadik/rosie/commit/ab19177), by Arya Mahadik, 2026-11-08 08:29:10 UTC
+- **Pull request:** [#164](https://github.com/aryamahadik/rosie/pull/164) from `task/T-1103`, merged 2026-11-08 08:29:11 UTC. It squashed 1 branch commit:
+  - `3352a83` T-1103: Skeleton end-to-end test in its prefix form (tests/e2e/skelet…
+- **Files changed:** 2 (+223 −0), by folder:
+  - `tests/e2e/skeleton/` README.md +27 −0, skeleton.test.ts +196 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 160. T-580: Migration 0016: safety and incidents part (K-34): outcomes sealed, holds and release, harm reports, safety timers, privacy slips (\#163)
+
+- **Commit:** [`d3ed27b`](https://github.com/aryamahadik/rosie/commit/d3ed27b), by Arya Mahadik, 2026-11-08 08:23:15 UTC
+- **Pull request:** [#163](https://github.com/aryamahadik/rosie/pull/163) from `task/T-580`, merged 2026-11-08 08:23:15 UTC. It squashed 2 branch commits:
+  - `e3bc48a` T-580: Migration for K-34 v1 safety and incidents: safety\_outcomes (w…
+  - `961b3c6` T-580: number the migration 0016 at merge (lead, DL-095)
+- **Files changed:** 3 (+2930 −1), by folder:
+  - `db/migrations/` 0016\_safety\_incidents.sql +420 −0
+  - `db/repo/` rls.int.test.ts +17 −1
+  - `db/test/` safety-incidents.int.test.ts +2493 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-580: Migration for K-34 v1 safety and incidents: safety_outcomes (words sealed, insert and select only), safety_holds with their release, harm_reports (Tool API insert only), safety_timers and privacy_incidents; row-level security on the four scoped tables in 0012's shape; version triggers on the four updated tables; 82 integration tests in db/test; rls test table lists and grant matrix
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-580: number the migration 0016 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 159. T-551: hop-prefix mode in tests/e2e/\_driver/prefix: SKELETON\_UPTO names a hop of 02-contracts section 11 (a K-08 hop of T-465's SKELETON\_HOPS, or a join card's row name such as gateway); hops 1 to n once each, in order, by T-465's checkRun over the spans up to the prefix's last hop (later spans not judged); the hop's row's v1 contract tests read from the caller's Vitest JSON report, no pass assumed; unknown names refused, named; unset returns checkRun's report itself; 540 e2e tests (\#161)
+
+- **Commit:** [`8cfd319`](https://github.com/aryamahadik/rosie/commit/8cfd319), by Arya Mahadik, 2026-11-08 07:52:59 UTC
+- **Pull request:** [#161](https://github.com/aryamahadik/rosie/pull/161) from `task/T-551`, merged 2026-11-08 07:53:00 UTC. It squashed 1 branch commit:
+  - `05256e7` T-551: hop-prefix mode in tests/e2e/\_driver/prefix: SKELETON\_UPTO nam…
+- **Files changed:** 9 (+1457 −0), by folder:
+  - `tests/e2e/_driver/prefix/` contract-report.test.ts +196 −0, contract-report.ts +110 −0, index.ts +42 −0, prefix.test.ts +407 −0, prefix.ts +178 −0, section-11.test.ts +150 −0, section-11.ts +180 −0, skeleton-upto.test.ts +87 −0, test-support.ts +107 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 158. T-153: Lint runner and the master's rules L1 to L4 (lib.js lintSteps), each in its own file with its own test; parity with lintSteps on the uncorrected master (\#159)
+
+- **Commit:** [`579107b`](https://github.com/aryamahadik/rosie/commit/579107b), by Arya Mahadik, 2026-11-08 07:52:13 UTC
+- **Pull request:** [#159](https://github.com/aryamahadik/rosie/pull/159) from `task/T-153`, merged 2026-11-08 07:52:13 UTC. It squashed 1 branch commit:
+  - `6014218` T-153: Lint runner and the master's rules L1 to L4 (lib.js lintSteps)…
+- **Files changed:** 10 (+1927 −0), by folder:
+  - `compiler/src/lint/` l1.test.ts +151 −0, l1.ts +139 −0, l2.test.ts +139 −0, l2.ts +221 −0, l3.test.ts +161 −0, l3.ts +145 −0, l4.test.ts +147 −0, l4.ts +138 −0, runner.test.ts +274 −0, runner.ts +412 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 157. T-311: Claim check (limit 7): each slot's field visible to this recipient (\#160)
+
+- **Commit:** [`e5a1086`](https://github.com/aryamahadik/rosie/commit/e5a1086), by Arya Mahadik, 2026-11-08 07:45:38 UTC
+- **Pull request:** [#160](https://github.com/aryamahadik/rosie/pull/160) from `task/T-311-r2`, merged 2026-11-08 07:45:39 UTC. It squashed 2 branch commits:
+  - `14e9195` T-311: claim check (limit 7): each slot's field visible to this recip…
+  - `839c4db` T-311: round 2 (DL-131): the claim check refuses a text with a broken…
+- **Files changed:** 7 (+1622 −0), by folder:
+  - `actions/src/finalize/claim-check/` audience.ts +100 −0, claim-check.test.ts +508 −0, claim-check.ts +494 −0, fields.test.ts +126 −0, fields.ts +224 −0, index.ts +40 −0, test-support.ts +130 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-311: claim check (limit 7): each slot's field visible to this recipient
+
+A slot passes only when its K-03 v1 audience and the audience of every frozen table-list column it reads (K-04 v1 and the domain parts) include the reader; a secure-page-only field reads 'Read it on the secure page'; a never-visible field, or one with no known audience, is cut with its sentence; the sensitive switch keeps the service and the reason on the secure page and gives initials. claimPlan and claimText claim before the fill (T-310), claimFacts gives the composer's facts, readerOf maps T-308's roles.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-311: round 2 (DL-131): the claim check refuses a text with a broken piece (a '{{' that opens no slot or a '}}' that closes none) and reads its claimed text again with the same pieces(), so each slot left for the fill is, in its place and as written, one this reader's claims showed (show or sensitiveForm); a refusal fails the plan closed (ok false, lines and question as written, nothing filled, no slot value) and names the line and why (broken, unclaimed); 6 new unit tests: the reviewer's three traced paths, a broken piece alone, a stray '}}' alone and the second guard alone (42 in all)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 156. T-305: One commit per turn: state, open question and clock row, outbox and effect rows, event log (\#158)
+
+- **Commit:** [`64f2c4e`](https://github.com/aryamahadik/rosie/commit/64f2c4e), by Arya Mahadik, 2026-11-08 07:34:06 UTC
+- **Pull request:** [#158](https://github.com/aryamahadik/rosie/pull/158) from `task/T-305-r2`, merged 2026-11-08 07:34:06 UTC. It squashed 3 branch commits:
+  - `b05d671` T-305: one commit per turn: gateAndCommit runs the gate (T-298) and t…
+  - `6a4f879` T-305: hand each core action and each passed part's writes the safety…
+  - `e52dc11` T-305: round 2 (DL-128): a part commits only if every open hold lets …
+- **Files changed:** 8 (+2918 −0), by folder:
+  - `actions/src/commit/` build.ts +446 −0, commit.test.ts +1092 −0, commit.ts +355 −0, errors.ts +70 −0, hold.ts +238 −0, index.ts +79 −0, test-support.ts +447 −0, types.ts +191 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-305: one commit per turn: gateAndCommit runs the gate (T-298) and turns the parts that may go into one K-05 v1.1 commitTurn request under the turn id (state writes, each asked question with its unarmed clock row, one outbox row per message with no plan, effect rows each on its own idempotency key, and a K-08 event-log entry per row), sent once through a K-05 port; a repeated turn id returns the first commit; refuses a bundle other than the turn's pin (CQ-72), holds routine parts under an open safety hold before the gate (CQ-65), keeps a go part waiting on its booking's one question (CQ-73); fails closed while a port, the clock branch or the planner is not built; 22 unit tests with a K-05 fake
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-305: hand each core action and each passed part's writes the safety holds in force (a safety outcome's hold binds the core actions after it); count the handler steps of the protective any-time rows (A3-48 pause, A3-50 private, STOP, death) as protective; keep a repeat's span free of rows; 23 unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-305: round 2 (DL-128): a part commits only if every open hold lets it through and no text is unread; every hold lets the protective changes through (STOP, death, threat rows; A7-11, B7-15, S2-08, A7-81, B7-73, A3-48, B3-30, A3-50, B3-32, each cited in the master); an after-safe hold also lets A3-24, A3-25, B3-19 and B3-20 through; A3-22, A3-23, A3-26, A3-49, B3-17, B3-31 and hand_off are held under every hold; openHolds answers the holds and the unread event ids (OpenHolds), handed to runCore and writesOf; types.ts says the three ports have no outside effect; 8 new unit tests (31)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 155. T-194: Migration 0015: effect rows, provider events and outbox claims (K-07's schema addition, with K-05 v1.1) (\#157)
+
+- **Commit:** [`08a7c4d`](https://github.com/aryamahadik/rosie/commit/08a7c4d), by Arya Mahadik, 2026-11-08 07:25:05 UTC
+- **Pull request:** [#157](https://github.com/aryamahadik/rosie/pull/157) from `task/T-194`, merged 2026-11-08 07:25:05 UTC. It squashed 2 branch commits:
+  - `90cfe1e` T-194: migration 9999\_effects\_provider\_events: K-07 v1 effects, provi…
+  - `49a702c` T-194: number the migration 0015 at merge (lead, DL-095)
+- **Files changed:** 3 (+1741 −3), by folder:
+  - `db/migrations/` 0015\_effects\_provider\_events.sql +215 −0
+  - `db/repo/` effects-schema.int.test.ts +1514 −0, rls.int.test.ts +12 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-194: migration 9999_effects_provider_events: K-07 v1 effects, provider_events and outbox_claims (version triggers; row-level security per business on effects and provider_events; select, insert, update grants as 0012; delete on outbox_claims to rosie_job only); effects-schema.int.test.ts proves the catalog against the table list, refuse-effect-without-key, provider events stored once, every rule, the version triggers, row-level security and grants; rls grant matrix lists K-07
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-194: number the migration 0015 at merge (lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 154. T-1099: limit 8 counts a texts yes as turning texts back on after a STOP only when it is the person's own yes from the number that stopped: the send state carries K-05 v1.2's stop time and covering texts row (with fromContact and bookingId, the fields the record needs; left out, the stop stands); a business's '1 Yes', and an answer holding textsOff and a consentId, never lift it; the refusal is a label on the dispatch span; 12 Workers tests on K-09 v1.1's frozen chain (\#156)
+
+- **Commit:** [`b019149`](https://github.com/aryamahadik/rosie/commit/b019149), by Arya Mahadik, 2026-11-08 07:18:29 UTC
+- **Pull request:** [#156](https://github.com/aryamahadik/rosie/pull/156) from `task/T-1099`, merged 2026-11-08 07:18:29 UTC. It squashed 1 branch commit:
+  - `640ddb7` T-1099: limit 8 counts a texts yes as turning texts back on after a S…
+- **Files changed:** 7 (+747 −13), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +22 −5, index.ts +9 −1, test-support.ts +2 −1, types.ts +41 −1
+  - `runtime/src/dispatch/limit8/` index.ts +5 −1, limit8.ts +63 −4, texts-yes.worker.test.ts +605 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 153. T-220: data access v1.2 reads on the runtime side as rosie\_job: handleTargets (the guard's roles, live open questions with send time and poll, bookings, phone flags), sendState (limit 8's send state from the row alone: phone, chat, newest texts consent, audience, zone, H04 hours, staging override, versions now, booking and question closed, record flags and pauses) and handleSealingKey (get or create a handle's key under an advisory lock on the address, a new person with no name at first sight or after every key was erased, the key wrapped under the named secret in sealing.ts's form and handed back unexportable, never in the answer); 51 integration tests: every K-05 v1.2 fixture of the three calls, 50 parallel calls make one key, a STOP is seen right after it commits, an erased key leaves the sealed field unreadable (\#155)
+
+- **Commit:** [`a52ed42`](https://github.com/aryamahadik/rosie/commit/a52ed42), by Arya Mahadik, 2026-11-08 07:06:51 UTC
+- **Pull request:** [#155](https://github.com/aryamahadik/rosie/pull/155) from `task/T-220`, merged 2026-11-08 07:06:52 UTC. It squashed 1 branch commit:
+  - `f972379` T-220: data access v1.2 reads on the runtime side as rosie\_job: handl…
+- **Files changed:** 6 (+3553 −0), by folder:
+  - `db/repo/` handle-keys.int.test.ts +699 −0, handle-keys.ts +366 −0, send-state.int.test.ts +866 −0, send-state.ts +465 −0, targets.int.test.ts +698 −0, targets.ts +459 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 152. T-085: Contract test inbound-event.v1: K-06 fixtures (v1 and v1.1) (\#154)
+
+- **Commit:** [`883f11e`](https://github.com/aryamahadik/rosie/commit/883f11e), by Arya Mahadik, 2026-11-08 06:39:42 UTC
+- **Pull request:** [#154](https://github.com/aryamahadik/rosie/pull/154) from `task/T-085`, merged 2026-11-08 06:39:43 UTC. It squashed 2 branch commits:
+  - `7d3f780` T-085: contract test inbound-event.v1: K-06 v1 and v1.1 fixtures, nam…
+  - `acf446e` T-085: round 2: refuse-no-event-id mended and accepted, kind pinned p…
+- **Files changed:** 1 (+867 −0), by folder:
+  - `tests/contract/` inbound-event.v1.test.ts +867 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-085: contract test inbound-event.v1: K-06 v1 and v1.1 fixtures, named rules, non-vacuous schema, side list
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-085: round 2: refuse-no-event-id mended and accepted, kind pinned per refused fixture, digits-only number check shown firing, consumers refuse every invalid one, entries selected by version
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 151. T-250: Guard: START, HELP and the 16 opt-out words in code, then the turn's targets (\#153)
+
+- **Commit:** [`8d59f1e`](https://github.com/aryamahadik/rosie/commit/8d59f1e), by Arya Mahadik, 2026-11-08 06:39:39 UTC
+- **Pull request:** [#153](https://github.com/aryamahadik/rosie/pull/153) from `task/T-250`, merged 2026-11-08 06:39:40 UTC. It squashed 2 branch commits:
+  - `969b3cb` T-250: guard: a text that is only START, HELP or one of the pinned bu…
+  - `2f86114` T-250: keyOf's doc comment wrapped to the line width
+- **Files changed:** 9 (+1503 −0), by folder:
+  - `runtime/src/guard/` guard.test.ts +373 −0, guard.ts +96 −0, index.ts +14 −0, keywords.test.ts +255 −0, keywords.ts +112 −0, targets.test.ts +208 −0, targets.ts +138 −0, test-support.ts +148 −0, types.ts +159 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-250: guard: a text that is only START, HELP or one of the pinned bundle's 16 opt-out words (K-01 v1 lists.keywords; any case, punctuation cut at the ends) goes to the fixed-reply path by code alone with nothing read, a bare CANCEL or CANCELAR also flagging the visit; the other texts go on with the handle's targets from K-05 v1.2 handleTargets (a fake port in tests) as K-09 guardTargets, open questions and bookings each a target, none the doors; a stop word is never handed on; fails closed on an unreadable keyword list or a failed targets read; guard span of counts and labels only; 96 unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-250: keyOf's doc comment wrapped to the line width
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 150. T-193: Migration 0014: platform and review part (K-37): parked turns, dead letters, gap cases, review queue (\#152)
+
+- **Commit:** [`26e085a`](https://github.com/aryamahadik/rosie/commit/26e085a), by Arya Mahadik, 2026-11-08 06:39:35 UTC
+- **Pull request:** [#152](https://github.com/aryamahadik/rosie/pull/152) from `task/T-193`, merged 2026-11-08 06:39:36 UTC. It squashed 2 branch commits:
+  - `9f6b242` T-193: migration 9999\_platform\_review: K-37 parked\_turns, dead\_letter…
+  - `6680c3b` T-193: number the platform and review migration 0014
+- **Files changed:** 3 (+1642 −1), by folder:
+  - `db/migrations/` 0014\_platform\_review.sql +243 −0
+  - `db/repo/` review.int.test.ts +1387 −0, rls.int.test.ts +12 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-193: migration 9999_platform_review: K-37 parked_turns, dead_letters, gap_cases, review_items and live_turn_labels (version triggers; rosie_job select, insert, update; no Tool API grant, no RLS: scope none); review.int.test.ts proves the catalog against the table list, the five seeds, both refused fixtures and every rule; rls grant matrix lists K-37
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-193: number the platform and review migration 0014
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 149. T-050: Freeze K-09 Tool API v1.1: journey 3 calls (rebased; the v1 base's tests read v1's own fixtures) (\#150)
+
+- **Commit:** [`3e22cbd`](https://github.com/aryamahadik/rosie/commit/3e22cbd), by Arya Mahadik, 2026-11-08 06:17:38 UTC
+- **Pull request:** [#150](https://github.com/aryamahadik/rosie/pull/150) from `task/T-050-r2`, merged 2026-11-08 06:17:38 UTC. It squashed 7 branch commits:
+  - `b26102d` T-050: freeze K-09 Tool API v1.1, journey 3 calls (openRequest, confi…
+  - `116e850` T-050: v1.1 binds a walk-in's booker to its caller, keeps a listed cu…
+  - `baf4c39` T-050: round 2 of K-09 v1.1: the arrival turn id from a marked input …
+  - `848d6e0` T-050: README open gap 45 names the minor version that stores a pendi…
+  - `3462b68` T-050: openRequest's version rule names every row it inserts at the b…
+  - `a425463` T-050: round 3 of K-09 v1.1: openRequest at the business's door write…
+  - `e23ba0e` T-050: the Tool API base's tests read K-09 v1's own fixture entries, …
+- **Files changed:** 44 (+4089 −8), by folder:
+  - `actions/src/tool-api/` test-support.ts +7 −2
+  - `contracts/tool-api/` README.md +167 −2, frozen.json +1 −1, tool-api.rules.mjs +183 −2, tool-api.v1.1.schema.json +2037 −0
+  - `contracts/tool-api/fixtures/` index.json +39 −1, j3-block-after-threat.json +36 −0, j3-check-booking-first.json +23 −0, j3-confirm-business-booking-change.json +54 −0, j3-confirm-business-booking-not-yet-text.json +47 −0, j3-confirm-business-booking-not-yet.json +57 −0, j3-confirm-business-booking-texts-off-page.json +63 −0, j3-confirm-business-booking-texts-off.json +47 −0, j3-confirm-business-booking-yes.json +47 −0, j3-find-customer.json +34 −0, j3-lift-block.json +28 −0, j3-open-request-agent.json +39 −0, j3-open-request-blocked.json +26 −0, j3-open-request-business-desk.json +57 −0, j3-open-request-business-text.json +59 −0, j3-open-request-page.json +39 −0, j3-open-request-walk-in.json +38 −0, j3-read-back-page.json +35 −0, j3-safety-agent-request.json +53 −0, j3-safety-arrival-batch-turn.json +95 −0, j3-safety-arrival-emergency.json +62 −0, j3-safety-arrival-own-line.json +62 −0, j3-safety-arrival-release.json +30 −0, j3-safety-arrival-threat-batch.json +126 −0, j3-safety-arrival-threat.json +62 −0, j3-safety-arrival-timeout.json +55 −0, j3-safety-page-request.json +53 −0, j3-stop-on-return-tells-businesses.json +43 −0, j3-stop-tells-businesses.json +49 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-j3-agent-request-without-read.json +15 −0, refuse-j3-arrival-record-of-no.json +56 −0, refuse-j3-arrival-record-without-turn.json +42 −0, refuse-j3-block-from-agent.json +11 −0, refuse-j3-business-door-from-agent.json +23 −0, refuse-j3-check-booking-acting-for-person.json +12 −0, refuse-j3-not-yet-left-held.json +19 −0, refuse-j3-read-back-yes-from-agent.json +20 −0, refuse-j3-turn-read-back-words.json +20 −0, refuse-j3-yes-without-way.json +18 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-050: freeze K-09 Tool API v1.1, journey 3 calls (openRequest, confirmBusinessBooking, findCustomer, checkBookingFirst, setCustomerBlock), the safety record on arrival, 17 accepted and 8 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: v1.1 binds a walk-in's booker to its caller, keeps a listed customer's contacts and way as on file (customerVersion), and states v1's turnless text record is refused
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: round 2 of K-09 v1.1: the arrival turn id from a marked input (arrivalTurnId, never a batch turn's), the BOOK's values stored in the BOOK turn and the reply booking them as entered (changeIt for '3 Change it'), readBackBusinessBooking for the Today page, a listed customer's contacts from the row, STOP's texts-off notice to the businesses (v1 gap 18), checkBookingFirst's per-contact limit; 25 accepted and 10 refused v1.1 fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: README open gap 45 names the minor version that stores a pending block
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: openRequest's version rule names every row it inserts at the business's door
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: round 3 of K-09 v1.1: openRequest at the business's door writes booking_details.taken 'nothing' so '2 Not yet' can show (default 55); the Today page's texts-off line has no outbox row (textsOff.outboxRowId null for a page, held by confirmBusinessBooking.exchange); a STOP with no turn tells each business through a clock row due at once on the owner's handle (default 56, open gap 43); README defaults and open gaps 27, 43, 44, 47 to 53 from the round 2 notes; 3 accepted fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-050: the Tool API base's tests read K-09 v1's own fixture entries, so v1.1's fixtures in the shared index do not reach them
+
+The lead's delta (DL-125): rebased onto main, then one filter in actions/src/tool-api/test-support.ts
+(fixtureEntries keeps entries whose version is v1, as its doc comment already said). Same v1 assertions.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 148. T-041: Freeze K-32 v1: Database schema: money (\#151)
+
+- **Commit:** [`c069ec7`](https://github.com/aryamahadik/rosie/commit/c069ec7), by Arya Mahadik, 2026-11-08 06:16:00 UTC
+- **Pull request:** [#151](https://github.com/aryamahadik/rosie/pull/151) from `task/T-041`, merged 2026-11-08 06:16:00 UTC. It squashed 4 branch commits:
+  - `2f52d7f` T-041: freeze K-32 v1, database schema money: 13 tables, 6 seeds, 8 r…
+  - `c573b63` T-041: add pay\_links (Rosie's pay page links, only the code's hash), …
+  - `0e2669e` T-041: round 2 fixes for K-32 money v1: customer id null until Stripe…
+  - `a74110d` T-041: round 3 for K-32 money v1: a membership bought on the page is …
+- **Files changed:** 20 (+5981 −0), by folder:
+  - `contracts/db-schema/money/` README.md +251 −0, frozen.json +1 −0, money.v1.tables.json +3174 −0
+  - `contracts/db-schema/money/fixtures/` index.json +132 −0, seed-fee-charged-twice.json +446 −0, seed-fee-rosfield-2.json +92 −0, seed-membership.json +400 −0, seed-pack-credits.json +255 −0, seed-pay-link.json +179 −0, seed-payment-deposit.json +237 −0, seed-refund-new-line.json +312 −0
+  - `contracts/db-schema/money/fixtures/invalid/` refuse-card-number-saved.json +68 −0, refuse-cross-business-payment-read.json +18 −0, refuse-fee-on-silence.json +85 −0, refuse-hold-payment.json +216 −0, refuse-ledger-update.json +19 −0, refuse-pack-over-credits.json +23 −0, refuse-pay-link-code-read.json +18 −0, refuse-payment-twice-one-effect.json +36 −0, refuse-rosfield-fee-update.json +19 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-041: freeze K-32 v1, database schema money: 13 tables, 6 seeds, 8 refused rows, README freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-041: add pay_links (Rosie's pay page links, only the code's hash), seed-pay-link and refuse-pay-link-code-read; README rules, seeds, checks, defaults and open gaps for 14 tables; table list cross-references to README rule 10
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-041: round 2 fixes for K-32 money v1: customer id null until Stripe names it, set once; set-once charged/dropped and charged/failed/skipped times on fees and plan charges; payments.plan_charge_id with one pending or paid payment per fee and plan charge; refunds second_payment and unbound_charge at once; credits no_fee; rule 5 payments check, rule 6 no TRUNCATE or owning role, rule 7 lists, K-14 row-by-row section, long pay-link code, probes for T-109
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-041: round 3 for K-32 money v1: a membership bought on the page is charged as its first plan charge, made with the customer present (plan_charges.customer_present, never updated; plan_charges_reminded_first passes it; plan_charges_one_customer_present; plan_charges_customer_present), named by its plan_charge payment and its 1%; purpose pack no longer covers a membership; a purchase no card pays ends the membership not_paid (default 28); rule 5 puts the cross-part and payments checks in WITH CHECK only so FOR UPDATE still locks a paid payment; refunds_one_at_once_per_payment; rule 10 late money after its charge line; open gap on at-once refunds with no listed effect writer; probes for T-109
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 147. T-465: End-to-end harness: webhook in, parts, outbox rows and trace hops out (\#149)
+
+- **Commit:** [`6f8bac4`](https://github.com/aryamahadik/rosie/commit/6f8bac4), by Arya Mahadik, 2026-11-08 06:12:22 UTC
+- **Pull request:** [#149](https://github.com/aryamahadik/rosie/pull/149) from `task/T-465`, merged 2026-11-08 06:12:22 UTC. It squashed 3 branch commits:
+  - `4c1dc42` T-465: end-to-end driver: local and staging targets, trace by trace i…
+  - `0d92cd1` T-465: console capture shared by concurrent targets; the no-key test …
+  - `8fb2e13` T-465: count duplicate sends per try from K-07 part states or the Lin…
+- **Files changed:** 14 (+2966 −0), by folder:
+  - `tests/e2e/_driver/` collect.test.ts +245 −0, contracts.ts +110 −0, hops.test.ts +377 −0, hops.ts +266 −0, index.ts +86 −0, local-target.test.ts +276 −0, local-target.ts +145 −0, outbox.ts +54 −0, parts.test.ts +376 −0, parts.ts +227 −0, run.ts +109 −0, staging-target.test.ts +281 −0, staging-target.ts +265 −0, trace.ts +149 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-465: end-to-end driver: local and staging targets, trace by trace id, Linq double parts, K-07 outbox rows, skeleton hop checker
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-465: console capture shared by concurrent targets; the no-key test proves its watch on the environment is on
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-465: count duplicate sends per try from K-07 part states or the Linq double's reports, never accepted outcomes alone: a same-key retry (K-07 rule 1, Linq dedupes) is one message under either double record; an accepted part reported failed and sent again under its next key (outbox-poll-failed-plain) reached the person once; two live deliveries of one part still fail; a target with neither report (staging) says one delivery cannot be shown; checkHops sets aside the AI gateway's model-call spans (portCall to anthropic, CQ-36) and still fails a missing or repeated hop
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 146. T-368: decide, one read: the decide prompt and CQ-25's two-step call through the AI gateway (step 1 the parts with their quotes and verbs and the text's language, step 2 one call per part side by side, cut from K-02), mapped into K-02 v1's decideRead and validated before it leaves the AI layer (K-02's schema and the named rules optionOffered and quoteInText); the answer is K-02's read with the model that read it and the language, or a typed refusal or modelsDown; 112 unit tests on the recorded-model double and K-02's fixtures (\#147)
+
+- **Commit:** [`5e35a00`](https://github.com/aryamahadik/rosie/commit/5e35a00), by Arya Mahadik, 2026-11-08 05:45:17 UTC
+- **Pull request:** [#147](https://github.com/aryamahadik/rosie/pull/147) from `task/T-368`, merged 2026-11-08 05:45:17 UTC. It squashed 1 branch commit:
+  - `4585e6e` T-368: decide, one read: the decide prompt and CQ-25's two-step call …
+- **Files changed:** 12 (+3297 −0), by folder:
+  - `ai/src/decide/` check.ts +222 −0, errors.ts +11 −0, index.ts +81 −0, map.ts +128 −0, prompt.test.ts +178 −0, prompt.ts +245 −0, read.test.ts +829 −0, read.ts +176 −0, schema.test.ts +417 −0, schema.ts +202 −0, test-support.ts +592 −0, types.ts +216 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 145. T-200: core seed from fixture set v1: 245 demo shops' business heads, owners with the owner role, handles, handle links and phone rows; checks fixtures/v1 against MANIFEST.sha256 first and reads nothing outside fixtures/; runs as rosie\_job; idempotent (\#146)
+
+- **Commit:** [`e44166a`](https://github.com/aryamahadik/rosie/commit/e44166a), by Arya Mahadik, 2026-11-08 05:44:12 UTC
+- **Pull request:** [#146](https://github.com/aryamahadik/rosie/pull/146) from `task/T-200`, merged 2026-11-08 05:44:13 UTC. It squashed 1 branch commit:
+  - `d906c60` T-200: core seed from fixture set v1: 245 demo shops' business heads,…
+- **Files changed:** 6 (+1529 −0), by folder:
+  - `db/seeds/` core.int.test.ts +529 −0, core.ts +150 −0
+  - `db/seeds/lib/` demo-shops.test.ts +206 −0, demo-shops.ts +202 −0, fixture-set.test.ts +132 −0, fixture-set.ts +310 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 144. T-192: Migration 0013: conversations and consent part (K-29): consent rows never edited, chat links issued (\#145)
+
+- **Commit:** [`dad64a8`](https://github.com/aryamahadik/rosie/commit/dad64a8), by Arya Mahadik, 2026-11-08 05:36:13 UTC
+- **Pull request:** [#145](https://github.com/aryamahadik/rosie/pull/145) from `task/T-192`, merged 2026-11-08 05:36:13 UTC. It squashed 2 branch commits:
+  - `dbed263` T-192: migration 9999\_consent: K-29 chat\_links and consents (rows onl…
+  - `e911e48` T-192: number the consent migration 0013
+- **Files changed:** 4 (+1803 −13), by folder:
+  - `db/migrations/` 0013\_consent.sql +184 −0
+  - `db/repo/` consent.int.test.ts +1275 −0, consent.ts +311 −0, rls.int.test.ts +33 −13
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-192: migration 9999_consent: K-29 chat_links and consents (rows only added, edits refused 42501), RLS per business as 0012; consent.ts reads and appends; tests; rls grant matrix and catalog lists cover K-29
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-192: number the consent migration 0013
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 143. T-134: element plain-text forms and the guard keyword list from msgtext.js, wrapped: plainText() is smsText() for every message of both flows (717 in A, 755 in B), elementTexts() gives each element's own form in smsText()'s order, typedOptions() the typed options, bareLinks() a card's link alone, bundleMessage() K-01's message with its plainText, flowMessages() every say/vary say/addSay; buildKeywords() and keywordsJson() give K-01's keywords (START, HELP, msgtext.js OPTOUT's 16 words read from its line 29, CANCEL and CANCELAR flagging the visit), equal to contracts/bundle/fixtures/keywords.json byte for byte; 27 unit tests (\#144)
+
+- **Commit:** [`2eb7ac9`](https://github.com/aryamahadik/rosie/commit/2eb7ac9), by Arya Mahadik, 2026-11-08 05:32:55 UTC
+- **Pull request:** [#144](https://github.com/aryamahadik/rosie/pull/144) from `task/T-134`, merged 2026-11-08 05:32:55 UTC. It squashed 1 branch commit:
+  - `db95bbb` T-134: element plain-text forms and the guard keyword list from msgte…
+- **Files changed:** 6 (+799 −0), by folder:
+  - `compiler/src/msgtext/` forms.test.ts +336 −0, forms.ts +162 −0, index.ts +25 −0, keywords.test.ts +153 −0, keywords.ts +39 −0, script.ts +84 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 142. T-298: policy gate framework: decide-output checks (verb, exact quote, offered option, value words) refuse before any limit runs (K-09 decideRefused); limits 1 to 6 per agreed part in order, the first failure stopping only that part and the parts on its booking; limit 6 answers valueFailsWords until decide's re-read; each limit slot a fail-closed stub registered in limits.ts (the call answers notBuilt, nothing passes); per-part results in K-09 v1's partResult shape; gate span logs limits 1 to 6, never words (\#143)
+
+- **Commit:** [`29993e5`](https://github.com/aryamahadik/rosie/commit/29993e5), by Arya Mahadik, 2026-11-08 04:59:00 UTC
+- **Pull request:** [#143](https://github.com/aryamahadik/rosie/pull/143) from `task/T-298`, merged 2026-11-08 04:59:00 UTC. It squashed 1 branch commit:
+  - `50ae303` T-298: policy gate framework: decide-output checks (verb, exact quote…
+- **Files changed:** 17 (+2440 −0), by folder:
+  - `actions/src/gate/framework/` checks.test.ts +287 −0, checks.ts +201 −0, errors.ts +51 −0, gate.test.ts +732 −0, gate.ts +368 −0, index.ts +51 −0, stub.ts +14 −0, test-support.ts +306 −0, tool-api.test.ts +215 −0, types.ts +150 −0
+  - `actions/src/gate/limit-1/` index.ts +7 −0
+  - `actions/src/gate/limit-2/` index.ts +7 −0
+  - `actions/src/gate/limit-3/` index.ts +7 −0
+  - `actions/src/gate/limit-4/` index.ts +7 −0
+  - `actions/src/gate/limit-5/` index.ts +7 −0
+  - `actions/src/gate/limit-6/` index.ts +8 −0
+  - `actions/src/gate/` limits.ts +22 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 141. T-249: bundle pin at turn start: each run of a turn pins its bundle id (stored per turn id, so a rerun keeps it; else the active id read through K-05), reads the manifest from KV or PostgreSQL's copy on a miss, checked against the id, and hands the turn's work the id, the bundle and a trace whose every span carries it (\#142)
+
+- **Commit:** [`af21b9d`](https://github.com/aryamahadik/rosie/commit/af21b9d), by Arya Mahadik, 2026-11-08 04:50:21 UTC
+- **Pull request:** [#142](https://github.com/aryamahadik/rosie/pull/142) from `task/T-249`, merged 2026-11-08 04:50:22 UTC. It squashed 1 branch commit:
+  - `b489dac` T-249: bundle pin at turn start: each run of a turn pins its bundle i…
+- **Files changed:** 11 (+1566 −11), by folder:
+  - `runtime/src/actor/` handle-actor.ts +16 −2, index.ts +2 −1, lease.ts +47 −7, lease.worker.test.ts +7 −1
+  - `runtime/src/bundle/` index.ts +15 −0, kv.ts +19 −0, pin.ts +315 −0, pin.worker.test.ts +596 −0, test-support.ts +168 −0, types.ts +153 −0, values.ts +228 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 140. T-308: identity and access service base: who a sender is for a business (live K-04 roles of the handle's people, this business only), booker, person served and payer kept apart, and who decides a visit (the person served; a minor's parent or guardian on file; the owner after a death), fees, refunds, team and settings (the owner or an admin with the K-22 power) and owner-only matters; reads K-04 through db/repo, admins' powers and the served person's age band behind ports with safe defaults; 30 unit tests on the frozen seeds (\#141)
+
+- **Commit:** [`971ecdf`](https://github.com/aryamahadik/rosie/commit/971ecdf), by Arya Mahadik, 2026-11-08 04:48:16 UTC
+- **Pull request:** [#141](https://github.com/aryamahadik/rosie/pull/141) from `task/T-308`, merged 2026-11-08 04:48:16 UTC. It squashed 1 branch commit:
+  - `3d33eb0` T-308: identity and access service base: who a sender is for a busine…
+- **Files changed:** 5 (+1420 −0), by folder:
+  - `actions/src/domain/identity-access/` facts.ts +98 −0, identity-access.test.ts +581 −0, identity-access.ts +294 −0, index.ts +37 −0, test-support.ts +410 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 139. T-191: Migration 0012: row-level security per business on every business-scoped core table (with T-1085) (\#140)
+
+- **Commit:** [`8edb79c`](https://github.com/aryamahadik/rosie/commit/8edb79c), by Arya Mahadik, 2026-11-08 04:40:26 UTC
+- **Pull request:** [#140](https://github.com/aryamahadik/rosie/pull/140) from `task/T-191`, merged 2026-11-08 04:40:26 UTC. It squashed 2 branch commits:
+  - `6c0e69f` T-191: row-level security per business on the 13 business-scoped core…
+  - `c8acf64` T-191: number the row-level security migration 0012
+- **Files changed:** 10 (+1442 −41), by folder:
+  - `db/migrations/` 0012\_core\_rls.sql +330 −0
+  - `db/repo/` bookings-head.int.test.ts +3 −3, event-log.int.test.ts +2 −2, outbox-schema.int.test.ts +2 −2, phones.int.test.ts +6 −6, reservations.int.test.ts +286 −4, reservations.ts +30 −18, rls.int.test.ts +777 −0, threads.int.test.ts +3 −3, turns.int.test.ts +3 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-191: row-level security per business on the 13 business-scoped core tables, roles rosie_app (Tool API, no bypass, owns nothing) and rosie_job (runtime side) with their grants, and two unscoped security-definer functions reserve() now uses for the cap of 2 and the booked overlap across businesses (T-1085 folded in)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-191: number the row-level security migration 0012
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 138. T-312: Message checks: fixed lines, values, one question, length, grade, banned forms (\#139)
+
+- **Commit:** [`859b678`](https://github.com/aryamahadik/rosie/commit/859b678), by Arya Mahadik, 2026-11-08 04:01:39 UTC
+- **Pull request:** [#139](https://github.com/aryamahadik/rosie/pull/139) from `task/T-312`, merged 2026-11-08 04:01:39 UTC. It squashed 3 branch commits:
+  - `bb81940` T-312: message checks (C-092): fixed lines, values, one question, nev…
+  - `b1e0647` T-312: round 2: opt-out check reads the step's and typed options on e…
+  - `beaf7ab` T-312: round 2: the business's own name counts as code-supplied, so t…
+- **Files changed:** 14 (+3236 −0), by folder:
+  - `actions/src/finalize/checks/` checks.test.ts +937 −0, checks.ts +368 −0, common-words.json +932 −0, common-words.record.mjs +76 −0, common-words.test.ts +65 −0, grade-parity.json +155 −0, grade-parity.record.mjs +24 −0, grade.test.ts +84 −0, grade.ts +78 −0, index.ts +36 −0, opt-out.ts +40 −0, reading.ts +138 −0, types.ts +110 −0, values.ts +193 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-312: message checks (C-092): fixed lines, values, one question, never in a message, shape, length and reading, format; lib.js grade() port with 30-line master parity
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-312: round 2: opt-out check reads the step's and typed options on every channel; names where a sentence starts unless a common word (recorded from the master's lines), fixed-line or master-line word; holdsWhole digit guard; any domain-like word is a link; <business> filled by a function; a quote taken out only at its own place
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-312: round 2: the business's own name counts as code-supplied, so the stricter sentence-start name rule does not flag it; comment reflow
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 137. T-248: turn lease: 60 s lease in the actor's storage under a turn id hashed from the texts' event ids; one restart before the commit, later batches wait for the next turn; a lapsed lease reruns from the sealed texts under the same id; T-247 security notes a, c, d, e (\#138)
+
+- **Commit:** [`8c919a5`](https://github.com/aryamahadik/rosie/commit/8c919a5), by Arya Mahadik, 2026-11-08 03:59:23 UTC
+- **Pull request:** [#138](https://github.com/aryamahadik/rosie/pull/138) from `task/T-248`, merged 2026-11-08 03:59:23 UTC. It squashed 1 branch commit:
+  - `48c5ad1` T-248: turn lease: 60 s lease in the actor's storage under a turn id …
+- **Files changed:** 10 (+1788 −70), by folder:
+  - `runtime/src/actor/` batch.ts +89 −27, batch.worker.test.ts +228 −11, handle-actor.ts +60 −11, inbox.ts +25 −8, index.ts +19 −1, lease.ts +569 −0, lease.worker.test.ts +705 −0
+  - `runtime/src/safety/` arrival.ts +43 −8, index.ts +1 −0, safety.worker.test.ts +49 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 136. T-030: Freeze K-21 v1: page and console calls, with K-22 v1.1 page links (\#137)
+
+- **Commit:** [`1c5aec7`](https://github.com/aryamahadik/rosie/commit/1c5aec7), by Arya Mahadik, 2026-11-08 03:57:35 UTC
+- **Pull request:** [#137](https://github.com/aryamahadik/rosie/pull/137) from `task/T-030`, merged 2026-11-08 03:57:36 UTC. It squashed 2 branch commits:
+  - `f5a5d39` T-030: freeze K-21 v1, the page and console calls: 26 calls with no b…
+  - `a295e5d` T-030: round 2 of the K-21 v1 freeze: the signed link row as K-22 v1.…
+- **Files changed:** 56 (+5709 −2), by folder:
+  - `contracts/db-schema/people-access/` README.md +41 −1, frozen.json +1 −1, people-access.v1.1.tables.json +205 −0
+  - `contracts/db-schema/people-access/fixtures/` index.json +56 −0, seed-page-link.json +77 −0
+  - `contracts/db-schema/people-access/fixtures/invalid/` refuse-page-link-code-read.json +18 −0, refuse-page-link-inserted-ended.json +28 −0, refuse-page-link-other-business-read.json +32 −0, refuse-page-link-raw-code.json +25 −0, refuse-page-link-reopened.json +23 −0, refuse-page-link-to-another-person.json +25 −0
+  - `contracts/page-api/` README.md +237 −0, frozen.json +1 −0, page-api.v1.schema.json +3143 −0
+  - `contracts/page-api/fixtures/` answer-from-page.json +35 −0, bill-card-setup.json +22 −0, calendar-connect-return.json +40 −0, calendar-connect-start.json +24 −0, email-check-on-page.json +25 −0, email-code-on-page.json +26 −0, fee-consent-ok.json +39 −0, fire-now-in-production.json +22 −0, fire-now.json +35 −0, go-live.json +42 −0, index.json +45 −0, open-link-expired.json +20 −0, open-link-secure-page.json +29 −0, open-link-signed-in.json +29 −0, registration-preview-summary.json +210 −0, registration-what-is-missing.json +108 −0, sign-in-already-signed-in.json +23 −0, sign-in-done.json +31 −0, sign-in-from-link-by-text.json +28 −0, sign-in-request.json +28 −0, sign-in-wrong-five.json +24 −0, sign-out.json +21 −0, staff-page.json +43 −0, stripe-onboarding-link.json +22 −0, stripe-onboarding-return.json +36 −0, team-console-pages.json +145 −0, team-page-acknowledge.json +24 −0, team-review-decide.json +33 −0, test-clock-rows.json +34 −0, test-phone-parts.json +98 −0, test-phone-send.json +26 −0, test-roster.json +104 −0, text-hours-override-clear.json +27 −0, text-hours-override.json +27 −0, upload-id-document.json +27 −0, upload-id-finished.json +38 −0
+  - `contracts/page-api/fixtures/invalid/` refuse-already-signed-in-with-token.json +24 −0, refuse-fire-now-in-production.json +35 −0, refuse-link-as-proof.json +29 −0, refuse-sign-in-names-person.json +12 −0, refuse-test-roster-in-production.json +97 −0, refuse-yes-without-session.json +10 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-030: freeze K-21 v1, the page and console calls: 26 calls with no browser identity (session and link bound on the server), sign-in and sessions, setup codes, registration, answers with read-backs and the page's yes, uploads, Stripe, the bill card, calendars, the staff page, the team console, six staging-only tools with the test-phone picker's listing; 32 accepted and 5 refused fixtures, README freeze record, frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-030: round 2 of the K-21 v1 freeze: the signed link row as K-22 v1.1 page_links (table, rule 8 grants and page_link_for_code, one seed and 6 refused rows, v1.1 frozen); README says how a link is issued, found and ended; the session token leaves once (alreadySignedIn; check_proof_code outcomes mapped); testRoster carries each business's text hours and each phone's override state; readRegistration carries the screen 20 preview and the screen 24 summary; N3, N4, N5; 3 accepted and 1 refused K-21 fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 135. T-365: Safety read: 8 outcomes, tense, evidence words, Haiku then Sonnet at 2 s each (\#136)
+
+- **Commit:** [`27b7098`](https://github.com/aryamahadik/rosie/commit/27b7098), by Arya Mahadik, 2026-11-08 03:45:36 UTC
+- **Pull request:** [#136](https://github.com/aryamahadik/rosie/pull/136) from `task/T-365`, merged 2026-11-08 03:45:37 UTC. It squashed 2 branch commits:
+  - `14dc327` T-365: safety read: Haiku then Sonnet at 2 s each outside the AI gate…
+  - `be2a9b8` T-365: give a no-verdict answer at the 4 s mark however fast both tri…
+- **Files changed:** 10 (+2293 −0), by folder:
+  - `ai/src/safety/` index.ts +55 −0, prompt.test.ts +158 −0, prompt.ts +240 −0, read.test.ts +850 −0, read.ts +229 −0, schema.test.ts +188 −0, schema.ts +133 −0, test-support.ts +202 −0, types.ts +133 −0, wire.ts +105 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-365: safety read: Haiku then Sonnet at 2 s each outside the AI gateway, K-02 labels from the 8 outcomes with tense, evidence, who is at risk and who wrote it; no verdict at 4 s; one K-08 span per call; the safety read prompt for the bundle
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-365: give a no-verdict answer at the 4 s mark however fast both tries fail, so the actor's own 4 s rule applies; refuse an empty safety read prompt at set-up; show each example's answer as the model returns it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 134. T-190: Migration 0011: the event log, append-only, with sealed private values (\#135)
+
+- **Commit:** [`70995d7`](https://github.com/aryamahadik/rosie/commit/70995d7), by Arya Mahadik, 2026-11-08 03:16:52 UTC
+- **Pull request:** [#135](https://github.com/aryamahadik/rosie/pull/135) from `task/T-190`, merged 2026-11-08 03:16:52 UTC. It squashed 2 branch commits:
+  - `d2e8ab6` T-190: event\_log migration (append-only, edits refused with 42501, se…
+  - `bfc093f` T-190: number the event log migration 0011
+- **Files changed:** 3 (+887 −0), by folder:
+  - `db/migrations/` 0011\_core\_event\_log.sql +81 −0
+  - `db/repo/` event-log.int.test.ts +534 −0, event-log.ts +272 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-190: event_log migration (append-only, edits refused with 42501, sealed private values), append and read calls, integration tests
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-190: number the event log migration 0011
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 133. T-310: slot filler: every K-03 v1 slot filled from the record and code facts (record rows by path and record values, money from whole cents with its currency), today and tomorrow bound at fill and worded at send in the reader's zone, a plan with an unknown or unfilled slot fails (\#134)
+
+- **Commit:** [`d0913ac`](https://github.com/aryamahadik/rosie/commit/d0913ac), by Arya Mahadik, 2026-11-08 03:07:13 UTC
+- **Pull request:** [#134](https://github.com/aryamahadik/rosie/pull/134) from `task/T-310`, merged 2026-11-08 03:07:14 UTC. It squashed 1 branch commit:
+  - `56253cc` T-310: slot filler: every K-03 v1 slot filled from the record and cod…
+- **Files changed:** 15 (+2530 −0), by folder:
+  - `actions/src/finalize/slots/` clock.ts +155 −0, fill.test.ts +315 −0, fill.ts +365 −0, fillers.ts +380 −0, index.ts +50 −0, money.test.ts +130 −0, money.ts +58 −0, record.test.ts +127 −0, record.ts +210 −0, send.test.ts +168 −0, syntax.ts +49 −0, test-support.ts +98 −0, types.ts +134 −0, vocabulary.test.ts +154 −0, vocabulary.ts +137 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 132. T-247: Batch window: 3 s after the latest text, the third text, or 6 s after the first; alarm schedule; hold before the lease seam (\#133)
+
+- **Commit:** [`c1923c8`](https://github.com/aryamahadik/rosie/commit/c1923c8), by Arya Mahadik, 2026-11-08 02:50:25 UTC
+- **Pull request:** [#133](https://github.com/aryamahadik/rosie/pull/133) from `task/T-247`, merged 2026-11-08 02:50:26 UTC. It squashed 1 branch commit:
+  - `90ffe1e` T-247: Batch window: 3 s after the latest text, the third text, or 6 …
+- **Files changed:** 4 (+799 −3), by folder:
+  - `runtime/src/actor/` batch.ts +323 −0, batch.worker.test.ts +393 −0, handle-actor.ts +72 −3, index.ts +11 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 131. T-372: composer system prompt: role sentence, 12 style rules with reasons, five worked examples across readers and channels (A7-12 relay with a private part), master line as model, only facts, rule-67 tagged data, language rule; cached bytes per bundle id (\#132)
+
+- **Commit:** [`fe09afc`](https://github.com/aryamahadik/rosie/commit/fe09afc), by Arya Mahadik, 2026-11-08 02:23:09 UTC
+- **Pull request:** [#132](https://github.com/aryamahadik/rosie/pull/132) from `task/T-372`, merged 2026-11-08 02:23:09 UTC. It squashed 1 branch commit:
+  - `d64a58f` T-372: composer system prompt: role sentence, 12 style rules with rea…
+- **Files changed:** 6 (+1396 −0), by folder:
+  - `ai/src/composer/prompt/` examples.ts +293 −0, index.ts +38 −0, prompt.test.ts +679 −0, prompt.ts +161 −0, render.ts +112 −0, types.ts +113 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 130. T-090: contract test port-linq.v1: K-11 fixtures, schema not vacuous, code-side checks, side list (\#131)
+
+- **Commit:** [`ae070aa`](https://github.com/aryamahadik/rosie/commit/ae070aa), by Arya Mahadik, 2026-11-08 02:23:05 UTC
+- **Pull request:** [#131](https://github.com/aryamahadik/rosie/pull/131) from `task/T-090`, merged 2026-11-08 02:23:05 UTC. It squashed 1 branch commit:
+  - `755f528` T-090: contract test port-linq.v1: K-11 fixtures, schema not vacuous,…
+- **Files changed:** 1 (+672 −0), by folder:
+  - `tests/contract/` port-linq.v1.test.ts +672 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 129. T-290: Tool API package base: call registry, schema validation, business scope, trace spans (\#129)
+
+- **Commit:** [`447c037`](https://github.com/aryamahadik/rosie/commit/447c037), by Arya Mahadik, 2026-11-08 02:23:00 UTC
+- **Pull request:** [#129](https://github.com/aryamahadik/rosie/pull/129) from `task/T-290`, merged 2026-11-08 02:23:01 UTC. It squashed 4 branch commits:
+  - `3920bfd` T-290: temporary schema exploration test (removed in the next commit)
+  - `274a823` T-290: remove the temporary schema exploration test
+  - `2332df8` T-290: Tool API base: every K-09 v1 call registered with Ajv request …
+  - `3441857` T-290: every call that takes a caller reaches its handler with a vali…
+- **Files changed:** 10 (+1815 −1), by folder:
+  - `actions/` README.md +33 −1
+  - `actions/src/tool-api/` calls.ts +194 −0, errors.ts +79 −0, index.ts +56 −0, scope.ts +28 −0, test-support.ts +192 −0, tool-api.test.ts +621 −0, tool-api.ts +350 −0, validator.test.ts +154 −0, validator.ts +108 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-290: temporary schema exploration test (removed in the next commit)
+
+* T-290: remove the temporary schema exploration test
+
+* T-290: Tool API base: every K-09 v1 call registered with Ajv request and response validation, run under its business scope, one K-08 span each
+
+* T-290: every call that takes a caller reaches its handler with a validated request (11 built from the sample cast), and every stub answers notBuilt
+~~~
+
+</details>
+
+## 128. T-036: freeze K-27 v1: database schema, availability (\#128)
+
+- **Commit:** [`fcea54a`](https://github.com/aryamahadik/rosie/commit/fcea54a), by Arya Mahadik, 2026-11-08 02:22:55 UTC
+- **Pull request:** [#128](https://github.com/aryamahadik/rosie/pull/128) from `task/T-036`, merged 2026-11-08 02:22:55 UTC. It squashed 3 branch commits:
+  - `f6dcb59` T-036: freeze K-27 v1: availability (database part): weekly hours, ti…
+  - `eab4521` T-036: K-27 README: scope and version per table, a default on every o…
+  - `c779d1b` T-036: K-27 v1 round 2: one calendar link per person, read by each bu…
+- **Files changed:** 17 (+2797 −0), by folder:
+  - `contracts/db-schema/availability/` README.md +178 −0, availability.v1.tables.json +1525 −0, frozen.json +1 −0
+  - `contracts/db-schema/availability/fixtures/` index.json +108 −0, seed-busy-block.json +53 −0, seed-calendar-link.json +122 −0, seed-hours.json +312 −0, seed-session-seats.json +180 −0, seed-time-off.json +89 −0
+  - `contracts/db-schema/availability/fixtures/invalid/` refuse-busy-block-other-business-read.json +18 −0, refuse-busy-block-title.json +25 −0, refuse-calendar-tokens-read.json +19 −0, refuse-connecting-with-tokens.json +32 −0, refuse-icloud-link.json +21 −0, refuse-photo-block-without-yes.json +29 −0, refuse-share-for-another-person.json +23 −0, refuse-two-sessions-one-room.json +62 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-036: freeze K-27 v1: availability (database part): weekly hours, time off, classes and sessions, calendar links with sealed tokens, busy blocks with no title; fixtures, README freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-036: K-27 README: scope and version per table, a default on every open gap, stays' drop-off and pick-up times, a timetable photo with no end
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-036: K-27 v1 round 2: one calendar link per person, read by each business through calendar_link_shares; link state connecting before its tokens, sealed at the connect's return on the runtime side; service foreign keys to K-25; seeds in K-16's double world
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 127. T-422: Stripe double: charges, declines, refunds, pay links, onboarding, page reads, signed webhooks, reconciliation hooks (K-14 v1) (\#130)
+
+- **Commit:** [`19d1848`](https://github.com/aryamahadik/rosie/commit/19d1848), by Arya Mahadik, 2026-11-08 02:13:44 UTC
+- **Pull request:** [#130](https://github.com/aryamahadik/rosie/pull/130) from `task/T-422`, merged 2026-11-08 02:13:44 UTC. It squashed 1 branch commit:
+  - `ad9ebf4` T-422: Stripe double: charges, declines, refunds, pay links, onboardi…
+- **Files changed:** 7 (+4001 −0), by folder:
+  - `adapters/src/stripe/double/` double.test.ts +1428 −0, double.ts +1258 −0, index.ts +4 −0, types.ts +329 −0, validate.ts +281 −0, webhooks.test.ts +380 −0, webhooks.ts +321 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 126. T-189: Migration 0010: outbox rows and parts with K-07's states, with the deferred outbox keys (\#127)
+
+- **Commit:** [`2ba0eb6`](https://github.com/aryamahadik/rosie/commit/2ba0eb6), by Arya Mahadik, 2026-11-08 02:13:41 UTC
+- **Pull request:** [#127](https://github.com/aryamahadik/rosie/pull/127) from `task/T-189`, merged 2026-11-08 02:13:41 UTC. It squashed 2 branch commits:
+  - `82a399b` T-189: Migration: outbox\_rows and outbox\_parts with K-07's states, pl…
+  - `5fda604` T-189: renumber the migration to 0010 at merge (lead)
+- **Files changed:** 3 (+974 −3), by folder:
+  - `db/migrations/` 0010\_core\_outbox.sql +114 −0
+  - `db/repo/` outbox-schema.int.test.ts +818 −0, threads.int.test.ts +42 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-189: Migration: outbox_rows and outbox_parts with K-07's states, plus the openers_sent and messages outbox keys
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-189: renumber the migration to 0010 at merge (lead)
+
+guard:migrations passes; the whole integration project passes 321 of 321, one file at a time (DL-106).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 125. T-1086: ci.yml drops pull\_request (merge-check runs every ci step); trigger and step-parity tests (\#126)
+
+- **Commit:** [`389a37e`](https://github.com/aryamahadik/rosie/commit/389a37e), by Arya Mahadik, 2026-11-08 02:04:29 UTC
+- **Pull request:** [#126](https://github.com/aryamahadik/rosie/pull/126) from `task/T-1086`, merged 2026-11-08 02:04:30 UTC. It squashed 1 branch commit:
+  - `8f6274f` T-1086: ci.yml drops pull\_request (merge-check runs every ci step); t…
+- **Files changed:** 2 (+37 −5), by folder:
+  - `.github/workflows/` ci.yml +2 −2
+  - `infra/ci/` ci-triggers.test.mjs +35 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 124. T-246: safety read on each raw text on arrival, before batching (ports, 4 s rule, holds, direct line while PostgreSQL is down) (\#125)
+
+- **Commit:** [`eab2bbe`](https://github.com/aryamahadik/rosie/commit/eab2bbe), by Arya Mahadik, 2026-11-08 01:52:29 UTC
+- **Pull request:** [#125](https://github.com/aryamahadik/rosie/pull/125) from `task/T-246`, merged 2026-11-08 01:52:29 UTC. It squashed 1 branch commit:
+  - `f672480` T-246: safety read on each raw text on arrival, before batching (port…
+- **Files changed:** 8 (+2071 −0), by folder:
+  - `runtime/src/actor/` handle-actor.ts +40 −0, index.ts +1 −0
+  - `runtime/src/safety/` arrival.ts +721 −0, index.ts +20 −0, rules.ts +154 −0, safety.worker.test.ts +605 −0, test-support.ts +273 −0, types.ts +257 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 123. T-188: Migration 0009: turns, open questions and clock rows, with the deferred pauses\_turn\_fk (\#124)
+
+- **Commit:** [`578232a`](https://github.com/aryamahadik/rosie/commit/578232a), by Arya Mahadik, 2026-11-08 01:42:50 UTC
+- **Pull request:** [#124](https://github.com/aryamahadik/rosie/pull/124) from `task/T-188`, merged 2026-11-08 01:42:51 UTC. It squashed 2 branch commits:
+  - `9d7a2ed` T-188: Migration 9999: turns, open questions and clock rows, with pau…
+  - `e8bbd13` T-188: renumber the migration to 0009 at merge (lead)
+- **Files changed:** 3 (+756 −9), by folder:
+  - `db/migrations/` 0009\_core\_turns\_questions\_clocks.sql +147 −0
+  - `db/repo/` phones.int.test.ts +14 −9, turns.int.test.ts +595 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-188: Migration 9999: turns, open questions and clock rows, with pauses_turn_fk
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-188: renumber the migration to 0009 at merge (lead)
+
+guard:migrations passes; the whole integration project passes 297 of 297, one file at a time (DL-106).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 122. T-367: context bundle builder: K-02 context to decide's prompt on T-364's cached layout, choices shuffled by a per-read seed recorded in the span, facts once, 30-day recent messages, tagged data (rule 67) (\#121)
+
+- **Commit:** [`fa5e190`](https://github.com/aryamahadik/rosie/commit/fa5e190), by Arya Mahadik, 2026-11-08 01:29:48 UTC
+- **Pull request:** [#121](https://github.com/aryamahadik/rosie/pull/121) from `task/T-367`, merged 2026-11-08 01:29:48 UTC. It squashed 1 branch commit:
+  - `694cd59` T-367: context bundle builder: K-02 context to decide's prompt on T-3…
+- **Files changed:** 8 (+1455 −0), by folder:
+  - `ai/src/context/` builder.ts +335 −0, context.test.ts +797 −0, errors.ts +14 −0, index.ts +33 −0, seed.ts +39 −0, tags.ts +60 −0, times.ts +56 −0, types.ts +121 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 121. T-412: Linq double: signed webhooks and inbound events for the test-phone page (\#123)
+
+- **Commit:** [`b90487f`](https://github.com/aryamahadik/rosie/commit/b90487f), by Arya Mahadik, 2026-11-08 01:29:30 UTC
+- **Pull request:** [#123](https://github.com/aryamahadik/rosie/pull/123) from `task/T-412`, merged 2026-11-08 01:29:30 UTC. It squashed 2 branch commits:
+  - `85ee5d3` T-412: Linq double: signed webhooks for texts, photos, reactions, vot…
+  - `066e6bc` T-412: refuse fromRosie on non-reaction kinds and non-fictional numbe…
+- **Files changed:** 3 (+922 −0), by folder:
+  - `adapters/src/linq/double-webhooks/` index.ts +2 −0, webhooks.test.ts +439 −0, webhooks.ts +481 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-412: Linq double: signed webhooks for texts, photos, reactions, votes, edits and receipts, with stale signing on request
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-412: refuse fromRosie on non-reaction kinds and non-fictional numbers on every kind
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 120. T-044: freeze K-35 v1: database schema, documents and licenses (\#122)
+
+- **Commit:** [`7d0d147`](https://github.com/aryamahadik/rosie/commit/7d0d147), by Arya Mahadik, 2026-11-08 01:29:27 UTC
+- **Pull request:** [#122](https://github.com/aryamahadik/rosie/pull/122) from `task/T-044`, merged 2026-11-08 01:29:27 UTC. It squashed 4 branch commits:
+  - `c049896` T-044: freeze K-35 v1: documents and licenses (database part)
+  - `ac82311` T-044: K-35 v1 adds documents.kind\_id for S1-31's offline work; READM…
+  - `89f45b8` T-044: K-35 v1 round 2: listing only the business's own papers, a cus…
+  - `6337083` T-044: K-35 v1 README records round 2's checks: the throwaway Postgre…
+- **Files changed:** 14 (+1654 −0), by folder:
+  - `contracts/db-schema/documents-licenses/` README.md +207 −0, documents-licenses.v1.tables.json +1002 −0, frozen.json +3 −0
+  - `contracts/db-schema/documents-licenses/fixtures/` index.json +84 −0, seed-agreement-signed.json +65 −0, seed-license-as-given.json +61 −0
+  - `contracts/db-schema/documents-licenses/fixtures/invalid/` refuse-as-given-edit.json +22 −0, refuse-checked-column.json +29 −0, refuse-cross-business-read.json +18 −0, refuse-customer-document-listed.json +30 −0, refuse-file-from-chat.json +27 −0, refuse-signature-edit.json +19 −0, refuse-signed-by-all-before-signer.json +64 −0, refuse-signed-by-all-moved.json +23 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-044: freeze K-35 v1: documents and licenses (database part)
+
+Five tables: documents (as given, never checked; no checked column), document_files (R2 object keys, sealed), document_texts (the words signed and their sha256), document_signers and document_signatures (written once). Seeds seed-license-as-given and seed-agreement-signed; five refused rows, refuse-checked-column among them; README freeze record; frozen.json v1.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-044: K-35 v1 adds documents.kind_id for S1-31's offline work; README cites erasePerson and the guard proof exactly
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-044: K-35 v1 round 2: listing only the business's own papers, a customer's or booking's values secure-page-only, kinds bond, legal_papers, court_order and other, the standard agreement's service link, signed_by_all_at set once after every signer, no SVG or XHTML files, 3 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-044: K-35 v1 README records round 2's checks: the throwaway PostgreSQL run (8 refused fixtures, 36 probes) and the freeze-guard proof
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 119. T-039: freeze K-30 v1, bookings and changes database schema (13 tables beside K-04's booking head, five seeds, eight refused rows, README freeze record) (\#120)
+
+- **Commit:** [`8219c7f`](https://github.com/aryamahadik/rosie/commit/8219c7f), by Arya Mahadik, 2026-11-08 01:21:23 UTC
+- **Pull request:** [#120](https://github.com/aryamahadik/rosie/pull/120) from `task/T-039`, merged 2026-11-08 01:21:23 UTC. It squashed 1 branch commit:
+  - `6187adb` T-039: freeze K-30 v1, bookings and changes database schema (13 table…
+- **Files changed:** 17 (+4565 −0), by folder:
+  - `contracts/db-schema/bookings-changes/` README.md +167 −0, bookings-changes.v1.tables.json +2566 −0, frozen.json +1 −0
+  - `contracts/db-schema/bookings-changes/fixtures/` index.json +108 −0, seed-booking-flow-a.json +254 −0, seed-booking-flow-b.json +311 −0, seed-booking-line-price-copied.json +330 −0, seed-quote-owner-ok.json +281 −0, seed-terms-snapshot.json +350 −0
+  - `contracts/db-schema/bookings-changes/fixtures/invalid/` refuse-booking-line-price-change.json +22 −0, refuse-booking-value-reset.json +23 −0, refuse-change-row-update.json +21 −0, refuse-cross-business-booking-read.json +18 −0, refuse-line-on-other-business-booking.json +40 −0, refuse-link-code-read.json +18 −0, refuse-owner-ok-without-who.json +34 −0, refuse-terms-snapshot-update.json +21 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 118. T-072: freeze K-05 v1.2: read turn state, a handle's targets, a recipient's send state, a handle's sealing key (\#119)
+
+- **Commit:** [`557a551`](https://github.com/aryamahadik/rosie/commit/557a551), by Arya Mahadik, 2026-11-08 01:21:19 UTC
+- **Pull request:** [#119](https://github.com/aryamahadik/rosie/pull/119) from `task/T-072`, merged 2026-11-08 01:21:19 UTC. It squashed 3 branch commits:
+  - `737b230` T-072: freeze K-05 v1.2: readTurnState, handleTargets, sendState, han…
+  - `31c4345` T-072: round 2: no sealing\_keys column as a fact; erased keys get a f…
+  - `dbd6668` T-072: round 3: open question sent time and poll id count only parts …
+- **Files changed:** 51 (+4991 −6), by folder:
+  - `contracts/data-access/` README.md +87 −5, data-access.v1.2.schema.json +2471 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` arm-clock-a7-03-after-4006.json +27 −0, claim-a7-03.json +90 −0, claim-effects-lapsed-logged.json +80 −0, claim-effects-logged.json +76 −0, claim-in-order-with-port.json +126 −0, commit-alex-cancels-while-sending.json +85 −0, commit-alex-stop.json +113 −0, handle-key-erased.json +22 −0, handle-key-existing.json +22 −0, handle-key-first-sight-repeat.json +22 −0, handle-key-first-sight.json +22 −0, handle-key-person-no-key.json +22 −0, index.json +376 −0, mark-a7-03-delivered-by-key.json +27 −0, mark-a7-03-failed-4006.json +29 −0, mark-a7-03-poll-failed.json +30 −0, mark-a7-03-poll-sent.json +28 −0, mark-delivered-by-key.json +27 −0, mark-failed-4006.json +29 −0, read-turn-state-alex.json +89 −0, read-turn-state-ben-stopped.json +79 −0, read-turn-state-delivered-after-4006.json +66 −0, read-turn-state-first-text.json +30 −0, read-turn-state-other-business.json +20 −0, read-turn-state-unknown-fact.json +21 −0, renew-claim-reads-phone.json +29 −0, renew-claim-stopped.json +29 −0, send-state-booking-cancelled.json +51 −0, send-state-customer.json +51 −0, send-state-no-chat.json +51 −0, send-state-owner.json +51 −0, send-state-stopped.json +56 −0, service-back-logged.json +86 −0, targets-alex.json +77 −0, targets-first-text.json +21 −0, targets-poll-failed-plain.json +77 −0, targets-sam-owner.json +30 −0, write-plan-a7-03.json +65 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-claim-event-not-claim-kind.json +57 −0, refuse-claimed-row-sms-port.json +41 −0, refuse-handle-key-with-key-value.json +7 −0, refuse-mark-delivered-key-only.json +5 −0, refuse-read-turn-state-fact-without-row.json +6 −0, refuse-read-turn-state-returns-harm-report.json +34 −0, refuse-read-turn-state-returns-sealing-key.json +34 −0, refuse-read-turn-state-sealing-key-fact.json +6 −0, refuse-read-turn-state-session-token-fact.json +6 −0, refuse-send-state-caller-versions.json +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-072: freeze K-05 v1.2: readTurnState, handleTargets, sendState, handleSealingKey; claim port, markPart delivered by key, renewClaim phone read, effect.claimed entries
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-072: round 2: no sealing_keys column as a fact; erased keys get a fresh person and key; openQuestionRead sentAt and pollId; claim entry why null; turn state handle; send state record flags; K-08 approvedBy; gaps 25-27 and consumer notes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-072: round 3: open question sent time and poll id count only parts that went (sent or delivered, never failed) to the question's own handle, delivered_at when no acceptance was recorded; no fact is a K-22 secret's hash or a team-only table's column; gap 28; consumer lines for T-553 and T-478
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 117. T-187: Migration 0008: reservations that refuse a double booking (EXCLUDE, class-seat CHECK), with reserve() and release() (\#118)
+
+- **Commit:** [`33ed98b`](https://github.com/aryamahadik/rosie/commit/33ed98b), by Arya Mahadik, 2026-11-08 01:19:08 UTC
+- **Pull request:** [#118](https://github.com/aryamahadik/rosie/pull/118) from `task/T-187`, merged 2026-11-08 01:19:09 UTC. It squashed 3 branch commits:
+  - `8807a63` T-187: Migration: reservations and class seats that refuse a double b…
+  - `52d8f67` T-187: lost-connection-safe reserve and release (transient), let\_go a…
+  - `e905847` T-187: renumber the migration to 0008 at merge (lead)
+- **Files changed:** 3 (+2119 −0), by folder:
+  - `db/migrations/` 0008\_core\_reservations.sql +94 −0
+  - `db/repo/` reservations.int.test.ts +1216 −0, reservations.ts +809 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-187: Migration: reservations and class seats that refuse a double booking (EXCLUDE, CHECK), with reserve() and release()
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-187: lost-connection-safe reserve and release (transient), let_go and cancelled always compare the version, repeat answers first
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-187: renumber the migration to 0008 at merge (lead)
+
+guard:migrations passes; the whole integration project passes 273 of 273, one file at a time (DL-106).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 116. T-025: freeze K-16 v1: the calendar port (Google and Microsoft) (\#117)
+
+- **Commit:** [`aa99966`](https://github.com/aryamahadik/rosie/commit/aa99966), by Arya Mahadik, 2026-11-08 01:11:07 UTC
+- **Pull request:** [#117](https://github.com/aryamahadik/rosie/pull/117) from `task/T-025`, merged 2026-11-08 01:11:08 UTC. It squashed 8 branch commits:
+  - `af52f20` T-025: freeze K-16 v1, the calendar port (Google and Microsoft): sche…
+  - `45b0c7b` T-025: K-16 v1 wording: Google's admin restriction is admin\_policy\_en…
+  - `240c390` T-025: K-16 v1 round 2: update and delete by event key with no id yet…
+  - `8c6c587` T-025: K-16 v1 round 2: README records the round-2 probes and guard p…
+  - `960bf86` T-025: K-16 v1 round 3: calendarWrite, calendarUpdate and calendarDel…
+  - `1aaed2c` T-025: K-16 v1 round 3: README records the round-3 probes, the one-fa…
+  - `7bf6187` T-025: K-16 v1 round 4: the effect's idempotency key is opaque (ids o…
+  - `d3d1044` T-025: K-16 v1 round 4: README records the round-4 one-fault probes a…
+- **Files changed:** 55 (+3698 −0), by folder:
+  - `contracts/port-calendar/` README.md +200 −0, frozen.json +1 −0, port-calendar.v1.schema.json +1530 −0
+  - `contracts/port-calendar/fixtures/` changes-full-read.json +98 −0, changes-to-busy-blocks.json +91 −0, connect-return-declined.json +20 −0, connect-return-google.json +23 −0, connect-return-microsoft.json +23 −0, connect-return-scopes-missing.json +21 −0, connect-start-google.json +21 −0, connect-start-microsoft.json +21 −0, effect-row-calendar-write.json +42 −0, error-link-dropped.json +19 −0, error-rate-limited.json +19 −0, event-delete-no-id.json +23 −0, event-delete.json +23 −0, event-move-gone.json +31 −0, event-move-no-id.json +31 −0, event-move.json +31 −0, event-sensitive-arabic.json +29 −0, event-sensitive-no-case.json +29 −0, event-sensitive-no-initials.json +29 −0, event-sensitive.json +29 −0, event-write-again.json +31 −0, event-write.json +31 −0, free-busy-clash-check.json +45 −0, free-busy-fresh.json +24 −0, index.json +412 −0, notification-google-sync.json +25 −0, notification-google.json +42 −0, notification-microsoft-lifecycle.json +69 −0, notification-microsoft-validation.json +20 −0, notification-microsoft.json +46 −0, notification-rejected.json +25 −0, renew-google.json +21 −0, renew-microsoft.json +21 −0, renewal-failed-dropped-link.json +17 −0, span-calendar-write.json +26 −0, span-free-busy.json +20 −0, span-notification.json +19 −0, watch-google.json +19 −0, watch-microsoft-existing.json +19 −0, watch-microsoft.json +19 −0
+  - `contracts/port-calendar/fixtures/invalid/` refuse-busy-block-with-title.json +92 −0, refuse-dropped-before-five-tries.json +15 −0, refuse-icloud.json +21 −0, refuse-initials-chinese-name.json +29 −0, refuse-initials-full-name.json +29 −0, refuse-scope-widened.json +21 −0, refuse-sensitive-with-service.json +30 −0, refuse-texted-connect.json +21 −0, refuse-title-in-span.json +20 −0, refuse-token-in-answer.json +24 −0, refuse-updated-without-event-id.json +31 −0, refuse-write-without-idempotency-key.json +30 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-025: freeze K-16 v1, the calendar port (Google and Microsoft): schema, 32 accepted and 8 refused fixtures, README with spike findings and freeze record, frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 wording: Google's admin restriction is admin_policy_enforced; the README records the throwaway probes and the K-08 span check
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 2: update and delete by event key with no id yet, a key's calendar effects in commit order, initials in scripts with no capitals, Graph's 409 answers the existing subscription, a key written again after a delete gets a new event; 5 accepted and 2 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 2: README records the round-2 probes and guard proof; alreadyWritten wording names an earlier write's event
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 3: calendarWrite, calendarUpdate and calendarDelete requests carry the effect's idempotency key (K-07's form), required; initials never take a letter of Han, Hangul, Hiragana, Katakana or Yi, and a name that gives none is 'Visit' alone (initials null); every request fixture carries its key; 2 accepted and 2 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 3: README records the round-3 probes, the one-fault checks and the guard proof
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 4: the effect's idempotency key is opaque (ids or a random value, never a name, initials, service, phone, email or words); the adapters put only a one-way hash of it (32 hex of SHA-256, default 19) into Google's event id and Graph's transactionId; initials taken after NFKC; every fixture's key, and the effect row's and span's effect id, a name-free placeholder (eff-cal-demo-0001 to 0011)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-025: K-16 v1 round 4: README records the round-4 one-fault probes and guard proof; the names paragraph prints no name-carrying key
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 115. T-018: freeze K-09 v1: the Tool API (turn face, gate limits 1 to 6, shared core calls) (\#116)
+
+- **Commit:** [`fa61fe9`](https://github.com/aryamahadik/rosie/commit/fa61fe9), by Arya Mahadik, 2026-11-08 00:45:54 UTC
+- **Pull request:** [#116](https://github.com/aryamahadik/rosie/pull/116) from `task/T-018`, merged 2026-11-08 00:45:54 UTC. It squashed 3 branch commits:
+  - `c05d5dc` T-018: freeze K-09 v1, the Tool API: setup calls of journeys 1 and 2 …
+  - `2c93198` T-018: round 2, close the verification's eight points in K-09 v1: the…
+  - `7070c82` T-018: round 3 after the rebase onto main (K-22, K-25, K-28 v1): send…
+- **Files changed:** 73 (+2984 −186), by folder:
+  - `contracts/tool-api/` README.md +252 −97, frozen.json +3 −0, tool-api.rules.mjs +232 −0, tool-api.v1.schema.json +2357 −89
+  - `contracts/tool-api/fixtures/` add-team.json +1 −0, booking-paused.json +1 −0, build-frontier-s1-02.json +1 −0, chat-link-after-contact-add.json +1 −0, chat-link-contact-add-failed.json +1 −0, clock-staff-invite-48h-repeat.json +1 −0, clock-staff-invite-48h.json +1 −0, closest-entries.json +1 −0, commit-limit-1-unproven-sender.json +1 −0, commit-limit-2-owner-rule.json +1 −0, commit-limit-3-no-exact-yes.json +1 −0, commit-limit-4-changed.json +1 −0, commit-limit-5-taken.json +1 −0, commit-limit-6-reread-first.json +1 −0, commit-limit-6-value-fails.json +1 −0, commit-s1-02.json +1 −0, compose-input-s1-02.json +1 −0, control-code-email.json +1 −0, control-team-decided.json +1 −0, control-team-review.json +1 −0, email-check-proven.json +1 −0, email-check-typed.json +1 −0, fee-consent.json +1 −0, finalize-pass.json +1 −0, finalize-passed-on.json +1 −0, finalize-rewrite.json +1 −0, flag-paused.json +1 −0, go-live-check.json +1 −0, id-upload-confirmed.json +1 −0, index.json +72 −0, limit-1-code-proven.json +1 −0, listing-lookup.json +1 −0, match-kinds.json +1 −0, new-work-approved.json +1 −0, page-team.json +1 −0, proof-code-email.json +1 −0, proof-code-text-from-mobile.json +1 −0, review-item.json +1 −0, safety-outcome-hold.json +1 −0, setup-s1-04-companies.json +1 −0, setup-s1-09-business.json +1 −0, setup-s1-12-services.json +1 −0, setup-s1-13-ways.json +1 −0, setup-s1-23-license.json +1 −0, setup-s1-24-calendar.json +1 −0, setup-s1-27-stripe.json +1 −0, setup-s1-29-terms.json +1 −0, setup-s1-35-live.json +1 −0, setup-s1-84-profile.json +1 −0, setup-s2-06-profile.json +1 −0, setup-s2-11-license.json +1 −0, setup-s2-15-team.json +1 −0, setup-s2-27-on-call.json +1 −0, staff-join-link.json +1 −0, staff-join-other-mobile.json +1 −0, staff-join-ready-text.json +1 −0, start-recorded.json +1 −0, stop-other-number.json +1 −0, stop-recorded.json +1 −0, take-bookings.json +1 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-core-setup-step-not-ready-text.json +1 −0, refuse-email-check-without-person.json +1 −0, refuse-limit-6-question-before-reread.json +1 −0, refuse-limit-outcome-wrong-kind.json +1 −0, refuse-sign-in-acting-for-person.json +1 −0, refuse-start-from-page.json +1 −0, refuse-start-without-text.json +1 −0, refuse-team-without-tick.json +1 −0, refuse-texts-without-turn.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-018: freeze K-09 v1, the Tool API: setup calls of journeys 1 and 2 (matchKinds, lookupListing, saveSetupStep per step, readSetup), exchanges and given, named rules statedOutcome and givesStepKeys, 50 accepted and 2 refused fixtures, README freeze record, frozen.json
+
+* T-018: round 2, close the verification's eight points in K-09 v1: the clock branch (clock turn or none, fired, notArmed, notDue, the clock row's versionChanged), START only from the phone's own START text (inboundEventId, notFromThatPhone), the core setup step only S2-05's ready text, limit 6 only after decide's re-read (valueFailsWords), review decisions written back (K-23 control, K-24 new work), the owner's typed email (route typedEmail), limit 1's code and question ids with proveCode's redecideTurnId, S1-12 without a read-back; rules rereadBeforeQuestion and clockTurn; 9 accepted and 5 refused fixtures; the security reviewer in the freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-018: round 3 after the rebase onto main (K-22, K-25, K-28 v1): sendProofCode.forPersonId, the person a code is for (K-22 v1 proof_codes.person_id and the account), set by the server, never the browser, with caller.personId null on a sign-in's and the owner email's send (dependentSchemas on purpose); the sign-in sends name it too; K-09's proof-code purposes mapped to K-22 v1 (README section, defaults 27 and 34, open gaps 2 and 24); S2-22's card in the limit 1, 3 and 4 fixtures in the master's words; a bare STOP in its own core-only turn (default 35); the timing table's work-phone clock as default 24's clock turn; 2 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 114. T-023: freeze K-14 v1: the Stripe port (Connect and Rosfield billing) (\#115)
+
+- **Commit:** [`d2cbdb7`](https://github.com/aryamahadik/rosie/commit/d2cbdb7), by Arya Mahadik, 2026-11-08 00:20:49 UTC
+- **Pull request:** [#115](https://github.com/aryamahadik/rosie/pull/115) from `task/T-023`, merged 2026-11-08 00:20:50 UTC. It squashed 2 branch commits:
+  - `89c3af8` T-023: freeze K-14 v1, the Stripe port: v1 schema (13 calls with requ…
+  - `743f08a` T-023: round 2 of the K-14 v1 freeze: pageIntent and savedCard reads …
+- **Files changed:** 54 (+4013 −0), by folder:
+  - `contracts/port-stripe/` README.md +230 −0, frozen.json +1 −0, port-stripe.v1.schema.json +1970 −0
+  - `contracts/port-stripe/fixtures/` account-status.json +22 −0, bill-card.json +23 −0, bill-pay-link.json +27 −0, charge-at-owner-ok.json +29 −0, charge-failed-pay-link.json +27 −0, charge-network-error.json +31 −0, close-pay-link.json +16 −0, decline-not-retried.json +31 −0, deposit.json +29 −0, dispute-evidence-owner-yes.json +35 −0, double-plant-charge-without-effect-id.json +27 −0, double-plant-second-charge.json +27 −0, double-signed-webhook.json +35 −0, full-price.json +29 −0, index.json +404 −0, list-48-hours.json +69 −0, list-charge-without-effect-id.json +39 −0, list-double-charge.json +39 −0, look-up-before-late-try.json +30 −0, monthly-charge.json +29 −0, needs-authentication.json +27 −0, off-session-at-done.json +29 −0, onboarding-link.json +21 −0, pack-purchase.json +29 −0, page-intent-card-saved.json +18 −0, page-intent-pay-link.json +19 −0, refund-double-charge.json +26 −0, refund-part.json +26 −0, remove-card.json +16 −0, save-card.json +23 −0, saved-card-bill-card.json +17 −0, span-charge.json +26 −0, span-list-money.json +20 −0, verify-bad-signature.json +20 −0, verify-ignored.json +20 −0, webhook-bill-card-saved.json +33 −0, webhook-card-details.json +33 −0, webhook-card-replaced.json +33 −0, webhook-card-saved.json +33 −0, webhook-dispute-opened.json +35 −0, webhook-event.json +34 −0, webhook-payout-failed.json +33 −0
+  - `contracts/port-stripe/fixtures/invalid/` refuse-card-hold.json +30 −0, refuse-card-in-span.json +27 −0, refuse-charge-without-effect-id.json +28 −0, refuse-charge-without-key.json +28 −0, refuse-decimal-amount.json +29 −0, refuse-dispute-evidence-without-owner-yes.json +27 −0, refuse-monthly-bill-on-business-account.json +29 −0, refuse-off-session-needs-authentication.json +27 −0, refuse-page-secret-after-saved.json +18 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-023: freeze K-14 v1, the Stripe port: v1 schema (13 calls with request, answers and exchange, 12 webhook event kinds, the K-08 span), 36 accepted and 8 refused fixtures, frozen.json, README with the spike findings, consumers, open gaps and freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-023: round 2 of the K-14 v1 freeze: pageIntent and savedCard reads (client secret, state, amount and card at page time; FS M04's card display), paymentMethodId on paymentSucceeded, cardReplaced from payment_method.automatically_updated, listMoney effectId and the rule for a try past 23 hours, spike rows 19-21, 5 accepted and 1 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 113. T-186: Migration 0007: bookable resources and the booking head row, with the deferred booking keys (\#114)
+
+- **Commit:** [`4998261`](https://github.com/aryamahadik/rosie/commit/4998261), by Arya Mahadik, 2026-11-08 00:02:35 UTC
+- **Pull request:** [#114](https://github.com/aryamahadik/rosie/pull/114) from `task/T-186`, merged 2026-11-08 00:02:35 UTC. It squashed 3 branch commits:
+  - `eec0294` T-186: resources and booking head migration, with threads\_booking\_fk …
+  - `f29b4da` T-186: threads.int.test.ts: the two booking keys are asserted present…
+  - `053ef26` T-186: renumber the migration to 0007 at merge (lead)
+- **Files changed:** 4 (+933 −8), by folder:
+  - `db/migrations/` 0007\_core\_resources\_booking\_head.sql +67 −0
+  - `db/repo/` bookings-head.int.test.ts +582 −0, bookings-head.ts +269 −0, threads.int.test.ts +15 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-186: resources and booking head migration, with threads_booking_fk and messages_booking_fk, repo calls and integration test
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-186: threads.int.test.ts: the two booking keys are asserted present, bookings made before threads and messages name them
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-186: renumber the migration to 0007 at merge (lead)
+
+guard:migrations passes; the whole integration project passes 226 of 226 (one file at a time: the Mac's load average was 15 on 10 cores, and two parallel runs timed out at Vitest's 5 s limit, as T-185's QA saw).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 112. T-413: Linq webhook verify and parse: whsec\_ signature check, vendor payloads to K-06 events, is\_me never a turn (\#113)
+
+- **Commit:** [`4f2c6ab`](https://github.com/aryamahadik/rosie/commit/4f2c6ab), by Arya Mahadik, 2026-11-07 23:45:25 UTC
+- **Pull request:** [#113](https://github.com/aryamahadik/rosie/pull/113) from `task/T-413`, merged 2026-11-07 23:45:26 UTC. It squashed 1 branch commit:
+  - `b51a88a` T-413: Linq webhook verify and parse: whsec\_ signature check, vendor …
+- **Files changed:** 5 (+1224 −0), by folder:
+  - `adapters/src/linq/webhook/` index.ts +5 −0, parse.ts +406 −0, types.ts +64 −0, verify.ts +59 −0, webhook.test.ts +690 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 111. T-145: Branches: tags (message, lookup, clock), gates, ends, answer fields, effects, layer lines, page types (\#112)
+
+- **Commit:** [`b895eb5`](https://github.com/aryamahadik/rosie/commit/b895eb5), by Arya Mahadik, 2026-11-07 23:43:24 UTC
+- **Pull request:** [#112](https://github.com/aryamahadik/rosie/pull/112) from `task/T-145`, merged 2026-11-07 23:43:25 UTC. It squashed 1 branch commit:
+  - `3157e17` T-145: Branches: tags (message, lookup, clock), gates, ends, answer f…
+- **Files changed:** 14 (+1164 −0), by folder:
+  - `compiler/src/branches/` branch.ts +254 −0, branches.test.ts +541 −0, effects.ts +121 −0, index.ts +38 −0, pages.ts +64 −0, parity.shard-1.test.ts +4 −0, parity.shard-2.test.ts +4 −0, parity.shard-3.test.ts +4 −0, parity.shard-4.test.ts +4 −0, parity.shard-5.test.ts +4 −0, parity.shard-6.test.ts +4 −0, parity.shard-7.test.ts +4 −0, parity.shard-8.test.ts +4 −0, parity.ts +114 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 110. T-146: Routing tables: hubs, doors, the 21 any-time rows with handlers, the 50 rule nodes, the homes (\#111)
+
+- **Commit:** [`af48ec4`](https://github.com/aryamahadik/rosie/commit/af48ec4), by Arya Mahadik, 2026-11-07 23:40:00 UTC
+- **Pull request:** [#111](https://github.com/aryamahadik/rosie/pull/111) from `task/T-146`, merged 2026-11-07 23:40:01 UTC. It squashed 1 branch commit:
+  - `9e51fd2` T-146: Routing tables: hubs, doors, the 21 any-time rows with handler…
+- **Files changed:** 13 (+1018 −0), by folder:
+  - `compiler/src/routing/` index.ts +23 −0, parity.shard-1.test.ts +4 −0, parity.shard-2.test.ts +4 −0, parity.shard-3.test.ts +4 −0, parity.shard-4.test.ts +4 −0, parity.shard-5.test.ts +4 −0, parity.shard-6.test.ts +4 −0, parity.shard-7.test.ts +4 −0, parity.shard-8.test.ts +4 −0, parity.ts +55 −0, routing.test.ts +297 −0, tables.ts +515 −0, unresolved-anytime.json +96 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 109. T-1075: Linq webhook scheme beside the hex form: whsec\_ key, v1,\<base64\>, several entries (\#110)
+
+- **Commit:** [`b193309`](https://github.com/aryamahadik/rosie/commit/b193309), by Arya Mahadik, 2026-11-07 23:25:56 UTC
+- **Pull request:** [#110](https://github.com/aryamahadik/rosie/pull/110) from `task/T-1075`, merged 2026-11-07 23:25:57 UTC. It squashed 1 branch commit:
+  - `db5420f` T-1075: Linq webhook scheme beside the hex form: whsec\_ key, v1,\<base…
+- **Files changed:** 2 (+196 −0), by folder:
+  - `adapters/src/shared/` hmac.test.ts +119 −0, hmac.ts +77 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 108. T-031: freeze K-22 v1: people and access (database part) (\#109)
+
+- **Commit:** [`1ada88b`](https://github.com/aryamahadik/rosie/commit/1ada88b), by Arya Mahadik, 2026-11-07 23:25:53 UTC
+- **Pull request:** [#109](https://github.com/aryamahadik/rosie/pull/109) from `task/T-031`, merged 2026-11-07 23:25:54 UTC. It squashed 5 branch commits:
+  - `500879c` T-031: freeze K-22 v1, people and access database schema (ten tables,…
+  - `44945bc` T-031: Tool API grants on proof\_codes, sessions and no-business conta…
+  - `026f06f` T-031: round 3, bind the Tool API's codes, sessions and no-business c…
+  - `7e5e96e` T-031: round 4, a sign-in call acts for no person until its code is r…
+  - `4c7cb77` T-031: round 5, a new device's second proof (a code to the owner's em…
+- **Files changed:** 37 (+3566 −0), by folder:
+  - `contracts/db-schema/people-access/` README.md +181 −0, frozen.json +1 −0, people-access.v1.tables.json +1763 −0
+  - `contracts/db-schema/people-access/fixtures/` index.json +268 −0, seed-contact-change.json +38 −0, seed-emergency-contact.json +57 −0, seed-on-call.json +50 −0, seed-owner-id-upload.json +52 −0, seed-proof-code.json +80 −0, seed-session.json +39 −0, seed-staff-invited.json +48 −0, seed-staff-joined.json +224 −0
+  - `contracts/db-schema/people-access/fixtures/invalid/` refuse-admin-export-power.json +25 −0, refuse-bookable-before-join.json +24 −0, refuse-code-after-ten-minutes.json +29 −0, refuse-emergency-contact-is-pro.json +29 −0, refuse-ended-session-reopened.json +23 −0, refuse-other-person-code-read.json +35 −0, refuse-other-person-session-end.json +24 −0, refuse-other-person-session-read.json +31 −0, refuse-own-chat-change-business-read.json +18 −0, refuse-own-chat-change-for-another.json +47 −0, refuse-own-chat-change-under-business.json +47 −0, refuse-proof-code-hash-read.json +18 −0, refuse-proof-code-inserted-used.json +26 −0, refuse-proof-code-pause-lifted.json +24 −0, refuse-proof-code-raw.json +28 −0, refuse-session-contact-change-code.json +46 −0, refuse-session-device-read.json +31 −0, refuse-session-raw-token.json +26 −0, refuse-session-token-read.json +18 −0, refuse-session-unused-code.json +46 −0, refuse-sign-in-own-change.json +52 −0, refuse-sign-in-session-end.json +21 −0, refuse-sign-in-session-read.json +28 −0, refuse-sign-in-session-start.json +44 −0, refuse-staff-joined-from-other-mobile.json +25 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-031: freeze K-22 v1, people and access database schema (ten tables, eight seeds, seven refused rows, README freeze record)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-031: Tool API grants on proof_codes, sessions and no-business contact_changes (README rules 4 and 5, two security-definer calls, four refused fixtures)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-031: round 3, bind the Tool API's codes, sessions and no-business contact changes to the call's person (rosie.person_id), device_sha256 out of every grant, proof_code_limits and device_known, five refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-031: round 4, a sign-in call acts for no person until its code is right; proof_codes INSERT only a send's columns; a session and an own_code or email_on_file change need a used code of that person; an ended session stays ended; the four calls' pinned search_path; seven refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-031: round 5, a new device's second proof (a code to the owner's email, or the ID re-check whose call sets the person K-05 kept with the used sign-in code) starts the session naming that code; contact_changes' business branch admits only in_person and owner_team_edit; a session needs a used code of a sign-in purpose; the README table of every path that binds a person; defaults 9 and 10 rewritten; two refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 107. T-034: freeze K-25 v1: services and prices (database part) (\#108)
+
+- **Commit:** [`acca8f1`](https://github.com/aryamahadik/rosie/commit/acca8f1), by Arya Mahadik, 2026-11-07 23:07:04 UTC
+- **Pull request:** [#108](https://github.com/aryamahadik/rosie/pull/108) from `task/T-034`, merged 2026-11-07 23:07:04 UTC. It squashed 2 branch commits:
+  - `6092b22` T-034: freeze K-25 v1 services-prices: services, ways per place, pric…
+  - `1ec8ef0` T-034: round 2: price\_rules\_dates\_in\_order allows a rule closed at it…
+- **Files changed:** 13 (+2310 −0), by folder:
+  - `contracts/db-schema/services-prices/` README.md +141 −0, frozen.json +1 −0, services-prices.v1.tables.json +928 −0
+  - `contracts/db-schema/services-prices/fixtures/` index.json +76 −0, seed-item-services.json +183 −0, seed-price-rule-dates.json +321 −0, seed-price-withdrawn-before-start.json +102 −0, seed-service-money-paths.json +277 −0, seed-services-price-list.json +168 −0
+  - `contracts/db-schema/services-prices/fixtures/invalid/` refuse-cross-business-price-read.json +18 −0, refuse-fee-on-nothing-taken.json +23 −0, refuse-overlapping-effective-dates.json +46 −0, refuse-place-of-another-service.json +26 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-034: freeze K-25 v1 services-prices: services, ways per place, price rules with effective dates and ties, item services; seeds, refused rows, README freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-034: round 2: price_rules_dates_in_order allows a rule closed at its own start, so a price set for a later date can be withdrawn or corrected before it starts (seed-price-withdrawn-before-start); time conditions are read in the visit's zone, else the business's (rule 8, S13-03)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 106. T-364: Prompt caching: the always-on rules, the composer's system prompt and static card text in cached prefixes (\#107)
+
+- **Commit:** [`0d81005`](https://github.com/aryamahadik/rosie/commit/0d81005), by Arya Mahadik, 2026-11-07 22:57:29 UTC
+- **Pull request:** [#107](https://github.com/aryamahadik/rosie/pull/107) from `task/T-364`, merged 2026-11-07 22:57:29 UTC. It squashed 2 branch commits:
+  - `f34eb2e` T-364: prompt caching: a fixed layout per bundle (prompt and the 50 r…
+  - `e0c3343` T-364: rules.ts states an effort change as Anthropic does (message bl…
+- **Files changed:** 9 (+1910 −0), by folder:
+  - `ai/src/cache/` bundle.ts +92 −0, errors.ts +13 −0, index.ts +51 −0, layout.test.ts +516 −0, layout.ts +294 −0, rules.ts +46 −0, test-support.ts +250 −0, wire.test.ts +505 −0, wire.ts +143 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-364: prompt caching: a fixed layout per bundle (prompt and the 50 rules, then the turn's step cards, each ending at a 5-minute cache breakpoint; the per-turn part last, unmarked), its markers through the AI gateway, Anthropic's caching rules, and a caching fake Messages API for the recorded-double replay
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-364: rules.ts states an effort change as Anthropic does (message blocks always, system blocks by model)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 105. T-185: Migration 0006, the bundle registry and release flags, with read and publish calls (\#106)
+
+- **Commit:** [`2398f76`](https://github.com/aryamahadik/rosie/commit/2398f76), by Arya Mahadik, 2026-11-07 22:48:25 UTC
+- **Pull request:** [#106](https://github.com/aryamahadik/rosie/pull/106) from `task/T-185`, merged 2026-11-07 22:48:26 UTC. It squashed 4 branch commits:
+  - `554f139` T-185: Migration for the bundle registry and release flags, with read…
+  - `89cc654` T-185: K-05 item 7: lost connection answers transient, publish refuse…
+  - `2e141ca` T-185: a lost connection is never released to the pool; ECONNRESET, E…
+  - `e151c29` T-185: renumber the migration to 0006 (lead, at merge)
+- **Files changed:** 5 (+1984 −0), by folder:
+  - `db/migrations/` 0006\_core\_bundle\_registry\_flags.sql +79 −0
+  - `db/repo/` bundles.int.test.ts +999 −0, bundles.ts +418 −0, flags.int.test.ts +327 −0, flags.ts +161 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-185: Migration for the bundle registry and release flags, with read and publish calls
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-185: K-05 item 7: lost connection answers transient, publish refuses empty or manifest-less values, readBundleValue takes {key}, migration comment fixed
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-185: a lost connection is never released to the pool; ECONNRESET, EPIPE, ETIMEDOUT answer transient; resend tests on the killed client
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-185: renumber the migration to 0006 (lead, at merge)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 104. T-037: freeze K-28 v1: customers (database part) (\#105)
+
+- **Commit:** [`19c7673`](https://github.com/aryamahadik/rosie/commit/19c7673), by Arya Mahadik, 2026-11-07 22:39:08 UTC
+- **Pull request:** [#105](https://github.com/aryamahadik/rosie/pull/105) from `task/T-037`, merged 2026-11-07 22:39:08 UTC. It squashed 2 branch commits:
+  - `d1d475f` T-037: freeze K-28 v1 customers: customers and customer\_blocks, seeds…
+  - `5b5a0b4` T-037: round 2: a block keys to the business and the person, not a cu…
+- **Files changed:** 12 (+1168 −0), by folder:
+  - `contracts/db-schema/customers/` README.md +131 −0, customers.v1.tables.json +459 −0, frozen.json +1 −0
+  - `contracts/db-schema/customers/fixtures/` index.json +68 −0, seed-customer-blocked-first-sender.json +76 −0, seed-customer-blocked.json +165 −0, seed-customer-business-added.json +122 −0, seed-customer-mobile-email.json +43 −0
+  - `contracts/db-schema/customers/fixtures/invalid/` refuse-calls-only-way.json +23 −0, refuse-cross-business-read.json +18 −0, refuse-email-way-without-email.json +32 −0, refuse-second-open-block.json +30 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-037: freeze K-28 v1 customers: customers and customer_blocks, seeds, refused rows, README freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-037: round 2: a block keys to the business and the person, not a customer row (A3-48, B3-30), with a first-time sender's seed; age_band's staff audience explained (A3-19, A3-30; RULES 4.5, 4.7); A4-80's 'in an earlier booking' restored
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 103. T-259: Limit 8 at send: stopped, stale, text hours, no open chat, never by an SMS port (\#104)
+
+- **Commit:** [`c0d68b0`](https://github.com/aryamahadik/rosie/commit/c0d68b0), by Arya Mahadik, 2026-11-07 22:30:51 UTC
+- **Pull request:** [#104](https://github.com/aryamahadik/rosie/pull/104) from `task/T-259`, merged 2026-11-07 22:30:51 UTC. It squashed 2 branch commits:
+  - `6a08119` T-259: limit 8 at send: stopped, stale, text hours, no open chat, nev…
+  - `3105e70` T-259: limit 8 rework: no open chat waits for every class and audienc…
+- **Files changed:** 9 (+1404 −17), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +188 −10, dispatcher.worker.test.ts +17 −1, index.ts +1 −0, test-support.ts +163 −6, types.ts +75 −0
+  - `runtime/src/dispatch/limit8/` index.ts +15 −0, limit8.ts +130 −0, limit8.worker.test.ts +726 −0, text-hours.ts +89 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-259: limit 8 at send: stopped, stale, text hours, no open chat, never SMS
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-259: limit 8 rework: no open chat waits for every class and audience, stopped flag read again before each send, SMS port only refused, refused row lets later rows pass
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 102. T-1073: unit project testTimeout and hookTimeout 30 s, with a config test (\#96)
+
+- **Commit:** [`7b2d48d`](https://github.com/aryamahadik/rosie/commit/7b2d48d), by Arya Mahadik, 2026-11-07 22:20:51 UTC
+- **Pull request:** [#96](https://github.com/aryamahadik/rosie/pull/96) from `task/T-1073`, merged 2026-11-07 22:20:52 UTC. It squashed 1 branch commit:
+  - `04eab82` T-1073: unit project testTimeout and hookTimeout 30 s, with a config …
+- **Files changed:** 2 (+48 −0), by folder:
+  - `infra/ci/` vitest-timeouts.test.mjs +44 −0
+  - `/` vitest.config.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 101. T-244: handle actor Durable Object with an ordered, persisted inbox of sealed events, receipt hooks, export from index (\#103)
+
+- **Commit:** [`e0f7261`](https://github.com/aryamahadik/rosie/commit/e0f7261), by Arya Mahadik, 2026-11-07 22:19:02 UTC
+- **Pull request:** [#103](https://github.com/aryamahadik/rosie/pull/103) from `task/T-244`, merged 2026-11-07 22:19:03 UTC. It squashed 1 branch commit:
+  - `f646b2b` T-244: handle actor Durable Object with an ordered, persisted inbox o…
+- **Files changed:** 5 (+606 −0), by folder:
+  - `runtime/src/actor/` handle-actor.ts +164 −0, handle-actor.worker.test.ts +317 −0, inbox.ts +112 −0, index.ts +10 −0
+  - `runtime/src/` index.ts +3 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 100. T-1078: parity shards run only in merge-check, in 3 parallel jobs behind an input check job; ci.yml has no parity step (\#102)
+
+- **Commit:** [`35b823f`](https://github.com/aryamahadik/rosie/commit/35b823f), by Arya Mahadik, 2026-11-07 22:11:12 UTC
+- **Pull request:** [#102](https://github.com/aryamahadik/rosie/pull/102) from `task/T-1078`, merged 2026-11-07 22:11:12 UTC. It squashed 1 branch commit:
+  - `81a3b3b` T-1078: parity shards run only in merge-check, in 3 parallel jobs beh…
+- **Files changed:** 4 (+257 −104), by folder:
+  - `.github/workflows/` ci.yml +2 −26, merge-check.yml +113 −22
+  - `infra/ci/` ci-triggers.test.mjs +2 −4, parity-placement.test.mjs +140 −52
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 99. T-243: Gateway: scrub, seal and hand the event to the handle's actor, receipts to the dispatcher door (\#101)
+
+- **Commit:** [`0f15004`](https://github.com/aryamahadik/rosie/commit/0f15004), by Arya Mahadik, 2026-11-07 21:53:50 UTC
+- **Pull request:** [#101](https://github.com/aryamahadik/rosie/pull/101) from `task/T-243`, merged 2026-11-07 21:53:51 UTC. It squashed 1 branch commit:
+  - `df77bc0` T-243: Gateway: scrub, seal and hand the event to the handle's actor,…
+- **Files changed:** 10 (+1072 −26), by folder:
+  - `runtime/src/gateway/` actor-door.ts +32 −0, hand-off.test.ts +101 −0, hand-off.ts +128 −0, hand-off.worker.test.ts +525 −0, index.ts +17 −0, linq-webhook.ts +36 −11, linq-webhook.worker.test.ts +38 −10, seal.ts +111 −0, test-support.ts +36 −0, types.ts +48 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 98. T-1077: freeze K-08 v1.1, event kinds for the Tool API's writes and effect claims: v1.1 schema (19 added kinds, three rules on them only), 16 accepted and 3 refused fixtures, frozen.json, README v1.1 sections (\#100)
+
+- **Commit:** [`48188c8`](https://github.com/aryamahadik/rosie/commit/48188c8), by Arya Mahadik, 2026-11-07 21:34:05 UTC
+- **Pull request:** [#100](https://github.com/aryamahadik/rosie/pull/100) from `task/T-1077`, merged 2026-11-07 21:34:05 UTC. It squashed 1 branch commit:
+  - `2d59537` T-1077: freeze K-08 v1.1, event kinds for the Tool API's writes and e…
+- **Files changed:** 23 (+1645 −3), by folder:
+  - `contracts/event-trace/` README.md +99 −2, event-trace.v1.1.schema.json +700 −0, frozen.json +1 −1
+  - `contracts/event-trace/fixtures/` event-chat-link-given-again.json +17 −0, event-chat-link-issued.json +26 −0, event-effect-claimed-lapsed.json +25 −0, event-effect-claimed-outage.json +31 −0, event-effect-claimed-pending.json +27 −0, event-gap-case-logged.json +26 −0, event-hand-off-answered.json +28 −0, event-harm-report.json +128 −0, event-proof-code-checked.json +20 −0, event-proof-code-sent.json +25 −0, event-review-item-opened.json +29 −0, event-safety-hold-released.json +28 −0, event-safety-outcome-hold.json +96 −0, event-team-page-acknowledged.json +30 −0, event-team-page-opened.json +56 −0, event-team-page-paged-again.json +26 −0, index.json +152 −0
+  - `contracts/event-trace/fixtures/invalid/` refuse-harm-report-business-scope.json +29 −0, refuse-proof-code-hash-in-clear.json +26 −0, refuse-proof-code-typed-in-clear.json +20 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 97. T-411: Linq double: records parts in order, faked failures, opt-out block, contact adds, capability, fake receipts and votes (\#99)
+
+- **Commit:** [`3588375`](https://github.com/aryamahadik/rosie/commit/3588375), by Arya Mahadik, 2026-11-07 21:23:36 UTC
+- **Pull request:** [#99](https://github.com/aryamahadik/rosie/pull/99) from `task/T-411`, merged 2026-11-07 21:23:36 UTC. It squashed 1 branch commit:
+  - `adefc31` T-411: Linq double: records parts in order, faked failures, opt-out b…
+- **Files changed:** 5 (+1158 −0), by folder:
+  - `adapters/src/linq/double/` double.test.ts +465 −0, double.ts +383 −0, index.ts +4 −0, types.ts +150 −0, validate.ts +156 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 96. T-257: outbox dispatcher: claim in commit order, parts to the Linq port, receipts to clock arming (\#97)
+
+- **Commit:** [`7b9b013`](https://github.com/aryamahadik/rosie/commit/7b9b013), by Arya Mahadik, 2026-11-07 21:14:00 UTC
+- **Pull request:** [#97](https://github.com/aryamahadik/rosie/pull/97) from `task/T-257`, merged 2026-11-07 21:14:01 UTC. It squashed 1 branch commit:
+  - `7750097` T-257: outbox dispatcher: claim in commit order, parts to the Linq po…
+- **Files changed:** 5 (+1697 −0), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +408 −0, dispatcher.worker.test.ts +574 −0, index.ts +15 −0, test-support.ts +431 −0, types.ts +269 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 95. T-184: Migration 0005, threads and the message log (\#98)
+
+- **Commit:** [`1ed64b4`](https://github.com/aryamahadik/rosie/commit/1ed64b4), by Arya Mahadik, 2026-11-07 21:13:47 UTC
+- **Pull request:** [#98](https://github.com/aryamahadik/rosie/pull/98) from `task/T-184`, merged 2026-11-07 21:13:48 UTC. It squashed 2 branch commits:
+  - `5e6bd07` T-184: Migration 9999 core\_threads\_messages: threads, openers\_sent, m…
+  - `8e99bbd` T-184: renumber the migration to 0005; the phones and threads tests e…
+- **Files changed:** 4 (+1460 −1), by folder:
+  - `db/migrations/` 0005\_core\_threads\_messages.sql +98 −0
+  - `db/repo/` phones.int.test.ts +3 −1, threads.int.test.ts +887 −0, threads.ts +472 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-184: Migration 9999 core_threads_messages: threads, openers_sent, messages; threads repo with sealed words
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-184: renumber the migration to 0005; the phones and threads tests empty their tables with cascade, so later migrations' tables do not break them (lead, at merge)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 94. T-241: Gateway: Linq webhook entry verifying through the K-11 port, 401/200/503 answers, receive span (\#95)
+
+- **Commit:** [`ebf2567`](https://github.com/aryamahadik/rosie/commit/ebf2567), by Arya Mahadik, 2026-11-07 21:07:48 UTC
+- **Pull request:** [#95](https://github.com/aryamahadik/rosie/pull/95) from `task/T-241`, merged 2026-11-07 21:07:48 UTC. It squashed 1 branch commit:
+  - `54fea1b` T-241: Gateway: Linq webhook entry verifying through the K-11 port, 4…
+- **Files changed:** 5 (+695 −7), by folder:
+  - `runtime/src/gateway/` index.ts +32 −0, linq-webhook.ts +192 −0, linq-webhook.worker.test.ts +368 −0, types.ts +70 −0
+  - `runtime/src/` index.ts +33 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 93. T-1076: parity step runs on any compiler/src change; placement test finds all shards from the glob (\#94)
+
+- **Commit:** [`1be5a5e`](https://github.com/aryamahadik/rosie/commit/1be5a5e), by Arya Mahadik, 2026-11-07 21:05:18 UTC
+- **Pull request:** [#94](https://github.com/aryamahadik/rosie/pull/94) from `task/T-1076`, merged 2026-11-07 21:05:18 UTC. It squashed 1 branch commit:
+  - `ea60cea` T-1076: parity step runs on any compiler/src change; placement test f…
+- **Files changed:** 4 (+37 −16), by folder:
+  - `.github/workflows/` ci.yml +4 −4, merge-check.yml +4 −4
+  - `infra/ci/` ci-triggers.test.mjs +2 −2, parity-placement.test.mjs +27 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 92. T-183: Migration 0004, handles and phones with the stopped flag, and the paused flag (\#93)
+
+- **Commit:** [`6996f2f`](https://github.com/aryamahadik/rosie/commit/6996f2f), by Arya Mahadik, 2026-11-07 20:27:56 UTC
+- **Pull request:** [#93](https://github.com/aryamahadik/rosie/pull/93) from `task/T-183`, merged 2026-11-07 20:27:56 UTC. It squashed 2 branch commits:
+  - `5fb1707` T-183: handles, person\_handles, phones with the stopped flag, and pau…
+  - `de2604e` T-183: renumber the migration to 0004 (the lead, at merge: next free …
+- **Files changed:** 3 (+1612 −0), by folder:
+  - `db/migrations/` 0004\_core\_handles\_phones.sql +99 −0
+  - `db/repo/` phones.int.test.ts +1006 −0, phones.ts +507 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-183: handles, person_handles, phones with the stopped flag, and pauses (migration, calls, tests)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-183: renumber the migration to 0004 (the lead, at merge: next free number after 0003)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 91. T-138: Master Corrections layer: framework with per-correction tags, C1 and C2 (\#91)
+
+- **Commit:** [`3d2eafb`](https://github.com/aryamahadik/rosie/commit/3d2eafb), by Arya Mahadik, 2026-11-07 20:27:51 UTC
+- **Pull request:** [#91](https://github.com/aryamahadik/rosie/pull/91) from `task/T-138`, merged 2026-11-07 20:27:52 UTC. It squashed 2 branch commits:
+  - `5302b82` T-138: Master Corrections layer: tagged framework, C1 (one Rosie numb…
+  - `9639288` T-138: move the all-243-trades sweep into 8 parity shards (DL-085, DL…
+- **Files changed:** 15 (+1540 −0), by folder:
+  - `compiler/src/corrections/` c1.test.ts +231 −0, c1.ts +114 −0, c2.test.ts +254 −0, c2.ts +176 −0, framework.test.ts +217 −0, framework.ts +407 −0, parity.shard-1.test.ts +4 −0, parity.shard-2.test.ts +4 −0, parity.shard-3.test.ts +4 −0, parity.shard-4.test.ts +4 −0, parity.shard-5.test.ts +4 −0, parity.shard-6.test.ts +4 −0, parity.shard-7.test.ts +4 −0, parity.shard-8.test.ts +4 −0, parity.ts +109 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-138: Master Corrections layer: tagged framework, C1 (one Rosie number, STOP stops every business) and C2 (mobile required, no SMS confirmation, calls only not offered)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-138: move the all-243-trades sweep into 8 parity shards (DL-085, DL-099)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 90. T-042: freeze K-33 v1 platform-billing: bill cards, monthly bills and lines, seeds, refused rows, README freeze record (\#92)
+
+- **Commit:** [`e21877a`](https://github.com/aryamahadik/rosie/commit/e21877a), by Arya Mahadik, 2026-11-07 20:25:49 UTC
+- **Pull request:** [#92](https://github.com/aryamahadik/rosie/pull/92) from `task/T-042`, merged 2026-11-07 20:25:49 UTC. It squashed 1 branch commit:
+  - `3042787` T-042: freeze K-33 v1 platform-billing: bill cards, monthly bills and…
+- **Files changed:** 13 (+1544 −0), by folder:
+  - `contracts/db-schema/platform-billing/` README.md +118 −0, frozen.json +1 −0, platform-billing.v1.tables.json +724 −0
+  - `contracts/db-schema/platform-billing/fixtures/` index.json +76 −0, seed-bill-card.json +31 −0, seed-bill-unpaid-pause.json +158 −0, seed-monthly-bill-charged.json +86 −0, seed-monthly-bill.json +134 −0
+  - `contracts/db-schema/platform-billing/fixtures/invalid/` refuse-card-number-stored.json +26 −0, refuse-line-not-two-dollars.json +49 −0, refuse-owner-removes-line.json +24 −0, refuse-pause-before-pay-by.json +82 −0, refuse-second-bill-same-month.json +35 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 89. T-035: freeze K-26 v1, database schema rules part (\#90)
+
+- **Commit:** [`87d51a0`](https://github.com/aryamahadik/rosie/commit/87d51a0), by Arya Mahadik, 2026-11-07 20:25:43 UTC
+- **Pull request:** [#90](https://github.com/aryamahadik/rosie/pull/90) from `task/T-035`, merged 2026-11-07 20:25:43 UTC. It squashed 1 branch commit:
+  - `ef353be` T-035: freeze K-26 v1, database schema rules part
+- **Files changed:** 10 (+1450 −0), by folder:
+  - `contracts/db-schema/rules/` README.md +141 −0, frozen.json +1 −0, rules.v1.tables.json +636 −0
+  - `contracts/db-schema/rules/fixtures/` index.json +52 −0, seed-note-only-rule.json +21 −0, seed-price-ok-limit.json +39 −0, seed-rule-registry.json +453 −0, seed-rules-tap-list.json +56 −0
+  - `contracts/db-schema/rules/fixtures/invalid/` refuse-overlapping-rule-dates.json +25 −0, refuse-unknown-rule-kind.json +26 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 88. T-033: freeze K-24 v1, kinds of work database schema (catalog, picks, plug-in text blocks, new-work drafts) (\#89)
+
+- **Commit:** [`d924ed9`](https://github.com/aryamahadik/rosie/commit/d924ed9), by Arya Mahadik, 2026-11-07 20:21:50 UTC
+- **Pull request:** [#89](https://github.com/aryamahadik/rosie/pull/89) from `task/T-033`, merged 2026-11-07 20:21:50 UTC. It squashed 1 branch commit:
+  - `f954875` T-033: freeze K-24 v1, kinds of work database schema (catalog, picks,…
+- **Files changed:** 12 (+1857 −0), by folder:
+  - `contracts/db-schema/kinds-of-work/` README.md +104 −0, frozen.json +1 −0, kinds-of-work.v1.tables.json +806 −0
+  - `contracts/db-schema/kinds-of-work/fixtures/` index.json +68 −0, seed-business-kinds.json +163 −0, seed-kinds-sample.json +470 −0, seed-new-work-draft.json +127 −0
+  - `contracts/db-schema/kinds-of-work/fixtures/invalid/` refuse-cross-business-text-read.json +18 −0, refuse-main-path-not-listed.json +22 −0, refuse-no-block-with-facts.json +27 −0, refuse-pick-without-company-kind.json +28 −0, refuse-typed-key-as-text-block.json +23 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 87. T-009: draft K-09 Tool API v1, the turn face and the shared core (\#88)
+
+- **Commit:** [`b496212`](https://github.com/aryamahadik/rosie/commit/b496212), by Arya Mahadik, 2026-11-07 18:42:08 UTC
+- **Pull request:** [#88](https://github.com/aryamahadik/rosie/pull/88) from `task/T-009`, merged 2026-11-07 18:42:08 UTC. It squashed 1 branch commit:
+  - `fce84f1` T-009: draft K-09 Tool API v1, the turn face and the shared core
+- **Files changed:** 2 (+4180 −0), by folder:
+  - `contracts/tool-api/` README.md +148 −0, tool-api.v1.schema.json +4032 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 86. T-071: Freeze K-05 v1.1, data-access calls for effects, provider events, claims and the dispatcher's follow-ups (\#87)
+
+- **Commit:** [`3f202dd`](https://github.com/aryamahadik/rosie/commit/3f202dd), by Arya Mahadik, 2026-11-07 18:42:03 UTC
+- **Pull request:** [#87](https://github.com/aryamahadik/rosie/pull/87) from `task/T-071`, merged 2026-11-07 18:42:03 UTC. It squashed 2 branch commits:
+  - `ae2c082` T-071: freeze K-05 v1.1: effect rows, provider events, the outbox cla…
+  - `8ae9373` T-071: K-05 v1.1 round 2: follow-up rows with the give-up and a safet…
+- **Files changed:** 52 (+5487 −9), by folder:
+  - `contracts/data-access/` README.md +107 −8, data-access.v1.1.schema.json +2676 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` claim-alex-safety.json +69 −0, claim-dee-answer.json +73 −0, claim-dee.json +73 −0, claim-effects-lapsed.json +55 −0, claim-effects.json +54 −0, claim-lapsed-reclaimed.json +73 −0, commit-adds-dee-booking.json +104 −0, commit-alex-safety.json +53 −0, commit-lets-go-outage-effect.json +107 −0, commit-supersedes-waiting.json +62 −0, commit-withdraws-waiting.json +75 −0, commit-writes-effect.json +150 −0, dispatcher-gives-up-owner-number.json +76 −0, dispatcher-gives-up-too-soon.json +74 −0, dispatcher-gives-up.json +76 −0, effect-fifth-try-outage.json +48 −0, effect-result-network-error.json +48 −0, effect-result.json +48 −0, effect-try-2.json +48 −0, effect-try-3.json +48 −0, effect-try-4.json +48 −0, index.json +384 −0, mark-failed-retry-after.json +30 −0, mark-row-wrong-state.json +22 −0, mark-safety-failed-other-way.json +67 −0, mark-waiting-chat.json +22 −0, provider-event-duplicate.json +31 −0, provider-event-recorded.json +31 −0, reconciliation-refund.json +53 −0, renew-claim-dee-answer.json +28 −0, renew-claim-first-send.json +28 −0, renew-claim-lost.json +24 −0, renew-claim-not-yet.json +21 −0, service-back.json +55 −0, write-all-set-not-failed.json +50 −0, write-all-set.json +49 −0, write-plan-alex-safety.json +46 −0, write-plan-dee-answer.json +53 −0, write-plan-dee.json +53 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-all-set-by-email.json +35 −0, refuse-claim-effects-sms-port.json +6 −0, refuse-effect-calendar-without-visit.json +20 −0, refuse-effect-result-ok-with-error.json +30 −0, refuse-effect-result-without-events.json +12 −0, refuse-failed-no-retry-with-not-before.json +9 −0, refuse-mark-waiting-chat-with-time.json +7 −0, refuse-provider-event-linq.json +11 −0, refuse-reconciliation-not-refund.json +38 −0, refuse-safety-other-way-without-events.json +26 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-071: freeze K-05 v1.1: effect rows, provider events, the outbox claim and K-07's moves
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-071: K-05 v1.1 round 2: follow-up rows with the give-up and a safety line's failure, writeAllSet, effect results logged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 85. T-142: sample-value slotting: names, businesses, places, phones, codes, dates, times and amounts in message lines become K-03 slots, fee terms literal (\#86)
+
+- **Commit:** [`4121fe7`](https://github.com/aryamahadik/rosie/commit/4121fe7), by Arya Mahadik, 2026-11-07 18:38:05 UTC
+- **Pull request:** [#86](https://github.com/aryamahadik/rosie/pull/86) from `task/T-142`, merged 2026-11-07 18:38:06 UTC. It squashed 1 branch commit:
+  - `baedfe5` T-142: sample-value slotting: names, businesses, places, phones, code…
+- **Files changed:** 15 (+1501 −0), by folder:
+  - `compiler/src/slots/` index.ts +43 −0, parity.shard-1.test.ts +4 −0, parity.shard-2.test.ts +4 −0, parity.shard-3.test.ts +4 −0, parity.shard-4.test.ts +4 −0, parity.shard-5.test.ts +4 −0, parity.shard-6.test.ts +4 −0, parity.shard-7.test.ts +4 −0, parity.shard-8.test.ts +4 −0, parity.ts +124 −0, samples.ts +302 −0, scan.ts +165 −0, slots.test.ts +427 −0, slotting.ts +288 −0, vocabulary.ts +120 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 84. T-020: Freeze K-11 v1, the Linq port (webhook verify with the echoed key, send, contacts, capability, double) (\#85)
+
+- **Commit:** [`6c30681`](https://github.com/aryamahadik/rosie/commit/6c30681), by Arya Mahadik, 2026-11-07 18:31:53 UTC
+- **Pull request:** [#85](https://github.com/aryamahadik/rosie/pull/85) from `task/T-020`, merged 2026-11-07 18:31:53 UTC. It squashed 2 branch commits:
+  - `b73f942` T-020: freeze K-11 v1, the Linq port, with fixtures, vendor samples a…
+  - `a4942fe` T-020: K-11 v1 round 2: verifyWebhook gives the echoed part key (part…
+- **Files changed:** 55 (+2325 −0), by folder:
+  - `contracts/port-linq/` README.md +142 −0, frozen.json +1 −0, port-linq.v1.schema.json +797 −0
+  - `contracts/port-linq/fixtures/` capability.json +18 −0, contact-add-failed.json +17 −0, contact-add-ok.json +16 −0, double-signed-webhook.json +50 −0, error-4006.json +32 −0, error-403-2024.json +32 −0, error-rate-limit.json +32 −0, index.json +204 −0, send-calendar-file.json +35 −0, send-link-card.json +31 −0, send-override-optout.json +31 −0, send-photo.json +34 −0, send-poll.json +31 −0, send-tapback.json +35 −0, send-text.json +31 −0, send-threaded-reply.json +33 −0, send-typing.json +31 −0, verify-bad-signature.json +21 −0, verify-delivered-after-4006.json +53 −0, verify-ok.json +49 −0, verify-stale-timestamp.json +21 −0
+  - `contracts/port-linq/fixtures/invalid/` refuse-bold.json +37 −0, refuse-key-on-text.json +49 −0, refuse-poll-six-options.json +31 −0, refuse-sms-channel.json +32 −0, refuse-tapback-on-poll.json +35 −0
+  - `contracts/port-linq/vendor-samples/` attachment-upload-request.json +5 −0, capability-check-imessage-response.json +6 −0, capability-check-request.json +3 −0, create-poll-request.json +6 −0, create-poll-response.json +15 −0, error-1007-rate-limit.json +11 −0, error-2024.json +10 −0, error-4006.json +10 −0, reaction-request.json +5 −0, reaction-response.json +5 −0, send-message-request-calendar-file.json +9 −0, send-message-request-link.json +6 −0, send-message-request.json +10 −0, send-message-response.json +17 −0, webhook-headers.json +9 −0, webhook-message-delivered.json +27 −0, webhook-message-edited.json +17 −0, webhook-message-failed.json +17 −0, webhook-message-received-photo.json +32 −0, webhook-message-received.json +22 −0, webhook-message-sent.json +22 −0, webhook-poll-failed.json +26 −0, webhook-poll-updated.json +17 −0, webhook-poll-vote-added.json +17 −0, webhook-poll-vote-removed.json +17 −0, webhook-reaction-added.json +23 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-020: freeze K-11 v1, the Linq port, with fixtures, vendor samples and spike findings
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-020: K-11 v1 round 2: verifyWebhook gives the echoed part key (partKey) beside the K-06 event, so a late receipt after 4001 or 4006 finds its part; the double carries it; README states the match and a safety line's 2024 despite overrideOptout
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 83. T-1074: scrub speed check measures process CPU time and the fastest run of each length (\#84)
+
+- **Commit:** [`ee2cebc`](https://github.com/aryamahadik/rosie/commit/ee2cebc), by Arya Mahadik, 2026-11-07 18:22:22 UTC
+- **Pull request:** [#84](https://github.com/aryamahadik/rosie/pull/84) from `task/T-1074`, merged 2026-11-07 18:22:23 UTC. It squashed 1 branch commit:
+  - `6a186bc` T-1074: scrub speed check measures process CPU time and the fastest r…
+- **Files changed:** 1 (+56 −44), by folder:
+  - `runtime/src/scrub/` scrub.test.ts +56 −44
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 82. T-026: Freeze K-17 v1, the geo port (geocode with precision, time zone and state) (\#83)
+
+- **Commit:** [`35617f1`](https://github.com/aryamahadik/rosie/commit/35617f1), by Arya Mahadik, 2026-11-07 18:09:58 UTC
+- **Pull request:** [#83](https://github.com/aryamahadik/rosie/pull/83) from `task/T-026`, merged 2026-11-07 18:09:59 UTC. It squashed 2 branch commits:
+  - `844a454` T-026: freeze K-17 v1, the geo port (geocode, double fixtures, K-08 s…
+  - `83ffc5e` T-026: K-17 v1 match carries its US state (nullable USPS code), adapt…
+- **Files changed:** 23 (+808 −0), by folder:
+  - `contracts/port-geo/` README.md +167 −0, frozen.json +1 −0, port-geo.v1.schema.json +216 −0
+  - `contracts/port-geo/fixtures/` error-rate-limited.json +5 −0, error-unavailable.json +5 −0, geocode-demo-shop.json +16 −0, geocode-street-partial.json +16 −0, geocode-street.json +16 −0, geocode-town-no-state.json +16 −0, geocode-town-riverton.json +16 −0, geocode-town.json +16 −0, geocode-travel-centre.json +16 −0, geocode-zip.json +16 −0, index.json +156 −0, not-found.json +5 −0, span-geocode.json +20 −0
+  - `contracts/port-geo/fixtures/invalid/` refuse-distance-in-match.json +17 −0, refuse-match-without-time-zone.json +15 −0, refuse-not-found-with-match.json +16 −0, refuse-partial-as-error.json +5 −0, refuse-state-not-two-letter.json +16 −0, refuse-town-in-span.json +20 −0, refuse-vendor-precision.json +16 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-026: freeze K-17 v1, the geo port (geocode, double fixtures, K-08 span)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-026: K-17 v1 match carries its US state (nullable USPS code), adapter fit rules and the double's test knobs (round 2)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 81. T-143: plug-in key map (K-01 keyMap, pf key resolver, sub-key count and guidance list) (\#82)
+
+- **Commit:** [`579e4c3`](https://github.com/aryamahadik/rosie/commit/579e4c3), by Arya Mahadik, 2026-11-07 17:55:52 UTC
+- **Pull request:** [#82](https://github.com/aryamahadik/rosie/pull/82) from `task/T-143`, merged 2026-11-07 17:55:53 UTC. It squashed 1 branch commit:
+  - `db3200d` T-143: plug-in key map (K-01 keyMap, pf key resolver, sub-key count a…
+- **Files changed:** 3 (+736 −0), by folder:
+  - `compiler/src/keymap/` index.ts +18 −0, keymap.test.ts +417 −0, keymap.ts +301 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 80. T-144: step cards (question, Means or stand-in, Never, safe default, Clock or step 9 default) and fallback text (\#81)
+
+- **Commit:** [`cffc0cd`](https://github.com/aryamahadik/rosie/commit/cffc0cd), by Arya Mahadik, 2026-11-07 17:50:04 UTC
+- **Pull request:** [#81](https://github.com/aryamahadik/rosie/pull/81) from `task/T-144`, merged 2026-11-07 17:50:05 UTC. It squashed 1 branch commit:
+  - `db81c5b` T-144: step cards (question, Means or stand-in, Never, safe default, …
+- **Files changed:** 5 (+1052 −0), by folder:
+  - `compiler/src/cards/` card.ts +188 −0, cards.test.ts +604 −0, fallback.ts +70 −0, index.ts +30 −0, lines.ts +160 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 79. T-182: Migration 0003, per-person sealing keys with seal, unseal and erase (\#79)
+
+- **Commit:** [`c1a6992`](https://github.com/aryamahadik/rosie/commit/c1a6992), by Arya Mahadik, 2026-11-07 17:50:01 UTC
+- **Pull request:** [#79](https://github.com/aryamahadik/rosie/pull/79) from `task/T-182`, merged 2026-11-07 17:50:01 UTC. It squashed 3 branch commits:
+  - `08680bd` T-182: per-person sealing keys table, with seal, unseal and erasePers…
+  - `5c7b0e6` T-182: renumber the migration to 0003 (the lead, at merge: next free …
+  - `b6159e0` T-182: people.int.test.ts pins the first two migrations in order (its…
+- **Files changed:** 4 (+1065 −1), by folder:
+  - `db/migrations/` 0003\_core\_sealing\_keys.sql +28 −0
+  - `db/repo/` people.int.test.ts +1 −1, sealing.int.test.ts +689 −0, sealing.ts +347 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-182: per-person sealing keys table, with seal, unseal and erasePerson calls
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-182: renumber the migration to 0003 (the lead, at merge: next free number after 0002)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-182: people.int.test.ts pins the first two migrations in order (its claim, 'recorded after 0001'), so a later migration does not break it (merge-check found it; May touch extended by the lead, DL-095)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 78. T-361: AI gateway: stage timeouts, one retry, then the other model, K-08 spans per call (\#80)
+
+- **Commit:** [`9e44991`](https://github.com/aryamahadik/rosie/commit/9e44991), by Arya Mahadik, 2026-11-07 17:43:39 UTC
+- **Pull request:** [#80](https://github.com/aryamahadik/rosie/pull/80) from `task/T-361`, merged 2026-11-07 17:43:39 UTC. It squashed 1 branch commit:
+  - `d7d354d` T-361: AI gateway: stage timeouts, one retry, then the other model, K…
+- **Files changed:** 6 (+1293 −0), by folder:
+  - `ai/src/gateway/` errors.ts +29 −0, gateway.test.ts +764 −0, gateway.ts +270 −0, index.ts +36 −0, prices.ts +61 −0, types.ts +133 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 77. T-032: Freeze K-23 v1, business setup database schema (owner-readable travel centre) (\#78)
+
+- **Commit:** [`2bb8440`](https://github.com/aryamahadik/rosie/commit/2bb8440), by Arya Mahadik, 2026-11-07 17:39:02 UTC
+- **Pull request:** [#78](https://github.com/aryamahadik/rosie/pull/78) from `task/T-032`, merged 2026-11-07 17:39:02 UTC. It squashed 2 branch commits:
+  - `f2a2215` T-032: freeze K-23 v1, database schema business setup (table list, fi…
+  - `8b83f17` T-032: owner audience for map\_point and travel\_centre, travel\_centre\_…
+- **Files changed:** 14 (+1867 −0), by folder:
+  - `contracts/db-schema/business-setup/` README.md +112 −0, business-setup.v1.tables.json +1177 −0, frozen.json +1 −0
+  - `contracts/db-schema/business-setup/fixtures/` index.json +84 −0, seed-business-demo-shop.json +118 −0, seed-company-two-kinds.json +97 −0, seed-location-flow-b.json +44 −0, seed-location-travel-centre.json +23 −0, seed-new-booking-pause.json +18 −0, seed-place-or-thing.json +70 −0
+  - `contracts/db-schema/business-setup/fixtures/invalid/` refuse-nomoney-fact-without-switch.json +24 −0, refuse-photo-customer-without-yes.json +28 −0, refuse-second-open-pause.json +40 −0, refuse-travel-centre-without-address.json +31 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-032: freeze K-23 v1, database schema business setup (table list, fixtures, README freeze record)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-032: owner audience for map_point and travel_centre, travel_centre_address with locations_travel_centre_with_address, seed and refused fixture for a separate centre, README position note
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 76. T-016: Freeze K-07 v1, outbox rows and effect rows (waiting for a chat, reconciliation refunds, claim times) (\#77)
+
+- **Commit:** [`a788494`](https://github.com/aryamahadik/rosie/commit/a788494), by Arya Mahadik, 2026-11-07 17:38:59 UTC
+- **Pull request:** [#77](https://github.com/aryamahadik/rosie/pull/77) from `task/T-016`, merged 2026-11-07 17:38:59 UTC. It squashed 2 branch commits:
+  - `5f0600b` T-016: freeze K-07 v1, outbox rows and effect rows (states and moves,…
+  - `d586d5f` T-016: K-07 v1 round 2: waiting\_chat and superseded row states, recon…
+- **Files changed:** 44 (+6914 −0), by folder:
+  - `contracts/outbox-effects/` README.md +185 −0, frozen.json +1 −0, outbox-effects.rules.mjs +301 −0, outbox-effects.v1.schema.json +1123 −0, outbox-effects.v1.tables.json +619 −0
+  - `contracts/outbox-effects/fixtures/` effect-calendar-delete.json +54 −0, effect-calendar-move.json +59 −0, effect-calendar-write.json +59 −0, effect-charge-declined.json +54 −0, effect-charge.json +54 −0, effect-gave-up-outage.json +86 −0, effect-linq-contact-add.json +54 −0, effect-outage-let-go.json +94 −0, effect-outage-runs-once.json +102 −0, effect-reconciliation-refund.json +54 −0, effect-refund.json +54 −0, index.json +300 −0, outbox-4001-delivered-anyway.json +129 −0, outbox-4006-new-key.json +173 −0, outbox-claim-lapsed.json +152 −0, outbox-delivered.json +138 −0, outbox-dropped-stopped.json +110 −0, outbox-email-copy.json +137 −0, outbox-fallback-email.json +198 −0, outbox-held-text-hours.json +160 −0, outbox-poll-failed-plain.json +262 −0, outbox-retry-after-reclaimed.json +144 −0, outbox-safety-retry.json +212 −0, outbox-stale-recomposed.json +171 −0, outbox-two-sends.json +193 −0, outbox-waiting-chat-superseded.json +119 −0, outbox-waiting-chat-withdrawn.json +111 −0, outbox-withdrawn.json +109 −0, provider-event-calendar.json +14 −0, provider-event-stripe.json +14 −0
+  - `contracts/outbox-effects/fixtures/invalid/` refuse-4006-new-key-too-soon.json +173 −0, refuse-decline-retried.json +62 −0, refuse-effect-without-key.json +53 −0, refuse-part-without-key.json +137 −0, refuse-row-move-not-allowed.json +146 −0, refuse-sms-channel.json +138 −0, refuse-sms-row-with-poll.json +193 −0, refuse-waiting-by-wrong-actor.json +103 −0, refuse-waiting-with-claim.json +110 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-016: freeze K-07 v1, outbox rows and effect rows (states and moves, retry rules, lifeChain rule, effects/provider_events/outbox_claims table list, fixtures, README freeze record)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-016: K-07 v1 round 2: waiting_chat and superseded row states, reconciliationJob effect actor, claim firstTryAt and nextTryNotBefore, fixtures and README
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 75. T-1071: the recorded-model double replays the composer's plan (K-03 v1) (\#76)
+
+- **Commit:** [`04ce119`](https://github.com/aryamahadik/rosie/commit/04ce119), by Arya Mahadik, 2026-11-07 17:18:31 UTC
+- **Pull request:** [#76](https://github.com/aryamahadik/rosie/pull/76) from `task/T-1071`, merged 2026-11-07 17:18:31 UTC. It squashed 1 branch commit:
+  - `1aefeac` T-1071: the recorded-model double replays the composer's plan (K-03 v1)
+- **Files changed:** 13 (+1057 −12), by folder:
+  - `ai/recordings/composer-inputs/` block-readback-poll.json +42 −0, confirmation-a6-14.json +47 −0, relay-private-a7-12.json +27 −0, sensitive-a6-15.json +25 −0, tapback-thanks.json +29 −0
+  - `ai/recordings/` composer.v1.json +43 −0
+  - `ai/src/recorded-double/` composer-double.test.ts +427 −0, composer-recordings.ts +227 −0, composer-types.ts +28 −0, double.ts +20 −7, index.ts +16 −1, plan-contract.ts +122 −0, recordings.ts +4 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 74. T-410: adapters shared base (HMAC helper, K-08 span helper, recorded-sample loader, port list; no SMS) (\#75)
+
+- **Commit:** [`a1be7ff`](https://github.com/aryamahadik/rosie/commit/a1be7ff), by Arya Mahadik, 2026-11-07 17:18:28 UTC
+- **Pull request:** [#75](https://github.com/aryamahadik/rosie/pull/75) from `task/T-410`, merged 2026-11-07 17:18:28 UTC. It squashed 1 branch commit:
+  - `481aad5` T-410: adapters shared base (HMAC helper, K-08 span helper, recorded-…
+- **Files changed:** 12 (+1108 −2), by folder:
+  - `adapters/` README.md +27 −1, package.json +4 −1
+  - `adapters/src/shared/` hmac.test.ts +134 −0, hmac.ts +92 −0, index.ts +6 −0, ports.test.ts +46 −0, ports.ts +41 −0, redact.ts +53 −0, samples.test.ts +119 −0, samples.ts +104 −0, spans.test.ts +275 −0, spans.ts +207 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 73. T-045: freeze K-36 v1 db-schema notifications (hand\_offs, team\_pages, team\_page\_recipients) with seeds, refused rows and README freeze record (\#74)
+
+- **Commit:** [`1ef3a8a`](https://github.com/aryamahadik/rosie/commit/1ef3a8a), by Arya Mahadik, 2026-11-07 17:18:24 UTC
+- **Pull request:** [#74](https://github.com/aryamahadik/rosie/pull/74) from `task/T-045`, merged 2026-11-07 17:18:25 UTC. It squashed 1 branch commit:
+  - `93e6f92` T-045: freeze K-36 v1 db-schema notifications (hand\_offs, team\_pages,…
+- **Files changed:** 10 (+1328 −0), by folder:
+  - `contracts/db-schema/notifications/` README.md +93 −0, frozen.json +1 −0, notifications.v1.tables.json +843 −0
+  - `contracts/db-schema/notifications/fixtures/` index.json +52 −0, seed-page-acknowledged.json +106 −0, seed-page-open.json +126 −0
+  - `contracts/db-schema/notifications/fixtures/invalid/` refuse-other-business-reads-hand-off.json +18 −0, refuse-owner-reads-team-page.json +18 −0, refuse-page-acknowledged-by-nobody.json +21 −0, refuse-threat-escalates-after-ten-minutes.json +50 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 72. T-137: record engine: homes, 16 slots, ways, one fee, fixtures, first-fit rows, hold refused (\#73)
+
+- **Commit:** [`ebbd485`](https://github.com/aryamahadik/rosie/commit/ebbd485), by Arya Mahadik, 2026-11-07 16:50:29 UTC
+- **Pull request:** [#73](https://github.com/aryamahadik/rosie/pull/73) from `task/T-137`, merged 2026-11-07 16:50:30 UTC. It squashed 1 branch commit:
+  - `91ccd2f` T-137: record engine: homes, 16 slots, ways, one fee, fixtures, first…
+- **Files changed:** 3 (+1011 −0), by folder:
+  - `compiler/src/record/` compile.ts +527 −0, index.ts +22 −0, record.test.ts +462 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Record engine: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 71. T-181: Migration 0002, core business head, persons and per-business roles (\#72)
+
+- **Commit:** [`9af986a`](https://github.com/aryamahadik/rosie/commit/9af986a), by Arya Mahadik, 2026-11-07 16:48:38 UTC
+- **Pull request:** [#72](https://github.com/aryamahadik/rosie/pull/72) from `task/T-181`, merged 2026-11-07 16:48:39 UTC. It squashed 2 branch commits:
+  - `cc15669` T-181: core business head, persons and per-business roles (migration,…
+  - `93f9702` T-181: renumber the migration to 0002 at merge (db/README, the migrat…
+- **Files changed:** 3 (+1069 −0), by folder:
+  - `db/migrations/` 0002\_core\_business\_people.sql +87 −0
+  - `db/repo/` people.int.test.ts +666 −0, people.ts +316 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Migration 0002 (core business head, persons and per-business roles): QA, the architect and the security reviewer PASS; merge-check applied it to the CI database and ran the integration tests.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 70. T-240: runtime trace context: one trace id per start, K-08 hop spans, CQ-06 batch and Q-41 reply time (\#71)
+
+- **Commit:** [`e3e970a`](https://github.com/aryamahadik/rosie/commit/e3e970a), by Arya Mahadik, 2026-11-07 16:47:29 UTC
+- **Pull request:** [#71](https://github.com/aryamahadik/rosie/pull/71) from `task/T-240`, merged 2026-11-07 16:47:29 UTC. It squashed 1 branch commit:
+  - `a65d5a1` T-240: runtime trace context: one trace id per start, K-08 hop spans,…
+- **Files changed:** 9 (+1869 −0), by folder:
+  - `runtime/src/trace/` context.test.ts +514 −0, context.ts +374 −0, index.ts +32 −0, reply-time.test.ts +135 −0, reply-time.ts +104 −0, test-support.ts +55 −0, types.ts +174 −0, validate.test.ts +189 −0, validate.ts +292 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Runtime trace context per K-08: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 69. T-004: recorded-model double and K-02 fixture loader (\#70)
+
+- **Commit:** [`f56d0f3`](https://github.com/aryamahadik/rosie/commit/f56d0f3), by Arya Mahadik, 2026-11-07 16:45:14 UTC
+- **Pull request:** [#70](https://github.com/aryamahadik/rosie/pull/70) from `task/T-004`, merged 2026-11-07 16:45:14 UTC. It squashed 1 branch commit:
+  - `d4a5102` T-004: recorded-model double and K-02 fixture loader
+- **Files changed:** 12 (+1379 −0), by folder:
+  - `ai/recordings/contexts/` planner-answer.json +84 −0, planner-hand-off.json +71 −0, planner-log-gap.json +71 −0
+  - `ai/recordings/` recordings.v1.json +103 −0
+  - `ai/src/recorded-double/` contract.ts +132 −0, double.ts +45 −0, errors.ts +29 −0, index.ts +19 −0, key.ts +32 −0, recorded-double.test.ts +472 −0, recordings.ts +267 −0, types.ts +54 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Recorded-model double: QA PASS (the composer follows in T-1071).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 68. T-1070: scrub follows K-06 v1.1 (Luhn windows in a run, separator runs, Nd digits, wider SSN); speed test checks growth, not a millisecond bound (\#69)
+
+- **Commit:** [`7b18de8`](https://github.com/aryamahadik/rosie/commit/7b18de8), by Arya Mahadik, 2026-11-07 16:40:57 UTC
+- **Pull request:** [#69](https://github.com/aryamahadik/rosie/pull/69) from `task/T-1070`, merged 2026-11-07 16:40:57 UTC. It squashed 1 branch commit:
+  - `593820b` T-1070: scrub follows K-06 v1.1 (Luhn windows in a run, separator run…
+- **Files changed:** 2 (+664 −94), by folder:
+  - `runtime/src/scrub/` scrub.test.ts +440 −57, scrub.ts +224 −37
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The scrub follows K-06 v1.1: QA PASS and the security reviewer's PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 67. T-136: path model, a trade's real paths, lit(), resolveVary(), applyStops() and a per-path walk (\#68)
+
+- **Commit:** [`3855241`](https://github.com/aryamahadik/rosie/commit/3855241), by Arya Mahadik, 2026-11-07 16:36:34 UTC
+- **Pull request:** [#68](https://github.com/aryamahadik/rosie/pull/68) from `task/T-136`, merged 2026-11-07 16:36:34 UTC. It squashed 1 branch commit:
+  - `65cf8a8` T-136: path model, a trade's real paths, lit(), resolveVary(), applyS…
+- **Files changed:** 5 (+1322 −0), by folder:
+  - `compiler/src/path/` core.ts +147 −0, index.ts +34 −0, model.ts +384 −0, path.test.ts +593 −0, words.ts +164 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Path model: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 66. T-043: freeze K-34 v1 db-schema safety-incidents (5 tables, 6 seeds, 4 refused, README freeze record) (\#67)
+
+- **Commit:** [`b78a4ef`](https://github.com/aryamahadik/rosie/commit/b78a4ef), by Arya Mahadik, 2026-11-07 16:35:04 UTC
+- **Pull request:** [#67](https://github.com/aryamahadik/rosie/pull/67) from `task/T-043`, merged 2026-11-07 16:35:05 UTC. It squashed 1 branch commit:
+  - `1f0ac6e` T-043: freeze K-34 v1 db-schema safety-incidents (5 tables, 6 seeds, …
+- **Files changed:** 14 (+2315 −0), by folder:
+  - `contracts/db-schema/safety-incidents/` README.md +109 −0, frozen.json +1 −0, safety-incidents.v1.tables.json +1425 −0
+  - `contracts/db-schema/safety-incidents/fixtures/` index.json +84 −0, seed-harm-report.json +98 −0, seed-hold-released.json +103 −0, seed-outcome-crisis.json +60 −0, seed-privacy-slip.json +101 −0, seed-safety-timer.json +126 −0, seed-threat-pause.json +84 −0
+  - `contracts/db-schema/safety-incidents/fixtures/invalid/` refuse-outcome-update.json +19 −0, refuse-owner-reads-harm-report.json +18 −0, refuse-timer-without-contact.json +52 −0, refuse-unknown-outcome-label.json +35 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-34 v1 (safety and incidents): QA PASS and all four consumer PASSes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 65. T-180: database client with primary and replica handles, withBusiness scope, test-database helper (\#66)
+
+- **Commit:** [`71afeb5`](https://github.com/aryamahadik/rosie/commit/71afeb5), by Arya Mahadik, 2026-11-07 16:34:01 UTC
+- **Pull request:** [#66](https://github.com/aryamahadik/rosie/pull/66) from `task/T-180`, merged 2026-11-07 16:34:01 UTC. It squashed 1 branch commit:
+  - `2fb1c62` T-180: database client with primary and replica handles, withBusiness…
+- **Files changed:** 4 (+656 −0), by folder:
+  - `db/repo/` client.int.test.ts +317 −0, client.ts +160 −0, scope.ts +69 −0, test-db.ts +110 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Database client, business scope and test-database helper: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 64. T-1069: K-06 v1.1, the wider card-number and SSN rule scrubbedV1dot1 (Luhn windows in a longer run, runs of spaces or dashes, non-ASCII digits), v1.1 schema, fixtures and freeze (\#65)
+
+- **Commit:** [`0a46a6e`](https://github.com/aryamahadik/rosie/commit/0a46a6e), by Arya Mahadik, 2026-11-07 16:30:19 UTC
+- **Pull request:** [#65](https://github.com/aryamahadik/rosie/pull/65) from `task/T-1069`, merged 2026-11-07 16:30:19 UTC. It squashed 1 branch commit:
+  - `a0c3ca5` T-1069: K-06 v1.1, the wider card-number and SSN rule scrubbedV1dot1 …
+- **Files changed:** 14 (+475 −3), by folder:
+  - `contracts/inbound-event/` README.md +49 −1, frozen.json +1 −1, inbound-event.rules.mjs +94 −1, inbound-event.v1.1.schema.json +7 −0
+  - `contracts/inbound-event/fixtures/` index.json +72 −0, text-with-card-next-to-digits.json +28 −0, text-with-card-non-ascii-digits.json +28 −0, text-with-card-wide-spaces.json +28 −0, text-with-nine-bare-digits.json +28 −0, text-with-ssn-wide-form.json +28 −0
+  - `contracts/inbound-event/fixtures/invalid/` refuse-unscrubbed-card-next-to-digits.json +28 −0, refuse-unscrubbed-card-non-ascii-digits.json +28 −0, refuse-unscrubbed-card-wide-spaces.json +28 −0, refuse-unscrubbed-ssn-wide-form.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+K-06 v1.1 (the wider card-number and SSN rule): QA PASS and all five PASSes, the security reviewer's included.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 63. T-017: Freeze K-08 v1, the event log and trace format (\#64)
+
+- **Commit:** [`72d0ef4`](https://github.com/aryamahadik/rosie/commit/72d0ef4), by Arya Mahadik, 2026-11-07 16:29:22 UTC
+- **Pull request:** [#64](https://github.com/aryamahadik/rosie/pull/64) from `task/T-017`, merged 2026-11-07 16:29:22 UTC. It squashed 2 branch commits:
+  - `bf53ba2` T-017: freeze K-08 event-trace v1 (event-log rows, spans, traces, mea…
+  - `8aebabf` T-017: span provider, call and attempt; portCall hop; vendor out of g…
+- **Files changed:** 21 (+3601 −0), by folder:
+  - `contracts/event-trace/` README.md +166 −0, event-trace.v1.schema.json +1541 −0, frozen.json +3 −0
+  - `contracts/event-trace/fixtures/` event-commit.json +99 −0, event-erased-person.json +37 −0, event-owner-yes.json +38 −0, event-stop-consent-row.json +33 −0, index.json +140 −0, measure-invariant-run.json +25 −0, measure-reply-time.json +13 −0, span-effect-run-retry.json +25 −0, span-places-call.json +20 −0, trace-batch-three-texts.json +480 −0, trace-clock-fire.json +176 −0, trace-duplicate-webhook.json +28 −0, trace-model-call-cost.json +358 −0, trace-skeleton.json +321 −0
+  - `contracts/event-trace/fixtures/invalid/` refuse-event-update.json +25 −0, refuse-raw-phone-in-span.json +17 −0, refuse-raw-text-in-span.json +17 −0, refuse-span-without-bundle-id.json +39 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-08 v1 (the event log and trace format): QA PASS and all eight consumer PASSes, the integrations engineer's after one rework.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 62. T-046: freeze K-37 v1, the platform and review database part, with its fixtures and README freeze record (\#63)
+
+- **Commit:** [`36522a9`](https://github.com/aryamahadik/rosie/commit/36522a9), by Arya Mahadik, 2026-11-07 16:26:25 UTC
+- **Pull request:** [#63](https://github.com/aryamahadik/rosie/pull/63) from `task/T-046`, merged 2026-11-07 16:26:26 UTC. It squashed 1 branch commit:
+  - `4a5b449` T-046: freeze K-37 v1, the platform and review database part, with it…
+- **Files changed:** 11 (+1470 −0), by folder:
+  - `contracts/db-schema/platform-review/` README.md +104 −0, frozen.json +1 −0, platform-review.v1.tables.json +994 −0
+  - `contracts/db-schema/platform-review/fixtures/` index.json +60 −0, seed-dead-letter.json +51 −0, seed-gap-case.json +70 −0, seed-live-turn-label.json +15 −0, seed-parked-turn.json +34 −0, seed-review-item.json +90 −0
+  - `contracts/db-schema/platform-review/fixtures/invalid/` refuse-dead-letter-early.json +33 −0, refuse-review-item-tool-api-read.json +18 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-37 v1 (platform and review): QA PASS and all five consumer PASSes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 61. T-1068: CQ-25, decide reaches the model in two calls (live on both models) (\#62)
+
+- **Commit:** [`4977c39`](https://github.com/aryamahadik/rosie/commit/4977c39), by Arya Mahadik, 2026-11-07 16:20:00 UTC
+- **Pull request:** [#62](https://github.com/aryamahadik/rosie/pull/62) from `task/T-1068`, merged 2026-11-07 16:20:01 UTC. It squashed 6 branch commits:
+  - `1ddfafd` T-1068: decide wire-form probe (tools, flat tools, envelope, two-step…
+  - `5eaea6e` T-1068: FINDINGS.md from the builder's text (its Write was refused; D…
+  - `7d8eb80` T-1068: live round 1 (6 of 12 calls): every one-call form refused; tw…
+  - `f6364c1` T-1068: round two for (c) on Sonnet (--live --round two-step-sonnet),…
+  - `019d7db` T-1068: round 2 live (3 calls, 9 of 12): the two-step form accepted o…
+  - `386dc9c` T-1068: the recommendation's last sentence reflects round 2 (QA's note)
+- **Files changed:** 23 (+4082 −0), by folder:
+  - `ai/spikes/decide-wire/` FINDINGS.md +187 −0, lib.mjs +818 −0, probe.mjs +510 −0, probe.test.mjs +717 −0, results.jsonl +9 −0
+  - `ai/spikes/decide-wire/samples/` 01-tools-two-requests-haiku-5-5.request.json +505 −0, 01-tools-two-requests-haiku-5-5.response.json +8 −0, 02-tools-flat-two-requests-haiku-5-5.request.json +411 −0, 02-tools-flat-two-requests-haiku-5-5.response.json +8 −0, 03-envelope-two-requests-haiku-5-5.request.json +123 −0, 03-envelope-two-requests-haiku-5-5.response.json +5 −0, 04-two-step-1-two-requests-haiku-5-5.request.json +57 −0, 04-two-step-1-two-requests-haiku-5-5.response.json +33 −0, 05-two-step-2-p1-two-requests-haiku-5-5.request.json +121 −0, 05-two-step-2-p1-two-requests-haiku-5-5.response.json +33 −0, 06-two-step-2-p2-two-requests-haiku-5-5.request.json +121 −0, 06-two-step-2-p2-two-requests-haiku-5-5.response.json +33 −0, 07-two-step-1-two-requests-sonnet-5-5.request.json +57 −0, 07-two-step-1-two-requests-sonnet-5-5.response.json +28 −0, 08-two-step-2-p1-two-requests-sonnet-5-5.request.json +121 −0, 08-two-step-2-p1-two-requests-sonnet-5-5.response.json +28 −0, 09-two-step-2-p2-two-requests-sonnet-5-5.request.json +121 −0, 09-two-step-2-p2-two-requests-sonnet-5-5.response.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+CQ-25 spike: QA PASS and the architect's PASS; decide reaches the model in two calls.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 60. T-014: freeze K-05 v1, the data-access calls, with fixtures and README freeze record (\#61)
+
+- **Commit:** [`b0bad48`](https://github.com/aryamahadik/rosie/commit/b0bad48), by Arya Mahadik, 2026-11-07 16:18:07 UTC
+- **Pull request:** [#61](https://github.com/aryamahadik/rosie/pull/61) from `task/T-014`, merged 2026-11-07 16:18:07 UTC. It squashed 1 branch commit:
+  - `2615569` T-014: freeze K-05 v1, the data-access calls, with fixtures and READM…
+- **Files changed:** 49 (+4754 −0), by folder:
+  - `contracts/data-access/` README.md +102 −0, data-access.v1.schema.json +2337 −0, frozen.json +3 −0
+  - `contracts/data-access/fixtures/` active-bundle.json +16 −0, arm-clock.json +27 −0, bundle-value-on-miss.json +22 −0, cancel-clock.json +22 −0, claim-evening-notice.json +60 −0, claim-held-lets-later-pass.json +60 −0, claim-in-order.json +106 −0, commit-evening-notice.json +71 −0, commit-first.json +107 −0, commit-opens-question.json +108 −0, commit-repeat-same-turn.json +103 −0, commit-reservation-lost.json +57 −0, commit-sam-quick-reply.json +53 −0, commit-version-changed.json +59 −0, due-for-handle.json +34 −0, due-for-sweep.json +47 −0, extend-ai-door-refused.json +21 −0, extend-once.json +22 −0, fire-once.json +81 −0, fire-repeat.json +81 −0, index.json +364 −0, mark-delivered.json +25 −0, mark-held-for-text-hours.json +22 −0, mark-sent.json +27 −0, park-turn.json +61 −0, publish-bundle-copy.json +30 −0, release-expired-promotes.json +34 −0, reserve-10-min.json +31 −0, reserve-ai-door-15-min.json +31 −0, reserve-next-in-line.json +30 −0, reserve-overlap-refused.json +25 −0, reserve-third-refused.json +28 −0, set-active-bundle.json +21 −0, unplanned-after-crash.json +23 −0, write-plan-evening-notice.json +45 −0, write-plan-owner.json +53 −0, write-plan-repeat.json +53 −0, write-plan-sam-quick-reply.json +45 −0, write-plan.json +53 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-outbox-with-plan.json +45 −0, refuse-commit-state-write-to-reservations.json +28 −0, refuse-fire-without-turn-writes-outbox.json +30 −0, refuse-mark-held-without-time.json +7 −0, refuse-reserve-ai-door-with-minutes.json +12 −0, refuse-reserve-document-over-24-hours.json +12 −0, refuse-turn-fourth-try.json +20 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-05 v1 (the data-access calls): QA PASS and all four consumer PASSes (database, action layer, runtime, frontend).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 59. T-242: card number and SSN scrub at the edge (pure scrub, K-06 tags, tests against the K-06 rule and fixtures) (\#60)
+
+- **Commit:** [`8dc0b78`](https://github.com/aryamahadik/rosie/commit/8dc0b78), by Arya Mahadik, 2026-11-07 16:14:45 UTC
+- **Pull request:** [#60](https://github.com/aryamahadik/rosie/pull/60) from `task/T-242`, merged 2026-11-07 16:14:46 UTC. It squashed 1 branch commit:
+  - `bcf51ed` T-242: card number and SSN scrub at the edge (pure scrub, K-06 tags, …
+- **Files changed:** 2 (+494 −0), by folder:
+  - `runtime/src/scrub/` scrub.test.ts +389 −0, scrub.ts +105 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Card number and SSN scrub at the edge: QA PASS and the security reviewer's PASS; follow-up T-1069 widens K-06's rule.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 58. T-038: freeze K-29 conversations-consent v1 (consents, chat links, seeds, refused rows) (\#59)
+
+- **Commit:** [`74d3638`](https://github.com/aryamahadik/rosie/commit/74d3638), by Arya Mahadik, 2026-11-07 16:05:13 UTC
+- **Pull request:** [#59](https://github.com/aryamahadik/rosie/pull/59) from `task/T-038`, merged 2026-11-07 16:05:13 UTC. It squashed 1 branch commit:
+  - `7d3b531` T-038: freeze K-29 conversations-consent v1 (consents, chat links, se…
+- **Files changed:** 10 (+870 −0), by folder:
+  - `contracts/db-schema/conversations-consent/` README.md +86 −0, conversations-consent.v1.tables.json +469 −0, frozen.json +1 −0
+  - `contracts/db-schema/conversations-consent/fixtures/` index.json +52 −0, seed-chat-link.json +135 −0, seed-consent-fee-ok.json +19 −0, seed-consent-health-agreement.json +42 −0, seed-consent-stop-row.json +20 −0
+  - `contracts/db-schema/conversations-consent/fixtures/invalid/` refuse-consent-update.json +19 −0, refuse-face-match-kind.json +27 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-29 v1 (conversations and consent): QA PASS and all four consumer PASSes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 57. T-015: Freeze K-06 v1, the inbound event (schema, scrubbed rule, fixtures, freeze record) (\#58)
+
+- **Commit:** [`fd97a4e`](https://github.com/aryamahadik/rosie/commit/fd97a4e), by Arya Mahadik, 2026-11-07 16:05:09 UTC
+- **Pull request:** [#58](https://github.com/aryamahadik/rosie/pull/58) from `task/T-015`, merged 2026-11-07 16:05:10 UTC. It squashed 1 branch commit:
+  - `d8aa0c8` T-015: Freeze K-06 v1, the inbound event (schema, scrubbed rule, fixt…
+- **Files changed:** 24 (+1847 −0), by folder:
+  - `contracts/inbound-event/` README.md +106 −0, frozen.json +3 −0, inbound-event.rules.mjs +75 −0, inbound-event.v1.schema.json +933 −0
+  - `contracts/inbound-event/fixtures/` delivered.json +32 −0, duplicate-event.json +28 −0, edit-after-commit.json +30 −0, email-reply-check-failed.json +32 −0, email-reply-check-passed.json +32 −0, index.json +155 −0, photo.json +33 −0, poll-failed.json +35 −0, poll-vote-removed.json +32 −0, poll-vote.json +32 −0, reaction-from-customer.json +31 −0, reaction-from-rosie.json +31 −0, sent.json +32 −0, test-phone-page.json +28 −0, text-imessage.json +28 −0, text-with-card-number.json +28 −0, text-with-ssn.json +28 −0
+  - `contracts/inbound-event/fixtures/invalid/` refuse-no-event-id.json +27 −0, refuse-unscrubbed-card.json +28 −0, refuse-unscrubbed-ssn.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-06 v1 (the inbound event): QA PASS and all four consumer PASSes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 56. T-135: overlay applier, a typed wrapper around overlay-core.js apply() with strict refusals and 243 x 2 parity tests (\#56)
+
+- **Commit:** [`e10461c`](https://github.com/aryamahadik/rosie/commit/e10461c), by Arya Mahadik, 2026-11-07 16:04:01 UTC
+- **Pull request:** [#56](https://github.com/aryamahadik/rosie/pull/56) from `task/T-135`, merged 2026-11-07 16:04:01 UTC. It squashed 1 branch commit:
+  - `cbcd8fd` T-135: overlay applier, a typed wrapper around overlay-core.js apply(…
+- **Files changed:** 13 (+647 −0), by folder:
+  - `compiler/src/overlay/` applier.test.ts +193 −0, apply.ts +250 −0, cjs-load.ts +50 −0, core.ts +38 −0, parity.shard-1.test.ts +4 −0, parity.shard-2.test.ts +4 −0, parity.shard-3.test.ts +4 −0, parity.shard-4.test.ts +4 −0, parity.shard-5.test.ts +4 −0, parity.shard-6.test.ts +4 −0, parity.shard-7.test.ts +4 −0, parity.shard-8.test.ts +4 −0, parity.ts +84 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Overlay applier: QA PASS; parity on all 243 trades x both flows; merged after T-1067 moved the parity suite to its own project (merge-check run 42388593454 ran it on the rebased branch).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 55. T-1067: Run the overlay parity suite in its own project, only when its inputs change (\#57)
+
+- **Commit:** [`05b0d62`](https://github.com/aryamahadik/rosie/commit/05b0d62), by Arya Mahadik, 2026-11-07 15:53:48 UTC
+- **Pull request:** [#57](https://github.com/aryamahadik/rosie/pull/57) from `task/T-1067`, merged 2026-11-07 15:53:48 UTC. It squashed 1 branch commit:
+  - `7d91b85` T-1067: Run the overlay parity suite in its own project, only when it…
+- **Files changed:** 6 (+233 −3), by folder:
+  - `.github/workflows/` ci.yml +26 −0, merge-check.yml +22 −0
+  - `infra/ci/` ci-triggers.test.mjs +4 −1, parity-placement.test.mjs +165 −0
+  - `/` package.json +1 −0, vitest.config.ts +15 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Parity suite only when its inputs change: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 54. T-013: Freeze K-04 v1, the core database schema (\#55)
+
+- **Commit:** [`dc67399`](https://github.com/aryamahadik/rosie/commit/dc67399), by Arya Mahadik, 2026-11-07 14:00:28 UTC
+- **Pull request:** [#55](https://github.com/aryamahadik/rosie/pull/55) from `task/T-013`, merged 2026-11-07 14:00:28 UTC. It squashed 3 branch commits:
+  - `e0d1d32` T-013: Freeze K-04 v1, the database schema core part (24 tables, seed…
+  - `4019b8b` T-013: Rework, reservations.queued\_at and reservations\_waiting\_queue\_…
+  - `bc2a0e0` T-013: a missing space in the seed-reservation entry's source (QA's n…
+- **Files changed:** 27 (+5632 −0), by folder:
+  - `contracts/db-schema/core/` README.md +121 −0, core.v1.tables.json +3755 −0, frozen.json +1 −0
+  - `contracts/db-schema/core/fixtures/` index.json +188 −0, seed-booking-head.json +37 −0, seed-bundle-registry.json +30 −0, seed-business-head.json +44 −0, seed-class-seats.json +50 −0, seed-clock-row.json +45 −0, seed-event-log.json +82 −0, seed-flag.json +37 −0, seed-open-question.json +48 −0, seed-outbox-row.json +200 −0, seed-pause.json +33 −0, seed-person-roles.json +256 −0, seed-phone-chat-open.json +92 −0, seed-phone-stopped.json +56 −0, seed-reservation.json +93 −0, seed-resources.json +91 −0, seed-sealing-key.json +29 −0, seed-thread-messages.json +178 −0, seed-turn.json +27 −0
+  - `contracts/db-schema/core/fixtures/invalid/` refuse-cross-business-read.json +20 −0, refuse-duplicate-turn-id.json +33 −0, refuse-event-log-update.json +24 −0, refuse-overlapping-reservation.json +34 −0, refuse-seats-over-capacity.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-04 v1 (the core database schema): QA PASS and all five consumer PASSes (database, action layer, runtime, release, QA and eval), the database engineer's after one rework.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 53. T-1066: Live check of the frozen model-facing schemas (decide read too complex) (\#54)
+
+- **Commit:** [`1819278`](https://github.com/aryamahadik/rosie/commit/1819278), by Arya Mahadik, 2026-11-07 13:20:52 UTC
+- **Pull request:** [#54](https://github.com/aryamahadik/rosie/pull/54) from `task/T-1066`, merged 2026-11-07 13:20:52 UTC. It squashed 2 branch commits:
+  - `afe3fd4` T-1066: probe --frozen plans the 4 frozen-schema calls; FINDINGS gain…
+  - `482a7b4` T-1066: live results (4 calls, 20 of 20): the frozen decide read is r…
+- **Files changed:** 13 (+1432 −22), by folder:
+  - `ai/spikes/structured-outputs/` FINDINGS.md +53 −15, frozen.mjs +194 −0, probe.mjs +76 −7, probe.test.mjs +293 −0, results.jsonl +4 −0
+  - `ai/spikes/structured-outputs/samples/` 17-frozen-decide-read-haiku-5-5-try2.request.json +274 −0, 17-frozen-decide-read-haiku-5-5-try2.response.json +5 −0, 17-frozen-decide-read-haiku-5-5.request.json +274 −0, 17-frozen-decide-read-haiku-5-5.response.json +1 −0, 18-frozen-safety-read-haiku-5-5.request.json +74 −0, 18-frozen-safety-read-haiku-5-5.response.json +28 −0, 19-frozen-planner-output-haiku-5-5.request.json +128 −0, 19-frozen-planner-output-haiku-5-5.response.json +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+T-1066, the frozen model-facing schemas live: QA PASS; the decide read is refused as too complex (CQ-25).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 52. T-360: Spike, structured outputs for K-02 and K-03 on both models (live results) (\#53)
+
+- **Commit:** [`02e1df9`](https://github.com/aryamahadik/rosie/commit/02e1df9), by Arya Mahadik, 2026-11-07 13:06:59 UTC
+- **Pull request:** [#53](https://github.com/aryamahadik/rosie/pull/53) from `task/T-360`, merged 2026-11-07 13:07:00 UTC. It squashed 3 branch commits:
+  - `a515d94` T-360: structured-outputs spike probe, candidate K-02/K-03 schemas an…
+  - `645d5ad` T-360: FINDINGS.md from the builder's report (docs, candidates, dry r…
+  - `0f7baa2` T-360: live results, 16 of 20 calls: decide refused as too complex on…
+- **Files changed:** 41 (+3302 −0), by folder:
+  - `ai/spikes/structured-outputs/` FINDINGS.md +113 −0, lib.mjs +407 −0, probe.mjs +217 −0, probe.test.mjs +307 −0, results.jsonl +16 −0
+  - `ai/spikes/structured-outputs/samples/` 01-control-haiku-5-5.request.json +18 −0, 01-control-haiku-5-5.response.json +23 −0, 02-decide-haiku-5-5.request.json +143 −0, 02-decide-haiku-5-5.response.json +5 −0, 03-safety-read-haiku-5-5.request.json +73 −0, 03-safety-read-haiku-5-5.response.json +28 −0, 04-planner-haiku-5-5.request.json +85 −0, 04-planner-haiku-5-5.response.json +28 −0, 05-message-plan-haiku-5-5.request.json +126 −0, 05-message-plan-haiku-5-5.response.json +28 −0, 06-decide-header-haiku-5-5.request.json +145 −0, 06-decide-header-haiku-5-5.response.json +5 −0, 07-control-sonnet-5-5.request.json +18 −0, 07-control-sonnet-5-5.response.json +23 −0, 08-decide-sonnet-5-5.request.json +143 −0, 08-decide-sonnet-5-5.response.json +5 −0, 09-safety-read-sonnet-5-5.request.json +73 −0, 09-safety-read-sonnet-5-5.response.json +28 −0, 10-planner-sonnet-5-5.request.json +85 −0, 10-planner-sonnet-5-5.response.json +28 −0, 11-message-plan-sonnet-5-5.request.json +126 −0, 11-message-plan-sonnet-5-5.response.json +28 −0, 12-decide-header-sonnet-5-5.request.json +145 −0, 12-decide-header-sonnet-5-5.response.json +5 −0, 13-neg-string-length.request.json +85 −0, 13-neg-string-length.response.json +28 −0, 14-neg-number-limit.request.json +86 −0, 14-neg-number-limit.response.json +8 −0, 15-neg-open-object.request.json +85 −0, 15-neg-open-object.response.json +8 −0, 16-neg-external-ref.request.json +142 −0, 16-neg-external-ref.response.json +8 −0
+  - `ai/spikes/structured-outputs/schemas/` decide.candidate.schema.json +139 −0, message-plan.candidate.schema.json +108 −0, planner.candidate.schema.json +73 −0, safety-read.candidate.schema.json +58 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Spike T-360, structured outputs live: QA PASS; decide refused as too complex on both models, the other three accepted.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 51. T-133: trade file loader by top key (R2, R3) for the 243 trades (\#52)
+
+- **Commit:** [`5c6d072`](https://github.com/aryamahadik/rosie/commit/5c6d072), by Arya Mahadik, 2026-11-07 09:50:40 UTC
+- **Pull request:** [#52](https://github.com/aryamahadik/rosie/pull/52) from `task/T-133`, merged 2026-11-07 09:50:40 UTC. It squashed 1 branch commit:
+  - `2e0968b` T-133: trade file loader by top key (R2, R3) for the 243 trades
+- **Files changed:** 2 (+1283 −0), by folder:
+  - `compiler/src/load/` trade.test.ts +436 −0, trade.ts +847 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Trade file loader for the 243 trades: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 50. T-081: contract test model.v1, the fixture part and the side list (\#51)
+
+- **Commit:** [`0c84a4b`](https://github.com/aryamahadik/rosie/commit/0c84a4b), by Arya Mahadik, 2026-11-07 09:40:47 UTC
+- **Pull request:** [#51](https://github.com/aryamahadik/rosie/pull/51) from `task/T-081`, merged 2026-11-07 09:40:48 UTC. It squashed 1 branch commit:
+  - `45fc380` T-081: contract test model.v1, the fixture part and the side list
+- **Files changed:** 1 (+1261 −0), by folder:
+  - `tests/contract/` model.v1.test.ts +1261 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Contract test model.v1: QA PASS and the architect's review PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 49. T-082: contract test for message-plan.v1 (fixtures, vacuity, slot vocabulary, pair and check-result checks, side list) (\#50)
+
+- **Commit:** [`069216d`](https://github.com/aryamahadik/rosie/commit/069216d), by Arya Mahadik, 2026-11-07 09:37:09 UTC
+- **Pull request:** [#50](https://github.com/aryamahadik/rosie/pull/50) from `task/T-082`, merged 2026-11-07 09:37:10 UTC. It squashed 1 branch commit:
+  - `713116d` T-082: contract test for message-plan.v1 (fixtures, vacuity, slot voc…
+- **Files changed:** 1 (+1376 −0), by folder:
+  - `tests/contract/` message-plan.v1.test.ts +1376 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Contract test message-plan.v1: QA PASS and the architect's review PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 48. T-132: master flow loader, typed step graph and CLI entry for the compiler (\#49)
+
+- **Commit:** [`83fd8b6`](https://github.com/aryamahadik/rosie/commit/83fd8b6), by Arya Mahadik, 2026-11-07 09:37:06 UTC
+- **Pull request:** [#49](https://github.com/aryamahadik/rosie/pull/49) from `task/T-132`, merged 2026-11-07 09:37:06 UTC. It squashed 1 branch commit:
+  - `a597fb0` T-132: master flow loader, typed step graph and CLI entry for the com…
+- **Files changed:** 6 (+1431 −1), by folder:
+  - `compiler/` package.json +4 −1
+  - `compiler/src/cli/commands/` .gitkeep +0 −0
+  - `compiler/src/cli/` index.ts +128 −0
+  - `compiler/src/graph/` types.ts +342 −0
+  - `compiler/src/load/` flow.test.ts +357 −0, flow.ts +600 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Compiler scaffold and master flow loader: QA PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 47. T-011: Freeze K-02 v1, the model's contract (\#48)
+
+- **Commit:** [`fefa0b8`](https://github.com/aryamahadik/rosie/commit/fefa0b8), by Arya Mahadik, 2026-11-07 09:29:38 UTC
+- **Pull request:** [#48](https://github.com/aryamahadik/rosie/pull/48) from `task/T-011`, merged 2026-11-07 09:29:38 UTC. It squashed 2 branch commits:
+  - `355d809` T-011: freeze K-02 v1, the model's contract, with fixtures, named rul…
+  - `d4d2456` T-011: danger words name their kind (selfHarm or other) and hand-offs…
+- **Files changed:** 46 (+7427 −4), by folder:
+  - `contracts/common/` fixtures-index.meta.schema.json +8 −0
+  - `contracts/model/` README.md +123 −0, frozen.json +1 −0, model.rules.mjs +105 −0, model.v1.schema.json +1756 −0
+  - `contracts/model/fixtures/` context-s1-02.json +231 −0, context-two-requests.json +273 −0, decide-ask.json +67 −0, decide-bare-2.json +61 −0, decide-hand-off-owner-or-staff.json +58 −0, decide-hand-off.json +58 −0, decide-no-op-thanks.json +52 −0, decide-none-fits.json +55 −0, decide-pass-on.json +55 −0, decide-poll-vote.json +61 −0, decide-reads-disagree.json +88 −0, decide-redact.json +55 −0, decide-s1-02-choose.json +79 −0, decide-tapback-asks-which.json +64 −0, decide-two-requests.json +145 −0, index.json +286 −0, planner-answer.json +10 −0, planner-hand-off.json +8 −0, planner-log-gap.json +7 −0, safety-business-own-line.json +27 −0, safety-child-or-elder.json +27 −0, safety-crisis-words.json +33 −0, safety-emergency-now.json +33 −0, safety-no.json +27 −0, safety-over-gas-leak.json +33 −0, safety-threat.json +27 −0, safety-timeout-danger-word.json +27 −0, safety-timeout-self-harm-word.json +27 −0, safety-unknown-tense.json +33 −0, safety-unsafe-at-home.json +27 −0
+  - `contracts/model/fixtures/invalid/` refuse-option-not-offered.json +312 −0, refuse-over-60-choices.json +1575 −0, refuse-planner-books.json +10 −0, refuse-quote-not-in-text.json +312 −0, refuse-unknown-verb.json +12 −0, refuse-value-without-words.json +21 −0
+  - `contracts/` package.json +1 −1
+  - `contracts/scripts/` check-fixtures.mjs +82 −3, model-contract.test.mjs +434 −0, structured-subset-lint.mjs +398 −0, structured-subset-lint.test.mjs +243 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-02 v1 (the model's contract): QA PASS and all five consumer PASSes (AI, action layer, integrations, runtime, QA and eval), the runtime and action-layer engineers' after one rework.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 46. T-131: spike, wrap the master's CommonJS overlay scripts from the ESM compiler (\#47)
+
+- **Commit:** [`397d3d7`](https://github.com/aryamahadik/rosie/commit/397d3d7), by Arya Mahadik, 2026-11-07 09:23:36 UTC
+- **Pull request:** [#47](https://github.com/aryamahadik/rosie/pull/47) from `task/T-131`, merged 2026-11-07 09:23:36 UTC. It squashed 1 branch commit:
+  - `15e49a3` T-131: spike, wrap the master's CommonJS overlay scripts from the ESM…
+- **Files changed:** 3 (+395 −0), by folder:
+  - `compiler/spikes/wrap/` cjs-load.mjs +40 −0, probe-plain.mjs +30 −0, try-wrap.mjs +325 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Spike T-131 (wrap or port): QA PASS; answer WRAP.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 45. T-012: freeze K-03 message-plan v1 with slot vocabulary, fixtures and freeze record (\#46)
+
+- **Commit:** [`b6f7b55`](https://github.com/aryamahadik/rosie/commit/b6f7b55), by Arya Mahadik, 2026-11-07 09:23:32 UTC
+- **Pull request:** [#46](https://github.com/aryamahadik/rosie/pull/46) from `task/T-012`, merged 2026-11-07 09:23:33 UTC. It squashed 1 branch commit:
+  - `613ecd6` T-012: freeze K-03 message-plan v1 with slot vocabulary, fixtures and…
+- **Files changed:** 25 (+2494 −0), by folder:
+  - `contracts/message-plan/` README.md +97 −0, frozen.json +3 −0, message-plan.v1.schema.json +934 −0
+  - `contracts/message-plan/fixtures/` check-emoji.json +40 −0, check-fallback.json +41 −0, check-optout-only-option.json +52 −0, check-pass.json +32 −0, check-passed-on.json +40 −0, check-raw-price.json +42 −0, check-two-questions.json +39 −0, check-unfilled-slot.json +40 −0, final-two-sends.json +35 −0, index.json +172 −0, input-s1-02.json +31 −0, plan-block-readback-poll.json +15 −0, plan-confirmation-a6-14.json +32 −0, plan-email-copy.json +37 −0, plan-relay-private-a7-12.json +19 −0, plan-s1-02.json +19 −0, plan-sensitive.json +16 −0, plan-tapback-thanks.json +7 −0, slots.json +680 −0
+  - `contracts/message-plan/fixtures/invalid/` refuse-format-not-allowed.json +12 −0, refuse-frontier-in-input.json +43 −0, refuse-hold-slot.json +16 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-03 v1 (the composer's message plan and slots): QA PASS and all six consumer PASSes (AI, action layer, runtime, database, playbook, QA and eval).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 44. T-130: vendor compiler master inputs into fixtures/master with SHA256SUMS (\#45)
+
+- **Commit:** [`8f48b18`](https://github.com/aryamahadik/rosie/commit/8f48b18), by Arya Mahadik, 2026-11-07 09:08:57 UTC
+- **Pull request:** [#45](https://github.com/aryamahadik/rosie/pull/45) from `task/T-130`, merged 2026-11-07 09:08:58 UTC. It squashed 1 branch commit:
+  - `42a56e2` T-130: vendor compiler master inputs into fixtures/master with SHA256…
+- **Files changed:** 251 (+1229721 −0), by folder:
+  - `fixtures/master/` SHA256SUMS +249 −0, manifest.test.ts +89 −0
+  - `fixtures/master/engine/design/` LINES.md +238 −0
+  - `fixtures/master/engine/work/build/` lib.js +2096 −0, msgtext.js +119 −0, overlay-core.js +2001 −0
+  - `fixtures/master/engine/work/master/` master-A.json +43758 −0, master-B.json +45917 −0
+  - `fixtures/master/engine/work/prof/` aba.json +3468 −0, acupuncturist.json +2831 −0, addiction.json +4530 −0, advisor.json +8843 −0, airport-shuttle.json +3365 −0, allergist.json +5070 −0, appliance.json +2851 −0, appraiser.json +4058 −0, aquarium.json +2174 −0, architect.json +2808 −0, art-appraiser.json +2605 −0, art-classes.json +3412 −0, auto-body.json +10081 −0, auto-glass.json +6918 −0, auto-repair.json +2851 −0, axe-throwing.json +3434 −0, baker.json +5149 −0, band.json +9662 −0, barber.json +3499 −0, bike-repair.json +3351 −0, biohazard.json +2709 −0, boarding.json +11237 −0, boat-repair.json +3545 −0, camp.json +3144 −0, cardiologist.json +5041 −0, carpet.json +3716 −0, caterer.json +3607 −0, chef.json +5616 −0, chimney.json +3088 −0, chiropractor.json +3412 −0, cleaner.json +3290 −0, climbing-gym.json +3842 −0, closets.json +4305 −0, clown.json +9518 −0, coach.json +4132 −0, coding-classes.json +3411 −0, college-admissions.json +3630 −0, comedian.json +9558 −0, commercial-cleaning.json +3616 −0, concierge.json +3101 −0, concrete.json +2829 −0, contractor.json +2378 −0, cooking-classes.json +3412 −0, cpa.json +4402 −0, cpr-training.json +3383 −0, credit-counselor.json +4632 −0, dance.json +22686 −0, daycare.json +12525 −0, deck.json +2879 −0, demolition.json +2868 −0, dentist.json +6818 −0, dermatologist.json +2924 −0, detailing.json +4946 −0, dietitian.json +3577 −0, dj.json +9523 −0, dog-trainer.json +3129 −0, dog-walker.json +5754 −0, doula.json +2775 −0, driving-school.json +9130 −0, drywall.json +3918 −0, duct-cleaning.json +3898 −0, electrician.json +2898 −0, endocrinologist.json +5043 −0, energy-audit.json +3430 −0, enrichment.json +2605 −0, ent.json +7760 −0, escape-room.json +3751 −0, estate-sale.json +3484 −0, esthetician.json +4134 −0, event-staffing.json +4419 −0, excavation.json +2830 −0, face-painter.json +3810 −0, farrier.json +6011 −0, fence.json +2070 −0, fertility.json +2423 −0, fishing-charter.json +2597 −0, flight-school.json +2909 −0, flooring.json +3220 −0, florist.json +3747 −0, food-truck.json +4379 −0, foundation.json +2960 −0, funeral.json +14060 −0, garage-door.json +3175 −0, gastroenterologist.json +7746 −0, glass-doors.json +2872 −0, golf-instructor.json +3210 −0, groomer.json +5200 −0, gunsmith.json +4462 −0, gutters.json +3294 −0, gym.json +3300 −0, gymnastics.json +3090 −0, hair-restoration.json +3085 −0, hair.json +2515 −0, handyman.json +3060 −0, hearing.json +6303 −0, holiday-lights.json +5091 −0, home-care.json +2728 −0, home-engineer.json +4079 −0, home-stager.json +4373 −0, horse-riding.json +2840 −0, hunting-guide.json +2601 −0, hvac.json +6390 −0, hypnotherapist.json +5803 −0, image-consultant.json +4092 −0, imaging.json +4458 −0, immigration-services.json +3310 −0, inspector.json +6445 −0, instrument-repair.json +3423 −0, insulation.json +3055 −0, insurance.json +7121 −0, interior.json +6233 −0, irrigation.json +3776 −0, iv-hydration.json +3210 −0, junk.json +6159 −0, lab.json +2429 −0, lactation.json +2820 −0, language-school.json +3405 −0, lash-brow.json +6372 −0, laundry.json +3502 −0, lawn.json +3987 −0, lawyer.json +2859 −0, limo.json +2582 −0, locksmith.json +6339 −0, magician.json +3204 −0, makeup.json +3674 −0, martial-arts.json +3761 −0, masonry.json +2828 −0, massage.json +4947 −0, matchmaker.json +4112 −0, mediator.json +3528 −0, medical-transport.json +3305 −0, medspa.json +3017 −0, midwife.json +2772 −0, mini-golf.json +3408 −0, mortgage.json +4312 −0, motorcycle.json +3076 −0, movers.json +6635 −0, music.json +3798 −0, nails.json +4889 −0, naturopath.json +5034 −0, neurologist.json +5043 −0, notary.json +6923 −0, obgyn.json +2433 −0, occupational-therapist.json +5540 −0, officiant.json +3023 −0, ophthalmologist.json +2925 −0, optometrist.json +3353 −0, oral-surgeon.json +2815 −0, organizer.json +4333 −0, orthodontist.json +2894 −0, orthopedist.json +7751 −0, pain-management.json +6221 −0, painter.json +3873 −0, party-characters.json +9545 −0, paving.json +2819 −0, pediatrician.json +2445 −0, personal-shopper.json +4100 −0, pest.json +3275 −0, pet-cremation.json +2834 −0, pet-rehab.json +5187 −0, pet-sitter.json +6076 −0, pet-taxi.json +5501 −0, pet-waste.json +5317 −0, pharmacist.json +5694 −0, photographer.json +7053 −0, physical-therapist.json +3358 −0, piano-tuner.json +2896 −0, pilates.json +11112 −0, planner.json +2790 −0, plastic-surgeon.json +3115 −0, plumber.json +1720 −0, pmu.json +7050 −0, podiatrist.json +2598 −0, pool-builder.json +3306 −0, pool.json +4682 −0, pressure.json +4601 −0, primary-care.json +5270 −0, private-investigator.json +2716 −0, property-manager.json +25148 −0, psychiatrist.json +4443 −0, psychic.json +4227 −0, radon.json +2944 −0, realtor.json +7936 −0, recording-studio.json +2854 −0, reiki.json +3934 −0, rentals.json +5256 −0, repair-shop.json +4139 −0, restaurant.json +2551 −0, restoration.json +9892 −0, roofer.json +2896 −0, rv-repair.json +3484 −0, security.json +8902 −0, senior-living.json +8879 −0, senior-move.json +3470 −0, septic.json +7442 −0, sharpening.json +3370 −0, shoe-repair.json +3343 −0, shooting.json +2902 −0, siding.json +3534 −0, sitter.json +10849 −0, ski-instructor.json +3105 −0, sleep-clinic.json +2408 −0, small-engine.json +3402 −0, snow.json +10378 −0, spa.json +3240 −0, speech-therapist.json +3696 −0, sports-coach.json +3160 −0, sports-medicine.json +5539 −0, spray-tan.json +5365 −0, surf-school.json +2612 −0, surveyor.json +3500 −0, swim.json +2717 −0, tailor.json +3036 −0, tattoo.json +6332 −0, tax.json +11052 −0, teeth-whitening.json +5429 −0, tennis-coach.json +2440 −0, therapist.json +3666 −0, tires.json +5825 −0, tours.json +3454 −0, towing.json +13423 −0, trainer.json +2683 −0, trampoline-park.json +2925 −0, translator.json +2628 −0, travel-agent.json +4109 −0, tree.json +4028 −0, tutor.json +12965 −0, tv-repair.json +2361 −0, upholstery.json +3370 −0, urgent-care.json +2447 −0, urologist.json +7749 −0, valet.json +4467 −0, vehicle-inspection.json +4213 −0, vehicle-wrap.json +5302 −0, vet.json +2843 −0, watch-jewelry.json +3488 −0, weight-loss.json +4784 −0, well-pump.json +2879 −0, wellness-studio.json +5303 −0, wildlife.json +4253 −0, window-tint.json +4181 −0, windows.json +3428 −0, yoga.json +7989 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The compiler's master inputs vendored with SHA256SUMS: QA PASS; 249 of 249 hashes match the handover.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 43. T-080: bundle.v1 contract test, fixture part and side list (\#44)
+
+- **Commit:** [`f14fb48`](https://github.com/aryamahadik/rosie/commit/f14fb48), by Arya Mahadik, 2026-11-07 09:08:54 UTC
+- **Pull request:** [#44](https://github.com/aryamahadik/rosie/pull/44) from `task/T-080`, merged 2026-11-07 09:08:54 UTC. It squashed 1 branch commit:
+  - `47f10d5` T-080: bundle.v1 contract test, fixture part and side list
+- **Files changed:** 1 (+847 −0), by folder:
+  - `tests/contract/` bundle.v1.test.ts +847 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Contract test bundle.v1: QA PASS and the architect's review PASS.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 42. T-010: Freeze K-01 v1, the step-graph bundle format (\#43)
+
+- **Commit:** [`f8b6a2d`](https://github.com/aryamahadik/rosie/commit/f8b6a2d), by Arya Mahadik, 2026-11-07 08:52:55 UTC
+- **Pull request:** [#43](https://github.com/aryamahadik/rosie/pull/43) from `task/T-010`, merged 2026-11-07 08:52:55 UTC. It squashed 2 branch commits:
+  - `4a28ab0` T-010: freeze K-01 bundle v1: shared lists, lint marks, judgment rule…
+  - `65f04ff` T-010: journey membership (journeyGate.steps), branch-end walker rule…
+- **Files changed:** 24 (+23541 −85), by folder:
+  - `contracts/bundle/` README.md +98 −18, bundle.v1.schema.json +1069 −67, frozen.json +1 −0
+  - `contracts/bundle/fixtures/` anytime-table.json +159 −0, bundle-mini-a.json +7550 −0, bundle-mini-b.json +6906 −0, bundle-v0-skeleton.json +3713 −0, fixed-lines.json +108 −0, index.json +161 −0, judgment-rules.json +339 −0, key-map.json +188 −0, keywords.json +26 −0, lint-report.json +31 −0, manifest.json +604 −0, out-of-scope-c9-first-texts.json +55 −0, trade-overlay.json +1541 −0
+  - `contracts/bundle/fixtures/invalid/` refuse-choice-without-definition.json +196 −0, refuse-guard-keyword-button.json +45 −0, refuse-journey-ships-with-failing-step.json +54 −0, refuse-judgment-rule-out-of-range.json +84 −0, refuse-lookup-without-field.json +161 −0, refuse-loop.json +132 −0, refuse-no-safe-default-or-clock.json +193 −0, refuse-unknown-slot.json +127 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Freeze K-01 v1 (the step-graph bundle format): QA PASS and all seven consumer PASSes (playbook, runtime, action layer, AI, QA and eval, release, database), the QA and eval engineer's after one rework.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 41. T-008: Draft K-01 bundle format with the KV size note (\#42)
+
+- **Commit:** [`f1e2367`](https://github.com/aryamahadik/rosie/commit/f1e2367), by Arya Mahadik, 2026-11-07 08:05:40 UTC
+- **Pull request:** [#42](https://github.com/aryamahadik/rosie/pull/42) from `task/T-008`, merged 2026-11-07 08:05:40 UTC. It squashed 2 branch commits:
+  - `20d8620` T-008: draft K-01 bundle schema and README with the KV value-size spike
+  - `51be1dc` T-008: name a source in every bundle schema description (QA rework: 6…
+- **Files changed:** 2 (+3059 −0), by folder:
+  - `contracts/bundle/` README.md +90 −0, bundle.v1.schema.json +2969 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Draft K-01 step-graph bundle format: manifest, per-flow master graph, routing tables, record, per-trade overlay, path model and KV keys; every field names its source (rework after one QA FAIL: 65 descriptions, now 0 unsourced). README: KV 25 MiB per value; largest flow 891,835 B, largest trade 540,952 B; Q-34 layout fits. QA PASS on 51be1dc; CI and merge-check run 42353847722 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 40. T-007: fixture set v1 loader for scenario inputs (demo shops, scenarios, stale flags) (\#41)
+
+- **Commit:** [`943f1d6`](https://github.com/aryamahadik/rosie/commit/943f1d6), by Arya Mahadik, 2026-11-07 07:54:04 UTC
+- **Pull request:** [#41](https://github.com/aryamahadik/rosie/pull/41) from `task/T-007`, merged 2026-11-07 07:54:04 UTC. It squashed 1 branch commit:
+  - `abd13d8` T-007: fixture set v1 loader for scenario inputs (demo shops, scenari…
+- **Files changed:** 8 (+934 −0), by folder:
+  - `tests/scenarios/_harness/fixture-set-v1/` index.ts +21 −0, known-stale.ts +87 −0, loader.test.ts +289 −0, loader.ts +94 −0, reader.ts +69 −0, scenarios.ts +119 −0, shops.ts +77 −0, types.ts +178 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Scenario inputs from fixture set v1: loadFixtureSetV1 verifies the set first, then returns typed demo shops and scenarios with the known-stale lines flagged. QA PASS on abd13d8; CI and merge-check run 42353041284 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 39. T-1062: contracts:check accepts a database part's own frozen.json; README states the per-part freeze (\#40)
+
+- **Commit:** [`66c2702`](https://github.com/aryamahadik/rosie/commit/66c2702), by Arya Mahadik, 2026-11-07 07:54:00 UTC
+- **Pull request:** [#40](https://github.com/aryamahadik/rosie/pull/40) from `task/T-1062`, merged 2026-11-07 07:54:00 UTC. It squashed 1 branch commit:
+  - `1daf3e6` T-1062: contracts:check accepts a database part's own frozen.json; RE…
+- **Files changed:** 3 (+102 −10), by folder:
+  - `contracts/` README.md +3 −2
+  - `contracts/scripts/` check-fixtures.mjs +39 −7, contract-tools.test.mjs +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+contracts:check accepts a database part own frozen.json (contracts/db-schema/<part>/frozen.json) and refuses other places; the README states the per-part freeze. QA PASS on 1daf3e6; CI and merge-check run 42353039387 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 38. T-1003: env.production in wrangler.jsonc with its own names and bindings, route commented (\#39)
+
+- **Commit:** [`8bdb137`](https://github.com/aryamahadik/rosie/commit/8bdb137), by Arya Mahadik, 2026-11-07 07:53:56 UTC
+- **Pull request:** [#39](https://github.com/aryamahadik/rosie/pull/39) from `task/T-1003`, merged 2026-11-07 07:53:56 UTC. It squashed 1 branch commit:
+  - `f947bbb` T-1003: env.production in wrangler.jsonc with its own names and bindi…
+- **Files changed:** 2 (+306 −0), by folder:
+  - `infra/ci/` wrangler-env.test.mjs +257 −0
+  - `/` wrangler.jsonc +49 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Production environment config in wrangler.jsonc (Worker rosie-production, production-named bindings, placeholder ids, route commented, no secret) with infra/ci/wrangler-env.test.mjs. QA PASS on f947bbb; CI and merge-check run 42353037415 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 37. T-1061: contract freeze guard reads the nearest frozen.json, so a database part's own frozen.json governs that part alone (\#38)
+
+- **Commit:** [`b3f094e`](https://github.com/aryamahadik/rosie/commit/b3f094e), by Arya Mahadik, 2026-11-07 07:44:25 UTC
+- **Pull request:** [#38](https://github.com/aryamahadik/rosie/pull/38) from `task/T-1061`, merged 2026-11-07 07:44:25 UTC. It squashed 1 branch commit:
+  - `f2c162d` T-1061: contract freeze guard reads the nearest frozen.json, so a dat…
+- **Files changed:** 2 (+179 −8), by folder:
+  - `infra/ci/` contract-freeze-guard.mjs +28 −8, contract-freeze-guard.test.mjs +151 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The freeze guard takes the nearest frozen.json between a file folder and contracts/<name>/, so a database part freezes on its own; contracts without parts behave as before. QA PASS on f2c162d; CI and merge-check run 42352397509 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 36. T-003: QA test harness: contract-fixture checker, double loader, quarantine rules (\#37)
+
+- **Commit:** [`d2ecf40`](https://github.com/aryamahadik/rosie/commit/d2ecf40), by Arya Mahadik, 2026-11-07 07:44:20 UTC
+- **Pull request:** [#37](https://github.com/aryamahadik/rosie/pull/37) from `task/T-003`, merged 2026-11-07 07:44:21 UTC. It squashed 1 branch commit:
+  - `28d199b` T-003: QA test harness: contract-fixture checker, double loader, quar…
+- **Files changed:** 16 (+1103 −1), by folder:
+  - `tests/` QUARANTINE.md +14 −1
+  - `tests/contract/_harness/` doubles.test.ts +124 −0, doubles.ts +135 −0, fixtures.test.ts +323 −0, fixtures.ts +322 −0, index.ts +29 −0, registry.ts +15 −0
+  - `tests/contract/_harness/sample/fixtures/` index.json +18 −0, note.ok.json +5 −0
+  - `tests/contract/_harness/sample/fixtures/invalid/` note.decimal-cents.json +5 −0
+  - `tests/contract/_harness/sample/` sample-double.ts +16 −0, sample.v1.schema.json +23 −0
+  - `tests/e2e/_harness/` index.test.ts +24 −0, index.ts +13 −0
+  - `tests/scenarios/_harness/` index.test.ts +24 −0, index.ts +13 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+QA test harness: contract-fixture checker (Ajv 2020-12 strict, accept or refuse as marked, missing or unlisted fixtures fail), double loader by port name, quarantine rules in tests/QUARANTINE.md. QA PASS on 28d199b; CI and merge-check run 42352395188 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 35. T-441: private R2 bucket rosie-staging-files, create script and FILES binding (\#36)
+
+- **Commit:** [`44acefb`](https://github.com/aryamahadik/rosie/commit/44acefb), by Arya Mahadik, 2026-11-07 07:37:02 UTC
+- **Pull request:** [#36](https://github.com/aryamahadik/rosie/pull/36) from `task/T-441`, merged 2026-11-07 07:37:03 UTC. It squashed 1 branch commit:
+  - `eb45558` T-441: private R2 bucket rosie-staging-files, create script and FILES…
+- **Files changed:** 2 (+61 −1), by folder:
+  - `infra/scripts/` create-r2-bucket.sh +55 −0
+  - `/` wrangler.jsonc +6 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Private R2 bucket rosie-staging-files on the staging account (idempotent create script through cf.sh; r2.dev off, no custom domain, checked every run) and the top-level FILES binding. QA PASS on 49d33c6 (rebased as eb45558, own files unchanged); CI and merge-check run 42351863776 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 34. T-002: fixture set v1 (forms, test-kit, PROFESSION-MAP) with sha256 manifest, input hashes, known-stale list and verify script (\#35)
+
+- **Commit:** [`53bce55`](https://github.com/aryamahadik/rosie/commit/53bce55), by Arya Mahadik, 2026-11-07 07:36:58 UTC
+- **Pull request:** [#35](https://github.com/aryamahadik/rosie/pull/35) from `task/T-002`, merged 2026-11-07 07:36:59 UTC. It squashed 1 branch commit:
+  - `7e4e48b` T-002: fixture set v1 (forms, test-kit, PROFESSION-MAP) with sha256 m…
+- **Files changed:** 499 (+275906 −0), by folder:
+  - `fixtures/v1/` INPUTS.sha256 +251 −0, KNOWN-STALE.md +30 −0, MANIFEST.sha256 +493 −0, PROFESSION-MAP.md +787 −0, README.md +51 −0
+  - `fixtures/v1/forms/` aba.json +952 −0, acupuncturist.json +921 −0, addiction.json +1106 −0, advisor.json +787 −0, airport-shuttle.json +871 −0, allergist.json +871 −0, appliance.json +938 −0, appraiser.json +945 −0, aquarium.json +891 −0, architect.json +926 −0, art-appraiser.json +896 −0, art-classes.json +859 −0, auto-body.json +989 −0, auto-glass.json +745 −0, auto-repair.json +874 −0, axe-throwing.json +871 −0, baker.json +762 −0, band.json +794 −0, barber.json +913 −0, bike-repair.json +671 −0, biohazard.json +822 −0, boarding.json +843 −0, boat-repair.json +924 −0, camp.json +964 −0, cardiologist.json +842 −0, carpet.json +976 −0, caterer.json +901 −0, chef.json +829 −0, chimney.json +977 −0, chiropractor.json +976 −0, cleaner.json +997 −0, climbing-gym.json +969 −0, closets.json +1123 −0, clown.json +791 −0, coach.json +937 −0, coding-classes.json +859 −0, college-admissions.json +901 −0, comedian.json +791 −0, commercial-cleaning.json +1010 −0, concierge.json +830 −0, concrete.json +1035 −0, contractor.json +1034 −0, cooking-classes.json +838 −0, cpa.json +932 −0, cpr-training.json +853 −0, credit-counselor.json +940 −0, dance.json +949 −0, daycare.json +1016 −0, deck.json +1036 −0, demolition.json +1057 −0, dentist.json +1056 −0, dermatologist.json +965 −0, detailing.json +800 −0, dietitian.json +942 −0, dj.json +793 −0, dog-trainer.json +1046 −0, dog-walker.json +834 −0, doula.json +896 −0, driving-school.json +999 −0, drywall.json +1151 −0, duct-cleaning.json +987 −0, electrician.json +1003 −0, endocrinologist.json +842 −0, energy-audit.json +932 −0, enrichment.json +823 −0, ent.json +874 −0, escape-room.json +804 −0, estate-sale.json +942 −0, esthetician.json +1022 −0, event-staffing.json +805 −0, excavation.json +1056 −0, face-painter.json +906 −0, farrier.json +874 −0, fence.json +739 −0, fertility.json +894 −0, fishing-charter.json +791 −0, flight-school.json +958 −0, flooring.json +1192 −0, florist.json +780 −0, food-truck.json +806 −0, foundation.json +1065 −0, funeral.json +835 −0, garage-door.json +933 −0, gastroenterologist.json +861 −0, glass-doors.json +1026 −0, golf-instructor.json +927 −0, groomer.json +872 −0, gunsmith.json +909 −0, gutters.json +1132 −0, gym.json +1055 −0, gymnastics.json +805 −0, hair-restoration.json +966 −0, hair.json +1084 −0, handyman.json +937 −0, hearing.json +1072 −0, holiday-lights.json +1040 −0, home-care.json +992 −0, home-engineer.json +960 −0, home-stager.json +1117 −0, horse-riding.json +833 −0, hunting-guide.json +812 −0, hvac.json +985 −0, hypnotherapist.json +923 −0, image-consultant.json +896 −0, imaging.json +944 −0, immigration-services.json +909 −0, inspector.json +896 −0, instrument-repair.json +871 −0, insulation.json +1057 −0, insurance.json +778 −0, interior.json +1097 −0, irrigation.json +905 −0, iv-hydration.json +955 −0, junk.json +808 −0, lab.json +942 −0, lactation.json +858 −0, language-school.json +859 −0, lash-brow.json +930 −0, laundry.json +779 −0, lawn.json +942 −0, lawyer.json +986 −0, limo.json +914 −0, locksmith.json +1067 −0, magician.json +672 −0, makeup.json +894 −0, martial-arts.json +1049 −0, masonry.json +1034 −0, massage.json +995 −0, matchmaker.json +890 −0, mediator.json +932 −0, medical-transport.json +944 −0, medspa.json +986 −0, midwife.json +981 −0, mini-golf.json +876 −0, mortgage.json +771 −0, motorcycle.json +961 −0, movers.json +1048 −0, music.json +922 −0, nails.json +999 −0, naturopath.json +886 −0, neurologist.json +842 −0, notary.json +753 −0, obgyn.json +876 −0, occupational-therapist.json +926 −0, officiant.json +898 −0, ophthalmologist.json +1035 −0, optometrist.json +966 −0, oral-surgeon.json +1023 −0, organizer.json +1119 −0, orthodontist.json +1021 −0, orthopedist.json +865 −0, pain-management.json +890 −0, painter.json +1100 −0, party-characters.json +797 −0, paving.json +1046 −0, pediatrician.json +860 −0, personal-shopper.json +896 −0, pest.json +925 −0, pet-cremation.json +796 −0, pet-rehab.json +858 −0, pet-sitter.json +933 −0, pet-taxi.json +855 −0, pet-waste.json +885 −0, pharmacist.json +870 −0, photographer.json +892 −0, physical-therapist.json +1038 −0, piano-tuner.json +915 −0, pilates.json +1097 −0, planner.json +806 −0, plastic-surgeon.json +994 −0, plumber.json +961 −0, pmu.json +792 −0, podiatrist.json +806 −0, pool-builder.json +956 −0, pool.json +983 −0, pressure.json +920 −0, primary-care.json +898 −0, private-investigator.json +872 −0, property-manager.json +764 −0, psychiatrist.json +953 −0, psychic.json +936 −0, radon.json +1020 −0, realtor.json +760 −0, recording-studio.json +827 −0, reiki.json +907 −0, rentals.json +786 −0, repair-shop.json +910 −0, restaurant.json +807 −0, restoration.json +1085 −0, roofer.json +1165 −0, rv-repair.json +923 −0, security.json +1073 −0, senior-living.json +831 −0, senior-move.json +993 −0, septic.json +942 −0, sharpening.json +828 −0, shoe-repair.json +791 −0, shooting.json +888 −0, siding.json +1133 −0, sitter.json +961 −0, ski-instructor.json +870 −0, sleep-clinic.json +905 −0, small-engine.json +870 −0, snow.json +943 −0, spa.json +988 −0, speech-therapist.json +1063 −0, sports-coach.json +892 −0, sports-medicine.json +919 −0, spray-tan.json +881 −0, surf-school.json +806 −0, surveyor.json +941 −0, swim.json +832 −0, tailor.json +851 −0, tattoo.json +1036 −0, tax.json +951 −0, teeth-whitening.json +870 −0, tennis-coach.json +788 −0, therapist.json +986 −0, tires.json +881 −0, tours.json +906 −0, towing.json +924 −0, trainer.json +900 −0, trampoline-park.json +889 −0, translator.json +709 −0, travel-agent.json +887 −0, tree.json +1107 −0, tutor.json +919 −0, tv-repair.json +774 −0, upholstery.json +832 −0, urgent-care.json +941 −0, urologist.json +863 −0, valet.json +802 −0, vehicle-inspection.json +816 −0, vehicle-wrap.json +911 −0, vet.json +983 −0, watch-jewelry.json +870 −0, weight-loss.json +910 −0, well-pump.json +963 −0, wellness-studio.json +897 −0, wildlife.json +989 −0, window-tint.json +885 −0, windows.json +940 −0, yoga.json +1166 −0
+  - `fixtures/v1/test-kit/` COVERAGE.md +443 −0, IMAGES.md +255 −0, SCENARIOS.md +536 −0, coverage.json +3938 −0
+  - `fixtures/v1/test-kit/shops/` aba.json +164 −0, acupuncturist.json +175 −0, addiction.json +195 −0, advisor.json +99 −0, airport-shuttle.json +165 −0, allergist.json +149 −0, appliance.json +270 −0, appraiser.json +198 −0, aquarium.json +197 −0, architect.json +204 −0, art-appraiser.json +202 −0, art-classes.json +134 −0, auto-body.json +209 −0, auto-glass.json +116 −0, auto-repair.json +194 −0, axe-throwing.json +178 −0, baker.json +174 −0, band.json +203 −0, barber.json +166 −0, bike-repair.json +162 −0, biohazard.json +169 −0, boarding.json +135 −0, boat-repair.json +195 −0, camp.json +156 −0, cardiologist.json +148 −0, carpet.json +240 −0, caterer.json +295 −0, chef.json +149 −0, chimney.json +260 −0, chiropractor.json +159 −0, cleaner.json +227 −0, climbing-gym.json +175 −0, closets.json +218 −0, clown.json +202 −0, coach.json +150 −0, coding-classes.json +134 −0, college-admissions.json +194 −0, comedian.json +202 −0, commercial-cleaning.json +245 −0, concierge.json +142 −0, concrete.json +202 −0, contractor.json +202 −0, cooking-classes.json +133 −0, cpa.json +165 −0, cpr-training.json +137 −0, credit-counselor.json +185 −0, dance.json +138 −0, daycare.json +168 −0, deck.json +202 −0, demolition.json +203 −0, dentist.json +235 −0, dermatologist.json +149 −0, detailing.json +148 −0, dietitian.json +163 −0, dj.json +202 −0, dog-trainer.json +180 −0, dog-walker.json +169 −0, doula.json +191 −0, driving-school.json +170 −0, drywall.json +257 −0, duct-cleaning.json +229 −0, electrician.json +274 −0, endocrinologist.json +148 −0, energy-audit.json +196 −0, enrichment.json +151 −0, ent.json +151 −0, escape-room.json +153 −0, estate-sale.json +164 −0, esthetician.json +226 −0, event-staffing.json +174 −0, excavation.json +203 −0, face-painter.json +224 −0, farrier.json +192 −0, fence.json +150 −0, fertility.json +174 −0, fishing-charter.json +136 −0, flight-school.json +186 −0, flooring.json +261 −0, florist.json +152 −0, food-truck.json +174 −0, foundation.json +203 −0, funeral.json +164 −0, garage-door.json +260 −0, gastroenterologist.json +151 −0, glass-doors.json +202 −0, golf-instructor.json +154 −0, groomer.json +177 −0, gunsmith.json +170 −0, gutters.json +278 −0, gym.json +155 −0, gymnastics.json +135 −0, hair-restoration.json +187 −0, hair.json +277 −0, handyman.json +261 −0, hearing.json +216 −0, holiday-lights.json +230 −0, home-care.json +206 −0, home-engineer.json +199 −0, home-stager.json +218 −0, horse-riding.json +155 −0, hunting-guide.json +175 −0, hvac.json +287 −0, hypnotherapist.json +164 −0, image-consultant.json +193 −0, imaging.json +144 −0, immigration-services.json +155 −0, inspector.json +209 −0, instrument-repair.json +204 −0, insulation.json +203 −0, insurance.json +94 −0, interior.json +245 −0, irrigation.json +248 −0, iv-hydration.json +178 −0, junk.json +208 −0, lab.json +198 −0, lactation.json +175 −0, language-school.json +134 −0, lash-brow.json +155 −0, laundry.json +156 −0, lawn.json +212 −0, lawyer.json +241 −0, limo.json +182 −0, locksmith.json +272 −0, magician.json +125 −0, makeup.json +208 −0, martial-arts.json +163 −0, masonry.json +202 −0, massage.json +161 −0, matchmaker.json +193 −0, mediator.json +168 −0, medical-transport.json +178 −0, medspa.json +159 −0, midwife.json +197 −0, mini-golf.json +179 −0, mortgage.json +103 −0, motorcycle.json +195 −0, movers.json +240 −0, music.json +148 −0, nails.json +230 −0, naturopath.json +140 −0, neurologist.json +148 −0, notary.json +117 −0, obgyn.json +162 −0, occupational-therapist.json +167 −0, officiant.json +210 −0, ophthalmologist.json +238 −0, optometrist.json +161 −0, oral-surgeon.json +238 −0, organizer.json +218 −0, orthodontist.json +237 −0, orthopedist.json +151 −0, pain-management.json +158 −0, painter.json +241 −0, party-characters.json +203 −0, paving.json +203 −0, pediatrician.json +144 −0, personal-shopper.json +193 −0, pest.json +152 −0, pet-cremation.json +172 −0, pet-rehab.json +151 −0, pet-sitter.json +197 −0, pet-taxi.json +178 −0, pet-waste.json +183 −0, pharmacist.json +134 −0, photographer.json +244 −0, physical-therapist.json +177 −0, piano-tuner.json +244 −0, pilates.json +183 −0, planner.json +147 −0, plastic-surgeon.json +192 −0, plumber.json +265 −0, pmu.json +120 −0, podiatrist.json +167 −0, pool-builder.json +159 −0, pool.json +195 −0, pressure.json +209 −0, primary-care.json +149 −0, private-investigator.json +153 −0, property-manager.json +118 −0, psychiatrist.json +159 −0, psychic.json +183 −0, radon.json +202 −0, realtor.json +107 −0, recording-studio.json +180 −0, reiki.json +162 −0, rentals.json +170 −0, repair-shop.json +211 −0, restaurant.json +174 −0, restoration.json +197 −0, roofer.json +293 −0, rv-repair.json +195 −0, security.json +250 −0, senior-living.json +140 −0, senior-move.json +170 −0, septic.json +254 −0, sharpening.json +187 −0, shoe-repair.json +154 −0, shooting.json +184 −0, siding.json +278 −0, sitter.json +145 −0, ski-instructor.json +138 −0, sleep-clinic.json +178 −0, small-engine.json +195 −0, snow.json +209 −0, spa.json +152 −0, speech-therapist.json +177 −0, sports-coach.json +141 −0, sports-medicine.json +159 −0, spray-tan.json +163 −0, surf-school.json +135 −0, surveyor.json +199 −0, swim.json +109 −0, tailor.json +159 −0, tattoo.json +210 −0, tax.json +178 −0, teeth-whitening.json +159 −0, tennis-coach.json +157 −0, test-mixed-A.json +151 −0, test-mixed-B.json +151 −0, therapist.json +159 −0, tires.json +171 −0, tours.json +183 −0, towing.json +125 −0, trainer.json +151 −0, trampoline-park.json +179 −0, translator.json +148 −0, travel-agent.json +193 −0, tree.json +237 −0, tutor.json +150 −0, tv-repair.json +164 −0, upholstery.json +171 −0, urgent-care.json +129 −0, urologist.json +150 −0, valet.json +173 −0, vehicle-inspection.json +139 −0, vehicle-wrap.json +197 −0, vet.json +203 −0, watch-jewelry.json +203 −0, weight-loss.json +141 −0, well-pump.json +263 −0, wellness-studio.json +148 −0, wildlife.json +232 −0, window-tint.json +186 −0, windows.json +226 −0, yoga.json +277 −0
+  - `fixtures/v1/tools/` verify.mjs +282 −0, verify.test.ts +140 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Fixture set v1 under fixtures/v1: regenerated forms, test-kit and PROFESSION-MAP (G1 to G3, never hand-edited) with MANIFEST.sha256, INPUTS.sha256, KNOWN-STALE.md and verify.mjs plus 13 verify tests (run by test:unit since T-1060). QA PASS on 7e4e48b; CI and merge-check run 42351861720 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 33. T-1128: Spike: a Durable Object, an alarm, a queue message and a cron handler under the Workers test plugin (\#32)
+
+- **Commit:** [`6376373`](https://github.com/aryamahadik/rosie/commit/6376373), by Arya Mahadik, 2026-11-07 07:35:19 UTC
+- **Pull request:** [#32](https://github.com/aryamahadik/rosie/pull/32) from `task/T-1128`, merged 2026-11-07 07:35:19 UTC. It squashed 3 branch commits:
+  - `af1eea8` T-1128: spike tests for a Durable Object, alarm, queue consumer and c…
+  - `fa120ac` T-1128: FINDINGS.md, written by the lead from the builder's report (D…
+  - `7980879` T-1128: prettier reflow of the findings table (no words changed)
+- **Files changed:** 7 (+489 −0), by folder:
+  - `runtime/src/spikes/do-test-pool/` FINDINGS.md +74 −0, alarm.worker.test.ts +80 −0, cron.worker.test.ts +59 −0, no-auto-isolation.worker.test.ts +28 −0, queue.worker.test.ts +52 −0, spike-actor.ts +125 −0, storage.worker.test.ts +71 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Spike: Durable Object storage per test (afterEach reset), alarms on demand, queue consumer and cron handler under the Workers test plugin; FINDINGS.md for T-244 and T-254 (env bindings wait for T-566). QA PASS on fa120ac; 7980879 only reflows the findings table (prettier); CI and merge-check run 42351716195 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 32. T-006: contract conventions (ADR-005 to CQ-02's layout), shared formats, meta-schemas, gen-types and check-fixtures scripts (\#34)
+
+- **Commit:** [`05207a9`](https://github.com/aryamahadik/rosie/commit/05207a9), by Arya Mahadik, 2026-11-07 07:35:15 UTC
+- **Pull request:** [#34](https://github.com/aryamahadik/rosie/pull/34) from `task/T-006`, merged 2026-11-07 07:35:15 UTC. It squashed 1 branch commit:
+  - `0b1d832` T-006: contract conventions (ADR-005 to CQ-02's layout), shared forma…
+- **Files changed:** 31 (+2016 −44), by folder:
+  - `contracts/` README.md +56 −17, package.json +5 −1
+  - `contracts/common/` README.md +34 −0, fixtures-index.meta.schema.json +75 −0, formats.v1.schema.json +87 −0, frozen.meta.schema.json +21 −0
+  - `contracts/common/fixtures/` bundle-id.ok.json +1 −0, id.ok.json +1 −0, index.json +103 −0, money.ok.json +1 −0, time.ok.json +1 −0
+  - `contracts/common/fixtures/invalid/` bundle-id.no-build.json +1 −0, id.empty.json +1 −0, money.decimal.json +1 −0, money.lowercase-currency.json +1 −0, money.no-currency.json +1 −0, time.no-zone.json +1 −0, time.offset.json +1 −0
+  - `contracts/db-schema/` tables.meta.schema.json +417 −0
+  - `contracts/scripts/` check-fixtures.mjs +383 −0, contract-tools.test.mjs +387 −0, gen-types.mjs +99 −0, lib.mjs +76 −0
+  - `contracts/scripts/test-sample/` README.md +9 −0, test-sample.v1.schema.json +27 −0, test-sample.v1.tables.json +156 −0
+  - `contracts/scripts/test-sample/fixtures/` index.json +18 −0, quote.ok.json +6 −0
+  - `contracts/scripts/test-sample/fixtures/invalid/` quote.decimal-cents.json +6 −0
+  - `docs/adr/` 0005-contract-format.md +26 −12, README.md +14 −14
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+ADR-005 revised to CQ-02 (version in each schema file name); contracts conventions, shared formats (CQ-09), fixtures-index, frozen and db table-list meta-schemas; contracts workspace types and check scripts with 24 tool tests. QA PASS on 0b1d832 (rule 7.9 read completed); CI and merge-check run 42351613742 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 31. T-1060: unit project also runs fixtures/\*\*/\*.test.ts (\#33)
+
+- **Commit:** [`021093b`](https://github.com/aryamahadik/rosie/commit/021093b), by Arya Mahadik, 2026-11-07 07:31:37 UTC
+- **Pull request:** [#33](https://github.com/aryamahadik/rosie/pull/33) from `task/T-1060`, merged 2026-11-07 07:31:38 UTC. It squashed 1 branch commit:
+  - `db82d3e` T-1060: unit project also runs fixtures/\*\*/\*.test.ts
+- **Files changed:** 1 (+1 −0), by folder:
+  - `/` vitest.config.ts +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The unit test project also runs fixtures/**/*.test.ts (one include entry), so fixture set v1 verify test runs on every branch. QA PASS on db82d3e; CI and merge-check run 42351508679 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 30. T-1059: wrangler config test allows one R2 FILES binding with a bucket\_name and no env.staging copy (\#31)
+
+- **Commit:** [`52e4208`](https://github.com/aryamahadik/rosie/commit/52e4208), by Arya Mahadik, 2026-11-07 07:29:27 UTC
+- **Pull request:** [#31](https://github.com/aryamahadik/rosie/pull/31) from `task/T-1059`, merged 2026-11-07 07:29:28 UTC. It squashed 1 branch commit:
+  - `ad0dc47` T-1059: wrangler config test allows one R2 FILES binding with a bucke…
+- **Files changed:** 1 (+54 −1), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The wrangler config test allows and checks exactly one R2 FILES binding (no env.staging copy), so T-441 can add it. QA PASS on ad0dc47; CI and merge-check run 42351337033 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 29. T-1129: one Cloudflare account for staging and production (findings for Q-51) (\#30)
+
+- **Commit:** [`54b9c32`](https://github.com/aryamahadik/rosie/commit/54b9c32), by Arya Mahadik, 2026-11-07 06:30:53 UTC
+- **Pull request:** [#30](https://github.com/aryamahadik/rosie/pull/30) from `task/T-1129`, merged 2026-11-07 06:30:54 UTC. It squashed 1 branch commit:
+  - `0d57aa3` T-1129: one Cloudflare account for staging and production (findings f…
+- **Files changed:** 1 (+72 −0), by folder:
+  - `infra/spikes/cloudflare-account/` FINDINGS.md +72 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+One Cloudflare account for staging and production: findings and options for Q-51. QA PASS on 0d57aa3; CI and merge-check run 42347121090 green. Findings file only.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 28. T-785: ADR-101, the Agent API's MCP transport and sign-in on a Worker (proposed) (\#29)
+
+- **Commit:** [`f876cbd`](https://github.com/aryamahadik/rosie/commit/f876cbd), by Arya Mahadik, 2026-11-07 06:30:49 UTC
+- **Pull request:** [#29](https://github.com/aryamahadik/rosie/pull/29) from `task/T-785`, merged 2026-11-07 06:30:50 UTC. It squashed 1 branch commit:
+  - `2b53563` T-785: ADR-101, the Agent API's MCP transport and sign-in on a Worker…
+- **Files changed:** 1 (+148 −0), by folder:
+  - `docs/adr/` 0101-agent-api-mcp-transport.md +148 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+ADR-101 (proposed): the Agent API MCP transport and sign-in on a Worker, for K-20 v1 freeze. QA PASS on 2b53563; CI and merge-check run 42347119227 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 27. T-1120: chat-link device-check page with QR codes and independent decoder test (\#28)
+
+- **Commit:** [`822d503`](https://github.com/aryamahadik/rosie/commit/822d503), by Arya Mahadik, 2026-11-07 06:29:12 UTC
+- **Pull request:** [#28](https://github.com/aryamahadik/rosie/pull/28) from `task/T-1120`, merged 2026-11-07 06:29:12 UTC. It squashed 1 branch commit:
+  - `2013d01` T-1120: chat-link device-check page with QR codes and independent dec…
+- **Files changed:** 4 (+424 −0), by folder:
+  - `web/spikes/chat-link/` build.mjs +97 −0, chat-link.test.mjs +40 −0, decode.mjs +128 −0, index.html +159 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Chat-link test page: 6 candidate sms: link forms to the Shared line with QR codes from fixture values, and a decoder test (9 pass). QA PASS on 2013d01; CI and merge-check run 42347071674 green. Spike folder only; the device check is T-1043.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 26. T-1056: README Transactions item matches the runner after T-724 (\#27)
+
+- **Commit:** [`ba0ff36`](https://github.com/aryamahadik/rosie/commit/ba0ff36), by Arya Mahadik, 2026-11-07 06:27:50 UTC
+- **Pull request:** [#27](https://github.com/aryamahadik/rosie/pull/27) from `task/T-1056`, merged 2026-11-07 06:27:50 UTC. It squashed 1 branch commit:
+  - `be4aa2c` T-1056: README Transactions item matches the runner after T-724
+- **Files changed:** 1 (+1 −1), by folder:
+  - `db/` README.md +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+db/README.md Transactions rule matches the runner after T-724 (DL-061). QA PASS on be4aa2c; CI and merge-check run 42346901700 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 25. T-1055: guard advice and CONCURRENTLY notice match the runner after T-724 (DL-061) (\#26)
+
+- **Commit:** [`27e5a7f`](https://github.com/aryamahadik/rosie/commit/27e5a7f), by Arya Mahadik, 2026-11-07 06:27:46 UTC
+- **Pull request:** [#26](https://github.com/aryamahadik/rosie/pull/26) from `task/T-1055`, merged 2026-11-07 06:27:46 UTC. It squashed 1 branch commit:
+  - `eeed52a` T-1055: guard advice and CONCURRENTLY notice match the runner after T…
+- **Files changed:** 2 (+63 −18), by folder:
+  - `infra/ci/` migration-guard.mjs +15 −8, migration-guard.test.mjs +48 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The migration guard CREATE INDEX CONCURRENTLY advice and checks match the runner after T-724 (DL-061). QA PASS on eeed52a; CI and merge-check run 42346899836 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 24. T-279: retry queue with 5 tries and a dead-letter queue in wrangler.jsonc (\#25)
+
+- **Commit:** [`aff1693`](https://github.com/aryamahadik/rosie/commit/aff1693), by Arya Mahadik, 2026-11-07 06:24:03 UTC
+- **Pull request:** [#25](https://github.com/aryamahadik/rosie/pull/25) from `task/T-279-r2`, merged 2026-11-07 06:24:03 UTC. It squashed 1 branch commit:
+  - `7d1089d` T-279: retry queue with 5 tries and a dead-letter queue in wrangler.j…
+- **Files changed:** 2 (+29 −2), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +22 −1
+  - `/` wrangler.jsonc +7 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Retry queue with 5 tries and a dead-letter queue in wrangler.jsonc (top level); config tests extended, T-278 cron tests kept. QA PASS on 7d1089d (rebase of 4281287); CI and merge-check run 42346425275 green. Replaces #20.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 23. T-1057: merge-check runs the migration runner's tests against its PostGIS service (\#24)
+
+- **Commit:** [`421a820`](https://github.com/aryamahadik/rosie/commit/421a820), by Arya Mahadik, 2026-11-07 06:23:58 UTC
+- **Pull request:** [#24](https://github.com/aryamahadik/rosie/pull/24) from `task/T-1057`, merged 2026-11-07 06:23:58 UTC. It squashed 1 branch commit:
+  - `2a3f99b` T-1057: merge-check runs the migration runner's tests against its Pos…
+- **Files changed:** 2 (+4 −0), by folder:
+  - `.github/workflows/` merge-check.yml +3 −0
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+merge-check runs the migration runner tests (npm run test:scripts) against its PostGIS service, after the migrations step. QA PASS on 2a3f99b; CI and merge-check run 42345990483 (this branch workflow) green, 7 of 7.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 22. T-1122: geo provider candidates against the geo port (findings) (\#23)
+
+- **Commit:** [`ada5510`](https://github.com/aryamahadik/rosie/commit/ada5510), by Arya Mahadik, 2026-11-07 06:19:42 UTC
+- **Pull request:** [#23](https://github.com/aryamahadik/rosie/pull/23) from `task/T-1122`, merged 2026-11-07 06:19:42 UTC. It squashed 1 branch commit:
+  - `0d47550` T-1122: geo provider candidates against the geo port (findings)
+- **Files changed:** 1 (+71 −0), by folder:
+  - `adapters/spikes/geo-provider/` FINDINGS.md +71 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Geo provider candidates against the geo port (K-17) for the CTO; Jay approves the cost (Q-25). QA PASS on 0d47550; CI and merge-check run 42346350684 green. Findings file only.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 21. T-1123: calendar app review and consent findings (Google, Microsoft) (\#22)
+
+- **Commit:** [`74b213e`](https://github.com/aryamahadik/rosie/commit/74b213e), by Arya Mahadik, 2026-11-07 06:19:38 UTC
+- **Pull request:** [#22](https://github.com/aryamahadik/rosie/pull/22) from `task/T-1123`, merged 2026-11-07 06:19:38 UTC. It squashed 1 branch commit:
+  - `84b0b22` T-1123: calendar app review and consent findings (Google, Microsoft)
+- **Files changed:** 1 (+94 −0), by folder:
+  - `adapters/spikes/calendar-oauth/` FINDINGS.md +94 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Calendar app review and consent findings (Google, Microsoft) for the CTO and J-13. QA PASS on 84b0b22; CI and merge-check run 42346348250 green. Findings file only.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 20. T-1058: ci.yml runs on pull\_request and on push to main only (\#21)
+
+- **Commit:** [`ff237b1`](https://github.com/aryamahadik/rosie/commit/ff237b1), by Arya Mahadik, 2026-11-07 06:16:54 UTC
+- **Pull request:** [#21](https://github.com/aryamahadik/rosie/pull/21) from `task/T-1058`, merged 2026-11-07 06:16:55 UTC. It squashed 1 branch commit:
+  - `ee83c2e` T-1058: ci.yml runs on pull\_request and on push to main only
+- **Files changed:** 2 (+92 −1), by folder:
+  - `.github/workflows/` ci.yml +2 −1
+  - `infra/ci/` ci-triggers.test.mjs +90 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Lever 1 of T-1126 (DL-065): ci.yml runs on pull requests and on pushes to main only; jobs, steps and concurrency unchanged; infra/ci/ci-triggers.test.mjs guards it. QA PASS on ee83c2e; CI (one pull_request run, no push run) and merge-check run 42346059090 green.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 19. T-1126: CI minutes findings (written by the lead from the builder's report, DL-063, DL-064) (\#19)
+
+- **Commit:** [`caf3f28`](https://github.com/aryamahadik/rosie/commit/caf3f28), by Arya Mahadik, 2026-11-07 06:13:06 UTC
+- **Pull request:** [#19](https://github.com/aryamahadik/rosie/pull/19) from `task/T-1126`, merged 2026-11-07 06:13:07 UTC. It squashed 1 branch commit:
+  - `9c28920` T-1126: CI minutes findings (written by the lead from the builder's r…
+- **Files changed:** 1 (+70 −0), by folder:
+  - `infra/spikes/ci-minutes/` FINDINGS.md +70 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+CI minutes spike: minutes per run from 38 runs, the projection over the plan (runs out about Nov 15 at full speed), the no-spend levers and the Free plan gaps. QA PASS on 9c28920; CI and merge-check run 42345808618 green. Findings file only.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 18. T-001: Fixture set v1: apply G1 to G3 in a fresh scratch copy and regenerate forms/ and test-kit/ (\#18)
+
+- **Commit:** [`1f79992`](https://github.com/aryamahadik/rosie/commit/1f79992), by Arya Mahadik, 2026-11-07 06:11:21 UTC
+- **Pull request:** [#18](https://github.com/aryamahadik/rosie/pull/18) from `task/T-001`, merged 2026-11-07 06:11:22 UTC. It squashed 2 branch commits:
+  - `5ca7292` T-001: G1-G3 patch and rebuild script for fixture set v1
+  - `784b440` T-001: G3 patch also removes the old folder name from comments and notes
+- **Files changed:** 3 (+163 −0), by folder:
+  - `fixtures/v1/patch/` G1-G3.patch +121 −0
+  - `fixtures/v1/tools/` README.md +13 −0, rebuild.sh +29 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Fixture set v1: G1 to G3 applied in a fresh copy of the master; forms/ and test-kit/ regenerated. QA PASS and the architect G1 ruling on e681aca; this head (784b440) is the same two commits rebased onto main, with identical T-001 files. CI and merge-check run 42345380278 green. The 5 known gaps go to T-002.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 17. T-278: one-minute cron trigger for the clock sweep in wrangler.jsonc (\#17)
+
+- **Commit:** [`b01d626`](https://github.com/aryamahadik/rosie/commit/b01d626), by Arya Mahadik, 2026-11-07 06:04:37 UTC
+- **Pull request:** [#17](https://github.com/aryamahadik/rosie/pull/17) from `task/T-278`, merged 2026-11-07 06:04:37 UTC. It squashed 1 branch commit:
+  - `915cae5` T-278: one-minute cron trigger for the clock sweep in wrangler.jsonc
+- **Files changed:** 2 (+22 −0), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +17 −0
+  - `/` wrangler.jsonc +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 16. T-1125: Spike (1.5 h): local PostgreSQL with PostGIS under emulation on the Apple-silicon build Mac: speed and stability of integration tests (\#16)
+
+- **Commit:** [`b5f258d`](https://github.com/aryamahadik/rosie/commit/b5f258d), by Arya Mahadik, 2026-11-07 06:03:05 UTC
+- **Pull request:** [#16](https://github.com/aryamahadik/rosie/pull/16) from `task/T-1125`, merged 2026-11-07 06:03:06 UTC. It squashed 5 branch commits:
+  - `a715ffa` T-1125: PostGIS emulation spike scripts (bench, repeat)
+  - `ad06a06` T-1125: findings (written by the lead from the builder's report, DL-063)
+  - `7cf26ae` T-1125: prettier formatting of the spike folder (found by merge-check)
+  - `044c3b6` T-1125: no empty function in bench.mjs (found by merge-check's lint)
+  - `13996d2` T-1125: CI column from merge-check run 42344823865
+- **Files changed:** 3 (+154 −0), by folder:
+  - `infra/spikes/postgis-emulation/` FINDINGS.md +47 −0, bench.mjs +76 −0, repeat.mjs +31 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1125: PostGIS emulation spike scripts (bench, repeat)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-1125: findings (written by the lead from the builder's report, DL-063)
+
+* T-1125: prettier formatting of the spike folder (found by merge-check)
+
+* T-1125: no empty function in bench.mjs (found by merge-check's lint)
+
+* T-1125: CI column from merge-check run 42344823865
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 15. T-331: uqr 0.1.3 (QR encoder) in the root manifest and lockfile (installed by the lead, P-01) (\#15)
+
+- **Commit:** [`92da1af`](https://github.com/aryamahadik/rosie/commit/92da1af), by Arya Mahadik, 2026-11-07 06:01:23 UTC
+- **Pull request:** [#15](https://github.com/aryamahadik/rosie/pull/15) from `task/T-331`, merged 2026-11-07 06:01:23 UTC. It squashed 1 branch commit:
+  - `9b71054` T-331: uqr 0.1.3 (QR encoder) in the root manifest and lockfile (inst…
+- **Files changed:** 2 (+12 −0), by folder:
+  - `/` package-lock.json +9 −0, package.json +3 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Rosie lead <lead@rosie.local>
+~~~
+
+</details>
+
+## 14. T-277: BUNDLES KV namespace binding in wrangler.jsonc, with config tests (\#14)
+
+- **Commit:** [`a7b9843`](https://github.com/aryamahadik/rosie/commit/a7b9843), by Arya Mahadik, 2026-11-07 05:58:27 UTC
+- **Pull request:** [#14](https://github.com/aryamahadik/rosie/pull/14) from `task/T-277`, merged 2026-11-07 05:58:28 UTC. It squashed 1 branch commit:
+  - `b587830` T-277: BUNDLES KV namespace binding in wrangler.jsonc, with config tests
+- **Files changed:** 2 (+29 −1), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +24 −0
+  - `/` wrangler.jsonc +5 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 13. T-1052: saved copy of the old /test page with sha256 list, staging route test, way-back runbook (\#13)
+
+- **Commit:** [`0abc6b9`](https://github.com/aryamahadik/rosie/commit/0abc6b9), by Arya Mahadik, 2026-11-07 05:52:03 UTC
+- **Pull request:** [#13](https://github.com/aryamahadik/rosie/pull/13) from `task/T-1052`, merged 2026-11-07 05:52:03 UTC. It squashed 1 branch commit:
+  - `75954ec` T-1052: saved copy of the old /test page with sha256 list, staging ro…
+- **Files changed:** 17 (+2845 −0), by folder:
+  - `infra/ci/` rosfield-test-route.test.mjs +147 −0
+  - `infra/rosfield-test-backup/` SHA256SUMS +14 −0, index.html +121 −0
+  - `infra/rosfield-test-backup/assets/` \_ +152 −0, \_assets\_brand\_apple-touch-icon-180.png (binary), \_assets\_brand\_rosfield-app-icon.svg +1 −0, \_assets\_chat.js +352 −0, \_assets\_fonts\_geistpixel-latin.woff2 (binary), \_assets\_fonts\_spacegrotesk-latin.woff2 (binary), \_assets\_ga.js +30 −0, \_assets\_test\_open.js +497 −0, \_assets\_test\_test.css +937 −0, \_favicon.ico (binary), \_privacy +321 −0, \_site.webmanifest +15 −0, \_terms +247 −0
+  - `infra/runbooks/` rosfield-test-route.md +11 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 12. T-724: Migration runner: apply a file of only CREATE INDEX CONCURRENTLY statements outside a transaction (\#12)
+
+- **Commit:** [`d29f5d3`](https://github.com/aryamahadik/rosie/commit/d29f5d3), by Arya Mahadik, 2026-11-07 05:49:50 UTC
+- **Pull request:** [#12](https://github.com/aryamahadik/rosie/pull/12) from `task/T-724`, merged 2026-11-07 05:49:50 UTC. It squashed 2 branch commits:
+  - `1503491` T-724: migrate.mjs applies files of only CREATE INDEX CONCURRENTLY ou…
+  - `0175a4d` T-724: marker files keep any single statement; schema-scoped invalid-…
+- **Files changed:** 2 (+349 −6), by folder:
+  - `infra/scripts/` migrate.mjs +128 −6, migrate.test.mjs +221 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-724: migrate.mjs applies files of only CREATE INDEX CONCURRENTLY outside a transaction
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-724: marker files keep any single statement; schema-scoped invalid-index drop; tests
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 11. T-005: Contract tooling plumbing: validator and type-generator dependencies, git-ignored types, frozen-file guard (\#10)
+
+- **Commit:** [`c15c4ba`](https://github.com/aryamahadik/rosie/commit/c15c4ba), by Arya Mahadik, 2026-11-07 05:49:45 UTC
+- **Pull request:** [#10](https://github.com/aryamahadik/rosie/pull/10) from `task/T-005`, merged 2026-11-07 05:49:45 UTC. It squashed 2 branch commits:
+  - `0983f45` T-005: frozen-contract guard, contracts:types and contracts:check scr…
+  - `0f4afe0` T-005: add ajv and json-schema-to-typescript
+- **Files changed:** 6 (+668 −10), by folder:
+  - `.github/workflows/` ci.yml +9 −0, merge-check.yml +9 −0
+  - `infra/ci/` contract-freeze-guard.mjs +288 −0, contract-freeze-guard.test.mjs +191 −0
+  - `/` package-lock.json +166 −10, package.json +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-005: frozen-contract guard, contracts:types and contracts:check scripts, CI steps
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-005: add ajv and json-schema-to-typescript
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 10. T-330: integration project also runs actions/\*\*/\*.int.test.ts (\#9)
+
+- **Commit:** [`38c6654`](https://github.com/aryamahadik/rosie/commit/38c6654), by Arya Mahadik, 2026-11-07 05:49:40 UTC
+- **Pull request:** [#9](https://github.com/aryamahadik/rosie/pull/9) from `task/T-330`, merged 2026-11-07 05:49:41 UTC. It squashed 1 branch commit:
+  - `bb7d8cd` T-330: integration project also runs actions/\*\*/\*.int.test.ts
+- **Files changed:** 1 (+1 −1), by folder:
+  - `/` vitest.config.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 9. T-276: HANDLE\_ACTOR Durable Object binding and class migration (\#8)
+
+- **Commit:** [`e197520`](https://github.com/aryamahadik/rosie/commit/e197520), by Arya Mahadik, 2026-11-07 05:49:35 UTC
+- **Pull request:** [#8](https://github.com/aryamahadik/rosie/pull/8) from `task/T-276`, merged 2026-11-07 05:49:36 UTC. It squashed 1 branch commit:
+  - `717af9f` T-276: HANDLE\_ACTOR Durable Object binding and class migration
+- **Files changed:** 2 (+76 −1), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +69 −0
+  - `/` wrangler.jsonc +7 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 8. T-1054: leave infra/rosfield-test-backup/ out of prettier and eslint (\#11)
+
+- **Commit:** [`e95e26e`](https://github.com/aryamahadik/rosie/commit/e95e26e), by Arya Mahadik, 2026-11-07 05:49:13 UTC
+- **Pull request:** [#11](https://github.com/aryamahadik/rosie/pull/11) from `task/T-1054`, merged 2026-11-07 05:49:14 UTC. It squashed 1 branch commit:
+  - `40816c9` T-1054: leave infra/rosfield-test-backup/ out of prettier and eslint
+- **Files changed:** 2 (+4 −0), by folder:
+  - `/` .prettierignore +3 −0, eslint.config.mjs +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 7. D-000: every agent writes Bash commands plainly (found by check 3) (\#7)
+
+- **Commit:** [`df2df27`](https://github.com/aryamahadik/rosie/commit/df2df27), by Arya Mahadik, 2026-11-06 22:49:29 UTC
+- **Pull request:** [#7](https://github.com/aryamahadik/rosie/pull/7) from `task/D-000-plain-commands`, merged 2026-11-06 22:49:30 UTC. It squashed 1 branch commit:
+  - `937ac6d` D-000: every agent writes Bash commands plainly (found by check 3)
+- **Files changed:** 1 (+2 −1), by folder:
+  - `/` CLAUDE.md +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Check 3 attempt 4 had one denial: a QA agent ran git log with
+backslash-escaped spaces (--format=%h\ %s\ %p). Claude Code refuses
+that form in an unattended shift although git log is allowed; the
+quoted form runs. CLAUDE.md now says to write one plain command per
+call and to quote values with spaces. It also says the Glob and Grep
+tools may be missing and to list folders with ls.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 6. D-000: night shifts load the project settings explicitly (\#6)
+
+- **Commit:** [`129b9fb`](https://github.com/aryamahadik/rosie/commit/129b9fb), by Arya Mahadik, 2026-11-06 15:36:42 UTC
+- **Pull request:** [#6](https://github.com/aryamahadik/rosie/pull/6) from `task/D-000-shift-settings`, merged 2026-11-06 15:36:42 UTC. It squashed 1 branch commit:
+  - `f54ef9a` D-000: shifts load the project settings explicitly (--settings)
+- **Files changed:** 3 (+14 −1), by folder:
+  - `infra/watchdog/` README.md +5 −0, shift.sh +6 −0, watchdog.test.sh +3 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+shift.sh passes --settings <code folder>/.claude/settings.json so the allow and deny rules and the guard hook apply to unattended shifts (the workspace is not marked trusted). CI green; watchdog self-test 107 checks pass. Done with the user's full permission (DL-053).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 5. D-000: correct the allow rules (found by check 3) (\#5)
+
+- **Commit:** [`246f433`](https://github.com/aryamahadik/rosie/commit/246f433), by Arya Mahadik, 2026-11-06 15:09:21 UTC
+- **Pull request:** [#5](https://github.com/aryamahadik/rosie/pull/5) from `task/D-000-allow-rules`, merged 2026-11-06 15:09:22 UTC. It squashed 1 branch commit:
+  - `f8737d1` D-000: correct the allow rules (cmd:\* form), lock removal, read-only …
+- **Files changed:** 2 (+53 −37), by folder:
+  - `.claude/` settings.json +48 −37
+  - `/` CLAUDE.md +5 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Every allow rule in the Bash(cmd:*) form Claude Code 2.1.318 reads; protected-branch and force pushes denied (the guard hook stays the backup); rm of ops/LEAD.lock; read-only helpers; a 3-line CLAUDE.md. Found by D-000 check 3. CI green. Applied with the user's authorization.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 4. D-000: switch on the safety rules (\#4)
+
+- **Commit:** [`dc40c34`](https://github.com/aryamahadik/rosie/commit/dc40c34), by Arya Mahadik, 2026-11-06 07:05:45 UTC
+- **Pull request:** [#4](https://github.com/aryamahadik/rosie/pull/4) from `task/D-000-safety-rules`, merged 2026-11-06 07:05:45 UTC. It squashed 1 branch commit:
+  - `637ebed` D-000: switch on the safety rules (.claude/settings.json)
+- **Files changed:** 1 (+86 −0), by folder:
+  - `.claude/` settings.json +86 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Adds .claude/settings.json: the permission rules of build prompt 5.6 and the guard hook registration. CI green. Approved by the user (DL-036, DL-041).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 3. D-000: staging on rosfield.com/test, and check 1 (\#3)
+
+- **Commit:** [`b6134d2`](https://github.com/aryamahadik/rosie/commit/b6134d2), by Arya Mahadik, 2026-11-06 07:01:06 UTC
+- **Pull request:** [#3](https://github.com/aryamahadik/rosie/pull/3) from `task/D-000-staging-route`, merged 2026-11-06 07:01:07 UTC. It squashed 1 branch commit:
+  - `e4991a0` D-000: staging on rosfield.com/test; health reports its service (chec…
+- **Files changed:** 3 (+12 −3), by folder:
+  - `runtime/src/` index.ts +5 −1, index.worker.test.ts +1 −0
+  - `/` wrangler.jsonc +6 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Route rosfield.com/test and rosfield.com/test/* to the staging Worker (DL-036); health also returns service: rosie. CI green; preview verified.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 2. D-000: the factory (\#2)
+
+- **Commit:** [`5d1f84a`](https://github.com/aryamahadik/rosie/commit/5d1f84a), by Arya Mahadik, 2026-11-06 06:11:19 UTC
+- **Pull request:** [#2](https://github.com/aryamahadik/rosie/pull/2) from `task/D-000-factory`, merged 2026-11-06 06:11:19 UTC. It squashed 2 branch commits:
+  - `a5b44e7` WIP D-000 factory: build agents' output before the independent check …
+  - `27b9116` D-000: the factory, verified
+- **Files changed:** 108 (+14013 −0), by folder:
+  - `.claude/agents/` action-layer-engineer.md +88 −0, ai-engineer.md +88 −0, architect.md +114 −0, critic-coverage.md +62 −0, critic-dependencies.md +64 −0, critic-loop-risk.md +63 −0, critic-parallelism.md +60 −0, critic-tests.md +62 −0, database-engineer.md +87 −0, frontend-engineer.md +86 −0, integrations-engineer.md +87 −0, playbook-engineer.md +88 −0, qa-eval-engineer.md +83 −0, release-engineer.md +94 −0, runtime-engineer.md +88 −0, security-reviewer.md +66 −0
+  - `.claude/hooks/` guard.mjs +582 −0
+  - `.claude/skills/canary-and-rollback/` SKILL.md +29 −0
+  - `.claude/skills/contract-change/` SKILL.md +42 −0
+  - `.claude/skills/deploy-staging/` SKILL.md +42 −0
+  - `.claude/skills/migration/` SKILL.md +32 −0
+  - `.claude/skills/release-card/` SKILL.md +50 −0
+  - `.claude/skills/run-evals/` SKILL.md +43 −0
+  - `.claude/skills/stuck-report/` SKILL.md +63 −0
+  - `.claude/skills/task-card/` SKILL.md +53 −0
+  - `/` .editorconfig +13 −0, .gitignore +27 −0, .nvmrc +1 −0, .prettierignore +7 −0, .prettierrc.json +5 −0, .worktreeinclude +2 −0, README.md +1 −0, eslint.config.mjs +48 −0, package-lock.json +4082 −0, package.json +64 −0, tsconfig.base.json +18 −0, tsconfig.json +25 −0, vitest.config.ts +80 −0, wrangler.jsonc +46 −0
+  - `.github/` CODEOWNERS +4 −0
+  - `.github/workflows/` ci.yml +62 −0, merge-check.yml +151 −0
+  - `actions/` README.md +9 −0, package.json +7 −0
+  - `adapters/` README.md +10 −0, package.json +7 −0
+  - `ai/` README.md +10 −0, package.json +7 −0
+  - `compiler/` README.md +15 −0, package.json +7 −0
+  - `contracts/` README.md +45 −0, package.json +7 −0
+  - `db/` README.md +30 −0, package.json +7 −0
+  - `db/migrations/` 0001\_init.sql +17 −0
+  - `docs/adr/` 0001-language-and-runtime.md +40 −0, 0002-monorepo-and-package-manager.md +37 −0, 0003-tests.md +45 −0, 0004-lint-and-format.md +39 −0, 0005-contract-format.md +43 −0, 0006-postgresql-postgis-and-migrations.md +42 −0, 0007-database-access-from-workers.md +42 −0, 0008-environments.md +46 −0, 0009-traces.md +40 −0, 0010-flags.md +41 −0, 0011-ci-runners.md +44 −0, 0012-github-free-gaps.md +42 −0, README.md +45 −0
+  - `evals/` README.md +11 −0, package.json +7 −0
+  - `infra/ci/` cf.test.mjs +357 −0, deploy-preview.test.mjs +266 −0, gitignore.test.mjs +59 −0, guard.test.mjs +394 −0, lib.test.mjs +86 −0, migration-guard.mjs +517 −0, migration-guard.test.mjs +297 −0, post-deploy-check.test.mjs +100 −0, script-harness.mjs +141 −0, test-guard.mjs +872 −0, test-guard.test.mjs +443 −0
+  - `infra/` docker-compose.yml +28 −0
+  - `infra/scripts/` cf.sh +237 −0, deploy-preview.sh +105 −0, deploy-staging.sh +129 −0, lib.sh +76 −0, migrate.mjs +241 −0, post-deploy-check.sh +86 −0, preview-cleanup.sh +36 −0, rollback-staging.sh +75 −0, test-count.mjs +48 −0
+  - `infra/watchdog/` README.md +161 −0, com.rosfield.rosie-watchdog.plist +38 −0, install.sh +81 −0, rosie-watchdog.sh +386 −0, shift.sh +244 −0, status.sh +129 −0, uninstall.sh +21 −0, watchdog.test.sh +526 −0
+  - `runtime/` README.md +22 −0, package.json +7 −0
+  - `runtime/src/` index.ts +52 −0, index.worker.test.ts +84 −0
+  - `tests/` QUARANTINE.md +34 −0, README.md +17 −0, package.json +7 −0
+  - `web/` README.md +10 −0, package.json +7 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* WIP D-000 factory: build agents' output before the independent check (paused for the night)
+
+Not verified yet. Resume: the verify and fix steps of the D-000 workflow.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* D-000: the factory, verified
+
+Repo scaffold (npm workspaces, TypeScript, ESLint 10, Prettier, Vitest 5.1 with the Workers plugin),
+local PostgreSQL with PostGIS, the staging health Worker with trace ids, migrations (expand-only guard),
+CI with checks only (ci.yml, merge-check.yml; DL-024), deploy, preview and back-only rollback scripts
+run on the build Mac through cf.sh (staging only, production paths refused), the night-shift watchdog
+(not installed), 16 agent role files, 8 skills, the PreToolUse guard hook and its 190 tests, ADRs 001-012.
+.claude/settings.json is switched on separately at the end of the plan (DL-036).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Rosie build lead <build-lead@localhost>
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 1. Initial commit
+
+- **Commit:** [`5fefb27`](https://github.com/aryamahadik/rosie/commit/5fefb27), by Arya Mahadik, 2026-11-05 22:07:39 UTC
+- **Pull request:** none (a commit made straight on `main` during setup)
+- **Files changed:** 1 (+2 −0), by folder:
+  - `/` README.md +2 −0
+
+## Pull requests closed without merging
+
+Each was replaced by another pull request (a branch rebased or squashed under a new name, or carried inside another pull request). Its work reached `main` through the replacement listed above.
+
+- [#20](https://github.com/aryamahadik/rosie/pull/20) T-279: wrangler.jsonc: the retry queue with its dead-letter queue (`task/T-279`, 1 branch commit, closed 2026-11-07 06:18:40 UTC)
+- [#148](https://github.com/aryamahadik/rosie/pull/148) T-050: Freeze K-09 Tool API v1.1: journey 3 calls (`task/T-050`, 6 branch commits, closed 2026-11-08 06:08:45 UTC)
+- [#218](https://github.com/aryamahadik/rosie/pull/218) T-317: Record flags and STOP, START and work-phone answers as consent rows (`task/T-317`, 3 branch commits, closed 2026-11-08 22:16:20 UTC)
+- [#220](https://github.com/aryamahadik/rosie/pull/220) T-1114: The parity project gets the unit project's 30 s resource guard (`task/T-1114`, 2 branch commits, closed 2026-11-08 22:08:37 UTC)
+- [#332](https://github.com/aryamahadik/rosie/pull/332) T-1186: the Worker answers the test-phone page's two calls on staging (`task/T-1186`, 14 branch commits, closed 2026-11-11 00:15:54 UTC)
+- [#343](https://github.com/aryamahadik/rosie/pull/343) T-1179: the compiler's publish keeps a database URL that does not parse out of every error (`task/T-1179`, 1 branch commit, closed 2026-11-11 05:01:21 UTC)
+- [#345](https://github.com/aryamahadik/rosie/pull/345) T-560: join hop 9, compose input from the Tool API and the composer's message plan (`task/T-560`, 3 branch commits, closed 2026-11-11 01:25:04 UTC)
