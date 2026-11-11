@@ -1176,7 +1176,8 @@ describe("a failure answers transient and leaves nothing: a lost connection, 400
       await waitsOnLock(xPid);
       // X's one deadlock check runs after deadlock_timeout and finds no cycle: the call waits for Y, which waits for
       // nothing. Once Y lets go, the call goes on to its entry and waits for X: the call, the later waiter, finds it.
-      await pause(deadlockMs * 2);
+      // Three times the timeout: room for a slow timer on an emulated PostgreSQL under load.
+      await pause(deadlockMs * 3);
       yLetGo.give();
       await y;
       const outcome = await pending;
