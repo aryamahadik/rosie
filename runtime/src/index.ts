@@ -186,8 +186,8 @@ const rosie = createWorker(
 );
 
 // The actor's ports are wired on the Worker's first request, where the HandleActor namespace is bound (T-553; DL-313
-// ruling 2: runtime/src/wiring wireWorker): never at module load, where Workers refuse crypto.randomUUID(), and not in the
-// Workers test pool or on staging, which have no binding until T-566.
+// ruling 2: runtime/src/wiring wireWorker; env.staging binds it since T-566, and the Workers test pool runs env.staging):
+// never at module load, where Workers refuse crypto.randomUUID().
 const fetchAndWire = (
   request: Request,
   env: Cloudflare.Env,
@@ -197,5 +197,19 @@ const fetchAndWire = (
   return rosie.fetch(request, env, context);
 };
 
+// A retry batch can be the first event an isolate sees (T-1223): the queue hands it to an isolate that may have served no
+// request. So the queue entry wires the isolate first, exactly as the fetch entry does (the root's install() sets the retry
+// queue's ports with the actor's), and the batch's tries run at once instead of answering "unwired" and coming back a
+// minute later. Production gets its own root, every port closed, as the fetch entry wires it. The scheduled entry is not
+// wired: the minute sweep reads the clock firing's ports (setClockDeps), which the root does not install.
+const queueAndWire = (batch: MessageBatch, env: Cloudflare.Env): Promise<void> => {
+  wireWorker(env);
+  return rosie.queue(batch, env);
+};
+
 // The cast states the arity rule of RosieWorker, as createWorker's does.
-export default { ...rosie, fetch: fetchAndWire as RosieWorker["fetch"] } satisfies RosieWorker;
+export default {
+  ...rosie,
+  fetch: fetchAndWire as RosieWorker["fetch"],
+  queue: queueAndWire,
+} satisfies RosieWorker;
