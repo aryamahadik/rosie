@@ -21,6 +21,7 @@ import safetyEmergencyNow from "../../../../contracts/model/fixtures/safety-emer
 import startRecorded from "../../../../contracts/tool-api/fixtures/start-recorded.json";
 import stopRecorded from "../../../../contracts/tool-api/fixtures/stop-recorded.json";
 import stopOnReturn from "../../../../contracts/tool-api/fixtures/j3-stop-on-return-tells-businesses.json";
+import k09v1 from "../../../../contracts/tool-api/tool-api.v1.schema.json";
 import { fakeBundles } from "../../bundle/test-support";
 import {
   actorNameOf,
@@ -81,7 +82,7 @@ import {
 } from "../index";
 import { readCommit, type ActorCopies } from "./copies";
 import type { QueuedWrite, ReplayStep, ReturnQueue, ReturnWrite } from "./return-queue";
-import { fakeToolApi, SAM_TIMER, type FakeToolApi } from "./test-support";
+import { fakeToolApi, LATER_TIMER_CALL, SAM_TIMER, type FakeToolApi } from "./test-support";
 import type { StoppedCopy } from "./types";
 
 type Json = Record<string, unknown>;
@@ -614,6 +615,60 @@ describe("the actor's copy of each live safety timer (K-34 safety_timers)", () =
       expect(result.noAddress).toBe("failed");
       expect(result.stale).toBe(true);
       expect(result.left).toEqual([copyOf(SAM_TIMER)]);
+    });
+  });
+
+  it("a timer row a core action wrote, which `written` leaves out, still reloads the copy: the actor reads the core result (T-1198); a commit that writes no timer still reads nothing", async () => {
+    await withTimerRig(async (rig) => {
+      // A later core action writes Sam's timer: its result names the row, and `written` leaves it out (actions/src/commit
+      // default 9), its clock row too. The rows are written all the same.
+      rig.api.timersByCore = LATER_TIMER_CALL;
+      rig.api.writes.push(structuredClone(SAM_TIMER));
+      await rig.text("evt-sam-0301");
+      expect(rig.api.answers).toHaveLength(1);
+      expect(rig.api.answers[0]).toMatchObject({
+        result: "committed",
+        repeated: false,
+        committed: {
+          core: [{ call: LATER_TIMER_CALL, response: { timerId: SAM_TIMER.id }, error: null }],
+          written: { written: [] },
+        },
+      });
+      expect(rig.api.reloads).toEqual(["handle-sam"]);
+      let copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+      expect(copies.timersStale).toBe(false);
+
+      // Moved an hour on by the core action (version 2): copied again.
+      const moved: SafetyTimerRow = {
+        ...structuredClone(SAM_TIMER),
+        due_at: "2026-10-27T16:20:00Z",
+        version: 2,
+      };
+      rig.api.writes.push(moved);
+      await rig.text("evt-sam-0302");
+      expect(rig.api.reloads).toHaveLength(2);
+      expect((await rig.actor.readCopies()).timers).toEqual([copyOf(moved)]);
+
+      // A commit that writes no timer row, by the walk or a core action, reloads nothing.
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0303");
+      expect(rig.api.answers[2]).toMatchObject({ committed: { core: [], written: { written: [] } } });
+      expect(rig.api.reloads).toHaveLength(2);
+      expect((await rig.actor.readCopies()).timers).toEqual([copyOf(moved)]);
+
+      // SAFE by the core action (version 3): the row is no longer live and leaves the copy.
+      rig.api.writes.push({
+        ...structuredClone(moved),
+        state: "safe",
+        safe_at: "2026-10-27T15:05:00Z",
+        version: 3,
+      });
+      await rig.text("evt-sam-0304");
+      expect(rig.api.reloads).toHaveLength(3);
+      copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([]);
+      expect(copies.timersStale).toBe(false);
     });
   });
 });
@@ -1385,5 +1440,70 @@ describe("what a commit gives the copies", () => {
       stopped: null,
       timersWritten: false,
     });
+  });
+});
+
+// ---- a safety timer a core action wrote (T-1198) ------------------------------------------------------------------------
+
+/** K-09 v1's core actions, by call name, as its coreAction lists them (v1.1 to v1.6 take that list by reference). */
+const K09_CORE_CALLS = (
+  k09v1 as unknown as { $defs: { coreAction: { oneOf: { properties: { call: { const: string } } }[] } } }
+).$defs.coreAction.oneOf.map((action) => action.properties.call.const);
+
+/** K-09 gateAndCommit.committed for a turn of Sam's, with the core results and the rows `written` lists that a test gives. */
+function samCommitted(core: unknown[], written: unknown[], repeated = false): Json {
+  return {
+    result: "committed",
+    turnId: "turn-sam-timer",
+    committedAt: "2026-10-27T13:20:02Z",
+    repeated,
+    parts: [],
+    planner: null,
+    core,
+    written: { written, outboxRows: [], promoted: [] },
+    effects: [],
+    openQuestions: { opened: [], closed: [] },
+  };
+}
+
+/** A later core action's result, gone through: it wrote Sam's timer row and its clock row, named in its own words. */
+const TIMER_BY_CORE = {
+  call: LATER_TIMER_CALL,
+  response: { timerId: SAM_TIMER.id, version: 1 },
+  error: null,
+};
+
+describe("what a commit gives the copies: a safety timer a core action wrote (T-1198)", () => {
+  it("learns of it from the core results, never from `written` alone: a later core action's result that went through reads written, though K-09's `written` leaves its rows out; refused, it wrote nothing", () => {
+    const record = safetyRecordFor("evt-sam-0301");
+    // The text's safety record first, then the later core action; `written` lists none of their rows (default 9).
+    expect(readCommit(samCommitted([record, TIMER_BY_CORE], []))).toEqual({
+      stopped: null,
+      timersWritten: true,
+    });
+    // A repeat answers its first commit, whose rows were written: it reloads too.
+    expect(readCommit(samCommitted([record, TIMER_BY_CORE], [], true)).timersWritten).toBe(true);
+    // Refused, the core action wrote nothing: nothing to reload.
+    const refused = { call: LATER_TIMER_CALL, response: null, error: { error: "transient" } };
+    expect(readCommit(samCommitted([record, refused], [])).timersWritten).toBe(false);
+    // A core result that is not K-09's shape gives nothing.
+    expect(
+      readCommit(samCommitted([{ call: LATER_TIMER_CALL }, "not a result", null], [])).timersWritten,
+    ).toBe(false);
+    // `written` still tells: a timer row the walk wrote, in K-09's answer.
+    expect(
+      readCommit(samCommitted([record], [{ table: "safety_timers", rowId: SAM_TIMER.id, version: 2 }]))
+        .timersWritten,
+    ).toBe(true);
+  });
+
+  it("today's commits read as before: none of K-09's core actions writes a timer row, so each one's result, with `written` naming none, reads nothing", () => {
+    expect(K09_CORE_CALLS).toHaveLength(15);
+    for (const call of K09_CORE_CALLS) {
+      const result = { call, response: {}, error: null };
+      expect(readCommit(samCommitted([result], [])).timersWritten, call).toBe(false);
+    }
+    // stop-recorded.json as it stands: its safety record and STOP went through, and `written` names Ben's phone row.
+    expect(readCommit(stopRecorded.outcome).timersWritten).toBe(false);
   });
 });
