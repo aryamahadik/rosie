@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 378, [`cb7c9ca`](https://github.com/aryamahadik/rosie/commit/cb7c9ca), 2026-11-11 13:58:39 UTC.
+- **Through:** commit 380, [`2e0b89b`](https://github.com/aryamahadik/rosie/commit/2e0b89b), 2026-11-11 14:16:55 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 380. docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385) (\#387)
+
+- **Commit:** [`2e0b89b`](https://github.com/aryamahadik/rosie/commit/2e0b89b), by Arya Mahadik, 2026-11-11 14:16:55 UTC
+- **Pull request:** [#387](https://github.com/aryamahadik/rosie/pull/387) from `task/commit-history-14`, merged 2026-11-11 14:16:55 UTC. It squashed 1 branch commit:
+  - `51761a3` docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 379. T-564: join hop 13, the double's delivery receipt marks the part delivered and arms S1-02's clock; the walking skeleton is joined end to end (\#386)
+
+- **Commit:** [`1415609`](https://github.com/aryamahadik/rosie/commit/1415609), by Arya Mahadik, 2026-11-11 14:16:51 UTC
+- **Pull request:** [#386](https://github.com/aryamahadik/rosie/pull/386) from `task/T-564`, merged 2026-11-11 14:16:51 UTC. It squashed 3 branch commits:
+  - `04dd09f` T-564: join hop 13 in the wiring: the arming port (K-05 v1 item 5 arm…
+  - `1e90dc3` T-564 (work in progress, NEED): e2e row 13: JOINED\_THROUGH clockArmed…
+  - `5308dc6` T-564: e2e rows 11 and 12 read the run's end state (DL-466, Need 1): …
+- **Files changed:** 14 (+1225 −83), by folder:
+  - `runtime/src/wiring/` bind.ts +1 −0, closed.ts +5 −5, hop13.worker.test.ts +490 −0, index.ts +4 −0, picks.ts +10 −4, ports.ts +29 −14, real.ts +81 −0, root.test.ts +50 −10, root.ts +31 −8, root.worker.test.ts +14 −17, test-support.ts +302 −12
+  - `tests/e2e/skeleton/` README.md +4 −2, root-run.ts +32 −2, skeleton.worker.test.ts +172 −9
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-564: join hop 13 in the wiring: the arming port (K-05 v1 item 5 armClock and cancelClock, the question's facts, a handle's actor name), split from stateReads and dataAccess, real in test and staging over RootOptions.armingCalls, closed in production; the receipt door's clock arming runs on it; K-05 doubles over the commit's rows; hop13.worker.test.ts proves the double's receipt marks the part delivered and arms S1-02's clock at T-255's due time on the JOIN's trace, a second receipt arms nothing more, and no database fails closed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-564 (work in progress, NEED): e2e row 13: JOINED_THROUGH clockArmed, row 13's CLAIMS, root-run.ts feeds the arming doubles and delivers the Linq double's receipt before the trace is collected, README's join 13 lines; the trace judge passes receive to clockArmed, but rows 11 and 12's existing claims (partMarks only 'sent', row state 'sent') fail now that the run's receipt marks the part delivered: they are outside the DL-433 grant
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-564: e2e rows 11 and 12 read the run's end state (DL-466, Need 1): the sent mark asserted once, with the same request and answer, over the marks other than row 13's one delivered mark; the row delivered under claim 1; the length check beside row 13's mark. Rows 1 to 13 pass with JOINED_THROUGH clockArmed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 378. docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383) (\#385)
 
