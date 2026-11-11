@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the twenty
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the twenty-one
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -22,9 +22,9 @@
 //                API base (its K-09 checks, the call's business scope, its span)
 //                and the frontier over K-05 v1.2 readTurnState and the turn's
 //                pinned bundle
-//   stateReads   other reads of stored state: who a handle is, each text's safety  T-564
-//                result, the safety read's bundle lines and stopped flag, a
-//                question's facts
+//   stateReads   other reads of stored state: who a handle is, each text's safety  not joined
+//                result, the safety read's bundle lines and stopped flag (the
+//                clock arming's reads are the arming port's since T-564)
 //   turnFace     the rest of K-09's turn face (closest entries: meaning search)    no D-017 hop
 //                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
@@ -44,9 +44,14 @@
 //                dispatcher's claim and marks, and the receipt door's mark
 //   sendState    K-05 v1.2 sendState: limit 8's read of the recipient's send       T-562
 //                state at send, and the chat the send goes to
-//   dataAccess   K-05 writes: the turn's plans, the clock arming                   T-564
+//   dataAccess   K-05 writes: the turn's plans (the clock arming's writes are the  not joined
+//                arming port's since T-564)
 //   linqSend     K-11 sendPart: each part the dispatcher sends, through the Linq   T-563
 //                line (@rosie/adapters' Linq double in a test)
+//   arming       the clock arming at a part's first delivery receipt: K-05 v1      T-564
+//                item 5's armClock and cancelClock, the question's facts the due
+//                rule reads and where a handle's actor lives, split from
+//                stateReads and dataAccess by T-564
 //   linqDirect   the checked safety line sent straight through Linq while          no D-017 hop
 //                PostgreSQL is down (arch 11 line 566), split from linqSend by T-563
 //
@@ -59,7 +64,6 @@
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 
 import type { ArmingOptions } from "../clocks/arming";
-import type { ArmingData } from "../clocks/types";
 import type { BundleDeps } from "../bundle/types";
 import type {
   LinqPort as LinqSendCall,
@@ -81,7 +85,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The twenty ports, in D-017's turn order (02-contracts section 11), the direct line, which no hop runs, last. */
+/** The twenty-one ports, in D-017's turn order (02-contracts section 11), the direct line, which no hop runs, last. */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -102,6 +106,7 @@ export const PORTS = [
   "sendState",
   "dataAccess",
   "linqSend",
+  "arming",
   "linqDirect",
 ] as const;
 
@@ -125,16 +130,15 @@ export interface TurnRowPort {
 
 /**
  * Reads of stored state not joined yet, by the part that reads them (K-04 rows through K-05). The bundle reads and the
- * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`), and the dispatcher's
- * send state since T-562 joined it (`Ports.sendState`).
+ * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`), the dispatcher's
+ * send state since T-562 joined it (`Ports.sendState`), and the clock arming's reads since T-564 joined it
+ * (`Ports.arming`).
  */
 export interface StateReads {
   /** The safety read's: the ids K-09 calls name for a handle, the bundle's checked lines and danger words, the stopped flag. */
   readonly safety: Pick<SafetyDeps, "directory" | "bundle" | "isStopped">;
   /** The turn's: who the handle is (K-04 handles, persons, roles, zone), and each text's safety result. */
   readonly turn: Pick<TurnDeps, "directory" | "safety">;
-  /** The clock arming's: an open question's facts, and the actor name of a handle. */
-  readonly arming: Pick<ArmingOptions, "facts" | "directory">;
 }
 
 /**
@@ -193,13 +197,22 @@ export interface TurnFacePort extends Omit<
  */
 export type FinalizePort = Pick<TurnFace, "finalizeMessage">;
 
-/** K-05 writes not joined yet (the outbox's are a port of their own since T-562 joined them: `Ports.outbox`). */
+/**
+ * K-05 writes not joined yet (the outbox's are a port of their own since T-562 joined them: `Ports.outbox`; the clock
+ * arming's since T-564 joined it: `Ports.arming`).
+ */
 export interface DataAccess {
   /** K-05 v1 unplannedRows and writePlan: the turn's rows after its commit (its park is the turn-row port's). */
   readonly rows: Omit<TurnRows, "parkTurn">;
-  /** K-05 v1 armClock and cancelClock: the clock arming's. */
-  readonly clocks: ArmingData;
 }
+
+/**
+ * The clock arming at a part's first delivery receipt (T-564; T-255's ArmingOptions; arch 02 step 9, line 127): K-05 v1
+ * item 5's armClock and cancelClock (T-197), the question's facts the due rule reads (no K-05 call returns them yet: K-05
+ * open gap 25), and where a handle's actor lives (the actor the arming tells of its newly armed row). The receipt door
+ * hands it each part K-05 markPart newly marked delivered.
+ */
+export type ArmingPort = Pick<ArmingOptions, "data" | "facts" | "directory">;
 
 /**
  * The dispatcher's Linq sends (T-563): K-11 v1 sendPart, each part of a claimed row, under its `<row>/<part>/<try>` key,
@@ -253,6 +266,8 @@ export interface Ports {
   readonly dataAccess: DataAccess;
   /** K-11 sendPart through the Linq line (T-563): each part the dispatcher sends, once per row-part-try key. */
   readonly linqSend: LinqSend;
+  /** The clock arming at a part's first delivery receipt (T-564): K-05 armClock and cancelClock, its reads. */
+  readonly arming: ArmingPort;
   /** A checked safety line straight through Linq while PostgreSQL is down (arch 11 line 566): no D-017 hop. */
   readonly linqDirect: DirectLineSender;
 }

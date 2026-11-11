@@ -22,6 +22,8 @@
 // recorded-model double (fakeComposerModels, which holds the plan of the turn this test records), whose model-call span
 // sits in the trace beside decide's. Since T-561 joined finalize, each row's plan is finalized by @rosie/actions' turn
 // face over K-05 doubles of its row calls (fakeFinalizeData), which keep the plan and final parts written into the row.
+// Since T-564 joined the clock arming, the receipt door arms the question's clock row through the arming port, over K-05
+// doubles of armClock and cancelClock and the question's facts on the rows the commit wrote (fakeArmingCalls).
 // Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
 // receipt door marks the part delivered and arms its clock.
 //
@@ -44,7 +46,7 @@ import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { turnIdOf, type HandleActor } from "../actor";
-import { A7_03_DELIVERED, A7_03_FACTS } from "../clocks/arming-support";
+import { A7_03_DELIVERED } from "../clocks/arming-support";
 import { actorNameOf } from "../gateway";
 import { createWorker } from "../index";
 import { spanProblems, type Hop, type Span, type Trace } from "../trace";
@@ -205,6 +207,8 @@ function rig(log: MockInstance): Run {
     sendStateCall: fakes.dispatch.sendState,
     // The Linq send port (T-563) over @rosie/adapters' Linq double: each part the dispatcher sends reaches the double.
     linqSendCall: fakes.linq.call,
+    // The arming port (T-564) over its K-05 doubles: the clock row and question the commit wrote, and Sam's actor.
+    armingCalls: fakes.arming.calls,
   });
   const restoreRoot = root.install();
   const watched = watchGate(root);
@@ -297,20 +301,9 @@ describe("through the composition root, every port on its fake: a text's webhook
         );
         const accepted = run.fakes.linq.accepted.get(`${row}/1/1`);
         if (accepted?.providerMessageId == null) throw new Error("Linq accepted no part");
-        // Until T-564 joins the clock arming, its doubles (clocks/arming-support, T-255) stand in for the question the row
-        // asks, as the dispatcher's fake store gave its row A7-03's question before T-562: S1-02's question takes A7-03's
-        // facts (K-04's seeds), and its clock row is the one the commit made (waiting, on Sam's handle).
+        // The question the row asks, and its clock row: the ones the commit made (waiting, on Sam's handle), which the
+        // joined arming port (T-564) reads and arms.
         const question = `oq-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
-        run.fakes.arming.facts.facts.set(question, {
-          ...structuredClone(A7_03_FACTS),
-          openQuestionId: question,
-        });
-        run.fakes.arming.data.make({
-          clockRowId: `clock-${question}`,
-          kind: "question",
-          openQuestionId: question,
-          handleId: SAM.party.handleId,
-        });
 
         // Linq's delivery receipt for that part: K-06 delivered.json with the part's message id, echoing its key.
         const receipt = {
@@ -396,9 +389,13 @@ describe("through the composition root, every port on its fake: a text's webhook
             row: { state: "delivered" },
           },
         ]);
-        // And armed that question's clock once (K-05 armClock).
-        expect(run.fakes.arming.data.armAnswers).toMatchObject([{ result: "armed", repeated: false }]);
-        expect(run.fakes.arming.data.armRequests).toMatchObject([{ openQuestionId: question }]);
+        // And armed that question's clock once (K-05 armClock), the clock row the commit made.
+        expect(run.fakes.arming.arms.map((call) => call.answer)).toMatchObject([
+          { result: "armed", repeated: false, clock: { clockRowId: `clock-${question}` } },
+        ]);
+        expect(run.fakes.arming.arms.map((call) => call.request)).toMatchObject([
+          { openQuestionId: question },
+        ]);
         // The receipt's own webhook opened its own trace id: its receive hop alone.
         expect(receiptTraceId).not.toBe(traceId);
         const receiptReport = checkHops(spansOfTrace(spans, receiptTraceId), {

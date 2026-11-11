@@ -1,11 +1,11 @@
 // The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560, T-561, T-562,
-// T-1213, T-563), under Node (Vitest project "unit"): the ports the root binds in each environment, each once and none
-// left unbound; the check that refuses a port bound twice or left unbound; each bound port handed to the part that calls
-// it; and the closed implementation the Worker's environments still bind for every port no join has reached (T-552 joined
-// the Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads
-// and the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561
-// finalize, T-562 the outbox and the send state, T-1213 the chat open, T-563 the Linq send and the dispatcher's retries;
-// production takes no join yet).
+// T-1213, T-563, T-564), under Node (Vitest project "unit"): the ports the root binds in each environment, each once and
+// none left unbound; the check that refuses a port bound twice or left unbound; each bound port handed to the part that
+// calls it; and the closed implementation the Worker's environments still bind for every port no join has reached (T-552
+// joined the Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle
+// reads and the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer,
+// T-561 finalize, T-562 the outbox and the send state, T-1213 the chat open, T-563 the Linq send and the dispatcher's
+// retries, T-564 the clock arming; production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
@@ -86,6 +86,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "outbox",
     "sendState",
     "linqSend",
+    "arming",
   ],
   staging: [
     "linqVerify",
@@ -104,6 +105,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "outbox",
     "sendState",
     "linqSend",
+    "arming",
   ],
   production: [],
 };
@@ -146,7 +148,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's twenty ports in its turn order, the direct line last", () => {
+  it("names D-017's twenty-one ports in its turn order, the direct line last", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -167,6 +169,7 @@ describe("the ports the root binds", () => {
       "sendState",
       "dataAccess",
       "linqSend",
+      "arming",
       "linqDirect",
     ]);
   });
@@ -175,7 +178,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, chat open, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox, send state and Linq send to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, chat open, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox, send state, Linq send and clock arming to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -539,6 +542,35 @@ describe("the Worker's environments", () => {
     );
   });
 
+  it("fails the arming port closed with no database bound (until T-567, T-564): on staging each of the clock arming's calls and reads refuses before anything is read or armed, and production keeps the port closed", async () => {
+    const arm = {
+      openQuestionId: "oq-s1-02-sam-1",
+      deliveredAt: "2026-10-19T14:02:01Z",
+      dueAt: "2026-10-21T00:00:00Z",
+      dueZone: "America/New_York",
+    };
+    const cancel = {
+      clockRowId: "clock-oq-s1-02-sam-1",
+      expectVersion: 1,
+      withdrawQuestion: null,
+      at: "2026-10-19T14:02:01Z",
+    };
+    const staging = workerRoot(workerEnv("staging")).ports.arming;
+    await expect(staging.data.armClock(arm)).rejects.toThrow(new NoDatabaseError("armClock"));
+    await expect(staging.data.cancelClock(cancel)).rejects.toThrow(new NoDatabaseError("cancelClock"));
+    await expect(staging.facts.questionFacts(arm.openQuestionId)).rejects.toThrow(
+      new NoDatabaseError("questionFacts"),
+    );
+    await expect(staging.directory.actorNameOf("handle-sam")).rejects.toThrow(
+      new NoDatabaseError("actorNameOf"),
+    );
+    const production = workerRoot(workerEnv("production")).ports.arming;
+    await expect(production.data.armClock(arm)).rejects.toThrow(new NotJoinedError("arming"));
+    await expect(production.facts.questionFacts(arm.openQuestionId)).rejects.toThrow(
+      new NotJoinedError("arming"),
+    );
+  });
+
   it("puts the retry queue's ports in place with the actor's (T-563, DL-315): its send jobs reach the dispatcher's door, no job kind or dead-letter writer is joined, and the earlier ports come back", async () => {
     const root = composeRoot({
       environment: "test",
@@ -627,10 +659,18 @@ describe("a closed port", () => {
     await expect(closed.sendState.recipients.chatFor("handle-sam")).rejects.toThrow(
       new NotJoinedError("sendState"),
     );
-    await expect(closed.dataAccess.clocks.armClock({} as never)).rejects.toThrow(
+    await expect(closed.dataAccess.rows.unplannedRows({} as never)).rejects.toThrow(
       new NotJoinedError("dataAccess"),
     );
     await expect(closed.linqSend.parts.sendPart({} as never)).rejects.toThrow(new NotJoinedError("linqSend"));
+    await expect(closed.arming.data.armClock({} as never)).rejects.toThrow(new NotJoinedError("arming"));
+    await expect(closed.arming.data.cancelClock({} as never)).rejects.toThrow(new NotJoinedError("arming"));
+    await expect(closed.arming.facts.questionFacts("oq-s1-02-sam-1")).rejects.toThrow(
+      new NotJoinedError("arming"),
+    );
+    await expect(closed.arming.directory.actorNameOf("handle-sam")).rejects.toThrow(
+      new NotJoinedError("arming"),
+    );
     await expect(closed.linqDirect.send({} as never)).rejects.toThrow(new NotJoinedError("linqDirect"));
     expect(() => closed.stateReads.safety.bundle.dangerWords()).toThrow(new NotJoinedError("stateReads"));
   });

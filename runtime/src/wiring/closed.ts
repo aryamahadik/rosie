@@ -52,10 +52,6 @@ export function closedPorts(): Ports {
         directory: { partyOf: () => fail("stateReads") },
         safety: { resultsOf: () => fail("stateReads") },
       },
-      arming: {
-        facts: { questionFacts: () => fail("stateReads") },
-        directory: { actorNameOf: () => fail("stateReads") },
-      },
     },
     turnFace: {
       closestEntries: () => fail("turnFace"),
@@ -85,9 +81,13 @@ export function closedPorts(): Ports {
         unplannedRows: () => fail("dataAccess"),
         writePlan: () => fail("dataAccess"),
       },
-      clocks: { armClock: () => fail("dataAccess"), cancelClock: () => fail("dataAccess") },
     },
     linqSend: { parts: { sendPart: () => fail("linqSend") } },
+    arming: {
+      data: { armClock: () => fail("arming"), cancelClock: () => fail("arming") },
+      facts: { questionFacts: () => fail("arming") },
+      directory: { actorNameOf: () => fail("arming") },
+    },
     linqDirect: { send: () => fail("linqDirect") },
   };
 }
