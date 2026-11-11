@@ -12,6 +12,14 @@
 //               double accepted is kept, once per idempotency key
 //   sentEmails  K-12 v1 doubleSentEmails over what is kept, oldest first (testPhoneParts' emails)
 //
+// What is kept is bounded (T-1238; DL-392): at most PARTS_PER_RECIPIENT parts to each number and EMAILS_PER_RECIPIENT emails
+// to each address, and at most PART_RECIPIENTS numbers and EMAIL_RECIPIENTS addresses in all. The record that would pass a
+// cap drops the oldest in the same transaction that stores it: past a recipient's cap, that recipient's oldest record; past
+// the recipients in all, the recipient sent to least recently, whole. So a flood to one recipient only ever drops that
+// recipient's own records, and the line never holds more than recipients times the cap. A repeated key stores nothing and
+// drops nothing. The caps are constants of this module: no request can name, raise or lift them. T-565's recorder is made
+// for each send, so no part stays in it once the send is over; the table is the line's only record of parts.
+//
 // One object for all of staging's test phones (./pages.ts TEST_PHONE_LINE_NAME): the roster's fictional 555-01xx phones all
 // text through the one Linq double, as they would through one Linq line. The line never signs or verifies an email, so the
 // email double is handed no webhook secret at all (never RESEND_WEBHOOK_SECRET; K-12 README line 22). The doubles are test
@@ -31,12 +39,47 @@ import {
   type SendEmailOutcome,
   type SendEmailRequest,
 } from "@rosie/adapters/email/double";
-import { createLinqDouble, type SendPartOutcome } from "@rosie/adapters/linq/double";
+import { createLinqDouble, type LinqDouble, type SendPartOutcome } from "@rosie/adapters/linq/double";
 import {
   createPartsRecorder,
-  type PartsRecorder,
   type RecordedPart,
 } from "@rosie/actions/src/page-calls/staging/test-phone/index";
+
+/**
+ * Parts kept to one number. A reply row is at most two sends, the words and then one poll or card (K-03 FinalParts; arch 07
+ * line 367), so a 20-text staging run sends its phone about 40 parts, with a few safety or fixed lines besides: 200 holds
+ * that run five times over, or a tester's last hundred or so texts.
+ */
+export const PARTS_PER_RECIPIENT = 200;
+
+/** Emails kept to one address: at most one copy or notice a row, so 100 holds a 20-text run's emails with room to spare. */
+export const EMAILS_PER_RECIPIENT = 100;
+
+/**
+ * Numbers and addresses kept in all. Staging's roster has five test phones, each with at most one person's address (Q-53;
+ * K-21 test-roster.json), and the seeded staff's notices add a few addresses: 20 holds them all four times over. So at most
+ * 4,000 parts and 2,000 emails are ever kept.
+ */
+export const PART_RECIPIENTS = 20;
+export const EMAIL_RECIPIENTS = 20;
+
+/** One table's caps: records per recipient, and recipients in all. */
+interface Caps {
+  readonly table: "test_phone_parts" | "test_phone_emails";
+  readonly perRecipient: number;
+  readonly recipients: number;
+}
+
+const PARTS: Caps = {
+  table: "test_phone_parts",
+  perRecipient: PARTS_PER_RECIPIENT,
+  recipients: PART_RECIPIENTS,
+};
+const EMAILS: Caps = {
+  table: "test_phone_emails",
+  perRecipient: EMAILS_PER_RECIPIENT,
+  recipients: EMAIL_RECIPIENTS,
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -66,32 +109,70 @@ function createTables(sql: SqlStorage): void {
   );
 }
 
+/**
+ * Keeps one record and drops what then passes a cap, in one transaction: the recipient's oldest records past its cap, then
+ * every record of a recipient past the caps' recipients, the one sent to least recently first. A key the table already
+ * holds stores nothing, so nothing is dropped. A typing part has no key (K-11) and is kept each time, as the double
+ * records it.
+ */
+function keep(
+  storage: DurableObjectStorage,
+  caps: Caps,
+  key: string | null,
+  recipient: string,
+  record: string,
+): void {
+  const sql = storage.sql;
+  const { table } = caps;
+  storage.transactionSync(() => {
+    if (
+      key !== null &&
+      sql.exec(`SELECT 1 FROM ${table} WHERE idempotency_key = ?`, key).toArray().length > 0
+    )
+      return;
+    sql.exec(
+      `INSERT INTO ${table} (idempotency_key, recipient, record) VALUES (?, ?, ?)`,
+      key,
+      recipient,
+      record,
+    );
+    sql.exec(
+      `DELETE FROM ${table} WHERE seq IN (
+         SELECT seq FROM ${table} WHERE recipient = ? ORDER BY seq DESC LIMIT -1 OFFSET ?
+       )`,
+      recipient,
+      caps.perRecipient,
+    );
+    sql.exec(
+      `DELETE FROM ${table} WHERE recipient IN (
+         SELECT recipient FROM ${table} GROUP BY recipient ORDER BY MAX(seq) DESC LIMIT -1 OFFSET ?
+       )`,
+      caps.recipients,
+    );
+  });
+}
+
 export class TestPhoneLine extends DurableObject {
-  readonly #recorder: PartsRecorder;
+  readonly #linq: LinqDouble;
   readonly #emails: EmailDouble;
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
     createTables(ctx.storage.sql);
-    this.#recorder = createPartsRecorder(createLinqDouble());
+    this.#linq = createLinqDouble();
     this.#emails = createEmailDouble();
   }
 
   /** K-11 v1 sendPart through the Linq double, answered as the double answers; a part it recorded is kept. */
   async sendPart(request: unknown): Promise<SendPartOutcome> {
+    // T-565's recorder for this send alone, in front of the line's one double: the part leaves it once it is kept.
+    const recorder = createPartsRecorder(this.#linq);
+    const outcome = await recorder.sendPart(request);
     const to = recipientOf(request);
-    const before = to === null ? 0 : this.#recorder.partsTo(to).length;
-    const outcome = await this.#recorder.sendPart(request);
     if (to === null) return outcome;
-    const parts = this.#recorder.partsTo(to);
-    const recorded = parts.length > before ? parts[parts.length - 1] : undefined;
+    const recorded = recorder.partsTo(to)[0];
     if (recorded !== undefined) {
-      this.ctx.storage.sql.exec(
-        "INSERT OR IGNORE INTO test_phone_parts (idempotency_key, recipient, record) VALUES (?, ?, ?)",
-        recorded.sent.idempotencyKey,
-        to,
-        JSON.stringify(recorded),
-      );
+      keep(this.ctx.storage, PARTS, recorded.sent.idempotencyKey, to, JSON.stringify(recorded));
     }
     return outcome;
   }
@@ -115,8 +196,9 @@ export class TestPhoneLine extends DurableObject {
       (email) => email.providerMessageId === outcome.providerMessageId,
     );
     if (recorded !== undefined) {
-      this.ctx.storage.sql.exec(
-        "INSERT OR IGNORE INTO test_phone_emails (idempotency_key, recipient, record) VALUES (?, ?, ?)",
+      keep(
+        this.ctx.storage,
+        EMAILS,
         recorded.request.idempotencyKey,
         recorded.request.to,
         JSON.stringify(recorded),
