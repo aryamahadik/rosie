@@ -10,7 +10,11 @@
 // fixture's `after` chain names run for real through db/repo's commitTurn as rosie_job, each answering its own fixture.
 //
 // Both role clients record every statement they send (postgres.js `debug`), so the column-list test reads what the three
-// reads sent, not a copy of their SQL (DL-326 note a).
+// reads sent, not a copy of their SQL (DL-326 note a). It also pins each read's tables, refuses whole-row references (a
+// bare row alias, to_jsonb, row_to_json) and the sealed columns of tables no read names (event_log.sealed_values,
+// harm_reports.sealed_details), and checks that every business's table a statement reads names its business (K-05
+// README v1.3: "every read of a business-scoped table names the business"); statements made to fail show that it
+// catches each (T-1168: T-1138's security notes a and b, DL-345).
 //
 // T-1197: readOutboxRow answers K-05 v1.6's businessSensitive (item 45), so every readOutboxRow answer is checked against
 // v1.6's readOutboxRow.v1dot6Response, and every fixture of the three reads, v1.3 to v1.6, runs here, each valid at its own
@@ -1589,7 +1593,37 @@ describe("readFixedLineFacts: one business's opener mark, never another's (item 
 });
 
 describe("sealed values: never selected, never answered, never logged (item 35's reason 1; DL-326 note a)", () => {
-  /** Never named by a statement of the three reads: the four sealed or personal columns and the key table. */
+  /** The three reads, as an exchange names them. */
+  const CALLS = ["readOpenHolds", "readOutboxRow", "readFixedLineFacts"] as const;
+  type Call = (typeof CALLS)[number];
+  /**
+   * Each read's tables, and no others (T-1138's security note a; DL-345): no statement of a read names another table,
+   * and over the fixtures and both sides its statements name each of these.
+   */
+  const TABLES_OF: Readonly<Record<Call, readonly string[]>> = {
+    readOpenHolds: ["businesses", "safety_holds", "safety_outcomes"],
+    readOutboxRow: [
+      "bookings",
+      "businesses",
+      "clock_rows",
+      "company_kinds",
+      "handles",
+      "open_questions",
+      "outbox_parts",
+      "outbox_rows",
+      "person_roles",
+      "persons",
+      "phones",
+      "safety_outcomes",
+      "turns",
+    ],
+    readFixedLineFacts: ["openers_sent", "outbox_rows", "phones"],
+  };
+  /**
+   * Never named by a statement of the three reads: the four sealed or personal columns, the key table and its columns,
+   * and the sealed columns of tables no read names, event_log.sealed_values and harm_reports.sealed_details (T-1138's
+   * security note a).
+   */
   const NEVER_NAMED = new Set([
     "words",
     "sealed_words",
@@ -1598,6 +1632,48 @@ describe("sealed values: never selected, never answered, never logged (item 35's
     "sealing_keys",
     "wrapped_key",
     "wrapping_key_name",
+    "sealed_values",
+    "sealed_details",
+  ]);
+  /** Functions that turn a whole row into a value. */
+  const WHOLE_ROW_FUNCTIONS = new Set([
+    "to_json",
+    "to_jsonb",
+    "row_to_json",
+    "json_agg",
+    "jsonb_agg",
+    "json_object_agg",
+    "jsonb_object_agg",
+    "array_agg",
+    "jsonb_populate_record",
+    "hstore",
+    "row",
+  ]);
+  /** Words that may follow a table in FROM or JOIN without being its alias. */
+  const NOT_AN_ALIAS = new Set([
+    "where",
+    "join",
+    "inner",
+    "left",
+    "right",
+    "full",
+    "cross",
+    "natural",
+    "on",
+    "using",
+    "order",
+    "group",
+    "having",
+    "limit",
+    "offset",
+    "fetch",
+    "for",
+    "union",
+    "except",
+    "intersect",
+    "window",
+    "returning",
+    "tablesample",
   ]);
   /** What no answer may hold: numbers, the email address, an inbound text's words, K-34's sealed stand-in bytes. */
   const NEVER_ANSWERED = [
@@ -1620,6 +1696,146 @@ describe("sealed values: never selected, never answered, never logged (item 35's
     );
   }
 
+  /** This file's schema: each table's columns, by table. */
+  const schemaColumns = new Map<string, Set<string>>();
+
+  beforeAll(async () => {
+    const columns = await db.sql<{ table_name: string; column_name: string }[]>`
+      select table_name, column_name from information_schema.columns where table_schema = ${db.schema}
+    `;
+    for (const column of columns) {
+      const ofTable = schemaColumns.get(column.table_name) ?? new Set<string>();
+      schemaColumns.set(column.table_name, ofTable.add(column.column_name));
+    }
+  }, 60_000);
+
+  const isTable = (token: string): boolean => schemaColumns.has(token);
+  const isName = (token: string | undefined): token is string =>
+    token !== undefined && /^[a-z_][a-z0-9_$]*$/.test(token);
+
+  /** A statement's tokens: comments, string literals and collations dropped, quoted names unquoted, lower case. */
+  function tokensOf(statement: string): string[] {
+    return (
+      statement
+        .replace(/--[^\n]*/g, " ")
+        .replace(/\/\*[\s\S]*?\*\//g, " ")
+        .replace(/'(?:[^']|'')*'/g, " ")
+        .replace(/collate\s+"[^"]*"/gi, " ")
+        .replaceAll('"', "")
+        .toLowerCase()
+        .match(/[a-z_][a-z0-9_$]*|\$\d+|\d+|[^\s\w]/g) ?? []
+    );
+  }
+
+  /** Every table of this file's schema a statement names, wherever it names it. */
+  const tablesOf = (statement: string): string[] => tokensOf(statement).filter(isTable);
+
+  /** A table a statement reads after FROM or JOIN, its alias (null with none), and the tokens that declare them. */
+  interface Declaration {
+    table: string;
+    alias: string | null;
+    places: number[];
+  }
+
+  /** The tables a statement reads, each where FROM or JOIN declares it. */
+  function declarationsOf(tokens: readonly string[]): Declaration[] {
+    const declarations: Declaration[] = [];
+    tokens.forEach((token, index) => {
+      const table = tokens[index + 1];
+      // `is [not] distinct from x` compares; a function or a subquery after FROM or JOIN is no table.
+      if ((token !== "from" && token !== "join") || tokens[index - 1] === "distinct") {
+        return;
+      }
+      if (!isName(table) || tokens[index + 2] === "(") {
+        return;
+      }
+      const aliasAt = tokens[index + 2] === "as" ? index + 3 : index + 2;
+      const alias = tokens[aliasAt];
+      if (isName(alias) && !NOT_AN_ALIAS.has(alias)) {
+        declarations.push({ table, alias, places: [index + 1, aliasAt] });
+      } else {
+        declarations.push({ table, alias: null, places: [index + 1] });
+      }
+    });
+    return declarations;
+  }
+
+  /**
+   * Whether a statement names the business of a table it reads, after declaring it (K-05 README v1.3: every read of a
+   * business-scoped table names the business): `alias.business_id`, or for a table with no alias its bare business_id
+   * or `table.business_id`; for businesses, its own id. A table with no business_id column holds no business's rows.
+   */
+  function namesBusiness(tokens: readonly string[], declaration: Declaration): boolean {
+    const { table, alias, places } = declaration;
+    const column = table === "businesses" ? "id" : "business_id";
+    if (schemaColumns.get(table)?.has(column) !== true) {
+      return true;
+    }
+    const declared = Math.max(...places);
+    return tokens.some((token, index) => {
+      if (index <= declared || token !== column) {
+        return false;
+      }
+      const owner = tokens[index - 1] === "." ? tokens[index - 2] : null;
+      return alias === null ? owner === null || owner === table : owner === alias;
+    });
+  }
+
+  /**
+   * What is wrong with one statement of `call`: a name never named, `*`, a whole row (a function that takes one, or a
+   * table or alias not followed by one of its columns), a table beyond the read's own, or a business's table read
+   * without naming its business.
+   */
+  function problemsOf(statement: string, call: Call): string[] {
+    const own = new Set(TABLES_OF[call]);
+    const tokens = tokensOf(statement);
+    const declarations = declarationsOf(tokens);
+    const declared = new Set<string>();
+    const places = new Set<number>();
+    for (const declaration of declarations) {
+      declared.add(declaration.table).add(declaration.alias ?? declaration.table);
+      for (const place of declaration.places) {
+        places.add(place);
+      }
+    }
+    const problems: string[] = [];
+    tokens.forEach((token, index) => {
+      const next = tokens[index + 1];
+      if (NEVER_NAMED.has(token)) {
+        problems.push(`never named: ${token}`);
+      }
+      if (token === "*") {
+        problems.push("*");
+      }
+      if (WHOLE_ROW_FUNCTIONS.has(token) && next === "(") {
+        problems.push(`a whole row: ${token}()`);
+      }
+      if ((declared.has(token) || isTable(token)) && !places.has(index) && next !== ".") {
+        problems.push(`a whole row: ${token}`);
+      }
+      if (isTable(token) && !own.has(token)) {
+        problems.push(`a table beyond its own: ${token}`);
+      }
+    });
+    for (const declaration of declarations) {
+      if (!namesBusiness(tokens, declaration)) {
+        const name =
+          declaration.alias === null ? declaration.table : `${declaration.table} ${declaration.alias}`;
+        problems.push(`a business's table read without its business: ${name}`);
+      }
+    }
+    return problems;
+  }
+
+  /** The read an exchange names. */
+  function callOf(exchange: Exchange): Call {
+    const call = CALLS.find((name) => name === exchange.call);
+    if (call === undefined) {
+      throw new Error(`no v1.3 read is called ${exchange.call}`);
+    }
+    return call;
+  }
+
   /** Runs `read` with every console method watched; answers the outcome and how many times anything was logged. */
   async function unlogged<T>(read: () => Promise<T>): Promise<{ outcome: T; logged: number }> {
     const spies = [
@@ -1640,43 +1856,150 @@ describe("sealed values: never selected, never answered, never logged (item 35's
     }
   }
 
+  it("the check refuses a whole row, a stray table, a sealed column and a business's table read without its business (shown on statements made to fail)", () => {
+    const caught: { call: Call; statement: string; problems: string[] }[] = [
+      {
+        call: "readFixedLineFacts",
+        statement: "select to_jsonb(p) from phones p where p.handle_id = $1",
+        problems: ["a whole row: to_jsonb()", "a whole row: p"],
+      },
+      {
+        call: "readOutboxRow",
+        statement: "select row_to_json(m) from persons m where m.id = $1",
+        problems: ["a whole row: row_to_json()", "a whole row: m"],
+      },
+      {
+        call: "readOpenHolds",
+        statement: "select json_agg(o) from safety_outcomes o where o.business_id = $1",
+        problems: ["a whole row: json_agg()", "a whole row: o"],
+      },
+      {
+        call: "readOutboxRow",
+        statement: "select h from handles h where h.id = $1",
+        problems: ["a whole row: h"],
+      },
+      {
+        call: "readOutboxRow",
+        statement: "select (h).kind from handles as h where h.id = $1",
+        problems: ["a whole row: h"],
+      },
+      {
+        call: "readFixedLineFacts",
+        statement: "select phones from phones where phones.handle_id = $1",
+        problems: ["a whole row: phones"],
+      },
+      {
+        call: "readFixedLineFacts",
+        statement: "select o.* from outbox_rows o where o.id = $1 and o.business_id is null",
+        problems: ["*"],
+      },
+      // A stray table: one no read names, and one another read names but this read does not.
+      {
+        call: "readOutboxRow",
+        statement: "select r.id from outbox_rows r join messages m on m.id = r.id where r.business_id = $1",
+        problems: ["a table beyond its own: messages"],
+      },
+      {
+        call: "readOpenHolds",
+        statement:
+          "select id from safety_holds where business_id = $1 and exists (select 1 from phones where phones.handle_id = $2)",
+        problems: ["a table beyond its own: phones"],
+      },
+      // A sealed or personal column, by an alias and quoted, the two of tables no read names among them.
+      {
+        call: "readFixedLineFacts",
+        statement: "select p.number from phones p where p.handle_id = $1",
+        problems: ["never named: number"],
+      },
+      {
+        call: "readOutboxRow",
+        statement: "select e.sealed_values from event_log e where e.business_id = $1",
+        problems: ["never named: sealed_values", "a table beyond its own: event_log"],
+      },
+      {
+        call: "readOpenHolds",
+        statement: 'select "r"."sealed_details" from "harm_reports" "r" where "r"."business_id" = $1',
+        problems: ["never named: sealed_details", "a table beyond its own: harm_reports"],
+      },
+      // A business's table read by its key alone: readFixedLineFacts' commit_seq subquery as T-1138 sent it (note b).
+      {
+        call: "readFixedLineFacts",
+        statement:
+          "select r.id from outbox_rows r where r.recipient_handle_id = $1 and r.business_id is null and r.commit_seq < (select o.commit_seq from outbox_rows o where o.id = $2) order by r.commit_seq limit 1",
+        problems: ["a business's table read without its business: outbox_rows o"],
+      },
+      {
+        call: "readOutboxRow",
+        statement: "select id, step from open_questions where handle_id = $1",
+        problems: ["a business's table read without its business: open_questions"],
+      },
+    ];
+    for (const { call, statement, problems } of caught) {
+      expect(problemsOf(statement, call), statement).toEqual(expect.arrayContaining(problems));
+    }
+    // Statements shaped as the reads' own pass: a lateral join and a derived table, `is [not] distinct from`, a cast,
+    // a collation and literals.
+    const clean: { call: Call; statement: string }[] = [
+      {
+        call: "readFixedLineFacts",
+        statement:
+          "select r.id from outbox_rows r where r.recipient_handle_id = $1 and r.business_id is null and r.commit_seq < (select o.commit_seq from outbox_rows o where o.id = $2 and o.business_id is null) and r.final_parts -> 'fixedLines' @> jsonb_build_array($3::text) order by r.commit_seq limit 1",
+      },
+      {
+        call: "readOutboxRow",
+        statement:
+          "select q.id, went.final_parts from open_questions q join lateral (select r.final_parts from outbox_rows r where r.open_question_id = q.id and r.business_id is not distinct from $1 and (select true from outbox_parts p where p.outbox_row_id = r.id and p.state in ('sent', 'delivered') limit 1) order by r.commit_seq desc limit 1) went on true where q.handle_id = $2 and q.business_id is not distinct from $3 and q.id is distinct from $4 order by q.id collate \"C\"",
+      },
+      {
+        call: "readOutboxRow",
+        statement:
+          "select bool_or(kind.listed) as listed from (select 'sensitive' = any(pf_switches_a) as listed from company_kinds where business_id = $1) as kind",
+      },
+    ];
+    for (const { call, statement } of clean) {
+      expect(problemsOf(statement, call), statement).toEqual([]);
+    }
+  });
+
   it(
-    "every statement the three reads send, in every fixture and on the runtime side, names no sealed column and selects no *; nothing is logged; no answer holds a sealed value",
+    "every statement the three reads send, in every fixture and on the runtime side, names only its read's tables and the business of each business's table it reads, no sealed column, no * and no whole row; nothing is logged; no answer holds a sealed value",
     SLOW,
     async () => {
-      const statements: string[] = [];
+      const runs: { call: Call; statements: string[] }[] = [];
       const outcomes: unknown[] = [];
       let logged = 0;
-      const watch = async (read: () => Promise<unknown>): Promise<void> => {
+      const watch = async (call: Call, read: () => Promise<unknown>): Promise<void> => {
         sent.length = 0;
         const run = await unlogged(read);
-        statements.push(...sent);
+        runs.push({ call, statements: [...sent] });
         outcomes.push(run.outcome);
         logged += run.logged;
       };
       for (const file of READ_FIXTURES) {
         const exchange = await given(file);
-        await watch(() => runRead(exchange));
+        await watch(callOf(exchange), () => runRead(exchange));
       }
       const noQuestion = await given("read-outbox-row-no-question.json");
       await addYogaRows();
       await addNoBusinessRows();
       for (const outboxRowId of ["out-nobiz-alex", "out-nobiz-alex-later"]) {
-        await watch(() => readOutboxRow(job, { outboxRowId, businessId: null }, nowOf(noQuestion)));
-        await watch(() => readFixedLineFacts(job, { outboxRowId, businessId: null }, nowOf(noQuestion)));
+        const request = { outboxRowId, businessId: null };
+        await watch("readOutboxRow", () => readOutboxRow(job, request, nowOf(noQuestion)));
+        await watch("readFixedLineFacts", () => readFixedLineFacts(job, request, nowOf(noQuestion)));
       }
-      await watch(() =>
+      await watch("readOutboxRow", () =>
         readOutboxRow(job, { outboxRowId: "out-yoga-alex", businessId: YOGA }, nowOf(noQuestion)),
       );
       const holds = await given("read-open-holds-alex.json");
       await addHoldsElsewhere();
-      await watch(() =>
+      await watch("readOpenHolds", () =>
         readOpenHolds(
           job,
           { handleId: "handle-alex", businessId: null, eventIds: ["evt-alex-nobiz-1"] },
           nowOf(holds),
         ),
       );
+      const statements = runs.flatMap((run) => run.statements);
 
       // The record was read: every table the three reads name was named.
       const named = new Set(statements.flatMap(namesOf));
@@ -1698,6 +2021,18 @@ describe("sealed values: never selected, never answered, never logged (item 35's
         "company_kinds",
       ]) {
         expect(named.has(table), table).toBe(true);
+      }
+      // Each read named its own tables, every one of them and no other (T-1138's security note a; DL-345).
+      for (const call of CALLS) {
+        const ofCall = runs.filter((run) => run.call === call).flatMap((run) => run.statements);
+        expect([...new Set(ofCall.flatMap(tablesOf))].sort(), call).toEqual([...TABLES_OF[call]].sort());
+      }
+      // No statement names a table beyond its read's or a sealed column, selects * or a whole row (a row alias or a
+      // table alone, to_jsonb, row_to_json), or reads a business's table without naming its business (note b).
+      for (const run of runs) {
+        for (const statement of run.statements) {
+          expect(problemsOf(statement, run.call), `${run.call}: ${statement}`).toEqual([]);
+        }
       }
       for (const statement of statements) {
         expect(
