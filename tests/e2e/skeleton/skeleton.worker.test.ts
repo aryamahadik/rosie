@@ -900,7 +900,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       },
     ]);
     // The one words part, handed to the root's FakeLinq under its key, to Sam's chat by iMessage, with the final parts'
-    // words; then marked sent, and the row sent under its one claim.
+    // words; then marked sent, and the row sent under its one claim. Row 13's receipt runs before the trace is judged
+    // (root-run.ts), so the marks also hold its one delivered mark (row 13 asserts it), and the run ends with the row
+    // delivered under the same claim.
     expect(linq.keysInOrder).toEqual([key]);
     expect(linq.requests).toMatchObject([
       {
@@ -913,10 +915,14 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
         overrideOptout: false,
       },
     ]);
-    expect(dispatch.partMarks.map((call) => [call.request.outcome, call.answer])).toMatchObject([
+    expect(
+      dispatch.partMarks
+        .filter((call) => call.request.outcome !== "delivered")
+        .map((call) => [call.request.outcome, call.answer]),
+    ).toMatchObject([
       ["sent", { result: "marked", outboxRowId: row, repeated: false, row: { state: "sent" } }],
     ]);
-    expect(dispatch.row(row)).toMatchObject({ state: "sent", claim: { claimNo: 1 } });
+    expect(dispatch.row(row)).toMatchObject({ state: "delivered", claim: { claimNo: 1 } });
 
     // One dispatch span for the row, the dispatcher's: limit 8 passed, claim 1, the one part sent by Linq.
     const span = onlySpan(facts, "dispatch");
@@ -1002,7 +1008,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // Accepted by the double, and the part marked sent with the message id it gave.
     const accepted = linq.accepted.get(key);
     if (accepted?.providerMessageId == null) throw new Error("the Linq double accepted no part");
-    expect(dispatch.partMarks.map((call) => call.request)).toMatchObject([
+    expect(
+      dispatch.partMarks.filter((call) => call.request.outcome !== "delivered").map((call) => call.request),
+    ).toMatchObject([
       { outcome: "sent", idempotencyKey: key, providerMessageId: accepted.providerMessageId },
     ]);
 
@@ -1059,10 +1067,11 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(dispatch.claims.slice(claimsBefore).map((call) => call.answer)).toEqual([
       { result: "claimed", claimed: [], passedHeld: [] },
     ]);
-    // Still one send: the double's one record, the line handed one request, the part marked once.
+    // Still one send: the double's one record, the line handed one request, the part marked sent once (row 13's
+    // delivered mark aside).
     expect(linq.double.sentRequests()).toHaveLength(1);
     expect(linq.requests).toHaveLength(1);
-    expect(dispatch.partMarks).toHaveLength(1);
+    expect(dispatch.partMarks.filter((call) => call.request.outcome !== "delivered")).toHaveLength(1);
     // No span holds a word of the part.
     expect(
       stringsOf(facts.collected.spans).filter((value) => lines.some((line) => value.includes(line))),
