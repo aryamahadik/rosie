@@ -298,6 +298,159 @@ describe("the routes before web's pages answer as they did (T-1192 adds the page
   });
 });
 
+/** One answer as it was sent: its status, every header and its body's text. */
+async function sentOf(
+  response: Response,
+): Promise<{ status: number; headers: [string, string][]; body: string }> {
+  return { status: response.status, headers: headersOf(response), body: await response.text() };
+}
+
+/** The headers of every JSON answer the Worker and its gateway give, in the order Headers gives them. */
+function jsonHeaders(traceId: string): [string, string][] {
+  return [
+    ["cache-control", "no-store"],
+    ["content-type", "application/json; charset=utf-8"],
+    ["x-trace-id", traceId],
+  ];
+}
+
+// T-1234: these answers were written down from the Worker as it was before it served the shell (main at 16af5be, where
+// this block passed against the servePage Worker), and the shell Worker must give the same bytes.
+describe("health, the webhook doors, the page entry and the 404 answer as before the Worker served the shell, byte for byte (T-1234)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("health: the same status, headers, body and log line", async () => {
+    const logLines = captureLogLines();
+
+    expect(await sentOf(get("/test/health", TRACE_ID))).toEqual({
+      status: 200,
+      headers: jsonHeaders(TRACE_ID),
+      body: `{"ok":true,"service":"rosie","environment":"staging","version":"test-sha","trace_id":"${TRACE_ID}"}`,
+    });
+    expect(logLines()).toEqual([
+      { level: "info", msg: "health", trace_id: TRACE_ID, environment: "staging", version: "test-sha" },
+    ]);
+  });
+
+  it.each(["GET", "POST", "HEAD"])(
+    "the 404: %s on a path no route and no page takes gets the same status, headers, body and log line",
+    async (method) => {
+      const logLines = captureLogLines();
+
+      const sent = await sentOf(send("/test/unknown", { method, headers: { ...READER } }));
+
+      expect(sent).toEqual({
+        status: 404,
+        headers: jsonHeaders(TRACE_ID),
+        body: `{"ok":false,"error":"not_found","trace_id":"${TRACE_ID}"}`,
+      });
+      expect(logLines()).toEqual([
+        { level: "info", msg: "not_found", trace_id: TRACE_ID, environment: "staging", version: "test-sha" },
+      ]);
+    },
+  );
+
+  it.each([
+    "/test/webhooks/linq",
+    "/test/webhooks/resend",
+    "/test/webhooks/stripe/rosfield",
+    "/test/webhooks/stripe/businesses",
+    "/test/webhooks/calendar/google",
+    "/test/webhooks/calendar/microsoft",
+    "/test/page-api/signOut",
+    "/test/page-api/fireNow",
+  ])("a GET on %s: that route's own 405, the same bytes, and no log line", async (path) => {
+    const logLines = captureLogLines();
+
+    const sent = await sentOf(await sendLater(path, { headers: { ...READER } }));
+
+    expect(sent).toEqual({
+      status: 405,
+      headers: jsonHeaders(TRACE_ID),
+      body: `{"ok":false,"error":"method_not_allowed","trace_id":"${TRACE_ID}"}`,
+    });
+    expect(logLines()).toEqual([]);
+  });
+
+  it.each([
+    { path: "/test/webhooks/linq", status: 404, error: "not_found" },
+    { path: "/test/webhooks/resend", status: 401, error: "unauthorized" },
+    { path: "/test/webhooks/stripe/rosfield", status: 401, error: "unauthorized" },
+    { path: "/test/webhooks/stripe/businesses", status: 401, error: "unauthorized" },
+    { path: "/test/webhooks/calendar/google", status: 401, error: "unauthorized" },
+    { path: "/test/webhooks/calendar/microsoft", status: 401, error: "unauthorized" },
+  ])(
+    "a POST on $path: the door's own $status, under a trace id of its own, the same bytes",
+    async ({ path, status, error }) => {
+      captureLogLines();
+
+      const response = await sendLater(path, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-trace-id": TRACE_ID },
+        body: "{}",
+      });
+      const traceId = response.headers.get("x-trace-id") ?? "";
+
+      // A webhook opens a trace id of its own (runtime/src/gateway/answer.ts): the one sent is never kept.
+      expect(traceId).toMatch(UUID);
+      expect(traceId).not.toBe(TRACE_ID);
+      expect(await sentOf(response)).toEqual({
+        status,
+        headers: jsonHeaders(traceId),
+        body: `{"ok":false,"error":"${error}","trace_id":"${traceId}"}`,
+      });
+    },
+  );
+
+  it.each([
+    { name: "a body that is not JSON", body: "not json at all", status: 400, error: "bad_request" },
+    { name: "a JSON body that is no object", body: "[1]", status: 400, error: "bad_request" },
+    { name: "a call whose handler is not joined", body: "{}", status: 503, error: "unavailable" },
+  ])(
+    "the page entry, $name: its own $status under the trace id sent, the same bytes",
+    async ({ body, status, error }) => {
+      captureLogLines();
+
+      const response = await sendLater("/test/page-api/signOut", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-trace-id": TRACE_ID },
+        body,
+      });
+
+      expect(await sentOf(response)).toEqual({
+        status,
+        headers: jsonHeaders(TRACE_ID),
+        body: `{"ok":false,"error":"${error}","trace_id":"${TRACE_ID}"}`,
+      });
+    },
+  );
+
+  it("the page entry, a staging-only call where ENVIRONMENT is production: K-21's stagingOnly with 200, the same bytes", async () => {
+    captureLogLines();
+    const vars = { ...env, ENVIRONMENT: "production", BASE_PATH: "" };
+
+    const response = await Promise.resolve(
+      worker.fetch(
+        new Request("https://rosie.test/page-api/fireNow", {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-trace-id": TRACE_ID },
+          body: "{}",
+        }),
+        vars,
+        createExecutionContext(),
+      ),
+    );
+
+    expect(await sentOf(response)).toEqual({
+      status: 200,
+      headers: jsonHeaders(TRACE_ID),
+      body: '{"error":"stagingOnly"}',
+    });
+  });
+});
+
 /** The HandleActor namespace env.staging binds (T-566), which the pool's env carries. */
 function handleActorBinding(): DurableObjectNamespace {
   const namespace = env.HANDLE_ACTOR;
