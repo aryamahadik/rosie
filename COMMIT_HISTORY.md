@@ -2,9 +2,63 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 363, [`8606bac`](https://github.com/aryamahadik/rosie/commit/8606bac), 2026-11-11 10:54:46 UTC.
+- **Through:** commit 366, [`358f9a6`](https://github.com/aryamahadik/rosie/commit/358f9a6), 2026-11-11 11:16:41 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 366. docs: COMMIT\_HISTORY.md through commit 363 (8606bac, \#370) (\#373)
+
+- **Commit:** [`358f9a6`](https://github.com/aryamahadik/rosie/commit/358f9a6), by Arya Mahadik, 2026-11-11 11:16:41 UTC
+- **Pull request:** [#373](https://github.com/aryamahadik/rosie/pull/373) from `task/commit-history-8`, merged 2026-11-11 11:16:42 UTC. It squashed 1 branch commit:
+  - `43b5083` docs: COMMIT\_HISTORY.md through commit 363 (8606bac, \#370)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 365. T-571: npm run seed:staging runs D-017's seed sets (core, staging-core, skeleton) or the sets named, one runner run each, on the staging database's schema public only, idempotently, printing no URL or phone number; infra/ci/seed-staging.test.mjs proves it on throwaway local databases (\#371)
+
+- **Commit:** [`83bc51a`](https://github.com/aryamahadik/rosie/commit/83bc51a), by Arya Mahadik, 2026-11-11 11:16:37 UTC
+- **Pull request:** [#371](https://github.com/aryamahadik/rosie/pull/371) from `task/T-571`, merged 2026-11-11 11:16:38 UTC. It squashed 1 branch commit:
+  - `db56b4c` T-571: npm run seed:staging runs D-017's seed sets (core, staging-cor…
+- **Files changed:** 3 (+612 −1), by folder:
+  - `infra/ci/` seed-staging.test.mjs +452 −0
+  - `infra/scripts/` seed-staging.sh +158 −0
+  - `/` package.json +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 364. T-1213: the gateway opens a number's chat at receipt (K-05 v1.7 openChatOnText), so e2e row 11's JOIN reply is claimed and sent (\#372)
+
+- **Commit:** [`fa50818`](https://github.com/aryamahadik/rosie/commit/fa50818), by Arya Mahadik, 2026-11-11 11:16:33 UTC
+- **Pull request:** [#372](https://github.com/aryamahadik/rosie/pull/372) from `task/T-1213`, merged 2026-11-11 11:16:33 UTC. It squashed 1 branch commit:
+  - `f541beb` T-1213: the gateway opens a number's chat at receipt (K-05 v1.7 openC…
+- **Files changed:** 34 (+1964 −116), by folder:
+  - `runtime/src/gateway/` chat-open.ts +145 −0, chat-open.worker.test.ts +626 −0, hand-off.ts +47 −8, index.ts +16 −0, linq-webhook.ts +28 −5, seal.ts +12 −0, test-support.ts +78 −2, types.ts +40 −0
+  - `runtime/src/wiring/` bind.ts +1 −0, chat-open.test.ts +307 −0, closed.ts +2 −1, hop10.worker.test.ts +2 −0, hop11.worker.test.ts +7 −4, hop2.worker.test.ts +2 −0, hop3.worker.test.ts +2 −0, hop4.worker.test.ts +2 −0, hop5.worker.test.ts +2 −0, hop6.worker.test.ts +2 −0, hop7.worker.test.ts +2 −0, hop8.worker.test.ts +2 −0, hop9.worker.test.ts +2 −0, index.ts +4 −0, linq.test.ts +2 −0, picks.ts +7 −2, ports.ts +11 −3, real.ts +88 −13, root.test.ts +37 −9, root.ts +21 −2, root.worker.test.ts +3 −1, test-phone.worker.test.ts +2 −0, test-support.ts +320 −30
+  - `tests/e2e/skeleton/` README.md +3 −3, root-run.ts +1 −0, skeleton.worker.test.ts +138 −33
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+A new chatOpen port (real in test and staging, closed in production, null in workerRoot until T-567) carries K-05 v1.7 openChatOnText. The gateway calls it once per text or photo a phone handle sends through Linq, after the key call (whose answer now gives the handle id) and before the actor's door, with the event's id, service, receivedAt and trace, never the number. transient or a throw: 503, nothing stored; notFound, notAPhone, or a request K-05 would refuse before reading: the text is stored, the code on the receive span. The K-05 double follows db/repo/chat-open.ts and writes the phone row the sendState and renewClaim doubles read; the key double finds test owner 1's seeded handle-sam. E2e rows 1 and 11 claim the call and the sent reply.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 363. docs: COMMIT\_HISTORY.md through commit 361 (5c22bf5, \#368) (\#370)
 
