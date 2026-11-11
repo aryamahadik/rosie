@@ -9,7 +9,10 @@
 //     (T-1198), a core action writes the timer rows instead: its result names them in its own words and `written` leaves
 //     them out, as the commit answers since T-1194 (actions/src/commit default 9; K-09 v1.5 default 134). With
 //     `loseNextAnswer` set (T-1203), the next first commit writes its rows but its answer is lost on the way back (the
-//     call throws: the lease's `noAnswer`), so only the repeat of that turn id answers, with no rows.
+//     call throws: the lease's `noAnswer`), so only the repeat of that turn id answers, with no rows. With `answerShape`
+//     "k05" (T-1204), it answers as a K-05-shaped commit hook does instead: K-05 v1 commitTurn.response, K-05's own
+//     commitResult in `committed` (every row the commit wrote; no core results, no flag inside it), and a repeat flagged on
+//     the lease's answer alone, with no rows and the first commit's outbox rows (commit-repeat-same-turn.json).
 //   - `SAM_TIMER` is K-34's seed timer (seed-safety-timer.json): Sam alone on Alex's move survey, due 11:20am New York
 //     time, Morgan Lee the contact who said yes, the job's address sealed under Alex's key (stand-in bytes).
 // Test values only: the master's sample cast and the frozen fixtures' ids (rule 9).
@@ -59,6 +62,12 @@ export interface FakeToolApi {
    * throws (the lease's `noAnswer`); the answer is not in `answers`. Set back to false once used.
    */
   loseNextAnswer: boolean;
+  /**
+   * How the next first commits answer (T-1204): "k09" (the default), K-09 gateAndCommit.committed through the turn's commit
+   * hook; or "k05", K-05 v1 commitTurn.response, whose commitResult lists every row the commit wrote (`timersByCore` is not
+   * read: K-05 has no core results). A repeat answers in its first commit's shape.
+   */
+  answerShape: "k09" | "k05";
   /** Every reload's handle id, in order. */
   readonly reloads: string[];
   /** While true the reload throws (no answer), as a core with PostgreSQL down does. */
@@ -78,6 +87,7 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
     writes: [],
     timersByCore: null,
     loseNextAnswer: false,
+    answerShape: "k09",
     reloads: [],
     reloadDown: false,
     commit(request) {
@@ -87,15 +97,21 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
         // A repeat writes nothing: its rows are empty, and the first commit comes back.
         const again = structuredClone(known) as CommitTurnAnswer & { committed: Json };
         const committed = again.committed;
-        const repeat = {
-          ...again,
-          repeated: true,
-          committed: {
-            ...committed,
-            repeated: true,
-            written: { written: [], outboxRows: [], promoted: [] },
-          },
-        } as CommitTurnAnswer;
+        // K-05's commitResult (its rows a list) has no flag inside it: the lease's answer alone says repeated, and the
+        // turn's outbox rows are read back by turn id (K-05 v1 commitResult; commit-repeat-same-turn.json).
+        const repeat = (
+          Array.isArray(committed.written)
+            ? { ...again, repeated: true, committed: { ...committed, written: [], promoted: [] } }
+            : {
+                ...again,
+                repeated: true,
+                committed: {
+                  ...committed,
+                  repeated: true,
+                  written: { written: [], outboxRows: [], promoted: [] },
+                },
+              }
+        ) as CommitTurnAnswer;
         fake.answers.push(structuredClone(repeat));
         return Promise.resolve(repeat);
       }
@@ -108,7 +124,7 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
         if (write.version === 1) {
           rows.push({ table: "clock_rows", rowId: write.clock_row_id, version: 1 });
         }
-        if (fake.timersByCore !== null) {
+        if (fake.timersByCore !== null && fake.answerShape === "k09") {
           core.push({
             call: fake.timersByCore,
             response: { timerId: write.id, version: write.version },
@@ -118,24 +134,33 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
       }
       // A core action's rows are left out of `written` (default 9): only the walk's are listed.
       const written = core.length === 0 ? rows : [];
-      const answer: CommitTurnAnswer = {
-        result: "committed",
-        turnId: request.turn.id,
-        committedAt,
-        repeated: false,
-        committed: {
-          result: "committed",
-          turnId: request.turn.id,
-          committedAt,
-          repeated: false,
-          parts: [],
-          planner: null,
-          core,
-          written: { written, outboxRows: [], promoted: [] },
-          effects: [],
-          openQuestions: { opened: [], closed: [] },
-        },
-      };
+      const answer: CommitTurnAnswer =
+        fake.answerShape === "k05"
+          ? {
+              result: "committed",
+              turnId: request.turn.id,
+              committedAt,
+              repeated: false,
+              committed: { written: rows, outboxRows: [], promoted: [] },
+            }
+          : {
+              result: "committed",
+              turnId: request.turn.id,
+              committedAt,
+              repeated: false,
+              committed: {
+                result: "committed",
+                turnId: request.turn.id,
+                committedAt,
+                repeated: false,
+                parts: [],
+                planner: null,
+                core,
+                written: { written, outboxRows: [], promoted: [] },
+                effects: [],
+                openQuestions: { opened: [], closed: [] },
+              },
+            };
       first.set(request.turn.id, structuredClone(answer));
       if (fake.loseNextAnswer) {
         // Committed, rows and all, but the answer never comes back.
