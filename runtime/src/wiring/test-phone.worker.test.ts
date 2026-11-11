@@ -237,6 +237,8 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     // The gate port (T-559) over its reads' doubles, its one commit through the turn-row port to the K-05 double.
     turnRows: fakes.turnRows.calls,
     gateReads: fakes.gate.reads,
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
     flags: fakeFlags(options.flagOn === false ? [] : [SKELETON_FLAG]),
     testPhone,
   });
