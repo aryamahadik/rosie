@@ -16,6 +16,9 @@
 //
 // T-1135 adds the v1.2 outbox calls' tests at the end of this file (K-05 v1.1 items 13 to 16, v1.2 items 30 to 32): the
 // v1 tests above run unchanged.
+//
+// T-1227 adds, after them, the tests of K-05 v1.9 item 48: markPartV12's answer says what a repeated delivery receipt
+// repeats (repeatedDelivery). T-1135's tests run unchanged: its helpers now check markPartV12's answers against v1.9.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -1451,8 +1454,13 @@ describe("writePlan writes only this row's plan, at the version read", () => {
 // outcome as that step's version states it: the fields a later version adds are left out (v1.1's claim, claimedFrom and
 // row for a v1 exchange; v1.2's port and recipient for a v1.1 exchange), since every v1 and v1.1 exchange is a v1.2
 // exchange (K-05 v1.2). Each answer of these calls is checked against data-access v1.2 in full, the added fields with it.
+//
+// From T-1227 markPartV12 answers as K-05 v1.9 says (item 48): its answer also states repeatedDelivery. So each of its
+// answers is checked against v1.9's markPart.v1dot9Response in full, and repeatedDelivery is left out when an answer is
+// compared with an exchange of v1 to v1.8, as the other added fields are: every v1 to v1.8 exchange is a v1.9 one.
 
 const V12_ID = schemaId("data-access/data-access.v1.2.schema.json");
+const V19_ID = schemaId("data-access/data-access.v1.9.schema.json");
 const LATEST_CALLS = ["claimOutbox", "renewClaim", "markPart", "markRow"];
 /** The v1.1 and v1.2 fixtures T-1135's card names (its "Reads"). */
 const CARD_LATEST_FIXTURES = [
@@ -1484,9 +1492,22 @@ type Fields = Record<string, unknown>;
 const without = (record: Fields, keys: readonly string[]): Fields =>
   Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));
 
-/** A v1.2 answer as an exchange of `version` states it: the fields a later version adds left out. */
+/** A K-05 version's minor number: 0 for v1, 9 for v1.9. */
+const minorOf = (version: string): number => Number(version.split(".")[1] ?? "0");
+
+/**
+ * A v1.2 call's answer as an exchange of `version` states it: the fields a later version adds left out. markPartV12's
+ * answer is v1.9's (T-1227), so its repeatedDelivery is left out for an exchange of v1 to v1.8.
+ */
 function asVersion(call: string, answer: unknown, version: string): unknown {
-  if (!isRecord(answer) || "error" in answer || version === "v1.2") {
+  if (!isRecord(answer) || "error" in answer) {
+    return answer;
+  }
+  if (call === "markPart") {
+    const added = minorOf(version) >= 9 ? [] : ["repeatedDelivery"];
+    return without(answer, version === "v1" ? ["row", ...added] : added);
+  }
+  if (version === "v1.2") {
     return answer;
   }
   switch (call) {
@@ -1496,17 +1517,31 @@ function asVersion(call: string, answer: unknown, version: string): unknown {
     }
     case "renewClaim":
       return without(answer, ["recipient"]);
-    case "markPart":
-      return version === "v1" ? without(answer, ["row"]) : answer;
     default:
       return answer;
   }
 }
 
-/** An answer against data-access v1.2: its call's response, or its errors. */
+/**
+ * An answer against data-access v1.2: its call's response, or its errors. markPartV12's answer is checked against
+ * v1.9's markPart.v1dot9Response, the answer a v1.9 call gives (T-1227): row and repeatedDelivery always stated.
+ */
 function latestErrors(call: string, outcome: unknown): string[] {
   const error = isRecord(outcome) ? outcome.error : undefined;
+  if (call === "markPart" && error === undefined) {
+    return schemaErrors(V19_ID, "markPart.v1dot9Response", outcome);
+  }
   return schemaErrors(V12_ID, error === undefined ? `${call}.response` : `${call}.errors`, outcome);
+}
+
+/**
+ * A markPart request with its answer as one K-05 v1.9 exchange. markPart.v1dot9Response alone cannot see the request;
+ * markPart.exchange ties repeatedDelivery to it: a delivery receipt answered repeated states the delivery it repeats,
+ * never null, and a mark that is no delivery states none (T-1226's security note a).
+ */
+function markExchangeErrors(request: unknown, outcome: unknown): string[] {
+  const given: Given = { k04Seeds: [], after: [], now: "2026-11-07T15:07:00Z" };
+  return schemaErrors(V19_ID, "markPart.exchange", { call: "markPart", given, request, outcome });
 }
 
 /** Runs one exchange's request: the four v1.2 calls and armClock here, and the rest as runExchange runs them. */
@@ -1564,10 +1599,20 @@ async function renew(request: RenewClaimRequest): Promise<RenewClaimOutcome> {
   return outcome;
 }
 
-async function markV12(request: MarkPartV12Request): Promise<MarkPartV12Outcome> {
+/** markPartV12's answer in full, as K-05 v1.9 states it: checked against its answer's definition and as an exchange. */
+async function markV19(request: MarkPartV12Request): Promise<MarkPartV12Outcome> {
   const outcome = await markPartV12(runtime, request);
   expect(latestErrors("markPart", outcome)).toEqual([]);
+  expect(markExchangeErrors(request, outcome)).toEqual([]);
   return outcome;
+}
+
+/**
+ * markPartV12's answer as K-05 v1.2 states it, for T-1135's tests: checked in full first (markV19), then v1.9's
+ * repeatedDelivery left out.
+ */
+async function markV12(request: MarkPartV12Request): Promise<unknown> {
+  return asVersion("markPart", await markV19(request), "v1.2");
 }
 
 async function limit8V12(request: MarkRowV12Request): Promise<MarkRowV12Outcome> {
@@ -2635,4 +2680,439 @@ describe("markRowV12: waitingChat lets the claim go; the other outcomes keep it 
     expect(await rowNow(held)).toEqual({ state: "waiting_chat", version: 6, held_until: null });
     expect(await claimNow(held)).toBeUndefined();
   });
+});
+
+// ==== T-1227: K-05 v1.9 item 48, a repeated delivery receipt says what it repeats ====================================
+//
+// markPartV12 answers every mark with repeatedDelivery. On a delivery receipt that repeats a recorded delivery it is
+// { firstOfRow, deliveredAt }: firstOfRow is true when no other part try of the row holds an earlier delivered_at, a
+// tie counting as first (K-05 default 85), and deliveredAt is the part try's stored delivered_at, never the repeat's
+// own time (default 86). On every other answer it is null (default 87). A repeat writes nothing, and firstDelivery
+// keeps v1's meaning: false on every repeat (default 88). Each answer is checked against v1.9's
+// markPart.v1dot9Response and, with its request, as a v1.9 markPart.exchange (markV19), since the answer's definition
+// alone cannot see the request.
+
+/** K-05 v1.9's accepted markPart exchanges (T-1226), each on A7-03's two-part row. */
+const V19_FIXTURES = INDEX.filter(
+  (entry) => entry.version === "v1.9" && entry.expect === "accept" && entry.def === "markPart.exchange",
+).map((entry) => entry.file);
+/** K-05 v1.9's refused markPart fixtures (T-1226). */
+const V19_REFUSED = INDEX.filter(
+  (entry) =>
+    entry.version === "v1.9" && entry.expect === "refuse" && (entry.def ?? "").startsWith("markPart."),
+).map((entry) => entry.file);
+/** K-05 v1 to v1.8's accepted markPart exchanges, but T-1136's: none of them repeats a delivery. */
+const EARLIER_MARK_FIXTURES = INDEX.filter(
+  (entry) =>
+    minorOf(entry.version) < 9 &&
+    entry.expect === "accept" &&
+    entry.def === "markPart.exchange" &&
+    !LATER_FIXTURES.includes(entry.file),
+).map((entry) => entry.file);
+
+describe("K-05 v1.9's markPart fixtures: each request gives its response (T-1227)", () => {
+  const WORDS_REPEAT = "mark-a7-03-delivered-repeat.json";
+  const POLL_REPEAT = "mark-a7-03-poll-delivered-repeat.json";
+  const refusedAnswer = (file: string): Fields => readJson(new URL(`invalid/${file}`, ACCESS_DIR)) as Fields;
+
+  it("covers v1.9's three accepted and three refused markPart fixtures", () => {
+    expect(V19_FIXTURES).toEqual([WORDS_REPEAT, "mark-a7-03-poll-delivered.json", POLL_REPEAT]);
+    expect(V19_REFUSED).toEqual([
+      "invalid/refuse-mark-repeat-delivery-left-out.json",
+      "invalid/refuse-mark-repeat-says-first-delivery.json",
+      "invalid/refuse-mark-delivered-repeat-null.json",
+    ]);
+  });
+
+  for (const file of V19_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // The whole answer, repeatedDelivery with it: nothing is left out for a v1.9 exchange.
+      expect(fixtureVersion(file)).toBe("v1.9");
+      expect(asVersion(exchange.call, answer, fixtureVersion(file))).toEqual(answer);
+      expect(answer).toEqual(exchange.outcome);
+      expect(latestErrors(exchange.call, answer)).toEqual([]);
+      // As an exchange too, with the fixture's own request: is it a delivery receipt, and is the answer a repeat?
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...exchange, outcome: answer })).toEqual([]);
+    });
+  }
+
+  it(
+    "a repeat writes nothing: no row, part or claim changes, and it answers the same again",
+    SLOW,
+    async () => {
+      for (const file of [WORDS_REPEAT, POLL_REPEAT]) {
+        const exchange = await givenLatest(file);
+        const before = await everythingNow();
+        expect(await runLatest(exchange), file).toEqual(exchange.outcome);
+        expect(await runLatest(exchange), file).toEqual(exchange.outcome);
+        expect(await everythingNow(), file).toEqual(before);
+      }
+    },
+  );
+
+  it(
+    "refuse-mark-repeat-delivery-left-out.json: the call's answer to a repeat always states what it repeats",
+    SLOW,
+    async () => {
+      const leftOut = refusedAnswer("refuse-mark-repeat-delivery-left-out.json");
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", leftOut)).not.toEqual([]);
+      const twin = await givenLatest(WORDS_REPEAT);
+      const answer = await runLatest(twin);
+      // Put right, it is its twin's outcome: what the call answers on that chain.
+      expect(answer).toEqual({
+        ...leftOut,
+        repeatedDelivery: { firstOfRow: true, deliveredAt: "2026-10-23T14:05:04Z" },
+      });
+      expect(answer).toEqual(twin.outcome);
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", answer)).toEqual([]);
+    },
+  );
+
+  it(
+    "refuse-mark-repeat-says-first-delivery.json: a repeat of the row's first delivery never says firstDelivery",
+    SLOW,
+    async () => {
+      const saysFirst = refusedAnswer("refuse-mark-repeat-says-first-delivery.json");
+      expect(schemaErrors(V19_ID, "markPart.response", saysFirst)).not.toEqual([]);
+      const twin = await givenLatest(WORDS_REPEAT);
+      const answer = await runLatest(twin);
+      // Put right, it is its twin's outcome: firstDelivery false beside the first delivery it repeats.
+      expect(answer).toEqual({ ...saysFirst, firstDelivery: false });
+      expect(answer).toEqual(twin.outcome);
+      expect(schemaErrors(V19_ID, "markPart.response", answer)).toEqual([]);
+    },
+  );
+
+  it(
+    "refuse-mark-delivered-repeat-null.json: a repeated receipt is never answered null; only the exchange refuses it",
+    SLOW,
+    async () => {
+      const file = "invalid/refuse-mark-delivered-repeat-null.json";
+      const refused = exchangeOf(file);
+      expect(schemaErrors(V19_ID, "markPart.exchange", refused)).not.toEqual([]);
+      // Its answer alone passes markPart.v1dot9Response, which cannot see the request (T-1226's security note a): so
+      // every answer here is checked as an exchange too.
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", refused.outcome)).toEqual([]);
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // Put right, its outcome is its twin's: the poll's delivery, not the row's first.
+      expect(answer).not.toEqual(refused.outcome);
+      expect(answer).toEqual(exchangeOf(POLL_REPEAT).outcome);
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...refused, outcome: answer })).toEqual([]);
+    },
+  );
+});
+
+describe("K-05 v1 to v1.8's markPart fixtures: each answer is its outcome with repeatedDelivery null (T-1227)", () => {
+  it("covers every earlier accepted markPart exchange but T-1136's", () => {
+    expect([...EARLIER_MARK_FIXTURES].sort()).toEqual([
+      "mark-a7-03-delivered-by-key.json",
+      "mark-a7-03-failed-4006.json",
+      "mark-a7-03-poll-failed.json",
+      "mark-a7-03-poll-sent.json",
+      "mark-delivered-by-key.json",
+      "mark-delivered.json",
+      "mark-failed-4006.json",
+      "mark-failed-retry-after.json",
+      "mark-sent.json",
+    ]);
+  });
+
+  for (const file of EARLIER_MARK_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // None of them repeats a delivery: the field is stated, null. v1's exchanges have no row, which the call adds.
+      const stated = isRecord(answer) && fixtureVersion(file) === "v1" ? without(answer, ["row"]) : answer;
+      expect(stated).toEqual({ ...exchange.outcome, repeatedDelivery: null });
+      expect(latestErrors(exchange.call, answer)).toEqual([]);
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...exchange, outcome: answer })).toEqual([]);
+    });
+  }
+});
+
+describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227; K-05 v1.9 item 48)", () => {
+  const NOW = "2026-11-07T15:07:00Z";
+  const id = "out-avery-repeat";
+  const WORDS_MESSAGE = "linq-test-1401";
+  const POLL_MESSAGE = "linq-test-1402";
+  const keyOf = (partNo: number, tryNo = 1): string => `${id}/${String(partNo)}/${String(tryNo)}`;
+
+  /** The test row, Avery's, with these sends: planned, then claimed by a v1.2 claim (sending, version 3, claim 1). */
+  async function claimedV12(sends: Json[]): Promise<void> {
+    await givenLatest("claim-in-order-with-port.json");
+    await addRow(id, "handle-avery");
+    expect(await plan(planRequest(id, 1, sends))).toMatchObject({ result: "written", version: 2 });
+    const { claimed } = await claimV12({
+      claimer: "dispatcher-1",
+      recipientHandleId: "handle-avery",
+      now: NOW,
+      limit: 10,
+    });
+    expect(claimed.map((row) => [row.outboxRowId, row.version, row.claim.claimNo])).toEqual([[id, 3, 1]]);
+  }
+
+  const sent = (partNo: number, providerMessageId: string, tryNo = 1): MarkPartV12Request => ({
+    outcome: "sent",
+    idempotencyKey: keyOf(partNo, tryNo),
+    providerMessageId,
+    providerOptionIds: null,
+    at: NOW,
+  });
+  /** A delivery receipt: Linq's message id and time, and the part's key when it echoes one. */
+  const receipt = (providerMessageId: string, at: string, idempotencyKey?: string): MarkPartV12Request =>
+    idempotencyKey === undefined
+      ? { outcome: "delivered", providerMessageId, at }
+      : { outcome: "delivered", providerMessageId, at, idempotencyKey };
+
+  /** markPartV12's whole answer for try 1 of a part of the test row, which asks no question; `fields` over it. */
+  const answerOf = (partNo: number, fields: Fields): Fields => ({
+    result: "marked",
+    outboxRowId: id,
+    partNo,
+    tryNo: 1,
+    attempts: 1,
+    repeated: false,
+    firstDelivery: false,
+    openQuestionId: null,
+    nextKey: null,
+    repeatedDelivery: null,
+    ...fields,
+  });
+  /** A repeated receipt's whole answer: repeated, never firstDelivery, the row as it stands, and what it repeats. */
+  const repeatOf = (
+    partNo: number,
+    row: Fields,
+    firstOfRow: boolean,
+    deliveredAt: string,
+    fields: Fields = {},
+  ): Fields =>
+    answerOf(partNo, { repeated: true, row, repeatedDelivery: { firstOfRow, deliveredAt }, ...fields });
+
+  it(
+    "a repeat of a row's only delivery: the row's first, at the stored time, never the repeat's own; nothing written",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS]);
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { row: { state: "sent", version: 4 } }),
+      );
+      const deliveredAt = "2026-11-07T15:07:04Z";
+      expect(await markV19(receipt(WORDS_MESSAGE, deliveredAt))).toEqual(
+        answerOf(1, { firstDelivery: true, row: { state: "delivered", version: 5 } }),
+      );
+      const before = await everythingNow();
+      const repeat = repeatOf(1, { state: "delivered", version: 5 }, true, deliveredAt);
+      // Linq's retry is the same event, with the same time (STATE note 38's crash before armClock).
+      expect(await markV19(receipt(WORDS_MESSAGE, deliveredAt))).toEqual(repeat);
+      // A second report of the part may carry another time, later or earlier: the answer is the record's.
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:09:30Z"))).toEqual(repeat);
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:00:00Z", keyOf(1)))).toEqual(repeat);
+      // Twenty at once: each answers the same, one after the other under the row's lock.
+      const together = await Promise.all(
+        Array.from({ length: 20 }, () =>
+          settled(() => markPartV12(runtime, receipt(WORDS_MESSAGE, "2026-11-07T15:09:31Z"))),
+        ),
+      );
+      expect(together).toEqual(Array.from({ length: 20 }, () => repeat));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "a repeat of a later part's delivery says firstOfRow false; the first part's repeat says true, before and after",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:06Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { row: { state: "sending", version: 4 } }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        answerOf(1, { firstDelivery: true, row: { state: "sending", version: 5 } }),
+      );
+      // The words' receipt again while the poll is still to go: the row's first delivery.
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        repeatOf(1, { state: "sending", version: 5 }, true, wordsAt),
+      );
+      expect(await markV19(sent(2, POLL_MESSAGE))).toEqual(
+        answerOf(2, { row: { state: "sent", version: 6 } }),
+      );
+      // The poll's delivery is recorded: the row's second, and no repeat.
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(
+        answerOf(2, { row: { state: "delivered", version: 7 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 7 };
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it("two parts delivered at one time: a tie counts as first for each", SLOW, async () => {
+    await claimedV12([WORDS, POLL]);
+    const at = "2026-11-07T15:07:04Z";
+    expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+    expect(await markV19(sent(2, POLL_MESSAGE))).toEqual(answerOf(2, { row: { state: "sent", version: 5 } }));
+    expect(await markV19(receipt(WORDS_MESSAGE, at))).toEqual(
+      answerOf(1, { firstDelivery: true, row: { state: "sent", version: 6 } }),
+    );
+    expect(await markV19(receipt(POLL_MESSAGE, at))).toEqual(
+      answerOf(2, { row: { state: "delivered", version: 7 } }),
+    );
+    const before = await everythingNow();
+    const row = { state: "delivered", version: 7 };
+    expect(await markV19(receipt(WORDS_MESSAGE, at))).toEqual(repeatOf(1, row, true, at));
+    expect(await markV19(receipt(POLL_MESSAGE, at))).toEqual(repeatOf(2, row, true, at));
+    expect(await everythingNow()).toEqual(before);
+  });
+
+  it(
+    "receipts recorded out of the order of their times: a repeat reads the row's first delivery from the times",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:16Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({
+        repeated: false,
+        repeatedDelivery: null,
+      });
+      expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+      // The poll's receipt is recorded first and says firstDelivery; the words' receipt, late, holds the earlier time.
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(
+        answerOf(2, { firstDelivery: true, row: { state: "sent", version: 6 } }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        answerOf(1, { row: { state: "delivered", version: 7 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 7 };
+      // By the times the record holds (K-05 default 85; open gap 54): the earlier-timed delivery is the row's first.
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "a late receipt of an earlier try after a 4006: each try's repeat is read by the times, across the part's tries",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS]);
+      const minute = "2026-11-07T15:08:00Z";
+      const failure = { outcome: "failed", idempotencyKey: keyOf(1), errorCode: "4006" } as const;
+      expect(await markV19({ ...failure, retry: false, at: NOW })).toEqual(
+        answerOf(1, { row: { state: "sending", version: 4 } }),
+      );
+      // K-07 rule 2: no receipt within a minute, so the next try under a new key.
+      expect(await markV19({ ...failure, retry: true, at: minute })).toEqual(
+        answerOf(1, { nextKey: keyOf(1, 2), row: { state: "sending", version: 5 } }),
+      );
+      const retryMessage = "linq-test-1403";
+      const retryAt = "2026-11-07T15:08:10Z";
+      const lateAt = "2026-11-07T15:07:30Z";
+      expect(await markV19(sent(1, retryMessage, 2))).toEqual(
+        answerOf(1, { tryNo: 2, row: { state: "sent", version: 6 } }),
+      );
+      expect(await markV19(receipt(retryMessage, retryAt))).toEqual(
+        answerOf(1, { tryNo: 2, firstDelivery: true, row: { state: "delivered", version: 7 } }),
+      );
+      // The first try's receipt comes late, with its earlier time, found by its key (a 4006 gave no message id).
+      expect(await markV19(receipt(WORDS_MESSAGE, lateAt, keyOf(1)))).toEqual(
+        answerOf(1, { row: { state: "delivered", version: 8 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 8 };
+      expect(await markV19(receipt(WORDS_MESSAGE, lateAt, keyOf(1)))).toEqual(repeatOf(1, row, true, lateAt));
+      expect(await markV19(receipt(retryMessage, retryAt))).toEqual(
+        repeatOf(1, row, false, retryAt, { tryNo: 2 }),
+      );
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "an attempt, a sent mark and a failure, each also when repeated, state repeatedDelivery null",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const sending = (version: number): Fields => ({ state: "sending", version });
+      expect(await markV19({ outcome: "attempt", idempotencyKey: keyOf(1), at: NOW })).toEqual(
+        answerOf(1, { attempts: 2, row: sending(4) }),
+      );
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(answerOf(1, { attempts: 2, row: sending(5) }));
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { attempts: 2, repeated: true, row: sending(5) }),
+      );
+      const failure: MarkPartV12Request = {
+        outcome: "failed",
+        idempotencyKey: keyOf(2),
+        errorCode: "poll.failed",
+        retry: true,
+        at: NOW,
+      };
+      expect(await markV19(failure)).toEqual(answerOf(2, { nextKey: keyOf(2, 2), row: sending(6) }));
+      expect(await markV19(failure)).toEqual(
+        answerOf(2, { repeated: true, nextKey: keyOf(2, 2), row: sending(6) }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:07:04Z"))).toEqual(
+        answerOf(1, { attempts: 2, firstDelivery: true, row: sending(7) }),
+      );
+      // A sent mark repeated after its part's delivery is no delivery receipt: null, though the part is delivered.
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { attempts: 2, repeated: true, row: sending(7) }),
+      );
+    },
+  );
+
+  it(
+    "a delivered part that holds no delivered_at fails loudly, never by a guess, and nothing is written",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:06Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({
+        repeated: false,
+        repeatedDelivery: null,
+      });
+      expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toMatchObject({ firstDelivery: true });
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toMatchObject({ row: { state: "delivered" } });
+      // No K-05 call leaves a delivered part without its time, and K-04 v1 has no CHECK against it: the tables' owner
+      // takes the poll's away here.
+      await db.sql`
+        update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
+      `;
+      const before = await everythingNow();
+      // The repeated part try itself holds no time to answer with.
+      await expect(markPartV12(runtime, receipt(POLL_MESSAGE, pollAt))).rejects.toThrow(
+        "a delivered part holds no delivered_at",
+      );
+      // Nor can the words' repeat say whether theirs was the row's first: another delivered part try holds no time.
+      await expect(markPartV12(runtime, receipt(WORDS_MESSAGE, wordsAt))).rejects.toThrow(
+        "a delivered part holds no delivered_at",
+      );
+      expect(await everythingNow()).toEqual(before);
+      // A mark that is no delivery receipt reads none of it, and v1's markPart answers its repeat as it always did.
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: true, repeatedDelivery: null });
+      expect(await mark({ outcome: "delivered", providerMessageId: POLL_MESSAGE, at: pollAt })).toEqual({
+        result: "marked",
+        outboxRowId: id,
+        partNo: 2,
+        tryNo: 1,
+        attempts: 1,
+        repeated: true,
+        firstDelivery: false,
+        openQuestionId: null,
+        nextKey: null,
+      });
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
 });
