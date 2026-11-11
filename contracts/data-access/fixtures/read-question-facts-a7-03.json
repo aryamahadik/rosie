@@ -1,0 +1,22 @@
+{
+  "call": "readQuestionFacts",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json", "seed-reservation.json"],
+    "after": ["commit-opens-question.json"],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "The tour's A7-03 (tour lines 423 to 427): Alex's question which new time, oq-a7-03-alex, about his haircut at Lee's Barbershop, asked with a 24-hour Clock line, as the clock arming reads it at the words' first delivery at 14:05:04Z. K-04's seed-reservation.json holds the haircut's one reservation, rsv-alex-haircut, booked with Riley for [2026-10-24T15:00:00Z, 15:30:00Z), so the visit is flow A (the booking's, seed-booking-head.json) starting at 15:00:00Z; its saved time with Avery and the two waiting rows name no booking, and the movers' released truck is another business's, so none of them is read. The question has no never-delivered row. The due rule then gives the Clock line's 24 h from the delivery, 2026-10-24T14:05:04Z, before the visit's start, so the clock arms as arm-clock-a7-03-after-4006's request arms it. No address is read or answered (K-30 is not migrated: README default 91)."
+  },
+  "request": {
+    "openQuestionId": "oq-a7-03-alex"
+  },
+  "outcome": {
+    "openQuestionId": "oq-a7-03-alex",
+    "clockLine": "24 h",
+    "businessZone": "America/New_York",
+    "visit": {
+      "flow": "A",
+      "startsAt": "2026-10-24T15:00:00Z"
+    },
+    "neverDelivered": null
+  }
+}
