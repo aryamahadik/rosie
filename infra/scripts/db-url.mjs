@@ -1,15 +1,19 @@
 // The database URL of the release scripts, checked and scrubbed (T-569; the security reviews of its rounds 1 and 2,
-// DL-356 and DL-363). migrate.mjs (deploy step 1), publish-bundle.sh (step 3) and infra/flags/flags.mjs (step 4) check
-// their URL here before any client is built, and print a failure only through describeError, so no line they print
-// holds any part of the URL. Left to itself, postgres.js throws a URL error whose `input` property holds the whole
-// string, password included (Node prints that property for an error no catch takes); reads a password holding a #, /
-// or ? after digits as a URL whose host is the user; and its errors name the host of a database that does not answer.
+// DL-356 and DL-363; T-1210). migrate.mjs (deploy step 1), publish-bundle.sh (step 3), infra/flags/flags.mjs (step 4)
+// and db/seeds/run.mjs check their URL here before any client is built, and print a failure only through
+// describeError, so no line they print holds any part of the URL. Left to itself, postgres.js throws a URL error whose
+// `input` property holds the whole string, password included (Node prints that property for an error no catch takes);
+// reads a password holding a #, / or ? after digits as a URL whose host is the user; takes its hosts from after the
+// first @ (Node's host follows the last), decoded and split at each comma into hosts it tries in turn, so
+// postgres://u:p@<remote>,x@127.0.0.1/db names 127.0.0.1 to Node and connects to <remote> first (T-201's security
+// review, note a); and its errors name the host of a database that does not answer.
 //
 //   checkDatabaseUrl(raw)            the URL, checked: one postgres:// URL that Node and postgres.js read alike, so a
-//                                    client connects only where it names. Returns its parts, what no printed line may
-//                                    hold: the whole URL (as given and as Node writes it), its user, password and
-//                                    database name (each as written and decoded), its host (with and without the port,
-//                                    each of several hosts, an IPv6 address with and without brackets) and its port.
+//                                    client connects only where it names: one host, after at most one @ (an @ or a
+//                                    comma in the user or password is written %40 or %2C). Returns its parts, what no
+//                                    printed line may hold: the whole URL (as given and as Node writes it), its user,
+//                                    password and database name (each as written and decoded), its host (with and
+//                                    without the port, an IPv6 address with and without brackets) and its port.
 //                                    Throws DatabaseUrlFault, whose message names the fault and holds no part of it.
 //   scrub(text, parts, error)        the text with each part taken out. With an error, the address, host name and port
 //                                    its own fields name are taken out too: a host name can show resolved to an address.
@@ -34,6 +38,23 @@ export function checkDatabaseUrl(raw) {
     throw new DatabaseUrlFault(
       "it holds a # (a # in the password is written %23, and a .dev.vars value has no comment after the URL)",
     );
+  // The authority (user, password, host and port) runs from the scheme's // to the first / or ? for Node and
+  // postgres.js alike (a # is refused above). Node's host follows its last @; postgres.js takes its hosts from after the
+  // first @, decoded and split at each comma, and tries them in turn (src/index.js parseUrl). So a second @, a comma or
+  // a %2C in the host can give postgres.js a host Node never read (see the top of this file), and a deploy names one
+  // host (CQ-192). Checked before Node reads the URL, so a list of hosts with ports, which Node does not read, is
+  // refused by name.
+  const afterScheme = raw.slice(raw.indexOf("//") + 2);
+  const authorityEnd = afterScheme.search(/[/?]|$/);
+  const authority = afterScheme.slice(0, authorityEnd);
+  if (authority.indexOf("@") !== authority.lastIndexOf("@"))
+    throw new DatabaseUrlFault(
+      "it holds a second @ in its user, password or host (an @ in the user or password is written %40)",
+    );
+  if (authority.includes(",") || /%2C/i.test(authority.slice(authority.indexOf("@") + 1)))
+    throw new DatabaseUrlFault(
+      "it names more than one host, or holds a comma in its user or password (a comma there is written %2C)",
+    );
   let url;
   try {
     url = new URL(raw);
@@ -44,20 +65,11 @@ export function checkDatabaseUrl(raw) {
     throw new DatabaseUrlFault("it is not a postgres:// or postgresql:// URL");
   if (url.hostname === "") throw new DatabaseUrlFault("it names no host");
   // An @ after the host means the user or password held a / or ?, so the URL read here names another host.
-  const afterScheme = raw.slice(raw.indexOf("//") + 2);
-  if (afterScheme.slice(afterScheme.search(/[/?]|$/)).includes("@"))
+  if (afterScheme.slice(authorityEnd).includes("@"))
     throw new DatabaseUrlFault(
       "it holds an @ after its host (a / or ? in the user or password is written %2F or %3F)",
     );
-  const parts = [
-    raw,
-    url.href,
-    url.host,
-    url.hostname,
-    ...url.hostname.split(","),
-    url.hostname.replace(/^\[|\]$/g, ""),
-    url.port,
-  ];
+  const parts = [raw, url.href, url.host, url.hostname, url.hostname.replace(/^\[|\]$/g, ""), url.port];
   for (const part of [url.username, url.password, url.pathname.slice(1)]) {
     try {
       parts.push(part, decodeURIComponent(part));
