@@ -1,5 +1,6 @@
 // The shell's error pages (T-511; C-185): what a reader sees when no page is at the address (404), when the address
-// does not take what was sent (405) and when a page could not be shown (500). Each is a whole page inside the frame
+// does not take what was sent (405), when a form's POST is refused by the shell's guards (403 and 413, post-guard.ts)
+// and when a page could not be shown (500). Each is a whole page inside the frame
 // (frame.ts), so it has the language, the skip link, the main landmark and the footer's privacy link like any other
 // page (RULES 4.11, 4.3), and each shows the request's trace id as a reference the reader can pass on, so the request
 // can be found in the logs.
@@ -10,8 +11,8 @@
 
 import { escapeHtml, renderPage } from "./frame";
 
-/** The statuses the shell has a page for. */
-export type ErrorStatus = 404 | 405 | 500;
+/** The statuses the shell has a page for. 403 and 413 are the POST guards' refusals (post-guard.ts; T-520). */
+export type ErrorStatus = 403 | 404 | 405 | 413 | 500;
 
 interface ErrorWords {
   readonly title: string;
@@ -20,6 +21,17 @@ interface ErrorWords {
 
 /** Each error page's words. */
 export const ERROR_WORDS: Readonly<Record<ErrorStatus, ErrorWords>> = {
+  403: {
+    title: "This form was not sent from its own page",
+    lines: [
+      "This address only takes a form sent from this site.",
+      "Open the page again and send it from there.",
+    ],
+  },
+  413: {
+    title: "That is too much to send",
+    lines: ["What was sent is larger than this page takes.", "Go back and send less."],
+  },
   404: {
     title: "Page not found",
     lines: ["There is no page at this address.", "Check the address and try again."],
