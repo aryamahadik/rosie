@@ -1,22 +1,24 @@
-// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.6 (T-084; T-1169, with
-// T-1188 folded in by DL-373; T-1199 for v1.6; ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12;
-// contracts/data-access/README.md "Fixtures", "Producers and consumers" and each version's "Consumers of" list).
+// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.7 (T-084; T-1169, with
+// T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; ops/plan/02-contracts.md K-05 "Contract test" and
+// section 2 item 12; contracts/data-access/README.md "Fixtures", "Producers and consumers" and each version's
+// "Consumers of" list).
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, fixtures
 // and README, and one part per producer or consumer side, added later by a QA side task that depends on this task and
 // on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3,
-// v1.4 and v1.6, every fixture of the three run through db/repo's own reads against local PostgreSQL, is
-// data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199); v1.5 adds no database call.
+// v1.4, v1.6 and v1.7, every fixture of the four run through db/repo's own calls against local PostgreSQL, is
+// data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214); v1.5 adds no database call.
 //
-// K-05 is frozen at v1 to v1.6 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
+// K-05 is frozen at v1 to v1.7 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
 // checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
 // data-access.<version>.schema.json #/$defs/<def>), and entries are selected by version, never by a pinned list or
 // count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land. As DL-124
 // settled for K-06, this file holds v1 and its additive minor versions: the v1.2 fixture part the README plans as
 // T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here, and so are the fixture parts of
-// v1.3, v1.4, v1.5 and v1.6 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did"; v1.6's "joins
-// tests/contract/data-access.v1.test.ts as v1.5's did"), with part 5, v1.5's rowReader read as README item 44 says and
-// three faults no fixture shows refused (T-1188; T-1184's security note b).
+// v1.3, v1.4, v1.5, v1.6 and v1.7 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did"; v1.6's
+// "joins tests/contract/data-access.v1.test.ts as v1.5's did"; v1.7's "joins tests/contract/data-access.v1.test.ts",
+// "Consumers of v1.7"), with part 5, v1.5's rowReader read as README item 44 says and three faults no fixture shows
+// refused (T-1188; T-1184's security note b), and part 6, v1.7's chat-opened entry named by its text as item 46 says.
 //
 // What this part proves:
 //   1. every fixture in contracts/data-access/fixtures/index.json is checked against the schema of its version:
@@ -39,8 +41,11 @@
 //      first), and three cases built from an accepted twin, each refused by the one rule its fault breaks and accepted
 //      once its outcome is put right: a row with no person, a line to no one (lineTo null) and a cust line, each read as
 //      the owner.
+//   6. v1.7's openChatOnText (README item 46, "The entry"): each answer names the request's handle, and each
+//      phone.chat_opened entry is the request's text's, its id '<event id>/chat-opened', its row the request's handle
+//      and its why the request's event, which the schema leaves to code (as a claim entry's id, item 33).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: each fixture's request run against local
-//   PostgreSQL giving its outcome (v1.3's, v1.4's and v1.6's in data-access.v1.db-side.test.ts), 1,000 parallel
+//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's and v1.7's in data-access.v1.db-side.test.ts), 1,000 parallel
 //   reserves, a repeated commit, parallel claims, and each consumer accepting every valid fixture and refusing every
 //   invalid one.
 
@@ -63,7 +68,7 @@ const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const ID_BASE = "https://rosie.invalid/contracts/";
 
 /** The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own. */
-const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6"];
+const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6", "v1.7"];
 /** The fixture parts the README plans as tasks of their own that this file covers (DL-124). */
 const COVERED_HERE = ["T-128"];
 
@@ -839,6 +844,44 @@ const MENDS: Record<string, Mend[]> = {
       putRight: "with that one value, true, the stricter of its two flows",
       changes: [{ at: "businessSensitive", to: true }],
       same: { file: "read-outbox-row-practice-sensitive.json", at: "outcome" },
+    },
+  ],
+  // v1.7: each refused fixture's twin as README "Consumers of v1.7" names it
+  "invalid/refuse-open-chat-stopped-number.json": [
+    {
+      reason:
+        "a text opens Ben T.'s stopped number's chat by clearing his stop, and only START clears a stop: the call never touches a stopped row",
+      putRight: "with nothing written, Ben's row as it stands (stopped)",
+      changes: [{ at: "outcome", to: fromFixture("open-chat-ben-stopped.json", "outcome") }],
+      same: { file: "open-chat-ben-stopped.json", at: "outcome", part: "outcome" },
+    },
+    {
+      reason:
+        "its entry names stopped, and a chat-opened entry names only chat_open, chat_open_at and chat_way (chatClosedValues, chatOpenValues)",
+      putRight:
+        "with only stopped taken out of the entry's old and new values (the schema cannot see that Ben's row is stopped: the database side answers his text stopped, writing nothing)",
+      changes: [
+        { at: "outcome.event.oldValues.stopped", remove: true },
+        { at: "outcome.event.newValues.stopped", remove: true },
+      ],
+    },
+  ],
+  "invalid/refuse-open-chat-no-event.json": [
+    {
+      reason:
+        "the call names no event, and the text's event id is the key a repeat is known by and its entry's why (openChatOnText.request)",
+      putRight: "with turn 1's text named, evt-sam-s1-01",
+      changes: [{ at: "eventId", to: "evt-sam-s1-01" }],
+      same: { file: "open-chat-first-text-sam.json", at: "request" },
+    },
+  ],
+  "invalid/refuse-open-chat-with-number.json": [
+    {
+      reason:
+        "the call carries the number beside the handle, and the request names the handle by its K-04 id alone: the call reads the number from K-04 handles (openChatOnText.request)",
+      putRight: "with the number taken out",
+      changes: [{ at: "phoneNumber", remove: true }],
+      same: { file: "open-chat-first-text-sam.json", at: "request" },
     },
   ],
 };
@@ -1618,6 +1661,83 @@ describe("data-access v1.5: rowReader reads each row as README item 44 says, and
 });
 
 // ---------------------------------------------------------------------------------------------------------------
+// 6. v1.7's openChatOnText: each answer and its entry named by the request's text (README item 46; T-1214)
+
+/** The fields of a phone.chat_opened entry that name its text (chatOpenedEvent; K-08 v1 why.provider_event). */
+interface ChatOpenedEntry {
+  id: string;
+  rowId: string;
+  why: { provider_event: { provider: string; event_id: string } };
+}
+
+/**
+ * README item 46 ("The transaction" step 4, "The entry"): each answer names the request's handle, and the
+ * phone.chat_opened entry an answer appends is the request's text's: its id '<event id>/chat-opened', its row the
+ * request's handle (K-08 v1 default 3) and its why Linq's event, the request's. The schema leaves these to code, as it
+ * leaves a claim entry's id (item 33; chatOpenedEvent's description).
+ */
+export function chatEntryProblems(exchange: Exchange): string[] {
+  if (exchange.call !== "openChatOnText") return [];
+  const { request, outcome } = exchange;
+  const problems: string[] = [];
+  const handleId = String(request.handleId);
+  if (typeof outcome.handleId === "string" && outcome.handleId !== handleId) {
+    problems.push(`the answer names the handle ${outcome.handleId}, not ${handleId}`);
+  }
+  if (!isRecord(outcome.event)) return problems;
+  const event = outcome.event as unknown as ChatOpenedEntry;
+  const eventId = String(request.eventId);
+  const rule = `${eventId}/chat-opened`;
+  if (event.id !== rule) problems.push(`the chat-opened entry is ${event.id}, not ${rule}`);
+  if (event.rowId !== handleId)
+    problems.push(`the chat-opened entry names the row ${event.rowId}, not ${handleId}`);
+  if (event.why.provider_event.event_id !== eventId) {
+    problems.push(`the chat-opened entry's why is ${event.why.provider_event.event_id}, not ${eventId}`);
+  }
+  return problems;
+}
+
+describe("data-access v1.7: openChatOnText's answer and its entry are the request's text's, as README item 46 says", () => {
+  const opens = acceptedEntries.filter((entry) => exchangeOf(entry.file).call === "openChatOnText");
+
+  it("names each answer's handle, and each chat-opened entry by the request's event and handle: its id, row and why", () => {
+    expect(opens.length).toBeGreaterThan(0);
+    for (const entry of opens) expect(chatEntryProblems(exchangeOf(entry.file)), entry.file).toEqual([]);
+    const appending = opens
+      .map((entry) => exchangeOf(entry.file).outcome)
+      .filter((outcome) => isRecord(outcome.event))
+      .map((outcome) => String(outcome.result));
+    expect(
+      [...new Set(appending)].sort(),
+      "the answers that append an entry, each shown: an insert and an opening",
+    ).toEqual(["inserted", "opened"]);
+    // The refused opening of Ben T.'s stopped chat names its entry by rule: it is refused for its stopped alone (part 2).
+    expect(chatEntryProblems(exchangeOf("invalid/refuse-open-chat-stopped-number.json"))).toEqual([]);
+  });
+
+  it("has the check fire on a damaged copy: another handle, another entry id, another row, another event", () => {
+    const first = exchangeOf("open-chat-first-text-sam.json");
+    expect(chatEntryProblems(first)).toEqual([]);
+    first.outcome.handleId = "handle-alex";
+    const event = first.outcome.event as ChatOpenedEntry;
+    event.id = "evt-sam-s1-02/chat-opened";
+    event.rowId = "handle-alex";
+    event.why.provider_event.event_id = "evt-sam-s1-02";
+    expect(chatEntryProblems(first)).toEqual([
+      "the answer names the handle handle-alex, not handle-sam",
+      "the chat-opened entry is evt-sam-s1-02/chat-opened, not evt-sam-s1-01/chat-opened",
+      "the chat-opened entry names the row handle-alex, not handle-sam",
+      "the chat-opened entry's why is evt-sam-s1-02, not evt-sam-s1-01",
+    ]);
+    const email = exchangeOf("open-chat-apple-id-email.json");
+    email.outcome.handleId = "handle-sam";
+    expect(chatEntryProblems(email)).toEqual([
+      "the answer names the handle handle-sam, not handle-sam-email",
+    ]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
 // The sides: where each producer and consumer side is added
 
 export interface SideCheck {
@@ -1647,7 +1767,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-151 migrating K-07's schema addition",
     ],
     needs:
-      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition.",
+      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written.",
   },
   {
     id: "consumer-action-layer",
@@ -1688,7 +1808,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-046 actor",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556).",
+      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125).",
   },
   {
     id: "consumer-release",
@@ -1995,8 +2115,8 @@ describe("data-access sides: the list where each producer and consumer side is a
     }
     const named = WRITTEN_FOR.flatMap((version) => groupsOf(version).flatMap((group) => taskIds(group.text)));
     for (const task of COVERED_HERE) expect(named, task).toContain(task);
-    // The producer's database side of v1.3, v1.4 and v1.6 names the builds it runs, beside this file.
-    for (const task of ["T-1138", "T-1161", "T-1197"]) expect(producer.needs, task).toContain(task);
+    // The producer's database side of v1.3, v1.4, v1.6 and v1.7 names the builds it runs, beside this file.
+    for (const task of ["T-1138", "T-1161", "T-1197", "T-1212"]) expect(producer.needs, task).toContain(task);
     expect(producer.needs).toContain("data-access.v1.db-side.test.ts");
   });
 
