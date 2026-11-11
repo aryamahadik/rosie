@@ -1,0 +1,44 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:01Z",
+    "note": "The walking skeleton's turn 1 (ADR-013): Sam's first text, evt-sam-s1-01 (sent 18:05:00Z, received by the gateway a second later, by iMessage, under trace-sam-0000), from handle-sam, which K-04's seed-person-roles.json holds with no phone row, as T-1148's db/seeds/skeleton.ts holds test owner 1's (JOIN is a first text). The gateway has just found the handle's key (handleSealingKey, item 29) and calls this before the sealed text reaches Sam's actor (item 46), so his phone row exists with its chat open before the safety read's record, the guard, the commit that writes turn 1's thread and row (commit-s1-01-sam) and limit 8's check at send. The row is inserted at version 1, not stopped, its chat open since the text's receipt by the service it came by, the rest at K-04's defaults; one phone.chat_opened entry is appended with no turn, the event id as its job id and the text's trace. Sam's roles (seed-person-roles.json gives him owner roles; the skeleton's seed gives none) are not read."
+  },
+  "request": {
+    "eventId": "evt-sam-s1-01",
+    "handleId": "handle-sam",
+    "service": "imessage",
+    "receivedAt": "2026-10-19T18:05:01Z",
+    "traceId": "trace-sam-0000"
+  },
+  "outcome": {
+    "result": "inserted",
+    "handleId": "handle-sam",
+    "phone": {
+      "chatOpen": true,
+      "chatOpenAt": "2026-10-19T18:05:01Z",
+      "chatWay": "imessage",
+      "stopped": false,
+      "version": 1
+    },
+    "event": {
+      "id": "evt-sam-s1-01/chat-opened",
+      "kind": "phone.chat_opened",
+      "zone": null,
+      "businessId": null,
+      "actorKind": "provider",
+      "actorPersonId": null,
+      "actorRole": null,
+      "tableName": "phones",
+      "rowId": "handle-sam",
+      "oldValues": null,
+      "newValues": { "chat_open": true, "chat_open_at": "2026-10-19T18:05:01Z", "chat_way": "imessage" },
+      "sealed": null,
+      "why": { "provider_event": { "provider": "linq", "event_id": "evt-sam-s1-01" } },
+      "approvedBy": null,
+      "proofs": null
+    }
+  }
+}

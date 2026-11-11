@@ -1,0 +1,28 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": ["open-chat-first-text-sam.json"],
+    "now": "2026-10-19T18:05:31Z",
+    "note": "The same text again: Linq sends evt-sam-s1-01's webhook a second time (arch 02 line 109: a 503 or a lost answer, and 'Linq retries for 30 minutes'), and the gateway calls again before the actor drops the known event id. Under the row's lock the call finds this text's own entry, evt-sam-s1-01/chat-opened, so it answers repeated with the row as it stands and writes nothing: no second row, no second entry, the version still 1."
+  },
+  "request": {
+    "eventId": "evt-sam-s1-01",
+    "handleId": "handle-sam",
+    "service": "imessage",
+    "receivedAt": "2026-10-19T18:05:01Z",
+    "traceId": "trace-sam-0000"
+  },
+  "outcome": {
+    "result": "repeated",
+    "handleId": "handle-sam",
+    "phone": {
+      "chatOpen": true,
+      "chatOpenAt": "2026-10-19T18:05:01Z",
+      "chatWay": "imessage",
+      "stopped": false,
+      "version": 1
+    },
+    "event": null
+  }
+}
