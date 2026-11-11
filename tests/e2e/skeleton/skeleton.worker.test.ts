@@ -1,10 +1,11 @@
-// The walking skeleton's end-to-end test (C-148; build prompt section 10, D-017), in its prefix form (T-1103; CQ-78), run
-// inside workerd through the Worker's own composition root (T-1149; DL-332). One JOIN webhook goes in through T-465's local
-// target, posted to runtime/src/wiring's root.linqWebhook with the HandleActor installed and every joined port fed its
-// double (./root-run.ts), and runs as far as its turn's reply. Its spans are collected by the trace id the gateway answered
-// with and judged by T-465's checkHops (through T-551's judgePrefixRun); the actor's inbox, safety state and batches, and
-// the rows the K-05 doubles wrote, are read back; and each joined row of 02-contracts section 11, up to the prefix, is held
-// to what its join proved (CLAIMS). Each hop join (T-552 to T-563) proves its own prefix with it:
+// The walking skeleton's end-to-end test (C-148; build prompt section 10, D-017), run inside workerd through the Worker's
+// own composition root (T-1149; DL-332). One JOIN webhook goes in through T-465's local target, posted to
+// runtime/src/wiring's root.linqWebhook with the HandleActor installed and every joined port fed its double
+// (./root-run.ts), and runs as far as its turn's reply and its delivery receipt. Its spans are collected by the trace id
+// the gateway answered with and judged by T-465's checkHops (through T-551's judgePrefixRun); the actor's inbox, safety
+// state and batches, and the rows the K-05 doubles wrote, are read back; and each joined row of 02-contracts section 11,
+// up to the prefix, is held to what its join proved (CLAIMS). The first test keeps its prefix form (T-1103; CQ-78), with
+// which each hop join (T-552 to T-563) proved its own prefix:
 //
 //   npm run test:contract -- tests/contract/<the hop's contract test> --reporter=json --outputFile=<report.json>
 //   SKELETON_UPTO=<name> CONTRACT_REPORT=<report.json> npm run test:e2e -- skeleton
@@ -16,17 +17,26 @@
 //   CONTRACT_REPORT the hop fails, naming the report it lacks (T-551 default 4). A name that is no hop of section 11, or a
 //   file that is not Vitest's JSON report, fails this test, naming it.
 // - SKELETON_UPTO unset (`npm run test:e2e`, as the merge check runs it): T-465's check over every hop joined so far, from
-//   receive to JOINED_THROUGH, with every joined row's claims, and no contract report read.
+//   receive to JOINED_THROUGH, on the whole judged trace, with every joined row's claims and D-017's automated tests, and
+//   no contract report read. The twenty runs below judge the full path whatever SKELETON_UPTO says.
 // - What the merged runtime does not write yet is judged around by name, and each such gap is asserted to still hold
 //   (./gaps.ts). T-1108 closed three: each text has one receive span, the gateway's; the batch hop is judged with the
 //   rest; and the trace is one run by seq across its writers, its hops, by seq as written, in the order they started. One
 //   narrower gap is left (modelCallOrder): the model calls' own portCall spans are not in start order by seq, so T-465's
-//   checkHops judges the trace in the order its spans started, numbered again.
+//   checkHops judges the trace in the order its spans started, numbered again. As written, every problem checkHops names
+//   is a span starting before the span before it, in one of the three places gaps.ts names (MODEL_CALL_ORDER_PLACES).
 //
-// Joined on main: joins 1 to 13 (T-552 to T-564), receive to clockArmed. Each later join moves JOINED_THROUGH to its row's
-// last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
-// Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
-// sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
+// Joined on main: joins 1 to 13 (T-552 to T-564), receive to clockArmed: every row of 02-contracts section 11. T-466
+// completed the file with D-017's automated tests (build prompt section 10, D-017's card), on the full path:
+//   - one JOIN webhook gives exactly 1 outbox row and 1 send to the Linq double, whose words ask S1-02's first sign-up
+//     question once (fullPathOf);
+//   - its trace shows every hop of section 11 once, in turn order, under one trace id and one bundle id, with only gap
+//     modelCallOrder's places set aside (fullPathOf, and the as-written checks of skeletonRun);
+//   - the same webhook sent again (same event id) adds no outbox row and no send, and the whole log gains exactly one
+//     span, its receive, dropped at receipt (row 12);
+//   - twenty consecutive runs, each through a fresh composition root, give the same result (build prompt 5.2): RUNS
+//     named cases, each the whole test, each giving expectedResult's result.
+// Nothing here prints a message's words or a number.
 
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { env } from "cloudflare:workers";
@@ -34,6 +44,7 @@ import { afterEach, describe, expect, inject, it } from "vitest";
 
 import joinComposeInput from "../../../ai/recordings/composer-inputs/join-s1-02.json";
 import { HAIKU_MODEL } from "../../../ai/src/gateway/index";
+import traceDuplicateWebhook from "../../../contracts/event-trace/fixtures/trace-duplicate-webhook.json";
 import traceSkeleton from "../../../contracts/event-trace/fixtures/trace-skeleton.json";
 import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS101Enter from "../../../contracts/model/fixtures/decide-s1-01-enter.json";
@@ -54,7 +65,17 @@ import {
   TEST_OWNER_1_BUSINESS_NAME,
   type EventLogRow,
 } from "../../../runtime/src/wiring/test-support";
-import { checkHops, checkRun, isModelCallSpan, readReceipt, type Collected, type SentText } from "../_driver";
+import {
+  checkHops,
+  checkRepeat,
+  checkRun,
+  isModelCallSpan,
+  readReceipt,
+  spansInOrder,
+  type Collected,
+  type RunReport,
+  type SentText,
+} from "../_driver";
 import {
   SECTION_11_ROWS,
   SKELETON_PLAN,
@@ -63,6 +84,7 @@ import {
   prefixOf,
   prefixTrace,
   type SkeletonHop,
+  type SkeletonPrefix,
 } from "../_driver/prefix";
 import { GAPS, NOT_WRITTEN, judgedTraceOf, stillHolds, writtenHops } from "./gaps";
 import { JOIN } from "./join";
@@ -70,6 +92,12 @@ import { actorOf, startRootRun, type ActorReader, type RootRun } from "./root-ru
 
 /** A run through the Workers runtime's own steps: a resource guard above Vitest's 5 s default. */
 const TEST_MS = 30_000;
+
+/**
+ * Twenty consecutive runs give the same result (T-466's card; build prompt 5.2: main is green only on tests that give the
+ * same result every run): each a named case of its own, a fresh composition root, inside TEST_MS.
+ */
+const RUNS = 20;
 
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
@@ -91,6 +119,9 @@ const mode =
 
 /** K-08 v1's trace-skeleton.json: the skeleton's trace as the contract draws it. */
 const SKELETON = traceSkeleton as unknown as Trace;
+
+/** K-08 v1's trace-duplicate-webhook.json: a webhook sent again, as the contract draws its trace. */
+const DUPLICATE_WEBHOOK = traceDuplicateWebhook as unknown as Trace;
 
 /** trace-skeleton.json's span of `hop`. */
 function skeletonSpan(hop: Hop): Span {
@@ -1064,10 +1095,44 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // No retry was needed: nothing went on the retry queue.
     expect(retryQueue.sent).toEqual([]);
 
-    // The same webhook sent again: dropped at receipt as a known event id, so nothing more is stored or sent.
+    // The same webhook sent again (same event id; D-017: "a repeated webhook sends nothing twice"; T-466): dropped at
+    // receipt as a known event id, so it adds nothing. The whole log gains exactly one span, the repeat's receive, on a
+    // trace of its own, as trace-duplicate-webhook.json draws it: dropped, the event id known, naming the trace the JOIN
+    // first arrived under; the JOIN's own trace gains none. Nothing else is added either (heldOf): no outbox row, turn,
+    // commit, event-log entry, inbox entry, safety read, batch, claim, send or chat-opened entry, and the phone row keeps
+    // its version.
+    const logBefore = facts.run.spans().length;
+    const heldBefore = await heldOf(facts);
     const again = await facts.run.target.sendEvent(JOIN);
     expect(again.gatewayStatus).toBe(200);
     await facts.actor.settle();
+    const [drawn] = DUPLICATE_WEBHOOK.spans;
+    expect(
+      facts.run
+        .spans()
+        .slice(logBefore)
+        .map((span) => ({
+          trace: span.trace_id,
+          seq: span.seq,
+          hop: span.hop,
+          outcome: span.outcome,
+          eventId: span.event_id,
+          got: span.got,
+          decided: span.decided,
+        })),
+    ).toEqual([
+      {
+        trace: again.traceId,
+        seq: drawn.seq,
+        hop: drawn.hop,
+        outcome: drawn.outcome,
+        eventId: JOIN.eventId,
+        got: { kind: JOIN.kind, service: JOIN.service },
+        decided: { ...drawn.decided, firstTrace: facts.sent.traceId },
+      },
+    ]);
+    expect(again.traceId).not.toBe(facts.sent.traceId);
+    expect(await heldOf(facts)).toEqual(heldBefore);
     const repeat = await facts.run.target.collect(again.traceId);
     if (repeat.trace === null) throw new Error(`no span carries trace id ${again.traceId}`);
     // Its trace is its one receive span, the gateway's, as trace-duplicate-webhook.json draws it: dropped, the event id
@@ -1081,6 +1146,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       repeatedWebhook: true,
       firstTraceId: facts.sent.traceId,
     });
+    // T-465's own check of a repeat: the JOIN's trace was not dropped, the repeat names its event id, was dropped at
+    // receipt as a known event id with no hop after it, names the JOIN's trace as its first, and has a trace of its own.
+    expect(checkRepeat(facts.judged.trace, repeat.trace)).toEqual([]);
 
     // A dispatcher retry forced through the root's retry door: the row is sent, so its claim takes nothing.
     const claimsBefore = dispatch.claims.length;
@@ -1345,6 +1413,395 @@ function leaksIn(spans: readonly Span[]): string[] {
   });
 }
 
+/**
+ * The places where gap modelCallOrder lets a span start before the span before it, by seq as written (./gaps.ts, its
+ * `what`), each named by its two spans as untimelyPlacesOf names them: the safety read after its own model call,
+ * decide's first model call after decideReads, the composer's model call after compose. Each may show once, or not at
+ * all; a place not named here is no part of the gap, and fails the run.
+ */
+const MODEL_CALL_ORDER_PLACES: readonly string[] = [
+  "safetyRead's model call, then safetyRead",
+  "decideReads, then decide's model call",
+  "compose, then compose's model call",
+];
+
+/** The purposes of decide's model calls (K-08 v1 modelCall.purpose): its two reads' first and check. */
+const DECIDE_PURPOSES = new Set(["decideFirst", "decideCheck"]);
+
+/** A span as a place names it: a hop by its K-08 name; a model call's own span as the call of the hop it ran for. */
+function placeNameOf(span: Span): string {
+  if (!isModelCallSpan(span)) return span.hop;
+  const purposes = [...new Set((span.model_calls ?? []).map((call) => call.purpose))];
+  if (purposes.length === 1 && purposes[0] === "safetyRead") return "safetyRead's model call";
+  if (purposes.length === 1 && purposes[0] === "compose") return "compose's model call";
+  if (purposes.length > 0 && purposes.every((purpose) => DECIDE_PURPOSES.has(purpose))) {
+    return "decide's model call";
+  }
+  return `a model call for ${purposes.join(" and ") || "nothing"}`;
+}
+
+/**
+ * Each place where, by seq as written, a span starts before the span before it (T-465's checkHops names each as a
+ * `time` problem), named "<the span before>, then <the span>".
+ */
+function untimelyPlacesOf(trace: Trace): string[] {
+  const spans = spansInOrder(trace);
+  return spans.flatMap((span, index) => {
+    const before = spans[index - 1];
+    return before !== undefined && Date.parse(span.at) < Date.parse(before.at)
+      ? [`${placeNameOf(before)}, then ${placeNameOf(span)}`]
+      : [];
+  });
+}
+
+/** A bundle id as one label: its hash and build. */
+const bundleLabel = (bundleId: { readonly hash: string; readonly build: number }): string =>
+  `${bundleId.hash}/${String(bundleId.build)}`;
+
+/** How many times `part` stands in `text`. */
+const timesIn = (text: string, part: string): number => text.split(part).length - 1;
+
+/** S1-02's first sign-up question, as the composer's S1-02 plan asks it (K-03 v1 plan-s1-02.json). */
+const S1_02_QUESTION = (planS102 as unknown as { readonly question: { readonly text: string } }).question
+  .text;
+
+/** What one run gave, in terms that are the same in every run: no time, no trace id, no words, no number. */
+interface RunResult {
+  /** What the gateway answered the JOIN. */
+  readonly answered: number;
+  /** The hops T-465's check judged, in turn order: SKELETON_UPTO's prefix, or every hop of section 11. */
+  readonly judged: readonly Hop[];
+  /** What it found on them. */
+  readonly problems: readonly string[];
+  /** D-017's automated tests on the full path (SKELETON_UPTO unset); null under a prefix, which judges hops 1 to n. */
+  readonly fullPath: FullPathResult | null;
+}
+
+/** One span as a run's result names it: its place, hop and outcome. */
+interface SpanResult {
+  readonly seq: number;
+  readonly hop: Hop;
+  readonly outcome: string;
+}
+
+/** D-017's automated tests, as one run read them (fullPathOf, then repeatOf once every row's claims ran). */
+interface FullPathResult {
+  /** The JOIN's trace as written, by seq: its hops, the model calls' own spans aside (they are no hop). */
+  readonly hops: readonly Hop[];
+  /** The bundle ids its spans name, model calls' too, each once. */
+  readonly bundleIds: readonly string[];
+  /** Every other trace in the whole log once the JOIN's receipt is in: each its spans, by seq. */
+  readonly otherTraces: readonly (readonly SpanResult[])[];
+  /** K-04's outbox rows, as the K-05 doubles hold every row the run's commits wrote, by id. */
+  readonly outboxRows: readonly string[];
+  /** Each part the Linq double recorded: its key, chat, service and kind, and how often its words ask S1-02's question. */
+  readonly sends: readonly {
+    readonly key: string | null;
+    readonly chatId: string;
+    readonly service: string | null;
+    readonly kind: string;
+    readonly questions: number;
+  }[];
+  /** What the same webhook sent again (row 12) left: its spans, and the outbox rows and sends once every claim ran. */
+  readonly repeat: {
+    readonly spans: readonly (SpanResult & { readonly knownEventId: unknown; readonly firstTrace: string })[];
+    readonly outboxRows: number;
+    readonly sends: number;
+  };
+}
+
+/**
+ * D-017's automated tests on the full path (build prompt section 10, D-017's card, "Automated tests": "a webhook fixture
+ * in gives exactly one outbox row and one send to the Linq double ... the trace shows every hop once, in order"; T-466),
+ * read once the JOIN's turn has replied and its delivery receipt is in, before any row's claim sends anything more.
+ * Row 12 holds the third, the same webhook sent again. Returns what it read, for the run's result.
+ */
+function fullPathOf(facts: Facts, report: RunReport): Omit<FullPathResult, "repeat"> {
+  const { composer, linq, turnRows } = facts.run.fakes;
+  const row = `outbox-s1-02-${facts.turnId}-1`;
+
+  // Every hop of 02-contracts section 11 once, in order. Section 11's rows hold K-08's skeleton trace hop for hop
+  // (trace-skeleton.json), none left out (no hop is unwritten), and the JOIN's trace shows each once, in that order: as
+  // written, by seq (the model calls' own spans aside, which are no hop), and as T-465's check judged it, with nothing
+  // found.
+  const section11 = SECTION_11_ROWS.flatMap((one) => one.hops);
+  expect(section11).toEqual(SKELETON.spans.map((span) => span.hop));
+  expect(writtenHops(section11)).toEqual(section11);
+  const hops = spansInOrder(facts.collected)
+    .filter((span) => !isModelCallSpan(span))
+    .map((span) => span.hop);
+  expect(hops).toEqual(section11);
+  expect(report.hops?.hops).toEqual(section11);
+  expect(report.problems).toEqual([]);
+
+  // One bundle id on every span, the model calls' own too: bundle v0's, as bundles/v0 publishes it.
+  const bundleIds = [...new Set(facts.collected.spans.map((span) => bundleLabel(span.bundle_id)))];
+  expect(bundleIds).toEqual([bundleLabel(BUNDLE_V0)]);
+
+  // One trace id: in the whole log, no span of the JOIN's event or of its turn is on any trace but the JOIN's. The only
+  // other trace is the delivery receipt's own webhook's: its one receive span (the receipt's delivered and clockArmed
+  // spans are on the JOIN's trace: row 13).
+  const elsewhere = facts.run.spans().filter((span) => span.trace_id !== facts.sent.traceId);
+  expect(elsewhere.filter((span) => span.event_id === JOIN.eventId || span.turn_id === facts.turnId)).toEqual(
+    [],
+  );
+  const otherTraces = [...new Set(elsewhere.map((span) => span.trace_id))].map((traceId) =>
+    elsewhere
+      .filter((span) => span.trace_id === traceId)
+      .sort((a, b) => a.seq - b.seq)
+      .map((span) => ({ seq: span.seq, hop: span.hop, outcome: span.outcome })),
+  );
+
+  // Exactly one outbox row: K-04's outbox_rows, as the K-05 doubles hold every row the run's commits wrote, holds the
+  // JOIN turn's one row, S1-02's.
+  const outboxRows = [...(turnRows.rows.get("outbox_rows")?.keys() ?? [])];
+  expect(outboxRows).toEqual([row]);
+
+  // Exactly one send to the Linq double: the root's Linq send port handed the line one request, the double the target
+  // collects from recorded one part, and T-465's count of what reached the person over the collected run is one send,
+  // under one key, with no part twice.
+  expect(linq.requests).toHaveLength(1);
+  const recorded = linq.double.sentRequests();
+  expect(recorded).toHaveLength(1);
+  expect(report.parts).toEqual({
+    parts: 1,
+    sends: 1,
+    duplicateSends: [],
+    unjudgedSends: [],
+    repeatedKeys: [],
+  });
+
+  // Its words carry S1-02's first sign-up question (D-017's human test: "Rosie answers once, with the first sign-up
+  // question"), once: the question plan-s1-02.json asks, which is S1-02's own as bundle v0 words it, the master text
+  // compose input read for the JOIN turn's one row (row 9 holds that input to recording 4).
+  const [input, ...moreInputs] = composer.inputs;
+  expect(moreInputs).toEqual([]);
+  const master = (
+    input as { readonly masterText?: { readonly step: string; readonly text: string } } | undefined
+  )?.masterText;
+  expect(master?.step).toBe("S1-02");
+  expect(master?.text.endsWith(S1_02_QUESTION)).toBe(true);
+  const sends = recorded.map((request) => ({
+    key: request.idempotencyKey,
+    chatId: request.chatId,
+    service: request.service,
+    kind: request.kind,
+    questions: timesIn(request.text ?? "", S1_02_QUESTION),
+  }));
+  expect(sends.map((send) => send.questions)).toEqual([1]);
+
+  return { hops, bundleIds, otherTraces, outboxRows, sends };
+}
+
+/**
+ * What the same webhook sent again (row 12) left once every row's claims have run: its spans in the whole log, those
+ * naming the JOIN's event id on any trace but the JOIN's, and the outbox rows and the Linq line's requests.
+ */
+function repeatOf(facts: Facts): FullPathResult["repeat"] {
+  const { linq, turnRows } = facts.run.fakes;
+  return {
+    spans: facts.run
+      .spans()
+      .filter((span) => span.event_id === JOIN.eventId && span.trace_id !== facts.sent.traceId)
+      .map((span) => ({
+        seq: span.seq,
+        hop: span.hop,
+        outcome: span.outcome,
+        knownEventId: span.decided?.knownEventId,
+        firstTrace: span.decided?.firstTrace === facts.sent.traceId ? "the JOIN's" : "another",
+      })),
+    outboxRows: turnRows.rows.get("outbox_rows")?.size ?? 0,
+    sends: linq.requests.length,
+  };
+}
+
+/**
+ * What a webhook could add anywhere but the log, by count or id, never a word or a number: K-04's rows as the K-05
+ * doubles hold them, the actor's inbox, safety reads and batches, the dispatcher's claims, the Linq line's requests
+ * and the double's parts, the chat-opened entries and the phone row's version.
+ */
+async function heldOf(facts: Facts): Promise<Readonly<Record<string, unknown>>> {
+  const { dispatch, linq, models, turnRows } = facts.run.fakes;
+  return {
+    outboxRows: [...(turnRows.rows.get("outbox_rows")?.keys() ?? [])],
+    rows: [...turnRows.rows.values()].reduce((sum, table) => sum + table.size, 0),
+    turns: [...turnRows.turns.keys()],
+    commits: turnRows.commits.length,
+    eventLog: turnRows.eventLog.length,
+    inbox: (await facts.actor.inbox()).map((stored) => stored.event.eventId),
+    safetyStates: (await facts.actor.safety()).length,
+    safetyReads: models.calls.length,
+    batches: (await facts.actor.batches()).length,
+    claims: dispatch.claims.length,
+    lineRequests: linq.requests.length,
+    sends: linq.double.sentRequests().length,
+    chatEntries: dispatch.chatEntries.length,
+    phoneVersion: dispatch.phones.get(TEST_OWNER_1.handleId)?.version ?? null,
+  };
+}
+
+/**
+ * One run of the skeleton's end-to-end test, through a fresh composition root (./root-run.ts): Sam's JOIN webhook through
+ * T-465's local target to its turn's reply and its delivery receipt, its trace judged by T-465's check (through
+ * `prefix`'s hop, or every hop), each joined row up to the prefix's held to what its join proved and, with no prefix,
+ * D-017's automated tests on the full path. Returns what the run gave, which expectedResult says it is in every run.
+ */
+async function skeletonRun(prefix: SkeletonPrefix | null): Promise<RunResult> {
+  const unwritten = prefix === null ? undefined : NOT_WRITTEN[prefix.hop];
+  if (prefix !== null && unwritten !== undefined) {
+    throw new Error(
+      `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten].task}): no run can show it`,
+    );
+  }
+  // The JOIN is the seeded test owner's first text (T-1148): the handle, chat and words the doubles know.
+  expect([JOIN.handle, JOIN.chatId, JOIN.body]).toEqual([TEST_OWNER_1.handle, SAM_CHAT, JOIN_TEXT]);
+
+  const run = startRootRun();
+  const actor = actorOf(JOIN.handle);
+  try {
+    // What the turn's commit records for the text (K-09 README default 5); the read on arrival is the joined one.
+    run.fakes.known(JOIN.eventId);
+    const sent = await run.target.sendEvent(JOIN);
+    expect(sent.gatewayStatus).toBe(200);
+    // On arrival: the inbox entry and the safety read. Then 3 s of quiet close the batch, and its turn runs on its
+    // lease to its reply.
+    await actor.settle();
+    await run.fakes.clock.advance(QUIET_MS);
+    await runDurableObjectAlarm(actor.stub);
+    const turnId = await turnIdOf([JOIN.eventId]);
+    await actor.untilReplied(turnId);
+    await actor.settle();
+
+    const collected = await run.target.collect(sent.traceId);
+    // Every span of the trace is a K-08 span (the prebuilt check, ./root-run.ts).
+    expect(collected.traceProblems).toEqual([]);
+    const trace = collected.trace;
+    if (trace === null) throw new Error(`no span carries trace id ${sent.traceId}`);
+    // As written, the trace is one run by seq across its writers (K-08 v1 README: a trace is read by ordering by seq, and
+    // seq runs 1, 2, 3 ...), and T-465's checkHops finds no problem but gap modelCallOrder's: no hop missing, repeated,
+    // out of the turn's order or unexpected, no seq, trace id or bundle id problem; only spans that start before the span
+    // before them (time). And by seq, as written, the hops stand in the order they started (`at` never goes back), every
+    // joined hop once, in the turn's order.
+    const asWritten = checkHops(trace).problems;
+    expect(asWritten.filter((problem) => problem.kind !== "time")).toEqual([]);
+    const hopsBySeq = spansInOrder(trace).filter((span) => !isModelCallSpan(span));
+    expect(hopsBySeq.map((span) => span.hop)).toEqual(writtenHops(joinedPrefix().hops));
+    hopsBySeq.forEach((span, place) => {
+      const before = hopsBySeq[place - 1];
+      if (before === undefined) return;
+      expect(
+        Date.parse(span.at),
+        `hop ${span.hop} (seq ${String(span.seq)}) starts before hop ${before.hop} (seq ${String(before.seq)})`,
+      ).toBeGreaterThanOrEqual(Date.parse(before.at));
+    });
+    // Gap modelCallOrder: the model calls' own portCall spans are not in start order by seq, so as written T-465's
+    // checkHops names a span starting before the one before it, each time beside a model call's span, and only in the
+    // places gaps.ts names, each at most once (MODEL_CALL_ORDER_PLACES).
+    const untimely = asWritten.filter((problem) => problem.kind === "time");
+    expect(untimely, stillHolds("modelCallOrder")).not.toEqual([]);
+    for (const problem of untimely) expect(problem.message).toContain("hop portCall");
+    const places = untimelyPlacesOf(trace);
+    expect(places).toHaveLength(untimely.length);
+    expect(
+      places.filter((place) => !MODEL_CALL_ORDER_PLACES.includes(place)),
+      `not a place of known gap modelCallOrder: ${GAPS.modelCallOrder.what}`,
+    ).toEqual([]);
+    expect(new Set(places).size).toBe(places.length);
+    const judged = { trace: judgedTraceOf(trace) };
+    const judgedRun: Collected = { ...collected, trace: judged.trace };
+
+    let report: RunReport;
+    if (prefix === null) {
+      // T-465's check over every hop joined so far, on the whole judged trace: no span stands after the last hop's, so
+      // none is cut off before the check.
+      const hops = writtenHops(joinedPrefix().hops);
+      expect(prefixTrace(judged.trace, hops).spans).toHaveLength(judged.trace.spans.length);
+      report = checkRun(judgedRun, hops);
+      expect(report.problems).toEqual([]);
+      expect(report.hops?.hops).toEqual(hops);
+    } else {
+      // T-551's prefix: hops 1 to n by T-465's checkRun, and hop n's contract tests as the report holds them.
+      const hops = writtenHops(prefix.hops);
+      const unjudged = prefix.hops.flatMap((hop) => {
+        const gap = NOT_WRITTEN[hop];
+        return gap === undefined ? [] : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap].task}`];
+      });
+      report = judgePrefixRun(judgedRun, { ...prefix, hops }, plan.contractTests);
+      expect(report.problems, [plan.hint, ...unjudged].join("; ")).toEqual([]);
+      expect(report.hops?.hops).toEqual(hops);
+    }
+
+    // No span holds the JOIN's number or words (K-08 v1 README: never the raw number or words).
+    expect(leaksIn(trace.spans)).toEqual([]);
+
+    const facts: Facts = { run, actor, sent, turnId, collected: trace, judged };
+    // D-017's automated tests on the full path, read before any row's claim sends anything more (row 12 sends the same
+    // webhook again, row 13 a second receipt).
+    const fullPath = prefix === null ? fullPathOf(facts, report) : null;
+
+    // Each joined row, up to the prefix's, holds what its join proved.
+    const joinedRow = joinedPrefix().row.row;
+    const through = Math.min(prefix?.row.row ?? joinedRow, joinedRow);
+    for (const row of SECTION_11_ROWS.slice(0, through)) {
+      const claims = CLAIMS[row.row];
+      if (claims === undefined) throw new Error(`row ${String(row.row)} is joined, but has no claims here`);
+      await claims(facts);
+    }
+
+    return {
+      answered: sent.gatewayStatus,
+      judged: report.hops?.hops ?? [],
+      problems: [...report.problems],
+      fullPath: fullPath === null ? null : { ...fullPath, repeat: repeatOf(facts) },
+    };
+  } finally {
+    run.close();
+  }
+}
+
+/**
+ * What every run gives (T-466: twenty consecutive runs give the same result), from the fixtures and the run's own ids:
+ * the hops of section 11 as K-08's trace-skeleton.json draws them, bundle v0's id, the JOIN turn's one S1-02 row (its id
+ * T-248's hash of the JOIN's event id, as row 8 builds it), one words part under that row's first key to Sam's chat by
+ * the JOIN's service, asking S1-02's question once, the receipt's own webhook a trace of one receive span, and the same
+ * webhook sent again one receive span as trace-duplicate-webhook.json draws it, naming the JOIN's trace, with still one
+ * outbox row and one send.
+ */
+async function expectedResult(prefix: SkeletonPrefix | null): Promise<RunResult> {
+  const row = `outbox-s1-02-${await turnIdOf([JOIN.eventId])}-1`;
+  const [drawn] = DUPLICATE_WEBHOOK.spans;
+  return {
+    answered: 200,
+    judged: writtenHops(prefix?.hops ?? joinedPrefix().hops),
+    problems: [],
+    fullPath:
+      prefix !== null
+        ? null
+        : {
+            hops: SKELETON.spans.map((span) => span.hop),
+            bundleIds: [bundleLabel(BUNDLE_V0)],
+            otherTraces: [[{ seq: 1, hop: "receive", outcome: "ok" }]],
+            outboxRows: [row],
+            sends: [
+              { key: `${row}/1/1`, chatId: SAM_CHAT, service: JOIN.service, kind: "words", questions: 1 },
+            ],
+            repeat: {
+              spans: [
+                {
+                  seq: drawn.seq,
+                  hop: drawn.hop,
+                  outcome: drawn.outcome,
+                  knownEventId: drawn.decided?.knownEventId,
+                  firstTrace: "the JOIN's",
+                },
+              ],
+              outboxRows: 1,
+              sends: 1,
+            },
+          },
+  };
+}
+
 afterEach(async () => {
   await reset();
 });
@@ -1356,96 +1813,22 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
     async () => {
       // A name that is no hop of section 11, or a file that is not Vitest's JSON report, fails here, named (T-551).
       if (plan.refused !== null) throw new Error(plan.refused);
-      const prefix = plan.prefix;
-      const unwritten = prefix === null ? undefined : NOT_WRITTEN[prefix.hop];
-      if (prefix !== null && unwritten !== undefined) {
-        throw new Error(
-          `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten].task}): no run can show it`,
-        );
-      }
-      // The JOIN is the seeded test owner's first text (T-1148): the handle, chat and words the doubles know.
-      expect([JOIN.handle, JOIN.chatId, JOIN.body]).toEqual([TEST_OWNER_1.handle, SAM_CHAT, JOIN_TEXT]);
-
-      const run = startRootRun();
-      const actor = actorOf(JOIN.handle);
-      try {
-        // What the turn's commit records for the text (K-09 README default 5); the read on arrival is the joined one.
-        run.fakes.known(JOIN.eventId);
-        const sent = await run.target.sendEvent(JOIN);
-        expect(sent.gatewayStatus).toBe(200);
-        // On arrival: the inbox entry and the safety read. Then 3 s of quiet close the batch, and its turn runs on its
-        // lease to its reply.
-        await actor.settle();
-        await run.fakes.clock.advance(QUIET_MS);
-        await runDurableObjectAlarm(actor.stub);
-        const turnId = await turnIdOf([JOIN.eventId]);
-        await actor.untilReplied(turnId);
-        await actor.settle();
-
-        const collected = await run.target.collect(sent.traceId);
-        // Every span of the trace is a K-08 span (the prebuilt check, ./root-run.ts).
-        expect(collected.traceProblems).toEqual([]);
-        const trace = collected.trace;
-        if (trace === null) throw new Error(`no span carries trace id ${sent.traceId}`);
-        // As written, the trace is one run by seq across its writers (K-08 v1 README: a trace is read by ordering by
-        // seq, and seq runs 1, 2, 3 ...): T-465's checkHops finds no seq problem. And by seq, as written, the hops stand
-        // in the order they started (`at` never goes back), every joined hop once, in the turn's order.
-        const asWritten = checkHops(trace).problems;
-        expect(asWritten.filter((problem) => problem.kind === "seq")).toEqual([]);
-        const hopsBySeq = [...trace.spans]
-          .sort((a, b) => a.seq - b.seq)
-          .filter((span) => !isModelCallSpan(span));
-        expect(hopsBySeq.map((span) => span.hop)).toEqual(writtenHops(joinedPrefix().hops));
-        hopsBySeq.forEach((span, place) => {
-          const before = hopsBySeq[place - 1];
-          if (before === undefined) return;
-          expect(
-            Date.parse(span.at),
-            `hop ${span.hop} (seq ${String(span.seq)}) starts before hop ${before.hop} (seq ${String(before.seq)})`,
-          ).toBeGreaterThanOrEqual(Date.parse(before.at));
-        });
-        // Gap modelCallOrder: the model calls' own portCall spans are not in start order by seq, so as written
-        // T-465's checkHops names a span starting before the one before it, each time beside a model call's span.
-        const untimely = asWritten.filter((problem) => problem.kind === "time");
-        expect(untimely, stillHolds("modelCallOrder")).not.toEqual([]);
-        for (const problem of untimely) expect(problem.message).toContain("hop portCall");
-        const judged = { trace: judgedTraceOf(trace) };
-        const judgedRun: Collected = { ...collected, trace: judged.trace };
-
-        if (prefix === null) {
-          // T-465's check over every hop joined so far.
-          const hops = writtenHops(joinedPrefix().hops);
-          const report = checkRun({ ...judgedRun, trace: prefixTrace(judged.trace, hops) }, hops);
-          expect(report.problems).toEqual([]);
-          expect(report.hops?.hops).toEqual(hops);
-        } else {
-          // T-551's prefix: hops 1 to n by T-465's checkRun, and hop n's contract tests as the report holds them.
-          const hops = writtenHops(prefix.hops);
-          const unjudged = prefix.hops.flatMap((hop) => {
-            const gap = NOT_WRITTEN[hop];
-            return gap === undefined ? [] : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap].task}`];
-          });
-          const report = judgePrefixRun(judgedRun, { ...prefix, hops }, plan.contractTests);
-          expect(report.problems, [plan.hint, ...unjudged].join("; ")).toEqual([]);
-          expect(report.hops?.hops).toEqual(hops);
-        }
-
-        // No span holds the JOIN's number or words (K-08 v1 README: never the raw number or words).
-        expect(leaksIn(trace.spans)).toEqual([]);
-
-        // Each joined row, up to the prefix's, holds what its join proved.
-        const facts: Facts = { run, actor, sent, turnId, collected: trace, judged };
-        const joinedRow = joinedPrefix().row.row;
-        const through = Math.min(prefix?.row.row ?? joinedRow, joinedRow);
-        for (const row of SECTION_11_ROWS.slice(0, through)) {
-          const claims = CLAIMS[row.row];
-          if (claims === undefined)
-            throw new Error(`row ${String(row.row)} is joined, but has no claims here`);
-          await claims(facts);
-        }
-      } finally {
-        run.close();
-      }
+      expect(await skeletonRun(plan.prefix)).toEqual(await expectedResult(plan.prefix));
     },
   );
+});
+
+// D-017's automated tests on the full path, whatever SKELETON_UPTO says (a prefix judges only hops 1 to n): each run
+// is the whole test above with no prefix, through a fresh composition root and a fresh actor (afterEach's reset), and
+// gives the same result.
+describe("the walking skeleton end to end, inside workerd: D-017's automated tests, twenty consecutive runs (T-466; build prompt section 10, D-017; 5.2)", () => {
+  for (const run of Array.from({ length: RUNS }, (_, index) => index + 1)) {
+    it(
+      `run ${String(run)} of ${String(RUNS)}: exactly 1 outbox row and 1 send asking S1-02's question, every hop of section 11 once and in order under one trace id and one bundle id, and the same webhook again adds nothing but its dropped span: the same result`,
+      { timeout: TEST_MS },
+      async () => {
+        expect(await skeletonRun(null)).toEqual(await expectedResult(null));
+      },
+    );
+  }
 });
