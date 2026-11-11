@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 387, [`d5d1fce`](https://github.com/aryamahadik/rosie/commit/d5d1fce), 2026-11-11 15:24:32 UTC.
+- **Through:** commit 389, [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), 2026-11-11 15:42:09 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 389. docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394) (\#396)
+
+- **Commit:** [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), by Arya Mahadik, 2026-11-11 15:42:09 UTC
+- **Pull request:** [#396](https://github.com/aryamahadik/rosie/pull/396) from `task/commit-history-18`, merged 2026-11-11 15:42:10 UTC. It squashed 1 branch commit:
+  - `603dacd` docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 388. T-1226: freeze K-05 v1.9, markPart's answer to a repeated delivered mark says whether that delivery was the row's first (repeatedDelivery) (\#395)
+
+- **Commit:** [`560929f`](https://github.com/aryamahadik/rosie/commit/560929f), by Arya Mahadik, 2026-11-11 15:42:05 UTC
+- **Pull request:** [#395](https://github.com/aryamahadik/rosie/pull/395) from `task/T-1226`, merged 2026-11-11 15:42:05 UTC. It squashed 2 branch commits:
+  - `2a5ec34` T-1226: K-05 v1.9, frozen: markPart's answer to a repeated delivery r…
+  - `7462b25` T-1226: K-05 v1.9 README and index wording: item 48's read is under t…
+- **Files changed:** 10 (+1455 −5), by folder:
+  - `contracts/data-access/` README.md +71 −4, data-access.v1.9.schema.json +1198 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +48 −0, mark-a7-03-delivered-repeat.json +28 −0, mark-a7-03-poll-delivered-repeat.json +28 −0, mark-a7-03-poll-delivered.json +28 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-mark-delivered-repeat-null.json +28 −0, refuse-mark-repeat-delivery-left-out.json +12 −0, refuse-mark-repeat-says-first-delivery.json +13 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1226: K-05 v1.9, frozen: markPart's answer to a repeated delivery receipt says what it repeats (repeatedDelivery: firstOfRow, deliveredAt), so a repeat of a row's first delivery can be handed to the clock arming
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1226: K-05 v1.9 README and index wording: item 48's read is under the row's lock; the refused exchange's twin is named by its outcome
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 387. docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392) (\#394)
 
