@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 376, [`4b69e2d`](https://github.com/aryamahadik/rosie/commit/4b69e2d), 2026-11-11 13:36:09 UTC.
+- **Through:** commit 378, [`cb7c9ca`](https://github.com/aryamahadik/rosie/commit/cb7c9ca), 2026-11-11 13:58:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 378. docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383) (\#385)
+
+- **Commit:** [`cb7c9ca`](https://github.com/aryamahadik/rosie/commit/cb7c9ca), by Arya Mahadik, 2026-11-11 13:58:39 UTC
+- **Pull request:** [#385](https://github.com/aryamahadik/rosie/pull/385) from `task/commit-history-13`, merged 2026-11-11 13:58:40 UTC. It squashed 1 branch commit:
+  - `5c72676` docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383)
+- **Files changed:** 1 (+117 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +117 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 377. T-1223: the Worker's queue entry wires the root before a retry batch, so a retry reaching a fresh isolate runs at once (\#384)
+
+- **Commit:** [`ba3e85b`](https://github.com/aryamahadik/rosie/commit/ba3e85b), by Arya Mahadik, 2026-11-11 13:58:34 UTC
+- **Pull request:** [#384](https://github.com/aryamahadik/rosie/pull/384) from `task/T-1223`, merged 2026-11-11 13:58:34 UTC. It squashed 4 branch commits:
+  - `ac08082` T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/a…
+  - `10af5cc` T-1223: the Worker's queue entry calls wireWorker(env) before it hand…
+  - `ea028ea` Merge branch 'main' into rework/T-1223-round2
+  - `2da568c` T-1223: round 2 (DL-460, DL-461): queues/producer.worker.test.ts's tw…
+- **Files changed:** 6 (+203 −16), by folder:
+  - `runtime/src/clocks/` actors.ts +3 −3, clocks.worker.test.ts +1 −1
+  - `runtime/src/` index.ts +17 −3, index.worker.test.ts +166 −2
+  - `runtime/src/queues/` producer.ts +3 −3, producer.worker.test.ts +13 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/adapters' Linq double (K-11 sendPart, real in test and staging, closed in production; the direct safety line split off as linqDirect), T-258's retries wired (DispatchDeps.retries on RootOptions.retryQueue, setQueueDeps with the dispatcher's send door), the K-05 double following db/repo defaults 1, 5, 8, 13, 17 and 18; e2e row 12 (JOINED_THROUGH providerAccepted) and hop12.worker.test.ts prove one send per row-part-try key
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1223: the Worker's queue entry calls wireWorker(env) before it hands a batch to the retry queue, as the fetch entry does, so a retry batch that is the first event an isolate sees runs at once instead of answering unwired; index.worker.test.ts proves it on staging (wired once, the try runs through the dispatcher's door) and on production (its root, every port closed, claims and sends nothing). The scheduled entry is not wired: its sweep reads setClockDeps, which the root does not install. Work in progress: queues/producer.worker.test.ts's two queue-handler tests hand the Worker the pool env, which binds HANDLE_ACTOR since T-566, and now fail; that file is outside May touch (NEED)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1223: round 2 (DL-460, DL-461): queues/producer.worker.test.ts's two queue-handler tests hand the Worker an env without HANDLE_ACTOR ({ ENVIRONMENT, BASE_PATH, DB_SCHEMA } of the pool's env, as hop2.worker.test.ts's workerEnv(false) builds it), so the queue entry's wireWorker wires nothing and each test keeps its own ports; no assertion changed. Comment words only: producer.ts, producer.worker.test.ts, clocks/actors.ts and clocks.worker.test.ts no longer say env.staging has no HANDLE_ACTOR or RETRY_QUEUE until T-566
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 376. docs: COMMIT\_HISTORY.md through commit 372 (6f86957, \#379) (\#383)
 
