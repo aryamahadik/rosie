@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 359, [`bfabe45`](https://github.com/aryamahadik/rosie/commit/bfabe45), 2026-11-11 09:08:11 UTC.
+- **Through:** commit 361, [`5c22bf5`](https://github.com/aryamahadik/rosie/commit/5c22bf5), 2026-11-11 09:56:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 361. docs: COMMIT\_HISTORY.md through commit 359 (bfabe45, \#366) (\#368)
+
+- **Commit:** [`5c22bf5`](https://github.com/aryamahadik/rosie/commit/5c22bf5), by Arya Mahadik, 2026-11-11 09:56:40 UTC
+- **Pull request:** [#368](https://github.com/aryamahadik/rosie/pull/368) from `task/commit-history-6`, merged 2026-11-11 09:56:41 UTC. It squashed 1 branch commit:
+  - `ed5748b` docs: COMMIT\_HISTORY.md through commit 359 (bfabe45, \#366)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 360. T-1212: K-05 v1.7 openChatOnText in db/repo, a number's text opens its chat, never a stopped one (\#367)
+
+- **Commit:** [`f5a3ff2`](https://github.com/aryamahadik/rosie/commit/f5a3ff2), by Arya Mahadik, 2026-11-11 09:56:36 UTC
+- **Pull request:** [#367](https://github.com/aryamahadik/rosie/pull/367) from `task/T-1212`, merged 2026-11-11 09:56:37 UTC. It squashed 2 branch commits:
+  - `a908e13` T-1212: K-05 v1.7 openChatOnText in db/repo/chat-open.ts: item 46's o…
+  - `b16acda` T-1212: chat-open.int.test.ts's deadlock test waits three times deadl…
+- **Files changed:** 2 (+1711 −0), by folder:
+  - `db/repo/` chat-open.int.test.ts +1243 −0, chat-open.ts +468 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1212: K-05 v1.7 openChatOnText in db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope (handle by id: notFound, notAPhone; insert on conflict do nothing: inserted; else FOR UPDATE: repeated, stopped, alreadyOpen or opened), one phone.chat_opened entry per write (job id = event id, the request's trace, no turn or bundle), the number read only from handles, 40001/40P01/lost connection answer transient; chat-open.int.test.ts proves every v1.7 fixture, 50 parallel first texts and repeats, STOP and START around the call, the kept way and time, and each entry against K-08 v1 eventLogRow
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1212: chat-open.int.test.ts's deadlock test waits three times deadlock_timeout before the call closes the cycle, room for a slow timer on an emulated PostgreSQL under load
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 359. docs: COMMIT\_HISTORY.md through commit 357 (109e822, \#364) (\#366)
 
