@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 401, [`74b9746`](https://github.com/aryamahadik/rosie/commit/74b9746), 2026-11-11 17:44:56 UTC.
+- **Through:** commit 403, [`16af5be`](https://github.com/aryamahadik/rosie/commit/16af5be), 2026-11-11 18:07:36 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 403. docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408) (\#410)
+
+- **Commit:** [`16af5be`](https://github.com/aryamahadik/rosie/commit/16af5be), by Arya Mahadik, 2026-11-11 18:07:36 UTC
+- **Pull request:** [#410](https://github.com/aryamahadik/rosie/pull/410) from `task/commit-history-24`, merged 2026-11-11 18:07:37 UTC. It squashed 1 branch commit:
+  - `148ac7f` docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 402. T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDelivery (a repeated delivery receipt says firstOfRow and the stored deliveredAt; null on every other answer), read in its one transaction from the locked part tries with no write; a delivered part with no delivered\_at fails loudly (\#409)
+
+- **Commit:** [`322c1a3`](https://github.com/aryamahadik/rosie/commit/322c1a3), by Arya Mahadik, 2026-11-11 18:07:32 UTC
+- **Pull request:** [#409](https://github.com/aryamahadik/rosie/pull/409) from `task/T-1227`, merged 2026-11-11 18:07:33 UTC. It squashed 1 branch commit:
+  - `eb89288` T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDeliv…
+- **Files changed:** 2 (+570 −18), by folder:
+  - `db/repo/` outbox.int.test.ts +486 −6, outbox.ts +84 −12
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 401. docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406) (\#408)
 
