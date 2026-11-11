@@ -17,12 +17,14 @@
 //     (`phone`) takes the flag at its next version, and the answer's core results name it as K-09 v1 recordStopOrStart's
 //     result does (stop-recorded.json's shape). Its `phones` is the re-read of that row's stopped flag, and its `park` is
 //     K-05 v1 parkTurn as the lease's park hook answers it: alreadyCommitted (with its committedAt) for a turn id it
-//     committed, whose answer may have been lost, else parked.
+//     committed, whose answer may have been lost, else parked. With `slowNextAnswer` (T-1206 round 2), the next first
+//     commit's answer comes back only once the test opens a hold, as a slow answer does.
 //   - `SAM_TIMER` is K-34's seed timer (seed-safety-timer.json): Sam alone on Alex's move survey, due 11:20am New York
 //     time, Morgan Lee the contact who said yes, the job's address sealed under Alex's key (stand-in bytes).
 // Test values only: the master's sample cast and the frozen fixtures' ids (rule 9).
 
 import seedSafetyTimer from "../../../../contracts/db-schema/safety-incidents/fixtures/seed-safety-timer.json";
+import type { Hold } from "../../turn/test-support";
 import type { CommitContext, CommitTurnAnswer, CommitTurnRequest, ParkAnswer, ParkingTurn } from "../lease";
 import type {
   LiveTimersAnswer,
@@ -74,6 +76,11 @@ export interface FakeToolApi {
    */
   loseNextAnswer: boolean;
   /**
+   * Set (T-1206 round 2): the next first commit goes through (its rows and flag are written at once) but its answer is
+   * slow: it comes back, and joins `answers`, only once the test opens this hold. Set back to null once used.
+   */
+  slowNextAnswer: Hold | null;
+  /**
    * How the next first commits answer (T-1204): "k09" (the default), K-09 gateAndCommit.committed through the turn's commit
    * hook; or "k05", K-05 v1 commitTurn.response, whose commitResult lists every row the commit wrote (`timersByCore` is not
    * read: K-05 has no core results). A repeat answers in its first commit's shape.
@@ -115,6 +122,7 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
     writes: [],
     timersByCore: null,
     loseNextAnswer: false,
+    slowNextAnswer: null,
     answerShape: "k09",
     reloads: [],
     reloadDown: false,
@@ -219,6 +227,15 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
         // Committed, rows and all, but the answer never comes back.
         fake.loseNextAnswer = false;
         return Promise.reject(new Error("the answer was lost on the way back"));
+      }
+      const slow = fake.slowNextAnswer;
+      if (slow !== null) {
+        // Committed, rows and flag and all, but the answer comes back only once the test opens the hold.
+        fake.slowNextAnswer = null;
+        return slow.wait().then(() => {
+          fake.answers.push(structuredClone(answer));
+          return answer;
+        });
       }
       fake.answers.push(structuredClone(answer));
       return Promise.resolve(answer);

@@ -11,8 +11,11 @@
 //     holds the stop rank of the write-on-return queue, the copy reads stopped, the stricter reading, whatever was copied
 //     last, until every stop or start record queued (any START among them) is written in order (DL-167 ruling 2). A commit
 //     that went through with its answer lost (a park answered alreadyCommitted: ../lease.ts `commitLost`, T-1206) may have
-//     written the flag unseen, so the copy reads stopped from then on (`noteLostCommit`), until the flag is read again
-//     from the handle's phone row (`rereadStopped`) or a later write of it is copied;
+//     written the flag unseen, so the copy reads stopped from then on (`noteLostCommit`), each lost commit with its own
+//     mark. Only three things end a mark (DL-427): a fresh read of the handle's phone row (`rereadStopped`, sent after the
+//     mark was set), the actor's own version-less STOP or START note, and a committed answer from the lost turn itself
+//     or from a turn the lease opened after it (the lease's turn order, never versions alone: the copy never holds the
+//     lost commit's version). A late answer from an earlier turn ends none, whatever its version;
 //   - the checked safety lines (K-01 v1): every line the safety read can send (911, 988 and 911, the danger question, the
 //     outage line, and each outcome step's own line), copied from the safety read's bundle each time a text is written
 //     (`refreshLines`). A line the bundle gives no words for now keeps the words copied before: a bundle that cannot be
@@ -24,6 +27,10 @@
 //     the rows: by K-09's flag or the lease's, T-1204), or its answer cannot be read (`readCommit`, T-1198, DL-413); a
 //     reload that fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds. A
 //     commit whose answer was lost (T-1206) marks the copy stale at once (`markTimersStale`), then reloads it.
+//
+// A mark that cannot be stored (a lost commit's, or the timers' stale mark) is kept in this instance's memory instead
+// (DL-427 ruling 4), so a storage that fails never leaves the flag or the timers unmarked while the instance lives; an
+// eviction loses what only memory held.
 //
 // T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
 // `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
@@ -219,11 +226,13 @@ export function createCopyTables(sql: SqlStorage): void {
        set_ms INTEGER NOT NULL
      )`,
   );
-  // A commit whose answer was lost, whose stopped flag the copy has not read (T-1206): one row at most, absent when none.
+  // The commits whose answers were lost, whose stopped flag the copy has not read (T-1206): one row each, in the order
+  // noted, with the order the lease opened its turn in (../lease.ts lease_turns.seq; null when not known). None when none.
   sql.exec(
-    `CREATE TABLE IF NOT EXISTS copy_stopped_lost (
-       one INTEGER PRIMARY KEY CHECK (one = 1),
-       turn_id TEXT NOT NULL,
+    `CREATE TABLE IF NOT EXISTS copy_lost_commits (
+       noted INTEGER PRIMARY KEY AUTOINCREMENT,
+       turn_id TEXT NOT NULL UNIQUE,
+       turn_opened INTEGER,
        since_ms INTEGER NOT NULL
      )`,
   );
@@ -358,11 +367,53 @@ function stoppedFlagOf(answer: unknown): { stopped: boolean; phoneVersion: numbe
   return { stopped, phoneVersion };
 }
 
+/** A commit whose answer was lost, whose stopped flag the copy has not read (T-1206), as the copy keeps its mark. */
+interface LostMark {
+  readonly turnId: string;
+  /** The order the lease opened its turn in (../lease.ts lease_turns.seq), or null when not known. */
+  readonly opened: number | null;
+  /** Since the park told of it, on the actor's clock. */
+  readonly since: number;
+}
+
+/**
+ * Which lost commits' marks a stopped flag taken ends (DL-427 ruling 1); no other write ends one:
+ *   - `all`: the actor's own version-less STOP or START note, the person's latest word;
+ *   - `openedBy`: a committed answer of the turn the lease opened in this place: the marks of the lost turns opened no
+ *     later (the lost turn itself, or an earlier one). That turn's commit came after every such lost commit went through,
+ *     since a turn opens only once the turn before it has finished;
+ *   - `noted`: a fresh read of the phone row, by the turn ids marked when it was sent: each of those commits went through
+ *     before its mark, so before the read;
+ *   - `none`: any other write (the write-on-return replay's answer, a write with no turn order).
+ */
+type LostEnds =
+  | { readonly kind: "all" }
+  | { readonly kind: "openedBy"; readonly opened: number }
+  | { readonly kind: "noted"; readonly turnIds: readonly string[] }
+  | { readonly kind: "none" };
+
+function endsMark(ends: LostEnds, mark: LostMark): boolean {
+  switch (ends.kind) {
+    case "all":
+      return true;
+    case "openedBy":
+      return mark.opened !== null && mark.opened <= ends.opened;
+    case "noted":
+      return ends.turnIds.includes(mark.turnId);
+    default:
+      return false;
+  }
+}
+
 export class ActorCopies {
   /** The reload of the timers running in this instance, if any: the next one waits for it, so the last write wins. */
   private timerWork: Promise<unknown> = Promise.resolve();
   /** The re-read of the stopped flag running in this instance, if any: the next one waits for it. */
   private stoppedWork: Promise<unknown> = Promise.resolve();
+  /** Lost commits whose mark the storage could not keep (DL-427 ruling 4): held in this instance's memory instead. */
+  private unstoredLost: LostMark[] = [];
+  /** True when the timers' copy is behind a write but its stale mark could not be stored (DL-427 ruling 4). */
+  private staleUnstored = false;
 
   constructor(private readonly host: CopiesHost) {
     createCopyTables(host.storage.sql);
@@ -382,12 +433,12 @@ export class ActorCopies {
    * rank of the write-on-return queue (DL-167 ruling 2), it reads stopped, the stricter reading, whatever was copied last,
    * with `held` naming the refusal: until every stop or start record queued (any START among them) is written in order.
    * While a commit whose answer was lost may have written the flag (T-1206), it reads stopped the same way, with `lost`
-   * naming that commit's turn: until the flag is read again or a later write of it is copied.
+   * naming the lost commit noted last: until rule 1 of DL-427 ends every lost commit's mark (`noteStopped`).
    */
   readStopped(): StoppedCopy | null {
     const copied = this.copiedStopped();
     const held = readHeld(this.sql).find((entry) => entry.rank === "stop");
-    const lost = this.lostCommit();
+    const lost = this.lostMarks().at(-1) ?? null;
     if (held === undefined && lost === null) return copied;
     return {
       stopped: true,
@@ -395,7 +446,7 @@ export class ActorCopies {
       turnId: copied?.turnId ?? null,
       setAt: copied?.setAt ?? held?.since ?? lost?.since ?? this.host.now(),
       ...(held === undefined ? {} : { held: { key: held.key, code: held.code, since: held.since } }),
-      ...(lost === null ? {} : { lost }),
+      ...(lost === null ? {} : { lost: { turnId: lost.turnId, since: lost.since } satisfies LostCommitHold }),
     };
   }
 
@@ -405,20 +456,26 @@ export class ActorCopies {
    */
   stoppedUnread(): boolean {
     try {
-      return this.lostCommit() !== null;
+      return this.lostMarks().length > 0;
     } catch {
       return true;
     }
   }
 
-  /** The commit whose answer was lost, whose stopped flag the copy has not read (T-1206), or null when there is none. */
-  private lostCommit(): LostCommitHold | null {
-    const row = this.sql
-      .exec<{ turn_id: string; since_ms: number }>(
-        "SELECT turn_id, since_ms FROM copy_stopped_lost WHERE one = 1",
+  /**
+   * The lost commits whose stopped flag the copy has not read (T-1206), in the order noted: the stored marks, and those
+   * only memory holds (DL-427 ruling 4) placed by when they were noted.
+   */
+  private lostMarks(): LostMark[] {
+    const stored = this.sql
+      .exec<{ turn_id: string; turn_opened: number | null; since_ms: number }>(
+        "SELECT turn_id, turn_opened, since_ms FROM copy_lost_commits ORDER BY noted",
       )
-      .toArray()[0];
-    return row === undefined ? null : { turnId: row.turn_id, since: row.since_ms };
+      .toArray()
+      .map((row): LostMark => ({ turnId: row.turn_id, opened: row.turn_opened, since: row.since_ms }));
+    if (this.unstoredLost.length === 0) return stored;
+    // A stable sort: of two noted at once, the stored one first.
+    return [...stored, ...this.unstoredLost].sort((a, b) => a.since - b.since);
   }
 
   /** The stopped flag as last copied from a write, without the queue's hold. */
@@ -438,58 +495,96 @@ export class ActorCopies {
   /**
    * Copies a stopped flag that was written; true when the copy took it. A write with the phone row's version is taken
    * unless the copy holds a later version; the actor's own note (no version) is always taken. A write taken while the stop
-   * rank is held is kept, and read once the hold is let go. A write taken lets go of a lost commit's stricter reading
-   * (T-1206): it is that commit's own answer come late, a later commit's or the actor's own newer word, or the phone row
-   * read again, so it is at least as new as what the lost commit wrote.
+   * rank is held is kept, and read once the hold is let go. A write ends the lost commits' marks (T-1206) that DL-427's
+   * rule 1 lets it end, and no other: the actor's own note ends every mark; a commit's answer, with the order the lease
+   * opened its turn in (`opened`), ends the marks of the lost turns opened no later than its own (the lost turn's own
+   * answer come late, or a later turn's), taken or older than the copy, never one of a turn opened after it, whatever its
+   * version; any other write (the write-on-return replay's answer, or one with no turn order) ends none.
    */
   noteStopped(write: StoppedWrite): boolean {
-    return this.host.storage.transactionSync((): boolean => {
-      const copied = this.copiedStopped();
-      if (
-        write.phoneVersion !== null &&
-        copied !== null &&
-        copied.phoneVersion !== null &&
-        write.phoneVersion < copied.phoneVersion
-      ) {
-        return false;
-      }
-      this.sql.exec(
-        "INSERT OR REPLACE INTO copy_stopped (one, stopped, phone_version, turn_id, set_ms) VALUES (1, ?, ?, ?, ?)",
-        write.stopped ? 1 : 0,
-        write.phoneVersion,
-        write.turnId,
-        this.host.now(),
-      );
-      this.sql.exec("DELETE FROM copy_stopped_lost WHERE one = 1");
-      return true;
-    });
+    const ends: LostEnds =
+      write.phoneVersion === null
+        ? { kind: "all" }
+        : isCount(write.opened)
+          ? { kind: "openedBy", opened: write.opened }
+          : { kind: "none" };
+    return this.takeStopped(write, ends);
   }
 
   /**
-   * Notes a commit that went through with its answer lost (T-1206: a park answered alreadyCommitted): it may have written
-   * the stopped flag unseen, so the copy reads stopped, the stricter reading, until the flag is read again
-   * (`rereadStopped`) or a later write of it is copied. A second lost commit keeps the first one's note. True when the
-   * note is stored; never throws (a storage that fails keeps the copy as it was).
+   * Copies a stopped flag by the phone row's version (`noteStopped`), and ends the lost marks `ends` names. A write older
+   * than the copy is not taken; a commit's answer still ends its marks then (the core's own word on that commit, so the
+   * copy holds a write newer still), while an older row read ends none (it may be a stale row).
    */
-  noteLostCommit(turnId: string): boolean {
+  private takeStopped(write: StoppedWrite, ends: LostEnds): boolean {
+    const done = this.host.storage.transactionSync((): { taken: boolean; ended: LostEnds } => {
+      const copied = this.copiedStopped();
+      const older =
+        write.phoneVersion !== null &&
+        copied !== null &&
+        copied.phoneVersion !== null &&
+        write.phoneVersion < copied.phoneVersion;
+      const ended: LostEnds = older && ends.kind !== "openedBy" ? { kind: "none" } : ends;
+      if (!older) {
+        this.sql.exec(
+          "INSERT OR REPLACE INTO copy_stopped (one, stopped, phone_version, turn_id, set_ms) VALUES (1, ?, ?, ?, ?)",
+          write.stopped ? 1 : 0,
+          write.phoneVersion,
+          write.turnId,
+          this.host.now(),
+        );
+      }
+      if (ended.kind === "all") this.sql.exec("DELETE FROM copy_lost_commits");
+      else if (ended.kind === "openedBy") {
+        // A mark with no turn order is never ended this way (NULL <= n is not true).
+        this.sql.exec("DELETE FROM copy_lost_commits WHERE turn_opened <= ?", ended.opened);
+      } else if (ended.kind === "noted") {
+        for (const turnId of ended.turnIds)
+          this.sql.exec("DELETE FROM copy_lost_commits WHERE turn_id = ?", turnId);
+      }
+      return { taken: !older, ended };
+    });
+    if (this.unstoredLost.length > 0) {
+      this.unstoredLost = this.unstoredLost.filter((mark) => !endsMark(done.ended, mark));
+    }
+    return done.taken;
+  }
+
+  /**
+   * Notes a commit that went through with its answer lost (T-1206: a park answered alreadyCommitted), with the order the
+   * lease opened its turn in: it may have written the stopped flag unseen, so the copy reads stopped, the stricter
+   * reading, until DL-427's rule 1 ends its mark (`noteStopped`, `rereadStopped`). Each lost commit keeps its own mark; a
+   * turn noted again keeps its first. True when the mark is stored. A storage that fails keeps the mark in this instance's
+   * memory instead (DL-427 ruling 4: lost on an eviction). Never throws.
+   */
+  noteLostCommit(turnId: string, opened: number | null = null): boolean {
+    const mark: { turnId: string; opened: number | null; since: number } = {
+      turnId,
+      opened: isCount(opened) ? opened : null,
+      since: 0,
+    };
     try {
+      mark.since = this.host.now();
       this.sql.exec(
-        "INSERT OR IGNORE INTO copy_stopped_lost (one, turn_id, since_ms) VALUES (1, ?, ?)",
-        turnId,
-        this.host.now(),
+        "INSERT OR IGNORE INTO copy_lost_commits (turn_id, turn_opened, since_ms) VALUES (?, ?, ?)",
+        mark.turnId,
+        mark.opened,
+        mark.since,
       );
       return true;
     } catch {
+      if (!this.unstoredLost.some((kept) => kept.turnId === turnId)) this.unstoredLost.push(mark);
       return false;
     }
   }
 
   /**
    * Reads the handle's stopped flag again (K-04 phones.stopped and its version; K-04 handles.id names the handle) after
-   * any re-read already running here, and copies it (`noteStopped`), which lets go of a lost commit's stricter reading. A
-   * re-read that cannot be done (not wired, no answer, an error, an answer that is not K-04's row) keeps the copy as it
-   * was, the stricter reading included. A row read never replaces the actor's own note (a STOP or START it took while
-   * PostgreSQL was down, with no version), whose record may not be written yet: "older". Never throws.
+   * any re-read already running here, and copies it by the row's version. A read is fresh only for the lost commits noted
+   * before it was sent (each went through before its mark): a read taken ends their marks, never one noted while it was
+   * on its way. A re-read that cannot be done (not wired, no answer, an error, an answer that is not K-04's row) keeps
+   * the copy as it was, the stricter reading included. A row read never replaces the actor's own note (a STOP or START it
+   * took while PostgreSQL was down, with no version), whose record may not be written yet: "older". Never throws.
    */
   rereadStopped(handleId: string): Promise<StoppedRefresh> {
     const run = this.stoppedWork.then(() => this.readStoppedAgain(handleId));
@@ -500,6 +595,8 @@ export class ActorCopies {
   private async readStoppedAgain(handleId: string): Promise<StoppedRefresh> {
     const source = deps?.phones;
     if (source === undefined || !isLabel(handleId)) return "unwired";
+    // The lost commits this read is fresh for: those marked as it is sent.
+    const noted = this.lostMarks().map((mark) => mark.turnId);
     let answer: unknown;
     try {
       answer = await source.stoppedFlag({ handleId });
@@ -510,7 +607,9 @@ export class ActorCopies {
     if (read === null) return "failed";
     // The actor's own note is newer than any row read (its record may still wait in the write-on-return queue).
     if (this.copiedStopped()?.phoneVersion === null) return "older";
-    return this.noteStopped({ ...read, turnId: null }) ? "copied" : "older";
+    return this.takeStopped({ ...read, turnId: null }, { kind: "noted", turnIds: noted })
+      ? "copied"
+      : "older";
   }
 
   // ---- the checked safety lines -------------------------------------------------------------------------------------
@@ -633,9 +732,17 @@ export class ActorCopies {
       }));
   }
 
-  /** True while the timers' copy is behind a write it was told of (its last reload failed). */
+  /**
+   * True while the timers' copy is behind a write it was told of (its last reload failed), its mark stored or only in
+   * memory (DL-427 ruling 4); a storage that cannot say answers true (one more reload).
+   */
   timersStale(): boolean {
-    return this.sql.exec("SELECT 1 FROM copy_meta WHERE k = ?", STALE).toArray().length > 0;
+    if (this.staleUnstored) return true;
+    try {
+      return this.sql.exec("SELECT 1 FROM copy_meta WHERE k = ?", STALE).toArray().length > 0;
+    } catch {
+      return true;
+    }
   }
 
   /**
@@ -648,8 +755,8 @@ export class ActorCopies {
 
   /**
    * Reloads the handle's live timers (K-04 handles.id) after any reload already running here, and replaces the copy with
-   * them. A reload that cannot be done (not wired, no answer, an error, a row that is not K-34's) keeps the copy as it
-   * was and marks it stale. Never throws.
+   * them. A reload that cannot be done (not wired, no answer, an error, a row that is not K-34's, a copy the storage cannot
+   * write) keeps the copy as it was and marks it stale. Never throws.
    */
   refreshTimers(handleId: string): Promise<TimerRefresh> {
     const run = this.timerWork.then(() => this.reloadTimers(handleId));
@@ -675,6 +782,19 @@ export class ActorCopies {
       this.markStale();
       return "failed";
     }
+    try {
+      this.replaceTimers(timers);
+    } catch {
+      // The copy could not be written: it stays as it was, and is marked behind.
+      this.markStale();
+      return "failed";
+    }
+    this.staleUnstored = false;
+    return "refreshed";
+  }
+
+  /** Replaces the timers' copy with these, and lets go of its stale mark, in one storage transaction. */
+  private replaceTimers(timers: readonly TimerValues[]): void {
     const at = this.host.now();
     this.host.storage.transactionSync(() => {
       this.sql.exec("DELETE FROM copy_timers");
@@ -703,14 +823,17 @@ export class ActorCopies {
       }
       this.sql.exec("DELETE FROM copy_meta WHERE k = ?", STALE);
     });
-    return "refreshed";
   }
 
+  /**
+   * Marks the timers' copy behind a write. A storage that fails keeps the mark in this instance's memory instead (DL-427
+   * ruling 4), so every later commit still reloads until a reload succeeds. Never throws.
+   */
   private markStale(): void {
     try {
       this.sql.exec("INSERT OR IGNORE INTO copy_meta (k, v) VALUES (?, ?)", STALE, this.host.now());
     } catch {
-      // The storage failed: the copy stays as it was, and the next write's reload tries again.
+      this.staleUnstored = true;
     }
   }
 }

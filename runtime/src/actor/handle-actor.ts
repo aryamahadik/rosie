@@ -226,8 +226,8 @@ export class HandleActor extends DurableObject {
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
       parkTrace: (request) => this.parkTrace(request),
-      committed: (turn, answer) => {
-        this.afterCommit(turn, answer);
+      committed: (turn, answer, opened) => {
+        this.afterCommit(turn, answer, opened);
       },
       commitLost: (lost) => {
         this.afterLostCommit(lost);
@@ -644,13 +644,14 @@ export class HandleActor extends DurableObject {
    * safety timer row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's
    * K-04 handle id), as work lent to the platform. The lease's own `repeated` goes with the answer (T-1204): K-05's
    * commitResult has no flag of its own, and a repeat reloads whatever the answer's shape, since its first answer, maybe
-   * lost, named the rows. While a lost commit's stopped flag is still not read after this commit's own write of it, if any
-   * (T-1206), the flag is read again.
+   * lost, named the rows. The flag goes with the order the lease opened the turn in (`opened`), so a late answer from a
+   * turn opened before a lost commit's never ends that commit's mark (DL-427). While a lost commit's stopped flag is still
+   * not read after this commit's own write of it, if any (T-1206), the flag is read again.
    */
-  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
+  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void {
     const read = readCommit(answer.committed, { repeated: answer.repeated });
-    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
-    // A lost commit's stopped flag still not read (T-1206; a write copied here lets it go): this commit's handle id reads it.
+    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id, opened });
+    // A lost commit's stopped flag still not read (T-1206; DL-427's rule 1 ends a mark): this commit's handle id reads it.
     if (this.copies.stoppedUnread()) this.rereadStopped(turn.handleId);
     if (read.timersWritten || this.copies.timersStale()) this.reloadTimers(turn.handleId);
   }
@@ -661,10 +662,10 @@ export class HandleActor extends DurableObject {
    * reads stopped (the stricter reading) and the timers' copy is marked stale, which hold if nothing more can be done
    * (no handle id, an eviction); then, as work lent to the platform, the flag is read again from the handle's phone row and
    * the live timers are reloaded, named by the handle id the turn's last commit named. A read that fails leaves its mark,
-   * and each later commit tries it again.
+   * and each later commit tries it again. Each lost commit keeps its own mark, with the order its turn opened in (DL-427).
    */
   private afterLostCommit(lost: LostCommit): void {
-    this.copies.noteLostCommit(lost.turnId);
+    this.copies.noteLostCommit(lost.turnId, lost.opened);
     this.copies.markTimersStale();
     if (lost.handleId === null) return;
     this.rereadStopped(lost.handleId);

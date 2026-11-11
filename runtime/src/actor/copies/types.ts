@@ -44,13 +44,14 @@ export interface StoppedCopy {
   /** Set only while a refusal holds the stop rank: until every stop or start record queued is written in order. */
   readonly held?: StopHold;
   /**
-   * Set only while a commit whose answer was lost may have written the flag (T-1206: a park answered alreadyCommitted):
-   * until the flag is read again from the handle's phone row, or a later write of it is copied.
+   * Set only while a commit whose answer was lost may have written the flag (T-1206: a park answered alreadyCommitted),
+   * naming the lost commit noted last: until DL-427's rule 1 ends every lost commit's mark (a fresh read of the phone row,
+   * the actor's own note, or a committed answer from the lost turn or a turn opened after it).
    */
   readonly lost?: LostCommitHold;
 }
 
-/** The commit whose answer was lost, whose stopped flag the copy has not read (T-1206): its turn id (a label), since when. */
+/** A commit whose answer was lost, whose stopped flag the copy has not read (T-1206): its turn id (a label), since when. */
 export interface LostCommitHold {
   readonly turnId: string;
   /** Since the park told of it, on the actor's clock. */
@@ -70,6 +71,11 @@ export interface StoppedWrite {
   readonly stopped: boolean;
   readonly phoneVersion: number | null;
   readonly turnId: string | null;
+  /**
+   * For a commit's answer: the order the lease opened its turn in (../lease.ts lease_turns.seq), which says which lost
+   * commits' marks it may end (T-1206, DL-427). Left out for any other write.
+   */
+  readonly opened?: number | null;
 }
 
 /** One line as the safety read's bundle gives it now (K-01 v1 `fixedLine`, or an outcome step's checked `say`). */
@@ -179,8 +185,8 @@ export type TimerRefresh = "refreshed" | "unwired" | "failed";
 
 /**
  * How a re-read of the stopped flag ended (T-1206): read and copied; read but older than the copy, or than the actor's own
- * note (kept as it was); not wired; or failed (no answer, an error, an answer that is not K-04's row). Only "copied" lets
- * the stricter reading go.
+ * note (kept as it was); not wired; or failed (no answer, an error, an answer that is not K-04's row). Only "copied" ends
+ * lost commits' marks: those noted before the read was sent (DL-427).
  */
 export type StoppedRefresh = "copied" | "older" | "unwired" | "failed";
 

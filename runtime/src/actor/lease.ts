@@ -52,6 +52,9 @@
 // `committed`): the actor copies the stopped flag a STOP or START wrote, so the copy is set before that turn's reply can go.
 // A commit that went through with its answer lost, which only a park's alreadyCommitted tells of, is handed to the host
 // before the next turn opens (`commitLost`, T-1206), with the K-04 handle id the turn's last commit named (kept as sent).
+// Both go with the order the lease opened the turn in (lease_turns.seq; DL-427): a committed answer can arrive late, after
+// a later turn's commit lost its answer, and only an answer from that lost turn or a turn opened after it may end what
+// the host keeps for it.
 //
 // PostgreSQL down (T-270; arch 11 line 566: "Turns queue in order in each handle's actor"): while the host says so
 // (`held`), a lapse is no crash. The lease holds the turn as it is: it reruns nothing, counts no try and parks nothing, the
@@ -275,6 +278,8 @@ export type ParkAnswer = ParkParked | ParkAlreadyCommitted | ParkNotDone;
  */
 export interface LostCommit {
   turnId: string;
+  /** The order the lease opened the turn in (lease_turns.seq; DL-427): a later committed answer is weighed against it. */
+  opened: number;
   /** The K-04 handle id the turn's last commit named (K-05 turn.handleId, as sent), or null when the lease sent none. */
   handleId: string | null;
   /** K-05's committedAt, from the park's answer. */
@@ -347,6 +352,8 @@ interface Item {
 }
 
 interface TurnRow extends Record<string, SqlStorageValue> {
+  /** The order the turn opened in (AUTOINCREMENT: never reused, never reordered). */
+  seq: number;
   turn_id: string;
   items: string;
   state: string;
@@ -440,9 +447,11 @@ export interface LeaseHost {
   /**
    * Told of each commit that came back committed, first or repeated, before the run that sent it is answered (T-269): the
    * actor refreshes its own copies from it, so the stopped flag a STOP or START wrote is set before any reply that commit
-   * wrote can go. Optional; a throw changes nothing for the commit.
+   * wrote can go. `opened` is the order the lease opened the turn in (lease_turns.seq): an answer can come late, after
+   * turns opened later have committed or lost their answers (DL-427), so the host weighs it by its turn's place. Optional;
+   * a throw changes nothing for the commit.
    */
-  committed?(turn: CommitTurnRef, answer: CommitTurnCommitted): void;
+  committed?(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void;
   /**
    * Told of a commit that went through with its answer lost (T-1206): a park answered alreadyCommitted, so `committed` was
    * never called for it. Called before the turn finishes, so before the next turn opens: the actor's copies cannot read
@@ -672,7 +681,7 @@ export class TurnLease {
     // The write-on-return queue goes first (T-270; CQ-104 (f)): a danger or stop write the core is not answering for yet
     // keeps this commit back, with nothing sent and the turn's state as it was.
     if (!(await this.readyToCommit())) return { error: "transient" };
-    const gate = this.host.storage.transactionSync((): LeaseRefusal | null => {
+    const gate = this.host.storage.transactionSync((): LeaseRefusal | { opened: number } => {
       const turn = this.turnRow(turnId);
       if (turn === undefined) return { error: "unknownTurn" };
       if (turn.state === "replaced") return { error: "replaced" };
@@ -690,9 +699,9 @@ export class TurnLease {
           handleId,
         );
       }
-      return null;
+      return { opened: turn.seq };
     });
-    if (gate !== null) return gate;
+    if ("error" in gate) return gate;
     const at: CommitContext = { holds: this.host.holds(), unread: this.host.unread() };
     let answer: CommitTurnAnswer;
     try {
@@ -701,7 +710,7 @@ export class TurnLease {
       return { error: "noAnswer" };
     }
     if (isCommitted(answer)) {
-      this.tellCommitted(request.turn, answer);
+      this.tellCommitted(request.turn, answer, gate.opened);
       if (reply) await this.holdForReply(turnId, answer.committedAt);
       else await this.finish(turnId, "committed", answer.committedAt);
     } else if (answer.error === "turnParked") {
@@ -711,12 +720,13 @@ export class TurnLease {
   }
 
   /**
-   * Tells the host of a committed answer before the run is answered (T-269: the actor's copies). A copy that cannot be
-   * refreshed never fails the commit: the next write refreshes it.
+   * Tells the host of a committed answer before the run is answered (T-269: the actor's copies), with the order the turn
+   * opened in, whenever the answer arrives (DL-427). A copy that cannot be refreshed never fails the commit: the next
+   * write refreshes it.
    */
-  private tellCommitted(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
+  private tellCommitted(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void {
     try {
-      this.host.committed?.(turn, answer);
+      this.host.committed?.(turn, answer, opened);
     } catch {
       // The commit stands; the copies are refreshed on the next write.
     }
@@ -957,20 +967,20 @@ export class TurnLease {
     }
     if (isParked(answer)) await this.finish(turnId, "parked", null);
     else if (isAlreadyCommitted(answer)) {
-      this.tellCommitLost(turnId, answer.committedAt);
+      this.tellCommitLost(turnId, turn.seq, answer.committedAt);
       await this.finish(turnId, "committed", answer.committedAt);
     } else await this.host.arm();
   }
 
   /**
-   * Tells the host of a commit that went through with its answer lost (T-1206), with the handle id the turn's last commit
-   * named; a stored id that cannot be read is told as none (the host then fails safe without it). A host that cannot be
-   * told changes nothing for the turn.
+   * Tells the host of a commit that went through with its answer lost (T-1206), with the order its turn opened in and the
+   * handle id the turn's last commit named; a stored id that cannot be read is told as none (the host then fails safe
+   * without it). A host that cannot be told changes nothing for the turn.
    */
-  private tellCommitLost(turnId: string, committedAt: string): void {
+  private tellCommitLost(turnId: string, opened: number, committedAt: string): void {
     const handleId = this.commitHandleOf(turnId);
     try {
-      this.host.commitLost?.({ turnId, handleId, committedAt });
+      this.host.commitLost?.({ turnId, opened, handleId, committedAt });
     } catch {
       // The turn stands committed; the copies fail safe on their own reads.
     }
@@ -1022,7 +1032,7 @@ export class TurnLease {
   private turnRow(turnId: string): TurnRow | undefined {
     return this.sql
       .exec<TurnRow>(
-        "SELECT turn_id, items, state, restart, tries, committed_at FROM lease_turns WHERE turn_id = ?",
+        "SELECT seq, turn_id, items, state, restart, tries, committed_at FROM lease_turns WHERE turn_id = ?",
         turnId,
       )
       .toArray()[0];
@@ -1033,7 +1043,7 @@ export class TurnLease {
     const lease = this.leaseRow();
     return this.sql
       .exec<TurnRow>(
-        "SELECT turn_id, items, state, restart, tries, committed_at FROM lease_turns ORDER BY seq",
+        "SELECT seq, turn_id, items, state, restart, tries, committed_at FROM lease_turns ORDER BY seq",
       )
       .toArray()
       .map((row) => ({
