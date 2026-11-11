@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 11 (T-552 to T-562), receive to dispatch. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 12 (T-552 to T-563), receive to providerAccepted. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -70,8 +70,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 11's, the outbox dispatcher's claim and limit 8 (T-562). */
-const JOINED_THROUGH: SkeletonHop = "dispatch";
+/** The last hop joined on main: join 12's, the send to the Linq double (T-563). */
+const JOINED_THROUGH: SkeletonHop = "providerAccepted";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -948,6 +948,123 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       ),
     ).toEqual([]);
     return Promise.resolve();
+  },
+
+  // Row 12, "Send to the Linq double" (K-11; T-563; DL-315, DL-433; CQ-152): the row's one words part went through the
+  // root's Linq send port to @rosie/adapters' Linq double (T-411), the one the local target collects its parts from, which
+  // recorded exactly one send: under the part's key, to Sam's chat by iMessage, carrying S1-02's question in the final
+  // parts finalize wrote (S13-01's opener first, Q-30's STOP, HELP and rates line, the privacy link alone on the last
+  // line), accepted with the message id the part was marked sent with. One providerAccepted span, the part's, at the
+  // double's acceptance, inside the row's dispatch span and after its start (DL-349); no retry was needed, so nothing went
+  // on the retry queue. Then the hard invariant (no duplicate send): the same webhook sent again is dropped at receipt, and
+  // a dispatcher retry forced through the root's retry door (T-258's door, which the root installs: DL-315) claims nothing
+  // and sends nothing, so the double still holds one send. A send whose answer was lost, retried about 60 s later under a
+  // re-claim with the same key, and a 4006 retried under a new try key with one part delivered, are proven in
+  // runtime/src/wiring/hop12.worker.test.ts.
+  12: async (facts) => {
+    const row = `outbox-s1-02-${facts.turnId}-1`;
+    const key = `${row}/1/1`;
+    const { dispatch, finalize, linq, retryQueue } = facts.run.fakes;
+    const written = finalize.plans.get(row);
+    if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
+    const text = written.finalParts.sends[0].text ?? "";
+    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
+    const question = (planS102 as unknown as { readonly question: { readonly text: string } }).question.text;
+
+    // The Linq double the target collects from recorded exactly one send: the part, under its key, to Sam's chat, with
+    // S1-02's question in Rosie's first text, word for word, and nothing it refused.
+    expect(facts.run.target.linq).toBe(linq.double);
+    expect(linq.double.sentRequests()).toEqual([
+      {
+        idempotencyKey: key,
+        to: TEST_OWNER_1.handle.address,
+        chatId: JOIN.chatId,
+        service: JOIN.service,
+        kind: "words",
+        text,
+        calendarFile: null,
+        options: [],
+        link: null,
+        photo: null,
+        tapback: null,
+        threadedReplyTo: null,
+        typing: null,
+        overrideOptout: false,
+      },
+    ]);
+    expect(linq.double.rejectedRequests()).toEqual([]);
+    const lines = text.split("\n");
+    expect(lines[0]?.startsWith(`${opener} `)).toBe(true);
+    expect(text).toContain(question);
+    expect(lines.slice(-2)).toEqual([bundleV0FixedLine("optOutLine"), bundleV0FixedLine("privacyLink")]);
+    // Accepted by the double, and the part marked sent with the message id it gave.
+    const accepted = linq.accepted.get(key);
+    if (accepted?.providerMessageId == null) throw new Error("the Linq double accepted no part");
+    expect(dispatch.partMarks.map((call) => call.request)).toMatchObject([
+      { outcome: "sent", idempotencyKey: key, providerMessageId: accepted.providerMessageId },
+    ]);
+
+    // The part's one providerAccepted span, at the double's acceptance, inside the row's dispatch span.
+    const providerAccepted = onlySpan(facts, "providerAccepted");
+    expect(providerAccepted).toMatchObject({
+      outcome: "ok",
+      error_code: null,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      provider: "linq",
+      rows: [{ table: "outbox_parts", id: key }],
+    });
+    expect(Date.parse(providerAccepted.at)).toBe(Date.parse(accepted.acceptedAt));
+    const dispatchSpan = onlySpan(facts, "dispatch");
+    expect(Date.parse(providerAccepted.at)).toBeGreaterThan(Date.parse(dispatchSpan.at));
+    expect(Date.parse(providerAccepted.at)).toBeLessThanOrEqual(
+      Date.parse(dispatchSpan.at) + dispatchSpan.ms,
+    );
+    // No retry was needed: nothing went on the retry queue.
+    expect(retryQueue.sent).toEqual([]);
+
+    // The same webhook sent again: dropped at receipt as a known event id, so nothing more is stored or sent.
+    const again = await facts.run.target.sendEvent(JOIN);
+    expect(again.gatewayStatus).toBe(200);
+    await facts.actor.settle();
+    const repeat = await facts.run.target.collect(again.traceId);
+    if (repeat.trace === null) throw new Error(`no span carries trace id ${again.traceId}`);
+    expect(readReceipt(judgedTraceOf(repeat.trace).trace)).toMatchObject({
+      eventId: JOIN.eventId,
+      knownEventId: true,
+      repeatedWebhook: true,
+    });
+
+    // A dispatcher retry forced through the root's retry door: the row is sent, so its claim takes nothing.
+    const claimsBefore = dispatch.claims.length;
+    await expect(
+      facts.run.root.queue.sends.retrySend({
+        key: `retry-${key}#1`,
+        kind: "send",
+        businessId: TEST_OWNER_1.businessId,
+        traceId: facts.sent.traceId,
+        body: {
+          outboxRowId: row,
+          recipientHandleId: TEST_OWNER_1.handleId,
+          failedKey: key,
+          chain: "rerun",
+          code: "forced",
+        },
+        try: 2,
+        firstTriedAt: new Date(facts.run.fakes.clock.now()).toISOString(),
+      }),
+    ).resolves.toEqual({ result: "done" });
+    expect(dispatch.claims.slice(claimsBefore).map((call) => call.answer)).toEqual([
+      { result: "claimed", claimed: [], passedHeld: [] },
+    ]);
+    // Still one send: the double's one record, the line handed one request, the part marked once.
+    expect(linq.double.sentRequests()).toHaveLength(1);
+    expect(linq.requests).toHaveLength(1);
+    expect(dispatch.partMarks).toHaveLength(1);
+    // No span holds a word of the part.
+    expect(
+      stringsOf(facts.collected.spans).filter((value) => lines.some((line) => value.includes(line))),
+    ).toEqual([]);
   },
 };
 

@@ -27,7 +27,9 @@
 //                       wrote and test owner 1's seeded rows, which keep the plan and final parts written into the row;
 //   join 11, dispatch   K-05 v1.2's claimOutboxV12, renewClaim, markPartV12 and markRowV12 and its sendState as one double
 //                       over the rows the commit wrote, the plans and final parts finalize wrote into them and test owner
-//                       1's seeded rows (no phone row), for the dispatcher's claim and limit 8's read at send.
+//                       1's seeded rows (no phone row), for the dispatcher's claim and limit 8's read at send;
+//   join 12, send       K-11 sendPart through the root's Linq send port to @rosie/adapters' Linq double (T-411), the one
+//                       the local target collects its parts from, and the retry queue the dispatcher's waits go on.
 //
 // Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
 // root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
@@ -151,6 +153,8 @@ export function startRootRun(): RootRun {
     gateway: (request) => root.linqWebhook(request),
     basePath: env.BASE_PATH,
     webhookSecret: secret,
+    // Join 12: the Linq double the dispatcher sends to, whose parts the target collects.
+    linq: fakes.linq.double,
     now: () => fakes.clock.now(),
     traceCheck: prebuiltTraceCheck(),
   });
@@ -179,6 +183,9 @@ export function startRootRun(): RootRun {
       finalizeData: fakes.finalize.data,
       outboxCalls: fakes.dispatch.outbox,
       sendStateCall: fakes.dispatch.sendState,
+      // Join 12: each part to the Linq double, and the retry queue a row's next try goes on.
+      linqSendCall: fakes.linq.call,
+      retryQueue: fakes.retryQueue,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     restore = root.install();

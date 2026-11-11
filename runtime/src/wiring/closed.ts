@@ -87,9 +87,7 @@ export function closedPorts(): Ports {
       },
       clocks: { armClock: () => fail("dataAccess"), cancelClock: () => fail("dataAccess") },
     },
-    linqSend: {
-      parts: { sendPart: () => fail("linqSend") },
-      direct: { send: () => fail("linqSend") },
-    },
+    linqSend: { parts: { sendPart: () => fail("linqSend") } },
+    linqDirect: { send: () => fail("linqDirect") },
   };
 }

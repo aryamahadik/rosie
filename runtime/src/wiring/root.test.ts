@@ -1,14 +1,16 @@
 // The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560, T-561, T-562,
-// T-1213), under Node (Vitest project "unit"): the ports the root binds in each environment, each once and none left
-// unbound; the check that refuses a port bound twice or left unbound; each bound port handed to the part that calls it;
-// and the closed implementation the Worker's environments still bind for every port no join has reached (T-552 joined the
-// Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and
-// the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561
-// finalize, T-562 the outbox and the send state, T-1213 the chat open; production takes no join yet).
+// T-1213, T-563), under Node (Vitest project "unit"): the ports the root binds in each environment, each once and none
+// left unbound; the check that refuses a port bound twice or left unbound; each bound port handed to the part that calls
+// it; and the closed implementation the Worker's environments still bind for every port no join has reached (T-552 joined
+// the Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads
+// and the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561
+// finalize, T-562 the outbox and the send state, T-1213 the chat open, T-563 the Linq send and the dispatcher's retries;
+// production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
+import sendText from "@rosie/contracts/port-linq/fixtures/send-text.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
@@ -16,6 +18,8 @@ import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json"
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
+import type { LinqSendRequest } from "../dispatch/types";
+import { queueDeps } from "../queues";
 import { openTrace, type Span } from "../trace";
 import type {
   BuildFrontierRequest,
@@ -35,9 +39,11 @@ import {
   environmentOf,
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
+  NO_DEAD_LETTERS,
   NoComposerError,
   NoDatabaseError,
   NoDeciderError,
+  NoLinqLineError,
   NotJoinedError,
   PICKS,
   PORTS,
@@ -79,6 +85,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "finalize",
     "outbox",
     "sendState",
+    "linqSend",
   ],
   staging: [
     "linqVerify",
@@ -96,6 +103,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "finalize",
     "outbox",
     "sendState",
+    "linqSend",
   ],
   production: [],
 };
@@ -138,7 +146,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's nineteen ports in its turn order", () => {
+  it("names D-017's twenty ports in its turn order, the direct line last", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -159,6 +167,7 @@ describe("the ports the root binds", () => {
       "sendState",
       "dataAccess",
       "linqSend",
+      "linqDirect",
     ]);
   });
 
@@ -166,7 +175,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, chat open, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox and send state to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, chat open, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox, send state and Linq send to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -223,7 +232,7 @@ describe("the ports the root binds", () => {
     expect(root.safety.bundle).toBe(fakes.ports.stateReads.safety.bundle);
     expect(root.safety.directory).toBe(fakes.ports.stateReads.safety.directory);
     expect(root.safety.core).toBe(fakes.ports.turnFace.safetyCore);
-    expect(root.safety.direct).toBe(fakes.ports.linqSend.direct);
+    expect(root.safety.direct).toBe(fakes.ports.linqDirect);
     expect(root.turn.directory).toBe(fakes.ports.stateReads.turn.directory);
     expect(root.turn.safety).toBe(fakes.ports.stateReads.turn.safety);
     // The turn's decide and its one re-read go to the joined decide port (T-558), never to a fake; its composer and the
@@ -519,6 +528,38 @@ describe("the Worker's environments", () => {
     expect(spans).toEqual([]);
   });
 
+  it("fails the Linq send port closed with no Linq line bound (T-563): on staging the joined port refuses every send before anything leaves, and production keeps the port closed", async () => {
+    const request = structuredClone(sendText.request) as unknown as LinqSendRequest;
+
+    await expect(workerRoot(workerEnv("staging")).ports.linqSend.parts.sendPart(request)).rejects.toThrow(
+      new NoLinqLineError(),
+    );
+    await expect(workerRoot(workerEnv("production")).ports.linqSend.parts.sendPart(request)).rejects.toThrow(
+      new NotJoinedError("linqSend"),
+    );
+  });
+
+  it("puts the retry queue's ports in place with the actor's (T-563, DL-315): its send jobs reach the dispatcher's door, no job kind or dead-letter writer is joined, and the earlier ports come back", async () => {
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: skeletonFakes().ports },
+      actors: null,
+      vars: VARS,
+    });
+    const before = queueDeps();
+    const restore = root.install();
+    try {
+      expect(queueDeps()).toBe(root.queue);
+      expect(root.queue.jobs.size).toBe(0);
+      expect(root.queue.deadLetters).toBe(NO_DEAD_LETTERS);
+      // A job's dead letter is refused, never written and never lost: its message comes back (T-256's handOn).
+      await expect(NO_DEAD_LETTERS.put({} as never)).resolves.toEqual({ error: "noDeadLetterStore" });
+    } finally {
+      restore();
+    }
+    expect(queueDeps()).toBe(before);
+  });
+
   it("fails the chat-open port closed with no database bound (until T-567): the gateway's chat open, and the key call that gives its handle id, reach nothing", async () => {
     const { gateway, ports } = workerRoot(workerEnv("staging"));
     const request = {
@@ -590,6 +631,7 @@ describe("a closed port", () => {
       new NotJoinedError("dataAccess"),
     );
     await expect(closed.linqSend.parts.sendPart({} as never)).rejects.toThrow(new NotJoinedError("linqSend"));
+    await expect(closed.linqDirect.send({} as never)).rejects.toThrow(new NotJoinedError("linqDirect"));
     expect(() => closed.stateReads.safety.bundle.dangerWords()).toThrow(new NotJoinedError("stateReads"));
   });
 });
