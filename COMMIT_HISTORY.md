@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 399, [`f9c0032`](https://github.com/aryamahadik/rosie/commit/f9c0032), 2026-11-11 17:26:36 UTC.
+- **Through:** commit 401, [`74b9746`](https://github.com/aryamahadik/rosie/commit/74b9746), 2026-11-11 17:44:56 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 401. docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406) (\#408)
+
+- **Commit:** [`74b9746`](https://github.com/aryamahadik/rosie/commit/74b9746), by Arya Mahadik, 2026-11-11 17:44:56 UTC
+- **Pull request:** [#408](https://github.com/aryamahadik/rosie/pull/408) from `task/commit-history-23`, merged 2026-11-11 17:44:57 UTC. It squashed 1 branch commit:
+  - `3dc3fc3` docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406)
+- **Files changed:** 1 (+90 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +90 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 400. T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wrangler.jsonc, and env.staging's own FILES binding on rosie-staging-files, which settles wrangler's r2\_buckets warning; the two config tests pin both (\#407)
+
+- **Commit:** [`19fdbb4`](https://github.com/aryamahadik/rosie/commit/19fdbb4), by Arya Mahadik, 2026-11-11 17:44:52 UTC
+- **Pull request:** [#407](https://github.com/aryamahadik/rosie/pull/407) from `task/T-1235`, merged 2026-11-11 17:44:53 UTC. It squashed 1 branch commit:
+  - `8661ad4` T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wran…
+- **Files changed:** 3 (+168 −10), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +123 −7, wrangler-env.test.mjs +30 −1
+  - `/` wrangler.jsonc +15 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 399. docs: COMMIT\_HISTORY.md through commit 396 (035381d, \#403) (\#406)
 
