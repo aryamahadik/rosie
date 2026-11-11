@@ -167,7 +167,8 @@ export type StoppedFlagAnswer =
 /**
  * The re-read of a handle's stopped flag (K-04 v1 `phones.stopped` and `phones.version`, for the handle's phone), after a
  * commit whose answer was lost (T-1206). No frozen data-access call reads it for the actor yet: the adapter joins with the
- * timers' at D-017, and a fake answers in tests. Unset, the copy keeps the stricter reading.
+ * timers' at D-017, and a fake answers in tests. Unset, the copy keeps the stricter reading. The read must be fresh, from
+ * the primary and never a cache: a read the copy takes ends the lost commits' marks noted before it was sent (DL-427).
  */
 export interface StoppedFlagSource {
   stoppedFlag(request: { handleId: string }): Promise<StoppedFlagAnswer>;
