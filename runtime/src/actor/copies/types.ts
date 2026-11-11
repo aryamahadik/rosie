@@ -152,5 +152,11 @@ export type TimerRefresh = "refreshed" | "unwired" | "failed";
 /** What a committed answer gives the copies: the stopped flag a STOP or START wrote, and whether a safety timer was written. */
 export interface CommitCopies {
   readonly stopped: { readonly stopped: boolean; readonly phoneVersion: number } | null;
+  /**
+   * True when the commit may have written a K-34 safety_timers row: its rows name one, a core result may have written one
+   * (a core action K-09 does not list, which went through: its rows are not in K-09's `written`, T-1198), it is K-09's
+   * repeat (its first answer, maybe lost, named the rows: T-1203), or the answer cannot be read (fails safe, DL-413). The
+   * actor then reloads the timers.
+   */
   readonly timersWritten: boolean;
 }

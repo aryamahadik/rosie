@@ -16,8 +16,10 @@
 //     read never takes a safety line from the actor;
 //   - each live safety timer of the handle (K-34 v1 `safety_timers`, running or missed): its due time and zone, the job's
 //     address exactly as K-34 seals it (under its person's key: never opened here), and the emergency contact who said
-//     yes (their person and handle). A commit that wrote a timer row reloads them all (`refreshTimers`); a reload that
-//     fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds.
+//     yes (their person and handle). A commit that may have written a timer row reloads them all (`refreshTimers`): its
+//     rows name the row, a core action's result may have written it, it is a repeat (whose first answer, maybe lost, named
+//     the rows), or its answer cannot be read (`readCommit`, T-1198, DL-413); a reload that fails keeps the copy as it was
+//     and marks it stale, and every later commit reloads until one succeeds.
 //
 // T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
 // `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
@@ -63,35 +65,100 @@ const isCount = (value: unknown): value is number =>
 
 // ---- what a commit says ---------------------------------------------------------------------------------------------
 
-/** The rows a commit wrote: K-09's answer keeps K-05's commitResult in `written`; K-05's own answer is that commitResult. */
-function writtenRowsOf(committed: Record<string, unknown>): unknown[] {
+/** K-34's table of safety timers, as K-05 v1 names a written row's table. */
+const TIMERS_TABLE = "safety_timers";
+
+/** A written row (K-05 v1 rowRef) that names K-34's table, or names no table, so it cannot be told not to (fails safe). */
+function mayNameTimers(row: unknown): boolean {
+  return !isRecord(row) || typeof row.table !== "string" || row.table === TIMERS_TABLE;
+}
+
+/** K-09's refusal of a core action: each of its errors is a JSON object with its own "error" code (K-09 v1 `*.errors`). */
+function isRefusal(error: unknown): boolean {
+  return isRecord(error) && typeof error.error === "string";
+}
+
+/**
+ * K-09's core actions (v1 `coreAction`, which v1.1 to v1.6 take by reference): none writes a K-34 safety_timers row (K-09
+ * names that table in none of their writes, T-1194's security review). A core action is known by its call alone.
+ */
+const CORE_CALLS_WITHOUT_TIMERS: ReadonlySet<string> = new Set([
+  "recordSafetyOutcome",
+  "releaseSafetyHold",
+  "recordStopOrStart",
+  "setRecordFlag",
+  "handOff",
+  "answerHandOff",
+  "pageTeam",
+  "acknowledgePage",
+  "openReviewItem",
+  "enterDoor",
+  "sendFixedLine",
+  "sendProofCode",
+  "proveCode",
+  "issueChatLink",
+  "saveSetupStep",
+]);
+
+/**
+ * True when a core result may have written a K-34 safety_timers row (T-1198). K-09's `written` leaves a core action's rows
+ * out, its response naming them in its own words (actions/src/commit default 9; K-09 v1.5 default 134), so a core action
+ * that writes a timer is known by its result alone: one that went through (error null, a response) for a call that is not
+ * one of K-09's core actions above, which write none. A result that is not K-09's coreResult cannot say what it wrote, so
+ * it may have (fails safe, DL-413): not a record, no string call, no error field, an error that is not K-09's refusal, or
+ * no response though it went through. Only a refused core action (nothing written: K-09) or one of the core actions above
+ * that went through reads no.
+ */
+function coreMayWriteTimers(result: unknown): boolean {
+  if (!isRecord(result) || typeof result.call !== "string") return true;
+  if (isRefusal(result.error)) return false;
+  if (result.error !== null || !isRecord(result.response)) return true;
+  return !CORE_CALLS_WITHOUT_TIMERS.has(result.call);
+}
+
+/**
+ * Whether a commit may have written a K-34 safety_timers row, so the actor reloads the timers' copy (T-1198, DL-413). It
+ * reads no only where the answer says so in its contract's shape; what it cannot read reloads, since one more read costs
+ * less than a copy behind a timer while PostgreSQL is down (arch 11 lines 566 and 568):
+ *
+ *   - K-09's answer (`written` a record: K-05's commitResult, without the rows a core action wrote, T-1194). A repeat
+ *     (`repeated` true) answers its first commit with no rows (K-05 v1 commitResult), and that first answer may have been
+ *     lost with the rows it named, so a repeat reloads (T-1203); so does an answer whose `repeated` is not a boolean, or
+ *     whose core results or rows are not lists. A first answer (`repeated` false) reloads when a row may name the table,
+ *     or a core result may have written one (`coreMayWriteTimers`).
+ *   - K-05's own commitResult (`written` a list, every row the commit wrote): when a row may name the table, or a core
+ *     result, if any, may have written one. Its repeat is not flagged inside it (the lease's `repeated` is not read here).
+ *   - `written` in neither shape: when a core result, if any, may have written one.
+ */
+function timersMayBeWritten(committed: Record<string, unknown>, core: readonly unknown[] | null): boolean {
   const written = committed.written;
-  if (Array.isArray(written)) return written as unknown[];
-  if (isRecord(written) && Array.isArray(written.written)) return written.written as unknown[];
-  return [];
+  if (isRecord(written)) {
+    if (committed.repeated !== false || core === null || !Array.isArray(written.written)) return true;
+    return (written.written as unknown[]).some(mayNameTimers) || core.some(coreMayWriteTimers);
+  }
+  const rows = Array.isArray(written) ? (written as unknown[]) : [];
+  return rows.some(mayNameTimers) || (core ?? []).some(coreMayWriteTimers);
 }
 
 /**
  * What a committed answer gives the copies (the lease's `committed`: K-09 v1 gateAndCommit.committed through the turn's
  * commit hook, or K-05 v1 commitTurn's commitResult). The stopped flag is the last recordStopOrStart result the core took,
- * in the actions' order, with its phone row's version; a safety timer was written when the commit's rows name the K-34
- * table. Anything that is not the contract's shape gives nothing.
+ * in the actions' order, with its phone row's version (a repeat's too: it answers its first commit). Whether a safety
+ * timer may have been written is `timersMayBeWritten`'s, never `written` alone: since T-1194, K-09's `written` lists only
+ * the walk's and the parts' rows. An answer that is not a record gives nothing.
  */
 export function readCommit(committed: unknown): CommitCopies {
   if (!isRecord(committed)) return { stopped: null, timersWritten: false };
+  const core = Array.isArray(committed.core) ? (committed.core as unknown[]) : null;
   let stopped: CommitCopies["stopped"] = null;
-  const core = committed.core;
-  for (const result of Array.isArray(core) ? (core as unknown[]) : []) {
+  for (const result of core ?? []) {
     if (!isRecord(result) || result.call !== "recordStopOrStart" || result.error !== null) continue;
     const response = result.response;
     if (!isRecord(response) || typeof response.stopped !== "boolean" || !isCount(response.phoneVersion))
       continue;
     stopped = { stopped: response.stopped, phoneVersion: response.phoneVersion };
   }
-  const timersWritten = writtenRowsOf(committed).some(
-    (row) => isRecord(row) && row.table === "safety_timers",
-  );
-  return { stopped, timersWritten };
+  return { stopped, timersWritten: timersMayBeWritten(committed, core) };
 }
 
 // ---- the stored copies ----------------------------------------------------------------------------------------------
