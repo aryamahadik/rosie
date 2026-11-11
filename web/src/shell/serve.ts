@@ -7,31 +7,41 @@
 // style by its hash alone and lets no other site frame the page; no referrer on any link; no type sniffing. Nothing from
 // the request (its query, headers or cookies) reaches the page, and nothing about the reader is logged.
 //
-// Not yet wired: the Worker's fetch calls servePage before its 404, a change to runtime/src/index.ts outside T-1171's
-// card (named in its handoff). Until then the page is built and tested here, not served on rosfield.com/test.
+// The Worker's fetch calls servePage last before its 404 (T-1192, runtime/src/index.ts), so these pages are served on
+// rosfield.com/test. The web app shell (T-511, shell.ts) serves the same pages with the same headers, and beside them
+// the feature folders' routes, each answer with its trace id and one log line; servePage itself is unchanged.
 import { PAGE_ROUTES, type PageRoute } from "../routes";
 import { FRAME_STYLE_SOURCE, basePathOf } from "./frame";
 
 /** The methods a page answers. */
 export const PAGE_METHODS = ["GET", "HEAD"] as const;
 
-/** The content security policy of every page answer (see the top of this file). */
-export function contentSecurityPolicy(): string {
+/** What one page's content security policy allows beyond the frame's own style. Left out: nothing. */
+export interface PagePolicy {
+  /** True: the page holds a form that posts to this site (form-action 'self'), never to another. */
+  forms?: boolean;
+}
+
+/**
+ * The content security policy of every page answer (see the top of this file). With `policy.forms`, a form may post to
+ * this site and nowhere else; everything else stays as it is.
+ */
+export function contentSecurityPolicy(policy: PagePolicy = {}): string {
   return [
     "default-src 'none'",
     `style-src ${FRAME_STYLE_SOURCE}`,
     "base-uri 'none'",
-    "form-action 'none'",
+    `form-action ${policy.forms === true ? "'self'" : "'none'"}`,
     "frame-ancestors 'none'",
   ].join("; ");
 }
 
 /** The headers of every page answer: no cookie, nothing loaded from outside, no script, no referrer, no framing. */
-export function pageHeaders(contentType: string): Headers {
+export function pageHeaders(contentType: string, policy: PagePolicy = {}): Headers {
   return new Headers({
     "content-type": contentType,
     "cache-control": "no-store",
-    "content-security-policy": contentSecurityPolicy(),
+    "content-security-policy": contentSecurityPolicy(policy),
     "referrer-policy": "no-referrer",
     "x-content-type-options": "nosniff",
     "x-frame-options": "DENY",
