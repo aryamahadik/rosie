@@ -1,0 +1,28 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-poll-sent.json"],
+    "now": "2026-10-23T14:05:06Z",
+    "note": "Linq's message.delivered for A7-03's poll, with its message id and the part's key echoed (K-11 partKey). The part holds that message id, so it is found by it, and moves sent to delivered. Every part's latest try is now delivered, so the row moves sent to delivered and its version rises to 7. It is the row's second delivery (the words were delivered at 14:05:04Z), so firstDelivery is false and the clock, armed at the words' receipt (arm-clock-a7-03-after-4006), is not armed again. A v1.9 call states repeatedDelivery on every answer: null here, since this mark records a delivery and repeats none."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0302",
+    "at": "2026-10-23T14:05:06Z",
+    "idempotencyKey": "out-a7-03-alex/2/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 2,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "delivered", "version": 7 },
+    "repeatedDelivery": null
+  }
+}
