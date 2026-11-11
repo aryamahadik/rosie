@@ -1,5 +1,5 @@
-// Data-access v1.2: a recipient's send state, limit 8's read just before a send (K-05 v1.2 item 28; QUESTIONS.md
-// NQ-RT-2; T-259; T-220).
+// Data-access v1.2 and v1.8: a recipient's send state, limit 8's read just before a send (K-05 v1.2 item 28; v1.8 item
+// 47; QUESTIONS.md NQ-RT-2; T-259; T-220; T-1216).
 //
 // sendState takes only the outbox row's id and reads everything else from the row itself, so a caller cannot hand it a
 // copy to compare (refuse-send-state-caller-versions), all in one read of the primary:
@@ -9,7 +9,9 @@
 //                          email handle or a number with no phone row) and the handle's chat thread with Linq's chat id;
 //   textsConsent           the newest texts consent row for that contact that covers the row's business, its
 //                          business's or every business's (K-29 consents_handle_kind_at_idx; default 35), read
-//                          through consent.ts's newestTextsConsent; for an email contact it is the stop record;
+//                          through consent.ts's newestTextsConsent; for an email contact it is the stop record. Since
+//                          v1.8 (item 47) it also says who gave it and for which booking, fromContact and bookingId
+//                          (below), always both;
 //   audience               whose text hours apply (RULES 4.3; default 31): owner for a live owner role of the recipient
 //                          person at the row's business, team for admin, staff or own_business (FS T01), customer
 //                          otherwise, a row with no business or no person included; the highest of a person's roles wins;
@@ -30,6 +32,29 @@
 //                          pauses are not read (K-05 open gap 17).
 // What limit 8 does with it, and what each flag holds back, is C-125's (T-259, T-562).
 //
+// Who gave the texts yes, and for which booking (K-05 v1.8 item 47; defaults 78 to 84; T-1099's handoff). The covering
+// row is the one newestTextsConsent picks, as v1.2 picks it (default 35, unchanged); in the same transaction the call
+// then reads that row by its id for K-29's channel, turn_id, handle_id and booking_id, and the handle_id of the turn that
+// wrote it (K-04 turns, by the turn's id, a left join: none when no turn wrote it). consent.ts keeps v1.2's answer of
+// newestTextsConsent as it stands, so this second read names the row by the id the first one chose; a consent row is
+// never edited or removed (0013) and no call moves a turn to another handle, so the two reads see one row either way.
+//   fromContact            true only for a yes the person sent by text from the contact the row covers: the recipient's
+//                          handle is a phone (default 80: an email contact's row reads false), the row does not
+//                          withdraw (default 82), its channel is text, and either a turn of the row's own handle wrote it
+//                          (turns.handle_id equal to consents.handle_id: a turn batches one handle's texts, so a yes by
+//                          text in it came from that number, whoever on it sent it), or no turn wrote it and it has no
+//                          business (only a STOP's or a START's row has none, and one that does not withdraw is a START,
+//                          which K-09 records only from that number's own START text, on return). False for every other
+//                          row, failing closed: a yes the business entered (the owner's '1 Yes' is his own turn's), a
+//                          page's, an outside AI's or an email's, a yes by text in another handle's turn, and a yes no
+//                          turn wrote that is not a START (default 79), even one that came from the contact;
+//   bookingId              consents.booking_id as stored (default 81): the booking a yes was given for; null on a STOP's
+//                          or a START's row and on a yes for the business rather than one booking. Whether that booking
+//                          was made after the stop is stored nowhere and is not read (default 83, K-05 open gap 52).
+// phone.stopped and phone.stopAt stay the phone row as stored, never derived from a consent row (STATE note 10; default
+// 84), and no statement here names a consent row's words (exact_words; default 36). Every answer is v1.8's
+// sendState.v1dot8Response.
+//
 // A versions_read entry names its home table and the row's primary key as text (K-02 fact rowId; K-04 versions_read).
 // The call reads only the homes VERSIONED_HOMES lists, the versioned tables of K-04 v1 core and K-29 v1 with a
 // one-column key, each by its key column; it builds no read from the stored names alone. Any other name throws, since
@@ -42,7 +67,8 @@
 // 538): the primary, uncached, in one read-only transaction at repeatable read, so it is one moment's read; a new call
 // right after a STOP commits sees it. A serialization failure, a deadlock or a lost connection answers transient.
 // Nothing here logs: the address and the consent are personal data.
-import { newestTextsConsent } from "./consent";
+import type * as K05v1dot8 from "../../contracts/generated/data-access/data-access.v1.8";
+import { type ConsentChannel, newestTextsConsent, type TextsConsent } from "./consent";
 import {
   assertId,
   assertRequestShape,
@@ -109,37 +135,23 @@ export interface PauseRead {
   version: number;
 }
 
-export interface SendStateResponse {
-  result: "sendState";
-  outboxRowId: string;
-  rowState: RowState;
-  rowVersion: number;
-  readAt: string;
-  recipient: { handleId: string; kind: "phone" | "email"; address: string; personId: string | null };
-  phone: PhoneRead | null;
-  chat: { threadId: string; linqChatId: string | null; version: number } | null;
-  textsConsent: { consentId: string; businessId: string | null; revoked: boolean; at: string } | null;
-  audience: Audience;
-  zone: string | null;
-  /** Null in v1.2: no frozen part stores a visit's zone until K-30 (default 34). */
-  visitZone: string | null;
-  businessZone: string | null;
-  textHours: { start: string; end: string } | null;
-  textHoursOverride: boolean;
-  currentVersions: RowRef[];
-  booking: {
-    id: string;
-    stage: BookingStage;
-    servedPersonId: string | null;
-    private: boolean;
-    deceased: boolean;
-    version: number;
-  } | null;
-  pauses: PauseRead[];
-  openQuestion: { id: string; status: QuestionStatus; version: number } | null;
-  closed: { booking: boolean; question: boolean };
-}
+/**
+ * K-05 v1.8 sendState.v1dot8Response (item 47): the answer sendState gives, v1.2's fields (item 28) with textsConsent,
+ * when there is one, always stating fromContact and bookingId.
+ */
+export type SendStateV1Dot8Response = K05v1dot8.SendStateV1Dot8Response;
+/** K-05 v1.8 textsConsentV1dot8: the covering texts row as a v1.8 call gives it, who gave it and for which booking. */
+export type TextsConsentV1Dot8 = K05v1dot8.TextsConsentV1Dot8;
+/**
+ * K-05 v1.8 sendState.response: the same fields with fromContact and bookingId optional, for a consumer that also reads
+ * an answer of v1.2 to v1.7, which has neither and reads as not known, so no yes lifts a stop (T-1099). sendState itself
+ * always states both.
+ */
+export type SendStateResponse = K05v1dot8.SendStateResponse;
 
+/** What sendState answers: a v1.8 answer, notFound or transient. */
+export type SendStateV1Dot8Outcome = SendStateV1Dot8Response | NotFoundError | TransientError;
+/** What a consumer of any version's answer reads (the runtime's send-state port): sendState's outcome is one. */
 export type SendStateOutcome = SendStateResponse | NotFoundError | TransientError;
 
 /** The release flag of the staging test phone's text-hours override (K-04 seed-flag; QUESTIONS.md M3-M3b.4). */
@@ -288,6 +300,72 @@ async function audienceOf(db: Db, personId: string | null, businessId: string | 
 }
 
 /**
+ * What item 47 reads of the covering row besides v1.2's four fields (K-29 v1 consents: channel, turn_id, handle_id,
+ * booking_id), with the handle of the turn that wrote it (K-04 v1 turns.handle_id; null when no turn wrote it). Never
+ * the row's words.
+ */
+interface ConsentSourceRow {
+  channel: ConsentChannel;
+  turn_id: string | null;
+  handle_id: string | null;
+  booking_id: string | null;
+  turn_handle_id: string | null;
+}
+
+/** Item 47's read of the covering row by its id, and of the turn that wrote it by the turn's id (K-05 v1.8). */
+async function consentSourceOf(db: Db, consentId: string): Promise<ConsentSourceRow> {
+  const [row] = await db<ConsentSourceRow[]>`
+    select c.channel, c.turn_id, c.handle_id, c.booking_id, t.handle_id as turn_handle_id
+    from consents c
+    left join turns t on t.id = c.turn_id
+    where c.id = ${consentId}
+  `;
+  if (row === undefined) {
+    throw new Error("sendState: the covering texts consent row is missing from its own read");
+  }
+  return row;
+}
+
+/**
+ * Whether the covering row is a yes the person sent by text from the contact it covers (K-05 v1.8 item 47, defaults 78
+ * to 82): only for a phone contact, a row that does not withdraw, given by text, and written either by a turn of the
+ * row's own handle or, with no turn, as a START (no business). Every other row is false, failing closed.
+ */
+function fromContactOf(
+  contactKind: "phone" | "email",
+  consent: TextsConsent,
+  source: ConsentSourceRow,
+): boolean {
+  if (contactKind !== "phone" || consent.revoked || source.channel !== "text") {
+    return false;
+  }
+  if (source.turn_id === null) {
+    return consent.businessId === null;
+  }
+  return source.turn_handle_id !== null && source.turn_handle_id === source.handle_id;
+}
+
+/** The covering row as a v1.8 call gives it (item 47): v1.2's four fields, who gave it and for which booking. */
+async function textsConsentOf(
+  db: Db,
+  contactKind: "phone" | "email",
+  consent: TextsConsent | null,
+): Promise<TextsConsentV1Dot8 | null> {
+  if (consent === null) {
+    return null;
+  }
+  const source = await consentSourceOf(db, consent.consentId);
+  return {
+    consentId: consent.consentId,
+    businessId: consent.businessId,
+    revoked: consent.revoked,
+    at: utc(consent.at),
+    fromContact: fromContactOf(contactKind, consent, source),
+    bookingId: source.booking_id,
+  };
+}
+
+/**
  * Limit 8's send state inside the transaction `db`, which must run on the runtime side (no business scope). Prefer
  * sendState(); this is for a caller that already holds a transaction.
  */
@@ -295,7 +373,7 @@ export async function sendStateIn(
   db: Db,
   request: SendStateRequest,
   options: ReadOptions = {},
-): Promise<SendStateResponse | NotFoundError> {
+): Promise<SendStateV1Dot8Response | NotFoundError> {
   assertRequestShape(request, "sendState", ["outboxRowId"]);
   assertId(request.outboxRowId, "outboxRowId");
   await assertRuntimeSide(db, "sendState");
@@ -332,7 +410,8 @@ export async function sendStateIn(
     select id, linq_chat_id, version from threads where handle_id = ${handle.id} and kind = 'chat'
   `;
 
-  const consent = await newestTextsConsent(db, handle.id, row.business_id);
+  const covering = await newestTextsConsent(db, handle.id, row.business_id);
+  const textsConsent = await textsConsentOf(db, handle.kind, covering);
   const audience = await audienceOf(db, row.recipient_person_id, row.business_id);
 
   const [business] =
@@ -406,15 +485,7 @@ export async function sendStateIn(
     phone: phone === undefined ? null : toPhone(phone),
     chat:
       chat === undefined ? null : { threadId: chat.id, linqChatId: chat.linq_chat_id, version: chat.version },
-    textsConsent:
-      consent === null
-        ? null
-        : {
-            consentId: consent.consentId,
-            businessId: consent.businessId,
-            revoked: consent.revoked,
-            at: utc(consent.at),
-          },
+    textsConsent,
     audience,
     // The visit's zone, else the business's (CQ-05): no frozen part stores a visit's zone before K-30 (default 34).
     zone: businessZone,
@@ -445,16 +516,16 @@ export async function sendStateIn(
 }
 
 /**
- * A recipient's send state for one outbox row (K-05 v1.2 item 28), for limit 8 at send: one read-only transaction on
- * the primary, uncached, on the runtime side. Pass the client's primary handle, run as rosie_job. notFound when the row
- * does not exist; transient on a serialization failure, a deadlock or a lost connection. Limit 8 sends nothing on
- * either (it fails closed: T-259).
+ * A recipient's send state for one outbox row (K-05 v1.2 item 28, with v1.8 item 47's fromContact and bookingId), for
+ * limit 8 at send: one read-only transaction on the primary, uncached, on the runtime side. Pass the client's primary
+ * handle, run as rosie_job. notFound when the row does not exist; transient on a serialization failure, a deadlock or a
+ * lost connection. Limit 8 sends nothing on either (it fails closed: T-259).
  */
 export async function sendState(
   sql: Sql,
   request: SendStateRequest,
   options: ReadOptions = {},
-): Promise<SendStateOutcome> {
+): Promise<SendStateV1Dot8Outcome> {
   assertRequestShape(request, "sendState", ["outboxRowId"]);
   assertId(request.outboxRowId, "outboxRowId");
   try {
