@@ -6,8 +6,9 @@
 // reads those files and puts all of their code into that one WebSocket message. workerd closes the runner's socket on a
 // message larger than SOCKET_LIMIT (close code 1009, "Message is too large"), and Vitest reports "Worker exited
 // unexpectedly" for the file. Measured on 5d69f31 with the seeded four-file run (pages.worker, root.worker, test-phone,
-// hop9): hop9's reply was 33,125,602 bytes (835 modules, 98.7% of the limit); with test-phone's old import of
-// gateway/pages/test-support put back, test-phone's was 33,802,390 bytes and its runner crashed.
+// hop9): hop9's reply was 33,125,602 bytes (835 entries, the ids and urls of some 420 modules; 98.7% of the limit);
+// with test-phone's old import of gateway/pages/test-support put back, test-phone's was 33,802,390 bytes and its runner
+// crashed.
 //
 // The fix. vitest.config.ts's workers and e2e-workers projects set fsModuleCache: false: no module is stored on disk,
 // so the reply carries no code, and each module reaches the runner in the reply to its own fetch. The largest message is
@@ -18,12 +19,13 @@
 //   1. checks that workerd still takes a SOCKET_LIMIT-byte message on a Worker's accepted socket (the runner's shape:
 //      a WebSocketPair, accept(), a 101 response) at wrangler.jsonc's compatibility date, and closes it on one byte
 //      more, so the stated limit stays a measured fact;
-//   2. collects test-phone's and root.worker's Workers tests (the largest graphs) through the workers project in one
-//      Vitest process with one worker, so the second file's runner meets the modules the first one's made the server
-//      transform, with every message the pool sends a runner measured. It fails when either workerd project does not
-//      resolve fsModuleCache: false, when a message carries more than one module's code, or when a message is larger
-//      than BUDGET (75% of the limit), naming the module: a module that grows that far needs splitting (or the pool a
-//      larger socket) before it reaches the limit.
+//   2. runs test-phone's and root.worker's Workers tests (the largest graphs) through the workers project in one
+//      Vitest process with one worker, so the second file's runner starts after the server has transformed the first
+//      file's modules, with every message the pool sends a runner measured (workers-pool-messages.run.mjs). It fails
+//      when a message carries more than one module's code, when a message is larger than BUDGET (75% of the limit),
+//      naming the module (a module that grows that far needs splitting, or the pool a larger socket, before it reaches
+//      the limit), when either workerd project does not resolve fsModuleCache: false, or when a runner crashed. The
+//      tests' own results are npm test's to judge.
 // miniflare comes with @cloudflare/vitest-plugin and wrangler (one copy in node_modules); the pool's socket is its
 // WebSocket, measured where the pool calls send().
 import { test } from "node:test";
