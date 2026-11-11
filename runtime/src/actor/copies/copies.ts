@@ -18,8 +18,8 @@
 //     address exactly as K-34 seals it (under its person's key: never opened here), and the emergency contact who said
 //     yes (their person and handle). A commit that may have written a timer row reloads them all (`refreshTimers`): its
 //     rows name the row, a core action's result may have written it, it is a repeat (whose first answer, maybe lost, named
-//     the rows), or its answer cannot be read (`readCommit`, T-1198, DL-413); a reload that fails keeps the copy as it was
-//     and marks it stale, and every later commit reloads until one succeeds.
+//     the rows: by K-09's flag or the lease's, T-1204), or its answer cannot be read (`readCommit`, T-1198, DL-413); a
+//     reload that fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds.
 //
 // T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
 // `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
@@ -127,7 +127,8 @@ function coreMayWriteTimers(result: unknown): boolean {
  *     whose core results or rows are not lists. A first answer (`repeated` false) reloads when a row may name the table,
  *     or a core result may have written one (`coreMayWriteTimers`).
  *   - K-05's own commitResult (`written` a list, every row the commit wrote): when a row may name the table, or a core
- *     result, if any, may have written one. Its repeat is not flagged inside it (the lease's `repeated` is not read here).
+ *     result, if any, may have written one. Its repeat is not flagged inside it: `readCommit` reads the lease's `repeated`
+ *     for it (T-1204).
  *   - `written` in neither shape: when a core result, if any, may have written one.
  */
 function timersMayBeWritten(committed: Record<string, unknown>, core: readonly unknown[] | null): boolean {
@@ -145,10 +146,17 @@ function timersMayBeWritten(committed: Record<string, unknown>, core: readonly u
  * commit hook, or K-05 v1 commitTurn's commitResult). The stopped flag is the last recordStopOrStart result the core took,
  * in the actions' order, with its phone row's version (a repeat's too: it answers its first commit). Whether a safety
  * timer may have been written is `timersMayBeWritten`'s, never `written` alone: since T-1194, K-09's `written` lists only
- * the walk's and the parts' rows. An answer that is not a record gives nothing.
+ * the walk's and the parts' rows. An answer that is not a record gives no stopped flag.
+ *
+ * `lease` is the lease's own answer around it (../lease.ts CommitTurnCommitted, T-1204): its `repeated` is K-05 v1
+ * commitTurn.response's, which K-05's commitResult does not carry inside it. A repeat reloads the timers whatever the
+ * answer's shape (T-1203's rule: its first answer, maybe lost, named the rows), and so does a flag that is not false (it may
+ * be a repeat: fails safe, DL-413). On K-09's path the lease's flag is K-09's own (../../turn/turn.ts
+ * commitThroughToolApi), so it reads as before. Left out (a caller with the answer alone), the answer alone decides.
  */
-export function readCommit(committed: unknown): CommitCopies {
-  if (!isRecord(committed)) return { stopped: null, timersWritten: false };
+export function readCommit(committed: unknown, lease?: { readonly repeated: unknown }): CommitCopies {
+  const repeat = lease === undefined ? false : lease.repeated !== false;
+  if (!isRecord(committed)) return { stopped: null, timersWritten: repeat };
   const core = Array.isArray(committed.core) ? (committed.core as unknown[]) : null;
   let stopped: CommitCopies["stopped"] = null;
   for (const result of core ?? []) {
@@ -158,7 +166,7 @@ export function readCommit(committed: unknown): CommitCopies {
       continue;
     stopped = { stopped: response.stopped, phoneVersion: response.phoneVersion };
   }
-  return { stopped, timersWritten: timersMayBeWritten(committed, core) };
+  return { stopped, timersWritten: repeat || timersMayBeWritten(committed, core) };
 }
 
 // ---- the stored copies ----------------------------------------------------------------------------------------------

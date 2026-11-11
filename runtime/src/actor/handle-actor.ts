@@ -633,12 +633,14 @@ export class HandleActor extends DurableObject {
 
   /**
    * A commit came back committed (T-269; the lease calls this before the run that sent it is answered): the stopped flag a
-   * STOP or START wrote is copied at once, so it is set before that turn's reply can go; a commit that wrote a safety timer
-   * row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's K-04 handle
-   * id), as work lent to the platform.
+   * STOP or START wrote is copied at once, so it is set before that turn's reply can go; a commit that may have written a
+   * safety timer row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's
+   * K-04 handle id), as work lent to the platform. The lease's own `repeated` goes with the answer (T-1204): K-05's
+   * commitResult has no flag of its own, and a repeat reloads whatever the answer's shape, since its first answer, maybe
+   * lost, named the rows.
    */
   private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
-    const read = readCommit(answer.committed);
+    const read = readCommit(answer.committed, { repeated: answer.repeated });
     if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
     if (read.timersWritten || this.copies.timersStale()) {
       // The PostgreSQL-down path's alarm follows the copy's earliest timer due (T-270).

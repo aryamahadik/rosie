@@ -154,9 +154,9 @@ export interface CommitCopies {
   readonly stopped: { readonly stopped: boolean; readonly phoneVersion: number } | null;
   /**
    * True when the commit may have written a K-34 safety_timers row: its rows name one, a core result may have written one
-   * (a core action K-09 does not list, which went through: its rows are not in K-09's `written`, T-1198), it is K-09's
-   * repeat (its first answer, maybe lost, named the rows: T-1203), or the answer cannot be read (fails safe, DL-413). The
-   * actor then reloads the timers.
+   * (a core action K-09 does not list, which went through: its rows are not in K-09's `written`, T-1198), it is a repeat by
+   * K-09's flag or the lease's, whatever the answer's shape (its first answer, maybe lost, named the rows: T-1203, T-1204),
+   * or the answer cannot be read (fails safe, DL-413). The actor then reloads the timers.
    */
   readonly timersWritten: boolean;
 }
