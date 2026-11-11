@@ -294,7 +294,7 @@ export interface SafetyHost {
   returns: ReturnWrites;
   /**
    * The actor's own copy of the handle's stopped flag (T-269): true once it says stopped. The outage line never goes to a
-   * number it, or the stopped flag the deps read, says is stopped (arch 11 line 564).
+   * number it, or the stopped flag the deps read, says is stopped (arch 11 line 564); a throw reads stopped (T-1208).
    */
   stopped?: () => boolean;
 }
@@ -1435,12 +1435,16 @@ export class SafetyOnArrival {
       : { path: "outage", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
   }
 
-  /** True when the actor's own copy of the stopped flag says stopped (T-269); a copy that cannot be read says nothing. */
+  /**
+   * True when the actor's own copy of the stopped flag says stopped (T-269), or cannot be read (T-1208): it may hold a STOP
+   * the stopped flag the deps read has not seen yet, so a copy that throws reads stopped, failing closed, as the outage
+   * path's own line does (../outage/db `stoppedNow`). A copy not wired says nothing.
+   */
   private copySaysStopped(): boolean {
     try {
       return this.host.stopped?.() === true;
     } catch {
-      return false;
+      return true;
     }
   }
 

@@ -182,7 +182,12 @@ export class HandleActor extends DurableObject {
     super(ctx, env);
     createInboxTables(ctx.storage.sql);
     // The actor's own copies and its write-on-return queue (T-269), before the safety read, which queues its records there.
-    this.copies = new ActorCopies({ storage: ctx.storage, now: () => actorClock().now() });
+    // The copies weigh a turn's answer against the actor's own STOP note by the lease's turn order (T-1208).
+    this.copies = new ActorCopies({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      turnsOpened: () => this.turnsOpened(),
+    });
     this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
     this.safety = new SafetyOnArrival({
       returns: this.returns,
@@ -562,6 +567,18 @@ export class HandleActor extends DurableObject {
   }
 
   /**
+   * The order of the last turn the lease has opened (lease.ts lease_turns.seq, AUTOINCREMENT and never deleted; 0 when
+   * none), the order the lease hands with each committed answer: the copies weigh a turn's answer against the actor's own
+   * STOP note by it (T-1208). A throw is the copies' "not known".
+   */
+  private turnsOpened(): number {
+    const row = this.ctx.storage.sql
+      .exec<{ seq: number | null }>("SELECT MAX(seq) AS seq FROM lease_turns")
+      .one();
+    return row.seq ?? 0;
+  }
+
+  /**
    * Replays the write-on-return queue (T-269): what the actor sent by itself while PostgreSQL was down is written to the
    * shared core, danger first, then stops, then the rest, each in the order queued and each once; a write the core is not
    * answering yet for stops the replay there. T-270 calls it when PostgreSQL is back.
@@ -645,12 +662,23 @@ export class HandleActor extends DurableObject {
    * K-04 handle id), as work lent to the platform. The lease's own `repeated` goes with the answer (T-1204): K-05's
    * commitResult has no flag of its own, and a repeat reloads whatever the answer's shape, since its first answer, maybe
    * lost, named the rows. The flag goes with the order the lease opened the turn in (`opened`), so a late answer from a
-   * turn opened before a lost commit's never ends that commit's mark (DL-427). While a lost commit's stopped flag is still
-   * not read after this commit's own write of it, if any (T-1206), the flag is read again.
+   * turn opened before a lost commit's never ends that commit's mark (DL-427), nor replaces the actor's own STOP note
+   * (T-1208). A STOP the copy cannot take (its storage write failed) is held as a lost commit's mark for this turn, in
+   * memory when the storage cannot keep it either (DL-427 ruling 4), so the flag reads stopped until DL-427's rule 1 ends
+   * the mark (T-1208). While a lost commit's stopped flag is still not read after this commit's own write of it, if any
+   * (T-1206), the flag is read again.
    */
   private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void {
     const read = readCommit(answer.committed, { repeated: answer.repeated });
-    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id, opened });
+    if (read.stopped !== null) {
+      try {
+        this.copies.noteStopped({ ...read.stopped, turnId: turn.id, opened });
+      } catch {
+        // Not copied: a STOP the copy never saw keeps the stricter reading as this turn's lost mark (a START not copied
+        // leaves the copy as it was, no looser), and the phone row is read again below.
+        if (read.stopped.stopped) this.copies.noteLostCommit(turn.id, opened);
+      }
+    }
     // A lost commit's stopped flag still not read (T-1206; DL-427's rule 1 ends a mark): this commit's handle id reads it.
     if (this.copies.stoppedUnread()) this.rereadStopped(turn.handleId);
     if (read.timersWritten || this.copies.timersStale()) this.reloadTimers(turn.handleId);
@@ -663,6 +691,10 @@ export class HandleActor extends DurableObject {
    * (no handle id, an eviction); then, as work lent to the platform, the flag is read again from the handle's phone row and
    * the live timers are reloaded, named by the handle id the turn's last commit named. A read that fails leaves its mark,
    * and each later commit tries it again. Each lost commit keeps its own mark, with the order its turn opened in (DL-427).
+   * With no handle id kept (a commit sent before the lease kept them, or a stored id that cannot be read), nothing can name
+   * the handle to either source (both read by K-04 handles.id, which the actor learns only from a commit), and the marks
+   * alone stand: a reload or a re-read sent before them can no longer end them (T-1208), so the next commit of any turn
+   * reads both again by its own handle id, as for a read that fails.
    */
   private afterLostCommit(lost: LostCommit): void {
     this.copies.noteLostCommit(lost.turnId, lost.opened);

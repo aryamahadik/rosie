@@ -2,7 +2,7 @@
 // the gateway's door; the safety read, the shared core, the Linq send and the clock are doubles that answer as the frozen
 // contracts state (src/safety/test-support.ts). Test method: T-1128's (runtime/src/spikes/do-test-pool/FINDINGS.md).
 // Test values only (rule 9).
-import { reset } from "cloudflare:test";
+import { reset, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -62,6 +62,10 @@ interface SafetyRpc {
 }
 
 function actorOf(name = ALEX): SafetyRpc {
+  return namespace().get(namespace().idFromName(name));
+}
+
+function stubOf(name = ALEX): DurableObjectStub<HandleActor> {
   return namespace().get(namespace().idFromName(name));
 }
 
@@ -331,6 +335,25 @@ describe("a read that never answers", () => {
 
       expect(h.core.fixed).toEqual([]);
       expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("the outage line is withheld when the actor's own copy of the stopped flag cannot be read, even when the stopped flag the deps read says not (T-1208: fails closed)", async () => {
+    await withSafety({}, {}, async (h) => {
+      // The actor's copy throws on every read: its storage cannot answer for it (here, its table is gone).
+      await runInDurableObject(stubOf(), (_, state) => {
+        state.storage.sql.exec("DROP TABLE copy_stopped");
+      });
+      expect(h.stopped.value).toBe(false);
+      await arrive("evt-quiet-3", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      // No verdict in 4 s and no danger word: the outage line's turn, but a copy that cannot be read reads stopped.
+      expect(h.core.fixed).toEqual([]);
+      expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-quiet-3", path: "none" }]);
       expect(await actorOf().routineHeld()).toBe(true);
     });
   });
