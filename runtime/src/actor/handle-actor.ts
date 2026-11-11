@@ -25,7 +25,10 @@
 // checked safety lines, copied from the safety read's bundle each time a text is written; each live safety timer's due
 // time, address (as K-34 seals it) and emergency contact, reloaded after a commit that wrote a timer row; and the queue of
 // writes to replay when PostgreSQL returns (danger, stops, then the rest, each once), where the safety read's records
-// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270).
+// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270). A commit whose answer
+// was lost, which only a park's alreadyCommitted tells of (T-1206), is read again: before the next turn opens, the stopped
+// flag reads stopped and the timers' copy is marked stale; then the flag is read again from the handle's phone row and
+// the timers are reloaded, and each later commit tries again until each read succeeds (fails safe).
 //
 // PostgreSQL down (T-270, ../outage/db): the actor follows each text until a commit takes it. While PostgreSQL is known
 // down, closed batches stay with the batch window, in order, and the lease holds its turn as it is (a lapse is no crash);
@@ -91,6 +94,7 @@ import {
   TurnLease,
   type CommitTurnCommitted,
   type CommitTurnRef,
+  type LostCommit,
   type ParkTraceRequest,
   type TurnEntry,
 } from "./lease";
@@ -222,8 +226,11 @@ export class HandleActor extends DurableObject {
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
       parkTrace: (request) => this.parkTrace(request),
-      committed: (turn, answer) => {
-        this.afterCommit(turn, answer);
+      committed: (turn, answer, opened) => {
+        this.afterCommit(turn, answer, opened);
+      },
+      commitLost: (lost) => {
+        this.afterLostCommit(lost);
       },
       // PostgreSQL down (T-270): the lease holds its turn as it is, and the queue is replayed before any commit.
       held: () => this.outage.isDown(),
@@ -637,19 +644,46 @@ export class HandleActor extends DurableObject {
    * safety timer row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's
    * K-04 handle id), as work lent to the platform. The lease's own `repeated` goes with the answer (T-1204): K-05's
    * commitResult has no flag of its own, and a repeat reloads whatever the answer's shape, since its first answer, maybe
-   * lost, named the rows.
+   * lost, named the rows. The flag goes with the order the lease opened the turn in (`opened`), so a late answer from a
+   * turn opened before a lost commit's never ends that commit's mark (DL-427). While a lost commit's stopped flag is still
+   * not read after this commit's own write of it, if any (T-1206), the flag is read again.
    */
-  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
+  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void {
     const read = readCommit(answer.committed, { repeated: answer.repeated });
-    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
-    if (read.timersWritten || this.copies.timersStale()) {
-      // The PostgreSQL-down path's alarm follows the copy's earliest timer due (T-270).
-      this.lend(
-        this.copies.refreshTimers(turn.handleId).then(() => {
-          this.outage.timersChanged();
-        }),
-      );
-    }
+    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id, opened });
+    // A lost commit's stopped flag still not read (T-1206; DL-427's rule 1 ends a mark): this commit's handle id reads it.
+    if (this.copies.stoppedUnread()) this.rereadStopped(turn.handleId);
+    if (read.timersWritten || this.copies.timersStale()) this.reloadTimers(turn.handleId);
+  }
+
+  /**
+   * A commit went through with its answer lost (T-1206; the lease calls this before the turn finishes, so before the next
+   * turn opens): the copies cannot read what it wrote, a STOP or START or a safety timer row. So, at once, the stopped flag
+   * reads stopped (the stricter reading) and the timers' copy is marked stale, which hold if nothing more can be done
+   * (no handle id, an eviction); then, as work lent to the platform, the flag is read again from the handle's phone row and
+   * the live timers are reloaded, named by the handle id the turn's last commit named. A read that fails leaves its mark,
+   * and each later commit tries it again. Each lost commit keeps its own mark, with the order its turn opened in (DL-427).
+   */
+  private afterLostCommit(lost: LostCommit): void {
+    this.copies.noteLostCommit(lost.turnId, lost.opened);
+    this.copies.markTimersStale();
+    if (lost.handleId === null) return;
+    this.rereadStopped(lost.handleId);
+    this.reloadTimers(lost.handleId);
+  }
+
+  /** Reads the handle's stopped flag again (T-1206), as work lent to the platform; it never throws. */
+  private rereadStopped(handleId: string): void {
+    this.lend(this.copies.rereadStopped(handleId).then(() => undefined));
+  }
+
+  /** Reloads the handle's live timers, as work lent to the platform; the PostgreSQL-down path's alarm follows (T-270). */
+  private reloadTimers(handleId: string): void {
+    this.lend(
+      this.copies.refreshTimers(handleId).then(() => {
+        this.outage.timersChanged();
+      }),
+    );
   }
 
   /**
