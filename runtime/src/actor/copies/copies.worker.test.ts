@@ -69,6 +69,7 @@ import {
 } from "../../turn/test-support";
 import type { GateAndCommitAnswer, GateAndCommitRequest, TurnParty } from "../../turn/types";
 import {
+  LEASE_MS,
   setBatchHooks,
   setBundleDeps,
   setCopyDeps,
@@ -81,6 +82,7 @@ import {
   type LeasedTurn,
   type ReplayReport,
   type SafetyTimerRow,
+  type TurnEntry,
 } from "../index";
 import { readCommit, type ActorCopies } from "./copies";
 import type { QueuedWrite, ReplayStep, ReturnQueue, ReturnWrite } from "./return-queue";
@@ -116,6 +118,7 @@ interface Party {
 /** The actor's calls over RPC, typed here (the stub's own type cannot carry every shape). */
 interface CopiesRpc {
   readCopies(): Promise<CopiesView>;
+  readTurns(): Promise<TurnEntry[]>;
   writeOnReturn(): Promise<ReplayReport>;
   readHolds(): Promise<{ eventId: string; holdId: string | null }[]>;
   safetyIdle(): Promise<void>;
@@ -786,6 +789,411 @@ describe("the actor's copy of each live safety timer (K-34 safety_timers)", () =
       copies = await rig.actor.readCopies();
       expect(copies.timers).toEqual([copyOf(moved)]);
       expect(copies.timersStale).toBe(false);
+    });
+  });
+});
+
+// ---- a commit whose answer was lost, which a park answers alreadyCommitted (T-1206) -------------------------------------
+
+/** Sam's text whose turn crashes three times: runs 1 and 2 before their commit, run 3 once its commit went through. */
+const LOST_EVENT = "evt-sam-0311";
+
+interface ParkRig {
+  readonly api: FakeToolApi;
+  readonly actor: CopiesRpc;
+  /** The lost turn's id (CQ-09: the hash of its one text's event id). */
+  readonly turnId: string;
+  /**
+   * The lost turn: Sam's text arrives and its turn runs three times. Runs 1 and 2 crash before their commit; run 3 commits
+   * once through the lease (what the Tool API double writes next), and crashes before it can send the commit again. The
+   * third lapse then parks the turn, and the park hook (K-05 v1 parkTurn through the double) answers. `beforePark` runs
+   * between run 3's commit and that lapse.
+   */
+  lose(beforePark?: () => Promise<void>): Promise<void>;
+  /** A later text of Sam's, whose turn commits once through the lease (sent again once if its answer is lost). */
+  text(eventId: string): Promise<void>;
+}
+
+async function withParkRig(
+  body: (rig: ParkRig) => Promise<void>,
+  options: { phones?: boolean } = {},
+): Promise<void> {
+  const events = [LOST_EVENT, ...TIMER_EVENTS];
+  const h: Harness = harness(keys, Object.fromEntries(events.map((id) => [id, safetyNoFor(id)])));
+  const api = fakeToolApi();
+  const turnId = await turnIdOf([LOST_EVENT]);
+  const restores = [
+    setSafetyDeps(h.deps),
+    setBatchHooks({ clock: h.clock }),
+    setLeaseHooks({
+      runTurn: async (turn) => {
+        const request = samCommit(turn);
+        if (turn.turnId === turnId) {
+          // Runs 1 and 2 crash before their commit; run 3 commits once, then crashes before it could send it again.
+          if (turn.tries === 3) await turn.commit(request);
+          return;
+        }
+        const answer = await turn.commit(request);
+        if ("error" in answer && answer.error === "noAnswer") await turn.commit(request);
+      },
+      commit: (request, at) => api.commit(request, at),
+      park: (turn) => api.park(turn),
+    }),
+    setBundleDeps(fakeBundles().deps),
+    setCopyDeps(
+      options.phones === false ? { timers: api.source } : { timers: api.source, phones: api.phones },
+    ),
+  ];
+  const tick = async (ms: number): Promise<void> => {
+    await h.clock.advance(ms);
+    await runDurableObjectAlarm(stubOf(SAM_PARTY));
+  };
+  const idle = async (): Promise<void> => {
+    await actorOf(SAM_PARTY).safetyIdle();
+    await actorOf(SAM_PARTY).batchIdle();
+  };
+  const rig: ParkRig = {
+    api,
+    get actor(): CopiesRpc {
+      return actorOf(SAM_PARTY);
+    },
+    turnId,
+    async lose(beforePark) {
+      const sent = api.commits.length;
+      await arrive(SAM_PARTY, LOST_EVENT, "TIMER 2 hours", "2026-10-27T13:20:00Z");
+      await tick(3000);
+      await idle();
+      await tick(LEASE_MS);
+      await idle();
+      await tick(LEASE_MS);
+      await until(() => api.commits.length === sent + 1, "run 3's commit");
+      await idle();
+      await beforePark?.();
+      await tick(LEASE_MS);
+      await until(() => api.parks.length === 1, "the park after the third lapse");
+      await idle();
+    },
+    async text(eventId) {
+      const sent = api.commits.length;
+      await arrive(SAM_PARTY, eventId, "TIMER 2 hours", "2026-10-27T13:20:00Z");
+      await tick(3000);
+      await until(() => api.commits.length > sent, "the turn's commit");
+      await idle();
+    },
+  };
+  try {
+    await body(rig);
+  } finally {
+    restores.reverse().forEach((restore) => {
+      restore();
+    });
+  }
+}
+
+describe("a commit whose answer was lost, which a park answers alreadyCommitted (T-1206)", () => {
+  it("reaches the actor's copies: the third run's commit wrote Sam's timer row and a STOP and its answer was lost; once the park answers alreadyCommitted, the copy holds the row and the stopped flag is set", async () => {
+    await withParkRig(async (rig) => {
+      rig.api.writes.push(structuredClone(SAM_TIMER));
+      rig.api.stopWrites.push(true);
+      rig.api.loseNextAnswer = true;
+      await rig.lose();
+
+      // Run 3's commit went through, Sam's timer row and his STOP (phone row version 3) with it, but no answer came back.
+      expect(rig.api.commits.map((commit) => [commit.turn.id, commit.turn.tries])).toEqual([[rig.turnId, 3]]);
+      expect(rig.api.answers).toEqual([]);
+      expect(rig.api.timers.get(SAM_TIMER.id)).toEqual(SAM_TIMER);
+      expect(rig.api.phone).toMatchObject({ stopped: true, version: 3 });
+      // The third lapse parked it: K-05 answered alreadyCommitted, and the turn finished as committed, the lease released.
+      expect(rig.api.parks).toEqual([rig.turnId]);
+      expect(await rig.actor.readTurns()).toEqual([
+        {
+          turnId: rig.turnId,
+          eventIds: [LOST_EVENT],
+          state: "committed",
+          restart: false,
+          tries: 3,
+          leaseUntil: null,
+          committedAt: "2026-10-27T13:20:02Z",
+        },
+      ]);
+
+      // The actor read that commit again by the handle id it named: Sam's live timers reloaded, his phone row's stopped
+      // flag read again. The copy holds the row, and the stopped flag is set.
+      expect(rig.api.reloads).toEqual(["handle-sam"]);
+      expect(rig.api.phoneReads).toEqual(["handle-sam"]);
+      const copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+      expect(copies.timersStale).toBe(false);
+      expect(copies.stopped).toEqual({
+        stopped: true,
+        phoneVersion: 3,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+      });
+    });
+  });
+
+  it("fails safe when neither can be read again: with no re-read of the phone row wired and the reload down, the flag reads stopped and the timers' copy is stale; the next commit reloads the timers, and only a later write of the flag lets the stricter reading go", async () => {
+    await withParkRig(
+      async (rig) => {
+        // The lost commit writes Sam's timer row and no flag: the actor cannot know that, so it reads the stricter way.
+        rig.api.writes.push(structuredClone(SAM_TIMER));
+        rig.api.loseNextAnswer = true;
+        rig.api.reloadDown = true;
+        await rig.lose();
+        expect(rig.api.parks).toEqual([rig.turnId]);
+        expect(rig.api.phone).toMatchObject({ stopped: false, version: 2 });
+        expect(rig.api.reloads).toEqual(["handle-sam"]);
+        expect(rig.api.phoneReads).toEqual([]);
+        let copies = await rig.actor.readCopies();
+        expect(copies.stopped).toEqual({
+          stopped: true,
+          phoneVersion: null,
+          turnId: null,
+          setAt: expect.any(Number) as number,
+          lost: { turnId: rig.turnId, since: expect.any(Number) as number },
+        });
+        expect(copies.timers).toEqual([]);
+        expect(copies.timersStale).toBe(true);
+
+        // The next commit writes no timer row and no flag: the stale copy reloads and catches up; the flag stays stricter.
+        rig.api.reloadDown = false;
+        rig.api.writes.push(null);
+        await rig.text("evt-sam-0301");
+        expect(rig.api.reloads).toEqual(["handle-sam", "handle-sam"]);
+        copies = await rig.actor.readCopies();
+        expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+        expect(copies.timersStale).toBe(false);
+        expect(copies.stopped).toMatchObject({ stopped: true, lost: { turnId: rig.turnId } });
+
+        // A later commit records a START (phone row version 3): copied from its answer, it lets the stricter reading go.
+        rig.api.writes.push(null);
+        rig.api.stopWrites.push(false);
+        await rig.text("evt-sam-0302");
+        copies = await rig.actor.readCopies();
+        expect(copies.stopped).toEqual({
+          stopped: false,
+          phoneVersion: 3,
+          turnId: await turnIdOf(["evt-sam-0302"]),
+          setAt: expect.any(Number) as number,
+        });
+      },
+      { phones: false },
+    );
+  });
+
+  it("reads the flag again, never guesses it: a lost commit that recorded START reads stopped while the re-read is down, and the next commit, writing no flag, reads the phone row again and finds it started", async () => {
+    await withParkRig(async (rig) => {
+      // An earlier commit records Sam's STOP: copied from its answer (phone row version 3).
+      rig.api.writes.push(null);
+      rig.api.stopWrites.push(true);
+      await rig.text("evt-sam-0301");
+      const stopTurn = await turnIdOf(["evt-sam-0301"]);
+      expect((await rig.actor.readCopies()).stopped).toMatchObject({
+        stopped: true,
+        phoneVersion: 3,
+        turnId: stopTurn,
+      });
+
+      // The lost turn's run 3 records his START (version 4), its answer lost; the phone row cannot be read just then.
+      rig.api.writes.push(null);
+      rig.api.stopWrites.push(false);
+      rig.api.loseNextAnswer = true;
+      rig.api.phoneDown = true;
+      await rig.lose();
+      expect(rig.api.phone).toMatchObject({ stopped: false, version: 4 });
+      expect(rig.api.phoneReads).toEqual(["handle-sam"]);
+      let copies = await rig.actor.readCopies();
+      expect(copies.stopped).toEqual({
+        stopped: true,
+        phoneVersion: 3,
+        turnId: stopTurn,
+        setAt: expect.any(Number) as number,
+        lost: { turnId: rig.turnId, since: expect.any(Number) as number },
+      });
+
+      // The next commit writes no flag: by its handle id, the phone row is read again, which says started (version 4).
+      rig.api.phoneDown = false;
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0302");
+      expect(rig.api.phoneReads).toEqual(["handle-sam", "handle-sam"]);
+      copies = await rig.actor.readCopies();
+      expect(copies.stopped).toEqual({
+        stopped: false,
+        phoneVersion: 4,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+      });
+
+      // Nothing lost any more: a commit that writes no flag reads nothing again.
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0303");
+      expect(rig.api.phoneReads).toHaveLength(2);
+    });
+  });
+
+  it("with no handle id kept for the lost commit (sent before the lease kept them, across a deploy), the copies fail safe with nothing read: the flag reads stopped and the timers' copy is stale; the next commit reads both again by its own handle id", async () => {
+    await withParkRig(async (rig) => {
+      rig.api.writes.push(structuredClone(SAM_TIMER));
+      rig.api.stopWrites.push(true);
+      rig.api.loseNextAnswer = true;
+      await rig.lose(async () => {
+        await runInDurableObject(stubOf(SAM_PARTY), (_, state) => {
+          state.storage.sql.exec("DELETE FROM lease_commit_handles");
+        });
+      });
+      expect(rig.api.parks).toEqual([rig.turnId]);
+      expect(rig.api.reloads).toEqual([]);
+      expect(rig.api.phoneReads).toEqual([]);
+      let copies = await rig.actor.readCopies();
+      expect(copies.stopped).toEqual({
+        stopped: true,
+        phoneVersion: null,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+        lost: { turnId: rig.turnId, since: expect.any(Number) as number },
+      });
+      expect(copies.timers).toEqual([]);
+      expect(copies.timersStale).toBe(true);
+
+      // The next commit (no timer row, no flag) reads both again: the copy holds the row, and the STOP is read from the
+      // phone row (version 3).
+      rig.api.writes.push(null);
+      await rig.text("evt-sam-0301");
+      expect(rig.api.reloads).toEqual(["handle-sam"]);
+      expect(rig.api.phoneReads).toEqual(["handle-sam"]);
+      copies = await rig.actor.readCopies();
+      expect(copies.timers).toEqual([copyOf(SAM_TIMER)]);
+      expect(copies.timersStale).toBe(false);
+      expect(copies.stopped).toEqual({
+        stopped: true,
+        phoneVersion: 3,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+      });
+    });
+  });
+
+  it("a re-read answer that is not K-04's phone row, or is older than the copy, keeps the stricter reading; only a read of the row at least as new as the copy lets it go", async () => {
+    await withParkRig(async () => {
+      const result = await runInDurableObject(stubOf(SAM_PARTY), async (instance) => {
+        const { copies } = insideOf(instance);
+        copies.noteStopped({ stopped: true, phoneVersion: 4, turnId: "turn-sam-stop" });
+        expect(copies.noteLostCommit("turn-sam-lost")).toBe(true);
+        const answers: unknown[] = [
+          null,
+          "phone",
+          { error: "transient" },
+          { result: "timers", timers: [] },
+          { result: "phone", stopped: "no", phoneVersion: 5 },
+          { result: "phone", stopped: false, phoneVersion: 0 },
+          { result: "phone", stopped: false, phoneVersion: 4.5 },
+          { result: "phone", stopped: false },
+        ];
+        const reads: string[] = [];
+        for (const answer of answers) {
+          const restore = setCopyDeps({
+            timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+            phones: { stoppedFlag: () => Promise.resolve(answer as never) },
+          });
+          reads.push(await copies.rereadStopped("handle-sam"));
+          restore();
+        }
+        const thrown = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+          phones: { stoppedFlag: () => Promise.reject(new Error("PostgreSQL is down")) },
+        });
+        reads.push(await copies.rereadStopped("handle-sam"));
+        // A handle id that is not a label is never read.
+        reads.push(await copies.rereadStopped("handle sam\n"));
+        thrown();
+        const unwired = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+        });
+        reads.push(await copies.rereadStopped("handle-sam"));
+        unwired();
+        const stillLost = copies.readStopped();
+        // A read older than the copy (version 3 behind 4) is not taken; one as new as it (version 4) is.
+        const older = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+          phones: {
+            stoppedFlag: () => Promise.resolve({ result: "phone", stopped: false, phoneVersion: 3 }),
+          },
+        });
+        const olderRead = await copies.rereadStopped("handle-sam");
+        older();
+        const afterOlder = copies.readStopped();
+        const same = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+          phones: {
+            stoppedFlag: () => Promise.resolve({ result: "phone", stopped: true, phoneVersion: 4 }),
+          },
+        });
+        const sameRead = await copies.rereadStopped("handle-sam");
+        same();
+        const after = copies.readStopped();
+        // The actor's own note (a STOP it took while PostgreSQL was down, no version; its record not written yet), then a
+        // lost commit: a row read, however new, never replaces the note, and the stricter reading stays.
+        copies.noteStopped({ stopped: true, phoneVersion: null, turnId: null });
+        copies.noteLostCommit("turn-sam-lost-2");
+        const newer = setCopyDeps({
+          timers: { liveTimers: () => Promise.resolve({ result: "timers", timers: [] }) },
+          phones: {
+            stoppedFlag: () => Promise.resolve({ result: "phone", stopped: false, phoneVersion: 9 }),
+          },
+        });
+        const noteRead = await copies.rereadStopped("handle-sam");
+        newer();
+        return {
+          reads,
+          stillLost,
+          olderRead,
+          afterOlder,
+          sameRead,
+          after,
+          noteRead,
+          afterNote: copies.readStopped(),
+        };
+      });
+      expect(result.reads).toEqual([
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "failed",
+        "unwired",
+        "unwired",
+      ]);
+      expect(result.stillLost).toMatchObject({
+        stopped: true,
+        phoneVersion: 4,
+        lost: { turnId: "turn-sam-lost" },
+      });
+      expect(result.olderRead).toBe("older");
+      expect(result.afterOlder).toMatchObject({
+        stopped: true,
+        phoneVersion: 4,
+        lost: { turnId: "turn-sam-lost" },
+      });
+      expect(result.sameRead).toBe("copied");
+      expect(result.after).toEqual({
+        stopped: true,
+        phoneVersion: 4,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+      });
+      expect(result.noteRead).toBe("older");
+      expect(result.afterNote).toEqual({
+        stopped: true,
+        phoneVersion: null,
+        turnId: null,
+        setAt: expect.any(Number) as number,
+        lost: { turnId: "turn-sam-lost-2", since: expect.any(Number) as number },
+      });
     });
   });
 });

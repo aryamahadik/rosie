@@ -43,6 +43,18 @@ export interface StoppedCopy {
   readonly setAt: number;
   /** Set only while a refusal holds the stop rank: until every stop or start record queued is written in order. */
   readonly held?: StopHold;
+  /**
+   * Set only while a commit whose answer was lost may have written the flag (T-1206: a park answered alreadyCommitted):
+   * until the flag is read again from the handle's phone row, or a later write of it is copied.
+   */
+  readonly lost?: LostCommitHold;
+}
+
+/** The commit whose answer was lost, whose stopped flag the copy has not read (T-1206): its turn id (a label), since when. */
+export interface LostCommitHold {
+  readonly turnId: string;
+  /** Since the park told of it, on the actor's clock. */
+  readonly since: number;
 }
 
 /** The refusal holding the stop rank of the write-on-return queue: the refused write's key and code (labels), since when. */
@@ -141,13 +153,36 @@ export interface SafetyTimerSource {
   liveTimers(request: { handleId: string }): Promise<LiveTimersAnswer>;
 }
 
+/** The re-read's answer: the handle's K-04 v1 `phones` row's stopped flag and version, or a K-05 error such as `transient`. */
+export type StoppedFlagAnswer =
+  | { readonly result: "phone"; readonly stopped: boolean; readonly phoneVersion: number }
+  | { readonly error: string };
+
+/**
+ * The re-read of a handle's stopped flag (K-04 v1 `phones.stopped` and `phones.version`, for the handle's phone), after a
+ * commit whose answer was lost (T-1206). No frozen data-access call reads it for the actor yet: the adapter joins with the
+ * timers' at D-017, and a fake answers in tests. Unset, the copy keeps the stricter reading.
+ */
+export interface StoppedFlagSource {
+  stoppedFlag(request: { handleId: string }): Promise<StoppedFlagAnswer>;
+}
+
 /** What the copies reach outside the actor, set once per Worker isolate (`setCopyDeps`); joins at D-017. */
 export interface CopyDeps {
   readonly timers: SafetyTimerSource;
+  /** The stopped flag's re-read (T-1206); left out, a lost commit's flag is read as stopped until a later write. */
+  readonly phones?: StoppedFlagSource;
 }
 
 /** How a reload of the timers ended: copied; not wired; or failed (no answer, an error, a row that is not K-34's). */
 export type TimerRefresh = "refreshed" | "unwired" | "failed";
+
+/**
+ * How a re-read of the stopped flag ended (T-1206): read and copied; read but older than the copy, or than the actor's own
+ * note (kept as it was); not wired; or failed (no answer, an error, an answer that is not K-04's row). Only "copied" lets
+ * the stricter reading go.
+ */
+export type StoppedRefresh = "copied" | "older" | "unwired" | "failed";
 
 /** What a committed answer gives the copies: the stopped flag a STOP or START wrote, and whether a safety timer was written. */
 export interface CommitCopies {

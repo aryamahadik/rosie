@@ -12,14 +12,25 @@
 //     call throws: the lease's `noAnswer`), so only the repeat of that turn id answers, with no rows. With `answerShape`
 //     "k05" (T-1204), it answers as a K-05-shaped commit hook does instead: K-05 v1 commitTurn.response, K-05's own
 //     commitResult in `committed` (every row the commit wrote; no core results, no flag inside it), and a repeat flagged on
-//     the lease's answer alone, with no rows and the first commit's outbox rows (commit-repeat-same-turn.json).
+//     the lease's answer alone, with no rows and the first commit's outbox rows (commit-repeat-same-turn.json). With
+//     `stopWrites` (T-1206), a first commit in K-09's shape also records a STOP or a START: the K-04 phones row it keeps
+//     (`phone`) takes the flag at its next version, and the answer's core results name it as K-09 v1 recordStopOrStart's
+//     result does (stop-recorded.json's shape). Its `phones` is the re-read of that row's stopped flag, and its `park` is
+//     K-05 v1 parkTurn as the lease's park hook answers it: alreadyCommitted (with its committedAt) for a turn id it
+//     committed, whose answer may have been lost, else parked.
 //   - `SAM_TIMER` is K-34's seed timer (seed-safety-timer.json): Sam alone on Alex's move survey, due 11:20am New York
 //     time, Morgan Lee the contact who said yes, the job's address sealed under Alex's key (stand-in bytes).
 // Test values only: the master's sample cast and the frozen fixtures' ids (rule 9).
 
 import seedSafetyTimer from "../../../../contracts/db-schema/safety-incidents/fixtures/seed-safety-timer.json";
-import type { CommitContext, CommitTurnAnswer, CommitTurnRequest } from "../lease";
-import type { LiveTimersAnswer, SafetyTimerRow, SafetyTimerSource } from "./types";
+import type { CommitContext, CommitTurnAnswer, CommitTurnRequest, ParkAnswer, ParkingTurn } from "../lease";
+import type {
+  LiveTimersAnswer,
+  SafetyTimerRow,
+  SafetyTimerSource,
+  StoppedFlagAnswer,
+  StoppedFlagSource,
+} from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -76,6 +87,23 @@ export interface FakeToolApi {
   commit(request: CommitTurnRequest, at: CommitContext): Promise<CommitTurnAnswer>;
   /** The reload of a handle's live timers, from the same rows. */
   readonly source: SafetyTimerSource;
+  /** The K-04 phones row of Sam's phone as the shared core keeps it (T-1206): its handle, stopped flag and version. */
+  readonly phone: { readonly handleId: string; stopped: boolean; version: number };
+  /**
+   * What the next first commits in K-09's shape record for the phone, in order (T-1206): a STOP (true), a START (false),
+   * or nothing (null). The phone row takes it at its next version; the answer's core results name it.
+   */
+  readonly stopWrites: (boolean | null)[];
+  /** Every re-read of the stopped flag's handle id, in order. */
+  readonly phoneReads: string[];
+  /** While true the re-read throws (no answer), as a core with PostgreSQL down does. */
+  phoneDown: boolean;
+  /** The re-read of a handle's stopped flag, from the same phone row (T-1206). */
+  readonly phones: StoppedFlagSource;
+  /** Every park's turn id, in order. */
+  readonly parks: string[];
+  /** The lease's park hook: K-05 v1 parkTurn, alreadyCommitted for a turn id committed here, else parked (T-1206). */
+  park(turn: ParkingTurn): Promise<ParkAnswer>;
 }
 
 export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
@@ -90,6 +118,11 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
     answerShape: "k09",
     reloads: [],
     reloadDown: false,
+    phone: { handleId: SAM_TIMER.worker_handle_id, stopped: false, version: 2 },
+    stopWrites: [],
+    phoneReads: [],
+    phoneDown: false,
+    parks: [],
     commit(request) {
       fake.commits.push(structuredClone(request));
       const known = first.get(request.turn.id);
@@ -132,8 +165,28 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
           });
         }
       }
+      const stop = fake.stopWrites.shift() ?? null;
+      if (stop !== null && fake.answerShape === "k09") {
+        // K-09 recordStopOrStart, gone through: the phone row's flag at its next version (stop-recorded.json's shape).
+        fake.phone.stopped = stop;
+        fake.phone.version += 1;
+        core.push({
+          call: "recordStopOrStart",
+          response: {
+            consentRowIds: [],
+            stopped: stop,
+            chatOpen: false,
+            phoneVersion: fake.phone.version,
+            reply: null,
+            askedWhichTexts: null,
+            flaggedBookingIds: [],
+            repeated: false,
+          },
+          error: null,
+        });
+      }
       // A core action's rows are left out of `written` (default 9): only the walk's are listed.
-      const written = core.length === 0 ? rows : [];
+      const written = fake.timersByCore !== null && fake.answerShape === "k09" ? [] : rows;
       const answer: CommitTurnAnswer =
         fake.answerShape === "k05"
           ? {
@@ -181,6 +234,27 @@ export function fakeToolApi(committedAt = "2026-10-27T13:20:02Z"): FakeToolApi {
           .map((row) => structuredClone(row));
         return Promise.resolve({ result: "timers", timers });
       },
+    },
+    phones: {
+      stoppedFlag({ handleId }): Promise<StoppedFlagAnswer> {
+        fake.phoneReads.push(handleId);
+        if (fake.phoneDown) return Promise.reject(new Error("PostgreSQL is down"));
+        if (handleId !== fake.phone.handleId) return Promise.resolve({ error: "unknownHandle" });
+        return Promise.resolve({
+          result: "phone",
+          stopped: fake.phone.stopped,
+          phoneVersion: fake.phone.version,
+        });
+      },
+    },
+    park(turn): Promise<ParkAnswer> {
+      fake.parks.push(turn.turnId);
+      const known = (first.get(turn.turnId) as { committedAt?: unknown } | undefined)?.committedAt;
+      if (typeof known === "string") {
+        // The turn's commit went through (its answer maybe lost): K-05 never parks it.
+        return Promise.resolve({ error: "alreadyCommitted", committedAt: known });
+      }
+      return Promise.resolve({ result: "parked", parkedAt: committedAt, repeated: false });
     },
   };
   return fake;

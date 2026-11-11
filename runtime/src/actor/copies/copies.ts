@@ -9,7 +9,10 @@
 //     can go, and a START clears it the same way. The phone row's version orders the writes: an answer older than the copy
 //     changes nothing (a repeat answers its first commit, whose version may be behind a later START). While a refusal
 //     holds the stop rank of the write-on-return queue, the copy reads stopped, the stricter reading, whatever was copied
-//     last, until every stop or start record queued (any START among them) is written in order (DL-167 ruling 2);
+//     last, until every stop or start record queued (any START among them) is written in order (DL-167 ruling 2). A commit
+//     that went through with its answer lost (a park answered alreadyCommitted: ../lease.ts `commitLost`, T-1206) may have
+//     written the flag unseen, so the copy reads stopped from then on (`noteLostCommit`), until the flag is read again
+//     from the handle's phone row (`rereadStopped`) or a later write of it is copied;
 //   - the checked safety lines (K-01 v1): every line the safety read can send (911, 988 and 911, the danger question, the
 //     outage line, and each outcome step's own line), copied from the safety read's bundle each time a text is written
 //     (`refreshLines`). A line the bundle gives no words for now keeps the words copied before: a bundle that cannot be
@@ -19,7 +22,8 @@
 //     yes (their person and handle). A commit that may have written a timer row reloads them all (`refreshTimers`): its
 //     rows name the row, a core action's result may have written it, it is a repeat (whose first answer, maybe lost, named
 //     the rows: by K-09's flag or the lease's, T-1204), or its answer cannot be read (`readCommit`, T-1198, DL-413); a
-//     reload that fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds.
+//     reload that fails keeps the copy as it was and marks it stale, and every later commit reloads until one succeeds. A
+//     commit whose answer was lost (T-1206) marks the copy stale at once (`markTimersStale`), then reloads it.
 //
 // T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
 // `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
@@ -40,8 +44,10 @@ import type {
   CopyDeps,
   KeywordCopy,
   LineRead,
+  LostCommitHold,
   SafetyTimerCopy,
   StoppedCopy,
+  StoppedRefresh,
   StoppedWrite,
   TimerRefresh,
 } from "./types";
@@ -213,6 +219,14 @@ export function createCopyTables(sql: SqlStorage): void {
        set_ms INTEGER NOT NULL
      )`,
   );
+  // A commit whose answer was lost, whose stopped flag the copy has not read (T-1206): one row at most, absent when none.
+  sql.exec(
+    `CREATE TABLE IF NOT EXISTS copy_stopped_lost (
+       one INTEGER PRIMARY KEY CHECK (one = 1),
+       turn_id TEXT NOT NULL,
+       since_ms INTEGER NOT NULL
+     )`,
+  );
   // The checked safety lines, one per place the safety read uses one: the sources' fixed words, never a person's.
   sql.exec(
     `CREATE TABLE IF NOT EXISTS copy_lines (
@@ -336,9 +350,19 @@ export interface CopiesHost {
 
 const STALE = "timersStaleSince";
 
+/** The stopped flag of a re-read's answer (K-04 phones.stopped and version); null when the answer is not K-04's row. */
+function stoppedFlagOf(answer: unknown): { stopped: boolean; phoneVersion: number } | null {
+  if (!isRecord(answer) || answer.result !== "phone") return null;
+  const { stopped, phoneVersion } = answer;
+  if (typeof stopped !== "boolean" || !isCount(phoneVersion)) return null;
+  return { stopped, phoneVersion };
+}
+
 export class ActorCopies {
   /** The reload of the timers running in this instance, if any: the next one waits for it, so the last write wins. */
   private timerWork: Promise<unknown> = Promise.resolve();
+  /** The re-read of the stopped flag running in this instance, if any: the next one waits for it. */
+  private stoppedWork: Promise<unknown> = Promise.resolve();
 
   constructor(private readonly host: CopiesHost) {
     createCopyTables(host.storage.sql);
@@ -357,18 +381,44 @@ export class ActorCopies {
    * The handle's stopped flag as last copied, or null when no write of it has been seen. While a refusal holds the stop
    * rank of the write-on-return queue (DL-167 ruling 2), it reads stopped, the stricter reading, whatever was copied last,
    * with `held` naming the refusal: until every stop or start record queued (any START among them) is written in order.
+   * While a commit whose answer was lost may have written the flag (T-1206), it reads stopped the same way, with `lost`
+   * naming that commit's turn: until the flag is read again or a later write of it is copied.
    */
   readStopped(): StoppedCopy | null {
     const copied = this.copiedStopped();
     const held = readHeld(this.sql).find((entry) => entry.rank === "stop");
-    if (held === undefined) return copied;
+    const lost = this.lostCommit();
+    if (held === undefined && lost === null) return copied;
     return {
       stopped: true,
       phoneVersion: copied?.phoneVersion ?? null,
       turnId: copied?.turnId ?? null,
-      setAt: copied?.setAt ?? held.since,
-      held: { key: held.key, code: held.code, since: held.since },
+      setAt: copied?.setAt ?? held?.since ?? lost?.since ?? this.host.now(),
+      ...(held === undefined ? {} : { held: { key: held.key, code: held.code, since: held.since } }),
+      ...(lost === null ? {} : { lost }),
     };
+  }
+
+  /**
+   * True while a commit whose answer was lost may have written the stopped flag, not read yet (T-1206); a storage that
+   * cannot say answers true (one more re-read). Never throws.
+   */
+  stoppedUnread(): boolean {
+    try {
+      return this.lostCommit() !== null;
+    } catch {
+      return true;
+    }
+  }
+
+  /** The commit whose answer was lost, whose stopped flag the copy has not read (T-1206), or null when there is none. */
+  private lostCommit(): LostCommitHold | null {
+    const row = this.sql
+      .exec<{ turn_id: string; since_ms: number }>(
+        "SELECT turn_id, since_ms FROM copy_stopped_lost WHERE one = 1",
+      )
+      .toArray()[0];
+    return row === undefined ? null : { turnId: row.turn_id, since: row.since_ms };
   }
 
   /** The stopped flag as last copied from a write, without the queue's hold. */
@@ -388,7 +438,9 @@ export class ActorCopies {
   /**
    * Copies a stopped flag that was written; true when the copy took it. A write with the phone row's version is taken
    * unless the copy holds a later version; the actor's own note (no version) is always taken. A write taken while the stop
-   * rank is held is kept, and read once the hold is let go.
+   * rank is held is kept, and read once the hold is let go. A write taken lets go of a lost commit's stricter reading
+   * (T-1206): it is that commit's own answer come late, a later commit's or the actor's own newer word, or the phone row
+   * read again, so it is at least as new as what the lost commit wrote.
    */
   noteStopped(write: StoppedWrite): boolean {
     return this.host.storage.transactionSync((): boolean => {
@@ -408,8 +460,57 @@ export class ActorCopies {
         write.turnId,
         this.host.now(),
       );
+      this.sql.exec("DELETE FROM copy_stopped_lost WHERE one = 1");
       return true;
     });
+  }
+
+  /**
+   * Notes a commit that went through with its answer lost (T-1206: a park answered alreadyCommitted): it may have written
+   * the stopped flag unseen, so the copy reads stopped, the stricter reading, until the flag is read again
+   * (`rereadStopped`) or a later write of it is copied. A second lost commit keeps the first one's note. True when the
+   * note is stored; never throws (a storage that fails keeps the copy as it was).
+   */
+  noteLostCommit(turnId: string): boolean {
+    try {
+      this.sql.exec(
+        "INSERT OR IGNORE INTO copy_stopped_lost (one, turn_id, since_ms) VALUES (1, ?, ?)",
+        turnId,
+        this.host.now(),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Reads the handle's stopped flag again (K-04 phones.stopped and its version; K-04 handles.id names the handle) after
+   * any re-read already running here, and copies it (`noteStopped`), which lets go of a lost commit's stricter reading. A
+   * re-read that cannot be done (not wired, no answer, an error, an answer that is not K-04's row) keeps the copy as it
+   * was, the stricter reading included. A row read never replaces the actor's own note (a STOP or START it took while
+   * PostgreSQL was down, with no version), whose record may not be written yet: "older". Never throws.
+   */
+  rereadStopped(handleId: string): Promise<StoppedRefresh> {
+    const run = this.stoppedWork.then(() => this.readStoppedAgain(handleId));
+    this.stoppedWork = run.catch(() => undefined);
+    return run.catch((): StoppedRefresh => "failed");
+  }
+
+  private async readStoppedAgain(handleId: string): Promise<StoppedRefresh> {
+    const source = deps?.phones;
+    if (source === undefined || !isLabel(handleId)) return "unwired";
+    let answer: unknown;
+    try {
+      answer = await source.stoppedFlag({ handleId });
+    } catch {
+      return "failed";
+    }
+    const read = stoppedFlagOf(answer);
+    if (read === null) return "failed";
+    // The actor's own note is newer than any row read (its record may still wait in the write-on-return queue).
+    if (this.copiedStopped()?.phoneVersion === null) return "older";
+    return this.noteStopped({ ...read, turnId: null }) ? "copied" : "older";
   }
 
   // ---- the checked safety lines -------------------------------------------------------------------------------------
@@ -535,6 +636,14 @@ export class ActorCopies {
   /** True while the timers' copy is behind a write it was told of (its last reload failed). */
   timersStale(): boolean {
     return this.sql.exec("SELECT 1 FROM copy_meta WHERE k = ?", STALE).toArray().length > 0;
+  }
+
+  /**
+   * Marks the timers' copy behind a write it cannot read (T-1206: a commit whose answer was lost), so every later commit
+   * reloads it until a reload succeeds. Never throws.
+   */
+  markTimersStale(): void {
+    this.markStale();
   }
 
   /**
