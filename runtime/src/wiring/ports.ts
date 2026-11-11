@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the nineteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the twenty
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -45,8 +45,10 @@
 //   sendState    K-05 v1.2 sendState: limit 8's read of the recipient's send       T-562
 //                state at send, and the chat the send goes to
 //   dataAccess   K-05 writes: the turn's plans, the clock arming                   T-564
-//   linqSend     K-11 sendPart, and the checked safety line sent straight through  T-563
-//                Linq while PostgreSQL is down
+//   linqSend     K-11 sendPart: each part the dispatcher sends, through the Linq   T-563
+//                line (@rosie/adapters' Linq double in a test)
+//   linqDirect   the checked safety line sent straight through Linq while          no D-017 hop
+//                PostgreSQL is down (arch 11 line 566), split from linqSend by T-563
 //
 // Not ports: the HandleActor namespace (the gateway's door to each handle's actor and the clock arming's way to it, a
 // binding the root is handed), the clock, and the wiring between the parts the root builds (the lease runs the turn loop;
@@ -79,7 +81,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The nineteen ports, in D-017's turn order (02-contracts section 11). */
+/** The twenty ports, in D-017's turn order (02-contracts section 11), the direct line, which no hop runs, last. */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -100,6 +102,7 @@ export const PORTS = [
   "sendState",
   "dataAccess",
   "linqSend",
+  "linqDirect",
 ] as const;
 
 export type PortName = (typeof PORTS)[number];
@@ -198,12 +201,14 @@ export interface DataAccess {
   readonly clocks: ArmingData;
 }
 
-/** The Linq sends. */
+/**
+ * The dispatcher's Linq sends (T-563): K-11 v1 sendPart, each part of a claimed row, under its `<row>/<part>/<try>` key,
+ * through the Linq line (@rosie/adapters' Linq double in a test). The checked safety line the actor sends straight through
+ * Linq while PostgreSQL is down is a port of its own (`Ports.linqDirect`), which no D-017 hop runs.
+ */
 export interface LinqSend {
   /** K-11 sendPart: each part the dispatcher sends. */
   readonly parts: LinqSendCall;
-  /** A checked safety line straight through Linq while PostgreSQL is down (arch 11 line 566). */
-  readonly direct: DirectLineSender;
 }
 
 /** One implementation of every port. */
@@ -246,5 +251,8 @@ export interface Ports {
   /** K-05 v1.2 sendState (T-562): limit 8's read at send, and the chat the send goes to. */
   readonly sendState: SendStatePort;
   readonly dataAccess: DataAccess;
+  /** K-11 sendPart through the Linq line (T-563): each part the dispatcher sends, once per row-part-try key. */
   readonly linqSend: LinqSend;
+  /** A checked safety line straight through Linq while PostgreSQL is down (arch 11 line 566): no D-017 hop. */
+  readonly linqDirect: DirectLineSender;
 }

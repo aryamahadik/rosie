@@ -203,6 +203,8 @@ function rig(log: MockInstance): Run {
     // The outbox and send-state ports (T-562) over one K-05 double: the rows the commit wrote, with finalize's plans.
     outboxCalls: fakes.dispatch.outbox,
     sendStateCall: fakes.dispatch.sendState,
+    // The Linq send port (T-563) over @rosie/adapters' Linq double: each part the dispatcher sends reaches the double.
+    linqSendCall: fakes.linq.call,
   });
   const restoreRoot = root.install();
   const watched = watchGate(root);

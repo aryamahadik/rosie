@@ -233,8 +233,10 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     options.database === false ? { access: null, roster: null, phones: null, line } : { ...reads, line };
   const root = composeRoot({
     environment: "test",
-    // Staging's send path through the line: each part the dispatcher sends goes to the line's Linq double.
-    sets: { fake: { ...fakes.ports, linqSend: { ...fakes.ports.linqSend, parts: lineLinqSend(line) } } },
+    sets: { fake: fakes.ports },
+    // Staging's send path through the line, fed to the joined Linq send port (T-563): each part the dispatcher sends goes
+    // to the line's Linq double.
+    linqSendCall: (request) => lineLinqSend(line).sendPart(request),
     actors: handleActors(),
     vars: { ENVIRONMENT: options.vars ?? env.ENVIRONMENT, GIT_SHA: "test-sha" },
     clock: fakes.clock,
