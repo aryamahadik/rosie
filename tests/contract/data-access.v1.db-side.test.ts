@@ -1,42 +1,52 @@
-// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6 and v1.7 (T-1169; T-1199 for
-// v1.6; T-1214 for v1.7; DL-348, DL-373, DL-398, DL-444; contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6"
-// and "v1.7", their "Consumers of" lists, "Fixtures", and "Producers and consumers").
+// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7 and v1.8 (T-1169; T-1199
+// for v1.6; T-1214 for v1.7; T-1218 for v1.8; DL-348, DL-373, DL-398, DL-444, DL-456; contracts/data-access/README.md
+// sections "v1.3", "v1.4", "v1.6", "v1.7" and "v1.8", their "Consumers of" lists, "Fixtures", and "Producers and
+// consumers").
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
 // (T-1138, db/repo/turn-face-reads.ts), v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts), v1.6's
 // businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: the row's business's sensitive switch, read
-// from K-23's company_kinds; README item 45) and v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: a number's text
-// opens its chat, writing its phone row and one phone.chat_opened entry; README item 46). v1.5 adds no database call
-// (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of fixtures/index.json
-// whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned list or count (DL-124,
-// DL-125), against local PostgreSQL with every migration applied to a fresh schema (db/repo/test-db.ts):
+// from K-23's company_kinds; README item 45), v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: a number's text
+// opens its chat, writing its phone row and one phone.chat_opened entry; README item 46) and v1.8's sendState (T-1216,
+// db/repo/send-state.ts: limit 8's read, whose texts consent row says who gave the yes and for which booking,
+// fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47). v1.5 adds no
+// database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
+// fixtures/index.json whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned
+// list or count (DL-124, DL-125), against local PostgreSQL with every migration applied to a fresh schema
+// (db/repo/test-db.ts):
 //   - each accepted exchange: its given is loaded (its k04Seeds and partSeeds, each with its own after chain, and the
 //     exchanges its after chain names, run first through db/repo, each answering its own fixture's outcome, a call no
-//     side entry names through CHAIN_CALLS; then the rows its note says its database side writes itself, where no frozen
-//     seed holds them: NOTED_ROWS); then its request goes through the db/repo call it names, in the role and on the side
-//     the README gives that call (items 34 to 43 and 46; commitTurn per write, as rosie_job). The answer is the fixture's
-//     outcome, and the answer and the exchange that holds it are valid against the schema of the entry's own version. For
-//     a call that writes (WRITERS: v1.7's openChatOnText), the tables then hold what the answer gives: the row as the
-//     call leaves it and the one entry it appends, or nothing written. Two answers are compared otherwise, each with a
-//     field a later version adds, never with one dropped: db/repo answers a readOutboxRow exchange of a version before
-//     v1.6 as v1.6 does, which always states businessSensitive (SWITCH), so its answer is the fixture's outcome, whole,
-//     with businessSensitive null and nothing else changed (the exchange's world holds no kind of work, checked before the
+//     side entry names through CHAIN_CALLS and a v1 claim through K-05 v1's own claimOutbox, V1_CHAIN_CALLS, with the
+//     saved-time clock row a held reserve gets, which db/repo's reserve does not write yet: SAVED_TIME; then the rows its
+//     note says its database side writes itself, where no frozen seed holds them: NOTED_ROWS); then its request goes
+//     through the db/repo call it names, in the role and on the side the README gives that call (items 28, 34 to 43, 46
+//     and 47; commitTurn per write, as rosie_job). The answer is the fixture's outcome, and the answer and the exchange
+//     that holds it are valid against the schema of the entry's own version, a v1.8 sendState answer against
+//     sendState.v1dot8Response, which states fromContact and bookingId always (CONSENT_SOURCE). For a call that writes
+//     (WRITERS: v1.7's openChatOnText), the tables then hold what the answer gives: the row as the call leaves it and
+//     the one entry it appends, or nothing written. Two answers are compared otherwise, each with a field a later
+//     version adds, never with one dropped: db/repo answers a readOutboxRow exchange of a version before v1.6 as v1.6
+//     does, which always states businessSensitive (SWITCH), so its answer is the fixture's outcome, whole, with
+//     businessSensitive null and nothing else changed (the exchange's world holds no kind of work, checked before the
 //     read), valid at v1.6, whose readOutboxRow.v1dot6Response is a v1.6 answer; and a v1.1 claim a chain runs first is
 //     answered as v1.2 does, each claimed row naming its port (PORT), valid at v1.2;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
 //     written;
-//   - each refused answer (its definition a call's response, or v1.6's readOutboxRow.v1dot6Response): in the state of
-//     the accepted exchange that answers the same read (its twin), db/repo's answer is valid against the refused entry's
-//     own definition, at the version db/repo answers the twin, which refuses the fixture too, and it differs from the
-//     refused fixture only at the fault the fixture carries (and at businessSensitive alone where db/repo answers an
-//     earlier twin as v1.6): the repo answers it put right, never as it stands;
+//   - each refused answer (its definition a call's response, v1.6's readOutboxRow.v1dot6Response or v1.8's
+//     sendState.v1dot8Response): in the state of the accepted exchange that answers the same read (its twin), db/repo's
+//     answer is valid against the refused entry's own definition, at the version db/repo answers the twin, which
+//     refuses the fixture too, and it differs from the refused fixture only at the fault the fixture carries (and at
+//     businessSensitive alone where db/repo answers an earlier twin as v1.6): the repo answers it put right, never as it
+//     stands;
 //   - each refused exchange (v1.7's refuse-open-chat-stopped-number): in its own given, its twin's but for its note,
 //     db/repo answers its request with the twin's outcome, which differs from the refused one only at its fault, the
 //     exchange with that answer is accepted, and nothing is written.
 // So a call of db/repo that drifts from the frozen contract fails this test. The repo's own tests (db/repo/*.int.test.ts)
 // hold the rest of the producer's side for these calls: other businesses' rows, the column lists, the roles refused,
-// and for openChatOnText parallel texts, a STOP and a START around the call, and its transient answers.
+// for openChatOnText parallel texts, a STOP and a START around the call, and its transient answers, and for sendState
+// the rows no v1.8 fixture shows (a yes by text in another handle's turn, a page's yes, an email contact's yes, a START
+// with no turn beside a yes with no turn that is not one).
 //
 // It needs PostgreSQL: `npm run db:up` locally (DATABASE_URL, else the local Docker database when CI is unset), and the
 // merge check's service database (DATABASE_URL) in CI.
@@ -53,7 +63,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { openChatOnText } from "../../db/repo/chat-open";
 import { resolvePrimaryUrl } from "../../db/repo/client";
 import { commitTurn } from "../../db/repo/commit-turn";
-import { claimOutboxV12, markRowV12, writePlan } from "../../db/repo/outbox";
+import { claimOutbox, claimOutboxV12, markRowV12, writePlan } from "../../db/repo/outbox";
+import { reserve } from "../../db/repo/reservations";
 import {
   readBusinessOwner,
   readBusinessZone,
@@ -64,6 +75,7 @@ import {
   readSafetyOutcomeOfEvent,
 } from "../../db/repo/safety-reads";
 import type { Sql, Tx } from "../../db/repo/scope";
+import { sendState } from "../../db/repo/send-state";
 import { createTestDatabase, type TestDatabase } from "../../db/repo/test-db";
 import { readFixedLineFacts, readOpenHolds, readOutboxRow } from "../../db/repo/turn-face-reads";
 import { CONTRACTS_ROOT, REPO_ROOT, type FixtureEntry } from "./_harness";
@@ -83,10 +95,10 @@ const SHOPS_DIR = path.join(REPO_ROOT, "fixtures", "v1", "test-kit", "shops");
 const SLOW = { timeout: 60_000 };
 
 /**
- * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197) and v1.7 (T-1212). v1 to v1.2's
- * database sides are tasks of their own (README: T-116, T-478), and v1.5 has none.
+ * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212) and v1.8
+ * (T-1216). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478), and v1.5 has none.
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8"];
 
 interface Given {
   k04Seeds: string[];
@@ -155,10 +167,12 @@ function defOf(entry: FixtureEntry): { call: string; part: string } {
 }
 
 /**
- * The parts of a definition that name an answer: a call's response, and v1.6's readOutboxRow.v1dot6Response, the answer
- * a v1.6 call gives (README item 45), which refuses refuse-outbox-row-switch-left-out.
+ * The parts of a definition that name an answer: a call's response; v1.6's readOutboxRow.v1dot6Response, the answer a
+ * v1.6 call gives (README item 45), which refuses refuse-outbox-row-switch-left-out; and v1.8's
+ * sendState.v1dot8Response, the answer a v1.8 call gives (item 47), which refuses refuse-send-state-yes-source-left-out
+ * and refuse-send-state-booking-left-out.
  */
-const ANSWER_PARTS: readonly string[] = ["response", "v1dot6Response"];
+const ANSWER_PARTS: readonly string[] = ["response", "v1dot6Response", "v1dot8Response"];
 const isAnswerDef = (entry: FixtureEntry): boolean => ANSWER_PARTS.includes(defOf(entry).part);
 
 /** A version's major and minor number: v1.3 is [1, 3]. */
@@ -216,13 +230,21 @@ const withSwitch = (outcome: Record<string, Json>): Record<string, Json> => ({
  * show (claimOutboxV12; its v1 claimOutbox answers no claim and no claimedFrom) always states it. So a v1.1 claim a
  * chain runs first (Dee W.'s, before open-chat-dee-closed-chat) is answered as v1.2 answers it: the fixture's outcome
  * with each claimed row's port added by its channel, as v1.2's claimedRow ties them (email for the email channel, linq
- * for imessage, rcs and sms), never with the field dropped from db/repo's answer, and that answer is valid at v1.2.
+ * for imessage, rcs and sms), never with the field dropped from db/repo's answer, and that answer is valid at v1.2. A v1
+ * claim (claim-in-order, before every v1.8 read) runs through db/repo's v1 claimOutbox, which answers v1's claimed rows
+ * as v1 states them (V1_CHAIN_CALLS), so no port is added to it.
  */
 const PORT = { call: "claimOutbox", version: "v1.2", field: "port" } as const;
 
-/** Whether db/repo answers an exchange with the port its version leaves out: a claim before v1.2. */
+/** K-05 v1, whose own outbox calls db/repo keeps beside v1.2's: a v1 exchange of one runs through it (V1_CHAIN_CALLS). */
+const V1 = "v1";
+
+/** Whether db/repo answers an exchange with the port its version leaves out: a claim after v1 and before v1.2. */
 const addsPort = (entry: FixtureEntry, exchange: Exchange): boolean =>
-  exchange.call === PORT.call && !isError(exchange.outcome) && isBefore(entry.version, PORT.version);
+  exchange.call === PORT.call &&
+  !isError(exchange.outcome) &&
+  isBefore(V1, entry.version) &&
+  isBefore(entry.version, PORT.version);
 
 /** An earlier claim's outcome as v1.2 answers it: each claimed row's port, by its channel, added whole. */
 function withPorts(outcome: Record<string, Json>): Record<string, Json> {
@@ -237,6 +259,23 @@ function withPorts(outcome: Record<string, Json>): Record<string, Json> {
     }),
   };
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// v1.8's who gave the yes, and for which booking, on every sendState answer (README item 47)
+
+/**
+ * v1.8 (T-1102): sendState's texts consent row says who gave the yes and for which booking, and a v1.8 producer
+ * "always writes both fields ... and checks every answer against sendState.v1dot8Response" (README "Consumers of v1.8").
+ * db/repo is that producer (T-1216), so its answer at v1.8 or later is judged by that definition, which requires both
+ * fields on a row, never by sendState.response alone, which also takes an answer of v1.2 to v1.7 with neither. Every
+ * sendState exchange that runs here is v1.8's (v1.2's are its own database side's: README T-478).
+ */
+const CONSENT_SOURCE = {
+  call: "sendState",
+  version: "v1.8",
+  fields: ["fromContact", "bookingId"],
+  answerDef: "sendState.v1dot8Response",
+} as const;
 
 // ---------------------------------------------------------------------------------------------------------------
 // The schemas: every schema under contracts/, as contracts:check loads them, so each $ref resolves; one strict
@@ -272,11 +311,15 @@ function errorsOf(validate: ValidateFunction, value: unknown): string[] {
 
 /**
  * The definition an answer is judged by at `version`: its call's errors when it is one, else the answer its call gives
- * there, which from v1.6 on is readOutboxRow.v1dot6Response for readOutboxRow (README item 45), and else its response.
+ * there, which from v1.6 on is readOutboxRow.v1dot6Response for readOutboxRow (README item 45), from v1.8 on
+ * sendState.v1dot8Response for sendState (item 47), and else its response.
  */
 function answerDefOf(version: string, call: string, answer: unknown): string {
   if (isError(answer)) return `${call}.errors`;
   if (call === SWITCH.call && !isBefore(version, SWITCH.version)) return SWITCH.answerDef;
+  if (call === CONSENT_SOURCE.call && !isBefore(version, CONSENT_SOURCE.version)) {
+    return CONSENT_SOURCE.answerDef;
+  }
   return `${call}.response`;
 }
 
@@ -300,11 +343,12 @@ interface DbCall {
 const byBusiness = (request: Record<string, Json>): Role => (request.businessId === null ? "job" : "app");
 
 /**
- * The calls v1.3, v1.4 and v1.7 add, and the commit their chains run: items 34 to 36 (v1.3), 37 to 43 (v1.4) and 46
- * (v1.7), each in the role its row of the README's table names; commitTurn per write, on the runtime side as rosie_job
- * (README "Scope"). v1.6 adds no call: businessSensitive is readOutboxRow's own (item 45, in item 35's transaction).
- * openChatOnText runs on the runtime side, as rosie_job with no business scope (item 46's table: phones and handles are
- * scoped none).
+ * The calls v1.3, v1.4 and v1.7 add, the call v1.8 changes, and the commit their chains run: items 34 to 36 (v1.3), 37
+ * to 43 (v1.4), 46 (v1.7) and 47 (v1.8), each in the role its row of the README's table names; commitTurn per write, on
+ * the runtime side as rosie_job (README "Scope"). v1.6 adds no call: businessSensitive is readOutboxRow's own (item 45,
+ * in item 35's transaction). openChatOnText runs on the runtime side, as rosie_job with no business scope (item 46's
+ * table: phones and handles are scoped none), and so does sendState, item 47's read inside item 28's read-only
+ * transaction (README "Consumers of v1.8"; v1.2 default 25).
  */
 const DB_CALLS: Readonly<Record<string, DbCall>> = {
   commitTurn: { role: () => "job", run: commitTurn },
@@ -319,27 +363,52 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
   readBusinessOwner: { role: () => "job", run: readBusinessOwner },
   readBusinessZone: { role: () => "app", run: readBusinessZone },
   openChatOnText: { role: () => "job", run: openChatOnText },
+  sendState: { role: () => "job", run: sendState },
 };
 
 /**
- * The calls a chain runs first that no entry of a version with a database side names: v1.1's plan, claim and limit-8
- * mark, which Dee W.'s waiting notice runs before open-chat-dee-closed-chat (README "Fixtures", v1.7), each on the
- * runtime side as rosie_job (v1 items 2 to 4; v1.1 items 13 and 16): the claim and the mark through v1.2's calls, which
- * answer v1.1's claim (PORT) and its waitingChat mark.
+ * The calls a chain runs first that no entry of a version with a database side names: v1's reserve, which saves Alex's
+ * Nov 14 time before the commit that books it (commit-first, in the chain of every v1.8 exchange: README "Fixtures",
+ * v1.8), under the reservation's business as rosie_app (README "Scope": business; item 8), then SAVED_TIME; and the
+ * plan, claim and limit-8 mark, which Dee W.'s waiting notice runs before open-chat-dee-closed-chat (README "Fixtures",
+ * v1.7) and Alex's confirmation before every v1.8 read ("Consumers of v1.8": "its chains running v1's plan and claim
+ * steps"), each on the runtime side as rosie_job (v1 items 2 to 4; v1.1 items 13 and 16): writePlan, the same in every
+ * version, and the claim and the mark through v1.2's calls, which answer v1.1's claim (PORT) and its waitingChat mark. A
+ * v1 claim runs through K-05 v1's own (V1_CHAIN_CALLS).
  */
 const CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
+  reserve: { role: () => "app", run: reserve },
   writePlan: { role: () => "job", run: writePlan },
   claimOutbox: { role: () => "job", run: claimOutboxV12 },
   markRow: { role: () => "job", run: markRowV12 },
+};
+
+/**
+ * K-05 v1's own claim, which db/repo keeps beside v1.2's (db/repo/outbox.ts: "The outbox calls come in two versions,
+ * each answering its own contract's shapes"): it writes no claim row and answers v1's claimed rows, which hold no
+ * claim, claimedFrom or port. So a v1 claim a chain runs first (claim-in-order, which claims Alex's confirmation before
+ * every v1.8 read: README "Fixtures", v1.8) runs through it, on the runtime side as rosie_job (v1 item 3), and answers
+ * its own fixture's outcome, whole, as no v1.2 claim could (PORT adds nothing to it); a v1.1 claim runs through v1.2's.
+ */
+const V1_CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
+  claimOutbox: { role: () => "job", run: claimOutbox },
 };
 
 /** The calls that write: an answer gives the row it leaves and the entry it appends (item 46 step 4), or none. */
 const WRITERS: readonly string[] = ["openChatOnText"];
 
 const callOf = (call: string): DbCall => must(DB_CALLS[call], `a db/repo call for ${call}`);
-/** A call a chain runs first: one of DB_CALLS, or else one of CHAIN_CALLS. */
-const stepCallOf = (call: string): DbCall =>
-  must(DB_CALLS[call] ?? CHAIN_CALLS[call], `a db/repo call for ${call}, run first`);
+
+/** Whether a chain step is a v1 exchange of a call whose v1 form db/repo keeps (V1_CHAIN_CALLS). */
+const runsAtV1 = (step: string): boolean =>
+  entryOf(step).version === V1 && Object.hasOwn(V1_CHAIN_CALLS, exchangeOf(step).call);
+
+/** The call a chain step runs through: one of DB_CALLS, else K-05 v1's own (runsAtV1), else one of CHAIN_CALLS. */
+function stepCallOf(step: string): DbCall {
+  const { call } = exchangeOf(step);
+  const v1 = runsAtV1(step) ? V1_CHAIN_CALLS[call] : undefined;
+  return must(DB_CALLS[call] ?? v1 ?? CHAIN_CALLS[call], `a db/repo call for ${call}, run first`);
+}
 
 /**
  * Each refused answer of a version with a database side, with its twin: the accepted exchange that answers the same
@@ -399,6 +468,19 @@ const RESPONSE_TWINS: Readonly<Record<string, { twin: string; part?: string; fau
   "invalid/refuse-outbox-row-switch-per-flow.json": {
     twin: "read-outbox-row-practice-sensitive.json",
     faults: ["businessSensitive"],
+  },
+  // v1.8: each is its twin's outcome, put right (README "Consumers of v1.8")
+  "invalid/refuse-send-state-yes-source-left-out.json": {
+    twin: "send-state-business-yes.json",
+    faults: ["textsConsent.fromContact"],
+  },
+  "invalid/refuse-send-state-booking-left-out.json": {
+    twin: "send-state-own-yes-one-booking.json",
+    faults: ["textsConsent.bookingId"],
+  },
+  "invalid/refuse-send-state-stop-read-as-own-yes.json": {
+    twin: "send-state-stop-row.json",
+    faults: ["textsConsent.fromContact"],
   },
 };
 
@@ -815,6 +897,56 @@ function chainOf(file: string, seen = new Set<string>()): { seeds: string[]; ste
   return { seeds, steps };
 }
 
+/**
+ * README v1 item 8: a held time gets its saved-time clock row, `<reservation id>/saved-time`, kind saved_time, armed and
+ * due at its held_until in its business's zone (CQ-05's default), owned by the mobile's handle (by the sweep, with no
+ * handle, for an agent token or a booking), firing its release as expired; the commit that books the time cancels it
+ * (item 1: commit-first's answer names that row at version 2). db/repo's reserve writes none yet
+ * (db/repo/reservations.ts: "reserve() writes no clock row yet: the answer names its id"), so after a held time a chain
+ * runs first, this test writes that one row as the tables' owner, as db/repo/commit-turn.int.test.ts does, from the
+ * reservation reserve wrote and its answer, once it has checked that reserve wrote none: when reserve writes it, that
+ * check fails and this step goes.
+ */
+const SAVED_TIME = { call: "reserve", result: "held", kind: "saved_time" } as const;
+
+/** Whether a chain step holds a time: a reserve whose answer (checked first to be its outcome) is held (SAVED_TIME). */
+const holdsTime = (exchange: Exchange): boolean =>
+  exchange.call === SAVED_TIME.call && exchange.outcome.result === SAVED_TIME.result;
+
+/** The saved-time clock row of a held time a chain ran first (SAVED_TIME), as the tables' owner. */
+async function writeSavedTimeClock(exchange: Exchange): Promise<void> {
+  const { request, outcome } = exchange;
+  const reservationId = textOf(outcome.reservationId, "a held time's reservation id");
+  const clockId = textOf(outcome.savedTimeClockId, "a held time's clock row id");
+  const [there] = await db.sql<{ rows: number }[]>`
+    select count(*)::int as rows from clock_rows where id = ${clockId}
+  `;
+  expect(there?.rows, `${clockId}: db/repo's reserve writes no saved-time clock row yet`).toBe(0);
+  const [held] = await db.sql<
+    { business_id: string; booking_id: string | null; handle_id: string | null; zone: string }[]
+  >`
+    select r.business_id, r.booking_id, p.handle_id, b.time_zone as zone
+    from reservations r
+    join businesses b on b.id = r.business_id
+    left join phones p on p.number = r.for_phone_number
+    where r.id = ${reservationId}
+  `;
+  const row = must(held, `the held reservation ${reservationId}`);
+  await insertRow(db.sql, "clock_rows", {
+    id: clockId,
+    kind: SAVED_TIME.kind,
+    reservation_id: reservationId,
+    handle_id: row.handle_id,
+    business_id: row.business_id,
+    booking_id: row.booking_id,
+    due_at: textOf(outcome.heldUntil, "a held time's end"),
+    due_zone: row.zone,
+    state: "armed",
+    armed_at: textOf(request.at, "a reserve's time"),
+    fires: { release: reservationId, why: "expired" },
+  });
+}
+
 const nowOf = (exchange: Exchange): { now: Date } => ({ now: new Date(exchange.given.now) });
 
 /** The exchange's request through its db/repo call (a side entry's own, unless a chain step's is given), in its role. */
@@ -854,7 +986,8 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
 /**
  * Loads a fixture's given into the emptied schema: its seeds and their chains as the tables' owner, in one
  * transaction, then the exchanges of its after chain through db/repo (stepCallOf), each answering its own fixture's
- * outcome (as answerOf reads it; a claim answered as v1.2 does valid at v1.2), then the rows its note lists
+ * outcome (as answerOf reads it; a claim answered as v1.2 does valid at v1.2, and one answered by K-05 v1's own call
+ * valid at v1), a held time followed by its saved-time clock row (SAVED_TIME), then the rows its note lists
  * (NOTED_ROWS), as the tables' owner, in one transaction.
  */
 async function given(file: string): Promise<Exchange> {
@@ -868,11 +1001,15 @@ async function given(file: string): Promise<Exchange> {
   for (const step of chain.steps) {
     const before = exchangeOf(step);
     const expected = await answerOf(entryOf(step), before);
-    const answer = await runExchange(before, stepCallOf(before.call));
+    const answer = await runExchange(before, stepCallOf(step));
     expect(answer, `${file}: ${step}, run first`).toEqual(expected);
     if (addsPort(entryOf(step), before)) {
       expect(answerErrors(PORT.version, before.call, answer), `${step}, answered at v1.2`).toEqual([]);
     }
+    if (runsAtV1(step)) {
+      expect(answerErrors(V1, before.call, answer), `${step}, answered at v1`).toEqual([]);
+    }
+    if (holdsTime(before)) await writeSavedTimeClock(before);
   }
   const noted = NOTED_ROWS[file]?.() ?? [];
   await db.sql.begin(async (tx) => {
@@ -885,7 +1022,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6 and v1.7, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7 and v1.8, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -907,7 +1044,7 @@ describe("data-access database side: the versions with one, each entry selected 
     }
   });
 
-  it("runs each exchange a chain runs first through db/repo: a call of DB_CALLS, else of CHAIN_CALLS, which no side entry names", () => {
+  it("runs each exchange a chain runs first through db/repo: a call of DB_CALLS, else K-05 v1's own for a v1 step (V1_CHAIN_CALLS), else of CHAIN_CALLS, which no side entry names", () => {
     const sideCalls = new Set(sideEntries.map((entry) => defOf(entry).call));
     const runFirst = [
       ...sideAccepted.map((entry) => entry.file),
@@ -923,6 +1060,16 @@ describe("data-access database side: the versions with one, each entry selected 
       expect([...stepCalls], `${call} is run first`).toContain(call);
       expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
     }
+    // K-05 v1's own calls run the v1 steps of theirs, and no other step.
+    const v1Calls = new Set(runFirst.filter(runsAtV1).map((step) => exchangeOf(step).call));
+    for (const call of Object.keys(V1_CHAIN_CALLS)) {
+      expect([...v1Calls], `${call} runs a v1 step first`).toContain(call);
+      expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
+    }
+    for (const step of runFirst) {
+      const v1Call = V1_CHAIN_CALLS[exchangeOf(step).call];
+      expect(stepCallOf(step) === v1Call, `${step}: through K-05 v1's own call`).toBe(runsAtV1(step));
+    }
     for (const call of WRITERS) expect(Object.keys(DB_CALLS), call).toContain(call);
   });
 
@@ -937,6 +1084,16 @@ describe("data-access database side: the versions with one, each entry selected 
       answers.filter((entry) => entry.def === SWITCH.answerDef).map((entry) => entry.file),
       "v1.6's answer refused by its own definition",
     ).toEqual(["invalid/refuse-outbox-row-switch-left-out.json"]);
+    expect(
+      answers
+        .filter((entry) => entry.def === CONSENT_SOURCE.answerDef)
+        .map((entry) => entry.file)
+        .sort(),
+      "v1.8's answers refused by its own definition",
+    ).toEqual([
+      "invalid/refuse-send-state-booking-left-out.json",
+      "invalid/refuse-send-state-yes-source-left-out.json",
+    ]);
     for (const [file, { twin }] of Object.entries(RESPONSE_TWINS)) {
       expect(entryOf(twin).expect, `${file}'s twin`).toBe("accept");
       expect(exchangeOf(twin).call, `${file}'s twin`).toBe(defOf(entryOf(file)).call);
@@ -988,6 +1145,98 @@ describe("data-access database side: the versions with one, each entry selected 
         `${step}: a port its channel does not take`,
       ).not.toEqual([]);
     }
+  });
+
+  it("answers a v1 claim a chain runs first through K-05 v1's own claimOutbox: its outcome whole, valid at v1, whose claimed row takes no claim, claimedFrom or port", () => {
+    const steps = [...new Set(sideAccepted.flatMap((entry) => chainOf(entry.file).steps))];
+    const claims = steps.filter((step) => exchangeOf(step).call === PORT.call && runsAtV1(step));
+    expect(claims.length, "v1 claims run first").toBeGreaterThan(0);
+    for (const step of claims) {
+      const exchange = exchangeOf(step);
+      expect(stepCallOf(step), step).toBe(V1_CHAIN_CALLS[PORT.call]);
+      expect(addsPort(entryOf(step), exchange), `${step}: answered whole, nothing added`).toBe(false);
+      expect(answerErrors(V1, exchange.call, exchange.outcome), `${step} at v1`).toEqual([]);
+      const rows = exchange.outcome.claimed as Record<string, Json>[];
+      expect(rows.length, step).toBeGreaterThan(0);
+      for (const row of rows) {
+        for (const field of ["claim", "claimedFrom", PORT.field]) {
+          expect(Object.hasOwn(row, field), `${step}: a claimed row with ${field}`).toBe(false);
+        }
+      }
+      expect(
+        answerErrors(V1, exchange.call, withPorts(exchange.outcome)),
+        `${step}: v1's claimed row is closed, so a v1.2 claim's answer is not its`,
+      ).not.toEqual([]);
+    }
+  });
+
+  it("writes after each held time a chain runs first its saved-time clock row, which a commit after it in that chain books (SAVED_TIME)", () => {
+    /** Whether a commit's answer names a row among those it wrote. */
+    const commitWrites = (exchange: Exchange, table: string, rowId: string): boolean => {
+      const committed: Record<string, unknown> = isRecord(exchange.outcome.committed)
+        ? exchange.outcome.committed
+        : {};
+      const rows = Array.isArray(committed.written) ? committed.written : [];
+      return (
+        exchange.call === "commitTurn" &&
+        rows.some((row) => isRecord(row) && row.table === table && row.rowId === rowId)
+      );
+    };
+    const chains = [
+      ...sideAccepted.map((entry) => entry.file),
+      ...Object.values(RESPONSE_TWINS).map((twin) => twin.twin),
+    ].map((file) => chainOf(file).steps);
+    let held = 0;
+    for (const steps of chains) {
+      for (const [at, step] of steps.entries()) {
+        if (!holdsTime(exchangeOf(step))) continue;
+        held += 1;
+        const { outcome } = exchangeOf(step);
+        const clockId = `${textOf(outcome.reservationId, `${step}'s reservation`)}/saved-time`;
+        expect(outcome.savedTimeClockId, `${step}: its clock row, by item 8's rule`).toBe(clockId);
+        const booking = steps
+          .slice(at + 1)
+          .filter((later) => commitWrites(exchangeOf(later), "clock_rows", clockId));
+        expect(booking.length, `${step}: a commit after it writes ${clockId}`).toBeGreaterThan(0);
+      }
+    }
+    expect(held, "held times run first").toBeGreaterThan(0);
+  });
+
+  it("judges each v1.8 sendState answer by sendState.v1dot8Response, which refuses one with fromContact or bookingId left out", () => {
+    const reads = sideAccepted.filter((entry) => exchangeOf(entry.file).call === CONSENT_SOURCE.call);
+    expect(reads.length, "v1.8's sendState reads").toBeGreaterThan(0);
+    const withRow = reads.filter((entry) => isRecord(exchangeOf(entry.file).outcome.textsConsent));
+    expect(withRow.length, "reads that give a texts consent row").toBeGreaterThan(0);
+    for (const entry of reads) {
+      const { outcome } = exchangeOf(entry.file);
+      expect(entry.version, entry.file).toBe(CONSENT_SOURCE.version);
+      expect(answerDefOf(entry.version, CONSENT_SOURCE.call, outcome), entry.file).toBe(
+        CONSENT_SOURCE.answerDef,
+      );
+      expect(answerErrors(entry.version, CONSENT_SOURCE.call, outcome), entry.file).toEqual([]);
+    }
+    const response = validatorOf(CONSENT_SOURCE.version, `${CONSENT_SOURCE.call}.response`);
+    for (const entry of withRow) {
+      const { outcome } = exchangeOf(entry.file);
+      const consent = outcome.textsConsent as Record<string, Json>;
+      for (const field of CONSENT_SOURCE.fields) {
+        expect(Object.hasOwn(consent, field), `${entry.file}: ${field} stated`).toBe(true);
+        const leftOut = { ...consent };
+        Reflect.deleteProperty(leftOut, field);
+        const answer = { ...outcome, textsConsent: leftOut };
+        expect(
+          answerErrors(entry.version, CONSENT_SOURCE.call, answer),
+          `${entry.file} with ${field} left out`,
+        ).not.toEqual([]);
+        expect(
+          errorsOf(response, answer),
+          `${entry.file} with ${field} left out, as an earlier answer`,
+        ).toEqual([]);
+      }
+    }
+    // Before v1.8 a sendState answer is judged by its response, which has neither field.
+    expect(answerDefOf("v1.7", CONSENT_SOURCE.call, {})).toBe(`${CONSENT_SOURCE.call}.response`);
   });
 
   it("answers an earlier readOutboxRow exchange as v1.6 does: its outcome and businessSensitive null, valid at v1.6 alone", () => {
@@ -1056,7 +1305,7 @@ describe("data-access database side: the versions with one, each entry selected 
   });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6 and v1.7 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7 and v1.8 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -1119,7 +1368,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6 
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6 and v1.7 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7 and v1.8 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
