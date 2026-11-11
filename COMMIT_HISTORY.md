@@ -2,9 +2,25 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 349, [`3cd4827`](https://github.com/aryamahadik/rosie/commit/3cd4827), 2026-11-11 06:50:42 UTC.
+- **Through:** commit 350, [`7f552c9`](https://github.com/aryamahadik/rosie/commit/7f552c9), 2026-11-11 07:12:52 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 350. docs: COMMIT\_HISTORY.md, every commit on main (1 to 349, through 3cd4827) with its pull request, squashed branch commits, files and message; the closed pull requests; regenerated after each merge (DL-436) (\#357)
+
+- **Commit:** [`7f552c9`](https://github.com/aryamahadik/rosie/commit/7f552c9), by Arya Mahadik, 2026-11-11 07:12:52 UTC
+- **Pull request:** [#357](https://github.com/aryamahadik/rosie/pull/357) from `task/commit-history-1`, merged 2026-11-11 07:12:52 UTC. It squashed 1 branch commit:
+  - `6ec6b53` docs: COMMIT\_HISTORY.md, every commit on main (1 to 349, through 3cd4…
+- **Files changed:** 2 (+8288 −0), by folder:
+  - `/` .prettierignore +2 −0, COMMIT\_HISTORY.md +8286 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 349. T-201: db/seeds/run.mjs seeds one set (db/seeds/\<set\>.ts, found by file name) into the schema DB\_SCHEMA names, idempotently, printing row counts per table and no part of the database URL; it seeds only a database on this machine or the one STAGING\_DATABASE\_URL names (never production, so --set skeleton is refused elsewhere, DL-341), and refuses a schema that is missing or lacks a migration, so no row reaches public; run.int.test.ts proves it (\#356)
 
