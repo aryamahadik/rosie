@@ -18,7 +18,8 @@
 // the recipients in all, the recipient sent to least recently, whole. So a flood to one recipient only ever drops that
 // recipient's own records, and the line never holds more than recipients times the cap. A repeated key stores nothing and
 // drops nothing. The caps are constants of this module: no request can name, raise or lift them. T-565's recorder is made
-// for each send, so no part stays in it once the send is over; the table is the line's only record of parts.
+// for each send, so no part stays in it once the send is over. The doubles' own memory of what they took (requests, keys,
+// emails) is theirs and lasts until the object is evicted, as before: trimming it would change their answers.
 //
 // One object for all of staging's test phones (./pages.ts TEST_PHONE_LINE_NAME): the roster's fictional 555-01xx phones all
 // text through the one Linq double, as they would through one Linq line. The line never signs or verifies an email, so the
