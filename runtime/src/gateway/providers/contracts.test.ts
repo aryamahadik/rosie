@@ -34,6 +34,7 @@ import {
   captureLogLines,
   endpointOf,
   googlePushRequest,
+  graphBatchExchange,
   graphBodyRequest,
   graphNotificationsRequest,
   graphValidationRequest,
@@ -282,6 +283,42 @@ describe("the calendar doors", () => {
     }
     const spans = providerSpans(logLines());
     expect(spans).toHaveLength(6);
+    for (const line of spans) {
+      expect(problems(K08, "span", spanOf(line))).toEqual([]);
+      expect(problems(K16, "calendar.span", spanOf(line))).toEqual([]);
+    }
+  });
+
+  it("a Graph batch of 100 notifications from two subscriptions (T-1201; README spike row 10): the exchange is K-16's, and so are the door's request, its 100 rows and its span", async () => {
+    const logLines = captureLogLines();
+    const batch = graphBatchExchange(100, microsoft.given.now);
+    const deps = {
+      ...depsAt(microsoft.given.now),
+      calendar: calendarPortDouble([...CALENDAR_ALL, batch]),
+    };
+
+    const response = await handleCalendarWebhook(
+      graphNotificationsRequest(batch.request.notifications, deps.calendar.verifierOf),
+      "microsoft",
+      deps,
+      WHERE,
+    );
+
+    expect(problems(K16, "verifyNotification.exchange", batch)).toEqual([]);
+    expect(response.status).toBe(200);
+    expect(deps.calendar.requests).toHaveLength(1);
+    for (const request of deps.calendar.requests) {
+      expect(problems(K16, "verifyNotification.request", request)).toEqual([]);
+    }
+    expect(deps.events.rows).toHaveLength(100);
+    for (const row of deps.events.rows) {
+      expect(problems(K07, "providerEvent", row)).toEqual([]);
+      expect(problems(K07, "providerEventRecord", { record: "providerEvent", event: row })).toEqual([]);
+      expect(problems(K05_V1_1, "recordProviderEvent.request", row)).toEqual([]);
+      expect(problems(K16, "calendarProviderEvent", row)).toEqual([]);
+    }
+    const spans = providerSpans(logLines());
+    expect(spans).toHaveLength(1);
     for (const line of spans) {
       expect(problems(K08, "span", spanOf(line))).toEqual([]);
       expect(problems(K16, "calendar.span", spanOf(line))).toEqual([]);
