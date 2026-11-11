@@ -5,7 +5,8 @@
 //
 //   - Order is read from when each hop started (`at`, its earliest span): no hop may start before a hop the expected list
 //     puts before it. Instants that are equal pass, since the Workers clock moves only between I/O steps. The spans' `seq`
-//     is judged on its own (`seqProblems`): every writer that opens its own trace context numbers its spans from 1.
+//     is judged on its own (`seqProblems`): one run 1, 2, 3 ... across a trace's writers (T-1108; context.ts). A writer
+//     that counts alone again (a trace nobody began in its isolate) shows as a seq taken twice.
 //   - What the merged runtime does not write yet is named by the caller, never dropped in silence: a `notWritten` hop leaves
 //     the expected list, and one that shows up anyway is `unexpected`, so a writer that lands makes the caller take the hop
 //     off its list. Spans the caller knows are written beside the expected ones are named by `extra` and set aside, and the

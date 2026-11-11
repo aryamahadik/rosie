@@ -4,6 +4,7 @@
 // - the data-access calls (K-05; the database engineer's C-152): `claimOutbox`, `renewClaim` and `markPart`.
 //   Each call comes from K-05 v1.1 (T-071), the newest frozen minor version: `claimOutbox`'s `claim` and the re-claim
 //   of a lapsed claim, `renewClaim` and `markPart`'s `row` are v1.1's additions; the rest of each shape is v1's.
+//   `markPart`'s `repeatedDelivery` is v1.9's (T-1226; item 48): what a repeated delivery receipt repeats.
 // - the Linq port (K-11 v1; the integrations engineer's C-206 and C-211): `sendPart`.
 // - the recipient's chat (to, chat id, service) and clock arming (C-055), which have no frozen call yet (NQ-RT-2:
 //   K-05 v1.2's "recipient send state"), so each is a small interface of its own.
@@ -187,6 +188,17 @@ export type MarkPartRequest =
       nextTryNotBefore?: Utc | null;
     };
 
+/**
+ * K-05 v1.9 `repeatedDelivery` (item 48): the delivery a repeated delivery receipt repeats, read by the store in the
+ * mark's own transaction from the row's part tries, with nothing written.
+ */
+export interface RepeatedDelivery {
+  /** True when no other part try of the row was delivered earlier (a tie counts as first: default 85). */
+  firstOfRow: boolean;
+  /** The part try's delivery time as stored, never the repeat's own time (default 86). */
+  deliveredAt: Utc;
+}
+
 export interface MarkPartResponse {
   result: "marked";
   outboxRowId: string;
@@ -194,10 +206,16 @@ export interface MarkPartResponse {
   tryNo: number;
   attempts: number;
   repeated: boolean;
+  /** True only on the mark that records the row's first delivery; a repeat never says it (K-05 default 88). */
   firstDelivery: boolean;
   openQuestionId: string | null;
   nextKey: string | null;
   row?: { state: string; version: number };
+  /**
+   * K-05 v1.9 item 48: on a `delivered` mark that repeats a recorded delivery, what it repeats; null on every other
+   * answer (default 87). Left out by an answer of v1 to v1.8: not known, and never read as a first delivery (default 89).
+   */
+  repeatedDelivery?: RepeatedDelivery | null;
 }
 
 /** K-05 v1.1 `markRow.request`: limit 8's outcome for a claimed row (compare-and-set on the row's version). */
@@ -240,7 +258,11 @@ export interface OutboxStore {
   ): Promise<
     RenewClaimResponse | ClaimLostError | NotYetError | WrongStateError | NotFoundError | TransientError
   >;
-  /** K-05 v1.1 item 15. */
+  /**
+   * K-05 v1.1 item 15, with v1.9's `repeatedDelivery` (item 48). The store throws, with nothing written, when it cannot
+   * read what a repeated delivery repeats (a delivered part try with no delivery time): the error is no answer, and the
+   * caller lets it surface.
+   */
   markPart(
     request: MarkPartRequest,
   ): Promise<MarkPartResponse | NotFoundError | WrongStateError | TransientError>;
@@ -311,10 +333,11 @@ export interface RecipientDirectory {
 }
 
 /**
- * K-05 v1.2 `sendState.textsConsent` (item 28; default 35): the newest texts consent row for the recipient's contact that
- * covers the row's business, its business's or every business's (a STOP or a START), by `at`, a tie to the lower id
- * (K-29: "the newest row decides"). Limit 8 reads it beside the stopped flag (T-1099): after a STOP only the person's own
- * yes from that number turns texts back on (RULES 7.1, 7.5; S13-32, MASTER-FLOW-A lines 7213 to 7215 and 7242).
+ * K-05 v1.8 `sendState.textsConsent` (`textsConsentRead`: v1.2's item 28 and default 35, with v1.8's item 47): the newest
+ * texts consent row for the recipient's contact that covers the row's business, its business's or every business's (a
+ * STOP or a START), by `at`, a tie to the lower id (K-29: "the newest row decides"), and from v1.8 who gave it and for
+ * which booking. Limit 8 reads it beside the stopped flag (T-1099): after a STOP only the person's own yes from that
+ * number turns texts back on (RULES 7.1, 7.5; S13-32, MASTER-FLOW-A lines 7213 to 7215 and 7242).
  */
 export interface TextsConsentRead {
   consentId: string;
@@ -329,13 +352,15 @@ export interface TextsConsentRead {
    * or a chat link's ready text, sent from that number (K-29 `consents.channel` text, written by a turn on that same
    * handle: `consents.turn_id`, K-04 `turns.handle_id`; or recorded on return from that number's own text, as K-09's
    * start-recorded.json). False for a yes the business entered ('1 Yes' by the owner's text or on the Today page: A3-30;
-   * S13-32 line 7215), a page's, an AI's or an email's. Not in K-05 v1.2's `textsConsent`: the field the record needs (a
-   * K-05 minor version). Left out: not known, so no yes lifts a stop.
+   * S13-32 line 7215), a page's, an AI's or an email's, and for every row that withdraws. K-05 v1.8 gives it (item 47;
+   * defaults 78 to 82), and the send-state port maps it across unchanged (T-1217). Left out by an answer before v1.8:
+   * not known, so no yes lifts a stop.
    */
   fromContact?: boolean;
   /**
    * The booking the yes was given for (K-29 `consents.booking_id`; null when it names none): a fresh yes turns that
-   * booking's texts back on (S13-32 line 7242). Not in K-05 v1.2's `textsConsent` either. Left out: not known.
+   * booking's texts back on (S13-32 line 7242). K-05 v1.8 gives it too (item 47; default 81). Left out by an answer
+   * before v1.8: not known.
    */
   bookingId?: string | null;
 }
@@ -392,13 +417,22 @@ export interface PartDelivered {
   outboxRowId: string;
   partNo: 1 | 2;
   tryNo: number;
-  /** True on the row's first delivery receipt: the question's clock arms then (arch 02 line 127). */
+  /**
+   * True on the row's first delivery receipt: the question's clock arms then (arch 02 line 127). Also true on a repeat
+   * of that receipt (K-05 v1.9 item 48), which is handed on as the first was.
+   */
   firstDelivery: boolean;
   openQuestionId: string | null;
+  /** The receipt's time; for a repeat of the row's first delivery, that delivery's stored time, never the repeat's. */
   deliveredAt: Utc;
 }
 
-/** Clock arming (C-055), a stub here: called once per delivered part, never for a repeated receipt. */
+/**
+ * Clock arming (C-055), a stub here: called once per part newly marked delivered, and again for each repeated receipt
+ * of the row's first delivery (K-05 v1.9 item 48), since a crash between markPart's commit and the arming would
+ * otherwise lose the arming for good. The arming is safe to repeat (K-05 armClock answers an armed row `repeated` with
+ * its first arming). Never called for any other repeated receipt.
+ */
 export interface ClockArming {
   partDelivered(delivered: PartDelivered): Promise<void>;
 }

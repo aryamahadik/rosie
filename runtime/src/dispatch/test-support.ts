@@ -11,7 +11,9 @@
 //   renewClaim        renew-claim-first-send.json (lapsesAt = at + 60 s, firstTryAt set once), renew-claim-lost.json
 //                     (another claim holds the row: claimLost), renew-claim-not-yet.json (a Retry-After still holds).
 //   markPart          mark-sent.json, mark-delivered.json (found by Linq's message id, firstDelivery on the row's
-//                     first receipt, a second receipt says repeated), mark-delivered-by-key.json (v1.2 item 31: no part
+//                     first receipt, a second receipt says repeated and, as K-05 v1.9 item 48 answers it, what it
+//                     repeats: mark-a7-03-delivered-repeat.json, mark-a7-03-poll-delivered-repeat.json; every other
+//                     answer states repeatedDelivery null), mark-delivered-by-key.json (v1.2 item 31: no part
 //                     holds the message id, so the part under the echoed key that holds none is the receipt's, failed
 //                     to delivered after a 4001 or 4006), mark-failed-4006.json (failed, no next try),
 //                     mark-failed-retry-after.json (failed with retry: the next try's key, try + 1, and the
@@ -47,6 +49,7 @@ import type {
   RecipientDirectory,
   RenewClaimRequest,
   RenewClaimResponse,
+  RepeatedDelivery,
   TransientError,
   Utc,
   WrongStateError,
@@ -534,7 +537,10 @@ export class FakeOutboxStore implements OutboxStore {
     }
     if (found === null) return { error: "notFound", table: "outbox_parts", rowId: request.providerMessageId };
     const { row, part } = found;
-    if (part.state === "delivered") return this.answer(row, part, { repeated: true });
+    if (part.state === "delivered") {
+      // K-05 v1.9 item 48: a repeat writes nothing and says what it repeats, from the stored times.
+      return this.answer(row, part, { repeated: true, repeatedDelivery: this.repeatedDeliveryOf(row, part) });
+    }
     // A receipt moves a sent part, or a failed one after a 4001 or 4006 that delivered anyway (K-07).
     if (part.state !== "sent" && part.state !== "failed") {
       return { error: "wrongState", table: "outbox_parts", rowId: part.key, state: part.state };
@@ -547,10 +553,35 @@ export class FakeOutboxStore implements OutboxStore {
     return this.answer(row, part, { firstDelivery });
   }
 
+  /**
+   * What a repeated delivery receipt repeats (K-05 v1.9 item 48; mark-a7-03-delivered-repeat.json and
+   * mark-a7-03-poll-delivered-repeat.json): `firstOfRow` when no other part try of the row holds an earlier delivery
+   * time, a tie counting as first (default 85), and the part try's stored time, never the repeat's own (default 86). A
+   * delivered part try with no delivery time is thrown, never answered by a guess (db/repo outbox.ts default 21).
+   */
+  private repeatedDeliveryOf(row: FakeRow, part: FakePart): RepeatedDelivery {
+    const deliveredAt = part.deliveredAt;
+    if (
+      deliveredAt === null ||
+      row.parts.some((one) => one.state === "delivered" && one.deliveredAt === null)
+    ) {
+      throw new Error("markPart: a delivered part holds no delivered_at");
+    }
+    const firstOfRow = row.parts.every(
+      (one) => one.deliveredAt === null || !after(deliveredAt, one.deliveredAt),
+    );
+    return { firstOfRow, deliveredAt };
+  }
+
   private answer(
     row: FakeRow,
     part: FakePart,
-    said: { repeated?: boolean; firstDelivery?: boolean; nextKey?: string | null },
+    said: {
+      repeated?: boolean;
+      firstDelivery?: boolean;
+      nextKey?: string | null;
+      repeatedDelivery?: RepeatedDelivery;
+    },
   ): MarkPartResponse {
     return {
       result: "marked",
@@ -563,6 +594,8 @@ export class FakeOutboxStore implements OutboxStore {
       openQuestionId: row.seed.openQuestionId ?? null,
       nextKey: said.nextKey ?? null,
       row: { state: row.state, version: row.version },
+      // A v1.9 call always states it: null on every answer but a repeated delivery receipt's (default 87).
+      repeatedDelivery: said.repeatedDelivery ?? null,
     };
   }
 }
