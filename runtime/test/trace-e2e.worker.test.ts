@@ -112,22 +112,6 @@ import {
  * with the checks that name it.
  */
 const GAPS = {
-  batchSpans: {
-    task: "T-1108",
-    what: "(b) the batch window writes no batch span (runtime/src/actor/batch.ts logs nothing, and runtime/src/trace closeBatch, which writes CQ-06's batch spans, has no caller), so a joined text's trace has no joinedTurn span either",
-  },
-  actorReceive: {
-    task: "T-1108",
-    what: "(c) the handle actor writes a second receive span (runtime/src/actor/handle-actor.ts recordSpan, got.door handleActor) beside the gateway's, where K-08 shows one receive per inbound event",
-  },
-  seqPerWriter: {
-    task: "T-1108",
-    what: "(d) seq restarts at 1 in each writer's context (gateway, actor, safety read, pin), so a trace is not one run by seq and its order is read from each span's start",
-  },
-  receiveFields: {
-    task: "T-1108",
-    what: "the gateway's receive span has no sealedToActor (a text written to its actor) and no firstTrace (a repeated event), which K-08's receive spans hold",
-  },
   clockHops: {
     task: "T-1109",
     what: "(e) runtime/src/clocks/fire.ts writes the clockFired span alone: its gate and commit go through K-09 with no span of their own, and nothing composes, sends or receipts the clock turn's rows",
@@ -154,12 +138,10 @@ function stillHolds(gap: Gap): string {
 }
 
 /**
- * Hops of a text's trace (trace-skeleton.json, trace-batch-three-texts.json) with no writer yet, each by its gap: left
- * out of the check, and unexpected (so the test fails, naming the gap) once a writer lands.
+ * Hops of a clock firing's trace (trace-clock-fire.json) with no writer yet, each by its gap: left out of the check, and
+ * unexpected (so the test fails, naming the gap) once a writer lands. Seven of its eight. A text's trace
+ * (trace-skeleton.json, trace-batch-three-texts.json) has no such hop: every hop of it is judged (T-1108).
  */
-const NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = { batch: "batchSpans" };
-
-/** Hops of a clock firing's trace (trace-clock-fire.json) with no writer yet: seven of its eight. */
 const CLOCK_NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = {
   gate: "clockHops",
   commit: "clockHops",
@@ -173,10 +155,32 @@ const CLOCK_NOT_WRITTEN: Readonly<Partial<Record<Hop, Gap>>> = {
 const hopsIn = (gaps: Readonly<Partial<Record<Hop, Gap>>>): Hop[] => Object.keys(gaps) as Hop[];
 
 /**
- * The handle actor's own receive span (gap actorReceive), under the same trace id as the gateway's: set aside from the
- * count, so K-08's one receive per inbound event is judged on the gateway's span, and asserted to be there, one per text.
+ * The spans in the order K-08 reads a trace, by seq ("filtering on trace_id and ordering by seq"), with every way that
+ * order is not the order they started in: seq is one run 1, 2, 3 ... across the trace's writers, and no span starts
+ * before the one seq puts before it (K-08 v1 README, the contract test's checks: "`at` never goes back").
  */
-const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
+function bySeq(trace: readonly Span[]): { spans: Span[]; problems: string[] } {
+  const spans = [...trace].sort((a, b) => a.seq - b.seq);
+  const problems = seqProblems(trace);
+  spans.forEach((span, place) => {
+    const before = spans[place - 1];
+    if (before !== undefined && Date.parse(span.at) < Date.parse(before.at)) {
+      problems.push(
+        `hop ${span.hop} (seq ${String(span.seq)}) starts before hop ${before.hop} (seq ${String(before.seq)})`,
+      );
+    }
+  });
+  return { spans, problems };
+}
+
+/** The one span of `hop` on a trace. */
+function onlySpan(trace: readonly Span[], hop: Hop): Span {
+  const found = trace.filter((span) => span.hop === hop);
+  expect(found.map((span) => span.hop)).toEqual([hop]);
+  const [span] = found;
+  if (span === undefined) throw new Error(`no ${hop} span`);
+  return span;
+}
 
 /** Every key, at any depth, that names a trace (gap receiptTrace: K-05 markPart's answer has none). */
 function traceKeysIn(value: unknown, into: string[] = []): string[] {
@@ -640,17 +644,14 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
 
         const spans = run.spans();
         const trace = spansOfTrace(spans, traceId);
-        const report = checkHops(trace, {
-          traceId,
-          expected: hopsOfTrace(SKELETON),
-          notWritten: hopsIn(NOT_WRITTEN),
-          extra: actorReceive,
-        });
-        expectHops(report, NOT_WRITTEN);
+        // Every hop of trace-skeleton.json is judged, with no span set aside: one receive span for the text.
+        const report = checkHops(trace, { traceId, expected: hopsOfTrace(SKELETON) });
+        expectHops(report);
         expect(report.judged).toEqual([
           "receive",
           "scrub",
           "safetyRead",
+          "batch",
           "lease",
           "guard",
           "frontier",
@@ -664,32 +665,43 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
           "delivered",
           "clockArmed",
         ]);
-        // Gap actorReceive: the actor's own receive span, set aside, is still written, exactly one, for this text.
-        expect(
-          report.extra.map((span) => [span.hop, span.event_id, span.outcome]),
-          stillHolds("actorReceive"),
-        ).toEqual([["receive", "evt-sam-0001", "ok"]]);
-        // Gap receiveFields: the gateway's receive span has no sealedToActor, which K-08's holds.
-        expect(SKELETON.spans[0]?.decided).toHaveProperty("sealedToActor", true);
-        const receive = trace.find((span) => span.hop === "receive" && !actorReceive(span));
-        expect(receive?.decided).toMatchObject({ signatureValid: true, knownEventId: false });
-        expect(receive?.decided, stillHolds("receiveFields")).not.toHaveProperty("sealedToActor");
+        // One receive span for the text, the gateway's: sealed and written to its actor, as trace-skeleton.json's says.
+        const receive = onlySpan(trace, "receive");
+        expect([receive.event_id, receive.outcome]).toEqual(["evt-sam-0001", "ok"]);
+        expect(receive.decided).toMatchObject({ ...SKELETON.spans[0]?.decided });
+        expect(receive.decided).toMatchObject({
+          signatureValid: true,
+          knownEventId: false,
+          sealedToActor: true,
+        });
 
         // One bundle id: the gateway's active id at receipt is the one the turn pinned, on every span.
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
           new Set([JSON.stringify(BUNDLE_A)]),
         );
-        // One turn id from the lease on (CQ-09: the lease's hash of the event ids), none before the batch closed.
+        // One turn id from the batch span on (CQ-09: the lease's hash of the event ids), none before the batch closed
+        // (K-08 v1 README: the turn id is "null before the batch closes").
         const turnId = run.face.gateCalls[0]?.request.turn.id;
         expect(turnId).toMatch(/^[0-9a-f]{64}$/u);
-        const fromLease = trace.slice(trace.findIndex((span) => span.hop === "lease"));
-        expect(new Set(fromLease.map((span) => span.turn_id))).toEqual(new Set([turnId]));
-        expect(trace.filter((span) => !fromLease.includes(span)).map((span) => span.turn_id)).toEqual([
-          null,
+        const fromBatch = trace.slice(trace.findIndex((span) => span.hop === "batch"));
+        expect(fromBatch[0]?.hop).toBe("batch");
+        expect(new Set(fromBatch.map((span) => span.turn_id))).toEqual(new Set([turnId]));
+        expect(trace.filter((span) => !fromBatch.includes(span)).map((span) => span.turn_id)).toEqual([
           null,
           null,
           null,
         ]);
+        // The batch span, as trace-skeleton.json draws it: one text, closed by three seconds of quiet, naming the turn;
+        // it starts no earlier than the text's safety read ended and ends no later than the lease starts.
+        const drawn = SKELETON.spans.find((span) => span.hop === "batch");
+        const batch = onlySpan(trace, "batch");
+        expect(drawn?.decided).toEqual({ closedBy: "threeSecondsQuiet", turn: SKELETON.turn_id });
+        expect(batch).toMatchObject({ outcome: drawn?.outcome, turn_id: turnId, error_code: null });
+        expect(batch.got).toEqual({ texts: 1, eventIds: ["evt-sam-0001"] });
+        expect(batch.decided).toEqual({ closedBy: "threeSecondsQuiet", turn: turnId });
+        const read = onlySpan(trace, "safetyRead");
+        expect(Date.parse(batch.at)).toBeGreaterThanOrEqual(Date.parse(read.at) + read.ms);
+        expect(Date.parse(batch.at) + batch.ms).toBeLessThanOrEqual(Date.parse(onlySpan(trace, "lease").at));
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
         expect(run.face.gateCalls[0]?.request.turn.traceId).toBe(traceId);
         // The receipt's own webhook opened its own trace id: its receive hop alone.
@@ -703,8 +715,13 @@ describe("a text's webhook to its delivery receipt: one trace id, every runtime 
         expect(run.store.deliveredAnswers).toHaveLength(1);
         expect(traceKeysIn(run.store.deliveredAnswers), stillHolds("receiptTrace")).toEqual([]);
 
-        // Gap seqPerWriter: each writer opens its own context and numbers from 1, so seq is not one run on this trace.
-        expect(seqProblems(trace), stillHolds("seqPerWriter")).not.toEqual([]);
+        // The spans of the trace order by seq as by start: one run 1, 2, 3 ... across its writers (the gateway, the
+        // safety read, the batch window, the pin and the turn), and read by seq they show K-08's hops in K-08's order.
+        const ordered = bySeq(trace);
+        expect(ordered.problems).toEqual([]);
+        expect(ordered.spans.map((span) => span.seq)).toEqual(trace.map((_, place) => place + 1));
+        expect(ordered.spans.map((span) => span.hop)).toEqual(hopsOfTrace(SKELETON));
+        expect(bySeq(spansOfTrace(spans, receiptTraceId)).problems).toEqual([]);
         expectNoWords(spans, [words, ...FIXTURE_WORDS]);
       } finally {
         run.restore();
@@ -724,42 +741,50 @@ describe("a repeated webhook adds only a 'dropped at receipt' span (trace-duplic
       run.known(first.eventId);
       const firstTrace = await run.post(first);
       await settle(actorNameOf(first.handle));
+      const before = run.spans();
       const repeatTrace = await run.post(again);
       await settle(actorNameOf(first.handle));
 
       const spans = run.spans();
       expect(repeatTrace).not.toBe(firstTrace);
       const repeat = spansOfTrace(spans, repeatTrace);
-      const report = checkHops(repeat, {
-        traceId: repeatTrace,
-        expected: hopsOfTrace(DUPLICATE),
-        extra: actorReceive,
-      });
-      expectHops(report);
+      expectHops(checkHops(repeat, { traceId: repeatTrace, expected: hopsOfTrace(DUPLICATE) }));
+      // The repeat added one span to the whole log, on any trace: its own 'dropped at receipt' span.
+      expect(spans.slice(0, before.length)).toEqual(before);
+      expect(spans.slice(before.length)).toEqual(repeat);
+      expect(repeat).toHaveLength(1);
+      // That span, as trace-duplicate-webhook.json draws it: dropped, the event id known, naming the trace the event
+      // first arrived under, answered 200, at place 1.
       const expected = DUPLICATE.spans[0];
-      const dropped = repeat.find((span) => !actorReceive(span));
-      expect(dropped?.outcome).toBe(expected?.outcome);
-      expect(dropped?.event_id).toBe(first.eventId);
-      expect(dropped?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
-      // Gap receiveFields: the dropped span does not name the first arrival's trace, which K-08's does (firstTrace).
-      expect(expected?.decided).toHaveProperty("firstTrace");
-      expect(dropped?.decided, stillHolds("receiveFields")).not.toHaveProperty("firstTrace");
-      // Gap actorReceive: the actor's own receive span, set aside, is still written: one, also dropped.
-      expect(
-        report.extra.map((span) => span.outcome),
-        stillHolds("actorReceive"),
-      ).toEqual(["dropped"]);
+      const dropped = onlySpan(repeat, "receive");
+      expect(dropped.outcome).toBe(expected?.outcome);
+      expect(dropped.event_id).toBe(first.eventId);
+      expect(dropped.seq).toBe(1);
+      expect(Object.keys(dropped.decided ?? {})).toEqual(Object.keys(expected?.decided ?? {}));
+      expect(dropped.decided).toEqual({
+        signatureValid: true,
+        knownEventId: true,
+        firstTrace,
+        answered: 200,
+      });
 
-      // The first arrival's trace went on to its safety read; the repeat's ran no hop after receive.
+      // The first arrival's trace went on to its safety read, and no further (no turn can run here); the repeat's ran
+      // no hop after receive. Its spans are one run by seq, in the order they started.
+      const firstSpans = spansOfTrace(spans, firstTrace);
       expectHops(
-        checkHops(spansOfTrace(spans, firstTrace), {
-          traceId: firstTrace,
-          expected: ["receive", "scrub", "safetyRead"],
-          notWritten: hopsIn(NOT_WRITTEN),
-          extra: actorReceive,
-        }),
-        NOT_WRITTEN,
+        checkHops(firstSpans, { traceId: firstTrace, expected: ["receive", "scrub", "safetyRead"] }),
       );
+      expect(onlySpan(firstSpans, "receive").decided).toMatchObject({
+        knownEventId: false,
+        sealedToActor: true,
+      });
+      const ordered = bySeq(firstSpans);
+      expect(ordered.problems).toEqual([]);
+      expect(ordered.spans.map((span) => [span.seq, span.hop])).toEqual([
+        [1, "receive"],
+        [2, "scrub"],
+        [3, "safetyRead"],
+      ]);
       expectNoWords(spans, [String((textFixture as Json).body)]);
     } finally {
       run.restore();
@@ -805,21 +830,50 @@ describe("a three-text batch (trace-batch-three-texts.json)", () => {
         ]);
 
         const spans = run.spans();
+        const turnId = run.face.gateCalls[0]?.request.turn.id;
+        expect(turnId).toMatch(/^[0-9a-f]{64}$/u);
+        // Each text's trace shows every hop of its trace in trace-batch-three-texts.json, once, in order, with no span
+        // set aside (one receive span per text), and is one run by seq in the order its spans started.
         [turnTrace, secondTrace, thirdTrace].forEach((traceId, place) => {
-          const report = checkHops(spansOfTrace(spans, traceId), {
-            traceId,
-            expected: hopsOfTrace(traceAt(BATCH_THREE, place)),
-            notWritten: hopsIn(NOT_WRITTEN),
-            extra: actorReceive,
-          });
-          expectHops(report, NOT_WRITTEN);
-          // Gap actorReceive: the actor's own receive span, set aside, is still written, one per text.
-          expect(report.extra, stillHolds("actorReceive")).toHaveLength(1);
+          const drawn = traceAt(BATCH_THREE, place);
+          const trace = spansOfTrace(spans, traceId);
+          expectHops(checkHops(trace, { traceId, expected: hopsOfTrace(drawn) }));
+          const ordered = bySeq(trace);
+          expect(ordered.problems).toEqual([]);
+          expect(ordered.spans.map((span) => span.hop)).toEqual(hopsOfTrace(drawn));
+          expect(onlySpan(trace, "receive").decided).toMatchObject({ ...drawn.spans[0]?.decided });
         });
-        // The joined texts' traces carry no turn: nothing ran on them after their safety read.
-        for (const traceId of [secondTrace, thirdTrace]) {
-          expect(spansOfTrace(spans, traceId).map((span) => span.turn_id)).toEqual([null, null, null, null]);
-        }
+        // The turn's batch span, as the fixture's first trace draws it: closed by the third text, the three texts'
+        // event ids in arrival order, the turn, and the other two texts' traces.
+        const turnBatch = onlySpan(spansOfTrace(spans, turnTrace), "batch");
+        const drawnBatch = traceAt(BATCH_THREE, 0).spans.find((span) => span.hop === "batch");
+        expect(Object.keys(turnBatch.decided ?? {})).toEqual(Object.keys(drawnBatch?.decided ?? {}));
+        expect(turnBatch).toMatchObject({ outcome: "ok", turn_id: turnId, error_code: null });
+        expect(turnBatch.got).toEqual({ texts: 3, eventIds: texts.map(([eventId]) => eventId) });
+        expect(turnBatch.decided).toEqual({
+          closedBy: drawnBatch?.decided?.closedBy,
+          turn: turnId,
+          joinedTraces: [secondTrace, thirdTrace],
+        });
+        expect(turnBatch.decided?.closedBy).toBe("thirdText");
+        // Each joined text's trace ends at its batch span, outcome joinedTurn, naming the turn and the turn's trace, as
+        // the fixture's second and third traces draw it; it carries no turn before that, and nothing runs on it after.
+        [secondTrace, thirdTrace].forEach((traceId, place) => {
+          const drawn = traceAt(BATCH_THREE, place + 1).spans.find((span) => span.hop === "batch");
+          const trace = bySeq(spansOfTrace(spans, traceId)).spans;
+          expect(trace.map((span) => [span.seq, span.hop, span.turn_id])).toEqual([
+            [1, "receive", null],
+            [2, "scrub", null],
+            [3, "safetyRead", null],
+            [4, "batch", turnId],
+          ]);
+          const joined = trace[trace.length - 1];
+          expect(joined?.outcome).toBe(drawn?.outcome);
+          expect(joined?.outcome).toBe("joinedTurn");
+          expect(joined?.event_id).toBe(texts[place + 1]?.[0]);
+          expect(Object.keys(joined?.decided ?? {})).toEqual(Object.keys(drawn?.decided ?? {}));
+          expect(joined?.decided).toEqual({ turn: turnId, turnTrace });
+        });
         expectNoWords(spans, [...texts.map(([, body]) => body), ...FIXTURE_WORDS]);
       } finally {
         run.restore();

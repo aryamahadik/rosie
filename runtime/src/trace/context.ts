@@ -13,6 +13,17 @@
 // A turn of several texts (CQ-06): each text opened its own trace at its webhook. `closeBatch` gives the turn the first
 // text's trace id, lists the other texts' trace ids on it, and ends each other text's trace at its batch span with
 // outcome joinedTurn ("joined turn T").
+//
+// One run by seq across a trace's writers (T-1108; K-08 v1 README: a trace is read "by filtering on trace_id and
+// ordering by seq"). A text's trace has several writers, each with its own context over the one trace id: the gateway
+// (receive, scrub), then, in the handle's actor, the safety read, the batch window and the turn (the pin's context). A
+// context alone numbers its own spans 1, 2, 3; so the writers of one trace share its count. `beginSeq` (the gateway, as
+// it opens a webhook's trace; the actor, as it stores a text, with the places the gateway took before it) makes every
+// context this isolate opens over that trace id take its places from one count, and `resumeSeq` brings a count back
+// after a restart without ever lowering it. A trace nobody began keeps each context's own count, as before. A place is
+// taken when a hop starts (`start`, or `reserve` for a hop that records its span by itself), not when its span is
+// written, so a span recorded inside a longer hop comes after it (the gateway's receive, which ends after the actor's
+// first hops; the dispatcher's dispatch, around the part's providerAccepted): by seq, the spans are in start order.
 
 import {
   TraceError,
@@ -38,6 +49,8 @@ export interface SpanFields {
   outcome: Outcome;
   /** When the hop started (UTC, RFC 3339); the context's clock when left out. */
   at?: string;
+  /** The span's place, when it was taken as the hop started (`reserve`); the next place when left out. */
+  seq?: number;
   eventId?: string | null;
   businessId?: string | null;
   provider?: Provider;
@@ -76,6 +89,43 @@ export function logSink(context: LogContext, write: (line: string) => void = con
       }),
     );
   };
+}
+
+/** How many traces' shared counts one isolate keeps; the oldest is forgotten first (its contexts then count alone). */
+export const SHARED_SEQ_TRACES = 4096;
+
+/** The last place taken on each trace whose writers share one count, by trace id (this isolate's memory). */
+const sharedSeq = new Map<string, number>();
+
+function keepSeq(traceId: string, taken: number): void {
+  sharedSeq.delete(traceId);
+  sharedSeq.set(traceId, taken);
+  while (sharedSeq.size > SHARED_SEQ_TRACES) {
+    const oldest = sharedSeq.keys().next().value;
+    if (oldest === undefined) break;
+    sharedSeq.delete(oldest);
+  }
+}
+
+const placesOf = (taken: number): number => (Number.isInteger(taken) && taken > 0 ? taken : 0);
+
+/**
+ * Begins one count for a trace's spans: from now on every context this isolate opens over `traceId` takes its places
+ * from it, the next being `taken + 1`. `taken` is how many places another writer took before (the gateway's, as its
+ * hand-off tells the actor); 0 when the trace starts here. A trace begun again starts again from `taken`.
+ */
+export function beginSeq(traceId: string, taken = 0): void {
+  keepSeq(traceId, placesOf(taken));
+}
+
+/** Brings a trace's count back (a restart: the count as it was stored). It never lowers a count this isolate holds. */
+export function resumeSeq(traceId: string, taken: number): void {
+  keepSeq(traceId, Math.max(sharedSeq.get(traceId) ?? 0, placesOf(taken)));
+}
+
+/** The last place taken on a trace whose writers share one count, or null for a trace nobody began here. */
+export function seqOf(traceId: string): number | null {
+  return sharedSeq.get(traceId) ?? null;
 }
 
 const TRACE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
@@ -132,6 +182,8 @@ export class TraceContext {
   private turn: string | null = null;
   private joined: string[] = [];
   private ended = false;
+  /** The last place this context took by itself, on a trace whose writers share no count. */
+  private own = 0;
   private readonly kept: Span[] = [];
   private readonly sink: SpanSink;
   private readonly now: () => number;
@@ -212,7 +264,8 @@ export class TraceContext {
   record(fields: SpanFields): Span {
     if (this.ended)
       throw new TraceError(`trace ${this.traceId} has ended at its batch span: no span may follow`);
-    const seq = this.kept.length + 1;
+    // A place is taken only by a span that is kept: a refused span leaves no hole in the run.
+    const seq = fields.seq ?? this.nextSeq();
     const span: Span = {
       trace_id: this.traceId,
       span_id: `${this.traceId}:${String(seq).padStart(2, "0")}`,
@@ -240,17 +293,39 @@ export class TraceContext {
 
     const problems = spanProblems(span);
     if (problems.length > 0) throw new TraceError(`span ${span.hop} refused`, problems);
+    if (fields.seq === undefined) this.reserve();
     this.kept.push(span);
     this.sink(span);
     return span;
   }
 
   /**
-   * Starts timing a hop. `finish` records the span with `at` the start and `ms` the time since, from the context's
-   * clock, so a hop does not do the arithmetic.
+   * Takes the next place (K-08 `seq`) on the trace now, for a span recorded later with it (`SpanFields.seq`): a hop that
+   * other writers record inside keeps the place it started at. From the trace's shared count when one was begun in this
+   * isolate (`beginSeq`), else from this context's own.
    */
-  start(hop: Hop): { finish: (rest: Omit<SpanFields, "hop" | "ms" | "at">) => Span } {
+  reserve(): number {
+    const seq = this.nextSeq();
+    if (sharedSeq.has(this.traceId)) sharedSeq.set(this.traceId, seq);
+    else this.own = seq;
+    return seq;
+  }
+
+  /** The place the next span takes: the trace's shared count plus one, or this context's own. */
+  private nextSeq(): number {
+    return (sharedSeq.get(this.traceId) ?? this.own) + 1;
+  }
+
+  /**
+   * Starts timing a hop. `finish` records the span with `at` the start and `ms` the time since, from the context's
+   * clock, so a hop does not do the arithmetic. The span's place is taken now, as the hop starts (`reserve`), so a
+   * span recorded before this one ends comes after it: read by seq, the spans are in the order they started (K-08 v1
+   * README: seq runs 1, 2, 3 and `at` never goes back; trace-skeleton.json's dispatch is seq 13 and the part's
+   * providerAccepted, recorded inside it, seq 14). A hop started and never finished leaves its place empty.
+   */
+  start(hop: Hop): { finish: (rest: Omit<SpanFields, "hop" | "ms" | "at" | "seq">) => Span } {
     const startedAt = this.now();
+    const seq = this.reserve();
     return {
       finish: (rest) =>
         this.record({
@@ -258,6 +333,7 @@ export class TraceContext {
           hop,
           at: new Date(startedAt).toISOString(),
           ms: Math.max(0, this.now() - startedAt),
+          seq,
         }),
     };
   }
@@ -303,15 +379,34 @@ export function openTrace(options: OpenTraceOptions): TraceContext {
 export interface BatchedText {
   context: TraceContext;
   eventId: string;
+  /**
+   * Where the text's last hop ended, in epoch milliseconds, when this context did not keep that hop itself (the actor's
+   * batch window: the text's safety read is another writer's). Left out, it is read from the context's last kept span.
+   */
+  waitedFrom?: number | null;
 }
+
+/**
+ * How a batch closed, as K-08's batch spans name it: 3 s quiet (trace-skeleton.json's `threeSecondsQuiet`; `quiet`
+ * is T-240's first name for it), the third text (trace-batch-three-texts.json), 6 s after the first text, or a danger
+ * outcome of one of its texts (arch 02 line 113 and step S).
+ */
+export type BatchClosedBy = "quiet" | "threeSecondsQuiet" | "thirdText" | "maxWait" | "danger";
 
 export interface CloseBatchOptions {
   /** The turn's id (a hash of the texts' event ids, computed elsewhere: CQ-09; K-04 turns.id). */
   turnId: string;
   /** How the batch closed: 3 s quiet, the third text, or 6 s (arch 02 line 113). */
-  closedBy: "quiet" | "thirdText" | "maxWait";
+  closedBy: BatchClosedBy;
   /** The batch's texts in arrival order: the first text's trace carries the turn (CQ-06). */
   texts: readonly BatchedText[];
+  /** When the batch closed, in epoch milliseconds; the first text's context's clock, now, when left out. */
+  closedAt?: number;
+  /**
+   * The turn's texts' event ids in arrival order, when `texts` does not hold one per text (texts handed in under one
+   * trace id share its span); the texts' own when left out.
+   */
+  eventIds?: readonly string[];
 }
 
 export interface BatchResult {
@@ -342,28 +437,34 @@ export function closeBatch(options: CloseBatchOptions): BatchResult {
 
   const joinedTraceIds = others.map((text) => text.context.traceId);
   const turnTraceId = first.context.traceId;
-  const closedAt = first.context.nowUtc();
-  const closeMs = Date.parse(closedAt);
-  const waited = (context: TraceContext): { at: string; ms: number } => {
-    const from = context.lastSpanEnd() ?? closeMs;
+  const closeMs = options.closedAt ?? Date.parse(first.context.nowUtc());
+  const waited = (text: BatchedText): { at: string; ms: number } => {
+    const from = text.waitedFrom ?? text.context.lastSpanEnd() ?? closeMs;
     return { at: new Date(from).toISOString(), ms: Math.max(0, closeMs - from) };
   };
 
   for (const text of options.texts) text.context.setTurn(options.turnId);
 
+  const eventIds = [...(options.eventIds ?? options.texts.map((text) => text.eventId))];
   first.context.record({
     hop: "batch",
-    ...waited(first.context),
+    ...waited(first),
     outcome: "ok",
-    got: { texts: options.texts.length, eventIds: options.texts.map((text) => text.eventId) },
-    decided: { closedBy: options.closedBy, turn: options.turnId, joinedTraces: joinedTraceIds },
+    got: { texts: eventIds.length, eventIds },
+    // The other texts' traces are named only when there are some, as K-08 draws both (trace-skeleton.json's batch span
+    // of one text names none; trace-batch-three-texts.json's names two).
+    decided: {
+      closedBy: options.closedBy,
+      turn: options.turnId,
+      ...(joinedTraceIds.length > 0 ? { joinedTraces: joinedTraceIds } : {}),
+    },
   });
   first.context.listJoined(joinedTraceIds);
 
   for (const text of others) {
     text.context.record({
       hop: "batch",
-      ...waited(text.context),
+      ...waited(text),
       outcome: "joinedTurn",
       eventId: text.eventId,
       decided: { turn: options.turnId, turnTrace: turnTraceId },

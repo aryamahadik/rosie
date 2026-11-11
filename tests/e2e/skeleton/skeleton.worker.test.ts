@@ -18,8 +18,10 @@
 // - SKELETON_UPTO unset (`npm run test:e2e`, as the merge check runs it): T-465's check over every hop joined so far, from
 //   receive to JOINED_THROUGH, with every joined row's claims, and no contract report read.
 // - What the merged runtime does not write yet is judged around by name, and each such gap is asserted to still hold
-//   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
-//   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
+//   (./gaps.ts). T-1108 closed three: each text has one receive span, the gateway's; the batch hop is judged with the
+//   rest; and the trace is one run by seq across its writers, its hops, by seq as written, in the order they started. One
+//   narrower gap is left (modelCallOrder): the model calls' own portCall spans are not in start order by seq, so T-465's
+//   checkHops judges the trace in the order its spans started, numbered again.
 //
 // Joined on main: joins 1 to 13 (T-552 to T-564), receive to clockArmed. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
@@ -62,7 +64,7 @@ import {
   prefixTrace,
   type SkeletonHop,
 } from "../_driver/prefix";
-import { GAPS, NOT_WRITTEN, judgedTraceOf, stillHolds, writtenHops, type JudgedTrace } from "./gaps";
+import { GAPS, NOT_WRITTEN, judgedTraceOf, stillHolds, writtenHops } from "./gaps";
 import { JOIN } from "./join";
 import { actorOf, startRootRun, type ActorReader, type RootRun } from "./root-run";
 
@@ -105,10 +107,19 @@ interface Facts {
   readonly sent: SentText;
   /** The JOIN's turn: T-248's hash of its event id (CQ-09). */
   readonly turnId: string;
-  /** The trace as collected (each writer's own seq). */
+  /** The trace as collected: one run by seq across its writers, its hops in the order they started (T-1108). */
   readonly collected: Trace;
-  /** The trace as T-465's checkHops judged it (./gaps.ts). */
-  readonly judged: JudgedTrace;
+  /** The trace as T-465's checkHops judged it (./gaps.ts judgedTraceOf: gap modelCallOrder); no span is set aside. */
+  readonly judged: { readonly trace: Trace };
+}
+
+/** The one span of `hop` as written: its place (seq) is the one it took on the trace, across its writers. */
+function writtenSpan(facts: Facts, hop: Hop): Span {
+  const found = facts.collected.spans.filter((span) => span.hop === hop);
+  expect(found.map((span) => span.hop)).toEqual([hop]);
+  const [span] = found;
+  if (span === undefined) throw new Error(`no ${hop} span`);
+  return span;
 }
 
 /** The one span of `hop` in the judged trace. */
@@ -121,15 +132,16 @@ function onlySpan(facts: Facts, hop: Hop): Span {
 }
 
 /**
- * The actor's inbox entry: its own receive span (gap actorReceive). Its `at` is when the entry started, as K-08 says: the
- * actor reads its clock once as the hand-off reaches it and stamps the span from that reading when it answers
- * (runtime/src/actor/handle-actor.ts accept and recordSpan; T-1170).
+ * When the text's entry was made in its actor's inbox. The actor writes no receive span of its own (K-08 shows one
+ * receive span per inbound event, the gateway's, which says the text was sealed and written to its actor:
+ * trace-skeleton.json's receive, decided.sealedToActor; T-1108). The actor stores the text and starts its safety read in
+ * one synchronous step (runtime/src/actor/handle-actor.ts accept), in which no clock moves, so the read's start (K-08
+ * `at`: when the hop started) is the entry's instant. The trace holds no span with the actor's door: one receive span.
  */
-function inboxEntrySpan(facts: Facts): Span {
-  expect(facts.judged.actorReceives, stillHolds("actorReceive")).toHaveLength(1);
-  const [span] = facts.judged.actorReceives;
-  if (span === undefined) throw new Error("no span of the actor's inbox entry");
-  return span;
+function inboxEntryAt(facts: Facts): number {
+  expect(facts.collected.spans.filter((span) => span.got?.door === "handleActor")).toEqual([]);
+  expect(onlySpan(facts, "receive").decided).toMatchObject({ sealedToActor: true });
+  return Date.parse(onlySpan(facts, "safetyRead").at);
 }
 
 /**
@@ -202,7 +214,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     const answered = opened.answer as { readonly phone: { readonly chatOpenAt: string } };
     expect(Date.parse(answered.phone.chatOpenAt)).toBe(Date.parse(receivedAt));
     // Before the actor's inbox entry: the call had ended when the hand-off reached the actor.
-    expect(opened.endedAt).toBeLessThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
+    expect(opened.endedAt).toBeLessThanOrEqual(inboxEntryAt(facts));
     // K-04's phone row, inserted once, as the dispatcher's doubles read it: its number the handle's own address.
     expect(dispatch.phones.get(TEST_OWNER_1.handleId)).toEqual({
       number: JOIN.handle.address,
@@ -248,18 +260,22 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       decided: skeletonSpan("scrub").decided,
     });
     // The actor's inbox entry, once, under the trace id, on the text's arrival: after the gateway's scrub, and before the
-    // gateway answered.
-    const entry = inboxEntrySpan(facts);
-    expect(entry).toMatchObject({
+    // gateway answered. K-08 draws it on the text's one receive span, the gateway's (trace-skeleton.json's receive at seq
+    // 1: outcome ok, the JOIN's event id, decided.sealedToActor), with the scrub at seq 2; the entry itself, stored and
+    // starting a turn, is read back below.
+    const receive = onlySpan(facts, "receive");
+    expect(receive).toMatchObject({
       outcome: "ok",
       event_id: JOIN.eventId,
       error_code: null,
-      got: { door: "handleActor", route: "inbox", kind: "text" },
-      decided: { stored: true, startsTurn: true },
+      got: { kind: "text" },
+      decided: skeletonSpan("receive").decided,
     });
+    expect(receive.decided).toMatchObject({ sealedToActor: true });
+    expect([writtenSpan(facts, "receive").seq, writtenSpan(facts, "scrub").seq]).toEqual([1, 2]);
     const arrival = arrivalOf(facts);
-    expect(Date.parse(entry.at)).toBeGreaterThanOrEqual(arrival.from);
-    expect(Date.parse(entry.at)).toBeLessThanOrEqual(arrival.to);
+    expect(inboxEntryAt(facts)).toBeGreaterThanOrEqual(arrival.from);
+    expect(inboxEntryAt(facts)).toBeLessThanOrEqual(arrival.to);
     // Read back: one entry, the JOIN's, on its trace, starting a turn. Its words are only sealed: they open under the key
     // K-05 gave the handle at its first sight, and under no other.
     const inbox = await facts.actor.inbox();
@@ -304,8 +320,13 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       decided: { danger: false, path: "none", line: null },
     });
     // On arrival: the read started once the text's inbox entry had (the actor stores the text and starts its read in one
-    // step: handle-actor.ts accept), and before the gateway answered, which waits for that step (arrivalOf).
-    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(inboxEntrySpan(facts).at));
+    // step: handle-actor.ts accept), and before the gateway answered, which waits for that step (arrivalOf). By seq it
+    // comes after the gateway's receive and scrub, as trace-skeleton.json's safetyRead does, and it starts no earlier
+    // than the scrub that handed the text on.
+    expect(skeletonSpan("safetyRead").seq).toBeGreaterThan(skeletonSpan("scrub").seq);
+    expect(writtenSpan(facts, "safetyRead").seq).toBeGreaterThan(writtenSpan(facts, "scrub").seq);
+    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(inboxEntryAt(facts));
+    expect(Date.parse(read.at)).toBeGreaterThanOrEqual(arrivalOf(facts).from);
     expect(Date.parse(read.at)).toBeLessThanOrEqual(arrivalOf(facts).to);
     // Its one model call: Haiku on the JOIN's words, answered by the recorded-model double (safety-no.json), on its own
     // portCall span beside the hops. The trace's model-call spans whose calls are all safety reads are the read's; those
@@ -339,15 +360,26 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // The read on arrival ended before the lease started: no turn takes a text whose read is not done.
     const read = onlySpan(facts, "safetyRead");
     expect(Date.parse(read.at) + read.ms).toBeLessThanOrEqual(Date.parse(lease.at));
-    // The batch window writes no span yet (gap batchSpans): the actor's own record shows the batch, closed and handed on.
-    expect(
-      facts.collected.spans.filter((span) => span.hop === "batch"),
-      stillHolds("batchSpans"),
-    ).toEqual([]);
+    // The batch window's span, as trace-skeleton.json draws it (by seq between the safety read and the lease): one
+    // text, its event id, the turn, how the batch closed, and no other text's trace; it carries the turn id, starts no
+    // earlier than the read ended and ends no later than the lease starts. The actor's own record shows the same batch,
+    // closed and handed on.
+    const batch = onlySpan(facts, "batch");
+    const drawn = skeletonSpan("batch");
+    expect(batch).toMatchObject({ outcome: drawn.outcome, turn_id: facts.turnId, error_code: null });
+    expect(writtenSpan(facts, "batch").seq).toBeGreaterThan(writtenSpan(facts, "safetyRead").seq);
+    expect(batch.got).toEqual({ texts: 1, eventIds: [JOIN.eventId] });
+    expect(Object.keys(batch.decided ?? {})).toEqual(Object.keys(drawn.decided ?? {}));
+    expect(batch.decided).toMatchObject({ turn: facts.turnId });
+    expect(Date.parse(batch.at)).toBeGreaterThanOrEqual(Date.parse(read.at) + read.ms);
+    expect(Date.parse(batch.at) + batch.ms).toBeLessThanOrEqual(Date.parse(lease.at));
+    expect(writtenSpan(facts, "lease").seq).toBe(writtenSpan(facts, "batch").seq + 1);
     const batches = await facts.actor.batches();
     expect(batches).toMatchObject([{ handed: true, eventIds: [JOIN.eventId] }]);
-    // Closed by the window's clock, never by a count: 3 s quiet (or 6 s after the text, on a slow machine).
+    // Closed by the window's clock, never by a count: 3 s quiet (or 6 s after the text, on a slow machine), and the
+    // span says the same (trace-skeleton.json: threeSecondsQuiet).
     expect(["quiet", "max"]).toContain(batches[0]?.reason);
+    expect(batch.decided?.closedBy).toBe(batches[0]?.reason === "max" ? "maxWait" : "threeSecondsQuiet");
     // One bundle id on every span: bundle v0's, as bundles/v0 publishes it, read at receipt and pinned for the turn.
     expect(new Set(facts.collected.spans.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
       new Set([JSON.stringify(BUNDLE_V0)]),
@@ -1039,10 +1071,16 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     await facts.actor.settle();
     const repeat = await facts.run.target.collect(again.traceId);
     if (repeat.trace === null) throw new Error(`no span carries trace id ${again.traceId}`);
-    expect(readReceipt(judgedTraceOf(repeat.trace).trace)).toMatchObject({
+    // Its trace is its one receive span, the gateway's, as trace-duplicate-webhook.json draws it: dropped, the event id
+    // known, naming the trace the JOIN first arrived under.
+    expect(repeat.trace.spans.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "dropped"],
+    ]);
+    expect(readReceipt(repeat.trace)).toMatchObject({
       eventId: JOIN.eventId,
       knownEventId: true,
       repeatedWebhook: true,
+      firstTraceId: facts.sent.traceId,
     });
 
     // A dispatcher retry forced through the root's retry door: the row is sent, so its claim takes nothing.
@@ -1323,7 +1361,7 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
       const unwritten = prefix === null ? undefined : NOT_WRITTEN[prefix.hop];
       if (prefix !== null && unwritten !== undefined) {
         throw new Error(
-          `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten].task}): no run can show it`,
+          `${SKELETON_UPTO}=${prefix.name} ends at hop ${prefix.hop}, which nothing writes yet (known gap ${unwritten}, ${GAPS[unwritten]?.task ?? "no task"}): no run can show it`,
         );
       }
       // The JOIN is the seeded test owner's first text (T-1148): the handle, chat and words the doubles know.
@@ -1350,12 +1388,27 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
         expect(collected.traceProblems).toEqual([]);
         const trace = collected.trace;
         if (trace === null) throw new Error(`no span carries trace id ${sent.traceId}`);
-        // Gap seqPerWriter: as written, the trace is no one run by seq.
-        expect(
-          checkHops(trace).problems.filter((problem) => problem.kind === "seq"),
-          stillHolds("seqPerWriter"),
-        ).not.toEqual([]);
-        const judged = judgedTraceOf(trace);
+        // As written, the trace is one run by seq across its writers (K-08 v1 README: a trace is read by ordering by
+        // seq, and seq runs 1, 2, 3 ...): T-465's checkHops finds no seq problem. And by seq, as written, the hops stand
+        // in the order they started (`at` never goes back), every joined hop once, in the turn's order.
+        const asWritten = checkHops(trace).problems;
+        expect(asWritten.filter((problem) => problem.kind === "seq")).toEqual([]);
+        const hopsBySeq = [...trace.spans].sort((a, b) => a.seq - b.seq).filter((span) => !isModelCallSpan(span));
+        expect(hopsBySeq.map((span) => span.hop)).toEqual(writtenHops(joinedPrefix().hops));
+        hopsBySeq.forEach((span, place) => {
+          const before = hopsBySeq[place - 1];
+          if (before === undefined) return;
+          expect(
+            Date.parse(span.at),
+            `hop ${span.hop} (seq ${String(span.seq)}) starts before hop ${before.hop} (seq ${String(before.seq)})`,
+          ).toBeGreaterThanOrEqual(Date.parse(before.at));
+        });
+        // Gap modelCallOrder: the model calls' own portCall spans are not in start order by seq, so as written
+        // T-465's checkHops names a span starting before the one before it, each time beside a model call's span.
+        const untimely = asWritten.filter((problem) => problem.kind === "time");
+        expect(untimely, stillHolds("modelCallOrder")).not.toEqual([]);
+        for (const problem of untimely) expect(problem.message).toContain("hop portCall");
+        const judged = { trace: judgedTraceOf(trace) };
         const judgedRun: Collected = { ...collected, trace: judged.trace };
 
         if (prefix === null) {
@@ -1369,7 +1422,9 @@ describe(`the walking skeleton end to end, inside workerd (${mode})`, () => {
           const hops = writtenHops(prefix.hops);
           const unjudged = prefix.hops.flatMap((hop) => {
             const gap = NOT_WRITTEN[hop];
-            return gap === undefined ? [] : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap].task}`];
+            return gap === undefined
+              ? []
+              : [`hop ${hop} is not judged: known gap ${gap}, ${GAPS[gap]?.task ?? "no task"}`];
           });
           const report = judgePrefixRun(judgedRun, { ...prefix, hops }, plan.contractTests);
           expect(report.problems, [plan.hint, ...unjudged].join("; ")).toEqual([]);

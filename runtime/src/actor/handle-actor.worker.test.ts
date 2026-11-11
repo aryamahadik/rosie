@@ -295,18 +295,22 @@ describe("refusals and logs", () => {
     expect(await inboxOf(ALEX)).toEqual([]);
   });
 
-  it("logs one span per call with the trace id and bundle id, and no word, phone number or sealed body", async () => {
+  it("writes no receive span of its own for a call (K-08: one receive span per inbound event, the gateway's), keeps the trace id and bundle id, tells a known event's first trace, and logs no word, phone number or sealed body", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const actor = door();
     const handoff = await handoffOf(textImessage);
-    await actor.accept(handoff);
-    await actor.accept(handoff);
+    // The two calls' outcomes are the door's answers: the gateway's one receive span says ok for the first and dropped
+    // for the repeat (K-08 trace-skeleton.json and trace-duplicate-webhook.json: one receive span each, at seq 1).
+    expect([await actor.accept(handoff), await actor.accept(handoff)]).toEqual(["written", "duplicate"]);
 
     const lines = log.mock.calls.map((call) => String(call[0]));
     const spans = lines.map((line) => JSON.parse(line) as Json).filter((line) => line.msg === "span");
-    expect(spans.map((span) => span.outcome)).toEqual(["ok", "dropped"]);
-    expect(spans[0]?.trace_id).toBe(TRACE);
-    expect(spans[0]?.bundle_id).toEqual(BUNDLE);
+    expect(spans.filter((span) => span.hop === "receive")).toEqual([]);
+    // The trace id and bundle id the text arrived under are kept with its entry, and the repeat's dropped span names
+    // that trace (K-08 trace-duplicate-webhook.json decided.firstTrace): the actor answers it for the gateway.
+    expect((await inboxOf(ALEX)).map((entry) => [entry.traceId, entry.bundleId])).toEqual([[TRACE, BUNDLE]]);
+    expect(await stubOf(ALEX).firstTraceOf(handoff.event.eventId)).toBe(TRACE);
+    expect(await stubOf(ALEX).firstTraceOf("evt-never-seen")).toBeNull();
     const everything = lines.join("\n");
     expect(everything).not.toContain("+15555550101");
     expect(everything).not.toContain("Haircut");
@@ -328,7 +332,7 @@ describe("refusals and logs", () => {
   });
 });
 
-describe("the actor's receive span: K-08's `at` is when the call started and `ms` how long it took, on the actor's clock (T-1170)", () => {
+describe("a call's spans on the actor's clock (T-1170), with no receive span of the actor's own: K-08 shows one receive span per inbound event, the gateway's (T-1108)", () => {
   /** An instant before any run of this file: a span stamped on the Workers clock instead would start after every span here. */
   const T0 = Date.parse("2026-10-19T14:01:50.100Z");
   const utc = (ms: number): string => new Date(ms).toISOString();
@@ -349,7 +353,7 @@ describe("the actor's receive span: K-08's `at` is when the call started and `ms
     };
   }
 
-  it("a receipt's: `at` is the clock as the call began and `ms` the call's length, and each span its hooks write starts after it and ends inside it", async () => {
+  it("a receipt's: the actor writes no receive span, and each span its hooks write starts after the call began and ends inside it", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     // The actor's clock, moved only by the hooks: the dispatcher's takes 250 ms, then marks the part delivered in 40 ms; the
     // clock arming's arms at once, then takes 10 ms. Each hook writes its span on the receipt's trace, on the same clock.
@@ -380,32 +384,26 @@ describe("the actor's receive span: K-08's `at` is when the call started and `ms
     try {
       expect(await door().accept(deliveredReceipt())).toBe("written");
 
-      // Judged in start order, the actor's span comes first, though it was written last, as the call answered.
+      // The receipt's one receive span is the gateway's (K-08 v1 hop receive: "The gateway checks the signature, drops
+      // a known event id, writes the sealed event, answers 200"): the actor writes none, so the trace here holds only
+      // its hooks' spans, in start order. The call began at T0 and took 300 ms on the actor's clock.
       const trace = traceOf(log);
-      expect(trace.map((span) => span.hop)).toEqual(["receive", "delivered", "clockArmed"]);
-      const [receive, ...inside] = trace;
-      if (receive === undefined) throw new Error("no receive span");
-      expect(receive).toMatchObject({
-        at: utc(T0),
-        ms: 300,
-        outcome: "ok",
-        got: { door: "handleActor", route: "receipt", kind: "delivered" },
-      });
-      expect(inside.map((span) => [span.at, span.ms])).toEqual([
+      expect(trace.map((span) => span.hop)).toEqual(["delivered", "clockArmed"]);
+      expect(now).toBe(T0 + 300);
+      expect(trace.map((span) => [span.at, span.ms])).toEqual([
         [utc(T0 + 250), 40],
         [utc(T0 + 290), 0],
       ]);
-      const start = Date.parse(receive.at);
-      for (const span of inside) {
-        expect(Date.parse(span.at)).toBeGreaterThan(start);
-        expect(Date.parse(span.at) + span.ms).toBeLessThanOrEqual(start + receive.ms);
+      for (const span of trace) {
+        expect(Date.parse(span.at)).toBeGreaterThan(T0);
+        expect(Date.parse(span.at) + span.ms).toBeLessThanOrEqual(T0 + 300);
       }
     } finally {
       for (const restore of restores.reverse()) restore();
     }
   });
 
-  it("a text's: `at` is the clock as the call began, and the safety read the call starts, on that clock, starts no earlier and inside it", async () => {
+  it("a text's: the actor writes no receive span, and the safety read the call starts, on that clock, starts as the call began and takes the place after the gateway's spans", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const answer = safetyNo as unknown as SafetyResult;
     // One clock for the actor and its safety read, as the composition root gives them (runtime/src/wiring root.ts install);
@@ -414,24 +412,29 @@ describe("the actor's receive span: K-08's `at` is when the call started and `ms
     const restores = [setSafetyDeps(h.deps), setBatchHooks({ clock: h.clock })];
     try {
       await h.clock.advance(T0);
-      expect(await door().accept(await handoffOf(textImessage, { eventId: answer.eventId }))).toBe("written");
+      // As the gateway hands a text on: its receive and scrub spans took places 1 and 2 on the trace (`seqBefore`).
+      const handoff = { ...(await handoffOf(textImessage, { eventId: answer.eventId })), seqBefore: 2 };
+      expect(await door().accept(handoff)).toBe("written");
       expect(h.read.requests.map((request) => request.eventId)).toEqual([answer.eventId]);
+      // The call stored the text and started its read in one step, with the clock still at T0, where the call began.
+      const answered = h.clock.now();
+      expect(answered).toBe(T0);
+      expect((await inboxOf(ALEX)).map((entry) => [entry.event.eventId, entry.startsTurn])).toEqual([
+        [answer.eventId, true],
+      ]);
       await h.clock.advance(1500);
       await stubOf(ALEX).safetyIdle();
 
+      // K-08 trace-skeleton.json: the text's one receive span is the gateway's (seq 1), then scrub (seq 2), and the
+      // safety read is seq 3. The actor writes no receive span, so its part of the trace starts at the safety read.
       const trace = traceOf(log);
-      expect(trace.map((span) => span.hop)).toEqual(["receive", "safetyRead"]);
-      const [receive, read] = trace;
-      if (receive === undefined || read === undefined) throw new Error("no receive or safetyRead span");
-      expect(receive).toMatchObject({
-        at: utc(T0),
-        outcome: "ok",
-        got: { door: "handleActor", route: "inbox", kind: "text" },
-        decided: { stored: true, startsTurn: true },
-      });
-      expect(read).toMatchObject({ at: utc(T0), ms: 1500, outcome: "ok", event_id: answer.eventId });
-      expect(Date.parse(read.at)).toBeGreaterThanOrEqual(Date.parse(receive.at));
-      expect(Date.parse(read.at)).toBeLessThanOrEqual(Date.parse(receive.at) + receive.ms);
+      expect(trace.map((span) => span.hop)).toEqual(["safetyRead"]);
+      const [read] = trace;
+      if (read === undefined) throw new Error("no safetyRead span");
+      expect(read).toMatchObject({ at: utc(T0), ms: 1500, outcome: "ok", event_id: answer.eventId, seq: 3 });
+      // No earlier than the call began, and inside it: before the call answered.
+      expect(Date.parse(read.at)).toBeGreaterThanOrEqual(T0);
+      expect(Date.parse(read.at)).toBeLessThanOrEqual(answered);
     } finally {
       for (const restore of restores.reverse()) restore();
     }
