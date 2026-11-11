@@ -121,12 +121,15 @@
 //                handle, or a number whose first turn wrote none) the renewal is answered notFound (the phone row), so
 //                nothing is sent, never read as not stopped (K-05 README's consumer note for T-562).
 //   sendState    T-562: limit 8's read of the recipient's send state at send, and the chat the send goes to, over K-05
-//                v1.2 sendState (T-220, db/repo/send-state.ts; item 28; NQ-RT-2) with its database bound, handed in by
-//                the root (RootOptions.sendStateCall): in a test, the same K-05 double over test owner 1's seeded rows (no
-//                phone row) and the rows the commit wrote; nothing in the Worker until T-567, so every read there fails
-//                closed and nothing is sent. phone.stopped, phone.stopAt and textsConsent go across unchanged, and the
-//                stopped flag is never derived from a consent row (STATE note 10; T-1099). A number with no phone row has
-//                no open chat that Rosie knows of, so its rows wait for the chat (limit 8's waitingChat; MC C9).
+//                v1.2 sendState (T-220, db/repo/send-state.ts; item 28; NQ-RT-2), which since v1.8 also says who gave the
+//                texts yes and for which booking (T-1216; item 47), with its database bound, handed in by the root
+//                (RootOptions.sendStateCall): in a test, the same K-05 double over test owner 1's seeded rows (no phone
+//                row) and the rows the commit wrote; nothing in the Worker until T-567, so every read there fails closed
+//                and nothing is sent. phone.stopped, phone.stopAt and textsConsent go across unchanged, v1.8's
+//                fromContact and bookingId with it (T-1217; left out when the answer has none, so limit 8 reads them as
+//                not known), and the stopped flag is never derived from a consent row (STATE note 10; T-1099). A number
+//                with no phone row has no open chat that Rosie knows of, so its rows wait for the chat (limit 8's
+//                waitingChat; MC C9).
 //   linqSend     T-563: K-11 v1 sendPart (C-206; C-211), each part the dispatcher sends through the root's Linq door
 //                (./linq-door.ts), under its K-07 key '<row>/<part>/<try>', with its Linq line bound, handed in by the root
 //                (RootOptions.linqSendCall): in a test, @rosie/adapters' Linq double (T-411), which records each part once
@@ -259,6 +262,7 @@ import type {
   RecipientDirectory,
   SendState,
   SendStateReader,
+  TextsConsentRead,
 } from "../dispatch/types";
 import type { HandleRef } from "../gateway/seal";
 import type { ChatOpenPort, InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
@@ -1882,7 +1886,11 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
 
 // ---- sendState: K-05 v1.2 sendState, limit 8's read at send and the chat a send goes to (T-562; C-125; NQ-RT-2) ---------
 
-/** K-05 v1.2 sendState (T-220, db/repo/send-state.ts) with its database bound, as rosie_job on the runtime side. */
+/**
+ * K-05 v1.2 sendState (T-220, db/repo/send-state.ts), answered since v1.8 with item 47's fromContact and bookingId
+ * (T-1216), with its database bound, as rosie_job on the runtime side. Typed as any version's answer (SendStateOutcome),
+ * so one of v1.2 to v1.7, with neither field, is read too: as not known.
+ */
 export type SendStateCall = (request: SendStateRequest) => Promise<SendStateOutcome>;
 
 /** What the real send-state port is fed: K-05's call with its database bound, or null where none is bound. */
@@ -1905,28 +1913,41 @@ export const CHAT_MEMORY = 512;
 const NOT_STORED = "";
 
 /**
- * K-05 v1.2's send state as limit 8 reads it (dispatch/types.ts SendState). The phone row's stopped flag and stop time
- * and the texts consent row go across unchanged: the stopped flag is the phone's alone, never derived from a consent row
- * (STATE note 10; T-1099), and K-05 v1.2's consent row says neither who gave a yes nor for which booking, so no yes lifts
- * a stop (limit 8's notKnown). With no phone row (an email handle, or a number whose first turn wrote none) no open chat
- * is known: the row waits for the chat (MC C9), whatever its class, since a phone with no open chat lets nothing out.
- * With no business K-05 gives no zone and no text hours: each goes as an empty value, which limit 8 cannot read, so a
- * routine row is unreadable and nothing is sent (fail closed).
+ * K-05's covering texts row as limit 8 reads it (dispatch/types.ts TextsConsentRead; item 28, default 35), field for
+ * field. v1.8's fromContact and bookingId (item 47; T-1216) go across unchanged when the answer holds them, and are left
+ * out when it does not (an answer of v1.2 to v1.7), so limit 8 reads them as not known and no yes lifts a stop (its
+ * notKnown). A value of neither field's type is no K-05 answer at all, so it is left out too: never read as a yes. Nothing
+ * is derived here: not who gave the yes, not its booking, and never the stop or its end (STATE note 10; default 84).
+ */
+function textsConsentOf(row: NonNullable<SendStateResponse["textsConsent"]>): TextsConsentRead {
+  const { fromContact, bookingId } = row;
+  return {
+    consentId: row.consentId,
+    businessId: row.businessId,
+    revoked: row.revoked,
+    at: row.at,
+    ...(typeof fromContact === "boolean" ? { fromContact } : {}),
+    ...(bookingId === null || typeof bookingId === "string" ? { bookingId } : {}),
+  };
+}
+
+/**
+ * K-05's send state as limit 8 reads it (dispatch/types.ts SendState). The phone row's stopped flag and stop time and the
+ * texts consent row go across unchanged, v1.8's fromContact and bookingId with it (item 47; T-1217), left out when the
+ * answer has none: the stopped flag is the phone's alone, never derived from a consent row (STATE note 10; T-1099; K-05
+ * default 84). Limit 8 then lifts a stop only on the person's own yes (fromContact true) newer than the stop: for a row
+ * about the booking it names, or for every row on START's yes for every business (yesAfterStop, T-1099); a yes whose
+ * record does not say who gave it or for which booking lifts nothing (notKnown). With no phone row (an email handle, or
+ * a number whose first turn wrote none) no open chat is known: the row waits for the chat (MC C9), whatever its class,
+ * since a phone with no open chat lets nothing out. With no business K-05 gives no zone and no text hours: each goes as
+ * an empty value, which limit 8 cannot read, so a routine row is unreadable and nothing is sent (fail closed).
  */
 export function sendStateOf(answer: SendStateResponse): SendState {
   const { phone } = answer;
   return {
     stopped: phone?.stopped ?? false,
     stopAt: phone?.stopAt ?? null,
-    textsConsent:
-      answer.textsConsent === null
-        ? null
-        : {
-            consentId: answer.textsConsent.consentId,
-            businessId: answer.textsConsent.businessId,
-            revoked: answer.textsConsent.revoked,
-            at: answer.textsConsent.at,
-          },
+    textsConsent: answer.textsConsent === null ? null : textsConsentOf(answer.textsConsent),
     chatOpen: phone?.chatOpen ?? false,
     audience: answer.audience,
     visitZone: answer.visitZone,
