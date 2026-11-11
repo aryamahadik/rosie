@@ -218,14 +218,12 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
         expect(run.fakes.core.recorded).toEqual([]);
         expect(run.fakes.core.fixed).toEqual([]);
 
-        // Three seconds quiet: the batch closes, the lease opens the turn and the turn replies.
+        // Three seconds quiet: the batch closes, the lease opens the turn, decide reads it and the gate commits it. Since
+        // T-562 joined the outbox, the dispatcher sends only the rows the commit wrote once composed, and this rig composes
+        // none (no compose input is fed), so the turn's commit, after decide's reads, is what this test waits for.
         await run.fakes.clock.advance(3000);
         await runDurableObjectAlarm(stubOf(SAM_ACTOR));
-        await until(
-          () => run.traceOf(traceId).some((span) => span.hop === "providerAccepted"),
-          "providerAccepted",
-          15_000,
-        );
+        await until(() => run.traceOf(traceId).some((span) => span.hop === "commit"), "commit", 15_000);
 
         const trace = run.traceOf(traceId);
         const [safety, ...again] = trace.filter((span) => span.hop === "safetyRead");

@@ -101,6 +101,24 @@
 //                rewrite, then the step's fallback, inside the same calls. The turn records the row's fillAndChecks and
 //                rewriteOrFallback spans; the face tells the base so (TURN_RECORDS_FILL_AND_CHECKS), and the base records
 //                none (T-1193; DL-376).
+//   outbox       T-562: the dispatcher's claim and marks, and the receipt door's mark, over K-05 v1.2's four outbox calls
+//                (T-1135, db/repo/outbox.ts: claimOutboxV12, renewClaim, markPartV12 and markRowV12, each called as
+//                (sql, request) as rosie_job; never T-196's v1 claimOutbox, markPart or markRow beside them: a v1 claim
+//                writes no claim row, so a v1.2 claim would take the row again at once: DL-317), with their database
+//                bound, handed in by the root (RootOptions.outboxCalls): in a test, the K-05 double over the rows the
+//                commit wrote and the plans finalize wrote into them; nothing in the Worker until T-567, so every claim
+//                there fails closed and nothing is sent. Each claimed row is handed on with the final parts finalize
+//                wrote, its port (K-05 v1.2 item 30) and its claim; K-03's options ({id, label}) go as their labels.
+//                The phone row renewClaim reads with each renewal (K-05 v1.2 item 32) must be there: with none (an email
+//                handle, or a number whose first turn wrote none) the renewal is answered notFound (the phone row), so
+//                nothing is sent, never read as not stopped (K-05 README's consumer note for T-562).
+//   sendState    T-562: limit 8's read of the recipient's send state at send, and the chat the send goes to, over K-05
+//                v1.2 sendState (T-220, db/repo/send-state.ts; item 28; NQ-RT-2) with its database bound, handed in by
+//                the root (RootOptions.sendStateCall): in a test, the same K-05 double over test owner 1's seeded rows (no
+//                phone row) and the rows the commit wrote; nothing in the Worker until T-567, so every read there fails
+//                closed and nothing is sent. phone.stopped, phone.stopAt and textsConsent go across unchanged, and the
+//                stopped flag is never derived from a consent row (STATE note 10; T-1099). A number with no phone row has
+//                no open chat that Rosie knows of, so its rows wait for the chat (limit 8's waitingChat; MC C9).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
@@ -162,6 +180,18 @@ import type {
 } from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
+import type {
+  ClaimedRowV12,
+  ClaimOutboxRequest as K05ClaimOutboxRequest,
+  ClaimOutboxV12Outcome,
+  MarkPartV12Outcome,
+  MarkPartV12Request,
+  MarkRowV12Outcome,
+  MarkRowV12Request,
+  RenewClaimOutcome,
+  RenewClaimRequest as K05RenewClaimRequest,
+} from "@rosie/db/repo/outbox";
+import type { SendStateOutcome, SendStateRequest, SendStateResponse } from "@rosie/db/repo/send-state";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
 import type {
   HandleTargetsOutcome,
@@ -177,6 +207,17 @@ import {
   type PinnedBundle,
 } from "../bundle/types";
 import { asListed, BundleReader, flowOf, keyOf, readManifest, sameBundle } from "../bundle/values";
+import type {
+  ChatTarget,
+  ClaimedRow,
+  FinalParts as DispatchFinalParts,
+  MarkPartResponse,
+  OutboxStore,
+  PlannedSend,
+  RecipientDirectory,
+  SendState,
+  SendStateReader,
+} from "../dispatch/types";
 import type { HandleRef } from "../gateway/seal";
 import type { InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
@@ -197,7 +238,15 @@ import type {
   TurnComposer,
   TurnDecide,
 } from "../turn/types";
-import type { ComposeInputPort, FinalizePort, FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
+import type {
+  ComposeInputPort,
+  FinalizePort,
+  FrontierPort,
+  GatePort,
+  Ports,
+  SendStatePort,
+  TurnRowPort,
+} from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -290,6 +339,16 @@ export interface RealInputs {
    * until T-567) and the bundles it reads (as compose input's). Left out, every finalize fails closed.
    */
   readonly finalize?: Omit<FinalizeInputs, "held" | "now"> | undefined;
+  /**
+   * K-05 v1.2's four outbox calls with their database bound (T-562): null or left out where none is bound (the Worker
+   * until T-567), so every claim and mark fails closed and nothing is sent.
+   */
+  readonly outbox?: OutboxCalls | null | undefined;
+  /**
+   * K-05 v1.2 sendState with its database bound (T-562): null or left out where none is bound (the Worker until T-567),
+   * so every send-state read fails closed and nothing is sent.
+   */
+  readonly sendState?: SendStateCall | null | undefined;
 }
 
 /** The real implementation of each port joined so far. */
@@ -339,6 +398,8 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       held,
       now: inputs.now,
     }),
+    outbox: realOutbox({ calls: inputs.outbox ?? null }),
+    sendState: realSendState({ call: inputs.sendState ?? null }),
   };
 }
 
@@ -1477,4 +1538,338 @@ export function realFinalize(inputs: FinalizeInputs): FinalizePort {
       return answer as unknown as FinalizeMessageAnswer;
     },
   };
+}
+
+// ---- outbox: K-05 v1.2 claimOutbox, renewClaim, markPart and markRow (T-562; C-124, C-125; DL-317) ---------------------
+
+/**
+ * K-05 v1.2's four outbox calls (T-1135, db/repo/outbox.ts) with their database bound, each one transaction on the primary
+ * as rosie_job with no business scope: `(request) => claimOutboxV12(sql, request)`, and so on, `sql` a rosie_job client
+ * (T-567 binds them). Only these four: T-196's v1 claimOutbox, markPart and markRow write no claim row and answer v1's
+ * shapes, so a v1 call beside them would let a v1.2 claim take a row again at once (K-05 default 20; DL-317). Each call's
+ * answer type is the v1.2 call's own, so a v1 call cannot be bound here.
+ */
+export interface OutboxCalls {
+  readonly claimOutboxV12: (request: K05ClaimOutboxRequest) => Promise<ClaimOutboxV12Outcome>;
+  readonly renewClaim: (request: K05RenewClaimRequest) => Promise<RenewClaimOutcome>;
+  readonly markPartV12: (request: MarkPartV12Request) => Promise<MarkPartV12Outcome>;
+  readonly markRowV12: (request: MarkRowV12Request) => Promise<MarkRowV12Outcome>;
+}
+
+/** What the real outbox port is fed: K-05's four calls with their database bound, or null where none is bound. */
+export interface OutboxInputs {
+  readonly calls: OutboxCalls | null;
+}
+
+/** A claimed row the dispatcher cannot be handed as K-05 gave it (a send option it cannot read). Names no value. */
+export class ClaimedRowError extends Error {
+  constructor(what: string) {
+    super(`a claimed row cannot go to the dispatcher: ${what}`);
+    this.name = "ClaimedRowError";
+  }
+}
+
+/** A K-03 send option as Linq takes it: its words (K-03 v1 option {id, label}: the label is what the person sees). */
+function optionWordsOf(option: unknown): string {
+  if (typeof option === "string") return option;
+  if (typeof option === "object" && option !== null && "label" in option) {
+    const { label } = option as { readonly label: unknown };
+    if (typeof label === "string") return label;
+  }
+  throw new ClaimedRowError("a send option is neither a label nor K-03's {id, label}");
+}
+
+/** One K-03 send of a claimed row's final parts, as the dispatcher reads it (dispatch/types.ts PlannedSend). */
+function plannedSendOf(send: ClaimedRowV12["finalParts"]["sends"][number]): PlannedSend {
+  const options: readonly unknown[] = Array.isArray(send.options) ? send.options : [];
+  return {
+    kind: send.kind,
+    text: send.text,
+    calendarFile: send.calendarFile,
+    options: options.map(optionWordsOf),
+    link: send.link,
+  };
+}
+
+/** The final parts finalize wrote into the row (K-03 v1 finalParts), as the dispatcher reads them: the words never logged. */
+function finalPartsOf(parts: ClaimedRowV12["finalParts"]): DispatchFinalParts {
+  return {
+    row: parts.row,
+    channel: parts.channel,
+    sends: parts.sends.map(plannedSendOf),
+    fixedLines: [...parts.fixedLines],
+    threadReplyTo: parts.threadReplyTo,
+  };
+}
+
+/** K-05 v1.2's claimedRow (v1's fields, v1.1's claim and claimedFrom, v1.2's port) as the dispatcher reads it. */
+export function claimedRowOf(row: ClaimedRowV12): ClaimedRow {
+  return {
+    outboxRowId: row.outboxRowId,
+    version: row.version,
+    commitSeq: row.commitSeq,
+    recipientHandleId: row.recipientHandleId,
+    recipientPersonId: row.recipientPersonId,
+    businessId: row.businessId,
+    bookingId: row.bookingId,
+    openQuestionId: row.openQuestionId,
+    channel: row.channel,
+    port: row.port,
+    sendClass: row.sendClass,
+    versionsRead: row.versionsRead.map((read) => ({
+      table: read.table,
+      rowId: read.rowId,
+      version: read.version,
+    })),
+    finalParts: finalPartsOf(row.finalParts),
+    parts: row.parts.map((part) => ({
+      partNo: part.partNo,
+      tryNo: part.tryNo,
+      idempotencyKey: part.idempotencyKey,
+      attempts: part.attempts,
+      sent: part.sent,
+    })),
+    traceId: row.traceId,
+    claim: { ...row.claim },
+    claimedFrom: row.claimedFrom,
+  };
+}
+
+/** The dispatcher's markPart request as K-05 v1.2 takes it: each outcome's own fields, nothing added. */
+function markPartRequestOf(request: Parameters<OutboxStore["markPart"]>[0]): MarkPartV12Request {
+  switch (request.outcome) {
+    case "sent":
+      return {
+        outcome: "sent",
+        idempotencyKey: request.idempotencyKey,
+        providerMessageId: request.providerMessageId,
+        providerOptionIds: request.providerOptionIds === null ? null : [...request.providerOptionIds],
+        at: request.at,
+      };
+    case "delivered":
+      return {
+        outcome: "delivered",
+        providerMessageId: request.providerMessageId,
+        at: request.at,
+        ...(request.idempotencyKey === undefined ? {} : { idempotencyKey: request.idempotencyKey }),
+      };
+    case "failed":
+      return {
+        outcome: "failed",
+        idempotencyKey: request.idempotencyKey,
+        errorCode: request.errorCode,
+        retry: request.retry,
+        at: request.at,
+        ...(request.providerMessageId === undefined ? {} : { providerMessageId: request.providerMessageId }),
+        ...(request.nextTryNotBefore === undefined ? {} : { nextTryNotBefore: request.nextTryNotBefore }),
+      };
+  }
+}
+
+/**
+ * The outbox port (T-562): the dispatcher's OutboxStore (runtime/src/dispatch) over K-05 v1.2's four outbox calls. Each
+ * request goes to its v1.2 call as it is; each answer comes back in the dispatcher's shapes:
+ *   - claimOutbox: claimOutboxV12. Each claimed row is handed on with its claim, the state it was claimed from, its port
+ *     (linq or email: v1.2 item 30), and the final parts finalize wrote into it (K-03's options as their labels);
+ *   - renewClaim: renewClaim, whose answer also holds the recipient's phone row as the renewal read it, FOR SHARE (v1.2
+ *     item 32). A renewal that read no phone row (an email handle, or a number whose first turn wrote none) is answered
+ *     notFound for the phone row: the dispatcher sends nothing and keeps no part out, never reading it as not stopped
+ *     (the K-05 README's consumer note for T-562; DL-317);
+ *   - markPart: markPartV12, its answer with the row after the mark (v1.1 item 15), which the dispatcher compares;
+ *   - markRow: markRowV12, limit 8's outcome, waitingChat among them (v1.1 item 16).
+ * Errors pass through as K-05 gives them. With no calls bound every call fails closed (NoDatabaseError), so the dispatcher
+ * claims nothing and sends nothing. Nothing here logs: a row's final parts hold a person's words.
+ */
+export function realOutbox(inputs: OutboxInputs): OutboxStore {
+  const { calls } = inputs;
+  const none = (call: string): Promise<never> => Promise.reject(new NoDatabaseError(call));
+  return {
+    async claimOutbox(request) {
+      if (calls === null) return none("claimOutbox");
+      const answer = await calls.claimOutboxV12({
+        claimer: request.claimer,
+        ...(request.recipientHandleId === undefined ? {} : { recipientHandleId: request.recipientHandleId }),
+        now: request.now,
+        limit: request.limit,
+      });
+      if ("error" in answer) return answer;
+      return {
+        result: "claimed",
+        claimed: answer.claimed.map(claimedRowOf),
+        passedHeld: answer.passedHeld.map((held) => ({
+          outboxRowId: held.outboxRowId,
+          heldUntil: held.heldUntil,
+        })),
+      };
+    },
+    async renewClaim(request) {
+      if (calls === null) return none("renewClaim");
+      const answer = await calls.renewClaim({
+        outboxRowId: request.outboxRowId,
+        claimer: request.claimer,
+        claimNo: request.claimNo,
+        idempotencyKey: request.idempotencyKey,
+        at: request.at,
+      });
+      if ("error" in answer) return answer;
+      // No phone row read with the renewal: unreadable, so nothing is sent (never "not stopped").
+      if (answer.recipient === null) return { error: "notFound", table: "phones", rowId: answer.outboxRowId };
+      return { result: "renewed", outboxRowId: answer.outboxRowId, claim: { ...answer.claim } };
+    },
+    async markPart(request) {
+      if (calls === null) return none("markPart");
+      const answer = await calls.markPartV12(markPartRequestOf(request));
+      if ("error" in answer) return answer;
+      const marked: MarkPartResponse = {
+        result: "marked",
+        outboxRowId: answer.outboxRowId,
+        partNo: answer.partNo,
+        tryNo: answer.tryNo,
+        attempts: answer.attempts,
+        repeated: answer.repeated,
+        firstDelivery: answer.firstDelivery,
+        openQuestionId: answer.openQuestionId,
+        nextKey: answer.nextKey,
+        row: { state: answer.row.state, version: answer.row.version },
+      };
+      return marked;
+    },
+    async markRow(request) {
+      if (calls === null) return none("markRow");
+      const answer = await calls.markRowV12({
+        outboxRowId: request.outboxRowId,
+        expectVersion: request.expectVersion,
+        outcome: request.outcome,
+        heldUntil: request.heldUntil,
+        at: request.at,
+      });
+      if ("error" in answer) return answer;
+      return {
+        result: "marked",
+        outboxRowId: answer.outboxRowId,
+        version: answer.version,
+        outcome: answer.outcome,
+      };
+    },
+  };
+}
+
+// ---- sendState: K-05 v1.2 sendState, limit 8's read at send and the chat a send goes to (T-562; C-125; NQ-RT-2) ---------
+
+/** K-05 v1.2 sendState (T-220, db/repo/send-state.ts) with its database bound, as rosie_job on the runtime side. */
+export type SendStateCall = (request: SendStateRequest) => Promise<SendStateOutcome>;
+
+/** What the real send-state port is fed: K-05's call with its database bound, or null where none is bound. */
+export interface SendStateInputs {
+  readonly call: SendStateCall | null;
+}
+
+/** A send-state read K-05 answered with no row (notFound) for a row the dispatcher holds: nothing is sent. Names no value. */
+export class SendStateError extends Error {
+  constructor(error: string) {
+    super(`no send state for the claimed row: ${error}`);
+    this.name = "SendStateError";
+  }
+}
+
+/** How many recipients' chats one isolate keeps between a send-state read and the dispatcher's chat lookup. */
+export const CHAT_MEMORY = 512;
+
+/** An instant K-05 gives no zone or text hours for (a row with no business): an empty value, which limit 8 cannot read. */
+const NOT_STORED = "";
+
+/**
+ * K-05 v1.2's send state as limit 8 reads it (dispatch/types.ts SendState). The phone row's stopped flag and stop time
+ * and the texts consent row go across unchanged: the stopped flag is the phone's alone, never derived from a consent row
+ * (STATE note 10; T-1099), and K-05 v1.2's consent row says neither who gave a yes nor for which booking, so no yes lifts
+ * a stop (limit 8's notKnown). With no phone row (an email handle, or a number whose first turn wrote none) no open chat
+ * is known: the row waits for the chat (MC C9), whatever its class, since a phone with no open chat lets nothing out.
+ * With no business K-05 gives no zone and no text hours: each goes as an empty value, which limit 8 cannot read, so a
+ * routine row is unreadable and nothing is sent (fail closed).
+ */
+export function sendStateOf(answer: SendStateResponse): SendState {
+  const { phone } = answer;
+  return {
+    stopped: phone?.stopped ?? false,
+    stopAt: phone?.stopAt ?? null,
+    textsConsent:
+      answer.textsConsent === null
+        ? null
+        : {
+            consentId: answer.textsConsent.consentId,
+            businessId: answer.textsConsent.businessId,
+            revoked: answer.textsConsent.revoked,
+            at: answer.textsConsent.at,
+          },
+    chatOpen: phone?.chatOpen ?? false,
+    audience: answer.audience,
+    visitZone: answer.visitZone,
+    businessZone: answer.businessZone ?? NOT_STORED,
+    textHours: answer.textHours ?? { start: NOT_STORED, end: NOT_STORED },
+    textHoursOverride: answer.textHoursOverride,
+    currentVersions: answer.currentVersions.map((current) => ({
+      table: current.table,
+      rowId: current.rowId,
+      version: current.version,
+    })),
+    closed: { booking: answer.closed.booking, question: answer.closed.question },
+  };
+}
+
+/**
+ * The chat a send goes to, from the same read (K-05 v1.2 item 28: the phone row and the handle's chat thread "together
+ * give the chat a send goes to"): the phone's number, the thread's Linq chat id and the service Linq reports for it.
+ * None for an email handle, a number with no phone row or no service yet, or a handle with no Linq chat: noChat.
+ */
+export function chatTargetOf(answer: SendStateResponse): ChatTarget | null {
+  const { recipient, phone, chat } = answer;
+  const service = phone?.chatWay ?? null;
+  const chatId = chat?.linqChatId ?? null;
+  if (recipient.kind !== "phone" || service === null || chatId === null) return null;
+  return { to: recipient.address, chatId, service };
+}
+
+/**
+ * The send-state port (T-562): limit 8's SendStateReader and the dispatcher's RecipientDirectory over K-05 v1.2 sendState,
+ * one primary read per call. The dispatcher reads a row's send state before each send (limit 8) and then asks for the
+ * recipient's chat, so the chat is the one that read gave, kept for the recipient in this isolate (bounded, the oldest
+ * forgotten first; a chat asked for with no read before it is none, so nothing is sent). A transient answer goes back as
+ * it is (the dispatcher tries again, then sends nothing); notFound for a row it holds is thrown (SendStateError): nothing
+ * is sent. With no call bound every read fails closed (NoDatabaseError). Nothing here logs: the number and the chat id
+ * are personal data.
+ */
+export function realSendState(inputs: SendStateInputs): SendStatePort {
+  const { call } = inputs;
+  const chats = new Map<string, ChatTarget | null>();
+  const keep = (handleId: string, chat: ChatTarget | null): void => {
+    chats.delete(handleId);
+    chats.set(handleId, chat);
+    while (chats.size > CHAT_MEMORY) {
+      const oldest = chats.keys().next().value;
+      if (oldest === undefined) break;
+      chats.delete(oldest);
+    }
+  };
+  const sendState: SendStateReader = {
+    async sendStateFor(row) {
+      if (call === null) return Promise.reject(new NoDatabaseError("sendState"));
+      const answer = await call({ outboxRowId: row.outboxRowId });
+      if ("error" in answer) {
+        if (answer.error === "transient") return { error: "transient", sqlstate: answer.sqlstate };
+        throw new SendStateError(answer.error);
+      }
+      // The chat is the claimed row's recipient's only when K-05 read that same recipient: else none (fail closed).
+      keep(
+        row.recipientHandleId,
+        answer.recipient.handleId === row.recipientHandleId ? chatTargetOf(answer) : null,
+      );
+      return sendStateOf(answer);
+    },
+  };
+  const recipients: RecipientDirectory = {
+    chatFor(recipientHandleId) {
+      return Promise.resolve(chats.get(recipientHandleId) ?? null);
+    },
+  };
+  return { sendState, recipients };
 }

@@ -76,6 +76,8 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "composeInput",
     "composer",
     "finalize",
+    "outbox",
+    "sendState",
   ],
   staging: [
     "linqVerify",
@@ -90,6 +92,8 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "composeInput",
     "composer",
     "finalize",
+    "outbox",
+    "sendState",
   ],
   production: [],
 };
@@ -132,7 +136,7 @@ async function leasePark(): Promise<ParkTurnRequest> {
 }
 
 describe("the ports the root binds", () => {
-  it("names D-017's sixteen ports in its turn order", () => {
+  it("names D-017's eighteen ports in its turn order", () => {
     expect(PORTS).toEqual([
       "linqVerify",
       "sealing",
@@ -148,6 +152,8 @@ describe("the ports the root binds", () => {
       "composeInput",
       "composer",
       "finalize",
+      "outbox",
+      "sendState",
       "dataAccess",
       "linqSend",
     ]);
@@ -157,7 +163,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer and finalize to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer, finalize, outbox and send state to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -479,6 +485,34 @@ describe("the Worker's environments", () => {
     expect(fetch).not.toHaveBeenCalled();
     expect(spans).toEqual([]);
   });
+
+  it("fails the outbox and send-state ports closed with no database bound (until T-567): the dispatcher claims nothing, reads nothing and sends nothing", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    await expect(
+      root.ports.outbox.claimOutbox({ claimer: "dispatcher-1", now: "2026-11-07T15:06:35Z", limit: 10 }),
+    ).rejects.toThrow(new NoDatabaseError("claimOutbox"));
+    await expect(
+      root.ports.outbox.markPart({
+        outcome: "delivered",
+        providerMessageId: "linq-msg-1",
+        at: "2026-11-07T15:06:36Z",
+      }),
+    ).rejects.toThrow(new NoDatabaseError("markPart"));
+    await expect(
+      root.ports.sendState.sendState.sendStateFor({ outboxRowId: "outbox-s1-02-sam-1" } as never),
+    ).rejects.toThrow(new NoDatabaseError("sendState"));
+    // The turn's wake of the dispatcher: its claim fails closed before any row's span, so nothing is read or sent.
+    await expect(
+      root.dispatcher.wake({ turnId: "turn-s1-01-sam", handleId: "handle-sam", outboxRowIds: [] }, trace),
+    ).rejects.toThrow(new NoDatabaseError("claimOutbox"));
+    expect(spans).toEqual([]);
+  });
 });
 
 describe("a closed port", () => {
@@ -516,7 +550,15 @@ describe("a closed port", () => {
     await expect(closed.finalize.finalizeMessage({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("finalize"),
     );
-    await expect(closed.dataAccess.outbox.claimOutbox({} as never)).rejects.toThrow(
+    await expect(closed.outbox.claimOutbox({} as never)).rejects.toThrow(new NotJoinedError("outbox"));
+    await expect(closed.outbox.markPart({} as never)).rejects.toThrow(new NotJoinedError("outbox"));
+    await expect(closed.sendState.sendState.sendStateFor({} as never)).rejects.toThrow(
+      new NotJoinedError("sendState"),
+    );
+    await expect(closed.sendState.recipients.chatFor("handle-sam")).rejects.toThrow(
+      new NotJoinedError("sendState"),
+    );
+    await expect(closed.dataAccess.clocks.armClock({} as never)).rejects.toThrow(
       new NotJoinedError("dataAccess"),
     );
     await expect(closed.linqSend.parts.sendPart({} as never)).rejects.toThrow(new NotJoinedError("linqSend"));

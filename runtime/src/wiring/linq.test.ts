@@ -124,6 +124,9 @@ async function rig(options: RigOptions = {}): Promise<Rig> {
     clock,
     flags,
     handleKey: fakes.handleKeys.call,
+    // The receipt door's store (T-562): a receipt that got past the verify would be marked here.
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
     ...(linq === "no secret" ? {} : { linq }),
   });
   const lines = (): Line[] => spy.mock.calls.map(([line]) => JSON.parse(String(line)) as Line);
@@ -161,7 +164,7 @@ function expectNothingWritten(run: Rig): void {
   expect(run.actors.opened).toEqual([]);
   expect(run.actors.accepted).toEqual([]);
   expect(run.fakes.handleKeys.requests).toEqual([]);
-  expect(run.fakes.store.marks).toEqual([]);
+  expect(run.fakes.dispatch.partMarks).toEqual([]);
 }
 
 // ---- the tests -------------------------------------------------------------------------------------------------------
