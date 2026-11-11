@@ -1,26 +1,26 @@
-// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.8 (T-084; T-1169, with
-// T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; ops/plan/02-contracts.md K-05
-// "Contract test" and section 2 item 12; contracts/data-access/README.md "Fixtures", "Producers and consumers" and each
-// version's "Consumers of" list).
+// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.9 (T-084; T-1169, with
+// T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9;
+// ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12; contracts/data-access/README.md "Fixtures",
+// "Producers and consumers" and each version's "Consumers of" list).
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, fixtures
 // and README, and one part per producer or consumer side, added later by a QA side task that depends on this task and
 // on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3,
-// v1.4, v1.6, v1.7 and v1.8, every fixture of the five run through db/repo's own calls against local PostgreSQL, is
-// data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214; v1.8's by T-1218); v1.5 adds no database
-// call.
+// v1.4, v1.6, v1.7, v1.8 and v1.9, every fixture of the six run through db/repo's own calls against local PostgreSQL,
+// is data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214; v1.8's by T-1218; v1.9's by T-1232);
+// v1.5 adds no database call.
 //
-// K-05 is frozen at v1 to v1.8 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
+// K-05 is frozen at v1 to v1.9 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
 // checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
 // data-access.<version>.schema.json #/$defs/<def>), and entries are selected by version, never by a pinned list or
 // count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land. As DL-124
 // settled for K-06, this file holds v1 and its additive minor versions: the v1.2 fixture part the README plans as
 // T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here, and so are the fixture parts of
-// v1.3, v1.4, v1.5, v1.6, v1.7 and v1.8 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did"; v1.6's
-// "joins tests/contract/data-access.v1.test.ts as v1.5's did"; v1.7's and v1.8's "joins
-// tests/contract/data-access.v1.test.ts", "Consumers of v1.7" and "Consumers of v1.8"), with part 5, v1.5's rowReader
-// read as README item 44 says and three faults no fixture shows refused (T-1188; T-1184's security note b), and part 6,
-// v1.7's chat-opened entry named by its text as item 46 says.
+// v1.3, v1.4, v1.5, v1.6, v1.7, v1.8 and v1.9 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did";
+// v1.6's "joins tests/contract/data-access.v1.test.ts as v1.5's did"; v1.7's, v1.8's and v1.9's "joins
+// tests/contract/data-access.v1.test.ts", "Consumers of v1.7", "Consumers of v1.8" and "Consumers of v1.9"), with part
+// 5, v1.5's rowReader read as README item 44 says and three faults no fixture shows refused (T-1188; T-1184's security
+// note b), and part 6, v1.7's chat-opened entry named by its text as item 46 says.
 //
 // What this part proves:
 //   1. every fixture in contracts/data-access/fixtures/index.json is checked against the schema of its version:
@@ -47,9 +47,9 @@
 //      phone.chat_opened entry is the request's text's, its id '<event id>/chat-opened', its row the request's handle
 //      and its why the request's event, which the schema leaves to code (as a claim entry's id, item 33).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: each fixture's request run against local
-//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's, v1.7's and v1.8's in data-access.v1.db-side.test.ts), 1,000
-//   parallel reserves, a repeated commit, parallel claims, and each consumer accepting every valid fixture and refusing
-//   every invalid one.
+//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's, v1.7's, v1.8's and v1.9's in
+//   data-access.v1.db-side.test.ts), 1,000 parallel reserves, a repeated commit, parallel claims, and each consumer
+//   accepting every valid fixture and refusing every invalid one.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -70,7 +70,7 @@ const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const ID_BASE = "https://rosie.invalid/contracts/";
 
 /** The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own. */
-const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6", "v1.7", "v1.8"];
+const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6", "v1.7", "v1.8", "v1.9"];
 /** The fixture parts the README plans as tasks of their own that this file covers (DL-124). */
 const COVERED_HERE = ["T-128"];
 
@@ -914,6 +914,42 @@ const MENDS: Record<string, Mend[]> = {
       putRight: "with fromContact false, as a row that withdraws always reads (README default 82)",
       changes: [{ at: "textsConsent.fromContact", to: false }],
       same: { file: "send-state-stop-row.json", at: "outcome" },
+    },
+  ],
+  // v1.9: each refused answer's twin as README "Consumers of v1.9" names it, its outcome
+  "invalid/refuse-mark-repeat-delivery-left-out.json": [
+    {
+      reason:
+        "the words' repeated receipt is answered with what it repeats left out, and a v1.9 answer always states repeatedDelivery, so no consumer meets a repeat whose delivery it cannot place (markPart.v1dot9Response)",
+      putRight:
+        "with repeatedDelivery stated: the row's first delivery, at 14:05:04Z as the part holds it (README item 48, defaults 85 and 86)",
+      changes: [{ at: "repeatedDelivery", to: { firstOfRow: true, deliveredAt: "2026-10-23T14:05:04Z" } }],
+      same: { file: "mark-a7-03-delivered-repeat.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-mark-repeat-says-first-delivery.json": [
+    {
+      reason:
+        "the words' repeated receipt is answered with firstDelivery true beside the delivery it repeats, and a repeat records nothing, so it never says firstDelivery (markPart.response: repeatedDelivery an object, firstDelivery false)",
+      putRight:
+        "with firstDelivery false, v1's meaning kept: the first delivery it repeats is said in repeatedDelivery (README default 88)",
+      changes: [{ at: "firstDelivery", to: false }],
+      same: { file: "mark-a7-03-delivered-repeat.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-mark-delivered-repeat-null.json": [
+    {
+      reason:
+        "the poll's repeated receipt is answered with repeatedDelivery null, and a delivery receipt answered repeated always states the delivery it repeats, never null (markPart.exchange)",
+      putRight:
+        "with the delivery it repeats stated: the poll's, at 14:05:06Z as the part holds it, not the row's first (README item 48, default 87)",
+      changes: [
+        {
+          at: "outcome.repeatedDelivery",
+          to: { firstOfRow: false, deliveredAt: "2026-10-23T14:05:06Z" },
+        },
+      ],
+      same: { file: "mark-a7-03-poll-delivered-repeat.json", at: "outcome", part: "outcome" },
     },
   ],
 };
@@ -1799,7 +1835,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-151 migrating K-07's schema addition",
     ],
     needs:
-      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written. v1.8's sendState with item 47's fromContact and bookingId (T-1216, db/repo/send-state.ts: the covering texts consent row picked as v1.2 picks it, by default 35, then its channel, turn_id, handle_id and booking_id and its turn's handle_id, read in sendState's one read-only transaction as rosie_job with no business scope) runs there too (T-1218): every v1.8 fixture through db/repo after its given, the chains running v1's reserve, plan and claim steps as well as commitTurn, each answering its own fixture's outcome (the claim through K-05 v1's own claimOutbox, which answers v1's claimed rows, and after the held reserve the saved-time clock row item 8 gives it, which db/repo's reserve does not write yet); each accepted request giving its outcome, valid at v1.8, each sendState answer valid at sendState.v1dot8Response, fromContact and bookingId always stated; and each refused answer (who gave the yes left out, its booking left out, a STOP read as the person's own yes) answered put right in its twin's state.",
+      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written. v1.8's sendState with item 47's fromContact and bookingId (T-1216, db/repo/send-state.ts: the covering texts consent row picked as v1.2 picks it, by default 35, then its channel, turn_id, handle_id and booking_id and its turn's handle_id, read in sendState's one read-only transaction as rosie_job with no business scope) runs there too (T-1218): every v1.8 fixture through db/repo after its given, the chains running v1's reserve, plan and claim steps as well as commitTurn, each answering its own fixture's outcome (the claim through K-05 v1's own claimOutbox, which answers v1's claimed rows, and after the held reserve the saved-time clock row item 8 gives it, which db/repo's reserve does not write yet); each accepted request giving its outcome, valid at v1.8, each sendState answer valid at sendState.v1dot8Response, fromContact and bookingId always stated; and each refused answer (who gave the yes left out, its booking left out, a STOP read as the person's own yes) answered put right in its twin's state. v1.9's markPart with item 48's repeatedDelivery (T-1227, db/repo/outbox.ts markPartV12: on a delivery receipt that repeats a recorded delivery, whether that delivery was the row's first, no other part try of the row holding an earlier delivered_at and a tie counting as first, and the part try's stored delivered_at, read in the mark's one transaction as rosie_job with no business scope from the part tries it locks, nothing written; null on every other answer) runs there too (T-1232): every v1.9 fixture through db/repo after its given, the chains running v1's commitTurn and v1.2's plan, claim, marks and armClock, each answering its own fixture's outcome (an earlier mark as v1.9 answers it, its outcome with repeatedDelivery null and nothing else changed); each accepted request giving its outcome, valid at v1.9 as a markPart.exchange, each answer valid at markPart.v1dot9Response, repeatedDelivery and row always stated; a repeat writing nothing, and the delivery it names being the part try's as the tables hold it; each refused answer (what a repeat repeats left out, a repeat that says firstDelivery) answered put right in its twin's state; and refuse-mark-delivered-repeat-null's receipt, in its own given, answered as its twin mark-a7-03-poll-delivered-repeat answers it, nothing written.",
   },
   {
     id: "consumer-action-layer",
@@ -1840,7 +1876,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-046 actor",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125). From v1.8 the dispatcher's send-state port (runtime/src/wiring/real.ts sendStateOf, T-562) maps textsConsent's fromContact and bookingId across unchanged when the answer holds them and leaves them out when it does not, never deriving stopped, or its end, from textsConsent (STATE note 10); limit 8 reads them as its yesAfterStop does: a yes lifts a stop for a row only when fromContact is true and the yes is newer than the stop, for every row when it names no business (START), else only for a row about the booking it names, and a missing field is not known and lifts nothing; through the port and limit 8, send-state-stop-row and send-state-own-yes-one-booking drop their row, and send-state-business-yes and send-state-own-start let it on to the other checks (C-124, C-125: T-1217).",
+      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125). From v1.8 the dispatcher's send-state port (runtime/src/wiring/real.ts sendStateOf, T-562) maps textsConsent's fromContact and bookingId across unchanged when the answer holds them and leaves them out when it does not, never deriving stopped, or its end, from textsConsent (STATE note 10); limit 8 reads them as its yesAfterStop does: a yes lifts a stop for a row only when fromContact is true and the yes is newer than the stop, for every row when it names no business (START), else only for a row about the booking it names, and a missing field is not known and lifts nothing; through the port and limit 8, send-state-stop-row and send-state-own-yes-one-booking drop their row, and send-state-business-yes and send-state-own-start let it on to the other checks (C-124, C-125: T-1217). From v1.9 the dispatcher's receipt handling (runtime/src/dispatch/dispatcher.ts handleDeliveryReceipt, over the outbox port runtime/src/wiring/real.ts realOutbox, which maps repeatedDelivery across unchanged, as it maps row) hands a delivered mark to the clock arming when firstDelivery is true, as before, or when it is repeated and repeatedDelivery.firstOfRow is true, as a first delivery delivered at repeatedDelivery.deliveredAt, named by the answer's row, part, try and openQuestionId, never by the receipt; and nothing otherwise: a repeat of a later part's delivery, repeatedDelivery null, or an answer without the field, so a missing field is never read as a first delivery; through the port and the receipt handling, mark-a7-03-delivered-repeat arms the clock once, at the stored time, by arm-clock-a7-03-after-4006's request, and mark-a7-03-poll-delivered-repeat hands nothing on (C-124, C-055: T-1228).",
   },
   {
     id: "consumer-release",
@@ -2147,8 +2183,8 @@ describe("data-access sides: the list where each producer and consumer side is a
     }
     const named = WRITTEN_FOR.flatMap((version) => groupsOf(version).flatMap((group) => taskIds(group.text)));
     for (const task of COVERED_HERE) expect(named, task).toContain(task);
-    // The producer's database side of v1.3, v1.4, v1.6, v1.7 and v1.8 names the builds it runs, beside this file.
-    for (const task of ["T-1138", "T-1161", "T-1197", "T-1212", "T-1216"]) {
+    // The producer's database side of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 names the builds it runs, beside this file.
+    for (const task of ["T-1138", "T-1161", "T-1197", "T-1212", "T-1216", "T-1227"]) {
       expect(producer.needs, task).toContain(task);
     }
     expect(producer.needs).toContain("data-access.v1.db-side.test.ts");

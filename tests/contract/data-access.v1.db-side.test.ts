@@ -1,16 +1,19 @@
-// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7 and v1.8 (T-1169; T-1199
-// for v1.6; T-1214 for v1.7; T-1218 for v1.8; DL-348, DL-373, DL-398, DL-444, DL-456; contracts/data-access/README.md
-// sections "v1.3", "v1.4", "v1.6", "v1.7" and "v1.8", their "Consumers of" lists, "Fixtures", and "Producers and
-// consumers").
+// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 (T-1169;
+// T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474;
+// contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8" and "v1.9", their "Consumers of"
+// lists, "Fixtures", and "Producers and consumers").
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
 // (T-1138, db/repo/turn-face-reads.ts), v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts), v1.6's
 // businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: the row's business's sensitive switch, read
 // from K-23's company_kinds; README item 45), v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: a number's text
-// opens its chat, writing its phone row and one phone.chat_opened entry; README item 46) and v1.8's sendState (T-1216,
+// opens its chat, writing its phone row and one phone.chat_opened entry; README item 46), v1.8's sendState (T-1216,
 // db/repo/send-state.ts: limit 8's read, whose texts consent row says who gave the yes and for which booking,
-// fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47). v1.5 adds no
+// fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47) and v1.9's
+// markPart (T-1227, db/repo/outbox.ts markPartV12: a delivery receipt that repeats a recorded delivery says what it
+// repeats, repeatedDelivery, whether that delivery was the row's first and when, read from the delivered_at of the
+// row's part tries with nothing written, and null on every other answer; README item 48: REPEAT, MARKS). v1.5 adds no
 // database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
 // fixtures/index.json whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned
 // list or count (DL-124, DL-125), against local PostgreSQL with every migration applied to a fresh schema
@@ -25,28 +28,36 @@
 //     that holds it are valid against the schema of the entry's own version, a v1.8 sendState answer against
 //     sendState.v1dot8Response, which states fromContact and bookingId always (CONSENT_SOURCE). For a call that writes
 //     (WRITERS: v1.7's openChatOnText), the tables then hold what the answer gives: the row as the call leaves it and
-//     the one entry it appends, or nothing written. Two answers are compared otherwise, each with a field a later
-//     version adds, never with one dropped: db/repo answers a readOutboxRow exchange of a version before v1.6 as v1.6
-//     does, which always states businessSensitive (SWITCH), so its answer is the fixture's outcome, whole, with
-//     businessSensitive null and nothing else changed (the exchange's world holds no kind of work, checked before the
-//     read), valid at v1.6, whose readOutboxRow.v1dot6Response is a v1.6 answer; and a v1.1 claim a chain runs first is
-//     answered as v1.2 does, each claimed row naming its port (PORT), valid at v1.2;
+//     the one entry it appends, or nothing written. A v1.9 markPart answer is judged by markPart.v1dot9Response, which
+//     states repeatedDelivery and the row always (REPEAT), and the outbox then holds what it gives (MARKS): a repeat
+//     wrote nothing, the row is the answer's, a recorded delivery is the part try's at the receipt's time, and the
+//     delivery a repeat names is the part try's as stored, the row's first by the stored times. Three answers are
+//     compared otherwise, each with a field a later version adds, never with one dropped: db/repo answers a
+//     readOutboxRow exchange of a version before v1.6 as v1.6 does, which always states businessSensitive (SWITCH), so
+//     its answer is the fixture's outcome, whole, with businessSensitive null and nothing else changed (the exchange's
+//     world holds no kind of work, checked before the read), valid at v1.6, whose readOutboxRow.v1dot6Response is a
+//     v1.6 answer; a v1.1 claim a chain runs first is answered as v1.2 does, each claimed row naming its port (PORT),
+//     valid at v1.2; and a mark of a version before v1.9 a chain runs first is answered as v1.9 does, its outcome with
+//     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
 //     written;
-//   - each refused answer (its definition a call's response, v1.6's readOutboxRow.v1dot6Response or v1.8's
-//     sendState.v1dot8Response): in the state of the accepted exchange that answers the same read (its twin), db/repo's
-//     answer is valid against the refused entry's own definition, at the version db/repo answers the twin, which
-//     refuses the fixture too, and it differs from the refused fixture only at the fault the fixture carries (and at
-//     businessSensitive alone where db/repo answers an earlier twin as v1.6): the repo answers it put right, never as it
-//     stands;
-//   - each refused exchange (v1.7's refuse-open-chat-stopped-number): in its own given, its twin's but for its note,
-//     db/repo answers its request with the twin's outcome, which differs from the refused one only at its fault, the
-//     exchange with that answer is accepted, and nothing is written.
+//   - each refused answer (its definition a call's response, v1.6's readOutboxRow.v1dot6Response, v1.8's
+//     sendState.v1dot8Response or v1.9's markPart.v1dot9Response): in the state of the accepted exchange that answers
+//     the same read or mark (its twin), db/repo's answer is valid against the refused entry's own definition, at the
+//     version db/repo answers the twin, which refuses the fixture too, and it differs from the refused fixture only at
+//     the fault the fixture carries (and at businessSensitive alone where db/repo answers an earlier twin as v1.6): the
+//     repo answers it put right, never as it stands;
+//   - each refused exchange (v1.7's refuse-open-chat-stopped-number, v1.9's refuse-mark-delivered-repeat-null): in its
+//     own given, its twin's but for its note, db/repo answers its request with the twin's outcome, which differs from
+//     the refused one only at its fault, the exchange with that answer is accepted, and nothing is written (for a mark,
+//     to the outbox, its claims, the clock rows or the log: MARKS).
 // So a call of db/repo that drifts from the frozen contract fails this test. The repo's own tests (db/repo/*.int.test.ts)
 // hold the rest of the producer's side for these calls: other businesses' rows, the column lists, the roles refused,
 // for openChatOnText parallel texts, a STOP and a START around the call, and its transient answers, and for sendState
 // the rows no v1.8 fixture shows (a yes by text in another handle's turn, a page's yes, an email contact's yes, a START
-// with no turn beside a yes with no turn that is not one).
+// with no turn beside a yes with no turn that is not one), and for markPart the repeats no v1.9 fixture shows (two parts
+// delivered at one time, a receipt recorded after a later-timed one, a second report at another time, a repeated sent
+// and failed mark: db/repo/outbox.int.test.ts, T-1227).
 //
 // It needs PostgreSQL: `npm run db:up` locally (DATABASE_URL, else the local Docker database when CI is unset), and the
 // merge check's service database (DATABASE_URL) in CI.
@@ -62,8 +73,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { openChatOnText } from "../../db/repo/chat-open";
 import { resolvePrimaryUrl } from "../../db/repo/client";
+import { armClock } from "../../db/repo/clocks";
 import { commitTurn } from "../../db/repo/commit-turn";
-import { claimOutbox, claimOutboxV12, markRowV12, writePlan } from "../../db/repo/outbox";
+import { claimOutbox, claimOutboxV12, markPartV12, markRowV12, writePlan } from "../../db/repo/outbox";
 import { reserve } from "../../db/repo/reservations";
 import {
   readBusinessOwner,
@@ -95,10 +107,10 @@ const SHOPS_DIR = path.join(REPO_ROOT, "fixtures", "v1", "test-kit", "shops");
 const SLOW = { timeout: 60_000 };
 
 /**
- * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212) and v1.8
- * (T-1216). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478), and v1.5 has none.
+ * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216)
+ * and v1.9 (T-1227). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478), and v1.5 has none.
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9"];
 
 interface Given {
   k04Seeds: string[];
@@ -168,11 +180,12 @@ function defOf(entry: FixtureEntry): { call: string; part: string } {
 
 /**
  * The parts of a definition that name an answer: a call's response; v1.6's readOutboxRow.v1dot6Response, the answer a
- * v1.6 call gives (README item 45), which refuses refuse-outbox-row-switch-left-out; and v1.8's
+ * v1.6 call gives (README item 45), which refuses refuse-outbox-row-switch-left-out; v1.8's
  * sendState.v1dot8Response, the answer a v1.8 call gives (item 47), which refuses refuse-send-state-yes-source-left-out
- * and refuse-send-state-booking-left-out.
+ * and refuse-send-state-booking-left-out; and v1.9's markPart.v1dot9Response, the answer a v1.9 call gives (item 48),
+ * which refuses refuse-mark-repeat-delivery-left-out.
  */
-const ANSWER_PARTS: readonly string[] = ["response", "v1dot6Response", "v1dot8Response"];
+const ANSWER_PARTS: readonly string[] = ["response", "v1dot6Response", "v1dot8Response", "v1dot9Response"];
 const isAnswerDef = (entry: FixtureEntry): boolean => ANSWER_PARTS.includes(defOf(entry).part);
 
 /** A version's major and minor number: v1.3 is [1, 3]. */
@@ -278,6 +291,49 @@ const CONSENT_SOURCE = {
 } as const;
 
 // ---------------------------------------------------------------------------------------------------------------
+// v1.9's repeatedDelivery on every markPart answer (README item 48)
+
+/**
+ * v1.9 (T-1226): markPart's answer to a delivery receipt that repeats a recorded delivery says what it repeats,
+ * repeatedDelivery, and a v1.9 producer "always writes the field ... and checks every answer against
+ * markPart.v1dot9Response" (README "Consumers of v1.9"). db/repo's markPartV12 is that producer (T-1227), so its answer
+ * at v1.9 or later is judged by that definition, which requires the field and the row, never by markPart.response
+ * alone, which also takes an answer of v1 to v1.8 with neither. It states the field for an exchange of every version,
+ * so a mark of an earlier version a chain runs first (v1.2's marks of A7-03's two parts, before every v1.9 exchange:
+ * README "Fixtures", v1.9), whose outcome leaves it out, is answered as v1.9 answers it: null, since none of them
+ * repeats a delivery (default 87). Every mark that runs here states its row (v1.1 item 15); v1's, which state none, are
+ * in no chain.
+ */
+const REPEAT = {
+  call: "markPart",
+  version: "v1.9",
+  field: "repeatedDelivery",
+  answerDef: "markPart.v1dot9Response",
+} as const;
+
+/** Whether an exchange is a delivery receipt answered repeated: the one answer that names what it repeats (item 48). */
+const repeatsDelivery = (exchange: Exchange): boolean =>
+  exchange.call === REPEAT.call &&
+  exchange.request.outcome === "delivered" &&
+  exchange.outcome.repeated === true;
+
+/** Whether db/repo answers an exchange with the field its version leaves out: a markPart answer before v1.9. */
+const addsRepeat = (entry: FixtureEntry, exchange: Exchange): boolean =>
+  exchange.call === REPEAT.call && !isError(exchange.outcome) && isBefore(entry.version, REPEAT.version);
+
+/**
+ * An earlier mark's outcome as v1.9 answers it: repeatedDelivery null, added whole. An earlier exchange that repeats a
+ * delivery is answered with the delivery the record holds, which its fixture does not state, so it is a broken test,
+ * never answered null here.
+ */
+function withRepeat(exchange: Exchange): Record<string, Json> {
+  if (repeatsDelivery(exchange)) {
+    throw new Error("an earlier mark that repeats a delivery: what it repeats is the record's, never null");
+  }
+  return { ...exchange.outcome, [REPEAT.field]: null };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // The schemas: every schema under contracts/, as contracts:check loads them, so each $ref resolves; one strict
 // validator (Ajv 2020-12), each definition taken from the schema of the version an entry lists
 
@@ -312,7 +368,8 @@ function errorsOf(validate: ValidateFunction, value: unknown): string[] {
 /**
  * The definition an answer is judged by at `version`: its call's errors when it is one, else the answer its call gives
  * there, which from v1.6 on is readOutboxRow.v1dot6Response for readOutboxRow (README item 45), from v1.8 on
- * sendState.v1dot8Response for sendState (item 47), and else its response.
+ * sendState.v1dot8Response for sendState (item 47), from v1.9 on markPart.v1dot9Response for markPart (item 48), and
+ * else its response.
  */
 function answerDefOf(version: string, call: string, answer: unknown): string {
   if (isError(answer)) return `${call}.errors`;
@@ -320,6 +377,7 @@ function answerDefOf(version: string, call: string, answer: unknown): string {
   if (call === CONSENT_SOURCE.call && !isBefore(version, CONSENT_SOURCE.version)) {
     return CONSENT_SOURCE.answerDef;
   }
+  if (call === REPEAT.call && !isBefore(version, REPEAT.version)) return REPEAT.answerDef;
   return `${call}.response`;
 }
 
@@ -343,12 +401,14 @@ interface DbCall {
 const byBusiness = (request: Record<string, Json>): Role => (request.businessId === null ? "job" : "app");
 
 /**
- * The calls v1.3, v1.4 and v1.7 add, the call v1.8 changes, and the commit their chains run: items 34 to 36 (v1.3), 37
- * to 43 (v1.4), 46 (v1.7) and 47 (v1.8), each in the role its row of the README's table names; commitTurn per write, on
- * the runtime side as rosie_job (README "Scope"). v1.6 adds no call: businessSensitive is readOutboxRow's own (item 45,
- * in item 35's transaction). openChatOnText runs on the runtime side, as rosie_job with no business scope (item 46's
- * table: phones and handles are scoped none), and so does sendState, item 47's read inside item 28's read-only
- * transaction (README "Consumers of v1.8"; v1.2 default 25).
+ * The calls v1.3, v1.4 and v1.7 add, the calls v1.8 and v1.9 change, and the commit their chains run: items 34 to 36
+ * (v1.3), 37 to 43 (v1.4), 46 (v1.7), 47 (v1.8) and 48 (v1.9), each in the role its row of the README's table names;
+ * commitTurn per write, on the runtime side as rosie_job (README "Scope"). v1.6 adds no call: businessSensitive is
+ * readOutboxRow's own (item 45, in item 35's transaction). openChatOnText runs on the runtime side, as rosie_job with no
+ * business scope (item 46's table: phones and handles are scoped none), and so does sendState, item 47's read inside
+ * item 28's read-only transaction (README "Consumers of v1.8"; v1.2 default 25). markPart is the dispatcher's
+ * markPartV12, which answers as v1.9 does (T-1227), item 48 inside item 15's one transaction as rosie_job with no
+ * business scope (README "Consumers of v1.9"); the v1.2 marks a chain runs first go through it too (REPEAT).
  */
 const DB_CALLS: Readonly<Record<string, DbCall>> = {
   commitTurn: { role: () => "job", run: commitTurn },
@@ -364,6 +424,7 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
   readBusinessZone: { role: () => "app", run: readBusinessZone },
   openChatOnText: { role: () => "job", run: openChatOnText },
   sendState: { role: () => "job", run: sendState },
+  markPart: { role: () => "job", run: markPartV12 },
 };
 
 /**
@@ -374,13 +435,17 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
  * v1.7) and Alex's confirmation before every v1.8 read ("Consumers of v1.8": "its chains running v1's plan and claim
  * steps"), each on the runtime side as rosie_job (v1 items 2 to 4; v1.1 items 13 and 16): writePlan, the same in every
  * version, and the claim and the mark through v1.2's calls, which answer v1.1's claim (PORT) and its waitingChat mark. A
- * v1 claim runs through K-05 v1's own (V1_CHAIN_CALLS).
+ * v1 claim runs through K-05 v1's own (V1_CHAIN_CALLS). A7-03's chain, before every v1.9 exchange ("Consumers of v1.9":
+ * "its chains running v1's commitTurn and v1.2's plan, claim and marks"), runs the plan and v1.2's claim the same way,
+ * and before the poll goes the arming of the question's clock at the words' receipt (arm-clock-a7-03-after-4006: v1
+ * item 5), armClock on the runtime side as rosie_job.
  */
 const CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
   reserve: { role: () => "app", run: reserve },
   writePlan: { role: () => "job", run: writePlan },
   claimOutbox: { role: () => "job", run: claimOutboxV12 },
   markRow: { role: () => "job", run: markRowV12 },
+  armClock: { role: () => "job", run: armClock },
 };
 
 /**
@@ -482,6 +547,15 @@ const RESPONSE_TWINS: Readonly<Record<string, { twin: string; part?: string; fau
     twin: "send-state-stop-row.json",
     faults: ["textsConsent.fromContact"],
   },
+  // v1.9: each is the words' repeat's outcome, put right (README "Consumers of v1.9")
+  "invalid/refuse-mark-repeat-delivery-left-out.json": {
+    twin: "mark-a7-03-delivered-repeat.json",
+    faults: ["repeatedDelivery"],
+  },
+  "invalid/refuse-mark-repeat-says-first-delivery.json": {
+    twin: "mark-a7-03-delivered-repeat.json",
+    faults: ["firstDelivery"],
+  },
 };
 
 /**
@@ -495,6 +569,12 @@ const EXCHANGE_TWINS: Readonly<Record<string, { twin: string; faults: string[] }
   "invalid/refuse-open-chat-stopped-number.json": {
     twin: "open-chat-ben-stopped.json",
     faults: ["result", "phone", "event"],
+  },
+  // v1.9: the poll's receipt again, answered as if it repeated no delivery (README "Consumers of v1.9": twin
+  // mark-a7-03-poll-delivered-repeat, its outcome, nothing written)
+  "invalid/refuse-mark-delivered-repeat-null.json": {
+    twin: "mark-a7-03-poll-delivered-repeat.json",
+    faults: ["repeatedDelivery"],
   },
 };
 
@@ -845,6 +925,76 @@ export function writtenProblems(
   return problems;
 }
 
+/**
+ * What a mark could write, as the tables' owner reads it, each in a fixed order (MARKS): the outbox rows, their part
+ * tries and their claims (v1 item 4, v1.1 item 15), and beside them the clock rows and the log, which no mark writes
+ * (the caller arms the clock: v1 item 5; item 48 "It writes nothing").
+ */
+interface Marks {
+  rows: Row[];
+  parts: Row[];
+  claims: Row[];
+  clocks: Row[];
+  log: Row[];
+}
+
+async function marks(): Promise<Marks> {
+  const rows = await db.sql<Row[]>`select * from outbox_rows order by id collate "C"`;
+  const parts = await db.sql<Row[]>`select * from outbox_parts order by idempotency_key collate "C"`;
+  const claims = await db.sql<Row[]>`select * from outbox_claims order by outbox_row_id collate "C"`;
+  const clocks = await db.sql<Row[]>`select * from clock_rows order by id collate "C"`;
+  const log = await db.sql<Row[]>`select * from event_log order by id collate "C"`;
+  return { rows: [...rows], parts: [...parts], claims: [...claims], clocks: [...clocks], log: [...log] };
+}
+
+/**
+ * README items 4, 15 and 48, read from the tables (MARKS). Each way the tables after a mark differ from what its answer
+ * gives, none when they hold it: an error and a repeat wrote nothing (no row, part, claim, clock row or entry changed);
+ * the row the tables hold is the answer's row, its state and version; a delivery receipt that is recorded leaves the
+ * part try the answer names (by item 3's key, <row>/<part>/<try>) delivered at the receipt's at; and the delivery a
+ * repeat names is that part try's delivered_at as stored (default 86), the row's first when no other part try of the
+ * row holds an earlier one, a tie counting as first (default 85).
+ */
+export function markProblems(before: Marks, after: Marks, exchange: Exchange, answer: unknown): string[] {
+  if (!isRecord(answer) || isError(answer)) {
+    return isDeepStrictEqual(after, before) ? [] : ["an answer that marks nothing wrote"];
+  }
+  const problems: string[] = [];
+  if (answer.repeated === true && !isDeepStrictEqual(after, before)) problems.push("a repeat wrote");
+  const stored = after.rows.find((row) => row.id === answer.outboxRowId);
+  const row = stored === undefined ? undefined : { state: stored.state, version: stored.version };
+  if (!isDeepStrictEqual(row, answer.row)) problems.push("the row the tables hold is not the answer's");
+  const key = `${String(answer.outboxRowId)}/${String(answer.partNo)}/${String(answer.tryNo)}`;
+  const tries = after.parts.filter((part) => part.outbox_row_id === answer.outboxRowId);
+  const deliveredAt = tries.find((part) => part.idempotency_key === key)?.delivered_at;
+  const repeats = answer[REPEAT.field];
+  if (isRecord(repeats)) {
+    if (utcOf(deliveredAt) !== repeats.deliveredAt) {
+      problems.push(
+        `the part try holds delivered_at ${String(utcOf(deliveredAt))}, not the answer's ${String(repeats.deliveredAt)}`,
+      );
+    }
+    const first =
+      deliveredAt instanceof Date &&
+      tries.every(
+        (part) =>
+          !(part.delivered_at instanceof Date) || part.delivered_at.getTime() >= deliveredAt.getTime(),
+      );
+    if (repeats.firstOfRow !== first) {
+      problems.push(
+        `the answer says firstOfRow ${String(repeats.firstOfRow)}, and by the times the tables hold it is ${String(first)}`,
+      );
+    }
+  } else if (
+    exchange.request.outcome === "delivered" &&
+    answer.repeated === false &&
+    utcOf(deliveredAt) !== exchange.request.at
+  ) {
+    problems.push("the part try is not delivered at the receipt's at");
+  }
+  return problems;
+}
+
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
 
@@ -960,7 +1110,8 @@ async function runExchange(exchange: Exchange, call = callOf(exchange.call)): Pr
 
 /**
  * What db/repo answers an exchange in its world: the fixture's outcome, compared whole; where it adds the port
- * (addsPort), that outcome with each claimed row's port and nothing else changed; where it adds the switch
+ * (addsPort), that outcome with each claimed row's port and nothing else changed; where it adds what a mark repeats
+ * (addsRepeat), that outcome with repeatedDelivery null and nothing else changed; where it adds the switch
  * (addsSwitch), that outcome with businessSensitive null and nothing else changed, never with the field dropped from
  * db/repo's answer. Null is item 45's answer for a business with no kinds of work, and the world of such an exchange
  * holds none (K-04's seeds hold no company_kinds row), which is checked here, as the tables' owner, whom no policy binds.
@@ -974,6 +1125,13 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
     ).toBe(true);
     return withPorts(exchange.outcome);
   }
+  if (addsRepeat(entry, exchange)) {
+    expect(
+      Object.hasOwn(exchange.outcome, REPEAT.field),
+      `${entry.file}'s outcome states no repeatedDelivery`,
+    ).toBe(false);
+    return withRepeat(exchange);
+  }
   if (!addsSwitch(entry, exchange)) return exchange.outcome;
   expect(Object.hasOwn(exchange.outcome, SWITCH.field), `${entry.file}'s outcome states no switch`).toBe(
     false,
@@ -986,9 +1144,9 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
 /**
  * Loads a fixture's given into the emptied schema: its seeds and their chains as the tables' owner, in one
  * transaction, then the exchanges of its after chain through db/repo (stepCallOf), each answering its own fixture's
- * outcome (as answerOf reads it; a claim answered as v1.2 does valid at v1.2, and one answered by K-05 v1's own call
- * valid at v1), a held time followed by its saved-time clock row (SAVED_TIME), then the rows its note lists
- * (NOTED_ROWS), as the tables' owner, in one transaction.
+ * outcome (as answerOf reads it; a claim answered as v1.2 does valid at v1.2, one answered by K-05 v1's own call
+ * valid at v1, and an earlier mark answered as v1.9 does valid at v1.9), a held time followed by its saved-time clock
+ * row (SAVED_TIME), then the rows its note lists (NOTED_ROWS), as the tables' owner, in one transaction.
  */
 async function given(file: string): Promise<Exchange> {
   const chain = chainOf(file);
@@ -1009,6 +1167,9 @@ async function given(file: string): Promise<Exchange> {
     if (runsAtV1(step)) {
       expect(answerErrors(V1, before.call, answer), `${step}, answered at v1`).toEqual([]);
     }
+    if (addsRepeat(entryOf(step), before)) {
+      expect(answerErrors(REPEAT.version, before.call, answer), `${step}, answered at v1.9`).toEqual([]);
+    }
     if (holdsTime(before)) await writeSavedTimeClock(before);
   }
   const noted = NOTED_ROWS[file]?.() ?? [];
@@ -1022,7 +1183,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6, v1.7 and v1.8, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -1094,6 +1255,10 @@ describe("data-access database side: the versions with one, each entry selected 
       "invalid/refuse-send-state-booking-left-out.json",
       "invalid/refuse-send-state-yes-source-left-out.json",
     ]);
+    expect(
+      answers.filter((entry) => entry.def === REPEAT.answerDef).map((entry) => entry.file),
+      "v1.9's answer refused by its own definition",
+    ).toEqual(["invalid/refuse-mark-repeat-delivery-left-out.json"]);
     for (const [file, { twin }] of Object.entries(RESPONSE_TWINS)) {
       expect(entryOf(twin).expect, `${file}'s twin`).toBe("accept");
       expect(exchangeOf(twin).call, `${file}'s twin`).toBe(defOf(entryOf(file)).call);
@@ -1239,6 +1404,86 @@ describe("data-access database side: the versions with one, each entry selected 
     expect(answerDefOf("v1.7", CONSENT_SOURCE.call, {})).toBe(`${CONSENT_SOURCE.call}.response`);
   });
 
+  it("judges each v1.9 markPart answer by markPart.v1dot9Response, which refuses one with repeatedDelivery or its row left out", () => {
+    const side = sideAccepted.filter((entry) => exchangeOf(entry.file).call === REPEAT.call);
+    expect(side.length, "v1.9's marks").toBeGreaterThan(0);
+    const response = validatorOf(REPEAT.version, `${REPEAT.call}.response`);
+    for (const entry of side) {
+      const exchange = exchangeOf(entry.file);
+      const { outcome } = exchange;
+      expect(entry.version, entry.file).toBe(REPEAT.version);
+      expect(answerDefOf(entry.version, REPEAT.call, outcome), entry.file).toBe(REPEAT.answerDef);
+      expect(answerErrors(entry.version, REPEAT.call, outcome), entry.file).toEqual([]);
+      // Item 48: an object exactly on a delivery receipt answered repeated, and null on every other answer.
+      expect(Object.hasOwn(outcome, REPEAT.field), `${entry.file}: ${REPEAT.field} stated`).toBe(true);
+      expect(isRecord(outcome[REPEAT.field]), `${entry.file}: what it repeats`).toBe(
+        repeatsDelivery(exchange),
+      );
+      if (!repeatsDelivery(exchange)) expect(outcome[REPEAT.field], entry.file).toBeNull();
+      for (const field of [REPEAT.field, "row"]) {
+        const leftOut = { ...outcome };
+        Reflect.deleteProperty(leftOut, field);
+        expect(
+          answerErrors(entry.version, REPEAT.call, leftOut),
+          `${entry.file} with ${field} left out`,
+        ).not.toEqual([]);
+        expect(
+          errorsOf(response, leftOut),
+          `${entry.file} with ${field} left out, as an earlier answer`,
+        ).toEqual([]);
+      }
+    }
+    // Each kind of answer is shown: a repeat of the row's first delivery, one of a later part's, and a mark that repeats
+    // none.
+    const repeats = side.map((entry) => exchangeOf(entry.file)).filter(repeatsDelivery);
+    expect(
+      repeats.map((exchange) => String(valueAt(exchange.outcome, `${REPEAT.field}.firstOfRow`))).sort(),
+      "the repeats' firstOfRow",
+    ).toEqual(["false", "true"]);
+    expect(side.length, "a mark that repeats no delivery").toBeGreaterThan(repeats.length);
+    // Before v1.9 a markPart answer is judged by its response, which has no such field.
+    expect(answerDefOf("v1.8", REPEAT.call, {})).toBe(`${REPEAT.call}.response`);
+  });
+
+  it("answers an earlier mark a chain runs first as v1.9 does: its outcome and repeatedDelivery null, valid at v1.9 alone", () => {
+    const steps = [...new Set(sideAccepted.flatMap((entry) => chainOf(entry.file).steps))];
+    const earlier = steps.filter((step) => addsRepeat(entryOf(step), exchangeOf(step)));
+    expect(earlier.length, "earlier marks run first").toBeGreaterThan(0);
+    const asExchange = validatorOf(REPEAT.version, `${REPEAT.call}.exchange`);
+    for (const step of earlier) {
+      const exchange = exchangeOf(step);
+      expect(repeatsDelivery(exchange), `${step}: it repeats no delivery`).toBe(false);
+      expect(isRecord(exchange.outcome.row), `${step}: its row stated`).toBe(true);
+      const answer = withRepeat(exchange);
+      expect(differences(exchange.outcome, answer), `${step}: one field more, none fewer`).toEqual([
+        REPEAT.field,
+      ]);
+      expect(answer[REPEAT.field], step).toBeNull();
+      expect(answerErrors(REPEAT.version, exchange.call, answer), `${step} at v1.9`).toEqual([]);
+      expect(
+        errorsOf(asExchange, { ...exchange, outcome: answer }),
+        `${step}: the exchange with db/repo's answer, at v1.9`,
+      ).toEqual([]);
+      expect(
+        answerErrors(entryOf(step).version, exchange.call, answer),
+        `${step} at ${entryOf(step).version}, whose answer is closed`,
+      ).not.toEqual([]);
+      expect(
+        answerErrors(REPEAT.version, exchange.call, exchange.outcome),
+        `${step}: v1.9's answer refuses its outcome with the field left out`,
+      ).not.toEqual([]);
+    }
+    // A repeated delivery is never answered null: its outcome with null is refused as an exchange, and withRepeat
+    // refuses to build it.
+    const repeat = exchangeOf("mark-a7-03-delivered-repeat.json");
+    expect(repeatsDelivery(repeat)).toBe(true);
+    expect(
+      errorsOf(asExchange, { ...repeat, outcome: { ...repeat.outcome, [REPEAT.field]: null } }),
+      "a repeated delivery answered null",
+    ).not.toEqual([]);
+    expect(() => withRepeat(repeat)).toThrow("never null");
+  });
+
   it("answers an earlier readOutboxRow exchange as v1.6 does: its outcome and businessSensitive null, valid at v1.6 alone", () => {
     const earlier = sideAccepted.filter((entry) => addsSwitch(entry, exchangeOf(entry.file)));
     expect(earlier.length, "earlier readOutboxRow answers").toBeGreaterThan(0);
@@ -1305,7 +1550,7 @@ describe("data-access database side: the versions with one, each entry selected 
   });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7 and v1.8 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -1315,6 +1560,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
         const expected = await answerOf(entry, exchange);
         const version = answeredAt(entry, exchange);
         const before = WRITERS.includes(exchange.call) ? await written() : null;
+        const marked = exchange.call === REPEAT.call ? await marks() : null;
         sent.length = 0;
         const answer = await runExchange(exchange);
         expect(answer).toEqual(expected);
@@ -1330,9 +1576,57 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
             "what the tables then hold",
           ).toEqual([]);
         }
+        if (marked !== null) {
+          expect(markProblems(marked, await marks(), exchange, answer), "what the outbox then holds").toEqual(
+            [],
+          );
+        }
       },
     );
   }
+
+  it(
+    "has the mark check fire: a repeat or an error that wrote, a row, a stored time and a first delivery other than the answer's",
+    SLOW,
+    async () => {
+      const delivery = await given("mark-a7-03-poll-delivered.json");
+      const sentOnly = await marks();
+      const recorded = await runExchange(delivery);
+      const delivered = await marks();
+      expect(recorded).toEqual(delivery.outcome);
+      expect(delivered, "the poll's delivery was recorded").not.toEqual(sentOnly);
+      expect(markProblems(sentOnly, delivered, delivery, recorded)).toEqual([]);
+      const later = { ...delivery, request: { ...delivery.request, at: "2026-10-23T14:05:07Z" } };
+      expect(markProblems(sentOnly, delivered, later, recorded)).toEqual([
+        "the part try is not delivered at the receipt's at",
+      ]);
+      // The poll's receipt again, over the tables as the delivery left them: its fixture's answer, a repeat.
+      const repeat = exchangeOf("mark-a7-03-poll-delivered-repeat.json");
+      expect(repeat.given.after).toEqual(["mark-a7-03-poll-delivered.json"]);
+      expect(markProblems(delivered, delivered, repeat, repeat.outcome)).toEqual([]);
+      expect(markProblems(sentOnly, delivered, repeat, repeat.outcome)).toEqual(["a repeat wrote"]);
+      const notFound = { error: "notFound", table: "outbox_parts", rowId: "linq-msg-demo-0302" };
+      expect(markProblems(delivered, delivered, repeat, notFound)).toEqual([]);
+      expect(markProblems(sentOnly, delivered, repeat, notFound)).toEqual([
+        "an answer that marks nothing wrote",
+      ]);
+      expect(
+        markProblems(delivered, delivered, repeat, {
+          ...repeat.outcome,
+          row: { state: "delivered", version: 8 },
+        }),
+      ).toEqual(["the row the tables hold is not the answer's"]);
+      expect(
+        markProblems(delivered, delivered, repeat, {
+          ...repeat.outcome,
+          [REPEAT.field]: { firstOfRow: true, deliveredAt: "2026-10-23T14:05:16Z" },
+        }),
+      ).toEqual([
+        "the part try holds delivered_at 2026-10-23T14:05:06Z, not the answer's 2026-10-23T14:05:16Z",
+        "the answer says firstOfRow true, and by the times the tables hold it is false",
+      ]);
+    },
+  );
 
   it(
     "has the written check fire: a write no answer gives, an entry and a row other than the answer's",
@@ -1368,7 +1662,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7 and v1.8 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
@@ -1430,6 +1724,7 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
         expect(errorsOf(validate, refused), "refused by its definition").not.toEqual([]);
         const exchange = await given(entry.file);
         const before = await written();
+        const marked = exchange.call === REPEAT.call ? await marks() : null;
         sent.length = 0;
         const answer = await runExchange(exchange);
         expect(answer, "the twin's outcome").toEqual(exchangeOf(twin.twin).outcome);
@@ -1444,6 +1739,13 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
         expect(twinProblems(refused.outcome, answer, twin), "it differs at the fault alone").toEqual([]);
         expect(sent.length, "the call reached the database").toBeGreaterThan(0);
         expect(await written(), "nothing written").toEqual(before);
+        if (marked !== null) {
+          const after = await marks();
+          expect(after, "nothing written to the outbox, its claims, the clock rows or the log").toEqual(
+            marked,
+          );
+          expect(markProblems(marked, after, exchange, answer), "what the outbox holds").toEqual([]);
+        }
       },
     );
   }
