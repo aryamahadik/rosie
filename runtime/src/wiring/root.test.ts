@@ -1,10 +1,10 @@
-// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560), under Node
-// (Vitest project "unit"): the ports the root binds in each environment, each once and none left unbound; the check that
-// refuses a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed
+// The composition root's bindings (T-550, T-552, T-553, T-554, T-555, T-556, T-557, T-558, T-559, T-560, T-561), under
+// Node (Vitest project "unit"): the ports the root binds in each environment, each once and none left unbound; the check
+// that refuses a port bound twice or left unbound; each bound port handed to the part that calls it; and the closed
 // implementation the Worker's environments still bind for every port no join has reached (T-552 joined the Linq verify on
 // staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle reads and the guard's
-// targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer; production takes no
-// join yet).
+// targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer, T-561 finalize;
+// production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
@@ -12,6 +12,7 @@ import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
+import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
@@ -22,6 +23,7 @@ import type {
   ComposeInputRequest,
   DecideContext,
   DecideResult,
+  FinalizeMessageRequest,
   GateAndCommitRequest,
   MessagePlan,
   ParkTurnRequest,
@@ -73,6 +75,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "gate",
     "composeInput",
     "composer",
+    "finalize",
   ],
   staging: [
     "linqVerify",
@@ -86,9 +89,16 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "gate",
     "composeInput",
     "composer",
+    "finalize",
   ],
   production: [],
 };
+
+/** finalize-pass.json's request (S1-02's row of turn 1 and its plan) on a trace of its own: its caller's trace id that trace's. */
+function finalizeOneOn(traceId: string): FinalizeMessageRequest {
+  const request = structuredClone(finalizePass.request) as unknown as FinalizeMessageRequest;
+  return { ...request, caller: { ...request.caller, traceId } };
+}
 
 /** compose-input-s1-02.json's request (S1-02's row of turn 1) on a trace of its own: its caller's trace id that trace's. */
 function composeOneOn(traceId: string): ComposeInputRequest {
@@ -147,7 +157,7 @@ describe("the ports the root binds", () => {
     expect(PICKS.map((pick) => pick.port)).toEqual([...PORTS]);
   });
 
-  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input and composer to their real packages, every other port to its fake", () => {
+  it("binds every port once under test: the joined Linq verify, sealing, safety read, turn-row calls, bundle reads, targets read, frontier, decide, gate, compose input, composer and finalize to their real packages, every other port to its fake", () => {
     const root = composeRoot({
       environment: "test",
       sets: { fake: skeletonFakes().ports },
@@ -219,49 +229,29 @@ describe("the ports the root binds", () => {
     expect(root.turn.dispatcher).toBe(root.dispatcher);
   });
 
-  it("puts compose input and finalize together as the turn's Tool API, each call to its own port: compose input to the joined port (with no reads handed in, it fails closed inside the Tool API base, with no span), finalize to its fake", async () => {
+  it("puts compose input and finalize together as the turn's Tool API, each call to its own joined port: with no reads or writes handed in, each fails closed inside the Tool API base, with no span, and no double is reached", async () => {
     const fakes = skeletonFakes();
     const root = composeRoot({ environment: "test", sets: { fake: fakes.ports }, actors: null, vars: VARS });
-    const caller = {
-      kind: "turn" as const,
-      turnId: "turn-wiring",
-      requestId: "turn-wiring",
-      businessId: null,
-      personId: null,
-      traceId: "trace-wiring",
-    };
-    const trace = {} as Parameters<Ports["finalize"]["finalizeMessage"]>[1];
     const spans: Span[] = [];
-    const composeTrace = openTrace({
+    const trace = openTrace({
       openedBy: "textWebhook",
       bundleId: BUNDLE_V0,
       sink: (span) => spans.push(span),
     });
-    const compose = composeOneOn(composeTrace.traceId);
-    composeTrace.setTurn(compose.caller.turnId);
+    const compose = composeOneOn(trace.traceId);
+    trace.setTurn(compose.caller.turnId);
 
-    await expect(root.turn.toolApi.composeInput(compose, composeTrace)).rejects.toThrow(
+    await expect(root.turn.toolApi.composeInput(compose, trace)).rejects.toThrow(
       new NoDatabaseError("composeInput"),
+    );
+    await expect(root.turn.toolApi.finalizeMessage(finalizeOneOn(trace.traceId), trace)).rejects.toThrow(
+      new NoDatabaseError("finalizeMessage"),
     );
     expect(spans).toEqual([]);
     expect(fakes.compose.scopes).toEqual([]);
-    await root.turn.toolApi.finalizeMessage(
-      {
-        caller,
-        outboxRowId: "out-wiring",
-        expectVersion: 1,
-        attempt: "composed",
-        plan: {
-          row: "out-wiring",
-          channel: "imessage",
-          copyOf: null,
-          plan: { formats: ["text"], lines: [], question: null, pageType: null, threadReplyTo: null },
-        },
-      },
-      trace,
-    );
-
-    expect(fakes.face.log).toEqual(["finalize:composed:out-wiring"]);
+    expect(fakes.finalize.scopes).toEqual([]);
+    expect(fakes.finalize.writes).toEqual([]);
+    expect(fakes.face.log).toEqual([]);
   });
 });
 
@@ -292,14 +282,14 @@ describe("a port bound twice or left unbound is refused, naming the port", () =>
   });
 
   it("refuses a port whose picked implementation is not at hand", () => {
-    // Finalize: a port no join has reached yet (T-561), so the test environment picks its fake (the composer is joined,
-    // T-560).
+    // The data-access port: one no join has reached yet (T-562, T-564), so the test environment picks its fake (finalize
+    // is joined, T-561).
     const partial = Object.fromEntries(
-      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "finalize"),
+      Object.entries(skeletonFakes().ports).filter(([port]) => port !== "dataAccess"),
     ) as Partial<Ports>;
 
     expect(() => bindPorts(PICKS, "test", { ...sets, fake: partial })).toThrow(
-      new WiringError("left unbound in test: finalize (no fake implementation)"),
+      new WiringError("left unbound in test: dataAccess (no fake implementation)"),
     );
   });
 
@@ -443,6 +433,24 @@ describe("the Worker's environments", () => {
     expect(spans).toEqual([]);
   });
 
+  it("fails finalize closed with no database bound (until T-567): inside the Tool API base, before anything is read or written, with no span", async () => {
+    const root = workerRoot(workerEnv("staging"));
+    const spans: Span[] = [];
+    const trace = openTrace({
+      openedBy: "textWebhook",
+      bundleId: BUNDLE_V0,
+      sink: (span) => spans.push(span),
+    });
+    const request = finalizeOneOn(trace.traceId);
+    trace.setTurn(request.caller.turnId);
+
+    await expect(root.turn.toolApi.finalizeMessage(request, trace)).rejects.toThrow(
+      new NoDatabaseError("finalizeMessage"),
+    );
+    // The turn records the row's fillAndChecks and rewriteOrFallback spans; the base records none for finalize (DL-376).
+    expect(spans).toEqual([]);
+  });
+
   it("fails the composer and its rewrite closed with no composer bound (until J-02): before any model call, with no span", async () => {
     const root = workerRoot(workerEnv("staging"));
     const spans: Span[] = [];
@@ -504,6 +512,9 @@ describe("a closed port", () => {
     );
     await expect(closed.composer.rewrite({} as never, {} as never)).rejects.toThrow(
       new NotJoinedError("composer"),
+    );
+    await expect(closed.finalize.finalizeMessage({} as never, {} as never)).rejects.toThrow(
+      new NotJoinedError("finalize"),
     );
     await expect(closed.dataAccess.outbox.claimOutbox({} as never)).rejects.toThrow(
       new NotJoinedError("dataAccess"),

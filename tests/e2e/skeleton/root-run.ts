@@ -21,12 +21,15 @@
 //                       and what the K-05 commitTurn double wrote, its one commit through the root's turn-row port;
 //   join 9, compose     @rosie/actions' turn face's composeInput (T-1141), over a K-05 v1.6 readOutboxRow double over
 //                       what the commit wrote and test owner 1's seeded rows, and @rosie/ai's composer over the
-//                       recorded-model double's composer models: T-1175's recording 4, the JOIN run's S1-02 row (DL-347).
+//                       recorded-model double's composer models: T-1175's recording 4, the JOIN run's S1-02 row (DL-347);
+//   join 10, finalize   @rosie/actions' turn face's finalizeMessage (T-1141: T-313's finalize, T-314's fixed lines), over
+//                       K-05 doubles of readOutboxRow, readFixedLineFacts, writePlan and cancelClock over what the commit
+//                       wrote and test owner 1's seeded rows, which keep the plan and final parts written into the row.
 //
-// Every port not joined yet is on its fake (T-550). The turn's gate calls are watched on their way to the root's own
-// gateAndCommit (watchGate), which changes nothing they are sent or answer. The spans are the log lines the target
-// captures; the actor's inbox, safety state, batches and turns are read inside its Durable Object, and the K-05 doubles
-// keep the rows they wrote.
+// Every port not joined yet is on its fake (T-550). The turn's gate and finalize calls are watched on their way to the
+// root's own (watchGate; the finalize requests kept on the fake face, as its stand-in kept them), which changes nothing
+// they are sent or answer. The spans are the log lines the target captures; the actor's inbox, safety state, batches
+// and turns are read inside its Durable Object, and the K-05 doubles keep the rows they wrote.
 //
 // Inside workerd, Ajv's compiler cannot run and contracts/ is not on disk, so the trace is checked against K-08 by the code
 // T-1144 prebuilds for the Worker (prebuiltTraceCheck). Test values only (rule 9): the master's sample cast, the fictional
@@ -169,11 +172,12 @@ export function startRootRun(): RootRun {
       gateReads: fakes.gate.reads,
       composeReads: fakes.compose.reads,
       composers: fakes.composer.composers,
+      finalizeData: fakes.finalize.data,
       flags: fakeFlags([SKELETON_FLAG]),
     });
     restore = root.install();
     // After the install: the watch goes on the root's own turn deps, and comes off before them.
-    watched = watchGate(root);
+    watched = watchGate(root, fakes.face);
   } catch (error) {
     // Nothing is left capturing console.log when the root cannot be composed.
     target.close();

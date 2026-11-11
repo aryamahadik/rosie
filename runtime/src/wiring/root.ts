@@ -51,10 +51,13 @@
 // goes through the compose-input port (T-560): @rosie/actions' turn face over compose input's reads
 // (RootOptions.composeReads) and the run's pinned bundle, its inbound text the words the turn's gate request handed in,
 // as the gate port's face holds them; and its plan, and its one rewrite, through the composer port (T-560): @rosie/ai's
-// composer for the turn's bundle (RootOptions.composers), which records only its model calls' portCall spans. The turn
-// records the compose span and every fillAndChecks span while the Tool API base records none
-// (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for them. Never logged by the root: a word, a number, a key,
-// a chat id.
+// composer for the turn's bundle (RootOptions.composers), which records only its model calls' portCall spans. Each plan
+// is finalized through the finalize port (T-561): @rosie/actions' turn face over finalize's reads and writes
+// (RootOptions.finalizeData) and the run's pinned bundle, which fills its slots, adds its fixed lines, runs the claim
+// check and the message checks, and writes the plan and the final parts into the row (T-196's writePlan), or asks for the
+// one rewrite, then the step's fallback. The turn records the compose span and every fillAndChecks and rewriteOrFallback
+// span while the Tool API base records none (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for them. Never
+// logged by the root: a word, a number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -84,6 +87,7 @@ import {
   type ComposeReads,
   type Composers,
   type Deciders,
+  type FinalizeData,
   type FrontierScope,
   type GateReads,
   type HandleSealingKeyCall,
@@ -200,6 +204,15 @@ export interface RootOptions {
    * closed before any model call and no row gets a plan.
    */
   readonly composers?: Composers | null;
+  /**
+   * What finalize reads and writes with its database bound (T-561; ./real.ts FinalizeData): the Tool API's own business
+   * scope (rosie_app), and on the runtime side (rosie_job) K-05 v1.6 readOutboxRow, v1.3 readFixedLineFacts, and T-196's
+   * writePlan and cancelClock. On local PostgreSQL, @rosie/actions' pgCallScope over a rosie_app client and pgRowData's four
+   * calls over a rosie_job client (turn-face/pg/calls.ts); in a test, K-05 doubles over the rows the commit wrote and test
+   * owner 1's seeded rows; null or left out where no database is bound (the Worker until T-567), so every finalize fails
+   * closed and no row gets its final parts.
+   */
+  readonly finalizeData?: FinalizeData | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -277,6 +290,12 @@ export function composeRoot(options: RootOptions): Root {
         pinnedOf: (trace) => pinnedRuns.of(trace),
       },
       composers: options.composers,
+      // Finalize's reads and writes, and the bundle the row was committed under: the run's pinned one, else the bundle port.
+      finalize: {
+        data: options.finalizeData ?? null,
+        bundles: () => ports.bundles,
+        pinnedOf: (trace) => pinnedRuns.of(trace),
+      },
     }),
     closed: closedPorts(),
   });
@@ -324,6 +343,7 @@ export function composeRoot(options: RootOptions): Root {
         ports.gate.gateAndCommit(turnChats.onTurn(request, trace), at, trace),
       // The turn records the row's fillAndChecks span; the real compose-input port's base records none (DL-376).
       composeInput: (request, trace) => ports.composeInput.composeInput(request, trace),
+      // And its fillAndChecks and rewriteOrFallback spans around finalize; the real finalize port's base records none.
       finalizeMessage: (request, trace) => ports.finalize.finalizeMessage(request, trace),
     },
     ai: ports.decide,
@@ -447,9 +467,10 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503), and the sealing, turn-row, bundle, targets, frontier and gate ports are handed no K-05
- * call, scope or read, since no database is bound to the Worker until T-567 (Hyperdrive), so every seal fails closed and
- * the gateway answers 503 with nothing written, no turn's bundle can be pinned, no frontier runs and nothing commits; the
+ * so the gateway answers 503), and the sealing, turn-row, bundle, targets, frontier, gate, compose-input and finalize
+ * ports are handed no K-05 call, scope or read, since no database is bound to the Worker until T-567 (Hyperdrive), so
+ * every seal fails closed and the gateway answers 503 with nothing written, no turn's bundle can be pinned, no frontier
+ * runs, nothing commits and no row is composed or finalized; the
  * decide port is handed no decider until J-02, so no decide runs. The gateway's door to the handle's actor is the
  * HANDLE_ACTOR binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays
  * closed), and
@@ -497,6 +518,10 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // calls only, DL-027) can be read in the Worker: every compose and rewrite fails closed before any model call
     // (./real.ts NoComposerError), so no row gets a plan and nothing is sent for it.
     composers: null,
+    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and pgRowData's four calls):
+    // every finalize fails closed inside the Tool API base, before anything is read or written, so no row gets its final
+    // parts and nothing is sent for it.
+    finalizeData: null,
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as

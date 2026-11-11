@@ -46,6 +46,7 @@ import {
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -183,6 +184,7 @@ function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId> | 
     gateReads: fakes.gate.reads,
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
+    finalizeData: fakes.finalize.data,
     flags: fakeFlags([SKELETON_FLAG]),
   });
 }
@@ -196,11 +198,15 @@ interface Rig {
   restore(): void;
 }
 
-/** The root for "test" with the HandleActor namespace and its actor ports installed. */
+/**
+ * The root for "test" with the HandleActor namespace and its actor ports installed. Since T-561 joined finalize, the turn's
+ * finalize calls go to the real finalize port, kept on the fake face on their way as the stand-in face kept them.
+ */
 function rig(log: MockInstance): Rig {
   const fakes = skeletonFakes();
   const root = testRoot(fakes, handleActors());
   const restoreRoot = root.install();
+  const watched = watchGate(root, fakes.face);
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
     fakes,
@@ -214,7 +220,10 @@ function rig(log: MockInstance): Rig {
     },
     spans,
     traceOf: (traceId) => spansOfTrace(spans(), traceId),
-    restore: restoreRoot,
+    restore: () => {
+      watched.restore();
+      restoreRoot();
+    },
   };
 }
 

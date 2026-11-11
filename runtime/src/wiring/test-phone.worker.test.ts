@@ -252,6 +252,7 @@ async function rig(options: RigOptions = {}): Promise<Run> {
     gateReads: fakes.gate.reads,
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
+    finalizeData: fakes.finalize.data,
     flags: fakeFlags(options.flagOn === false ? [] : [SKELETON_FLAG]),
     testPhone,
   });

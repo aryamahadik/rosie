@@ -87,6 +87,20 @@
 //                model key is set by name (J-02; smoke-size calls only, DL-027), so every compose and rewrite there fails
 //                closed before any model call. The answers are mapped as T-374's handoff maps the rewrite (DL-309). Each
 //                model call writes its own portCall span into the turn's trace; the compose span stays the turn's.
+//   finalize     T-561: K-09 finalizeMessage through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
+//                Tool API base with K-09's checks and the call's own business scope; T-313's finalize with T-314's
+//                fixed-line inserter over T-1141's row binding, finalizeDeps). Its reads and writes are handed in by the
+//                root (RootOptions.finalizeData: the Tool API's business scope, and on the runtime side K-05 v1.6
+//                readOutboxRow, v1.3 readFixedLineFacts, and T-196's writePlan and cancelClock; in a test, K-05 doubles over
+//                the rows the commit wrote and test owner 1's seeded rows); nothing in the Worker until T-567, so every
+//                finalize there fails closed before anything is read or written. Its bundle is the one the turn's run
+//                pinned (as compose input's), whose fixed lines finalize adds word for word (S13-01's opener, Q-30's STOP,
+//                HELP and rates line and privacy link), and its reader's language the one the gate port's face holds for
+//                the turn. The claim check and the message checks are finalize's own, run as it runs them. The plan and
+//                the final parts go into the row together through writePlan, after the commit, or the row gets its one
+//                rewrite, then the step's fallback, inside the same calls. The turn records the row's fillAndChecks and
+//                rewriteOrFallback spans; the face tells the base so (TURN_RECORDS_FILL_AND_CHECKS), and the base records
+//                none (T-1193; DL-376).
 //
 // Worker code: no double, no fixture, no key, no network call. The secret is never kept, returned or logged: an error
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
@@ -112,8 +126,14 @@ import {
   type SafetyReads,
   type TurnCommitBinding,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
+import type { FinalizeNote } from "@rosie/actions/src/finalize/rewrite/types";
 import { HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
-import { composeInputDeps, type RowBinding, type RowData } from "@rosie/actions/src/tool-api/turn-face/rows";
+import {
+  composeInputDeps,
+  finalizeDeps,
+  type RowBinding,
+  type RowData,
+} from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createTurnFace } from "@rosie/actions/src/tool-api/turn-face/turn-face";
 import { createToolApiValidator, type ToolApiValidator } from "@rosie/actions/src/tool-api/validator";
 import {
@@ -169,6 +189,7 @@ import type {
   ComposerAnswer,
   DecideAnswer,
   DecideResult,
+  FinalizeMessageAnswer,
   GateAndCommitAnswer,
   MessagePlan,
   ParkTurnAnswer,
@@ -176,7 +197,7 @@ import type {
   TurnComposer,
   TurnDecide,
 } from "../turn/types";
-import type { ComposeInputPort, FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
+import type { ComposeInputPort, FinalizePort, FrontierPort, GatePort, Ports, TurnRowPort } from "./ports";
 
 /** The name the Worker reads the Linq webhook secret by (K-11 README default 1). */
 export const LINQ_WEBHOOK_SECRET = "LINQ_WEBHOOK_SECRET";
@@ -264,13 +285,19 @@ export interface RealInputs {
    * manifest and the model key can be read there), so every compose and rewrite fails closed.
    */
   readonly composers?: Composers | null | undefined;
+  /**
+   * What finalize reads and writes (T-561): its calls with their database bound (null where none is bound: the Worker
+   * until T-567) and the bundles it reads (as compose input's). Left out, every finalize fails closed.
+   */
+  readonly finalize?: Omit<FinalizeInputs, "held" | "now"> | undefined;
 }
 
 /** The real implementation of each port joined so far. */
 export function realPorts(inputs: RealInputs): Partial<Ports> {
   const bundles = realBundles({ calls: inputs.bundleReads ?? null });
-  // The words of each turn the gate committed, as its request handed them in, held for its rows' inbound text (T-1141's
-  // held.ts): one memory per root, the isolate's own and bounded, shared by the gate port and the compose-input port.
+  // The words and language of each turn the gate committed, as its request handed them in (T-1141's held.ts): one memory
+  // per root, the isolate's own and bounded, shared by the gate port, the compose-input port (the rows' inbound text) and
+  // the finalize port (the reader's language).
   const held = new HeldTurns();
   return {
     linqVerify: linqVerify(inputs),
@@ -305,6 +332,13 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       held,
     }),
     composer: realComposer({ composers: inputs.composers ?? null }),
+    finalize: realFinalize({
+      data: inputs.finalize?.data ?? null,
+      bundles: inputs.finalize?.bundles ?? (() => bundles),
+      pinnedOf: inputs.finalize?.pinnedOf ?? (() => null),
+      held,
+      now: inputs.now,
+    }),
   };
 }
 
@@ -1298,6 +1332,149 @@ export function realComposer(inputs: ComposerInputs): TurnComposer {
         { trace },
       );
       return composerAnswerOf(answer);
+    },
+  };
+}
+
+// ---- finalize: K-09 finalizeMessage through @rosie/actions' turn face (T-561; C-074, C-093, C-089) ---------------------
+
+/**
+ * What finalize reads and writes with its database bound (T-561; @rosie/actions' turn-face/pg/calls.ts names each one on
+ * PostgreSQL): the Tool API's own business scope, one transaction per call whose row-level security scope is the call's
+ * business (rosie_app: pgCallScope, as compose input's), and pgRowData's four calls on the runtime side (rosie_job), each a
+ * transaction of its own: K-05 v1.6 readOutboxRow and v1.3 readFixedLineFacts under the call's business, and K-05 v1's
+ * writePlan (T-196: the plan and the final parts written into the row together, after the commit) and cancelClock (the
+ * passed-on path's withdrawal).
+ */
+export interface FinalizeData<Repo = unknown> {
+  readonly scope: BusinessScope<Repo>;
+  readonly readOutboxRow: RowData["readOutboxRow"];
+  readonly readFixedLineFacts: RowData["readFixedLineFacts"];
+  readonly writePlan: RowData["writePlan"];
+  readonly cancelClock: RowData["cancelClock"];
+}
+
+/** What the real finalize port is fed. */
+export interface FinalizeInputs {
+  /** Finalize's reads and writes with their database bound; null where none is bound, so every finalize fails closed. */
+  readonly data: FinalizeData | null;
+  /** The bound bundle port, read at each call: for a row committed under a bundle the turn did not pin. */
+  readonly bundles: () => BundleDeps;
+  /** The bundle the run whose trace this is pinned (./pinned-runs.ts), or null for a trace that is no pinned run's. */
+  readonly pinnedOf: (trace: TraceContext) => PinnedBundle | null;
+  /**
+   * The turns the gate port's face holds, as each gate request handed them in (T-1141's held.ts; realPorts shares one):
+   * the reader's language is the turn's, else the stored one (T-1141's default 5).
+   */
+  readonly held: HeldTurns;
+  /** Epoch milliseconds: the root's clock, for when a passed-on message's question is withdrawn (cancelClock's `at`). */
+  readonly now: () => number;
+}
+
+/** The scope where no database is bound: each finalize fails closed before anything is read or written, inside the base. */
+const NO_FINALIZE_SCOPE: BusinessScope<unknown> = {
+  withBusiness: () => Promise.reject(new NoDatabaseError("finalizeMessage")),
+};
+
+/** A call the finalize port never makes (the gate's commit): the message names it. */
+export class NotFinalizeError extends Error {
+  constructor(call: string) {
+    super(`${call} is never made through the finalize port`);
+    this.name = "NotFinalizeError";
+  }
+}
+
+/** The finalize face makes no commit: gateAndCommit is the gate port's, so its commit is never asked for. */
+const NO_FINALIZE_COMMIT = (): never => {
+  throw new NotFinalizeError("gateAndCommit");
+};
+
+/** K-05's row data as finalize reads and writes it (@rosie/actions' RowBinding.data), each failing closed with no database. */
+function finalizeRowData(data: FinalizeData | null): RowData {
+  const none = (call: string): Promise<never> => Promise.reject(new NoDatabaseError(call));
+  return {
+    readOutboxRow: (request) => (data === null ? none("readOutboxRow") : data.readOutboxRow(request)),
+    readFixedLineFacts: (request) =>
+      data === null ? none("readFixedLineFacts") : data.readFixedLineFacts(request),
+    writePlan: (request) => (data === null ? none("writePlan") : data.writePlan(request)),
+    cancelClock: (request) => (data === null ? none("cancelClock") : data.cancelClock(request)),
+  };
+}
+
+/** An instant as K-05 takes it: UTC, whole seconds, ending in Z. */
+function utcSecondsOf(ms: number): string {
+  return new Date(ms).toISOString().replace(/\.\d{3}Z$/u, "Z");
+}
+
+/**
+ * Finalize's note of one attempt as one JSON line (BP 5.5): the action layer's labels (the row, the attempt, its outcome,
+ * the checks it missed; @rosie/actions' logNote), with the turn's trace id beside them. Never a value, a detail or a word.
+ */
+function finalizeNoteOn(trace: TraceContext): (note: FinalizeNote) => void {
+  return (note) => {
+    console.info(
+      JSON.stringify({
+        level: "info",
+        msg: "finalize_attempt",
+        trace_id: trace.traceId,
+        row: note.row,
+        attempt: note.attempt,
+        outcome: note.outcome,
+        missed: note.missed,
+      }),
+    );
+  };
+}
+
+/**
+ * The finalize port (T-561): K-09 finalizeMessage through @rosie/actions' turn face (createTurnFace with its calls: the
+ * Tool API base with K-09's checks and the call's own business scope, FinalizeData.scope; T-313's finalize with T-314's
+ * fixed-line inserter over T-1141's row binding, finalizeDeps). For one committed outbox row and its plan, it reads the
+ * row through K-05 v1.6 readOutboxRow (its reader by K-05 v1.5's rowReader, its sensitive switch by v1.6 item 45), the
+ * step's master line, card terms and fallback text from the bundle the row was committed under (the run's pinned bundle,
+ * read KV first and PostgreSQL's copy on a miss, as compose input reads it), and the fixed lines' facts through K-05 v1.3
+ * readFixedLineFacts; then, as finalize runs them and never here: limit 7 on each slot and the fill, the parts, the fixed
+ * lines word for word as the bundle writes them (Rosie's first text to a handle about a business: S13-01's opener first,
+ * then Q-30's STOP, HELP and rates line, and the privacy link alone on the last line), and the seven message checks. Every
+ * check passed, the plan and the final parts go into the row together through T-196's writePlan, after the commit; a miss
+ * on the composed plan answers the one rewrite, nothing written; a blocking miss on the rewrite takes the step's fallback
+ * text through the same checks, then the passed-on line (K-09 README default 11). The base records no span: the turn
+ * records the row's fillAndChecks and rewriteOrFallback spans itself (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag
+ * is set for this hop. With no data bound every call goes to the base all the same and fails closed there, before
+ * anything is read or written. The validator is made at the first call and kept: inside workerd, T-1144's prebuilt
+ * standalone code; under Node, Ajv over the frozen schemas. Nothing here logs a value: the plan and the final parts hold
+ * a person's words, which go to the row only; finalize's notes are labels, with the turn's trace id.
+ */
+export function realFinalize(inputs: FinalizeInputs): FinalizePort {
+  let validator: ToolApiValidator | null = null;
+  return {
+    async finalizeMessage(request, trace) {
+      validator ??= createToolApiValidator();
+      const data = inputs.data;
+      const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const rows: RowBinding = {
+        data: finalizeRowData(data),
+        bundles,
+        held: inputs.held,
+        now: () => utcSecondsOf(inputs.now()),
+        log: finalizeNoteOn(trace),
+      };
+      const face = createTurnFace<FrontierRepo>({
+        // The frontier is its own port's: this face's frontier is never called.
+        scope: NO_FRONTIER_SCOPE,
+        bundles,
+        validator,
+        calls: {
+          scope: data?.scope ?? NO_FINALIZE_SCOPE,
+          commit: NO_FINALIZE_COMMIT,
+          finalize: finalizeDeps(rows),
+        },
+      });
+      const answer = await face.finalizeMessage(request, trace);
+      // The same K-09 finalizeMessage answer in two hand-written forms: @rosie/actions' generated one, and the turn's
+      // (../turn/types.ts), which reads the outcome, the checks and the final parts and checks them itself (compose.ts
+      // finalizedOf).
+      return answer as unknown as FinalizeMessageAnswer;
     },
   };
 }
