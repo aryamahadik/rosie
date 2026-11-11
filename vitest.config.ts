@@ -86,6 +86,13 @@ export default defineConfig({
             "runtime/test/**/*.worker.test.ts",
             "actions/src/**/*.worker.test.ts",
           ],
+          // No module cache on disk (T-1207, DL-420), so the pool sends the runner each module in a message of its own.
+          // With the cache, Vitest hands a new runner every module of its file's graph that the run has already
+          // transformed, and the pool sends all of that code in one WebSocket message; workerd closes the runner's
+          // socket on a message over 33,554,432 bytes ("Worker exited unexpectedly"). That message had reached
+          // 33,125,602 bytes; one module at a time, the largest is the Tool API's generated validators, 13,213,756.
+          // infra/ci/workers-pool-messages.test.mjs keeps every message under 24 MiB. Not part of any test's claim.
+          fsModuleCache: false,
         },
       },
       {
@@ -139,6 +146,8 @@ export default defineConfig({
           include: ["tests/e2e/**/*.worker.test.ts"],
           // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md).
           globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts"],
+          // Each module in a message of its own to the runner, as in the workers project (T-1207).
+          fsModuleCache: false,
         },
       },
     ],
