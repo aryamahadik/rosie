@@ -1,6 +1,6 @@
 // The retry queue's producer and the Worker's queue handler (T-256), run inside the Workers runtime. The producer binding
-// is a double (env.staging has no RETRY_QUEUE until T-566); the handler is the Worker's own (runtime/src/index.ts), given
-// the runtime's own MessageBatch. Test values only (rule 9).
+// is a double (./test-support fakeQueue), not the RETRY_QUEUE env.staging binds since T-566; the handler is the Worker's
+// own (runtime/src/index.ts), given the runtime's own MessageBatch. Test values only (rule 9).
 import { env } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -221,6 +221,15 @@ describe("a send the dispatcher never ends", () => {
 });
 
 describe("the Worker's queue handler (runtime/src/index.ts)", () => {
+  /**
+   * The Worker's env without the HandleActor binding the pool's env carries (env.staging binds it since T-566), as
+   * runtime/src/wiring/hop2.worker.test.ts's workerEnv(false) builds it. The queue entry wires the isolate first (T-1223),
+   * and with no HANDLE_ACTOR it wires nothing, so each test keeps the ports it sets itself.
+   */
+  function workerEnv(): Cloudflare.Env {
+    return { ENVIRONMENT: env.ENVIRONMENT, BASE_PATH: env.BASE_PATH, DB_SCHEMA: env.DB_SCHEMA };
+  }
+
   const due: RetryMessage = {
     v: 1,
     job: calendarPoll(),
@@ -235,7 +244,7 @@ describe("the Worker's queue handler (runtime/src/index.ts)", () => {
     const undo = setQueueDeps(depsOf({ jobs: { [POLL_KIND]: poll.run } }));
     try {
       const { batch, result } = batchOf([{ id: "0fworker1", body: due }], Date.now());
-      await worker.queue(batch, env);
+      await worker.queue(batch, workerEnv());
 
       expect((await result()).explicitAcks).toEqual(["0fworker1"]);
       expect(poll.calls.map((call) => [call.key, call.try])).toEqual([[due.job.key, 2]]);
@@ -246,7 +255,7 @@ describe("the Worker's queue handler (runtime/src/index.ts)", () => {
 
   it("with no ports joined it runs nothing and retries each message", async () => {
     const { batch, result, retries } = batchOf([{ id: "0fworker2", body: due }], Date.now());
-    await worker.queue(batch, env);
+    await worker.queue(batch, workerEnv());
 
     const queued = await result();
     expect(queued.explicitAcks).toEqual([]);
