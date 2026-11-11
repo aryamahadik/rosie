@@ -161,16 +161,20 @@ const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got
 const modelCall = (span: Span): boolean => span.hop === "portCall" && span.provider === "anthropic";
 
 /**
- * A part a console method was handed, as text: an Error, at any depth, by its name, its message and its cause, which
- * JSON writes as {}.
+ * A part a console method was handed, as text: a string as it is, and anything else as JSON writes it, every own field
+ * at any depth. An Error, at any depth, is read by its name, its message and its cause, which JSON leaves out, and
+ * beside them by its own fields as JSON writes them (a class field, a database error's detail), so none escapes
+ * (T-1200 round 2, DL-444).
  */
 function textOf(part: unknown): string {
   if (typeof part === "string") return part;
-  if (part instanceof Error) {
-    const cause = part.cause === undefined ? [] : [textOf(part.cause)];
-    return [`${part.name}: ${part.message}`, ...cause].join(" ");
-  }
-  return JSON.stringify(part, (_key, value: unknown) => (value instanceof Error ? textOf(value) : value));
+  // JSON hands its replacer the part itself first, under the key "": an Error part's own fields are read there.
+  const json = JSON.stringify(part, (_key, value: unknown) =>
+    value instanceof Error && value !== part ? textOf(value) : value,
+  );
+  if (!(part instanceof Error)) return json;
+  const cause = part.cause === undefined ? [] : [textOf(part.cause)];
+  return [`${part.name}: ${part.message}`, ...cause, json].join(" ");
 }
 
 /** One line as a console method was handed it, as text. */
@@ -430,8 +434,8 @@ describe("hop 9 joined: compose input through @rosie/actions' turn face, and the
             holdersOf(written, secrets, `console.${method} line`),
           );
         // The check fires on a damaged copy of this run's lines that holds one inside a longer line: the number in
-        // an Error handed to console.error (JSON writes one as {}), the plan's question in a line handed to
-        // console.info, and the JOIN in a warning.
+        // the message of an Error handed to console.error, the plan's question in a line handed to console.info,
+        // and the JOIN in a warning.
         const question = PLAN_S1_02.question?.text;
         if (question === undefined) throw new Error("plan-s1-02.json asks a question");
         expect(
@@ -445,6 +449,27 @@ describe("hop 9 joined: compose input through @rosie/actions' turn face, and the
         ).toEqual(holding("console.info line 1", secrets, question));
         expect(lineHolders({ ...lines, warn: [lineOf(["Sam texted JOIN"]), ...lines.warn] })).toEqual(
           holding("console.warn line 1", secrets, "JOIN"),
+        );
+        // An Error that holds the chat id and the number in fields of its own (a class field, a database error's
+        // detail), never in its message, fires too, bare and nested in an object, handed to console.error and
+        // console.info (T-1200 round 2, DL-444).
+        const refused = Object.assign(new Error("refused"), {
+          chatId: SAM_CHAT,
+          detail: "Key (phone)=(+15555550100) already exists.",
+        });
+        const nested = ["compose_failed", { step: "compose", error: refused }];
+        const ownFields = [SAM_CHAT, "+15555550100", "15555550100", "5555550100"];
+        expect(lineHolders({ ...lines, error: [lineOf([refused]), ...lines.error] })).toEqual(
+          holding("console.error line 1", secrets, ...ownFields),
+        );
+        expect(lineHolders({ ...lines, info: [lineOf([refused]), ...lines.info] })).toEqual(
+          holding("console.info line 1", secrets, ...ownFields),
+        );
+        expect(lineHolders({ ...lines, error: [lineOf(nested), ...lines.error] })).toEqual(
+          holding("console.error line 1", secrets, ...ownFields),
+        );
+        expect(lineHolders({ ...lines, info: [lineOf(nested), ...lines.info] })).toEqual(
+          holding("console.info line 1", secrets, ...ownFields),
         );
         // Then none holds one in the run.
         expect(lineHolders(lines)).toEqual([]);
