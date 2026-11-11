@@ -1,0 +1,28 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-poll-delivered.json"],
+    "now": "2026-10-23T14:05:16Z",
+    "note": "Refused: the poll's receipt again, a repeat of a recorded delivery, answered with repeatedDelivery null, as if it repeated no delivery. A delivery receipt answered repeated always states the delivery it repeats, whether it was the row's first and when, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming. Put right, it is mark-a7-03-poll-delivered-repeat's answer: the poll's delivery at 14:05:06Z, not the row's first."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0302",
+    "at": "2026-10-23T14:05:06Z",
+    "idempotencyKey": "out-a7-03-alex/2/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 2,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": true,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "delivered", "version": 7 },
+    "repeatedDelivery": null
+  }
+}
