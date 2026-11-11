@@ -56,7 +56,13 @@
 // (RootOptions.finalizeData) and the run's pinned bundle, which fills its slots, adds its fixed lines, runs the claim
 // check and the message checks, and writes the plan and the final parts into the row (T-196's writePlan), or asks for the
 // one rewrite, then the step's fallback. The turn records the compose span and every fillAndChecks and rewriteOrFallback
-// span while the Tool API base records none (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for them. Never
+// span while the Tool API base records none (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set for them. The
+// dispatcher the turn wakes claims and marks through the outbox port (T-562: K-05 v1.2's claimOutboxV12, renewClaim,
+// markPartV12 and markRowV12 over RootOptions.outboxCalls), so the committed row is claimed once, in commit order, with the
+// final parts finalize wrote, and reads limit 8's send state and the recipient's chat through the send-state port (T-562:
+// K-05 v1.2 sendState over RootOptions.sendStateCall) before any send; the receipt door marks a part delivered through the
+// same outbox port. The root's Linq door (./linq-door.ts) lets only a row whose claim names the linq port reach the Linq
+// port, each send within a time limit far below the claim's 60 s. The dispatcher records the dispatch span itself. Never
 // logged by the root: a word, a number, a key, a chat id.
 
 import { setBatchHooks } from "../actor/batch";
@@ -78,6 +84,7 @@ import { setTurnDeps, turnHooks } from "../turn/turn";
 import type { TurnDeps, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
+import { LinqDoor } from "./linq-door";
 import { environmentOf, PICKS, type Environment } from "./picks";
 import type { PortName, Ports } from "./ports";
 import { PinnedRuns } from "./pinned-runs";
@@ -93,7 +100,9 @@ import {
   type HandleSealingKeyCall,
   type HandleTargetsCall,
   type LinqVerifyInputs,
+  type OutboxCalls,
   type SafetyReaders,
+  type SendStateCall,
   type TurnRowCalls,
 } from "./real";
 import { RowTraces } from "./row-traces";
@@ -213,6 +222,21 @@ export interface RootOptions {
    * closed and no row gets its final parts.
    */
   readonly finalizeData?: FinalizeData | null;
+  /**
+   * K-05 v1.2's four outbox calls with their database bound (T-562; ./real.ts OutboxCalls): db/repo/outbox.ts's
+   * claimOutboxV12, renewClaim, markPartV12 and markRowV12, each called as (sql, request) over a rosie_job client, never
+   * T-196's v1 calls beside them (DL-317). In a test, the K-05 double over the rows the commit wrote and the plans finalize
+   * wrote into them; null or left out where no database is bound (the Worker until T-567), so every claim fails closed and
+   * nothing is sent.
+   */
+  readonly outboxCalls?: OutboxCalls | null;
+  /**
+   * K-05 v1.2 sendState with its database bound (T-562; ./real.ts SendStateCall): db/repo/send-state.ts's sendState over a
+   * rosie_job client, limit 8's read at send and the chat the send goes to. In a test, the same K-05 double over test
+   * owner 1's seeded rows (no phone row) and the rows the commit wrote; null or left out where no database is bound (the
+   * Worker until T-567), so every read fails closed and nothing is sent.
+   */
+  readonly sendStateCall?: SendStateCall | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
   readonly flags?: ReleaseFlags | null;
   /**
@@ -296,6 +320,9 @@ export function composeRoot(options: RootOptions): Root {
         bundles: () => ports.bundles,
         pinnedOf: (trace) => pinnedRuns.of(trace),
       },
+      // The dispatcher's claim and marks, and limit 8's send state, each with its database bound (T-562).
+      outbox: options.outboxCalls ?? null,
+      sendState: options.sendStateCall ?? null,
     }),
     closed: closedPorts(),
   });
@@ -306,15 +333,19 @@ export function composeRoot(options: RootOptions): Root {
   // Made at the first wake, never when the root is built: Workers refuse crypto.randomUUID() at global scope (DL-313).
   let claimer: string | null = null;
   const claimerOf = (): string => (claimer ??= `dispatcher-${crypto.randomUUID()}`);
+  // Only a row whose claim names the linq port reaches the Linq port, each send within its time limit (./linq-door.ts).
+  const door = new LinqDoor();
+  const dispatchStore = door.watch(ports.outbox);
+  const dispatchLinq = door.door(ports.linqSend.parts);
 
   const dispatcher: TurnDispatcher = {
     async wake(request, trace) {
       await runDispatch(
         {
-          store: ports.dataAccess.outbox,
-          linq: ports.linqSend.parts,
-          recipients: ports.stateReads.dispatch.recipients,
-          sendState: ports.stateReads.dispatch.sendState,
+          store: dispatchStore,
+          linq: dispatchLinq,
+          recipients: ports.sendState.recipients,
+          sendState: ports.sendState.sendState,
           environment: options.vars.ENVIRONMENT,
           traceFor: (row) => {
             rowTraces.keep(row.outboxRowId, trace);
@@ -375,7 +406,8 @@ export function composeRoot(options: RootOptions): Root {
       const trace = rowTraces.forPart(handoff.partKey) ?? receiptTraceOf(handoff, log, now);
       const result = await handleDeliveryReceipt(
         {
-          store: ports.dataAccess.outbox,
+          // The store the dispatcher's parts were marked sent in: a receipt finds its part there (T-562).
+          store: ports.outbox,
           clockArming: clockArming({
             data: ports.dataAccess.clocks,
             facts: ports.stateReads.arming.facts,
@@ -522,6 +554,11 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // every finalize fails closed inside the Tool API base, before anything is read or written, so no row gets its final
     // parts and nothing is sent for it.
     finalizeData: null,
+    // No database is bound until T-567 (its rosie_job client gives db/repo/outbox.ts's four v1.2 calls and send-state.ts's
+    // sendState): every claim, mark and send-state read fails closed (./real.ts NoDatabaseError), so the dispatcher claims
+    // nothing and nothing is sent, and a receipt is not marked (answered 503, so Linq sends it again).
+    outboxCalls: null,
+    sendStateCall: null,
     // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
     // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
     // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as

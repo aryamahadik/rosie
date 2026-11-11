@@ -51,10 +51,6 @@ export function closedPorts(): Ports {
         directory: { partyOf: () => fail("stateReads") },
         safety: { resultsOf: () => fail("stateReads") },
       },
-      dispatch: {
-        recipients: { chatFor: () => fail("stateReads") },
-        sendState: { sendStateFor: () => fail("stateReads") },
-      },
       arming: {
         facts: { questionFacts: () => fail("stateReads") },
         directory: { actorNameOf: () => fail("stateReads") },
@@ -73,16 +69,20 @@ export function closedPorts(): Ports {
     composeInput: { composeInput: () => fail("composeInput") },
     composer: { compose: () => fail("composer"), rewrite: () => fail("composer") },
     finalize: { finalizeMessage: () => fail("finalize") },
+    outbox: {
+      markRow: () => fail("outbox"),
+      claimOutbox: () => fail("outbox"),
+      renewClaim: () => fail("outbox"),
+      markPart: () => fail("outbox"),
+    },
+    sendState: {
+      sendState: { sendStateFor: () => fail("sendState") },
+      recipients: { chatFor: () => fail("sendState") },
+    },
     dataAccess: {
       rows: {
         unplannedRows: () => fail("dataAccess"),
         writePlan: () => fail("dataAccess"),
-      },
-      outbox: {
-        markRow: () => fail("dataAccess"),
-        claimOutbox: () => fail("dataAccess"),
-        renewClaim: () => fail("dataAccess"),
-        markPart: () => fail("dataAccess"),
       },
       clocks: { armClock: () => fail("dataAccess"), cancelClock: () => fail("dataAccess") },
     },

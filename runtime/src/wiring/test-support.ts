@@ -40,8 +40,7 @@
 //                answers on those rows under Lee's Barbershop's scope, and refusing a read that names another business
 //                than the call's scope, as T-219's readTurnStateIn does
 //   stateReads   safety/test-support fixtureBundle; Sam's party and ids; each named text's safety result;
-//                dispatch/test-support FakeRecipients and FakeSendState; clocks/arming-support's question facts and actor
-//                directory
+//                clocks/arming-support's question facts and actor directory
 //   turnFace     turn/test-support fakeTurnFace (closest entries) and safety/test-support fakeCore
 //   composeInput joined (T-560): the root binds @rosie/actions' turn face's composeInput through its real compose-input
 //                port (./real.ts realComposeInput), its inbound text the words the gate port's face holds for the turn.
@@ -73,9 +72,15 @@
 //                the row holds once written), readFixedLineFacts (no phone row in the seed), writePlan (T-196's, keeping
 //                each row's plan and final parts) and cancelClock. The turn's finalize calls are kept on the fake face as
 //                the stand-in kept them, by `watchGate` when it is handed the face
-//   dataAccess   turn/test-support fakeRows (the commit's one row), dispatch/test-support FakeOutboxStore, and
-//                clocks/arming-support's K-05 armClock and cancelClock
-//   linqSend     dispatch/test-support FakeLinq and safety/test-support fakeDirect
+//   outbox       joined (T-562): the root binds K-05 v1.2's claimOutboxV12, renewClaim, markPartV12 and markRowV12 through
+//   sendState    its real outbox port and K-05 v1.2 sendState through its real send-state port (./real.ts realOutbox,
+//                realSendState). What both are fed comes from here: `fakeDispatchData`, one K-05 double over the rows the
+//                K-05 commitTurn double wrote, the plans and final parts finalize wrote into them (`fakeFinalizeData`) and
+//                test owner 1's seeded rows (no phone row), answering as db/repo/outbox.ts and send-state.ts answer on them
+//   dataAccess   turn/test-support fakeRows (the commit's one row) and clocks/arming-support's K-05 armClock and
+//                cancelClock
+//   linqSend     dispatch/test-support FakeLinq (accepting a part a moment after its send starts) and safety/test-support
+//                fakeDirect
 //
 // One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures and the Linq
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
@@ -119,6 +124,7 @@ import manifestFixture from "@rosie/contracts/bundle/fixtures/manifest.json";
 import activeBundleJson from "@rosie/contracts/data-access/fixtures/active-bundle.json";
 import commitFirstJson from "@rosie/contracts/data-access/fixtures/commit-first.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
+import sendStateOwner from "@rosie/contracts/data-access/fixtures/send-state-owner.json";
 import targetsFirstTextJson from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
 import seedBusinessHead from "@rosie/contracts/db-schema/core/fixtures/seed-business-head.json";
 import seedPersonRoles from "@rosie/contracts/db-schema/core/fixtures/seed-person-roles.json";
@@ -129,13 +135,30 @@ import decideS101Enter from "@rosie/contracts/model/fixtures/decide-s1-01-enter.
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
 import inputS102V11 from "@rosie/contracts/message-plan/fixtures/input-s1-02-v1.1.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
-import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
+import type {
+  ClaimedRowV12,
+  ClaimOutboxRequest as K05ClaimOutboxRequest,
+  ClaimOutboxV12Outcome,
+  MarkPartV12Outcome,
+  MarkPartV12Request,
+  MarkRowV12Outcome,
+  MarkRowV12Request,
+  OutboxClaim as K05OutboxClaim,
+  RenewClaimOutcome,
+  RenewClaimRequest as K05RenewClaimRequest,
+} from "@rosie/db/repo/outbox";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import type {
+  PhoneRead,
+  RowState as K07RowState,
+  SendStateOutcome,
+  SendStateRequest,
+} from "@rosie/db/repo/send-state";
 import { BusinessScopeError } from "@rosie/db/repo/scope";
 import type {
   HandleTargetsOutcome,
@@ -147,8 +170,8 @@ import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
 import type { CommitContext, CommitTurnRef } from "../actor";
 import { turnIdOf } from "../actor/lease";
 import { BUNDLE_B } from "../bundle/test-support";
-import { A7_03_QUESTION, wireArming, type WiredArming } from "../clocks/arming-support";
-import { FakeLinq, FakeOutboxStore, FakeRecipients, FakeSendState } from "../dispatch/test-support";
+import { wireArming, type WiredArming } from "../clocks/arming-support";
+import { FakeLinq, yieldToOthers } from "../dispatch/test-support";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds, SafetyResult } from "../safety/types";
 import type { BundleId, TraceContext } from "../trace";
@@ -185,7 +208,9 @@ import type {
   HandleSealingKeyCall,
   HandleTargetsCall,
   LinqVerifyInputs,
+  OutboxCalls,
   SafetyReaders,
+  SendStateCall,
   TurnRowCalls,
 } from "./real";
 import type { Root, RootClock } from "./root";
@@ -2726,6 +2751,596 @@ export function fakeFlags(on: readonly string[] = []): FakeFlags {
   return flags;
 }
 
+// ---- K-05 v1.2's outbox calls and sendState, as one double: the dispatcher's claim, marks and limit 8's read (T-562) --
+
+/** One call the dispatch double answered: the request as sent, and its answer. */
+export interface DispatchCall<Request, Answer> {
+  readonly request: Request;
+  readonly answer: Answer;
+}
+
+/** One try of a part (K-04 outbox_parts: '<row>/<part>/<try>'), as the double keeps it. */
+export interface DispatchedPart {
+  readonly partNo: 1 | 2;
+  readonly tryNo: number;
+  readonly key: string;
+  attempts: number;
+  state: "pending" | "sent" | "delivered" | "failed";
+  messageId: string | null;
+}
+
+/** A row as the dispatcher's calls moved it (K-07's states), beside the row the commit wrote, never in it. */
+export interface DispatchedRow {
+  state: K07RowState;
+  version: number;
+  heldUntil: string | null;
+  claim: K05OutboxClaim | null;
+  parts: DispatchedPart[];
+}
+
+export interface FakeDispatchData {
+  /** What the root's real outbox port is fed (RootOptions.outboxCalls): K-05 v1.2's four outbox calls over the double. */
+  readonly outbox: OutboxCalls;
+  /** What the root's real send-state port is fed (RootOptions.sendStateCall): K-05 v1.2 sendState over the double. */
+  readonly sendState: SendStateCall;
+  /**
+   * Each handle's phone row as K-05 reads it (K-04 phones, by handle id). Test owner 1's seed holds none (T-1148: "a phone
+   * row: the number has none until turn 1 commits"), and turn 1's commit writes none (commit-s1-01.json), so it starts
+   * empty; a test that needs one sets it, as K-05's own fixtures hold it.
+   */
+  readonly phones: Map<string, PhoneRead>;
+  /** Every claimOutboxV12, renewClaim, markPartV12 and markRowV12 and its answer, in order. */
+  readonly claims: DispatchCall<K05ClaimOutboxRequest, ClaimOutboxV12Outcome>[];
+  readonly renewals: DispatchCall<K05RenewClaimRequest, RenewClaimOutcome>[];
+  readonly partMarks: DispatchCall<MarkPartV12Request, MarkPartV12Outcome>[];
+  readonly rowMarks: DispatchCall<MarkRowV12Request, MarkRowV12Outcome>[];
+  /** Every sendState read and its answer, in order. */
+  readonly stateReads: DispatchCall<SendStateRequest, SendStateOutcome>[];
+  /** A row as the dispatcher's calls left it, or as the commit and finalize wrote it; null for a row no commit wrote. */
+  row(id: string): Readonly<DispatchedRow> | null;
+  /** When set, the next claimOutboxV12 answers it instead (a lost connection): nothing is claimed. */
+  failNextClaim: TransientError | null;
+}
+
+/**
+ * Sam's phone row as K-05 v1.2's send-state-owner.json reads it from K-04's seeds: chat open on iMessage, not stopped,
+ * the opt-out line delivered before. Test owner 1's skeleton seed holds no phone row (T-1148), and turn 1's commit writes
+ * none, so a test that needs one sets this.
+ */
+export function samPhoneRow(): PhoneRead {
+  return structuredClone(sendStateOwner.outcome.phone) as PhoneRead;
+}
+
+/**
+ * The fakes with Sam's phone row set (samPhoneRow), for a rig whose test waits for the turn's reply to be sent: since
+ * T-562 joined limit 8 at send, a row to a number with no phone row waits for the chat and nothing is sent.
+ */
+export function withSamPhoneRow(fakes: SkeletonFakes): SkeletonFakes {
+  fakes.dispatch.phones.set(TEST_OWNER_1.handleId, samPhoneRow());
+  return fakes;
+}
+
+/** K-07's open row states: the ones a claim's walk reads (finished rows are skipped). */
+const WALKED_STATES: ReadonlySet<string> = new Set([
+  "planned",
+  "checked",
+  "sending",
+  "held",
+  "stale",
+  "waiting_chat",
+]);
+
+/** K-04 open_questions statuses that close a question (K-05 v1.2 default 32). */
+const CLOSED_QUESTION: ReadonlySet<string> = new Set(["answered", "defaulted", "withdrawn"]);
+
+/** K-07 default 2: a claim lapses 60 s after it is taken or renewed. */
+const CLAIM_LAPSE_MS = 60_000;
+
+const lapseAfter = (at: string): string => new Date(Date.parse(at) + CLAIM_LAPSE_MS).toISOString();
+
+/** Each part's latest try, by part number. */
+function latestPartTries(parts: readonly DispatchedPart[]): DispatchedPart[] {
+  const latest = new Map<number, DispatchedPart>();
+  for (const part of parts) {
+    const known = latest.get(part.partNo);
+    if (known === undefined || part.tryNo > known.tryNo) latest.set(part.partNo, part);
+  }
+  return [...latest.values()].sort((a, b) => a.partNo - b.partNo);
+}
+
+/** "HH:MM" of a K-04 time (the seed writes "08:00" or "08:00:00"). */
+function hoursAndMinutesOf(value: unknown, what: string): string {
+  if (typeof value !== "string" || !/^\d{2}:\d{2}/u.test(value)) {
+    throw new Error(`the skeleton's sendState double holds no ${what}`);
+  }
+  return value.slice(0, 5);
+}
+
+/**
+ * K-05 v1.2's four outbox calls (T-1135, db/repo/outbox.ts: claimOutboxV12, renewClaim, markPartV12, markRowV12) and its
+ * sendState (T-220, db/repo/send-state.ts) as one double over the rows the K-05 commitTurn double wrote (`written`), the
+ * plans finalize wrote into them (`plans`: a row holding one is checked at its version, else planned) and test owner 1's
+ * seeded rows (T-1148: Lee's Barbershop's head, Sam with no role and no phone row), answering as the database calls answer
+ * on those rows:
+ *
+ *   claimOutboxV12  K-05 items 3, 13 and 30 (claim-in-order-with-port.json, claim-held-lets-later-pass.json): the named
+ *                   recipient, or every recipient with open rows earliest commit order first, each under its own lock
+ *                   held across the call's await (pg_try_advisory_xact_lock: a recipient another claim holds is skipped),
+ *                   its open rows walked in commit order: a waiting_chat row passed, a held row whose time is ahead passed
+ *                   and listed, a sending row with a live claim or a row with no final parts stopping the walk; a checked
+ *                   or held row, or a sending row whose claim lapsed, claimed: sending, its version raised, its parts'
+ *                   tries written (try 1 under '<row>/<part>/1'; a pending try's attempts raised at a re-claim), its claim
+ *                   written (claim 1, or the next number, lapsing 60 s on), handed out with the final parts finalize
+ *                   wrote, the state it was claimed from and its port (linq for a text channel, email for email);
+ *   renewClaim      K-05 items 14 and 32 (renew-claim-reads-phone.json): claimLost, notFound, wrongState and notYet as
+ *                   K-05 orders them; the claim lapsing 60 s after the renewal, its first try set once; and the phone row
+ *                   of the row's recipient, as `phones` holds it (null for none);
+ *   markPartV12     K-05 items 15 and 31 (mark-sent.json, mark-delivered.json, mark-delivered-by-key.json): sent on a
+ *                   pending part of a sending row, delivered by the message id or else by the echoed key of a part that
+ *                   holds none, failed (with retry, the next try as words); a repeat changes nothing; the row follows its
+ *                   parts' latest tries and its version rises with each mark that changes a part;
+ *   markRowV12      K-05 items 4 and 16 (mark-held-for-text-hours.json, mark-waiting-chat.json): only a sending row,
+ *                   compare-and-set on its version; waitingChat also lets the claim go;
+ *   sendState       K-05 item 28 (send-state-owner.json's form): the row's state and version now, the recipient (test
+ *                   owner 1's handle, kind phone), the phone row `phones` holds for it (none in the seed), the chat thread
+ *                   the commit wrote for the handle with its Linq chat id, no texts consent row, the audience customer
+ *                   (Sam holds no role: K-05 default 31), the business's zone and text hours from the seed, no override,
+ *                   the row's read versions as they stand, the question's status and closed.
+ *
+ * The double keeps what it moves beside `written`, never in it. Each call yields first, as a call over the network does,
+ * so calls from two dispatchers interleave.
+ */
+export function fakeDispatchData(
+  written: Pick<FakeTurnRows, "rows" | "turns">,
+  plans: ReadonlyMap<string, StoredPlan>,
+  now: () => number = Date.now,
+): FakeDispatchData {
+  const moved = new Map<string, DispatchedRow>();
+  const locks = new Set<string>();
+  const phones = new Map<string, PhoneRead>();
+  const outboxRows = (): WrittenRow[] => [...(written.rows.get("outbox_rows")?.values() ?? [])];
+  const outboxRow = (id: string): WrittenRow | undefined => written.rows.get("outbox_rows")?.get(id);
+  const recipientOf = (row: WrittenRow): string => String(row.values.recipientHandleId);
+  const seqOf = (row: WrittenRow): number => Number(row.values.commitSeq);
+  const stateOf = (row: WrittenRow): DispatchedRow => {
+    const known = moved.get(row.id);
+    if (known !== undefined) return known;
+    const plan = plans.get(row.id);
+    return plan === undefined
+      ? { state: "planned", version: row.version, heldUntil: null, claim: null, parts: [] }
+      : { state: "checked", version: plan.version, heldUntil: null, claim: null, parts: [] };
+  };
+  const touch = (row: WrittenRow): DispatchedRow => {
+    const state = stateOf(row);
+    moved.set(row.id, state);
+    return state;
+  };
+  /** The row follows its parts' latest tries (K-05 v1.1 item 15; K-07 "The row follows the latest try of each part"). */
+  const follow = (row: DispatchedRow): void => {
+    const latest = latestPartTries(row.parts);
+    if (latest.every((part) => part.state === "delivered")) row.state = "delivered";
+    else if (latest.every((part) => part.state === "sent" || part.state === "delivered")) row.state = "sent";
+    else if (row.state === "sent" && latest.some((part) => part.state === "pending")) row.state = "checked";
+  };
+
+  const take = (row: WrittenRow, plan: StoredPlan, request: K05ClaimOutboxRequest): ClaimedRowV12 => {
+    const state = touch(row);
+    const from = state.state === "held" ? "held" : state.state === "sending" ? "sending" : "checked";
+    if (state.parts.length === 0) {
+      state.parts = plan.finalParts.sends.map((_send, index) => ({
+        partNo: (index + 1) as 1 | 2,
+        tryNo: 1,
+        key: `${row.id}/${String(index + 1)}/1`,
+        attempts: 1,
+        state: "pending",
+        messageId: null,
+      }));
+    } else {
+      // A part the provider never accepted keeps its stored key with attempts raised (K-05 item 3).
+      for (const part of latestPartTries(state.parts)) if (part.state === "pending") part.attempts += 1;
+    }
+    const old = state.claim;
+    state.state = "sending";
+    state.heldUntil = null;
+    state.version += 1;
+    state.claim = {
+      claimer: request.claimer,
+      claimedAt: request.now,
+      lapsesAt: lapseAfter(request.now),
+      claimNo: (old?.claimNo ?? 0) + 1,
+      firstTryAt: old?.firstTryAt ?? null,
+      nextTryNotBefore: old?.nextTryNotBefore ?? null,
+    };
+    const turn = written.turns.get(row.turnId);
+    if (turn === undefined) throw new Error("the skeleton's claim double holds no turn for the row");
+    const values = row.values;
+    const claimed = {
+      outboxRowId: row.id,
+      version: state.version,
+      commitSeq: seqOf(row),
+      recipientHandleId: recipientOf(row),
+      recipientPersonId: values.recipientPersonId ?? null,
+      businessId: values.businessId ?? null,
+      bookingId: values.bookingId ?? null,
+      openQuestionId: values.openQuestionId ?? null,
+      channel: values.channel,
+      sendClass: values.sendClass,
+      versionsRead: structuredClone(values.versionsRead ?? []),
+      finalParts: structuredClone(plan.finalParts),
+      parts: latestPartTries(state.parts).map((part) => ({
+        partNo: part.partNo,
+        tryNo: part.tryNo,
+        idempotencyKey: part.key,
+        attempts: part.attempts,
+        sent: part.state === "sent" || part.state === "delivered",
+      })),
+      traceId: turn.traceId,
+      claim: { ...state.claim },
+      claimedFrom: from,
+      port: values.channel === "email" ? "email" : "linq",
+    };
+    return claimed as unknown as ClaimedRowV12;
+  };
+
+  const claimOf = async (request: K05ClaimOutboxRequest): Promise<ClaimOutboxV12Outcome> => {
+    await yieldToOthers(1);
+    if (double.failNextClaim !== null) {
+      const failed = double.failNextClaim;
+      double.failNextClaim = null;
+      return failed;
+    }
+    const at = Date.parse(request.now);
+    const open = (row: WrittenRow): boolean => WALKED_STATES.has(stateOf(row).state);
+    const firstSeq = (recipient: string): number =>
+      Math.min(
+        ...outboxRows()
+          .filter((row) => open(row) && recipientOf(row) === recipient)
+          .map(seqOf),
+      );
+    const recipients =
+      request.recipientHandleId === undefined
+        ? [...new Set(outboxRows().filter(open).map(recipientOf))].sort((a, b) => firstSeq(a) - firstSeq(b))
+        : [request.recipientHandleId];
+    const claimed: ClaimedRowV12[] = [];
+    const passedHeld: { outboxRowId: string; heldUntil: string }[] = [];
+    for (const recipient of recipients) {
+      if (claimed.length >= request.limit) break;
+      // Another claim holds this recipient's lock: skipped (K-05 item 3: SKIP LOCKED's meaning per recipient).
+      if (locks.has(recipient)) continue;
+      locks.add(recipient);
+      try {
+        // The claim's transaction is open across this wait: a claim made beside it meets the lock.
+        await yieldToOthers();
+        const walk = outboxRows()
+          .filter((row) => open(row) && recipientOf(row) === recipient)
+          .sort((a, b) => seqOf(a) - seqOf(b));
+        for (const row of walk) {
+          if (claimed.length >= request.limit) break;
+          const state = stateOf(row);
+          if (state.state === "waiting_chat") continue;
+          if (state.state === "held" && state.heldUntil !== null && Date.parse(state.heldUntil) > at) {
+            passedHeld.push({ outboxRowId: row.id, heldUntil: state.heldUntil });
+            continue;
+          }
+          if (state.state === "sending") {
+            if (state.claim !== null && Date.parse(state.claim.lapsesAt) > at) break;
+          } else if (state.state !== "checked" && state.state !== "held") {
+            break;
+          }
+          const plan = plans.get(row.id);
+          if (plan === undefined) break;
+          claimed.push(take(row, plan, request));
+        }
+      } finally {
+        locks.delete(recipient);
+      }
+    }
+    return { result: "claimed", claimed, passedHeld };
+  };
+
+  const renewOf = async (request: K05RenewClaimRequest): Promise<RenewClaimOutcome> => {
+    await yieldToOthers(1);
+    const row = outboxRow(request.outboxRowId);
+    if (row === undefined) return { error: "notFound", table: "outbox_rows", rowId: request.outboxRowId };
+    const state = stateOf(row);
+    const claim = state.claim;
+    if (
+      state.state !== "sending" ||
+      claim?.claimer !== request.claimer ||
+      claim.claimNo !== request.claimNo
+    ) {
+      return {
+        error: "claimLost",
+        table: "outbox_rows",
+        rowId: row.id,
+        claimer: claim?.claimer ?? null,
+        claimNo: claim?.claimNo ?? null,
+        state: state.state,
+      };
+    }
+    const part = state.parts.find((candidate) => candidate.key === request.idempotencyKey);
+    if (part === undefined)
+      return { error: "notFound", table: "outbox_parts", rowId: request.idempotencyKey };
+    if (part.state !== "pending") {
+      return {
+        error: "wrongState",
+        table: "outbox_parts",
+        rowId: request.idempotencyKey,
+        state: part.state,
+      };
+    }
+    if (claim.nextTryNotBefore !== null && Date.parse(claim.nextTryNotBefore) > Date.parse(request.at)) {
+      return { error: "notYet", outboxRowId: row.id, notBefore: claim.nextTryNotBefore };
+    }
+    state.claim = {
+      ...claim,
+      lapsesAt: lapseAfter(request.at),
+      firstTryAt: claim.firstTryAt ?? request.at,
+      nextTryNotBefore: null,
+    };
+    const phone = phones.get(recipientOf(row));
+    return {
+      result: "renewed",
+      outboxRowId: row.id,
+      claim: { ...state.claim },
+      recipient:
+        phone === undefined
+          ? null
+          : { stopped: phone.stopped, chatOpen: phone.chatOpen, version: phone.version },
+    };
+  };
+
+  const markPartOf = async (request: MarkPartV12Request): Promise<MarkPartV12Outcome> => {
+    await yieldToOthers(1);
+    const all = outboxRows().flatMap((row) =>
+      (moved.get(row.id)?.parts ?? []).map((part) => ({ row, part })),
+    );
+    const byKey = (key: string | null | undefined) =>
+      key === null || key === undefined ? undefined : all.find((entry) => entry.part.key === key);
+    // A receipt by its message id first; else the part under the key it echoes, only while that part holds none (item 31).
+    const echoed = request.outcome === "delivered" ? byKey(request.idempotencyKey) : undefined;
+    const found =
+      request.outcome === "delivered"
+        ? (all.find((entry) => entry.part.messageId === request.providerMessageId) ??
+          (echoed?.part.messageId === null ? echoed : undefined))
+        : byKey(request.idempotencyKey);
+    if (found === undefined) {
+      const rowId = request.outcome === "delivered" ? request.providerMessageId : request.idempotencyKey;
+      return { error: "notFound", table: "outbox_parts", rowId };
+    }
+    const { row, part } = found;
+    const state = touch(row);
+    let repeated = false;
+    let firstDelivery = false;
+    let nextKey: string | null = null;
+    const wrong = (table: "outbox_rows" | "outbox_parts", id: string, now: string): MarkPartV12Outcome =>
+      ({ error: "wrongState", table, rowId: id, state: now }) as MarkPartV12Outcome;
+    switch (request.outcome) {
+      case "sent":
+        if (part.state === "sent" || part.state === "delivered") repeated = true;
+        else if (part.state !== "pending") return wrong("outbox_parts", part.key, part.state);
+        else if (state.state !== "sending") return wrong("outbox_rows", row.id, state.state);
+        else {
+          part.state = "sent";
+          part.messageId = request.providerMessageId;
+        }
+        break;
+      case "delivered":
+        if (part.state === "delivered") repeated = true;
+        else if (part.state !== "sent" && part.state !== "failed")
+          return wrong("outbox_parts", part.key, part.state);
+        else {
+          firstDelivery = state.parts.every((each) => each.state !== "delivered");
+          part.state = "delivered";
+          part.messageId ??= request.providerMessageId;
+        }
+        break;
+      case "failed": {
+        if (part.state === "delivered") return wrong("outbox_parts", part.key, part.state);
+        if (part.state === "failed") {
+          repeated = true;
+          break;
+        }
+        part.state = "failed";
+        if (request.retry) {
+          const tryNo = part.tryNo + 1;
+          nextKey = `${row.id}/${String(part.partNo)}/${String(tryNo)}`;
+          state.parts.push({
+            partNo: part.partNo,
+            tryNo,
+            key: nextKey,
+            attempts: 1,
+            state: "pending",
+            messageId: null,
+          });
+        }
+        break;
+      }
+    }
+    if (!repeated) {
+      follow(state);
+      state.version += 1;
+    }
+    return {
+      result: "marked",
+      outboxRowId: row.id,
+      partNo: part.partNo,
+      tryNo: part.tryNo,
+      attempts: part.attempts,
+      repeated,
+      firstDelivery,
+      openQuestionId: row.values.openQuestionId ?? null,
+      nextKey,
+      row: { state: state.state, version: state.version },
+    } as MarkPartV12Outcome;
+  };
+
+  const markRowOf = async (request: MarkRowV12Request): Promise<MarkRowV12Outcome> => {
+    await yieldToOthers(1);
+    const row = outboxRow(request.outboxRowId);
+    if (row === undefined) return { error: "notFound", table: "outbox_rows", rowId: request.outboxRowId };
+    const state = stateOf(row);
+    if (state.state !== "sending") {
+      return {
+        error: "wrongState",
+        table: "outbox_rows",
+        rowId: row.id,
+        state: state.state,
+      };
+    }
+    if (state.version !== request.expectVersion) {
+      return {
+        error: "versionChanged",
+        changed: [
+          {
+            table: "outbox_rows",
+            rowId: row.id,
+            readVersion: request.expectVersion,
+            currentVersion: state.version,
+          },
+        ],
+      };
+    }
+    const kept = touch(row);
+    switch (request.outcome) {
+      case "held":
+        kept.state = "held";
+        kept.heldUntil = request.heldUntil;
+        break;
+      case "droppedStopped":
+        kept.state = "dropped_stopped";
+        break;
+      case "stale":
+        kept.state = "stale";
+        break;
+      case "withdrawn":
+        kept.state = "withdrawn";
+        break;
+      case "waitingChat":
+        kept.state = "waiting_chat";
+        kept.heldUntil = null;
+        kept.claim = null;
+        break;
+    }
+    kept.version += 1;
+    return {
+      result: "marked",
+      outboxRowId: row.id,
+      version: kept.version,
+      outcome: request.outcome,
+    };
+  };
+
+  const sendStateOf = async (request: SendStateRequest): Promise<SendStateOutcome> => {
+    await yieldToOthers(1);
+    const row = outboxRow(request.outboxRowId);
+    if (row === undefined) return { error: "notFound", table: "outbox_rows", rowId: request.outboxRowId };
+    const handleId = recipientOf(row);
+    if (handleId !== TEST_OWNER_1.handleId) {
+      throw new Error("the skeleton's sendState double holds no other recipient");
+    }
+    const businessId = typeof row.values.businessId === "string" ? row.values.businessId : null;
+    const business = businessId === null ? undefined : SEEDED.businesses.get(businessId);
+    if (businessId !== null && business === undefined) {
+      throw new Error("the skeleton's sendState double holds no other business");
+    }
+    const zone = business === undefined ? null : String(business.values.time_zone);
+    const thread = [...(written.rows.get("threads")?.values() ?? [])].find(
+      (candidate) => candidate.values.handle_id === handleId && candidate.values.kind === "chat",
+    );
+    const questionId = row.values.openQuestionId;
+    const question =
+      typeof questionId === "string" ? written.rows.get("open_questions")?.get(questionId) : undefined;
+    const status = question === undefined ? null : String(question.values.status);
+    const reads = Array.isArray(row.values.versionsRead)
+      ? (row.values.versionsRead as readonly { table: string; rowId: string; version: number }[])
+      : [];
+    const state = stateOf(row);
+    const phone = phones.get(handleId);
+    return {
+      result: "sendState",
+      outboxRowId: row.id,
+      rowState: state.state,
+      rowVersion: state.version,
+      readAt: utcSeconds(now()),
+      recipient: {
+        handleId,
+        kind: "phone",
+        address: TEST_OWNER_1.handle.address,
+        personId: typeof row.values.recipientPersonId === "string" ? row.values.recipientPersonId : null,
+      },
+      phone: phone === undefined ? null : structuredClone(phone),
+      chat:
+        thread === undefined
+          ? null
+          : {
+              threadId: thread.id,
+              linqChatId: typeof thread.values.linq_chat_id === "string" ? thread.values.linq_chat_id : null,
+              version: thread.version,
+            },
+      textsConsent: null,
+      audience: "customer",
+      zone,
+      visitZone: null,
+      businessZone: zone,
+      textHours:
+        business === undefined
+          ? null
+          : {
+              start: hoursAndMinutesOf(business.values.text_hours_start, "text hours"),
+              end: hoursAndMinutesOf(business.values.text_hours_end, "text hours"),
+            },
+      textHoursOverride: false,
+      currentVersions: reads.flatMap((read) => {
+        const current = written.rows.get(read.table)?.get(read.rowId);
+        return current === undefined
+          ? []
+          : [{ table: read.table, rowId: read.rowId, version: current.version }];
+      }),
+      booking: null,
+      pauses: [],
+      openQuestion:
+        question === undefined
+          ? null
+          : { id: question.id, status: status as never, version: question.version },
+      closed: { booking: false, question: status !== null && CLOSED_QUESTION.has(status) },
+    };
+  };
+
+  const kept = <Request, Answer>(
+    calls: DispatchCall<Request, Answer>[],
+    answering: (request: Request) => Promise<Answer>,
+  ): ((request: Request) => Promise<Answer>) => {
+    return async (request) => {
+      const answer = await answering(request);
+      calls.push({ request: structuredClone(request), answer: structuredClone(answer) });
+      return answer;
+    };
+  };
+
+  const double: FakeDispatchData = {
+    outbox: {
+      claimOutboxV12: (request) => kept(double.claims, claimOf)(request),
+      renewClaim: (request) => kept(double.renewals, renewOf)(request),
+      markPartV12: (request) => kept(double.partMarks, markPartOf)(request),
+      markRowV12: (request) => kept(double.rowMarks, markRowOf)(request),
+    },
+    sendState: (request) => kept(double.stateReads, sendStateOf)(request),
+    phones,
+    claims: [],
+    renewals: [],
+    partMarks: [],
+    rowMarks: [],
+    stateReads: [],
+    row(id) {
+      const row = outboxRow(id);
+      return row === undefined ? null : stateOf(row);
+    },
+    failNextClaim: null,
+  };
+  return double;
+}
+
 // ---- the walking skeleton's turn -----------------------------------------------------------------------------------
 
 /** The row commit-s1-02.json writes (S1-04's question to Sam): the one the turn composes and the dispatcher sends. */
@@ -2763,13 +3378,15 @@ type JoinedPort =
   | "gate"
   | "composeInput"
   | "composer"
-  | "finalize";
+  | "finalize"
+  | "outbox"
+  | "sendState";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
    * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input, the
-   * composer and finalize, which the root builds (./real.ts).
+   * composer, finalize, the outbox and the send state, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -2840,12 +3457,21 @@ export interface SkeletonFakes {
    * writePlan and the plan each row holds.
    */
   readonly finalize: FakeFinalizeData;
+  /**
+   * K-05 v1.2's outbox calls and sendState as one double over the rows the K-05 commitTurn double wrote, the plans
+   * finalize wrote into them and test owner 1's seeded rows (no phone row), for the root's real outbox and send-state
+   * ports (RootOptions.outboxCalls: `dispatch.outbox`; RootOptions.sendStateCall: `dispatch.sendState`).
+   */
+  readonly dispatch: FakeDispatchData;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
   readonly direct: FakeDirect;
   readonly face: FakeTurnFace;
-  readonly store: FakeOutboxStore;
+  /**
+   * The Linq port the dispatcher sends each part through (K-11 sendPart, joined by T-563). It accepts a part a moment
+   * after the send starts, as over the network, so a row's dispatch span starts before its providerAccepted span (DL-349).
+   */
   readonly linq: FakeLinq;
   readonly arming: WiredArming;
   /**
@@ -2901,21 +3527,12 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   });
   const turnFace = turnFaceOf(face);
 
-  const store = new FakeOutboxStore([
-    {
-      id: SKELETON_ROW,
-      recipient: SAM.party.handleId,
-      commitSeq: 1,
-      sends: finalizePass.outcome.finalParts.sends.map((send) => ({
-        ...send,
-        kind: "words" as const,
-        calendarFile: "none" as const,
-      })),
-      openQuestionId: A7_03_QUESTION,
-      sendClass: "quick_reply",
-    },
-  ]);
+  // The outbox and send state are joined (T-562): one K-05 double reads the rows the commit wrote, with the final parts
+  // finalize wrote into them, so the dispatcher claims and sends those final parts (DL-433).
+  const dispatch = fakeDispatchData(turnRows, finalize.plans, () => clock.now());
   const linq = new FakeLinq(() => clock.utc());
+  // Linq accepts a part a moment after the send starts, never at the same instant (DL-349).
+  linq.beforeAnswer = () => flush(1);
   const arming = wireArming();
   const secret = testWebhookSecret();
   const webhooks = createLinqWebhookDouble({ secret });
@@ -2943,19 +3560,13 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
             ),
         },
       },
-      dispatch: {
-        recipients: new FakeRecipients({
-          [SAM.party.handleId]: { to: SAM.handle.address, chatId: SAM_CHAT, service: "imessage" },
-        }),
-        sendState: new FakeSendState(),
-      },
       arming: { facts: arming.facts.reader, directory: arming.actors.directory },
     },
     turnFace: {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       safetyCore: core,
     },
-    dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
+    dataAccess: { rows: rowsOf(rows), clocks: arming.data.data },
     linqSend: { parts: linq, direct },
   };
 
@@ -2981,10 +3592,10 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     compose,
     composer,
     finalize,
+    dispatch,
     core,
     direct,
     face,
-    store,
     linq,
     arming,
     known(eventId) {

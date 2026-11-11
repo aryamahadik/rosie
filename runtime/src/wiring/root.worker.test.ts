@@ -43,8 +43,8 @@ import { createExecutionContext, reset, runDurableObjectAlarm } from "cloudflare
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
-import type { HandleActor } from "../actor";
-import { A7_03_DELIVERED } from "../clocks/arming-support";
+import { turnIdOf, type HandleActor } from "../actor";
+import { A7_03_DELIVERED, A7_03_FACTS } from "../clocks/arming-support";
 import { actorNameOf } from "../gateway";
 import { createWorker } from "../index";
 import { spanProblems, type Hop, type Span, type Trace } from "../trace";
@@ -55,7 +55,7 @@ import {
   BUNDLE_V0,
   SAM_CHAT,
   SAM_TRADES_TEXT,
-  SKELETON_ROW,
+  samPhoneRow,
   skeletonFakes,
   watchGate,
   type LinqInboundEvent,
@@ -198,6 +198,9 @@ function rig(log: MockInstance): Run {
     composers: fakes.composer.composers,
     // The finalize port (T-561) over its K-05 doubles: the row the commit wrote, and the plan written into it.
     finalizeData: fakes.finalize.data,
+    // The outbox and send-state ports (T-562) over one K-05 double: the rows the commit wrote, with finalize's plans.
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
   });
   const restoreRoot = root.install();
   const watched = watchGate(root);
@@ -267,6 +270,9 @@ describe("through the composition root, every port on its fake: a text's webhook
         const words = SAM_TRADES_TEXT;
         run.fakes.known("evt-sam-0001");
         run.fakes.decide.recordTurn(["evt-sam-0001"]);
+        // Sam's phone row as K-05 reads it (send-state-owner.json: chat open on iMessage, not stopped), so limit 8 lets the
+        // turn's reply go (T-562); test owner 1's own seed holds none, and a row to it waits for the chat (hop11's tests).
+        run.fakes.dispatch.phones.set(SAM.party.handleId, samPhoneRow());
         const traceId = await run.post(samText("evt-sam-0001", words));
         await settle(SAM_ACTOR);
 
@@ -274,12 +280,33 @@ describe("through the composition root, every port on its fake: a text's webhook
         await run.fakes.clock.advance(3000);
         await runDurableObjectAlarm(stubOf(SAM_ACTOR));
         await run.untilHop(traceId, "providerAccepted");
-        const parts = finalizePass.outcome.finalParts.sends.map(
-          (_send, index) => `${SKELETON_ROW}/${String(index + 1)}/1`,
+        // The dispatcher claimed the row the turn committed (K-05 v1.2's claim, T-562) and sent the final parts finalize
+        // wrote into it, one part per send.
+        const row = `outbox-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
+        const written = run.fakes.finalize.plans.get(row);
+        if (written === undefined) throw new Error("finalize wrote no final parts into the turn's row");
+        expect(run.fakes.linq.keysInOrder).toEqual(
+          written.finalParts.sends.map((_send, index) => `${row}/${String(index + 1)}/1`),
         );
-        expect(run.fakes.linq.keysInOrder).toEqual(parts);
-        const accepted = run.fakes.linq.accepted.get(`${SKELETON_ROW}/1/1`);
+        expect(run.fakes.linq.requests.map((request) => request.text)).toEqual(
+          written.finalParts.sends.map((send) => send.text),
+        );
+        const accepted = run.fakes.linq.accepted.get(`${row}/1/1`);
         if (accepted?.providerMessageId == null) throw new Error("Linq accepted no part");
+        // Until T-564 joins the clock arming, its doubles (clocks/arming-support, T-255) stand in for the question the row
+        // asks, as the dispatcher's fake store gave its row A7-03's question before T-562: S1-02's question takes A7-03's
+        // facts (K-04's seeds), and its clock row is the one the commit made (waiting, on Sam's handle).
+        const question = `oq-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
+        run.fakes.arming.facts.facts.set(question, {
+          ...structuredClone(A7_03_FACTS),
+          openQuestionId: question,
+        });
+        run.fakes.arming.data.make({
+          clockRowId: `clock-${question}`,
+          kind: "question",
+          openQuestionId: question,
+          handleId: SAM.party.handleId,
+        });
 
         // Linq's delivery receipt for that part: K-06 delivered.json with the part's message id, echoing its key.
         const receipt = {
@@ -289,7 +316,7 @@ describe("through the composition root, every port on its fake: a text's webhook
           chatId: SAM_CHAT,
           status: { messageId: accepted.providerMessageId, at: A7_03_DELIVERED.deliveredAt, failure: null },
         } as unknown as LinqInboundEvent;
-        const receiptTraceId = await run.post(receipt, `${SKELETON_ROW}/1/1`);
+        const receiptTraceId = await run.post(receipt, `${row}/1/1`);
 
         const spans = run.spans();
         const trace = spansOfTrace(spans, traceId);
@@ -352,9 +379,22 @@ describe("through the composition root, every port on its fake: a text's webhook
         );
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
         expect(run.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
-        // The receipt marked the part delivered once and armed A7-03's clock once (K-05 armClock).
-        expect(run.fakes.store.marks.filter((mark) => mark.outcome === "delivered")).toHaveLength(1);
+        // The receipt marked the part delivered once, through the outbox port's K-05 double (T-562), the row's first
+        // delivery, naming the question the turn committed.
+        const delivered = run.fakes.dispatch.partMarks.filter((mark) => mark.request.outcome === "delivered");
+        expect(delivered.map((mark) => mark.answer)).toMatchObject([
+          {
+            result: "marked",
+            outboxRowId: row,
+            repeated: false,
+            firstDelivery: true,
+            openQuestionId: question,
+            row: { state: "delivered" },
+          },
+        ]);
+        // And armed that question's clock once (K-05 armClock).
         expect(run.fakes.arming.data.armAnswers).toMatchObject([{ result: "armed", repeated: false }]);
+        expect(run.fakes.arming.data.armRequests).toMatchObject([{ openQuestionId: question }]);
         // The receipt's own webhook opened its own trace id: its receive hop alone.
         expect(receiptTraceId).not.toBe(traceId);
         const receiptReport = checkHops(spansOfTrace(spans, receiptTraceId), {

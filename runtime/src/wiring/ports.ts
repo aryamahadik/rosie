@@ -1,5 +1,5 @@
 // The walking skeleton's ports (T-550; C-046, C-044; build prompt section 10, D-017; ops/plan/02-contracts.md section 11):
-// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the sixteen
+// every outside call the Worker's gateway, the handle actor and the outbox dispatcher make, grouped into the eighteen
 // ports the composition root binds (./root.ts), in D-017's turn order. Each port's type is taken from the code that calls
 // it (the runtime's own hand-written contract shapes), so a port and its caller cannot drift apart. Each join (T-552 to
 // T-564) swaps one port's implementation, in the test environment and on staging (./picks.ts), for the real package:
@@ -20,9 +20,9 @@
 //                API base (its K-09 checks, the call's business scope, its span)
 //                and the frontier over K-05 v1.2 readTurnState and the turn's
 //                pinned bundle
-//   stateReads   other reads of stored state: who a handle is, each text's safety  T-562, T-564
+//   stateReads   other reads of stored state: who a handle is, each text's safety  T-564
 //                result, the safety read's bundle lines and stopped flag, a
-//                recipient's chat and send state, a question's facts
+//                question's facts
 //   turnFace     the rest of K-09's turn face (closest entries: meaning search)    no D-017 hop
 //                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
@@ -38,8 +38,11 @@
 //                composer, one per bundle for both
 //   finalize     K-09 finalizeMessage: slots, fixed lines, the claim check and     T-561
 //                the message checks
-//   dataAccess   K-05 writes: the turn's plans, the outbox claim and marks, the     T-562, T-564
-//                clock arming
+//   outbox       K-05 v1.2 claimOutbox, renewClaim, markPart and markRow: the      T-562
+//                dispatcher's claim and marks, and the receipt door's mark
+//   sendState    K-05 v1.2 sendState: limit 8's read of the recipient's send       T-562
+//                state at send, and the chat the send goes to
+//   dataAccess   K-05 writes: the turn's plans, the clock arming                   T-564
 //   linqSend     K-11 sendPart, and the checked safety line sent straight through  T-563
 //                Linq while PostgreSQL is down
 //
@@ -54,8 +57,12 @@ import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit
 import type { ArmingOptions } from "../clocks/arming";
 import type { ArmingData } from "../clocks/types";
 import type { BundleDeps } from "../bundle/types";
-import type { DispatchDeps } from "../dispatch/dispatcher";
-import type { LinqPort as LinqSendCall, OutboxStore } from "../dispatch/types";
+import type {
+  LinqPort as LinqSendCall,
+  OutboxStore,
+  RecipientDirectory,
+  SendStateReader,
+} from "../dispatch/types";
 import type { SealingKeyStore } from "../gateway/seal";
 import type { LinqPort as LinqVerifyCall } from "../gateway/types";
 import type { HandleTargetsPort } from "../guard/types";
@@ -70,7 +77,7 @@ import type {
   TurnRows,
 } from "../turn/types";
 
-/** The sixteen ports, in D-017's turn order (02-contracts section 11). */
+/** The eighteen ports, in D-017's turn order (02-contracts section 11). */
 export const PORTS = [
   "linqVerify",
   "sealing",
@@ -86,6 +93,8 @@ export const PORTS = [
   "composeInput",
   "composer",
   "finalize",
+  "outbox",
+  "sendState",
   "dataAccess",
   "linqSend",
 ] as const;
@@ -110,17 +119,25 @@ export interface TurnRowPort {
 
 /**
  * Reads of stored state not joined yet, by the part that reads them (K-04 rows through K-05). The bundle reads and the
- * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`).
+ * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`), and the dispatcher's
+ * send state since T-562 joined it (`Ports.sendState`).
  */
 export interface StateReads {
   /** The safety read's: the ids K-09 calls name for a handle, the bundle's checked lines and danger words, the stopped flag. */
   readonly safety: Pick<SafetyDeps, "directory" | "bundle" | "isStopped">;
   /** The turn's: who the handle is (K-04 handles, persons, roles, zone), and each text's safety result. */
   readonly turn: Pick<TurnDeps, "directory" | "safety">;
-  /** The dispatcher's: a recipient's chat, and limit 8's send state (K-05 v1.2 sendState). */
-  readonly dispatch: Pick<DispatchDeps, "recipients" | "sendState">;
   /** The clock arming's: an open question's facts, and the actor name of a handle. */
   readonly arming: Pick<ArmingOptions, "facts" | "directory">;
+}
+
+/**
+ * K-05 v1.2 sendState (T-562; item 28; NQ-RT-2): limit 8's read of a claimed row's recipient just before each send, and the
+ * chat that same read gives the send (the phone's number, the thread's Linq chat id, the service Linq reports).
+ */
+export interface SendStatePort {
+  readonly sendState: SendStateReader;
+  readonly recipients: RecipientDirectory;
 }
 
 /**
@@ -170,12 +187,10 @@ export interface TurnFacePort extends Omit<
  */
 export type FinalizePort = Pick<TurnFace, "finalizeMessage">;
 
-/** K-05 writes. */
+/** K-05 writes not joined yet (the outbox's are a port of their own since T-562 joined them: `Ports.outbox`). */
 export interface DataAccess {
   /** K-05 v1 unplannedRows and writePlan: the turn's rows after its commit (its park is the turn-row port's). */
   readonly rows: Omit<TurnRows, "parkTurn">;
-  /** K-05 v1.1 claimOutbox, renewClaim, markRow and markPart: the dispatcher's and the receipt door's. */
-  readonly outbox: OutboxStore;
   /** K-05 v1 armClock and cancelClock: the clock arming's. */
   readonly clocks: ArmingData;
 }
@@ -215,6 +230,13 @@ export interface Ports {
   readonly composer: TurnComposer;
   /** K-09 finalizeMessage through @rosie/actions' turn face (T-561): each row's final parts, written with its plan. */
   readonly finalize: FinalizePort;
+  /**
+   * K-05 v1.2's outbox calls (T-562): the dispatcher's claim in commit order, its renewal and marks, and the receipt
+   * door's delivered mark, one store, since a receipt finds the part the dispatcher sent.
+   */
+  readonly outbox: OutboxStore;
+  /** K-05 v1.2 sendState (T-562): limit 8's read at send, and the chat the send goes to. */
+  readonly sendState: SendStatePort;
   readonly dataAccess: DataAccess;
   readonly linqSend: LinqSend;
 }
