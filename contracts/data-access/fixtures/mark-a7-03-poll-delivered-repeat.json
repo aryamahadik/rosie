@@ -1,0 +1,28 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-a7-03-poll-delivered.json"],
+    "now": "2026-10-23T14:05:16Z",
+    "note": "Linq sends the poll's receipt again, the same event: found by its message id, the part is already delivered, so the mark is a repeat, nothing is written and the row stays delivered at version 7. repeatedDelivery names what it repeats: the poll's delivery at 14:05:06Z, as stored, which was not the row's first, since the words' part holds an earlier delivered_at (14:05:04Z). So firstOfRow is false and the caller hands nothing to the clock arming: the clock keeps its arming at the words' receipt (arm-clock-a7-03-after-4006)."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0302",
+    "at": "2026-10-23T14:05:06Z",
+    "idempotencyKey": "out-a7-03-alex/2/1"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-a7-03-alex",
+    "partNo": 2,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": true,
+    "firstDelivery": false,
+    "openQuestionId": "oq-a7-03-alex",
+    "nextKey": null,
+    "row": { "state": "delivered", "version": 7 },
+    "repeatedDelivery": { "firstOfRow": false, "deliveredAt": "2026-10-23T14:05:06Z" }
+  }
+}

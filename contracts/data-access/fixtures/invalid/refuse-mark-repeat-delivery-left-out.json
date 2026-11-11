@@ -1,0 +1,12 @@
+{
+  "result": "marked",
+  "outboxRowId": "out-a7-03-alex",
+  "partNo": 1,
+  "tryNo": 1,
+  "attempts": 1,
+  "repeated": true,
+  "firstDelivery": false,
+  "openQuestionId": "oq-a7-03-alex",
+  "nextKey": null,
+  "row": { "state": "sending", "version": 5 }
+}

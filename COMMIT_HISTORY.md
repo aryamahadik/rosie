@@ -2,9 +2,118 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 383, [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), 2026-11-11 14:39:31 UTC.
+- **Through:** commit 389, [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), 2026-11-11 15:42:09 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 389. docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394) (\#396)
+
+- **Commit:** [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), by Arya Mahadik, 2026-11-11 15:42:09 UTC
+- **Pull request:** [#396](https://github.com/aryamahadik/rosie/pull/396) from `task/commit-history-18`, merged 2026-11-11 15:42:10 UTC. It squashed 1 branch commit:
+  - `603dacd` docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 388. T-1226: freeze K-05 v1.9, markPart's answer to a repeated delivered mark says whether that delivery was the row's first (repeatedDelivery) (\#395)
+
+- **Commit:** [`560929f`](https://github.com/aryamahadik/rosie/commit/560929f), by Arya Mahadik, 2026-11-11 15:42:05 UTC
+- **Pull request:** [#395](https://github.com/aryamahadik/rosie/pull/395) from `task/T-1226`, merged 2026-11-11 15:42:05 UTC. It squashed 2 branch commits:
+  - `2a5ec34` T-1226: K-05 v1.9, frozen: markPart's answer to a repeated delivery r…
+  - `7462b25` T-1226: K-05 v1.9 README and index wording: item 48's read is under t…
+- **Files changed:** 10 (+1455 −5), by folder:
+  - `contracts/data-access/` README.md +71 −4, data-access.v1.9.schema.json +1198 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +48 −0, mark-a7-03-delivered-repeat.json +28 −0, mark-a7-03-poll-delivered-repeat.json +28 −0, mark-a7-03-poll-delivered.json +28 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-mark-delivered-repeat-null.json +28 −0, refuse-mark-repeat-delivery-left-out.json +12 −0, refuse-mark-repeat-says-first-delivery.json +13 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1226: K-05 v1.9, frozen: markPart's answer to a repeated delivery receipt says what it repeats (repeatedDelivery: firstOfRow, deliveredAt), so a repeat of a row's first delivery can be handed to the clock arming
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1226: K-05 v1.9 README and index wording: item 48's read is under the row's lock; the refused exchange's twin is named by its outcome
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 387. docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392) (\#394)
+
+- **Commit:** [`d5d1fce`](https://github.com/aryamahadik/rosie/commit/d5d1fce), by Arya Mahadik, 2026-11-11 15:24:32 UTC
+- **Pull request:** [#394](https://github.com/aryamahadik/rosie/pull/394) from `task/commit-history-17`, merged 2026-11-11 15:24:32 UTC. It squashed 1 branch commit:
+  - `66ba9fd` docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 386. T-1217: the send-state port maps K-05 v1.8's fromContact and bookingId across unchanged, left out when the answer has none; the v1.8 fixtures run through the port and limit 8 (\#393)
+
+- **Commit:** [`34af696`](https://github.com/aryamahadik/rosie/commit/34af696), by Arya Mahadik, 2026-11-11 15:24:26 UTC
+- **Pull request:** [#393](https://github.com/aryamahadik/rosie/pull/393) from `task/T-1217`, merged 2026-11-11 15:24:27 UTC. It squashed 1 branch commit:
+  - `16865c5` T-1217: the send-state port maps K-05 v1.8's fromContact and bookingI…
+- **Files changed:** 2 (+414 −23), by folder:
+  - `runtime/src/wiring/` real.ts +44 −23, send-state-yes.worker.test.ts +370 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 385. docs: COMMIT\_HISTORY.md through commit 383 (ea324b2, \#390) (\#392)
+
+- **Commit:** [`ec654b7`](https://github.com/aryamahadik/rosie/commit/ec654b7), by Arya Mahadik, 2026-11-11 15:01:00 UTC
+- **Pull request:** [#392](https://github.com/aryamahadik/rosie/pull/392) from `task/commit-history-16`, merged 2026-11-11 15:01:01 UTC. It squashed 1 branch commit:
+  - `77ecb0d` docs: COMMIT\_HISTORY.md through commit 383 (ea324b2, \#390)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 384. T-1218: K-05 contract test covers v1.8 (sendState's fromContact and bookingId): WRITTEN\_FOR and the mends of the 3 refused fixtures to their README twins; the database side runs T-1216's sendState on every v1.8 fixture after v1's reserve, plan and claim and the commits, each through db/repo (\#391)
+
+- **Commit:** [`d5998d2`](https://github.com/aryamahadik/rosie/commit/d5998d2), by Arya Mahadik, 2026-11-11 15:00:55 UTC
+- **Pull request:** [#391](https://github.com/aryamahadik/rosie/pull/391) from `task/T-1218`, merged 2026-11-11 15:00:56 UTC. It squashed 1 branch commit:
+  - `0b1ee8d` T-1218: K-05 contract test covers v1.8 (sendState's fromContact and b…
+- **Files changed:** 2 (+354 −71), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +301 −52, data-access.v1.test.ts +53 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 383. docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387) (\#390)
 
