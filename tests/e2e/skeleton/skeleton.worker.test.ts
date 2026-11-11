@@ -21,7 +21,7 @@
 //   (./gaps.ts): the actor's own receive span (the inbox entry, judged on its own), seq restarting in each writer (judged
 //   in the order the spans started), and the batch hop with no writer (left out of the hops judged).
 //
-// Joined on main: joins 1 to 9 (T-552 to T-560), receive to the composer. Each later join moves JOINED_THROUGH to its row's
+// Joined on main: joins 1 to 10 (T-552 to T-561), receive to finalize. Each later join moves JOINED_THROUGH to its row's
 // last hop and adds its row's claims. T-466 completes the file with D-017's automated tests: 1 outbox row and 1 send to the
 // Linq double carrying S1-02's question; every hop once, in order, under one trace id and one bundle id; the same webhook
 // sent again adds nothing; 20 consecutive runs give the same result. Nothing here prints a message's words or a number.
@@ -41,7 +41,14 @@ import type { Hop, Span, Trace } from "../../../contracts/generated/event-trace/
 import { QUIET_MS, turnIdOf } from "../../../runtime/src/actor";
 import { actorNameOf, openWords } from "../../../runtime/src/gateway";
 import { SEALING_WRAP_KEY } from "../../../runtime/src/wiring";
-import { BUNDLE_V0, JOIN_TEXT, SAM_CHAT, TEST_OWNER_1 } from "../../../runtime/src/wiring/test-support";
+import {
+  BUNDLE_V0,
+  bundleV0FixedLine,
+  JOIN_TEXT,
+  SAM_CHAT,
+  TEST_OWNER_1,
+  TEST_OWNER_1_BUSINESS_NAME,
+} from "../../../runtime/src/wiring/test-support";
 import { checkHops, checkRun, isModelCallSpan, readReceipt, type Collected, type SentText } from "../_driver";
 import {
   SECTION_11_ROWS,
@@ -62,8 +69,8 @@ const TEST_MS = 30_000;
 /** What SKELETON_UPTO and CONTRACT_REPORT ask of this run, read in Node (../_driver/prefix/plan.ts). */
 const plan = inject(SKELETON_PLAN);
 
-/** The last hop joined on main: join 9's, the composer returning that row's plan (T-560). */
-const JOINED_THROUGH: SkeletonHop = "compose";
+/** The last hop joined on main: join 10's, finalize filling slots and fixed lines with the claim and message checks (T-561). */
+const JOINED_THROUGH: SkeletonHop = "fillAndChecks";
 
 /** Every hop joined so far, as SKELETON_UPTO=<JOINED_THROUGH> names them: what the run judges with SKELETON_UPTO unset. */
 function joinedPrefix(): NonNullable<ReturnType<typeof prefixOf>> {
@@ -622,6 +629,86 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(facts.run.fakes.compose.rowReads).toEqual([
       { outboxRowId: row, businessId: TEST_OWNER_1.businessId },
     ]);
+  },
+
+  // Row 10, "Code fills slots and fixed lines; claim check and message checks" (K-09 finalizeMessage, K-03 final parts;
+  // T-561; ADR-013 section 6; Q-30's default): @rosie/actions' turn face's finalizeMessage, reading the JOIN turn's row and
+  // its fixed-line facts once each under Lee's Barbershop's scope, fills the row's plan (plan-s1-02.json) and adds Rosie's
+  // first-text lines word for word as bundle v0 writes them: S13-01's opener first, then Q-30's STOP, HELP and rates line,
+  // and the privacy link alone on the last line. Every message check passes at the first attempt as finalize runs them, so
+  // no rewrite, and the plan and the final parts are written into the row together, once, after the commit (T-196's
+  // writePlan). One fillAndChecks span, the turn's (the Tool API base records none: DL-376).
+  10: (facts) => {
+    const row = `outbox-s1-02-${facts.turnId}-1`;
+    const plan = planS102 as unknown as {
+      readonly lines: readonly { readonly text: string }[];
+      readonly question: { readonly text: string };
+    };
+    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
+    const optOutLine = bundleV0FixedLine("optOutLine");
+    const privacyLink = bundleV0FixedLine("privacyLink");
+    const fixedLines = ["opener", "optOutLine", "privacyLink"];
+    // One fillAndChecks span for the row, the turn's, after the compose: sent at the first attempt with no message check
+    // failed, the first text's fixed lines by id, the row written.
+    const checks = onlySpan(facts, "fillAndChecks");
+    expect(checks).toMatchObject({
+      outcome: "ok",
+      error_code: null,
+      turn_id: facts.turnId,
+      bundle_id: BUNDLE_V0,
+      business_id: TEST_OWNER_1.businessId,
+      got: { row, attempt: "composed", calls: 1 },
+      decided: {
+        outcome: "send",
+        failed: [],
+        fallback: false,
+        fallbackFailed: [],
+        fixedLines,
+        sends: 1,
+        questionWithdrawn: false,
+        teamPaged: false,
+      },
+      rows: [{ table: "outbox_rows", id: row }],
+    });
+    expect(Date.parse(checks.at)).toBeGreaterThanOrEqual(Date.parse(onlySpan(facts, "compose").at));
+    // No rewrite: no rewriteOrFallback span, and the composer was asked none.
+    expect(facts.collected.spans.filter((span) => span.hop === "rewriteOrFallback")).toEqual([]);
+    expect(facts.run.fakes.composer.rewrites).toEqual([]);
+    // The plan and the final parts, written into the row together, once, after the commit: the opener first, then the
+    // plan's words, the STOP, HELP and rates line, and the privacy link alone on the last line, each word for word.
+    const words = [`${opener} ${[...plan.lines.map((line) => line.text), plan.question.text].join("\n")}`];
+    const text = [...words, optOutLine, privacyLink].join("\n");
+    const { finalize } = facts.run.fakes;
+    expect(finalize.writes).toEqual([
+      {
+        outboxRowId: row,
+        expectVersion: 1,
+        plan: { row, channel: JOIN.service, copyOf: null, plan: planS102 },
+        finalParts: {
+          row,
+          channel: JOIN.service,
+          sends: [{ kind: "words", text, calendarFile: "none", options: [], link: null }],
+          fixedLines,
+          slotValues: [],
+          threadReplyTo: null,
+        },
+      },
+    ]);
+    const lines = text.split("\n");
+    expect(lines[0]?.startsWith(`${opener} `)).toBe(true);
+    expect(lines.slice(-2)).toEqual([optOutLine, privacyLink]);
+    expect(facts.run.fakes.turnRows.commits).toHaveLength(1);
+    // Finalize read the row and its fixed-line facts once each, under Lee's Barbershop's scope.
+    expect(finalize.scopes).toEqual([TEST_OWNER_1.businessId]);
+    expect(finalize.rowReads).toEqual([{ outboxRowId: row, businessId: TEST_OWNER_1.businessId }]);
+    expect(finalize.factReads).toEqual([{ outboxRowId: row, businessId: TEST_OWNER_1.businessId }]);
+    // No span holds a word of the final parts.
+    expect(
+      stringsOf(facts.collected.spans).filter((value) =>
+        [opener, optOutLine, privacyLink, ...lines].some((line) => value.includes(line)),
+      ),
+    ).toEqual([]);
+    return Promise.resolve();
   },
 };
 

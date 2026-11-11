@@ -33,8 +33,12 @@
 // double over the rows the commit wrote and test owner 1's seeded rows and by no database on staging until T-567, so
 // every compose input there fails closed; and composer (T-560), @rosie/ai's composer and its one rewrite, one per bundle,
 // over the recorded-model double in a test and over no composer on staging until the bundle's manifest and the model key
-// can be read there (J-02), so every compose and rewrite there fails closed before any model call. Every other port of
-// the Worker's environments stays closed: each call fails, as
+// can be read there (J-02), so every compose and rewrite there fails closed before any model call; and finalize (T-561),
+// K-09 finalizeMessage through @rosie/actions' turn face (T-313's finalize with T-314's fixed lines, the claim check and
+// the message checks, over K-05 v1.6 readOutboxRow and v1.3 readFixedLineFacts and the row's pinned bundle, the plan and
+// final parts written into the row by T-196's writePlan), fed in a test by K-05 doubles over the rows the commit wrote and
+// test owner 1's seeded rows and by no database on staging until T-567, so every finalize there fails closed and nothing
+// is written. Every other port of the Worker's environments stays closed: each call fails, as
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
@@ -74,7 +78,7 @@ export const PICKS: readonly PortPick[] = [
   { port: "gate", test: "real", staging: "real", production: "closed" }, // T-559
   { port: "composeInput", test: "real", staging: "real", production: "closed" }, // T-560
   { port: "composer", test: "real", staging: "real", production: "closed" }, // T-560
-  { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561
+  { port: "finalize", test: "real", staging: "real", production: "closed" }, // T-561
   { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-562, T-564
   { port: "linqSend", test: "fake", staging: "closed", production: "closed" }, // T-563
 ];

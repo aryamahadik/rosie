@@ -239,6 +239,7 @@ function rig(log: MockInstance, fed: { deciders?: boolean } = {}): Rig {
     gateReads: fakes.gate.reads,
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
+    finalizeData: fakes.finalize.data,
     flags: fakeFlags([SKELETON_FLAG]),
   });
   const restoreRoot = root.install();

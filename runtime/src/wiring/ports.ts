@@ -160,7 +160,14 @@ export interface TurnFacePort extends Omit<
   readonly safetyCore: SafetyCore;
 }
 
-/** K-09 finalizeMessage (T-313, C-093). */
+/**
+ * K-09 finalizeMessage (T-561; T-313, C-093): a committed outbox row's plan through @rosie/actions' turn face, read under the
+ * call's business from K-05 v1.6 readOutboxRow and v1.3 readFixedLineFacts and the bundle the row was committed under:
+ * its slots filled, its fixed lines added word for word (T-314: S13-01's opener, Q-30's STOP, HELP and rates line and
+ * privacy link), the claim check and the message checks run, and the plan written into the row with its final parts
+ * (T-196's writePlan); or the one rewrite asked for, then the step's fallback. The turn records the row's fillAndChecks
+ * and rewriteOrFallback spans and the Tool API base records none (TURN_RECORDS_FILL_AND_CHECKS; DL-376), so no flag is set.
+ */
 export type FinalizePort = Pick<TurnFace, "finalizeMessage">;
 
 /** K-05 writes. */
@@ -206,6 +213,7 @@ export interface Ports {
   readonly composeInput: ComposeInputPort;
   /** K-03's plan for each row and its one rewrite through @rosie/ai's composer (T-560), one per bundle for both. */
   readonly composer: TurnComposer;
+  /** K-09 finalizeMessage through @rosie/actions' turn face (T-561): each row's final parts, written with its plan. */
   readonly finalize: FinalizePort;
   readonly dataAccess: DataAccess;
   readonly linqSend: LinqSend;

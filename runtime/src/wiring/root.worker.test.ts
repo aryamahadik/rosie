@@ -20,8 +20,10 @@
 // then composes. Since T-560 joined compose input and the composer, each row's composer input comes from @rosie/actions'
 // turn face over a K-05 readOutboxRow double (fakeComposeReads), and its plan from @rosie/ai's composer over the
 // recorded-model double (fakeComposerModels, which holds the plan of the turn this test records), whose model-call span
-// sits in the trace beside decide's. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the
-// root's dispatcher, and the root's receipt door marks the part delivered and arms its clock.
+// sits in the trace beside decide's. Since T-561 joined finalize, each row's plan is finalized by @rosie/actions' turn
+// face over K-05 doubles of its row calls (fakeFinalizeData), which keep the plan and final parts written into the row.
+// Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
+// receipt door marks the part delivered and arms its clock.
 //
 // The trace is judged as T-260's runtime trace test judges it (runtime/test/trace-e2e.worker.test.ts, which passes
 // unchanged beside this file), with T-260's hop check (runtime/src/trace/hop-check.ts) against K-08 v1's
@@ -194,6 +196,8 @@ function rig(log: MockInstance): Run {
     // recorded-model double, which holds the plan of the turn this test records.
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
+    // The finalize port (T-561) over its K-05 doubles: the row the commit wrote, and the plan written into it.
+    finalizeData: fakes.finalize.data,
   });
   const restoreRoot = root.install();
   const watched = watchGate(root);

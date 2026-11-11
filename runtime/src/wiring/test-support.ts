@@ -1,11 +1,11 @@
 // Doubles for the composition root's tests (T-550, T-552): the fake set the test environment binds (./picks.ts), every
 // port not joined yet on the doubles the runtime's own tests already use, answering the walking skeleton's turn as T-260's
-// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, S1-02's compose input and
-// finalize-pass.json retargeted to each row the commit wrote, the dispatcher's K-05 store holding the skeleton's row, and a
-// delivery receipt that arms A7-03's clock. The frontier is the joined one (T-557): its K-05 double answers for test owner
-// 1's seeded rows, so the turn's context is the real frontier's; decide is the joined one (T-558), whose recorded-model
-// double answers that context's reads; and the gate is the joined one (T-559), whose K-05 doubles write the turn's rows.
-// Not imported by the Worker.
+// runtime trace test does (runtime/test/trace-e2e.worker.test.ts): Sam's text, the dispatcher's K-05 store holding the
+// skeleton's row (with finalize-pass.json's sends), and a delivery receipt that arms A7-03's clock. The frontier is the
+// joined one (T-557): its K-05 double answers for test owner 1's seeded rows, so the turn's context is the real
+// frontier's; decide is the joined one (T-558), whose recorded-model double answers that context's reads; the gate is the
+// joined one (T-559), whose K-05 doubles write the turn's rows; compose input, the composer (T-560) and finalize (T-561)
+// are the joined ones, whose doubles read and write those rows. Not imported by the Worker.
 //
 //   linqVerify   joined (T-552): the root binds the Linq adapter's verify (./real.ts). What it is fed comes from here:
 //                the Linq double's signer (T-412, @rosie/adapters' double-webhooks) signs each webhook under a
@@ -66,7 +66,13 @@
 //                fake Messages API whose answers come from the recorded-model double: ai/recordings' composer.v1.1.json
 //                as it is (recording 4 is the JOIN run's S1-02 row; DL-347) and the plans a test records for its own
 //                turn of test owner 1's (`recordTurn`)
-//   finalize     the same fakeTurnFace (finalize-pass.json)
+//   finalize     joined (T-561): the root binds @rosie/actions' turn face's finalizeMessage through its real finalize port
+//                (./real.ts realFinalize), over the bundle the turn's run pinned. What its reads and writes are fed comes
+//                from here: `fakeFinalizeData`, the Tool API's business scope and K-05 doubles over the rows the K-05
+//                commitTurn double wrote and test owner 1's seeded rows: readOutboxRow (as compose input's, with the plan
+//                the row holds once written), readFixedLineFacts (no phone row in the seed), writePlan (T-196's, keeping
+//                each row's plan and final parts) and cancelClock. The turn's finalize calls are kept on the fake face as
+//                the stand-in kept them, by `watchGate` when it is handed the face
 //   dataAccess   turn/test-support fakeRows (the commit's one row), dispatch/test-support FakeOutboxStore, and
 //                clocks/arming-support's K-05 armClock and cancelClock
 //   linqSend     dispatch/test-support FakeLinq and safety/test-support fakeDirect
@@ -78,9 +84,15 @@
 import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
 import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
 import type { StoredHold, StoredOutcome } from "@rosie/actions/src/domain/safety/ports";
+import type {
+  CancelClockAnswer,
+  CancelClockRequest,
+  WritePlanAnswer,
+  WritePlanRequest,
+} from "@rosie/actions/src/finalize/rewrite/types";
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
 import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
-import type { OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
+import type { FixedLineFactsRead, OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createLinqWebhookDouble, type LinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import type { InboundEvent as LinqEvent, VerifyWebhookRequest } from "@rosie/adapters/linq/webhook";
 import joinComposeInputJson from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
@@ -119,7 +131,6 @@ import inputS102V11 from "@rosie/contracts/message-plan/fixtures/input-s1-02-v1.
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
-import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import type { ReadActiveBundleResult, ReadBundleValueResult, StoredText } from "@rosie/db/repo/bundles";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { FlagSubject } from "@rosie/db/repo/flags";
@@ -153,7 +164,14 @@ import {
   unplannedRow,
   type FakeTurnFace,
 } from "../turn/test-support";
-import type { DecideContext, GateAndCommitAnswer, GateAndCommitRequest, GateCommitted } from "../turn/types";
+import type {
+  DecideContext,
+  FinalizeMessageAnswer,
+  FinalizeMessageRequest,
+  GateAndCommitAnswer,
+  GateAndCommitRequest,
+  GateCommitted,
+} from "../turn/types";
 import type { Ports } from "./ports";
 import type {
   BundleReadCalls,
@@ -161,6 +179,7 @@ import type {
   ComposeReads,
   Composers,
   Deciders,
+  FinalizeData,
   FrontierScope,
   GateReads,
   HandleSealingKeyCall,
@@ -855,14 +874,35 @@ export interface WatchedGateCall {
   answer: unknown;
 }
 
+/** One finalizeMessage the turn handed the root: the request as the turn made it, and what the finalize port answered. */
+export interface WatchedFinalizeCall {
+  readonly request: FinalizeMessageRequest;
+  /** What the root's finalize port answered (or threw), once it has. */
+  answer: unknown;
+}
+
+/** The turn's calls a watch keeps besides its gate calls: its finalize calls, with their answers. */
+export interface WatchedTurn {
+  readonly calls: WatchedGateCall[];
+  readonly finalizeCalls: WatchedFinalizeCall[];
+  restore(): void;
+}
+
 /**
- * Watches the turn's gateAndCommit on a root whose actor ports are installed (call it after `root.install()`): each call
- * the turn makes is kept, as the turn made it, then goes on to the root's own gateAndCommit unchanged (which puts the run's
- * text source on the request's turn and sends it to the gate port), its answer kept beside it. A test's observer only:
- * nothing it holds changes what the gate is sent or answers. Returns the calls and what puts the root's own turn deps back.
+ * Watches the turn's gateAndCommit and finalizeMessage on a root whose actor ports are installed (call it after
+ * `root.install()`): each call the turn makes is kept, as the turn made it, then goes on to the root's own call unchanged
+ * (gateAndCommit puts the run's text source on the request's turn and sends it to the gate port; finalizeMessage goes to
+ * the finalize port), its answer kept beside it. Since T-561 joined finalize, no stand-in face answers it, so a fake face
+ * handed in (`face`) also gets each finalize request and its log line, as the stand-in face kept them. A test's observer
+ * only: nothing it holds changes what the gate or finalize is sent or answers. Returns the calls and what puts the root's
+ * own turn deps back.
  */
-export function watchGate(root: Root): { readonly calls: WatchedGateCall[]; restore(): void } {
+export function watchGate(
+  root: Root,
+  face: Pick<FakeTurnFace, "finalizeCalls" | "log"> | null = null,
+): WatchedTurn {
   const calls: WatchedGateCall[] = [];
+  const finalizeCalls: WatchedFinalizeCall[] = [];
   const restore = setTurnDeps({
     ...root.turn,
     toolApi: {
@@ -878,9 +918,22 @@ export function watchGate(root: Root): { readonly calls: WatchedGateCall[]; rest
         }
         return call.answer as GateAndCommitAnswer;
       },
+      async finalizeMessage(request, trace) {
+        const call: WatchedFinalizeCall = { request: structuredClone(request), answer: undefined };
+        finalizeCalls.push(call);
+        face?.finalizeCalls.push(structuredClone(request));
+        face?.log.push(`finalize:${request.attempt}:${request.outboxRowId}`);
+        try {
+          call.answer = await root.turn.toolApi.finalizeMessage(request, trace);
+        } catch (error) {
+          call.answer = error;
+          throw error;
+        }
+        return call.answer as FinalizeMessageAnswer;
+      },
     },
   });
-  return { calls, restore };
+  return { calls, finalizeCalls, restore };
 }
 
 // ---- K-05 v1 item 7's bundle reads, as a double: bundle v0 as bundles/v0 publishes it (T-556) ----------------------
@@ -918,6 +971,39 @@ function bundleKeyOf(bundleId: BundleId, part: string): string {
 
 /** Bundle v0's id, as bundles/v0 publishes it: the bundle the test environment's bundle port holds active. */
 export const BUNDLE_V0: BundleId = bundleIdOfParts(BUNDLE_V0_PARTS);
+
+/** One part of bundle v0 as bundles/v0 publishes it, parsed: its manifest, or a flow graph (flow/A). */
+function bundleV0Part(part: string): Record<string, unknown> {
+  const text = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, part));
+  if (text === undefined) throw new Error(`bundles/v0 publishes no ${part}`);
+  return JSON.parse(text) as Record<string, unknown>;
+}
+
+/**
+ * Bundle v0's fixed line `id` in `lang` (K-01 v1 lists.fixedLines), word for word as bundles/v0 publishes its manifest (its
+ * <business> left as written): the words finalize adds to a row of a turn pinned to bundle v0 (T-314, T-1146).
+ */
+export function bundleV0FixedLine(id: string, lang = "en"): string {
+  const lists = bundleV0Part("manifest").lists as
+    | {
+        readonly fixedLines?: {
+          readonly lines?: readonly { id: string; lang: string; text: string | null }[];
+        };
+      }
+    | undefined;
+  const text = lists?.fixedLines?.lines?.find((line) => line.id === id && line.lang === lang)?.text;
+  if (typeof text !== "string") throw new Error(`bundles/v0 holds no ${lang} fixed line ${id}`);
+  return text;
+}
+
+/** A step's fallback text in bundle v0's flow A (K-01 v1 step.fallbackText), as bundles/v0 publishes it. */
+export function bundleV0FallbackText(stepId: string): string {
+  const steps = bundleV0Part("flow/A").steps as
+    Readonly<Record<string, { fallbackText?: unknown }>> | undefined;
+  const text = steps?.[stepId]?.fallbackText;
+  if (typeof text !== "string") throw new Error(`bundles/v0's flow A holds no fallback text for ${stepId}`);
+  return text;
+}
 
 /** A K-01 value's kind, from its key's part: the manifest, a flow graph or a trade overlay. */
 function kindOfKey(key: string): StoredText["kind"] {
@@ -1086,6 +1172,14 @@ const SEEDED: Readonly<Record<"businesses" | "persons", ReadonlyMap<string, Seed
     ],
   ]),
 };
+
+/**
+ * Lee's Barbershop's name as test owner 1's seed stores it (K-04 businesses.name): with its sensitive switch off, the name
+ * limit 7 lets a reader see (biz.name), so the one a fixed line's <business> is filled with (T-314 claimedBusiness).
+ */
+export const TEST_OWNER_1_BUSINESS_NAME = String(
+  SEEDED.businesses.get(TEST_OWNER_1.businessId)?.values.name ?? "",
+);
 
 /** One read the frontier made through the scope: the business the call's transaction was scoped to, and the read. */
 export interface FrontierScopeRead {
@@ -1979,6 +2073,40 @@ export function fakeComposeReads(
 ): FakeComposeReads {
   const scopes: string[] = [];
   const rowReads: ComposeRowRead[] = [];
+  const reads: ComposeReads = {
+    scope: scopeRecordedIn(scopes),
+    readOutboxRow(request) {
+      rowReads.push({ outboxRowId: request.outboxRowId, businessId: request.businessId });
+      log.push(`composeInput:${request.outboxRowId}`);
+      return outboxRowOf(written, request, now);
+    },
+  };
+  return { reads, scopes, rowReads };
+}
+
+/** The Tool API's own business scope as a double: each call's business kept in `scopes`, its repo scoped to it. */
+function scopeRecordedIn(scopes: string[]): ComposeReads["scope"] {
+  return {
+    withBusiness: (businessId, work) => {
+      scopes.push(businessId);
+      const repo: GateCallRepo = { scopedTo: businessId };
+      return work(repo);
+    },
+  };
+}
+
+/** A K-05 error answer as the row binding takes it (notFound, fixedLineRow). */
+type RowError = Extract<Awaited<ReturnType<ComposeReads["readOutboxRow"]>>, { readonly error: string }>;
+
+/**
+ * K-05 v1.6 readOutboxRow as fakeComposeReads describes it: the row the K-05 commitTurn double wrote, read under the
+ * request's business over test owner 1's seeded rows, as a row that holds no plan yet (K-07 planned, version as written).
+ */
+function outboxRowOf(
+  written: Pick<FakeTurnRows, "rows" | "turns">,
+  request: { readonly outboxRowId: string; readonly businessId: string },
+  now: () => number,
+): Promise<OutboxRowRead | RowError> {
   const rowsOf = (table: string): WrittenRow[] => [...(written.rows.get(table)?.values() ?? [])];
   const refused = (what: string): Promise<never> =>
     Promise.reject(new Error(`the skeleton's readOutboxRow double holds no ${what}`));
@@ -2014,98 +2142,268 @@ export function fakeComposeReads(
     };
   };
 
-  const reads: ComposeReads = {
-    scope: {
-      withBusiness: (businessId, work) => {
-        scopes.push(businessId);
-        const repo: GateCallRepo = { scopedTo: businessId };
-        return work(repo);
-      },
+  const row = written.rows.get("outbox_rows")?.get(request.outboxRowId);
+  if (row?.values.businessId !== request.businessId) {
+    return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId });
+  }
+  const values = row.values;
+  if (values.sendClass === "safety") {
+    return Promise.resolve({ error: "fixedLineRow", outboxRowId: row.id, sendClass: "safety" });
+  }
+  const turn = written.turns.get(row.turnId);
+  if (turn === undefined) return refused("turn for the row");
+  if (values.bookingId !== null) return refused("booking");
+  if (values.recipientHandleId !== TEST_OWNER_1.handleId) return refused("other recipient");
+  const person = SEEDED.persons.get(String(values.recipientPersonId));
+  const business = SEEDED.businesses.get(request.businessId);
+  if (person === undefined || business === undefined) return refused("other person or business");
+  const questionId = values.openQuestionId;
+  const question = typeof questionId === "string" ? questionOf(questionId, request.businessId) : null;
+  if (typeof questionId === "string" && question === null) return refused("question for the row");
+  const outcomeOf = (eventId: string): WrittenRow | undefined =>
+    rowsOf("safety_outcomes").find(
+      (outcome) => outcome.values.event_id === eventId && outcome.values.business_id === request.businessId,
+    );
+  const answer = {
+    result: "outboxRow",
+    outboxRowId: row.id,
+    businessId: request.businessId,
+    readAt: utcSeconds(now()),
+    row: {
+      turnId: row.turnId,
+      bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
+      state: "planned",
+      version: row.version,
+      channel: values.channel,
+      sendClass: values.sendClass,
+      bookingId: null,
+      openQuestionId: questionId ?? null,
+      copyOfRowId: values.copyOfRowId ?? null,
+      hasPlan: false,
+      finalParts: null,
     },
-    readOutboxRow(request) {
+    // The step that asks, line 0; a row that asks no question has none.
+    line: question === null ? null : { step: question.step, index: 0, from: "openQuestion" },
+    recipient: {
+      handleId: TEST_OWNER_1.handleId,
+      kind: TEST_OWNER_1.handle.kind,
+      personId: TEST_OWNER_1.personId,
+      name: person.values.name,
+      storedLanguage: person.values.language ?? null,
+      roles: [],
+      phone: null,
+    },
+    answers: {
+      handleId: turn.handleId,
+      texts: turn.eventIds.map((eventId) => {
+        const outcome = outcomeOf(eventId);
+        return {
+          eventId,
+          outcomes: outcome?.values.outcomes ?? null,
+          tenses: outcome?.values.tenses ?? null,
+        };
+      }),
+    },
+    slotSource: {
+      business: {
+        id: request.businessId,
+        name: business.values.name,
+        displayName: business.values.display_name,
+        timeZone: business.values.time_zone,
+        version: business.version,
+      },
+      booking: null,
+      question,
+    },
+    businessSensitive: SEEDED_SENSITIVE.get(request.businessId) ?? null,
+    openQuestions: [],
+  };
+  return Promise.resolve(answer as unknown as OutboxRowRead);
+}
+
+// ---- K-05's row calls under finalize's scope, as doubles: the row the commit wrote, and its plan (T-561) ----------
+
+/** The plan and the final parts one row holds, as writePlan wrote them, with the row's version after the write. */
+export interface StoredPlan {
+  readonly plan: WritePlanRequest["plan"];
+  readonly finalParts: WritePlanRequest["finalParts"];
+  readonly version: number;
+}
+
+export interface FakeFinalizeData {
+  /**
+   * What the root's real finalize port is fed (RootOptions.finalizeData): the Tool API's business scope and K-05's four
+   * row calls over the doubles.
+   */
+  readonly data: FinalizeData;
+  /** Each finalize call's business scope, in order (the Tool API's own: rosie_app on PostgreSQL). */
+  readonly scopes: string[];
+  /** Every readOutboxRow, in order (each the runtime side's own transaction under the named business). */
+  readonly rowReads: ComposeRowRead[];
+  /** Every readFixedLineFacts, in order (each the runtime side's own transaction under the named business). */
+  readonly factReads: ComposeRowRead[];
+  /** Every writePlan request, in order, as finalize sent it (T-196's call: the plan and the final parts together). */
+  readonly writes: WritePlanRequest[];
+  /** Every cancelClock request, in order (the passed-on path's withdrawal). */
+  readonly cancels: CancelClockRequest[];
+  /** The plan each row holds, by row id: what a writePlan wrote. */
+  readonly plans: ReadonlyMap<string, StoredPlan>;
+}
+
+/** K-01's opener (S13-01): a row whose final parts carry it is Rosie's first text to its handle about its business. */
+const OPENER = "opener";
+
+/**
+ * Finalize's K-05 calls (T-561; @rosie/actions' turn-face/pg/calls.ts pgRowData on PostgreSQL) as doubles over the rows the
+ * K-05 commitTurn double wrote (`written`) and test owner 1's seeded rows, each answering as db/repo answers on those rows:
+ *
+ *   readOutboxRow       as fakeComposeReads' (T-1138, T-1197), the row holding no plan; once writePlan wrote one, the row
+ *                       as K-07's checked moves it (state checked, its version raised, hasPlan, its final parts);
+ *   readFixedLineFacts  K-05 v1.3 item 36 (T-1138), as fixed-line-facts-s1-02.json: Rosie has texted the handle about the
+ *                       row's business only when another of its rows there holds final parts that carry the opener (K-04
+ *                       openers_sent's mark, as the double keeps it); the STOP, HELP and rates line was never delivered,
+ *                       since test owner 1's seed holds no phone row;
+ *   writePlan           K-05 v1 item 2 (T-196, db/repo/outbox.ts; write-plan.json, write-plan-repeat.json): the plan and
+ *                       the final parts written together, the row checked and its version raised; alreadyPlanned when the
+ *                       row holds a plan (checked before the version), versionChanged, notFound; a plan or final parts
+ *                       of another row or channel refused (thrown), nothing written;
+ *   cancelClock         K-05 v1 item 5 (cancel-clock.json): the question's clock row cancelled, the question withdrawn.
+ *
+ * The doubles keep what they write beside `written`, never in it, so the commit's rows stay as the commit wrote them.
+ * Each call's scope is the Tool API's own, its repo scoped to the call's business.
+ */
+export function fakeFinalizeData(
+  written: Pick<FakeTurnRows, "rows" | "turns">,
+  now: () => number = Date.now,
+): FakeFinalizeData {
+  const scopes: string[] = [];
+  const rowReads: ComposeRowRead[] = [];
+  const factReads: ComposeRowRead[] = [];
+  const writes: WritePlanRequest[] = [];
+  const cancels: CancelClockRequest[] = [];
+  const plans = new Map<string, StoredPlan>();
+  const cancelled = new Map<string, number>();
+  const outboxRow = (id: string): WrittenRow | undefined => written.rows.get("outbox_rows")?.get(id);
+  const refusedWrite = (what: string): Promise<never> =>
+    Promise.reject(new Error(`K-05 v1 refuses the writePlan request: ${what}`));
+
+  const data: FinalizeData = {
+    scope: scopeRecordedIn(scopes),
+    async readOutboxRow(request) {
       rowReads.push({ outboxRowId: request.outboxRowId, businessId: request.businessId });
-      log.push(`composeInput:${request.outboxRowId}`);
-      const row = written.rows.get("outbox_rows")?.get(request.outboxRowId);
+      const read = await outboxRowOf(written, request, now);
+      const stored = plans.get(request.outboxRowId);
+      if ("error" in read || stored === undefined) return read;
+      // The row as K-07 moves it at the write: checked, its version raised, holding the plan and its final parts.
+      return {
+        ...read,
+        row: {
+          ...read.row,
+          state: "checked",
+          version: stored.version,
+          hasPlan: true,
+          finalParts: stored.finalParts,
+        },
+      };
+    },
+    readFixedLineFacts(request) {
+      factReads.push({ outboxRowId: request.outboxRowId, businessId: request.businessId });
+      const row = outboxRow(request.outboxRowId);
       if (row?.values.businessId !== request.businessId) {
         return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId });
       }
-      const values = row.values;
-      if (values.sendClass === "safety") {
-        return Promise.resolve({ error: "fixedLineRow", outboxRowId: row.id, sendClass: "safety" });
+      const handleId = row.values.recipientHandleId;
+      if (handleId !== TEST_OWNER_1.handleId) {
+        return Promise.reject(new Error("the skeleton's readFixedLineFacts double holds no other recipient"));
       }
-      const turn = written.turns.get(row.turnId);
-      if (turn === undefined) return refused("turn for the row");
-      if (values.bookingId !== null) return refused("booking");
-      if (values.recipientHandleId !== TEST_OWNER_1.handleId) return refused("other recipient");
-      const person = SEEDED.persons.get(String(values.recipientPersonId));
-      const business = SEEDED.businesses.get(request.businessId);
-      if (person === undefined || business === undefined) return refused("other person or business");
-      const questionId = values.openQuestionId;
-      const question = typeof questionId === "string" ? questionOf(questionId, request.businessId) : null;
-      if (typeof questionId === "string" && question === null) return refused("question for the row");
-      const outcomeOf = (eventId: string): WrittenRow | undefined =>
-        rowsOf("safety_outcomes").find(
-          (outcome) =>
-            outcome.values.event_id === eventId && outcome.values.business_id === request.businessId,
+      const carriesOpener = (id: string): boolean =>
+        plans.get(id)?.finalParts.fixedLines.includes(OPENER) ?? false;
+      const opened = [...plans.keys()].find((id) => {
+        const other = outboxRow(id);
+        return (
+          id !== row.id &&
+          other?.values.recipientHandleId === handleId &&
+          other.values.businessId === request.businessId &&
+          carriesOpener(id)
         );
-      const answer = {
-        result: "outboxRow",
+      });
+      const facts: FixedLineFactsRead & Record<string, unknown> = {
+        result: "fixedLineFacts",
         outboxRowId: row.id,
         businessId: request.businessId,
+        recipientHandleId: handleId,
         readAt: utcSeconds(now()),
-        row: {
-          turnId: row.turnId,
-          bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
-          state: "planned",
-          version: row.version,
-          channel: values.channel,
-          sendClass: values.sendClass,
-          bookingId: null,
-          openQuestionId: questionId ?? null,
-          copyOfRowId: values.copyOfRowId ?? null,
-          hasPlan: false,
-          finalParts: null,
-        },
-        // The step that asks, line 0; a row that asks no question has none.
-        line: question === null ? null : { step: question.step, index: 0, from: "openQuestion" },
-        recipient: {
-          handleId: TEST_OWNER_1.handleId,
-          kind: TEST_OWNER_1.handle.kind,
-          personId: TEST_OWNER_1.personId,
-          name: person.values.name,
-          storedLanguage: person.values.language ?? null,
-          roles: [],
-          phone: null,
-        },
-        answers: {
-          handleId: turn.handleId,
-          texts: turn.eventIds.map((eventId) => {
-            const outcome = outcomeOf(eventId);
-            return {
-              eventId,
-              outcomes: outcome?.values.outcomes ?? null,
-              tenses: outcome?.values.tenses ?? null,
-            };
-          }),
-        },
-        slotSource: {
-          business: {
-            id: request.businessId,
-            name: business.values.name,
-            displayName: business.values.display_name,
-            timeZone: business.values.time_zone,
-            version: business.version,
-          },
-          booking: null,
-          question,
-        },
-        businessSensitive: SEEDED_SENSITIVE.get(request.businessId) ?? null,
-        openQuestions: [],
+        textedAboutBusiness: opened !== undefined,
+        openerRowId: opened ?? (carriesOpener(row.id) ? row.id : null),
+        // Test owner 1's seed holds no phone row (T-1148): the line was never delivered to the number.
+        optOutLineDeliveredAt: null,
       };
-      return Promise.resolve(answer as unknown as OutboxRowRead);
+      return Promise.resolve(facts);
+    },
+    writePlan(request): Promise<WritePlanAnswer> {
+      writes.push(structuredClone(request));
+      const id = request.outboxRowId;
+      const row = outboxRow(id);
+      if (row === undefined) return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: id });
+      const stored = plans.get(id);
+      // A row that holds a plan keeps it, checked before its version: a repeat writes nothing.
+      if (stored !== undefined) {
+        return Promise.resolve({ error: "alreadyPlanned", outboxRowId: id, version: stored.version });
+      }
+      if (row.version !== request.expectVersion) {
+        return Promise.resolve({
+          error: "versionChanged",
+          changed: [
+            {
+              table: "outbox_rows",
+              rowId: id,
+              readVersion: request.expectVersion,
+              currentVersion: row.version,
+            },
+          ],
+        });
+      }
+      const { plan, finalParts } = request;
+      if (plan.row !== id || finalParts.row !== id)
+        return refusedWrite("a plan or final parts of another row");
+      const channel = row.values.channel;
+      if (plan.channel !== channel || finalParts.channel !== channel) return refusedWrite("another channel");
+      if (plan.copyOf !== (row.values.copyOfRowId ?? null)) return refusedWrite("another copyOf");
+      const version = row.version + 1;
+      plans.set(id, { plan: structuredClone(plan), finalParts: structuredClone(finalParts), version });
+      return Promise.resolve({ result: "written", outboxRowId: id, version });
+    },
+    cancelClock(request): Promise<CancelClockAnswer> {
+      cancels.push(structuredClone(request));
+      const clock = written.rows.get("clock_rows")?.get(request.clockRowId);
+      if (clock === undefined) {
+        return Promise.resolve({ error: "notFound", table: "clock_rows", rowId: request.clockRowId });
+      }
+      const version = cancelled.get(clock.id) ?? clock.version;
+      if (version !== request.expectVersion) {
+        return Promise.resolve({
+          error: "versionChanged",
+          changed: [
+            {
+              table: "clock_rows",
+              rowId: clock.id,
+              readVersion: request.expectVersion,
+              currentVersion: version,
+            },
+          ],
+        });
+      }
+      cancelled.set(clock.id, version + 1);
+      return Promise.resolve({
+        result: "cancelled",
+        clockRowId: clock.id,
+        version: version + 1,
+        cancelledAt: request.at,
+        repeated: false,
+      });
     },
   };
-  return { reads, scopes, rowReads };
+  return { data, scopes, rowReads, factReads, writes, cancels, plans };
 }
 
 // ---- @rosie/ai's composer over the recorded-model double (T-560) ----------------------------------------------------
@@ -2434,7 +2732,6 @@ export const SKELETON_ROW = commitS102.outcome.written.outboxRows[0]?.id ?? "out
 /** Sam's chat with Rosie's line, as his texts and receipts name it. */
 export const SAM_CHAT = "linq-chat-demo-sam";
 
-const FIXTURE_ROW = composeInputS102.request.outboxRowId;
 const S1_02_TURN = commitS102.request.turn.id;
 
 /** Sam's ids as K-04 names them, for the safety read's calls. */
@@ -2464,13 +2761,14 @@ type JoinedPort =
   | "decide"
   | "gate"
   | "composeInput"
-  | "composer";
+  | "composer"
+  | "finalize";
 
 export interface SkeletonFakes {
   /**
    * The fake set the test environment binds: every port but the joined ones, the Linq verify, the sealing, the safety
-   * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input and the
-   * composer, which the root builds (./real.ts).
+   * read, the turn-row calls, the bundle reads, the targets read, the frontier, decide, the gate, compose input, the
+   * composer and finalize, which the root builds (./real.ts).
    */
   readonly ports: Omit<Ports, JoinedPort>;
   readonly clock: TestClock;
@@ -2535,6 +2833,12 @@ export interface SkeletonFakes {
    * `composer.composers`): each input it was given, each rewrite, each model call it answered and each miss.
    */
   readonly composer: FakeComposerModels;
+  /**
+   * Finalize's reads and writes as doubles over what the K-05 commitTurn double wrote and test owner 1's seeded rows, for
+   * the root's real finalize port (RootOptions.finalizeData: `finalize.data`): each call's scope, every read, every
+   * writePlan and the plan each row holds.
+   */
+  readonly finalize: FakeFinalizeData;
   /** The shared core the safety read calls (K-09 recordSafetyOutcome, sendFixedLine): what each text's line did. */
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down. */
@@ -2569,6 +2873,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   // Compose input and the composer are joined (T-560): their doubles log to the face's log as the stand-ins did.
   const compose = fakeComposeReads(turnRows, () => clock.now(), face.log);
   const composer = fakeComposerModels(face.log);
+  // Finalize is joined (T-561): its K-05 doubles read the rows the commit wrote and keep the plan each row is given.
+  const finalize = fakeFinalizeData(turnRows, () => clock.now());
   // A turn a test records for decide goes the JOIN run's way to its reply: its two reads as recording 2 holds the JOIN
   // run's, so it commits S1-01 and S1-02's row, and that row's plan as recording 4 holds the JOIN run's.
   const recordReads = decide.recordTurn.bind(decide);
@@ -2577,7 +2883,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     composer.recordTurn(eventIds);
   };
   const rows = fakeRows(face.log);
-  face.finalize = (request) => swap(finalizePass.outcome, [[FIXTURE_ROW, request.outboxRowId]]) as never;
   // The turn's rows with no plan yet (K-05 unplannedRows): the outbox rows the K-05 double's commit wrote for that turn
   // (the joined gate's, T-559), each as committed, in commit order.
   rows.unplanned = (turnId) => ({
@@ -2649,7 +2954,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
       closestEntries: (request, trace) => turnFace.closestEntries(request, trace),
       safetyCore: core,
     },
-    finalize: { finalizeMessage: (request, trace) => turnFace.finalizeMessage(request, trace) },
     dataAccess: { rows: rowsOf(rows), outbox: store, clocks: arming.data.data },
     linqSend: { parts: linq, direct },
   };
@@ -2675,6 +2979,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     gate,
     compose,
     composer,
+    finalize,
     core,
     direct,
     face,
