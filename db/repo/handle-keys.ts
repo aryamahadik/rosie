@@ -361,6 +361,6 @@ export async function handleSealingKey(
         dataKey: null,
       };
     }
-    return { outcome: transientOrThrow(error), dataKey: null };
+    return { outcome: transientOrThrow(error, "handleSealingKey"), dataKey: null };
   }
 }

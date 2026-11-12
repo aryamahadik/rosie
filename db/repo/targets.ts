@@ -34,6 +34,7 @@
 // This file also holds the runtime side's one transaction and its transient answer, which send-state.ts and
 // handle-keys.ts use too (the same rules as bundles.ts's, whose helpers are not exported).
 import { isLostConnection } from "./bundles";
+import { scrubbed } from "./clocks";
 import { readBusinessScope, SCOPE_SETTING, type Sql, type Tx } from "./scope";
 
 type Db = Sql | Tx;
@@ -71,12 +72,148 @@ const LOST_CONNECTION_CODES = new Set([
   "ETIMEDOUT",
 ]);
 const LOST_CONNECTION_SQLSTATE = "08006";
+/**
+ * The codes of a connection that never opened (T-1268), which carry no SQLSTATE either: postgres.js's own
+ * CONNECT_TIMEOUT (no answer to the startup within connect_timeout), and the socket's own for an address that refused
+ * the connection, could not be reached or could not be resolved. No statement went out on such a connection, so nothing
+ * was written and the same request may be sent again: they answer 08001 (sqlclient_unable_to_establish_sqlconnection).
+ */
+const NEVER_CONNECTED_CODES = new Set([
+  "CONNECT_TIMEOUT",
+  "ECONNREFUSED",
+  "EHOSTUNREACH",
+  "ENETUNREACH",
+  "EHOSTDOWN",
+  "ENETDOWN",
+  "EADDRNOTAVAIL",
+  "ENOTFOUND",
+]);
+/** Every other failure of the name lookup (getaddrinfo: EAI_AGAIN, EAI_FAIL, ...): no address, so no connect was tried. */
+const NAME_LOOKUP_FAILED = /^EAI_[A-Z]+$/;
+const NEVER_CONNECTED_SQLSTATE = "08001";
+/**
+ * JavaScript's own errors for a value or a program at fault. postgres.js rejects a statement with one when it cannot
+ * build the statement or read its rows (a value it cannot send), never when its socket fails.
+ */
+const FAULT_NAMES = new Set([
+  "TypeError",
+  "RangeError",
+  "SyntaxError",
+  "ReferenceError",
+  "EvalError",
+  "URIError",
+]);
+/**
+ * PostgreSQL's refusals of a session at its start, whose message names the host, the user or the role (T-1268 round 2;
+ * PostgreSQL's errcodes.txt, with the backend's messages): class 28, invalid authorization (28000
+ * invalid_authorization_specification: "no pg_hba.conf entry for host ..., user ...", "role ... does not exist"; 28P01
+ * invalid_password: "password authentication failed for user ..."), and 53300 too_many_connections ("too many
+ * connections for role ...", "sorry, too many clients already"). Not transient: a retry cannot mend a refused login, and
+ * 53300 is CQ-271's (until the architect rules, scrubbed and not transient).
+ */
+const SESSION_REFUSED_SQLSTATE = /^(28[0-9A-Z]{3}|53300)$/;
+const SQLSTATE = /^[0-9A-Z]{5}$/;
+/**
+ * A client's own codes for a connect or a session that failed and is not answered transient (T-1268 round 2):
+ *   - Node's socket: EACCES and EPERM, a connect the system did not permit; ECONNABORTED, one it gave up;
+ *   - postgres.js 3.4.9's own (connection.js): SASL_SIGNATURE_MISMATCH, a server whose SCRAM signature is wrong (its
+ *     authentication), and MESSAGE_NOT_SUPPORTED, a protocol message it cannot read (NegotiateProtocolVersion at the
+ *     session's start); its connection codes (CONNECT_TIMEOUT, CONNECTION_CLOSED, CONNECTION_DESTROYED,
+ *     CONNECTION_ENDED) are answered transient above;
+ *   - Node's certificate checks, by OpenSSL's X509_V_ERR_ names as Node's TLS gives them (a certificate not trusted,
+ *     expired, revoked or not for this host), OUT_OF_MEM among them (X509_V_ERR_OUT_OF_MEM, 17, in the OpenSSL headers
+ *     Node 24.12.0 installs), and UNSPECIFIED, the code Node gives a verify error it does not list (T-1268 round 3):
+ *     Node's X509ErrorCode starts from "UNSPECIFIED" and names only the codes it lists, so a newer OpenSSL check
+ *     (X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER, 33, and the others) comes up as UNSPECIFIED, with no mark of a connection.
+ */
+const SESSION_FAILED_CODES = new Set([
+  "EACCES",
+  "EPERM",
+  "ECONNABORTED",
+  "SASL_SIGNATURE_MISMATCH",
+  "MESSAGE_NOT_SUPPORTED",
+  "UNSPECIFIED",
+  "UNABLE_TO_GET_ISSUER_CERT",
+  "UNABLE_TO_GET_CRL",
+  "UNABLE_TO_DECRYPT_CERT_SIGNATURE",
+  "UNABLE_TO_DECRYPT_CRL_SIGNATURE",
+  "UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY",
+  "CERT_SIGNATURE_FAILURE",
+  "CRL_SIGNATURE_FAILURE",
+  "CERT_NOT_YET_VALID",
+  "CERT_HAS_EXPIRED",
+  "CRL_NOT_YET_VALID",
+  "CRL_HAS_EXPIRED",
+  "ERROR_IN_CERT_NOT_BEFORE_FIELD",
+  "ERROR_IN_CERT_NOT_AFTER_FIELD",
+  "ERROR_IN_CRL_LAST_UPDATE_FIELD",
+  "ERROR_IN_CRL_NEXT_UPDATE_FIELD",
+  "OUT_OF_MEM",
+  "DEPTH_ZERO_SELF_SIGNED_CERT",
+  "SELF_SIGNED_CERT_IN_CHAIN",
+  "UNABLE_TO_GET_ISSUER_CERT_LOCALLY",
+  "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+  "CERT_CHAIN_TOO_LONG",
+  "CERT_REVOKED",
+  "INVALID_CA",
+  "PATH_LENGTH_EXCEEDED",
+  "INVALID_PURPOSE",
+  "CERT_UNTRUSTED",
+  "CERT_REJECTED",
+  "HOSTNAME_MISMATCH",
+]);
+/** Node's TLS errors (ERR_TLS_CERT_ALTNAME_INVALID, its host and certificate on it, and the others) and OpenSSL's. */
+const TLS_CODE = /^ERR_(TLS|SSL)_[A-Z0-9_]+$/;
+/**
+ * An error's own marks of a connection: its address, port, host name or certificate (Node's socket, name lookup and TLS
+ * errors; postgres.js's connection errors), one error per address (errors), or Node's mark of a system error (syscall,
+ * errno). db/repo's own errors and PostgreSQL's refusals carry none.
+ */
+const CONNECTION_MARKS = ["address", "port", "hostname", "host", "cert", "errors", "syscall", "errno"];
+/** The name a scrubbed error carries when its caller names no call. */
+const UNNAMED_CALL = "a db/repo call";
 
 /**
- * The transient answer for a serialization failure, a deadlock or a lost connection (K-05 README: nothing was written,
- * the same request may be sent again); any other error is thrown. The answer carries only a SQLSTATE.
+ * A failure to open or keep a session that is not answered transient, and that transientOrThrow (and clocks.ts's
+ * scrubbed) therefore throws scrubbed (T-1268 round 2): PostgreSQL's refusal of a session at its start
+ * (SESSION_REFUSED_SQLSTATE), or a PostgresError with no SQLSTATE, which cannot be told apart from one; a client's error
+ * with a code of SESSION_FAILED_CODES or TLS_CODE, or with a mark of a connection (CONNECTION_MARKS). Never db/repo's
+ * own errors, a statement's own refusal of any other SQLSTATE, or one of JavaScript's own for a faulty value.
  */
-export function transientOrThrow(error: unknown): TransientError {
+export function isSessionFailure(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  const code = (error as { code?: unknown }).code;
+  if (error.name === "PostgresError") {
+    return typeof code !== "string" || !SQLSTATE.test(code) || SESSION_REFUSED_SQLSTATE.test(code);
+  }
+  if (FAULT_NAMES.has(error.name)) {
+    return false;
+  }
+  if (typeof code === "string" && (SESSION_FAILED_CODES.has(code) || TLS_CODE.test(code))) {
+    return true;
+  }
+  return CONNECTION_MARKS.some((mark) => Object.hasOwn(error, mark));
+}
+
+/**
+ * The transient answer for a serialization failure, a deadlock, a lost connection or a connection that never opened
+ * (K-05 README: nothing was written, the same request may be sent again); any other error is thrown. The answer carries
+ * only a SQLSTATE, never the error's message, host, port, user, statement or parameters (T-1268).
+ *
+ * A socket error with no code is a lost connection too (08006): postgres.js's Workers build passes its socket's failure
+ * up as the socket gives it, with no code, and rejects the statement in flight with it, putting that statement on it as
+ * own properties (query and parameters, empty for a statement it never built; args, its values).
+ *
+ * A failure to open or keep a session that is not transient (isSessionFailure: EACCES, a TLS or certificate error,
+ * postgres.js's SASL_SIGNATURE_MISMATCH, PostgreSQL's class 28 and 53300) is thrown scrubbed, never as it is (T-1268
+ * round 2): clocks.ts's scrubbed, with `call`, the K-05 call's name, and the code alone (a PostgresError as
+ * DataAccessDatabaseError, any other as a new Error with no message, stack, cause or property of the original's). Every
+ * other error is thrown as it is: db/repo's own, a statement's own refusal of any other SQLSTATE, and JavaScript's own
+ * for a faulty value (postgres.js could not build or read a statement).
+ */
+export function transientOrThrow(error: unknown, call: string = UNNAMED_CALL): TransientError {
   const code = (error as { code?: unknown } | null | undefined)?.code;
   if (typeof code === "string") {
     if (TRANSIENT_SQLSTATES.has(code) || /^08[0-9A-Z]{3}$/.test(code)) {
@@ -85,6 +222,19 @@ export function transientOrThrow(error: unknown): TransientError {
     if (LOST_CONNECTION_CODES.has(code)) {
       return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
     }
+    if (NEVER_CONNECTED_CODES.has(code) || NAME_LOOKUP_FAILED.test(code)) {
+      return { error: "transient", sqlstate: NEVER_CONNECTED_SQLSTATE };
+    }
+  } else if (
+    error instanceof Error &&
+    error.name !== "PostgresError" &&
+    !FAULT_NAMES.has(error.name) &&
+    (Object.hasOwn(error, "query") || Object.hasOwn(error, "parameters"))
+  ) {
+    return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
+  }
+  if (isSessionFailure(error)) {
+    throw scrubbed(call, error);
   }
   throw error;
 }
@@ -454,6 +604,6 @@ export async function handleTargets(
   try {
     return await inRuntimeTransaction(sql, { readOnly: true }, (tx) => handleTargetsIn(tx, request, options));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "handleTargets");
   }
 }
