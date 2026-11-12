@@ -49,6 +49,7 @@ interface K07Record {
     attempts: number;
     kind: string;
     state: string;
+    deliveredAt?: string | null;
   }[];
   moves: { subject: string; from: string | null; to: string }[];
 }
@@ -149,7 +150,8 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     jsonb: "jsonb",
     timestamptz: "timestamp with time zone",
   };
-  const tables = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).tables.filter((table) =>
+  // T-1278 (DL-545): the pin moves to K-04 v1.1's list, the whole part at v1.1, which migrations 0032 and 0033 build.
+  const tables = (readCore("core.v1.1.tables.json") as { tables: ContractTable[] }).tables.filter((table) =>
     (OWN_TABLES as readonly string[]).includes(table.name),
   );
 
@@ -436,19 +438,24 @@ describe("fixture seed-outbox-row and the refused rows", () => {
       throw new Error("the fixture names no part");
     }
     expect(part.idempotencyKey).toBeUndefined();
+    // T-1278 (CQ-211; DL-545): K-04 v1.1's outbox_parts_delivered_has_time needs a delivered part's time, so both
+    // writes carry the one K-07's record gives the part, and the key stays the one reason.
+    const deliveredAt = part.deliveredAt ?? null;
+    expect([part.state, deliveredAt]).toEqual(["delivered", "2026-11-07T15:06:37Z"]);
     await db.sql`insert into outbox_rows ${db.sql(rowOf(record) as never)}`;
     const failure = await refusal(
       db.sql`
-        insert into outbox_parts (outbox_row_id, part_no, try_no, attempts, kind, state)
-        values (${part.outboxRowId}, ${part.partNo}, ${part.tryNo}, ${part.attempts}, ${part.kind}, ${part.state})
+        insert into outbox_parts (outbox_row_id, part_no, try_no, attempts, kind, state, delivered_at)
+        values (${part.outboxRowId}, ${part.partNo}, ${part.tryNo}, ${part.attempts}, ${part.kind}, ${part.state},
+                ${deliveredAt})
       `,
     );
     expect(failure.code).toBe("23502");
     // The same part with its key passes: the key is the one reason.
     await db.sql`
-      insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, state)
+      insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, state, delivered_at)
       values (${part.outboxRowId}, ${part.partNo}, ${part.tryNo}, ${`${part.outboxRowId}/1/1`}, ${part.attempts},
-              ${part.kind}, ${part.state})
+              ${part.kind}, ${part.state}, ${deliveredAt})
     `;
     expect(await db.sql`select 1 from outbox_parts where outbox_row_id = ${part.outboxRowId}`).toHaveLength(
       1,
@@ -637,6 +644,7 @@ describe("what the database refuses", () => {
     const rowStates = new Set<string>();
     const partStates = new Set<string>();
     const kinds = new Set<string>();
+    const deliveredTimes = new Set<string>();
     const files = readdirSync(OUTBOX_DIR).filter(
       (name) => name.startsWith("outbox-") && name.endsWith(".json"),
     );
@@ -653,6 +661,9 @@ describe("what the database refuses", () => {
       for (const part of record.parts) {
         kinds.add(part.kind);
         partStates.add(part.state);
+        if (part.state === "delivered" && typeof part.deliveredAt === "string") {
+          deliveredTimes.add(part.deliveredAt);
+        }
       }
     }
     let n = 0;
@@ -660,10 +671,19 @@ describe("what the database refuses", () => {
       await rowInsert(`out-k07-${String((n += 1))}`, { state });
     }
     await rowInsert("out-k07-parts");
+    // T-1278 (CQ-211; DL-545): K-04 v1.1's outbox_parts_delivered_has_time needs a delivered part's time, so the
+    // delivered part holds one that K-07's own records give a delivered part.
+    const deliveredAt = [...deliveredTimes].sort()[0];
+    expect(deliveredAt).toBeDefined();
     let partNo = 0;
     for (const state of partStates) {
       partNo += 1;
-      await partInsert("out-k07-parts", 1, partNo, { state });
+      await partInsert(
+        "out-k07-parts",
+        1,
+        partNo,
+        state === "delivered" ? { state, delivered_at: deliveredAt } : { state },
+      );
     }
     for (const kind of kinds) {
       partNo += 1;

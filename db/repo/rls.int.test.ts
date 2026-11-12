@@ -33,12 +33,15 @@ const RUNS: Record<string, readonly Role[]> = {
 const CHAT_LINK_UPDATES = ["given_via", "owner_retold_at", "used_at", "version"];
 // K-22 v1.1's four named exceptions (T-204; DL-169). Its README's rules 4, 5 and 8 give four tables policies other than
 // 0012's pair, rosie_app column grants on three of them and five security-definer calls of their own;
-// people-access.int.test.ts checks each against the README word for word. Every other table and function stays held to
-// this file's generic checks.
+// people-access.int.test.ts checks each against the README word for word. v1.2 (T-1278; DL-538, DL-545) extends (a),
+// (b) and (d) by README rule 9: sign_in_attempts (scope none, row-level security on) holds only the runtime side's one
+// policy, the Tool API holds no grant on it at all (the generic grant rule gives exactly that), and three more
+// security-definer calls. Every other table and function stays held to this file's generic checks.
 /**
- * (a), (b) The policies on K-22's four excepted tables, by table, in name order. README rule 4 (contact_changes) and
+ * (a), (b) The policies on K-22's five excepted tables, by table, in name order. README rule 4 (contact_changes) and
  * rule 8 (page_links): 0012's <table>_runtime beside one Tool API policy per command. Rule 5 (proof_codes, sessions:
  * scope none, row-level security on): Tool API rows bound to the call's person, beside a runtime policy on every row.
+ * Rule 9 (sign_in_attempts: scope none, row-level security on): the runtime policy on every row alone.
  */
 const K22_POLICIES: Record<string, readonly string[]> = {
   contact_changes: [
@@ -59,6 +62,7 @@ const K22_POLICIES: Record<string, readonly string[]> = {
     "sessions_tool_api_select",
     "sessions_tool_api_update",
   ],
+  sign_in_attempts: ["sign_in_attempts_runtime"],
 };
 /**
  * (c) rosie_app's 63 column grants on K-22's tables, never a hash. README rule 5: it reads every proof_codes column but
@@ -159,8 +163,9 @@ const K22_COLUMN_GRANTS: { table: string; privilege: string; columns: readonly s
   },
 ];
 /**
- * (d) K-22's five security-definer calls, in name order: README rule 5's four and rule 8's page_link_for_code. Kept out
- * of FUNCTIONS, whose checks expect search_path=pg_catalog, pg_temp: rules 5 and 8 pin these to <schema>, pg_temp.
+ * (d) K-22's eight security-definer calls, in name order: README rule 5's four, rule 8's page_link_for_code and rule 9's
+ * three (v1.2: sign_in_attempt, sign_in_attempt_signed_in, sign_in_attempt_tried). Kept out of FUNCTIONS, whose checks
+ * expect search_path=pg_catalog, pg_temp: rules 5, 8 and 9 pin these to <schema>, pg_temp.
  */
 const K22_FUNCTIONS = [
   "check_proof_code",
@@ -168,6 +173,9 @@ const K22_FUNCTIONS = [
   "page_link_for_code",
   "proof_code_limits",
   "session_for_token",
+  "sign_in_attempt",
+  "sign_in_attempt_signed_in",
+  "sign_in_attempt_tried",
 ];
 // K-27 v1's three named exceptions (T-208; DL-247). Its README's rule 5 (with rule 6 for the sealed tokens) gives three
 // tables policies other than 0012's pair, row-level security on two tables scoped none, and rosie_app column grants on
@@ -627,8 +635,9 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
 /**
  * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
- * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.1 people and access
- * (T-204: v1's ten tables and v1.1's page_links), K-24 v1 kinds of work (T-205), K-25 v1 services and prices
+ * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.2 people and access
+ * (T-204: v1's ten tables and v1.1's page_links; T-1278: v1.2's sign_in_attempts), K-24 v1 kinds of work (T-205), K-25
+ * v1 services and prices
  * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), K-35 v1
  * documents and licenses (T-210), K-28 v1 customers (T-211), K-30 v1 bookings and changes, part 1 (T-720: the five
  * tables of K30_PART_1) and part 2 (T-721: the eight of K30_PART_2), and K-32 v1 money, part 1 (T-722: the five of
@@ -702,6 +711,14 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/people-access/people-access.v1.1.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/people-access/people-access.v1.2.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -798,8 +815,8 @@ const SCOPED = scopedOf(TABLES);
 const ALL_SCOPED = scopedOf(ALL_TABLES);
 /**
  * (a), (b) The tables with row-level security on and policies, in name order: every business-scoped table, K-22's
- * proof_codes and sessions, scoped none (README rule 5), and K-27's calendar_links and busy_blocks, scoped none (K-27
- * rule 5; DL-247).
+ * proof_codes and sessions, scoped none (README rule 5), and sign_in_attempts, scoped none (rule 9), and K-27's
+ * calendar_links and busy_blocks, scoped none (K-27 rule 5; DL-247).
  */
 const POLICY_TABLES = [
   ...new Set([
@@ -995,7 +1012,7 @@ describe("the migration: row-level security on every business-scoped core table 
     expect(forced).toEqual([]);
   });
 
-  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's four of README rules 4, 5 and 8, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 and part 2 tables of its rule 5)", async () => {
+  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's five of README rules 4, 5, 8 and 9, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 and part 2 tables of its rule 5)", async () => {
     const policies = await db.sql<
       {
         table: string;
@@ -1015,7 +1032,8 @@ describe("the migration: row-level security on every business-scoped core table 
     `;
     expect([...new Set(policies.map((policy) => policy.table))]).toEqual(POLICY_TABLES);
     // (a) K-22's named exceptions: contact_changes (README rule 4), page_links (rule 8), proof_codes and sessions (rule
-    // 5) hold their own policies, by name here; people-access.int.test.ts checks each word for word against the README.
+    // 5) hold their own policies, and sign_in_attempts (rule 9, v1.2) its runtime policy alone, by name here;
+    // people-access.int.test.ts checks each word for word against the README.
     for (const [table, names] of Object.entries(K22_POLICIES)) {
       expect(
         policies.filter((policy) => policy.table === table).map((policy) => policy.name),
@@ -1219,7 +1237,8 @@ describe("the two roles", () => {
           from pg_class c where c.relnamespace = ${again.schema}::regnamespace and c.relkind = 'r'
         `;
         // (b) K-22's named exceptions: row-level security is on for proof_codes and sessions as well (README rule 5),
-        // and its four excepted tables hold their own policies (rules 4, 5 and 8) in place of 0012's two.
+        // and its four excepted tables hold their own policies (rules 4, 5 and 8) in place of 0012's two. v1.2
+        // (T-1278): row-level security is on for sign_in_attempts too, with its one runtime policy (rule 9): 1 more each.
         expect(row).toEqual({
           // (b) K-27's named exception (K-27 rule 5; DL-247): row-level security is on for calendar_links and
           // busy_blocks, scoped none, as well: 2 more (56 to 58 with K-27).
@@ -1584,6 +1603,8 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       }
       // K-28 v1 README rule 5: both roles select, insert and update customers and customer_blocks (business-scoped and
       // versioned), as table grants, and never delete: the generic rule below, with no exception.
+      // K-22 v1.2 README rule 9 (T-1278): sign_in_attempts (scope none, versioned) is the runtime side's SELECT, INSERT
+      // and UPDATE, and the Tool API's nothing at all, not even a column grant: the generic rule below, with no exception.
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
@@ -2028,14 +2049,15 @@ describe("the security-definer functions: the two that read across businesses (K
     ]);
   });
 
-  it("no other function of the schema is security definer but K-22's five (README rules 5 and 8): reservations_saved_times stays the only read of saved times across businesses", async () => {
+  it("no other function of the schema is security definer but K-22's eight (README rules 5, 8 and 9): reservations_saved_times stays the only read of saved times across businesses", async () => {
     const definers = await db.sql<{ name: string }[]>`
       select p.proname as name from pg_proc p
       where p.pronamespace = ${db.schema}::regnamespace and p.prosecdef
       order by 1
     `;
-    // (d) K-22's named exception: README rule 5's four calls and rule 8's page_link_for_code are security definer too,
-    // pinned to <schema>, pg_temp; people-access.int.test.ts checks each (owner, search_path, arguments, EXECUTE).
+    // (d) K-22's named exception: README rule 5's four calls, rule 8's page_link_for_code and rule 9's three (v1.2) are
+    // security definer too, pinned to <schema>, pg_temp; people-access.int.test.ts checks each (owner, search_path,
+    // arguments, EXECUTE).
     expect(definers.map((row) => row.name)).toEqual([...FUNCTIONS, ...K22_FUNCTIONS].sort());
   });
 

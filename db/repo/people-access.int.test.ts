@@ -1,7 +1,8 @@
 // T-204: the people and access part (K-22 v1.1: accounts, id_uploads, staff, staff_skills, team_powers, on_call,
 // emergency_contacts, proof_codes, sessions, contact_changes and v1.1's page_links, with README rules 4, 5 and 8)
 // against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/people-access`). The schema comes from
-// migrating a fresh test schema.
+// migrating a fresh test schema. T-1278 adds K-22 v1.2's sign_in_attempts with README rule 9 (migration 0034): its
+// list, its table class, its seed and refused rows, and its three calls.
 //
 // The test's connection is the migrations' role, which owns the tables and is not bound by row-level security. A check
 // made as the Tool API (rosie_app) or the runtime side (rosie_job) runs in its own transaction under SET LOCAL ROLE,
@@ -29,7 +30,7 @@ const RUNTIME = "rosie_job";
 type Role = typeof TOOL_API | typeof RUNTIME;
 const ROLES: readonly Role[] = [TOOL_API, RUNTIME];
 const PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
-/** The eleven tables of K-22 v1 and v1.1, in code-unit order (as PostgreSQL orders a relation's name). */
+/** The twelve tables of K-22 v1, v1.1 and v1.2, in code-unit order (as PostgreSQL orders a relation's name). */
 const OWN_TABLES = [
   "accounts",
   "contact_changes",
@@ -39,6 +40,7 @@ const OWN_TABLES = [
   "page_links",
   "proof_codes",
   "sessions",
+  "sign_in_attempts",
   "staff",
   "staff_skills",
   "team_powers",
@@ -59,6 +61,11 @@ const PLAIN_SCOPED = ["emergency_contacts", "on_call", "staff", "staff_skills", 
 const PERSON_BOUND = ["proof_codes", "sessions"];
 /** Scope none with no Tool API grant (README open gap): row-level security off, as K-04's persons. */
 const RUNTIME_ONLY = ["accounts", "id_uploads"];
+/**
+ * Scope none with no Tool API grant at all, and row-level security on with the runtime side's one policy, so a grant
+ * given by mistake would still show the Tool API no row (README rule 9, v1.2).
+ */
+const RUNTIME_POLICY_ONLY = ["sign_in_attempts"];
 /** The tables every update of which raises the version (README rule 2), each with a one-column key. */
 const VERSIONED = [
   "accounts",
@@ -67,6 +74,7 @@ const VERSIONED = [
   "page_links",
   "proof_codes",
   "sessions",
+  "sign_in_attempts",
   "staff",
   "team_powers",
 ];
@@ -155,6 +163,7 @@ const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
 const TABLES = [
   ...(readJson(new URL("people-access.v1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
   ...(readJson(new URL("people-access.v1.1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
+  ...(readJson(new URL("people-access.v1.2.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
 ];
 const INDEX = (readJson(new URL("index.json", FIXTURES_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const SEEDS = INDEX.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
@@ -264,7 +273,7 @@ const standIn = (label: string): string => createHash("sha256").update(label).di
 const plus = (iso: string, minutes: number): string =>
   new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
 
-/** Every K-22 row of the nine seeds and their chains, in load order. */
+/** Every K-22 row of the ten seeds and their chains, in load order. */
 const SEED_ROWS = ((): FixtureRow[] => {
   const seen = new Set<string>();
   return SEEDS.flatMap((file) => fixtureRows(new URL(file, FIXTURES_DIR), seen)).filter((row) =>
@@ -534,7 +543,7 @@ async function loadFixtures(files: readonly string[], own = true): Promise<Recor
 /** What is loaded now, so checks that share a state load it once. */
 let loadedState = "";
 
-/** Every K-04 v1 seed and every K-22 v1.1 seed with its chain (K-23's and K-29's seeds among them). */
+/** Every K-04 v1 seed and every K-22 seed to v1.2 with its chain (K-23's and K-29's seeds among them). */
 async function loadEverySeed(): Promise<void> {
   if (loadedState !== "every seed") {
     await reset();
@@ -644,14 +653,14 @@ afterAll(async () => {
   await db.drop();
 });
 
-describe("the migration against the frozen table lists (K-22 v1 and v1.1)", () => {
+describe("the migration against the frozen table lists (K-22 v1, v1.1 and v1.2)", () => {
   /** The table list's types as format_type prints them; the others print as the list writes them. */
   const typeNames: Record<string, string> = {
     timestamptz: "timestamp with time zone",
     time: "time without time zone",
   };
 
-  it("the two lists name eleven tables: seven scoped by business on business_id, four scoped none; eight versioned", () => {
+  it("the three lists name twelve tables: seven scoped by business on business_id, five scoped none; nine versioned", () => {
     expect(TABLES.map((table) => table.name).sort()).toEqual(OWN_TABLES);
     for (const table of TABLES) {
       const scoped = BUSINESS_SCOPED.includes(table.name);
@@ -662,7 +671,7 @@ describe("the migration against the frozen table lists (K-22 v1 and v1.1)", () =
         VERSIONED.includes(table.name) ? [true, "version"] : [false, undefined],
       );
     }
-    expect([...PERSON_BOUND, ...RUNTIME_ONLY].sort()).toEqual(
+    expect([...PERSON_BOUND, ...RUNTIME_ONLY, ...RUNTIME_POLICY_ONLY].sort()).toEqual(
       OWN_TABLES.filter((table) => !BUSINESS_SCOPED.includes(table)),
     );
   });
@@ -784,7 +793,7 @@ describe("the migration against the frozen table lists (K-22 v1 and v1.1)", () =
     });
   }
 
-  it("the eight versioned tables raise their version on every update (0002's rule): <table>_version_raised, and no other trigger on any of the eleven", async () => {
+  it("the nine versioned tables raise their version on every update (0002's rule): <table>_version_raised, and no other trigger on any of the twelve", async () => {
     const triggers = await db.sql<{ table: string; name: string; definition: string }[]>`
       select c.relname as table, t.tgname as name, pg_get_triggerdef(t.oid) as definition
       from pg_trigger t join pg_class c on c.oid = t.tgrelid
@@ -830,6 +839,13 @@ describe("the migration against the frozen table lists (K-22 v1 and v1.1)", () =
     expect(names).toContain("people_access");
     expect(names.indexOf("people_access")).toBeGreaterThan(names.indexOf("business_setup"));
     expect(names.indexOf("people_access")).toBeGreaterThan(names.indexOf("core_sealing_keys"));
+  });
+
+  it("v1.2's sign_in_attempts is recorded in schema_migrations as sign_in_attempts, after people_access (T-1278)", async () => {
+    const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
+    const names = rows.map((row) => row.name);
+    expect(names.filter((name) => name === "sign_in_attempts")).toHaveLength(1);
+    expect(names.indexOf("sign_in_attempts")).toBeGreaterThan(names.indexOf("people_access"));
   });
 });
 
@@ -915,7 +931,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     order by tablename, policyname
   `;
 
-  it("row-level security is on for the seven business-scoped tables and the two bound to the call's person; off for accounts and id_uploads (no Tool API grant); none forced", async () => {
+  it("row-level security is on for the seven business-scoped tables, the two bound to the call's person and sign_in_attempts (rule 9); off for accounts and id_uploads (no Tool API grant); none forced", async () => {
     const flags = await db.sql<{ name: string; on: boolean; forced: boolean }[]>`
       select relname as name, relrowsecurity as on, relforcerowsecurity as forced from pg_class
       where relnamespace = ${db.schema}::regnamespace and relname in ${db.sql(OWN_TABLES)}
@@ -926,7 +942,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     );
   });
 
-  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side", async () => {
+  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side; on sign_in_attempts the runtime side's one alone (rule 9)", async () => {
     const own = (await policiesIn(db.sql, db.schema)).filter((policy) => OWN_TABLES.includes(policy.table));
     const shape = own.map((policy) => [
       policy.table,
@@ -940,9 +956,11 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         [table, `${table}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"],
         [table, `${table}_tool_api`, "PERMISSIVE", [TOOL_API], "ALL"],
       ]),
-      ...[...BUSINESS_SCOPED.filter((table) => !PLAIN_SCOPED.includes(table)), ...PERSON_BOUND].map(
-        (table) => [table, `${table}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"],
-      ),
+      ...[
+        ...BUSINESS_SCOPED.filter((table) => !PLAIN_SCOPED.includes(table)),
+        ...PERSON_BOUND,
+        ...RUNTIME_POLICY_ONLY,
+      ].map((table) => [table, `${table}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"]),
       ...RULE_POLICIES.map((policy) => [policy.table, policy.name, "PERMISSIVE", [TOOL_API], policy.command]),
     ];
     const order = (rows: unknown[][]): unknown[][] =>
@@ -952,7 +970,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(order(shape)).toEqual(order(expected));
   });
 
-  it("the plain tables' policies, and the runtime policies of contact_changes and page_links, are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes' and sessions' runtime policies admit every row", async () => {
+  it("the plain tables' policies, and the runtime policies of contact_changes and page_links, are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes', sessions' and sign_in_attempts' runtime policies admit every row", async () => {
     const all = await policiesIn(db.sql, db.schema);
     const core = all.filter((policy) => policy.table === "outbox_rows");
     const of = (name: string): [string | null, string | null] => {
@@ -968,7 +986,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     for (const table of ["contact_changes", "page_links"]) {
       expect(of(`${table}_runtime`), table).toEqual([coreRuntime?.using, coreRuntime?.check]);
     }
-    for (const table of PERSON_BOUND) {
+    for (const table of [...PERSON_BOUND, ...RUNTIME_POLICY_ONLY]) {
       expect(of(`${table}_runtime`), table).toEqual(["true", "true"]);
     }
   });
@@ -999,7 +1017,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(expressions(own)).toEqual(expressions(listed));
   });
 
-  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts and id_uploads and in full on proof_codes, sessions and page_links; the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
+  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts, id_uploads and sign_in_attempts (rule 9: the Tool API none) and in full on proof_codes, sessions and page_links; the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -1029,6 +1047,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         page_links: full,
         proof_codes: full,
         sessions: full,
+        sign_in_attempts: full,
         staff: full,
         staff_skills: once,
         team_powers: full,
@@ -1050,7 +1069,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(others).toEqual([]);
   });
 
-  it("column grants (rules 5 and 8): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; no other column grant, and no hash readable", async () => {
+  it("column grants (rules 5 and 8): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; no other column grant (none on sign_in_attempts: rule 9), and no hash readable", async () => {
     const granted = await db.sql<{ table: string; column: string; grantee: string; privilege: string }[]>`
       select c.relname as table, a.attname as column,
              case when g.grantee = 0 then 'PUBLIC' else pg_get_userbyid(g.grantee) end as grantee,
@@ -1083,9 +1102,20 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     const hashes = await db.sql<{ readable: boolean }[]>`
       select has_column_privilege(${TOOL_API}, (${db.schema} || '.' || t.name)::regclass, t.col, 'SELECT') as readable
       from (values ('proof_codes', 'code_hash'), ('sessions', 'token_sha256'), ('sessions', 'device_sha256'),
-                   ('page_links', 'code_sha256')) as t(name, col)
+                   ('page_links', 'code_sha256'), ('sign_in_attempts', 'request_sha256'),
+                   ('sign_in_attempts', 'device_sha256'), ('sign_in_attempts', 'contact_hash'),
+                   ('sign_in_attempts', 'last_check_sha256')) as t(name, col)
     `;
-    expect(hashes.map((row) => row.readable)).toEqual([false, false, false, false]);
+    expect(hashes.map((row) => row.readable)).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]);
   });
 
   it("neither role owns a table or a function: they stay the migrations' role's", async () => {
@@ -1096,17 +1126,19 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
       select p.proname, pg_get_userbyid(p.proowner), current_user from pg_proc p
       where p.pronamespace = ${db.schema}::regnamespace
         and p.proname in ('check_proof_code', 'proof_code_limits', 'session_for_token', 'device_known',
-                          'page_link_for_code')
+                          'page_link_for_code', 'sign_in_attempt', 'sign_in_attempt_tried',
+                          'sign_in_attempt_signed_in')
       order by 1
     `;
-    expect(owners).toHaveLength(OWN_TABLES.length + 5);
+    // Rules 5 and 8's five calls, and rule 9's three (v1.2).
+    expect(owners).toHaveLength(OWN_TABLES.length + 8);
     for (const row of owners) {
       expect(row.owner, row.name).toBe(row.me);
       expect(ROLES, row.name).not.toContain(row.owner);
     }
   });
 
-  it("the five calls of rules 5 and 8: security definer, owned by the tables' owner, search_path pinned to this schema then pg_temp, with the README's arguments and results; the four SQL ones bound when made; EXECUTE for the two roles only, never PUBLIC", async () => {
+  it("the eight calls of rules 5, 8 and 9: security definer, owned by the tables' owner, search_path pinned to this schema then pg_temp, with the README's arguments and results; the five SQL ones bound when made; EXECUTE for the two roles only, never PUBLIC", async () => {
     const calls = await db.sql<
       {
         name: string;
@@ -1127,7 +1159,8 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
       from pg_proc p join pg_language l on l.oid = p.prolang
       where p.pronamespace = ${db.schema}::regnamespace
         and p.proname in ('check_proof_code', 'proof_code_limits', 'session_for_token', 'device_known',
-                          'page_link_for_code')
+                          'page_link_for_code', 'sign_in_attempt', 'sign_in_attempt_tried',
+                          'sign_in_attempt_signed_in')
       order by p.proname
     `;
     const pinned = [`search_path=${db.schema}, pg_temp`];
@@ -1183,13 +1216,58 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         result: "TABLE(session_id text, person_id text)",
         ownedByTables: true,
       },
+      // README rule 9 (v1.2): the binding (SQL, bound when made, volatile since it locks), the try and the session.
+      {
+        name: "sign_in_attempt",
+        definer: true,
+        config: pinned,
+        bound: true,
+        language: "sql",
+        args: "attempt_id text, device_sha256 text, at timestamp with time zone",
+        result:
+          "TABLE(id text, person_id text, owner_or_admin boolean, proof_code_id text, way text, expires_at timestamp with time zone, expired boolean, wrong_tries integer, paused_until timestamp with time zone, paused boolean, signed_in boolean, last_outcome text)",
+        ownedByTables: true,
+      },
+      {
+        name: "sign_in_attempt_signed_in",
+        definer: true,
+        config: pinned,
+        bound: false,
+        language: "plpgsql",
+        args: "id text, session_id text",
+        result: "boolean",
+        ownedByTables: true,
+      },
+      {
+        name: "sign_in_attempt_tried",
+        definer: true,
+        config: pinned,
+        bound: false,
+        language: "plpgsql",
+        args: "id text, check_sha256 text, outcome text, at timestamp with time zone",
+        result:
+          "TABLE(repeated boolean, wrong_tries integer, paused_until timestamp with time zone, last_outcome text)",
+        ownedByTables: true,
+      },
+    ]);
+    const volatility = await db.sql<{ name: string; volatile: string }[]>`
+      select p.proname as name, p.provolatile as volatile from pg_proc p
+      where p.pronamespace = ${db.schema}::regnamespace
+        and p.proname in ('sign_in_attempt', 'sign_in_attempt_tried', 'sign_in_attempt_signed_in')
+      order by p.proname
+    `;
+    expect(volatility.map((row) => [row.name, row.volatile])).toEqual([
+      ["sign_in_attempt", "v"],
+      ["sign_in_attempt_signed_in", "v"],
+      ["sign_in_attempt_tried", "v"],
     ]);
     const grants = await db.sql<{ name: string; grantee: string }[]>`
       select p.proname as name, case when a.grantee = 0 then 'PUBLIC' else pg_get_userbyid(a.grantee) end as grantee
       from pg_proc p cross join lateral aclexplode(p.proacl) a
       where p.pronamespace = ${db.schema}::regnamespace and a.privilege_type = 'EXECUTE'
         and p.proname in ('check_proof_code', 'proof_code_limits', 'session_for_token', 'device_known',
-                          'page_link_for_code')
+                          'page_link_for_code', 'sign_in_attempt', 'sign_in_attempt_tried',
+                          'sign_in_attempt_signed_in')
       order by 1, 2
     `;
     const [me] = await db.sql<{ name: string }[]>`select current_user as name`;
@@ -1201,8 +1279,11 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
   });
 });
 
-describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes' and v1.1's page_links'", () => {
-  /** The K-22 rows the nine seeds give together, per table: every table gets rows. */
+describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes', v1.1's page_links' and v1.2's sign_in_attempts'", () => {
+  /**
+   * The K-22 rows the ten seeds give together, per table: every table gets rows. v1.2's seed-sign-in-attempt adds two
+   * of Sam's sign-in codes, the session the first started, and three attempts (T-1278).
+   */
   const SEEDED = {
     accounts: 1,
     contact_changes: 1,
@@ -1210,20 +1291,29 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     id_uploads: 1,
     on_call: 3,
     page_links: 4,
-    proof_codes: 5,
-    sessions: 2,
+    proof_codes: 7,
+    sessions: 3,
+    sign_in_attempts: 3,
     staff: 4,
     staff_skills: 6,
     team_powers: 1,
   };
 
-  it("the index lists nine seeds (the card's six among them) and thirty-one refused rows (25 of v1, 6 of v1.1), all on K-22's own tables", () => {
+  it("the index lists ten seeds (the card's six among them) and thirty-seven refused rows (25 of v1, 6 of v1.1, 6 of v1.2), all on K-22's own tables", () => {
     expect([...SEEDS].sort()).toEqual(
-      [...CARD_SEEDS, "seed-contact-change.json", "seed-on-call.json", "seed-page-link.json"].sort(),
+      [
+        ...CARD_SEEDS,
+        "seed-contact-change.json",
+        "seed-on-call.json",
+        "seed-page-link.json",
+        "seed-sign-in-attempt.json",
+      ].sort(),
     );
     const refused = INDEX.filter((entry) => entry.expect === "refuse");
     expect(refused.filter((entry) => entry.version === "v1")).toHaveLength(25);
     expect(refused.filter((entry) => entry.version === "v1.1")).toHaveLength(6);
+    expect(refused.filter((entry) => entry.version === "v1.2")).toHaveLength(6);
+    expect(refused).toHaveLength(37);
     expect(INDEX.every((entry) => OWN_TABLES.includes(entry.table))).toBe(true);
   });
 
@@ -1249,7 +1339,7 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     );
   }
 
-  it("all nine insert together, each after chain once, and no table is left empty", SLOW, async () => {
+  it("all ten insert together, each after chain once, and no table is left empty", SLOW, async () => {
     await reset();
     loadedState = "";
     const loaded = await loadFixtures(SEEDS);
@@ -2121,6 +2211,57 @@ const REFUSED_CASES: { file: string; why?: Why; fixed: Fixed[] }[] = [
     file: "invalid/refuse-ended-session-reopened.json",
     fixed: [runtimeSide],
   },
+  // v1.2 (README rule 9; T-1278): each passes once its one fault is put right, as the README's "Seeds and refused rows
+  // (v1.2)" says; the stand-in hashes are hex in hash form, not hashes of anything real.
+  {
+    file: "invalid/refuse-sign-in-attempt-raw-device.json",
+    fixed: [
+      {
+        label: "the same row with the device cookie's sha256",
+        change: { device_sha256: standIn("device cookie placeholder-device-token-unknown-2") },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-sign-in-attempt-raw-contact.json",
+    fixed: [
+      {
+        label: "the same row with the contact's keyed hash",
+        change: { contact_hash: standIn("rosie-sign-in-contact email sam@example.com keyed") },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-sign-in-attempt-sixth-wrong-try.json",
+    fixed: [
+      {
+        label: "the same row at five, paused 15 minutes after the fifth",
+        change: { wrong_tries: 5 },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-sign-in-attempt-pause-not-fifteen-minutes.json",
+    fixed: [
+      {
+        label: "the same row paused 15 minutes after the fifth",
+        change: { paused_until: "2026-10-29T09:18:00Z" },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-sign-in-attempt-outcome-not-k21.json",
+    fixed: [{ label: "the same row with K-21's wrong", change: { last_outcome: "wrong" }, rows: 1 }],
+  },
+  {
+    file: "invalid/refuse-sign-in-attempt-tool-api-read.json",
+    why: "privilege",
+    fixed: [runtimeSide],
+  },
 ];
 
 const roleOf = (role: Refused["role"]): Role => (role === "toolApi" ? TOOL_API : RUNTIME);
@@ -2161,8 +2302,8 @@ function actionOf(refused: Refused, fix: Fixed | null) {
   };
 }
 
-describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5 and 8 and the CHECKs)", () => {
-  it("the cases cover the index's thirty-one refused fixtures, each once", () => {
+describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5, 8 and 9 and the CHECKs)", () => {
+  it("the cases cover the index's thirty-seven refused fixtures, each once", () => {
     expect(REFUSED_CASES.map((entry) => entry.file).sort()).toEqual(
       INDEX.filter((entry) => entry.expect === "refuse")
         .map((entry) => entry.file)
@@ -2253,7 +2394,8 @@ describe("every path that binds a person (README rules 4 and 5): each in its ord
       right: "right",
       known: true,
       started: 1,
-      own: ["session-sam-oct20", "session-sam-oct26", "session-probe-sign-in"],
+      // T-1278: v1.2's seed-sign-in-attempt adds the session Sam's email sign-in of Oct 26 started, at 1:01:30pm.
+      own: ["session-sam-oct20", "session-sam-oct26", "session-sam-oct26-email", "session-probe-sign-in"],
     });
   });
 
@@ -2713,6 +2855,390 @@ describe("page links (rule 8): found only by page_link_for_code, ended and never
   });
 });
 
+describe("sign-in attempts (rule 9, v1.2; T-1278): the Tool API reaches an attempt only through the three calls, which answer no hash", () => {
+  beforeAll(loadEverySeed, 120_000);
+
+  const at = "2026-11-05T10:00:00.000Z";
+  /** The devices of seed-sign-in-attempt's two Oct 28 attempts (Sam's email typed, and its twin), stand-in hashes. */
+  const OCT28_DEVICE = "d2e3f405162738495a6b7c8d9eaf0b1cd2e3f405162738495a6b7c8d9eaf0b1c";
+  const NO_ACCOUNT_DEVICE = "d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2";
+
+  /** A new attempt for a contact no account holds, with no code, started at `at` and working 10 minutes. */
+  function attemptRow(id: string, change: Values = {}): FixtureRow {
+    return {
+      table: "sign_in_attempts",
+      values: {
+        id,
+        attempt_id: `attempt-${id}`,
+        request_sha256: standIn(`request ${id}`),
+        device_sha256: standIn(`device ${id}`),
+        contact_hash: standIn(`contact ${id}`),
+        hash_key_name: HASH_KEY_NAME,
+        way: "email",
+        started_at: at,
+        expires_at: plus(at, 10),
+        ...change,
+      },
+    };
+  }
+
+  /** sign_in_attempt's answer; the time goes as text, cast on the server, as checkCode sends it. */
+  async function bind(
+    tx: Tx,
+    attemptId: string | null,
+    device: string | null,
+    time: string | null,
+  ): Promise<Record<string, unknown>[]> {
+    return [
+      ...(await tx`select * from sign_in_attempt(${attemptId}, ${device}, ${time}::text::timestamptz)`),
+    ];
+  }
+
+  /** sign_in_attempt_tried's answer. */
+  async function tried(
+    tx: Tx,
+    id: string | null,
+    check: string | null,
+    outcome: string | null,
+    time: string | null,
+  ): Promise<Record<string, unknown>[]> {
+    return [
+      ...(await tx`select * from sign_in_attempt_tried(${id}, ${check}, ${outcome}, ${time}::text::timestamptz)`),
+    ];
+  }
+
+  async function signedIn(tx: Tx, id: string | null, sessionId: string | null): Promise<boolean | undefined> {
+    const [row] = await tx<
+      { done: boolean }[]
+    >`select sign_in_attempt_signed_in(${id}, ${sessionId}) as done`;
+    return row?.done;
+  }
+
+  /** The columns the calls move, of one attempt, read on the runtime side (the Tool API reads none), then back. */
+  async function attemptState(tx: Tx, id: string): Promise<Record<string, unknown> | undefined> {
+    await tx.unsafe(`set local role ${RUNTIME}`);
+    const [row] = await tx<Record<string, unknown>[]>`
+      select wrong_tries as tries, last_wrong_at as last, paused_until as paused, last_check_sha256 as "check",
+             last_outcome as outcome, session_id as session, version
+      from sign_in_attempts where id = ${id}
+    `;
+    await tx.unsafe(`set local role ${TOOL_API}`);
+    return row;
+  }
+
+  /** What sign_in_attempt_tried answers: whether it repeats, and the attempt's tries, pause and last answer. */
+  const answered = (repeated: boolean, tries: number, paused: string | null, outcome: string | null) => [
+    {
+      repeated,
+      wrong_tries: tries,
+      paused_until: paused === null ? null : new Date(paused),
+      last_outcome: outcome,
+    },
+  ];
+
+  it("sign_in_attempt answers the attempt only from the device that started it, with its person, code, tries and pause, expired and paused read at the time given; an unknown id, another device and each NULL argument answer no row", async () => {
+    const t = "2026-10-28T15:08:00Z";
+    const answer = await as(TOOL_API, null, async (tx) => ({
+      during: await bind(tx, "attempt-sam-signin-3", OCT28_DEVICE, t),
+      atExpiry: (await bind(tx, "attempt-sam-signin-3", OCT28_DEVICE, "2026-10-28T15:15:00Z")).map((row) => [
+        row.expired,
+        row.paused,
+      ]),
+      atPauseEnd: (await bind(tx, "attempt-sam-signin-3", OCT28_DEVICE, "2026-10-28T15:22:10Z")).map(
+        (row) => [row.expired, row.paused],
+      ),
+      signedIn: (await bind(tx, "attempt-sam-signin-1", SAM_DEVICE, "2026-10-26T13:02:00Z")).map((row) => [
+        row.id,
+        row.signed_in,
+        row.last_outcome,
+      ]),
+      noAccount: (await bind(tx, "attempt-no-account-signin-1", NO_ACCOUNT_DEVICE, t)).map((row) => [
+        row.id,
+        row.person_id,
+        row.proof_code_id,
+        row.wrong_tries,
+        row.paused_until,
+        row.paused,
+      ]),
+      otherDevice: (await bind(tx, "attempt-sam-signin-3", SAM_DEVICE, t)).length,
+      unknown: (await bind(tx, "attempt-nobody", OCT28_DEVICE, t)).length,
+      noId: (await bind(tx, null, OCT28_DEVICE, t)).length,
+      noDevice: (await bind(tx, "attempt-sam-signin-3", null, t)).length,
+      noTime: (await bind(tx, "attempt-sam-signin-3", OCT28_DEVICE, null)).length,
+    }));
+    expect(answer).toEqual({
+      // Every column it answers; none is a hash.
+      during: [
+        {
+          id: "sign-in-sam-oct28-1505",
+          person_id: SAM,
+          owner_or_admin: true,
+          proof_code_id: "code-sam-sign-in-oct28-email",
+          way: "email",
+          expires_at: new Date("2026-10-28T15:15:00Z"),
+          expired: false,
+          wrong_tries: 5,
+          paused_until: new Date("2026-10-28T15:22:10Z"),
+          paused: true,
+          signed_in: false,
+          last_outcome: "paused",
+        },
+      ],
+      atExpiry: [[false, true]],
+      atPauseEnd: [[true, false]],
+      signedIn: [["sign-in-sam-oct26-1300", true, "signedIn"]],
+      // Its twin for a contact no account holds: no person and no code, the same tries and pause.
+      noAccount: [["sign-in-no-account-oct28-1505", null, null, 5, new Date("2026-10-28T15:22:10Z"), true]],
+      otherDevice: 0,
+      unknown: 0,
+      noId: 0,
+      noDevice: 0,
+      noTime: 0,
+    });
+  });
+
+  it("sign_in_attempt locks the attempt for the rest of the caller's transaction: another transaction cannot take it (55P03 with NOWAIT), while another attempt stays free", async () => {
+    const answer = await as(TOOL_API, null, async (tx) => {
+      expect(await bind(tx, "attempt-sam-signin-3", OCT28_DEVICE, "2026-10-28T15:08:00Z")).toHaveLength(1);
+      const held = await refusal(
+        db.sql`select id from sign_in_attempts where id = 'sign-in-sam-oct28-1505' for update nowait`,
+      );
+      const free = await db.sql`
+        select id from sign_in_attempts where id = 'sign-in-no-account-oct28-1505' for update nowait
+      `;
+      return { held: held.code, free: free.length };
+    });
+    expect(answer).toEqual({ held: "55P03", free: 1 });
+  });
+
+  it("sign_in_attempt_tried counts wrong tries as check_proof_code counts a code's: the look writes nothing; wrong four times, then paused at the fifth 15 minutes on; a sixth counts nothing (paused); the same check again answers its first result and writes nothing", async () => {
+    const five = attemptRow("sign-in-probe-five");
+    const id = textOf(five.values.id);
+    const answer = await as(
+      TOOL_API,
+      null,
+      async (tx) => {
+        const look = await tried(tx, id, standIn("check look"), null, plus(at, 0.5));
+        const afterLook = await attemptState(tx, id);
+        const wrongs: Record<string, unknown>[][] = [];
+        for (let minute = 1; minute <= 5; minute += 1) {
+          wrongs.push(await tried(tx, id, standIn(`check ${String(minute)}`), "wrong", plus(at, minute)));
+        }
+        const sixth = await tried(tx, id, standIn("check 6"), "wrong", plus(at, 6));
+        const afterSixth = await attemptState(tx, id);
+        const again = await tried(tx, id, standIn("check 6"), "wrong", plus(at, 7));
+        const againLook = await tried(tx, id, standIn("check 6"), null, plus(at, 7));
+        return {
+          look,
+          afterLook,
+          wrongs,
+          sixth,
+          afterSixth,
+          again,
+          againLook,
+          last: await attemptState(tx, id),
+        };
+      },
+      [five],
+    );
+    const paused = plus(at, 20);
+    const sixthState = {
+      tries: 5,
+      last: new Date(plus(at, 5)),
+      paused: new Date(paused),
+      check: standIn("check 6"),
+      outcome: "paused",
+      session: null,
+      version: 7,
+    };
+    expect(answer).toEqual({
+      look: answered(false, 0, null, null),
+      afterLook: {
+        tries: 0,
+        last: null,
+        paused: null,
+        check: null,
+        outcome: null,
+        session: null,
+        version: 1,
+      },
+      wrongs: [
+        answered(false, 1, null, "wrong"),
+        answered(false, 2, null, "wrong"),
+        answered(false, 3, null, "wrong"),
+        answered(false, 4, null, "wrong"),
+        answered(false, 5, paused, "paused"),
+      ],
+      sixth: answered(false, 5, paused, "paused"),
+      afterSixth: sixthState,
+      again: answered(true, 5, paused, "paused"),
+      againLook: answered(true, 5, paused, "paused"),
+      last: sixthState,
+    });
+  });
+
+  it("sign_in_attempt_tried records any other K-21 label as it is, counting nothing; a wrong check after the attempt's 10 minutes counts nothing and is recorded expired, while one at its 10 minutes still counts", async () => {
+    const label = attemptRow("sign-in-probe-label");
+    const late = attemptRow("sign-in-probe-late");
+    const edge = attemptRow("sign-in-probe-edge");
+    const answer = await as(
+      TOOL_API,
+      null,
+      async (tx) => ({
+        label: await tried(tx, textOf(label.values.id), standIn("check label"), "signedIn", plus(at, 1)),
+        late: await tried(tx, textOf(late.values.id), standIn("check late"), "wrong", plus(at, 10 + 1 / 60)),
+        lateState: await attemptState(tx, textOf(late.values.id)),
+        edge: await tried(tx, textOf(edge.values.id), standIn("check edge"), "wrong", plus(at, 10)),
+      }),
+      [label, late, edge],
+    );
+    expect(answer).toEqual({
+      label: answered(false, 0, null, "signedIn"),
+      late: answered(false, 0, null, "expired"),
+      lateState: {
+        tries: 0,
+        last: null,
+        paused: null,
+        check: standIn("check late"),
+        outcome: "expired",
+        session: null,
+        version: 2,
+      },
+      edge: answered(false, 1, null, "wrong"),
+    });
+  });
+
+  it("sign_in_attempt_tried answers no row and writes nothing, raising nothing (DL-170), for a NULL id, check or time, a check not in hash form, an unknown id or an outcome that is not K-21's", async () => {
+    const row = attemptRow("sign-in-probe-refused");
+    const id = textOf(row.values.id);
+    const check = standIn("check refused");
+    const t = plus(at, 1);
+    const answer = await as(
+      TOOL_API,
+      null,
+      async (tx) => ({
+        noId: (await tried(tx, null, check, "wrong", t)).length,
+        noCheck: (await tried(tx, id, null, "wrong", t)).length,
+        noTime: (await tried(tx, id, check, "wrong", null)).length,
+        notHex: (await tried(tx, id, "482913", "wrong", t)).length,
+        upperCase: (await tried(tx, id, check.toUpperCase(), "wrong", t)).length,
+        unknown: (await tried(tx, "sign-in-nobody", check, "wrong", t)).length,
+        notK21: (await tried(tx, id, check, "placeholder-session-token-sam-0002", t)).length,
+        state: await attemptState(tx, id),
+      }),
+      [row],
+    );
+    expect(answer).toEqual({
+      noId: 0,
+      noCheck: 0,
+      noTime: 0,
+      notHex: 0,
+      upperCase: 0,
+      unknown: 0,
+      notK21: 0,
+      state: { tries: 0, last: null, paused: null, check: null, outcome: null, session: null, version: 1 },
+    });
+  });
+
+  it("sign_in_attempt_signed_in names the session the attempt's own code started, once: true, then false; a session of another code, an attempt that names one already, an attempt with no code, an unknown id and NULLs answer false and write nothing", async () => {
+    const code = codeUsed("code-probe-attempt-signed-in", "sign_in", SAM, "handle-sam-email", at);
+    const session: FixtureRow = {
+      table: "sessions",
+      values: sessionStarted(
+        "session-probe-attempt",
+        SAM,
+        "code-probe-attempt-signed-in",
+        "code",
+        plus(at, 1),
+      ),
+    };
+    const attempt = attemptRow("sign-in-probe-signed-in", {
+      person_id: SAM,
+      owner_or_admin: true,
+      proof_code_id: "code-probe-attempt-signed-in",
+    });
+    const id = textOf(attempt.values.id);
+    const answer = await as(
+      TOOL_API,
+      { personId: SAM },
+      async (tx) => ({
+        otherCode: await signedIn(tx, id, "session-sam-oct26"),
+        named: await signedIn(tx, "sign-in-sam-oct26-1300", "session-probe-attempt"),
+        noCode: await signedIn(tx, "sign-in-no-account-oct28-1505", "session-probe-attempt"),
+        unknown: await signedIn(tx, "sign-in-nobody", "session-probe-attempt"),
+        noId: await signedIn(tx, null, "session-probe-attempt"),
+        noSession: await signedIn(tx, id, null),
+        before: await attemptState(tx, id),
+        first: await signedIn(tx, id, "session-probe-attempt"),
+        again: await signedIn(tx, id, "session-probe-attempt"),
+        after: await attemptState(tx, id),
+      }),
+      [code, session, attempt],
+    );
+    const unsigned = {
+      tries: 0,
+      last: null,
+      paused: null,
+      check: null,
+      outcome: null,
+      session: null,
+      version: 1,
+    };
+    expect(answer).toEqual({
+      otherCode: false,
+      named: false,
+      noCode: false,
+      unknown: false,
+      noId: false,
+      noSession: false,
+      before: unsigned,
+      first: true,
+      again: false,
+      after: { ...unsigned, session: "session-probe-attempt", version: 2 },
+    });
+  });
+
+  it("the Tool API is refused every read and write of sign_in_attempts (42501), in a sign-in call, in Sam's own call and scoped to a business; the runtime side reads the rows", async () => {
+    const row = attemptRow("sign-in-probe-tool-api");
+    const actions: [string, (tx: Tx) => Promise<unknown>][] = [
+      ["select", (tx) => countRows(tx, "sign_in_attempts")],
+      ["insert", (tx) => insertRow(tx, "sign_in_attempts", row.values)],
+      [
+        "update",
+        (tx) => tx`update sign_in_attempts set version = version + 1 where id = 'sign-in-sam-oct28-1505'`,
+      ],
+      ["delete", (tx) => tx`delete from sign_in_attempts where id = 'sign-in-sam-oct28-1505'`],
+    ];
+    for (const scope of [null, { personId: SAM }, { businessId: BARBERSHOP, personId: SAM }]) {
+      for (const [label, action] of actions) {
+        const refused = await refusal(as(TOOL_API, scope, action));
+        expect([refused.code, refused.message], `${label} ${JSON.stringify(scope)}`).toEqual([
+          "42501",
+          "permission denied for table sign_in_attempts",
+        ]);
+      }
+    }
+    expect(await as(RUNTIME, null, (tx) => countRows(tx, "sign_in_attempts"))).toBe(3);
+  });
+
+  it("a temporary sign_in_attempts table the caller makes does not reach sign_in_attempt_tried (pg_temp is searched last)", async () => {
+    const check = standIn("a forged check");
+    const found = await as(TOOL_API, null, async (tx) => {
+      await tx`
+        create temporary table sign_in_attempts (id text, wrong_tries integer, paused_until timestamptz,
+                                                 last_outcome text, last_check_sha256 text, expires_at timestamptz,
+                                                 version integer)
+      `;
+      await tx`
+        insert into pg_temp.sign_in_attempts
+        values ('sign-in-forged', 0, null, 'signedIn', ${check}, '2030-01-01T00:00:00Z', 1)
+      `;
+      return tried(tx, "sign-in-forged", check, null, "2026-11-05T10:00:00Z");
+    });
+    expect(found).toHaveLength(0);
+  });
+});
+
 describe("row-level security per business on the seven business-scoped tables, every K-04 v1 and K-22 v1.1 seed loaded", () => {
   beforeAll(loadEverySeed, 120_000);
 
@@ -2754,7 +3280,7 @@ describe("row-level security per business on the seven business-scoped tables, e
     },
   );
 
-  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the eleven", async () => {
+  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the twelve", async () => {
     const skill = {
       ...valuesOf("seed-staff-joined.json", "staff_skills", 1),
       id: "skill-jordan-electrician-2",
@@ -2854,7 +3380,7 @@ describe("sealed fields (rule 6; T-182's sealing): the stored value is the seale
   });
 });
 
-describe("versions (rule 2): every update of the eight versioned tables raises the version by exactly one", () => {
+describe("versions (rule 2): every update of the nine versioned tables raises the version by exactly one", () => {
   beforeAll(loadEverySeed, 120_000);
 
   it("on the runtime side, an update that leaves it is refused (<table>_version_raised, 23514) and one that raises it passes", async () => {

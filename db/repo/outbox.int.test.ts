@@ -3088,20 +3088,23 @@ describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227;
       expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
       expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toMatchObject({ firstDelivery: true });
       expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toMatchObject({ row: { state: "delivered" } });
-      // No K-05 call leaves a delivered part without its time, and K-04 v1 has no CHECK against it: the tables' owner
-      // takes the poll's away here.
-      await db.sql`
-        update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
-      `;
       const before = await everythingNow();
-      // The repeated part try itself holds no time to answer with.
-      await expect(markPartV12(runtime, receipt(POLL_MESSAGE, pollAt))).rejects.toThrow(
-        "a delivered part holds no delivered_at",
-      );
-      // Nor can the words' repeat say whether theirs was the row's first: another delivered part try holds no time.
-      await expect(markPartV12(runtime, receipt(WORDS_MESSAGE, wordsAt))).rejects.toThrow(
-        "a delivered part holds no delivered_at",
-      );
+      // Restated by T-1278 (CQ-211; DL-545; the architect rules it in review, build prompt 6.6): no K-05 call leaves a
+      // delivered part without its time, and K-04 v1.1's validated CHECK outbox_parts_delivered_has_time now refuses
+      // one, so the tables' owner taking the poll's time away fails loudly (23514) and writes nothing. markPartV12's own
+      // throw for such a part ("a delivered part holds no delivered_at") stays in outbox.ts as the second guard, which
+      // no row can reach once the CHECK holds.
+      await expect(
+        db.sql`
+          update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
+        `,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_parts_delivered_has_time" });
+      expect(await everythingNow()).toEqual(before);
+      // So every delivered part try holds its time, and each repeat answers by those times, never by a guess: the
+      // poll's is the row's second delivery, the words' its first.
+      const row = { state: "delivered", version: 7 };
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
       expect(await everythingNow()).toEqual(before);
       // A mark that is no delivery receipt reads none of it, and v1's markPart answers its repeat as it always did.
       expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: true, repeatedDelivery: null });
