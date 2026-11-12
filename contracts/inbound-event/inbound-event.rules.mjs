@@ -164,5 +164,40 @@ export function scrubbedV1dot1(event) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// K-06 v1.2 (T-1296): the rule `scrubbedV1dot2`, added beside `scrubbed` and `scrubbedV1dot1`, which stay exactly as
+// they were. A poll's option words are words too: an option someone added is read as typed words (arch 07 line 379;
+// S13-24 rule 6), so a card number or a Social Security number typed as a new option is swapped before anything is kept,
+// as one in the body is (arch 02 line 109; RULES 4.5 line 199; CQ-58). The rule is scrubbedV1dot1's reading, unchanged,
+// with poll.optionWords read beside the body and an email's subject (README "Named rule (v1.2)"). It refuses everything
+// scrubbedV1dot1 refuses, since it runs that rule first and only adds lines.
+
+/** v1.2: the problems scrubbedV1dot1's reading finds in one field's words, each line naming the field. */
+function problemsInV1dot2(where, words) {
+  const problems = [];
+  for (const count of cardRunsInV1dot1(words)) {
+    problems.push(
+      `${where}: holds a card number (a 13 to 19 digit Luhn window in a run of ${String(count)} digits); it must be ${CARD_TAG}`,
+    );
+  }
+  if (hasSsnV1dot1(words)) problems.push(`${where}: holds a Social Security number; it must be ${SSN_TAG}`);
+  return problems;
+}
+
+/**
+ * scrubbedV1dot2 (K-06 v1.2): the body, an email's subject and a poll's option words hold no card number and no Social
+ * Security number, each read as scrubbedV1dot1 reads the body. Sources: arch 02 line 109 ("Before any write it swaps
+ * card numbers (13 to 19 digits, Luhn) and Social Security numbers for a tag"); arch 07 line 379 ("A vote for an option
+ * someone added reads as typed words (S13-24 rule 6)"); arch 10 line 516; RULES 4.5 line 199 ("Never kept at all: full
+ * card numbers outside the card box, full Social Security numbers"); QUESTIONS.md CQ-58; T-1265's security review.
+ * Like the earlier rules, its problem lines name the field and a count of digits, never the digits.
+ */
+export function scrubbedV1dot2(event) {
+  const problems = scrubbedV1dot1(event);
+  const optionWords = event.poll?.optionWords;
+  if (typeof optionWords === "string") problems.push(...problemsInV1dot2("poll.optionWords", optionWords));
+  return problems;
+}
+
 /** The named rules fixtures/index.json may name. */
-export const rules = Object.freeze({ scrubbed, scrubbedV1dot1 });
+export const rules = Object.freeze({ scrubbed, scrubbedV1dot1, scrubbedV1dot2 });

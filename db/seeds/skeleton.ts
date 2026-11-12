@@ -46,17 +46,21 @@
 //
 // D-017's run loads, in order: db/seeds/core.ts (T-200's demo shops, which share no id or number with this set), then
 // this set.
+//
+// tp-01's roster id, its handle's id and the handle's number are the roster's list's (lib/roster.ts, T-1302; K-05 v1.12
+// default 106), the one list the test-phone page's roster reads too, so the page and this seed cannot drift.
 import { SCOPE_SETTING, type Sql, type Tx } from "../repo/scope";
 import { handleTargetsIn } from "../repo/targets";
 import { type CoreSeedTableCount, SEED_ROLE } from "./core";
 import { FICTIONAL_MOBILE } from "./lib/demo-shops";
+import { TEST_OWNER_1_PHONE } from "./lib/roster";
 
 /** Test owner 1 (K-21 v1 test-roster.json tp-01) by the fixtures' ids, never by the number. */
 export const TEST_OWNER_1 = {
-  testPhoneId: "tp-01",
+  testPhoneId: TEST_OWNER_1_PHONE.testPhoneId,
   businessId: "biz-lees-barbershop",
   personId: "person-sam",
-  handleId: "handle-sam",
+  handleId: TEST_OWNER_1_PHONE.handleId,
 } as const;
 
 export interface SkeletonBusinessRow {
@@ -137,7 +141,7 @@ export const SKELETON_ROWS: SkeletonSeedRows = {
     },
   ],
   persons: [{ id: TEST_OWNER_1.personId, name: "Sam Lee", language: null }],
-  handles: [{ id: TEST_OWNER_1.handleId, kind: "phone", address: "+15555550100" }],
+  handles: [{ id: TEST_OWNER_1.handleId, kind: "phone", address: TEST_OWNER_1_PHONE.fakeNumber }],
   person_handles: [{ person_id: TEST_OWNER_1.personId, handle_id: TEST_OWNER_1.handleId }],
   companies: [
     {

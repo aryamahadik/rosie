@@ -145,7 +145,9 @@ const countOf = (words: string, tag: string): number => words.split(tag).length 
 /** README, "What the schema and the rule leave to code": `scrubbed`'s counts match the tags left in the words. */
 export function checkScrubbedCounts(event: InboundEvent): string[] {
   const problems: string[] = [];
-  const words = [event.body, event.email?.subject].filter((part): part is string => typeof part === "string");
+  const words = [event.body, event.email?.subject, event.poll?.optionWords].filter(
+    (part): part is string => typeof part === "string",
+  );
   const cards = words.reduce((sum, part) => sum + countOf(part, CARD_TAG), 0);
   const ssns = words.reduce((sum, part) => sum + countOf(part, SSN_TAG), 0);
   if (cards !== event.scrubbed.cards)
@@ -444,7 +446,7 @@ describe("inbound-event fixtures: the named rules are run, none skipped", () => 
   it("never prints the number a rule found in its problem lines, compared as digits only against the body's number", () => {
     for (const entry of refusedByRule) {
       const event = eventOf(entry.file);
-      const words = must(event.body);
+      const words = must(event.body ?? event.poll?.optionWords);
       expect(numbersIn(words).length, `${entry.file}: the body holds a number to look for`).toBeGreaterThan(
         0,
       );
