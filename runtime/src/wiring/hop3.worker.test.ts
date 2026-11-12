@@ -24,7 +24,7 @@ import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:tes
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
-import type { CopiesView, HandleActor, HoldEntry, SafetyEntry } from "../actor";
+import type { BatchEntry, CopiesView, HandleActor, HoldEntry, SafetyEntry } from "../actor";
 import type { ActorCopies } from "../actor/copies/copies";
 import { WHOLE_A } from "../bundle/test-support";
 import { actorNameOf } from "../gateway";
@@ -115,6 +115,7 @@ interface SafetyRpc {
   readCopies(): Promise<CopiesView>;
   readOutage(): Promise<OutageView>;
   outageIdle(): Promise<void>;
+  readBatches(): Promise<BatchEntry[]>;
 }
 
 function actorOf(actorName: string): SafetyRpc {
@@ -350,6 +351,12 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
         expect(await actorOf(PLAIN_ACTOR).readHolds()).toMatchObject([
           { eventId: plain, rule: "unread", released: false },
         ]);
+        // Its batch is kept back while it is unread (the security reviewer's DL-615 ruling: the rule's other effects stand).
+        expect(
+          (await actorOf(PLAIN_ACTOR).readBatches()).filter(
+            (batch) => batch.handed && batch.eventIds.includes(plain),
+          ),
+        ).toEqual([]);
         expect(run.fakes.direct.sent).toEqual([]);
 
         // Each read tried Haiku, then Sonnet, and each try was cut off at 2 s: the read's own spans say so. (Since T-1264

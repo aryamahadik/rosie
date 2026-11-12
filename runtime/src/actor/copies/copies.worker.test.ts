@@ -83,6 +83,7 @@ import {
   type CopiesView,
   type HandleActor,
   type LeasedTurn,
+  type BatchEntry,
   type ReplayReport,
   type SafetyEntry,
   type SafetyTimerRow,
@@ -130,6 +131,7 @@ interface CopiesRpc {
   readSafety(): Promise<SafetyEntry[]>;
   readOutage(): Promise<OutageView>;
   outageIdle(): Promise<void>;
+  readBatches(): Promise<BatchEntry[]>;
 }
 
 function stubOf(who: Party): DurableObjectStub<HandleActor> {
@@ -2861,8 +2863,8 @@ describe("the write-on-return queue, with the safety read's records", () => {
       expect(
         (await actorOf(ALEX).readSafety()).find((entry) => entry.eventId === "evt-alex-0299"),
       ).toMatchObject({ path: "none", lineId: "outage" });
-      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): the text's unread hold open and
-      // its re-read set 30 s on.
+      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): the text's unread hold open, its
+      // re-read set 30 s on, and its batch kept back.
       expect(await actorOf(ALEX).readHolds()).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ eventId: "evt-alex-0299", rule: "unread", released: false }),
@@ -2874,6 +2876,11 @@ describe("the write-on-return queue, with the safety read's records", () => {
           .toArray(),
       );
       expect(reread).toEqual([{ due_ms: 34_000 }]);
+      expect(
+        (await actorOf(ALEX).readBatches()).filter(
+          (batch) => batch.handed && batch.eventIds.includes("evt-alex-0299"),
+        ),
+      ).toEqual([]);
 
       // The danger record waits; a reader sees labels only. No record waits for an outage line.
       expect((await actorOf(ALEX).readCopies()).returns).toEqual([
