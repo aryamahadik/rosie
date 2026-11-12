@@ -1,25 +1,27 @@
-// Tests for T-1329's guard (DL-612, DL-617, DL-625): `npm run typecheck` refuses, in every file under db/ but its test
-// files, the syntax Node's type stripping cannot run (parameter properties, enums, namespaces), and allows it
+// Tests for T-1329's guard (DL-612, DL-617, DL-625, DL-631): `npm run typecheck` refuses, in every file under db/ but
+// its test files, the syntax Node's type stripping cannot run (parameter properties, enums, namespaces), and allows it
 // elsewhere. Run by `npm run test:ci-scripts`.
 //
 // Node runs db/ straight from TypeScript (db/seeds/run.mjs, infra/flags/flags.mjs, seed-staging.test.mjs) and stops
 // at such a line with ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX, as train 143's CI script tests did at db/repo/clocks.ts.
-// db/tsconfig.json checks db/ a second time with erasableSyntaxOnly; wrangler and Vitest transform the rest of the
-// repository, and Vitest runs db/'s own *.test.ts files, so the syntax stays allowed there.
+// db/tsconfig.erasable.json checks db/ a second time with erasableSyntaxOnly; wrangler and Vitest transform the rest
+// of the repository, and Vitest runs db/'s own *.test.ts files, so the syntax stays allowed there. That config is not
+// named tsconfig.json (DL-631), so no tool but the typecheck script takes it up.
 //
 // Each case builds a throwaway repository with this repository's tsconfig.base.json, tsconfig.json and
-// db/tsconfig.json, its typecheck script line and its node_modules (a link), plants files there and runs
+// db/tsconfig.erasable.json, its typecheck script line and its node_modules (a link), plants files there and runs
 // `npm run typecheck` as written. Nothing is planted in this repository. No database, no network.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync, symlinkSync } from "node:fs";
+import { existsSync, readFileSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
 import { REPO, cleanEnv, tempDir, write } from "./script-harness.mjs";
 
-const CONFIGS = ["tsconfig.base.json", "tsconfig.json", "db/tsconfig.json"];
+const ERASABLE = "db/tsconfig.erasable.json";
+const CONFIGS = ["tsconfig.base.json", "tsconfig.json", ERASABLE];
 const TYPECHECK = JSON.parse(readFileSync(path.join(REPO, "package.json"), "utf8")).scripts.typecheck;
 
 const lines = (...text) => `${text.join("\n")}\n`;
@@ -78,15 +80,22 @@ function typecheck(t, root) {
 }
 
 describe("npm run typecheck and the syntax Node's type stripping cannot run", () => {
-  it("the typecheck script runs the root program, then db/tsconfig.json's", () => {
-    assert.equal(TYPECHECK, "tsc --noEmit -p . && tsc --noEmit -p db");
-    const db = readFileSync(path.join(REPO, "db/tsconfig.json"), "utf8");
+  it("the typecheck script runs the root program, then db/tsconfig.erasable.json's", () => {
+    assert.equal(TYPECHECK, "tsc --noEmit -p . && tsc --noEmit -p db/tsconfig.erasable.json");
+    const db = readFileSync(path.join(REPO, ERASABLE), "utf8");
     assert.match(db, /"extends": "\.\.\/tsconfig\.json"/);
     assert.match(db, /"erasableSyntaxOnly": true/);
     assert.match(db, /"include": \["\*\*\/\*"\]/);
     assert.match(db, /"exclude": \["\*\*\/\*\.test\.ts"\]/);
     const root = readFileSync(path.join(REPO, "tsconfig.json"), "utf8");
     assert.doesNotMatch(root, /erasableSyntaxOnly"\s*:/);
+    // No db/tsconfig.json (DL-631): typescript-eslint's projectService, Vitest and wrangler take the nearest
+    // tsconfig.json, and one in db/ had ESLint type db/ through two programs, past V8's heap.
+    assert.equal(
+      existsSync(path.join(REPO, "db/tsconfig.json")),
+      false,
+      "db/tsconfig.json must not exist (DL-631)",
+    );
   });
 
   it("refuses a parameter property, an enum and a namespace in db/, naming each line, and no runtime/ file", (t) => {

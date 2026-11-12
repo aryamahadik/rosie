@@ -108,7 +108,7 @@ export interface OpenChatOptions {
  */
 export class OpenChatOnTextDatabaseError extends Error {
   // Plain fields set in the constructor, never parameter properties: Node's type stripping cannot run those, and
-  // `npm run typecheck` refuses them in db/ (db/tsconfig.json, T-1329; as T-1268's round 4 did in clocks.ts).
+  // `npm run typecheck` refuses them in db/ (db/tsconfig.erasable.json, T-1329; as T-1268's round 4 did in clocks.ts).
   readonly code: string;
   readonly table: string | null;
   readonly constraint: string | null;
