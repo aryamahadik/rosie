@@ -31,6 +31,7 @@ A record that work is built on is never rewritten to say something else; it is s
 | [ADR-012](0012-github-free-gaps.md)                  | GitHub Free gaps                   | No branch protection, no environments, one login: local permission rules and hooks are the controls; production keys never in GitHub             | proposed, default in use (D-000)  |
 | [ADR-013](0013-walking-skeleton-turn-one.md)         | The walking skeleton's turn        | Turn 1, Sam's first text (S1-01) to S1-02's question, through decide's two reads and one commit; each hop's fixture named (K-02 v1.1, K-09 v1.5) | proposed, default in use (T-1142) |
 | [ADR-014](0014-worker-database-roles.md)             | The Worker's database roles        | Two logins, one inheriting rosie_job and one rosie_app, each behind its own Hyperdrive configuration and binding; a guard in every call          | proposed, default in use (T-1239) |
+| [ADR-015](0015-safety-result-until-commit.md)        | The safety result until its commit | Each text's K-02 safety result is kept sealed in its handle actor's storage until its turn ends; the turn reads it there; no contract changes    | proposed, default in use (T-1241) |
 
 ## Short names used in the records
 
