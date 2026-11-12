@@ -6,7 +6,7 @@
   const GREETING =
     "Hi! I’m Rosie. I can help you find and book a local pro, or get your business booked. What can I do for you?";
   const OFFLINE =
-    "Sorry, I couldn’t reach the desk just now. Please try again in a moment, or text me on iMessage at +1 (205) 261-1117.";
+    "Sorry, I couldn’t reach the desk just now. Please try again in a moment, or text me on iMessage at ROSFIELD_TEST_IMESSAGE_NUMBER.";
   const SESSION_KEY = "rosfield_session";
 
   const $ = (id) => document.getElementById(id);
