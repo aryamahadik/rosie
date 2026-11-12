@@ -1,0 +1,312 @@
+{
+  "part": "people-access",
+  "version": "v1.2",
+  "tables": [
+    {
+      "name": "sign_in_attempts",
+      "description": "Each sign-in started on a page (K-21 v1 signInStart), kept on the server from its start to its last check (ADR-016 section 4; this README's open gap on how the code id and its person are kept on the server): the page's attempt id, bound to the device that started it by the device cookie's sha256; the start's repeat key; the typed contact as a keyed hash, never the contact; the way; the person of the one account the contact found, and whether that person held a live owner or admin role then; the code sent for it; its 10 minutes; its own wrong tries and the pause at the fifth, counted alike with or without an account; the last check's repeat key and answer, a K-21 label and never a token; and the session it started. The start's hourly bound, the contact's pause and the day's cap read it (README rule 9). v1.2 only adds this table; v1's ten tables and v1.1's page_links stay as their lists give them, so the part at v1.2 is the three lists together.",
+      "source": "ADR-016 section 4 (the table, rules 0 to 5, the check) and section 7 card V2; K-21 v1 signInStart and signInCheck (schema lines 686 to 946; README lines 75, 76 and 114 to 117); STATE note 74; S13-45 ('At most a few codes a day per contact'); RULES 6.2; S11-52; BP rule 7; CQ-237; CQ-249; T-1250 round 2 security notes a and b (DL-526)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The attempt's own id: an opaque string the server makes and never parses (CQ-09), never the page's attempt id. It is also the job id of the code's outbox row and its event-log entries (ADR-016 section 1), and the first part of last_check_sha256's input (README rule 9).",
+          "source": "CQ-09; ADR-016 sections 1 and 4"
+        },
+        {
+          "name": "attempt_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The page's attemptId (K-21 v1 signInStart.response.attemptId), kept as made (CQ-239): made by the server with at least 128 bits from a cryptographically secure random generator (K-21 v1 README default 18), never K-22's code id. It finds the attempt only together with the device that started it (sign_in_attempt), so a copied or guessed id checks nothing (attemptNotFound).",
+          "source": "K-21 v1 schema line 751; K-21 v1 README line 117 and default 18; ADR-016 open point 3 (CQ-239)"
+        },
+        {
+          "name": "request_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The start's repeat key: the sha256, in lowercase hex, of device_sha256, a line feed and the page's requestId (README rule 9). A start whose key a row already holds answers that row again and writes nothing, so a repeated requestId sends no second code.",
+          "source": "K-21 v1 README line 75; K-21 v1 schema line 688 ('a repeat answers the same attempt and sends no second code'); ADR-016 section 4 rule 1"
+        },
+        {
+          "name": "device_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256, in lowercase hex, of the device cookie the start came with (K-21 v1 signInStart.request.deviceToken); never the cookie. Only a check from the same device finds the attempt (sign_in_attempt), and once the code is right device_known is asked with it (README rule 5).",
+          "source": "K-21 v1 schema line 726; K-21 v1 README line 117; BP rule 7"
+        },
+        {
+          "name": "contact_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The typed contact as its HMAC-SHA-256 under the Workers secret named in hash_key_name, in lowercase hex, over a fixed prefix, the typed kind and the contact as normalized (README rule 9); never the contact itself. The contact's pause and the day's cap are counted by it, so they answer alike for a contact no account holds.",
+          "source": "ADR-016 section 4 ('The key'); K-21 v1 schema line 780; README line 55 and default 7; BP rule 7"
+        },
+        {
+          "name": "hash_key_name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The name of the Workers secret contact_hash is keyed with (PROOF_CODE_HASH_KEY, the one key of CQ-240, which proof_codes.hash_key_name also names): a name, never a value.",
+          "source": "ADR-016 section 4; CQ-240; K-22 v1 proof_codes.hash_key_name"
+        },
+        {
+          "name": "way",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "email (a code to the account's email on file, typed on the page) or text (a ready text from the account's own mobile: MC C9), as K-21 v1 signInStart.request.way. ADR-016's lane serves email only (CQ-244); the column admits text.",
+          "source": "K-21 v1 schema lines 720 to 723; ADR-016 section 5; CQ-244"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person of the one account the typed contact found on the runtime side (for way email, by its proven email), set at the start and never changed; null when no account, or two or more, matched (CQ-250), and for a start from a link in ADR-016's lane (CQ-244). The page never learns it, and the check acts for it only once check_proof_code answers right (README rule 4).",
+          "source": "ADR-016 section 4 rules 4 and 5; README rule 4; CQ-250"
+        },
+        {
+          "name": "owner_or_admin",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Whether person_id held a live owner or admin role (K-04 person_roles, not ended) at the start, so a right code on a device device_known does not know asks the second proof (secondProofNeeded); false with no person.",
+          "source": "K-21 v1 README line 110; S13-45 row 8; ADR-016 section 4"
+        },
+        {
+          "name": "proof_code_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The sign-in code sendSignInCode wrote for this attempt after the answer, set once by the runtime side in that code's own commit (ADR-016 section 1); null before it, and for good when no code was sent (no person, or the address's codes capped or paused: proof_code_limits). The check asks check_proof_code with it; a null id answers unknown.",
+          "source": "ADR-016 sections 1 and 4; README rule 5 (check_proof_code, proof_code_limits)"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the start was written, by the database's clock: the default, now(), the start's transaction time, which the start never overrides. Every count of README rule 9 compares against the same clock.",
+          "source": "ADR-016 section 4 rule 3 ('by the database's clock')"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "started_at plus 10 minutes (RULES 6.2), K-21's expiresAt. A check after it answers expired before any code is checked, and no wrong try is counted after it.",
+          "source": "RULES 6.2 ('A code works 10 minutes'); K-21 v1 schema lines 755 to 757; ADR-016 section 4"
+        },
+        {
+          "name": "wrong_tries",
+          "type": "integer",
+          "null": false,
+          "default": "0",
+          "audience": "never",
+          "description": "The attempt's own wrong tries, 0 to 5: every check whose code is not right counts one through sign_in_attempt_tried, with a code or without one (check_proof_code's wrong, paused or expired, or the null id's unknown), so the count is the same with or without an account (README rule 9; DL-526).",
+          "source": "RULES 6.2 ('Five wrong codes pause it'); ADR-016 section 4 ('The check'); T-1250 round 2 security note a (DL-526)"
+        },
+        {
+          "name": "last_wrong_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the last wrong try was counted; null with none.",
+          "source": "RULES 6.2; README rule 5 (proof_codes.last_wrong_at)"
+        },
+        {
+          "name": "paused_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "Set at the fifth wrong try: 15 minutes after it. Until then every check of the attempt answers paused, and every new start for the same contact hash answers paused (README rule 9), with or without the page's cookie.",
+          "source": "RULES 6.2 ('Five wrong codes pause it 15 minutes'); S11-52; ADR-016 section 4 rule 2; STATE note 74"
+        },
+        {
+          "name": "last_check_sha256",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The last check's repeat key: the sha256, in lowercase hex, of id, a line feed, device_sha256, a line feed and the check's requestId (README rule 9); never over a typed code, whose plain sha256 a million tries would give up (default 7). A check with the same key answers its first result. Null before the first check; set with last_outcome.",
+          "source": "ADR-016 section 4; K-21 v1 README line 76; T-1250 round 2 security note b; README default 7"
+        },
+        {
+          "name": "last_outcome",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The last check's answer, one of K-21 v1 signInCheck's eight labels (signedIn, secondProofNeeded, wrong, paused, expired, alreadySignedIn, attemptNotFound, waitingForText), so no token, code or hash can be kept here; set with last_check_sha256.",
+          "source": "K-21 v1 schema lines 813 to 945; K-21 v1 README line 116; T-1250 round 2 security note b"
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The session this sign-in started (K-22 v1 sessions.id), set once by sign_in_attempt_signed_in in the session insert's transaction; null until then. A later check answers alreadySignedIn, with no token.",
+          "source": "K-21 v1 README line 115; K-22 v1 sessions_proof_code_key; ADR-016 sections 4 and 6"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one (0002's trigger), the calls of README rule 9 included.",
+          "source": "arch 01 line 85; arch 10 line 506; README rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "sign_in_attempts_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "sign_in_attempts_proof_code_fk",
+          "columns": ["proof_code_id"],
+          "references": {
+            "table": "proof_codes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "sign_in_attempts_session_fk",
+          "columns": ["session_id"],
+          "references": {
+            "table": "sessions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "sign_in_attempts_attempt_key",
+          "columns": ["attempt_id"],
+          "source": "K-21 v1 schema line 751 (the page holds only the attempt id); K-21 v1 README line 117"
+        },
+        {
+          "name": "sign_in_attempts_request_key",
+          "columns": ["request_sha256"],
+          "source": "K-21 v1 README line 75 (a repeated requestId answers the same attempt); ADR-016 section 4 rule 1"
+        },
+        {
+          "name": "sign_in_attempts_proof_code_key",
+          "columns": ["proof_code_id"],
+          "source": "ADR-016 section 1 (one code per attempt, written by sendSignInCode)"
+        },
+        {
+          "name": "sign_in_attempts_session_key",
+          "columns": ["session_id"],
+          "source": "K-22 v1 sessions_proof_code_key (each sign-in starts at most one session)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "sign_in_attempts_request_hash_form",
+          "expression": "request_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (only a hash is stored); K-22 v1 sessions_token_hash_form"
+        },
+        {
+          "name": "sign_in_attempts_device_hash_form",
+          "expression": "device_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7; K-21 v1 README line 117; K-22 v1 sessions_device_hash_form"
+        },
+        {
+          "name": "sign_in_attempts_contact_hash_form",
+          "expression": "contact_hash ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (never the contact itself); ADR-016 section 4 ('The key'); K-22 v1 proof_codes_hash_form"
+        },
+        {
+          "name": "sign_in_attempts_check_hash_form",
+          "expression": "last_check_sha256 is null or last_check_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7; T-1250 round 2 security note b (never a typed code)"
+        },
+        {
+          "name": "sign_in_attempts_key_name_form",
+          "expression": "hash_key_name ~ '^[A-Z][A-Z0-9_]*$'",
+          "source": "BP rule 7; K-22 v1 proof_codes_key_name_form"
+        },
+        {
+          "name": "sign_in_attempts_way_known",
+          "expression": "way in ('email', 'text')",
+          "source": "K-21 v1 signInStart.request.way"
+        },
+        {
+          "name": "sign_in_attempts_role_has_person",
+          "expression": "person_id is not null or not owner_or_admin",
+          "source": "ADR-016 section 4 rule 5 ('else null and false')"
+        },
+        {
+          "name": "sign_in_attempts_code_has_person",
+          "expression": "proof_code_id is null or person_id is not null",
+          "source": "ADR-016 section 4 (no account, no code); K-21 v1 README line 114 ('a way with no contact on file sends nothing')"
+        },
+        {
+          "name": "sign_in_attempts_session_has_code",
+          "expression": "session_id is null or proof_code_id is not null",
+          "source": "README rule 5 (a session needs a used sign-in code); K-21 v1 README line 107"
+        },
+        {
+          "name": "sign_in_attempts_ten_minutes",
+          "expression": "expires_at = started_at + interval '10 minutes'",
+          "source": "RULES 6.2 ('A code works 10 minutes'); K-22 v1 proof_codes_ten_minutes"
+        },
+        {
+          "name": "sign_in_attempts_wrong_tries_range",
+          "expression": "wrong_tries between 0 and 5 and (wrong_tries = 0) = (last_wrong_at is null)",
+          "source": "RULES 6.2 ('Five wrong codes pause it'); K-22 v1 proof_codes_wrong_tries_range (so a sixth wrong try is refused)"
+        },
+        {
+          "name": "sign_in_attempts_pause_after_five",
+          "expression": "(wrong_tries >= 5) = (paused_until is not null) and (paused_until is null or paused_until = last_wrong_at + interval '15 minutes')",
+          "source": "RULES 6.2 ('Five wrong codes pause it 15 minutes'); K-22 v1 proof_codes_pause_after_five (README default 21: >= so a count past five fails the range check alone)"
+        },
+        {
+          "name": "sign_in_attempts_outcome_known",
+          "expression": "last_outcome in ('signedIn', 'secondProofNeeded', 'wrong', 'paused', 'expired', 'alreadySignedIn', 'attemptNotFound', 'waitingForText')",
+          "source": "K-21 v1 signInCheck.response and .errors (schema lines 813 to 945); T-1250 round 2 security note b (so no token can be kept)"
+        },
+        {
+          "name": "sign_in_attempts_check_has_outcome",
+          "expression": "(last_check_sha256 is null) = (last_outcome is null)",
+          "source": "K-21 v1 README line 76 (a repeat answers its first result)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sign_in_attempts_contact_idx",
+          "columns": ["contact_hash", "started_at"],
+          "why": "The contact's pause (rule 2) and the day's cap (rule 3): the contact's attempts started in the last 24 hours, by the database's clock (README rule 9)."
+        },
+        {
+          "name": "sign_in_attempts_started_idx",
+          "columns": ["started_at"],
+          "why": "The hourly bound (rule 0): every contact's attempts started in the last hour (README rule 9)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Not per business: a sign-in covers every business of the person, and a start names no business, nor a person the page could give. The runtime side (rosie_job) selects, inserts and updates every row: the start with its counts, and the code's id (ADR-016 section 6). The Tool API (rosie_app) holds no grant on the table and reaches an attempt only through three security-definer calls keyed by what the caller holds, which never return a hash: sign_in_attempt (the attempt id with the device's sha256), sign_in_attempt_tried and sign_in_attempt_signed_in (the attempt's own id, which only the first answers). Row-level security is on with one policy, the runtime side's, so a grant given by mistake would still show the Tool API no row (README rule 9)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}
