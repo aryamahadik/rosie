@@ -1,0 +1,25 @@
+{
+  "call": "signInEntries",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T13:01:31Z",
+    "note": "After Sam's right check committed and the page answered, the runtime side logs it under the attempt's id as the job id and the check's trace, with no turn, bundle or business (team only). It reads each row: the code, used at 13:01:30Z, gives proof_code.checked log-code-sam-sign-in-nov02-used (old used_at null, new used_at; actor Sam, his own act); the session gives session.started log-session-sam-nov02-started (new: person_id, proven_via code, proof_code_id, started_at, last_seen_at, expires_at; actor Sam). Neither holds a code, a hash, a token or an address (K-08 v1.1, v1.2)."
+  },
+  "request": {
+    "jobId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1301",
+    "entries": [
+      { "kind": "proof_code.checked", "proofCodeId": "code-sam-sign-in-nov02" },
+      { "kind": "session.started", "sessionId": "session-sam-nov02" }
+    ]
+  },
+  "outcome": {
+    "result": "logged",
+    "entries": [
+      { "id": "log-code-sam-sign-in-nov02-used", "kind": "proof_code.checked", "written": true },
+      { "id": "log-session-sam-nov02-started", "kind": "session.started", "written": true }
+    ]
+  }
+}

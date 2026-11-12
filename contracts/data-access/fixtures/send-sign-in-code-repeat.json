@@ -1,0 +1,50 @@
+{
+  "call": "sendSignInCode",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json"],
+    "now": "2026-11-02T13:00:03Z",
+    "note": "The send for Sam's attempt runs again (a retried request), with a new code the page call drew and new ids. The attempt already names its code, so the call answers the first send, its code, its email row (found by the attempt's id as its job id) and its end, writes nothing and makes no second code. The new code is never stored or sent."
+  },
+  "request": {
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1300",
+    "bundle": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "code": {
+      "id": "code-sam-sign-in-nov02-again",
+      "codeHash": "f5e6d7c8b9aabb0c9d8e7f6051423324f5e6d7c8b9aabb0c9d8e7f6051423324",
+      "hashKeyName": "PROOF_CODE_HASH_KEY"
+    },
+    "emailRowId": "out-sam-sign-in-nov02-code-again",
+    "plan": {
+      "row": "out-sam-sign-in-nov02-code-again",
+      "channel": "email",
+      "copyOf": null,
+      "plan": { "formats": ["text"], "lines": [], "question": null, "pageType": null, "threadReplyTo": null }
+    },
+    "finalParts": {
+      "row": "out-sam-sign-in-nov02-code-again",
+      "channel": "email",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Code 730254: type it on the sign-in page. It works for 10 minutes.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "sent",
+    "proofCodeId": "code-sam-sign-in-nov02",
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "expiresAt": "2026-11-02T13:10:01Z",
+    "repeated": true
+  }
+}

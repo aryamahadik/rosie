@@ -1,0 +1,25 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-11-02T13:05:00Z",
+    "note": "Staging's bound on rows (ADR-016 rule 0; open point 13): the database side writes 100 attempts, each of its own contact hash, ids, request and device hashes, with no person and no code, started every 30 seconds from 12:06:00Z to 12:55:30Z (expires_at 10 minutes after each; version 1). Sam's start at 13:05:00Z finds 100 in the hour before now, before taking any contact's lock and before reading any account, so it answers paused until the oldest of them is an hour old, and writes nothing (K-22 rule 9, rule 0)."
+  },
+  "request": {
+    "id": "sign-in-sam-nov02-1305",
+    "attemptId": "attempt-sam-signin-nov02-1305",
+    "requestSha256": "a9bacbdcedf0a1b2c3d4e5f607182934a9bacbdcedf0a1b2c3d4e5f607182934",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "paused",
+    "until": "2026-11-02T13:06:00Z",
+    "by": "hourBound"
+  }
+}

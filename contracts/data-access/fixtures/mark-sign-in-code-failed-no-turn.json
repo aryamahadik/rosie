@@ -1,0 +1,60 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "claim-sam-sign-in-code.json"],
+    "now": "2026-11-02T13:00:05Z",
+    "note": "A failed mark of Sam's code row's part that carries follow-up rows, which only a safety line's first failure does (README item 15). The follow-ups and their entries go under the failed row's turn, which this row has none of, so the call answers noTurn and writes nothing, the failure included; the same mark with no follow-ups is marked as for any row, and its retry passes limit 8's notAfter first (ADR-016 section 3)."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-sam-sign-in-nov02-code/1/1",
+    "errorCode": "500",
+    "retry": false,
+    "at": "2026-11-02T13:00:05Z",
+    "providerMessageId": null,
+    "nextTryNotBefore": null,
+    "followUps": [
+      {
+        "why": "safetyOtherWay",
+        "row": {
+          "id": "out-sam-sign-in-nov02-code-by-text",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": null,
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-out-sam-sign-in-nov02-code-by-text",
+        "kind": "outbox_row.created",
+        "zone": null,
+        "businessId": null,
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-sam-sign-in-nov02-code-by-text",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "imessage" },
+        "sealed": null,
+        "why": { "followUpOf": "out-sam-sign-in-nov02-code", "followUp": "safetyOtherWay" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "error": "noTurn",
+    "table": "outbox_rows",
+    "rowId": "out-sam-sign-in-nov02-code"
+  }
+}

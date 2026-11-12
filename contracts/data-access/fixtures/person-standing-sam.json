@@ -1,0 +1,24 @@
+{
+  "call": "personStanding",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T13:01:30Z",
+    "note": "The standing of Sam's signedIn answer, read after the check commits by the person it set. His live roles, in role id order: owner of Lee's Barbershop, of Lee Home Services (K-23 seed-company-two-kinds.json), of the moving company and of the yoga studio (K-04 seed-person-roles.json); no live K-36 team row (no seed names one), so team false and tester false."
+  },
+  "request": {
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "personId": "person-sam",
+    "roles": [
+      { "role": "owner", "businessId": "biz-lees-barbershop" },
+      { "role": "owner", "businessId": "biz-lee-home-services" },
+      { "role": "owner", "businessId": "biz-movers" },
+      { "role": "owner", "businessId": "biz-yoga-studio" }
+    ],
+    "team": false,
+    "tester": false
+  }
+}

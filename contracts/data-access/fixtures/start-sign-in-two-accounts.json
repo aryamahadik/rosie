@@ -1,0 +1,28 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-11-02T13:00:00Z",
+    "note": "accounts.email is not unique (0020: only the mobile has a unique key), so before the start the database side writes a second account with Sam's address as its proven email: accounts (person_id person-riley, mobile null, mobile_proven_at null, email sam@example.com, email_proven_at 2026-10-30T10:00:00Z, version 1). Sam's own start, as start-sign-in-sam's request: rule 4's one statement finds two accounts, so it names no person (ADR-016 open point 14), the attempt is inserted with no person and owner_or_admin false, and the answer is started with personId null: no code goes to either."
+  },
+  "request": {
+    "id": "sign-in-sam-nov02-1300",
+    "attemptId": "attempt-sam-signin-nov02",
+    "requestSha256": "a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "started",
+    "id": "sign-in-sam-nov02-1300",
+    "attemptId": "attempt-sam-signin-nov02",
+    "expiresAt": "2026-11-02T13:10:00Z",
+    "repeated": false,
+    "personId": null
+  }
+}
