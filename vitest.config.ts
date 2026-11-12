@@ -86,6 +86,8 @@ export default defineConfig({
             "runtime/test/**/*.worker.test.ts",
             "actions/src/**/*.worker.test.ts",
           ],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
           // No module cache on disk (T-1207, DL-420), so the pool sends the runner each module in a message of its own.
           // With the cache, Vitest hands a new runner every module of its file's graph that the run has already
           // transformed, and the pool sends all of that code in one WebSocket message; workerd closes the runner's
@@ -146,6 +148,8 @@ export default defineConfig({
           include: ["tests/e2e/**/*.worker.test.ts"],
           // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md).
           globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts"],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
           // Each module in a message of its own to the runner, as in the workers project (T-1207).
           fsModuleCache: false,
         },
