@@ -17,7 +17,26 @@
 #  - delete, in any command (no script deletes anything).
 # CF_BUILD_DIR (deploy-preview.sh sets it to a branch's temporary worktree): run there, with that folder's
 # wrangler.jsonc checked the same way and still this checkout's wrangler; only for versions upload.
+# Tracing, allexport and keyword are switched off first, whatever the caller's shell asked for (T-1261), as
+# make-staging-secrets.sh and put-staging-secrets.sh do: the note above `unset -v` below.
+set +x
+set +a
+set +k
 set -euo pipefail
+# No variable of cf.sh's own starts out marked for export, or with the caller's text in it, whatever names the
+# caller's environment holds. bash marks every variable it inherits for export, and under allexport (bash -a, or
+# handed down in SHELLOPTS) every variable as it is set; a variable marked so goes to every command started from
+# here, node and wrangler among them, with whatever it holds then (an argument, a word of one, a path). Under
+# keyword (bash -k, or handed down in SHELLOPTS) an assignment anywhere on a command line goes to that command's
+# environment instead: the two `export NAME=value` lines below would run as bare exports, which print every
+# exported variable, and wrangler would start without the Rosfield sign-in and account; lib.sh's `local name=...`
+# would declare nothing. So allexport and keyword are switched off above, and every name cf.sh and lib.sh keep a
+# variable of their own under is dropped here, before anything is read or sourced: lib.sh's ROOT and CF, the fixed
+# texts in capitals, and the rest (paths, the arguments and their words, counts). The variables cf.sh reads from
+# the caller (CF_BUILD_DIR, CLOUDFLARE_ENV, CLOUDFLARE_ACCOUNT_ID, the WRANGLER_*_NAME overrides) are not its own,
+# and are checked below as they are. A new variable here goes on these lines too: cf.test.mjs fails until it does.
+unset -v ROOT CF ROSFIELD_ACCOUNT_ID STAGING_WORKER dir config variable arg key env_name env_count words expect
+unset -v ended changes_worker command_words word why file wrangler
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 ROSFIELD_ACCOUNT_ID="ecb06e7bc9129fa81104d331e9652362"
