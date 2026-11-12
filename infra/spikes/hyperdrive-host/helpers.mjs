@@ -26,7 +26,8 @@ export function hostKind(url) {
   if (parsed.protocol !== "postgres:" && parsed.protocol !== "postgresql:") {
     throw new Error("not a postgres:// URL");
   }
-  return parsed.hostname.includes("-pooler.") ? "pooled" : "direct";
+  // In lower case first: Node keeps a postgres:// host's letter case (T-1271).
+  return parsed.hostname.toLowerCase().includes("-pooler.") ? "pooled" : "direct";
 }
 
 /**
