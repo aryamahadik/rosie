@@ -2,9 +2,77 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 474, [`9f4c5e2`](https://github.com/aryamahadik/rosie/commit/9f4c5e2), 2026-11-12 16:06:20 UTC.
+- **Through:** commit 478, [`5fbe5ce`](https://github.com/aryamahadik/rosie/commit/5fbe5ce), 2026-11-12 16:32:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 478. docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483) (\#487)
+
+- **Commit:** [`5fbe5ce`](https://github.com/aryamahadik/rosie/commit/5fbe5ce), by Arya Mahadik, 2026-11-12 16:32:08 UTC
+- **Pull request:** [#487](https://github.com/aryamahadik/rosie/pull/487) from `task/commit-history-52`, merged 2026-11-12 16:32:08 UTC. It squashed 1 branch commit:
+  - `da67030` docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 477. T-1312: the direct danger line never waits for its hold (ADR-018 card H): the direct path writes its hold through holdFromOutcomes' guard; a danger is complete only once its hold is written, its pending note staying until then; the hold written again from the kept labels at dangerSent, each re-read, resume or late answer, and closeResults keeping the note meanwhile; the record's replay writes the core's hold with its id when the actor holds none; holdFromKept never reopens a released hold; the outbox path's writeHold unchanged; card H's proofs in hold.worker.test.ts (\#486)
+
+- **Commit:** [`a7e2dc7`](https://github.com/aryamahadik/rosie/commit/a7e2dc7), by Arya Mahadik, 2026-11-12 16:32:03 UTC
+- **Pull request:** [#486](https://github.com/aryamahadik/rosie/pull/486) from `task/T-1312`, merged 2026-11-12 16:32:03 UTC. It squashed 1 branch commit:
+  - `9ec025d` T-1312: the direct danger line never waits for its hold (ADR-018 card…
+- **Files changed:** 2 (+1050 −49), by folder:
+  - `runtime/src/safety/` arrival.ts +157 −49, hold.worker.test.ts +893 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 476. T-1311: a STOP batch restarts a restarted turn once more (ADR-018 Card S; CQ-230): LeaseHost.stopAmong (a throw reads true, a host without it false), the second restart in planOf and advance written as 2 in lease\_turns.restart and never restarted again, the actor's lease host answering through the down path (true while unwired, on a throw, for a text it cannot find or with no reading); the tests that pin the one restart run with the down path wired, assertions kept (\#485)
+
+- **Commit:** [`1b002e2`](https://github.com/aryamahadik/rosie/commit/1b002e2), by Arya Mahadik, 2026-11-12 16:31:58 UTC
+- **Pull request:** [#485](https://github.com/aryamahadik/rosie/pull/485) from `task/T-1311`, merged 2026-11-12 16:31:59 UTC. It squashed 1 branch commit:
+  - `a3524eb` T-1311: a STOP batch restarts a restarted turn once more (ADR-018 Car…
+- **Files changed:** 6 (+883 −67), by folder:
+  - `runtime/src/actor/` handle-actor.ts +8 −1, lease.ts +78 −14, lease.worker.test.ts +639 −48
+  - `runtime/src/outage/db/` outage.ts +33 −1
+  - `runtime/src/turn/` lease-turn.worker.test.ts +116 −3
+  - `runtime/src/wiring/` kept-results.worker.test.ts +9 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 475. T-1237: the web shell takes a form post only on its own host (LINK\_HOST), and web/README.md describes the sign-in routes, the POST guards and a local wrangler dev session (\#484)
+
+- **Commit:** [`d62c7ac`](https://github.com/aryamahadik/rosie/commit/d62c7ac), by Arya Mahadik, 2026-11-12 16:31:54 UTC
+- **Pull request:** [#484](https://github.com/aryamahadik/rosie/pull/484) from `task/T-1237`, merged 2026-11-12 16:31:55 UTC. It squashed 1 branch commit:
+  - `023fc4d` T-1237: the web shell takes a form post only on its own host (LINK\_HO…
+- **Files changed:** 6 (+515 −24), by folder:
+  - `web/` README.md +48 −5
+  - `web/src/shell/` host-rule.test.ts +426 −0, post-guard.test.ts +7 −3, post-guard.ts +26 −9, shell.ts +6 −5, test-support.ts +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 474. docs: COMMIT\_HISTORY.md through commit 471 (f770b0a, \#480) (\#483)
 
