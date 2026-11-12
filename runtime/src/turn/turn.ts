@@ -420,15 +420,24 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
     return outcomeOf(run, await commitCoreOnly(run, run.caller, []), null);
   }
 
-  // Every text of a turn that is decided carries its safety record in the commit (K-09 README default 5).
-  if (opened.some((text) => text.readable && !safety.has(text.eventId))) {
-    return notCommitted(run, "noSafetyResult");
-  }
+  // Every text of a turn that is decided carries its safety record in the commit (K-09 README default 5), so a turn with
+  // no keyword texts ends here while a result is missing. Keyword texts never wait for one (ADR-015 section 3): the run
+  // goes on with that text left out of the records, and the commit holds every routine part while it is unread.
+  const missing = opened.some((text) => text.readable && !safety.has(text.eventId));
+  if (missing && keywords.length === 0) return notCommitted(run, "noSafetyResult");
+  // When the decided part cannot be made on this run, the keyword texts commit at once through `keywordTurn` with no
+  // decided input (core-only, with the records the run has) if a result is missing, which a rerun would find missing
+  // again, or if one of them is a stop (DL-508; arch 06 line 329: a change that only protects commits at once), since a
+  // park records no core action (K-05 v1 parkTurn). Keyword texts that are START or HELP only, with every result
+  // present, keep the lease's retry, which may find the decided part ready.
+  const keywordsAtOnce = keywords.length > 0 && (missing || run.stopAsked);
   // The targets read failed: nothing may reach decide on this run (the frontier needs the targets).
-  if (onward.read === "failed") return notCommitted(run, onward.errorCode);
+  if (onward.read === "failed") {
+    return keywordsAtOnce ? keywordTurn(run, keywords, null) : notCommitted(run, onward.errorCode);
+  }
 
   const prepared = await prepareDecided(run, texts, onward.targets);
-  if ("result" in prepared) return prepared;
+  if ("result" in prepared) return keywordsAtOnce ? keywordTurn(run, keywords, null) : prepared;
   // Keyword texts beside decided ones ride in the same one commit (K-09 README default 10).
   if (keywords.length > 0) return keywordTurn(run, keywords, prepared);
   return outcomeOf(run, await commitDecided(run, prepared, []), null);
