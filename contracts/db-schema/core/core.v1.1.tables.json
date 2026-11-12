@@ -2677,8 +2677,8 @@
           "null": false,
           "default": "'routine'",
           "audience": "never",
-          "description": "routine; quick_reply (a reply in the same turn: Q-15); visit_now (a visit happening now); safety. Only routine waits for text hours.",
-          "source": "RULES 4.3; arch 01 line 65; Q-15"
+          "description": "routine; quick_reply (a reply in the same turn: Q-15); visit_now (a visit happening now); safety. Only routine waits for text hours. From v1.1 a sign-in's code row, written with no turn, is quick_reply too: it answers the person's own request in the same call and dies 10 minutes after its code is made (ADR-016 section 3).",
+          "source": "RULES 4.3; arch 01 line 65; Q-15; ADR-016 section 3 (v1.1)"
         },
         {
           "name": "versions_read",
@@ -2742,8 +2742,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The bundle of the turn that wrote it. The hash half of K-01's bundleId: 64 lowercase hex characters.",
-          "source": "K-01 v1 bundleId (bundle.v1.schema.json manifest.bundleId); CQ-09; arch 10 line 548"
+          "description": "The bundle of the turn that wrote it; for a row written by work with no turn (v1.1), the bundle active at that work's call, as K-08 v1.1 default 1 names it for a hop outside a turn. The hash half of K-01's bundleId: 64 lowercase hex characters.",
+          "source": "K-01 v1 bundleId (bundle.v1.schema.json manifest.bundleId); CQ-09; arch 10 line 548; K-08 v1.1 default 1 and ADR-016 section 1 (v1.1)"
         },
         {
           "name": "bundle_build",
@@ -2758,8 +2758,8 @@
           "type": "text",
           "null": false,
           "audience": "never",
-          "description": "The trace id it rides under, from webhook to delivery receipt.",
-          "source": "arch 10 line 548; BP 5.5"
+          "description": "The trace id it rides under, from webhook to delivery receipt; for a row written by work with no turn (v1.1), that work's own trace, such as the page call's for a sign-in's code row.",
+          "source": "arch 10 line 548; BP 5.5; ADR-016 section 1 (v1.1)"
         },
         {
           "name": "version",
