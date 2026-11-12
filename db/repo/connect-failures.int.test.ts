@@ -20,6 +20,11 @@
 // direct callers too, with a socket that fails as Node's would (postgres.js's own socket option) and a local server
 // that refuses each session at its start with PostgreSQL's own ErrorResponse.
 //
+// Round 3 (DL-602): commitTurn and openChatOnText throw what transientOrThrow throws for a session's failure, never
+// their own scrubbed() of the original, which passes a client's error on as it is (EACCES, the TLS name check,
+// SASL_SIGNATURE_MISMATCH through each); Node's certificate codes OUT_OF_MEM and UNSPECIFIED (the code Node gives a
+// verify error it does not list), which carry no mark of a connection, are thrown scrubbed.
+//
 // Rule 9: the probe's user, password, database and hosts are made up here (.invalid names and documentation
 // addresses), and its one number is a 555-01xx number. A check names what leaked, never its value, so a failing run
 // prints no secret.
@@ -40,6 +45,7 @@ import {
   scrubbed,
   transientOrScrubbed,
 } from "./clocks";
+import { commitTurn } from "./commit-turn";
 import { handleSealingKey } from "./handle-keys";
 import { parkTurn } from "./park";
 import { BusinessScopeError, type Sql } from "./scope";
@@ -556,6 +562,18 @@ const SHAPES: Shape[] = [
     expected: { thrown: "client", code: "DEPTH_ZERO_SELF_SIGNED_CERT", session: true },
   },
   {
+    name: "Node's certificate check out of memory (OUT_OF_MEM), its code alone on it, is thrown scrubbed by both",
+    make: () => rejecting(certError("OUT_OF_MEM", "out of memory")),
+    holds: ["number", "statement"],
+    expected: { thrown: "client", code: "OUT_OF_MEM", session: true },
+  },
+  {
+    name: "Node's certificate check it does not list (UNSPECIFIED, no mark of a connection) is thrown scrubbed by both",
+    make: () => rejecting(certError("UNSPECIFIED", "unable to get CRL issuer certificate")),
+    holds: ["number", "statement"],
+    expected: { thrown: "client", code: "UNSPECIFIED", session: true },
+  },
+  {
     name: "Node's EACCES (a connect the system did not permit) on no statement is thrown scrubbed by both",
     make: () => connectError("EACCES", -13),
     holds: ["address", "port"],
@@ -912,6 +930,67 @@ describe("a session's failure through a direct caller of transientOrThrow, scrub
       await sql.end({ timeout: 0 });
     }
   });
+
+  // Round 3 (DL-602): the two callers that scrub a statement's own refusal themselves throw transientOrThrow's scrubbed
+  // error for a session's failure. SASL_SIGNATURE_MISMATCH holds no host: postgres.js's SASLFinal rejects the statement
+  // with it as it does a socket's error (connection.js errored, queryError), the statement put on it.
+  const commitTurnRun = fixtureCall(commitTurn, "commit-first.json");
+  const openChatRun = fixtureCall(openChatOnText, "open-chat-first-text-sam.json");
+  const saslMismatch = (): Error => genericError("SASL_SIGNATURE_MISMATCH", SASL_MISMATCH);
+  const ownScrubberCases: {
+    call: string;
+    run: Run;
+    make: () => Error;
+    code: string;
+    holds: readonly string[];
+  }[] = [
+    {
+      call: "commitTurn",
+      run: commitTurnRun,
+      make: () => connectError("EACCES", -13),
+      code: "EACCES",
+      holds: ["address", "port"],
+    },
+    {
+      call: "commitTurn",
+      run: commitTurnRun,
+      make: saslMismatch,
+      code: "SASL_SIGNATURE_MISMATCH",
+      holds: [],
+    },
+    {
+      call: "openChatOnText",
+      run: openChatRun,
+      make: tlsNameError,
+      code: "ERR_TLS_CERT_ALTNAME_INVALID",
+      holds: ["host"],
+    },
+    {
+      call: "openChatOnText",
+      run: openChatRun,
+      make: saslMismatch,
+      code: "SASL_SIGNATURE_MISMATCH",
+      holds: [],
+    },
+  ];
+
+  it.each(ownScrubberCases)(
+    "$call: $code on its socket, transientOrThrow's scrubbed error",
+    async ({ call, run, make, code, holds }) => {
+      const raw = make();
+      expect(leaksOf(raw, SHAPE_SECRETS)).toEqual(expect.arrayContaining([...holds]));
+      const sql = failingSocketClient(raw);
+      try {
+        const rejected = await rejectionOf(run(sql));
+        // postgres.js rejected the transaction's first statement with the error, the statement put on it.
+        expect(Object.hasOwn(raw, "query")).toBe(true);
+        expect(rejected).not.toBe(raw);
+        expectScrubbedClientError(rejected, call, code, SHAPE_SECRETS);
+      } finally {
+        await sql.end({ timeout: 0 });
+      }
+    },
+  );
 
   const refusedCases: { call: string; run: Run; code: string; text: string }[] = [
     {

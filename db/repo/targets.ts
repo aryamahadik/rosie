@@ -121,7 +121,10 @@ const SQLSTATE = /^[0-9A-Z]{5}$/;
  *     session's start); its connection codes (CONNECT_TIMEOUT, CONNECTION_CLOSED, CONNECTION_DESTROYED,
  *     CONNECTION_ENDED) are answered transient above;
  *   - Node's certificate checks, by OpenSSL's X509_V_ERR_ names as Node's TLS gives them (a certificate not trusted,
- *     expired, revoked or not for this host).
+ *     expired, revoked or not for this host), OUT_OF_MEM among them (X509_V_ERR_OUT_OF_MEM, 17, in the OpenSSL headers
+ *     Node 24.12.0 installs), and UNSPECIFIED, the code Node gives a verify error it does not list (T-1268 round 3):
+ *     Node's X509ErrorCode starts from "UNSPECIFIED" and names only the codes it lists, so a newer OpenSSL check
+ *     (X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER, 33, and the others) comes up as UNSPECIFIED, with no mark of a connection.
  */
 const SESSION_FAILED_CODES = new Set([
   "EACCES",
@@ -129,6 +132,7 @@ const SESSION_FAILED_CODES = new Set([
   "ECONNABORTED",
   "SASL_SIGNATURE_MISMATCH",
   "MESSAGE_NOT_SUPPORTED",
+  "UNSPECIFIED",
   "UNABLE_TO_GET_ISSUER_CERT",
   "UNABLE_TO_GET_CRL",
   "UNABLE_TO_DECRYPT_CERT_SIGNATURE",
@@ -144,6 +148,7 @@ const SESSION_FAILED_CODES = new Set([
   "ERROR_IN_CERT_NOT_AFTER_FIELD",
   "ERROR_IN_CRL_LAST_UPDATE_FIELD",
   "ERROR_IN_CRL_NEXT_UPDATE_FIELD",
+  "OUT_OF_MEM",
   "DEPTH_ZERO_SELF_SIGNED_CERT",
   "SELF_SIGNED_CERT_IN_CHAIN",
   "UNABLE_TO_GET_ISSUER_CERT_LOCALLY",

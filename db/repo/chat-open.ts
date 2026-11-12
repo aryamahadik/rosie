@@ -461,8 +461,10 @@ export async function openChatOnText(
   } catch (error) {
     try {
       return transientOrThrow(error, CALL);
-    } catch {
-      throw scrubbed(error);
+    } catch (thrown) {
+      // transientOrThrow throws a session's failure already scrubbed (T-1268): that goes on as it is. What it lets
+      // through unchanged (a statement's own refusal) is scrubbed here, as before.
+      throw thrown === error ? scrubbed(error) : thrown;
     }
   }
 }
