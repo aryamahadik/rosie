@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 451, [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), 2026-11-12 09:00:57 UTC.
+- **Through:** commit 453, [`69b3c85`](https://github.com/aryamahadik/rosie/commit/69b3c85), 2026-11-12 10:16:50 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 453. docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461) (\#462)
+
+- **Commit:** [`69b3c85`](https://github.com/aryamahadik/rosie/commit/69b3c85), by Arya Mahadik, 2026-11-12 10:16:50 UTC
+- **Pull request:** [#462](https://github.com/aryamahadik/rosie/pull/462) from `task/commit-history-43`, merged 2026-11-12 10:16:50 UTC. It squashed 1 branch commit:
+  - `359fb04` docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 452. T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 v1.12 items 53 to 55) in db/repo/test-phone-reads.ts, each one read-only transaction as rosie\_job with no business scope, with their integration tests (every v1.12 fixture, the cases beyond them, the statements sent, read-only, lost connection) (\#463)
+
+- **Commit:** [`60ef75e`](https://github.com/aryamahadik/rosie/commit/60ef75e), by Arya Mahadik, 2026-11-12 10:16:46 UTC
+- **Pull request:** [#463](https://github.com/aryamahadik/rosie/pull/463) from `task/T-1300`, merged 2026-11-12 10:16:46 UTC. It squashed 1 branch commit:
+  - `38649c7` T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 …
+- **Files changed:** 2 (+2122 −0), by folder:
+  - `db/repo/` test-phone-reads.int.test.ts +1790 −0, test-phone-reads.ts +332 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 451. docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458) (\#461)
 
