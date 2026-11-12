@@ -515,7 +515,7 @@ describe("the turn runs again every 30 s until the models are back, then commits
 });
 
 describe("on return: danger first, then stops, then the rest", () => {
-  it("a queued danger text is handled before a queued STOP, and both before the routine texts, in the one commit on recovery", async () => {
+  it("a queued danger text is handled before a queued STOP in the one commit, which a STOP never holds for the models' return: core-only, on the first run (DL-508)", async () => {
     // Arrival order is the reverse of the return order: the routine answer, then the STOP, then the danger text.
     const danger = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: DANGER_TEXT.eventId };
     const s = await samTurn([S1_02_TEXT, STOP_TEXT, DANGER_TEXT], {
@@ -540,13 +540,17 @@ describe("on return: danger first, then stops, then the rest", () => {
     restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
     downThenBack(s, 2);
 
-    const report = await runWithRetries(s, 2);
+    const report = await runTurnThroughOutage(s.turn);
 
-    expect(report).toMatchObject({ end: "committed", tries: 3 });
+    // The models are down at the first try, and the STOP does not wait for their return (DL-508; arch 06 line 329: a
+    // change that only protects commits at once): the turn commits on its first run, with no wait and no retry.
+    expect(report).toMatchObject({ end: "committed", tries: 1 });
+    expect(s.decidedAt).toEqual([0]);
+    expect(s.o.waits).toEqual([]);
     expect(s.face.gateCalls).toHaveLength(1);
     const request = s.face.gateCalls[0]?.request;
-    // The danger text's safety record first, then the others' in arrival order, then the STOP's record; the decided
-    // parts (the routine and danger texts' choices) follow every core action in the commit (C-087).
+    // The danger text's safety record first, then the others' in arrival order, then the STOP's record; core-only, since
+    // the decided parts (the routine and danger texts' choices) could not be made on this run.
     expect(
       request?.core.map((action) => {
         const asked = action.request as { safety?: { eventId: string }; phoneNumber?: string };
@@ -558,7 +562,7 @@ describe("on return: danger first, then stops, then the rest", () => {
       ["recordSafetyOutcome", STOP_TEXT.eventId],
       ["recordStopOrStart", "stop"],
     ]);
-    expect(request?.input.kind).toBe("decided");
+    expect(request?.input.kind).toBe("coreOnly");
     // The STOP went to the stop path, never to decide: only the routine and danger texts did, in arrival order.
     expect(s.face.frontierCalls.at(-1)?.texts.map((text) => text.eventId)).toEqual([
       S1_02_TEXT.eventId,
@@ -570,7 +574,7 @@ describe("on return: danger first, then stops, then the rest", () => {
     expect(report.outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome])).toEqual([
       ["stop", "replied"],
     ]);
-    // A phone whose own text asked to stop got no outage line while it waited.
+    // No outage line: the turn committed on its first run, and the phone's own text asked to stop.
     expect(s.o.lines.requests).toEqual([]);
   });
 
