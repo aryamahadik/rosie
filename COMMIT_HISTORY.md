@@ -2,9 +2,89 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 461, [`d43a295`](https://github.com/aryamahadik/rosie/commit/d43a295), 2026-11-12 12:04:32 UTC.
+- **Through:** commit 464, [`1c76e9b`](https://github.com/aryamahadik/rosie/commit/1c76e9b), 2026-11-12 12:27:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 464. docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471) (\#474)
+
+- **Commit:** [`1c76e9b`](https://github.com/aryamahadik/rosie/commit/1c76e9b), by Arya Mahadik, 2026-11-12 12:27:15 UTC
+- **Pull request:** [#474](https://github.com/aryamahadik/rosie/pull/474) from `task/commit-history-47`, merged 2026-11-12 12:27:15 UTC. It squashed 1 branch commit:
+  - `bee5f6b` docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 463. T-1264: the turn reads each kept safety result from its leased turn, and the lease removes it when the turn ends for good (ADR-015 card B) (\#473)
+
+- **Commit:** [`17c6b88`](https://github.com/aryamahadik/rosie/commit/17c6b88), by Arya Mahadik, 2026-11-12 12:27:08 UTC
+- **Pull request:** [#473](https://github.com/aryamahadik/rosie/pull/473) from `task/T-1264`, merged 2026-11-12 12:27:08 UTC. It squashed 4 branch commits:
+  - `2902d1b` T-1264: the turn reads each text's kept safety result from its leased…
+  - `e8cc740` T-1264: the hop rig's known() says plainly that it sets nothing since…
+  - `5abd2c2` Merge branch 'main' into task/T-1264
+  - `6f78222` T-1264: card A's 'a STOP batched behind an owed danger whose re-reads…
+- **Files changed:** 18 (+1742 −160), by folder:
+  - `runtime/src/actor/` handle-actor.ts +22 −2, lease-results.worker.test.ts +415 −0, lease.ts +71 −6
+  - `runtime/src/safety/` store.worker.test.ts +57 −18
+  - `runtime/src/turn/` lease-turn.worker.test.ts +28 −10, test-support.ts +32 −16, turn.ts +7 −4, turn.worker.test.ts +10 −15, types.ts +7 −11
+  - `runtime/src/wiring/` closed.ts +0 −1, hop3.worker.test.ts +5 −3, kept-results.worker.test.ts +1026 −0, ports.ts +9 −6, real.ts +14 −21, root.test.ts +4 −1, root.ts +3 −10, state-reads.worker.test.ts +22 −19, test-support.ts +10 −17
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1264: the turn reads each text's kept safety result from its leased turn (LeasedTurn.resultsOf, from the actor's own store, its own texts alone), and the lease removes a turn's results, closing its texts, inside each transaction that ends the turn for good (its reply ended, finish, its reply given up) and at no other step; the PostgreSQL-down hand-off closes the STOP and START texts it took alone; TurnDeps.safety, Ports.stateReads.turn.safety, RootOptions.turnSafety, StateReadInputs.turnSafety and realStateReads' resultsOf removed; hop-rig and lease tests (ADR-015 card B)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1264: the hop rig's known() says plainly that it sets nothing since card B, and why it is kept
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1264: card A's 'a STOP batched behind an owed danger whose re-reads answer No' restated for card B's turn end (DL-571 grant, store.worker.test.ts that describe only): the 31 s re-read, owed row, unreadTexts and routineHeld checked before the danger's turn commits, the STOP's kept result before the commit that ends its turn; after it, rows gone, texts closed, resultsOf empty, unreadTexts empty, the hold still open and binding the STOP's next-batch commit (unread now empty); at 61 s a danger whose line went is read again no more (DL-508) and one cut off mid-seal is still read again, keeping no row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 462. T-1267: ADR-018, a STOP batch restarts a restarted turn once more, and the direct danger line never waits for its hold (CQ-230, CQ-231) (\#472)
+
+- **Commit:** [`beeb376`](https://github.com/aryamahadik/rosie/commit/beeb376), by Arya Mahadik, 2026-11-12 12:27:00 UTC
+- **Pull request:** [#472](https://github.com/aryamahadik/rosie/pull/472) from `task/T-1267`, merged 2026-11-12 12:27:00 UTC. It squashed 3 branch commits:
+  - `505807c` T-1267: design record ADR-018 rules CQ-230 and CQ-231: a STOP batch r…
+  - `98f8a39` Merge branch 'main' into task/T-1267
+  - `829dc40` T-1267: round 2 (DL-570): ADR-018 ruling 1's host answers true while …
+- **Files changed:** 2 (+168 −19), by folder:
+  - `docs/adr/` 0018-stop-and-danger-line-at-once.md +148 −0, README.md +20 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1267: design record ADR-018 rules CQ-230 and CQ-231: a STOP batch restarts a restarted turn once more and commits on that run (card S); the direct danger line's hold write is guarded, and a danger stays pending, its routine parts held, until its hold is written (card H); README row for ADR-018, and ADR-017's row says poll option words are plain and unscrubbed until CQ-58 (DL-540)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1267: round 2 (DL-570): ADR-018 ruling 1's host answers true while the PostgreSQL-down path is unwired (RULES 7.2: an unread batch may hold a STOP), at the cost of one bounded restart; a readable text with no reading counts as unknown; Card S's Gives, Depends on (not on D-017's wiring), proofs and May touch, the consequences, a new alternative and open point 1 (the bounded case of a batch with no stop word taking the second restart) match; README row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 461. docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469) (\#471)
 
