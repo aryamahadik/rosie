@@ -36,7 +36,13 @@
 //      0002 refuses it), row-level security per business (rule 4), the event log never edited (rule 5), the file format,
 //      the queue order of waiting rows, a class session's taken seats, the versions an open question or outbox row read,
 //      the outbox row's plan and final parts as K-03 v1's rowPlan and finalParts (the open question's options as K-03's)
-//      and its channel list as K-03 v1's, and the cast's phone numbers (555-01xx) and emails (example.com; rule 9).
+//      and its channel list as K-03 v1's, and the cast's phone numbers (555-01xx) and emails (example.com; rule 9);
+//   5. v1.1 (T-1290; README section "v1.1"): each v1.1 refused fixture refused for its one reason and, put right as the
+//      README puts it (db-schema.core.twins.ts), passing; each constraint v1.1 adds the one reason of one of them; v1.1
+//      only adding to v1; and every v1 case (each refused fixture and its mend, each damaged copy, a row without its
+//      turn id) holding under v1.1's list as under v1's. Its database side is db-schema.core.v1.db-side.test.ts.
+//      Round 2 (DL-618): outbox_rows_email_purpose_known's list pinned to K-12 v1's six purposes, and the CHECKs v1.1
+//      adds pinned at their edges (db-schema.core.twins.ts EDGES_V1_1, which the database side runs too).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: a freshly migrated PostgreSQL schema
 //   compared with the table list, the seeds loaded into it and the refused rows refused there, and each consumer's reads
 //   and writes through K-05.
@@ -51,6 +57,19 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
 import { CONTRACTS_ROOT, checkContractFixtures, formatErrors, type FixtureEntry } from "./_harness";
+import {
+  CODE_HAS_NOT_AFTER,
+  DELIVERED_HAS_TIME,
+  EDGES_V1_1,
+  K07_PART_STATES,
+  K12_PURPOSES,
+  OUTSIDE_PURPOSES,
+  PURPOSE_KNOWN,
+  PUT_RIGHT_V1_1,
+  TURN_OR_JOB,
+  putRight,
+  type Edge,
+} from "./db-schema.core.twins";
 
 // ---------------------------------------------------------------------------------------------------------------
 // The contract's files
@@ -2304,6 +2323,299 @@ describe("db-schema core fixtures: what the table list leaves to the README, eac
       "rows[12].values.address: alex@example.org is not at example.com",
     ]);
   });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// 5. v1.1 (T-1290): each v1.1 refusal tied to its reason, what v1.1 adds, and every v1 case under v1.1's list
+//
+// README section "v1.1" (T-1273): a minor version of the two outbox tables, whose list restates the whole part (default
+// 10), with five refused twins and no accepted seed (default 13). Section 1 checks each v1.1 entry against
+// core.v1.1.tables.json, the SQL check reads its list and rule 2 holds its versioned tables. Here: each twin refused for
+// its one reason and, put right as the README puts it (db-schema.core.twins.ts, from which the database side,
+// db-schema.core.v1.db-side.test.ts, puts it right too), passing; each constraint v1.1 adds the one reason of one twin;
+// v1.1 only adding to v1; and every v1 case holding under v1.1's list as under v1's.
+
+const V1_1 = "v1.1";
+
+/** The words of a table list (descriptions, sources, and an index's or a scope's why), which no rule reads. */
+const WORDS = new Set(["description", "source", "why"]);
+
+/** A part of a table list without its words, so two versions compare by their rules alone. */
+function rulesOf(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(rulesOf);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !WORDS.has(key))
+      .map(([key, item]) => [key, rulesOf(item)]),
+  );
+}
+
+/** Every named constraint of a version's list (primary key, unique, EXCLUDE, CHECK, foreign key) by name, with its rule. */
+function constraintRules(version: string): Map<string, unknown> {
+  return new Map(
+    tableListOf(version).tables.flatMap((table): [string, unknown][] => [
+      [primaryKeyName(table.name), table.primaryKey],
+      ...(table.unique ?? []).map((key): [string, unknown] => [uniqueName(table.name, key), rulesOf(key)]),
+      ...(table.exclude ?? []).map((exclusion): [string, unknown] => [exclusion.name, rulesOf(exclusion)]),
+      ...(table.checks ?? []).map((check): [string, unknown] => [check.name, rulesOf(check)]),
+      ...(table.foreignKeys ?? []).map((key): [string, unknown] => [
+        key.name ?? `${table.name}_${key.columns.join("_")}_fkey`,
+        rulesOf(key),
+      ]),
+    ]),
+  );
+}
+
+/** The constraints a refused fixture's `expect` names. */
+const namedBy = (entry: FixtureEntry): string[] =>
+  must(fixtureOf(entry.file).refused, `${entry.file}'s refused action`).expect.constraintOneOf ?? [];
+
+describe("db-schema core v1.1 fixtures: each refused one refused for its one reason, and put right it passes", () => {
+  it("has a way to put right every v1.1 refused fixture, as the README's table Refused rows (v1.1) gives each one's fault", () => {
+    expect(ofVersion(V1_1, "refuse").length).toBeGreaterThan(0);
+    expect(Object.keys(PUT_RIGHT_V1_1).sort()).toEqual(
+      ofVersion(V1_1, "refuse")
+        .map((entry) => entry.file)
+        .sort(),
+    );
+  });
+
+  for (const entry of ofVersion(V1_1, "refuse")) {
+    const fix = PUT_RIGHT_V1_1[entry.file];
+    it(`refuses ${entry.file} because ${fix?.reason ?? "(no way to put it right)"}; put right (${fix?.putRight ?? ""}), the same action passes`, () => {
+      const right = must(fix, `a way to put right ${entry.file}`);
+      expect(right.reason).not.toBe("");
+      const content = fixtureOf(entry.file);
+      const action = must(content.refused, "the refused action");
+      const db = freshDb(entry.version);
+      expect(shown(load(db, entry.file, new Set(), content))).toBe("loaded");
+      expect(expectProblems(run(db, action), action.expect)).toEqual([]);
+      const mended = putRight(action, right);
+      expect(differences(action, mended)).toEqual([right.at]);
+      const again = freshDb(entry.version);
+      expect(shown(load(again, entry.file, new Set(), content))).toBe("loaded");
+      const passed = run(again, mended);
+      expect(passed.error?.message ?? null).toBeNull();
+      expect(passed.rows).toBe(1);
+    });
+  }
+
+  it("refuses each v1.1 refused fixture by one constraint v1.1 adds: every constraint new in core.v1.1.tables.json is the one reason of exactly one of them, and v1's list holds none", () => {
+    const before = constraintRules("v1");
+    const added = [...constraintRules(V1_1).keys()].filter((name) => !before.has(name));
+    expect(added.length).toBeGreaterThan(0);
+    const reasons = ofVersion(V1_1, "refuse").map((entry) => ({ file: entry.file, names: namedBy(entry) }));
+    for (const { file, names } of reasons) expect(names, `${file} names its one reason`).toHaveLength(1);
+    expect(reasons.flatMap(({ names }) => names).sort()).toEqual([...added].sort());
+  });
+
+  it("puts a twin right at one value of a copy: the refused action is left as it was, and a way that names no values.<column> or set.<column>, or a part the action lacks, is a broken test", () => {
+    const file = "invalid/refuse-delivered-part-without-time.json";
+    const action = must(fixtureOf(file).refused);
+    const fix = must(PUT_RIGHT_V1_1[file]);
+    expect(must(putRight(action, fix).set).delivered_at).toBe(fix.value);
+    expect(must(action.set).delivered_at, "the refused action is left as it was").toBeNull();
+    expect(() => putRight(action, { ...fix, at: "delivered_at" })).toThrow("names no values.<column>");
+    expect(() => putRight(action, { ...fix, at: "values.delivered_at" })).toThrow("has no values");
+  });
+});
+
+describe("db-schema core v1.1: every v1 case holds under core.v1.1.tables.json as under core.v1.tables.json", () => {
+  it("README section v1.1, Kind: v1.1 only adds to v1 (every v1 table and column kept with its type and default, null dropped from outbox_rows.turn_id alone; each column it adds nullable with no default, after v1's; every v1 constraint, row-level security and version kept)", () => {
+    const v1 = tableListOf("v1");
+    const later = tableListOf(V1_1);
+    expect(later.tables.map((table) => table.name)).toEqual(v1.tables.map((table) => table.name));
+    const nullChanged: string[] = [];
+    for (const table of v1.tables) {
+      const kept = tableOf(later, table.name);
+      expect(
+        kept.columns.slice(0, table.columns.length).map((column) => column.name),
+        `${table.name}: v1's columns first, in v1's order`,
+      ).toEqual(table.columns.map((column) => column.name));
+      for (const [at, column] of table.columns.entries()) {
+        const now = must(kept.columns[at], `${table.name}.${column.name} in v1.1`);
+        expect([now.type, now.default], `${table.name}.${column.name}`).toEqual([
+          column.type,
+          column.default,
+        ]);
+        if (now.null !== column.null)
+          nullChanged.push(`${table.name}.${column.name} null ${String(column.null)} to ${String(now.null)}`);
+      }
+      for (const column of kept.columns.slice(table.columns.length))
+        expect([column.null, column.default], `${table.name}.${column.name}, added in v1.1`).toEqual([
+          true,
+          undefined,
+        ]);
+      expect(rulesOf(kept.rowLevelSecurity), table.name).toEqual(rulesOf(table.rowLevelSecurity));
+      expect([kept.versioned, kept.versionColumn], table.name).toEqual([
+        table.versioned,
+        table.versionColumn,
+      ]);
+    }
+    expect(nullChanged).toEqual(["outbox_rows.turn_id null false to true"]);
+    const after = constraintRules(V1_1);
+    for (const [name, rule] of constraintRules("v1")) expect(after.get(name), name).toEqual(rule);
+  });
+
+  for (const entry of ofVersion("v1", "refuse")) {
+    const mend = MENDS[entry.file];
+    it(`refuses ${entry.file} under v1.1's list as under v1's, because ${mend?.reason ?? "(no mend)"}; put right (${mend?.putRight ?? ""}), the same action passes there`, () => {
+      const { mend: putRightV1 } = must(mend, `a mend for ${entry.file}`);
+      const content = fixtureOf(entry.file);
+      const action = must(content.refused, "the refused action");
+      const db = freshDb(V1_1);
+      expect(shown(load(db, entry.file, new Set(), content))).toBe("loaded");
+      expect(expectProblems(run(db, action), action.expect)).toEqual([]);
+      const again = freshDb(V1_1);
+      expect(shown(load(again, entry.file, new Set(), content))).toBe("loaded");
+      const passed = run(again, putRightV1(structuredClone(action)));
+      expect(passed.error?.message ?? null).toBeNull();
+      expect(passed.rows).toBe(1);
+    });
+  }
+
+  for (const { base, does, damage, sqlstate, constraint } of DAMAGES) {
+    it(`${base} with ${does}, under v1.1's list: ${sqlstate}${constraint === null ? "" : ` ${constraint}`}`, () => {
+      expect(shown(load(freshDb(V1_1), base, new Set()))).toBe("loaded");
+      const copy = fixtureOf(base);
+      damage(copy);
+      const refusal = load(freshDb(V1_1), base, new Set(), copy);
+      expect([refusal?.error.sqlstate, refusal?.error.constraint], shown(refusal)).toEqual([
+        sqlstate,
+        constraint,
+      ]);
+    });
+  }
+
+  it("README section v1.1 (turn_id becomes nullable): the tour's outbox row without its turn id, refused by not null under v1, is refused by outbox_rows_turn_or_job under v1.1, and with a job id in its place v1.1 takes it", () => {
+    const withoutTurn = fixtureOf("seed-outbox-row.json");
+    Reflect.deleteProperty(valuesWhere(withoutTurn, "id", "out-a7-03-alex"), "turn_id");
+    const underV1 = load(freshDb("v1"), "seed-outbox-row.json", new Set(), withoutTurn);
+    expect([underV1?.error.sqlstate, underV1?.error.column], shown(underV1)).toEqual(["23502", "turn_id"]);
+    const underV1dot1 = load(freshDb(V1_1), "seed-outbox-row.json", new Set(), withoutTurn);
+    expect([underV1dot1?.error.sqlstate, underV1dot1?.error.constraint], shown(underV1dot1)).toEqual([
+      "23514",
+      "outbox_rows_turn_or_job",
+    ]);
+    // The minute sweep's job id of seed-event-log.json's write with no turn (evlog-0003) stands in for the work's own:
+    // README section v1.1 names a clock firing with no turn (CQ-28) as the next work to write such a row.
+    valuesWhere(withoutTurn, "id", "out-a7-03-alex").job_id = must(
+      fixtureOf("seed-event-log.json").rows.find((row) => row.values.id === "evlog-0003"),
+      "evlog-0003",
+    ).values.job_id;
+    expect(shown(load(freshDb(V1_1), "seed-outbox-row.json", new Set(), withoutTurn))).toBe("loaded");
+  });
+});
+
+// Round 2 (T-1290, DL-618): the CHECKs v1.1 adds pinned at their edges, so a list cut down or a CHECK tightened fails
+// here. README section "v1.1", "What changes" (lines 104 to 108) and defaults 12 and 15. Each edge is a twin's action
+// with one value changed, or the tour row's own update (db-schema.core.twins.ts EDGES_V1_1); the database side runs the
+// same edges on PostgreSQL.
+
+/** README line 105 (and default 12): outbox_rows_email_purpose_known's six, K-12 v1's purposes as K-12 spells them. */
+const README_PURPOSES = ["confirmation", "copy", "emailWay", "nextWay", "code", "notice"];
+
+/** What an edge's action names at a column: its insert's value, else its update's. */
+const named = (edge: Edge, column: string): unknown =>
+  edge.action.values?.[column] ?? edge.action.set?.[column] ?? null;
+const passes = (edge: Edge): boolean => "rows" in edge.action.expect;
+const edgesOf = (constraint: string, passing: boolean): Edge[] =>
+  EDGES_V1_1.filter((edge) => edge.constraint === constraint && passes(edge) === passing);
+/** The purposes a list of edges names, no purpose as "(none)", sorted. */
+const purposesOf = (edges: Edge[]): string[] =>
+  edges
+    .map((edge) => (named(edge, "email_purpose") === null ? "(none)" : String(named(edge, "email_purpose"))))
+    .sort();
+
+describe("db-schema core v1.1: each CHECK v1.1 adds pinned at its edges (README section v1.1, What changes; defaults 12 and 15)", () => {
+  it("README line 105 and default 12 (K-12): outbox_rows_email_purpose_known holds K-12 v1's six purposes, no more and no less, or none; a purpose outside them is refused", () => {
+    const k12Purposes = (
+      readJson(path.join(CONTRACTS_ROOT, "port-email", "port-email.v1.schema.json")) as {
+        $defs: { purpose: { enum: string[] } };
+      }
+    ).$defs.purpose.enum;
+    expect([...k12Purposes].sort()).toEqual([...README_PURPOSES].sort());
+    expect(K12_PURPOSES, "the edges take K-12 v1's purposes").toEqual(k12Purposes);
+    const check = must(
+      tableOf(tableListOf(V1_1), "outbox_rows").checks?.find((each) => each.name === PURPOSE_KNOWN),
+      PURPOSE_KNOWN,
+    );
+    const node = sqlOf(check.expression);
+    const [isNull, inList] = node.op === "or" && node.args.length === 2 ? node.args : [];
+    if (
+      isNull?.op !== "isNull" ||
+      isNull.negated ||
+      isNull.arg.op !== "column" ||
+      inList?.op !== "in" ||
+      inList.negated ||
+      inList.arg.op !== "column"
+    )
+      throw new Error(
+        `${PURPOSE_KNOWN} is not "a column is null or the column in a list": ${check.expression}`,
+      );
+    expect([isNull.arg.name, inList.arg.name]).toEqual(["email_purpose", "email_purpose"]);
+    const listed = inList.list.map((item) =>
+      item.op === "literal" ? textArg(item.value) : "(not a literal)",
+    );
+    expect([...listed].sort()).toEqual([...k12Purposes].sort());
+    for (const purpose of k12Purposes)
+      expect(holds(check.expression, { email_purpose: purpose }), purpose).toBe(true);
+    expect(holds(check.expression, { email_purpose: null })).toBe(true);
+    for (const purpose of ["signIn", ...OUTSIDE_PURPOSES])
+      expect(holds(check.expression, { email_purpose: purpose }), purpose).toBe(false);
+  });
+
+  it("has an edge for each case of the lead's round-2 note: every K-12 purpose and none, and purposes outside them; a code row with and without its not_after, and every other purpose or none without one; every K-07 part state but delivered with no time; and both ids", () => {
+    const none = "(none)";
+    const others = K12_PURPOSES.filter((purpose) => purpose !== "code");
+    expect(purposesOf(edgesOf(PURPOSE_KNOWN, true))).toEqual([...K12_PURPOSES, none].sort());
+    const outside = purposesOf(edgesOf(PURPOSE_KNOWN, false));
+    expect(outside).toEqual([...OUTSIDE_PURPOSES].sort());
+    for (const purpose of outside) expect(K12_PURPOSES, purpose).not.toContain(purpose);
+    const withoutNotAfter = edgesOf(CODE_HAS_NOT_AFTER, true).filter(
+      (edge) => named(edge, "not_after") === null,
+    );
+    expect(purposesOf(withoutNotAfter)).toEqual([...others, none].sort());
+    const withNotAfter = edgesOf(CODE_HAS_NOT_AFTER, true).filter(
+      (edge) => named(edge, "not_after") !== null,
+    );
+    expect(purposesOf(withNotAfter)).toEqual(["code"]);
+    const refused = edgesOf(CODE_HAS_NOT_AFTER, false);
+    expect([purposesOf(refused), refused.map((edge) => named(edge, "not_after"))]).toEqual([
+      ["code"],
+      [null],
+    ]);
+    const parts = edgesOf(DELIVERED_HAS_TIME, true);
+    expect(parts.map((edge) => named(edge, "state")).sort()).toEqual(
+      K07_PART_STATES.filter((state) => state !== "delivered").sort(),
+    );
+    for (const edge of parts) expect(named(edge, "delivered_at"), edge.case).toBeNull();
+    expect(edgesOf(DELIVERED_HAS_TIME, false)).toEqual([]);
+    const [both, ...more] = edgesOf(TURN_OR_JOB, true);
+    expect(more).toEqual([]);
+    const tourRow = must(
+      fixtureOf(must(both).base).rows.find((row) => row.values.id === must(both).action.where?.id),
+      "the row the update names",
+    );
+    expect([typeof tourRow.values.turn_id, typeof named(must(both), "job_id")]).toEqual(["string", "string"]);
+  });
+
+  for (const edge of EDGES_V1_1) {
+    it(`${edge.constraint}: ${edge.case} ${passes(edge) ? "passes and writes one row" : "is refused with 23514 by it"}`, () => {
+      if (edge.changed !== null) {
+        const twin = must(fixtureOf(edge.base).refused, `${edge.base}'s refused action`);
+        expect(
+          differences({ ...twin, expect: null }, { ...edge.action, expect: null }),
+          "the twin's action, changed only where the edge says",
+        ).toEqual([...edge.changed]);
+      }
+      const db = freshDb(V1_1);
+      expect(shown(load(db, edge.base, new Set()))).toBe("loaded");
+      const outcome = run(db, edge.action);
+      expect(expectProblems(outcome, edge.action.expect), outcome.error?.message ?? "").toEqual([]);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------------------------------------------
