@@ -22,10 +22,10 @@
 //                API base (its K-09 checks, the call's business scope, its span)
 //                and the frontier over K-05 v1.2 readTurnState and the turn's
 //                pinned bundle
-//   stateReads   other reads of stored state: who a handle is, each text's safety  T-1242 on staging,
-//                result, the safety read's bundle lines and stopped flag (the      each read failing
-//                clock arming's reads are the arming port's since T-564)           closed until a part
-//                                                                                  of T-1154 binds it
+//   stateReads   other reads of stored state: who a handle is, the safety read's   T-1242 on staging,
+//                bundle lines and stopped flag (the clock arming's reads are the   each read failing
+//                arming port's since T-564; each text's safety result is the       closed until a part
+//                turn's own, read from its leased turn: ADR-015, T-1264)           of T-1154 binds it
 //   turnFace     the rest of K-09's turn face (closest entries: meaning search)    no D-017 hop
 //                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
@@ -139,8 +139,11 @@ export interface TurnRowPort {
 export interface StateReads {
   /** The safety read's: the ids K-09 calls name for a handle, the bundle's checked lines and danger words, the stopped flag. */
   readonly safety: Pick<SafetyDeps, "directory" | "bundle" | "isStopped">;
-  /** The turn's: who the handle is (K-04 handles, persons, roles, zone), and each text's safety result. */
-  readonly turn: Pick<TurnDeps, "directory" | "safety">;
+  /**
+   * The turn's: who the handle is (K-04 handles, persons, roles, zone). Each text's safety result is no state read: the
+   * turn reads it from its leased turn, which the handle's own actor answers (ADR-015 sections 1 and 3; T-1264).
+   */
+  readonly turn: Pick<TurnDeps, "directory">;
 }
 
 /**

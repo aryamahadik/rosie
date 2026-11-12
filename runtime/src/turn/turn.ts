@@ -377,7 +377,7 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
 
   let safety: Map<string, SafetyResult>;
   try {
-    safety = await safetyOf(set, opened);
+    safety = await safetyOf(turn, opened);
   } catch {
     safety = new Map();
   }
@@ -559,12 +559,15 @@ function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string)
   }
 }
 
-/** Each readable text's safety result, by event id; a result for another text is not taken. */
-async function safetyOf(set: TurnDeps, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
+/**
+ * Each readable text's safety result, by event id, read through the run's leased turn from the handle's own actor, where
+ * the read on arrival kept it (ADR-015 section 3); a result for another text is not taken.
+ */
+async function safetyOf(turn: LeasedTurn, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
   const wanted = opened.filter((text) => text.readable).map((text) => text.eventId);
   const found = new Map<string, SafetyResult>();
   if (wanted.length === 0) return found;
-  for (const result of await set.safety.resultsOf(wanted)) {
+  for (const result of await turn.resultsOf(wanted)) {
     if (wanted.includes(result.eventId) && !found.has(result.eventId)) found.set(result.eventId, result);
   }
   return found;

@@ -6,7 +6,7 @@
 // trace id is the text's), the safety read's doubles (src/safety/test-support.ts), K-05's bundle reads
 // (src/bundle/test-support.ts), K-05 v1.2's targets for the guard, and T-267's shared-core double for a STOP. Spans are
 // read from the log lines (one JSON line each, ADR-009). Test method: T-1128's. Test values only (rule 9).
-import { reset, runDurableObjectAlarm } from "cloudflare:test";
+import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
@@ -109,11 +109,29 @@ async function arrive(who: Party, eventId: string, body: string, sentAt: string)
   expect(await door().accept(handoff)).toBe("written");
 }
 
+/**
+ * A text's kept safety result is gone from the actor's own storage (ADR-015 section 2: a storage that refused both of the
+ * read's writes keeps no row), after its read on arrival kept it: the row is deleted, nothing else.
+ */
+async function dropKeptResult(who: Party, eventId: string): Promise<void> {
+  const kept = await runInDurableObject(stubOf(who), (_actor: HandleActor, state) => {
+    const { sql } = state.storage;
+    const rows = sql.exec("SELECT 1 FROM safety_results WHERE event_id = ? AND box IS NOT NULL", eventId);
+    const had = rows.toArray().length;
+    sql.exec("DELETE FROM safety_results WHERE event_id = ?", eventId);
+    return had;
+  });
+  expect(kept).toBe(1);
+}
+
 interface Run {
   h: Harness;
   face: FakeTurnFace;
   ai: FakeDecide;
-  /** The turn's own facts: the safety results its port answers (the read on arrival answers from `h`). */
+  /**
+   * The turn's own facts: who the handle is and the times its requests name. Each run reads its texts' safety results
+   * through its leased turn, from what the read on arrival (answering from `h`) kept in the actor (ADR-015; T-1264).
+   */
   facts: FakeFacts;
   /** K-05 v1.2 handleTargets for the guard. */
   targets: FakeTargets;
@@ -134,7 +152,6 @@ async function withTurnLoop(
   const face = fakeTurnFace();
   const ai = fakeDecide(face.log);
   const facts = fakeFacts(who.party, times);
-  for (const [eventId, result] of Object.entries(answers)) facts.safety.set(eventId, result);
   const targets = fakeTargets();
   targets.answers.set(who.party.handleId, targetsAnswer(who.party.handleId, SAM_S1_02_TARGETS));
   const restores = [
@@ -482,15 +499,16 @@ describe("a STOP through the lease never waits for a missing result or the decid
       Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
       [buildFrontierS102.request.now, commitS102.request.now],
       async (run) => {
-        // The read on arrival read every text, but the turn is given no result for the second (ADR-015 section 3).
-        run.facts.safety.delete("evt-sam-0002");
         const { core, restore } = gateOverSamCore(run);
         try {
-          await arriveAndRun(run, [
-            ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
-            ["evt-sam-0002", "and lawn care", "2026-10-19T14:05:01Z"],
-            ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
-          ]);
+          // The read on arrival read every text and kept each result, but the second's kept row is gone before the turn
+          // runs (the batch is still open: the third text closes it), so its leased turn reads no result for it (ADR-015
+          // section 3).
+          await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+          await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:01Z");
+          await run.settle();
+          await dropKeptResult(SAM, "evt-sam-0002");
+          await arriveAndRun(run, [["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"]]);
         } finally {
           restore();
         }

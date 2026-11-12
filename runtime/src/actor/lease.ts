@@ -56,6 +56,15 @@
 // a later turn's commit lost its answer, and only an answer from that lost turn or a turn opened after it may end what
 // the host keeps for it.
 //
+// Each text's safety result, as the safety read on arrival applied it last, is kept sealed in the actor's own storage until
+// its text can reach no commit (ADR-015; T-1262). A run reads its texts' results through its leased turn when it calls
+// `resultsOf` (T-1264; ADR-015 section 3), never through a port every actor of the isolate shares: the host answers from
+// the handle's own store, and only for the turn's own texts. The step that ends a turn for good removes its texts' results
+// and closes them (the host's `closeResults`), inside the same storage transaction, so a crash leaves both or neither: its
+// reply ended (`replied`), a commit with no reply, K-05's turnParked, a park and a park's alreadyCommitted (`finish`), and
+// its reply given up at its third lapse. Never at a restart (the texts move to the restart's turn), a lapse's rerun, a
+// commit that keeps the lease for its reply, a turn held while PostgreSQL is down, or a third lapse with no park wired.
+//
 // PostgreSQL down (T-270; arch 11 line 566: "Turns queue in order in each handle's actor"): while the host says so
 // (`held`), a lapse is no crash. The lease holds the turn as it is: it reruns nothing, counts no try and parks nothing, the
 // lease is renewed for LEASE_MS and the turn noted held, and no batch opens or restarts a turn. On return the host calls
@@ -71,7 +80,7 @@
 // (the pin records the turn's `lease` span; the park, its own).
 
 import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
-import type { OpenHold } from "../safety";
+import type { OpenHold, SafetyResult } from "../safety";
 import type { BundleId, TraceContext } from "../trace";
 import { actorClock, createScheduleTable, scheduleEntry, unscheduleEntry, type ClosedBatch } from "./batch";
 import { readInboxEvents, type InboxEntry } from "./inbox";
@@ -191,9 +200,20 @@ export interface LeasedTurn {
   commit(request: CommitTurnRequest, options?: CommitOptions): Promise<CommitAnswer>;
   /**
    * The run's reply has ended (T-253): every row its commit wrote holds a plan or is closed, and the dispatcher was woken.
-   * The lease is released and the waiting batches open the next turn. From a run no longer the turn's it changes nothing.
+   * The lease is released and the waiting batches open the next turn, and the turn's texts' kept safety results are
+   * removed (ADR-015 section 2). From a run no longer the turn's it changes nothing.
    */
   replied(): Promise<void>;
+  /**
+   * Each asked text's safety result (K-02 v1 `safetyResult`) as the safety read on arrival applied it last and the actor
+   * keeps it, sealed, until the text can reach no commit (ADR-015 sections 2 and 3; T-1264). Read when the run calls it,
+   * so a restart's run, a lapse's rerun and a rerun after the commit each read it again. Only this turn's own texts are
+   * answered: an id outside `eventIds`, a text with no result kept (none applied, one not kept yet, or its text closed) and
+   * a result that does not open as that text's own are left out; never a made-up result, a stand-in or a second read.
+   * Rejects when no read can be done at all (nothing wired, the key store or the storage failed): the turn then takes no
+   * results.
+   */
+  resultsOf(eventIds: readonly string[]): Promise<readonly SafetyResult[]>;
   /**
    * The bundle id pinned at the turn's start (T-249): the same for every run of this turn id, whatever the active id is by
    * then. The commit names it (K-05 turn.bundleId; arch 10 line 548: the bundle id on every turn).
@@ -470,6 +490,19 @@ export interface LeaseHost {
    * left out, every commit is sent; a throw sends nothing (fails closed).
    */
   beforeCommit?(): Promise<boolean>;
+  /**
+   * The kept safety results of these texts, all of them the running turn's own (ADR-015 section 3; the actor's safety read,
+   * T-1262): each one's K-02 result as the read on arrival applied it last, a text with none kept left out. A throw is a
+   * read that cannot be done: the run takes no results. Optional: left out, every run's read rejects (nothing wired).
+   */
+  resultsOf?(eventIds: readonly string[]): Promise<readonly SafetyResult[]>;
+  /**
+   * Removes the kept safety results of these texts and closes them, so nothing is kept for them again (ADR-015 section 2;
+   * the actor's safety read, T-1262): called synchronously, inside the lease's storage transaction that ends their turn for
+   * good, and at no other step. A throw is the storage's: the transaction then keeps neither the turn's end nor the
+   * removal. Optional: left out, nothing is kept to remove.
+   */
+  closeResults?(eventIds: readonly string[]): void;
 }
 
 /** What the park's trace is opened from (T-253). */
@@ -631,6 +664,7 @@ export class TurnLease {
       signal,
       commit: (request, options) => this.commit(turnId, request, options?.reply === true),
       replied: () => this.replied(turnId, controller),
+      resultsOf: (asked) => this.resultsOf(eventIds, asked),
     };
     const pinRequest: PinRequest = {
       turnId,
@@ -658,6 +692,29 @@ export class TurnLease {
           () => undefined,
         ),
     );
+  }
+
+  /**
+   * A run's read of its texts' kept safety results (ADR-015 section 3): only the turn's own texts are asked of the host, each
+   * once, and only a result naming one of them is answered. Rejects when the host keeps none (nothing wired).
+   */
+  private async resultsOf(
+    own: readonly string[],
+    asked: readonly string[],
+  ): Promise<readonly SafetyResult[]> {
+    if (this.host.resultsOf === undefined) throw new Error("no safety results are wired");
+    const eventIds = [...new Set(asked)].filter((eventId) => own.includes(eventId));
+    if (eventIds.length === 0) return [];
+    const results = await this.host.resultsOf(eventIds);
+    return results.filter((result) => eventIds.includes(result.eventId));
+  }
+
+  /**
+   * Removes the kept safety results of a turn's texts and closes them (ADR-015 section 2), inside the caller's transaction
+   * that ends the turn for good: a throw (the storage's) undoes the turn's end with it.
+   */
+  private closeResultsOf(turn: TurnRow): void {
+    this.host.closeResults?.((JSON.parse(turn.items) as Item[]).map((item) => item.eventId));
   }
 
   /** Tells a run that is no longer the turn's to stop (a restart replaced it, a park began, or its reply was given up). */
@@ -760,7 +817,8 @@ export class TurnLease {
 
   /**
    * The run's reply has ended (T-253): its committed turn gives the lease up and the waiting batches open the next turn.
-   * Only the run that has the turn now is heard: a run a lapse replaced leaves it to its rerun.
+   * The turn has ended for good: its texts' kept safety results go in the same transaction (ADR-015 section 2). Only the
+   * run that has the turn now is heard: a run a lapse replaced leaves it to its rerun.
    */
   private async replied(turnId: string, run: AbortController): Promise<void> {
     if (this.runs.get(turnId) !== run) return;
@@ -768,6 +826,7 @@ export class TurnLease {
       const turn = this.turnRow(turnId);
       if (turn?.state !== "committed" || this.leaseRow()?.turn_id !== turnId) return false;
       this.sql.exec("DELETE FROM turn_lease WHERE turn_id = ?", turnId);
+      this.closeResultsOf(turn);
       this.syncSchedule();
       return true;
     });
@@ -778,8 +837,10 @@ export class TurnLease {
   }
 
   /**
-   * The turn is done: the lease is released and the waiting batches open the next turn. A later answer changes nothing,
-   * and a turn already committed keeps its lease until its reply ends (T-253).
+   * The turn is done: the lease is released and the waiting batches open the next turn, and its texts' kept safety results
+   * go in the same transaction (ADR-015 section 2): a commit with no reply, K-05's turnParked, a park, or a park's
+   * alreadyCommitted. A later answer changes nothing, and a turn already committed keeps its lease until its reply ends
+   * (T-253).
    */
   private async finish(
     turnId: string,
@@ -796,6 +857,7 @@ export class TurnLease {
         turnId,
       );
       this.sql.exec("DELETE FROM turn_lease WHERE turn_id = ?", turnId);
+      this.closeResultsOf(turn);
       this.syncSchedule();
     });
     this.runs.delete(turnId);
@@ -883,7 +945,8 @@ export class TurnLease {
 
   /**
    * Applies a lapse inside the caller's transaction: a rerun (one more try when `countTry`), a park (marked first, so no
-   * run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails) or a reply given up.
+   * run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails) or a reply given up, which
+   * ends the turn for good, so its texts' kept safety results go with it (ADR-015 section 2).
    */
   private lapse(turnId: string, act: Lapse, now: number, countTry: boolean): { act: Lapse; turnId: string } {
     if (act === "park") {
@@ -891,6 +954,8 @@ export class TurnLease {
       this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + PARK_RETRY_MS);
     } else if (act === "giveUp") {
       this.sql.exec("DELETE FROM turn_lease WHERE one = 1");
+      const turn = this.turnRow(turnId);
+      if (turn !== undefined) this.closeResultsOf(turn);
     } else {
       if (countTry) this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", turnId);
       this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);

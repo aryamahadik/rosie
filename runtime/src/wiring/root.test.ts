@@ -240,7 +240,10 @@ describe("the ports the root binds", () => {
     expect(root.safety.core).toBe(fakes.ports.turnFace.safetyCore);
     expect(root.safety.direct).toBe(fakes.ports.linqDirect);
     expect(root.turn.directory).toBe(fakes.ports.stateReads.turn.directory);
-    expect(root.turn.safety).toBe(fakes.ports.stateReads.turn.safety);
+    // Each text's safety result is no port of the turn's nor a state read (ADR-015 section 1; T-1264): each run reads it
+    // through its leased turn, from the handle's own actor.
+    expect(Object.keys(root.turn)).not.toContain("safety");
+    expect(Object.keys(root.ports.stateReads.turn)).toEqual(["directory"]);
     // The turn's decide and its one re-read go to the joined decide port (T-558), never to a fake; its composer and the
     // one rewrite to the joined composer port (T-560).
     expect(root.turn.ai).toBe(root.ports.decide);

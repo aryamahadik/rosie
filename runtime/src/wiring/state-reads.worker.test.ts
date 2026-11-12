@@ -22,11 +22,11 @@ import { BundlePins, type Manifest, type PinEntry, type PinRequest } from "../bu
 import { actorNameOf } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
 import { FIXTURE_DANGER_WORDS, fixtureBundle } from "../safety/test-support";
-import type { HandleDirectory, HandleIds, SafetyReadRequest, SafetyResult } from "../safety/types";
+import type { HandleDirectory, HandleIds, SafetyReadRequest } from "../safety/types";
 import type { Span } from "../trace";
-import { safetyNoFor, SAM, storedText, testTurn } from "../turn/test-support";
+import { SAM, storedText, testTurn } from "../turn/test-support";
 import { runTurnLoop } from "../turn/turn";
-import type { TurnDirectory, TurnSafety, WriteRowPlanRequest } from "../turn/types";
+import type { TurnDirectory, WriteRowPlanRequest } from "../turn/types";
 import { NotJoinedError } from "./closed";
 import { PORTS } from "./ports";
 import {
@@ -52,9 +52,11 @@ const NEVER_NAMED = ["+15555550100", "15555550100", "5555550100", ACTOR, JOIN_TE
 
 type Environment = "staging" | "production";
 
-/** The new inputs, as RootOptions names them (the seams' table in ./real.ts). */
-type NewInput =
-  "bundleSafety" | "handleDirectory" | "stoppedFlags" | "turnDirectory" | "turnSafety" | "planCalls";
+/**
+ * The new inputs, as RootOptions names them (the seams' table in ./real.ts). Each text's safety result is none since
+ * ADR-015 card B (T-1264): the turn reads it from its leased turn, so `turnSafety` is gone with the read it fed.
+ */
+type NewInput = "bundleSafety" | "handleDirectory" | "stoppedFlags" | "turnDirectory" | "planCalls";
 
 /** Each read through the root that a new input feeds, and the input that feeds it. */
 const READS = {
@@ -64,7 +66,6 @@ const READS = {
   idsOf: "handleDirectory",
   isStopped: "stoppedFlags",
   partyOf: "turnDirectory",
-  resultsOf: "turnSafety",
   unplannedRows: "planCalls",
   writePlan: "planCalls",
 } as const satisfies Record<string, NewInput>;
@@ -108,7 +109,6 @@ async function readAll(root: Root): Promise<Record<ReadName, Outcome>> {
     idsOf: await outcomeOf(() => root.safety.directory.idsOf(ACTOR)),
     isStopped: await outcomeOf(() => root.safety.isStopped(ACTOR)),
     partyOf: await outcomeOf(() => root.turn.directory.partyOf({ actorName: ACTOR, handle: SAM.handle })),
-    resultsOf: await outcomeOf(() => root.turn.safety.resultsOf([EVENT])),
     unplannedRows: await outcomeOf(() => root.turn.rows.unplannedRows({ turnId: UNPLANNED_TURN })),
     writePlan: await outcomeOf(() => root.turn.rows.writePlan(WRITE_PLAN)),
   };
@@ -198,12 +198,6 @@ function handedFakes(): HandedFakes {
       return Promise.resolve(row);
     },
   };
-  const turnSafety: TurnSafety = {
-    resultsOf(eventIds) {
-      calls.push(`resultsOf ${eventIds.join(",")}`);
-      return Promise.resolve(eventIds.map((eventId): SafetyResult => safetyNoFor(eventId)));
-    },
-  };
   // K-05 v1's two plan calls as db/repo answers them: unplanned-after-crash.json's rows, write-plan.json's written row.
   const planCalls: PlanCalls = {
     unplannedRows(request) {
@@ -219,7 +213,7 @@ function handedFakes(): HandedFakes {
     },
   };
   return {
-    inputs: { bundleSafety: lines, handleDirectory, stoppedFlags, turnDirectory, turnSafety, planCalls },
+    inputs: { bundleSafety: lines, handleDirectory, stoppedFlags, turnDirectory, planCalls },
     lines,
     calls,
   };
@@ -233,7 +227,6 @@ const ANSWERED: Record<ReadName, Outcome> = {
   idsOf: { answered: SAM_IDS },
   isStopped: { answered: false },
   partyOf: { answered: SAM.party },
-  resultsOf: { answered: [safetyNoFor(EVENT)] },
   unplannedRows: { answered: unplannedAfterCrash.outcome },
   writePlan: { answered: writePlanJson.outcome },
 };
@@ -243,7 +236,6 @@ const ASKED: Record<Exclude<NewInput, "bundleSafety">, string[]> = {
   handleDirectory: ["idsOf Sam's actor"],
   stoppedFlags: ["isStopped Sam's actor"],
   turnDirectory: ["partyOf Sam's actor"],
-  turnSafety: [`resultsOf ${EVENT}`],
   planCalls: [`unplannedRows ${JSON.stringify({ turnId: UNPLANNED_TURN })}`, "writePlan as sent"],
 };
 
@@ -285,7 +277,6 @@ function rootFor(
     handleDirectory: null,
     stoppedFlags: null,
     turnDirectory: null,
-    turnSafety: null,
     planCalls: null,
     ...inputs,
   });
@@ -346,6 +337,19 @@ describe("on staging with every new input null", () => {
       expect(implementationOf(of, "linqDirect")).toBe("closed");
     }
     expect(worker.bindings).toEqual(root.bindings);
+  });
+
+  it("holds no read of each text's safety result (ADR-015 card B, T-1264): the turn's deps and the state reads' turn hold the directory alone, here, in the Worker's own staging root and on production", () => {
+    const roots = [
+      rootFor(skeletonFakes()),
+      workerRoot({ ENVIRONMENT: "staging", BASE_PATH: "", DB_SCHEMA: "" }),
+      rootFor(skeletonFakes(), handedFakes().inputs, "production"),
+    ];
+
+    for (const root of roots) {
+      expect(Object.keys(root.turn)).not.toContain("safety");
+      expect(Object.keys(root.ports.stateReads.turn)).toEqual(["directory"]);
+    }
   });
 
   it("fails each new read closed with its named error, naming the read and no value, and reaches no key, model, database or line", async () => {
@@ -450,7 +454,6 @@ describe("on staging with each new input handed a fake in turn", () => {
     "handleDirectory",
     "stoppedFlags",
     "turnDirectory",
-    "turnSafety",
     "planCalls",
   ];
 

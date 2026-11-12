@@ -16,7 +16,7 @@ import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.jso
 import decideDisagree from "../../../contracts/model/fixtures/decide-reads-disagree.json";
 import decideNoneFits from "../../../contracts/model/fixtures/decide-none-fits.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
-import type { CommitContext } from "../actor";
+import type { CommitContext, LeasedTurn } from "../actor";
 import { BUNDLE_A, BUNDLE_B, WHOLE_A, WHOLE_B } from "../bundle/test-support";
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
@@ -839,21 +839,16 @@ describe("a run that is no longer the turn's", () => {
       phone("+15555550131", "handle-ben", "person-ben", 3),
     ]);
     restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
-    // The run is replaced while it reads its texts' safety results, before the replies run.
-    const deps = turnDeps(facts, face, fakeDecide(face.log), keys);
-    restores.push(
-      setTurnDeps({
-        ...deps,
-        safety: {
-          resultsOf(eventIds) {
-            t.abort();
-            return deps.safety.resultsOf(eventIds);
-          },
-        },
-      }),
-    );
+    // The run is replaced while it reads its texts' safety results through its leased turn, before the replies run.
+    const turn: LeasedTurn = {
+      ...t.turn,
+      resultsOf: (eventIds) => {
+        t.abort();
+        return t.turn.resultsOf(eventIds);
+      },
+    };
 
-    const outcome = await runTurnLoop(t.turn);
+    const outcome = await runTurnLoop(turn);
 
     expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 0 });
     expect(facts.asked).toEqual(["evt-ben-0007"]);
