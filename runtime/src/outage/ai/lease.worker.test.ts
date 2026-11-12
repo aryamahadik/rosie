@@ -5,7 +5,7 @@
 // ids, a decide fake that answers the AI gateway's typed `modelsDown` (no live model call, J-02), the safety read's
 // doubles (../../safety/test-support.ts) on whose fake clock the actor, the lease and the 30 s retries all run, and K-09's
 // sendFixedLine for the outage line (./test-support.ts). Test method: T-1128's. Test values only (rule 9).
-import { reset, runDurableObjectAlarm } from "cloudflare:test";
+import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -21,12 +21,16 @@ import {
   type HandleActor,
   type TurnEntry,
 } from "../../actor";
-import { BUNDLE_A, fakeBundles } from "../../bundle/test-support";
+import type { ActorCopies } from "../../actor/copies/copies";
+import { BUNDLE_A, fakeBundles, WHOLE_A } from "../../bundle/test-support";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
 import { setGuardDeps } from "../../guard";
 import { fakeTargets } from "../../guard/test-support";
-import { harness, type Harness } from "../../safety/test-support";
+import { fakeRead, harness, TEST_IDS, type Harness } from "../../safety/test-support";
+import type { SafetyDeps } from "../../safety/types";
+import { setDbOutageDeps, type OutageView } from "../db";
+import { dbFakes } from "../db/test-support";
 import { setTurnDeps, turnHooks } from "../../turn";
 import {
   ALEX,
@@ -78,6 +82,8 @@ interface ActorRpc {
   readTurns(): Promise<TurnEntry[]>;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
 }
 
 function stubOf(who: Party): DurableObjectStub<HandleActor> {
@@ -213,9 +219,32 @@ describe("the AI-down path inside the real lease", () => {
 
   it("the turn's outage line is the safety read's own request for the same text (its timeout rule's), so K-09 sends it once per text", async () => {
     // The safety read never answers: at 4 s its timeout rule sends the outage line, with no danger word in the text.
-    const h = harness(keys, {});
-    restores.push(setSafetyDeps(h.deps), setBatchHooks({ clock: h.clock }));
+    // That line is a step on the way here (DL-615, the architect's 5(b)): the PostgreSQL-down path runs wired, as D-017 is
+    // to wire it, over ../db/test-support.ts's doubles (PostgreSQL answering), with the handle's keyword copy bundle A's,
+    // installed by the actor's own ActorCopies.refreshKeywords (no turn runs here), and has read the text as another text.
+    const f = dbFakes(keys, {}, { start: 0, ids: TEST_IDS });
+    const read = fakeRead(f.clock, {});
+    const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => false };
+    const h: Harness = {
+      clock: f.clock,
+      core: f.core,
+      direct: f.direct,
+      read,
+      stopped: { value: false },
+      deps,
+    };
+    restores.push(setSafetyDeps(h.deps), setBatchHooks({ clock: h.clock }), setDbOutageDeps(f.outageDeps));
+    const copied = await runInDurableObject(stubOf(ALEX), (instance) =>
+      (instance as unknown as { copies: ActorCopies }).copies.refreshKeywords(
+        WHOLE_A.manifest as unknown as Record<string, unknown>,
+      ),
+    );
+    expect(copied).toBe(true);
     await arrive(ALEX, "evt-alex-0601", "Test words: can I come Thursday?", "2026-10-22T16:00:00Z");
+    await actorOf(ALEX).outageIdle();
+    expect((await actorOf(ALEX).readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: "evt-alex-0601", kind: "other" }),
+    ]);
     await h.clock.advance(4000);
     await actorOf(ALEX).safetyIdle();
     expect(h.core.fixed).toHaveLength(1);

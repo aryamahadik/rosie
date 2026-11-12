@@ -311,7 +311,7 @@ export class DbOutage {
    * outage_texts rows; T-1313), but a STOP or START the actor took alone (`handled`): its word is the actor's copy of the
    * stopped flag, which the actor reads beside this. True while unwired (no `setDbOutageDeps`), as `stopAmong` is: the
    * path then reads nothing, so no text no commit has taken is known to hold no stop word, the safety read's own text
-   * included (ADR-018 section 1, round 2). A storage that cannot say answers true (fails closed).
+   * included (DL-615, which replaces ADR-018 line 42). A storage that cannot say answers true (fails closed).
    */
   stopPending(): boolean {
     if (deps === null) return true;

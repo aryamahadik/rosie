@@ -821,6 +821,7 @@ describe("a STOP stored but not committed stops the safety read's outage line to
   const DANGER_WORD = "evt-sam-0423";
   const DANGER = "evt-sam-0424";
   const OTHER = "evt-sam-0425";
+  const START = "evt-sam-0426";
 
   /** The safety read answers No for these texts and finds danger in DANGER; QUIET and DANGER_WORD get no verdict. */
   const answers = (): Record<string, SafetyResult> => ({
@@ -828,6 +829,7 @@ describe("a STOP stored but not committed stops the safety read's outage line to
     [FIRST]: safetyNoFor(FIRST),
     [STOP]: safetyNoFor(STOP),
     [OTHER]: safetyNoFor(OTHER),
+    [START]: safetyNoFor(START),
     [DANGER]: emergencyFor(DANGER),
   });
 
@@ -851,12 +853,10 @@ describe("a STOP stored but not committed stops the safety read's outage line to
 
   /**
    * Sam's first turn has committed (the pin copied bundle A's keyword list), and the down path is unwired unless
-   * `downPath`. FIRST's turn then begins its commit, which the core does not answer yet (K-05 `transient`), so the lease
-   * keeps every later batch waiting for it. Then his STOP arrives, read by the safety read (No), and its batch closes 3 s
-   * on and waits: a STOP stored, not committed, and no copy says stopped. With `unreadable`, the down path cannot open the
-   * STOP's words (its key read fails), so it reads it as `unknown`.
+   * `downPath`. FIRST's turn (its words `first`) then begins its commit, which the core does not answer yet (K-05
+   * `transient`), so the lease keeps every later batch waiting for it.
    */
-  async function stopWaiting(rig: Rig, options: { downPath: boolean; unreadable?: boolean }): Promise<void> {
+  async function commitBegun(rig: Rig, options: { downPath: boolean; first?: string }): Promise<void> {
     await prime(rig);
     if (!options.downPath) restores.push(setDbOutageDeps(null));
     const refused: string[] = [];
@@ -872,9 +872,18 @@ describe("a STOP stored but not committed stops the safety read's outage line to
         },
       }),
     );
-    await rig.arrive(FIRST, "Test words: can I come Friday at 3?");
+    await rig.arrive(FIRST, options.first ?? "Test words: can I come Friday at 3?");
     await rig.tick(3000);
     await until(() => refused.length > 0, "the first turn's commit", 10_000);
+  }
+
+  /**
+   * As `commitBegun`; then Sam's STOP arrives, read by the safety read (No), and its batch closes 3 s on and waits: a STOP
+   * stored, not committed, and no copy says stopped. With `unreadable`, the down path cannot open the STOP's words (its
+   * key read fails), so it reads it as `unknown`.
+   */
+  async function stopWaiting(rig: Rig, options: { downPath: boolean; unreadable?: boolean }): Promise<void> {
+    await commitBegun(rig, { downPath: options.downPath });
     if (options.unreadable === true) rig.f.keyReads.push(false);
     await rig.arrive(STOP, "STOP");
     await rig.tick(3000);
@@ -1046,5 +1055,221 @@ describe("a STOP stored but not committed stops the safety read's outage line to
       state.storage.sql.exec("UPDATE outage_texts SET kind = 'other' WHERE event_id = ?", STOP);
     });
     expect(await readings([STOP])).toEqual({ stopPending: true, stopAmong: true });
+  });
+
+  // ---- round 2 (DL-615): the proofs both rulings add ----------------------------------------------------------------
+
+  /** The host's `stopPending` now, inside the actor (what `stopped` asks beside the copy). */
+  const stopPendingNow = (): Promise<boolean> =>
+    runInDurableObject(stub(), (instance) =>
+      (instance as unknown as { outage: DbOutage }).outage.stopPending(),
+    );
+
+  /** The timed-out text arrives with no verdict; the test waits for the down path's reading of it before its 4 s. */
+  async function quietRead(rig: Rig): Promise<number> {
+    const arrivedAt = rig.f.clock.now();
+    await rig.arrive(QUIET, "Test words: hello, is anyone there?", false);
+    await rig.actor.outageIdle();
+    return arrivedAt;
+  }
+
+  /** The outage line went once through the core's outbox row (K-09 sendFixedLine, send class quick_reply), at 4 s. */
+  async function lineThroughCore(rig: Rig, arrivedAt: number): Promise<void> {
+    expect(rig.f.core.fixed).toEqual([
+      {
+        at: arrivedAt + 4000,
+        request: expect.objectContaining({
+          fixedLineId: "outage",
+          recipientHandleId: SAM.party.handleId,
+          sendClass: "quick_reply",
+          sentByActor: null,
+        }) as unknown,
+      },
+    ]);
+    expect(outageSends(rig)).toEqual([]);
+    expect(await safetyOf(rig, QUIET)).toMatchObject({
+      path: "outbox",
+      lineId: "outage",
+      handedAfterMs: 4000,
+    });
+  }
+
+  /** The outage line went once straight through Linq (the core not answering), not past an opt-out; its record queued. */
+  async function lineThroughLinq(rig: Rig, arrivedAt: number): Promise<void> {
+    expect(rig.f.core.fixed).toEqual([]);
+    expect(outageSends(rig)).toEqual([
+      {
+        actorName: SAM_ACTOR,
+        fixedLineId: "outage",
+        text: OUTAGE_TEXT,
+        overrideOptout: false,
+        idempotencyKey: `safety:${QUIET}:outage`,
+        at: arrivedAt + 4000,
+      },
+    ]);
+    expect(await safetyOf(rig, QUIET)).toMatchObject({
+      path: "outage",
+      lineId: "outage",
+      handedAfterMs: 4000,
+    });
+    expect((await rig.actor.readCopies()).returns).toContainEqual(
+      expect.objectContaining({ key: `sendFixedLine:${QUIET}`, call: "sendFixedLine", rank: "rest" }),
+    );
+  }
+
+  it("the boundary, with the down path wired (the architect's 2(a); the security reviewer's (a)): a turn whose commit has begun holds its text with the lease and the timed-out text waits in the window, each read as another text by the real classify, the copy not stopped: the outage line goes once, through the core's outbox row", async () => {
+    const rig = rigFor(answers());
+    await commitBegun(rig, { downPath: true });
+    const arrivedAt = await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: FIRST, kind: "other" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect((await rig.actor.readCopies()).stopped?.stopped ?? false).toBe(false);
+    expect(await readings([FIRST, QUIET])).toEqual({ stopPending: false, stopAmong: false });
+    await rig.tick(4000);
+    await lineThroughCore(rig, arrivedAt);
+    // Once: nothing more goes for it, by the safety read or by the down path's 20 s.
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(rig.f.core.fixed).toHaveLength(1);
+    expect(outageSends(rig)).toEqual([]);
+  });
+
+  it("the boundary, with the down path wired (the architect's 2(a); the security reviewer's (a)): a START waiting behind the turn whose commit has begun is read as a START, the others as other texts: the outage line goes once, through the core's outbox row", async () => {
+    const rig = rigFor(answers());
+    await commitBegun(rig, { downPath: true });
+    await rig.arrive(START, "START");
+    await rig.tick(3000);
+    expect(await rig.actor.readWaitingBatches()).toHaveLength(1);
+    const arrivedAt = await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: FIRST, kind: "other" }),
+      expect.objectContaining({ eventId: START, kind: "start", keyword: "left" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect((await rig.actor.readCopies()).stopped?.stopped ?? false).toBe(false);
+    expect(await readings([START])).toEqual({ stopPending: false, stopAmong: false });
+    await rig.tick(4000);
+    await lineThroughCore(rig, arrivedAt);
+  });
+
+  it("the boundary, with the down path wired and the core not answering (the architect's 2(a); the security reviewer's (a)): the outage line goes once straight through Linq, not past an opt-out, under the key safety:<event id>:outage, its record queued", async () => {
+    const rig = rigFor(answers());
+    await commitBegun(rig, { downPath: true });
+    rig.f.down = true;
+    const arrivedAt = await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: FIRST, kind: "other" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+    await rig.tick(4000);
+    await lineThroughLinq(rig, arrivedAt);
+  });
+
+  it("the handled carve-out (the architect's 2(b)): a STOP then a START the actor took itself while PostgreSQL was down, the copy not stopped: stopPending answers false, and the outage line goes once straight through Linq", async () => {
+    const rig = rigFor(answers());
+    await prime(rig);
+    rig.f.down = true;
+    await rig.arrive(STOP, "STOP");
+    await rig.arrive(START, "START");
+    expect(rig.f.direct.sent.map((send) => send.idempotencyKey)).toEqual([
+      `keyword:${STOP}:stopReply`,
+      `keyword:${START}:startReply`,
+    ]);
+    expect((await rig.actor.readCopies()).stopped).toMatchObject({ stopped: false });
+    const arrivedAt = await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "handled" }),
+      expect.objectContaining({ eventId: START, kind: "start", keyword: "handled" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+    await rig.tick(4000);
+    expect(outageSends(rig)).toEqual([
+      expect.objectContaining({
+        fixedLineId: "outage",
+        overrideOptout: false,
+        idempotencyKey: `safety:${QUIET}:outage`,
+        at: arrivedAt + 4000,
+      }),
+    ]);
+    expect(await safetyOf(rig, QUIET)).toMatchObject({ path: "outage", lineId: "outage" });
+  });
+
+  it("the handled carve-out (the architect's 2(b); the security reviewer's (b)): a lone STOP the actor took itself while PostgreSQL was down is left out of stopPending, and the copy, which says stopped, withholds the outage line", async () => {
+    const rig = rigFor(answers());
+    await prime(rig);
+    rig.f.down = true;
+    await rig.arrive(STOP, "STOP");
+    expect((await rig.actor.readCopies()).stopped).toMatchObject({ stopped: true });
+    await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "handled" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+    await rig.tick(4000);
+    await noOutageLine(rig);
+  });
+
+  it("the handled carve-out (the security reviewer's (b); RULES 7.5): a lone START the actor took itself while PostgreSQL was down withholds nothing: the outage line goes once straight through Linq", async () => {
+    const rig = rigFor(answers());
+    await prime(rig);
+    rig.f.down = true;
+    await rig.arrive(START, "START");
+    expect((await rig.actor.readCopies()).stopped).toMatchObject({ stopped: false });
+    const arrivedAt = await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: START, kind: "start", keyword: "handled" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+    await rig.tick(4000);
+    await lineThroughLinq(rig, arrivedAt);
+  });
+
+  it("the accepted wired cost, pinned (the security reviewer's (c); CQ-282): a handle with no keyword copy (no turn has pinned a bundle yet) reads its first text as unknown, so the timeout rule's outage line is withheld, while a danger word's safety line still goes", async () => {
+    const rig = rigFor(answers());
+    const copy = await runInDurableObject(stub(), (instance) =>
+      (instance as unknown as { copies: ActorCopies }).copies.readKeywords(),
+    );
+    expect(copy).toBeNull();
+    await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: QUIET, kind: "unknown" }),
+    ]);
+    expect(await stopPendingNow()).toBe(true);
+    await rig.tick(4000);
+    await noOutageLine(rig);
+    // No verdict in 4 s and a danger word: Unsure, and its safety line (911) through the core's outbox row.
+    const wordAt = rig.f.clock.now();
+    await rig.arrive(DANGER_WORD, "Test words: a client's cut won't stop bleeding", false);
+    await rig.tick(4000);
+    expect(safetyLines(rig)).toEqual([[DANGER_WORD, "safetyEmergency"]]);
+    expect(rig.f.core.recorded.map((call) => call.at)).toEqual([wordAt + 4000]);
+    expect(await safetyOf(rig, DANGER_WORD)).toMatchObject({ danger: true, path: "outbox" });
+    await noOutageLine(rig);
+  });
+
+  it("a STOP among the texts of the turn whose commit has begun, not only in a waiting batch (the security reviewer's (d); lease.ts pendingEventIds: a turn leased, committing or being parked), withholds the outage line, with the down path wired", async () => {
+    const rig = rigFor(answers());
+    await commitBegun(rig, { downPath: true, first: "STOP" });
+    expect((await rig.actor.readTurns()).map((turn) => [turn.eventIds, turn.state])).toEqual([
+      [[PRIME], "committed"],
+      [[FIRST], "committing"],
+    ]);
+    expect(await rig.actor.readWaitingBatches()).toEqual([]);
+    await quietRead(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: FIRST, kind: "stop", keyword: "left" }),
+      expect.objectContaining({ eventId: QUIET, kind: "other" }),
+    ]);
+    expect((await rig.actor.readCopies()).stopped?.stopped ?? false).toBe(false);
+    expect(await stopPendingNow()).toBe(true);
+    await rig.tick(4000);
+    await noOutageLine(rig);
+    await dangerStillGoes(rig);
+    await noOutageLine(rig);
   });
 });

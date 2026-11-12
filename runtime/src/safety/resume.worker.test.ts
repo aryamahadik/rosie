@@ -7,8 +7,10 @@
 // cut-off read's work never ends. The new instance is woken by its stored alarm (`runDurableObjectAlarm`) or by a new
 // text. Before a cut the read never answers and nothing waits on a fake-clock timer; after it, the doubles answer on the
 // fake clock. Round 2 (DL-127): a text with no verdict in 4 s (its unread hold open) is read again every 30 s until a
-// verdict lands, from a stored entry, so an eviction cannot leave it held for good. Test method: T-1128's. Test values
-// only (rule 9).
+// verdict lands, from a stored entry, so an eviction cannot leave it held for good. The PostgreSQL-down path is unwired,
+// as the composition root installs it today, unless a test wires it as D-017 is to wire it (`wired`, DL-615): unwired,
+// the timeout rule's outage line never goes (a text no commit has taken may hold a stop word: RULES 7.2). Test method:
+// T-1128's. Test values only (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -27,7 +29,7 @@ import {
   type InboundEvent,
 } from "../gateway";
 import { fakeKeyStore, present } from "../gateway/test-support";
-import { fakeBundles } from "../bundle/test-support";
+import { fakeBundles, WHOLE_A } from "../bundle/test-support";
 import {
   setBatchHooks,
   setBundleDeps,
@@ -39,15 +41,19 @@ import {
   type CommitContext,
   type CommitTurnAnswer,
   type CommitTurnRequest,
+  type CopiesView,
   type HandleActor,
   type HoldEntry,
   type LeasedTurn,
   type OpenHold,
   type SafetyEntry,
 } from "../actor";
+import type { ActorCopies } from "../actor/copies/copies";
+import { setDbOutageDeps, type OutageView } from "../outage/db";
+import { dbFakes, type DbFakes } from "../outage/db/test-support";
 import type { ModelCall } from "../trace/types";
 import { timeoutResult } from "./rules";
-import { harness, type Harness } from "./test-support";
+import { fakeRead, harness, TEST_IDS, type Harness } from "./test-support";
 import type {
   RecordSafetyOutcomeRequest,
   SafetyDeps,
@@ -98,10 +104,66 @@ interface ResumeRpc {
   markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
+  readCopies(): Promise<CopiesView>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
 }
 
 function actorOf(): ResumeRpc {
   return stub();
+}
+
+/**
+ * The doubles of ../outage/db/test-support.ts as this file's harness (DL-615; the architect's 5(c)): their one `down`
+ * switch, the core's, covers the probe and the bundle registry too, so PostgreSQL is in whatever state the test sets the
+ * core to; the safety read answers `answers` after `delayMs` on their clock.
+ */
+function dbHarness(answers: Record<string, SafetyResult>, delayMs = 0): { h: Harness; f: DbFakes } {
+  const f = dbFakes(keys, answers, { start: 0, ids: TEST_IDS });
+  const read = fakeRead(f.clock, answers, delayMs);
+  const stopped = { value: false };
+  const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => stopped.value };
+  return { h: { clock: f.clock, core: f.core, direct: f.direct, read, stopped, deps }, f };
+}
+
+/**
+ * Wires the PostgreSQL-down path as D-017 is to wire it (DL-615): its ports are the doubles', and, since no turn has pinned
+ * a bundle here, the actor's keyword copy is bundle A's, installed by its own ActorCopies.refreshKeywords, so the real
+ * classify reads each text with the key store the gateway sealed it under. Answers the function that unwires it.
+ */
+async function wireDownPath(f: DbFakes): Promise<() => void> {
+  const restore = setDbOutageDeps(f.outageDeps);
+  const copied = await runInDurableObject(stub(), (instance) =>
+    (instance as unknown as { copies: ActorCopies }).copies.refreshKeywords(
+      WHOLE_A.manifest as unknown as Record<string, unknown>,
+    ),
+  );
+  expect(copied).toBe(true);
+  return restore;
+}
+
+/** The down path has read each of these texts as another text (no stop word), before any timeout fires (DL-615). */
+async function readAsOther(...eventIds: string[]): Promise<void> {
+  await actorOf().outageIdle();
+  expect((await actorOf().readOutage()).texts).toEqual(
+    eventIds.map((eventId) => expect.objectContaining({ eventId, kind: "other" }) as unknown),
+  );
+}
+
+/**
+ * No outage line by any path (DL-615: unwired, a text no commit has taken may hold a stop word): none through the core,
+ * none straight through Linq, no record queued for one, and the text's safety row says the timeout rule withheld it.
+ */
+async function noOutageLine(h: Harness, eventId: string): Promise<void> {
+  expect(h.core.fixed).toEqual([]);
+  expect(h.direct.sent.filter((sent) => sent.fixedLineId === "outage")).toEqual([]);
+  expect((await actorOf().readCopies()).returns.map((entry) => entry.key)).not.toContain(
+    `sendFixedLine:${eventId}`,
+  );
+  expect((await actorOf().readSafety()).find((entry) => entry.eventId === eventId)).toMatchObject({
+    path: "none",
+    lineId: "outage",
+  });
 }
 
 async function arrive(eventId: string, body: string): Promise<void> {
@@ -232,7 +294,9 @@ interface Run {
  * are the ones in place until the first cut instead (round 3: a read that answers, a core that refuses, a Linq send that
  * never ends), on the fake clock. With `lease` (round 4), closed batches go to the actor's own turn lease, wired with the
  * turn's work (each turn kept in `lease.turns`) and K-05's commit double (each context kept in `lease.contexts`; it
- * commits whatever it is sent, so a test shows what T-252's gate is handed), not to `handed`.
+ * commits whatever it is sent, so a test shows what T-252's gate is handed), not to `handed`. With `wired` (DL-615), the
+ * doubles are ../outage/db/test-support.ts's (`dbHarness`) and the PostgreSQL-down path is wired as D-017 is to wire it
+ * (`wireDownPath`), before the first text arrives.
  */
 async function withEviction(
   answers: Record<string, SafetyResult>,
@@ -241,10 +305,12 @@ async function withEviction(
     deadlineRuns?: boolean;
     before?: (h: Harness) => SafetyDeps;
     lease?: Lease;
+    wired?: boolean;
   },
   body: (run: Run) => Promise<void>,
 ): Promise<void> {
-  const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
+  const db = options.wired === true ? dbHarness(answers, options.delayMs ?? 0) : null;
+  const h = db?.h ?? harness(keys, answers, { delayMs: options.delayMs ?? 0 });
   const cutOff: SafetyReadRequest[] = [];
   const handed: ClosedBatch[] = [];
   const stalled: SafetyDeps = options.before?.(h) ?? {
@@ -285,9 +351,10 @@ async function withEviction(
           return Promise.resolve({ ...first, turnId: request.turn.id });
         },
       }),
-      setBundleDeps(fakeBundles().deps),
+      setBundleDeps(db?.f.bundleDeps ?? fakeBundles().deps),
     );
   }
+  if (db !== null) restores.push(await wireDownPath(db.f));
   const run: Run = {
     h,
     cutOff,
@@ -495,10 +562,49 @@ describe("a read cut off by an eviction", () => {
     });
   });
 
-  it("past 4 s with no danger word: the outage line at once, and the read sent again lifts the unread hold with its late verdict, so routine work is not held for ever", async () => {
+  it("with the down path unwired, as the root installs it today: past 4 s with no danger word, the timeout rule at once (its outage line withheld: DL-615), and the read sent again lifts the unread hold with its late verdict, so routine work is not held for ever", async () => {
     const answer = { ...asResult(safetyNo), eventId: "evt-1" };
     await withEviction({ "evt-1": answer }, { delayMs: 1000 }, async (run) => {
       await arrive("evt-1", PLAIN_TEXT);
+      await run.h.clock.advance(1000);
+      await run.evict();
+
+      await run.h.clock.advance(3000);
+      await run.wake();
+      await run.settle();
+      await noOutageLine(run.h, "evt-1");
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      // The batch, closed by the alarm, waits: its text has not been read.
+      await vi.waitFor(async () => {
+        expect(await actorOf().readBatches()).toMatchObject([
+          { reason: "quiet", handed: false, eventIds: ["evt-1"] },
+        ]);
+      });
+      expect(run.handed).toEqual([]);
+      expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1"]);
+
+      // 5 s: the read sent again says No; the unread hold lifts and the settle path hands the batch on.
+      await run.h.clock.advance(1000);
+      await vi.waitFor(() => {
+        expect(run.handed.map((batch) => batch.entries.map((entry) => entry.event.eventId))).toEqual([
+          ["evt-1"],
+        ]);
+      });
+      expect(await actorOf().routineHeld()).toBe(false);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+      ]);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text before the cut (DL-615): past 4 s with no danger word, the outage line at once, and the read sent again lifts the unread hold with its late verdict, so routine work is not held for ever", async () => {
+    const answer = { ...asResult(safetyNo), eventId: "evt-1" };
+    await withEviction({ "evt-1": answer }, { delayMs: 1000, wired: true }, async (run) => {
+      await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       await run.h.clock.advance(1000);
       await run.evict();
 
@@ -563,13 +669,69 @@ describe("a read cut off by an eviction", () => {
     });
   });
 
-  it("several cut-off reads resume in arrival order, each keeping its own deadline from its own arrival", async () => {
+  it("with the down path unwired, as the root installs it today: several cut-off reads resume in arrival order, each keeping its own deadline from its own arrival (the timeout rule's rows; their outage lines withheld: DL-615)", async () => {
     const first = { ...asResult(safetyNo), eventId: "evt-1" };
     const second = { ...asResult(safetyNo), eventId: "evt-2" };
     await withEviction({ "evt-1": first, "evt-2": second }, { delayMs: 3000 }, async (run) => {
       await arrive("evt-1", "Is Thursday free?");
       await run.h.clock.advance(1000);
       await arrive("evt-2", "or Friday morning");
+      await run.h.clock.advance(500);
+      await vi.waitFor(() => {
+        expect(run.cutOff.map((request) => request.eventId)).toEqual(["evt-1", "evt-2"]);
+      });
+      await run.evict();
+
+      // 2.5 s: woken by the stored alarm; each text is read again, in arrival order. The reads answer at 5.5 s, so each
+      // text's own deadline (4 s from its arrival: 4 s and 5 s) decides what it gets meanwhile.
+      await run.h.clock.advance(1000);
+      await run.wake();
+      await vi.waitFor(() => {
+        expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1", "evt-2"]);
+      });
+
+      // 4 s: evt-1's deadline: the timeout rule (its outage line withheld), and its unread hold. 5 s: evt-2's.
+      await run.h.clock.advance(1500);
+      await vi.waitFor(async () => {
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", path: "none", lineId: "outage" },
+          { eventId: "evt-2", state: "reading" },
+        ]);
+      });
+      await run.h.clock.advance(1000);
+      await vi.waitFor(async () => {
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", path: "none", lineId: "outage" },
+          { eventId: "evt-2", state: "done", path: "none", lineId: "outage" },
+        ]);
+      });
+
+      // 5.5 s: the verdicts come, late for both, and lift their unread holds: no text stays unread and held.
+      await run.h.clock.advance(500);
+      await vi.waitFor(async () => {
+        expect(await actorOf().routineHeld()).toBe(false);
+      });
+      await noOutageLine(run.h, "evt-1");
+      await noOutageLine(run.h, "evt-2");
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-1", state: "done", danger: false },
+        { eventId: "evt-2", state: "done", danger: false },
+      ]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+        { eventId: "evt-2", rule: "unread", released: true },
+      ]);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the texts read as other texts before the cut (DL-615): several cut-off reads resume in arrival order, each keeping its own deadline from its own arrival", async () => {
+    const first = { ...asResult(safetyNo), eventId: "evt-1" };
+    const second = { ...asResult(safetyNo), eventId: "evt-2" };
+    await withEviction({ "evt-1": first, "evt-2": second }, { delayMs: 3000, wired: true }, async (run) => {
+      await arrive("evt-1", "Is Thursday free?");
+      await run.h.clock.advance(1000);
+      await arrive("evt-2", "or Friday morning");
+      await readAsOther("evt-1", "evt-2");
       await run.h.clock.advance(500);
       await vi.waitFor(() => {
         expect(run.cutOff.map((request) => request.eventId)).toEqual(["evt-1", "evt-2"]);
@@ -641,10 +803,63 @@ describe("a read cut off by an eviction", () => {
     });
   });
 
-  it("a cut-off read whose key store throws at once still gets the outage line (no verdict can come), keeps its unread hold, and is read again 30 s on (security note d)", async () => {
+  it("with the down path unwired, as the root installs it today: a cut-off read whose key store throws at once still takes the timeout rule (no verdict can come; its outage line withheld: DL-615), keeps its unread hold, and is read again 30 s on (security note d)", async () => {
     const answer = { ...asResult(safetyNo), eventId: "evt-1" };
     await withEviction({ "evt-1": answer }, {}, async (run) => {
       await arrive("evt-1", PLAIN_TEXT);
+      await run.h.clock.advance(1000);
+      await run.evict({
+        ...run.h.deps,
+        keys: {
+          getOrCreateKey: () => {
+            throw new Error("the key store broke");
+          },
+        },
+      });
+
+      // 3 s: woken; the words cannot be opened, so the timeout rule applies at once, as for a read that fails on arrival:
+      // no danger word can be matched, so the outage line's turn, withheld unwired, and the text stays unread and held.
+      await run.h.clock.advance(2000);
+      await run.wake();
+      await run.settle();
+      await noOutageLine(run.h, "evt-1");
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-1", state: "done", danger: false, lineId: "outage" },
+      ]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(run.h.read.requests).toEqual([]);
+      await vi.waitFor(async () => {
+        expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
+        expect(await scheduleOf()).toEqual([{ kind: "safetyRead", due_ms: 33_000 }]);
+      });
+
+      // 33 s: the key store answers again; the re-read says No, the hold lifts and the batch goes on.
+      const restore = setSafetyDeps(run.h.deps);
+      try {
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.handed.map(idsOf)).toEqual([["evt-1"]]);
+        });
+        expect(run.h.read.requests.map((request) => request.eventId)).toEqual(["evt-1"]);
+        expect(await actorOf().readHolds()).toMatchObject([
+          { eventId: "evt-1", rule: "unread", released: true },
+        ]);
+        await noOutageLine(run.h, "evt-1");
+      } finally {
+        restore();
+      }
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text before the cut (DL-615; the architect's 5(d): the fault hits only the safety read's key read, SafetyDeps.keys, and not the down path's own, which read the text at its arrival): a cut-off read whose key store throws at once still gets the outage line (no verdict can come), keeps its unread hold, and is read again 30 s on (security note d)", async () => {
+    const answer = { ...asResult(safetyNo), eventId: "evt-1" };
+    await withEviction({ "evt-1": answer }, { wired: true }, async (run) => {
+      await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       await run.h.clock.advance(1000);
       await run.evict({
         ...run.h.deps,
@@ -671,7 +886,11 @@ describe("a read cut off by an eviction", () => {
       expect(run.h.read.requests).toEqual([]);
       await vi.waitFor(async () => {
         expect(await actorOf().readBatches()).toMatchObject([{ reason: "quiet", handed: false }]);
-        expect(await scheduleOf()).toEqual([{ kind: "safetyRead", due_ms: 33_000 }]);
+        // Changed by the wiring, named (DL-615): the down path's own entry, at the text's 20 s, beside the re-read's.
+        expect(await scheduleOf()).toEqual([
+          { kind: "dbOutage", due_ms: 20_000 },
+          { kind: "safetyRead", due_ms: 33_000 },
+        ]);
       });
 
       // 33 s: the key store answers again; the re-read says No, the hold lifts and the batch goes on.
@@ -720,8 +939,11 @@ describe("a read cut off by an eviction", () => {
 describe("a text with no verdict in 4 s (its unread hold open)", () => {
   it("an eviction between the timeout rule and the late verdict: the stored re-read wakes a new instance 30 s on, and the text's verdict lifts the hold", async () => {
     const answer = { ...asResult(safetyNo), eventId: "evt-1" };
-    await withEviction({ "evt-1": answer }, { deadlineRuns: true }, async (run) => {
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read the text as another text.
+    await withEviction({ "evt-1": answer }, { deadlineRuns: true, wired: true }, async (run) => {
       await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       // 4 s: no verdict and no danger word: the outage line once, the unread hold, and the first re-read stored 30 s on.
       // The late answer is awaited in this instance's memory only.
       await run.h.clock.advance(4000);
@@ -754,15 +976,20 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
       expect(await actorOf().routineHeld()).toBe(false);
       expect(run.h.core.fixed).toHaveLength(1);
       await vi.waitFor(async () => {
-        expect(await scheduleOf()).toEqual([]);
+        // Changed by the wiring, named (DL-615): no safety entry is left, and the down path's own entry stays at its next
+        // look (34 s + 30 s), where it drops the text the batch has handed on.
+        expect(await scheduleOf()).toEqual([{ kind: "dbOutage", due_ms: 64_000 }]);
       });
     });
   });
 
   it("a second cut, between a resumed read's timeout rule and its late verdict, still ends in a re-read 30 s on that lifts the hold", async () => {
     const answer = { ...asResult(safetyNo), eventId: "evt-1" };
-    await withEviction({ "evt-1": answer }, {}, async (run) => {
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read the text as another text before the first cut.
+    await withEviction({ "evt-1": answer }, { wired: true }, async (run) => {
       await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       await run.h.clock.advance(1000);
       // The first cut; the new instance's read never answers either.
       await run.evict(run.stalled);
@@ -796,7 +1023,7 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
     });
   });
 
-  it("a model outage across several re-reads: each timedOut or failed answer keeps the hold and sets the next re-read 30 s after it; the outage line goes once; the first verdict lifts the hold", async () => {
+  it("with the down path unwired, as the root installs it today: a model outage across several re-reads: each timedOut or failed answer keeps the hold and sets the next re-read 30 s after it; the outage line never goes (DL-615); the first verdict lifts the hold", async () => {
     const h = harness(keys, {});
     const calls: SafetyReadRequest[] = [];
     // The models are down: the late answer (6 s) and the first re-read are the read's own timedOut marker, the second
@@ -830,6 +1057,93 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
     };
     try {
       await arrive("evt-1", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+      await noOutageLine(h, "evt-1");
+
+      // 6 s: the late answer is itself timedOut: no verdict. The hold stays and the next re-read is 30 s after it.
+      await h.clock.advance(2000);
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 36_000 });
+      });
+      await holdOpen();
+
+      // 36 s: read again: timedOut again. 66 s: read again: the read fails.
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(async () => {
+        expect(calls).toHaveLength(2);
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 66_000 });
+      });
+      await holdOpen();
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(async () => {
+        expect(calls).toHaveLength(3);
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 96_000 });
+      });
+      await holdOpen();
+      // Never lifted without a verdict, and the outage line is never sent.
+      await noOutageLine(h, "evt-1");
+      expect(h.direct.sent).toEqual([]);
+
+      // 96 s: the models are back: the verdict (No) lifts the hold, the batch goes on and the re-reads stop.
+      await h.clock.advance(30_000);
+      await runDurableObjectAlarm(stub());
+      await vi.waitFor(() => {
+        expect(handed.map(idsOf)).toEqual([["evt-1"]]);
+      });
+      expect(calls.map((request) => request.eventId)).toEqual(["evt-1", "evt-1", "evt-1", "evt-1"]);
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: true },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(false);
+      await vi.waitFor(async () => {
+        expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+      });
+      await noOutageLine(h, "evt-1");
+    } finally {
+      restoreBatch();
+      restoreSafety();
+    }
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text (DL-615): a model outage across several re-reads: each timedOut or failed answer keeps the hold and sets the next re-read 30 s after it; the outage line goes once; the first verdict lifts the hold", async () => {
+    const { h, f } = dbHarness({});
+    const calls: SafetyReadRequest[] = [];
+    // The models are down: the late answer (6 s) and the first re-read are the read's own timedOut marker, the second
+    // re-read fails outright; the third comes after the models are back.
+    const read: SafetyReadPort = {
+      async read(request) {
+        calls.push(request);
+        if (calls.length === 1) {
+          await h.clock.after(6000);
+          return gaveUp(request.eventId);
+        }
+        if (calls.length === 2) return gaveUp(request.eventId);
+        if (calls.length === 3) throw new Error("the models are down");
+        return verdict({ ...asResult(safetyNo), eventId: request.eventId });
+      },
+    };
+    const handed: ClosedBatch[] = [];
+    const restoreSafety = setSafetyDeps({ ...h.deps, read });
+    const restoreBatch = setBatchHooks({
+      clock: h.clock,
+      toLease: (batch) => {
+        handed.push(batch);
+      },
+    });
+    const holdOpen = async (): Promise<void> => {
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+      ]);
+      expect(await actorOf().routineHeld()).toBe(true);
+      expect(handed).toEqual([]);
+    };
+    const restoreDown = await wireDownPath(f);
+    try {
+      await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
       expect(h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([[4000, "outage"]]);
@@ -876,13 +1190,16 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
       });
       expect(h.core.fixed).toHaveLength(1);
     } finally {
+      restoreDown();
       restoreBatch();
       restoreSafety();
     }
   });
 
   it("on return every held text is read again at once, in arrival order: a danger among them gets its line then, not at its own re-read, and the batch goes on once all are read", async () => {
-    const h = harness(keys, {});
+    // The outage lines are a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read both texts as other texts.
+    const { h, f } = dbHarness({});
     let modelsBack = false;
     const answers: Record<string, SafetyResult> = {
       "evt-1": { ...asResult(safetyNo), eventId: "evt-1" },
@@ -909,12 +1226,15 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
         handed.push(batch);
       },
     });
+    const restoreDown = await wireDownPath(f);
     try {
       // A plain text, then a danger the danger-word list does not hold: each gets the outage line at its own 4 s, and
       // each late answer (6 s and 7 s) gives up: their re-reads are due at 36 s and 37 s.
       await arrive("evt-1", PLAIN_TEXT);
+      await readAsOther("evt-1");
       await h.clock.advance(1000);
       await arrive("evt-2", SMOKE_TEXT);
+      await readAsOther("evt-1", "evt-2");
       await h.clock.advance(6000);
       await actorOf().safetyIdle();
       expect(h.core.fixed.map((call) => [call.at, call.request.caller.requestId])).toEqual([
@@ -952,6 +1272,7 @@ describe("a text with no verdict in 4 s (its unread hold open)", () => {
         { eventId: "evt-2", state: "done", danger: true, lineId: "safetyEmergency" },
       ]);
     } finally {
+      restoreDown();
       restoreBatch();
       restoreSafety();
     }
@@ -1120,9 +1441,12 @@ describe("a danger outcome cut off before its line and record are done", () => {
     async (kind) => {
       const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
       const hanging = hangingDirect();
+      // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+      // wire it, and has read the text as another text.
       await withEviction(
         { "evt-1": answer },
         {
+          wired: true,
           before: (h) => {
             let calls = 0;
             const read: SafetyReadPort = {
@@ -1142,6 +1466,7 @@ describe("a danger outcome cut off before its line and record are done", () => {
         },
         async (run) => {
           await arrive("evt-1", SMOKE_TEXT);
+          await readAsOther("evt-1");
           // 4 s: no verdict and no danger word: the outage line (the core is still up) and the unread hold.
           await run.h.clock.advance(4000);
           await run.settle();
@@ -1195,7 +1520,9 @@ describe("a danger outcome cut off before its line and record are done", () => {
 
   it("a core that throws at once (no rejected promise) still gets the hold written and the line tried; with Linq refusing too, the text keeps its hold, stays scheduled, and its line goes once at the next re-read with its record kept (round 2 security note b)", async () => {
     const answer = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
-    const h = harness(keys, {});
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read the text as another text.
+    const { h, f } = dbHarness({});
     let reads = 0;
     // The read sent on arrival says An emergency at 6 s, past the deadline; the re-read says it at once.
     const read: SafetyReadPort = {
@@ -1214,8 +1541,10 @@ describe("a danger outcome cut off before its line and record are done", () => {
     };
     const restoreSafety = setSafetyDeps({ ...h.deps, read, core: throwing });
     const restoreBatch = setBatchHooks({ clock: h.clock, toLease: () => undefined });
+    const restoreDown = await wireDownPath(f);
     try {
       await arrive("evt-1", SMOKE_TEXT);
+      await readAsOther("evt-1");
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
       expect(h.core.fixed.map((call) => call.request.fixedLineId)).toEqual(["outage"]);
@@ -1266,6 +1595,7 @@ describe("a danger outcome cut off before its line and record are done", () => {
         restoreCore();
       }
     } finally {
+      restoreDown();
       restoreBatch();
       restoreSafety();
     }
@@ -1678,9 +2008,12 @@ describe("a danger cut off before the core answers (round 4)", () => {
 
   it("on the late path, an open danger whose hold's write failed (its unread hold still open) gets its hold at the next re-read, though that read says No, so its batch goes on", async () => {
     const danger = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read the text as another text.
     await withEviction(
       { "evt-1": danger },
       {
+        wired: true,
         before: (h) => ({
           ...h.deps,
           // The read sent on arrival answers An emergency at 6 s, past the deadline; the core takes the record and never
@@ -1696,6 +2029,7 @@ describe("a danger cut off before the core answers (round 4)", () => {
       },
       async (run) => {
         await arrive("evt-1", SMOKE_TEXT);
+        await readAsOther("evt-1");
         await run.h.clock.advance(4000);
         await vi.waitFor(() => {
           expect(run.h.core.fixed.map((call) => [call.at, call.request.fixedLineId])).toEqual([
@@ -1817,10 +2151,13 @@ describe("a danger cut off before the core answers (round 4)", () => {
       const lease: Lease = { turns: [], contexts: [] };
       const attempts: RecordSafetyOutcomeRequest[] = [];
       let stopChecks = 0;
+      // The outage line's failed try is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired,
+      // as D-017 is to wire it, and has read the text as another text, so the try reaches the stopped flag that throws.
       await withEviction(
         { "evt-1": danger },
         {
           lease,
+          wired: true,
           before: (h) => ({
             ...h.deps,
             // The read sent on arrival answers An emergency at 6 s, past the deadline. The stopped flag cannot be read at
@@ -1840,6 +2177,7 @@ describe("a danger cut off before the core answers (round 4)", () => {
         },
         async (run) => {
           await arrive("evt-1", SMOKE_TEXT);
+          await readAsOther("evt-1");
           // 4 s: no verdict and no danger word: the unread hold and its re-read at 34 s, then the outage line, which
           // fails (the stopped flag throws): no line went, and the row says lineFailed with no danger. The batch, closed
           // at 3 s by the alarm, waits: its text has no verdict yet.
