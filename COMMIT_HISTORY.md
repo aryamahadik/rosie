@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 427, [`0292eaa`](https://github.com/aryamahadik/rosie/commit/0292eaa), 2026-11-12 02:02:52 UTC.
+- **Through:** commit 429, [`54b9c1d`](https://github.com/aryamahadik/rosie/commit/54b9c1d), 2026-11-12 02:47:06 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 429. docs: COMMIT\_HISTORY.md through commit 427 (0292eaa, \#435) (\#437)
+
+- **Commit:** [`54b9c1d`](https://github.com/aryamahadik/rosie/commit/54b9c1d), by Arya Mahadik, 2026-11-12 02:47:06 UTC
+- **Pull request:** [#437](https://github.com/aryamahadik/rosie/pull/437) from `task/commit-history-34`, merged 2026-11-12 02:47:06 UTC. It squashed 1 branch commit:
+  - `0bd8987` docs: COMMIT\_HISTORY.md through commit 427 (0292eaa, \#435)
+- **Files changed:** 1 (+56 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +56 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 428. T-1252: the Worker's two database logins and staging's two Hyperdrive configurations: the SQL, the create script, the parser (\#436)
+
+- **Commit:** [`d4767cc`](https://github.com/aryamahadik/rosie/commit/d4767cc), by Arya Mahadik, 2026-11-12 02:47:02 UTC
+- **Pull request:** [#436](https://github.com/aryamahadik/rosie/pull/436) from `task/T-1252`, merged 2026-11-12 02:47:03 UTC. It squashed 3 branch commits:
+  - `f62fba1` T-1252: the hyperdrive list parser moves to infra/scripts/hyperdrive-…
+  - `2bc7f07` T-1252: create-staging-hyperdrive.sh and .mjs make staging's two Hype…
+  - `126fa55` T-1252: create-staging-hyperdrive.sh's header names the exit codes as…
+- **Files changed:** 12 (+3197 −131), by folder:
+  - `infra/ci/` README.md +2 −0, create-staging-hyperdrive.test.mjs +1633 −0, hyperdrive-list.test.mjs +210 −0, worker-logins.test.mjs +484 −0
+  - `infra/scripts/` create-staging-hyperdrive.mjs +598 −0, create-staging-hyperdrive.sh +49 −0, hyperdrive-list.mjs +66 −0, worker-logins.sql +146 −0
+  - `infra/spikes/hyperdrive-host/` helpers.mjs +3 −49, probe.test.mjs +2 −80, run.test.mjs +2 −1
+  - `/` package.json +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1252: the hyperdrive list parser moves to infra/scripts/hyperdrive-list.mjs with the user cell, and worker-logins.sql makes and checks the Worker's two logins (ADR-014 piece 1)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1252: create-staging-hyperdrive.sh and .mjs make staging's two Hyperdrive configurations (ADR-014 piece 2): each password only in ALTER ROLE on one checked session and in the API's request body; tests behind the real cf.sh, a stand-in wrangler and API, and the local database behind TLS
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1252: create-staging-hyperdrive.sh's header names the exit codes as the .mjs gives them (caching disabled for 0)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 427. docs: COMMIT\_HISTORY.md through commit 425 (14d7e61, \#430) (\#435)
 
