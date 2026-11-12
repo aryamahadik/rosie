@@ -50,10 +50,20 @@ import {
   type GatewayDeps,
   type PageCallName,
 } from "./gateway";
+import { HandleActor as HandleActorBase } from "./actor";
 import { wireWorker, workerRoot } from "./wiring";
 
-// The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
-export { HandleActor } from "./actor";
+// The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here. Each instance
+// wires its isolate's actor ports before its constructor reads one (T-1243): an isolate a stub call or an alarm reaches
+// may have served no request or retry batch, and an actor left unwired there stores each text 'unwired' and holds it for
+// good. wireWorker installs once per isolate, never over a root already wired, and wires nothing for an actor while a
+// test holds the actor's wiring (runtime/src/wiring setActorWiring).
+export class HandleActor extends HandleActorBase {
+  constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
+    wireWorker(env, "actor");
+    super(ctx, env);
+  }
+}
 export { TestPhoneLine } from "./wiring/test-phone/line";
 
 // The retry queue's consumer (T-256, runtime/src/queues): the Workers runtime hands it each batch of RETRY_QUEUE.
