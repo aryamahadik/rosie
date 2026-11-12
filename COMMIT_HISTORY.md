@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 478, [`5fbe5ce`](https://github.com/aryamahadik/rosie/commit/5fbe5ce), 2026-11-12 16:32:08 UTC.
+- **Through:** commit 480, [`b8882e0`](https://github.com/aryamahadik/rosie/commit/b8882e0), 2026-11-12 19:19:48 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 480. docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487) (\#489)
+
+- **Commit:** [`b8882e0`](https://github.com/aryamahadik/rosie/commit/b8882e0), by Arya Mahadik, 2026-11-12 19:19:48 UTC
+- **Pull request:** [#489](https://github.com/aryamahadik/rosie/pull/489) from `task/commit-history-53`, merged 2026-11-12 19:19:49 UTC. It squashed 1 branch commit:
+  - `61883e8` docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487)
+- **Files changed:** 1 (+69 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +69 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 479. T-1320: a package.json change confined to script lines the parity run never runs is not a parity input. merge-check.yml's parity-inputs step keeps its list and, when package.json is the only input that changed, runs infra/ci/parity-inputs.mjs as origin/main holds it: an input unless the change is confined to the scripts object and leaves test:parity, its pre and post scripts, npm ci's install scripts and every script their lines name unchanged; every other field counts (key order included); it fails closed, and a failing rule fails the step. parity-inputs.test.mjs runs the step as the file holds it with a case for each shape; the local merge-check gains a run test (a script line alone runs no shard; a changed test:parity runs them) and its fixture carries the rule; README section (DL-589, DL-600) (\#488)
+
+- **Commit:** [`4b87736`](https://github.com/aryamahadik/rosie/commit/4b87736), by Arya Mahadik, 2026-11-12 19:19:44 UTC
+- **Pull request:** [#488](https://github.com/aryamahadik/rosie/pull/488) from `task/T-1320`, merged 2026-11-12 19:19:45 UTC. It squashed 1 branch commit:
+  - `22b7e97` T-1320: a package.json change confined to script lines the parity run…
+- **Files changed:** 5 (+727 −4), by folder:
+  - `.github/workflows/` merge-check.yml +15 −0
+  - `infra/ci/` README.md +7 −1, local-merge-check.test.mjs +40 −3, parity-inputs.mjs +232 −0, parity-inputs.test.mjs +433 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 478. docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483) (\#487)
 
