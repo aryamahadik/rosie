@@ -11,6 +11,7 @@ import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit-6-reread-first.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
@@ -459,13 +460,16 @@ describe("a STOP through the lease never waits for a missing result or the decid
         : [action.call, body.kind ?? "", body.inboundEventId ?? ""];
     });
 
-  /** The texts arrive, their batch goes to the lease, the turn commits, and its lease's 60 s lapse then passes. */
-  async function arriveAndRun(run: Run, texts: [string, string, string][]): Promise<void> {
+  /**
+   * The texts arrive, their batch goes to the lease, the turn makes its `gateCalls` gate calls (one unless given) and
+   * commits, and its lease's 60 s lapse then passes.
+   */
+  async function arriveAndRun(run: Run, texts: [string, string, string][], gateCalls = 1): Promise<void> {
     for (const [eventId, body, sentAt] of texts) await arrive(SAM, eventId, body, sentAt);
     await run.settle();
     await run.tick(3000);
     await run.settle();
-    await until(() => run.face.gateCalls.length === 1, "the turn's commit");
+    await until(() => run.face.gateCalls.length >= gateCalls, "the turn's commit");
     await run.settle();
     await run.tick(61_000);
     await run.settle();
@@ -541,6 +545,61 @@ describe("a STOP through the lease never waits for a missing result or the decid
         expect(run.face.gateCalls).toHaveLength(1);
         const request = run.face.gateCalls[0]?.request;
         expect(request?.input).toEqual({ kind: "coreOnly" });
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  it("every result present: a decided text and a STOP whose decided request the gate refuses on its tries commit the STOP core-only on the turn's first run: no rerun at the lapse, no park (DL-521)", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        const { core, restore } = gateOverSamCore(run);
+        // Limit 6 refuses the decided request before the re-read (commit-limit-6-reread-first.json's refusal), and the
+        // one re-read cannot run (the decide double's re-read answers the models down), so there is no second try.
+        const commit = run.face.gate;
+        run.face.gate = (request, index) => {
+          if (request.input.kind === "decided") return structuredClone(commitLimit6First.outcome);
+          return commit === null ? { error: "unwired" } : commit(request, index);
+        };
+        try {
+          await arriveAndRun(
+            run,
+            [
+              ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+              ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+            ],
+            2,
+          );
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.ai.decideCalls).toHaveLength(1);
+        expect(run.ai.rereadCalls).toHaveLength(1);
+        expect(run.face.gateCalls.map((call) => call.request.input.kind)).toEqual(["decided", "coreOnly"]);
+        const request = run.face.gateCalls[1]?.request;
+        expect(request?.turn.id).toBe(turnId);
         expect(coreOf(request)).toEqual([
           ["recordSafetyOutcome", "evt-sam-0001"],
           ["recordSafetyOutcome", "evt-sam-0003"],

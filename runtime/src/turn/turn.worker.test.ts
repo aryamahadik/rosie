@@ -1155,4 +1155,156 @@ describe("keyword texts never wait for a missing safety result, and a STOP never
     expect(face.gateCalls).toEqual([]);
     expect(t.commits).toEqual([]);
   });
+
+  /**
+   * How the gate refuses the decided request on its tries (DL-521), while it commits a core-only request as before: limit
+   * 6 before the re-read (commit-limit-6-reread-first.json's refusal, naming part 0's field kinds), with the one re-read
+   * unable to run (the models down), so there is no second try; the same with the re-read run, and the database busy on
+   * its request and that request's one resend; and the database busy on the first request and its one resend.
+   */
+  const REFUSALS = ["valueFailsWords", "afterReread", "transient"] as const;
+  type Refusal = (typeof REFUSALS)[number];
+
+  function refuseDecided({ face, ai }: Setup, refusal: Refusal): void {
+    const commit = face.gate;
+    face.gate = (request, index) => {
+      if (request.input.kind !== "decided") {
+        return commit === null ? { error: "unwired" } : commit(request, index);
+      }
+      if (refusal === "transient" || request.input.decided.decide.reread) {
+        return { error: "transient", sqlstate: "40001" };
+      }
+      return structuredClone(commitLimit6First.outcome);
+    };
+    ai.reread = () =>
+      refusal === "afterReread"
+        ? decided({ ...decideS102, reread: true }, ONE_REREAD)
+        : { error: "modelsDown" };
+  }
+
+  it("every result present: a decided text and a STOP whose decided request the gate refuses on its tries commit the STOP core-only on that run, with no park (DL-521)", async () => {
+    // The decided request's tries: the first request, the re-read's request and its one resend, or one resend.
+    const decidedTries: Record<Refusal, number> = { valueFailsWords: 1, afterReread: 3, transient: 2 };
+    for (const refusal of REFUSALS) {
+      const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+      refuseDecided(setup, refusal);
+      const { t, face, ai } = setup;
+
+      const outcome = committed(await runTurnLoop(t.turn));
+
+      // The decided input went to the gate on its tries only; then the keyword texts' core-only request, once.
+      const requests = requestsOf(face);
+      expect(requests.map((request) => request.input.kind)).toEqual([
+        ...Array<string>(decidedTries[refusal]).fill("decided"),
+        "coreOnly",
+      ]);
+      expect(requests[0]?.input).toEqual(commitS102.request.input);
+      expect(ai.rereadCalls.map((request) => [request.why, request.failing])).toEqual(
+        refusal === "transient" ? [] : [["valueFailsWords", [{ part: 0, fields: ["kinds"] }]]],
+      );
+      // Under the caller of every business, with every text's record, as a turn of keyword texts alone commits.
+      const coreOnly = requests.at(-1);
+      expect(coreOnly?.caller.businessId).toBeNull();
+      expect(coreOf(coreOnly)).toEqual([
+        ["recordSafetyOutcome", DECIDED.eventId],
+        ["recordSafetyOutcome", KEYWORD_ID],
+        keywordAction("STOP"),
+      ]);
+      expect(outcome.answer.parts).toEqual([]);
+      expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+        ["replied", "stopReply", true],
+      ]);
+      expect(outcome.replies?.rerun).toBe(false);
+      // On its run, with no rerun and no park: the lease's last commit committed, and it is told the reply ended.
+      expect(t.commits.map((sent) => "result" in sent.answer)).toEqual([
+        ...Array<boolean>(decidedTries[refusal]).fill(false),
+        true,
+      ]);
+      expect(t.replied.count).toBe(1);
+      restoreAll();
+    }
+  });
+
+  it("every result present: the same batch with START, and with HELP, in place of the STOP keeps today's behaviour: the decided input on every commit the replies ask for, then the run ends with nothing committed, and the lease's retry", async () => {
+    // Each of the replies' runs sends the decided input on its tries; the one re-read runs once in the turn's run.
+    const decidedTries: Record<Refusal, number> = {
+      valueFailsWords: KEYWORD_RUNS,
+      afterReread: 3 + (KEYWORD_RUNS - 1),
+      transient: 2 * KEYWORD_RUNS,
+    };
+    const lastError: Record<Refusal, string> = {
+      valueFailsWords: "valueFailsWords",
+      afterReread: "valueFailsWords",
+      transient: "transient",
+    };
+    for (const refusal of REFUSALS) {
+      for (const word of ["START", "HELP"] as const) {
+        const setup = await samTurn([DECIDED, keywordText(word)], []);
+        refuseDecided(setup, refusal);
+        const { t, face, ai } = setup;
+
+        const outcome = await runTurnLoop(t.turn);
+
+        expect(outcome).toMatchObject({
+          result: "notCommitted",
+          why: "notRecorded",
+          gateCalls: decidedTries[refusal],
+        });
+        expect(
+          outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome, reply.errorCode]),
+        ).toEqual([[word.toLowerCase(), "notRecorded", lastError[refusal]]]);
+        // The re-read that found the models down: the AI-down path's waiting texts, as before (T-271).
+        expect("aiDown" in outcome).toBe(refusal === "valueFailsWords");
+        expect(requestsOf(face).map((request) => request.input.kind)).toEqual(
+          Array<string>(decidedTries[refusal]).fill("decided"),
+        );
+        expect(ai.rereadCalls).toHaveLength(refusal === "transient" ? 0 : 1);
+        expect(t.commits.every((sent) => "error" in sent.answer)).toBe(true);
+        expect(t.replied.count).toBe(0);
+        restoreAll();
+      }
+    }
+  });
+
+  it("a STOP whose core-only commit is refused too gets no decided input again on that run: the replies' rerun commits it core-only at once", async () => {
+    const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+    refuseDecided(setup, "valueFailsWords");
+    const { t, face } = setup;
+    const refusing = face.gate;
+    // The database busy on the first core-only request and on its one resend.
+    face.gate = (request, index) =>
+      index === 1 || index === 2 || refusing === null
+        ? { error: "transient", sqlstate: "40001" }
+        : refusing(request, index);
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual([
+      "decided",
+      "coreOnly",
+      "coreOnly",
+      "coreOnly",
+    ]);
+    expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+      ["replied", "stopReply", true],
+    ]);
+    expect(t.replied.count).toBe(1);
+  });
+
+  it("a STOP's run replaced while the gate refuses its decided request sends no core-only request: the run that has the turn now records it", async () => {
+    const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+    refuseDecided(setup, "valueFailsWords");
+    const { t, face, ai } = setup;
+    ai.reread = () => {
+      t.abort();
+      return { error: "modelsDown" };
+    };
+
+    const outcome = await runTurnLoop(t.turn);
+
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 1 });
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual(["decided"]);
+    expect(t.commits).toHaveLength(1);
+    expect(t.replied.count).toBe(0);
+  });
 });
