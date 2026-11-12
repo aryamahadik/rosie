@@ -101,7 +101,10 @@ export interface PinRequest {
   joinedTraceIds: readonly string[];
   /** How many texts the turn holds. */
   texts: number;
-  /** This run's try (1, then 2 and 3 after a lapse) and whether the turn is the one restart. */
+  /**
+   * This run's try (1, then 2 and 3 after a lapse) and whether the turn is a restart: the one restart, or the second, for
+   * a batch that may hold a stop word (ADR-018 section 1).
+   */
   tries: number;
   restart: boolean;
   /** The lease's length. */

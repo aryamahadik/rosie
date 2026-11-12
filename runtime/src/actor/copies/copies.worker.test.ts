@@ -24,7 +24,7 @@ import startRecorded from "../../../../contracts/tool-api/fixtures/start-recorde
 import stopRecorded from "../../../../contracts/tool-api/fixtures/stop-recorded.json";
 import stopOnReturn from "../../../../contracts/tool-api/fixtures/j3-stop-on-return-tells-businesses.json";
 import k09v1 from "../../../../contracts/tool-api/tool-api.v1.schema.json";
-import { fakeBundles } from "../../bundle/test-support";
+import { fakeBundles, WHOLE_A } from "../../bundle/test-support";
 import {
   actorNameOf,
   durableObjectActor,
@@ -47,8 +47,8 @@ import {
 import { fakeTargets } from "../../guard/test-support";
 import { OUTAGE_WAIT_MS, PROBE_MS, setDbOutageDeps, type OutageView } from "../../outage/db";
 import { dbFakes, idsOf, type DbFakes } from "../../outage/db/test-support";
-import { fixtureBundle, harness, type Harness } from "../../safety/test-support";
-import type { SafetyResult } from "../../safety/types";
+import { fakeRead, fixtureBundle, harness, TEST_IDS, type Harness } from "../../safety/test-support";
+import type { SafetyDeps, SafetyResult } from "../../safety/types";
 import { setTurnDeps, turnHooks, turnReplyCore } from "../../turn";
 import {
   ALEX,
@@ -83,7 +83,9 @@ import {
   type CopiesView,
   type HandleActor,
   type LeasedTurn,
+  type BatchEntry,
   type ReplayReport,
+  type SafetyEntry,
   type SafetyTimerRow,
   type TurnEntry,
 } from "../index";
@@ -126,6 +128,10 @@ interface CopiesRpc {
   readHolds(): Promise<{ eventId: string; holdId: string | null }[]>;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
+  readSafety(): Promise<SafetyEntry[]>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
+  readBatches(): Promise<BatchEntry[]>;
 }
 
 function stubOf(who: Party): DurableObjectStub<HandleActor> {
@@ -133,6 +139,39 @@ function stubOf(who: Party): DurableObjectStub<HandleActor> {
 }
 
 const actorOf = (who: Party): CopiesRpc => stubOf(who);
+
+/**
+ * The safety read's doubles as ../../outage/db/test-support.ts makes them (DL-615; the architect's 5(c)), as this file's
+ * harness: their one `down` switch, the core's, covers the probe and the bundle registry too.
+ */
+function dbHarness(f: DbFakes, answers: Record<string, SafetyResult>): Harness {
+  const read = fakeRead(f.clock, answers);
+  const stopped = { value: false };
+  const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => stopped.value };
+  return { clock: f.clock, core: f.core, direct: f.direct, read, stopped, deps };
+}
+
+/**
+ * Wires the PostgreSQL-down path as D-017 is to wire it (DL-615): its ports are the doubles', and, since no turn has pinned
+ * a bundle here, the handle's keyword copy is bundle A's, installed by the actor's own ActorCopies.refreshKeywords, so the
+ * real classify reads each text with the key store the gateway sealed it under. Answers the function that unwires it.
+ */
+async function wireDownPath(who: Party, f: DbFakes): Promise<() => void> {
+  const restore = setDbOutageDeps(f.outageDeps);
+  const copied = await runInDurableObject(stubOf(who), (instance) =>
+    insideOf(instance).copies.refreshKeywords(WHOLE_A.manifest as unknown as Record<string, unknown>),
+  );
+  expect(copied).toBe(true);
+  return restore;
+}
+
+/** The down path has read each of these texts as another text (no stop word), before any timeout fires (DL-615). */
+async function readAsOther(who: Party, ...eventIds: string[]): Promise<void> {
+  await actorOf(who).outageIdle();
+  expect((await actorOf(who).readOutage()).texts).toEqual(
+    eventIds.map((eventId) => expect.objectContaining({ eventId, kind: "other" }) as unknown),
+  );
+}
 
 /** The actor's own copies and queue, inside it. */
 function insideOf(instance: unknown): { copies: ActorCopies; returns: ReturnQueue } {
@@ -408,6 +447,34 @@ describe("the actor's copy of the stopped flag (K-04 phones.stopped)", () => {
       expect(h.core.fixed).toEqual([]);
       expect(h.direct.sent).toEqual([]);
     } finally {
+      restore();
+    }
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text, so only its own reason withholds it (DL-615, the architect's 5(f)): the outage line never goes to a number the actor's copy says is stopped, even when the stopped flag the deps read says not", async () => {
+    const f = dbFakes(keys, {}, { start: 0, ids: TEST_IDS });
+    const h = dbHarness(f, {});
+    const restore = setSafetyDeps(h.deps);
+    const restoreDown = await wireDownPath(ALEX, f);
+    try {
+      await arrive(
+        ALEX,
+        "evt-alex-0300",
+        "Can I get a haircut on Thursday afternoon?",
+        "2026-10-21T19:30:00Z",
+      );
+      await readAsOther(ALEX, "evt-alex-0300");
+      await runInDurableObject(stubOf(ALEX), (instance) => {
+        insideOf(instance).copies.noteStopped({ stopped: true, phoneVersion: 4, turnId: null });
+      });
+      await h.clock.advance(4000);
+      await actorOf(ALEX).safetyIdle();
+      // No verdict in 4 s and no danger word: the outage line, but never to a stopped number.
+      expect(h.stopped.value).toBe(false);
+      expect(h.core.fixed).toEqual([]);
+      expect(h.direct.sent).toEqual([]);
+    } finally {
+      restoreDown();
       restore();
     }
   });
@@ -2759,7 +2826,7 @@ function insideOfQueueStorage(queue: ReturnQueue): { key: string; box: string }[
 }
 
 describe("the write-on-return queue, with the safety read's records", () => {
-  it("with PostgreSQL down, the outage line's record and a danger line's record wait as labels; back up, the danger record is written first, each once, and its hold id lands", async () => {
+  it("with PostgreSQL down and the down path unwired, as the root installs it today: the timed-out text gets no outage line by any path, so no record for one (DL-615), and a danger line's record waits as labels; back up, it is written once and its hold id lands", async () => {
     const danger = safetyEmergencyNow as unknown as SafetyResult;
     const h = harness(keys, { [danger.eventId]: danger });
     const order: string[] = [];
@@ -2776,6 +2843,105 @@ describe("the write-on-return queue, with the safety read's records", () => {
     const restore = setSafetyDeps(h.deps);
     try {
       h.core.down = true;
+      // First a text the read gives no verdict for (the outage line's turn, withheld), then the emergency (its safety line).
+      await arrive(
+        ALEX,
+        "evt-alex-0299",
+        "Can I get a haircut on Thursday afternoon?",
+        "2026-10-22T16:40:00Z",
+      );
+      await h.clock.advance(4000);
+      await actorOf(ALEX).safetyIdle();
+      await arrive(
+        ALEX,
+        danger.eventId,
+        "my lips are swelling after the beard color and I can't breathe well",
+        "2026-10-22T16:41:00Z",
+      );
+      await actorOf(ALEX).safetyIdle();
+      expect(h.direct.sent.map((sent) => sent.fixedLineId)).toEqual(["safetyEmergency"]);
+      expect(
+        (await actorOf(ALEX).readSafety()).find((entry) => entry.eventId === "evt-alex-0299"),
+      ).toMatchObject({ path: "none", lineId: "outage" });
+      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): the text's unread hold open, its
+      // re-read set 30 s on, and its batch kept back.
+      expect(await actorOf(ALEX).readHolds()).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ eventId: "evt-alex-0299", rule: "unread", released: false }),
+        ]),
+      );
+      const reread = await runInDurableObject(stubOf(ALEX), (_, state) =>
+        state.storage.sql
+          .exec<{ due_ms: number }>("SELECT due_ms FROM safety_reread WHERE event_id = 'evt-alex-0299'")
+          .toArray(),
+      );
+      expect(reread).toEqual([{ due_ms: 34_000 }]);
+      expect(
+        (await actorOf(ALEX).readBatches()).filter(
+          (batch) => batch.handed && batch.eventIds.includes("evt-alex-0299"),
+        ),
+      ).toEqual([]);
+
+      // The danger record waits; a reader sees labels only. No record waits for an outage line.
+      expect((await actorOf(ALEX).readCopies()).returns).toEqual([
+        {
+          seq: 1,
+          key: `recordSafetyOutcome:${danger.eventId}`,
+          call: "recordSafetyOutcome",
+          rank: "danger",
+          tries: 0,
+          refused: null,
+        },
+      ]);
+
+      // Still down: the first write gets no answer.
+      order.length = 0;
+      expect(await actorOf(ALEX).writeOnReturn()).toEqual({ written: 0, refused: 0, left: 1 });
+      expect(order).toEqual([`record:${danger.eventId}`]);
+
+      // Back up: the danger record, once, as written on return with what the actor sent.
+      h.core.down = false;
+      order.length = 0;
+      expect(await actorOf(ALEX).writeOnReturn()).toEqual({ written: 1, refused: 0, left: 0 });
+      expect(order).toEqual([`record:${danger.eventId}`]);
+      expect(h.core.recorded.map((call) => call.request.caller.kind)).toEqual(["actorOnReturn"]);
+      expect(h.core.recorded[0]?.request.sentByActor).toMatchObject({ fixedLineId: "safetyEmergency" });
+      expect(h.core.fixed).toEqual([]);
+      expect(await actorOf(ALEX).readHolds()).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ eventId: danger.eventId, holdId: `hold-${danger.eventId}` }),
+        ]),
+      );
+
+      // Again: nothing is written twice.
+      order.length = 0;
+      expect(await actorOf(ALEX).writeOnReturn()).toEqual({ written: 0, refused: 0, left: 0 });
+      expect(order).toEqual([]);
+      expect(h.direct.sent).toHaveLength(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it("with PostgreSQL down and the down path wired, as D-017 is to wire it, the timed-out text read as another text (DL-615): the outage line's record and a danger line's record wait as labels; back up, the danger record is written first, each once, and its hold id lands", async () => {
+    const danger = safetyEmergencyNow as unknown as SafetyResult;
+    const f = dbFakes(keys, { [danger.eventId]: danger }, { start: 0, ids: TEST_IDS });
+    const h = dbHarness(f, { [danger.eventId]: danger });
+    const order: string[] = [];
+    const record = h.core.recordSafetyOutcome.bind(h.core);
+    const fixed = h.core.sendFixedLine.bind(h.core);
+    h.core.recordSafetyOutcome = (request) => {
+      order.push(`record:${request.safety.eventId}`);
+      return record(request);
+    };
+    h.core.sendFixedLine = (request) => {
+      order.push(`fixed:${request.caller.requestId}`);
+      return fixed(request);
+    };
+    const restore = setSafetyDeps(h.deps);
+    const restoreDown = await wireDownPath(ALEX, f);
+    try {
+      h.core.down = true;
       // First a text the read gives no verdict for (the outage line), then the emergency (its safety line).
       await arrive(
         ALEX,
@@ -2783,6 +2949,7 @@ describe("the write-on-return queue, with the safety read's records", () => {
         "Can I get a haircut on Thursday afternoon?",
         "2026-10-22T16:40:00Z",
       );
+      await readAsOther(ALEX, "evt-alex-0299");
       await h.clock.advance(4000);
       await actorOf(ALEX).safetyIdle();
       await arrive(
@@ -2840,6 +3007,7 @@ describe("the write-on-return queue, with the safety read's records", () => {
       expect(order).toEqual([]);
       expect(h.direct.sent).toHaveLength(2);
     } finally {
+      restoreDown();
       restore();
     }
   });

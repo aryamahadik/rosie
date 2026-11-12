@@ -15,7 +15,7 @@ import textImessage from "../../../contracts/inbound-event/fixtures/text-imessag
 import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
-import { fakeBundles } from "../bundle/test-support";
+import { fakeBundles, WHOLE_A } from "../bundle/test-support";
 import {
   durableObjectActor,
   prepareHandoff,
@@ -42,10 +42,13 @@ import {
   type OpenHold,
   type SafetyEntry,
 } from "../actor";
+import type { ActorCopies } from "../actor/copies/copies";
+import { setDbOutageDeps, type OutageView } from "../outage/db";
+import { dbFakes, type DbFakes } from "../outage/db/test-support";
 import type { ModelCall } from "../trace/types";
 import type { SafetyOnArrival } from "./arrival";
 import { timeoutResult } from "./rules";
-import { fakeRead, harness, type Harness } from "./test-support";
+import { fakeRead, harness, TEST_IDS, type Harness } from "./test-support";
 import {
   SAFETY_LINE_BUDGET_MS,
   type DirectLineRequest,
@@ -102,10 +105,47 @@ interface StoreRpc {
   writeSafetyOnReturn(): Promise<number>;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
 }
 
 function actorOf(): StoreRpc {
   return stub();
+}
+
+/**
+ * The doubles of ../outage/db/test-support.ts as this file's harness (DL-615; the architect's 5(c)): their one `down`
+ * switch, the core's, covers the probe and the bundle registry too; the safety read answers `answers` after `delayMs`.
+ */
+function dbHarness(f: DbFakes, answers: Record<string, SafetyResult>, delayMs: number): Harness {
+  const read = fakeRead(f.clock, answers, delayMs);
+  const stopped = { value: false };
+  const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => stopped.value };
+  return { clock: f.clock, core: f.core, direct: f.direct, read, stopped, deps };
+}
+
+/**
+ * Wires the PostgreSQL-down path as D-017 is to wire it (DL-615): its ports are the doubles', and, since no turn has pinned
+ * a bundle here, the actor's keyword copy is bundle A's, installed by its own ActorCopies.refreshKeywords, so the real
+ * classify reads each text with the key store the gateway sealed it under. Answers the function that unwires it.
+ */
+async function wireDownPath(f: DbFakes): Promise<() => void> {
+  const restore = setDbOutageDeps(f.outageDeps);
+  const copied = await runInDurableObject(stub(), (instance) =>
+    (instance as unknown as { copies: ActorCopies }).copies.refreshKeywords(
+      WHOLE_A.manifest as unknown as Record<string, unknown>,
+    ),
+  );
+  expect(copied).toBe(true);
+  return restore;
+}
+
+/** The down path has read each of these texts as another text (no stop word), before any timeout fires (DL-615). */
+async function readAsOther(...eventIds: string[]): Promise<void> {
+  await actorOf().outageIdle();
+  expect((await actorOf().readOutage()).texts).toEqual(
+    eventIds.map((eventId) => expect.objectContaining({ eventId, kind: "other" }) as unknown),
+  );
 }
 
 async function arrive(eventId: string, body: string): Promise<SealedHandoff> {
@@ -456,14 +496,20 @@ interface Run {
 /**
  * Runs a test body with the doubles set for the isolate and put back after: the read answers `answers` after `delayMs`
  * on the fake clock, unless `deps` gives other doubles. With `lease`, closed batches go to the actor's own turn lease,
- * whose commit is K-05's double (each context kept); else each closed batch is kept in `handed`.
+ * whose commit is K-05's double (each context kept); else each closed batch is kept in `handed`. With `wired` (DL-615),
+ * the doubles are ../outage/db/test-support.ts's (`dbHarness`) and the PostgreSQL-down path is wired as D-017 is to wire
+ * it (`wireDownPath`), before the first text arrives.
  */
 async function withActor(
   answers: Record<string, SafetyResult>,
-  options: { delayMs?: number; deps?: (h: Harness) => SafetyDeps; lease?: boolean },
+  options: { delayMs?: number; deps?: (h: Harness) => SafetyDeps; lease?: boolean; wired?: boolean },
   body: (run: Run) => Promise<void>,
 ): Promise<void> {
-  const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
+  const db = options.wired === true ? dbFakes(keys, answers, { start: 0, ids: TEST_IDS }) : null;
+  const h =
+    db === null
+      ? harness(keys, answers, { delayMs: options.delayMs ?? 0 })
+      : dbHarness(db, answers, options.delayMs ?? 0);
   const deps = options.deps?.(h) ?? h.deps;
   const restores: (() => void)[] = [setSafetyDeps(deps)];
   const lease: Lease = { turns: [], contexts: [] };
@@ -481,7 +527,7 @@ async function withActor(
           return Promise.resolve({ ...first, turnId: request.turn.id });
         },
       }),
-      setBundleDeps(fakeBundles().deps),
+      setBundleDeps(db?.bundleDeps ?? fakeBundles().deps),
     );
   } else {
     restores.push(
@@ -493,6 +539,7 @@ async function withActor(
       }),
     );
   }
+  if (db !== null) restores.push(await wireDownPath(db));
   const run: Run = {
     h,
     deps,
@@ -1313,16 +1360,29 @@ describe("no row, and a new instance", () => {
   });
 
   it("no row for words that cannot be opened: the stand-in has no key and keeps its unread hold", async () => {
+    // The outage line is a step on the way here (DL-615, the architect's 5(b) and 5(d)): the down path runs wired, as D-017
+    // is to wire it, and reads the text with its own key read, which answers. The fault hits only the safety read's key
+    // read (SafetyDeps.keys), which fails once that reading is made, with the fake clock unmoved; a read failing before it
+    // is the accepted cost the architect's ruling names (section 3), whose line is withheld.
+    const keyStore = { broken: false };
     await withActor(
       {},
       {
+        wired: true,
         deps: (h) => ({
           ...h.deps,
-          keys: { getOrCreateKey: () => Promise.reject(new Error("the key store broke")) },
+          keys: {
+            getOrCreateKey: async () => {
+              while (!keyStore.broken) await new Promise((resolve) => setTimeout(resolve, 1));
+              throw new Error("the key store broke");
+            },
+          },
         }),
       },
       async (run) => {
         await arrive("evt-1", PLAIN_TEXT);
+        await readAsOther("evt-1");
+        keyStore.broken = true;
         await run.settle();
         expect(run.h.core.fixed.map((call) => call.request.fixedLineId)).toEqual(["outage"]);
         expect(await actorOf().readHolds()).toMatchObject([
