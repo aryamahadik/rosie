@@ -127,8 +127,11 @@ const CALENDAR_PROVIDERS = new Set(["google", "microsoft"]);
 
 /** Thrown inside the transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
-  constructor(readonly answer: CommitTurnError) {
+  readonly answer: CommitTurnError;
+
+  constructor(answer: CommitTurnError) {
     super("commitTurn refused");
+    this.answer = answer;
   }
 }
 
@@ -301,9 +304,12 @@ function checkRequest(request: CommitTurnRequest): void {
 
 /** The business scope of the commit's transaction, set to each write's own business (null: the runtime side). */
 class Scope {
+  private readonly tx: Sql;
   private current: string | null = null;
 
-  constructor(private readonly tx: Sql) {}
+  constructor(tx: Sql) {
+    this.tx = tx;
+  }
 
   async to(businessId: string | null): Promise<void> {
     if (businessId === this.current) {
@@ -1424,16 +1430,19 @@ function constraintOf(error: unknown): K05.ConstraintError | null {
  * never PostgresError's message, detail or query, which can hold a row's values (STATE's notes for later cards, 3).
  */
 export class CommitTurnDatabaseError extends Error {
-  constructor(
-    readonly code: string,
-    readonly table: string | null,
-    readonly constraint: string | null,
-  ) {
+  readonly code: string;
+  readonly table: string | null;
+  readonly constraint: string | null;
+
+  constructor(code: string, table: string | null, constraint: string | null) {
     const names = [
       table === null ? "" : `, table ${table}`,
       constraint === null ? "" : `, constraint ${constraint}`,
     ];
     super(`commitTurn: the database refused the commit (SQLSTATE ${code}${names.join("")})`);
+    this.code = code;
+    this.table = table;
+    this.constraint = constraint;
     this.name = "CommitTurnDatabaseError";
   }
 }
@@ -1485,9 +1494,11 @@ export async function commitTurn(
       return refused;
     }
     try {
-      return transientOrThrow(error);
-    } catch {
-      throw scrubbed(error);
+      return transientOrThrow(error, "commitTurn");
+    } catch (thrown) {
+      // transientOrThrow throws a session's failure already scrubbed (T-1268): that goes on as it is. What it lets
+      // through unchanged (a statement's own refusal) is scrubbed here, as before.
+      throw thrown === error ? scrubbed(error) : thrown;
     }
   }
 }

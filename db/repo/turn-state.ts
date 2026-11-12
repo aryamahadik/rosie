@@ -928,6 +928,6 @@ export async function readTurnState(
       return outcome;
     });
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readTurnState");
   }
 }

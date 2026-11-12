@@ -259,7 +259,7 @@ async function inOwnTransaction<T>(
       return outcome;
     });
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, call);
   }
 }
 
