@@ -4,22 +4,32 @@
 // one isolate's memory may never see the other's sends. Both call this one object instead, which every isolate reaches:
 //
 //   sendPart    K-11 v1 sendPart as staging's send path makes it (./pages.ts lineLinqSend): through T-565's parts recorder
-//               in front of the Linq double (T-411), answered as the double answers. A part the double recorded is kept in
-//               this object's storage, with the time of the answer and the answer (K-21 v1 RecordedPart), once per
-//               idempotency key: the double's own record is in memory, so a repeat after an eviction is not listed twice
+//               in front of the Linq double (T-411), answered as the double answers. A part the double newly recorded in
+//               this call is kept in this object's storage, with the time of the answer and the answer (K-21 v1
+//               RecordedPart)
 //   partsTo     the parts kept to one number, in the order they were sent (testPhoneParts' parts)
 //   sendEmail   K-12 v1 sendEmail through the email double (T-418), for the email rows once they are joined: an email the
-//               double accepted is kept, once per idempotency key
+//               double newly recorded in this call is kept
 //   sentEmails  K-12 v1 doubleSentEmails over what is kept, oldest first (testPhoneParts' emails)
 //
 // What is kept is bounded (T-1238; DL-392): at most PARTS_PER_RECIPIENT parts to each number and EMAILS_PER_RECIPIENT emails
 // to each address, and at most PART_RECIPIENTS numbers and EMAIL_RECIPIENTS addresses in all. The record that would pass a
 // cap drops the oldest in the same transaction that stores it: past a recipient's cap, that recipient's oldest record; past
 // the recipients in all, the recipient sent to least recently, whole. So a flood to one recipient only ever drops that
-// recipient's own records, and the line never holds more than recipients times the cap. A repeated key stores nothing and
-// drops nothing. The caps are constants of this module: no request can name, raise or lift them. T-565's recorder is made
-// for each send, so no part stays in it once the send is over. The doubles' own memory of what they took (requests, keys,
-// emails) is theirs and lasts until the object is evicted, as before: trimming it would change their answers.
+// recipient's own records, and the line never holds more than recipients times the cap. The caps are constants of this
+// module: no request can name, raise or lift them. T-565's recorder is made for each send, so no part stays in it once the
+// send is over. The doubles' own memory of what they took (requests, keys, emails) is theirs and lasts until the object is
+// evicted, as before: trimming it would change their answers, and it is what tells a repeat from a new send.
+//
+// The line's record mirrors what the doubles actually sent (T-1238; DL-504): a send is kept only when its double newly
+// recorded it in that call. For parts, T-565's recorder, made for the send, lists a part only when the Linq double's record
+// grew (actions/src/page-calls/staging/test-phone/parts.ts); for emails, the email double's record must grow in the call.
+// The line remembers no dropped key of its own, and needs none. Within the object's life a double answers a repeat from
+// its own memory (Linq's dedupe; Resend's idempotency key, for its 24 hours) and records nothing, so the line stores
+// nothing and drops nothing, even when a cap has dropped that key's record. When a double sends a repeat again as a new
+// message (after an eviction, whose new doubles know no key; the email double past those 24 hours), the line keeps that
+// send once, as any new send, so it may drop an oldest record or recipient as above. A key the table still holds is never
+// stored twice (idempotency_key is UNIQUE): sent again after an eviction, it keeps its first record.
 //
 // One object for all of staging's test phones (./pages.ts TEST_PHONE_LINE_NAME): the roster's fictional 555-01xx phones all
 // text through the one Linq double, as they would through one Linq line. The line never signs or verifies an email, so the
@@ -164,7 +174,10 @@ export class TestPhoneLine extends DurableObject {
     this.#emails = createEmailDouble();
   }
 
-  /** K-11 v1 sendPart through the Linq double, answered as the double answers; a part it recorded is kept. */
+  /**
+   * K-11 v1 sendPart through the Linq double, answered as the double answers; a part the double newly recorded in this
+   * call is kept (T-565's recorder lists nothing else).
+   */
   async sendPart(request: unknown): Promise<SendPartOutcome> {
     // T-565's recorder for this send alone, in front of the line's one double: the part leaves it once it is kept.
     const recorder = createPartsRecorder(this.#linq);
@@ -189,13 +202,18 @@ export class TestPhoneLine extends DurableObject {
       .map((row) => JSON.parse(row.record) as RecordedPart);
   }
 
-  /** K-12 v1 sendEmail through the email double, answered as the double answers; an email it accepted is kept. */
+  /**
+   * K-12 v1 sendEmail through the email double, answered as the double answers. An email is kept only when the double
+   * newly recorded it in this call, as T-565's recorder keeps a part: its record grew by one, and the newest is this send.
+   * A repeat it answers from its memory, a refusal and a failure record nothing, so nothing is kept and nothing dropped.
+   * The double answers at once, so nothing runs between its record and this one.
+   */
   async sendEmail(request: SendEmailRequest): Promise<SendEmailOutcome> {
+    const before = (await this.#emails.doubleSentEmails({ to: null })).emails.length;
     const outcome = await this.#emails.sendEmail(request);
     if (outcome.result !== "accepted") return outcome;
-    const recorded = (await this.#emails.doubleSentEmails({ to: null })).emails.find(
-      (email) => email.providerMessageId === outcome.providerMessageId,
-    );
+    const after = (await this.#emails.doubleSentEmails({ to: null })).emails;
+    const recorded = after.length > before ? after[after.length - 1] : undefined;
     if (recorded !== undefined) {
       keep(
         this.ctx.storage,
