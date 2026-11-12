@@ -1,8 +1,8 @@
 // The composition root (T-550; C-046, C-044; build prompt section 10, D-017 'Joins: one hop at a time, in the turn order
 // of What changes'; ops/plan/02-contracts.md section 11): the one place that builds the Worker's gateway, the handle
-// actor's turn and the outbox dispatcher, with each of the fifteen ports of ./ports.ts bound once to the implementation
-// its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's pick for the real
-// package; nothing else here changes for it.
+// actor's turn and the outbox dispatcher, with each of the twenty-one ports of ./ports.ts bound once to the
+// implementation its environment picks (./picks.ts, checked by ./bind.ts). Each join (T-552 to T-564) swaps one port's
+// pick for the real package; nothing else here changes for it.
 //
 // What the root builds from the ports:
 //
@@ -13,11 +13,12 @@
 //     entry with those doors; while it is off (or no flags are bound), 404 with nothing read, verified or reached;
 //   - the handle actor's ports, put in place for the isolate by `install()`: the safety read on arrival (T-246), the
 //     batch clock (T-247), the bundle pin's reads (T-249; the bundle port, joined by T-556, so the guard's keyword list is
-//     the pinned bundle's), the guard's targets (T-250; the targets port, joined by T-556), the turn loop as the lease's
-//     hooks (T-248, T-251 to T-253), each run's pinned bundle kept for its frontier and gate (./pinned-runs.ts, T-557)
-//     and its last text's service and chat id for its gate (./turn-chats.ts, T-559), and the turn's ports (`TurnDeps`,
-//     its frontier the frontier port, joined by T-557, its gate and commit the gate port, joined by T-559), the Durable
-//     Object reading each at use;
+//     the pinned bundle's; where the state reads are real, behind the bundle's safety lines' check, so a bundle they
+//     refuse is never pinned: T-1242, DL-341, DL-351), the guard's targets (T-250; the targets port, joined by T-556), the
+//     turn loop as the lease's hooks (T-248, T-251 to T-253), each run's pinned bundle kept for its frontier and gate
+//     (./pinned-runs.ts, T-557) and its last text's service and chat id for its gate (./turn-chats.ts, T-559), and the
+//     turn's ports (`TurnDeps`, its frontier the frontier port, joined by T-557, its gate and commit the gate port, joined
+//     by T-559), the Durable Object reading each at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255) through the
@@ -28,11 +29,15 @@
 //     which posts through the Linq route above; every other page call stays unconfigured (503).
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
-// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name, and the sealing, turn-row, bundle, targets, frontier
-// and gate ports, which no database feeds there until T-567, so every seal, commit, park, pin, targets read, frontier and
-// gate fails closed, and the decide port, which no decider feeds there until J-02, so every decide fails closed) and the
-// closed set are at hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as
-// before. A test composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
+// have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name; the ports K-05's calls feed, which no database client
+// feeds there until T-1154's parts bind them over T-567's Hyperdrive binding, so every seal, chat open, commit, park,
+// pin, targets read, frontier, gate, compose input, finalize, claim, send-state read and arming fails closed; the model
+// ports, which no safety reader, decider or composer feeds there until those parts build them from the bundle's
+// manifest and the model key (J-02), so every safety read, decide and compose fails closed before any model call; the
+// Linq send, which no line feeds there yet; and the state reads and the plan calls (T-1242), which no reader feeds
+// there until those parts hand theirs in, so each read fails closed and no bundle is pinned) and the closed set are at
+// hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as before. A test
+// composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
 // (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads,
 // handleTargets and the frontier's readTurnState scope, @rosie/ai's deciders over the recorded-model double, and the
 // gate's reads over the K-05 doubles), the HandleActor namespace, its flags and its own clock.
@@ -86,7 +91,7 @@
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
 import { setBundleDeps } from "../bundle/pin";
-import type { BundleRegistry } from "../bundle/types";
+import type { BundleDeps, BundleRegistry } from "../bundle/types";
 import { ArmingMemory, clockArming } from "../clocks/arming";
 import type { ClockActorRpc } from "../clocks/types";
 import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatch/dispatcher";
@@ -107,10 +112,10 @@ import {
   type SendDoor,
 } from "../queues";
 import { setSafetyDeps } from "../safety";
-import type { SafetyDeps } from "../safety/types";
+import type { HandleDirectory, SafetyDeps } from "../safety/types";
 import { isLabel, logSink, openTrace, type BundleId, type LogContext, type TraceContext } from "../trace";
 import { setTurnDeps, turnHooks } from "../turn/turn";
-import type { TurnDeps, TurnDispatcher } from "../turn/types";
+import type { TurnDeps, TurnDirectory, TurnDispatcher, TurnSafety } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
 import { LinqDoor } from "./linq-door";
@@ -118,9 +123,11 @@ import { environmentOf, PICKS, type Environment } from "./picks";
 import type { PortName, Ports } from "./ports";
 import { PinnedRuns } from "./pinned-runs";
 import {
+  checkedPin,
   realPorts,
   type ArmingCalls,
   type BundleReadCalls,
+  type BundleSafetyLines,
   type ComposeReads,
   type Composers,
   type Deciders,
@@ -133,8 +140,10 @@ import {
   type LinqVerifyInputs,
   type OpenChatOnTextCall,
   type OutboxCalls,
+  type PlanCalls,
   type SafetyReaders,
   type SendStateCall,
+  type StoppedFlagRead,
   type TurnRowCalls,
 } from "./real";
 import { RowTraces } from "./row-traces";
@@ -186,7 +195,8 @@ export interface RootOptions {
    * openChatOnText over a rosie_job client, the gateway's call at receipt for each text or photo a phone handle sends
    * through Linq. In a test, the K-05 double over test owner 1's seeded handle and the handles the key call made, which
    * writes the phone row the outbox and send-state doubles read; null or left out where no database is bound (the Worker
-   * until T-567), so every call fails closed and the gateway answers 503 for such a text, with nothing stored.
+   * until the part of T-1154 that binds it), so every call fails closed and the gateway answers 503 for such a text, with
+   * nothing stored.
    */
   readonly chatOpenCall?: OpenChatOnTextCall | null;
   /**
@@ -198,20 +208,21 @@ export interface RootOptions {
   /**
    * K-05's commitTurn (T-195) and parkTurn (T-197) with their database bound, the two calls that write a turn's one row
    * (T-555; ./real.ts realTurnRow): in a test, the K-05 double; null or left out where no database is bound (the Worker
-   * until T-567), so every commit and park fails closed.
+   * until the part of T-1154 that binds it), so every commit and park fails closed.
    */
   readonly turnRows?: TurnRowCalls | null;
   /**
    * K-05 v1 item 7's readActiveBundle and readBundleValue (T-185) with their database bound, the reads the actor's pin
    * makes at each turn's start and the gateway at each webhook (T-556; ./real.ts realBundles): in a test, the K-05 double
-   * holding bundle v0 as bundles/v0 publishes it; null or left out where no database is bound (the Worker until T-567), so
-   * no turn's bundle is pinned and the gateway names bundle v0's stand-in.
+   * holding bundle v0 as bundles/v0 publishes it; null or left out where no database is bound (the Worker until the part
+   * of T-1154 that binds it), so no turn's bundle is pinned and the gateway names bundle v0's stand-in.
    */
   readonly bundleReads?: BundleReadCalls | null;
   /**
    * K-05 v1.2 handleTargets (T-220) with its database bound, the guard's targets read (T-556; ./real.ts realTargets): in a
    * test, the K-05 double answering for test owner 1's seeded rows as targets-first-text.json; null or left out where no
-   * database is bound (the Worker until T-567), so every targets read fails closed and no text reaches decide.
+   * database is bound (the Worker until the part of T-1154 that binds it), so every targets read fails closed and no text
+   * reaches decide.
    */
   readonly handleTargets?: HandleTargetsCall | null;
   /**
@@ -219,9 +230,44 @@ export interface RootOptions {
    * rosie_job under each call's business, set for the transaction only. On local PostgreSQL, @rosie/actions'
    * pgFrontierScope over a client whose connections run as rosie_job (the scope pgTurnFace builds on); in a test, the
    * K-05 double over test owner 1's seeded rows (T-1148); null or left out where no database is bound (the Worker until
-   * T-567), so every frontier fails closed and no text reaches decide.
+   * the part of T-1154 that binds it), so every frontier fails closed and no text reaches decide.
    */
   readonly frontierScope?: FrontierScope | null;
+  /**
+   * The bundle's safety lines (T-1242; DL-341, DL-351; ./real.ts BundleSafetyLines): the safety read's BundleSafety over
+   * the pinned bundle's K-01 v1 lines (fixedLine, outcomeLine, dangerWords; synchronous), bundle-backed, and the pin's
+   * check (checkPin), asked at each turn's pin that reads the active bundle id, which refuses a bundle whose safety lines
+   * have no words or whose A3-49 line holds no hotline. Bound where the state-reads port binds real (staging). Null or left
+   * out (the Worker until the part of T-1154 that binds it), each line read throws NoStateReadError, so the safety read
+   * fails before any model call and the actor applies its no-verdict rule, and the pin refuses every bundle, so no turn's
+   * work starts. In a test, the fake set's fixture bundle stands in (./test-support.ts), and no pin is checked.
+   */
+  readonly bundleSafety?: BundleSafetyLines | null;
+  /**
+   * The safety read's directory (T-1242; ../safety/types.ts HandleDirectory.idsOf): the ids K-09's calls name for a handle,
+   * by actor name, for the outage and danger lines' calls. Null or left out (the Worker until the part of T-1154 that
+   * binds it), every read fails closed (NoStateReadError), which the safety read takes as ids not known.
+   */
+  readonly handleDirectory?: HandleDirectory | null;
+  /**
+   * The handle's stopped flag as the outage line asks it (T-1242; SafetyDeps.isStopped; ./real.ts StoppedFlagRead), by
+   * actor name. Null or left out (the Worker until the part of T-1154 that binds it), every read fails closed
+   * (NoStateReadError), so the outage line, which never goes to a stopped number, does not go.
+   */
+  readonly stoppedFlags?: StoppedFlagRead | null;
+  /**
+   * The turn's directory (T-1242; ../turn/types.ts TurnDirectory.partyOf): who a handle is (its K-04 id, business, person
+   * and zone), which every run of a turn reads first. Null or left out (the Worker until the part of T-1154 that binds it,
+   * over the party read T-1240 names), every read fails closed (NoStateReadError), so each run ends noDirectory before
+   * anything is opened, read or written.
+   */
+  readonly turnDirectory?: TurnDirectory | null;
+  /**
+   * Each text's safety result as the arrival read gave it (T-1242; ../turn/types.ts TurnSafety.resultsOf), which the turn's
+   * commit records (K-09 README default 5), from where T-1241 rules it is kept. Null or left out (the Worker until the part
+   * of T-1154 that binds it), every read fails closed (NoStateReadError), so the turn takes no result and records none.
+   */
+  readonly turnSafety?: TurnSafety | null;
   /**
    * @rosie/ai's decide for each bundle (T-558; ./real.ts Deciders): the turn's two reads and its one Sonnet re-read, one
    * decider per bundle for both. In a test, over a fake Messages API answered by the recorded-model double; null or left
@@ -234,8 +280,9 @@ export interface RootOptions {
    * scope (rosie_app) and, on its transaction, K-05 v1.3 readOpenHolds and K-05 v1.4's safety reads, and the read-only
    * sealer. On local PostgreSQL, @rosie/actions' pgCallScope over a client whose connections run as rosie_app, with
    * readOpenHoldsIn, pgSafetyReads and pgReadOnlySealer over a rosie_job client (turn-face/pg/calls.ts); in a test, the K-05
-   * doubles over test owner 1's seeded rows; null or left out where no database is bound (the Worker until T-567), so every
-   * gate fails closed and nothing commits. Its one commitTurn is the turn-row port's (`turnRows`).
+   * doubles over test owner 1's seeded rows; null or left out where no database is bound (the Worker until the part of
+   * T-1154 that binds it), so every gate fails closed and nothing commits. Its one commitTurn is the turn-row port's
+   * (`turnRows`). Its optional `words` (T-1242) are the safety service's SafetyDeps.words, which a later part fills.
    */
   readonly gateReads?: GateReads | null;
   /**
@@ -243,7 +290,8 @@ export interface RootOptions {
    * (rosie_app) and K-05 v1.6 readOutboxRow on the runtime side (rosie_job). On local PostgreSQL, @rosie/actions'
    * pgCallScope over a rosie_app client and pgRowData's readOutboxRow over a rosie_job client (turn-face/pg/calls.ts); in a
    * test, a K-05 double over the rows the commit wrote and test owner 1's seeded rows; null or left out where no database
-   * is bound (the Worker until T-567), so every compose input fails closed and no row is composed.
+   * is bound (the Worker until the part of T-1154 that binds it), so every compose input fails closed and no row is
+   * composed.
    */
   readonly composeReads?: ComposeReads | null;
   /**
@@ -258,25 +306,33 @@ export interface RootOptions {
    * scope (rosie_app), and on the runtime side (rosie_job) K-05 v1.6 readOutboxRow, v1.3 readFixedLineFacts, and T-196's
    * writePlan and cancelClock. On local PostgreSQL, @rosie/actions' pgCallScope over a rosie_app client and pgRowData's four
    * calls over a rosie_job client (turn-face/pg/calls.ts); in a test, K-05 doubles over the rows the commit wrote and test
-   * owner 1's seeded rows; null or left out where no database is bound (the Worker until T-567), so every finalize fails
-   * closed and no row gets its final parts.
+   * owner 1's seeded rows; null or left out where no database is bound (the Worker until the part of T-1154 that binds
+   * it), so every finalize fails closed and no row gets its final parts.
    */
   readonly finalizeData?: FinalizeData | null;
   /**
    * K-05 v1.2's four outbox calls with their database bound (T-562; ./real.ts OutboxCalls): db/repo/outbox.ts's
    * claimOutboxV12, renewClaim, markPartV12 and markRowV12, each called as (sql, request) over a rosie_job client, never
    * T-196's v1 calls beside them (DL-317). In a test, the K-05 double over the rows the commit wrote and the plans finalize
-   * wrote into them; null or left out where no database is bound (the Worker until T-567), so every claim fails closed and
-   * nothing is sent.
+   * wrote into them; null or left out where no database is bound (the Worker until the part of T-1154 that binds them), so
+   * every claim fails closed and nothing is sent.
    */
   readonly outboxCalls?: OutboxCalls | null;
   /**
    * K-05 v1.2 sendState with its database bound (T-562; ./real.ts SendStateCall): db/repo/send-state.ts's sendState over a
    * rosie_job client, limit 8's read at send and the chat the send goes to. In a test, the same K-05 double over test
    * owner 1's seeded rows (no phone row) and the rows the commit wrote; null or left out where no database is bound (the
-   * Worker until T-567), so every read fails closed and nothing is sent.
+   * Worker until the part of T-1154 that binds it), so every read fails closed and nothing is sent.
    */
   readonly sendStateCall?: SendStateCall | null;
+  /**
+   * K-05 v1's plan calls with their database bound (T-1242; ./real.ts PlanCalls): db/repo/outbox.ts's unplannedRows and
+   * writePlan, each called as (sql, request) over a rosie_job client, the turn's rows with no plan yet after its commit
+   * and an email copy's plan. Bound where the data-access port binds real (staging). Null or left out (the Worker until
+   * the part of T-1154 that binds them), every call fails closed (NoDatabaseError), so no row of the turn is listed,
+   * composed or planned. In a test, the fake set's rows stand in (./test-support.ts).
+   */
+  readonly planCalls?: PlanCalls | null;
   /**
    * K-11 v1 sendPart with its Linq line bound (T-563; ./real.ts LinqSendCall): each part the dispatcher sends, through the
    * root's Linq door. In a test, @rosie/adapters' Linq double (T-411), which records each part once per idempotency key;
@@ -288,15 +344,16 @@ export interface RootOptions {
    * The retry queue's producer (runtime/src/queues RetryQueue: the RETRY_QUEUE binding, retryQueueOf(env), in the Worker),
    * where a row the dispatcher leaves waiting for its next try is put (T-258; DL-315), and where the queue's consumer puts
    * each next try of a job. In a test, a double that keeps each message with its delay; null or left out where none is
-   * bound (staging until T-566), so each wait reports noQueue and the row waits for the next run that claims it.
+   * bound (a Worker environment with no RETRY_QUEUE: env.staging has it since T-566), so each wait reports noQueue and
+   * the row waits for the next run that claims it.
    */
   readonly retryQueue?: RetryQueue | null;
   /**
    * What the clock arming reads and writes with its database bound (T-564; ./real.ts ArmingCalls): db/repo/clocks.ts's
    * armClock and cancelClock, each called as (sql, request) over a rosie_job client, the question's facts the due rule
    * reads and the actor name of a K-04 handle. In a test, K-05 doubles over the rows the commit wrote and test owner 1's
-   * seeded rows; null or left out where no database is bound (the Worker until T-567), so every arming fails closed and
-   * nothing is armed.
+   * seeded rows; null or left out where no database is bound (the Worker until the part of T-1154 that binds them), so
+   * every arming fails closed and nothing is armed.
    */
   readonly armingCalls?: ArmingCalls | null;
   /** T-185's release-flag read (./skeleton.ts); null or left out where none is bound, so every flag reads off. */
@@ -325,6 +382,12 @@ export interface Root {
   readonly turn: TurnDeps;
   /** What the safety read on arrival reaches (`setSafetyDeps`). */
   readonly safety: SafetyDeps;
+  /**
+   * What the bundle pin at each turn's start reads through (`setBundleDeps`): where the state-reads port binds real
+   * (staging), the bundle port behind the bundle's safety lines' check (./real.ts checkedPin; T-1242, DL-341, DL-351), so a
+   * bundle they refuse, or any bundle while none are bound, is never pinned; elsewhere the bundle port itself.
+   */
+  readonly pin: BundleDeps;
   /** The outbox dispatcher, as the turn wakes it. */
   readonly dispatcher: TurnDispatcher;
   /**
@@ -368,6 +431,14 @@ export function composeRoot(options: RootOptions): Root {
       frontierScope: options.frontierScope,
       // The bound bundle port, read at each call, for a bundle the turn did not pin; and the bundle each run pinned.
       frontierBundles: { bundles: () => ports.bundles, pinnedOf: (trace) => pinnedRuns.of(trace) },
+      // The state reads (T-1242), each over its own input: each read fails closed while its input is null.
+      stateReads: {
+        bundleSafety: options.bundleSafety ?? null,
+        handleDirectory: options.handleDirectory ?? null,
+        stoppedFlags: options.stoppedFlags ?? null,
+        turnDirectory: options.turnDirectory ?? null,
+        turnSafety: options.turnSafety ?? null,
+      },
       deciders: options.deciders,
       // The gate's reads, its one commit through the bound turn-row port (the turn id checked there), and the run's bundle.
       gate: {
@@ -392,6 +463,8 @@ export function composeRoot(options: RootOptions): Root {
       // The dispatcher's claim and marks, and limit 8's send state, each with its database bound (T-562).
       outbox: options.outboxCalls ?? null,
       sendState: options.sendStateCall ?? null,
+      // The turn's plan calls, with their database bound (T-1242).
+      planCalls: options.planCalls ?? null,
       // Each part the dispatcher sends, to the Linq line (T-563).
       linqSend: options.linqSendCall ?? null,
       // The clock arming's calls and reads at a part's first delivery receipt (T-564).
@@ -505,6 +578,13 @@ export function composeRoot(options: RootOptions): Root {
     isStopped: (actorName) => ports.stateReads.safety.isStopped(actorName),
   };
 
+  // What the turn's pin reads through: where the state reads are real, behind the bundle's safety lines' check, so a bundle
+  // they refuse (or any bundle while none are bound) is never pinned (DL-341, DL-351); elsewhere the bundle port itself,
+  // so a test's fake state reads leave the pin as it was.
+  const pin = bindsReal(bindings, "stateReads")
+    ? checkedPin(ports.bundles, options.bundleSafety ?? null)
+    : ports.bundles;
+
   const receipts: ReceiptSink = {
     async accept(handoff) {
       const status = deliveredStatusOf(handoff);
@@ -574,13 +654,14 @@ export function composeRoot(options: RootOptions): Root {
     linqWebhook,
     turn,
     safety,
+    pin,
     dispatcher,
     queue,
     install() {
       const restores = [
         setBatchHooks({ clock: { now } }),
         setSafetyDeps(safety),
-        setBundleDeps(ports.bundles),
+        setBundleDeps(pin),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
         setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
@@ -610,16 +691,15 @@ export interface WorkerSecrets {
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503), and the sealing, turn-row, bundle, targets, frontier, gate, compose-input and finalize
- * ports are handed no K-05 call, scope or read, since no database is bound to the Worker until T-567 (Hyperdrive), so
- * every seal fails closed and the gateway answers 503 with nothing written, no turn's bundle can be pinned, no frontier
- * runs, nothing commits and no row is composed or finalized; the
- * decide port is handed no decider until J-02, so no decide runs. The gateway's door to the handle's actor is the
- * HANDLE_ACTOR binding where the environment has one (T-553; env.staging has none until T-566, so there the door stays
- * closed), and
- * no release flags are handed in until staging has its database and the flag's deploy step (T-567, T-569), so the
- * skeleton flag reads off and `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed
- * parts) last as long as the isolate does.
+ * so the gateway answers 503); every other joined port, and on staging the state reads and the plan calls (T-1242), is
+ * handed no K-05 call, scope, reader or line yet (T-567 gives staging its Hyperdrive binding; T-1154's parts hand each
+ * port its calls and readers), so every seal fails closed and the gateway answers 503 with nothing written, no turn's
+ * bundle is pinned, no frontier runs, no safety read, decide or compose reaches a model, nothing commits, no row is
+ * composed, finalized or sent, and nothing is armed. The gateway's door to the handle's actor is the HANDLE_ACTOR binding
+ * where the environment has one (T-553; env.staging has it since T-566), and no release flags are handed in until the
+ * part of T-1154 that binds T-185's flag read over the staging database (DL-356), so the skeleton flag reads off and
+ * `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed parts) last as long as the
+ * isolate does.
  */
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);
@@ -629,66 +709,81 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     actors: handleActorsOf(env),
     vars: env,
     linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
-    // No database is bound until T-567: the sealing port fails closed (./real.ts NoDatabaseError).
+    // No database client is handed in yet (a part of T-1154 binds handleSealingKey over T-567's Hyperdrive): the sealing
+    // port fails closed (./real.ts NoDatabaseError).
     handleKey: null,
-    // No database is bound until T-567 (its rosie_job client gives db/repo/chat-open.ts's openChatOnText): every call
+    // No database client is handed in yet (its rosie_job client gives db/repo/chat-open.ts's openChatOnText): every call
     // fails closed (./real.ts NoDatabaseError), so a text that opens a chat is answered 503 with nothing stored, as its
     // seal already is.
     chatOpenCall: null,
-    // No safety read until the bundle's manifest (T-555's bundle reads, T-566's BUNDLES on staging) and the model key
-    // (J-02; DL-027) can be read in the Worker: every read fails closed (./real.ts NoSafetyReaderError), so the actor
-    // applies its no-verdict rule.
+    // No safety read until a part of T-1154 builds one from the bundle's manifest (the bundle reads; staging's BUNDLES,
+    // bound since T-566) and the model key (J-02; DL-027): every read fails closed (./real.ts NoSafetyReaderError), so the
+    // actor applies its no-verdict rule.
     safetyReaders: null,
-    // No database is bound until T-567: every commit and park fails closed (./real.ts NoDatabaseError), so no turn row is
-    // written; a turn whose commit is not taken lapses and is parked, and its park is tried again (T-248, T-253).
+    // No database client is handed in yet: every commit and park fails closed (./real.ts NoDatabaseError), so no turn row
+    // is written; a turn whose commit is not taken lapses and is parked, and its park is tried again (T-248, T-253).
     turnRows: null,
-    // No database is bound until T-567 (nor BUNDLES until T-566; T-1154 binds both): every bundle read fails closed
-    // (./real.ts NoDatabaseError), so no turn's bundle is pinned and no turn's work starts, and the gateway's trace names
-    // bundle v0's stand-in (answer.ts).
+    // No database client is handed in yet (staging's BUNDLES is bound since T-566; a part of T-1154 binds the K-05 reads):
+    // every bundle read fails closed (./real.ts NoDatabaseError), so no turn's bundle is pinned and no turn's work starts,
+    // and the gateway's trace names bundle v0's stand-in (answer.ts).
     bundleReads: null,
-    // No database is bound until T-567: every targets read fails closed, so the guard hands no text to the frontier.
+    // No database client is handed in yet: every targets read fails closed, so the guard hands no text to the frontier.
     handleTargets: null,
-    // No database is bound until T-567 (its rosie_job client gives pgFrontierScope): every frontier fails closed inside
+    // No database client is handed in yet (its rosie_job client gives pgFrontierScope): every frontier fails closed inside
     // the Tool API base, before anything is read, so no text reaches decide.
     frontierScope: null,
-    // No decide until the bundle's manifest and flows (T-566's BUNDLES, T-567's database) and the model key (J-02;
-    // smoke-size calls only, DL-027) can be read in the Worker: every decide and re-read fails closed before any model
-    // call (./real.ts NoDeciderError), so no decided part reaches the gate.
+    // The state reads (T-1242): no reader is handed in yet. The part of T-1154 that binds each read hands it in here as
+    // its own field, typed as the seams' table in ./real.ts says, with no other change to this file: until then
+    // each read fails closed (./real.ts NoStateReadError), so no safety read reaches a model and the actor applies its
+    // no-verdict rule, the pin refuses every bundle, and a run of a turn ends noDirectory with nothing read or written.
+    bundleSafety: null,
+    handleDirectory: null,
+    stoppedFlags: null,
+    turnDirectory: null,
+    turnSafety: null,
+    // No decide until a part of T-1154 builds one from the bundle's manifest and flows (the bundle reads; staging's
+    // BUNDLES) and the model key (J-02; smoke-size calls only, DL-027): every decide and re-read fails closed before any
+    // model call (./real.ts NoDeciderError), so no decided part reaches the gate.
     deciders: null,
-    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and the gate's reads): every
-    // gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
+    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and the gate's reads):
+    // every gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
     gateReads: null,
-    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and readOutboxRow): every
+    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and readOutboxRow): every
     // compose input fails closed inside the Tool API base, before anything is read, so no row is composed.
     composeReads: null,
-    // No composer until the bundle's manifest (T-566's BUNDLES, T-567's database) and the model key (J-02; smoke-size
-    // calls only, DL-027) can be read in the Worker: every compose and rewrite fails closed before any model call
+    // No composer until a part of T-1154 builds one from the bundle's manifest (the bundle reads; staging's BUNDLES) and
+    // the model key (J-02; smoke-size calls only, DL-027): every compose and rewrite fails closed before any model call
     // (./real.ts NoComposerError), so no row gets a plan and nothing is sent for it.
     composers: null,
-    // No database is bound until T-567 (its rosie_app and rosie_job clients give pgCallScope and pgRowData's four calls):
-    // every finalize fails closed inside the Tool API base, before anything is read or written, so no row gets its final
-    // parts and nothing is sent for it.
+    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and pgRowData's four
+    // calls): every finalize fails closed inside the Tool API base, before anything is read or written, so no row gets its
+    // final parts and nothing is sent for it.
     finalizeData: null,
-    // No database is bound until T-567 (its rosie_job client gives db/repo/outbox.ts's four v1.2 calls and send-state.ts's
-    // sendState): every claim, mark and send-state read fails closed (./real.ts NoDatabaseError), so the dispatcher claims
-    // nothing and nothing is sent, and a receipt is not marked (answered 503, so Linq sends it again).
+    // No database client is handed in yet (its rosie_job client gives db/repo/outbox.ts's four v1.2 calls and
+    // send-state.ts's sendState): every claim, mark and send-state read fails closed (./real.ts NoDatabaseError), so the
+    // dispatcher claims nothing and nothing is sent, and a receipt is not marked (answered 503, so Linq sends it again).
     outboxCalls: null,
     sendStateCall: null,
+    // The turn's plan calls (T-1242): no database client is handed in yet (a part of T-1154 binds db/repo/outbox.ts's
+    // unplannedRows and writePlan over a rosie_job client, as this field): every call fails closed (./real.ts
+    // NoDatabaseError), so no row of the turn is listed, composed or planned.
+    planCalls: null,
     // No Linq line is handed in yet (T-563): every send fails closed (./real.ts NoLinqLineError) and nothing leaves. On
     // staging the line is the test-phone line's Linq double (./test-phone lineLinqSend over testPhoneLineOf(env
-    // .TEST_PHONE_LINE)), bound with the database by T-567; the real Linq line is J-08's. No row is claimed before then.
+    // .TEST_PHONE_LINE)), which a part of T-1154 binds with the outbox calls; the real Linq line is J-08's. No row is
+    // claimed before then.
     linqSendCall: null,
-    // The RETRY_QUEUE binding where the environment has one (T-279; none on staging until T-566, so each wait there
+    // The RETRY_QUEUE binding where the environment has one (T-279; env.staging has it since T-566; with none, each wait
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
-    // No database is bound until T-567 (its rosie_job client gives db/repo/clocks.ts's armClock and cancelClock): every
+    // No database client is handed in yet (its rosie_job client gives db/repo/clocks.ts's armClock and cancelClock): every
     // arming fails closed (./real.ts NoDatabaseError), so nothing is armed; and no receipt reaches it there yet, since
     // the outbox port marks no part delivered with no database bound (the receipt is answered 503, and Linq sends it
     // again).
     armingCalls: null,
-    // The test-phone page's calls (T-1186) have nothing to read until T-567 binds the database (the session, roster and
-    // phone reads), so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until
-    // its handler is joined. T-567 hands RootOptions.testPhone, with staging's test-phone line as
+    // The test-phone page's calls (T-1186) have nothing to read until a part of T-1154 binds the session, roster and phone
+    // reads, so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until its
+    // handler is joined. That part hands RootOptions.testPhone, with staging's test-phone line as
     // testPhoneLineOf(env.TEST_PHONE_LINE), and the root binds both calls on staging.
     testPhone: null,
   });
@@ -712,8 +807,9 @@ let wired: { readonly root: Root; readonly restore: () => void } | null = null;
 
 /**
  * Wires the Worker's actor ports for this isolate (the root's `install()`), once, on its first request (DL-313 ruling 2):
- * only where the HandleActor namespace is bound, and never at global scope. Where none is bound (the Workers test pool,
- * and staging until T-566) nothing is wired, so the actor keeps its unwired defaults. Answers the root wired, or null.
+ * only where the HandleActor namespace is bound, and never at global scope. env.staging binds it since T-566, and so does
+ * the Workers test pool, which runs env.staging; where none is bound (an env a test builds without it) nothing is wired,
+ * so the actor keeps its unwired defaults. Answers the root wired, or null.
  */
 export function wireWorker(env: Cloudflare.Env & WorkerSecrets): Root | null {
   if (wired !== null) return wired.root;

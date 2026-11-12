@@ -100,6 +100,9 @@ function ask(address: string, method: Method, headers: Record<string, string> = 
   });
 }
 
+/** What a POST to a route that is meant to answer carries: this site's own Origin (shell/post-guard.ts; T-520). */
+const SAME_ORIGIN = { origin: `https://${TEST_LINK_HOST}` };
+
 /** The shell's 404 page for the tests' trace id. */
 const notFoundPage = (basePath: string): string =>
   renderErrorPage({ status: 404, basePath, traceId: TRACE_ID });
@@ -131,10 +134,9 @@ const PRODUCTION_CONFIG = readWebConfig(testVars("production"));
 
 /**
  * Asks every route of the tool with GET, POST and HEAD and holds each answer to "the tool does not exist here": the
- * shell's 404 page, as an unknown address gets it. With the guard alone, a method a route does not take gets the
- * shell's 405 page before any handler (guard.ts, "One limit"). Gives the number of requests it sent.
+ * shell's 404 page, as an unknown address gets it. Gives the number of requests it sent.
  */
-async function expectNoTool(shell: WebShell, basePath: string, tool: Tool, listed: boolean): Promise<number> {
+async function expectNoTool(shell: WebShell, basePath: string, tool: Tool): Promise<number> {
   const unknown = await shell.fetch(ask(`${basePath}/dummy-unknown-address`, "GET"));
   expect(unknown.status).toBe(404);
   let sent = 0;
@@ -143,10 +145,6 @@ async function expectNoTool(shell: WebShell, basePath: string, tool: Tool, liste
       const what = `${method} ${addressOf(basePath, route)}`;
       const response = await shell.fetch(ask(addressOf(basePath, route), method));
       sent += 1;
-      if (listed && !takes(route, method)) {
-        expect(response.status, what).toBe(405);
-        continue;
-      }
       expect(response.status, what).toBe(404);
       expect([...response.headers], what).toEqual([...unknown.headers]);
       expect(await response.text(), what).toBe(method === "HEAD" ? "" : notFoundPage(basePath));
@@ -167,7 +165,7 @@ describe("with ENVIRONMENT=production every staging tool route answers 404 and t
             vars: { ...testVars("staging"), ENVIRONMENT: value, BASE_PATH: basePath },
           });
           expect(config.environment).toBe(value);
-          const sent = await expectNoTool(shell, basePath, tool, !marked);
+          const sent = await expectNoTool(shell, basePath, tool);
           expect(sent).toBe(tool.routes.length * METHODS.length);
           expect(tool.calls()).toBe(0);
           for (const spy of tool.spies.values()) expect(spy).not.toHaveBeenCalled();
@@ -212,7 +210,9 @@ describe("with ENVIRONMENT=staging the routes answer", () => {
         for (const method of METHODS.filter((asked) => takes(route, asked))) {
           const what = `${method} ${addressOf("/test", route)}`;
           spy.mockClear();
-          const response = await shell.fetch(ask(addressOf("/test", route), method));
+          const response = await shell.fetch(
+            ask(addressOf("/test", route), method, method === "POST" ? SAME_ORIGIN : {}),
+          );
           sent += 1;
           expect(response.status, what).toBe(200);
           expect(response.headers.get("x-trace-id"), what).toBe(TRACE_ID);
@@ -259,7 +259,7 @@ describe("with ENVIRONMENT=staging the routes answer", () => {
       },
     ]);
     const { shell } = testShell({ modules: [{ folder: "staging/example", stagingOnly: true, routes }] });
-    const answered = await shell.fetch(ask("/test/staging/own", "POST"));
+    const answered = await shell.fetch(ask("/test/staging/own", "POST", SAME_ORIGIN));
     expect(answered.status).toBe(303);
     expect(answered.headers.get("location")).toBe("/test/staging/next");
     expect(await answered.text()).toBe("made by the tool");

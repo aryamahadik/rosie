@@ -3,10 +3,17 @@
 // It serves web's static pages (web/src/routes.ts PAGE_ROUTES: the privacy notice, with the bytes and headers servePage
 // gives it) and the routes of every feature folder (ROUTE_MODULES; route.ts). For one request:
 //   1. Its trace id: the incoming x-trace-id when it is a valid id, else a new one (trace.ts).
-//   2. The route at its path under BASE_PATH, an exact path before a :name path. A folder marked staging only has no
-//      routes unless ENVIRONMENT is exactly "staging" (build prompt 9.4: never in production).
-//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. Else the route's handler
-//      answers; a throw, or an answer that is no Response, gives the 500 page. Each error page shows the trace id.
+//   2. The route at its path under BASE_PATH, an exact path before a :name path. Staging's test tools exist only when
+//      ENVIRONMENT is exactly "staging" (build prompt 9.4: never in production), decided once, from the config alone
+//      and failing closed (staging/guard isStagingConfig). Anywhere else the table holds no route of a folder marked
+//      staging only, and no route behind the staging-only guard (staging/guard isGuarded), whatever its folder's mark.
+//      So there a tool's address is an unknown address for every method and whatever the request carries, decided
+//      before anything below looks at the request (T-520 round 2; DL-491): no Origin, header or body changes the
+//      answer, none of the body is read and no handler runs.
+//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. A POST that is not from this
+//      site's own origin: the 403 page; one whose body is over the cap: the 413 page (post-guard.ts; T-520), both
+//      before any handler runs. Else the route's handler answers; a throw, or an answer that is no Response, gives
+//      the 500 page. Each error page shows the trace id.
 //   4. HEAD gets GET's answer with no body.
 // Every answer carries the trace id in x-trace-id, and one JSON log line is written for it: the trace id, the route's
 // label and the status, nothing else. A label is fixed letters from the code (route.ts), and the trace id is always a
@@ -17,15 +24,17 @@
 // framework, each page through the frame (frame.ts), with a content security policy that loads nothing but the frame's
 // own style. A page that holds a form says so, and the policy then lets it post to this site only.
 //
-// `fetch` answers every request; `serve` gives null for an address no route takes, so a Worker with routes of its own
-// (runtime/src/index.ts) can keep its own 404 for those.
+// `fetch` answers every request; `serve` gives null for an address no route takes (a tool's address outside staging
+// among them), so a Worker with routes of its own (runtime/src/index.ts) can keep its own 404 for those.
 
 import { envelopeOf } from "../client/calls";
 import { createPageApiClient, type PageApiTransport } from "../client/client";
 import { PAGE_ROUTES, ROUTE_MODULES, type PageRoute } from "../routes";
+import { isGuarded, isStagingConfig } from "../staging/guard";
 import type { WebConfig } from "./config";
 import { renderErrorPage, type ErrorStatus } from "./error-pages";
 import { renderPage } from "./frame";
+import { guardPost, type PostRefusal } from "./post-guard";
 import {
   NOT_FOUND_LABEL,
   routeTable,
@@ -109,10 +118,15 @@ export function createWebShell(deps: ShellDeps): WebShell {
       console.log(line);
     });
   const modules = deps.modules ?? ROUTE_MODULES;
-  // Staging's test tools are listed only on staging: anywhere else their addresses are like any unknown address.
+  // Staging's test tools are in the table only on staging (see the top of this file): anywhere else neither a folder
+  // marked staging only nor a guarded route is listed, so a tool's address is like any unknown address.
+  const staging = isStagingConfig(config);
   const table = routeTable([
     ...(deps.pages ?? PAGE_ROUTES).map(staticRoute),
-    ...modules.filter((module) => config.staging || !module.stagingOnly).flatMap((module) => module.routes),
+    ...modules
+      .filter((module) => staging || !module.stagingOnly)
+      .flatMap((module) => module.routes)
+      .filter((route) => staging || !isGuarded(route)),
   ]);
 
   /** The request's path under BASE_PATH, or null when it is not under it. */
@@ -160,8 +174,22 @@ export function createWebShell(deps: ShellDeps): WebShell {
       refused.headers.set("allow", allowOf(route));
       return finish(request, refused, traceId, route.label);
     }
+    // A POST reaches its handler only from this site's own origin and with a body under the cap (post-guard.ts).
+    let guarded = request;
+    if (request.method === "POST") {
+      let checked: Request | PostRefusal;
+      try {
+        checked = await guardPost(request, config);
+      } catch (error) {
+        deps.onRouteError?.(error);
+        return finish(request, errorPage(500, traceId), traceId, route.label);
+      }
+      if (typeof checked === "number")
+        return finish(request, errorPage(checked, traceId), traceId, route.label);
+      guarded = checked;
+    }
     const context: RouteContext = {
-      request,
+      request: guarded,
       url,
       path,
       params,

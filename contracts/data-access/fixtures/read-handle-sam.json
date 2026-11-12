@@ -1,0 +1,19 @@
+{
+  "call": "readHandle",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "The walking skeleton's turn 1 (ADR-013): once armClock has armed S1-02's clock row, whose handle is handle-sam (its answer's clock.handleId), the clock arming tells that handle's actor (syncClocks), and the receipt sink's directory names the actor from this answer with the gateway's own rule, actorNameOf: phone:+15555550100, the Durable Object the gateway wrote Sam's JOIN to. handle-sam is test owner 1's handle at tp-01's number, as T-1148's db/seeds/skeleton.ts and K-04's seed-person-roles.json hold it. The answer's number names the actor only: it is never logged or put in a span or an entry."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "handle": {
+      "kind": "phone",
+      "address": "+15555550100"
+    }
+  }
+}

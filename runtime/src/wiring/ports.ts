@@ -22,9 +22,10 @@
 //                API base (its K-09 checks, the call's business scope, its span)
 //                and the frontier over K-05 v1.2 readTurnState and the turn's
 //                pinned bundle
-//   stateReads   other reads of stored state: who a handle is, each text's safety  not joined
-//                result, the safety read's bundle lines and stopped flag (the
-//                clock arming's reads are the arming port's since T-564)
+//   stateReads   other reads of stored state: who a handle is, each text's safety  T-1242 on staging,
+//                result, the safety read's bundle lines and stopped flag (the      each read failing
+//                clock arming's reads are the arming port's since T-564)           closed until a part
+//                                                                                  of T-1154 binds it
 //   turnFace     the rest of K-09's turn face (closest entries: meaning search)    no D-017 hop
 //                and the shared core the safety read calls
 //   decide       K-02's two reads and the one Sonnet re-read through @rosie/ai's   T-558
@@ -44,8 +45,8 @@
 //                dispatcher's claim and marks, and the receipt door's mark
 //   sendState    K-05 v1.2 sendState: limit 8's read of the recipient's send       T-562
 //                state at send, and the chat the send goes to
-//   dataAccess   K-05 writes: the turn's plans (the clock arming's writes are the  not joined
-//                arming port's since T-564)
+//   dataAccess   K-05 writes: the turn's plans (the clock arming's writes are the  T-1242 on staging,
+//                arming port's since T-564)                                        as stateReads
 //   linqSend     K-11 sendPart: each part the dispatcher sends, through the Linq   T-563
 //                line (@rosie/adapters' Linq double in a test)
 //   arming       the clock arming at a part's first delivery receipt: K-05 v1      T-564
@@ -129,10 +130,11 @@ export interface TurnRowPort {
 }
 
 /**
- * Reads of stored state not joined yet, by the part that reads them (K-04 rows through K-05). The bundle reads and the
- * guard's targets are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`), the dispatcher's
- * send state since T-562 joined it (`Ports.sendState`), and the clock arming's reads since T-564 joined it
- * (`Ports.arming`).
+ * Reads of stored state, by the part that reads them (K-04 rows through K-05). The bundle reads and the guard's targets
+ * are ports of their own since T-556 joined them (`Ports.bundles`, `Ports.targets`), the dispatcher's send state since
+ * T-562 joined it (`Ports.sendState`), and the clock arming's reads since T-564 joined it (`Ports.arming`). On staging
+ * (T-1242) the port is real: each read over its own RootOptions input (./real.ts realStateReads), failing closed until
+ * the part of T-1154 that binds it hands its reader in; a test binds its fake, production keeps it closed.
  */
 export interface StateReads {
   /** The safety read's: the ids K-09 calls name for a handle, the bundle's checked lines and danger words, the stopped flag. */
@@ -198,8 +200,10 @@ export interface TurnFacePort extends Omit<
 export type FinalizePort = Pick<TurnFace, "finalizeMessage">;
 
 /**
- * K-05 writes not joined yet (the outbox's are a port of their own since T-562 joined them: `Ports.outbox`; the clock
- * arming's since T-564 joined it: `Ports.arming`).
+ * K-05's plan calls (the outbox's are a port of their own since T-562 joined them: `Ports.outbox`; the clock arming's
+ * since T-564 joined it: `Ports.arming`). On staging (T-1242) the port is real, over RootOptions.planCalls (./real.ts
+ * realDataAccess), failing closed until the part of T-1154 that binds them; a test binds its fake, production keeps it
+ * closed.
  */
 export interface DataAccess {
   /** K-05 v1 unplannedRows and writePlan: the turn's rows after its commit (its park is the turn-row port's). */

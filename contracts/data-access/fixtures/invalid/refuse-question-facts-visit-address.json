@@ -1,0 +1,11 @@
+{
+  "openQuestionId": "oq-a7-03-alex",
+  "clockLine": "24 h",
+  "businessZone": "America/New_York",
+  "visit": {
+    "flow": "A",
+    "startsAt": "2026-10-24T15:00:00Z",
+    "address": "1200 Main St, Springfield"
+  },
+  "neverDelivered": null
+}
