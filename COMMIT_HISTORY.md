@@ -2,9 +2,84 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 429, [`54b9c1d`](https://github.com/aryamahadik/rosie/commit/54b9c1d), 2026-11-12 02:47:06 UTC.
+- **Through:** commit 432, [`5245bbf`](https://github.com/aryamahadik/rosie/commit/5245bbf), 2026-11-12 03:12:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 432. docs: COMMIT\_HISTORY.md through commit 429 (54b9c1d, \#437) (\#440)
+
+- **Commit:** [`5245bbf`](https://github.com/aryamahadik/rosie/commit/5245bbf), by Arya Mahadik, 2026-11-12 03:12:10 UTC
+- **Pull request:** [#440](https://github.com/aryamahadik/rosie/pull/440) from `task/commit-history-35`, merged 2026-11-12 03:12:10 UTC. It squashed 1 branch commit:
+  - `b9670f9` docs: COMMIT\_HISTORY.md through commit 429 (54b9c1d, \#437)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 431. T-1258: db/repo's readQuestionFacts and readHandle (K-05 v1.10 items 49 and 50) (\#439)
+
+- **Commit:** [`326861d`](https://github.com/aryamahadik/rosie/commit/326861d), by Arya Mahadik, 2026-11-12 03:12:06 UTC
+- **Pull request:** [#439](https://github.com/aryamahadik/rosie/pull/439) from `task/T-1258`, merged 2026-11-12 03:12:06 UTC. It squashed 3 branch commits:
+  - `fd2bd39` T-1258: db/repo/arming-reads.ts gives K-05 v1.10's readQuestionFacts …
+  - `c0d5305` Merge branch 'main' into task/T-1258
+  - `32ac32e` T-1258: readQuestionFacts reads the question first with no role check…
+- **Files changed:** 2 (+1949 −0), by folder:
+  - `db/repo/` arming-reads.int.test.ts +1676 −0, arming-reads.ts +273 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1258: db/repo/arming-reads.ts gives K-05 v1.10's readQuestionFacts and readHandle (items 49 and 50), each one read-only transaction as rosie_job naming the question's own business, with integration tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1258: readQuestionFacts reads the question first with no role check (BusinessScopeError gone); a question with no business answers businessZone and visit null whatever its booking_id holds; BrokenRecordError kept for a missing business row and a booking of another business, both tested (round 2, DL-510)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 430. T-1243: the handle actor wires its own isolate before its first call (\#438)
+
+- **Commit:** [`abb99bb`](https://github.com/aryamahadik/rosie/commit/abb99bb), by Arya Mahadik, 2026-11-12 03:12:02 UTC
+- **Pull request:** [#438](https://github.com/aryamahadik/rosie/pull/438) from `task/T-1243`, merged 2026-11-12 03:12:02 UTC. It squashed 3 branch commits:
+  - `0a8d628` T-1243: the HandleActor wires its own isolate before its first call (…
+  - `7b99792` Merge branch 'main' into task/T-1243
+  - `c4cc53b` T-1243: the Workers test projects hold a HandleActor's own wiring (ru…
+- **Files changed:** 5 (+295 −7), by folder:
+  - `runtime/src/` index.ts +12 −2
+  - `runtime/src/wiring/` actor-wiring.worker.test.ts +226 −0, root.ts +37 −5
+  - `runtime/test/` hold-actor-wiring.ts +16 −0
+  - `/` vitest.config.ts +4 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1243: the HandleActor wires its own isolate before its first call (wireWorker caller actor), with a hold a test pool can set; work in progress: green only once the Workers test projects' setup holds an actor's own wiring (NEED)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1243: the Workers test projects hold a HandleActor's own wiring (runtime/test/hold-actor-wiring.ts, one setupFiles entry in workers and e2e-workers; DL-509), so every existing test runs as before and actor-wiring.worker.test.ts lifts the hold to prove a deployed Worker
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 429. docs: COMMIT\_HISTORY.md through commit 427 (0292eaa, \#435) (\#437)
 
