@@ -11,6 +11,7 @@ import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit-6-reread-first.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
@@ -30,7 +31,7 @@ import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorR
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../guard/replies/test-support";
-import { fakeTargets } from "../guard/test-support";
+import { fakeTargets, type FakeTargets } from "../guard/test-support";
 import { harness, type Harness } from "../safety/test-support";
 import type { SafetyResult } from "../safety/types";
 import { spanProblems } from "../trace";
@@ -50,6 +51,7 @@ import {
   turnDeps,
   until,
   type FakeDecide,
+  type FakeFacts,
   type FakeTurnFace,
 } from "./test-support";
 import type { BuildFrontierRequest, DecideContext, GateAndCommitRequest, TurnParty } from "./types";
@@ -111,6 +113,10 @@ interface Run {
   h: Harness;
   face: FakeTurnFace;
   ai: FakeDecide;
+  /** The turn's own facts: the safety results its port answers (the read on arrival answers from `h`). */
+  facts: FakeFacts;
+  /** K-05 v1.2 handleTargets for the guard. */
+  targets: FakeTargets;
   /** The fake clock moves, then the alarm runs, as the platform would at the stored time. */
   tick(ms: number): Promise<void>;
   /** Settles the safety work, the batch work and the turns' work. */
@@ -143,6 +149,8 @@ async function withTurnLoop(
     h,
     face,
     ai,
+    facts,
+    targets,
     actor: actorOf(who),
     async tick(ms) {
       await h.clock.advance(ms);
@@ -410,6 +418,205 @@ describe("the turn loop as the lease's turn", () => {
         expect(run.ai.decideCalls).toEqual([]);
         expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
         expect(await run.actor.readTurns()).toMatchObject([{ turnId, state: "committed" }]);
+      },
+    );
+  });
+});
+
+describe("a STOP through the lease never waits for a missing result or the decided part (ADR-015 card C; DL-508)", () => {
+  const SAM_PHONE = "+15555550100";
+
+  /**
+   * The S1-02 answers under the running turn's id, with T-267's shared-core double over Sam's phone behind the gate (each
+   * commit's keyword actions, after the records), and the replies committing through the turn.
+   */
+  function gateOverSamCore(run: Run): { core: ReturnType<typeof fakeReplyCore>; restore: () => void } {
+    answerS102(run);
+    const core = fakeReplyCore(commitS102.request.now, [phone(SAM_PHONE, "handle-sam", "person-sam", 3)]);
+    run.face.gate = async (request: GateAndCommitRequest) => {
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      const outcome = forTurn(commitS102.outcome, S1_02, request.turn.id);
+      return {
+        ...outcome,
+        parts: request.input.kind === "decided" ? outcome.parts : [],
+        core: [...records.map(() => outcome.core[0]), ...answer.core],
+      } as never;
+    };
+    const restore = setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER });
+    return { core, restore };
+  }
+
+  /** A request's core actions, in order: each text's record by its event id, a STOP's record by its kind and event. */
+  const coreOf = (request: GateAndCommitRequest | undefined): string[][] =>
+    (request?.core ?? []).map((action) => {
+      const body = action.request as { safety?: { eventId: string }; kind?: string; inboundEventId?: string };
+      return action.call === "recordSafetyOutcome"
+        ? [action.call, body.safety?.eventId ?? ""]
+        : [action.call, body.kind ?? "", body.inboundEventId ?? ""];
+    });
+
+  /**
+   * The texts arrive, their batch goes to the lease, the turn makes its `gateCalls` gate calls (one unless given) and
+   * commits, and its lease's 60 s lapse then passes.
+   */
+  async function arriveAndRun(run: Run, texts: [string, string, string][], gateCalls = 1): Promise<void> {
+    for (const [eventId, body, sentAt] of texts) await arrive(SAM, eventId, body, sentAt);
+    await run.settle();
+    await run.tick(3000);
+    await run.settle();
+    await until(() => run.face.gateCalls.length >= gateCalls, "the turn's commit");
+    await run.settle();
+    await run.tick(61_000);
+    await run.settle();
+  }
+
+  it("a decided text, a text whose result the turn cannot read and a STOP, one batch, commit on the turn's first run with the decided input: no rerun at the lapse, no park", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0002", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        // The read on arrival read every text, but the turn is given no result for the second (ADR-015 section 3).
+        run.facts.safety.delete("evt-sam-0002");
+        const { core, restore } = gateOverSamCore(run);
+        try {
+          await arriveAndRun(run, [
+            ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+            ["evt-sam-0002", "and lawn care", "2026-10-19T14:05:01Z"],
+            ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+          ]);
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.face.gateCalls).toHaveLength(1);
+        const request = run.face.gateCalls[0]?.request;
+        expect(request?.turn.id).toBe(turnId);
+        expect(request?.input).toEqual(forTurn(commitS102.request.input, S1_02, turnId));
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  it("every result present: a decided text and a STOP whose targets read fails commit the STOP core-only on the turn's first run: no rerun at the lapse, no park", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [commitS102.request.now],
+      async (run) => {
+        run.targets.answers.set(SAM.party.handleId, { error: "transient", sqlstate: "40001" });
+        const { core, restore } = gateOverSamCore(run);
+        try {
+          await arriveAndRun(run, [
+            ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+            ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+          ]);
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.face.frontierCalls).toEqual([]);
+        expect(run.ai.decideCalls).toEqual([]);
+        expect(run.face.gateCalls).toHaveLength(1);
+        const request = run.face.gateCalls[0]?.request;
+        expect(request?.input).toEqual({ kind: "coreOnly" });
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  it("every result present: a decided text and a STOP whose decided request the gate refuses on its tries commit the STOP core-only on the turn's first run: no rerun at the lapse, no park (DL-521)", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        const { core, restore } = gateOverSamCore(run);
+        // Limit 6 refuses the decided request before the re-read (commit-limit-6-reread-first.json's refusal), and the
+        // one re-read cannot run (the decide double's re-read answers the models down), so there is no second try.
+        const commit = run.face.gate;
+        run.face.gate = (request, index) => {
+          if (request.input.kind === "decided") return structuredClone(commitLimit6First.outcome);
+          return commit === null ? { error: "unwired" } : commit(request, index);
+        };
+        try {
+          await arriveAndRun(
+            run,
+            [
+              ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+              ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+            ],
+            2,
+          );
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.ai.decideCalls).toHaveLength(1);
+        expect(run.ai.rereadCalls).toHaveLength(1);
+        expect(run.face.gateCalls.map((call) => call.request.input.kind)).toEqual(["decided", "coreOnly"]);
+        const request = run.face.gateCalls[1]?.request;
+        expect(request?.turn.id).toBe(turnId);
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
       },
     );
   });
