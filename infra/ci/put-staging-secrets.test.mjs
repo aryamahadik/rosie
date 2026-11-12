@@ -6,6 +6,8 @@
 // they are, and a value is seen exactly where wrangler would get it. HOME and TMPDIR are folders of the test's own, and
 // no run gets this shell's values of the names (script-harness.mjs). Every value is made up, and built at run time, so
 // no key-shaped text sits in this file: none is a key of anything, and no address in it is anyone's (rule 9).
+// Since T-1261 (DL-549) the script never puts staging's own names, whatever .dev.vars holds for them, and it switches
+// keyword off as well as tracing and allexport; the cases below hold it to both.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
@@ -33,8 +35,11 @@ const NAMES = [
   "STAGING_TEST_INBOXES",
 ];
 // Staging's own names: make-staging-secrets.sh makes them in place, and staging holds the first two since T-1236's
-// live run (DL-518), never to be replaced (DL-495). So the build Mac's .dev.vars has no line for them.
+// live run (DL-518), never to be replaced (DL-495). So the build Mac's .dev.vars has no line for them, and the script
+// never puts one, even when .dev.vars has a value for it (DL-549; T-1261).
 const OWN = ["SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"];
+// The names the script puts from .dev.vars, in its order: every name but staging's own.
+const PUT = NAMES.filter((name) => !OWN.includes(name));
 // The values of the checkout's .dev.vars: a model key, 32 bytes as base64 and a whsec_ secret, in the forms the code
 // reads them in (db/repo/sealing.ts WrappingKeys.resolve; runtime/src/wiring/real.ts LinqVerifyInputs). The 32 bytes
 // are picked so their base64 holds every sign base64 has: forty "+", then "//8=". Then the proof-code hash key (32
@@ -63,8 +68,15 @@ const SHELL_VALUES = {
 // Lines of other names in the same .dev.vars: the script reads none of them.
 const OTHER_VALUES = ["t568-made-up-email-key-55aa90c3", "t568-made-up-other-value-91c2e07d"];
 const EVERY_VALUE = [...Object.values(VALUES), ...Object.values(SHELL_VALUES), ...OTHER_VALUES];
+// The made-up texts a caller's variables hold in the cases of T-568 and T-1261 (each with its name after a comma).
+const CALLER_TEXTS = ["t568 made-up caller text", "t1261 made-up caller text"];
 
-/** A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single quotes, among other lines. */
+/**
+ * A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single quotes, among other lines.
+ * Each form holds a name the script puts, so the byte-for-byte case proves each on a value put: ANTHROPIC_API_KEY
+ * plain, STAGING_TEST_INBOXES double-quoted, RESEND_API_KEY exported. LINQ_WEBHOOK_SECRET's exported line is one of
+ * staging's own, never read (DL-549).
+ */
 const devVars = (values = VALUES) =>
   [
     "# made-up values for T-568's and T-1276's tests",
@@ -75,7 +87,7 @@ const devVars = (values = VALUES) =>
       ? [`  export LINQ_WEBHOOK_SECRET='${values.LINQ_WEBHOOK_SECRET}'`]
       : []),
     ...("PROOF_CODE_HASH_KEY" in values ? [`PROOF_CODE_HASH_KEY=${values.PROOF_CODE_HASH_KEY}`] : []),
-    ...("RESEND_API_KEY" in values ? [`RESEND_API_KEY=${values.RESEND_API_KEY}`] : []),
+    ...("RESEND_API_KEY" in values ? [`  export RESEND_API_KEY='${values.RESEND_API_KEY}'`] : []),
     ...("STAGING_TEST_INBOXES" in values ? [`STAGING_TEST_INBOXES="${values.STAGING_TEST_INBOXES}"`] : []),
     `OTHER_NAME="${OTHER_VALUES[1]}"`,
     "",
@@ -86,9 +98,10 @@ const valuesOf = (names) => Object.fromEntries(names.map((name) => [name, VALUES
 
 // The stand-in for wrangler (CommonJS). argv: wrangler's arguments, as cf.sh hands them on. It records one JSON line in
 // $FAKE_LOG: its arguments, all of its standard input, its folder, the names (never the values) of its environment's
-// variables, the names of those whose value holds what came on standard input, and three settings cf.sh and the script
-// make. Then it repeats its standard input on both streams, as a wrangler that showed a secret would, and fails for the
-// name FAKE_FAIL_AT gives.
+// variables, the names of those whose value holds what came on standard input, and of those whose value holds any text
+// $FAKE_WATCH lists (every made-up value and caller's text above), and three settings cf.sh and the script make. Then
+// it repeats its standard input on both streams, as a wrangler that showed a secret would, and fails for the name
+// FAKE_FAIL_AT gives.
 const FAKE_WRANGLER = String.raw`"use strict";
 const fs = require("node:fs");
 const args = process.argv.slice(2);
@@ -104,7 +117,9 @@ for (const key of ["XDG_CONFIG_HOME", "CLOUDFLARE_ACCOUNT_ID", "WRANGLER_LOG_SAN
 }
 const envNames = Object.keys(process.env);
 const envHoldingStdin = stdin === "" ? [] : envNames.filter((key) => process.env[key].includes(stdin));
-const entry = { tool: "wrangler", args, stdin, cwd: process.cwd(), envNames, envHoldingStdin, env };
+const watched = JSON.parse(fs.readFileSync(process.env.FAKE_WATCH, "utf8"));
+const envHoldingValue = envNames.filter((key) => watched.some((text) => process.env[key].includes(text)));
+const entry = { tool: "wrangler", args, stdin, cwd: process.cwd(), envNames, envHoldingStdin, envHoldingValue, env };
 fs.appendFileSync(process.env.FAKE_LOG, JSON.stringify(entry) + "\n");
 process.stdout.write("fake wrangler: was given " + stdin + "\n");
 process.stderr.write("fake wrangler: was given " + stdin + "\n");
@@ -142,13 +157,17 @@ function checkout(t, { devVars: text, mode, files = {} } = {}) {
   const tmp = path.join(dir, "tmp");
   mkdirSync(tmp);
   const log = path.join(dir, "calls.ndjson");
+  // The stand-in's list of watched texts, in a folder of its own: no file of the checkout holds a value but .dev.vars
+  // and the stand-in's record of its standard input.
+  const watch = path.join(tempDir(t, "secrets-watch"), "watched.json");
+  write(watch, JSON.stringify([...EVERY_VALUE, ...CALLER_TEXTS]));
   /** Runs the script; `bash` holds options for bash itself (-x). This shell's values of the names never reach it. */
   const run = (args = [], extra = {}, { bash = [] } = {}) => {
     const unset = Object.fromEntries(NAMES.map((name) => [name, undefined]));
     const result = spawnSync("bash", [...bash, script, ...args], {
       cwd: root,
       encoding: "utf8",
-      env: cleanEnv(home, { FAKE_LOG: log, TMPDIR: tmp, ...unset, ...extra }),
+      env: cleanEnv(home, { FAKE_LOG: log, FAKE_WATCH: watch, TMPDIR: tmp, ...unset, ...extra }),
     });
     return { ...result, output: `${result.stdout}${result.stderr}` };
   };
@@ -202,13 +221,17 @@ function filesHolding(dir, values, except) {
   return held;
 }
 
-const ALL_SET = NAMES.map((name) => `${name} set\n`).join("");
+/** Standard output's line for one of staging's own: never put (DL-549). */
+const MADE_HERE = (name) => `${name} made in place, never put\n`;
+/** Standard output of a run that put every name it puts: each with set, and staging's own made in place, never put. */
+const ALL_SET = NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} set\n`)).join("");
 /** Standard error's one line when `missing` of the names had no value. */
 const missingNote = (missing) =>
   `put-staging-secrets.sh: no value in .dev.vars for ${String(missing)} of the ${String(NAMES.length)} names, each printed as missing: nothing was put for a missing name. Add each as NAME=value, then run it again.\n`;
 
 describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value through cf.sh", () => {
-  it("each value reaches wrangler on standard input only, and the output is only the names with set", (t) => {
+  it("each value reaches wrangler on standard input only, and the output is only the names with set, staging's own with made in place, never put", (t) => {
+    // .dev.vars has a value for every name, staging's own included: those are never put (DL-549).
     const rig = checkout(t, { devVars: devVars() });
     const result = rig.run();
     assert.equal(result.status, 0, result.output);
@@ -217,9 +240,9 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
     const calls = rig.calls();
     assert.deepEqual(
       calls.map((call) => call.args),
-      NAMES.map((name) => putArgs(rig, name)),
+      PUT.map((name) => putArgs(rig, name)),
     );
-    for (const [index, name] of NAMES.entries()) {
+    for (const [index, name] of PUT.entries()) {
       const call = calls[index];
       assert.equal(call.stdin, VALUES[name], `${name}: standard input is its value, byte for byte`);
       assert.equal(call.cwd, rig.root);
@@ -244,7 +267,7 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
       assert.equal(result.stderr, "");
       assert.deepEqual(
         rig.calls().map((call) => call.stdin),
-        NAMES.map((name) => VALUES[name]),
+        PUT.map((name) => VALUES[name]),
       );
     }
   });
@@ -258,36 +281,39 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
     const calls = rig.calls();
     assert.deepEqual(
       calls.map((call) => call.stdin),
-      NAMES.map((name) => VALUES[name]),
+      PUT.map((name) => VALUES[name]),
     );
-    for (const [index, name] of NAMES.entries()) {
+    for (const [index, name] of PUT.entries()) {
       assertOnlyOnStdin(calls[index], name);
       assert.equal(calls[index].env.WRANGLER_LOG_SANITIZE, "true", name);
     }
   });
 
   it("a name with no value is reported missing and nothing is put for it, never an empty secret (exit 3)", (t) => {
-    const value = VALUES.SEALING_WRAP_KEY;
+    // A name the script puts, with names put before and after it: staging's own (SEALING_WRAP_KEY here before T-1261)
+    // are never read, so never missing (DL-549).
+    const value = VALUES.RESEND_API_KEY;
     const lines = [
       null,
-      "SEALING_WRAP_KEY=",
-      'SEALING_WRAP_KEY=""',
-      "SEALING_WRAP_KEY=''",
-      "SEALING_WRAP_KEY=   ",
-      `# SEALING_WRAP_KEY=${value}`,
-      `SEALING_WRAP_KEY_OLD=${value}`,
+      "RESEND_API_KEY=",
+      'RESEND_API_KEY=""',
+      "RESEND_API_KEY=''",
+      "RESEND_API_KEY=   ",
+      `# RESEND_API_KEY=${value}`,
+      `RESEND_API_KEY_OLD=${value}`,
     ];
-    // Every other name has its value.
-    const put = NAMES.filter((name) => name !== "SEALING_WRAP_KEY");
+    // Every other name has its value, staging's own included.
+    const given = NAMES.filter((name) => name !== "RESEND_API_KEY");
+    const put = PUT.filter((name) => name !== "RESEND_API_KEY");
     for (const line of lines) {
       const what = line === null ? "no line" : line.replace(value, "<value>");
-      const rig = checkout(t, { devVars: `${devVars(valuesOf(put))}${line ?? ""}\n` });
+      const rig = checkout(t, { devVars: `${devVars(valuesOf(given))}${line ?? ""}\n` });
       // A value of that name in the caller's shell does not stand in for the missing one.
-      const result = rig.run([], { SEALING_WRAP_KEY: SHELL_VALUES.SEALING_WRAP_KEY });
+      const result = rig.run([], { RESEND_API_KEY: SHELL_VALUES.RESEND_API_KEY });
       assert.equal(result.status, 3, `${what}: ${result.output}`);
       assert.equal(
         result.stdout,
-        "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY missing\nLINQ_WEBHOOK_SECRET set\nPROOF_CODE_HASH_KEY set\nRESEND_API_KEY set\nSTAGING_TEST_INBOXES set\n",
+        "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY missing\nSTAGING_TEST_INBOXES set\n",
         what,
       );
       assert.equal(
@@ -311,27 +337,31 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
     }
   });
 
-  it("with no .dev.vars every name is missing and wrangler never starts, whatever the caller's shell holds", (t) => {
+  it("with no .dev.vars every name it puts is missing, staging's own are made in place, never put, and wrangler never starts, whatever the caller's shell holds", (t) => {
     const rig = checkout(t);
-    const result = rig.run([], SHELL_VALUES);
-    assert.equal(result.status, 3, result.output);
-    assert.equal(result.stdout, NAMES.map((name) => `${name} missing\n`).join(""));
-    assert.equal(result.stderr, missingNote(NAMES.length));
-    assert.deepEqual(rig.calls(), []);
-    assertNoValueShown(result, "no .dev.vars");
-  });
-
-  it("the build Mac's .dev.vars for ADR-016's live run: the model key, Resend's key and the inbox list are set, and staging's own three are missing with nothing put for them, so the keys staging holds are left as they are (exit 3)", (t) => {
-    const given = NAMES.filter((name) => !OWN.includes(name));
-    const rig = checkout(t, { devVars: devVars(valuesOf(given)) });
-    // Another tool's values of every name in the caller's shell change nothing: staging's own are still never put.
     const result = rig.run([], SHELL_VALUES);
     assert.equal(result.status, 3, result.output);
     assert.equal(
       result.stdout,
-      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY missing\nLINQ_WEBHOOK_SECRET missing\nPROOF_CODE_HASH_KEY missing\nRESEND_API_KEY set\nSTAGING_TEST_INBOXES set\n",
+      NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} missing\n`)).join(""),
     );
-    assert.equal(result.stderr, missingNote(OWN.length));
+    // The closing note counts only the names it puts: it never asks for a line for one of staging's own (DL-549).
+    assert.equal(result.stderr, missingNote(PUT.length));
+    assert.deepEqual(rig.calls(), []);
+    assertNoValueShown(result, "no .dev.vars");
+  });
+
+  it("the build Mac's .dev.vars for ADR-016's live run: the model key, Resend's key and the inbox list are set, and staging's own three are made in place, never put, so the keys staging holds are left as they are (exit 0)", (t) => {
+    const given = NAMES.filter((name) => !OWN.includes(name));
+    const rig = checkout(t, { devVars: devVars(valuesOf(given)) });
+    // Another tool's values of every name in the caller's shell change nothing: staging's own are still never put.
+    const result = rig.run([], SHELL_VALUES);
+    assert.equal(result.status, 0, result.output);
+    assert.equal(
+      result.stdout,
+      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY set\nSTAGING_TEST_INBOXES set\n",
+    );
+    assert.equal(result.stderr, "");
     const calls = rig.calls();
     assert.deepEqual(
       calls.map((call) => call.args),
@@ -352,6 +382,116 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
     // The output holds names and set or missing, never a value or an address.
     assertNoValueShown(result, "the live run's .dev.vars");
     assert.equal(result.output.includes("@"), false, "an address is shown");
+  });
+});
+
+describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes in place (DL-549; T-1261)", () => {
+  // Lines for staging's own that are not a plain NAME=value: a comment after the value, a space in it, a quote left
+  // open. For a name it puts the script refuses such a line (the refusal cases below); for these it never takes the
+  // value, so they refuse nothing.
+  const FAULTY_OWN_LINES = [
+    `SEALING_WRAP_KEY="${VALUES.SEALING_WRAP_KEY}" # staging's key`,
+    `LINQ_WEBHOOK_SECRET=${VALUES.LINQ_WEBHOOK_SECRET.slice(0, 12)} ${VALUES.LINQ_WEBHOOK_SECRET.slice(12)}`,
+    `PROOF_CODE_HASH_KEY='${VALUES.PROOF_CODE_HASH_KEY}`,
+  ];
+  // Every text of staging's own a run could hand on: the .dev.vars values, the caller's, and the parts of the split one.
+  const OWN_TEXTS = [
+    ...OWN.map((name) => VALUES[name]),
+    ...OWN.map((name) => SHELL_VALUES[name]),
+    VALUES.LINQ_WEBHOOK_SECRET.slice(12),
+  ];
+
+  it("a value in .dev.vars for each of staging's own is never put, taken or shown, whatever form its line takes and whatever the caller's shell holds (exit 0)", (t) => {
+    for (const [what, text] of [
+      ["the build Mac's forms: quoted, exported, plain", devVars()],
+      ["lines that are not a plain NAME=value", `${FAULTY_OWN_LINES.join("\n")}\n${devVars(valuesOf(PUT))}`],
+    ]) {
+      const rig = checkout(t, { devVars: text });
+      const result = rig.run([], SHELL_VALUES);
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.equal(result.stdout, ALL_SET, what);
+      assert.equal(result.stderr, "", what);
+      const calls = rig.calls();
+      assert.deepEqual(
+        calls.map((call) => call.args),
+        PUT.map((name) => putArgs(rig, name)),
+        what,
+      );
+      assert.deepEqual(
+        calls.filter((call) => OWN.some((name) => call.args.includes(name))),
+        [],
+        `${what}: a put of staging's own name`,
+      );
+      assert.deepEqual(
+        calls.map((call) => call.stdin),
+        PUT.map((name) => VALUES[name]),
+        what,
+      );
+      for (const call of calls) {
+        assertOnlyOnStdin(call, what);
+        assert.equal(
+          OWN_TEXTS.some((own) => call.stdin.includes(own)),
+          false,
+          `${what}: a value of staging's own on standard input`,
+        );
+        assert.deepEqual(
+          call.envHoldingValue,
+          [],
+          `${what}: a variable of wrangler's environment holds a value`,
+        );
+      }
+      assertNoValueShown(result, what);
+      assert.equal(
+        OWN_TEXTS.some((own) => result.output.includes(own)),
+        false,
+        `${what}: a part of a value of staging's own is shown`,
+      );
+      // No file holds a value of staging's own but the .dev.vars it is in: not even the stand-in's record.
+      assert.deepEqual(filesHolding(rig.dir, OWN_TEXTS, [rig.devVarsFile]), [], what);
+    }
+  });
+
+  it("a .dev.vars with values for staging's own alone: every name it puts is missing, the note asks for those alone, and wrangler never starts (exit 3)", (t) => {
+    const rig = checkout(t, { devVars: devVars(valuesOf(OWN)) });
+    const result = rig.run();
+    assert.equal(result.status, 3, result.output);
+    assert.equal(
+      result.stdout,
+      NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} missing\n`)).join(""),
+    );
+    // "Add each as NAME=value" is said of the names printed as missing, never of staging's own.
+    assert.equal(result.stderr, missingNote(PUT.length));
+    assert.deepEqual(rig.calls(), []);
+    assertNoValueShown(result, "staging's own alone");
+  });
+
+  it("the names it never puts are make-staging-secrets.sh's MADE list, each on its own list (SECRETS)", (t) => {
+    const block = /^MADE=\(\n([\s\S]*?)\n\)$/m.exec(
+      readFileSync(path.join(SCRIPTS, "make-staging-secrets.sh"), "utf8"),
+    );
+    assert.ok(block, "make-staging-secrets.sh no longer holds: MADE=( ... )");
+    const made = block[1]
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line !== "" && !line.startsWith("#"));
+    // The script's own word, from a run with no .dev.vars: each name with missing, or made in place, never put.
+    const result = checkout(t).run();
+    assert.equal(result.status, 3, result.output);
+    const never = Array.from(
+      result.stdout.matchAll(/^(\S+) made in place, never put$/gm),
+      ([, name]) => name,
+    );
+    assert.deepEqual(
+      [...never].sort(),
+      [...made].sort(),
+      "a name make-staging-secrets.sh makes that put-staging-secrets.sh would put, or the other way round",
+    );
+    assert.deepEqual([...OWN].sort(), [...made].sort(), "this file's OWN");
+    assert.deepEqual(
+      made.filter((name) => !NAMES.includes(name)),
+      [],
+      "a name make-staging-secrets.sh makes that is not on put-staging-secrets.sh's list",
+    );
   });
 });
 
@@ -459,28 +599,37 @@ describe("put-staging-secrets.sh refuses", () => {
   });
 
   it("a value that holds a space, a quote or a #, before any put: its name is given, never the value", (t) => {
-    const key = VALUES.SEALING_WRAP_KEY;
-    const secret = VALUES.LINQ_WEBHOOK_SECRET;
+    // The faulty forms of T-568's cases, each on a name the script puts: staging's own, which they were on before
+    // T-1261, are never read (DL-549), and each case's .dev.vars starts with their lines in those same forms, which
+    // are never named.
+    const model = VALUES.ANTHROPIC_API_KEY;
     const resend = VALUES.RESEND_API_KEY;
     const [first, second] = VALUES.STAGING_TEST_INBOXES.split(",");
+    const key = VALUES.SEALING_WRAP_KEY;
+    const secret = VALUES.LINQ_WEBHOOK_SECRET;
+    const own = [
+      `SEALING_WRAP_KEY="${key}" # staging's key`,
+      `LINQ_WEBHOOK_SECRET=${secret.slice(0, 12)} ${secret.slice(12)}`,
+      `PROOF_CODE_HASH_KEY='${VALUES.PROOF_CODE_HASH_KEY}`,
+    ];
     // [the lines of some of the names, the names refused]
     const cases = [
-      [[`SEALING_WRAP_KEY="${key}" # staging's key`, `LINQ_WEBHOOK_SECRET=${secret}`], "SEALING_WRAP_KEY"],
-      [[`SEALING_WRAP_KEY=${key} # staging's key`, `LINQ_WEBHOOK_SECRET=${secret}`], "SEALING_WRAP_KEY"],
-      [[`SEALING_WRAP_KEY="${key}`, `LINQ_WEBHOOK_SECRET=${secret}`], "SEALING_WRAP_KEY"],
+      [[`ANTHROPIC_API_KEY="${model}" # the model key`, `RESEND_API_KEY=${resend}`], "ANTHROPIC_API_KEY"],
+      [[`ANTHROPIC_API_KEY=${model} # the model key`, `RESEND_API_KEY=${resend}`], "ANTHROPIC_API_KEY"],
+      [[`ANTHROPIC_API_KEY="${model}`, `RESEND_API_KEY=${resend}`], "ANTHROPIC_API_KEY"],
       [
-        [`SEALING_WRAP_KEY=${key}`, `LINQ_WEBHOOK_SECRET=${secret.slice(0, 12)} ${secret.slice(12)}`],
-        "LINQ_WEBHOOK_SECRET",
+        [`ANTHROPIC_API_KEY=${model}`, `RESEND_API_KEY=${resend.slice(0, 12)} ${resend.slice(12)}`],
+        "RESEND_API_KEY",
       ],
       [
-        [`SEALING_WRAP_KEY='${key}' # a comment`, `LINQ_WEBHOOK_SECRET=${secret}#1`],
-        "SEALING_WRAP_KEY, LINQ_WEBHOOK_SECRET",
+        [`ANTHROPIC_API_KEY='${model}' # a comment`, `RESEND_API_KEY=${resend}#1`],
+        "ANTHROPIC_API_KEY, RESEND_API_KEY",
       ],
       // The inbox list with a space after its comma: its addresses are joined by a comma alone.
       [
         [
-          `SEALING_WRAP_KEY=${key}`,
-          `LINQ_WEBHOOK_SECRET=${secret}`,
+          `ANTHROPIC_API_KEY=${model}`,
+          `RESEND_API_KEY=${resend}`,
           `STAGING_TEST_INBOXES=${first}, ${second}`,
         ],
         "STAGING_TEST_INBOXES",
@@ -493,13 +642,12 @@ describe("put-staging-secrets.sh refuses", () => {
     for (const [lines, names] of cases) {
       const shown = lines
         .join(" | ")
-        .replace(key, "<key>")
-        .replace(secret, "<secret>")
+        .replace(model, "<model>")
         .replace(resend, "<resend>")
         .replace(first, "<address>")
         .replace(second, "<address>");
       const what = `${names}: ${shown}`;
-      const text = `ANTHROPIC_API_KEY=${VALUES.ANTHROPIC_API_KEY}\n${lines.join("\n")}\n`;
+      const text = `${own.join("\n")}\n${lines.join("\n")}\n`;
       const rig = checkout(t, { devVars: text });
       const result = rig.run();
       assert.equal(result.status, 1, `${what}: ${result.output}`);
@@ -511,7 +659,8 @@ describe("put-staging-secrets.sh refuses", () => {
       assert.equal(result.stdout, "", what);
       assert.deepEqual(rig.calls(), [], `${what}: wrangler must not start`);
       assertNoValueShown(result, what);
-      assert.equal(result.output.includes(secret.slice(12)), false, `${what}: a part of the value`);
+      assert.equal(result.output.includes(resend.slice(12)), false, `${what}: a part of the value`);
+      assert.equal(result.output.includes(secret.slice(12)), false, `${what}: a part of staging's own value`);
       assert.equal(result.output.includes("@"), false, `${what}: a part of an address`);
     }
   });
@@ -520,19 +669,23 @@ describe("put-staging-secrets.sh refuses", () => {
 describe("put-staging-secrets.sh when a put fails", () => {
   it("stops there: the names before it stay set, the ones after it are not put, and the value is taken out of wrangler's words", (t) => {
     const rig = checkout(t, { devVars: devVars() });
-    const result = rig.run([], { FAKE_FAIL_AT: "SEALING_WRAP_KEY" });
+    // A name it puts, after the model key and staging's own (SEALING_WRAP_KEY here before T-1261, never put now).
+    const result = rig.run([], { FAKE_FAIL_AT: "RESEND_API_KEY" });
     assert.equal(result.status, 1, result.output);
-    assert.equal(result.stdout, "ANTHROPIC_API_KEY set\n");
+    assert.equal(
+      result.stdout,
+      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\n",
+    );
     // Both streams of wrangler, each with the value it repeated taken out, then the script's own line.
     assert.match(result.stderr, /^fake wrangler: was given \[value not shown\]$/m);
-    assert.match(result.stderr, /^fake wrangler: secret put SEALING_WRAP_KEY failed$/m);
+    assert.match(result.stderr, /^fake wrangler: secret put RESEND_API_KEY failed$/m);
     assert.match(
       result.stderr,
-      /^put-staging-secrets\.sh: wrangler secret put SEALING_WRAP_KEY --env staging failed \(exit 1, for the reason above\): SEALING_WRAP_KEY was not put, and no name after it was tried; the names printed as set stay set\. Once the cause is fixed, run it again\.$/m,
+      /^put-staging-secrets\.sh: wrangler secret put RESEND_API_KEY --env staging failed \(exit 1, for the reason above\): RESEND_API_KEY was not put, and no name after it was tried; the names printed as set stay set\. Once the cause is fixed, run it again\.$/m,
     );
     assert.deepEqual(
       rig.calls().map((call) => call.args),
-      [putArgs(rig, "ANTHROPIC_API_KEY"), putArgs(rig, "SEALING_WRAP_KEY")],
+      [putArgs(rig, "ANTHROPIC_API_KEY"), putArgs(rig, "RESEND_API_KEY")],
     );
     assertNoValueShown(result, "a failed put");
   });
@@ -568,7 +721,7 @@ describe("put-staging-secrets.sh never traces and writes no file", () => {
       assertNoValueShown(result, what);
       assert.deepEqual(
         rig.calls().map((call) => call.stdin),
-        NAMES.map((name) => VALUES[name]),
+        PUT.map((name) => VALUES[name]),
         what,
       );
     }
@@ -635,8 +788,8 @@ describe("put-staging-secrets.sh hands no variable of its own on to what it star
   }
 
   /**
-   * Fails unless a run put every value, on standard input alone, and for every put wrangler's environment holds no
-   * value and no variable under any of `names`, whatever its text.
+   * Fails unless a run put every value it puts, on standard input alone, and for every put wrangler's environment
+   * holds no value or caller's text and no variable under any of `names`, whatever its text.
    */
   function assertNothingHandedOn(rig, result, names, what) {
     assert.equal(result.status, 0, `${what}: ${result.output}`);
@@ -645,10 +798,10 @@ describe("put-staging-secrets.sh hands no variable of its own on to what it star
     const calls = rig.calls();
     assert.deepEqual(
       calls.map((call) => call.stdin),
-      NAMES.map((name) => VALUES[name]),
+      PUT.map((name) => VALUES[name]),
       what,
     );
-    for (const [index, name] of NAMES.entries()) {
+    for (const [index, name] of PUT.entries()) {
       const call = calls[index];
       assertOnlyOnStdin(call, `${what}, ${name}`);
       assert.deepEqual(
@@ -656,7 +809,43 @@ describe("put-staging-secrets.sh hands no variable of its own on to what it star
         [],
         `${what}, ${name}: wrangler's environment has a variable of the script's own`,
       );
+      assert.deepEqual(
+        call.envHoldingValue,
+        [],
+        `${what}, ${name}: a variable of wrangler's environment holds a value or a caller's text`,
+      );
     }
+  }
+
+  /**
+   * The caller's environment with none of this shell's variables but PATH, HOME and TMPDIR: under keyword a script
+   * that did not switch it off would run its `export NAME=value` line as a bare export, printing every exported
+   * variable. With this, it could print only the test's own made-up texts.
+   */
+  const bare = (extra) => ({
+    ...Object.fromEntries(
+      Object.keys(process.env)
+        .filter((key) => !["PATH", "HOME", "TMPDIR"].includes(key))
+        .map((key) => [key, undefined]),
+    ),
+    ...extra,
+  });
+
+  /**
+   * Fails unless a run exited 0 with the set and made in place lines alone on standard output and nothing on standard
+   * error. A failure names the fault and the size of the output, never the output.
+   */
+  function assertQuietRun(result, what) {
+    const size = (text) => `${String(text.length)} characters, not repeated here`;
+    assert.ok(
+      result.status === 0,
+      `${what}: exit ${String(result.status)} (the output is not repeated here)`,
+    );
+    assert.ok(
+      result.stdout === ALL_SET,
+      `${what}: standard output is not the set and made in place lines (${size(result.stdout)})`,
+    );
+    assert.ok(result.stderr === "", `${what}: standard error is not empty (${size(result.stderr)})`);
   }
 
   it("a caller's environment that already holds value, said, line and every other name the script works with", (t) => {
@@ -683,6 +872,84 @@ describe("put-staging-secrets.sh hands no variable of its own on to what it star
       assertNothingHandedOn(rig, rig.run([], extra, options), OWN_NAMES, what);
     }
   });
+
+  it("every variable the script works with is dropped before anything is sourced, read or started (T-1261)", () => {
+    const lines = readFileSync(path.join(SCRIPTS, "put-staging-secrets.sh"), "utf8")
+      .split("\n")
+      .filter((line) => !/^\s*#/.test(line) && line.trim() !== "");
+    // Tracing, allexport and keyword off first, then the unset lines, then lib.sh: nothing is assigned, read or
+    // started before them.
+    assert.deepEqual(
+      lines.slice(0, 4),
+      ["set +x", "set +a", "set +k", "set -euo pipefail"],
+      "the first commands",
+    );
+    const unsets = [];
+    let at = 4;
+    for (; /^unset -v [A-Za-z_][A-Za-z0-9_ ]*$/.test(lines[at]); at += 1) {
+      unsets.push(...lines[at].slice("unset -v ".length).split(" "));
+    }
+    // The names in small letters (OWN_NAMES, which ownNames() reads from the two files above), the fixed texts in
+    // capitals the script assigns at the start of a line, lib.sh's own (ROOT, CF) and BASH_REMATCH.
+    const capitals = (file) =>
+      readFileSync(path.join(SCRIPTS, file), "utf8")
+        .split("\n")
+        .map((line) => /^([A-Z][A-Z0-9_]*)=/.exec(line)?.[1])
+        .filter((name) => name !== undefined);
+    assert.deepEqual(
+      [...unsets].sort(),
+      [...OWN_NAMES, ...capitals("put-staging-secrets.sh"), ...capitals("lib.sh"), "BASH_REMATCH"].sort(),
+      "the names on the unset lines: put-staging-secrets.sh or lib.sh works with another variable",
+    );
+    assert.equal(new Set(unsets).size, unsets.length, "a name is on the unset lines twice");
+    assert.equal(lines[at], 'source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"', "what follows the unset lines");
+  });
+
+  it("allexport in bash's POSIX mode (bash --posix -a)", (t) => {
+    const rig = checkout(t, { devVars: devVars() });
+    const result = rig.run([], bare({}), { bash: ["--posix", "-a"] });
+    assertQuietRun(result, "bash --posix -a");
+    assertNothingHandedOn(rig, result, OWN_NAMES, "bash --posix -a");
+  });
+
+  it("keyword from the caller (bash -k, or handed down in SHELLOPTS), which puts an assignment anywhere on a command line in that command's environment", (t) => {
+    for (const [what, extra, options] of [
+      ["bash -k", {}, { bash: ["-k"] }],
+      ["SHELLOPTS=keyword", { SHELLOPTS: "keyword" }, {}],
+      ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, {}],
+    ]) {
+      const rig = checkout(t, { devVars: devVars() });
+      // Under keyword the script's `export WRANGLER_LOG_SANITIZE=true` would run as a bare export, and lib.sh's
+      // `local name=...` would declare nothing.
+      const result = rig.run([], bare(extra), options);
+      assertQuietRun(result, what);
+      assertNothingHandedOn(rig, result, OWN_NAMES, what);
+      assert.deepEqual(
+        rig.calls().map((call) => call.env.WRANGLER_LOG_SANITIZE),
+        PUT.map(() => "true"),
+        `${what}: wrangler's debug log is told to leave request bodies out`,
+      );
+    }
+  });
+
+  it("a mix: the caller's working names and every secret's name exported, with allexport and keyword handed down in SHELLOPTS or given as bash -a -k", (t) => {
+    const names = [...OWN_NAMES, "BASH_REMATCH"];
+    const caller = {
+      ...Object.fromEntries(names.map((name) => [name, `t1261 made-up caller text, ${name}`])),
+      ...SHELL_VALUES,
+    };
+    // POSIX mode and SHELLOPTS are kept apart: with both, bash itself prints "SHELLOPTS: readonly variable" (bash 3.2)
+    // before any line of a script runs.
+    for (const [what, extra, options] of [
+      ["SHELLOPTS=allexport:keyword", { ...caller, SHELLOPTS: "allexport:keyword" }, {}],
+      ["bash --posix -a -k", caller, { bash: ["--posix", "-a", "-k"] }],
+    ]) {
+      const rig = checkout(t, { devVars: devVars() });
+      const result = rig.run([], bare(extra), options);
+      assertQuietRun(result, `the mix, ${what}`);
+      assertNothingHandedOn(rig, result, names, `the mix, ${what}`);
+    }
+  });
 });
 
 describe("put-staging-secrets.sh's names are the ones the runtime reads", () => {
@@ -701,11 +968,17 @@ describe("put-staging-secrets.sh's names are the ones the runtime reads", () => 
     return match[1];
   };
 
-  /** The script's names, from a run: with no .dev.vars it names each as missing, in its order. */
+  /**
+   * The script's names, from a run: with no .dev.vars it names each, in its order, as missing, or as made in place,
+   * never put for staging's own (DL-549).
+   */
   function namesOfTheScript(t) {
     const result = checkout(t).run();
     assert.equal(result.status, 3, result.output);
-    return Array.from(result.stdout.matchAll(/^(\S+) missing$/gm), ([, name]) => name);
+    return Array.from(
+      result.stdout.matchAll(/^(\S+) (?:missing|made in place, never put)$/gm),
+      ([, name]) => name,
+    );
   }
 
   it("the model key the AI gateway reads, the wrapping key the seal call reads, the Linq webhook secret, and ADR-016's three for sign-in by code", (t) => {

@@ -3,8 +3,11 @@
 // what can be undone (flag off, previous bundle id, previous code)"), run by `node --test "infra/ci/*.test.mjs"`.
 // The deploy runs in a throwaway checkout (release-harness.mjs): wrangler is a fake that records each call (staging's
 // live version never changes, so the code's rollback has nothing to roll back), curl is a fake health check, and the
-// staging database is a throwaway local one, migrated as the staging database is.
+// staging database is a throwaway local one, migrated as the staging database is. The last describe holds T-1304's
+// tests of Rosie's own number, ROSIE_NUMBER, which step 2 gives the Worker by name; those deploys need no database.
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
@@ -212,5 +215,179 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
       assert.equal(await readActive(db.sql), active, what);
       assert.equal(await skeleton(), flag, what);
     }
+  });
+});
+
+// Rosie's own number (T-1304; CQ-253 as DL-542 refines it; K-05 default 109 and open gap 63): ROSIE_NUMBER reaches
+// the staging Worker only as step 2's --var ROSIE_NUMBER:<number>, read by name from the environment, else from the
+// checkout's .dev.vars. These deploys run without STAGING_DATABASE_URL (steps 1, 3 and 4 are skipped), so they need
+// no database. Every number is a fiction-range one (+1 555 555-01xx), and no deploy's output may hold it. The wrangler
+// and curl stand-ins also note when ROSIE_NUMBER is in their environment, which the script empties before any command
+// runs, so only the deploy's arguments carry it.
+describe("deploy-staging.sh: Rosie's own number, ROSIE_NUMBER (T-1304)", () => {
+  const NUMBER = "+15555550142";
+  const GIVEN =
+    "step 2/4 code: ROSIE_NUMBER goes to the Worker by name, as a var (wrangler prints its value as (hidden))";
+  const MISSING =
+    "step 2/4 code: NOTICE: ROSIE_NUMBER is not set, so the Worker gets no number and chat links stay off " +
+    "(K-05 default 109)";
+  const MALFORMED =
+    "step 2/4 code: NOTICE: ROSIE_NUMBER is not in E.164 form (a + and 7 to 15 digits), so the Worker gets no " +
+    "number and chat links stay off (K-05 default 109); the value is not printed";
+
+  /**
+   * A release root (with a made-up .dev.vars when devVars is given) whose wrangler and curl stand-ins first write their
+   * name to a note when ROSIE_NUMBER is in their environment. deploy(extra) runs deploy-staging.sh with DEPLOY_ENV and
+   * extra, and gives that run's own calls; noted() lists the stand-ins that found ROSIE_NUMBER.
+   */
+  const rigOf = (t, devVars) => {
+    const rig = releaseRoot(t, devVars === undefined ? {} : { devVars });
+    const note = path.join(rig.dir, "rosie-number-environment.txt");
+    const standIns = [
+      path.join(rig.root, "node_modules", ".bin", "wrangler"),
+      path.join(rig.dir, "bin", "curl"),
+    ];
+    for (const file of standIns) {
+      const [shebang, ...rest] = readFileSync(file, "utf8").split("\n");
+      const check = `if [[ -n "\${ROSIE_NUMBER+set}" ]]; then echo ${path.basename(file)} >>"${note}"; fi`;
+      writeFileSync(file, [shebang, check, ...rest].join("\n"));
+    }
+    return {
+      ...rig,
+      standIns,
+      deploy(extra) {
+        const from = rig.calls().length;
+        const result = rig.run("deploy-staging.sh", [], { ...DEPLOY_ENV, ...extra });
+        return { ...result, calls: rig.calls().slice(from) };
+      },
+      noted() {
+        if (!existsSync(note)) return [];
+        return readFileSync(note, "utf8")
+          .split("\n")
+          .filter((line) => line !== "");
+      },
+    };
+  };
+  /** The --var values of the one wrangler deploy among the calls. */
+  const deployVars = (calls) => {
+    const deploys = calls.filter((call) => call.tool === "wrangler" && call.args.includes("deploy"));
+    assert.equal(deploys.length, 1, JSON.stringify(deploys));
+    const { args } = deploys[0];
+    return args.filter((_, at) => args[at - 1] === "--var");
+  };
+  /** The lines of the deploy's log that name ROSIE_NUMBER, without their times. */
+  const numberLines = (stdout) =>
+    stdout
+      .split("\n")
+      .map((line) => line.replace(/^\[[^\]]+\] /, ""))
+      .filter((line) => line.includes("ROSIE_NUMBER"));
+  /** Fails when a run's output holds the value as given, trimmed, or as its digits alone. */
+  const assertNotPrinted = (result, value, what) => {
+    for (const piece of new Set([value, value.trim(), value.replace(/[^0-9]/g, "")])) {
+      assert.ok(piece === "" || !result.output.includes(piece), `${what}: the output holds the value`);
+    }
+  };
+
+  it("from the environment: only the deploy gets it, as --var ROSIE_NUMBER:<number>; no output or environment holds it", (t) => {
+    const rig = rigOf(t);
+    const result = rig.deploy({ ROSIE_NUMBER: NUMBER });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`, `ROSIE_NUMBER:${NUMBER}`]);
+    const holding = result.calls.filter((call) => JSON.stringify(call).includes(NUMBER));
+    assert.equal(holding.length, 1, "no call but the deploy holds the number");
+    assert.deepEqual(numberLines(result.stdout), [GIVEN]);
+    assert.match(result.stdout, /deploy-staging: done/);
+    assertNotPrinted(result, NUMBER, "from the environment");
+    assert.deepEqual(rig.noted(), []);
+  });
+
+  it("from .dev.vars when the environment has none or an empty one: read by name, bare, quoted or exported", (t) => {
+    for (const line of [
+      `ROSIE_NUMBER=${NUMBER}`,
+      `ROSIE_NUMBER="${NUMBER}"`,
+      `export ROSIE_NUMBER='${NUMBER}'`,
+    ]) {
+      const rig = rigOf(t, `OTHER=1\n${line}\n`);
+      for (const value of [undefined, ""]) {
+        const what = `${line} with ${JSON.stringify(value)} in the environment`;
+        const result = rig.deploy({ ROSIE_NUMBER: value });
+        assert.equal(result.status, 0, `${what}: ${result.output}`);
+        assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`, `ROSIE_NUMBER:${NUMBER}`], what);
+        assert.deepEqual(numberLines(result.stdout), [GIVEN], what);
+        assertNotPrinted(result, NUMBER, what);
+      }
+      assert.deepEqual(rig.noted(), [], line);
+    }
+  });
+
+  it("the environment's value wins over .dev.vars'", (t) => {
+    const rig = rigOf(t, "ROSIE_NUMBER=+15555550143\n");
+    const result = rig.deploy({ ROSIE_NUMBER: NUMBER });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`, `ROSIE_NUMBER:${NUMBER}`]);
+    assertNotPrinted(result, "+15555550143", "the number in .dev.vars");
+  });
+
+  it("missing: the deploy goes on without it, and one line says chat links stay off", (t) => {
+    for (const [what, devVars, value] of [
+      ["unset, with no .dev.vars", undefined, undefined],
+      ["empty, with no .dev.vars", undefined, ""],
+      ["unset, with a .dev.vars that has none", "OTHER=1\n", undefined],
+      ["unset, with an empty line in .dev.vars", "ROSIE_NUMBER=\n", undefined],
+    ]) {
+      const rig = rigOf(t, devVars);
+      const result = rig.deploy({ ROSIE_NUMBER: value });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`], what);
+      assert.deepEqual(numberLines(result.stdout), [MISSING], what);
+      assert.match(result.stdout, /deploy-staging: done/, what);
+    }
+  });
+
+  it("malformed: the deploy goes on without it, one line says chat links stay off, and the value is never printed", (t) => {
+    const rig = rigOf(t);
+    for (const value of [
+      "5555550142",
+      "15555550142",
+      "555-555-0142",
+      "(555) 555-0142",
+      "+1 555 555 0142",
+      "+1-555-555-0142",
+      ` ${NUMBER}`,
+      `${NUMBER} `,
+      `${NUMBER}\n`,
+      "+05555550142",
+      "+155555",
+      `${NUMBER}01420`,
+      `tel:${NUMBER}`,
+      `${NUMBER},GIT_SHA:0`,
+    ]) {
+      const what = JSON.stringify(value);
+      const result = rig.deploy({ ROSIE_NUMBER: value });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`], what);
+      assert.deepEqual(numberLines(result.stdout), [MALFORMED], what);
+      assert.match(result.stdout, /deploy-staging: done/, what);
+      assertNotPrinted(result, value, what);
+    }
+    // A .dev.vars line with a comment after the number: load_dev_var keeps the comment in the value.
+    const commented = rigOf(t, `ROSIE_NUMBER=${NUMBER} # Rosie's line\n`);
+    const result = commented.deploy({ ROSIE_NUMBER: undefined });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`]);
+    assert.deepEqual(numberLines(result.stdout), [MALFORMED]);
+    assertNotPrinted(result, `${NUMBER} # Rosie's line`, "a commented .dev.vars line");
+    assert.deepEqual([...rig.noted(), ...commented.noted()], []);
+  });
+
+  it("a stand-in notes ROSIE_NUMBER when its environment holds it (the control for the checks above)", (t) => {
+    const rig = rigOf(t);
+    const env = {
+      PATH: process.env.PATH,
+      FAKE_LOG: path.join(rig.dir, "control.ndjson"),
+      ROSIE_NUMBER: NUMBER,
+    };
+    for (const file of rig.standIns) spawnSync(file, [], { env, encoding: "utf8" });
+    assert.deepEqual(rig.noted(), ["wrangler", "curl"]);
   });
 });

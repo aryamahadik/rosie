@@ -211,6 +211,21 @@ jobs:
           set -euo pipefail
           inputs=(compiler/src fixtures/master vitest.config.ts package.json package-lock.json)
           changed="$(git diff --name-only origin/main...HEAD -- "${inputs[@]}")"
+          # T-1320 (DL-600): when package.json is the only input that changed, infra/ci/parity-inputs.mjs judges it,
+          # as origin/main holds it (as it holds this file), never the branch's copy. It prints scripts-only when the
+          # change is confined to script lines the parity run never runs (not test:parity, nor any script it or
+          # npm ci runs): then package.json is not an input. Any other answer counts it, and a rule that fails
+          # fails this step, so the shards are never skipped by a broken rule.
+          if [ "$changed" = "package.json" ]; then
+            rule="$(mktemp -d)"
+            git show origin/main:infra/ci/parity-inputs.mjs > "$rule/parity-inputs.mjs"
+            verdict="$(node "$rule/parity-inputs.mjs" origin/main HEAD)"
+            rm -rf "$rule"
+            if [ "$verdict" = "scripts-only" ]; then
+              echo "package.json changed only in script lines the parity run never runs: not a parity input."
+              changed=""
+            fi
+          fi
           if [ -n "$changed" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "Parity inputs changed, so the parity shards run:"

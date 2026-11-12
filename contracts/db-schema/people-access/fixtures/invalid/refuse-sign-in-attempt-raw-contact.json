@@ -1,0 +1,27 @@
+{
+  "after": ["seed-sign-in-attempt.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "insert",
+    "table": "sign_in_attempts",
+    "values": {
+      "id": "sign-in-sam-oct29-0900",
+      "attempt_id": "attempt-sam-signin-4",
+      "request_sha256": "a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394",
+      "device_sha256": "d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4",
+      "contact_hash": "sam@example.com",
+      "hash_key_name": "PROOF_CODE_HASH_KEY",
+      "way": "email",
+      "person_id": "person-sam",
+      "owner_or_admin": true,
+      "started_at": "2026-10-29T09:00:00Z",
+      "expires_at": "2026-10-29T09:10:00Z"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["sign_in_attempts_contact_hash_form"]
+    }
+  }
+}

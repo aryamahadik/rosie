@@ -20,10 +20,16 @@
 //      try the gateway's own timeouts made slow does not push the next one back). The retry its lease would not outlast
 //      is not run: the lease's lapse reruns the turn then (T-248; its 60 s lease is two tries), 30 s after the last try
 //      began, and the rerun goes on the same way. A run no longer the turn's stops at once.
-//   4. On return the turn commits once, its core actions in the return order (`inReturnOrder`, in the turn's commit):
-//      every text's safety record first, the danger texts' leading ("danger words are read first": S12-12), then the
-//      stop and start records ("and stops next"), then the rest of the keyword texts' actions; the decided parts follow
-//      the core actions in the commit (C-087: "the turn's core actions, then the parts"), so the routine texts come last.
+//   4. Only a turn with no stop word waits for the models' return. A turn holding one never does (DL-508, DL-521; arch
+//      06 line 329: a change that only protects commits at once): whatever the models answer, its keyword texts commit on
+//      the run, core-only on the run that finds the models down (runtime/src/turn), so this path holds such a turn only
+//      when that commit does not go through, and then it waits for the core, not the models: on a later try it commits
+//      core-only while they are still down, or with the decided input once they are back. On return the turn commits
+//      once, its core actions in the return order (`inReturnOrder`, in the turn's commit), the order a STOP's core-only
+//      commit keeps too: every text's safety record first, the danger texts' leading ("danger words are read first":
+//      S12-12), then the stop and start records ("and stops next"), then the rest of the keyword texts' actions; the
+//      decided parts follow the core actions in the commit (C-087: "the turn's core actions, then the parts"), so the
+//      routine texts come last.
 //
 // After the commit nothing here runs: a model call that fails then takes step 7's path for its row (the turn's compose,
 // ../../turn/compose.ts), never the outage line. Unwired (no `setOutageDeps`), a run whose models are down ends as it did

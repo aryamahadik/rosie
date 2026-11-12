@@ -25,7 +25,7 @@ import { fakeTargets } from "../../guard/test-support";
 import { timeoutResult } from "../../safety";
 import type { SafetyResult } from "../../safety/types";
 import { spanProblems } from "../../trace";
-import { runTurnThroughOutage, setTurnDeps, turnReplyCore, type TurnOutcome } from "../../turn";
+import { KEYWORD_RUNS, runTurnThroughOutage, setTurnDeps, turnReplyCore, type TurnOutcome } from "../../turn";
 import {
   ALEX,
   ONE_REREAD,
@@ -514,7 +514,79 @@ describe("the turn runs again every 30 s until the models are back, then commits
   });
 });
 
-describe("on return: danger first, then stops, then the rest", () => {
+/**
+ * K-09 v1 gateAndCommit over T-267's shared-core double (Sam's phone): each text's safety record answered as
+ * commit-s1-02.json's, the keyword texts' core actions by the core, behind the gate. A decided request is answered
+ * commit-s1-02.json's outcome; a core-only one as K-09 answers it (stop-recorded.json): no parts, and nothing a decided
+ * part writes (no picked kinds, no S1-04 row, no question opened or closed), its rows the core's own. So no assertion can
+ * pass on a decided answer to a core-only request.
+ */
+function gateOverReplyCore(
+  core: ReturnType<typeof fakeReplyCore>,
+): (request: GateAndCommitRequest) => Promise<never> {
+  return async (request) => {
+    const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+    const actions = request.core.slice(records.length);
+    const answer = await core.core.commitCore({
+      caller: (actions[0]?.request as { caller: never }).caller,
+      actions: actions as never,
+    });
+    if ("error" in answer) return answer as never;
+    const outcome = structuredClone(commitS102.outcome);
+    const answered = { ...outcome, core: [...records.map(() => outcome.core[0]), ...answer.core] };
+    if (request.input.kind === "decided") return answered as never;
+    const outboxRows = [...core.outbox.values()].map((row) => ({ id: row.id, commitSeq: row.commitSeq }));
+    return {
+      ...answered,
+      parts: [],
+      written: { written: [], outboxRows, promoted: [] },
+      openQuestions: { opened: [], closed: [] },
+    } as never;
+  };
+}
+
+/** Sam's routine answer, a STOP and a danger text: arrival order the reverse of the return order. */
+async function samStopBatch(): Promise<Setup> {
+  const danger = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: DANGER_TEXT.eventId };
+  return samTurn([S1_02_TEXT, STOP_TEXT, DANGER_TEXT], { safety: { [DANGER_TEXT.eventId]: danger } });
+}
+
+/** The return order of that batch's core actions: the danger text's record, the others' in arrival order, the STOP's. */
+const STOP_BATCH_ORDER = [
+  ["recordSafetyOutcome", DANGER_TEXT.eventId],
+  ["recordSafetyOutcome", S1_02_TEXT.eventId],
+  ["recordSafetyOutcome", STOP_TEXT.eventId],
+  ["recordStopOrStart", "stop"],
+];
+
+/** A request's core actions in order: each safety record by its text's event id, a STOP's or START's record by kind. */
+const coreOrder = (request: GateAndCommitRequest): string[][] =>
+  request.core.map((action) => {
+    const asked = action.request as { safety?: { eventId: string }; kind?: string };
+    return [action.call, asked.safety?.eventId ?? asked.kind ?? ""];
+  });
+
+/**
+ * That batch on a first try that finds the models down and the database busy: the gate refuses each core-only request of
+ * that try (transient: nothing written), and answers as K-09 does after it. At the next try decide answers S1-02's result
+ * when the models are `back`, else modelsDown again.
+ */
+async function refusedStopBatch(
+  back: boolean,
+): Promise<{ s: Setup; core: ReturnType<typeof fakeReplyCore> }> {
+  const s = await samStopBatch();
+  const core = fakeReplyCore(commitS102.request.now, [phone("+15555550100", "handle-sam", "person-sam", 3)]);
+  const gate = gateOverReplyCore(core);
+  s.face.gate = (request) =>
+    request.input.kind === "coreOnly" && s.decidedAt.length < 2
+      ? { error: "transient", sqlstate: "40001" }
+      : gate(request);
+  restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+  downThenBack(s, back ? 1 : 99);
+  return { s, core };
+}
+
+describe("the return order, danger first, then stops, then the rest: a STOP commits at once whatever the models answer, core-only while they are down, and waits only for the core (DL-508, DL-521); only a turn with no STOP waits for the models' return", () => {
   it("a queued danger text is handled before a queued STOP in the one commit, which a STOP never holds for the models' return: core-only, on the first run (DL-508)", async () => {
     // Arrival order is the reverse of the return order: the routine answer, then the STOP, then the danger text.
     const danger = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: DANGER_TEXT.eventId };
@@ -524,19 +596,7 @@ describe("on return: danger first, then stops, then the rest", () => {
     const core = fakeReplyCore(commitS102.request.now, [
       phone("+15555550100", "handle-sam", "person-sam", 3),
     ]);
-    s.face.gate = async (request: GateAndCommitRequest) => {
-      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
-      const actions = request.core.slice(records.length);
-      const answer = await core.core.commitCore({
-        caller: (actions[0]?.request as { caller: never }).caller,
-        actions: actions as never,
-      });
-      if ("error" in answer) return answer;
-      return {
-        ...structuredClone(commitS102.outcome),
-        core: [...records.map(() => commitS102.outcome.core[0]), ...answer.core],
-      } as never;
-    };
+    s.face.gate = gateOverReplyCore(core);
     restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
     downThenBack(s, 2);
 
@@ -575,6 +635,73 @@ describe("on return: danger first, then stops, then the rest", () => {
       ["stop", "replied"],
     ]);
     // No outage line: the turn committed on its first run, and the phone's own text asked to stop.
+    expect(s.o.lines.requests).toEqual([]);
+  });
+
+  it("a STOP batch whose core-only commit is refused too while the models are down waits for the next try, not for the models: back by then, it commits with the decided input, in the same core order", async () => {
+    const { s, core } = await refusedStopBatch(true);
+
+    const report = await runWithRetries(s, 1);
+
+    // The first try: the models down, and the keyword texts' core-only commit refused on each of the replies' runs (each
+    // sent once more: transient), so nothing committed and the turn waited. The next try, 30 s on, found the models back,
+    // and its one commit carries the decided input.
+    expect(report).toMatchObject({ end: "committed", tries: 2 });
+    expect(s.decidedAt).toEqual([0, RETRY_MS]);
+    expect(s.o.waits).toEqual([{ at: 0, ms: RETRY_MS }]);
+    const requests = s.face.gateCalls.map((call) => call.request);
+    expect(requests.map((request) => request.input.kind)).toEqual([
+      ...Array<string>(2 * KEYWORD_RUNS).fill("coreOnly"),
+      "decided",
+    ]);
+    expect(s.t.commits.map((sent) => "result" in sent.answer)).toEqual([
+      ...Array<boolean>(2 * KEYWORD_RUNS).fill(false),
+      true,
+    ]);
+    expect(requests.at(-1)?.input).toEqual(commitS102.request.input);
+    // The same core order in every request, the refused core-only ones and the decided one alike.
+    for (const request of requests) expect(coreOrder(request)).toEqual(STOP_BATCH_ORDER);
+    // The STOP never reached decide, on either try: only the routine and danger texts did.
+    expect(s.face.frontierCalls.map((request) => request.texts.map((text) => text.eventId))).toEqual([
+      [S1_02_TEXT.eventId, DANGER_TEXT.eventId],
+      [S1_02_TEXT.eventId, DANGER_TEXT.eventId],
+    ]);
+    // The stop is applied in that one commit, beside the decided part, and its reply's words written by code.
+    expect(core.phones.get("+15555550100")?.stopped).toBe(true);
+    if (report.outcome.result !== "committed") throw new Error("not committed");
+    expect(report.outcome.answer.parts).toEqual(commitS102.outcome.parts);
+    expect(report.outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome])).toEqual([
+      ["stop", "replied"],
+    ]);
+    // No outage line while it waited: the phone's own text asked to stop, so the stopped flag is not even read.
+    expect(s.o.lines.requests).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([]);
+  });
+
+  it("the same batch with the models still down at the next try commits core-only then: a STOP waits for the core, never for the models", async () => {
+    const { s, core } = await refusedStopBatch(false);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(report).toMatchObject({ end: "committed", tries: 2 });
+    expect(s.decidedAt).toEqual([0, RETRY_MS]);
+    expect(s.o.waits).toEqual([{ at: 0, ms: RETRY_MS }]);
+    // Every request core-only, in the same core order: the first try's refused, the next try's committed.
+    const requests = s.face.gateCalls.map((call) => call.request);
+    expect(requests.map((request) => request.input.kind)).toEqual(
+      Array<string>(2 * KEYWORD_RUNS + 1).fill("coreOnly"),
+    );
+    expect(s.t.commits.map((sent) => "result" in sent.answer)).toEqual([
+      ...Array<boolean>(2 * KEYWORD_RUNS).fill(false),
+      true,
+    ]);
+    for (const request of requests) expect(coreOrder(request)).toEqual(STOP_BATCH_ORDER);
+    expect(core.phones.get("+15555550100")?.stopped).toBe(true);
+    if (report.outcome.result !== "committed") throw new Error("not committed");
+    expect(report.outcome.answer.parts).toEqual([]);
+    expect(report.outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome])).toEqual([
+      ["stop", "replied"],
+    ]);
     expect(s.o.lines.requests).toEqual([]);
   });
 

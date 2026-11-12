@@ -3,16 +3,19 @@
 // node_modules/.bin/wrangler is a fake that only records its arguments; another fake wrangler is first on PATH,
 // so a call that went to PATH would show. HOME is a temp folder, so nothing reads this Mac's Rosfield sign-in
 // (script-harness.mjs). A refused case must exit non-zero with a reason on stderr and never start wrangler.
+// The last block (T-1261) runs cf.sh under the caller set-ups of T-1236's tests (its working names exported, allexport,
+// keyword, POSIX mode, tracing) with recorders in front of wrangler and node.
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
 import {
   REPO,
   ROSFIELD_ACCOUNT_ID,
+  SCRIPTS,
   cleanEnv,
   copyScript,
   fakeTools,
@@ -353,5 +356,284 @@ describe("cf.sh with CF_BUILD_DIR (deploy-preview.sh: a branch's worktree)", () 
     const result = repo.run(UPLOAD, { CF_BUILD_DIR: path.join(repo.dir, "missing") });
     assert.notEqual(result.status, 0);
     assert.deepEqual(repo.calls(), []);
+  });
+});
+
+describe("cf.sh hands no variable of its own on to what it starts, whatever the caller's shell asked for (T-1261)", () => {
+  // The names cf.sh keeps a variable of its own under, and lib.sh's two it gets by sourcing lib.sh (the checkout's
+  // folder and cf.sh's own path): paths, the arguments and their words, counts, and the fixed texts in capitals.
+  const OWN_NAMES = [
+    "CF",
+    "ROOT",
+    "ROSFIELD_ACCOUNT_ID",
+    "STAGING_WORKER",
+    "arg",
+    "changes_worker",
+    "command_words",
+    "config",
+    "dir",
+    "ended",
+    "env_count",
+    "env_name",
+    "expect",
+    "file",
+    "key",
+    "variable",
+    "why",
+    "word",
+    "words",
+    "wrangler",
+  ];
+  // Made-up texts, none a key of anything: the caller's text under each of those names, a value on its way to a
+  // secret put on standard input, and the commit of a deploy's --var.
+  const CALLER_TEXT = "t1261 made-up caller text";
+  const CALLER = Object.fromEntries(OWN_NAMES.map((name) => [name, `${CALLER_TEXT}, ${name}`]));
+  const VALUE = `t1261-made-up-value-${"5c0e93a7".repeat(4)}`;
+  const SHA = "t1261madeupcommit0a1b2c3";
+  const WATCHED = [CALLER_TEXT, VALUE, SHA];
+  const PUT = ["secret", "put", "T1261_MADE_UP_NAME", ...STAGING];
+  const DEPLOY = ["deploy", ...STAGING, "--var", `GIT_SHA:${SHA}`];
+
+  const code = (file) =>
+    readFileSync(path.join(SCRIPTS, file), "utf8")
+      .split("\n")
+      .filter((line) => !/^\s*#/.test(line) && line.trim() !== "");
+
+  /**
+   * The same names, read from the two files: every name, in small letters or capitals, that cf.sh assigns, adds to,
+   * loops over or declares local, and every name lib.sh assigns outside its functions (at the start of a line).
+   */
+  function ownNames() {
+    const text = code("cf.sh").join("\n");
+    const names = new Set();
+    // name=... or name+=..., first on its line or after ;, &&, ||, a case pattern's ) or a !.
+    for (const [, name] of text.matchAll(/(?:^|;|&&|\|\||\)|!)[ \t]*([A-Za-z_][A-Za-z0-9_]*)\+?=/gm)) {
+      names.add(name);
+    }
+    // for name in ...
+    for (const [, name] of text.matchAll(/\bfor[ \t]+([A-Za-z_][A-Za-z0-9_]*)[ \t]+in\b/g)) names.add(name);
+    // local name="..." other: each word of the declaration, up to its =.
+    for (const [, words] of text.matchAll(/^[ \t]*local[ \t]+(.+)$/gm)) {
+      for (const word of words.split(/[ \t]+/)) names.add(word.replace(/=.*$/, ""));
+    }
+    for (const line of code("lib.sh")) {
+      const match = /^([A-Za-z_][A-Za-z0-9_]*)=/.exec(line);
+      if (match) names.add(match[1]);
+    }
+    return [...names].sort();
+  }
+
+  // What both recorders start with (CommonJS): the names of the command's environment, the ones whose value holds a
+  // text $FAKE_WATCH lists, and how many of its arguments hold one.
+  const WATCH = String.raw`"use strict";
+const fs = require("node:fs");
+const watched = JSON.parse(fs.readFileSync(process.env.FAKE_WATCH, "utf8"));
+const envNames = Object.keys(process.env);
+const held = (args) => ({
+  envNames,
+  envHoldingValue: envNames.filter((key) => watched.some((text) => process.env[key].includes(text))),
+  argsHoldingValue: args.filter((arg) => watched.some((text) => arg.includes(text))).length,
+});
+`;
+  // The stand-in for wrangler: one JSON line in $FAKE_LOG with its arguments, all of its standard input, its folder,
+  // what WATCH gives and the two settings cf.sh makes.
+  const FAKE_WRANGLER = `${WATCH}${String.raw`
+const args = process.argv.slice(2);
+let stdin = "";
+try {
+  stdin = fs.readFileSync(0, "utf8");
+} catch {
+  stdin = "";
+}
+const env = {};
+for (const key of ["XDG_CONFIG_HOME", "CLOUDFLARE_ACCOUNT_ID"]) {
+  if (key in process.env) env[key] = process.env[key];
+}
+const entry = { tool: "wrangler", args, stdin, cwd: process.cwd(), ...held(args), env };
+fs.appendFileSync(process.env.FAKE_LOG, JSON.stringify(entry) + "\n");
+`}`;
+  // The stand-in for node, first on PATH: the real node with this module loaded first (--require), so cf.sh's config
+  // check runs as it is. It records what WATCH gives (its options, the program after -e among its arguments) and reads
+  // nothing from standard input.
+  const FAKE_NODE = `${WATCH}${String.raw`
+const args = [...process.execArgv, ...process.argv.slice(1)];
+fs.appendFileSync(process.env.FAKE_LOG, JSON.stringify({ tool: "node", ...held(args) }) + "\n");
+`}`;
+
+  /**
+   * A throwaway checkout with both recorders. A run gets none of this shell's environment, only PATH, HOME, TMPDIR and
+   * the recorders' files: under keyword a cf.sh that did not switch it off would run its `export NAME=value` lines as
+   * bare exports, printing every exported variable. So a failure names the fault and the size of the output, never
+   * the output.
+   */
+  function rig(t) {
+    const dir = tempDir(t, "cf-own");
+    const root = path.join(dir, "rosie");
+    const cf = copyScript("cf.sh", root);
+    copyScript("lib.sh", root);
+    write(path.join(root, "wrangler.jsonc"), WRANGLER_JSONC);
+    const stub = (file, ...words) => {
+      const command = [process.execPath, ...words].map((word) => `"${word}"`).join(" ");
+      write(file, `#!/usr/bin/env bash\nexec ${command} "$@"\n`, 0o755);
+    };
+    const wrangler = path.join(dir, "fake", "wrangler.cjs");
+    write(wrangler, FAKE_WRANGLER);
+    stub(path.join(root, "node_modules", ".bin", "wrangler"), wrangler);
+    const node = path.join(dir, "fake", "node.cjs");
+    write(node, FAKE_NODE);
+    const bin = path.join(dir, "bin");
+    stub(path.join(bin, "node"), "--require", node);
+    const home = path.join(dir, "home");
+    mkdirSync(home);
+    const tmp = path.join(dir, "tmp");
+    mkdirSync(tmp);
+    const log = path.join(dir, "calls.ndjson");
+    const watch = path.join(dir, "watched.json");
+    write(watch, JSON.stringify(WATCHED));
+    const run = (args, { stdin = "", extra = {}, bash = [] } = {}) =>
+      spawnSync("bash", [...bash, cf, ...args], {
+        cwd: root,
+        encoding: "utf8",
+        input: stdin,
+        env: {
+          PATH: `${bin}${path.delimiter}${process.env.PATH ?? ""}`,
+          HOME: home,
+          TMPDIR: tmp,
+          FAKE_LOG: log,
+          FAKE_WATCH: watch,
+          ...extra,
+        },
+      });
+    return { root, home, run, started: () => readLog(log) };
+  }
+
+  /** "<n> characters, not repeated here": the size of a stream a failure names in its place. */
+  const size = (text) => `${String(text.length)} characters, not repeated here`;
+
+  /**
+   * Fails unless one run passed wrangler the arguments and standard input it was given, with the Rosfield sign-in and
+   * account, said nothing, and no command it started (cf.sh's node, then wrangler) has a variable of cf.sh's own or a
+   * watched text in its environment, or a watched text in node's arguments.
+   */
+  function assertNothingHandedOn(box, result, args, stdin, what) {
+    assert.ok(
+      result.status === 0,
+      `${what}: exit ${String(result.status)} (the output is not repeated here)`,
+    );
+    assert.ok(result.stdout === "", `${what}: standard output is not empty (${size(result.stdout)})`);
+    assert.ok(result.stderr === "", `${what}: standard error is not empty (${size(result.stderr)})`);
+    const started = box.started();
+    assert.deepEqual(
+      started.map((entry) => entry.tool),
+      ["node", "wrangler"],
+      `${what}: the commands started`,
+    );
+    const [node, wrangler] = started;
+    assert.deepEqual(wrangler.args, ["--config", path.join(box.root, "wrangler.jsonc"), ...args], what);
+    assert.ok(wrangler.stdin === stdin, `${what}: wrangler's standard input is not what cf.sh was given`);
+    assert.equal(wrangler.cwd, box.root, what);
+    assert.deepEqual(
+      wrangler.env,
+      {
+        XDG_CONFIG_HOME: path.join(box.home, ".config", "rosfield"),
+        CLOUDFLARE_ACCOUNT_ID: ROSFIELD_ACCOUNT_ID,
+      },
+      `${what}: the Rosfield sign-in and account`,
+    );
+    assert.equal(node.argsHoldingValue, 0, `${what}: an argument of node holds a watched text`);
+    for (const entry of started) {
+      const which = `${what}, ${entry.tool}`;
+      assert.deepEqual(
+        OWN_NAMES.filter((name) => entry.envNames.includes(name)),
+        [],
+        `${which}: its environment has a variable of cf.sh's own`,
+      );
+      assert.deepEqual(
+        entry.envHoldingValue,
+        [],
+        `${which}: a variable of its environment holds a watched text`,
+      );
+    }
+  }
+
+  // [title, the caller's environment, options for bash itself]: T-1236's caller set-ups, and mixes of them. POSIX mode
+  // and SHELLOPTS are kept apart: with both, bash itself prints "SHELLOPTS: readonly variable" on standard error
+  // (bash 3.2), before any line of a script runs, which is not cf.sh's to change.
+  const SETUPS = [
+    ["the caller's working names, exported with values", CALLER, []],
+    ["bash -a", {}, ["-a"]],
+    ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, []],
+    ["bash --posix -a", {}, ["--posix", "-a"]],
+    ["bash -k", {}, ["-k"]],
+    ["SHELLOPTS=keyword", { SHELLOPTS: "keyword" }, []],
+    ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, []],
+    [
+      "a mix: the working names exported and SHELLOPTS=allexport:keyword",
+      { ...CALLER, SHELLOPTS: "allexport:keyword" },
+      [],
+    ],
+    ["a mix: the working names exported and bash --posix -a -k", CALLER, ["--posix", "-a", "-k"]],
+  ];
+
+  it("every variable cf.sh works with is dropped before anything is sourced, read or started", () => {
+    assert.deepEqual(
+      ownNames(),
+      OWN_NAMES,
+      "cf.sh or lib.sh works with another variable: add its name to cf.sh's unset lines and to OWN_NAMES",
+    );
+    const lines = code("cf.sh");
+    // Tracing, allexport and keyword off first, then the unset lines, then lib.sh: nothing is assigned, read or
+    // started before them.
+    assert.deepEqual(
+      lines.slice(0, 4),
+      ["set +x", "set +a", "set +k", "set -euo pipefail"],
+      "the first commands",
+    );
+    const unsets = [];
+    let at = 4;
+    for (; /^unset -v [A-Za-z_][A-Za-z0-9_ ]*$/.test(lines[at]); at += 1) {
+      unsets.push(...lines[at].slice("unset -v ".length).split(" "));
+    }
+    assert.deepEqual([...unsets].sort(), OWN_NAMES, "the names on the unset lines");
+    assert.equal(new Set(unsets).size, unsets.length, "a name is on the unset lines twice");
+    assert.equal(lines[at], 'source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"', "what follows the unset lines");
+  });
+
+  for (const [title, extra, bash] of SETUPS) {
+    it(`${title}: a secret put's value reaches wrangler on standard input alone, and a deploy's --var as an argument alone`, (t) => {
+      for (const [args, stdin] of [
+        [PUT, VALUE],
+        [DEPLOY, ""],
+      ]) {
+        const box = rig(t);
+        const what = `${title}, ${args.slice(0, 2).join(" ")}`;
+        assertNothingHandedOn(box, box.run(args, { stdin, extra, bash }), args, stdin, what);
+      }
+    });
+  }
+
+  it("tracing from the caller (bash -x, or handed down in SHELLOPTS): nothing after the switch-off is traced", (t) => {
+    for (const [what, extra, bash] of [
+      ["bash -x", {}, ["-x"]],
+      ["SHELLOPTS=xtrace", { SHELLOPTS: "xtrace" }, []],
+      [
+        "the working names exported, SHELLOPTS=xtrace:allexport:keyword and bash -x -a -k",
+        { ...CALLER, SHELLOPTS: "xtrace:allexport:keyword" },
+        ["-x", "-a", "-k"],
+      ],
+    ]) {
+      const box = rig(t);
+      const result = box.run(PUT, { stdin: VALUE, extra, bash });
+      assert.ok(
+        result.status === 0,
+        `${what}: exit ${String(result.status)} (the output is not repeated here)`,
+      );
+      assert.ok(result.stdout === "", `${what}: standard output is not empty (${size(result.stdout)})`);
+      assert.ok(
+        result.stderr === "+ set +x\n",
+        `${what}: standard error is not the trace of set +x alone (${size(result.stderr)})`,
+      );
+      assert.equal(box.started().length, 2, `${what}: node and wrangler ran`);
+    }
   });
 });

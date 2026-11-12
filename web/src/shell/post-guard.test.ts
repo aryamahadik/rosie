@@ -141,14 +141,18 @@ describe("a POST whose Origin is not this site's own origin is refused before an
     expect((await shell.fetch(elsewhere)).status).toBe(403);
     expect(bodies).toEqual([]);
 
-    // With another LINK_HOST set, that host's origin is the one answered, and the tests' usual one is refused.
+    // With another LINK_HOST set, that host's origin is the one answered, and the tests' usual one is refused. Both
+    // POSTs are sent to that host, the site's own: a POST is taken only there (T-1237).
     const other = testShell({
       modules: [formModule(bodies)],
       vars: { ...testVars("staging"), LINK_HOST: "pages.example.test" },
     });
+    const otherForm = "https://pages.example.test/test/example/form";
     expect(siteOrigin(other.config)).toBe("https://pages.example.test");
-    expect((await other.shell.fetch(post({ origin: "https://pages.example.test" }))).status).toBe(200);
-    expect((await other.shell.fetch(post({ origin: ORIGIN }))).status).toBe(403);
+    expect((await other.shell.fetch(post({ origin: "https://pages.example.test" }, otherForm))).status).toBe(
+      200,
+    );
+    expect((await other.shell.fetch(post({ origin: ORIGIN }, otherForm))).status).toBe(403);
     expect(bodies).toEqual(["field=dummy-value"]);
   });
 

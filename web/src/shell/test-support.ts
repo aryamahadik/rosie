@@ -15,8 +15,8 @@ import { createWebShell, type PageLogLine, type ShellDeps, type WebShell } from 
 export type TestEnvironment = "staging" | "production";
 
 /**
- * The link host the tests run on. wrangler.jsonc sets no LINK_HOST yet (the release engineer's file), so this is the
- * tests' own value: rosfield.com, the host DL-014 and DL-023 name.
+ * The link host the tests run on: rosfield.com, the LINK_HOST wrangler.jsonc sets for staging and production (DL-014,
+ * DL-023). A test's POST is sent to this host, the site's own, as the host rule asks (post-guard.ts; T-1237).
  */
 export const TEST_LINK_HOST = "rosfield.com";
 

@@ -51,8 +51,13 @@
 // models are down (the AI gateway's `modelsDown`, after its own retry and the other model, T-361) and nothing has
 // committed, the run ends saying who waits (`aiDown`), and the lease's `runTurn` runs the turn through the AI-down path:
 // each waiting text gets the outage line once, never to a stopped number, and the turn runs again every 30 s until it
-// commits. Its one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger
-// texts' first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
+// commits. Only a turn with no stop word waits there for the models' return. A turn holding one never does (DL-508,
+// DL-521; arch 06 line 329): whatever the models answer, its keyword texts commit on the run, core-only on the run that
+// finds the models down, with the safety records the run has (step 3). Such a turn waits only when that commit does not
+// go through, and then for the core, not the models: on a later try it commits core-only while they are still down, or
+// with the decided input once they are back (a run's first keyword commit carries it: `commitKeywords`). Either way its
+// one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger texts'
+// first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
 // outage line goes: a model call that fails then takes step 7's path for its row (./compose.ts).
 //
 // Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
@@ -377,7 +382,7 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
 
   let safety: Map<string, SafetyResult>;
   try {
-    safety = await safetyOf(set, opened);
+    safety = await safetyOf(turn, opened);
   } catch {
     safety = new Map();
   }
@@ -559,12 +564,15 @@ function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string)
   }
 }
 
-/** Each readable text's safety result, by event id; a result for another text is not taken. */
-async function safetyOf(set: TurnDeps, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
+/**
+ * Each readable text's safety result, by event id, read through the run's leased turn from the handle's own actor, where
+ * the read on arrival kept it (ADR-015 section 3); a result for another text is not taken.
+ */
+async function safetyOf(turn: LeasedTurn, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
   const wanted = opened.filter((text) => text.readable).map((text) => text.eventId);
   const found = new Map<string, SafetyResult>();
   if (wanted.length === 0) return found;
-  for (const result of await set.safety.resultsOf(wanted)) {
+  for (const result of await turn.resultsOf(wanted)) {
     if (wanted.includes(result.eventId) && !found.has(result.eventId)) found.set(result.eventId, result);
   }
   return found;
@@ -1066,10 +1074,20 @@ const NOT_CHECKED: LimitResult[] = [1, 2, 3, 4, 5, 6].map((limit) => ({
   outcome: null,
 }));
 
-/** One gate span per part, with that part's limits (a limit that fails stops only its choice); one for a core-only commit. */
+/**
+ * One gate span per part, with that part's limits (a limit that fails stops only its choice); one for a core-only commit,
+ * which says whether it was answered as a repeat. A later commit of the turn id writes nothing and answers the first
+ * (K-05 v1 item 1), so a repeat's no parts are this call's, never a turn that committed nothing.
+ */
 function recordGate(run: Run, first: Timer, got: SpanFacts, committed: GateCommitted): void {
   if (committed.parts.length === 0) {
-    finish(first, { outcome: "ok", ...businessOf(run), got, limits: NOT_CHECKED, decided: { parts: 0 } });
+    finish(first, {
+      outcome: "ok",
+      ...businessOf(run),
+      got,
+      limits: NOT_CHECKED,
+      decided: { parts: 0, repeated: committed.repeated },
+    });
     return;
   }
   committed.parts.forEach((part, index) => {

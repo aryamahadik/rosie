@@ -6,7 +6,10 @@
 // (T-248, lease.ts) once each of their texts has been read; the open safety holds go with the turn to its commit
 // (QUESTIONS.md CQ-65 as DL-119 replaced it: holds bind commits, not hand-offs). Each run of a turn pins its bundle first
 // (T-249, ../bundle). A turn parked after its third lapse with no commit (T-253) has its park's span on the turn's trace,
-// under the bundle pinned for it (`parkTrace`).
+// under the bundle pinned for it (`parkTrace`). Each text's safety result, which the read on arrival keeps sealed in the
+// actor's storage (ADR-015, T-1262), is what each run of its turn reads through its leased turn, and the lease removes it,
+// closing the text, in the step that ends the turn for good (T-1264); the STOP and START texts the PostgreSQL-down path
+// took alone are closed at the hand-off, since no turn takes them.
 //
 // A safety read lives in memory, so the actor keeps a stored alarm at each read's 4 s deadline (T-1088): if the actor is
 // evicted mid-read (a deploy, a reset), the alarm brings a new instance, which resumes every read cut off, in arrival
@@ -36,7 +39,10 @@
 // copied, its reply straight through Linq, its record queued for the return, and it joins no turn); a running safety
 // timer due fires from the copy. On return the write-on-return queue replays danger, then stops, then the rest (the STOP
 // and START records through `recordStopOrStart`), and only then does the lease resume and the queued batches go on. Every
-// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)).
+// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)). The lease asks the same path whether a batch waiting
+// behind a turn that has used its one restart may hold a stop word (ADR-018 section 1; T-1311): if so, that turn is
+// restarted a second time with it, so a STOP commits on the first run of the turn that takes it; while the path is
+// unwired, any such batch may.
 //
 // The trace (T-1108; K-08 v1): the gateway writes each inbound event's one receive span, and the actor none of its own. A
 // text's trace is one run by seq whoever writes on it: as the actor stores a text it begins the trace's count after the
@@ -278,6 +284,16 @@ export class HandleActor extends DurableObject {
       // PostgreSQL down (T-270): the lease holds its turn as it is, and the queue is replayed before any commit.
       held: () => this.outage.isDown(),
       beforeCommit: () => this.outage.beforeCommit(),
+      // A batch that may hold a stop word restarts a turn that has used its one restart a second time (ADR-018 section 1):
+      // the down path's reading of each text, true while that path is unwired, on a throw, and for a readable text it
+      // cannot find or that has no reading (RULES 7.2: "Unsure: treat it as a stop").
+      stopAmong: (eventIds) => this.outage.stopAmong(eventIds),
+      // Each text's safety result as the read on arrival kept it (ADR-015; T-1264): a run reads its own texts' through its
+      // leased turn, and the step that ends the turn for good removes them and closes the texts, in its transaction.
+      resultsOf: (eventIds) => this.safety.resultsOf(eventIds),
+      closeResults: (eventIds) => {
+        this.safety.closeResults(eventIds);
+      },
     });
     // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
     // armed row; a clock turn's commit is handed the holds open and the texts not read yet, read at commit time.
@@ -674,11 +690,22 @@ export class HandleActor extends DurableObject {
   /**
    * The batch window's hand-off to the lease (T-270): kept back (as for no turn able to run, so the batch stays stored, in
    * order) while PostgreSQL is known down or one of its texts is a STOP or START not decided on; otherwise taken, without
-   * the STOP and START texts the actor took while it was down.
+   * the STOP and START texts the actor took while it was down. Those never join a turn, so no commit can record their kept
+   * safety results: the results go and the texts are closed first, in one transaction (ADR-015 section 2; T-1264). A crash
+   * before the batch is handed hands it again, and closing again changes nothing; a throw keeps the batch for its retry.
    */
   private async handOff(batch: ClosedBatch): Promise<"taken" | "unwired"> {
     const kept = this.outage.handOff(batch);
     if (kept === null) return "unwired";
+    const joining = new Set(kept.entries.map((entry) => entry.event.eventId));
+    const takenAlone = batch.entries
+      .map((entry) => entry.event.eventId)
+      .filter((eventId) => !joining.has(eventId));
+    if (takenAlone.length > 0) {
+      this.ctx.storage.transactionSync(() => {
+        this.safety.closeResults(takenAlone);
+      });
+    }
     return this.lease.take(kept);
   }
 

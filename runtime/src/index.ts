@@ -87,6 +87,14 @@ declare global {
       LINK_HOST?: string;
       /** The commit a deploy came from (`--var GIT_SHA:<sha>`); missing when run locally. */
       GIT_SHA?: string;
+      /**
+       * Rosie's own number, staging's Linq line, in E.164 form (T-1304; CQ-253 as DL-542 refines it): the number a
+       * chat link's `sms:` address carries (K-09 v1 issueChatLink). Only staging's deploy gives it, by name
+       * (`--var ROSIE_NUMBER:<number>`, infra/scripts/deploy-staging.sh), never wrangler.jsonc: the repository is
+       * public (DL-436). Missing when no value was set or it was not in E.164 form, and in production, branch
+       * previews and local runs, so chat links stay off there (K-05 default 109).
+       */
+      ROSIE_NUMBER?: string;
     }
   }
 }

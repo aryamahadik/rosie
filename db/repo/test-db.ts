@@ -22,6 +22,7 @@
 // never printed.
 import { execFile } from "node:child_process";
 import { randomBytes } from "node:crypto";
+import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import postgres from "postgres";
@@ -33,7 +34,11 @@ const MIGRATE_SCRIPT = fileURLToPath(new URL("../../infra/scripts/migrate.mjs", 
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const TEST_SCHEMA_PREFIX = "t_";
 // Held while migrating, so two test files starting together never race on `create extension` in a fresh database.
+// Taken by polling (takeMigrateLock says why): a try every MIGRATE_LOCK_POLL_MS, for at most MIGRATE_LOCK_WAIT_MS, as
+// infra/scripts/migrate.mjs's takeLock waits for its own lock (120 s).
 const MIGRATE_LOCK_KEY = "rosie-test-db-migrate";
+const MIGRATE_LOCK_POLL_MS = 100;
+const MIGRATE_LOCK_WAIT_MS = 120_000;
 // The pool's databases: `t_own_<n>`, n from 1, at most POOL_SIZE on a server (the runs at once on the build Mac hold
 // a few), each held under the advisory lock `rosie-test-db-own:<its name>` in the maintenance database.
 const POOL_PREFIX = `${TEST_SCHEMA_PREFIX}own_`;
@@ -96,10 +101,38 @@ function schemaNameFor(name: string): string {
   return `${TEST_SCHEMA_PREFIX}${slug === "" ? "test" : slug}_${randomBytes(4).toString("hex")}`;
 }
 
+/**
+ * Takes the migrate lock on `admin`'s one session by polling pg_try_advisory_lock, never the blocking pg_advisory_lock
+ * (T-1278). A session blocked inside a statement holds a snapshot for as long as it waits, and a migration's CREATE
+ * INDEX CONCURRENTLY (0033) waits out every transaction in the database whose snapshot is older than its own. So a file
+ * waiting in pg_advisory_lock held up the index build of the file holding the lock, which let the lock go only once its
+ * migrations ended: two runs on one server deadlocked where PostgreSQL cannot see it, since the holder's side of the
+ * wait is this process waiting for its migrate child. Each try here answers at once and ends its transaction, and
+ * between tries the session is idle outside any transaction with no snapshot, which the index build skips: it waits at
+ * most for the one try in flight, never for the lock.
+ */
+async function takeMigrateLock(admin: Sql): Promise<void> {
+  const giveUpAt = Date.now() + MIGRATE_LOCK_WAIT_MS;
+  for (;;) {
+    const [lock] = await admin<{ taken: boolean }[]>`
+      select pg_try_advisory_lock(hashtext(${MIGRATE_LOCK_KEY})) as taken
+    `;
+    if (lock?.taken === true) {
+      return;
+    }
+    if (Date.now() >= giveUpAt) {
+      throw new Error(
+        `test database: another file still holds the migrate lock after ${String(MIGRATE_LOCK_WAIT_MS / 1000)} s`,
+      );
+    }
+    await sleep(MIGRATE_LOCK_POLL_MS);
+  }
+}
+
 async function migrate(url: string, schema: string): Promise<void> {
   const admin = postgres(url, { max: 1, onnotice: () => undefined });
   try {
-    await admin`select pg_advisory_lock(hashtext(${MIGRATE_LOCK_KEY}))`;
+    await takeMigrateLock(admin);
     try {
       await run(process.execPath, [MIGRATE_SCRIPT], {
         cwd: REPO_ROOT,

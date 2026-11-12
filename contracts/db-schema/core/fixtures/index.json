@@ -183,6 +183,46 @@
       "expect": "refuse",
       "shows": "A Tool API call scoped to the yoga studio cannot read Lee's Barbershop's booking: row-level security returns no row (the same read scoped to Lee's Barbershop returns it)",
       "source": "arch 10 line 546 (row-level security per business on every Tool API call); RULES 4.10"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-with-no-turn-or-job.json",
+      "version": "v1.1",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "The runtime side writing the email row of Sam's sign-in code (K-09 v1's proof-code-email.json: out-sam-signin-code, to his email on file, purpose code, the code's expiry 13:10Z, the page call's trace) with neither a turn id nor a job id is refused (CHECK outbox_rows_turn_or_job, 23514); with its attempt's job id, sign-in-attempt-sam-1, the same insert passes",
+      "source": "ADR-016 section 1 (K-04 v1.1: a row with no turn carries a job id; CHECK outbox_rows_turn_or_job, the event log's own rule); contracts/tool-api/fixtures/proof-code-email.json"
+    },
+    {
+      "file": "invalid/refuse-email-purpose-on-text-row.json",
+      "version": "v1.1",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "The same code row sent as a text to Sam's mobile (imessage) while it still names the email purpose code is refused (CHECK outbox_rows_email_purpose_is_email, 23514); the same text row naming no purpose passes",
+      "source": "ADR-016 section 1 (email_purpose: null, or one of K-12 v1's six purposes on an email row only)"
+    },
+    {
+      "file": "invalid/refuse-email-purpose-unknown.json",
+      "version": "v1.1",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "Sam's code email row naming signIn, K-09's sendProofCode purpose, which is none of K-12 v1's six email purposes, is refused (CHECK outbox_rows_email_purpose_known, 23514); naming code, the same insert passes",
+      "source": "ADR-016 section 1; K-12 v1 README (sendEmail.request purpose: confirmation, copy, emailWay, nextWay, code, notice)"
+    },
+    {
+      "file": "invalid/refuse-code-row-without-not-after.json",
+      "version": "v1.1",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "Sam's code email row (purpose code) with no not_after is refused (CHECK outbox_rows_code_has_not_after, 23514), so a dead code can never be sent; with not_after at its code's expiry, 13:10Z, the same insert passes",
+      "source": "ADR-016 sections 1 and 3 (a row of purpose code has a not_after: the code dies 10 minutes after it is made, and a retry never sends a dead code); RULES 6.2"
+    },
+    {
+      "file": "invalid/refuse-delivered-part-without-time.json",
+      "version": "v1.1",
+      "table": "outbox_parts",
+      "expect": "refuse",
+      "shows": "The tour's delivered words part to Alex (seed-outbox-row.json, out-a7-03-alex/1/1) updated to drop its delivery time, its version raised 3 to 4, is refused (CHECK outbox_parts_delivered_has_time, 23514); keeping its time, the same update passes",
+      "source": "QUESTIONS.md CQ-211 (the CHECK joins K-04's next minor version); ADR-016 section 1; arch 02 line 127"
     }
   ]
 }

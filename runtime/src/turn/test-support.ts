@@ -8,11 +8,13 @@
 //   - K-02 v1's decide and re-read (`fakeDecide`): the decide-*.json results, with the model calls a stage reports;
 //   - the second half's ports (`fakeReply`, T-252): the composer (K-03 plans, with its model calls), K-05 v1's
 //     unplannedRows and writePlan, and the dispatcher's wake; and K-05 v1's parkTurn as park-turn.json answers it (T-253);
-//   - the handle's directory, the safety results (safety-no.json under each text's event id) and a clock of the fixtures'
-//     `now` values;
+//   - the handle's directory and a clock of the fixtures' `now` values (`turnDeps`), and the safety results (safety-no.json
+//     under each text's event id: `FakeFacts.safety`), which a test turn's `resultsOf` answers as the lease answers it from
+//     the actor's kept results (ADR-015 section 3);
 //   - K-05 v1.2 handleTargets for the guard (`targetsAnswer`), so the guard's targets are the fixtures' `targets`;
 //   - a leased turn (`testTurn`) whose commit goes to the turn's own commit hook with a CommitContext the test gives, as
-//     the lease does (the lease itself is tested in runtime/src/actor; the actor tests here run it for real).
+//     the lease does (the lease itself is tested in runtime/src/actor; the actor tests here run it for real, where each
+//     run reads the results the real read on arrival kept).
 // A double that waits (`hold`) polls a flag rather than waiting on a promise: a promise made inside a Durable Object
 // cannot be settled from the test's own context (T-1128's findings). Test values only: the master's sample cast and the
 // frozen fixtures' ids; phones in the fictional 555-01xx range (rule 9).
@@ -212,10 +214,16 @@ export interface TestTurnSpec {
   context?: CommitContext;
 }
 
+/** The facts whose results a test turn's `resultsOf` answers: the last ones `turnDeps` was handed. */
+let keptResults: FakeFacts | null = null;
+
 /**
  * A run of a turn as the lease hands it (LeasedTurn), with the fixture's own ids. Its commit is the lease's, emulated: the
  * turn id must be this turn's, the commit hook (`commitThroughToolApi`) gets the request with this test's CommitContext,
- * and a hook that throws is `noAnswer`.
+ * and a hook that throws is `noAnswer`. Its `resultsOf` is the lease's too (ADR-015 section 3): each asked id is noted in
+ * the facts' `asked`, and each one of this turn's own texts that the facts hold a result for is answered, a copy, from
+ * the facts the last `turnDeps` call was handed, read when the run asks (as the turn's deps are set for the isolate);
+ * with none handed, the read rejects, as the lease's does with nothing wired.
  */
 export function testTurn(spec: TestTurnSpec): TestTurn {
   const spans: Span[] = [];
@@ -265,6 +273,19 @@ export function testTurn(spec: TestTurnSpec): TestTurn {
     replied() {
       replied.count += 1;
       return Promise.resolve();
+    },
+    resultsOf(asked) {
+      const facts = keptResults;
+      if (facts === null) return Promise.reject(new Error("no safety results are wired"));
+      facts.asked.push(...asked);
+      return Promise.resolve(
+        [...new Set(asked)]
+          .filter((eventId) => eventIds.includes(eventId))
+          .flatMap((eventId) => {
+            const result = facts.safety.get(eventId);
+            return result === undefined ? [] : [structuredClone(result)];
+          }),
+      );
     },
     bundleId: spec.bundleId,
     bundle,
@@ -629,10 +650,14 @@ export function safetyNoFor(eventId: string): SafetyResult {
 export interface FakeFacts {
   /** What the directory answers for every handle (null: not known). */
   party: TurnParty | null;
-  /** Each event's safety result. */
+  /**
+   * Each event's safety result: what a test turn's `resultsOf` answers (`testTurn`), as the actor's kept results answer the
+   * real lease's. A run inside the real actor reads what its read on arrival kept instead.
+   */
   readonly safety: Map<string, SafetyResult>;
   /** The `now` each K-09 request names, in order (the last one again after). */
   readonly times: string[];
+  /** Each event id a test turn's run asked a result for, in order. */
   readonly asked: string[];
 }
 
@@ -643,6 +668,7 @@ export function fakeFacts(party: TurnParty | null, times: string[]): FakeFacts {
 /**
  * Every port the turn reaches, over these doubles. The second half's (T-252) are `reply`'s; left out, a fresh set whose
  * rows fake lists none of the turn's rows, so nothing is composed and only the dispatcher's wake shows, in its own log.
+ * Each text's safety result is no port (ADR-015 section 3): a test turn's `resultsOf` answers from these facts from now on.
  */
 export function turnDeps(
   facts: FakeFacts,
@@ -651,6 +677,7 @@ export function turnDeps(
   keys: SealingKeyStore,
   reply: FakeReply = fakeReply(),
 ): TurnDeps {
+  keptResults = facts;
   let next = 0;
   return {
     composer: composerOf(reply.composer),
@@ -660,17 +687,6 @@ export function turnDeps(
       partyOf: () => Promise.resolve(facts.party),
     },
     keys,
-    safety: {
-      resultsOf(eventIds) {
-        facts.asked.push(...eventIds);
-        return Promise.resolve(
-          eventIds.flatMap((eventId) => {
-            const result = facts.safety.get(eventId);
-            return result === undefined ? [] : [structuredClone(result)];
-          }),
-        );
-      },
-    },
     toolApi: turnFaceOf(face),
     ai: decideOf(ai),
     now() {

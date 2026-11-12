@@ -11,6 +11,14 @@
 //   - A batch that closes before the running turn commits restarts that turn once, with its texts: a new turn id from the
 //     union of the ids. A batch that closes after that restart, or once the turn has begun its commit, waits; when the turn
 //     commits, every waiting batch opens the next turn together.
+//   - A STOP never waits on a restarted turn (ADR-018 section 1; CQ-230; RULES 7.2: "Unsure: treat it as a stop. It stops
+//     texts from the number it answers, at once"; arch 06 line 329). A waiting batch that may hold a stop word (the host's
+//     `stopAmong`) restarts a turn that has used its one restart a second time, in the same way, while that turn is leased
+//     (it has not begun its commit, is not holding its lease for its reply and is not being parked) and is not left for the
+//     park: a turn of its texts and every waiting batch's, at try 1, written as 2 in lease_turns.restart. A turn so opened
+//     is never restarted again: any later batch waits for the next turn. So a turn is restarted at most twice. The STOP's
+//     turn then commits its keyword texts on its first run (T-1263, ../turn/turn.ts). A host that cannot say (a throw)
+//     reads as a stop word; a host without `stopAmong` as none, so it keeps the one restart.
 //   - A lease that lapses (60 s and no commit) reruns the turn from its sealed texts under the same turn id, so a commit
 //     that went through before the crash comes back as the first result (K-05 v1 commitTurn: a repeat writes nothing).
 //
@@ -56,6 +64,15 @@
 // a later turn's commit lost its answer, and only an answer from that lost turn or a turn opened after it may end what
 // the host keeps for it.
 //
+// Each text's safety result, as the safety read on arrival applied it last, is kept sealed in the actor's own storage until
+// its text can reach no commit (ADR-015; T-1262). A run reads its texts' results through its leased turn when it calls
+// `resultsOf` (T-1264; ADR-015 section 3), never through a port every actor of the isolate shares: the host answers from
+// the handle's own store, and only for the turn's own texts. The step that ends a turn for good removes its texts' results
+// and closes them (the host's `closeResults`), inside the same storage transaction, so a crash leaves both or neither: its
+// reply ended (`replied`), a commit with no reply, K-05's turnParked, a park and a park's alreadyCommitted (`finish`), and
+// its reply given up at its third lapse. Never at a restart (the texts move to the restart's turn), a lapse's rerun, a
+// commit that keeps the lease for its reply, a turn held while PostgreSQL is down, or a third lapse with no park wired.
+//
 // PostgreSQL down (T-270; arch 11 line 566: "Turns queue in order in each handle's actor"): while the host says so
 // (`held`), a lapse is no crash. The lease holds the turn as it is: it reruns nothing, counts no try and parks nothing, the
 // lease is renewed for LEASE_MS and the turn noted held, and no batch opens or restarts a turn. On return the host calls
@@ -71,7 +88,7 @@
 // (the pin records the turn's `lease` span; the park, its own).
 
 import type { PinnedBundle, PinRequest, TurnPin } from "../bundle";
-import type { OpenHold } from "../safety";
+import type { OpenHold, SafetyResult } from "../safety";
 import type { BundleId, TraceContext } from "../trace";
 import { actorClock, createScheduleTable, scheduleEntry, unscheduleEntry, type ClosedBatch } from "./batch";
 import { readInboxEvents, type InboxEntry } from "./inbox";
@@ -174,7 +191,10 @@ export interface LeasedTurn {
   joinedTraceIds: string[];
   /** How many times this turn has started: 1, then 2 and 3 after a lapse (K-05 turn.tries). */
   tries: number;
-  /** True when this turn is the one restart: a later batch waits for the next turn. */
+  /**
+   * True when this turn is a restart: the one restart, after which a later batch waits unless it may hold a stop word, or
+   * the second, for a batch that may hold one, after which every later batch waits for the next turn (ADR-018 section 1).
+   */
   restart: boolean;
   /** When the lease lapses, on the actor's clock. */
   leaseUntil: number;
@@ -191,9 +211,20 @@ export interface LeasedTurn {
   commit(request: CommitTurnRequest, options?: CommitOptions): Promise<CommitAnswer>;
   /**
    * The run's reply has ended (T-253): every row its commit wrote holds a plan or is closed, and the dispatcher was woken.
-   * The lease is released and the waiting batches open the next turn. From a run no longer the turn's it changes nothing.
+   * The lease is released and the waiting batches open the next turn, and the turn's texts' kept safety results are
+   * removed (ADR-015 section 2). From a run no longer the turn's it changes nothing.
    */
   replied(): Promise<void>;
+  /**
+   * Each asked text's safety result (K-02 v1 `safetyResult`) as the safety read on arrival applied it last and the actor
+   * keeps it, sealed, until the text can reach no commit (ADR-015 sections 2 and 3; T-1264). Read when the run calls it,
+   * so a restart's run, a lapse's rerun and a rerun after the commit each read it again. Only this turn's own texts are
+   * answered: an id outside `eventIds`, a text with no result kept (none applied, one not kept yet, or its text closed) and
+   * a result that does not open as that text's own are left out; never a made-up result, a stand-in or a second read.
+   * Rejects when no read can be done at all (nothing wired, the key store or the storage failed): the turn then takes no
+   * results.
+   */
+  resultsOf(eventIds: readonly string[]): Promise<readonly SafetyResult[]>;
   /**
    * The bundle id pinned at the turn's start (T-249): the same for every run of this turn id, whatever the active id is by
    * then. The commit names it (K-05 turn.bundleId; arch 10 line 548: the bundle id on every turn).
@@ -338,6 +369,7 @@ export interface TurnEntry {
   turnId: string;
   eventIds: string[];
   state: TurnState;
+  /** True for either restart: the one restart, or the second, for a batch that may hold a stop word (ADR-018). */
   restart: boolean;
   tries: number;
   /** When its lease lapses, while it holds the lease; else null. */
@@ -357,6 +389,10 @@ interface TurnRow extends Record<string, SqlStorageValue> {
   turn_id: string;
   items: string;
   state: string;
+  /**
+   * 0: opened by the waiting batches; 1: the one restart; 2: the second restart, for a batch that may hold a stop word,
+   * never restarted again (ADR-018 section 1).
+   */
   restart: number;
   tries: number;
   committed_at: string | null;
@@ -422,6 +458,19 @@ interface Snapshot {
     items: Item[];
   } | null;
   waiting: { batchId: number; items: Item[] }[];
+  /**
+   * True when a waiting batch may hold a stop word (the host's `stopAmong`, ADR-018 section 1). Asked only while a leased
+   * turn that has used its one restart holds the lease and batches wait; false otherwise.
+   */
+  stopWaiting: boolean;
+}
+
+/** What the waiting batches do: open a turn (`replaces` null, restart 0) or replace the running one (restart 1 or 2). */
+interface Plan {
+  items: Item[];
+  replaces: string | null;
+  /** What lease_turns.restart is written as for the turn the plan opens. */
+  restart: 0 | 1 | 2;
 }
 
 export interface LeaseHost {
@@ -460,6 +509,14 @@ export interface LeaseHost {
    */
   commitLost?(lost: LostCommit): void;
   /**
+   * True when one of these texts, the batches waiting behind a turn that has used its one restart, may hold a stop word
+   * (STOP or another opt-out word; ADR-018 section 1): that turn is then restarted a second time with them, so the STOP
+   * commits on the first run of the turn that takes it, never after the running turn's lapses (RULES 7.2; arch 06 line
+   * 329). Called synchronously, inside the lease's storage transaction that decides again. Optional: left out, false (the
+   * one restart, as before this rule); a throw reads as true ("Unsure: treat it as a stop", RULES 7.2).
+   */
+  stopAmong?(eventIds: readonly string[]): boolean;
+  /**
    * True while PostgreSQL is down (T-270): a lapse is no crash, so the lease holds the turn as it is (no rerun, no try, no
    * park), and no batch opens or restarts a turn, until `resume`. Optional: left out (or a throw), never held.
    */
@@ -470,6 +527,19 @@ export interface LeaseHost {
    * left out, every commit is sent; a throw sends nothing (fails closed).
    */
   beforeCommit?(): Promise<boolean>;
+  /**
+   * The kept safety results of these texts, all of them the running turn's own (ADR-015 section 3; the actor's safety read,
+   * T-1262): each one's K-02 result as the read on arrival applied it last, a text with none kept left out. A throw is a
+   * read that cannot be done: the run takes no results. Optional: left out, every run's read rejects (nothing wired).
+   */
+  resultsOf?(eventIds: readonly string[]): Promise<readonly SafetyResult[]>;
+  /**
+   * Removes the kept safety results of these texts and closes them, so nothing is kept for them again (ADR-015 section 2;
+   * the actor's safety read, T-1262): called synchronously, inside the lease's storage transaction that ends their turn for
+   * good, and at no other step. A throw is the storage's: the transaction then keeps neither the turn's end nor the
+   * removal. Optional: left out, nothing is kept to remove.
+   */
+  closeResults?(eventIds: readonly string[]): void;
 }
 
 /** What the park's trace is opened from (T-253). */
@@ -523,9 +593,10 @@ export class TurnLease {
 
   /**
    * Gives the waiting batches a turn: with no lease held, they open the next turn; with a running turn that has not
-   * restarted and has not begun its commit, they restart it once with its texts and theirs; otherwise they wait. The turn
-   * id is hashed outside the transaction (WebCrypto is asynchronous), so the transaction decides again from what is stored
-   * now and writes only when it decides the same; otherwise it starts over.
+   * restarted and has not begun its commit, they restart it once with its texts and theirs; with one that has used that
+   * restart, they restart it a second time when one of them may hold a stop word (ADR-018 section 1); otherwise they wait.
+   * The turn id is hashed outside the transaction (WebCrypto is asynchronous), so the transaction decides again from what
+   * is stored now, the host's `stopAmong` asked again, and writes only when it decides the same; otherwise it starts over.
    */
   private async advance(): Promise<void> {
     for (;;) {
@@ -545,7 +616,7 @@ export class TurnLease {
           "INSERT INTO lease_turns (turn_id, items, state, restart, tries, opened_ms) VALUES (?, ?, 'leased', ?, 1, ?)",
           turnId,
           JSON.stringify(plan.items),
-          plan.replaces === null ? 0 : 1,
+          plan.restart,
           at,
         );
         this.sql.exec("UPDATE lease_batches SET turn_id = ? WHERE turn_id IS NULL", turnId);
@@ -582,6 +653,9 @@ export class TurnLease {
       .exec<WaitingRow>("SELECT batch_id, items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
       .toArray()
       .map((row) => ({ batchId: row.batch_id, items: JSON.parse(row.items) as Item[] }));
+    // Only a leased turn that has used its one restart can take the second: the host is asked only while such a turn holds
+    // the lease and batches wait (planOf still leaves one that is left for the park).
+    const asks = turn?.state === "leased" && turn.restart === 1 && waiting.length > 0;
     return {
       lease:
         lease === undefined || turn === undefined
@@ -595,7 +669,24 @@ export class TurnLease {
               items: JSON.parse(turn.items) as Item[],
             },
       waiting,
+      stopWaiting:
+        asks && this.stopAmong(bySeq(waiting.flatMap((batch) => batch.items)).map((item) => item.eventId)),
     };
+  }
+
+  /**
+   * Whether one of these waiting texts may hold a stop word (ADR-018 section 1): the host's answer; a host that cannot say
+   * (a throw, or an answer that is not false) reads as yes (RULES 7.2: "Unsure: treat it as a stop"), and a host without
+   * `stopAmong` as no, so a host built before the rule keeps the one restart.
+   */
+  private stopAmong(eventIds: readonly string[]): boolean {
+    if (this.host.stopAmong === undefined) return false;
+    try {
+      const answer: unknown = this.host.stopAmong(eventIds);
+      return answer !== false;
+    } catch {
+      return true;
+    }
   }
 
   // ---- running and committing ---------------------------------------------------------------------------------------
@@ -626,11 +717,13 @@ export class TurnLease {
       traceId,
       joinedTraceIds,
       tries: turn.tries,
-      restart: turn.restart === 1,
+      // Either restart, the one or the second (ADR-018 section 1).
+      restart: turn.restart > 0,
       leaseUntil: lease.until_ms,
       signal,
       commit: (request, options) => this.commit(turnId, request, options?.reply === true),
       replied: () => this.replied(turnId, controller),
+      resultsOf: (asked) => this.resultsOf(eventIds, asked),
     };
     const pinRequest: PinRequest = {
       turnId,
@@ -658,6 +751,29 @@ export class TurnLease {
           () => undefined,
         ),
     );
+  }
+
+  /**
+   * A run's read of its texts' kept safety results (ADR-015 section 3): only the turn's own texts are asked of the host, each
+   * once, and only a result naming one of them is answered. Rejects when the host keeps none (nothing wired).
+   */
+  private async resultsOf(
+    own: readonly string[],
+    asked: readonly string[],
+  ): Promise<readonly SafetyResult[]> {
+    if (this.host.resultsOf === undefined) throw new Error("no safety results are wired");
+    const eventIds = [...new Set(asked)].filter((eventId) => own.includes(eventId));
+    if (eventIds.length === 0) return [];
+    const results = await this.host.resultsOf(eventIds);
+    return results.filter((result) => eventIds.includes(result.eventId));
+  }
+
+  /**
+   * Removes the kept safety results of a turn's texts and closes them (ADR-015 section 2), inside the caller's transaction
+   * that ends the turn for good: a throw (the storage's) undoes the turn's end with it.
+   */
+  private closeResultsOf(turn: TurnRow): void {
+    this.host.closeResults?.((JSON.parse(turn.items) as Item[]).map((item) => item.eventId));
   }
 
   /** Tells a run that is no longer the turn's to stop (a restart replaced it, a park began, or its reply was given up). */
@@ -760,7 +876,8 @@ export class TurnLease {
 
   /**
    * The run's reply has ended (T-253): its committed turn gives the lease up and the waiting batches open the next turn.
-   * Only the run that has the turn now is heard: a run a lapse replaced leaves it to its rerun.
+   * The turn has ended for good: its texts' kept safety results go in the same transaction (ADR-015 section 2). Only the
+   * run that has the turn now is heard: a run a lapse replaced leaves it to its rerun.
    */
   private async replied(turnId: string, run: AbortController): Promise<void> {
     if (this.runs.get(turnId) !== run) return;
@@ -768,6 +885,7 @@ export class TurnLease {
       const turn = this.turnRow(turnId);
       if (turn?.state !== "committed" || this.leaseRow()?.turn_id !== turnId) return false;
       this.sql.exec("DELETE FROM turn_lease WHERE turn_id = ?", turnId);
+      this.closeResultsOf(turn);
       this.syncSchedule();
       return true;
     });
@@ -778,8 +896,10 @@ export class TurnLease {
   }
 
   /**
-   * The turn is done: the lease is released and the waiting batches open the next turn. A later answer changes nothing,
-   * and a turn already committed keeps its lease until its reply ends (T-253).
+   * The turn is done: the lease is released and the waiting batches open the next turn, and its texts' kept safety results
+   * go in the same transaction (ADR-015 section 2): a commit with no reply, K-05's turnParked, a park, or a park's
+   * alreadyCommitted. A later answer changes nothing, and a turn already committed keeps its lease until its reply ends
+   * (T-253).
    */
   private async finish(
     turnId: string,
@@ -796,6 +916,7 @@ export class TurnLease {
         turnId,
       );
       this.sql.exec("DELETE FROM turn_lease WHERE turn_id = ?", turnId);
+      this.closeResultsOf(turn);
       this.syncSchedule();
     });
     this.runs.delete(turnId);
@@ -883,7 +1004,8 @@ export class TurnLease {
 
   /**
    * Applies a lapse inside the caller's transaction: a rerun (one more try when `countTry`), a park (marked first, so no
-   * run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails) or a reply given up.
+   * run commits from now on and no batch restarts it; tried again PARK_RETRY_MS on if it fails) or a reply given up, which
+   * ends the turn for good, so its texts' kept safety results go with it (ADR-015 section 2).
    */
   private lapse(turnId: string, act: Lapse, now: number, countTry: boolean): { act: Lapse; turnId: string } {
     if (act === "park") {
@@ -891,6 +1013,8 @@ export class TurnLease {
       this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + PARK_RETRY_MS);
     } else if (act === "giveUp") {
       this.sql.exec("DELETE FROM turn_lease WHERE one = 1");
+      const turn = this.turnRow(turnId);
+      if (turn !== undefined) this.closeResultsOf(turn);
     } else {
       if (countTry) this.sql.exec("UPDATE lease_turns SET tries = tries + 1 WHERE turn_id = ?", turnId);
       this.sql.exec("UPDATE turn_lease SET until_ms = ? WHERE one = 1", now + LEASE_MS);
@@ -1050,7 +1174,7 @@ export class TurnLease {
         turnId: row.turn_id,
         eventIds: (JSON.parse(row.items) as Item[]).map((item) => item.eventId),
         state: row.state as TurnState,
-        restart: row.restart === 1,
+        restart: row.restart > 0,
         tries: row.tries,
         leaseUntil: lease?.turn_id === row.turn_id ? lease.until_ms : null,
         committedAt: row.committed_at,
@@ -1109,16 +1233,21 @@ function lapseOf(turn: TurnRow): Lapse | null {
 }
 
 /**
- * What the waiting batches do: open a turn (no lease is held), restart the running turn once (it holds the lease, has not
- * restarted and has not begun its commit; a third try that lapsed is left for the park), or wait (null): a turn that has
- * begun its commit, is replying (T-253) or is being parked keeps them waiting.
+ * What the waiting batches do: open a turn (no lease is held); restart the running turn once (it holds the lease, has not
+ * restarted and has not begun its commit; a third try that lapsed is left for the park); restart it a second time when it
+ * has used its one restart and one of them may hold a stop word (ADR-018 section 1: the same conditions); or wait (null):
+ * a turn that has begun its commit, is replying (T-253), is being parked or is left for the park keeps them waiting, and
+ * so do a turn that has used its one restart while none of them may hold a stop word and a turn opened by the second
+ * restart, which is never restarted again.
  */
-function planOf(state: Snapshot, now: number): { items: Item[]; replaces: string | null } | null {
+function planOf(state: Snapshot, now: number): Plan | null {
   if (state.waiting.length === 0) return null;
   const waitingItems = state.waiting.flatMap((batch) => batch.items);
   const live = state.lease;
-  if (live === null) return { items: bySeq(waitingItems), replaces: null };
+  if (live === null) return { items: bySeq(waitingItems), replaces: null, restart: 0 };
   const stuck = live.tries >= MAX_TRIES && live.untilMs <= now;
-  if (live.state !== "leased" || live.restart === 1 || stuck) return null;
-  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId };
+  if (live.state !== "leased" || stuck) return null;
+  const restart = live.restart === 0 ? 1 : live.restart === 1 && state.stopWaiting ? 2 : null;
+  if (restart === null) return null;
+  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId, restart };
 }

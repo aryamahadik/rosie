@@ -1,0 +1,32 @@
+{
+  "after": ["seed-sign-in-attempt.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "insert",
+    "table": "sign_in_attempts",
+    "values": {
+      "id": "sign-in-no-account-oct29-0900",
+      "attempt_id": "attempt-no-account-signin-2",
+      "request_sha256": "a6b7c8d9eafb0c1d2e3f405162738495a6b7c8d9eafb0c1d2e3f405162738495",
+      "device_sha256": "d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+      "contact_hash": "c2a3b4c5d6e7f8091a2b3c4d5e6f7081c2a3b4c5d6e7f8091a2b3c4d5e6f7081",
+      "hash_key_name": "PROOF_CODE_HASH_KEY",
+      "way": "email",
+      "person_id": null,
+      "owner_or_admin": false,
+      "started_at": "2026-10-29T09:00:00Z",
+      "expires_at": "2026-10-29T09:10:00Z",
+      "wrong_tries": 6,
+      "last_wrong_at": "2026-10-29T09:03:00Z",
+      "paused_until": "2026-10-29T09:18:00Z",
+      "last_check_sha256": "e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2d3",
+      "last_outcome": "paused"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["sign_in_attempts_wrong_tries_range"]
+    }
+  }
+}
