@@ -5,9 +5,10 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { renderSVG } from "uqr";
 
-// Fixtures. The number is Rosfield's own Shared line; the code and text are made up.
+// Fixtures, all made up. The number is a fiction-range one (+1 NPA 555-01xx), not a real line: the repository is
+// public and no real phone number goes in it (DL-436, DL-542; T-1316). The code and the text are made up too.
 export const FIXTURE = {
-  sharedLine: "+12052611117",
+  sharedLine: "+15555550123",
   shortCode: "ZX7Q4K",
   readyText: "Hi Rosie, I would like to book. Code ZX7Q4K",
 };
@@ -85,7 +86,7 @@ figure.qr svg { width: 16rem; height: 16rem; }
 </head>
 <body>
 <h1>Chat link device check</h1>
-<p>Fixture values only. Line: ${escapeHtml(FIXTURE.sharedLine)} (Rosfield's Shared line). Short code: ${escapeHtml(FIXTURE.shortCode)} (made up). Scan each code and tap each link on a real phone.</p>
+<p>Fixture values only. Line: ${escapeHtml(FIXTURE.sharedLine)} (fiction range, made up). Short code: ${escapeHtml(FIXTURE.shortCode)} (made up). Scan each code and tap each link on a real phone.</p>
 ${sections}
 </body>
 </html>
