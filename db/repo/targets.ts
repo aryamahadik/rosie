@@ -71,10 +71,48 @@ const LOST_CONNECTION_CODES = new Set([
   "ETIMEDOUT",
 ]);
 const LOST_CONNECTION_SQLSTATE = "08006";
+/**
+ * The codes of a connection that never opened (T-1268), which carry no SQLSTATE either: postgres.js's own
+ * CONNECT_TIMEOUT (no answer to the startup within connect_timeout), and the socket's own for an address that refused
+ * the connection, could not be reached or could not be resolved. No statement went out on such a connection, so nothing
+ * was written and the same request may be sent again: they answer 08001 (sqlclient_unable_to_establish_sqlconnection).
+ */
+const NEVER_CONNECTED_CODES = new Set([
+  "CONNECT_TIMEOUT",
+  "ECONNREFUSED",
+  "EHOSTUNREACH",
+  "ENETUNREACH",
+  "EHOSTDOWN",
+  "ENETDOWN",
+  "EADDRNOTAVAIL",
+  "ENOTFOUND",
+]);
+/** Every other failure of the name lookup (getaddrinfo: EAI_AGAIN, EAI_FAIL, ...): no address, so no connect was tried. */
+const NAME_LOOKUP_FAILED = /^EAI_[A-Z]+$/;
+const NEVER_CONNECTED_SQLSTATE = "08001";
+/**
+ * JavaScript's own errors for a value or a program at fault. postgres.js rejects a statement with one when it cannot
+ * build the statement or read its rows (a value it cannot send), never when its socket fails.
+ */
+const FAULT_NAMES = new Set([
+  "TypeError",
+  "RangeError",
+  "SyntaxError",
+  "ReferenceError",
+  "EvalError",
+  "URIError",
+]);
 
 /**
- * The transient answer for a serialization failure, a deadlock or a lost connection (K-05 README: nothing was written,
- * the same request may be sent again); any other error is thrown. The answer carries only a SQLSTATE.
+ * The transient answer for a serialization failure, a deadlock, a lost connection or a connection that never opened
+ * (K-05 README: nothing was written, the same request may be sent again); any other error is thrown. The answer carries
+ * only a SQLSTATE, never the error's message, host, port, user, statement or parameters (T-1268).
+ *
+ * A socket error with no code is a lost connection too (08006): postgres.js's Workers build passes its socket's failure
+ * up as the socket gives it, with no code, and rejects the statement in flight with it, putting that statement on it as
+ * own properties (query and parameters, empty for a statement it never built; args, its values). An error with no code
+ * that rejected no statement (db/repo's own), or that is one of JavaScript's own for a faulty value (postgres.js could
+ * not build or read a statement), is thrown.
  */
 export function transientOrThrow(error: unknown): TransientError {
   const code = (error as { code?: unknown } | null | undefined)?.code;
@@ -85,6 +123,16 @@ export function transientOrThrow(error: unknown): TransientError {
     if (LOST_CONNECTION_CODES.has(code)) {
       return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
     }
+    if (NEVER_CONNECTED_CODES.has(code) || NAME_LOOKUP_FAILED.test(code)) {
+      return { error: "transient", sqlstate: NEVER_CONNECTED_SQLSTATE };
+    }
+  } else if (
+    error instanceof Error &&
+    error.name !== "PostgresError" &&
+    !FAULT_NAMES.has(error.name) &&
+    (Object.hasOwn(error, "query") || Object.hasOwn(error, "parameters"))
+  ) {
+    return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
   }
   throw error;
 }

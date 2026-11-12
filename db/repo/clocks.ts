@@ -312,20 +312,55 @@ function nameOrNull(value: unknown): string | null {
   return typeof value === "string" && NAME.test(value) ? value : null;
 }
 
-/** A PostgreSQL error as DataAccessDatabaseError; any other error as it is. */
+/**
+ * A PostgreSQL error as DataAccessDatabaseError; an error of the database client or of its connection as a new Error
+ * that carries the call's name and the client's code alone (`call`, `code`: a plain code such as
+ * ERR_TLS_CERT_ALTNAME_INVALID or UNDEFINED_VALUE, or null), with no stack of the original's and no cause (T-1268);
+ * db/repo's own errors as they are.
+ *
+ * The client's error is never passed on. Its message names the host and the port (postgres.js's "write CONNECT_TIMEOUT
+ * host:port", Node's "connect ECONNREFUSED host:port" and "getaddrinfo ENOTFOUND host"), its properties hold them
+ * (address, port, hostname; host and cert from Node's TLS name check; errors, one per address, when every address of a
+ * name failed), and postgres.js puts the statement on every error it rejects a statement with (query, parameters, args,
+ * types, and the statement's origin on its stack; args holds the statement's values even when the connection never
+ * opened). It is known by those properties, which db/repo's own errors never carry, or by syscall and errno, Node's mark
+ * of a system error.
+ */
 export function scrubbed(call: string, error: unknown): unknown {
-  if (!(error instanceof Error) || error.name !== "PostgresError") {
+  if (!(error instanceof Error)) {
     return error;
   }
   const failure = error as Error & { code?: unknown; table_name?: unknown; constraint_name?: unknown };
-  if (typeof failure.code !== "string" || !SQLSTATE.test(failure.code)) {
+  if (error.name === "PostgresError" && typeof failure.code === "string" && SQLSTATE.test(failure.code)) {
+    return new DataAccessDatabaseError(
+      call,
+      failure.code,
+      nameOrNull(failure.table_name),
+      nameOrNull(failure.constraint_name),
+    );
+  }
+  const clientFields = [
+    "query",
+    "parameters",
+    "args",
+    "types",
+    "address",
+    "port",
+    "hostname",
+    "host",
+    "cert",
+    "errors",
+    "syscall",
+    "errno",
+  ];
+  if (error.name !== "PostgresError" && !clientFields.some((field) => Object.hasOwn(error, field))) {
     return error;
   }
-  return new DataAccessDatabaseError(
-    call,
-    failure.code,
-    nameOrNull(failure.table_name),
-    nameOrNull(failure.constraint_name),
+  const code =
+    typeof failure.code === "string" && /^[A-Z0-9_]{1,64}$/.test(failure.code) ? failure.code : null;
+  return Object.assign(
+    new Error(`${call}: the database call failed (${code === null ? "no code" : `code ${code}`})`),
+    { call, code },
   );
 }
 
