@@ -77,6 +77,10 @@ const SWAPS = [
 ];
 // Every command the script, lib.sh and cf.sh start by name. PATH holds nothing else.
 const COMMANDS = ["bash", "sed", "tr", "dirname", "basename"];
+// How much of a text answer from the API the script shows, read from its source (T-1271).
+const ERROR_TEXT_CUT = Number(
+  /^const ERROR_TEXT_CUT = (\d+);$/m.exec(readFileSync(path.join(SCRIPTS, PROGRAM), "utf8"))?.[1],
+);
 
 const quote = (name) => `"${name.replaceAll('"', '""')}"`;
 const shellQuoted = (text) => `'${text.replaceAll("'", `'\\''`)}'`;
@@ -458,7 +462,10 @@ async function database(names, { setPrivilege = true, settings = {} } = {}) {
   return { url, password, database };
 }
 
-/** The stand-in API of one case: each create answered as `answers` says, in order ("ok" when it runs out). */
+/**
+ * The stand-in API of one case: each create answered as `answers` says, in order ("ok" when it runs out). T-1271 adds
+ * "long:password", "long:token" and "long:host": a text answer longer than the script's cut, with that value across it.
+ */
 async function api(rig, answers = []) {
   const posts = [];
   const server = http.createServer((request, response) => {
@@ -502,6 +509,16 @@ async function api(rig, answers = []) {
             },
           ],
         });
+        return;
+      }
+      if (answer.startsWith("long:")) {
+        // Not JSON, and longer than the cut: the value's first half (rounded up) before the cut, the rest after it.
+        const value = { password: body.origin.password, token: TOKEN, host: body.origin.host }[
+          answer.slice(5)
+        ];
+        const kept = Math.ceil(value.length / 2);
+        response.writeHead(502, { "content-type": "text/plain" });
+        response.end(`${"x".repeat(ERROR_TEXT_CUT - kept)}${value}${"y".repeat(500)}`);
         return;
       }
       const id = randomBytes(16).toString("hex");
@@ -1628,6 +1645,288 @@ describe("create-staging-hyperdrive's names, account, npm script and wrangler's 
       assert.match(cli, new RegExp(`variableName: "${name}",\\n\\s*deprecatedName: "${old}"`));
       assert.match(source(`infra/scripts/${PROGRAM}`), new RegExp(`"${name}",\\n\\s*"`));
       assert.ok(source(`infra/scripts/${PROGRAM}`).includes(`"${old}"`), `the script does not drop ${old}`);
+    }
+  });
+});
+
+describe("create-staging-hyperdrive.sh, hardened before its live run (T-1271: T-1252's security review, notes a to e, and its database review, note a)", () => {
+  const source = (file) => readFileSync(path.join(REPO, file), "utf8");
+  const refusedForLogging =
+    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, password included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m;
+  const triedPanic =
+    /^create-staging-hyperdrive: log_min_error_statement could not be set to panic for this session \(no SET privilege on it\); its value is read next$/m;
+  /** Each recorded wrangler call's value of one variable. */
+  const wranglerValues = (rig, name) =>
+    childrenOf(rig)
+      .filter((child) => child.name === "wrangler")
+      .map((child) => new RegExp(`^${name}=(.*)$`, "m").exec(child.env)?.[1]);
+
+  before(async () => {
+    const [server] = await admin`select current_setting('pgaudit.log', true) as pgaudit`;
+    assert.equal(
+      server.pgaudit,
+      null,
+      "pgaudit is loaded on the test server: its placeholders would not stand in",
+    );
+  });
+
+  // Note a.
+  it("log_min_error_statement at log, which the maker may not change, is refused after the script's own try to set panic, before any password, and nothing is made", async (t) => {
+    const rig = checkout(t, "sl");
+    const db = await database(rig.names, {
+      setPrivilege: false,
+      settings: { log_statement: "none", log_min_error_statement: "log" },
+    });
+    const stand = await api(rig);
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    assert.match(result.stdout, triedPanic);
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's logging: log_statement none, log_min_error_statement log, /m,
+    );
+    assert.match(result.stderr, refusedForLogging);
+    assert.match(
+      result.stderr,
+      /log_min_error_statement is log \(the statement's text is logged with any message at that level or above, and log ranks above error: only fatal and panic are taken\)/,
+    );
+    assert.equal(result.connections, 1);
+    // Refused before the token and before worker-logins.sql: no login made, no password, no create.
+    assert.deepEqual(wranglerCalls(rig), ["hyperdrive list"]);
+    await assertNoPassword(stand, rig.names, result, "log_min_error_statement log");
+    assert.equal(await shapeOf(rig.names.worker_job), null, "log_min_error_statement log: a login was made");
+    assertNothingLeaked(rig, result, db, [], "log_min_error_statement log");
+  });
+
+  for (const level of ["fatal", "panic"]) {
+    it(`log_min_error_statement at ${level}, which the maker may not change, still runs; each wrangler call (two lists and the token) has WRANGLER_WRITE_LOGS=false (note e)`, async (t) => {
+      const rig = checkout(t, `s${level}`);
+      const db = await database(rig.names, {
+        setPrivilege: false,
+        settings: { log_statement: "none", log_min_error_statement: level },
+      });
+      const stand = await api(rig);
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.equal(result.status, 0, result.output);
+      assert.equal(result.stderr, "");
+      assert.match(result.stdout, triedPanic);
+      assert.match(
+        result.stdout,
+        new RegExp(
+          `^create-staging-hyperdrive: this session's logging: log_statement none, log_min_error_statement ${level}, `,
+          "m",
+        ),
+      );
+      assert.match(
+        result.stdout,
+        /^create-staging-hyperdrive: this session's audit logging: pgaudit not loaded$/m,
+      );
+      assert.equal(stand.creates().length, 2);
+      assert.match(result.stdout, summary(JOB, rig.names.worker_job));
+      assert.match(result.stdout, summary(APP, rig.names.worker_app));
+      assert.deepEqual(wranglerCalls(rig), ["hyperdrive list", "auth token --json", "hyperdrive list"]);
+      assert.deepEqual(wranglerValues(rig, "WRANGLER_WRITE_LOGS"), ["false", "false", "false"]);
+      assertNothingLeaked(
+        rig,
+        result,
+        db,
+        stand.creates().map((body) => body.origin.password),
+        `log_min_error_statement ${level}`,
+      );
+    });
+  }
+
+  it("the levels of log_min_error_statement it takes are exactly the ones the server ranks above log: fatal and panic", async () => {
+    const [setting] = await admin`
+      select enumvals, extra_desc from pg_settings where name = 'log_min_error_statement'`;
+    assert.match(String(setting.extra_desc), /Each level includes all the levels that follow it\./);
+    const levels = setting.enumvals;
+    assert.deepEqual(levels.slice(levels.indexOf("error")), ["error", "log", "fatal", "panic"]);
+    assert.match(
+      source(`infra/scripts/${PROGRAM}`),
+      /\nconst QUIET_ERROR_LEVELS = new Set\(\["fatal", "panic"\]\);\n/,
+    );
+  });
+
+  // Note b. [case, the maker's pgaudit.log: a placeholder, as T-1252 set pg_stat_statements' (pgaudit is not loaded
+  // on the test server)]
+  const AUDITED = [
+    ["ga", "role"],
+    ["gb", "ddl"],
+    ["gc", "all"],
+    ["gd", "read, write, ROLE"],
+    ["ge", "misc,-read , Ddl"],
+    ["gf", "all, -role"],
+    ["gg", "every_statement"],
+  ];
+  for (const [caseName, value] of AUDITED) {
+    it(`pgaudit loaded with pgaudit.log "${value}" is refused before any password, and nothing is made`, async (t) => {
+      const rig = checkout(t, caseName);
+      const db = await database(rig.names, { settings: { "pgaudit.log": value } });
+      const stand = await api(rig);
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.ok(
+        result.stdout.includes(
+          `create-staging-hyperdrive: this session's audit logging: pgaudit.log ${value}\n`,
+        ),
+        result.stdout,
+      );
+      assert.match(result.stderr, refusedForLogging);
+      assert.ok(
+        result.stderr.includes(
+          `pgaudit is loaded and pgaudit.log is ${value} (it names role, ddl or all, or a class not known here: its audit log could keep the ALTER ROLE's text)`,
+        ),
+        result.stderr,
+      );
+      assert.equal(result.connections, 1);
+      assert.deepEqual(wranglerCalls(rig), ["hyperdrive list"]);
+      await assertNoPassword(stand, rig.names, result, value);
+      assert.equal(await shapeOf(rig.names.worker_job), null, `${value}: a login was made`);
+      assertNothingLeaked(rig, result, db, [], value);
+    });
+  }
+
+  it("pgaudit loaded with pgaudit.log none, or with classes that leave ALTER ROLE out, runs", async (t) => {
+    for (const [caseName, value] of [
+      ["gn", "none"],
+      ["gm", "READ, write, Function, misc, misc_set, -role"],
+    ]) {
+      const rig = checkout(t, caseName);
+      const db = await database(rig.names, { settings: { "pgaudit.log": value } });
+      const stand = await api(rig);
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.equal(result.status, 0, result.output);
+      assert.ok(
+        result.stdout.includes(
+          `create-staging-hyperdrive: this session's audit logging: pgaudit.log ${value}\n`,
+        ),
+        result.stdout,
+      );
+      assert.equal(stand.creates().length, 2);
+      assert.match(result.stdout, summary(JOB, rig.names.worker_job));
+      assertNothingLeaked(
+        rig,
+        result,
+        db,
+        stand.creates().map((body) => body.origin.password),
+        value,
+      );
+    }
+  });
+
+  // Note c.
+  it("Cloudflare's text answer, longer than the cut, with the password, the token or the host across the cut, is shown with none of them: scrubbed whole, then cut", async (t) => {
+    assert.ok(Number.isInteger(ERROR_TEXT_CUT) && ERROR_TEXT_CUT > 100, "the script names no ERROR_TEXT_CUT");
+    const rig = checkout(t, "sc");
+    const db = await database(rig.names);
+    const kinds = ["password", "token", "host"];
+    const stand = await api(
+      rig,
+      kinds.map((kind) => `long:${kind}`),
+    );
+    for (const [index, kind] of kinds.entries()) {
+      const failed = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.equal(failed.status, 1, failed.output);
+      const body = stand.creates()[index];
+      assert.equal(body.name, JOB);
+      const value = { password: body.origin.password, token: TOKEN, host: body.origin.host }[kind];
+      const kept = Math.ceil(value.length / 2);
+      // A cut first would have shown this much of the value.
+      const part = value.slice(0, kept);
+      const shown = `${"x".repeat(ERROR_TEXT_CUT - kept)}${`[redacted]${"y".repeat(500)}`.slice(0, kept)}`;
+      assert.ok(
+        failed.stderr.includes(
+          `refused: Cloudflare's API did not create ${JOB} (HTTP 502: ${shown}). ${rig.names.worker_job} now holds a password nobody has`,
+        ),
+        `${kind}: ${failed.stderr}`,
+      );
+      assert.equal(failed.output.includes(part), false, `${kind}: part of it was shown`);
+      assertNothingLeaked(
+        rig,
+        failed,
+        db,
+        stand.creates().map((created) => created.origin.password),
+        kind,
+      );
+    }
+  });
+
+  // Note d.
+  it("a pooled host written in capitals is refused before anything is listed or connected to: Node keeps a postgres:// host's case", async (t) => {
+    const rig = checkout(t, "su");
+    const stand = await api(rig);
+    for (const host of [
+      "ep-made-up-000000-POOLER.made-up-region.example.test",
+      "EP-MADE-UP-000000-Pooler.MADE-UP-REGION.EXAMPLE.TEST",
+    ]) {
+      const url = `postgres://made_up_owner:t1252-made-up-pass@${host}/main?sslmode=require`;
+      assert.equal(new URL(url).hostname, host, "Node lowers a postgres:// host's case now");
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: url } });
+      assert.equal(result.status, 1, result.output);
+      assert.match(
+        result.stderr,
+        /^create-staging-hyperdrive: refused: STAGING_DATABASE_URL names a pooled host \(-pooler\)/m,
+      );
+      assert.equal(result.output.toLowerCase().includes("ep-made-up"), false);
+      assert.equal(result.connections, 0);
+    }
+    assert.deepEqual(wranglerCalls(rig), []);
+    assert.deepEqual(stand.posts, []);
+  });
+
+  // Note e: read in the installed wrangler's own code, never run to see.
+  it("the installed wrangler writes its log file only while WRANGLER_WRITE_LOGS is not false or 0, and the script sets it false for every child", () => {
+    const wrangler = JSON.parse(source("node_modules/wrangler/package.json"));
+    const cli = source("node_modules/wrangler/wrangler-dist/cli.js");
+    assert.match(
+      cli,
+      /function shouldLogToDisk\(isTestEnvironment = typeof vitest !== "undefined"\) \{\n\s*if \(isTestEnvironment\) \{\n\s*return false;\n\s*\}\n\s*const setting = process\.env\.WRANGLER_WRITE_LOGS\?\.toLowerCase\(\);\n\s*return setting !== "false" && setting !== "0";\n\}/,
+      `wrangler ${String(wrangler.version)} does not read WRANGLER_WRITE_LOGS as 4.158.0 does`,
+    );
+    assert.equal(
+      cli.match(/WRANGLER_WRITE_LOGS/g)?.length,
+      1,
+      "wrangler reads or sets WRANGLER_WRITE_LOGS elsewhere",
+    );
+    // A logged line reaches the file only through appendToDebugLogFile, called once, under shouldLogToDisk(); and only
+    // that function writes the file.
+    assert.equal(
+      cli.match(/appendToDebugLogFile\(/g)?.length,
+      2,
+      "appendToDebugLogFile is not defined and called once",
+    );
+    assert.match(
+      cli,
+      /if \(shouldLogToDisk\(\)\) \{\n\s*void appendToDebugLogFile\(messageLevel, message\);\n\s*\}/,
+    );
+    assert.equal(cli.match(/appendFile\(debugLogFilepath, entry\)/g)?.length, 1);
+    assert.equal(
+      /(?:writeFile|writeFileSync|appendFileSync|createWriteStream)\(debugLogFilepath/.test(cli),
+      false,
+    );
+    assert.match(source(`infra/scripts/${PROGRAM}`), /\n {2}env\.WRANGLER_WRITE_LOGS = "false";\n/);
+  });
+
+  // The database engineer's note a.
+  it("each ALTER ROLE is followed at once by one more statement of the script's own, the last of its transaction", () => {
+    const lines = source(`infra/scripts/${PROGRAM}`)
+      .split("\n")
+      .filter((line) => !/^\s*\/\//.test(line) && line.trim() !== "");
+    const alters = lines.flatMap((line, at) => (/["'`]\s*alter\s+role\b/i.test(line) ? [at] : []));
+    assert.deepEqual(
+      alters.map((at) => lines[at].trim()),
+      ["await tx.unsafe(`alter role ${quoteIdent(pair.login)} password '${password}'`);"],
+    );
+    for (const at of alters) {
+      assert.equal(
+        lines[at + 1]?.trim(),
+        'await tx.unsafe("select pg_catalog.pg_backend_pid()::pg_catalog.text as pid");',
+        "the statement after ALTER ROLE was taken out or moved",
+      );
+      assert.equal(
+        lines[at + 2]?.trim(),
+        "});",
+        "the statement after ALTER ROLE is not the last of its transaction",
+      );
     }
   });
 });
