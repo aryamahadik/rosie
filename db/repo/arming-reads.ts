@@ -10,9 +10,10 @@
 //                      open_questions.booking_id at that business, and its start, the earliest lower(during) among that
 //                      booking's held or booked reservations at that business: default 90) and its never-delivered clock
 //                      row with its version (clock_rows by open_question_id and kind, chosen as default 92 says). A question
-//                      with no business reads none of businesses, bookings and reservations. The answer is the port's own
-//                      names: clockLine (open_questions.clock as stored), businessZone, visit (null for no booking, and for
-//                      a booking with no held or booked reservation) and neverDelivered.
+//                      with no business reads none of businesses, bookings and reservations, and answers businessZone and
+//                      visit null whatever its booking_id holds. The answer is the port's own names: clockLine
+//                      (open_questions.clock as stored), businessZone, visit (null for a question with no business, for no
+//                      booking, and for a booking with no held or booked reservation) and neverDelivered.
 //   readHandle         a K-04 handle by its id (item 50): handles by its primary key, the columns kind and address alone,
 //                      answered in K-06 v1's handle shape with handleId the request's; handle null when no row has the id
 //                      (default 95). No actor name is built here: the consumer builds it from the answer with the gateway's
@@ -25,7 +26,11 @@
 // owner's rights: rosie_job reads open_questions, businesses, bookings, reservations and clock_rows behind their runtime
 // policies and handles through its own grant (0012). With no scope rosie_job sees every business's rows, so each read of
 // a business-scoped table after the question names the question's own business itself, and the answer holds nothing of
-// another business even under a role row-level security does not bind (a table's owner).
+// another business even under a role row-level security does not bind (a table's owner). Neither read checks the role it
+// runs as, and neither reads anything its item does not name: readQuestionFacts reads the question first (item 49), and
+// on the deployed Worker ADR-014's guard checks the login and its one membership in every call before db/repo runs.
+// rosie_app, the Tool API's role, holds no grant on handles (0012), so a Tool API client's readHandle is refused by
+// privilege (42501, thrown as DataAccessDatabaseError).
 //
 // What these reads never touch (item 49: "never an address or an address's zone", default 91; item 50; the card's security
 // review): no statement here names a visit's address or zone (K-30's booking_addresses, or any other table's address),
@@ -44,24 +49,19 @@
 //
 // Defaults used (for ops/QUESTIONS.md; each where no source decides):
 //   1. A stored record the answer would have to guess around throws BrokenRecordError, and nothing is answered
-//      (turn-face-reads.ts default 2's rule: fail closed rather than answer half): a question whose business row is
-//      missing; a question whose booking is not under the question's own business; and a question with no business that
-//      names a booking (every booking has a business: K-04 bookings.business_id is not null), which reads none of
-//      businesses, bookings and reservations. A visit is never guessed: no answer gives a no-visit due rule to a
-//      question that names a booking it cannot read.
+//      (turn-face-reads.ts default 2's rule: fail closed rather than answer half), in the two cases item 49 is silent on:
+//      a question whose business row is missing, and a question whose booking is not under the question's own business.
+//      A visit is never guessed: no answer gives a no-visit due rule to a question with a business that names a booking
+//      it cannot read. A question with no business is neither: item 49 reads none of businesses, bookings and
+//      reservations for it and answers businessZone and visit null, whatever its booking_id holds.
 //   2. The never-delivered row's read names the question's own business too (business_id is not distinct from the
 //      question's, so a question with no business finds its rows with none): item 49's "every later read names the
 //      question's own business beside its key", as readOutboxRow names it for a question's clock row (turn-face-reads.ts).
-//   3. readQuestionFacts refuses a role that holds rosie_app's rights and not rosie_job's (BusinessScopeError) before
-//      its first read: rosie_app with no scope sees no open question, so a Tool API client passed by mistake would answer
-//      notFound for every question, and the arming would arm none (safety-reads.ts default 1; DL-326 note 4). A role
-//      that holds neither (the tables' owner) runs. readHandle needs no such check: rosie_app holds no grant on handles
-//      (0012), so a Tool API client's read is refused by privilege (42501, thrown as DataAccessDatabaseError) every time.
-//   4. readHandle's handleId is a K-08 safe id that never reads as a number (its schema's handleRef), as openChatOnText's
+//   3. readHandle's handleId is a K-08 safe id that never reads as a number (its schema's handleRef), as openChatOnText's
 //      is (chat-open.ts): an address or a number passed as the id is refused before any read, so no request carries one.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.10";
 import { transientOrScrubbed } from "./clocks";
-import { BusinessScopeError, type Sql } from "./scope";
+import type { Sql } from "./scope";
 import { assertId, assertRequestShape, inRuntimeTransaction, utc } from "./targets";
 import { BrokenRecordError } from "./turn-face-reads";
 
@@ -113,7 +113,7 @@ function questionIdOf(request: unknown): string {
   return openQuestionId;
 }
 
-/** The handle's id: a K-08 safe id, never a number or an address (default 4). */
+/** The handle's id: a K-08 safe id, never a number or an address (default 3). */
 function handleIdOf(request: unknown): string {
   const handleId = onlyField(request, READ_HANDLE, "handleId");
   if (typeof handleId !== "string" || !SAFE_ID.test(handleId) || READS_AS_NUMBER.test(handleId)) {
@@ -131,22 +131,6 @@ interface QuestionRow {
   business_id: string | null;
   booking_id: string | null;
   clock: string | null;
-}
-
-/**
- * Refuses a role that holds rosie_app's rights and not rosie_job's (default 3): with no scope it sees no question, so it
- * would answer notFound whatever is stored. rosie_job, and a role that holds neither (the tables' owner), run.
- */
-async function assertRuntimeRole(tx: Sql): Promise<void> {
-  const [rights] = await tx<{ app: boolean; job: boolean }[]>`
-    select pg_has_role(current_user, 'rosie_app', 'USAGE') as app,
-           pg_has_role(current_user, 'rosie_job', 'USAGE') as job
-  `;
-  if (rights === undefined || (rights.app && !rights.job)) {
-    throw new BusinessScopeError(
-      `${QUESTION_FACTS} runs on the runtime side, as rosie_job: rosie_app sees no question without a scope`,
-    );
-  }
 }
 
 /** The business's zone: businesses by the question's own business, its key (a missing row: default 1). */
@@ -206,12 +190,15 @@ async function neverDeliveredOf(
   return row === undefined ? null : { clockRowId: row.id, version: row.version };
 }
 
-/** The question's facts inside the read's own transaction, on the runtime side. */
+/**
+ * The question's facts inside the read's own transaction, on the runtime side: the question first, by its key (item 49).
+ * A question with no business reads none of businesses, bookings and reservations: businessZone and visit are null,
+ * whatever its booking_id holds.
+ */
 async function questionFactsIn(
   tx: Sql,
   openQuestionId: string,
 ): Promise<ReadQuestionFactsResponse | K05.NotFoundError> {
-  await assertRuntimeRole(tx);
   const [question] = await tx<QuestionRow[]>`
     select business_id, booking_id, clock from open_questions where id = ${openQuestionId}
   `;
@@ -224,8 +211,6 @@ async function questionFactsIn(
   if (businessId !== null) {
     businessZone = await businessZoneOf(tx, businessId);
     visit = question.booking_id === null ? null : await visitOf(tx, question.booking_id, businessId);
-  } else if (question.booking_id !== null) {
-    throw new BrokenRecordError(`${QUESTION_FACTS}: a question with no business names a booking`);
   }
   return {
     openQuestionId,
@@ -240,9 +225,10 @@ async function questionFactsIn(
  * The facts the clock arming's due rule reads about one open question (K-05 v1.10 item 49): its Clock line as stored, its
  * business's zone, the visit it is about (never an address or an address's zone) and its never-delivered row. One
  * read-only transaction at repeatable read on the primary, uncached, writing nothing. Pass the runtime side's client
- * (rosie_job). notFound (table open_questions) when no question has the id; transient on a serialization failure, a
- * deadlock or a lost connection. Throws a TypeError for a request of the wrong shape, a BusinessScopeError for the Tool
- * API's role, a BrokenRecordError for a record it would have to guess around, and any other database error scrubbed
+ * (rosie_job): the role is the connection's. A question with no business answers businessZone and visit null, reading
+ * none of businesses, bookings and reservations. notFound (table open_questions) when no question has the id; transient
+ * on a serialization failure, a deadlock or a lost connection. Throws a TypeError for a request of the wrong shape, a
+ * BrokenRecordError for a record it would have to guess around (default 1), and any other database error scrubbed
  * (DataAccessDatabaseError); nothing is written on any of them.
  */
 export async function readQuestionFacts(

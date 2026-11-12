@@ -28,7 +28,7 @@ import {
 import { resolvePrimaryUrl } from "./client";
 import { DataAccessDatabaseError } from "./clocks";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
-import { BusinessScopeError, type Sql, type Tx } from "./scope";
+import type { Sql, Tx } from "./scope";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 import { BrokenRecordError } from "./turn-face-reads";
 
@@ -452,9 +452,11 @@ const QUESTIONS: readonly Row[] = [
   question("oq-t1258-west", WEST, null, "1 h"),
   // A sign-up's question, before there is a business: none of businesses, bookings and reservations is read.
   question("oq-t1258-no-business", null, null, "24 h"),
-  // Broken records (default 1): a booking of another business, and a booking with no business on the question.
-  question("oq-t1258-booking-elsewhere", BARBERSHOP, "booking-alex-workshop", "24 h"),
+  // A question with no business that names a booking, the haircut, which has a time at the barbershop: item 49 still
+  // reads none of the three, so its zone and visit are null whatever the booking holds.
   question("oq-t1258-no-business-booking", null, HAIRCUT, "24 h"),
+  // A broken record (default 1): a booking of another business.
+  question("oq-t1258-booking-elsewhere", BARBERSHOP, "booking-alex-workshop", "24 h"),
 ];
 
 type ClockState = "waiting" | "armed" | "fired" | "cancelled";
@@ -580,13 +582,19 @@ const FACTS: Readonly<Record<string, ReadQuestionFactsResponse>> = {
     visit: null,
     neverDelivered: { clockRowId: "nd-t1258-no-business-1", version: 1 },
   },
+  "oq-t1258-no-business-booking": {
+    openQuestionId: "oq-t1258-no-business-booking",
+    clockLine: "24 h",
+    businessZone: null,
+    visit: null,
+    neverDelivered: null,
+  },
 };
 
-/** The two broken records' questions (default 1): each read throws BrokenRecordError and answers nothing. */
+/** The broken record's question (default 1): its read throws BrokenRecordError and answers nothing. */
 const BROKEN: Readonly<Record<string, string>> = {
   "oq-t1258-booking-elsewhere":
     "readQuestionFacts: the question's booking is not under the question's business",
-  "oq-t1258-no-business-booking": "readQuestionFacts: a question with no business names a booking",
 };
 
 /** Each question's own business (null: none), for the statement checks; an unknown question names none. */
@@ -683,23 +691,16 @@ describe("the role the reads run as (K-05 v1.10 items 49 and 50; T-191)", () => 
   });
 
   it(
-    "a Tool API client is refused before any answer: readQuestionFacts by its role check (default 3), readHandle by privilege (no grant on handles: 0012)",
+    "a Tool API client's readHandle is refused by PostgreSQL's own privilege check (no grant on handles: 0012), naming no value",
     SLOW,
     async () => {
       await given("read-question-facts-s1-02.json");
-      const facts = await thrownBy(readQuestionFacts(app, { openQuestionId: S1_02 }));
-      expect(facts).toBeInstanceOf(BusinessScopeError);
-      expect((facts as Error).message).toBe(
-        "readQuestionFacts runs on the runtime side, as rosie_job: rosie_app sees no question without a scope",
-      );
       const handle = await thrownBy(readHandle(app, { handleId: "handle-sam" }));
       expect(handle).toBeInstanceOf(DataAccessDatabaseError);
       expect((handle as DataAccessDatabaseError).code).toBe("42501");
-      for (const error of [facts, handle]) {
-        const text = (error as Error).message;
-        for (const value of [S1_02, "handle-sam", "+15555550100", BARBERSHOP]) {
-          expect(text.includes(value), value).toBe(false);
-        }
+      const text = (handle as Error).message;
+      for (const value of ["handle-sam", "+15555550100", BARBERSHOP]) {
+        expect(text.includes(value), value).toBe(false);
       }
     },
   );
@@ -837,14 +838,23 @@ describe("readQuestionFacts: the question's visit, zone and never-delivered row 
   );
 
   it(
-    "a question with no business: businessZone and visit null, its own never-delivered row with none, and no statement reads businesses, bookings or reservations",
+    "a question with no business answers businessZone and visit null whatever its booking_id holds (none, or a booking with a time), its own never-delivered row with none, and no statement reads businesses, bookings or reservations",
     SLOW,
     async () => {
       await givenArmingRows();
-      const run = await watched("readQuestionFacts", "oq-t1258-no-business");
-      expect(run.outcome).toEqual(FACTS["oq-t1258-no-business"]);
-      const tables = new Set(run.statements.flatMap((statement) => tablesOf(statement.text)));
-      expect([...tables].sort()).toEqual(["clock_rows", "open_questions"]);
+      // The haircut the second question names has held and booked rows at the barbershop: read, it would give a visit.
+      const [timed] = await db.sql<{ n: number }[]>`
+        select count(*)::int as n from reservations
+        where booking_id = ${HAIRCUT} and business_id = ${BARBERSHOP} and state in ('held', 'booked')
+      `;
+      expect(timed?.n).toBeGreaterThan(0);
+      for (const id of ["oq-t1258-no-business", "oq-t1258-no-business-booking"]) {
+        const run = await watched("readQuestionFacts", id);
+        expect(run.outcome, id).toEqual(FACTS[id]);
+        expect(answerErrors("readQuestionFacts", run.outcome), id).toEqual([]);
+        const tables = new Set(run.statements.flatMap((statement) => tablesOf(statement.text)));
+        expect([...tables].sort(), id).toEqual(["clock_rows", "open_questions"]);
+      }
     },
   );
 
@@ -902,7 +912,7 @@ describe("readQuestionFacts: the question's visit, zone and never-delivered row 
   );
 
   it(
-    "a record the answer would have to guess around throws BrokenRecordError, naming no value (default 1): a booking of another business, a booking on a question with no business",
+    "a record the answer would have to guess around throws BrokenRecordError, naming no value, and answers nothing (default 1): a booking of another business, and a question whose business row is missing",
     SLOW,
     async () => {
       await givenArmingRows();
@@ -914,11 +924,26 @@ describe("readQuestionFacts: the question's visit, zone and never-delivered row 
           expect((run.outcome as Error).message.includes(value), value).toBe(false);
         }
       }
-      // With no business, none of businesses, bookings and reservations is read before it throws.
-      const noBusiness = await watched("readQuestionFacts", "oq-t1258-no-business-booking");
-      expect([...new Set(noBusiness.statements.flatMap((statement) => tablesOf(statement.text)))]).toEqual([
-        "open_questions",
-      ]);
+      // The question's business row missing, as rosie_job reads it: open_questions_business_fk keeps the row, so a
+      // restrictive policy of this file's schema hides West's row from rosie_job alone, and is dropped after.
+      const schema = `"${db.schema}"`;
+      try {
+        await db.sql.unsafe(
+          `create policy t_hide_west on ${schema}.businesses as restrictive for select to ${JOB_ROLE} ` +
+            `using (id <> '${WEST}')`,
+        );
+        const run = await watched("readQuestionFacts", "oq-t1258-west");
+        expect(run.outcome).toBeInstanceOf(BrokenRecordError);
+        expect((run.outcome as Error).message).toBe("readQuestionFacts: the question's business is missing");
+        for (const value of ["oq-t1258-west", WEST, LOS_ANGELES]) {
+          expect((run.outcome as Error).message.includes(value), value).toBe(false);
+        }
+      } finally {
+        await db.sql.unsafe(`drop policy if exists t_hide_west on ${schema}.businesses`);
+      }
+      expect(await readQuestionFacts(job, { openQuestionId: "oq-t1258-west" })).toEqual(
+        FACTS["oq-t1258-west"],
+      );
     },
   );
 
@@ -970,7 +995,7 @@ describe("readHandle: a handle's kind and address, by its id (item 50; defaults 
   );
 
   it(
-    "the request names a handle id alone: an address, a number or another field is refused before any statement (default 4)",
+    "the request names a handle id alone: an address, a number or another field is refused before any statement (default 3)",
     SLOW,
     async () => {
       await given("read-handle-sam.json");
@@ -999,7 +1024,7 @@ describe("readHandle: a handle's kind and address, by its id (item 50; defaults 
 
 describe("one read-only transaction per read, and nothing written (item 49 and 50: 'writing nothing')", () => {
   it(
-    "each read sends its statements on one connection inside one 'begin isolation level repeatable read read only', ending in commit, or rollback when it throws",
+    "each read sends its statements on one connection inside one 'begin isolation level repeatable read read only', ending in commit, or rollback when it throws; inside it, after the scope is cleared, its own reads alone, the first its item's first (item 49: the question, by its key)",
     SLOW,
     async () => {
       for (const run of await everyRun()) {
@@ -1017,6 +1042,17 @@ describe("one read-only transaction per read, and nothing written (item 49 and 5
         );
         expect(end, label).toBeGreaterThan(0);
         expect(inside[end]?.text, label).toBe(run.outcome instanceof Error ? "rollback" : "commit");
+        // targets.ts inRuntimeTransaction clears the business scope first; then the read sends its item's reads alone,
+        // each naming a table, with nothing before its first (no check of the role it runs as: the role is the
+        // connection's).
+        const texts = inside.slice(0, end).map((statement) => normalized(statement.text));
+        expect(texts[0], label).toBe("select set_config($1, '', true)");
+        expect(texts[1], label).toBe(
+          run.call === "readQuestionFacts" ? QUESTION_STATEMENT : READ_HANDLE_STATEMENT,
+        );
+        for (const text of texts.slice(1)) {
+          expect(tablesOf(text).length, `${label}: ${text}`).toBeGreaterThan(0);
+        }
         for (const statement of run.statements) {
           if (tablesOf(statement.text).length > 0) {
             const at = run.statements.indexOf(statement);
@@ -1147,6 +1183,8 @@ const COLUMNS_OF: Readonly<Record<Call, readonly string[]>> = {
 
 /** readHandle's one statement (item 50: kind and address alone; default 93: no actor name built in SQL). */
 const READ_HANDLE_STATEMENT = "select kind, address from handles where id = $1";
+/** readQuestionFacts's first statement (item 49: the question first, by its primary key). */
+const QUESTION_STATEMENT = "select business_id, booking_id, clock from open_questions where id = $1";
 
 /**
  * Never named by a statement of either read (the card's security review): a visit's address and its zone (K-30's
@@ -1525,9 +1563,7 @@ describe("no statement names a visit's address, a message's words or any column 
           continue;
         }
         // The question first, by its key; every later read binds the question's own business (null: none).
-        expect(normalized(reading[0]?.text ?? ""), label).toBe(
-          "select business_id, booking_id, clock from open_questions where id = $1",
-        );
+        expect(normalized(reading[0]?.text ?? ""), label).toBe(QUESTION_STATEMENT);
         expect(reading[0]?.parameters, label).toEqual([run.id]);
         for (const statement of reading.slice(1)) {
           expect(businessBound(statement), `${label}: ${statement.text}`).toBe(run.business);
