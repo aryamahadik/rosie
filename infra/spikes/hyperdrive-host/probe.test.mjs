@@ -39,6 +39,17 @@ test("a pooled host is told from a direct one, and nothing else passes for a dat
   assert.throws(() => hostKind(""), /not a URL/);
 });
 
+test("a pooled host is told in any letter case: Node keeps a postgres:// host's case (T-1271)", () => {
+  const url = "postgres://u:p@EP-EXAMPLE-123456-POOLER.us-east-1.aws.example.test/main";
+  assert.equal(new URL(url).hostname, "EP-EXAMPLE-123456-POOLER.us-east-1.aws.example.test");
+  assert.equal(hostKind(url), "pooled");
+  assert.equal(
+    hostKind("postgresql://u:p@ep-example-123456-Pooler.us-east-1.aws.example.test/main"),
+    "pooled",
+  );
+  assert.equal(hostKind("postgres://u:p@EP-EXAMPLE-123456.US-EAST-1.AWS.EXAMPLE.TEST/main"), "direct");
+});
+
 test("the spike's wrangler config names staging's Worker and binds only Hyperdrive", () => {
   const remote = spikeConfig({
     main: "/repo/worker.mjs",
