@@ -1,0 +1,49 @@
+{
+  "after": [
+    "seed-person-roles.json",
+    "seed-bundle-registry.json"
+  ],
+  "rows": [
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-sam-email",
+        "kind": "email",
+        "address": "sam@example.com"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-sam",
+        "handle_id": "handle-sam-email"
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "outbox_rows",
+    "values": {
+      "id": "out-sam-signin-code",
+      "turn_id": null,
+      "recipient_handle_id": "handle-sam-email",
+      "recipient_person_id": "person-sam",
+      "channel": "email",
+      "send_class": "quick_reply",
+      "versions_read": [],
+      "email_purpose": "code",
+      "not_after": "2026-10-26T13:10:00Z",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "trace_id": "trace-page-sam-0200"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": [
+        "outbox_rows_turn_or_job"
+      ]
+    }
+  }
+}
