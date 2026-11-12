@@ -12,7 +12,8 @@
 // `database: "own"` makes the schema in a database of the file's own, made from template_postgis (else template1) and
 // dropped with the file, so no other run's lock or row is in it, and a read of pg_stat_activity (which spans the
 // server) kept to current_database() sees none of another run's sessions. Such a file opens the connections it makes
-// itself with `connect`: the URL of DATABASE_URL names the shared database.
+// itself with `connect`: the URL of DATABASE_URL names the shared database. Its drop is a DROP DATABASE, which makes
+// PostgreSQL take a checkpoint, so its afterAll takes a longer limit than the 30 s guard (120 s in each such file).
 //
 // Uses the database of DATABASE_URL, else the local Docker database when CI is unset (the integration project sets
 // it). Only schemas and databases this helper made (names starting `t_`) are ever dropped. Connection strings are never

@@ -815,11 +815,13 @@ beforeAll(async () => {
   typedColumns = new Map(typed.map((column) => [column.key, column.type]));
 }, 120_000);
 
+// A resource guard, not part of any test's claim (T-1251): the drop is a DROP DATABASE, whose checkpoint can run past
+// the 30 s hook limit while other suites load the build Mac.
 afterAll(async () => {
   await app.end({ timeout: 5 });
   await job.end({ timeout: 5 });
   await db.drop();
-});
+}, 120_000);
 
 /** Empties every table and restarts its identity (truncating the heads cascades to the rest; this file's schema only). */
 async function reset(): Promise<void> {
