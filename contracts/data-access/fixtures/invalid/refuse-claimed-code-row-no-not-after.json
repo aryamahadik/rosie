@@ -1,0 +1,57 @@
+{
+  "result": "claimed",
+  "claimed": [
+    {
+      "outboxRowId": "out-sam-sign-in-nov02-code",
+      "version": 3,
+      "commitSeq": 1,
+      "recipientHandleId": "handle-sam-email",
+      "recipientPersonId": "person-sam",
+      "businessId": null,
+      "bookingId": null,
+      "openQuestionId": null,
+      "channel": "email",
+      "sendClass": "quick_reply",
+      "versionsRead": [],
+      "finalParts": {
+        "row": "out-sam-sign-in-nov02-code",
+        "channel": "email",
+        "sends": [
+          {
+            "kind": "words",
+            "text": "Code 482913: type it on the sign-in page. It works for 10 minutes.",
+            "calendarFile": "none",
+            "options": [],
+            "link": null
+          }
+        ],
+        "fixedLines": [],
+        "slotValues": [],
+        "threadReplyTo": null
+      },
+      "parts": [
+        {
+          "partNo": 1,
+          "tryNo": 1,
+          "idempotencyKey": "out-sam-sign-in-nov02-code/1/1",
+          "attempts": 1,
+          "sent": false
+        }
+      ],
+      "traceId": "trace-page-sam-nov02-1300",
+      "claim": {
+        "claimer": "dispatcher-1",
+        "claimedAt": "2026-11-02T13:00:02Z",
+        "lapsesAt": "2026-11-02T13:01:02Z",
+        "claimNo": 1,
+        "firstTryAt": null,
+        "nextTryNotBefore": null
+      },
+      "claimedFrom": "checked",
+      "port": "email",
+      "emailPurpose": "code",
+      "notAfter": null
+    }
+  ],
+  "passedHeld": []
+}

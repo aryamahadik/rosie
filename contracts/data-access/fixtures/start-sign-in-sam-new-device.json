@@ -1,0 +1,28 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-11-02T13:20:00Z",
+    "note": "Sam starts a sign-in on a phone's browser none of his sessions has used. The start reads no device beyond binding the attempt to this one: it passes as start-sign-in-sam's does and names Sam, owner_or_admin true (his live owner roles at the start). His check then needs a second proof (prove-sign-in-second-proof)."
+  },
+  "request": {
+    "id": "sign-in-sam-nov02-1320",
+    "attemptId": "attempt-sam-signin-nov02-phone",
+    "requestSha256": "abbacbdcedf0a1b2c3d4e5f607182937abbacbdcedf0a1b2c3d4e5f607182937",
+    "deviceSha256": "d4e5f60718293a4b5c6d7e8f9a0b1c2dd4e5f60718293a4b5c6d7e8f9a0b1c2d",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "started",
+    "id": "sign-in-sam-nov02-1320",
+    "attemptId": "attempt-sam-signin-nov02-phone",
+    "expiresAt": "2026-11-02T13:30:00Z",
+    "repeated": false,
+    "personId": "person-sam"
+  }
+}

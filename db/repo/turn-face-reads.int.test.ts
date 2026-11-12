@@ -800,7 +800,7 @@ describe("the roles the reads run as (K-05 v1.3 items 34 to 36; T-191)", () => {
 
 describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05 v1.3 items 34 to 36; v1.6 item 45)", () => {
   it(
-    "the index lists the three reads' fifteen exchanges, each valid at its own version and at v1.6",
+    "the index lists the three reads' sixteen exchanges, each valid at its own version and at v1.6",
     SLOW,
     () => {
       expect([...OPEN_HOLDS_FIXTURES].sort()).toEqual([
@@ -817,6 +817,7 @@ describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05
         "read-outbox-row-s1-02-not-sensitive.json",
         "read-outbox-row-s1-02.json",
         "read-outbox-row-safety-line.json",
+        "read-outbox-row-sign-in-code.json",
       ]);
       expect([...FIXED_LINE_FIXTURES].sort()).toEqual([
         "fixed-line-facts-opener-row.json",

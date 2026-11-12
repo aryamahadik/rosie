@@ -1,0 +1,50 @@
+{
+  "call": "writeAllSet",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "claim-sam-sign-in-code.json"],
+    "now": "2026-11-02T13:30:00Z",
+    "note": "An 'all set' asked to close Sam's code row. The 'all set' row and its entry go under the first failed row's turn, which a row with no turn has none of, so the call answers noTurn as it locks the row, before its state is read, and writes nothing (README item 66; a job row never becomes failed: ADR-016 section 3)."
+  },
+  "request": {
+    "failedRowIds": ["out-sam-sign-in-nov02-code"],
+    "row": {
+      "id": "out-sam-sign-in-nov02-code/all-set",
+      "recipientHandleId": "handle-sam",
+      "recipientPersonId": "person-sam",
+      "businessId": null,
+      "bookingId": null,
+      "channel": "imessage",
+      "sendClass": "routine",
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "versionsRead": []
+    },
+    "at": "2026-11-02T13:30:00Z",
+    "events": [
+      {
+        "id": "log-out-sam-sign-in-nov02-code-all-set",
+        "kind": "outbox_row.created",
+        "zone": null,
+        "businessId": null,
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-sam-sign-in-nov02-code/all-set",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "imessage" },
+        "sealed": null,
+        "why": { "allSetFor": ["out-sam-sign-in-nov02-code"] },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "error": "noTurn",
+    "table": "outbox_rows",
+    "rowId": "out-sam-sign-in-nov02-code"
+  }
+}

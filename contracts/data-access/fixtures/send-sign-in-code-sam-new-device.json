@@ -1,0 +1,57 @@
+{
+  "call": "sendSignInCode",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam-new-device.json"],
+    "now": "2026-11-02T13:20:01Z",
+    "note": "The code for Sam's start on his phone's browser, sent as send-sign-in-code-sam's is: its own code row, email row with no turn, three entries and the attempt's code id. The code is a stand-in in the words; its hash is a stand-in."
+  },
+  "request": {
+    "signInAttemptId": "sign-in-sam-nov02-1320",
+    "traceId": "trace-page-sam-nov02-1320",
+    "bundle": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "code": {
+      "id": "code-sam-sign-in-nov02-phone",
+      "codeHash": "f4e5d6c7b8a9aa9b8c7d6e5f40312213f4e5d6c7b8a9aa9b8c7d6e5f40312213",
+      "hashKeyName": "PROOF_CODE_HASH_KEY"
+    },
+    "emailRowId": "out-sam-sign-in-nov02-phone-code",
+    "plan": {
+      "row": "out-sam-sign-in-nov02-phone-code",
+      "channel": "email",
+      "copyOf": null,
+      "plan": { "formats": ["text"], "lines": [], "question": null, "pageType": null, "threadReplyTo": null }
+    },
+    "finalParts": {
+      "row": "out-sam-sign-in-nov02-phone-code",
+      "channel": "email",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Code 305718: type it on the sign-in page. It works for 10 minutes.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "sent",
+    "proofCodeId": "code-sam-sign-in-nov02-phone",
+    "outboxRowId": "out-sam-sign-in-nov02-phone-code",
+    "commitSeq": 1,
+    "version": 2,
+    "expiresAt": "2026-11-02T13:30:01Z",
+    "entryIds": [
+      "log-out-sam-sign-in-nov02-phone-code-created",
+      "log-out-sam-sign-in-nov02-phone-code-planned",
+      "log-code-sam-sign-in-nov02-phone-sent"
+    ],
+    "repeated": false
+  }
+}

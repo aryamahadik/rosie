@@ -1,0 +1,18 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-02T13:00:02Z",
+    "note": "A read that names Sam's sign-in code row, which has no business, so it runs on the runtime side. No frozen seed holds a row with no turn (K-04 v1.1 has no accepted seed: its default 13), and the read's own tests run no sendSignInCode step, so the database side writes the row as send-sign-in-code-sam leaves it: handles (handle-sam-email, email, sam@example.com); person_handles (person-sam, handle-sam-email); outbox_rows (id out-sam-sign-in-nov02-code, turn_id null, job_id sign-in-sam-nov02-1300, recipient_handle_id handle-sam-email, recipient_person_id person-sam, business_id null, booking_id null, open_question_id null, copy_of_row_id null, channel email, send_class quick_reply, email_purpose code, not_after 2026-11-02T13:10:01Z, versions_read empty, bundle_hash and bundle_build the active bundle's, trace_id trace-page-sam-nov02-1300, state checked, its plan and final parts as send-sign-in-code-sam's request holds them, version 2). The row has no turn, so the read answers notFound (table outbox_rows) before any turn read, as a safety row answers fixedLineRow first, and returns nothing of it (README item 65; ADR-016 section 1). No caller names such a row: it is written checked and never goes stale."
+  },
+  "request": {
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "businessId": null
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "outbox_rows",
+    "rowId": "out-sam-sign-in-nov02-code"
+  }
+}

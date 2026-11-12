@@ -1,0 +1,72 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json"],
+    "now": "2026-11-02T13:00:02Z",
+    "note": "The request's own dispatch after the code's commit (ADR-016 section 2) claims Sam's email handle's open rows: the code row, checked with its final parts, is claimed as any row is (sending, version 3, its claim and one part), by the email port, and in its v1.13 form names its purpose, code, and its notAfter, the code's expires_at, so limit 8 withdraws it unsent at any try at or after 13:10:01Z (ADR-016 section 3). It has no business, booking or question, and carries no turn id or job id."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "now": "2026-11-02T13:00:02Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-sign-in-nov02-code",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-sam-email",
+        "recipientPersonId": "person-sam",
+        "businessId": null,
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "email",
+        "sendClass": "quick_reply",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-sign-in-nov02-code",
+          "channel": "email",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Code 482913: type it on the sign-in page. It works for 10 minutes.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-sign-in-nov02-code/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-page-sam-nov02-1300",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-02T13:00:02Z",
+          "lapsesAt": "2026-11-02T13:01:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "email",
+        "emailPurpose": "code",
+        "notAfter": "2026-11-02T13:10:01Z"
+      }
+    ],
+    "passedHeld": []
+  }
+}

@@ -2,9 +2,93 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 478, [`5fbe5ce`](https://github.com/aryamahadik/rosie/commit/5fbe5ce), 2026-11-12 16:32:08 UTC.
+- **Through:** commit 482, [`9a0c7fa`](https://github.com/aryamahadik/rosie/commit/9a0c7fa), 2026-11-12 20:03:00 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 482. docs: COMMIT\_HISTORY.md through commit 480 (b8882e0, \#489) (\#492)
+
+- **Commit:** [`9a0c7fa`](https://github.com/aryamahadik/rosie/commit/9a0c7fa), by Arya Mahadik, 2026-11-12 20:03:00 UTC
+- **Pull request:** [#492](https://github.com/aryamahadik/rosie/pull/492) from `task/commit-history-54`, merged 2026-11-12 20:03:00 UTC. It squashed 1 branch commit:
+  - `4fdf08b` docs: COMMIT\_HISTORY.md through commit 480 (b8882e0, \#489)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 481. T-1277: K-05 v1.13, the sign-in version (six calls; a turnless row's claim fields and guards) (\#490)
+
+- **Commit:** [`774b5e1`](https://github.com/aryamahadik/rosie/commit/774b5e1), by Arya Mahadik, 2026-11-12 20:02:56 UTC
+- **Pull request:** [#490](https://github.com/aryamahadik/rosie/pull/490) from `task/T-1277`, merged 2026-11-12 20:02:57 UTC. It squashed 3 branch commits:
+  - `6845784` T-1277: K-05 v1.13, the sign-in version (ADR-016 card V3): startSignI…
+  - `bd8ca4f` T-1277: read-outbox-row-sign-in-code writes its job row by its note (…
+  - `ba734a0` T-1277: README v1.13: the freeze record's security line names where t…
+- **Files changed:** 49 (+3315 −11), by folder:
+  - `contracts/data-access/` README.md +158 −9, data-access.v1.13.schema.json +1512 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` claim-sam-sign-in-code.json +72 −0, end-session-repeat.json +17 −0, end-session-sam.json +19 −0, give-up-sign-in-code-no-turn.json +42 −0, index.json +352 −0, mark-sign-in-code-failed-no-turn.json +60 −0, person-standing-alex.json +18 −0, person-standing-check-tester.json +18 −0, person-standing-sam.json +24 −0, prove-sign-in-expired.json +26 −0, prove-sign-in-other-device.json +23 −0, prove-sign-in-repeat.json +25 −0, prove-sign-in-sam-right.json +29 −0, prove-sign-in-second-proof.json +27 −0, prove-sign-in-sixth-check-no-account.json +27 −0, prove-sign-in-sixth-check.json +27 −0, prove-sign-in-wrong.json +27 −0, read-outbox-row-sign-in-code.json +18 −0, send-sign-in-code-no-person.json +47 −0, send-sign-in-code-repeat.json +50 −0, send-sign-in-code-sam-new-device.json +57 −0, send-sign-in-code-sam.json +57 −0, sign-in-entries-sign-out.json +24 −0, sign-in-entries-signed-in.json +25 −0, sign-in-entries-wrong-try.json +19 −0, start-sign-in-contact-paused.json +25 −0, start-sign-in-day-cap.json +25 −0, start-sign-in-hour-bound.json +25 −0, start-sign-in-no-account-paused.json +25 −0, start-sign-in-no-account.json +28 −0, start-sign-in-repeat.json +28 −0, start-sign-in-sam-new-device.json +28 −0, start-sign-in-sam.json +28 −0, start-sign-in-two-accounts.json +28 −0, write-all-set-no-turn.json +50 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-claimed-code-row-no-not-after.json +57 −0, refuse-end-session-token-not-hash.json +19 −0, refuse-give-up-no-turn-wrote.json +6 −0, refuse-person-standing-customer-role.json +6 −0, refuse-prove-sign-in-other-device-told.json +4 −0, refuse-prove-sign-in-session-no-person.json +9 −0, refuse-send-sign-in-code-plain-code.json +57 −0, refuse-sign-in-entries-caller-values.json +29 −0, refuse-start-sign-in-past-cap-wrote.json +6 −0, refuse-start-sign-in-text-way.json +28 −0
+  - `db/repo/` turn-face-reads.int.test.ts +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1277: K-05 v1.13, the sign-in version (ADR-016 card V3): startSignIn, sendSignInCode, proveSignIn, endSession, personStanding and signInEntries with their roles and rosie.person_id per call; the claim's optional emailPurpose and notAfter; readOutboxRow's notFound for a row with no turn; noTurn on dispatcherGivesUp, writeAllSet and markPart's follow-ups; 34 accepted and 10 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1277: read-outbox-row-sign-in-code writes its job row by its note (the read's own test runs only commitTurn steps), and turn-face-reads.int.test.ts's pinned readOutboxRow list adds it (DL-455's grant); README: the list numbering, the send's lock order, R0's noted rows; schema description counts nine restated definitions
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1277: README v1.13: the freeze record's security line names where the code is (its row's final parts alone), the change log names the pinned-list edit, and CQ-263 waits for v1.14 with CQ-211, CQ-234 and CQ-235's note a
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 480. docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487) (\#489)
+
+- **Commit:** [`b8882e0`](https://github.com/aryamahadik/rosie/commit/b8882e0), by Arya Mahadik, 2026-11-12 19:19:48 UTC
+- **Pull request:** [#489](https://github.com/aryamahadik/rosie/pull/489) from `task/commit-history-53`, merged 2026-11-12 19:19:49 UTC. It squashed 1 branch commit:
+  - `61883e8` docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487)
+- **Files changed:** 1 (+69 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +69 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 479. T-1320: a package.json change confined to script lines the parity run never runs is not a parity input. merge-check.yml's parity-inputs step keeps its list and, when package.json is the only input that changed, runs infra/ci/parity-inputs.mjs as origin/main holds it: an input unless the change is confined to the scripts object and leaves test:parity, its pre and post scripts, npm ci's install scripts and every script their lines name unchanged; every other field counts (key order included); it fails closed, and a failing rule fails the step. parity-inputs.test.mjs runs the step as the file holds it with a case for each shape; the local merge-check gains a run test (a script line alone runs no shard; a changed test:parity runs them) and its fixture carries the rule; README section (DL-589, DL-600) (\#488)
+
+- **Commit:** [`4b87736`](https://github.com/aryamahadik/rosie/commit/4b87736), by Arya Mahadik, 2026-11-12 19:19:44 UTC
+- **Pull request:** [#488](https://github.com/aryamahadik/rosie/pull/488) from `task/T-1320`, merged 2026-11-12 19:19:45 UTC. It squashed 1 branch commit:
+  - `22b7e97` T-1320: a package.json change confined to script lines the parity run…
+- **Files changed:** 5 (+727 −4), by folder:
+  - `.github/workflows/` merge-check.yml +15 −0
+  - `infra/ci/` README.md +7 −1, local-merge-check.test.mjs +40 −3, parity-inputs.mjs +232 −0, parity-inputs.test.mjs +433 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 478. docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483) (\#487)
 
