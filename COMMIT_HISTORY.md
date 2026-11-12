@@ -2,9 +2,64 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 425, [`14d7e61`](https://github.com/aryamahadik/rosie/commit/14d7e61), 2026-11-12 00:54:03 UTC.
+- **Through:** commit 427, [`0292eaa`](https://github.com/aryamahadik/rosie/commit/0292eaa), 2026-11-12 02:02:52 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 427. docs: COMMIT\_HISTORY.md through commit 425 (14d7e61, \#430) (\#435)
+
+- **Commit:** [`0292eaa`](https://github.com/aryamahadik/rosie/commit/0292eaa), by Arya Mahadik, 2026-11-12 02:02:52 UTC
+- **Pull request:** [#435](https://github.com/aryamahadik/rosie/pull/435) from `task/commit-history-33`, merged 2026-11-12 02:02:52 UTC. It squashed 1 branch commit:
+  - `4bef3d0` docs: COMMIT\_HISTORY.md through commit 425 (14d7e61, \#430)
+- **Files changed:** 1 (+72 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +72 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 426. T-1249: K-05 v1.11, the handle's party for a turn (readTurnParty) (\#434)
+
+- **Commit:** [`8464d05`](https://github.com/aryamahadik/rosie/commit/8464d05), by Arya Mahadik, 2026-11-12 02:02:48 UTC
+- **Pull request:** [#434](https://github.com/aryamahadik/rosie/pull/434) from `task/T-1249`, merged 2026-11-12 02:02:48 UTC. It squashed 4 branch commits:
+  - `8bc8265` T-1249: K-05 v1.11 freezes readTurnParty, the handle's party for a tu…
+  - `3e36234` T-1249: README v1.11 wording: quotes put with their sources, the zone…
+  - `2f15ec2` T-1249: name K-09's table of journeys 1 and 2 where the owner's missi…
+  - `ad25346` T-1249: cite S13-31, the home step for who acts for a business and fo…
+- **Files changed:** 17 (+1571 −7), by folder:
+  - `contracts/data-access/` README.md +93 −6, data-access.v1.11.schema.json +1173 −0, frozen.json +1 −1
+  - `contracts/data-access/fixtures/` index.json +104 −0, read-turn-party-first-text.json +18 −0, read-turn-party-handed-over.json +18 −0, read-turn-party-one-role.json +18 −0, read-turn-party-owner-role-ended.json +18 −0, read-turn-party-several-businesses.json +18 −0, read-turn-party-several-companies.json +18 −0, read-turn-party-sign-up-before-business.json +18 −0, read-turn-party-test-owner-1.json +18 −0, read-turn-party-unknown.json +18 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-turn-party-business-zone-null.json +6 −0, refuse-turn-party-caller-business.json +19 −0, refuse-turn-party-no-business-zone-utc.json +6 −0, refuse-turn-party-undecided-names-businesses.json +7 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1249: K-05 v1.11 freezes readTurnParty, the handle's party for a turn: the one business the handle's live roles and companies name, businessUndecided for several or a contradicted company, never a guess
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1249: README v1.11 wording: quotes put with their sources, the zone's UTC source, a set ended_at, the roster not read
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1249: name K-09's table of journeys 1 and 2 where the owner's missing role is cited
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1249: cite S13-31, the home step for who acts for a business and for a removal on papers
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 425. docs: COMMIT\_HISTORY.md through commit 422 (44dab4d, \#429) (\#430)
 
