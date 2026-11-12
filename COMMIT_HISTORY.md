@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 447, [`17c4bfa`](https://github.com/aryamahadik/rosie/commit/17c4bfa), 2026-11-12 07:52:03 UTC.
+- **Through:** commit 449, [`1a7f415`](https://github.com/aryamahadik/rosie/commit/1a7f415), 2026-11-12 08:36:47 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 449. docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457) (\#458)
+
+- **Commit:** [`1a7f415`](https://github.com/aryamahadik/rosie/commit/1a7f415), by Arya Mahadik, 2026-11-12 08:36:47 UTC
+- **Pull request:** [#458](https://github.com/aryamahadik/rosie/pull/458) from `task/commit-history-41`, merged 2026-11-12 08:36:47 UTC. It squashed 1 branch commit:
+  - `57920b5` docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457)
+- **Files changed:** 1 (+63 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +63 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 448. T-1276: staging's sign-in secrets by name (ADR-016 card G): PROOF\_CODE\_HASH\_KEY joins MADE (32 random bytes as base64, as SEALING\_WRAP\_KEY) and SECRETS; RESEND\_API\_KEY and STAGING\_TEST\_INBOXES join SECRETS; tests: each list holds each name, a name staging holds (SEALING\_WRAP\_KEY, LINQ\_WEBHOOK\_SECRET) is left as it is, the output holds names and set or missing, never a value (\#459)
+
+- **Commit:** [`9674a46`](https://github.com/aryamahadik/rosie/commit/9674a46), by Arya Mahadik, 2026-11-12 08:36:43 UTC
+- **Pull request:** [#459](https://github.com/aryamahadik/rosie/pull/459) from `task/T-1276`, merged 2026-11-12 08:36:44 UTC. It squashed 1 branch commit:
+  - `5c2daee` T-1276: staging's sign-in secrets by name (ADR-016 card G): PROOF\_COD…
+- **Files changed:** 4 (+403 −88), by folder:
+  - `infra/ci/` make-staging-secrets.test.mjs +228 −44, put-staging-secrets.test.mjs +136 −27
+  - `infra/scripts/` make-staging-secrets.sh +15 −7, put-staging-secrets.sh +24 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 447. docs: COMMIT\_HISTORY.md through commit 444 (69d322c, \#449) (\#457)
 
