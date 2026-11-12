@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Staging's Worker secrets, set by name from the build Mac (T-568; C-022; build prompt rule 7: keys are named, never
-# shown; DL-017, DL-024):
+# Staging's Worker secrets, set by name from the build Mac (T-568; T-1276, ADR-016 card G; C-022; build prompt rule 7:
+# keys are named, never shown; DL-017, DL-024):
 #   npm run secrets:staging        (bash infra/scripts/put-staging-secrets.sh [--env staging])
 # For each name in SECRETS below, the value is read by name from this checkout's git-ignored .dev.vars and handed to
 # `wrangler secret put <NAME> --env staging` through cf.sh, on standard input. Standard output is one line per name, in
@@ -8,11 +8,12 @@
 #   <NAME> set       wrangler took the value: staging's Worker reads it by that name from now on
 #   <NAME> missing   .dev.vars holds no value for the name (no line, or an empty one): nothing was put for it, never an
 #                    empty secret
-# The names are the ones staging's Worker reads, each beside the code that reads it. The model key is the one scoped to
-# Rosie's workspace (DL-027), so no workspace id is a secret: no code reads one.
-# SEALING_WRAP_KEY and LINQ_WEBHOOK_SECRET are staging's own: nobody is given them, so they need no line in .dev.vars.
-# make-staging-secrets.sh (npm run secrets:staging:make, T-1236) makes them in place and keeps them nowhere else; they
-# still print as missing here, since this script reads .dev.vars alone.
+# The names are the ones staging's Worker reads, each beside the code that reads it, or for sign-in by code beside the
+# card that builds that code (ADR-016). The model key is the one scoped to Rosie's workspace (DL-027), so no workspace
+# id is a secret: no code reads one.
+# SEALING_WRAP_KEY, LINQ_WEBHOOK_SECRET and PROOF_CODE_HASH_KEY are staging's own: nobody is given them, so they need no
+# line in .dev.vars. make-staging-secrets.sh (npm run secrets:staging:make, T-1236, T-1276) makes them in place and
+# keeps them nowhere else; they still print as missing here, since this script reads .dev.vars alone.
 #
 # A value:
 #   - comes from .dev.vars alone. A variable of the same name in the caller's shell is dropped before the file is read,
@@ -31,9 +32,10 @@
 #   - CLOUDFLARE_ENV other than staging, which cf.sh refuses too.
 # Refused before any value is put (exit 1):
 #   - a .dev.vars that cannot be read;
-#   - a value that holds a space, a quote or a #: no key, base64 or whsec_ value does, so its line is not a plain
-#     NAME=value (a comment after the value, a quote left open: lib.sh's load_dev_var keeps those in the value). Every
-#     name is checked before the first put, so staging is untouched.
+#   - a value that holds a space, a quote or a #: no key, base64 or whsec_ value does, nor the inbox list, whose
+#     addresses are joined by commas, so its line is not a plain NAME=value (a comment after the value, a quote left
+#     open: lib.sh's load_dev_var keeps those in the value). Every name is checked before the first put, so staging is
+#     untouched.
 # A put that fails stops the run (exit 1): the names before it stay set, and the ones after it are not put. cf.sh's own
 # refusals arrive the same way.
 # Each put makes a new version of the staging Worker and deploys it at once (wrangler secret put), so run this when a
@@ -68,6 +70,18 @@ SECRETS=(
   # The Linq webhook signing secret: runtime/src/wiring/real.ts LINQ_WEBHOOK_SECRET. "whsec_" and base64. Until J-08 it
   # is the one the test-phone page's Linq double signs with (T-412): staging's own, never Linq's.
   LINQ_WEBHOOK_SECRET
+  # The key every sign-in code's hash and every typed contact's hash is made under (ADR-016 section 4; the name K-22's
+  # rows keep in hash_key_name): the hashing port staging's root hands the sign-in calls reads it (T-1289). 32 random
+  # bytes as base64, staging's own: make-staging-secrets.sh makes it in place (T-1276).
+  PROOF_CODE_HASH_KEY
+  # Resend's send-only key (K-12 default 1; DL-022; J-04): the Resend send adapter reads it (T-419), for the sign-in
+  # codes staging sends to the named inboxes alone (ADR-016 section 5).
+  RESEND_API_KEY
+  # The named-inbox list (ADR-016 section 5; K-12 default 19): the testers' own addresses, staff's and never customer
+  # data (DL-011), the only inboxes a staging code reaches. Staging's email router (T-1288) and the Resend adapter's
+  # allow-list (T-419) read it; seed:staging reads the same name from .dev.vars (T-1287). Its line holds the addresses
+  # joined by commas, with no space. Like every value here it is never printed: only its name is.
+  STAGING_TEST_INBOXES
 )
 USAGE="usage: put-staging-secrets.sh [--env staging]"
 DEV_VARS="$ROOT/.dev.vars"

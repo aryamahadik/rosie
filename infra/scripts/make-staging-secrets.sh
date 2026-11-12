@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Staging's own secrets, made in place from the build Mac (T-1236; C-022; CQ-210; DL-485; build prompt rule 7: keys are
-# named, never shown):
+# Staging's own secrets, made in place from the build Mac (T-1236; T-1276, ADR-016 card G; C-022; CQ-210; DL-485; build
+# prompt rule 7: keys are named, never shown):
 #   npm run secrets:staging:make   (bash infra/scripts/make-staging-secrets.sh [--env staging] [NAME ...])
-# Two of the secrets staging's Worker reads are staging's own: no vendor issues them and nobody is given them, so
+# The secrets on MADE below are staging's own: no vendor issues them and nobody is given them, so
 # put-staging-secrets.sh (npm run secrets:staging) finds no value for them in .dev.vars and prints them as missing.
 # This script makes them where they are used. It first asks staging which names it holds
 # (`wrangler secret list --env staging --format json`, through cf.sh: names only). Then, for each name in MADE below,
@@ -10,7 +10,9 @@
 # nothing else:
 #   <NAME> already set
 #       staging holds the name. It is left exactly as it is: a secret is never replaced from here. Replacing the sealing
-#       key would orphan everything sealed under it; rotation is a task of its own, never this script's.
+#       key would orphan everything sealed under it, and replacing the proof-code hash key would void every live sign-in
+#       code and restart every contact's day count and pause (ADR-016 section 4); rotation is a task of its own, never
+#       this script's (DL-495; CQ-218).
 #   <NAME> has a value in .dev.vars: use secrets:staging
 #       staging does not hold the name, and this checkout's .dev.vars has a value for it (read as put-staging-secrets.sh
 #       reads it): that value is the one to put, with npm run secrets:staging. Nothing is made for the name.
@@ -24,8 +26,9 @@
 #   - is made here and nowhere else: 32 random bytes from node's crypto.randomBytes (node's own cryptographic generator;
 #     no package), as base64, with the name's prefix in front. It is checked to be exactly that form before it is put,
 #     so an empty or cut-short value is never put.
-#   - is made only for a name on MADE. A vendor's key is never made here: ANTHROPIC_API_KEY, or any other name that is
-#     not on the list, is refused as an argument before anything is listed, made or put.
+#   - is made only for a name on MADE. A vendor's key is never made here, nor the testers' inbox list:
+#     ANTHROPIC_API_KEY, RESEND_API_KEY, STAGING_TEST_INBOXES, or any other name that is not on the list, is refused as
+#     an argument before anything is listed, made or put.
 #   - is never printed, logged, exported, put on a command line or written to a file: it is held in one shell variable
 #     and goes down one pipe to cf.sh. No here-document or here-string is used (bash 3.2 writes those to a temporary
 #     file), and tracing is switched off first, whatever the caller's shell asked for. So are allexport and keyword, and
@@ -85,6 +88,11 @@ MADE=(
   # after the prefix are what adapters/src/shared/hmac.ts signs and checks under). Until J-08 it is the one the
   # test-phone page's Linq double signs with (T-412): staging's own, never Linq's.
   LINQ_WEBHOOK_SECRET
+  # The key every sign-in code's hash and every typed contact's hash is made under: HMAC-SHA-256, with a fixed, distinct
+  # prefix for each (ADR-016 section 4; one key for both, CQ-240). 32 random bytes as base64, as SEALING_WRAP_KEY. Its
+  # name is the one K-22's rows keep in hash_key_name (contracts/db-schema/people-access); staging's root hands a hashing
+  # port over it, read by name, to the sign-in calls (T-1289). DL-495's conditions hold for it as for the sealing key.
+  PROOF_CODE_HASH_KEY
 )
 # A variable of one of those names in the caller's shell (another tool's key on this Mac) is dropped before any command
 # is started: it never counts as a value, and never travels on to cf.sh, node or wrangler.
@@ -233,7 +241,7 @@ value=""
 make_value() {
   local prefix
   case "$1" in
-    SEALING_WRAP_KEY) prefix="" ;;
+    SEALING_WRAP_KEY | PROOF_CODE_HASH_KEY) prefix="" ;;
     LINQ_WEBHOOK_SECRET) prefix="whsec_" ;;
     *) die "refused: $1 is on MADE with no form in make_value: nothing was made or put for it" ;;
   esac
