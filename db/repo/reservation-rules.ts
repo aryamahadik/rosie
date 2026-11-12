@@ -377,6 +377,6 @@ export async function extend(sql: Sql, request: ExtendRequest): Promise<ExtendOu
   try {
     return await inBusinessTransaction(sql, request.businessId, (tx) => extendIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "extend");
   }
 }

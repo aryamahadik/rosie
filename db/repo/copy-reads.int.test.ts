@@ -1635,14 +1635,17 @@ describe("a lost connection answers transient, with no address, number, id or co
       async () => {
         const exchange = await given(fixture);
         const url = new URL(resolvePrimaryUrl());
+        const connection = new Map([
+          [resolvePrimaryUrl(), "the database URL"],
+          [url.host, "the database host"],
+          [url.username, "the database user"],
+          [url.password, "the database password"],
+        ]);
         const neverInAnswer = [
           ...NEVER_ANSWERED,
           seedLiveTimer().address,
           handleOf(exchange).handleId,
-          resolvePrimaryUrl(),
-          url.host,
-          url.username,
-          url.password,
+          ...connection.keys(),
         ].filter((value) => value !== "");
         const before = await fingerprint();
         const application = `rosie-t1301-cut-${table}`;
@@ -1667,7 +1670,7 @@ describe("a lost connection answers transient, with no address, number, id or co
         expect(answerErrors(call, outcome)).toEqual([]);
         const text = JSON.stringify(outcome);
         for (const value of neverInAnswer) {
-          expect(text.includes(value), value).toBe(false);
+          expect(text.includes(value), connection.get(value) ?? value).toBe(false);
         }
         expect(await fingerprint()).toEqual(before);
         expect(await READS[call](job, handleOf(exchange))).toEqual(exchange.outcome);

@@ -578,8 +578,11 @@ function heldOutcome(row: Reservation, repeated: boolean): ReserveOutcome {
 
 /** Thrown inside a savepoint to undo it and leave with an answer. */
 class Refused extends Error {
-  constructor(readonly outcome: ReserveOutcome) {
+  readonly outcome: ReserveOutcome;
+
+  constructor(outcome: ReserveOutcome) {
     super("refused");
+    this.outcome = outcome;
   }
 }
 

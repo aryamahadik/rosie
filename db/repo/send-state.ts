@@ -531,6 +531,6 @@ export async function sendState(
   try {
     return await inRuntimeTransaction(sql, { readOnly: true }, (tx) => sendStateIn(tx, request, options));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "sendState");
   }
 }
