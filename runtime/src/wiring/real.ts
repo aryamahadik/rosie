@@ -57,6 +57,13 @@
 //                first and PostgreSQL's copy on a miss, and its call's span says where each part it read came from.
 //                Inside workerd the Tool API's validator and the frontier's checker are T-1144's prebuilt standalone
 //                code (`npm run build:validators`), never a no-op; under Node, Ajv over the frozen schemas.
+//   stateReads   T-1242 (T-1154's part P1b): the safety read's bundle lines (BundleSafety: fixedLine, outcomeLine and
+//                dangerWords) with the pin's check of each bundle a turn would pin (DL-341, DL-351), the handle's ids
+//                (idsOf) and stopped flag (isStopped), the turn's directory (partyOf) and each text's safety result
+//                (resultsOf), each read over its own input, handed in by the root (RootOptions.bundleSafety,
+//                handleDirectory, stoppedFlags, turnDirectory, turnSafety; the seams' table below says how): on
+//                staging none is handed in until the part of T-1154 that binds it, so every read there fails closed
+//                (NoStateReadError) and no bundle is pinned. The test environment binds the fake set's state reads.
 //   decide       T-558: @rosie/ai's decide (T-369 createDecider: two reads routed by stakes and compared part by part;
 //                C-115) and its one Sonnet re-read (T-370; C-116), one decider per bundle for both, handed in by the
 //                root (RootOptions.deciders): in a test, over a fake Messages API answered by the recorded-model double
@@ -130,6 +137,11 @@
 //                not known), and the stopped flag is never derived from a consent row (STATE note 10; T-1099). A number
 //                with no phone row has no open chat that Rosie knows of, so its rows wait for the chat (limit 8's
 //                waitingChat; MC C9).
+//   dataAccess   T-1242 (T-1154's part P1b): the turn's plan calls, K-05 v1's unplannedRows and writePlan (T-196,
+//                db/repo/outbox.ts, each called as (sql, request) as rosie_job), with their database bound, handed in by
+//                the root (RootOptions.planCalls): on staging nothing until the part of T-1154 that binds them, so every
+//                call there fails closed (NoDatabaseError) and no row is listed or planned. The test environment binds
+//                the fake set's rows.
 //   linqSend     T-563: K-11 v1 sendPart (C-206; C-211), each part the dispatcher sends through the root's Linq door
 //                (./linq-door.ts), under its K-07 key '<row>/<part>/<try>', with its Linq line bound, handed in by the root
 //                (RootOptions.linqSendCall): in a test, @rosie/adapters' Linq double (T-411), which records each part once
@@ -157,6 +169,7 @@ import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/
 import {
   NOT_TOLD_YET,
   PLUGIN_LISTS_NO_STOP_WORDS,
+  type SafetyWords,
   type WordsSealer,
 } from "@rosie/actions/src/domain/safety/ports";
 import { createFrontierChecker, type FrontierChecker } from "@rosie/actions/src/frontier/assemble/check";
@@ -225,6 +238,10 @@ import type {
   MarkRowV12Request,
   RenewClaimOutcome,
   RenewClaimRequest as K05RenewClaimRequest,
+  UnplannedRowsOutcome,
+  UnplannedRowsRequest,
+  WritePlanOutcome,
+  WritePlanRequest as K05WritePlanRequest,
 } from "@rosie/db/repo/outbox";
 import type { SendStateOutcome, SendStateRequest, SendStateResponse } from "@rosie/db/repo/send-state";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
@@ -241,7 +258,15 @@ import {
   type PartRead,
   type PinnedBundle,
 } from "../bundle/types";
-import { asListed, BundleReader, flowOf, keyOf, readManifest, sameBundle } from "../bundle/values";
+import {
+  asListed,
+  BundleReader,
+  bundleIdOf,
+  flowOf,
+  keyOf,
+  readManifest,
+  sameBundle,
+} from "../bundle/values";
 import type {
   ArmClockAnswer,
   CancelClockAnswer,
@@ -268,7 +293,14 @@ import type { HandleRef } from "../gateway/seal";
 import type { ChatOpenPort, InboundEvent, LinqPort, VerifyWebhookResult } from "../gateway/types";
 import type { HandleTargetsAnswer, HandleTargetsPort } from "../guard/types";
 import { MODELS_DOWN } from "../outage/ai";
-import type { DangerWordEntry, SafetyReadPort } from "../safety/types";
+import type {
+  BundleSafety,
+  DangerWordEntry,
+  HandleDirectory,
+  HandleIds,
+  SafetyDeps,
+  SafetyReadPort,
+} from "../safety/types";
 import { openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
 import type {
   BuildFrontierAnswer,
@@ -281,18 +313,25 @@ import type {
   MessagePlan,
   ParkTurnAnswer,
   RewriteRequest,
+  RowsAnswer,
   TurnComposer,
   TurnDecide,
+  TurnDirectory,
+  TurnParty,
+  TurnSafety,
+  WriteRowPlanAnswer,
 } from "../turn/types";
 import type {
   ArmingPort,
   ComposeInputPort,
+  DataAccess,
   FinalizePort,
   FrontierPort,
   GatePort,
   LinqSend,
   Ports,
   SendStatePort,
+  StateReads,
   TurnRowPort,
 } from "./ports";
 
@@ -368,6 +407,12 @@ export interface RealInputs {
    */
   readonly frontierScope?: FrontierScope | null | undefined;
   /**
+   * The state reads' inputs (T-1242; realStateReads): the bundle's safety lines, the handle's ids and stopped flag, the
+   * turn's directory and each text's safety result, each null where none is bound (the Worker until the part of T-1154
+   * that binds it), so each of its reads fails closed. Left out, every one is null.
+   */
+  readonly stateReads?: StateReadInputs | undefined;
+  /**
    * @rosie/ai's decide for each bundle (T-558): null or left out where none can be built (the Worker, until its bundle's
    * manifest and flows and the model key can be read there), so every decide and re-read fails closed.
    */
@@ -404,6 +449,11 @@ export interface RealInputs {
    */
   readonly sendState?: SendStateCall | null | undefined;
   /**
+   * K-05 v1's plan calls, unplannedRows and writePlan, with their database bound (T-1242; realDataAccess): null or left out
+   * where none is bound (the Worker until the part of T-1154 that binds them), so every call fails closed.
+   */
+  readonly planCalls?: PlanCalls | null | undefined;
+  /**
    * K-11 v1 sendPart with its Linq line bound (T-563): null or left out where no line is bound (the Worker until one is
    * handed in), so every send fails closed and nothing leaves.
    */
@@ -439,6 +489,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       bundles: inputs.frontierBundles?.bundles ?? (() => bundles),
       pinnedOf: inputs.frontierBundles?.pinnedOf ?? (() => null),
     }),
+    stateReads: realStateReads(inputs.stateReads ?? NO_STATE_READ_INPUTS),
     decide: realDecide({ deciders: inputs.deciders ?? null }),
     gate: realGate({
       ...(inputs.gate ?? {
@@ -465,6 +516,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
     }),
     outbox: realOutbox({ calls: inputs.outbox ?? null }),
     sendState: realSendState({ call: inputs.sendState ?? null }),
+    dataAccess: realDataAccess({ calls: inputs.planCalls ?? null }),
     linqSend: realLinqSend({ call: inputs.linqSend ?? null }),
     arming: realArming({ calls: inputs.arming ?? null }),
   };
@@ -1028,6 +1080,246 @@ class FrontierBundleReads implements FrontierBundles {
   }
 }
 
+// ---- stateReads and dataAccess: the seams on staging (T-1242; T-1154's part P1b, DL-492) ---------------------------
+//
+// On staging the state reads and the plan calls are real ports (./picks.ts), each read over its own RootOptions input.
+// The part of T-1154 that binds a reader hands it in as that one field of workerRoot's composeRoot call (./root.ts, on
+// staging) and changes nothing else here or there; production keeps both ports closed, whatever it is handed. Until
+// then workerRoot hands null, and null (or left out) fails closed at once, as every other staging input does: a named
+// error that names the read and never a value (no number, no words, no id), with nothing read or written.
+//
+//   field              type               feeds; and what null does
+//   bundleSafety       BundleSafetyLines  SafetyDeps.bundle (fixedLine, outcomeLine, dangerWords: synchronous), so the
+//                                         safety read's danger words too, and the pin's check (checkPin, through
+//                                         Root.pin: checkedPin). Null: each line read throws NoStateReadError, so the
+//                                         safety read fails before any model call, and the pin refuses every bundle.
+//   handleDirectory    HandleDirectory    SafetyDeps.directory.idsOf. Null: NoStateReadError("idsOf").
+//   stoppedFlags       StoppedFlagRead    SafetyDeps.isStopped. Null: NoStateReadError("isStopped").
+//   turnDirectory      TurnDirectory      TurnDeps.directory.partyOf. Null: NoStateReadError("partyOf"), so the run ends
+//                                         noDirectory before anything is opened, read or written.
+//   turnSafety         TurnSafety         TurnDeps.safety.resultsOf. Null: NoStateReadError("resultsOf"), so the turn
+//                                         takes no text's result (../turn/turn.ts) and its commit records none.
+//   planCalls          PlanCalls          TurnDeps.rows.unplannedRows and writePlan: db/repo/outbox.ts's K-05 v1 calls,
+//                                         `(request) => unplannedRows(sql, request)` and `(request) => writePlan(sql,
+//                                         request)` over a rosie_job client. Null: NoDatabaseError("unplannedRows" or
+//                                         "writePlan"), so no row of the turn is listed, composed or planned.
+//
+// The state reads are typed as the ports they feed (../safety/types.ts, ../turn/types.ts), since no K-05 call names them
+// yet (T-1240 freezes the party read; T-1241 rules where each text's result is kept); the plan calls as db/repo's K-05
+// calls, as every K-05 call the root is handed. The test environment binds the fake set's state reads and rows
+// (./test-support.ts), so it never asks the pin's check.
+
+/**
+ * A state read asked for where none is bound (staging, until the part of T-1154 that binds it hands its reader in). The
+ * message names the read only: never a number, a word or an id.
+ */
+export class NoStateReadError extends Error {
+  constructor(read: string) {
+    super(`no ${read} read is bound here`);
+    this.name = "NoStateReadError";
+  }
+}
+
+/** What the pin's check is asked about: the bundle a turn would pin, and the bound bundle port the pin reads it through. */
+export interface PinCheckRequest {
+  /** The active bundle id K-05 readActiveBundle answered, of K-01's form, its manifest key K-01's for it. */
+  readonly bundleId: BundleId;
+  /**
+   * The bound bundle port (K-05 v1 item 7's reads; T-556): the reads the pin itself makes, for the bundle's manifest and
+   * flow graphs. Its KV is left out, as the pin's is: the pin reads the actor's own BUNDLES binding first.
+   */
+  readonly bundles: BundleDeps;
+}
+
+/**
+ * The bundle's safety lines (DL-341, DL-351): the safety read's BundleSafety over the pinned bundle's K-01 v1 lines (its
+ * fixed lines by id, each outcome step's checked line, its shared lists' danger words; synchronous: ../safety/types.ts),
+ * bundle-backed, and the pin's check of each bundle a turn would pin.
+ */
+export interface BundleSafetyLines extends BundleSafety {
+  /**
+   * The pin's check (../bundle/pin.ts, through Root.pin): asked once at each turn's pin that reads the active bundle id
+   * (a turn's first run; a rerun keeps the id its turn stored, which this check let through), after K-05's answer and
+   * before the pin stores the id for the turn. Resolves: the pin goes on. Rejects: the bundle is refused (one whose
+   * safetyEmergency, safetyCrisis or safetyAsk line has no words, or whose A3-49 line holds no hotline), so nothing is
+   * pinned or stored for the turn, its work does not start, and the lease's next run asks again.
+   */
+  checkPin(request: PinCheckRequest): Promise<void>;
+}
+
+/** The handle's stopped flag, as the outage line asks it (SafetyDeps.isStopped; arch 11 line 566), by actor name. */
+export type StoppedFlagRead = SafetyDeps["isStopped"];
+
+/** What the real state-reads port is fed: each input, or null where none is bound, so each of its reads fails closed. */
+export interface StateReadInputs {
+  readonly bundleSafety: BundleSafetyLines | null;
+  readonly handleDirectory: HandleDirectory | null;
+  readonly stoppedFlags: StoppedFlagRead | null;
+  readonly turnDirectory: TurnDirectory | null;
+  readonly turnSafety: TurnSafety | null;
+}
+
+/** Every state read with none bound: each fails closed. */
+const NO_STATE_READ_INPUTS: StateReadInputs = {
+  bundleSafety: null,
+  handleDirectory: null,
+  stoppedFlags: null,
+  turnDirectory: null,
+  turnSafety: null,
+};
+
+/** The handle's party as the turn reads it, field for field: its K-04 id, business, person and zone, nothing more. */
+function turnPartyOf(party: TurnParty): TurnParty {
+  return {
+    handleId: party.handleId,
+    businessId: party.businessId,
+    personId: party.personId,
+    zone: party.zone,
+  };
+}
+
+/** The handle's ids as K-09's calls name them, field for field: nothing more. */
+function handleIdsOf(ids: HandleIds): HandleIds {
+  return {
+    handleId: ids.handleId,
+    businessId: ids.businessId,
+    personId: ids.personId,
+    bookingId: ids.bookingId,
+  };
+}
+
+/**
+ * The state-reads port (T-1242): each read through the input the root is handed for it (StateReadInputs; the table above).
+ * The bundle's lines and the stopped flag go back as their input gives them, and each text's safety result as its input
+ * gives it (the turn takes only its own texts' results); the party and the handle's ids go back field for field, so a
+ * reader that answers a row with more in it hands the turn and the safety read nothing more. With an input null, its reads
+ * fail closed at once (NoStateReadError naming the read): a bundle line's read throws, being synchronous, and every other
+ * read rejects. Nothing here logs: a request names a handle's number.
+ */
+export function realStateReads(inputs: StateReadInputs): StateReads {
+  const { bundleSafety, handleDirectory, stoppedFlags, turnDirectory, turnSafety } = inputs;
+  const none = (read: string): Promise<never> => Promise.reject(new NoStateReadError(read));
+  const noneNow = (read: string): never => {
+    throw new NoStateReadError(read);
+  };
+  return {
+    safety: {
+      directory: {
+        async idsOf(actorName) {
+          if (handleDirectory === null) throw new NoStateReadError("idsOf");
+          const ids = await handleDirectory.idsOf(actorName);
+          return ids === null ? null : handleIdsOf(ids);
+        },
+      },
+      bundle: {
+        fixedLine: (id) => (bundleSafety === null ? noneNow("fixedLine") : bundleSafety.fixedLine(id)),
+        outcomeLine: (outcome) =>
+          bundleSafety === null ? noneNow("outcomeLine") : bundleSafety.outcomeLine(outcome),
+        dangerWords: () => (bundleSafety === null ? noneNow("dangerWords") : bundleSafety.dangerWords()),
+      },
+      isStopped: (actorName) => (stoppedFlags === null ? none("isStopped") : stoppedFlags(actorName)),
+    },
+    turn: {
+      directory: {
+        async partyOf(request) {
+          if (turnDirectory === null) throw new NoStateReadError("partyOf");
+          const party = await turnDirectory.partyOf(request);
+          return party === null ? null : turnPartyOf(party);
+        },
+      },
+      safety: {
+        resultsOf: (eventIds) => (turnSafety === null ? none("resultsOf") : turnSafety.resultsOf(eventIds)),
+      },
+    },
+  };
+}
+
+/**
+ * The active bundle id the pin itself would take from K-05's answer (pin.ts readActive: K-01's form, its manifest under
+ * K-01's key), or null for an answer the pin refuses on its own.
+ */
+function activeIdOf(answer: unknown): BundleId | null {
+  if (typeof answer !== "object" || answer === null) return null;
+  const fields = answer as Record<string, unknown>;
+  if (fields.result !== "active") return null;
+  const bundleId = bundleIdOf(fields.bundleId);
+  if (bundleId === null || fields.manifestKey !== keyOf(bundleId, "manifest")) return null;
+  return bundleId;
+}
+
+/**
+ * What the turn's pin reads through where the state reads are real (Root.pin; DL-341, DL-351): the bound bundle port, with
+ * the bundle's safety lines' check (BundleSafetyLines.checkPin) asked for each active bundle id the pin would take, after
+ * K-05 answers it and before the pin stores it for the turn. A bundle the check refuses (it rejects), or any bundle while
+ * no safety lines are bound (NoStateReadError "checkPin"), is never pinned: the read rejects, so the pin fails as for any
+ * read that fails (its lease span's code is noAnswer, ../bundle/pin.ts), nothing is stored for the turn, its work does not
+ * start, and the lease's next run pins again. An answer the pin would refuse itself (no active bundle, transient, or not
+ * K-05's form) goes back as it came, so the pin's own code stands; every value read goes to the bundle port as it is.
+ */
+export function checkedPin(bundles: BundleDeps, lines: BundleSafetyLines | null): BundleDeps {
+  const { registry } = bundles;
+  return {
+    ...(bundles.kv === undefined ? {} : { kv: bundles.kv }),
+    registry: {
+      async readActiveBundle(request) {
+        const answer = await registry.readActiveBundle(request);
+        const bundleId = activeIdOf(answer);
+        if (bundleId === null) return answer;
+        if (lines === null) throw new NoStateReadError("checkPin");
+        await lines.checkPin({ bundleId, bundles });
+        return answer;
+      },
+      readBundleValue: (request) => registry.readBundleValue(request),
+    },
+  };
+}
+
+/** K-05 v1 unplannedRows (T-196, db/repo/outbox.ts) with its database bound (the primary, as rosie_job). */
+export type UnplannedRowsCall = (request: UnplannedRowsRequest) => Promise<UnplannedRowsOutcome>;
+
+/** K-05 v1 writePlan (T-196, db/repo/outbox.ts) with its database bound (the primary, as rosie_job). */
+export type WritePlanCall = (request: K05WritePlanRequest) => Promise<WritePlanOutcome>;
+
+/** K-05 v1's plan calls with their database bound: what the root is handed (RootOptions.planCalls). */
+export interface PlanCalls {
+  readonly unplannedRows: UnplannedRowsCall;
+  readonly writePlan: WritePlanCall;
+}
+
+/**
+ * The data-access port (T-1242): the turn's plan calls (../turn/types.ts TurnRows, less its park, which is the turn-row
+ * port's) over K-05 v1's unplannedRows and writePlan, the calls the root is handed (RootOptions.planCalls). Each request
+ * goes to K-05 field for field, and each answer comes back as K-05 gives it, which the turn checks itself (compose.ts).
+ * With no calls bound every call fails closed (NoDatabaseError) before anything is read or written. Nothing here logs: a
+ * plan holds a person's words.
+ */
+export function realDataAccess(inputs: { readonly calls: PlanCalls | null }): DataAccess {
+  const { calls } = inputs;
+  return {
+    rows: {
+      async unplannedRows(request) {
+        if (calls === null) throw new NoDatabaseError("unplannedRows");
+        // The same K-05 v1 unplannedRows answer in two hand-written forms: db/repo's, and the turn's (../turn/types.ts),
+        // which reads each row's fields and checks them itself (compose.ts listedOf).
+        const answer: unknown = await calls.unplannedRows({ turnId: request.turnId });
+        return answer as RowsAnswer;
+      },
+      async writePlan(request) {
+        if (calls === null) throw new NoDatabaseError("writePlan");
+        // The same K-05 v1 writePlan exchange in two hand-written forms: the turn's (../turn/types.ts, which builds the
+        // request and reads the answer) and the generated one db/repo/outbox.ts takes, checks and answers.
+        const answer: unknown = await calls.writePlan({
+          outboxRowId: request.outboxRowId,
+          expectVersion: request.expectVersion,
+          plan: request.plan,
+          finalParts: request.finalParts,
+        } as unknown as K05WritePlanRequest);
+        return answer as WriteRowPlanAnswer;
+      },
+    },
+  };
+}
+
 // ---- decide: @rosie/ai's two reads and the one Sonnet re-read (T-558; C-115, C-116) -----------------------------------
 
 /**
@@ -1179,6 +1471,13 @@ export interface GateReads<Repo = unknown> {
   readonly sealer: WordsSealer;
   readonly flagsReader?: (repo: Repo) => FlagsReader;
   readonly messagesReader?: (repo: Repo) => MessagesReader;
+  /**
+   * The safety service's SafetyDeps.words (T-1242; T-1176): K-01 v1's fixed lines word for word from the pinned bundle,
+   * for the danger question a record's line carries (safetyAsk's). A later part of T-1154 fills it; left out, as in the
+   * test environment, the service has none, so a record whose line asks it answers notBuilt and one that asks nothing
+   * never reads it.
+   */
+  readonly words?: SafetyWords;
 }
 
 /** What the real gate port is fed. */
@@ -1248,6 +1547,7 @@ export function realGate(inputs: GateInputs): GatePort {
         safetyExtra: {
           ...(reads?.flagsReader === undefined ? {} : { flagsReader: reads.flagsReader }),
           ...(reads?.messagesReader === undefined ? {} : { messagesReader: reads.messagesReader }),
+          ...(reads?.words === undefined ? {} : { words: reads.words }),
         },
       };
       const face = createTurnFace<FrontierRepo>({

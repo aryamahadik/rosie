@@ -290,7 +290,8 @@ describe("every page response carries x-trace-id (a valid incoming one echoed) a
     const response = await shell.fetch(
       new Request(`https://${TEST_LINK_HOST}${c.path}`, {
         method: c.method,
-        headers: { ...READER, "x-trace-id": TRACE_ID.toUpperCase() },
+        // A POST is answered only from this site's own origin (post-guard.ts; T-520).
+        headers: { ...READER, origin: `https://${TEST_LINK_HOST}`, "x-trace-id": TRACE_ID.toUpperCase() },
       }),
     );
     expect(response.status).toBe(c.status);
@@ -467,7 +468,13 @@ describe("methods: HEAD rides with GET, and any method a route does not take get
   it("names POST in Allow for a route that takes it, and still refuses the rest", async () => {
     const { shell } = testShell({ modules: [EXAMPLE] });
     const send = (method: string): Promise<Response> =>
-      shell.fetch(new Request(`https://${TEST_LINK_HOST}/test/example/form`, { method }));
+      shell.fetch(
+        new Request(`https://${TEST_LINK_HOST}/test/example/form`, {
+          method,
+          // A POST is answered only from this site's own origin (post-guard.ts; T-520).
+          headers: { origin: `https://${TEST_LINK_HOST}` },
+        }),
+      );
     expect((await send("POST")).status).toBe(200);
     const refused = await send("PUT");
     expect(refused.status).toBe(405);

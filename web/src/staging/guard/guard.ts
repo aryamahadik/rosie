@@ -11,11 +11,6 @@
 // vars). It never reads the request, so no address, query, header, cookie or body can switch a tool on. It fails
 // closed: a config that is missing, is no object, does not hold both values as its own, or whose two values disagree
 // (an ENVIRONMENT other than "staging" with the staging mark set, or "staging" without the mark) is not staging.
-//
-// One limit, the shell's own: a method a route does not take gets the shell's 405 page before any handler runs, so the
-// guard alone cannot make that answer a 404. The folder's mark in web/src/routes.ts does, since the shell then lists
-// none of the folder's routes. guard.test.ts holds the two together: a staging-only folder lists guarded routes only,
-// and a guarded route sits only in a staging-only folder.
 
 import type { ShellRoute } from "../../shell/route";
 

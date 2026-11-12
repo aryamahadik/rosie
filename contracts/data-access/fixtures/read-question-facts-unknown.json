@@ -1,0 +1,17 @@
+{
+  "call": "readQuestionFacts",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:08Z",
+    "note": "A question no row holds, such as one named by a delivered mark after the schema it was asked in was reset: turn 1's commit asked oq-s1-02-sam-1 only, so oq-s1-02-sam-2 is not found. The read answers notFound and writes nothing; the clock arming arms nothing and reports it (questionNotFound)."
+  },
+  "request": {
+    "openQuestionId": "oq-s1-02-sam-2"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "open_questions",
+    "rowId": "oq-s1-02-sam-2"
+  }
+}

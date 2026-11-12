@@ -5,7 +5,7 @@
 // joined the Linq verify on staging, T-553 the sealing, T-554 the safety read, T-555 the turn-row calls, T-556 the bundle
 // reads and the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer,
 // T-561 finalize, T-562 the outbox and the send state, T-1213 the chat open, T-563 the Linq send and the dispatcher's
-// retries, T-564 the clock arming; production takes no join yet).
+// retries, T-564 the clock arming, T-1242 staging's state reads and plan calls; production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
@@ -66,7 +66,8 @@ function workerEnv(environment: string): Cloudflare.Env {
 
 /**
  * The ports joined so far in each environment (./picks.ts): their real package; every other port on its fake under test,
- * and closed on the Worker's environments.
+ * and closed on the Worker's environments. On staging the state reads and the plan calls are real too (T-1242), each
+ * read failing closed until the part of T-1154 that binds it (./state-reads.worker.test.ts).
  */
 const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortName[]>> = {
   test: [
@@ -97,6 +98,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "bundles",
     "targets",
     "frontier",
+    "stateReads",
     "decide",
     "gate",
     "composeInput",
@@ -104,6 +106,7 @@ const JOINED: Readonly<Record<"test" | "staging" | "production", readonly PortNa
     "finalize",
     "outbox",
     "sendState",
+    "dataAccess",
     "linqSend",
     "arming",
   ],
