@@ -39,7 +39,10 @@
 // copied, its reply straight through Linq, its record queued for the return, and it joins no turn); a running safety
 // timer due fires from the copy. On return the write-on-return queue replays danger, then stops, then the rest (the STOP
 // and START records through `recordStopOrStart`), and only then does the lease resume and the queued batches go on. Every
-// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)).
+// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)). The lease asks the same path whether a batch waiting
+// behind a turn that has used its one restart may hold a stop word (ADR-018 section 1; T-1311): if so, that turn is
+// restarted a second time with it, so a STOP commits on the first run of the turn that takes it; while the path is
+// unwired, any such batch may.
 //
 // The trace (T-1108; K-08 v1): the gateway writes each inbound event's one receive span, and the actor none of its own. A
 // text's trace is one run by seq whoever writes on it: as the actor stores a text it begins the trace's count after the
@@ -281,6 +284,10 @@ export class HandleActor extends DurableObject {
       // PostgreSQL down (T-270): the lease holds its turn as it is, and the queue is replayed before any commit.
       held: () => this.outage.isDown(),
       beforeCommit: () => this.outage.beforeCommit(),
+      // A batch that may hold a stop word restarts a turn that has used its one restart a second time (ADR-018 section 1):
+      // the down path's reading of each text, true while that path is unwired, on a throw, and for a readable text it
+      // cannot find or that has no reading (RULES 7.2: "Unsure: treat it as a stop").
+      stopAmong: (eventIds) => this.outage.stopAmong(eventIds),
       // Each text's safety result as the read on arrival kept it (ADR-015; T-1264): a run reads its own texts' through its
       // leased turn, and the step that ends the turn for good removes them and closes the texts, in its transaction.
       resultsOf: (eventIds) => this.safety.resultsOf(eventIds),

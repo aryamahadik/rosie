@@ -11,6 +11,14 @@
 //   - A batch that closes before the running turn commits restarts that turn once, with its texts: a new turn id from the
 //     union of the ids. A batch that closes after that restart, or once the turn has begun its commit, waits; when the turn
 //     commits, every waiting batch opens the next turn together.
+//   - A STOP never waits on a restarted turn (ADR-018 section 1; CQ-230; RULES 7.2: "Unsure: treat it as a stop. It stops
+//     texts from the number it answers, at once"; arch 06 line 329). A waiting batch that may hold a stop word (the host's
+//     `stopAmong`) restarts a turn that has used its one restart a second time, in the same way, while that turn is leased
+//     (it has not begun its commit, is not holding its lease for its reply and is not being parked) and is not left for the
+//     park: a turn of its texts and every waiting batch's, at try 1, written as 2 in lease_turns.restart. A turn so opened
+//     is never restarted again: any later batch waits for the next turn. So a turn is restarted at most twice. The STOP's
+//     turn then commits its keyword texts on its first run (T-1263, ../turn/turn.ts). A host that cannot say (a throw)
+//     reads as a stop word; a host without `stopAmong` as none, so it keeps the one restart.
 //   - A lease that lapses (60 s and no commit) reruns the turn from its sealed texts under the same turn id, so a commit
 //     that went through before the crash comes back as the first result (K-05 v1 commitTurn: a repeat writes nothing).
 //
@@ -183,7 +191,10 @@ export interface LeasedTurn {
   joinedTraceIds: string[];
   /** How many times this turn has started: 1, then 2 and 3 after a lapse (K-05 turn.tries). */
   tries: number;
-  /** True when this turn is the one restart: a later batch waits for the next turn. */
+  /**
+   * True when this turn is a restart: the one restart, after which a later batch waits unless it may hold a stop word, or
+   * the second, for a batch that may hold one, after which every later batch waits for the next turn (ADR-018 section 1).
+   */
   restart: boolean;
   /** When the lease lapses, on the actor's clock. */
   leaseUntil: number;
@@ -358,6 +369,7 @@ export interface TurnEntry {
   turnId: string;
   eventIds: string[];
   state: TurnState;
+  /** True for either restart: the one restart, or the second, for a batch that may hold a stop word (ADR-018). */
   restart: boolean;
   tries: number;
   /** When its lease lapses, while it holds the lease; else null. */
@@ -377,6 +389,10 @@ interface TurnRow extends Record<string, SqlStorageValue> {
   turn_id: string;
   items: string;
   state: string;
+  /**
+   * 0: opened by the waiting batches; 1: the one restart; 2: the second restart, for a batch that may hold a stop word,
+   * never restarted again (ADR-018 section 1).
+   */
   restart: number;
   tries: number;
   committed_at: string | null;
@@ -442,6 +458,19 @@ interface Snapshot {
     items: Item[];
   } | null;
   waiting: { batchId: number; items: Item[] }[];
+  /**
+   * True when a waiting batch may hold a stop word (the host's `stopAmong`, ADR-018 section 1). Asked only while a leased
+   * turn that has used its one restart holds the lease and batches wait; false otherwise.
+   */
+  stopWaiting: boolean;
+}
+
+/** What the waiting batches do: open a turn (`replaces` null, restart 0) or replace the running one (restart 1 or 2). */
+interface Plan {
+  items: Item[];
+  replaces: string | null;
+  /** What lease_turns.restart is written as for the turn the plan opens. */
+  restart: 0 | 1 | 2;
 }
 
 export interface LeaseHost {
@@ -479,6 +508,14 @@ export interface LeaseHost {
    * changes nothing for the turn.
    */
   commitLost?(lost: LostCommit): void;
+  /**
+   * True when one of these texts, the batches waiting behind a turn that has used its one restart, may hold a stop word
+   * (STOP or another opt-out word; ADR-018 section 1): that turn is then restarted a second time with them, so the STOP
+   * commits on the first run of the turn that takes it, never after the running turn's lapses (RULES 7.2; arch 06 line
+   * 329). Called synchronously, inside the lease's storage transaction that decides again. Optional: left out, false (the
+   * one restart, as before this rule); a throw reads as true ("Unsure: treat it as a stop", RULES 7.2).
+   */
+  stopAmong?(eventIds: readonly string[]): boolean;
   /**
    * True while PostgreSQL is down (T-270): a lapse is no crash, so the lease holds the turn as it is (no rerun, no try, no
    * park), and no batch opens or restarts a turn, until `resume`. Optional: left out (or a throw), never held.
@@ -556,9 +593,10 @@ export class TurnLease {
 
   /**
    * Gives the waiting batches a turn: with no lease held, they open the next turn; with a running turn that has not
-   * restarted and has not begun its commit, they restart it once with its texts and theirs; otherwise they wait. The turn
-   * id is hashed outside the transaction (WebCrypto is asynchronous), so the transaction decides again from what is stored
-   * now and writes only when it decides the same; otherwise it starts over.
+   * restarted and has not begun its commit, they restart it once with its texts and theirs; with one that has used that
+   * restart, they restart it a second time when one of them may hold a stop word (ADR-018 section 1); otherwise they wait.
+   * The turn id is hashed outside the transaction (WebCrypto is asynchronous), so the transaction decides again from what
+   * is stored now, the host's `stopAmong` asked again, and writes only when it decides the same; otherwise it starts over.
    */
   private async advance(): Promise<void> {
     for (;;) {
@@ -578,7 +616,7 @@ export class TurnLease {
           "INSERT INTO lease_turns (turn_id, items, state, restart, tries, opened_ms) VALUES (?, ?, 'leased', ?, 1, ?)",
           turnId,
           JSON.stringify(plan.items),
-          plan.replaces === null ? 0 : 1,
+          plan.restart,
           at,
         );
         this.sql.exec("UPDATE lease_batches SET turn_id = ? WHERE turn_id IS NULL", turnId);
@@ -615,6 +653,9 @@ export class TurnLease {
       .exec<WaitingRow>("SELECT batch_id, items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
       .toArray()
       .map((row) => ({ batchId: row.batch_id, items: JSON.parse(row.items) as Item[] }));
+    // Only a leased turn that has used its one restart can take the second: the host is asked only while such a turn holds
+    // the lease and batches wait (planOf still leaves one that is left for the park).
+    const asks = turn?.state === "leased" && turn.restart === 1 && waiting.length > 0;
     return {
       lease:
         lease === undefined || turn === undefined
@@ -628,7 +669,24 @@ export class TurnLease {
               items: JSON.parse(turn.items) as Item[],
             },
       waiting,
+      stopWaiting:
+        asks && this.stopAmong(bySeq(waiting.flatMap((batch) => batch.items)).map((item) => item.eventId)),
     };
+  }
+
+  /**
+   * Whether one of these waiting texts may hold a stop word (ADR-018 section 1): the host's answer; a host that cannot say
+   * (a throw, or an answer that is not false) reads as yes (RULES 7.2: "Unsure: treat it as a stop"), and a host without
+   * `stopAmong` as no, so a host built before the rule keeps the one restart.
+   */
+  private stopAmong(eventIds: readonly string[]): boolean {
+    if (this.host.stopAmong === undefined) return false;
+    try {
+      const answer: unknown = this.host.stopAmong(eventIds);
+      return answer !== false;
+    } catch {
+      return true;
+    }
   }
 
   // ---- running and committing ---------------------------------------------------------------------------------------
@@ -659,7 +717,8 @@ export class TurnLease {
       traceId,
       joinedTraceIds,
       tries: turn.tries,
-      restart: turn.restart === 1,
+      // Either restart, the one or the second (ADR-018 section 1).
+      restart: turn.restart > 0,
       leaseUntil: lease.until_ms,
       signal,
       commit: (request, options) => this.commit(turnId, request, options?.reply === true),
@@ -1115,7 +1174,7 @@ export class TurnLease {
         turnId: row.turn_id,
         eventIds: (JSON.parse(row.items) as Item[]).map((item) => item.eventId),
         state: row.state as TurnState,
-        restart: row.restart === 1,
+        restart: row.restart > 0,
         tries: row.tries,
         leaseUntil: lease?.turn_id === row.turn_id ? lease.until_ms : null,
         committedAt: row.committed_at,
@@ -1174,16 +1233,21 @@ function lapseOf(turn: TurnRow): Lapse | null {
 }
 
 /**
- * What the waiting batches do: open a turn (no lease is held), restart the running turn once (it holds the lease, has not
- * restarted and has not begun its commit; a third try that lapsed is left for the park), or wait (null): a turn that has
- * begun its commit, is replying (T-253) or is being parked keeps them waiting.
+ * What the waiting batches do: open a turn (no lease is held); restart the running turn once (it holds the lease, has not
+ * restarted and has not begun its commit; a third try that lapsed is left for the park); restart it a second time when it
+ * has used its one restart and one of them may hold a stop word (ADR-018 section 1: the same conditions); or wait (null):
+ * a turn that has begun its commit, is replying (T-253), is being parked or is left for the park keeps them waiting, and
+ * so do a turn that has used its one restart while none of them may hold a stop word and a turn opened by the second
+ * restart, which is never restarted again.
  */
-function planOf(state: Snapshot, now: number): { items: Item[]; replaces: string | null } | null {
+function planOf(state: Snapshot, now: number): Plan | null {
   if (state.waiting.length === 0) return null;
   const waitingItems = state.waiting.flatMap((batch) => batch.items);
   const live = state.lease;
-  if (live === null) return { items: bySeq(waitingItems), replaces: null };
+  if (live === null) return { items: bySeq(waitingItems), replaces: null, restart: 0 };
   const stuck = live.tries >= MAX_TRIES && live.untilMs <= now;
-  if (live.state !== "leased" || live.restart === 1 || stuck) return null;
-  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId };
+  if (live.state !== "leased" || stuck) return null;
+  const restart = live.restart === 0 ? 1 : live.restart === 1 && state.stopWaiting ? 2 : null;
+  if (restart === null) return null;
+  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId, restart };
 }

@@ -10,10 +10,10 @@
 //      So there a tool's address is an unknown address for every method and whatever the request carries, decided
 //      before anything below looks at the request (T-520 round 2; DL-491): no Origin, header or body changes the
 //      answer, none of the body is read and no handler runs.
-//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. A POST that is not from this
-//      site's own origin: the 403 page; one whose body is over the cap: the 413 page (post-guard.ts; T-520), both
-//      before any handler runs. Else the route's handler answers; a throw, or an answer that is no Response, gives
-//      the 500 page. Each error page shows the trace id.
+//   3. No route: the 404 page. A method the route does not take: the 405 page with Allow. A POST that was not sent to
+//      this site's own host (LINK_HOST), or is not from its own origin: the 403 page; one whose body is over the cap:
+//      the 413 page (post-guard.ts; T-520, T-1237), each before any handler runs. Else the route's handler answers; a
+//      throw, or an answer that is no Response, gives the 500 page. Each error page shows the trace id.
 //   4. HEAD gets GET's answer with no body.
 // Every answer carries the trace id in x-trace-id, and one JSON log line is written for it: the trace id, the route's
 // label and the status, nothing else. A label is fixed letters from the code (route.ts), and the trace id is always a
@@ -174,7 +174,8 @@ export function createWebShell(deps: ShellDeps): WebShell {
       refused.headers.set("allow", allowOf(route));
       return finish(request, refused, traceId, route.label);
     }
-    // A POST reaches its handler only from this site's own origin and with a body under the cap (post-guard.ts).
+    // A POST reaches its handler only on this site's own host, from its own origin and with a body under the cap
+    // (post-guard.ts).
     let guarded = request;
     if (request.method === "POST") {
       let checked: Request | PostRefusal;
