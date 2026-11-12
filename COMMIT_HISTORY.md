@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 464, [`1c76e9b`](https://github.com/aryamahadik/rosie/commit/1c76e9b), 2026-11-12 12:27:15 UTC.
+- **Through:** commit 466, [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), 2026-11-12 13:22:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 466. docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474) (\#476)
+
+- **Commit:** [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), by Arya Mahadik, 2026-11-12 13:22:39 UTC
+- **Pull request:** [#476](https://github.com/aryamahadik/rosie/pull/476) from `task/commit-history-48`, merged 2026-11-12 13:22:39 UTC. It squashed 1 branch commit:
+  - `93c586a` docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474)
+- **Files changed:** 1 (+81 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +81 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 465. T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else the git-ignored local vars file, as load\_dev\_var reads it) and given at deploy as --var ROSIE\_NUMBER:\<number\> only in E.164 form; a missing or malformed value deploys without it with one line that chat links stay off (K-05 default 109), never the value; the Worker's Env gains ROSIE\_NUMBER?; tests: the deploy's var, the vars file and precedence, missing and malformed values, no stand-in environment holds it, and no wrangler.jsonc section names it nor any tracked config or script holds a phone number outside the fiction range (\#475)
+
+- **Commit:** [`bbd1a98`](https://github.com/aryamahadik/rosie/commit/bbd1a98), by Arya Mahadik, 2026-11-12 13:22:33 UTC
+- **Pull request:** [#475](https://github.com/aryamahadik/rosie/pull/475) from `task/T-1304`, merged 2026-11-12 13:22:33 UTC. It squashed 1 branch commit:
+  - `0c6ec26` T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else t…
+- **Files changed:** 4 (+327 −6), by folder:
+  - `infra/ci/` deploy-staging.test.mjs +178 −1, wrangler-env.test.mjs +101 −3
+  - `infra/scripts/` deploy-staging.sh +40 −2
+  - `runtime/src/` index.ts +8 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 464. docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471) (\#474)
 
