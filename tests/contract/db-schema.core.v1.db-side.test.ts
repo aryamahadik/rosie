@@ -12,10 +12,11 @@
 //   - a refused fixture: its `after` chain and its rows load, and its one action, run as its side, is refused with the
 //     SQLSTATE and one of the constraints its `expect` names (or returns its rows); put right as the README puts it
 //     (db-schema.core.twins.ts, from which the model puts it right too), the same action passes and writes one row.
-// The rows load as the tables' owner, as the database engineer's seeds do. The action runs as README rule 4's side:
-// the runtime side as rosie_job with no business scope, a Tool API call as rosie_app under its business (0012's roles
-// and policies). Each fixture runs in one transaction that is always rolled back, and each action in a savepoint rolled
-// back after it, so nothing is ever committed and every fixture starts from the empty migrated schema.
+// A fixture's rows load in order as the runtime side, as the README's file format has them, and its action runs as
+// README rule 4's side: the runtime side as rosie_job with no business scope, a Tool API call as rosie_app under its
+// business (0012's roles and policies). Each fixture runs in one transaction that is always rolled back, and each action
+// in a savepoint rolled back after it, so nothing is ever committed and every fixture starts from the empty migrated
+// schema.
 //
 // Not here: the rest of the producer's side (SIDE_CHECKS' producer-database in db-schema.core.v1.test.ts: v1's catalog,
 // seeds and refused rows on PostgreSQL) stays its own QA side task, and db/repo/outbox-schema.int.test.ts (T-1278)
@@ -148,16 +149,26 @@ function whereOf(sql: Tx, table: string, where: Record<string, Json>) {
   return conditions.reduce((all, condition) => sql`${all} and ${condition}`);
 }
 
-/** Loads a fixture after the fixtures its `after` names (each once, in order), its rows as the tables' owner. */
-async function load(tx: Tx, file: string, loaded: Set<string>, chain: readonly string[] = []): Promise<void> {
-  if (loaded.has(file)) return;
+/** A fixture's rows after those of the fixtures its `after` names, each fixture once, in order. */
+function chainRows(file: string, loaded: Set<string>, chain: readonly string[] = []): FixtureFile["rows"] {
+  if (loaded.has(file)) return [];
   if (chain.includes(file)) throw new Error(`the after chain loops: ${[...chain, file].join(" -> ")}`);
   const content = fixtureOf(file);
-  for (const first of content.after) await load(tx, first, loaded, [...chain, file]);
-  for (const row of content.rows) {
+  const before = content.after.flatMap((first) => chainRows(first, loaded, [...chain, file]));
+  loaded.add(file);
+  return [...before, ...content.rows];
+}
+
+/**
+ * Loads a fixture with its `after` chain, its rows inserted in order as the runtime side (README "Seed and refused-row
+ * fixtures": rosie_job with no business scope), the role ending with the load.
+ */
+async function load(tx: Tx, file: string): Promise<void> {
+  await tx`set local role rosie_job`;
+  for (const row of chainRows(file, new Set())) {
     await tx`insert into ${tx(row.table)} ${tx(rowOf(tx, row.table, row.values))}`;
   }
-  loaded.add(file);
+  await tx`reset role`;
 }
 
 /** Runs an action's one statement: the rows it wrote or read. */
@@ -288,7 +299,7 @@ describe("db-schema core database side: the fixtures of v1.1 against PostgreSQL 
         async () => {
           const table = must(entry.table, `${entry.file}'s table`);
           const count = await rolledBack(async (tx) => {
-            await load(tx, entry.file, new Set());
+            await load(tx, entry.file);
             const [row] = await tx<{ count: number }[]>`select count(*)::int as count from ${tx(table)}`;
             return row?.count ?? 0;
           });
@@ -306,7 +317,7 @@ describe("db-schema core database side: the fixtures of v1.1 against PostgreSQL 
           expect(action.table, "the table its entry names").toBe(entry.table);
           const right = putRight(action, must(fix, `a way to put right ${entry.file}`));
           const [refused, passed] = await rolledBack(async (tx) => {
-            await load(tx, entry.file, new Set());
+            await load(tx, entry.file);
             return [await attempt(tx, action), await attempt(tx, right)] as const;
           });
           expect(expectProblems(refused, action.expect)).toEqual([]);
@@ -329,7 +340,7 @@ describe("db-schema core database side: the fixtures of v1.1 against PostgreSQL 
         expect: { rows: 1 },
       });
       const [asToolApi, asRuntime, after] = await rolledBack(async (tx) => {
-        await load(tx, "seed-person-roles.json", new Set());
+        await load(tx, "seed-person-roles.json");
         const outcomes = [await attempt(tx, read("toolApi")), await attempt(tx, read("runtime"))] as const;
         const [state] = await tx<{ owner: boolean; scope: string | null }[]>`
           select current_user = session_user as owner, current_setting('rosie.business_id', true) as scope
