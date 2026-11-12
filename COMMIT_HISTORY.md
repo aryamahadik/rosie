@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 488, [`7c3fc58`](https://github.com/aryamahadik/rosie/commit/7c3fc58), 2026-11-12 21:19:34 UTC.
+- **Through:** commit 491, [`1e30dc8`](https://github.com/aryamahadik/rosie/commit/1e30dc8), 2026-11-12 21:52:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 491. docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496) (\#498)
+
+- **Commit:** [`1e30dc8`](https://github.com/aryamahadik/rosie/commit/1e30dc8), by Arya Mahadik, 2026-11-12 21:52:59 UTC
+- **Pull request:** [#498](https://github.com/aryamahadik/rosie/pull/498) from `task/commit-history-58`, merged 2026-11-12 21:52:59 UTC. It squashed 1 branch commit:
+  - `87bc581` docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496)
+- **Files changed:** 1 (+57 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +57 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 490. T-1328: fill.test.ts line 282 takes a London number from Ofcom's drama range (T-1317's finding 2): only the input and its expected value change, in E.164 form; the test's name, claim and every other assertion unchanged (\#499)
+
+- **Commit:** [`db16c5f`](https://github.com/aryamahadik/rosie/commit/db16c5f), by Arya Mahadik, 2026-11-12 21:52:54 UTC
+- **Pull request:** [#499](https://github.com/aryamahadik/rosie/pull/499) from `task/T-1328`, merged 2026-11-12 21:52:55 UTC. It squashed 1 branch commit:
+  - `b227f95` T-1328: fill.test.ts line 282 takes a London number from Ofcom's dram…
+- **Files changed:** 1 (+1 −1), by folder:
+  - `actions/src/finalize/slots/` fill.test.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 489. T-1327: the saved copy of the old /test page holds its iMessage number as one named placeholder, ROSFIELD\_TEST\_IMESSAGE\_NUMBER, at assets/\_assets\_chat.js line 9 (no other byte changed). SHA256SUMS re-pinned on that file's line only. Runbook steps 3 and 4 name the placeholder: the one expected difference, filled by the user outside the repository before a restore. rosfield-test-route.test.mjs proves it stands in one place, that T-1304's shapes read no number in the copy outside the wordmark's path data, and that a fiction fill changes only that value (T-1317's finding 1, DL-616) (\#497)
+
+- **Commit:** [`984ffee`](https://github.com/aryamahadik/rosie/commit/984ffee), by Arya Mahadik, 2026-11-12 21:52:51 UTC
+- **Pull request:** [#497](https://github.com/aryamahadik/rosie/pull/497) from `task/T-1327`, merged 2026-11-12 21:52:51 UTC. It squashed 1 branch commit:
+  - `bd9a7ae` T-1327: the saved copy of the old /test page holds its iMessage numbe…
+- **Files changed:** 4 (+135 −6), by folder:
+  - `infra/ci/` rosfield-test-route.test.mjs +131 −2
+  - `infra/rosfield-test-backup/` SHA256SUMS +1 −1
+  - `infra/rosfield-test-backup/assets/` \_assets\_chat.js +1 −1
+  - `infra/runbooks/` rosfield-test-route.md +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 488. docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495) (\#496)
 
