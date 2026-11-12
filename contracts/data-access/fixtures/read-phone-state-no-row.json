@@ -1,0 +1,16 @@
+{
+  "call": "readPhoneState",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:00Z",
+    "note": "tp-01 before its first text: T-1148's skeleton seed writes no phone row, and K-04's seed-person-roles.json holds handle-sam with none, so no row, and no chat link can name the number (chat_links_phone_fk). The binding shows the chat closed and not stopped (README item 55, default 108)."
+  },
+  "request": {
+    "number": "+15555550100"
+  },
+  "outcome": {
+    "phone": null,
+    "chatLink": null
+  }
+}

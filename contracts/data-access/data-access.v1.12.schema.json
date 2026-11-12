@@ -1,0 +1,1643 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.12.schema.json",
+  "title": "DataAccessV1dot12",
+  "description": "K-05 v1.12, a minor version of the data-access calls (T-1248, from the D-017 path audit's line 26 'F2' and ruling R5; QUESTIONS.md CQ-206 and CQ-214; DL-498). It only adds to v1.11 (data-access.v1.11.schema.json, frozen and unchanged, referred to here, which refers on to v1.10 and through it to every earlier version down to v1): every v1.11 definition is here under its own name, by reference, and none changes, so every v1 to v1.11 exchange is a v1.12 exchange. Added: five reads on the runtime side, the three behind staging's test-phone page (actions/src/page-calls/staging/test-phone/types.ts TesterAccess, TestPhoneRoster, PhoneStates) and the two behind the handle actor's copies (runtime/src/actor/copies/types.ts SafetyTimerSource, StoppedFlagSource): readTesterStanding (README item 53: a session token's sha256 and a time give tester, notTester or noSession, from K-22 v1's session_for_token and K-36 v1's live team rows, never the session, the person or a hash), readRosterPhone (item 54: a roster phone's number and email on file, by the K-04 handle id the roster's list names), readPhoneState (item 55: a number's K-04 phone row as the page shows it, and its newest K-29 chat link's code and ready text), readLiveTimers (item 56: a handle's running and missed K-34 safety timers, the address sealed as stored) and readStoppedFlag (item 57: a handle's K-04 stopped flag and version, fresh). Each runs as rosie_job with no business scope, reads the primary uncached, writes nothing and reads K-04 v1, K-22 v1, K-29 v1, K-34 v1 and K-36 v1 as migrated (0004, 0012, 0013, 0016, 0017, 0020) with the grants rosie_job holds, so no column, grant, index, table or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    },
+    {
+      "$ref": "#/$defs/rowReader.exchange"
+    },
+    {
+      "$ref": "#/$defs/openChatOnText.exchange"
+    },
+    {
+      "$ref": "#/$defs/readQuestionFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readHandle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readChatHandle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnParty.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTesterStanding.exchange"
+    },
+    {
+      "$ref": "#/$defs/readRosterPhone.exchange"
+    },
+    {
+      "$ref": "#/$defs/readPhoneState.exchange"
+    },
+    {
+      "$ref": "#/$defs/readLiveTimers.exchange"
+    },
+    {
+      "$ref": "#/$defs/readStoppedFlag.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markPart.request"
+    },
+    "repeatedDelivery": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/repeatedDelivery"
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markPart.response"
+    },
+    "markPart.v1dot9Response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markPart.v1dot9Response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markPart.exchange"
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleTargets.exchange"
+    },
+    "textsConsentRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/textsConsentRead"
+    },
+    "textsConsentV1dot8": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/textsConsentV1dot8"
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendState.response"
+    },
+    "sendState.v1dot8Response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendState.v1dot8Response"
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/sendState.exchange"
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/fixedLineRowError"
+    },
+    "businessSensitive": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/businessSensitive"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/nullableTurnId"
+    },
+    "storedOutcome": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/storedOutcome"
+    },
+    "storedHold": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/storedHold"
+    },
+    "ownerContact": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/ownerContact"
+    },
+    "moreThanOneOwnerError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/moreThanOneOwnerError"
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcome.request"
+    },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcome.errors"
+    },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHold.request"
+    },
+    "readSafetyHold.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHold.response"
+    },
+    "readSafetyHold.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHold.errors"
+    },
+    "readSafetyHold.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHold.exchange"
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessOwner.request"
+    },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessOwner.errors"
+    },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessZone.request"
+    },
+    "readBusinessZone.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessZone.response"
+    },
+    "readBusinessZone.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessZone.errors"
+    },
+    "readBusinessZone.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readBusinessZone.exchange"
+    },
+    "rowReader.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowReader.request"
+    },
+    "rowReader.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowReader.response"
+    },
+    "noReaderError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/noReaderError"
+    },
+    "rowReader.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowReader.errors"
+    },
+    "rowReader.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/rowReader.exchange"
+    },
+    "textService": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/textService"
+    },
+    "chatPhoneOpen": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatPhoneOpen"
+    },
+    "chatPhoneStopped": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatPhoneStopped"
+    },
+    "chatOpenValues": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatOpenValues"
+    },
+    "chatClosedValues": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatClosedValues"
+    },
+    "chatOpenedEvent": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatOpenedEvent"
+    },
+    "notAPhoneError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/notAPhoneError"
+    },
+    "openChatOnText.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.request"
+    },
+    "openChatOnText.inserted": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.inserted"
+    },
+    "openChatOnText.opened": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.opened"
+    },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.stopped"
+    },
+    "openChatOnText.repeated": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.repeated"
+    },
+    "openChatOnText.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.response"
+    },
+    "openChatOnText.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.errors"
+    },
+    "openChatOnText.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/openChatOnText.exchange"
+    },
+    "questionVisit": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/questionVisit"
+    },
+    "neverDeliveredRow": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/neverDeliveredRow"
+    },
+    "readQuestionFacts.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readQuestionFacts.request"
+    },
+    "readQuestionFacts.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readQuestionFacts.response"
+    },
+    "readQuestionFacts.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readQuestionFacts.errors"
+    },
+    "readQuestionFacts.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readQuestionFacts.exchange"
+    },
+    "readHandle.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readHandle.request"
+    },
+    "readHandle.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readHandle.response"
+    },
+    "readHandle.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readHandle.errors"
+    },
+    "readHandle.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readHandle.exchange"
+    },
+    "chatPhoneHandle": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/chatPhoneHandle"
+    },
+    "readChatHandle.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.request"
+    },
+    "readChatHandle.found": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.found"
+    },
+    "readChatHandle.unknown": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.unknown"
+    },
+    "readChatHandle.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.response"
+    },
+    "readChatHandle.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.errors"
+    },
+    "readChatHandle.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readChatHandle.exchange"
+    },
+    "readTurnParty.request": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.request"
+    },
+    "readTurnParty.atBusiness": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.atBusiness"
+    },
+    "readTurnParty.noBusiness": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.noBusiness"
+    },
+    "readTurnParty.unknown": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.unknown"
+    },
+    "readTurnParty.response": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.response"
+    },
+    "businessUndecidedError": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/businessUndecidedError"
+    },
+    "readTurnParty.errors": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.errors"
+    },
+    "readTurnParty.exchange": {
+      "$ref": "data-access.v1.11.schema.json#/$defs/readTurnParty.exchange"
+    },
+    "tokenSha256": {
+      "title": "TokenSha256",
+      "description": "A session token's sha256 in lower-case hex, the form K-22 v1 sessions.token_sha256 stores (sessions_token_hash_form). The token is a key: the page entry hashes the cookie's token and sends this alone, so the token never reaches the database, a request, an answer, an error, a log or a span (K-21 v1 'Never in a span or a log'; README item 53). New in v1.12.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "readTesterStanding.request": {
+      "title": "ReadTesterStandingRequest",
+      "description": "The standing of the session a staging page call carries, for staging's test tools (README item 53; actions/src/page-calls/staging/test-phone/types.ts TesterAccess.standing; K-21 v1 README 'Staging only': 'a signed-in roster tester or a person on Rosie's team'). The page entry sends it after a request with a session token, before the roster or the phone is read (handlers.ts step 3). The request carries the token's sha256 and the time, never the token (refuse-tester-standing-token-not-hash) and never a person. Scope: the runtime side, as rosie_job with no business scope (K-22 v1 sessions and K-36 v1 team_page_recipients are scoped none; team_page_recipients grants rosie_app nothing: 0017; the team console's reads run on the runtime side: K-21 v1 'The team console'). Reads the primary, uncached: a session that ended or a team row removed ends the standing at once. Repeat: safe, a read. Time budget: none in the sources; once per staging test-tool call. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "tokenSha256": {
+          "description": "The sha256 of the session token the page sent (K-21 v1 signedInPage.sessionToken), never the token itself.",
+          "$ref": "#/$defs/tokenSha256"
+        },
+        "at": {
+          "description": "The moment the session must be live at: the page entry's own clock (handlers.ts: utcSeconds(now)), K-22 v1 session_for_token's at.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["tokenSha256", "at"],
+      "additionalProperties": false
+    },
+    "readTesterStanding.response": {
+      "title": "ReadTesterStandingResponse",
+      "description": "The standing alone (README item 53, defaults 103 and 104): never the session, the person, a hash or whether a person or a team row exists, so a call that is no tester's learns only notTester, and a call with no live session only noSession (K-21 v1 notTester, signInNeeded; refuse-tester-standing-names-person). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "standing": {
+          "description": "tester: a live session (K-22 v1 session_for_token answers a row) whose person holds a live K-36 v1 team_page_recipients row, removed_at null (README default 103); notTester: a live session whose person holds none; noSession: no live session has the hash at the time, whether the hash is unknown, the session ended (signed out, contact changed, left, handed over) or it expired (README default 104).",
+          "type": "string",
+          "enum": ["tester", "notTester", "noSession"]
+        }
+      },
+      "required": ["standing"],
+      "additionalProperties": false
+    },
+    "readTesterStanding.errors": {
+      "title": "ReadTesterStandingErrors",
+      "description": "transient alone: the same request may be sent again; the page entry answers 503 meanwhile, and no tool is used on a standing not read. A read writes nothing. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readTesterStanding.exchange": {
+      "title": "ReadTesterStandingExchange",
+      "description": "One readTesterStanding request with its outcome: the standing, or transient. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readTesterStanding"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readTesterStanding.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readTesterStanding.response"
+            },
+            {
+              "$ref": "#/$defs/readTesterStanding.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "emailOnFile": {
+      "title": "EmailOnFile",
+      "description": "An email address as K-04 v1 handles stores one of kind email (handles_address_form: one @, no space, lower case). New in v1.12.",
+      "type": "string",
+      "pattern": "^[^@\\sA-Z]+@[^@\\sA-Z]+$"
+    },
+    "rosterPhone": {
+      "title": "RosterPhone",
+      "description": "A roster test phone as the page's roster gives it (actions/src/page-calls/staging/test-phone/types.ts RosterPhone, less its roster id, which the binding holds): its number and the email on file for its one person (README item 54, default 107). Never the person, a name or another handle. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "number": {
+          "description": "K-04 handles.address of the phone handle: its number in E.164 form (handles_address_form), the number the seed wrote and the page sends as. Never logged or put in a span; the page shows its last four digits alone.",
+          "$ref": "#/$defs/phoneNumber"
+        },
+        "email": {
+          "description": "The email on file: when the phone handle has exactly one person (K-04 person_handles), the address of that person's one K-04 handle of kind email; null when the handle has none or several people, or the person none or several email handles (README default 107), so the page lists no email.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/emailOnFile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["number", "email"],
+      "additionalProperties": false
+    },
+    "readRosterPhone.request": {
+      "title": "ReadRosterPhoneRequest",
+      "description": "A roster test phone's number and email on file (README item 54; actions/src/page-calls/staging/test-phone/types.ts TestPhoneRoster.phone). The roster's list, which roster id is which K-04 handle, is staging's config, kept as the seed's own (README default 106; K-21 v1 default 6), so the binding finds the roster id's handle id there and sends it: the request names that handle alone, never a roster id (refuse-roster-phone-by-roster-id) or a number. Scope: the runtime side, as rosie_job with no business scope (K-04 handles and person_handles are tables only rosie_job reads: 0012). Reads the primary, uncached. Repeat: safe, a read. Time budget: none in the sources; once per staging test-phone call, after the tester's standing. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "K-04 handles.id the roster's list gives for the roster id (tp-01: handle-sam, T-1148's TEST_OWNER_1; tp-02 to tp-05: handle-<roster id>, T-202's db/seeds/staging-core.ts).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["handleId"],
+      "additionalProperties": false
+    },
+    "readRosterPhone.response": {
+      "title": "ReadRosterPhoneResponse",
+      "description": "The roster phone, or none when K-04 holds no phone handle by that id: no handle (the seed has not written it) or one of kind email (README default 107). None is an answer, not an error, as for v1.10's handle reads (README default 95): the binding answers the page's roster null, so the call answers notTestPhone and nothing is signed or posted. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "The request's handle id (K-08 v1 handleRef).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/handleRef"
+        },
+        "phone": {
+          "description": "The phone's number and email on file, or null for no phone handle by that id.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rosterPhone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["handleId", "phone"],
+      "additionalProperties": false
+    },
+    "readRosterPhone.errors": {
+      "title": "ReadRosterPhoneErrors",
+      "description": "transient alone: the same request may be sent again; the page entry answers 503 meanwhile. A read writes nothing. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readRosterPhone.exchange": {
+      "title": "ReadRosterPhoneExchange",
+      "description": "One readRosterPhone request with its outcome: the roster phone, none, or transient. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readRosterPhone"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readRosterPhone.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readRosterPhone.response"
+            },
+            {
+              "$ref": "#/$defs/readRosterPhone.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "phoneStateOpen": {
+      "title": "PhoneStateOpen",
+      "description": "A phone row that is not stopped (K-04 v1 phones.stopped false): its chat open or closed, and no STOP in force, even when stop_at keeps the last STOP's time after a START (DL-193; README default 108). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "chatOpen": {
+          "description": "K-04 v1 phones.chat_open.",
+          "type": "boolean"
+        },
+        "stopped": {
+          "description": "K-04 v1 phones.stopped: false.",
+          "const": false
+        },
+        "stoppedAt": {
+          "description": "No STOP is in force, so none: never stop_at after a START (refuse-phone-state-stopped-at-after-start).",
+          "type": "null"
+        }
+      },
+      "required": ["chatOpen", "stopped", "stoppedAt"],
+      "additionalProperties": false
+    },
+    "phoneStateStopped": {
+      "title": "PhoneStateStopped",
+      "description": "A stopped phone row (K-04 v1 phones.stopped true): Rosie's texts to it are off for every business until START (MC C1; RULES 7.2), its chat closed (phones_stop_closes_chat), and the STOP in force came at stop_at (phones_stopped_has_time). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "chatOpen": {
+          "description": "K-04 v1 phones.chat_open: false for a stopped phone (phones_stop_closes_chat).",
+          "const": false
+        },
+        "stopped": {
+          "description": "K-04 v1 phones.stopped: true.",
+          "const": true
+        },
+        "stoppedAt": {
+          "description": "K-04 v1 phones.stop_at: when the STOP in force came (actions/src/page-calls/staging/test-phone/types.ts PhoneState.stoppedAt).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["chatOpen", "stopped", "stoppedAt"],
+      "additionalProperties": false
+    },
+    "chatLinkRead": {
+      "title": "ChatLinkRead",
+      "description": "A phone's chat link as K-29 v1 chat_links stores it: its short code and its ready text, which holds the code (chat_links_ready_text_has_code). The link's address is not stored: the binding builds it in K-09 v1 issueChatLink's form from Rosie's number, a config value (README default 109; Q-51). Never the link's id, person, business, booking or purpose. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "shortCode": {
+          "description": "K-29 v1 chat_links.short_code (chat_links_short_code_form: no space).",
+          "type": "string",
+          "pattern": "^[^\\s]+$"
+        },
+        "readyText": {
+          "description": "K-29 v1 chat_links.ready_text, word for word: the text the phone sends to open its chat (MC C9; RULES 4.1b). Never logged or put in a span.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["shortCode", "readyText"],
+      "additionalProperties": false
+    },
+    "readPhoneState.request": {
+      "title": "ReadPhoneStateRequest",
+      "description": "A roster phone's own state as staging's test-phone page shows it (README item 55; actions/src/page-calls/staging/test-phone/types.ts PhoneStates.state; K-21 v1 testPhoneParts: 'the stop state; the chat link with its ready text'). The request names the number (K-04 phones.number, the row's key), which the binding has from readRosterPhone. Scope: the runtime side, as rosie_job with no business scope (K-04 phones is a table only rosie_job reads: 0012; a test phone's chat links may be any business's, K-29 chat_links behind rosie_job's runtime policy). Reads the primary, uncached (K-21 v1 README 'Who may call': every call). Repeat: safe, a read. Time budget: none in the sources; once per testPhoneParts call. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "number": {
+          "description": "The roster phone's number in E.164 form. Never logged or put in a span.",
+          "$ref": "#/$defs/phoneNumber"
+        }
+      },
+      "required": ["number"],
+      "additionalProperties": false
+    },
+    "readPhoneState.noRow": {
+      "title": "ReadPhoneStateNoRow",
+      "description": "K-04 holds no phone row for the number: its first text has not come (K-05 v1.7 openChatOnText writes the row at receipt). No chat link can name it (chat_links_phone_fk). The binding answers chat closed and not stopped (PhoneState.chatOpen: 'false while the phone has no row yet'; README default 108). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "phone": {
+          "type": "null"
+        },
+        "chatLink": {
+          "description": "None: a number with no phone row has no chat link (refuse-phone-state-link-without-phone).",
+          "type": "null"
+        }
+      },
+      "required": ["phone", "chatLink"],
+      "additionalProperties": false
+    },
+    "readPhoneState.row": {
+      "title": "ReadPhoneStateRow",
+      "description": "The number's phone row and its newest chat link (README item 55). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "phone": {
+          "description": "The row's chat open, stopped and the STOP in force (README default 108).",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/phoneStateOpen"
+            },
+            {
+              "$ref": "#/$defs/phoneStateStopped"
+            }
+          ]
+        },
+        "chatLink": {
+          "description": "The phone's newest K-29 chat link by issued_at, a tie to the lower id, whatever its purpose, business or use; null when it has none (README default 109).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/chatLinkRead"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["phone", "chatLink"],
+      "additionalProperties": false
+    },
+    "readPhoneState.response": {
+      "title": "ReadPhoneStateResponse",
+      "description": "The number's state, or no row. It names no number (refuse-phone-state-answers-number): the request holds it. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/readPhoneState.noRow"
+        },
+        {
+          "$ref": "#/$defs/readPhoneState.row"
+        }
+      ]
+    },
+    "readPhoneState.errors": {
+      "title": "ReadPhoneStateErrors",
+      "description": "transient alone: the same request may be sent again; the page entry answers 503 meanwhile. A read writes nothing. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readPhoneState.exchange": {
+      "title": "ReadPhoneStateExchange",
+      "description": "One readPhoneState request with its outcome: the state, no row, or transient. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readPhoneState"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readPhoneState.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readPhoneState.response"
+            },
+            {
+              "$ref": "#/$defs/readPhoneState.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "sealedBytes": {
+      "title": "SealedBytes",
+      "description": "A sealed column's bytes as PostgreSQL stores them (bytea), written in its hex text form: a backslash, x, and two lower-case hex digits a byte, as K-34 v1's seed-safety-timer.json writes safety_timers.address. The bytes are sealed under one person's key (K-34 rule 6; db/repo/sealing.ts): never opened, decoded or put in plain words on the way (refuse-live-timers-address-opened). New in v1.12.",
+      "type": "string",
+      "pattern": "^\\\\x([0-9a-f]{2})+$"
+    },
+    "liveTimer": {
+      "title": "LiveTimer",
+      "description": "One live K-34 v1 safety_timers row of the handle, the thirteen columns the actor's copy keeps (runtime/src/actor/copies/types.ts SafetyTimerRow; arch 11 line 566: 'the actor's copy of its due time, address and emergency contact'), each named here in K-05's form for its K-34 column (README item 56). Never the timer's other columns. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "K-34 safety_timers.id.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "K-34 safety_timers.business_id: the business of the job the timer covers, any business (no business scope).",
+          "$ref": "#/$defs/id"
+        },
+        "bookingId": {
+          "description": "K-34 safety_timers.booking_id, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "workerHandleId": {
+          "description": "K-34 safety_timers.worker_handle_id: the pro's handle, the request's.",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/handleRef"
+        },
+        "emergencyContactPersonId": {
+          "description": "K-34 safety_timers.emergency_contact_person_id: the contact who said yes.",
+          "$ref": "#/$defs/id"
+        },
+        "emergencyContactHandleId": {
+          "description": "K-34 safety_timers.emergency_contact_handle_id: the contact's handle, which the copy reaches while PostgreSQL is down.",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/handleRef"
+        },
+        "dueAt": {
+          "description": "K-34 safety_timers.due_at: the check-out time, in UTC.",
+          "$ref": "#/$defs/utc"
+        },
+        "dueZone": {
+          "description": "K-34 safety_timers.due_zone: the IANA zone it was given in (safety_timers_due_zone_form).",
+          "$ref": "#/$defs/zone"
+        },
+        "address": {
+          "description": "K-34 safety_timers.address: the job's address, sealed under address_for_person_id's key, as stored (README default 110).",
+          "$ref": "#/$defs/sealedBytes"
+        },
+        "addressForPersonId": {
+          "description": "K-34 safety_timers.address_for_person_id: the person whose key seals the address.",
+          "$ref": "#/$defs/id"
+        },
+        "clockRowId": {
+          "description": "K-34 safety_timers.clock_row_id: the core clock row that fires the miss while PostgreSQL is up.",
+          "$ref": "#/$defs/id"
+        },
+        "state": {
+          "description": "K-34 safety_timers.state: running, or missed (a missed check stays open until SAFE: S13-10). A safe timer is never live, so never answered (refuse-live-timers-safe-listed).",
+          "type": "string",
+          "enum": ["running", "missed"]
+        },
+        "version": {
+          "description": "K-34 safety_timers.version: the copy is the row at this version.",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": [
+        "id",
+        "businessId",
+        "bookingId",
+        "workerHandleId",
+        "emergencyContactPersonId",
+        "emergencyContactHandleId",
+        "dueAt",
+        "dueZone",
+        "address",
+        "addressForPersonId",
+        "clockRowId",
+        "state",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "readLiveTimers.request": {
+      "title": "ReadLiveTimersRequest",
+      "description": "The reload of a handle's live safety timers for its actor's copy (README item 56; runtime/src/actor/copies/types.ts SafetyTimerSource.liveTimers; K-34 v1 safety_timers_worker_live_idx: 'the actor reloads its copies'). The actor sends it after a commit that may have written a timer row, and after a commit whose answer was lost (copies.ts refreshTimers). The request names the handle alone, never a business (refuse-live-timers-business-scope): a read under one business's scope would hide another business's timers and empty the copy of a live one (README default 110). Scope: the runtime side, as rosie_job with no business scope (K-34 safety_timers behind rosie_job's runtime policy: 0016). Reads the primary, uncached. Repeat: safe, a read. Time budget: none in the sources. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "K-04 handles.id of the actor's handle (K-34 safety_timers.worker_handle_id).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["handleId"],
+      "additionalProperties": false
+    },
+    "readLiveTimers.response": {
+      "title": "ReadLiveTimersResponse",
+      "description": "The handle's live timers: K-34 safety_timers whose worker_handle_id is the handle and whose state is running or missed, at every business, earliest due_at first, a tie to the lower id; none is an empty list, an answer (README item 56, default 110). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "The request's handle id (K-08 v1 handleRef).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/handleRef"
+        },
+        "timers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/liveTimer"
+          }
+        }
+      },
+      "required": ["handleId", "timers"],
+      "additionalProperties": false
+    },
+    "readLiveTimers.errors": {
+      "title": "ReadLiveTimersErrors",
+      "description": "transient alone: the same request may be sent again; the copy keeps what it holds and stays marked stale, so a later commit reloads (copies.ts reloadTimers). A read writes nothing. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readLiveTimers.exchange": {
+      "title": "ReadLiveTimersExchange",
+      "description": "One readLiveTimers request with its outcome: the live timers, or transient. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readLiveTimers"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readLiveTimers.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readLiveTimers.response"
+            },
+            {
+              "$ref": "#/$defs/readLiveTimers.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readStoppedFlag.request": {
+      "title": "ReadStoppedFlagRequest",
+      "description": "The re-read of a handle's stopped flag for its actor's copy, after a commit whose answer was lost (README item 57; runtime/src/actor/copies/types.ts StoppedFlagSource.stoppedFlag; T-1206; DL-427). The request names the actor's handle alone, never a number (refuse-stopped-flag-by-number). Scope: the runtime side, as rosie_job with no business scope (K-04 phones is a table only rosie_job reads: 0012). Reads the primary, never a replica or a cache, in its own transaction begun after the call is sent: a read the copy takes ends the lost commits' marks noted before it was sent, so a stale read could end a mark on a flag it never saw (T-1206's security note a; README default 111). Repeat: safe, a read. Time budget: none in the sources. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "K-04 handles.id of the actor's handle (K-04 phones.handle_id, phones_handle_key).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["handleId"],
+      "additionalProperties": false
+    },
+    "readStoppedFlag.response": {
+      "title": "ReadStoppedFlagResponse",
+      "description": "The handle's K-04 phones row's stopped flag and version (README item 57): the flag is one for every business (MC C1), and the version orders the copy's writes (copies.ts takeStopped). New in v1.12.",
+      "type": "object",
+      "properties": {
+        "handleId": {
+          "description": "The request's handle id (K-08 v1 handleRef).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/handleRef"
+        },
+        "stopped": {
+          "description": "K-04 v1 phones.stopped.",
+          "type": "boolean"
+        },
+        "phoneVersion": {
+          "description": "K-04 v1 phones.version (K-09 v1 recordStopOrStart's phoneVersion): never left out (refuse-stopped-flag-no-version).",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["handleId", "stopped", "phoneVersion"],
+      "additionalProperties": false
+    },
+    "phoneNotFoundError": {
+      "title": "PhoneNotFoundError",
+      "description": "K-04 holds no phone row for the handle: an email handle, or a phone whose first text has not come. The port has no answer for none (StoppedFlagAnswer), so the copy reads it as a failed re-read and keeps the stricter reading, a lost commit's mark included; it is never answered as not stopped (README default 111). Nothing was written. New in v1.12.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "table": {
+              "description": "The table read: phones.",
+              "const": "phones"
+            },
+            "rowId": {
+              "description": "The request's handle id, which the row was looked up by (phones_handle_key).",
+              "$ref": "#/$defs/id"
+            }
+          }
+        }
+      ]
+    },
+    "readStoppedFlag.errors": {
+      "title": "ReadStoppedFlagErrors",
+      "description": "notFound (table phones): no phone row for the handle; transient: the same request may be sent again. Each leaves the copy as it was, the stricter reading included (copies.ts readStoppedAgain). A read writes nothing. New in v1.12.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/phoneNotFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readStoppedFlag.exchange": {
+      "title": "ReadStoppedFlagExchange",
+      "description": "One readStoppedFlag request with its outcome: the flag and its version, or one of its errors. New in v1.12.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readStoppedFlag"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readStoppedFlag.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readStoppedFlag.response"
+            },
+            {
+              "$ref": "#/$defs/readStoppedFlag.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

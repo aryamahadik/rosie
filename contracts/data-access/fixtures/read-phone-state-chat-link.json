@@ -1,0 +1,24 @@
+{
+  "call": "readPhoneState",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["conversations-consent/seed-chat-link.json"],
+    "after": [],
+    "now": "2026-10-21T15:00:00Z",
+    "note": "Pat's phone (K-29's seed-chat-link.json): a phone row with its chat not yet open and never stopped, and one chat link, Sam's staff invite to Pat, issued Oct 19 and not yet answered, the owner told again on Oct 21. Its short code and ready text as stored, which the page shows with the address the binding builds from Rosie's number (README item 55, default 109)."
+  },
+  "request": {
+    "number": "+15555550107"
+  },
+  "outcome": {
+    "phone": {
+      "chatOpen": false,
+      "stopped": false,
+      "stoppedAt": null
+    },
+    "chatLink": {
+      "shortCode": "P5J3",
+      "readyText": "YES. Ref P5J3"
+    }
+  }
+}

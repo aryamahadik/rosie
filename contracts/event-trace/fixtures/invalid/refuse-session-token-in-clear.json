@@ -1,0 +1,28 @@
+{
+  "id": "log-session-sam-oct26-started",
+  "at": "2026-10-26T08:21:00Z",
+  "zone": null,
+  "turn_id": null,
+  "job_id": "page-req-sam-signin-oct26",
+  "trace_id": "trace-page-sam-signin-oct26",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": null,
+  "actor_kind": "person",
+  "actor_person_id": "person-sam",
+  "actor_role": null,
+  "kind": "session.started",
+  "table_name": "sessions",
+  "row_id": "session-sam-oct26",
+  "old_values": null,
+  "new_values": {
+    "person_id": "person-sam",
+    "proven_via": "code",
+    "proof_code_id": "code-sam-sign-in-oct26",
+    "started_at": "2026-10-26T08:21:00Z",
+    "last_seen_at": "2026-10-26T08:21:00Z",
+    "expires_at": "2026-11-25T08:21:00Z",
+    "token": "placeholder-session-token-sam-oct26"
+  },
+  "why": { "step": "S11-52" }
+}

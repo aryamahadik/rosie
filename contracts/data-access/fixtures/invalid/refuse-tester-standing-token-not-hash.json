@@ -1,0 +1,16 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-11-12T04:05:00Z",
+    "note": "The check tester's standing, with its rows written as read-tester-standing-check-tester's note lists them; the request carries the session token itself in place of its sha256."
+  },
+  "request": {
+    "sessionToken": "placeholder-session-token-check-0001",
+    "at": "2026-11-12T04:05:00Z"
+  },
+  "outcome": {
+    "standing": "tester"
+  }
+}

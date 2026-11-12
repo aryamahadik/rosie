@@ -287,6 +287,38 @@
       "expect": "refuse",
       "shows": "event-harm-report.json's harm report row with the business on the row: Lee's Barbershop's own scope would read a report that may name its owner or staff",
       "source": "K-34 v1 README rule 4 ('no business reads them, its owner included'); arch 06 line 329; S13-10; K-04 v1 rule 4; README 'v1.1'"
+    },
+    {
+      "file": "event-session-started.json",
+      "version": "v1.2",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam signs in to the portal at S11-52 on Mon Oct 26: his sign-in code is right at 08:21 and his session starts, proven by the code; a page call, so a job id and no turn or bundle; the row names K-22's sessions and carries no business and nothing sealed, and never the session's token, its sha256 or the device's sha256",
+      "source": "ADR-016 sections 6 and 7 (card V4: signInEntries after proveSignIn); S11-52; K-21 v1 signInCheck (signedIn); K-22 v1 sessions and seed-session.json (session-sam-oct26, code-sam-sign-in-oct26); README 'Never in an added kind', default 16 and 'v1.2'"
+    },
+    {
+      "file": "event-session-ended.json",
+      "version": "v1.2",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam signs out of his Oct 20 session at 08:30, his own act: only that live session ends, ended_why signed_out; no business, nothing sealed, no token and no hash",
+      "source": "ADR-016 section 6 (endSession, then signInEntries); K-21 v1 signOut; K-22 v1 rule 5, sessions_ended_has_why and seed-session.json (session-sam-oct20); README 'Never in an added kind', default 16 and 'v1.2'"
+    },
+    {
+      "file": "invalid/refuse-session-token-in-clear.json",
+      "version": "v1.2",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "event-session-started.json with the session's token in its new values (token): a session's token never appears in the log",
+      "source": "BP rule 7; K-21 v1 opaqueToken ('never logged, put in a span, an event-log row or a message'); README 'Never in an added kind' and 'v1.2'"
+    },
+    {
+      "file": "invalid/refuse-session-device-hash-in-clear.json",
+      "version": "v1.2",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "event-session-ended.json with the device's sha256 in its new values (device_sha256): a device's hash never appears in the log",
+      "source": "BP rule 7; K-22 v1 sessions.device_sha256 and sessions_device_hash_form; README 'Never in an added kind' and 'v1.2'"
     }
   ]
 }

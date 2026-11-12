@@ -17,7 +17,8 @@
 // database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
 // fixtures/index.json whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned
 // list or count (DL-124, DL-125), against local PostgreSQL with every migration applied to a fresh schema
-// (db/repo/test-db.ts):
+// (db/repo/test-db.ts), in a database of this file's own, so a claim in a chain never meets another run's lock on the
+// same recipient (an advisory lock is per database; T-1251):
 //   - each accepted exchange: its given is loaded (its k04Seeds and partSeeds, each with its own after chain, and the
 //     exchanges its after chain names, run first through db/repo, each answering its own fixture's outcome, a call no
 //     side entry names through CHAIN_CALLS and a v1 claim through K-05 v1's own claimOutbox, V1_CHAIN_CALLS, with the
@@ -68,11 +69,9 @@ import { isDeepStrictEqual } from "node:util";
 
 import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
-import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { openChatOnText } from "../../db/repo/chat-open";
-import { resolvePrimaryUrl } from "../../db/repo/client";
 import { armClock } from "../../db/repo/clocks";
 import { commitTurn } from "../../db/repo/commit-turn";
 import { claimOutbox, claimOutboxV12, markPartV12, markRowV12, writePlan } from "../../db/repo/outbox";
@@ -780,7 +779,8 @@ const textsIn = (value: Json): string[] =>
   typeof value === "string" ? [value] : Array.isArray(value) ? value.flatMap(textsIn) : [];
 
 // ---------------------------------------------------------------------------------------------------------------
-// The database: one fresh schema for this file, the tables' owner for seeds, and a client per role
+// The database: one fresh schema for this file, in a database of its own (T-1251), the tables' owner for seeds, and a
+// client per role
 
 let db: TestDatabase;
 /** Connections that run as rosie_app, the Tool API's role, with this file's schema first. */
@@ -792,7 +792,7 @@ let typedColumns: Map<string, string>;
 const sent: string[] = [];
 
 function roleClient(role: string, applicationName: string): Sql {
-  return postgres(resolvePrimaryUrl(), {
+  return db.connect({
     max: 2,
     onnotice: () => undefined,
     debug: (_connection: number, query: string) => {
@@ -805,7 +805,7 @@ function roleClient(role: string, applicationName: string): Sql {
 const clientOf = (role: Role): Sql => (role === "app" ? app : job);
 
 beforeAll(async () => {
-  db = await createTestDatabase({ name: "data_access_db_side", client: { max: 2 } });
+  db = await createTestDatabase({ name: "data_access_db_side", client: { max: 2 }, database: "own" });
   app = roleClient("rosie_app", "rosie-t1169-app");
   job = roleClient("rosie_job", "rosie-t1169-job");
   const typed = await db.sql<{ key: string; type: string }[]>`
