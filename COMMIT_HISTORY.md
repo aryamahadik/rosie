@@ -2,9 +2,155 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 466, [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), 2026-11-12 13:22:39 UTC.
+- **Through:** commit 471, [`f770b0a`](https://github.com/aryamahadik/rosie/commit/f770b0a), 2026-11-12 14:47:13 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 471. docs: COMMIT\_HISTORY.md through commit 466 (2f29a26, \#476) (\#480)
+
+- **Commit:** [`f770b0a`](https://github.com/aryamahadik/rosie/commit/f770b0a), by Arya Mahadik, 2026-11-12 14:47:13 UTC
+- **Pull request:** [#480](https://github.com/aryamahadik/rosie/pull/480) from `task/commit-history-50`, merged 2026-11-12 14:47:14 UTC. It squashed 1 branch commit:
+  - `6797e18` docs: COMMIT\_HISTORY.md through commit 466 (2f29a26, \#476)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 470. T-1308: K-06 v1.2's contract test (tests/contract/inbound-event.v1.2.test.ts): each v1.2 refused twin refused by scrubbedV1dot2 alone for its one poll.optionWords line and mended to its tagged twin; scrubbedV1dot2 reads option words as scrubbedV1dot1 reads the body, and scrubbed counts their tags; every earlier fixture valid under v1.2; the sealed-event fixtures made in this test (CQ-261 (a)): every accepted fixture the actor takes sealed in form 2 (sealedEvent) and form 1 (sealedEventV1) with a real AES-256-GCM seal, plain words refused, the box forms, the additional data, a fail-closed reader; no file under fixtures/ is a sealed event (\#477)
+
+- **Commit:** [`ce5fd5c`](https://github.com/aryamahadik/rosie/commit/ce5fd5c), by Arya Mahadik, 2026-11-12 14:47:09 UTC
+- **Pull request:** [#477](https://github.com/aryamahadik/rosie/pull/477) from `task/T-1308`, merged 2026-11-12 14:47:09 UTC. It squashed 1 branch commit:
+  - `0c73ade` T-1308: K-06 v1.2's contract test (tests/contract/inbound-event.v1.2.…
+- **Files changed:** 1 (+1007 −0), by folder:
+  - `tests/contract/` inbound-event.v1.2.test.ts +1007 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 469. T-1278: the sign-in migrations, K-04 v1.1 (0032, 0033) and K-22 v1.2 (0034); test-db.ts polls the migrate lock (\#479)
+
+- **Commit:** [`f709da9`](https://github.com/aryamahadik/rosie/commit/f709da9), by Arya Mahadik, 2026-11-12 14:47:04 UTC
+- **Pull request:** [#479](https://github.com/aryamahadik/rosie/pull/479) from `task/T-1278`, merged 2026-11-12 14:47:04 UTC. It squashed 10 branch commits:
+  - `390f5f7` T-1274: K-22 v1.2, sign\_in\_attempts (ADR-016 card V2): the table list…
+  - `35b9458` T-1273: work in progress, unchecked (the builder was stopped at 04:39…
+  - `01a740f` T-1274: K-22 README rule 9: neither role holds DELETE, TRUNCATE, REFE…
+  - `e4791b5` T-1273: K-04 v1.1 checked: section 1's table and its reader table wor…
+  - `17dbe4a` T-1278: start from T-1273 (K-04 v1.1, \#455), as the card says (DL-538…
+  - `45729e6` T-1278: start from T-1274 (K-22 v1.2, \#450), as the card says (DL-538…
+  - `02e6d73` T-1278: migrations 0032 to 0034, the sign-in lane's schema: K-04 v1.1…
+  - `9e0a9f1` T-1278: money.int.test.ts's migration-list pin gains 0032 to 0034 and…
+  - `a8f363f` Merge branch 'main' into task/T-1278
+  - `a67a659` T-1278: db/repo/test-db.ts's migrate() takes the 'rosie-test-db-migra…
+- **Files changed:** 9 (+1060 −73), by folder:
+  - `db/migrations/` 0032\_core\_outbox\_no\_turn.sql +64 −0, 0033\_core\_outbox\_job\_idx.sql +10 −0, 0034\_sign\_in\_attempts.sql +301 −0
+  - `db/repo/` money.int.test.ts +10 −2, outbox-schema.int.test.ts +26 −6, outbox.int.test.ts +16 −13, people-access.int.test.ts +562 −36, rls.int.test.ts +37 −15, test-db.ts +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1274: K-22 v1.2, sign_in_attempts (ADR-016 card V2): the table list, rule 9 (the runtime side's grants and one policy, sign_in_attempt, sign_in_attempt_tried and sign_in_attempt_signed_in, the hashes' inputs, the hourly bound, the contact's pause and the day's cap stated exactly, the check's order and DL-526's ruling), one seed and six refused rows, frozen.json v1.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1273: work in progress, unchecked (the builder was stopped at 04:39Z to free the Mac's memory: swap 13.3 GB; DL-534)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1274: K-22 README rule 9: neither role holds DELETE, TRUNCATE, REFERENCES or TRIGGER, nor owns the table or a call
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1273: K-04 v1.1 checked: section 1's table and its reader table word for word as the consumer list, each card's own components, how a row with no turn fills send_class, bundle_hash and trace_id, the unrun database claim replaced by the checks run (the model refuses each twin and passes it put right), and the three integration cases CQ-211's CHECK meets once M1 lands
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1278: migrations 0032 to 0034, the sign-in lane's schema: K-04 v1.1's outbox changes (turn_id nullable, job_id, email_purpose, not_after, four outbox_rows CHECKs and CQ-211's outbox_parts_delivered_has_time, each NOT VALID then validated), outbox_rows_job_idx built concurrently alone, and K-22 v1.2's sign_in_attempts with README rule 9 (one runtime policy, no Tool API grant, three security-definer calls pinned to the schema); people-access and rls tests take v1.2's lists, seed, refused cases and calls; outbox-schema's pin moves to v1.1; the three CQ-211 cases get their delivered time, one restated for the architect's ruling
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1278: money.int.test.ts's migration-list pin gains 0032 to 0034 and stays exact (the card's Proves: a test that pins the migration list changes only to add the files)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1278: db/repo/test-db.ts's migrate() takes the 'rosie-test-db-migrate' lock by polling pg_try_advisory_lock (every 100 ms, at most 120 s, as migrate.mjs's takeLock), never the blocking pg_advisory_lock, so no waiting session holds a snapshot that 0033's concurrent index build waits out (DL-551); no test changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 468. T-1274: K-22 v1.2, sign\_in\_attempts and its three calls (ADR-016 card V2) (\#450)
+
+- **Commit:** [`aad01de`](https://github.com/aryamahadik/rosie/commit/aad01de), by Arya Mahadik, 2026-11-12 14:46:59 UTC
+- **Pull request:** [#450](https://github.com/aryamahadik/rosie/pull/450) from `task/T-1274`, merged 2026-11-12 14:46:59 UTC. It squashed 2 branch commits:
+  - `390f5f7` T-1274: K-22 v1.2, sign\_in\_attempts (ADR-016 card V2): the table list…
+  - `01a740f` T-1274: K-22 README rule 9: neither role holds DELETE, TRUNCATE, REFE…
+- **Files changed:** 11 (+753 −5), by folder:
+  - `contracts/db-schema/people-access/` README.md +84 −4, frozen.json +1 −1, people-access.v1.2.tables.json +312 −0
+  - `contracts/db-schema/people-access/fixtures/` index.json +56 −0, seed-sign-in-attempt.json +132 −0
+  - `contracts/db-schema/people-access/fixtures/invalid/` refuse-sign-in-attempt-outcome-not-k21.json +31 −0, refuse-sign-in-attempt-pause-not-fifteen-minutes.json +32 −0, refuse-sign-in-attempt-raw-contact.json +27 −0, refuse-sign-in-attempt-raw-device.json +27 −0, refuse-sign-in-attempt-sixth-wrong-try.json +32 −0, refuse-sign-in-attempt-tool-api-read.json +19 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1274: K-22 v1.2, sign_in_attempts (ADR-016 card V2): the table list, rule 9 (the runtime side's grants and one policy, sign_in_attempt, sign_in_attempt_tried and sign_in_attempt_signed_in, the hashes' inputs, the hourly bound, the contact's pause and the day's cap stated exactly, the check's order and DL-526's ruling), one seed and six refused rows, frozen.json v1.2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1274: K-22 README rule 9: neither role holds DELETE, TRUNCATE, REFERENCES or TRIGGER, nor owns the table or a call
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 467. T-1273: K-04 v1.1, outbox rows with no turn, the code row's purpose and not\_after (ADR-016 card V1) (\#455)
+
+- **Commit:** [`7dde0d9`](https://github.com/aryamahadik/rosie/commit/7dde0d9), by Arya Mahadik, 2026-11-12 14:46:54 UTC
+- **Pull request:** [#455](https://github.com/aryamahadik/rosie/pull/455) from `task/T-1273`, merged 2026-11-12 14:46:54 UTC. It squashed 2 branch commits:
+  - `35b9458` T-1273: work in progress, unchecked (the builder was stopped at 04:39…
+  - `e4791b5` T-1273: K-04 v1.1 checked: section 1's table and its reader table wor…
+- **Files changed:** 9 (+4160 −4), by folder:
+  - `contracts/db-schema/core/` README.md +101 −3, core.v1.1.tables.json +3810 −0, frozen.json +1 −1
+  - `contracts/db-schema/core/fixtures/` index.json +40 −0
+  - `contracts/db-schema/core/fixtures/invalid/` refuse-code-row-without-not-after.json +49 −0, refuse-delivered-part-without-time.json +28 −0, refuse-email-purpose-on-text-row.json +33 −0, refuse-email-purpose-unknown.json +49 −0, refuse-outbox-row-with-no-turn-or-job.json +49 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1273: work in progress, unchecked (the builder was stopped at 04:39Z to free the Mac's memory: swap 13.3 GB; DL-534)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1273: K-04 v1.1 checked: section 1's table and its reader table word for word as the consumer list, each card's own components, how a row with no turn fills send_class, bundle_hash and trace_id, the unrun database claim replaced by the checks run (the model refuses each twin and passes it put right), and the three integration cases CQ-211's CHECK meets once M1 lands
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 466. docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474) (\#476)
 
