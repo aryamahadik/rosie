@@ -293,17 +293,23 @@ export function checkEventEntry(call: string, entry: unknown): void {
  * table and constraint, never PostgresError's message, detail or query, which can hold a row's values.
  */
 export class DataAccessDatabaseError extends Error {
-  constructor(
-    readonly call: string,
-    readonly code: string,
-    readonly table: string | null,
-    readonly constraint: string | null,
-  ) {
+  // Plain fields set in the constructor, never parameter properties: Node's type stripping cannot run those, and the
+  // seed runner loads this file through targets.ts (T-1268 round 4).
+  readonly call: string;
+  readonly code: string;
+  readonly table: string | null;
+  readonly constraint: string | null;
+
+  constructor(call: string, code: string, table: string | null, constraint: string | null) {
     const names = [
       table === null ? "" : `, table ${table}`,
       constraint === null ? "" : `, constraint ${constraint}`,
     ];
     super(`${call}: the database refused the call (SQLSTATE ${code}${names.join("")})`);
+    this.call = call;
+    this.code = code;
+    this.table = table;
+    this.constraint = constraint;
     this.name = "DataAccessDatabaseError";
   }
 }
@@ -394,8 +400,11 @@ function constraintOf(error: unknown): K05.ConstraintError | null {
 
 /** Thrown inside fireClock's transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
-  constructor(readonly answer: FireClockError) {
+  readonly answer: FireClockError;
+
+  constructor(answer: FireClockError) {
     super("fireClock refused");
+    this.answer = answer;
   }
 }
 
@@ -911,9 +920,12 @@ function checkFire(request: FireClockRequest): Date {
 
 /** The business scope of the firing's transaction, set to each write's own business (null: the runtime side). */
 class Scope {
+  private readonly tx: Sql;
   private current: string | null = null;
 
-  constructor(private readonly tx: Sql) {}
+  constructor(tx: Sql) {
+    this.tx = tx;
+  }
 
   async to(businessId: string | null): Promise<void> {
     if (businessId === this.current) {
