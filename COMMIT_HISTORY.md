@@ -2,9 +2,95 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 432, [`5245bbf`](https://github.com/aryamahadik/rosie/commit/5245bbf), 2026-11-12 03:12:10 UTC.
+- **Through:** commit 436, [`4062130`](https://github.com/aryamahadik/rosie/commit/4062130), 2026-11-12 03:48:29 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 436. docs: COMMIT\_HISTORY.md through commit 432 (5245bbf, \#440) (\#444)
+
+- **Commit:** [`4062130`](https://github.com/aryamahadik/rosie/commit/4062130), by Arya Mahadik, 2026-11-12 03:48:29 UTC
+- **Pull request:** [#444](https://github.com/aryamahadik/rosie/pull/444) from `task/commit-history-36`, merged 2026-11-12 03:48:30 UTC. It squashed 1 branch commit:
+  - `676fa21` docs: COMMIT\_HISTORY.md through commit 432 (5245bbf, \#440)
+- **Files changed:** 1 (+76 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +76 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 435. T-1250: design record ADR-016, sign-in by code on staging, end to end (\#443)
+
+- **Commit:** [`304e469`](https://github.com/aryamahadik/rosie/commit/304e469), by Arya Mahadik, 2026-11-12 03:48:26 UTC
+- **Pull request:** [#443](https://github.com/aryamahadik/rosie/pull/443) from `task/T-1250`, merged 2026-11-12 03:48:26 UTC. It squashed 5 branch commits:
+  - `af4d300` T-1250: design record ADR-016, sign-in by code on staging end to end:…
+  - `6b286d7` T-1250: ADR-016 read-through fixes: the send's one narrow call named,…
+  - `66cee7a` T-1250: merge main (0292eaa) into the task branch
+  - `15e40af` T-1250: ADR-016 round 2 (DL-519): a code row never sent past its not\_…
+  - `abaa1d2` T-1250: ADR-016 round 2 read-through: the three unbuilt follow-up wri…
+- **Files changed:** 2 (+319 −0), by folder:
+  - `docs/adr/` 0016-sign-in-by-code-on-staging.md +318 −0, README.md +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1250: design record ADR-016, sign-in by code on staging end to end: a job id on turnless outbox rows (K-04 v1.1), the code row's send and its limit 8 class, the pause and day's cap per typed contact (K-22 v1.2 attempts), where a staging code goes, the roles per step under ADR-014, and the cards in order
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1250: ADR-016 read-through fixes: the send's one narrow call named, the answer's unshared writes stated, a missing inbox list sends to the double, CQ-211's CHECK in K-04 v1.1, card dependencies and refused rows corrected
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1250: ADR-016 round 2 (DL-519): a code row never sent past its not_after and never given up (no follow-up; noTurn on items 15, 17, 25); every reader of a job row listed, readOutboxRow ruled breaking by the record's rule with a guarded default and the CTO's OK asked; the code's three entries; the email stop from the consent row; the chat step for email; one answer per wrong code with or without an account; the seed's inbox list (card S); the hour's bound on starts; the notes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1250: ADR-016 round 2 read-through: the three unbuilt follow-up writers named, STATE note 10's source stated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 434. T-1269: db/repo readTurnParty, K-05 v1.11 item 52: the handle's party for a turn in one read-only transaction as rosie\_job, default 100's order (anotherOwner, roleEnded, severalBusinesses), the closed reading of DL-511, tested against every v1.11 fixture, item 52's cases and every statement sent (\#442)
+
+- **Commit:** [`50f74dc`](https://github.com/aryamahadik/rosie/commit/50f74dc), by Arya Mahadik, 2026-11-12 03:48:22 UTC
+- **Pull request:** [#442](https://github.com/aryamahadik/rosie/pull/442) from `task/T-1269`, merged 2026-11-12 03:48:23 UTC. It squashed 1 branch commit:
+  - `8968c2c` T-1269: db/repo readTurnParty, K-05 v1.11 item 52: the handle's party…
+- **Files changed:** 2 (+1819 −0), by folder:
+  - `db/repo/` turn-party.int.test.ts +1520 −0, turn-party.ts +299 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 433. T-1262: the arrival safety read's result kept sealed in the actor's own storage until its turn commits (ADR-015 card A): safety\_results, safety\_closed and the noted danger lines; the key carried from queueRead; applyResult's three steps before the line; the owed text in unreadTexts, routineHeld, waiting, onReturn, applyLate and sendDanger's clears; resultsOf and closeResults; DL-508's lead notes, with their tests (\#441)
+
+- **Commit:** [`886e82c`](https://github.com/aryamahadik/rosie/commit/886e82c), by Arya Mahadik, 2026-11-12 03:48:19 UTC
+- **Pull request:** [#441](https://github.com/aryamahadik/rosie/pull/441) from `task/T-1262`, merged 2026-11-12 03:48:19 UTC. It squashed 1 branch commit:
+  - `8801538` T-1262: the arrival safety read's result kept sealed in the actor's o…
+- **Files changed:** 2 (+1873 −67), by folder:
+  - `runtime/src/safety/` arrival.ts +382 −67, store.worker.test.ts +1491 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 432. docs: COMMIT\_HISTORY.md through commit 429 (54b9c1d, \#437) (\#440)
 
