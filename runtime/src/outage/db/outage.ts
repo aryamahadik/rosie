@@ -38,11 +38,16 @@
 //   6. The lease asks, through the actor, whether a batch waiting behind a turn that has used its one restart may hold a
 //      stop word (`stopAmong`; ADR-018 section 1): from each text's reading above, the stricter reading for a text not
 //      read, so a STOP's batch restarts that turn a second time and commits on its first run.
+//   7. The safety read asks, through the actor, whether a text no commit has taken may hold a stop word (`stopPending`,
+//      by the same reading of the same rows: T-1313), so its own outage line (its timeout rule) never goes to a number
+//      whose STOP is stored and not committed yet, whether PostgreSQL answers or not (RULES 7.2: "at once").
 //
 // Q-45's default: nothing here backs up Cloudflare itself being down. Not here: "booking is paused" for AIs and the booking
 // page (K-09 shared core, C-110; the platform-status actor, T-607 and T-608). Unwired (no `setDbOutageDeps`), nothing here
 // runs and every batch goes on as before, but `stopAmong` reads every batch as one that may hold a stop word (ADR-018
-// round 2, DL-570). Never logged or put in a span: a text's words, a number, an address, a key.
+// round 2, DL-570), and `stopPending` every text no commit has taken (T-1313): the path reads none of them, so the safety
+// read's outage line does not go while it is unwired. Never logged or put in a span: a text's words, a number, an
+// address, a key.
 
 import { scheduleEntry, unscheduleEntry, type ClosedBatch } from "../../actor/batch";
 import type { ActorCopies } from "../../actor/copies/copies";
@@ -299,18 +304,26 @@ export class DbOutage {
   }
 
   /**
-   * True while a STOP of the handle that no commit has taken waits with the batch window or the lease, not taken by the
-   * actor (left to its turn, or not decided yet): the number asked to stop, so the safety read's own outage line (its
-   * timeout rule) never goes to it either. A storage that cannot say answers true (fails closed). False while unwired.
+   * True while a text of the handle that no commit has taken (with the batch window or the lease) may hold a stop word,
+   * so the number may have asked to stop and the safety read's own outage line (its timeout rule) never goes to it either
+   * (RULES 7.2: "Unsure: treat it as a stop. It stops texts from the number it answers, at once"; arch 11 line 564: "never
+   * to a stopped number"). Each text is weighed by the one reading `stopAmong` gives the lease (`mayHoldStop`, of the same
+   * outage_texts rows; T-1313), but a STOP or START the actor took alone (`handled`): its word is the actor's copy of the
+   * stopped flag, which the actor reads beside this. True while unwired (no `setDbOutageDeps`), as `stopAmong` is: the
+   * path then reads nothing, so no text no commit has taken is known to hold no stop word, the safety read's own text
+   * included (ADR-018 section 1, round 2). A storage that cannot say answers true (fails closed).
    */
   stopPending(): boolean {
-    if (deps === null) return false;
+    if (deps === null) return true;
     try {
       const pending = this.host.pending();
-      const waiting = new Set([...pending.window, ...pending.lease]);
-      return this.rows().some(
-        (row) => waiting.has(row.event_id) && row.kind === "stop" && row.keyword !== "handled",
+      const waiting = [...new Set([...pending.window, ...pending.lease])];
+      const taken = new Set(
+        this.rowsOf(waiting)
+          .filter((row) => row.keyword === "handled")
+          .map((row) => row.event_id),
       );
+      return this.mayHoldStop(waiting.filter((eventId) => !taken.has(eventId)));
     } catch {
       return true;
     }
@@ -319,26 +332,14 @@ export class DbOutage {
   /**
    * Whether these texts, a batch the lease takes behind a turn that has used its one restart, may hold a stop word (STOP
    * or another opt-out word; ADR-018 section 1): the lease then restarts that turn a second time, so the STOP commits at
-   * once (RULES 7.2). Of the texts, those whose words are read (`isReadableEvent`: a text, a caption, a vote's words, an
-   * edit) are weighed by the reading stored when each was followed (`outage_texts.kind`, `classify`): true when one reads as
-   * a STOP or `unknown`, or has no reading (not read yet, or no row: its `arrive` write threw), and when a text cannot be
-   * found or the reading throws ("Unsure: treat it as a stop"); false when each reads as a START or another text (HELP
-   * among them), or none of them is read (a tapback holds no stop word). Unlike `stopPending`, true while unwired (no
-   * `setDbOutageDeps`): the path then reads nothing, so no batch is known to hold no stop word (round 2, DL-570).
+   * once (RULES 7.2). Weighed by the one reading `stopPending` gives the safety read too (`mayHoldStop`); true when the
+   * reading throws ("Unsure: treat it as a stop"), and true while unwired (no `setDbOutageDeps`): the path then reads
+   * nothing, so no batch is known to hold no stop word (round 2, DL-570).
    */
   stopAmong(eventIds: readonly string[]): boolean {
     if (deps === null) return true;
     try {
-      const ids = [...new Set(eventIds)];
-      const stored = new Map(this.host.texts(ids).map((entry) => [entry.event.eventId, entry.event]));
-      const kinds = new Map(this.rowsOf(ids).map((row) => [row.event_id, row.kind]));
-      return ids.some((eventId) => {
-        const event = stored.get(eventId);
-        if (event === undefined) return true;
-        if (!isReadableEvent(event)) return false;
-        const kind = kinds.get(eventId) ?? null;
-        return kind !== "start" && kind !== "other";
-      });
+      return this.mayHoldStop(eventIds);
     } catch {
       return true;
     }
@@ -647,6 +648,28 @@ export class DbOutage {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * The one reading of whether these texts may hold a stop word (STOP or another opt-out word), which `stopAmong` gives the
+   * lease and `stopPending` the safety read (ADR-018 section 1; T-1313). Of the texts, those whose words are read
+   * (`isReadableEvent`: a text, a caption, a vote's words, an edit) are weighed by the reading stored when each was
+   * followed (`outage_texts.kind`, `classify`): true when one reads as a STOP or `unknown`, or has no reading (not read
+   * yet, or no row: its `arrive` write threw), and when a text cannot be found ("Unsure: treat it as a stop", RULES 7.2);
+   * false when each reads as a START or another text (HELP among them), or none of them is read (a tapback holds no stop
+   * word). Throws what the storage throws: each caller reads a throw as true.
+   */
+  private mayHoldStop(eventIds: readonly string[]): boolean {
+    const ids = [...new Set(eventIds)];
+    const stored = new Map(this.host.texts(ids).map((entry) => [entry.event.eventId, entry.event]));
+    const kinds = new Map(this.rowsOf(ids).map((row) => [row.event_id, row.kind]));
+    return ids.some((eventId) => {
+      const event = stored.get(eventId);
+      if (event === undefined) return true;
+      if (!isReadableEvent(event)) return false;
+      const kind = kinds.get(eventId) ?? null;
+      return kind !== "start" && kind !== "other";
+    });
   }
 
   // ---- STOP and START ---------------------------------------------------------------------------------------------

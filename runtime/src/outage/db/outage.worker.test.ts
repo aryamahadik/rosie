@@ -23,16 +23,25 @@ import {
   type HandleActor,
   type LeasedTurn,
   type ReplayReport,
+  type SafetyEntry,
   type TurnEntry,
 } from "../../actor";
 import type { ActorCopies } from "../../actor/copies/copies";
+import type { LeaseHost } from "../../actor/lease";
 import { SAM_TIMER } from "../../actor/copies/test-support";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
 import { Q01_DRAFTED } from "../../guard/replies/words";
 import type { SafetyResult } from "../../safety/types";
 import { SAM, safetyNoFor, storedText, until } from "../../turn/test-support";
-import { OUTAGE_WAIT_MS, PROBE_MS, setDbOutageDeps, TIMER_RETRY_MS, type OutageView } from "./index";
+import {
+  OUTAGE_WAIT_MS,
+  PROBE_MS,
+  setDbOutageDeps,
+  TIMER_RETRY_MS,
+  type DbOutage,
+  type OutageView,
+} from "./index";
 import { dbFakes, idsOf, type DbFakes } from "./test-support";
 
 const TRACE = "11111111-2222-4333-8444-555555555555";
@@ -82,6 +91,8 @@ interface Rpc {
   readCopies(): Promise<CopiesView>;
   readOutage(): Promise<OutageView>;
   readTurns(): Promise<TurnEntry[]>;
+  readWaitingBatches(): Promise<number[]>;
+  readSafety(): Promise<SafetyEntry[]>;
   writeOnReturn(): Promise<ReplayReport>;
   outageIdle(): Promise<void>;
   safetyIdle(): Promise<void>;
@@ -800,5 +811,222 @@ describe("on return, only the answer for the STOP note's own text replaces it (T
       turnId: later,
       setAt: anyTime,
     });
+  });
+});
+
+describe("a STOP stored but not committed stops the safety read's outage line to its number, with the down path wired or not (T-1313; RULES 7.2), while a danger line still goes (RULES 4.12)", () => {
+  const FIRST = "evt-sam-0420";
+  const STOP = "evt-sam-0421";
+  const QUIET = "evt-sam-0422";
+  const DANGER_WORD = "evt-sam-0423";
+  const DANGER = "evt-sam-0424";
+  const OTHER = "evt-sam-0425";
+
+  /** The safety read answers No for these texts and finds danger in DANGER; QUIET and DANGER_WORD get no verdict. */
+  const answers = (): Record<string, SafetyResult> => ({
+    [PRIME]: safetyNoFor(PRIME),
+    [FIRST]: safetyNoFor(FIRST),
+    [STOP]: safetyNoFor(STOP),
+    [OTHER]: safetyNoFor(OTHER),
+    [DANGER]: emergencyFor(DANGER),
+  });
+
+  /** Each safety record the core was asked for, as its text and the checked line the core's outbox row holds. */
+  const safetyLines = (rig: Rig): [string, string | null][] =>
+    rig.f.core.recorded.map((call) => [
+      call.request.safety.eventId,
+      "error" in call.response ? null : (call.response.safetyLine?.fixedLineId ?? null),
+    ]);
+
+  /** The safety read's state of one text. */
+  const safetyOf = async (rig: Rig, eventId: string): Promise<SafetyEntry | undefined> =>
+    (await rig.actor.readSafety()).find((entry) => entry.eventId === eventId);
+
+  /** The actor's down path, inside the actor: the host's `stopped` asks its `stopPending`, the lease's host its `stopAmong`. */
+  const readings = (eventIds: string[]): Promise<{ stopPending: boolean; stopAmong: boolean | undefined }> =>
+    runInDurableObject(stub(), (instance) => {
+      const inside = instance as unknown as { outage: DbOutage; lease: { host: LeaseHost } };
+      return { stopPending: inside.outage.stopPending(), stopAmong: inside.lease.host.stopAmong?.(eventIds) };
+    });
+
+  /**
+   * Sam's first turn has committed (the pin copied bundle A's keyword list), and the down path is unwired unless
+   * `downPath`. FIRST's turn then begins its commit, which the core does not answer yet (K-05 `transient`), so the lease
+   * keeps every later batch waiting for it. Then his STOP arrives, read by the safety read (No), and its batch closes 3 s
+   * on and waits: a STOP stored, not committed, and no copy says stopped. With `unreadable`, the down path cannot open the
+   * STOP's words (its key read fails), so it reads it as `unknown`.
+   */
+  async function stopWaiting(rig: Rig, options: { downPath: boolean; unreadable?: boolean }): Promise<void> {
+    await prime(rig);
+    if (!options.downPath) restores.push(setDbOutageDeps(null));
+    const refused: string[] = [];
+    restores.push(
+      setLeaseHooks({
+        runTurn: async (turn) => {
+          await turn.commit(samCommit(turn));
+        },
+        commit: (request, at) => {
+          if (!request.turn.eventIds.includes(FIRST)) return rig.f.commit(request, at);
+          refused.push(request.turn.id);
+          return Promise.resolve({ error: "transient" });
+        },
+      }),
+    );
+    await rig.arrive(FIRST, "Test words: can I come Friday at 3?");
+    await rig.tick(3000);
+    await until(() => refused.length > 0, "the first turn's commit", 10_000);
+    if (options.unreadable === true) rig.f.keyReads.push(false);
+    await rig.arrive(STOP, "STOP");
+    await rig.tick(3000);
+    expect((await rig.actor.readTurns()).map((turn) => [turn.eventIds, turn.state])).toEqual([
+      [[PRIME], "committed"],
+      [[FIRST], "committing"],
+    ]);
+    expect(await rig.actor.readWaitingBatches()).toHaveLength(1);
+    expect((await rig.actor.readCopies()).stopped?.stopped ?? false).toBe(false);
+    expect(rig.f.stops).toEqual([]);
+  }
+
+  /** A text with no verdict in 4 s and no danger word: the safety read's timeout rule, whose line is the outage line. */
+  async function noVerdict(
+    rig: Rig,
+    eventId = QUIET,
+    body = "Test words: hello, is anyone there?",
+  ): Promise<void> {
+    await rig.arrive(eventId, body, false);
+    await rig.tick(4000);
+  }
+
+  /** No line RULES 7.2 forbids went: no outage line through the core's outbox row, nor straight through Linq. */
+  async function noOutageLine(rig: Rig, eventId = QUIET): Promise<void> {
+    expect(rig.f.core.fixed).toEqual([]);
+    expect(outageSends(rig)).toEqual([]);
+    expect(await safetyOf(rig, eventId)).toMatchObject({ path: "none", lineId: "outage" });
+  }
+
+  /** The danger lines RULES 4.12 requires still go at once, through the core's outbox row (send class safety). */
+  async function dangerStillGoes(rig: Rig): Promise<void> {
+    // No verdict in 4 s and a danger word: Unsure, and its safety line (911).
+    const wordAt = rig.f.clock.now();
+    await rig.arrive(DANGER_WORD, "Test words: a client's cut won't stop bleeding", false);
+    await rig.tick(4000);
+    // A danger verdict: its outcome's checked line, at once.
+    const verdictAt = rig.f.clock.now();
+    await rig.arrive(DANGER, "Test words: my lips are swelling");
+    expect(safetyLines(rig)).toEqual([
+      [DANGER_WORD, "safetyEmergency"],
+      [DANGER, "safetyEmergency"],
+    ]);
+    expect(rig.f.core.recorded.map((call) => call.at)).toEqual([wordAt + 4000, verdictAt]);
+    expect(await safetyOf(rig, DANGER_WORD)).toMatchObject({ danger: true, path: "outbox" });
+    expect(await safetyOf(rig, DANGER)).toMatchObject({ danger: true, path: "outbox" });
+  }
+
+  it("with the down path unwired, as the root installs it today: a STOP waiting behind a turn whose commit has begun stops the timeout rule's outage line through the core, while a danger word's safety line and a danger verdict's still go", async () => {
+    const rig = rigFor(answers());
+    await stopWaiting(rig, { downPath: false });
+    await noVerdict(rig);
+    await noOutageLine(rig);
+    await dangerStillGoes(rig);
+    await noOutageLine(rig);
+  });
+
+  it("with the down path unwired and the core not answering: no outage line straight through Linq, and a danger verdict's safety line goes straight through Linq, past any opt-out", async () => {
+    const rig = rigFor(answers());
+    await stopWaiting(rig, { downPath: false });
+    rig.f.down = true;
+    await noVerdict(rig);
+    await noOutageLine(rig);
+    await rig.arrive(DANGER, "Test words: my lips are swelling");
+    expect(rig.f.direct.sent).toEqual([
+      expect.objectContaining({
+        fixedLineId: "safetyEmergency",
+        overrideOptout: true,
+        idempotencyKey: `safety:${DANGER}:safetyEmergency`,
+      }),
+    ]);
+    expect(await safetyOf(rig, DANGER)).toMatchObject({ danger: true, path: "direct" });
+  });
+
+  it("with the down path unwired: a STOP whose own read gives no verdict in 4 s gets no outage line", async () => {
+    const rig = rigFor({ [PRIME]: safetyNoFor(PRIME) });
+    await prime(rig);
+    restores.push(setDbOutageDeps(null));
+    await noVerdict(rig, STOP, "STOP");
+    await noOutageLine(rig, STOP);
+  });
+
+  it("with the down path wired, the STOP read as a STOP by the keyword copy: no outage line, while the danger lines still go", async () => {
+    const rig = rigFor(answers());
+    await stopWaiting(rig, { downPath: true });
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "left" }),
+    );
+    await noVerdict(rig);
+    await noOutageLine(rig);
+    await dangerStillGoes(rig);
+    await noOutageLine(rig);
+  });
+
+  it("with the down path wired, the STOP's words not opened (read as unknown: it may be a stop word): no outage line, while the danger lines still go", async () => {
+    const rig = rigFor(answers());
+    await stopWaiting(rig, { downPath: true, unreadable: true });
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: STOP, kind: "unknown" }),
+    );
+    await noVerdict(rig);
+    await noOutageLine(rig);
+    await dangerStillGoes(rig);
+    await noOutageLine(rig);
+  });
+
+  const faults: { fault: string; sql: string[] }[] = [
+    // Its `arrive` write threw: the down path has no reading of it.
+    { fault: "has no reading", sql: [`DELETE FROM outage_texts WHERE event_id = '${STOP}'`] },
+    {
+      fault: "cannot be found",
+      sql: [
+        `DELETE FROM outage_texts WHERE event_id = '${STOP}'`,
+        `DELETE FROM inbox WHERE event_id = '${STOP}'`,
+      ],
+    },
+    { fault: "has a reading that throws", sql: ["DROP TABLE outage_texts"] },
+  ];
+
+  it.each(faults)(
+    "with the down path wired, fails closed: a waiting text that $fault counts as a possible STOP, and no outage line goes",
+    async ({ sql }) => {
+      const rig = rigFor(answers());
+      await stopWaiting(rig, { downPath: true });
+      await runInDurableObject(stub(), (_, state) => {
+        for (const query of sql) state.storage.sql.exec(query);
+      });
+      await noVerdict(rig);
+      await noOutageLine(rig);
+    },
+  );
+
+  it("the host's `stopped` and the lease's `stopAmong` give one reading of the same outage_texts rows: a waiting batch read as another text, or a START, is no STOP to either; one read as a STOP or unknown is one to both; unwired, any is", async () => {
+    const rig = rigFor(answers());
+    await stopWaiting(rig, { downPath: true });
+    expect(await readings([STOP])).toEqual({ stopPending: true, stopAmong: true });
+    // The same waiting text, as the down path could have read it (the first turn's text, still committing, reads `other`).
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("UPDATE outage_texts SET kind = 'other' WHERE event_id = ?", STOP);
+    });
+    expect(await readings([STOP])).toEqual({ stopPending: false, stopAmong: false });
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("UPDATE outage_texts SET kind = 'start' WHERE event_id = ?", STOP);
+    });
+    expect(await readings([STOP])).toEqual({ stopPending: false, stopAmong: false });
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("UPDATE outage_texts SET kind = 'unknown' WHERE event_id = ?", STOP);
+    });
+    expect(await readings([STOP])).toEqual({ stopPending: true, stopAmong: true });
+    restores.push(setDbOutageDeps(null));
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("UPDATE outage_texts SET kind = 'other' WHERE event_id = ?", STOP);
+    });
+    expect(await readings([STOP])).toEqual({ stopPending: true, stopAmong: true });
   });
 });
