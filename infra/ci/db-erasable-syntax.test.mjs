@@ -1,11 +1,11 @@
-// Tests for T-1329's guard (DL-612, DL-617): `npm run typecheck` refuses, in every file under db/, the syntax
-// Node's type stripping cannot run (parameter properties, enums, namespaces), and allows it elsewhere. Run by
-// `npm run test:ci-scripts`.
+// Tests for T-1329's guard (DL-612, DL-617, DL-625): `npm run typecheck` refuses, in every file under db/ but its test
+// files, the syntax Node's type stripping cannot run (parameter properties, enums, namespaces), and allows it
+// elsewhere. Run by `npm run test:ci-scripts`.
 //
 // Node runs db/ straight from TypeScript (db/seeds/run.mjs, infra/flags/flags.mjs, seed-staging.test.mjs) and stops
 // at such a line with ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX, as train 143's CI script tests did at db/repo/clocks.ts.
 // db/tsconfig.json checks db/ a second time with erasableSyntaxOnly; wrangler and Vitest transform the rest of the
-// repository, so the syntax stays allowed there.
+// repository, and Vitest runs db/'s own *.test.ts files, so the syntax stays allowed there.
 //
 // Each case builds a throwaway repository with this repository's tsconfig.base.json, tsconfig.json and
 // db/tsconfig.json, its typecheck script line and its node_modules (a link), plants files there and runs
@@ -84,6 +84,7 @@ describe("npm run typecheck and the syntax Node's type stripping cannot run", ()
     assert.match(db, /"extends": "\.\.\/tsconfig\.json"/);
     assert.match(db, /"erasableSyntaxOnly": true/);
     assert.match(db, /"include": \["\*\*\/\*"\]/);
+    assert.match(db, /"exclude": \["\*\*\/\*\.test\.ts"\]/);
     const root = readFileSync(path.join(REPO, "tsconfig.json"), "utf8");
     assert.doesNotMatch(root, /erasableSyntaxOnly"\s*:/);
   });
@@ -115,6 +116,20 @@ describe("npm run typecheck and the syntax Node's type stripping cannot run", ()
       "runtime/src/planted-parameter.ts": PARAMETER_PROPERTY,
       "runtime/src/planted-enum.ts": ENUM,
       "runtime/src/planted-namespace.ts": NAMESPACE,
+    });
+    const { status, output, errors } = typecheck(t, root);
+    assert.deepEqual(errors, [], output);
+    assert.equal(status, 0, output);
+  });
+
+  it("allows the same syntax in db/'s own test files, which Vitest runs (DL-625)", (t) => {
+    // A parameter property as the RolledBack class of db/'s integration tests holds it, an enum and a namespace, each
+    // in a db/ test file of one of the two names Vitest runs there, beside a db/ file written without the syntax.
+    const root = repository(t, {
+      "db/repo/plain.ts": PLAIN,
+      "db/repo/planted-parameter.int.test.ts": PARAMETER_PROPERTY,
+      "db/seeds/lib/planted-enum.test.ts": ENUM,
+      "db/test/planted-namespace.int.test.ts": NAMESPACE,
     });
     const { status, output, errors } = typecheck(t, root);
     assert.deepEqual(errors, [], output);

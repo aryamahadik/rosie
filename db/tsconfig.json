@@ -4,10 +4,13 @@
   // Node runs db/ straight from TypeScript, with no bundler (db/seeds/run.mjs, infra/flags/flags.mjs and the CI script
   // tests that load db/seeds and db/repo), and stops at such a line with ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX (train 143).
   // The rest of the repository is bundled by wrangler or run by Vitest, whose transform runs that syntax, so the root
-  // program (tsconfig.json) keeps it allowed there. Every other option is the root's.
+  // program (tsconfig.json) keeps it allowed there. db/'s own test files (*.test.ts, *.int.test.ts) are left out for
+  // the same reason: Vitest runs them (DL-625); the root program still type-checks them. Every other option is the
+  // root's.
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "erasableSyntaxOnly": true
   },
-  "include": ["**/*"]
+  "include": ["**/*"],
+  "exclude": ["**/*.test.ts"]
 }
