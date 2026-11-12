@@ -2861,6 +2861,19 @@ describe("the write-on-return queue, with the safety read's records", () => {
       expect(
         (await actorOf(ALEX).readSafety()).find((entry) => entry.eventId === "evt-alex-0299"),
       ).toMatchObject({ path: "none", lineId: "outage" });
+      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): the text's unread hold open and
+      // its re-read set 30 s on.
+      expect(await actorOf(ALEX).readHolds()).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ eventId: "evt-alex-0299", rule: "unread", released: false }),
+        ]),
+      );
+      const reread = await runInDurableObject(stubOf(ALEX), (_, state) =>
+        state.storage.sql
+          .exec<{ due_ms: number }>("SELECT due_ms FROM safety_reread WHERE event_id = 'evt-alex-0299'")
+          .toArray(),
+      );
+      expect(reread).toEqual([{ due_ms: 34_000 }]);
 
       // The danger record waits; a reader sees labels only. No record waits for an outage line.
       expect((await actorOf(ALEX).readCopies()).returns).toEqual([

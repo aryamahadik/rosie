@@ -26,7 +26,14 @@ import {
 import { fakeKeyStore } from "../gateway/test-support";
 import { decideLimit8 } from "../dispatch/limit8";
 import type { ClaimedRow, SendState } from "../dispatch/types";
-import { setSafetyDeps, type CopiesView, type HandleActor, type HoldEntry, type SafetyEntry } from "../actor";
+import {
+  setSafetyDeps,
+  type BatchEntry,
+  type CopiesView,
+  type HandleActor,
+  type HoldEntry,
+  type SafetyEntry,
+} from "../actor";
 import type { ActorCopies } from "../actor/copies/copies";
 import { WHOLE_A } from "../bundle/test-support";
 import { setDbOutageDeps, type OutageView } from "../outage/db";
@@ -68,6 +75,7 @@ interface SafetyRpc {
   readCopies(): Promise<CopiesView>;
   readOutage(): Promise<OutageView>;
   outageIdle(): Promise<void>;
+  readBatches(): Promise<BatchEntry[]>;
 }
 
 function actorOf(name = ALEX): SafetyRpc {
@@ -164,6 +172,32 @@ async function noOutageLine(h: Harness, eventId: string): Promise<void> {
     path: "none",
     lineId: "outage",
   });
+}
+
+/** The text's next re-read as the safety read stores it, on the safety clock (`safety_reread`), or none. */
+function rereadOf(eventId: string): Promise<{ event_id: string; due_ms: number }[]> {
+  return runInDurableObject(stubOf(), (_, state) =>
+    state.storage.sql
+      .exec<{
+        event_id: string;
+        due_ms: number;
+      }>("SELECT event_id, due_ms FROM safety_reread WHERE event_id = ?", eventId)
+      .toArray(),
+  );
+}
+
+/**
+ * The timeout rule's other effects, unchanged while its outage line is withheld (the security reviewer's DL-615 ruling):
+ * the text's unread hold open, its re-read set 30 s on, and its batch kept back (none of its batches handed on).
+ */
+async function timeoutRuleStill(eventId: string, rereadAt: number): Promise<void> {
+  expect(await actorOf().readHolds()).toContainEqual(
+    expect.objectContaining({ eventId, rule: "unread", released: false }),
+  );
+  expect(await rereadOf(eventId)).toEqual([{ event_id: eventId, due_ms: rereadAt }]);
+  expect(
+    (await actorOf().readBatches()).filter((batch) => batch.handed && batch.eventIds.includes(eventId)),
+  ).toEqual([]);
 }
 
 const asResult = (fixture: unknown): SafetyResult => fixture as SafetyResult;
@@ -381,6 +415,7 @@ describe("a read that never answers", () => {
 
       expect(h.core.recorded).toEqual([]);
       await noOutageLine(h, "evt-quiet-1");
+      await timeoutRuleStill("evt-quiet-1", 34_000);
       expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
       expect(await actorOf().routineHeld()).toBe(true);
     });
@@ -583,6 +618,7 @@ describe("a read that never answers", () => {
 
       expect(h.core.recorded).toEqual([]);
       await noOutageLine(h, eventId);
+      await timeoutRuleStill(eventId, 33_999);
       expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
       expect(await actorOf().routineHeld()).toBe(true);
     });
@@ -611,6 +647,7 @@ describe("a read that never answers", () => {
 
       expect(h.clock.now()).toBe(0);
       await noOutageLine(h, "evt-failed-1");
+      await timeoutRuleStill("evt-failed-1", 30_000);
       expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-failed-1", state: "done" }]);
     });
   });
@@ -738,6 +775,7 @@ describe("the safety line and a stopped number", () => {
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
       await noOutageLine(h, "evt-down-1");
+      await timeoutRuleStill("evt-down-1", 34_000);
       expect(await actorOf().routineHeld()).toBe(true);
     });
   });

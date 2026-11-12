@@ -573,6 +573,8 @@ describe("a read cut off by an eviction", () => {
       await run.wake();
       await run.settle();
       await noOutageLine(run.h, "evt-1");
+      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): its re-read is set 30 s on.
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 34_000 });
       expect(await actorOf().readHolds()).toMatchObject([
         { eventId: "evt-1", rule: "unread", released: false },
       ]);
@@ -705,6 +707,14 @@ describe("a read cut off by an eviction", () => {
           { eventId: "evt-2", state: "done", path: "none", lineId: "outage" },
         ]);
       });
+      // The timeout rule's other effects stand (the security reviewer's DL-615 ruling): each unread hold open, the
+      // first re-read set 30 s on, and no batch handed on.
+      expect(await actorOf().readHolds()).toMatchObject([
+        { eventId: "evt-1", rule: "unread", released: false },
+        { eventId: "evt-2", rule: "unread", released: false },
+      ]);
+      expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 34_000 });
+      expect(run.handed).toEqual([]);
 
       // 5.5 s: the verdicts come, late for both, and lift their unread holds: no text stays unread and held.
       await run.h.clock.advance(500);
