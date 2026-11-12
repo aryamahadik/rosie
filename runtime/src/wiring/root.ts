@@ -805,18 +805,50 @@ function handleActorsOf(env: Cloudflare.Env): HandleActors<DurableObjectId> | nu
 /** The root this isolate's actor ports are wired to, and the function that puts the earlier ones back. */
 let wired: { readonly root: Root; readonly restore: () => void } | null = null;
 
+/** Who asks `wireWorker` to wire the isolate: one of the Worker's entries (fetch, queue), or a HandleActor as it is built. */
+export type WiringCaller = "entry" | "actor";
+
 /**
- * Wires the Worker's actor ports for this isolate (the root's `install()`), once, on its first request (DL-313 ruling 2):
- * only where the HandleActor namespace is bound, and never at global scope. env.staging binds it since T-566, and so does
- * the Workers test pool, which runs env.staging; where none is bound (an env a test builds without it) nothing is wired,
- * so the actor keeps its unwired defaults. Answers the root wired, or null.
+ * Whether a HandleActor built in this isolate wires it (T-1243): "auto" wherever the Worker runs; "held" only where a test
+ * says so (`setActorWiring`). The fetch and queue entries wire either way.
  */
-export function wireWorker(env: Cloudflare.Env & WorkerSecrets): Root | null {
+export type ActorWiring = "auto" | "held";
+
+let actorWiring: ActorWiring = "auto";
+
+/**
+ * Wires the Worker's actor ports for this isolate (the root's `install()`), once, on its first event (DL-313 ruling 2):
+ * the first request or retry batch (`caller` "entry"), or the first HandleActor built here (`caller` "actor", T-1243),
+ * which calls it before its constructor reads a port, so a stub call or an alarm that lands in an isolate no request or
+ * retry batch reached still runs the turn (Cloudflare does not say the actor and the fetch handler share an isolate;
+ * ./test-phone/line.ts treats them as two). Only where the HandleActor namespace is bound, and never at global scope.
+ * env.staging binds it since T-566, and so does the Workers test pool, which runs env.staging; where none is bound (an env
+ * a test builds without it) nothing is wired, so the actor keeps its unwired defaults. Once wired, it never installs
+ * again, whoever calls: ports a test installs after that stay the test's. While a test holds the actor's wiring
+ * (`setActorWiring("held")`: the Workers test projects' setup does, since the pool's one isolate runs every test's actors),
+ * an actor's call wires nothing, so an actor a test builds keeps the ports that test installed, or its unwired defaults
+ * where it installed none. Answers the root wired, or null.
+ */
+export function wireWorker(env: Cloudflare.Env & WorkerSecrets, caller: WiringCaller = "entry"): Root | null {
   if (wired !== null) return wired.root;
+  if (caller === "actor" && actorWiring === "held") return null;
   if (env.HANDLE_ACTOR === undefined) return null;
   const root = workerRoot(env);
   wired = { root, restore: root.install() };
   return root;
+}
+
+/**
+ * Holds or lets go a HandleActor's own wiring of this isolate (T-1243): a test's switch, and the Workers test projects'
+ * setup, which holds it for every test (an actor a test builds keeps the test's ports). Returns the function that puts
+ * the earlier setting back. The Worker never calls it, so every deployed actor wires its isolate.
+ */
+export function setActorWiring(next: ActorWiring): () => void {
+  const before = actorWiring;
+  actorWiring = next;
+  return () => {
+    actorWiring = before;
+  };
 }
 
 /** The root this isolate's actor ports are wired to by `wireWorker`, or null while none is. */
