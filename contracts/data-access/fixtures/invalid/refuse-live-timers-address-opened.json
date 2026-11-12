@@ -1,0 +1,20 @@
+{
+  "handleId": "handle-sam",
+  "timers": [
+    {
+      "id": "timer-sam-survey",
+      "businessId": "biz-movers",
+      "bookingId": "booking-alex-move-survey",
+      "workerHandleId": "handle-sam",
+      "emergencyContactPersonId": "person-morgan-lee",
+      "emergencyContactHandleId": "handle-morgan-lee",
+      "dueAt": "2026-10-27T15:20:00Z",
+      "dueZone": "America/New_York",
+      "address": "12 Example Street",
+      "addressForPersonId": "person-alex",
+      "clockRowId": "clock-timer-sam-survey",
+      "state": "running",
+      "version": 1
+    }
+  ]
+}

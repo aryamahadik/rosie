@@ -1,0 +1,17 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-session.json"],
+    "after": [],
+    "now": "2026-11-25T08:21:00Z",
+    "note": "Sam's Oct 26 session (K-22 v1 seed-session.json: session-sam-oct26) read at its own expires_at, 2026-11-25T08:21:00Z: session_for_token wants expires_at after the time, so a session is no longer live at its expiry, and the answer is noSession (README default 104)."
+  },
+  "request": {
+    "tokenSha256": "bcc9e6bc57d87c2e4bce0e6261d51dfa66d346abf24ef81de1bb8a4acd286127",
+    "at": "2026-11-25T08:21:00Z"
+  },
+  "outcome": {
+    "standing": "noSession"
+  }
+}

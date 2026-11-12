@@ -1,0 +1,17 @@
+{
+  "call": "readStoppedFlag",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "Alex's stopped flag, as read-stopped-flag-alex-stopped reads it, asked by his number in place of his actor's handle id."
+  },
+  "request": {
+    "number": "+15555550101"
+  },
+  "outcome": {
+    "handleId": "handle-alex",
+    "stopped": true,
+    "phoneVersion": 4
+  }
+}

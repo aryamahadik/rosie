@@ -1975,6 +1975,262 @@
       "expect": "refuse",
       "shows": "A first text's party with no business answered with the zone UTC: no row stores a zone for a party with no business, so the answer gives none and UTC stays the consumer's reading (put right, it is read-turn-party-first-text's outcome)",
       "source": "K-05 v1.3 default 52 (what K-04 stores is returned as stored); K-08 v1 eventLogRow.zone ('null means UTC'); K-05 v1.11 item 52, default 101"
+    },
+    {
+      "file": "read-tester-standing-check-tester.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Staging's check tester: its token's sha256 finds its live session, whose person holds a live team row as the test console's member, so the page may be used: tester, and nothing more",
+      "source": "QUESTIONS.md CQ-214 (a); K-22 v1 session_for_token, rule 5; K-36 v1 team_page_recipients; K-21 v1 'Staging only', 'The team console', defaults 2 and 14; K-05 v1.12 item 53, defaults 103 to 105"
+    },
+    {
+      "file": "read-tester-standing-removed-member.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "The check tester after its team row was removed: the session is live but its person holds no live team row, so notTester",
+      "source": "K-36 v1 README ('a member leaves the list by removed_at'), team_page_recipients_one_live_per_person; K-05 v1.12 item 53, default 103"
+    },
+    {
+      "file": "read-tester-standing-not-tester.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's live portal session: his person holds no team row, so notTester, and the answer names neither the session nor Sam",
+      "source": "K-22 v1 seed-session.json, session_for_token; K-21 v1 notTester; K-05 v1.12 item 53, default 103"
+    },
+    {
+      "file": "read-tester-standing-signed-out.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's signed-out session, before its expiry: an ended session is no live session, so noSession, as an unknown token answers",
+      "source": "K-22 v1 seed-session.json, session_for_token (ended_at null); RULES 8.7; K-21 v1 signInNeeded; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-tester-standing-expired.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's session read at its own expires_at: no longer live, so noSession",
+      "source": "K-22 v1 seed-session.json, session_for_token (expires_at after at); K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-tester-standing-unknown-token.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "A token hash no session holds: noSession, alike with an ended or expired session",
+      "source": "K-22 v1 session_for_token ('no row otherwise'); K-21 v1 signInNeeded; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-token-not-hash.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "refuse",
+      "shows": "A standing asked with the session token itself in place of its sha256: a token is a key and never leaves the page entry (put right, with the hash in its place, it is read-tester-standing-check-tester)",
+      "source": "K-22 v1 sessions_token_hash_form; K-21 v1 'Never in a span or a log'; BP rule 7; K-05 v1.12 item 53"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-names-person.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.response",
+      "expect": "refuse",
+      "shows": "Sam's notTester answered with his person: the answer is the standing alone, so a caller who is no tester learns nothing (put right, it is read-tester-standing-not-tester's outcome)",
+      "source": "K-21 v1 notTester; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-roster-phone-tp-01.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "Test owner 1's roster phone by the handle the roster's list names: the number the seed wrote, +15555550100, and no email on file",
+      "source": "T-1148 db/seeds/skeleton.ts TEST_OWNER_1; K-04 v1 seed-person-roles.json, handles, person_handles; K-21 v1 default 6; K-05 v1.12 item 54, defaults 106 and 107"
+    },
+    {
+      "file": "read-roster-phone-email-on-file.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "Sam's phone after S1-10 gave him one email handle: the phone handle's one person's one email is the email on file",
+      "source": "K-22 v1 seed-owner-id-upload.json, accounts_email_fk; S1-10; K-21 v1 testPhoneParts; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "read-roster-phone-unknown.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "tp-02 before seed:staging: no row holds its handle, so none, and the page answers notTestPhone with nothing signed",
+      "source": "T-202 db/seeds/staging-core.ts; K-21 v1 notTestPhone; K-05 v1.10 default 95's rule; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "read-roster-phone-not-a-phone.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "A roster entry naming an email handle: no phone the Linq double can sign as, so none",
+      "source": "K-04 v1 handles.kind; adapters/src/linq/double-webhooks/webhooks.ts; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "invalid/refuse-roster-phone-by-roster-id.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "refuse",
+      "shows": "A roster phone asked by its roster id: the roster's list is staging's config and the read takes the K-04 handle id it gives (put right, it is read-roster-phone-tp-01)",
+      "source": "K-21 v1 default 6; the D-017 path audit's R5; K-05 v1.12 item 54, default 106"
+    },
+    {
+      "file": "invalid/refuse-roster-phone-names-person.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.response",
+      "expect": "refuse",
+      "shows": "Test owner 1's roster phone answered with its person: the answer is the number and the email alone (put right, it is read-roster-phone-tp-01's outcome)",
+      "source": "actions/src/page-calls/staging/test-phone/types.ts RosterPhone; K-21 v1 rule 9 ('never who holds it'); K-05 v1.12 item 54"
+    },
+    {
+      "file": "read-phone-state-no-row.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "tp-01 before its first text: no phone row and so no chat link, which the binding shows as chat closed and not stopped",
+      "source": "T-1148 db/seeds/skeleton.ts; K-05 v1.7 item 46; K-29 v1 chat_links_phone_fk; PhoneState.chatOpen; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-chat-open.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Sam's phone with its chat open and never stopped: open, not stopped, no STOP in force, no chat link",
+      "source": "K-04 v1 seed-phone-chat-open.json, phones; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-stopped.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Alex's phone after his STOP: stopped, its chat closed, and the STOP in force at its stop_at",
+      "source": "commit-alex-stop.json; K-04 v1 phones_stop_closes_chat, phones_stopped_has_time; RULES 7.2; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-started-again.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Alex's phone after his own START: not stopped, so no STOP in force, though the row keeps the last STOP's time",
+      "source": "commit-alex-start.json; DL-193; PhoneState.stoppedAt ('When the STOP in force came, or null'); K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-chat-link.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Pat's phone with an unanswered staff invite: the chat not open, and the link's short code and ready text as stored",
+      "source": "K-29 v1 seed-chat-link.json, chat_links; MC C9; RULES 4.1b; K-21 v1 testPhoneParts; K-05 v1.12 item 55, default 109"
+    },
+    {
+      "file": "invalid/refuse-phone-state-stopped-at-after-start.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "Alex's phone after START answered with the last STOP's time as the STOP in force: a phone that is not stopped has none (put right, it is read-phone-state-started-again's outcome)",
+      "source": "DL-193; PhoneState.stoppedAt; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "invalid/refuse-phone-state-link-without-phone.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "A number with no phone row answered with a chat link: no link can name a number with no row (put right, it is read-phone-state-no-row's outcome)",
+      "source": "K-29 v1 chat_links_phone_fk; K-05 v1.12 item 55"
+    },
+    {
+      "file": "invalid/refuse-phone-state-answers-number.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "Sam's phone state answered with its number: the request holds the number and the answer names none (put right, it is read-phone-state-chat-open's outcome)",
+      "source": "BP rule 7; K-21 v1 ('in no answer but as its last four digits'); K-05 v1.12 item 55"
+    },
+    {
+      "file": "read-live-timers-sam.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "accept",
+      "shows": "Sam's running safety timer on Alex's move survey: the thirteen columns the actor's copy keeps, the address sealed as stored",
+      "source": "K-34 v1 seed-safety-timer.json, safety_timers, safety_timers_worker_live_idx; arch 11 line 566; runtime/src/actor/copies/types.ts SafetyTimerRow; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "read-live-timers-none.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "accept",
+      "shows": "The contact's own actor, the pro of no timer: an empty list, an answer",
+      "source": "K-34 v1 seed-safety-timer.json; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "invalid/refuse-live-timers-address-opened.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.response",
+      "expect": "refuse",
+      "shows": "Sam's timer answered with the job's address in plain words: the address leaves PostgreSQL only sealed, as stored (put right, it is read-live-timers-sam's outcome)",
+      "source": "K-34 v1 rule 6 (safety_timers.address sealed); arch 09 line 492; RULES 4.5; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "invalid/refuse-live-timers-safe-listed.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.response",
+      "expect": "refuse",
+      "shows": "Sam's timer answered as safe: a timer closed by SAFE is never live, so never answered (put right, it is read-live-timers-sam's outcome)",
+      "source": "K-34 v1 safety_timers_state_known, safety_timers_worker_live_idx; B8-86; K-05 v1.12 item 56"
+    },
+    {
+      "file": "invalid/refuse-live-timers-business-scope.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "refuse",
+      "shows": "Sam's live timers asked under one business's scope: a scoped read would hide another business's timers and empty the copy of a live one (put right, with the handle alone, it is read-live-timers-sam)",
+      "source": "K-04 v1 rule 4; K-34 v1 safety_timers_runtime; arch 11 line 566; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "read-stopped-flag-alex-stopped.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "Alex's stopped flag after his STOP's commit lost its answer: stopped, at version 4, read fresh",
+      "source": "commit-alex-stop.json; T-1206; DL-427; runtime/src/actor/copies/types.ts StoppedFlagSource; K-05 v1.12 item 57, default 111"
+    },
+    {
+      "file": "read-stopped-flag-alex-started.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "Alex's stopped flag after his own START: not stopped, at version 5",
+      "source": "commit-alex-start.json; RULES 7.5; K-05 v1.12 item 57"
+    },
+    {
+      "file": "read-stopped-flag-no-phone.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "A handle with no phone row: notFound, table phones, so the copy keeps the stricter reading, and it is never answered as not stopped",
+      "source": "runtime/src/actor/copies/copies.ts readStoppedAgain; K-05 v1.10 default 95's rule; K-05 v1.12 item 57, default 111"
+    },
+    {
+      "file": "invalid/refuse-stopped-flag-no-version.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.response",
+      "expect": "refuse",
+      "shows": "Alex's stopped flag answered with no version: the copy orders its writes by the row's version, so it never goes without one (put right, it is read-stopped-flag-alex-stopped's outcome)",
+      "source": "runtime/src/actor/copies/copies.ts stoppedFlagOf, keepsCopy; K-04 v1 rule 2; K-05 v1.12 item 57"
+    },
+    {
+      "file": "invalid/refuse-stopped-flag-by-number.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "refuse",
+      "shows": "A stopped flag asked by the number in place of the actor's handle id: the actor names its handle, and no number travels in the request (put right, it is read-stopped-flag-alex-stopped)",
+      "source": "runtime/src/actor/copies/types.ts StoppedFlagSource ({ handleId }); K-05 v1.7 item 46 (no number in a request); K-05 v1.12 item 57"
     }
   ]
 }
