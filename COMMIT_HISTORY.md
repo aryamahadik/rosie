@@ -2,9 +2,173 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 438, [`a363a26`](https://github.com/aryamahadik/rosie/commit/a363a26), 2026-11-12 04:07:56 UTC.
+- **Through:** commit 444, [`69d322c`](https://github.com/aryamahadik/rosie/commit/69d322c), 2026-11-12 07:30:01 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 444. docs: COMMIT\_HISTORY.md through commit 438 (a363a26, \#446) (\#449)
+
+- **Commit:** [`69d322c`](https://github.com/aryamahadik/rosie/commit/69d322c), by Arya Mahadik, 2026-11-12 07:30:01 UTC
+- **Pull request:** [#449](https://github.com/aryamahadik/rosie/pull/449) from `task/commit-history-39`, merged 2026-11-12 07:30:02 UTC. It squashed 1 branch commit:
+  - `ae10a0a` docs: COMMIT\_HISTORY.md through commit 438 (a363a26, \#446)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 443. T-1248: K-05 v1.12, the test-phone page's reads and the actor's copy deps (\#452)
+
+- **Commit:** [`780e714`](https://github.com/aryamahadik/rosie/commit/780e714), by Arya Mahadik, 2026-11-12 07:29:57 UTC
+- **Pull request:** [#452](https://github.com/aryamahadik/rosie/pull/452) from `task/T-1248`, merged 2026-11-12 07:29:58 UTC. It squashed 2 branch commits:
+  - `8609ead` T-1248: K-05 v1.12 freezes the test-phone page's reads (readTesterSta…
+  - `663c548` T-1248: README v1.12 names only side-list components in Producers and…
+- **Files changed:** 36 (+2548 −7), by folder:
+  - `contracts/data-access/` README.md +95 −6, data-access.v1.12.schema.json +1643 −0, frozen.json +15 −1
+  - `contracts/data-access/fixtures/` index.json +256 −0, read-live-timers-none.json +17 −0, read-live-timers-sam.json +33 −0, read-phone-state-chat-link.json +24 −0, read-phone-state-chat-open.json +20 −0, read-phone-state-no-row.json +16 −0, read-phone-state-started-again.json +20 −0, read-phone-state-stopped.json +20 −0, read-roster-phone-email-on-file.json +20 −0, read-roster-phone-not-a-phone.json +17 −0, read-roster-phone-tp-01.json +19 −0, read-roster-phone-unknown.json +16 −0, read-stopped-flag-alex-started.json +17 −0, read-stopped-flag-alex-stopped.json +17 −0, read-stopped-flag-no-phone.json +17 −0, read-tester-standing-check-tester.json +16 −0, read-tester-standing-expired.json +17 −0, read-tester-standing-not-tester.json +17 −0, read-tester-standing-removed-member.json +16 −0, read-tester-standing-signed-out.json +17 −0, read-tester-standing-unknown-token.json +17 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-live-timers-address-opened.json +20 −0, refuse-live-timers-business-scope.json +34 −0, refuse-live-timers-safe-listed.json +20 −0, refuse-phone-state-answers-number.json +9 −0, refuse-phone-state-link-without-phone.json +7 −0, refuse-phone-state-stopped-at-after-start.json +8 −0, refuse-roster-phone-by-roster-id.json +19 −0, refuse-roster-phone-names-person.json +8 −0, refuse-stopped-flag-by-number.json +17 −0, refuse-stopped-flag-no-version.json +4 −0, refuse-tester-standing-names-person.json +4 −0, refuse-tester-standing-token-not-hash.json +16 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1248: K-05 v1.12 freezes the test-phone page's reads (readTesterStanding, readRosterPhone, readPhoneState) and the actor's copy sources (readLiveTimers, readStoppedFlag); the roster testers' source with no team row is open gap 62
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1248: README v1.12 names only side-list components in Producers and consumers (C-046, C-152), the page's wiring as C-040 and C-205, and K-21's defaults by name
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 442. T-1265: design record ADR-017, how long the handle actor keeps what it stores (\#451)
+
+- **Commit:** [`20015ec`](https://github.com/aryamahadik/rosie/commit/20015ec), by Arya Mahadik, 2026-11-12 07:29:53 UTC
+- **Pull request:** [#451](https://github.com/aryamahadik/rosie/pull/451) from `task/T-1265`, merged 2026-11-12 07:29:54 UTC. It squashed 4 branch commits:
+  - `1b76467` T-1265: design record ADR-017, how long the handle actor keeps what i…
+  - `e4e29a9` T-1265: ADR-017's forget never waits on a text kept back for good (un…
+  - `166ad98` Merge branch 'main' into task/T-1265
+  - `fc60969` T-1265: ADR-017 round 2 (DL-536): a re-read row counts only for a tex…
+- **Files changed:** 2 (+294 −0), by folder:
+  - `docs/adr/` 0017-actor-storage-retention.md +293 −0, README.md +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1265: design record ADR-017, how long the handle actor keeps what it stores: every table's rule; a text's rows go once it is settled (its turn over, its safety work over, the outage path and the return queue done with it), a 24-hour tombstone of its id kept; ADR-015's closed note kept while its danger is pending; erasure by the handle's key; forget for the 45-day delete with its survivors; five runtime cards (R1 to R5) and what a test can measure; its README row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1265: ADR-017's forget never waits on a text kept back for good (unwired, or unresolved with no read to come); a danger pending for good goes to Rosie's team near the job's deadline (RULES 4.10's one extension); R4's card and section 7 say so
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1265: ADR-017 round 2 (DL-536): a re-read row counts only for a text waiting() still lists, and the sweep drops one left behind (R1 test); a poll's option words kept plain and unscrubbed until CQ-58's cards T-1296 and T-1297, and a password sealed (open point 8); forget's textsOpen fails closed on a key store that throws or answers no usable key (section 7, R4); readOut covers landing; accept sets the retention entry; the sweep arms after clocks.onAlarm; the scan leaves out sqlite_ and _cf_ names, sqlite_sequence survives forget; any notNow near the deadline goes to Rosie's team; open point 5's mitigations; README row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 441. T-1256: branch previews are uploaded with no Hyperdrive binding (\#448)
+
+- **Commit:** [`69eb89c`](https://github.com/aryamahadik/rosie/commit/69eb89c), by Arya Mahadik, 2026-11-12 07:29:49 UTC
+- **Pull request:** [#448](https://github.com/aryamahadik/rosie/pull/448) from `task/T-1256`, merged 2026-11-12 07:29:50 UTC. It squashed 1 branch commit:
+  - `a5acfa9` T-1256: branch previews are uploaded with no Hyperdrive binding
+- **Files changed:** 3 (+411 −11), by folder:
+  - `infra/ci/` README.md +2 −0, deploy-preview.test.mjs +275 −4
+  - `infra/scripts/` deploy-preview.sh +134 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+deploy-preview.sh writes the upload's config in place in its temporary
+worktree: the worktree's wrangler.jsonc without env.staging's hyperdrive
+list, everything else as it was, so cf.sh checks it as it checks any build
+folder's. Read back, a config that still names a Hyperdrive binding (a key
+or text holding hyperdrive, or a removed binding's name, at the top level or
+in env.staging) stops the preview before anything is migrated or uploaded,
+printing paths and never values. deploy-preview.test.mjs proves it behind
+the stand-in wrangler, which now keeps a copy of the config it is given.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 440. T-1263: a keyword text never waits for a missing safety result, and a STOP never waits for the decided part (ADR-015 card C) (\#447)
+
+- **Commit:** [`c32aeb7`](https://github.com/aryamahadik/rosie/commit/c32aeb7), by Arya Mahadik, 2026-11-12 07:29:45 UTC
+- **Pull request:** [#447](https://github.com/aryamahadik/rosie/pull/447) from `task/T-1263`, merged 2026-11-12 07:29:46 UTC. It squashed 3 branch commits:
+  - `f51e6a4` T-1263: keyword texts never wait for a missing safety result, and a S…
+  - `d925ccc` Merge branch 'main' into task/T-1263
+  - `283cfe4` T-1263: a STOP whose decided request the gate refuses on its tries co…
+- **Files changed:** 4 (+723 −33), by folder:
+  - `runtime/src/outage/ai/` outage.worker.test.ts +11 −7
+  - `runtime/src/turn/` lease-turn.worker.test.ts +208 −1, turn.ts +58 −25, turn.worker.test.ts +446 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1263: keyword texts never wait for a missing safety result, and a STOP never waits for the decided part (ADR-015 card C; DL-508)
+
+runtime/src/turn/turn.ts, main's lines 423-431 inside 411-435: a missing result ends the run (noSafetyResult) only for a turn with no keyword texts. When the targets read, the frontier, decide or the re-read fails, a turn whose keyword texts hold a STOP, or which misses a result, commits its keyword texts core-only through keywordTurn on that run. Keyword texts that are START or HELP only, with every result present, keep the lease's retry.
+
+Tests: 7 in runtime/src/turn/turn.worker.test.ts and 2 through the real lease in runtime/src/turn/lease-turn.worker.test.ts. Open: T-271's test at runtime/src/outage/ai/outage.worker.test.ts line 518 pins the old shape (a STOP waiting through the models-down retries) and fails; it is outside this card's paths.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1263: a STOP whose decided request the gate refuses on its tries commits core-only on that run; T-271's outage test states DL-508; the turn's words describe the rule (DL-521)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 439. T-1299: the scrub's speed check reads the median of 7 rounds (the scrub's work counted linear) (\#453)
+
+- **Commit:** [`9d05372`](https://github.com/aryamahadik/rosie/commit/9d05372), by Arya Mahadik, 2026-11-12 07:29:41 UTC
+- **Pull request:** [#453](https://github.com/aryamahadik/rosie/pull/453) from `task/T-1299`, merged 2026-11-12 07:29:42 UTC. It squashed 2 branch commits:
+  - `70bec2e` T-1299: the scrub's speed check reads the median of 7 rounds of its f…
+  - `a4f7923` T-1299: the speed check's median-of-7 note carries this run's measure…
+- **Files changed:** 1 (+45 −17), by folder:
+  - `runtime/src/scrub/` scrub.test.ts +45 −17
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1299: the scrub's speed check reads the median of 7 rounds of its fastest-run ratio (limit 8 and the quadratic stand-in kept); the scrub's work counted linear, the 20-digit shape's excess is page faults at 40 000 characters
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1299: the speed check's median-of-7 note carries this run's measures: the scrub's work counted linear (x3.98 for x3.98), the 20-digit shape's excess its 40 000 character run's large-object pages (110 page faults a run, none at 10 000), single rounds up to 6.22 idle and 6.10 beside npm test, the median 4.54 to 5.68 and 4.56 to 4.81, the quadratic stand-in 14.13 to 16.82
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 438. docs: COMMIT\_HISTORY.md through commit 436 (4062130, \#444) (\#446)
 
