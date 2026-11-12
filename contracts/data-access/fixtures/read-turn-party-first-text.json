@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-sealing-key.json"],
+    "after": ["handle-key-first-sight.json"],
+    "now": "2026-11-08T14:00:03Z",
+    "note": "A number Rosie has never seen texts for the first time: the gateway's handleSealingKey wrote its handle, a person with no name yet and their link at receipt (after: handle-key-first-sight.json), so the turn's first run finds the handle with its one person, who holds no role and owns no company. No row names a business, so the turn runs with no business and no zone, which the consumer reads as UTC, and nothing on file is used (RULES 6.3: 'Ask, see prices and times, book a new visit: anyone, at any door'; RULES 6.5; item 52, defaults 96 to 98 and 101). handle-gw-0108 and person-gw-0108 are that exchange's example ids."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550108" }
+  },
+  "outcome": {
+    "handleId": "handle-gw-0108",
+    "businessId": null,
+    "personId": "person-gw-0108",
+    "zone": null
+  }
+}

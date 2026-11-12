@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-26T13:15:03Z",
+    "note": "Sam as K-04's seed-person-roles.json holds him: three live owner roles, at Lee's Barbershop, the yoga studio and the movers (role-sam-barber, role-sam-yoga, role-sam-movers), and no company. No row says which of the three his texts are about: the master reads that from the message and asks when two fit (S13-27 rule 29: 'Read the role from what the message is about. When two roles fit, ask which one'; arch 02 line 115), and S11-15 asks 'Pause which business?'. So none is picked and none is dropped: businessUndecided, severalBusinesses, with his handle and his one person (item 52, defaults 98, 100 and 102), and no turn runs on a business picked for him (open gaps 56 and 57)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" }
+  },
+  "outcome": {
+    "error": "businessUndecided",
+    "reason": "severalBusinesses",
+    "handleId": "handle-sam",
+    "personId": "person-sam"
+  }
+}
