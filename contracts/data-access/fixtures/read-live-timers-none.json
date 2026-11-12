@@ -1,0 +1,17 @@
+{
+  "call": "readLiveTimers",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-safety-timer.json"],
+    "after": [],
+    "now": "2026-10-27T14:00:00Z",
+    "note": "Morgan Lee's own actor (K-34's seed-safety-timer.json: the contact of Sam's timer, never its pro): no timer names handle-morgan-lee as its worker, so an empty list, an answer, and the copy holds none (README item 56, default 110)."
+  },
+  "request": {
+    "handleId": "handle-morgan-lee"
+  },
+  "outcome": {
+    "handleId": "handle-morgan-lee",
+    "timers": []
+  }
+}

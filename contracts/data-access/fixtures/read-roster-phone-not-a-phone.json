@@ -1,0 +1,17 @@
+{
+  "call": "readRosterPhone",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-owner-id-upload.json"],
+    "after": [],
+    "now": "2026-10-19T14:30:00Z",
+    "note": "A roster entry put wrong, naming Sam's email handle (K-22's seed-owner-id-upload.json: handle-sam-email): an email handle is no phone the Linq double can sign as, so none, and the page answers notTestPhone (README default 107)."
+  },
+  "request": {
+    "handleId": "handle-sam-email"
+  },
+  "outcome": {
+    "handleId": "handle-sam-email",
+    "phone": null
+  }
+}

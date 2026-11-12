@@ -1,0 +1,17 @@
+{
+  "call": "readStoppedFlag",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-start.json"],
+    "now": "2026-11-07T15:20:05Z",
+    "note": "The same re-read after Alex's own START committed with its answer lost (commit-alex-start: not stopped, version 5): the copy takes the newer version, so texts to him are on again in the copy as in the row (README item 57)."
+  },
+  "request": {
+    "handleId": "handle-alex"
+  },
+  "outcome": {
+    "handleId": "handle-alex",
+    "stopped": false,
+    "phoneVersion": 5
+  }
+}

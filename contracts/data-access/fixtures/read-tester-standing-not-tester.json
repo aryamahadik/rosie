@@ -1,0 +1,17 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-session.json"],
+    "after": [],
+    "now": "2026-10-26T09:00:00Z",
+    "note": "Sam's live portal session of Oct 26 (K-22 v1 seed-session.json: session-sam-oct26, not ended, expiring Nov 25), read at 9:00am UTC that day: session_for_token finds it and Sam, who holds no K-36 team row (no seed names one), so notTester. An owner's session is no tester's, and the answer names neither the session nor Sam (README default 103)."
+  },
+  "request": {
+    "tokenSha256": "bcc9e6bc57d87c2e4bce0e6261d51dfa66d346abf24ef81de1bb8a4acd286127",
+    "at": "2026-10-26T09:00:00Z"
+  },
+  "outcome": {
+    "standing": "notTester"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "call": "readStoppedFlag",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:00Z",
+    "note": "A re-read for handle-sam where K-04 holds no phone row for it (K-04's seed-person-roles.json, as before tp-01's first text): notFound, table phones, which the copy reads as a failed re-read, keeping the stricter reading; never answered as not stopped (README item 57, default 111)."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "phones",
+    "rowId": "handle-sam"
+  }
+}

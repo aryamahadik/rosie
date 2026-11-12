@@ -1,0 +1,20 @@
+{
+  "call": "readPhoneState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "Alex's phone four seconds after his STOP committed (commit-alex-stop: stopped, the chat closed, stop_at 15:06:36Z, version 4): stopped, its chat closed, and the STOP in force came at 15:06:36Z (README item 55, default 108). No chat link names the number."
+  },
+  "request": {
+    "number": "+15555550101"
+  },
+  "outcome": {
+    "phone": {
+      "chatOpen": false,
+      "stopped": true,
+      "stoppedAt": "2026-11-07T15:06:36Z"
+    },
+    "chatLink": null
+  }
+}

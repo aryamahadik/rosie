@@ -1,0 +1,34 @@
+{
+  "call": "readLiveTimers",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["safety-incidents/seed-safety-timer.json"],
+    "after": [],
+    "now": "2026-10-27T14:00:00Z",
+    "note": "Sam's live timers, as read-live-timers-sam reads them, asked under one business's scope beside the handle."
+  },
+  "request": {
+    "handleId": "handle-sam",
+    "businessId": "biz-movers"
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "timers": [
+      {
+        "id": "timer-sam-survey",
+        "businessId": "biz-movers",
+        "bookingId": "booking-alex-move-survey",
+        "workerHandleId": "handle-sam",
+        "emergencyContactPersonId": "person-morgan-lee",
+        "emergencyContactHandleId": "handle-morgan-lee",
+        "dueAt": "2026-10-27T15:20:00Z",
+        "dueZone": "America/New_York",
+        "address": "\\x6b33342d736565642d7365616c65642d616464726573732d6e6f742d7265616c",
+        "addressForPersonId": "person-alex",
+        "clockRowId": "clock-timer-sam-survey",
+        "state": "running",
+        "version": 1
+      }
+    ]
+  }
+}
