@@ -1,0 +1,57 @@
+{
+  "call": "sendSignInCode",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json"],
+    "now": "2026-11-02T13:00:01Z",
+    "note": "After the page answered started, the page call sends Sam's code. The call reads the attempt's contact hash, takes K-22 rule 9's lock on it, locks the attempt (person-sam, no code yet, in time) and reads his account's proven email and its handle, handle-sam-email (K-22 seed-owner-id-upload.json). proof_code_limits for that handle and sign_in since 24 hours before now: no code went to it in that window and none of its sign-in codes is paused. In one transaction: the proof_codes row (sign_in, person-sam, no business, handle-sam-email, email, the code's keyed hash, sent_at now, expires_at 10 minutes on); the email row with no turn (job id the attempt's id, recipient handle-sam-email and person-sam, no business, booking or question, email, quick_reply, email_purpose code, not_after the code's expires_at, versions_read empty, the active bundle, the page call's trace), inserted planned and then given its plan and final parts and moved to checked; the three entries of README item 59; and the attempt's proof_code_id. The code 482913 (S11-52's example) is only in the final parts' words; its hash is a stand-in."
+  },
+  "request": {
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1300",
+    "bundle": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "code": {
+      "id": "code-sam-sign-in-nov02",
+      "codeHash": "f3e4d5c6b7a8998a7b6c5d4e3f201102f3e4d5c6b7a8998a7b6c5d4e3f201102",
+      "hashKeyName": "PROOF_CODE_HASH_KEY"
+    },
+    "emailRowId": "out-sam-sign-in-nov02-code",
+    "plan": {
+      "row": "out-sam-sign-in-nov02-code",
+      "channel": "email",
+      "copyOf": null,
+      "plan": { "formats": ["text"], "lines": [], "question": null, "pageType": null, "threadReplyTo": null }
+    },
+    "finalParts": {
+      "row": "out-sam-sign-in-nov02-code",
+      "channel": "email",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Code 482913: type it on the sign-in page. It works for 10 minutes.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "sent",
+    "proofCodeId": "code-sam-sign-in-nov02",
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "commitSeq": 1,
+    "version": 2,
+    "expiresAt": "2026-11-02T13:10:01Z",
+    "entryIds": [
+      "log-out-sam-sign-in-nov02-code-created",
+      "log-out-sam-sign-in-nov02-code-planned",
+      "log-code-sam-sign-in-nov02-sent"
+    ],
+    "repeated": false
+  }
+}

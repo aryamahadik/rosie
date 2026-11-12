@@ -1,0 +1,9 @@
+{
+  "outcome": "signedIn",
+  "signInAttemptId": "sign-in-sam-nov02-1300",
+  "personId": null,
+  "sessionId": "session-sam-nov02",
+  "sessionExpiresAt": "2026-12-02T13:01:30Z",
+  "proofCodeId": "code-sam-sign-in-nov02",
+  "repeated": false
+}

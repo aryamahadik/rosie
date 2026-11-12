@@ -1,0 +1,25 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json"],
+    "now": "2026-11-02T15:00:00Z",
+    "note": "Beside start-sign-in-sam's attempt (13:00:00Z), the database side writes four more attempts of Sam's contact hash, started at 13:30:00Z, 14:00:00Z, 14:30:00Z and 14:45:00Z (ids sign-in-sam-nov02-1330, -1400, -1430 and -1445; attempt ids attempt-sam-signin-nov02-2 to -5; request hashes of the hash form, each its own; device and contact as Sam's; person person-sam, owner_or_admin true; no code; expires_at 10 minutes after each; no tries, no last check, version 1). A sixth start at 15:00:00Z: rule 3 counts five whose started_at is after 24 hours before now, so the start answers paused until the earliest of them plus 24 hours, and writes nothing, so the window never holds more than five (K-22 rule 9; ADR-016 rule 3). It reads no account: a contact no account holds, started as often, answers the same."
+  },
+  "request": {
+    "id": "sign-in-sam-nov02-1500",
+    "attemptId": "attempt-sam-signin-nov02-6",
+    "requestSha256": "a7b8c9daebf0a1b2c3d4e5f607182932a7b8c9daebf0a1b2c3d4e5f607182932",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "paused",
+    "until": "2026-11-03T13:00:00Z",
+    "by": "dayCap"
+  }
+}

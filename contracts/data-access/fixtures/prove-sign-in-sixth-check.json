@@ -1,0 +1,27 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-10-28T15:08:00Z",
+    "note": "The sixth check of the attempt someone started at Sam's email (K-22 seed-sign-in-attempt.json: sign-in-sam-oct28-1505, five wrong tries, paused until 15:22:10Z; K-21 sign-in-wrong-five.json), from its own browser, whatever its cookie says. The binding answers paused, so the call answers paused until the attempt's paused_until, recorded as paused with no try counted, before check_proof_code: the server refuses a sixth check (STATE note 74). prove-sign-in-sixth-check-no-account answers its twin with no account the same."
+  },
+  "request": {
+    "attemptId": "attempt-sam-signin-3",
+    "deviceSha256": "d2e3f405162738495a6b7c8d9eaf0b1cd2e3f405162738495a6b7c8d9eaf0b1c",
+    "requestId": "req-portal-signin-3-try6",
+    "typedHash": "0b1c2d3e4f5061728394a5b6c7d8e9f00b1c2d3e4f5061728394a5b6c7d8e9f0",
+    "session": {
+      "id": "session-unknown-oct28-try6",
+      "tokenSha256": "b7c8d9eafb0c1d2e3f405162738495a6b7c8d9eafb0c1d2e3f405162738495a6"
+    }
+  },
+  "outcome": {
+    "outcome": "paused",
+    "signInAttemptId": "sign-in-sam-oct28-1505",
+    "until": "2026-10-28T15:22:10Z",
+    "proofCodeId": "code-sam-sign-in-oct28-email",
+    "repeated": false
+  }
+}
