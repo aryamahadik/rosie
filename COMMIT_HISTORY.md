@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 482, [`9a0c7fa`](https://github.com/aryamahadik/rosie/commit/9a0c7fa), 2026-11-12 20:03:00 UTC.
+- **Through:** commit 484, [`09341bc`](https://github.com/aryamahadik/rosie/commit/09341bc), 2026-11-12 20:22:12 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 484. docs: COMMIT\_HISTORY.md through commit 482 (9a0c7fa, \#492) (\#494)
+
+- **Commit:** [`09341bc`](https://github.com/aryamahadik/rosie/commit/09341bc), by Arya Mahadik, 2026-11-12 20:22:12 UTC
+- **Pull request:** [#494](https://github.com/aryamahadik/rosie/pull/494) from `task/commit-history-55`, merged 2026-11-12 20:22:12 UTC. It squashed 1 branch commit:
+  - `6826f1e` docs: COMMIT\_HISTORY.md through commit 482 (9a0c7fa, \#492)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 483. T-1319: the corrections parity file is split by trades: T-1116's and T-1132's sweeps run over every 8th trade id (shardOf) in each of parity.shard-9 to 15 and 17, every test and assertion kept (487 across the eight; has 243 trades stays in parity.shard-9), names chosen by Vitest's sha1 order to spread 3, 3 and 2 over the three parity shard jobs (16 skipped); parity-placement.test.mjs pins corrections 1 to 15 and 17 (\#493)
+
+- **Commit:** [`11aeb94`](https://github.com/aryamahadik/rosie/commit/11aeb94), by Arya Mahadik, 2026-11-12 20:22:08 UTC
+- **Pull request:** [#493](https://github.com/aryamahadik/rosie/pull/493) from `task/T-1319`, merged 2026-11-12 20:22:08 UTC. It squashed 1 branch commit:
+  - `db7b19e` T-1319: the corrections parity file is split by trades: T-1116's and …
+- **Files changed:** 9 (+2875 −12), by folder:
+  - `compiler/src/corrections/` parity.shard-10.test.ts +407 −0, parity.shard-11.test.ts +407 −0, parity.shard-12.test.ts +407 −0, parity.shard-13.test.ts +407 −0, parity.shard-14.test.ts +407 −0, parity.shard-15.test.ts +407 −0, parity.shard-17.test.ts +407 −0, parity.shard-9.test.ts +20 −6
+  - `infra/ci/` parity-placement.test.mjs +6 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 482. docs: COMMIT\_HISTORY.md through commit 480 (b8882e0, \#489) (\#492)
 
