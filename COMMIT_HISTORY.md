@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 471, [`f770b0a`](https://github.com/aryamahadik/rosie/commit/f770b0a), 2026-11-12 14:47:13 UTC.
+- **Through:** commit 474, [`9f4c5e2`](https://github.com/aryamahadik/rosie/commit/9f4c5e2), 2026-11-12 16:06:20 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 474. docs: COMMIT\_HISTORY.md through commit 471 (f770b0a, \#480) (\#483)
+
+- **Commit:** [`9f4c5e2`](https://github.com/aryamahadik/rosie/commit/9f4c5e2), by Arya Mahadik, 2026-11-12 16:06:20 UTC
+- **Pull request:** [#483](https://github.com/aryamahadik/rosie/pull/483) from `task/commit-history-51`, merged 2026-11-12 16:06:21 UTC. It squashed 1 branch commit:
+  - `126201c` docs: COMMIT\_HISTORY.md through commit 471 (f770b0a, \#480)
+- **Files changed:** 1 (+147 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +147 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 473. T-1294: the AI-down words say a STOP commits at once and waits only for the core; the outage test's gate double answers a core-only request as K-09 does; a test for the STOP batch whose core-only commit is refused while the models are down; a core-only repeat's gate span says repeated (\#482)
+
+- **Commit:** [`6c96621`](https://github.com/aryamahadik/rosie/commit/6c96621), by Arya Mahadik, 2026-11-12 16:06:16 UTC
+- **Pull request:** [#482](https://github.com/aryamahadik/rosie/pull/482) from `task/T-1294`, merged 2026-11-12 16:06:17 UTC. It squashed 1 branch commit:
+  - `4331548` T-1294: the AI-down words say a STOP commits at once and waits only f…
+- **Files changed:** 4 (+240 −23), by folder:
+  - `runtime/src/outage/ai/` outage.ts +10 −4, outage.worker.test.ts +142 −15
+  - `runtime/src/turn/` turn.ts +19 −4, turn.worker.test.ts +69 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 472. T-1316: the chat-link spike's line is a fiction-range number (+1 555 555-0123) in build.mjs, its test and index.html, generated again with the build script and formatted; the comment and the page no longer call it Rosfield's line; the test scans every file of the spike for a phone number outside the fiction range (DL-542) (\#481)
+
+- **Commit:** [`aa402ff`](https://github.com/aryamahadik/rosie/commit/aa402ff), by Arya Mahadik, 2026-11-12 16:06:12 UTC
+- **Pull request:** [#481](https://github.com/aryamahadik/rosie/pull/481) from `task/T-1316`, merged 2026-11-12 16:06:12 UTC. It squashed 1 branch commit:
+  - `38f6e87` T-1316: the chat-link spike's line is a fiction-range number (+1 555 …
+- **Files changed:** 3 (+83 −25), by folder:
+  - `web/spikes/chat-link/` build.mjs +4 −3, chat-link.test.mjs +61 −4, index.html +18 −18
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 471. docs: COMMIT\_HISTORY.md through commit 466 (2f29a26, \#476) (\#480)
 
