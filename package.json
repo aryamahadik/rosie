@@ -64,7 +64,8 @@
     "check:staging": "bash infra/scripts/post-deploy-check.sh",
     "seed:staging": "bash infra/scripts/seed-staging.sh",
     "secrets:staging": "bash infra/scripts/put-staging-secrets.sh",
-    "secrets:staging:make": "bash infra/scripts/make-staging-secrets.sh"
+    "secrets:staging:make": "bash infra/scripts/make-staging-secrets.sh",
+    "hyperdrive:staging:create": "bash infra/scripts/create-staging-hyperdrive.sh"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.6.0",
