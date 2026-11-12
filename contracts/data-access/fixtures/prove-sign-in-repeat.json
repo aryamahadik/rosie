@@ -1,0 +1,25 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T13:01:32Z",
+    "note": "The browser sends Sam's right check again with the same page.requestId (a lost answer). The look finds this check's key as the attempt's last check, so the call answers its first result, signedIn, as alreadySignedIn: no token, no second session, nothing counted or written (K-21 README line 115; K-22 rule 9's check, step 2). The page signs in again if it holds no session."
+  },
+  "request": {
+    "attemptId": "attempt-sam-signin-nov02",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "requestId": "req-portal-sam-nov02-check-1",
+    "typedHash": "f3e4d5c6b7a8998a7b6c5d4e3f201102f3e4d5c6b7a8998a7b6c5d4e3f201102",
+    "session": {
+      "id": "session-sam-nov02-again",
+      "tokenSha256": "b5c6d7e8f9a0b1c2d3e4f5061728394ab5c6d7e8f9a0b1c2d3e4f5061728394a"
+    }
+  },
+  "outcome": {
+    "outcome": "alreadySignedIn",
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "repeated": true
+  }
+}

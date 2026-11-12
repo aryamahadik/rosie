@@ -33,6 +33,7 @@ import { REPO, cleanEnv, tempDir, write } from "./script-harness.mjs";
 
 const SCRIPT = fileURLToPath(new URL("./local-merge-check.mjs", import.meta.url));
 const WORKFLOW = readFileSync(path.join(REPO, ".github/workflows/merge-check.yml"), "utf8");
+const PARITY_RULE = readFileSync(path.join(REPO, "infra/ci/parity-inputs.mjs"), "utf8");
 const POSTGRES_ENTRY = import.meta.resolve("postgres");
 const REBASE = "Rebase onto origin/main (a conflict fails the run)";
 
@@ -315,10 +316,12 @@ if (name === ${JSON.stringify(sleepAt)}) await new Promise((resolve) => setTimeo
 }
 
 // A repository whose commits carry a copy of merge-check.yml, a package.json of recorder scripts with an empty
-// lockfile, .nvmrc and one passing infra/ci test. origin/main (refs/remotes/origin/main) is one commit past the
-// local main, which stays behind; task/T-1 branches off the local main.
+// lockfile, .nvmrc, one passing infra/ci test and the parity inputs' rule (infra/ci/parity-inputs.mjs, which the
+// parity-inputs step reads at origin/main). origin/main (refs/remotes/origin/main) is one commit past the local
+// main, which stays behind; task/T-1 branches off the local main. branchScripts: script lines the branch adds or
+// changes in package.json.
 function fixture(t, options = {}) {
-  const { failAt = "", sleepAt = "", mainFiles = {} } = options;
+  const { failAt = "", sleepAt = "", mainFiles = {}, branchScripts = {} } = options;
   const branchFiles = options.branchFiles ?? { "notes/branch.txt": "branch\n" };
   const root = tempDir(t, "mc-repo");
   const log = path.join(tempDir(t, "mc-log"), "steps.log");
@@ -334,6 +337,7 @@ function fixture(t, options = {}) {
   write(path.join(root, ".nvmrc"), `${process.versions.node.split(".")[0]}\n`);
   const passing = 'import { test } from "node:test";\ntest("ok", () => {});\n';
   write(path.join(root, "infra/ci/ok.test.mjs"), passing);
+  write(path.join(root, "infra/ci/parity-inputs.mjs"), PARITY_RULE);
   write(path.join(root, "step.mjs"), stepProgram(log, failAt, sleepAt));
   write(path.join(root, "notes/base.txt"), "base\n");
   git("init", "-q", "-b", "main");
@@ -349,6 +353,10 @@ function fixture(t, options = {}) {
   git("reset", "-q", "--hard", base);
   git("switch", "-q", "-c", "task/T-1");
   for (const [file, text] of Object.entries(branchFiles)) write(path.join(root, file), text);
+  if (Object.keys(branchScripts).length > 0) {
+    const branchPkg = { ...pkg, scripts: { ...scripts, ...branchScripts } };
+    write(path.join(root, "package.json"), `${JSON.stringify(branchPkg, null, 2)}\n`);
+  }
   git("add", ".");
   git("commit", "-q", "-m", "the branch's change");
   return { root, log, base, main, head: git("rev-parse", "HEAD") };
@@ -516,6 +524,35 @@ describe("local-merge-check: runs on throwaway repositories, each against a data
       ["reused", "reused", "reused", "reused", "reused", "success"],
     );
     assert.equal(await databaseExists(run.result.database.name), false);
+  });
+
+  it("parity-inputs' package.json rule, as merge-check.yml runs it: a script line alone runs no shard; a changed test:parity runs them (T-1320)", async (t) => {
+    const lineOnly = fixture(t, {
+      branchScripts: { "check-tester:token:make": "node step.mjs check-tester" },
+    });
+    const skipped = runCheck(t, lineOnly.root, "task/T-1");
+    assert.equal(skipped.code, 0, skipped.output);
+    assert.deepEqual(
+      skipped.result.jobs.map((entry) => [entry.id, entry.result]),
+      [
+        ["merge-check", "success"],
+        ["parity-inputs", "success"],
+        ["parity-shard", "skipped"],
+      ],
+    );
+    assert.ok(!logLines(lineOnly.log).some((line) => line.startsWith("test:parity")), "no shard ran");
+    const log = readFileSync(path.join(skipped.folder, "merge-check.log"), "utf8");
+    assert.match(log, /only scripts the parity run never runs changed: check-tester:token:make/);
+
+    const changed = fixture(t, { branchScripts: { "test:parity": "node step.mjs test:parity changed" } });
+    const ran = runCheck(t, changed.root, "task/T-1");
+    assert.equal(ran.code, 0, ran.output);
+    assert.deepEqual(logLines(changed.log).slice(-3), [
+      "test:parity changed --shard=1/3",
+      "test:parity changed --shard=2/3",
+      "test:parity changed --shard=3/3",
+    ]);
+    for (const run of [skipped, ran]) assert.equal(await databaseExists(run.result.database.name), false);
   });
 
   it("Ctrl-C stops the running step, skips the rest, drops the database and exits 130", async (t) => {
