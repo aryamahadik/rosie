@@ -44,11 +44,22 @@ function withFields(fields) {
   );
 }
 
+// The real manifest without one script line.
+function withoutScript(name) {
+  const scripts = Object.fromEntries(Object.entries(MANIFEST.scripts).filter(([key]) => key !== name));
+  return { ...MANIFEST, scripts };
+}
+
+// T-1303's and T-1310's shapes: each card's real script line, which the branch adds over main as it stood
+// before that card merged (T1303_BASE, T1310_BASE). Once a card merges, package.json holds its line, so over
+// the real manifest the branch would change nothing and its commit would fail (DL-612).
+const T1303_BASE = withoutScript("check-tester:token:make");
 const T1303 = withScript(
   "check-tester:token:make",
   "node infra/scripts/make-check-tester-token.mjs",
   "secrets:staging:make",
 );
+const T1310_BASE = withoutScript("pretest:ci-scripts");
 const T1310 = withScript("pretest:ci-scripts", "npm run build:validators", "test:scripts");
 
 // A manifest whose test:parity runs other scripts: parity:prepare by npm run, which runs build:validators.
@@ -122,14 +133,14 @@ const expectRun = (t, change, run, options) => {
 
 describe("parity-inputs' step: a case for each shape (T-1320)", () => {
   it("a script line alone, T-1303's shape (check-tester:token:make): not a parity input", (t) => {
-    const step = expectRun(t, { "package.json": json(T1303) }, "false");
+    const step = expectRun(t, { "package.json": json(T1303) }, "false", { manifest: T1303_BASE });
     assert.match(step.output, /only scripts the parity run never runs changed: check-tester:token:make/);
     assert.match(step.output, /package\.json changed only in script lines the parity run never runs/);
     assert.match(step.output, /No parity input changed: the parity shards are skipped\./);
   });
 
   it("a script line alone, T-1310's shape (pretest:ci-scripts): not a parity input", (t) => {
-    const step = expectRun(t, { "package.json": json(T1310) }, "false");
+    const step = expectRun(t, { "package.json": json(T1310) }, "false", { manifest: T1310_BASE });
     assert.match(step.output, /only scripts the parity run never runs changed: pretest:ci-scripts/);
   });
 
@@ -232,10 +243,10 @@ describe("parity-inputs' step: a case for each shape (T-1320)", () => {
 
   it("a mixed change (a script line plus a dependency, or plus a parity file): an input", (t) => {
     const lineAndDependency = { ...T1303, dependencies: { ...MANIFEST.dependencies, uqr: "0.1.4" } };
-    const step = expectRun(t, { "package.json": json(lineAndDependency) }, "true");
+    const step = expectRun(t, { "package.json": json(lineAndDependency) }, "true", { manifest: T1303_BASE });
     assert.match(step.output, /fields besides scripts changed: dependencies/);
     const lineAndFile = { "package.json": json(T1303), "compiler/src/rule.ts": "export const rule = 2;\n" };
-    expectRun(t, lineAndFile, "true");
+    expectRun(t, lineAndFile, "true", { manifest: T1303_BASE });
   });
 
   it("no parity input changed: not an input, and the rule is not asked", (t) => {
@@ -262,13 +273,19 @@ describe("parity-inputs' step: the rule is origin/main's, and a broken rule neve
   });
 
   it("no rule on origin/main: the step fails and writes no run=", (t) => {
-    const step = runStep(t, repository(t, { "package.json": json(T1303) }, { rule: null }));
+    const step = runStep(
+      t,
+      repository(t, { "package.json": json(T1303) }, { manifest: T1303_BASE, rule: null }),
+    );
     assert.notEqual(step.code, 0, step.output);
     assert.equal(step.run, undefined);
   });
 
   it("a rule that exits with an error: the step fails and writes no run=", (t) => {
-    const step = runStep(t, repository(t, { "package.json": json(T1303) }, { rule: "process.exit(2);\n" }));
+    const step = runStep(
+      t,
+      repository(t, { "package.json": json(T1303) }, { manifest: T1303_BASE, rule: "process.exit(2);\n" }),
+    );
     assert.notEqual(step.code, 0, step.output);
     assert.equal(step.run, undefined);
   });
@@ -279,7 +296,7 @@ describe("parity-inputs' step: the rule is origin/main's, and a broken rule neve
       'process.stdout.write("Scripts-only\\n");\n',
       'process.stdout.write("maybe");\n',
     ]) {
-      expectRun(t, { "package.json": json(T1303) }, "true", { rule });
+      expectRun(t, { "package.json": json(T1303) }, "true", { manifest: T1303_BASE, rule });
     }
   });
 });
@@ -363,7 +380,7 @@ describe("parity-inputs.mjs: the rule on manifest text", () => {
       );
     }
     // A pattern outside the parity run's lines is no matter: test:ci-scripts' "infra/ci/*.test.mjs".
-    assert.equal(verdict(MANIFEST, T1303).input, false);
+    assert.equal(verdict(T1303_BASE, T1303).input, false);
   });
 
   it("a script name it cannot read, on either side: an input", () => {
