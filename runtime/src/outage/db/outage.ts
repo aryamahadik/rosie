@@ -919,8 +919,10 @@ export class DbOutage {
   }
 
   /**
-   * Never to a stopped number: true while the actor's copy says stopped (or cannot be read), and while any text no commit
-   * has taken is a STOP or START the actor has not finished, or a text it cannot read (it may be a stop word).
+   * Never to a stopped number: true while the actor's copy says stopped (or cannot be read), while a text no commit has
+   * taken may hold a stop word by the one reading the safety read's line asks too (`stopPending`; T-1313: a text with no
+   * reading or that cannot be found among them), and while any text no commit has taken is a STOP or START the actor has
+   * not finished, or a text it cannot read (it may be a stop word).
    */
   private stoppedNow(): boolean {
     try {
@@ -928,6 +930,7 @@ export class DbOutage {
     } catch {
       return true;
     }
+    if (this.stopPending()) return true;
     return this.rows().some(
       (row) =>
         row.kind === null || row.kind === "unknown" || (isKeyword(row.kind) && row.keyword !== "handled"),

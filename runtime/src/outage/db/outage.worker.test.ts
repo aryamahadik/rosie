@@ -1006,6 +1006,24 @@ describe("a STOP stored but not committed stops the safety read's outage line to
     },
   );
 
+  it("with PostgreSQL down, the down path's own outage line asks the same reading: a text no commit has taken with no reading (its `arrive` write threw) withholds it at 20 s", async () => {
+    const rig = rigFor(answers());
+    await prime(rig);
+    rig.f.down = true;
+    await rig.arrive(OTHER, "Test words: thanks!");
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("DELETE FROM outage_texts WHERE event_id = ?", OTHER);
+    });
+    await rig.arrive(FIRST, "Test words: can I come Friday at 3?");
+    await rig.tick(3000);
+    await rig.tick(OUTAGE_WAIT_MS - 3000);
+    expect(rig.f.probes).not.toEqual([]);
+    expect(outageSends(rig)).toEqual([]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: FIRST, kind: "other", line: "stopped" }),
+    ]);
+  });
+
   it("the host's `stopped` and the lease's `stopAmong` give one reading of the same outage_texts rows: a waiting batch read as another text, or a START, is no STOP to either; one read as a STOP or unknown is one to both; unwired, any is", async () => {
     const rig = rigFor(answers());
     await stopWaiting(rig, { downPath: true });
