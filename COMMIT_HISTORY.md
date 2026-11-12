@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 420, [`2f113ee`](https://github.com/aryamahadik/rosie/commit/2f113ee), 2026-11-11 23:32:08 UTC.
+- **Through:** commit 422, [`44dab4d`](https://github.com/aryamahadik/rosie/commit/44dab4d), 2026-11-11 23:59:30 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 422. docs: COMMIT\_HISTORY.md through commit 420 (2f113ee, \#427) (\#429)
+
+- **Commit:** [`44dab4d`](https://github.com/aryamahadik/rosie/commit/44dab4d), by Arya Mahadik, 2026-11-11 23:59:30 UTC
+- **Pull request:** [#429](https://github.com/aryamahadik/rosie/pull/429) from `task/commit-history-31`, merged 2026-11-11 23:59:31 UTC. It squashed 1 branch commit:
+  - `b01c7a4` docs: COMMIT\_HISTORY.md through commit 420 (2f113ee, \#427)
+- **Files changed:** 1 (+89 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +89 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 421. T-1239: design record ADR-014: the Worker reaches PostgreSQL as rosie\_job and rosie\_app through two dedicated logins and two Hyperdrive configurations, with a guard in every call (\#428)
+
+- **Commit:** [`969c335`](https://github.com/aryamahadik/rosie/commit/969c335), by Arya Mahadik, 2026-11-11 23:59:27 UTC
+- **Pull request:** [#428](https://github.com/aryamahadik/rosie/pull/428) from `task/T-1239`, merged 2026-11-11 23:59:27 UTC. It squashed 4 branch commits:
+  - `3bb8d11` T-1239 (work in progress, unchecked): the design record on the Worker…
+  - `1689379` Merge branch 'main' into task/T-1239
+  - `6264408` T-1239: ADR-014, the Worker's database roles, checked against its sou…
+  - `f447cdd` T-1239: ADR-014 round 2 (DL-499): no command line holds a login's pas…
+- **Files changed:** 2 (+288 −0), by folder:
+  - `docs/adr/` 0014-worker-database-roles.md +287 −0, README.md +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1239 (work in progress, unchecked): the design record on the Worker's database roles as the builder left it when the account's model limit stopped the run at about 19:47Z Nov 11; not reviewed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1239: ADR-014, the Worker's database roles, checked against its sources and finished: two logins (rosie_worker_job, rosie_worker_app) granted one role each WITH INHERIT TRUE, SET FALSE, each behind its own Hyperdrive configuration and binding; the guard in every call (session_user, current_user, own role USAGE, other role MEMBER, row_security_active, current_schema) and no client through Hyperdrive while DB_SCHEMA is set; the spike's configuration bound nowhere and deleted by the user; who makes what, with the live steps that set a password marked as the user's; production's shape (T-1006); CQ-208's corrected default; every Hyperdrive claim cited to FINDINGS.md or a page read Nov 11 2026, or marked not measured with its measuring piece
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1239: ADR-014 round 2 (DL-499): no command line holds a login's password (one Node process sets it in PostgreSQL and sends it to Cloudflare's Hyperdrive API in the request body, with the Rosfield sign-in's token from wrangler auth token through cf.sh), and the script refuses while the server would log the ALTER ROLE; the audit's R2 ruled (localConnectionString for plain wrangler dev, miniflare hyperdrives from DATABASE_URL for both Workers projects, fixed local-only passwords, the rig's globalSetup and npm run db:logins make the logins); a database per Workers test file with DB_SCHEMA empty, so the handle keeps one path; the script prints each configuration's id and the hyperdrive list parser moves to infra/scripts; memberships read by member, exactly one, in the guard, piece 1 and T-1093; PostgreSQL 16 minimum; one DO block; connect and guard timed apart; T-1093 before the first deploy that opens a client; three new tasks and open question 3 recorded
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 420. docs: COMMIT\_HISTORY.md through commit 417 (601d9b5, \#423) (\#427)
 
