@@ -1,0 +1,24 @@
+{
+  "id": "log-session-sam-oct20-ended",
+  "at": "2026-10-20T08:30:00Z",
+  "zone": null,
+  "turn_id": null,
+  "job_id": "page-req-sam-signout-oct20",
+  "trace_id": "trace-page-sam-signout-oct20",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": null,
+  "actor_kind": "person",
+  "actor_person_id": "person-sam",
+  "actor_role": null,
+  "kind": "session.ended",
+  "table_name": "sessions",
+  "row_id": "session-sam-oct20",
+  "old_values": { "ended_at": null, "ended_why": null },
+  "new_values": {
+    "ended_at": "2026-10-20T08:30:00Z",
+    "ended_why": "signed_out",
+    "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c"
+  },
+  "why": null
+}
