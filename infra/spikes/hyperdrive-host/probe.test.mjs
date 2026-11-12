@@ -4,7 +4,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import postgres from "postgres";
-import { hostKind, hyperdriveRow, liveVersion, passed, spikeConfig } from "./helpers.mjs";
+// The list reader's tests moved with it to infra/ci/hyperdrive-list.test.mjs (T-1252).
+import { hostKind, liveVersion, passed, spikeConfig } from "./helpers.mjs";
 import { LOCAL_DATABASE_URL, localDatabaseUrl, runLocal } from "./local.mjs";
 import { SCHEMA, clampCommits, makeRedactor, percentile, summarize } from "./probe.mjs";
 import worker, { refusedBy } from "./worker.mjs";
@@ -26,86 +27,7 @@ async function schemaCount() {
   }
 }
 
-// The shape wrangler 4.158.0's `hyperdrive list` prints (logger.table): its columns, in its order.
-const HEAD = [
-  "id",
-  "name",
-  "user",
-  "host",
-  "port",
-  "scheme",
-  "database",
-  "caching",
-  "mtls",
-  "origin_connection_limit",
-];
 const ID_A = "0123456789abcdef0123456789abcdef";
-const ID_B = "fedcba9876543210fedcba9876543210";
-const listRow = (id, name, caching) => [
-  id,
-  name,
-  "origin-user",
-  "origin-host.example.test",
-  "5432",
-  "PostgreSQL",
-  "main",
-  caching,
-  "{}",
-  "",
-];
-const table = (rows) => {
-  const line = (cells) => `│ ${cells.join(" │ ")} │`;
-  return [
-    " ⛅️ wrangler 4.158.0",
-    "📋 Listing Hyperdrive configs",
-    "┌────┬────┐",
-    line(HEAD),
-    "├────┼────┤",
-    ...rows.map(line),
-    "└────┴────┘",
-    "",
-  ].join("\n");
-};
-
-test("the list reader gives only the id and the caching cell of the named configuration", () => {
-  const listing = table([
-    listRow(ID_B, "another-config", "max_age: 60, stale_while_revalidate: 15"),
-    listRow(ID_A, "rosie-staging-hyperdrive", "disabled"),
-  ]);
-  assert.deepEqual(hyperdriveRow(listing, "rosie-staging-hyperdrive"), { id: ID_A, caching: "disabled" });
-  assert.deepEqual(hyperdriveRow(listing, "another-config"), {
-    id: ID_B,
-    caching: "max_age: 60, stale_while_revalidate: 15",
-  });
-  assert.equal(hyperdriveRow(listing, "rosie-staging"), null);
-  // No table at all: the account has no configuration (what the list printed on Nov 11 2026).
-  assert.equal(
-    hyperdriveRow(" ⛅️ wrangler 4.158.0\n📋 Listing Hyperdrive configs\n", "rosie-staging-hyperdrive"),
-    null,
-  );
-  // Colour codes around the table, as on a terminal.
-  const coloured = listing.replaceAll("│", "\u001b[90m│\u001b[39m");
-  assert.deepEqual(hyperdriveRow(coloured, "rosie-staging-hyperdrive"), { id: ID_A, caching: "disabled" });
-});
-
-test("the list reader refuses what it cannot read", () => {
-  const exitCode = (listing) => {
-    try {
-      hyperdriveRow(listing, "rosie-staging-hyperdrive");
-      return 0;
-    } catch (error) {
-      return error.exitCode;
-    }
-  };
-  const twice = table([
-    listRow(ID_A, "rosie-staging-hyperdrive", "disabled"),
-    listRow(ID_B, "rosie-staging-hyperdrive", "disabled"),
-  ]);
-  assert.equal(exitCode(twice), 3);
-  assert.equal(exitCode(table([listRow("not-an-id", "rosie-staging-hyperdrive", "disabled")])), 2);
-  assert.equal(exitCode("rosie-staging-hyperdrive exists, in words"), 2);
-  assert.equal(exitCode("│ title │ value │\n│ rosie-staging-hyperdrive │ x │\n"), 2);
-});
 
 test("a pooled host is told from a direct one, and nothing else passes for a database URL", () => {
   assert.equal(
