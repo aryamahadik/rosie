@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 436, [`4062130`](https://github.com/aryamahadik/rosie/commit/4062130), 2026-11-12 03:48:29 UTC.
+- **Through:** commit 438, [`a363a26`](https://github.com/aryamahadik/rosie/commit/a363a26), 2026-11-12 04:07:56 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 438. docs: COMMIT\_HISTORY.md through commit 436 (4062130, \#444) (\#446)
+
+- **Commit:** [`a363a26`](https://github.com/aryamahadik/rosie/commit/a363a26), by Arya Mahadik, 2026-11-12 04:07:56 UTC
+- **Pull request:** [#446](https://github.com/aryamahadik/rosie/pull/446) from `task/commit-history-37`, merged 2026-11-12 04:07:56 UTC. It squashed 1 branch commit:
+  - `76c3fe1` docs: COMMIT\_HISTORY.md through commit 436 (4062130, \#444)
+- **Files changed:** 1 (+87 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +87 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 437. T-1271: harden the staging Hyperdrive create script: log\_min\_error\_statement fatal or panic only, pgaudit refused, errors scrubbed before the cut, -pooler in any case, wrangler's log switch and the follow-up statement pinned (\#445)
+
+- **Commit:** [`6e7f7f9`](https://github.com/aryamahadik/rosie/commit/6e7f7f9), by Arya Mahadik, 2026-11-12 04:07:52 UTC
+- **Pull request:** [#445](https://github.com/aryamahadik/rosie/pull/445) from `task/T-1271`, merged 2026-11-12 04:07:52 UTC. It squashed 1 branch commit:
+  - `6e5ad5d` T-1271: harden the staging Hyperdrive create script: log\_min\_error\_st…
+- **Files changed:** 4 (+393 −18), by folder:
+  - `infra/ci/` create-staging-hyperdrive.test.mjs +300 −1
+  - `infra/scripts/` create-staging-hyperdrive.mjs +80 −16
+  - `infra/spikes/hyperdrive-host/` helpers.mjs +2 −1, probe.test.mjs +11 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 436. docs: COMMIT\_HISTORY.md through commit 432 (5245bbf, \#440) (\#444)
 
