@@ -669,6 +669,15 @@ describe("the turn reads each text's kept safety result through its leased turn 
       const run = rig(vi.spyOn(console, "log").mockImplementation(() => undefined));
       const handle = handleOf(64);
       try {
+        // The PostgreSQL-down path wired over the root's own sealing port, PostgreSQL answering (ADR-018 section 1): it
+        // reads the third text as another text, so its batch, which may hold no stop word, waits behind the restarted turn.
+        // Unwired, as the root installs it today, that batch would restart the turn a second time.
+        const db = dbFakes(
+          run.root.ports.sealing,
+          {},
+          { start: run.fakes.clock.now(), ids: idsOf(SAM.party) },
+        );
+        run.also(setDbOutageDeps(db.outageDeps));
         const [a, b, c, unknown] = ["evt-kept-6401", "evt-kept-6402", "evt-kept-6403", "evt-kept-6404"];
         // Each run asks its leased turn for every text of the handle and one that never arrived, and commits nothing.
         const asked: { turnId: string; tries: number; eventIds: string[]; answered: string[] }[] = [];
