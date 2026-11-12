@@ -1,0 +1,9 @@
+{
+  "number": "+15555550100",
+  "phone": {
+    "chatOpen": true,
+    "stopped": false,
+    "stoppedAt": null
+  },
+  "chatLink": null
+}

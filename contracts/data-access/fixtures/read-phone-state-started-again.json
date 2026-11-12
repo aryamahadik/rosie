@@ -1,0 +1,20 @@
+{
+  "call": "readPhoneState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-start.json"],
+    "now": "2026-11-07T15:20:05Z",
+    "note": "Alex's phone after his own START (commit-alex-start: not stopped, the chat open again, start_at 15:20:00Z, version 5). The row keeps stop_at 15:06:36Z, the last STOP's (DL-193), but no STOP is in force, so stoppedAt is null (README default 108)."
+  },
+  "request": {
+    "number": "+15555550101"
+  },
+  "outcome": {
+    "phone": {
+      "chatOpen": true,
+      "stopped": false,
+      "stoppedAt": null
+    },
+    "chatLink": null
+  }
+}

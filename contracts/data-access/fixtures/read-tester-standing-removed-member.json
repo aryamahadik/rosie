@@ -1,0 +1,16 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-11-12T04:05:00Z",
+    "note": "The check tester's rows as read-tester-standing-check-tester's note lists them, but its team row was removed a minute before the read (team_page_recipients team-check-tester with removed_at 2026-11-12T04:04:00Z and version 2: a member leaves the list by removed_at, never by a delete, K-36 README). The session is still live, and its person holds no live team row (live is removed_at null, as team_page_recipients_one_live_per_person reads it), so notTester: the call learns nothing more, and the page answers notTester (README defaults 103 and 104)."
+  },
+  "request": {
+    "tokenSha256": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    "at": "2026-11-12T04:05:00Z"
+  },
+  "outcome": {
+    "standing": "notTester"
+  }
+}

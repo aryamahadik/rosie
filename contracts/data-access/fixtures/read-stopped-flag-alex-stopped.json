@@ -1,0 +1,17 @@
+{
+  "call": "readStoppedFlag",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "Alex's actor re-reads its stopped flag after a park answered alreadyCommitted for his STOP's turn, whose answer was lost (T-1206): the phone row as commit-alex-stop wrote it, stopped at version 4, read from the primary after the mark was noted, so the copy takes it and ends that mark (README item 57, default 111)."
+  },
+  "request": {
+    "handleId": "handle-alex"
+  },
+  "outcome": {
+    "handleId": "handle-alex",
+    "stopped": true,
+    "phoneVersion": 4
+  }
+}

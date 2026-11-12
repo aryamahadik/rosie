@@ -1,0 +1,19 @@
+{
+  "call": "readRosterPhone",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:00Z",
+    "note": "The test-phone page's tp-01, test owner 1: the roster's list names handle-sam (README default 106; T-1148's TEST_OWNER_1), which K-04's seed-person-roles.json holds as T-1148's db/seeds/skeleton.ts writes it, a phone handle at the fiction-range number +15555550100 with Sam its one person and no email handle. So the number the page sends JOIN as, and no email, so the page lists none (README item 54, default 107). The number is the database's, the one the seed wrote, never the list's."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "phone": {
+      "number": "+15555550100",
+      "email": null
+    }
+  }
+}
