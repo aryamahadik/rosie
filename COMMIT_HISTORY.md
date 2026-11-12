@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 449, [`1a7f415`](https://github.com/aryamahadik/rosie/commit/1a7f415), 2026-11-12 08:36:47 UTC.
+- **Through:** commit 451, [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), 2026-11-12 09:00:57 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 451. docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458) (\#461)
+
+- **Commit:** [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), by Arya Mahadik, 2026-11-12 09:00:57 UTC
+- **Pull request:** [#461](https://github.com/aryamahadik/rosie/pull/461) from `task/commit-history-42`, merged 2026-11-12 09:00:58 UTC. It squashed 1 branch commit:
+  - `52db5ab` docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 450. T-419: the real Resend send adapter: one email row from mail.rosfield.com with its reply address, thread headers and (for a confirmation) the chat link's QR, under the part's Idempotency-Key and a User-Agent; RESEND\_API\_KEY and the STAGING\_TEST\_INBOXES allow-list read by name, refused before any request when missing or off the list; live-check.mjs for T-1032 (the key read by name, never printed) (\#460)
+
+- **Commit:** [`7e82e92`](https://github.com/aryamahadik/rosie/commit/7e82e92), by Arya Mahadik, 2026-11-12 09:00:53 UTC
+- **Pull request:** [#460](https://github.com/aryamahadik/rosie/pull/460) from `task/T-419`, merged 2026-11-12 09:00:53 UTC. It squashed 1 branch commit:
+  - `b7ae610` T-419: the real Resend send adapter: one email row from mail.rosfield…
+- **Files changed:** 10 (+2059 −0), by folder:
+  - `adapters/src/email/resend-send/` index.ts +25 −0, live-check.d.mts +23 −0, live-check.mjs +218 −0, live-check.test.ts +311 −0, qr-png.ts +137 −0, send.test.ts +761 −0, send.ts +177 −0, types.ts +61 −0, validate.ts +170 −0, wire.ts +176 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 449. docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457) (\#458)
 
