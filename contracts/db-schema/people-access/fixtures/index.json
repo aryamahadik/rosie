@@ -319,6 +319,62 @@
       "expect": "refuse",
       "shows": "A Tool API insert, scoped to Lee's Barbershop, of a link that names ended_at and ended_why is refused (SQLSTATE 42501): an issue writes only an issue's columns, so a link always starts live at version 1; the same insert without them passes",
       "source": "README rule 8"
+    },
+    {
+      "file": "seed-sign-in-attempt.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "accept",
+      "shows": "Three sign-in attempts, each kept with its device's sha256, the start's and the last check's repeat keys and the typed contact's keyed hash (stand-in hex, never a cookie, a requestId, a code or a contact): Sam's email sign-in of Oct 26, 1:00pm (K-21's sign-in-request.json, attempt-sam-signin-1), its code sent after the answer and typed back right at 1:01:30, his session started on his known device and named (signedIn); someone typing Sam's email at 3:05pm on Oct 28 (K-21's sign-in-wrong-five.json, attempt-sam-signin-3), whose five wrong codes paused the attempt and its code until 3:22:10; and its twin for a contact no account holds, with no person and no code, whose five wrong checks left the same tries, the same pause and the same last answer",
+      "source": "README rule 9; ADR-016 section 4 (the table and 'The check'); K-21 v1 sign-in-request.json and sign-in-wrong-five.json; RULES 6.2 ('A code works 10 minutes. Five wrong codes pause it 15 minutes'); S11-52; S13-45; STATE note 74; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-raw-device.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "An attempt that keeps the device cookie as sent (a placeholder device token) instead of its sha256 is refused by CHECK sign_in_attempts_device_hash_form (SQLSTATE 23514); the same row with the cookie's sha256 passes",
+      "source": "README rule 9; BP rule 7 (only a hash is stored); K-21 v1 README line 117"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-raw-contact.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "An attempt that keeps Sam's email as typed instead of its keyed hash is refused by CHECK sign_in_attempts_contact_hash_form (SQLSTATE 23514); the same row with the contact's keyed hash passes",
+      "source": "README rule 9; BP rule 7 (never the contact itself); ADR-016 section 4 ('The key')"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-sixth-wrong-try.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "An attempt counting a sixth wrong try (paused 15 minutes after it) is refused by CHECK sign_in_attempts_wrong_tries_range alone (SQLSTATE 23514): the count never passes five, so the server refuses a sixth check with or without the page's cookie; the same row at five passes",
+      "source": "README rule 9; RULES 6.2 ('Five wrong codes pause it 15 minutes'); STATE note 74; ADR-016 section 4"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-pause-not-fifteen-minutes.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "An attempt paused at its fifth wrong try for 10 minutes instead of 15 is refused by CHECK sign_in_attempts_pause_after_five (SQLSTATE 23514); the same row paused until 15 minutes after the fifth passes",
+      "source": "README rule 9; RULES 6.2 ('Five wrong codes pause it 15 minutes'); S11-52 ('Five wrong codes pause sign-in for 15 minutes')"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-outcome-not-k21.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "An attempt whose last answer holds a session token (a placeholder) instead of one of K-21's signInCheck labels is refused by CHECK sign_in_attempts_outcome_known (SQLSTATE 23514), so no token, code or hash can be kept there; the same row with wrong passes",
+      "source": "README rule 9; K-21 v1 signInCheck (schema lines 813 to 945); T-1250 round 2 security note b; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-sign-in-attempt-tool-api-read.json",
+      "version": "v1.2",
+      "table": "sign_in_attempts",
+      "expect": "refuse",
+      "shows": "Sam's own call (rosie.person_id Sam) reading the paused attempt of Oct 28 is refused (no Tool API grant on sign_in_attempts, SQLSTATE 42501), even for columns that hold no hash: the Tool API reaches an attempt only through sign_in_attempt, sign_in_attempt_tried and sign_in_attempt_signed_in; the same read on the runtime side returns the row",
+      "source": "README rule 9; ADR-016 section 4 ('rosie_app holds no grant'); K-22 v1 rule 5; BP rule 7"
     }
   ]
 }
