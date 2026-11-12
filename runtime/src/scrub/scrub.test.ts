@@ -686,7 +686,18 @@ describe("properties", () => {
 //  - the fastest run of each length is kept, not the median: noise only ever adds time, so the fastest run is the
 //    closest to the scrub's own cost;
 //  - the runs of the two lengths alternate, so a change in the machine's speed (a clock that steps down, a hotter
-//    cache) over the measure reaches both lengths alike.
+//    cache) over the measure reaches both lengths alike;
+//  - the reading is the median of 7 rounds of that ratio (T-1299): a busy stretch of a shared machine can slow every
+//    run of one length in a round, so one round can read high (or low), and the median of 7 moves only when 4
+//    rounds do. One round failed once on GitHub's runner: "20 digits and more in a run" read 9.28 (train 127). The
+//    scrub was not at fault: counted, its work for that shape grows 3.98 times for a text 3.98 times as long, and no
+//    character is looked at more than 5 times at either length. Its 40 000 character text pays about 110 page faults
+//    a run on the build Mac (the arrays of its one long run grow past V8's largest regular object onto fresh
+//    large-object pages) and the 10 000 one none, so it reads about 4.7 idle where user time alone reads 4.1 (and
+//    40 000 to 160 000 characters, both past that step, 3.9): kernel time, which a busy machine slows most. Beside 16
+//    busy processes on the build Mac, one round read up to 8.99 for that shape (1 of 30 readings), and beside 12 up
+//    to 8.83 for prices (1 of 20); the median of 7 rounds read 4.74 to 5.16 and 3.94 to 4.07 beside 16 (30 readings
+//    each), and the quadratic stand-in 14.54 to 14.80 (8 readings).
 
 /** The CPU time in microseconds this process spends running `run`. */
 function cpuTimed(run: () => unknown): number {
@@ -696,21 +707,14 @@ function cpuTimed(run: () => unknown): number {
   return spent.user + spent.system;
 }
 
+/** How many rounds a growth is read in; the reading is their median (an odd count, so it is one round's ratio). */
+const GROWTH_ROUNDS = 7;
+
 /**
- * How many times as long `run` takes on the `large` text as on the `small` one, by the CPU time of the fastest of
- * `runs` alternating runs of each (after `warmups` runs of each that are not kept).
+ * How many times as long `run` takes on the `large` text as on the `small` one in one round, by the CPU time of the
+ * fastest of `runs` alternating runs of each.
  */
-function growthOf(
-  run: (text: string) => unknown,
-  small: string,
-  large: string,
-  runs: number,
-  warmups: number,
-): number {
-  for (let warm = 0; warm < warmups; warm += 1) {
-    run(small);
-    run(large);
-  }
+function fastestRatio(run: (text: string) => unknown, small: string, large: string, runs: number): number {
   let fastestSmall = Number.POSITIVE_INFINITY;
   let fastestLarge = Number.POSITIVE_INFINITY;
   for (let at = 0; at < runs; at += 1) {
@@ -727,7 +731,29 @@ function growthOf(
   return fastestLarge / Math.max(fastestSmall, 1);
 }
 
-/** How many times as long the scrub takes on `text` made 4 times as long, by the fastest of alternating runs. */
+/**
+ * How many times as long `run` takes on the `large` text as on the `small` one: the median of GROWTH_ROUNDS rounds,
+ * each the fastest of `runs` alternating runs of each (after `warmups` runs of each, before the first round, that are
+ * not kept).
+ */
+function growthOf(
+  run: (text: string) => unknown,
+  small: string,
+  large: string,
+  runs: number,
+  warmups: number,
+): number {
+  for (let warm = 0; warm < warmups; warm += 1) {
+    run(small);
+    run(large);
+  }
+  const ratios = Array.from({ length: GROWTH_ROUNDS }, () => fastestRatio(run, small, large, runs));
+  ratios.sort((a, b) => a - b);
+  // NaN, were the middle round ever missing, fails the linear check and the quadratic one alike.
+  return ratios[(GROWTH_ROUNDS - 1) / 2] ?? Number.NaN;
+}
+
+/** How many times as long the scrub takes on `text` made 4 times as long, by growthOf's median of rounds. */
 function growth(make: (length: number) => string, length: number): number {
   const small = make(length);
   const large = make(length * 4);
@@ -775,8 +801,8 @@ describe("speed: the time grows in step with the length of the text", () => {
       return seen;
     };
     const make = repeated("Order 4242424242424241 total $1,250.00 call 555-0104. ");
-    // The texts are shorter than the shapes' (1 000 and 4 000 characters), so the stand-in finishes in well under a
-    // second of CPU even on a loaded machine; its ratio still reads 14 to 16, nearly twice the limit.
+    // The texts are shorter than the shapes' (1 000 and 4 000 characters), so the stand-in's 7 rounds stay near a
+    // second of CPU on the build Mac; its ratio still reads 14 to 16, nearly twice the limit.
     const small = make(1_000);
     const large = make(4_000);
     expect(growthOf(quadratic, small, large, 7, 2)).toBeGreaterThan(LINEAR_LIMIT_FOR_4X);
