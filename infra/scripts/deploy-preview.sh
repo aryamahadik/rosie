@@ -3,8 +3,9 @@
 # Runs on the build Mac, where the Rosfield sign-in is, before anyone has reviewed the branch, so nothing of
 # the branch's runs here unreviewed: its install scripts are skipped, no npm script of its runs, its infra/
 # (migrate.mjs, cf.sh, build/tool-api-validators.mjs) must be unchanged from origin/main, and the upload uses
-# this checkout's cf.sh and wrangler. Its code runs only on Cloudflare (the preview), and its migrations run
-# with its own schema as the search path. It deploys the branch's pushed commit, never this checkout's files:
+# this checkout's cf.sh and wrangler. Its code runs only on Cloudflare (the preview), with no Hyperdrive binding
+# (step 3), and its migrations run with its own schema as the search path. It deploys the branch's pushed
+# commit, never this checkout's files:
 #  0. it fetches origin/<branch> and origin/main and refuses the branch, listing the files, when its own
 #     changes (its diff against origin/main from their merge base, as in a pull request) touch a file that
 #     controls the install, the build or the deploy: wrangler.jsonc (or a wrangler.json or wrangler.toml),
@@ -23,13 +24,18 @@
 #     branch's. It writes the git-ignored actions/src/tool-api/generated/ (from the branch's contracts/) that
 #     validator.ts imports, so the Worker has its prebuilt code. A failed build stops the preview: nothing is
 #     migrated or uploaded;
-#  3. migrations into the branch's own schema on the staging database, when STAGING_DATABASE_URL is set
+#  3. the upload's config (ADR-014 new task a; T-1256): the worktree's wrangler.jsonc is rewritten in place,
+#     inside this script's temporary folder, without env.staging's hyperdrive list and with everything else as
+#     it was, so the preview gets no Hyperdrive binding whatever env.staging holds (HYPERDRIVE_JOB and
+#     HYPERDRIVE_APP reach the staging database, and the branch's code runs there unreviewed). The file is read
+#     back, and one that still names a Hyperdrive binding stops the preview: nothing is migrated or uploaded;
+#  4. migrations into the branch's own schema on the staging database, when STAGING_DATABASE_URL is set
 #     (skipped with a notice when it is not);
-#  4. a Worker version of that commit uploaded to rosie-staging under the preview alias <slug> by THIS
+#  5. a Worker version of that commit uploaded to rosie-staging under the preview alias <slug> by THIS
 #     checkout's cf.sh and wrangler (never the branch's), with CF_BUILD_DIR=<worktree>: cf.sh checks the
-#     worktree's wrangler.jsonc as it checks its own, then uploads from there with DB_SCHEMA and GIT_SHA (that
-#     commit) set (an upload, not a deploy: staging traffic keeps its current version);
-#  5. the preview URL printed.
+#     worktree's wrangler.jsonc (step 3's) as it checks its own, then uploads from there with DB_SCHEMA and
+#     GIT_SHA (that commit) set (an upload, not a deploy: staging traffic keeps its current version);
+#  6. the preview URL printed.
 # <slug>: the branch in lower case, [a-z0-9-] only, at most 40 characters. Schema: preview_<slug> with "_"
 # for "-".
 set -euo pipefail
@@ -152,6 +158,127 @@ git -C "$ROOT" worktree add --quiet --detach "$tree" "$sha"
 log "preview: build the Tool API's validators in the worktree (node infra/build/tool-api-validators.mjs)"
 (cd "$tree" && node infra/build/tool-api-validators.mjs) ||
   die "the Tool API's validators did not build for $branch ($sha): nothing was migrated or uploaded"
+
+# Step 3: the upload's config (ADR-014 new task a; T-1256). The branch's code runs unreviewed on the preview,
+# so the preview gets no Hyperdrive binding, whatever env.staging holds. node reads the worktree's wrangler.jsonc
+# as cf.sh reads it (comments and trailing commas dropped outside strings), leaves out env.staging's hyperdrive
+# list and writes the rest back in place as JSON, so cf.sh checks this file as it checks any build folder's and
+# wrangler uploads exactly it (cf.sh passes it as --config, so wrangler searches for no other). In the installed
+# wrangler's code (4.158.0), an environment inherits no hyperdrive list from the top level (notInheritable), and
+# a version upload keeps only secrets, and vars with keep_vars, from the version before (keep_bindings). The
+# file is then read back, and the preview stops when it still names a Hyperdrive binding: a key or a text that
+# holds "hyperdrive" in any letter case, or the name of a binding left out, at the top level or in env.staging
+# (no other environment is uploaded here). That takes in a top-level list, an unsafe binding or unsafe metadata
+# (wrangler sends both as they are), and a required secret named as a binding left out (wrangler sends it as an
+# inherit binding, which takes the deployed version's binding of that name). Only names and paths are printed,
+# never a value: a local connection string holds a password. Before the database key is loaded, and before
+# anything is migrated or uploaded.
+log "preview: write the upload's config: the worktree's wrangler.jsonc without env.staging's hyperdrive list"
+if ! config_note="$(node -e '
+  const fs = require("node:fs");
+  const file = process.argv[1];
+  const fail = (why) => {
+    console.log(why);
+    process.exit(1);
+  };
+  const isObject = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
+  // The file as cf.sh reads it: comments and trailing commas dropped outside strings, the rest JSON.
+  const read = () => {
+    let stat;
+    try {
+      stat = fs.lstatSync(file);
+    } catch {
+      fail("cannot be read");
+    }
+    // A link would send the write below to the file it points at, outside the temporary folder.
+    if (!stat.isFile()) fail("is not a regular file");
+    let text;
+    try {
+      text = fs.readFileSync(file, "utf8");
+    } catch {
+      fail("cannot be read");
+    }
+    let json = "";
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (c === "\"") {
+        let j = i + 1;
+        while (j < text.length && text[j] !== "\"") j += text[j] === "\\" ? 2 : 1;
+        json += text.slice(i, j + 1);
+        i = j;
+      } else if (c === "/" && text[i + 1] === "/") {
+        while (i + 1 < text.length && text[i + 1] !== "\n") i++;
+      } else if (c === "/" && text[i + 1] === "*") {
+        const end = text.indexOf("*/", i + 2);
+        if (end < 0) fail("has a /* comment that is not closed");
+        json += " ";
+        i = end + 1;
+      } else if (c === "}" || c === "]") {
+        json = json.replace(/,\s*$/, "") + c;
+      } else {
+        json += c;
+      }
+    }
+    let config;
+    try {
+      config = JSON.parse(json);
+    } catch {
+      // Without the parser message, which can quote the text around the fault.
+      fail("does not parse");
+    }
+    if (!isObject(config) || !isObject(config.env) || !isObject(config.env.staging)) fail("has no env.staging");
+    return config;
+  };
+
+  const config = read();
+  const staging = config.env.staging;
+  const listed = Object.hasOwn(staging, "hyperdrive");
+  const left = (Array.isArray(staging.hyperdrive) ? staging.hyperdrive : [])
+    .map((entry) => (isObject(entry) ? entry.binding : undefined))
+    .filter((name) => typeof name === "string" && name !== "");
+  delete staging.hyperdrive;
+  try {
+    fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+  } catch {
+    fail("cannot be written");
+  }
+
+  // What wrangler will read: the file as written, read back.
+  const written = read();
+  const names = (text) => /hyperdrive/i.test(text) || left.includes(text);
+  const step = (at, key) =>
+    /^[A-Za-z_$][\w$]*$/.test(key) ? (at === "" ? key : `${at}.${key}`) : `${at}[${JSON.stringify(key)}]`;
+  const found = new Set();
+  const scan = (value, at) => {
+    if (typeof value === "string") {
+      if (names(value)) found.add(at);
+    } else if (Array.isArray(value)) {
+      value.forEach((item, index) => scan(item, `${at}[${index}]`));
+    } else if (isObject(value)) {
+      for (const [key, item] of Object.entries(value)) {
+        if (names(key)) found.add(step(at, key));
+        scan(item, step(at, key));
+      }
+    }
+  };
+  const { env, ...top } = written;
+  scan(top, "");
+  scan(env.staging, "env.staging");
+  if (found.size > 0) {
+    const at = [...found].join(", ");
+    fail(`still names a Hyperdrive binding once the hyperdrive list of env.staging is left out, at ${at}`);
+  }
+  if (!listed) {
+    console.log("env.staging holds no hyperdrive list: the upload has none");
+  } else {
+    const named = left.map((name) => JSON.stringify(name)).join(", ") || "no binding named";
+    console.log(`the upload leaves out the hyperdrive list of env.staging (${named})`);
+  }
+' "$tree/wrangler.jsonc")"; then
+  die "refusing to upload $branch ($sha): its wrangler.jsonc $config_note. A preview never gets a Hyperdrive" \
+    "binding (ADR-014): nothing was migrated or uploaded"
+fi
+log "preview: $config_note"
 
 load_dev_var STAGING_DATABASE_URL
 if [[ -n "${STAGING_DATABASE_URL:-}" ]]; then
