@@ -15,8 +15,8 @@
 # kept in one variable that is never marked for export, and goes to node alone, in its environment, as migrate.mjs and
 # the seed runner get theirs; node takes it out at once and starts nothing that finds it there. DATABASE_URL, which
 # this script never reads, leaves the environment too, so no copy of a database URL reaches anything started here.
-# Exit: 0 both configurations exist and store their logins; 1 refused, failed or incomplete (the line before says why);
-# 2 misuse (any argument), found before anything is read.
+# Exit: 0 both configurations exist, store their logins and have caching disabled; 1 refused, failed or not so (the
+# line before says why); 2 misuse (any argument), found before anything is read.
 set +x
 set +a
 set +k
