@@ -51,13 +51,13 @@ function listOf(text, key) {
   return m[1];
 }
 
-test("every parity shard on disk is found: overlay and slots hold shards 1 to 8, corrections 1 to 9", () => {
-  for (const [folder, last] of Object.entries({ overlay: 8, slots: 8, corrections: 9 })) {
+test("every parity shard on disk is found: overlay and slots hold shards 1 to 8, corrections 1 to 15 and 17", () => {
+  const upTo = (last) => Array.from({ length: last }, (_, i) => i + 1);
+  // corrections 9 to 15 and 17 hold T-1116's and T-1132's sweeps split by trades (T-1319, which skips 16).
+  const held = { overlay: upTo(8), slots: upTo(8), corrections: [...upTo(15), 17] };
+  for (const [folder, numbers] of Object.entries(held)) {
     const own = SHARDS.filter((s) => s.startsWith(`compiler/src/${folder}/`));
-    assert.deepEqual(
-      own,
-      Array.from({ length: last }, (_, i) => `compiler/src/${folder}/parity.shard-${i + 1}.test.ts`).sort(),
-    );
+    assert.deepEqual(own, numbers.map((n) => `compiler/src/${folder}/parity.shard-${n}.test.ts`).sort());
   }
   assert.ok(SHARDS.length >= 24, `${SHARDS.length} shards found`);
   console.log(`parity shards found (${SHARDS.length}):\n${SHARDS.join("\n")}`);

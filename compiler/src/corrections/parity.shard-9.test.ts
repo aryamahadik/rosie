@@ -1,9 +1,16 @@
 // T-1116: the opt-out line once in each person's chat, on Rosie's first reply in it, over all 243 trades x both flows x
-// every money path (Q-30; Master Corrections C9; DL-211, DL-226). Not a ninth slice of parity.ts's sweep: its own file,
-// in T-1067's parity project (the glob compiler/src/**/parity.shard-*.test.ts), outside `npm test`.
+// every money path (Q-30; Master Corrections C9; DL-211, DL-226). Not a slice of parity.ts's sweep: its own files, in
+// T-1067's parity project (the glob compiler/src/**/parity.shard-*.test.ts), outside `npm test`.
 //
-// stops.test.ts runs the same sweep on 17 trades inside `npm test` (barber, aba, deck and every 16th trade); this file
-// runs it on every trade. Its statement of who each message goes to, its walk and its checks are stops.test.ts's,
+// T-1319 (DL-600): this sweep and T-1132's below are split by trades over eight files, so no parity file runs near the
+// parity shard job's time limit (Vitest never splits a file). Each runs both sweeps over every 8th trade id of the
+// sorted list, starting at its SHARD (shardOf, ./parity.ts): parity.shard-9 to 15 and parity.shard-17 hold SHARD 0 to
+// 7, so together they run every trade once. SHARD 0's file also checks that there are 243 trades. Apart from SHARD and
+// that check the eight files are the same, and they change together. The names skip 16: Vitest's --shard orders the
+// files by the sha1 of their path, and these eight spread 3, 3 and 2 over the merge check's three shard jobs.
+//
+// stops.test.ts runs the same sweep on 17 trades inside `npm test` (barber, aba, deck and every 16th trade); the eight
+// files run it on every trade. Its statement of who each message goes to, its walk and its checks are stops.test.ts's,
 // copied (a test file cannot import another without running its tests, and the statement must stay apart from
 // stops.ts: it never reads walk.texts), with one change of cost and none of answer: a walk's state is copied only when
 // a text changes it, and a step that texts nobody (it does not text, or no message goes between Rosie and a person) is
@@ -49,6 +56,7 @@ import { applyTrade, type AppliedStep } from "../overlay/apply";
 import { tradePaths, type TradePath } from "../path";
 import { FROM_MOBILE } from "./c9";
 import { applyCorrections, tagOf, type CorrectedTrade } from "./framework";
+import { shardOf } from "./parity";
 import { walkStops } from "./stops";
 
 const FLOWS: readonly FlowLetter[] = ["A", "B"];
@@ -265,12 +273,18 @@ function chatLines(done: CorrectedTrade, path: TradePath): { problems: string[];
 const master = loadMaster();
 const ALL = listTradeIds();
 
+/** How many files share the two sweeps (T-1319). */
+const SHARDS = 8;
+/** This file's share (0-based): every SHARDS-th trade id of the sorted list, starting at SHARD. */
+const SHARD = 0;
+const IDS = shardOf(ALL, SHARD, SHARDS);
+
 describe(`the line once per person's chat: all ${String(ALL.length)} trades x both flows x every money path (T-1116)`, () => {
   it("has 243 trades", () => {
     expect(ALL).toHaveLength(243);
   });
 
-  for (const id of ALL) {
+  for (const id of IDS) {
     it(`${id}: each person's chat has the line exactly once, on Rosie's first reply in it, on every walk of every money path`, () => {
       const trade = loadTrade(id);
       for (const flow of FLOWS) {
@@ -341,7 +355,7 @@ function fieldsThatDiffer(a: unknown, b: unknown): string[] {
 }
 
 describe(`the bundle in the run's order: all ${String(ALL.length)} trades x both flows x every money path (T-1132)`, () => {
-  for (const id of ALL) {
+  for (const id of IDS) {
     it(`${id}: the bundle's ops over its corrected master give the corrected build at every step a correction changes, and every message's stop marker, on every walk of every money path`, () => {
       const trade = loadTrade(id);
       const held = correctWordsOps(master, trade);
