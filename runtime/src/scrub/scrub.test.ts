@@ -687,17 +687,19 @@ describe("properties", () => {
 //    closest to the scrub's own cost;
 //  - the runs of the two lengths alternate, so a change in the machine's speed (a clock that steps down, a hotter
 //    cache) over the measure reaches both lengths alike;
-//  - the reading is the median of 7 rounds of that ratio (T-1299): a busy stretch of a shared machine can slow every
-//    run of one length in a round, so one round can read high (or low), and the median of 7 moves only when 4
-//    rounds do. One round failed once on GitHub's runner: "20 digits and more in a run" read 9.28 (train 127). The
-//    scrub was not at fault: counted, its work for that shape grows 3.98 times for a text 3.98 times as long, and no
-//    character is looked at more than 5 times at either length. Its 40 000 character text pays about 110 page faults
-//    a run on the build Mac (the arrays of its one long run grow past V8's largest regular object onto fresh
-//    large-object pages) and the 10 000 one none, so it reads about 4.7 idle where user time alone reads 4.1 (and
-//    40 000 to 160 000 characters, both past that step, 3.9): kernel time, which a busy machine slows most. Beside 16
-//    busy processes on the build Mac, one round read up to 8.99 for that shape (1 of 30 readings), and beside 12 up
-//    to 8.83 for prices (1 of 20); the median of 7 rounds read 4.74 to 5.16 and 3.94 to 4.07 beside 16 (30 readings
-//    each), and the quadratic stand-in 14.54 to 14.80 (8 readings).
+//  - the reading is the median of 7 rounds of that ratio (T-1299): a busy stretch of a shared machine can slow the
+//    runs of one length in a round, so one round can read high (or low), and the median of 7 moves only when 4
+//    rounds do. One round read 9.28 once on GitHub's runner, for "20 digits and more in a run" (train 127). The scrub
+//    was not at fault: counted, its work on that shape grows 3.98 times for a text 3.98 times as long (9.33 looks
+//    and copies a character at 10 000, 40 000 and 160 000 characters; no character looked at more than 7 times).
+//    Its 40 000 character text holds one run of 38 100 digits, whose two arrays pass V8's largest regular object: each
+//    run of it takes 1.7 MB of fresh large-object pages and 110 page faults on the build Mac, where a run of the
+//    10 000 character text takes no such page and 0 to 3 faults, so the shape reads about 4.6 where user time alone
+//    reads 4.0 (and 40 000 to 160 000 characters, both past that step, 3.5 to 3.9): kernel time, which a busy
+//    machine slows most. On the build Mac one round read up to 6.22 for that shape idle (240 rounds) and 6.10
+//    beside a full npm test at a load of up to 70 (720 rounds); the median of 7 read 4.54 to 5.68 (30 readings) and
+//    4.56 to 4.81 (90 readings), no other shape's over 5.03, and the quadratic stand-in's 14.13 to 16.82 (120
+//    readings).
 
 /** The CPU time in microseconds this process spends running `run`. */
 function cpuTimed(run: () => unknown): number {
@@ -802,7 +804,7 @@ describe("speed: the time grows in step with the length of the text", () => {
     };
     const make = repeated("Order 4242424242424241 total $1,250.00 call 555-0104. ");
     // The texts are shorter than the shapes' (1 000 and 4 000 characters), so the stand-in's 7 rounds stay near a
-    // second of CPU on the build Mac; its ratio still reads 14 to 16, nearly twice the limit.
+    // second of CPU on the build Mac; its ratio still reads 14 to 17, nearly twice the limit.
     const small = make(1_000);
     const large = make(4_000);
     expect(growthOf(quadratic, small, large, 7, 2)).toBeGreaterThan(LINEAR_LIMIT_FOR_4X);
