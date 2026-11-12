@@ -41,6 +41,8 @@
 //      README puts it (db-schema.core.twins.ts), passing; each constraint v1.1 adds the one reason of one of them; v1.1
 //      only adding to v1; and every v1 case (each refused fixture and its mend, each damaged copy, a row without its
 //      turn id) holding under v1.1's list as under v1's. Its database side is db-schema.core.v1.db-side.test.ts.
+//      Round 2 (DL-618): outbox_rows_email_purpose_known's list pinned to K-12 v1's six purposes, and the CHECKs v1.1
+//      adds pinned at their edges (db-schema.core.twins.ts EDGES_V1_1, which the database side runs too).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: a freshly migrated PostgreSQL schema
 //   compared with the table list, the seeds loaded into it and the refused rows refused there, and each consumer's reads
 //   and writes through K-05.
@@ -55,7 +57,19 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
 import { CONTRACTS_ROOT, checkContractFixtures, formatErrors, type FixtureEntry } from "./_harness";
-import { PUT_RIGHT_V1_1, putRight } from "./db-schema.core.twins";
+import {
+  CODE_HAS_NOT_AFTER,
+  DELIVERED_HAS_TIME,
+  EDGES_V1_1,
+  K07_PART_STATES,
+  K12_PURPOSES,
+  OUTSIDE_PURPOSES,
+  PURPOSE_KNOWN,
+  PUT_RIGHT_V1_1,
+  TURN_OR_JOB,
+  putRight,
+  type Edge,
+} from "./db-schema.core.twins";
 
 // ---------------------------------------------------------------------------------------------------------------
 // The contract's files
@@ -2492,6 +2506,116 @@ describe("db-schema core v1.1: every v1 case holds under core.v1.1.tables.json a
     ).values.job_id;
     expect(shown(load(freshDb(V1_1), "seed-outbox-row.json", new Set(), withoutTurn))).toBe("loaded");
   });
+});
+
+// Round 2 (T-1290, DL-618): the CHECKs v1.1 adds pinned at their edges, so a list cut down or a CHECK tightened fails
+// here. README section "v1.1", "What changes" (lines 104 to 108) and defaults 12 and 15. Each edge is a twin's action
+// with one value changed, or the tour row's own update (db-schema.core.twins.ts EDGES_V1_1); the database side runs the
+// same edges on PostgreSQL.
+
+/** README line 105 (and default 12): outbox_rows_email_purpose_known's six, K-12 v1's purposes as K-12 spells them. */
+const README_PURPOSES = ["confirmation", "copy", "emailWay", "nextWay", "code", "notice"];
+
+/** What an edge's action names at a column: its insert's value, else its update's. */
+const named = (edge: Edge, column: string): unknown =>
+  edge.action.values?.[column] ?? edge.action.set?.[column] ?? null;
+const passes = (edge: Edge): boolean => "rows" in edge.action.expect;
+const edgesOf = (constraint: string, passing: boolean): Edge[] =>
+  EDGES_V1_1.filter((edge) => edge.constraint === constraint && passes(edge) === passing);
+/** The purposes a list of edges names, no purpose as "(none)", sorted. */
+const purposesOf = (edges: Edge[]): string[] =>
+  edges
+    .map((edge) => (named(edge, "email_purpose") === null ? "(none)" : String(named(edge, "email_purpose"))))
+    .sort();
+
+describe("db-schema core v1.1: each CHECK v1.1 adds pinned at its edges (README section v1.1, What changes; defaults 12 and 15)", () => {
+  it("README line 105 and default 12 (K-12): outbox_rows_email_purpose_known holds K-12 v1's six purposes, no more and no less, or none; a purpose outside them is refused", () => {
+    const k12Purposes = (
+      readJson(path.join(CONTRACTS_ROOT, "port-email", "port-email.v1.schema.json")) as {
+        $defs: { purpose: { enum: string[] } };
+      }
+    ).$defs.purpose.enum;
+    expect([...k12Purposes].sort()).toEqual([...README_PURPOSES].sort());
+    expect(K12_PURPOSES, "the edges take K-12 v1's purposes").toEqual(k12Purposes);
+    const check = must(
+      tableOf(tableListOf(V1_1), "outbox_rows").checks?.find((each) => each.name === PURPOSE_KNOWN),
+      PURPOSE_KNOWN,
+    );
+    const node = sqlOf(check.expression);
+    const [isNull, inList] = node.op === "or" && node.args.length === 2 ? node.args : [];
+    if (
+      isNull?.op !== "isNull" ||
+      isNull.negated ||
+      isNull.arg.op !== "column" ||
+      inList?.op !== "in" ||
+      inList.negated ||
+      inList.arg.op !== "column"
+    )
+      throw new Error(
+        `${PURPOSE_KNOWN} is not "a column is null or the column in a list": ${check.expression}`,
+      );
+    expect([isNull.arg.name, inList.arg.name]).toEqual(["email_purpose", "email_purpose"]);
+    const listed = inList.list.map((item) =>
+      item.op === "literal" ? textArg(item.value) : "(not a literal)",
+    );
+    expect([...listed].sort()).toEqual([...k12Purposes].sort());
+    for (const purpose of k12Purposes)
+      expect(holds(check.expression, { email_purpose: purpose }), purpose).toBe(true);
+    expect(holds(check.expression, { email_purpose: null })).toBe(true);
+    for (const purpose of ["signIn", ...OUTSIDE_PURPOSES])
+      expect(holds(check.expression, { email_purpose: purpose }), purpose).toBe(false);
+  });
+
+  it("has an edge for each case of the lead's round-2 note: every K-12 purpose and none, and purposes outside them; a code row with and without its not_after, and every other purpose or none without one; every K-07 part state but delivered with no time; and both ids", () => {
+    const none = "(none)";
+    const others = K12_PURPOSES.filter((purpose) => purpose !== "code");
+    expect(purposesOf(edgesOf(PURPOSE_KNOWN, true))).toEqual([...K12_PURPOSES, none].sort());
+    const outside = purposesOf(edgesOf(PURPOSE_KNOWN, false));
+    expect(outside).toEqual([...OUTSIDE_PURPOSES].sort());
+    for (const purpose of outside) expect(K12_PURPOSES, purpose).not.toContain(purpose);
+    const withoutNotAfter = edgesOf(CODE_HAS_NOT_AFTER, true).filter(
+      (edge) => named(edge, "not_after") === null,
+    );
+    expect(purposesOf(withoutNotAfter)).toEqual([...others, none].sort());
+    const withNotAfter = edgesOf(CODE_HAS_NOT_AFTER, true).filter(
+      (edge) => named(edge, "not_after") !== null,
+    );
+    expect(purposesOf(withNotAfter)).toEqual(["code"]);
+    const refused = edgesOf(CODE_HAS_NOT_AFTER, false);
+    expect([purposesOf(refused), refused.map((edge) => named(edge, "not_after"))]).toEqual([
+      ["code"],
+      [null],
+    ]);
+    const parts = edgesOf(DELIVERED_HAS_TIME, true);
+    expect(parts.map((edge) => named(edge, "state")).sort()).toEqual(
+      K07_PART_STATES.filter((state) => state !== "delivered").sort(),
+    );
+    for (const edge of parts) expect(named(edge, "delivered_at"), edge.case).toBeNull();
+    expect(edgesOf(DELIVERED_HAS_TIME, false)).toEqual([]);
+    const [both, ...more] = edgesOf(TURN_OR_JOB, true);
+    expect(more).toEqual([]);
+    const tourRow = must(
+      fixtureOf(must(both).base).rows.find((row) => row.values.id === must(both).action.where?.id),
+      "the row the update names",
+    );
+    expect([typeof tourRow.values.turn_id, typeof named(must(both), "job_id")]).toEqual(["string", "string"]);
+  });
+
+  for (const edge of EDGES_V1_1) {
+    it(`${edge.constraint}: ${edge.case} ${passes(edge) ? "passes and writes one row" : "is refused with 23514 by it"}`, () => {
+      if (edge.changed !== null) {
+        const twin = must(fixtureOf(edge.base).refused, `${edge.base}'s refused action`);
+        expect(
+          differences({ ...twin, expect: null }, { ...edge.action, expect: null }),
+          "the twin's action, changed only where the edge says",
+        ).toEqual([...edge.changed]);
+      }
+      const db = freshDb(V1_1);
+      expect(shown(load(db, edge.base, new Set()))).toBe("loaded");
+      const outcome = run(db, edge.action);
+      expect(expectProblems(outcome, edge.action.expect), outcome.error?.message ?? "").toEqual([]);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------------------------------------------

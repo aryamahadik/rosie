@@ -12,6 +12,10 @@
 //   - a refused fixture: its `after` chain and its rows load, and its one action, run as its side, is refused with the
 //     SQLSTATE and one of the constraints its `expect` names (or returns its rows); put right as the README puts it
 //     (db-schema.core.twins.ts, from which the model puts it right too), the same action passes and writes one row.
+// Round 2 (DL-618): the CHECKs v1.1 adds, pinned at their edges as the model pins them (db-schema.core.twins.ts
+// EDGES_V1_1: each of K-12 v1's six purposes, none, and a purpose outside them; a code row with and without its
+// not_after, and every other purpose or none without one; a part in every K-07 state but delivered with no time; a row
+// with both ids), each run the same way; and outbox_rows_email_purpose_known's list as PostgreSQL holds it.
 // A fixture's rows load in order as the runtime side, as the README's file format has them, and its action runs as
 // README rule 4's side: the runtime side as rosie_job with no business scope, a Tool API call as rosie_app under its
 // business (0012's roles and policies). Each fixture runs in one transaction that is always rolled back, and each action
@@ -33,7 +37,15 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Tx } from "../../db/repo/scope";
 import { createTestDatabase, type TestDatabase } from "../../db/repo/test-db";
 import { CONTRACTS_ROOT, type FixtureEntry } from "./_harness";
-import { PUT_RIGHT_V1_1, putRight, type FixtureValue, type PutRight } from "./db-schema.core.twins";
+import {
+  EDGES_V1_1,
+  K12_PURPOSES,
+  PURPOSE_KNOWN,
+  PUT_RIGHT_V1_1,
+  putRight,
+  type FixtureValue,
+  type PutRight,
+} from "./db-schema.core.twins";
 
 // ---------------------------------------------------------------------------------------------------------------
 // The contract's files
@@ -365,6 +377,43 @@ describe("db-schema core database side: the fixtures of v1.1 against PostgreSQL 
         ),
       ).toEqual(["must be refused by one of outbox_rows_code_has_not_after, but by outbox_rows_turn_or_job"]);
       expect(expectProblems(asToolApi, { rows: 1 })[0]).toMatch(/^must return 1 rows, but is refused/);
+    },
+  );
+});
+
+describe("db-schema core database side: each CHECK v1.1 adds pinned at its edges on PostgreSQL with every migration applied (T-1290 round 2)", () => {
+  for (const edge of EDGES_V1_1) {
+    const passes = "rows" in edge.action.expect;
+    it(
+      `${edge.constraint}: ${edge.case} ${passes ? "passes and writes one row" : "is refused with 23514 by it"}`,
+      SLOW,
+      async () => {
+        const outcome = await rolledBack(async (tx) => {
+          await load(tx, edge.base);
+          return attempt(tx, edge.action);
+        });
+        expect(expectProblems(outcome, edge.action.expect)).toEqual([]);
+      },
+    );
+  }
+
+  it(
+    "holds outbox_rows_email_purpose_known as the migrated schema has it: no purpose, or one of K-12 v1's six, no more and no less",
+    SLOW,
+    async () => {
+      const [found] = await db.sql<{ definition: string }[]>`
+      select pg_get_constraintdef(c.oid) as definition
+      from pg_constraint c
+      join pg_class t on t.oid = c.conrelid
+      join pg_namespace n on n.oid = t.relnamespace
+      where n.nspname = ${db.schema} and t.relname = 'outbox_rows' and c.conname = ${PURPOSE_KNOWN}
+    `;
+      const definition = must(found, `${PURPOSE_KNOWN} on outbox_rows`).definition;
+      expect(definition).toMatch(
+        /^CHECK \(\(\(email_purpose IS NULL\) OR \(email_purpose = ANY \(ARRAY\[[^\]]*\]\)\)\)\)$/,
+      );
+      const listed = [...definition.matchAll(/'((?:[^']|'')*)'::text/g)].map((match) => match[1]);
+      expect([...listed].sort()).toEqual([...K12_PURPOSES].sort());
     },
   );
 });
