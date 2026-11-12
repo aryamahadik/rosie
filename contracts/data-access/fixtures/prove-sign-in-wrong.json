@@ -1,0 +1,27 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json"],
+    "now": "2026-11-02T13:00:40Z",
+    "note": "Sam mistypes his code. check_proof_code answers wrong (the code's wrong_tries 1); sign_in_attempt_tried records the attempt's wrong try (its wrong_tries 1, last_wrong_at now) and the answer is read from the attempt after it: 4 tries left. The wrong try commits at once, so it counts whatever fails after (K-22 README line 212). An attempt with no code counts and answers the same (K-22 rule 9's check, step 5). The typed hash is a stand-in for a wrong code's."
+  },
+  "request": {
+    "attemptId": "attempt-sam-signin-nov02",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "requestId": "req-portal-sam-nov02-check-0",
+    "typedHash": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f9",
+    "session": {
+      "id": "session-sam-nov02-try-0",
+      "tokenSha256": "b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5"
+    }
+  },
+  "outcome": {
+    "outcome": "wrong",
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "triesLeft": 4,
+    "proofCodeId": "code-sam-sign-in-nov02",
+    "repeated": false
+  }
+}

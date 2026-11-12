@@ -1,0 +1,19 @@
+{
+  "call": "endSession",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T14:00:00Z",
+    "note": "Sam signs out of the session prove-sign-in-sam-right started. As the Tool API: session_for_token finds the live session by its token's sha256 and answers it and Sam; rosie.person_id is set to Sam; the update sets ended_at now and ended_why signed_out under K-22 rule 5's update policy, which admits only that person's own live session. The answer names the session and the person for the session.ended entry (signInEntries), never to the page."
+  },
+  "request": {
+    "tokenSha256": "b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1"
+  },
+  "outcome": {
+    "result": "signedOut",
+    "repeated": false,
+    "sessionId": "session-sam-nov02",
+    "personId": "person-sam"
+  }
+}

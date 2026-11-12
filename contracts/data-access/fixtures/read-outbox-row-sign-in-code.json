@@ -1,0 +1,19 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json"],
+    "now": "2026-11-02T13:00:02Z",
+    "note": "A read that names Sam's code row, which has no business, so it runs on the runtime side. The row has no turn (K-04 v1.1 job row), so the read answers notFound (table outbox_rows) before any turn read, as a safety row answers fixedLineRow first, and returns nothing of it (README item 65; ADR-016 section 1). No caller names such a row: it is written checked and never goes stale."
+  },
+  "request": {
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "businessId": null
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "outbox_rows",
+    "rowId": "out-sam-sign-in-nov02-code"
+  }
+}

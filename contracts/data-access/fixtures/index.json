@@ -2231,6 +2231,358 @@
       "expect": "refuse",
       "shows": "A stopped flag asked by the number in place of the actor's handle id: the actor names its handle, and no number travels in the request (put right, it is read-stopped-flag-alex-stopped)",
       "source": "runtime/src/actor/copies/types.ts StoppedFlagSource ({ handleId }); K-05 v1.7 item 46 (no number in a request); K-05 v1.12 item 57"
+    },
+    {
+      "file": "start-sign-in-sam.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam starts an email sign-in from his laptop: no bound, repeat, pause or cap holds, one account names him, and the attempt is written with his person, its 10 minutes by the database's clock",
+      "source": "ADR-016 section 4 rules 0 to 5; K-22 v1.2 rule 9; K-21 v1 sign-in-request.json; S11-52; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-repeat.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same start sent again: its first attempt answered, repeated, nothing written and no code to follow",
+      "source": "ADR-016 section 4 rule 1; K-21 v1 schema line 688; K-22 v1.2 rule 9; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-no-account.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A start for an email no account holds: the same started answer, the attempt with no person, no code to follow",
+      "source": "ADR-016 section 4 rules 4 and 5; S13-45; K-21 README line 114; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-two-accounts.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Two accounts with one proven email: the start names no person and sends nothing, answering started all the same",
+      "source": "ADR-016 section 4 rule 4 and open point 14; 0020 lines 98 to 107; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-day-cap.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A sixth start of one contact in 24 hours: paused until the earliest of the five plus 24 hours, nothing written",
+      "source": "ADR-016 section 4 rule 3 and open point 1; S13-45; K-22 v1.2 rule 9 and default 23; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-contact-paused.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A new start for a contact whose attempt five wrong codes paused: paused until that pause ends, nothing written",
+      "source": "ADR-016 section 4 rule 2; K-22 v1.2 seed-sign-in-attempt.json; K-21 v1 sign-in-wrong-five.json; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-no-account-paused.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same paused answer for a contact no account holds, whose attempt was paused the same way",
+      "source": "ADR-016 section 4; K-21 v1 schema line 780; K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-hour-bound.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The 101st start in an hour, of any contacts: paused until the oldest of the hour's 100 is an hour old, read before any lock or account, nothing written",
+      "source": "ADR-016 section 4 rule 0 and open point 13; K-22 v1.2 rule 9; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-sam-new-device.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam starts from a browser none of his sessions used: started as from any device, the attempt bound to this one",
+      "source": "ADR-016 section 4; K-22 v1.2 sign_in_attempts.device_sha256; K-05 v1.13 item 58"
+    },
+    {
+      "file": "send-sign-in-code-sam.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "Sam's code after the answer, in one transaction under the contact's lock: the code row with only its keyed hash, the email row with no turn (job id, quick_reply, purpose code, not_after the code's end) written checked with its plan and final parts, three entries and the attempt's code id",
+      "source": "ADR-016 section 1; K-04 v1.1; K-22 v1.2 rule 9; K-12 v1 send-code.json; DL-546; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-repeat.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "The send for the same attempt again: the first send answered, nothing written, no second code",
+      "source": "ADR-016 section 1; K-04 v1.1 outbox_rows_job_idx; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-no-person.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "A send for an attempt with no person: notSent, nothing written or sent",
+      "source": "ADR-016 section 4; card R1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-sam-new-device.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "The code for Sam's start on a new browser, sent as any code is",
+      "source": "ADR-016 section 1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "prove-sign-in-sam-right.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam's right code on a device he used before: rosie.person_id set to his person, the session started naming the code, the attempt signed in",
+      "source": "ADR-016 sections 4 and 6; K-22 v1 rules 4 and 5; K-22 v1.2 rule 9's check; K-21 v1 signInCheck; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-repeat.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The right check sent again: alreadySignedIn, no token, no second session, nothing counted",
+      "source": "K-21 README line 115; K-22 v1.2 rule 9's check, step 2; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-other-device.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A check of Sam's attempt from another browser: attemptNotFound alone, nothing told, counted or written",
+      "source": "K-21 README line 117; K-22 v1.2 sign_in_attempt; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-wrong.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A wrong code: one wrong try of the attempt, 4 left, read from the attempt and committed at once",
+      "source": "ADR-016 section 4; K-22 v1.2 rule 9's check, step 5; K-22 README line 212; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-sixth-check.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A sixth check after five wrong ones: paused from the server, counting nothing, cookie or none",
+      "source": "STATE note 74; ADR-016 section 4; K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-sixth-check-no-account.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same sixth check of an attempt with no account and no code: the same paused answer",
+      "source": "ADR-016 section 4 (every answer to a code that is not right comes from the attempt); K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-expired.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The right code at 10 minutes 1 second: expired, nothing counted, the code not used",
+      "source": "RULES 6.2; 05-deployments.md line 958; K-22 v1.2 rule 9's check, step 3; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-second-proof.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "An owner's right code on a device none of his sessions used: secondProofNeeded, the code used, no session",
+      "source": "S13-45 row 8; K-21 README line 110; K-22 v1 rule 4; K-05 v1.13 item 60"
+    },
+    {
+      "file": "end-session-sam.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "accept",
+      "shows": "Sam signs out: session_for_token finds his session, rosie.person_id is set to him, and only that live session ends, signed_out",
+      "source": "ADR-016 section 6; K-22 v1 rule 5; K-21 v1 sign-out.json; K-05 v1.13 item 61"
+    },
+    {
+      "file": "end-session-repeat.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "accept",
+      "shows": "The sign-out again: repeated, nothing ended, no session named",
+      "source": "K-21 v1 signOut; K-05 v1.13 item 61"
+    },
+    {
+      "file": "person-standing-sam.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's standing after his sign-in: his four live owner roles in role id order, no team row, not a tester",
+      "source": "ADR-016 section 6; K-21 v1 signedIn.person; K-04 seed-person-roles.json; K-23 seed-company-two-kinds.json; K-05 v1.13 item 62"
+    },
+    {
+      "file": "person-standing-alex.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Alex, a customer only: no role is a standing, so roles empty",
+      "source": "FS line 701; K-21 v1 SignedInRole; K-05 v1.13 item 62"
+    },
+    {
+      "file": "person-standing-check-tester.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Staging's check tester: no role, a live team row, so team and tester",
+      "source": "K-05 v1.12 defaults 103 and 105; K-21 v1 default 2; K-05 v1.13 item 62"
+    },
+    {
+      "file": "sign-in-entries-signed-in.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "Sam's check logged under the attempt's id: proof_code.checked for his code's use and session.started, values read from the rows",
+      "source": "ADR-016 section 6; K-08 v1.1 proof_code.checked; K-08 v1.2 session.started; CQ-258; K-05 v1.13 item 63"
+    },
+    {
+      "file": "sign-in-entries-wrong-try.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "A wrong code logged: proof_code.checked for the code's first wrong try",
+      "source": "K-08 v1.1 proof_code.checked; ADR-016 section 6; K-05 v1.13 item 63"
+    },
+    {
+      "file": "sign-in-entries-sign-out.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "Sam's sign-out logged: session.ended under the sign-out's own request id",
+      "source": "K-08 v1.2 session.ended and default 25; ADR-016 section 6; K-05 v1.13 item 63"
+    },
+    {
+      "file": "claim-sam-sign-in-code.json",
+      "version": "v1.13",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's code row claimed by the email port, naming its purpose code and its notAfter, with no business, turn or job id",
+      "source": "ADR-016 sections 2, 3 and 5; K-04 v1.1 email_purpose, not_after; card R0; K-05 v1.13 item 64"
+    },
+    {
+      "file": "read-outbox-row-sign-in-code.json",
+      "version": "v1.13",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A read of the code row, which has no turn: notFound before any turn read, nothing of it returned",
+      "source": "ADR-016 section 1 (the reader table) and open point 12; K-04 v1.1; CQ-248; K-05 v1.13 item 65"
+    },
+    {
+      "file": "give-up-sign-in-code-no-turn.json",
+      "version": "v1.13",
+      "def": "dispatcherGivesUp.exchange",
+      "expect": "accept",
+      "shows": "A give-up of the code row: noTurn, nothing written, neither the move to failed nor a follow-up nor an entry",
+      "source": "ADR-016 section 3 (how a code row ends); K-07 retry rule 5; K-05 v1.13 item 66"
+    },
+    {
+      "file": "write-all-set-no-turn.json",
+      "version": "v1.13",
+      "def": "writeAllSet.exchange",
+      "expect": "accept",
+      "shows": "An 'all set' naming the code row: noTurn, nothing written",
+      "source": "ADR-016 section 3; K-05 v1.1 item 25; K-05 v1.13 item 66"
+    },
+    {
+      "file": "mark-sign-in-code-failed-no-turn.json",
+      "version": "v1.13",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A failed mark of the code row's part carrying follow-ups: noTurn, nothing written, the failure included",
+      "source": "ADR-016 section 3; K-05 v1.1 item 15; K-05 v1.13 item 66"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-past-cap-wrote.json",
+      "version": "v1.13",
+      "def": "startSignIn.response",
+      "expect": "refuse",
+      "shows": "A sixth start in a day answered paused that names the attempt it wrote: a start past the cap writes nothing (put right, it is start-sign-in-day-cap's outcome)",
+      "source": "ADR-016 section 4 rule 3; K-22 v1.2 rule 9; card V3's refused twins; K-05 v1.13 item 58"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-text-way.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "refuse",
+      "shows": "Sam's start by way text, which this lane does not serve (put right, by way email, it is start-sign-in-sam)",
+      "source": "ADR-016 section 5; CQ-244; K-05 v1.13 item 58"
+    },
+    {
+      "file": "invalid/refuse-send-sign-in-code-plain-code.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "refuse",
+      "shows": "Sam's send with the code itself where its keyed hash goes: a code is never stored (put right, with its hash, it is send-sign-in-code-sam)",
+      "source": "K-22 v1 proof_codes_hash_form; BP rule 7; ADR-016 section 1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "invalid/refuse-prove-sign-in-other-device-told.json",
+      "version": "v1.13",
+      "def": "proveSignIn.errors",
+      "expect": "refuse",
+      "shows": "A check from another device answered attemptNotFound that names the attempt: another browser learns nothing, not even that an attempt exists (put right, it is prove-sign-in-other-device's outcome)",
+      "source": "K-21 README line 117; K-21 v1 AttemptNotFoundError; card V3's refused twins; K-05 v1.13 item 60"
+    },
+    {
+      "file": "invalid/refuse-prove-sign-in-session-no-person.json",
+      "version": "v1.13",
+      "def": "proveSignIn.response",
+      "expect": "refuse",
+      "shows": "A session started with no person: a session starts only for the attempt's person, set as rosie.person_id (put right, with person-sam, it is prove-sign-in-sam-right's outcome)",
+      "source": "K-22 v1 rules 4 and 5 (refuse-sign-in-session-start); card V3's refused twins; K-05 v1.13 item 60"
+    },
+    {
+      "file": "invalid/refuse-end-session-token-not-hash.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "refuse",
+      "shows": "A sign-out asked with the session token itself where its sha256 goes (put right, with the hash, it is end-session-sam)",
+      "source": "K-22 v1 sessions_token_hash_form; K-21 v1 opaqueToken; K-05 v1.13 item 61"
+    },
+    {
+      "file": "invalid/refuse-person-standing-customer-role.json",
+      "version": "v1.13",
+      "def": "personStanding.response",
+      "expect": "refuse",
+      "shows": "Alex's customer role answered as a standing: customers have no sign-in (put right, roles empty, it is person-standing-alex's outcome)",
+      "source": "FS line 701; K-21 v1 SignedInRole; K-05 v1.13 item 62"
+    },
+    {
+      "file": "invalid/refuse-sign-in-entries-caller-values.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "refuse",
+      "shows": "A session's entry asked with the caller's own values, a token hash among them: every value is read from the row (put right, the ask alone, it is sign-in-entries-signed-in)",
+      "source": "K-08 v1.2 (never a token or device hash); K-21 v1 opaqueToken; K-05 v1.13 item 63"
+    },
+    {
+      "file": "invalid/refuse-claimed-code-row-no-not-after.json",
+      "version": "v1.13",
+      "def": "claimOutbox.response",
+      "expect": "refuse",
+      "shows": "Sam's code row claimed with no notAfter: a code row always carries its end, so no try sends a dead code (put right, it is claim-sam-sign-in-code's outcome)",
+      "source": "K-04 v1.1 outbox_rows_code_has_not_after; ADR-016 section 3; K-05 v1.13 item 64"
+    },
+    {
+      "file": "invalid/refuse-give-up-no-turn-wrote.json",
+      "version": "v1.13",
+      "def": "dispatcherGivesUp.errors",
+      "expect": "refuse",
+      "shows": "A give-up of a row with no turn answered noTurn that lists a follow-up row it wrote: noTurn writes nothing (put right, it is give-up-sign-in-code-no-turn's outcome)",
+      "source": "ADR-016 section 3; card V3's refused twins; K-05 v1.13 item 66"
     }
   ]
 }

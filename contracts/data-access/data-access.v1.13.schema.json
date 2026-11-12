@@ -1,0 +1,1512 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.13.schema.json",
+  "title": "DataAccessV1dot13",
+  "description": "K-05 v1.13, a minor version of the data-access calls (T-1277: ADR-016's card V3, the sign-in version; DL-526, DL-546). It only adds to v1.12 (data-access.v1.12.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.12 definition is here under its own name, by reference, save the seven restated to take what v1.13 adds (claimedRow, claimOutbox.response, claimOutbox.exchange, markPart.errors, markPart.exchange, dispatcherGivesUp.errors, dispatcherGivesUp.exchange, writeAllSet.errors and writeAllSet.exchange), each of which takes only a new optional field or a new error, so every v1 to v1.12 exchange is a v1.13 exchange. Added: the six calls of ADR-016 section 6 (README items 58 to 63): startSignIn and sendSignInCode (the send side, rosie_job), proveSignIn (the check, rosie_app), endSession (the sign-out, rosie_app), personStanding and signInEntries (after a check or a sign-out, rosie_job); the claimed row's optional emailPurpose and notAfter (item 64, K-04 v1.1's email_purpose and not_after); readOutboxRow's notFound for a row with no turn (item 65, a rule: no definition changes); and noTurn on dispatcherGivesUp, writeAllSet and markPart's follow-ups (item 66). Every time a sign-in call reads or writes is the database's own clock in its transaction, never a time in a request (README default 112). Each call reads the primary uncached. The calls read and write K-04 v1.1 and K-22 v1.2 as migrated (0032 to 0034) with K-08 v1.2's kinds, so no column, grant, index, table or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/commitTurn.exchange" },
+    { "$ref": "#/$defs/writePlan.exchange" },
+    { "$ref": "#/$defs/unplannedRows.exchange" },
+    { "$ref": "#/$defs/claimOutbox.exchange" },
+    { "$ref": "#/$defs/markPart.exchange" },
+    { "$ref": "#/$defs/markRow.exchange" },
+    { "$ref": "#/$defs/armClock.exchange" },
+    { "$ref": "#/$defs/cancelClock.exchange" },
+    { "$ref": "#/$defs/dueClocks.exchange" },
+    { "$ref": "#/$defs/fireClock.exchange" },
+    { "$ref": "#/$defs/reserve.exchange" },
+    { "$ref": "#/$defs/release.exchange" },
+    { "$ref": "#/$defs/extend.exchange" },
+    { "$ref": "#/$defs/readActiveBundle.exchange" },
+    { "$ref": "#/$defs/readBundleValue.exchange" },
+    { "$ref": "#/$defs/publishBundleCopy.exchange" },
+    { "$ref": "#/$defs/setActiveBundle.exchange" },
+    { "$ref": "#/$defs/parkTurn.exchange" },
+    { "$ref": "#/$defs/renewClaim.exchange" },
+    { "$ref": "#/$defs/dispatcherGivesUp.exchange" },
+    { "$ref": "#/$defs/claimEffects.exchange" },
+    { "$ref": "#/$defs/recordEffectResult.exchange" },
+    { "$ref": "#/$defs/serviceBack.exchange" },
+    { "$ref": "#/$defs/recordProviderEvent.exchange" },
+    { "$ref": "#/$defs/reconciliationRefund.exchange" },
+    { "$ref": "#/$defs/writeAllSet.exchange" },
+    { "$ref": "#/$defs/readTurnState.exchange" },
+    { "$ref": "#/$defs/handleTargets.exchange" },
+    { "$ref": "#/$defs/sendState.exchange" },
+    { "$ref": "#/$defs/handleSealingKey.exchange" },
+    { "$ref": "#/$defs/readOpenHolds.exchange" },
+    { "$ref": "#/$defs/readOutboxRow.exchange" },
+    { "$ref": "#/$defs/readFixedLineFacts.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/readSafetyHold.exchange" },
+    { "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange" },
+    { "$ref": "#/$defs/readOutboxRowWritten.exchange" },
+    { "$ref": "#/$defs/readBusinessOwner.exchange" },
+    { "$ref": "#/$defs/readBusinessZone.exchange" },
+    { "$ref": "#/$defs/rowReader.exchange" },
+    { "$ref": "#/$defs/openChatOnText.exchange" },
+    { "$ref": "#/$defs/readQuestionFacts.exchange" },
+    { "$ref": "#/$defs/readHandle.exchange" },
+    { "$ref": "#/$defs/readChatHandle.exchange" },
+    { "$ref": "#/$defs/readTurnParty.exchange" },
+    { "$ref": "#/$defs/readTesterStanding.exchange" },
+    { "$ref": "#/$defs/readRosterPhone.exchange" },
+    { "$ref": "#/$defs/readPhoneState.exchange" },
+    { "$ref": "#/$defs/readLiveTimers.exchange" },
+    { "$ref": "#/$defs/readStoppedFlag.exchange" },
+    { "$ref": "#/$defs/startSignIn.exchange" },
+    { "$ref": "#/$defs/sendSignInCode.exchange" },
+    { "$ref": "#/$defs/proveSignIn.exchange" },
+    { "$ref": "#/$defs/endSession.exchange" },
+    { "$ref": "#/$defs/personStanding.exchange" },
+    { "$ref": "#/$defs/signInEntries.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "data-access.v1.12.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "data-access.v1.12.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "data-access.v1.12.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "data-access.v1.12.schema.json#/$defs/nullableUtc" },
+    "zone": { "$ref": "data-access.v1.12.schema.json#/$defs/zone" },
+    "bundleId": { "$ref": "data-access.v1.12.schema.json#/$defs/bundleId" },
+    "phoneNumber": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneNumber" },
+    "tableName": { "$ref": "data-access.v1.12.schema.json#/$defs/tableName" },
+    "version": { "$ref": "data-access.v1.12.schema.json#/$defs/version" },
+    "sqlstate": { "$ref": "data-access.v1.12.schema.json#/$defs/sqlstate" },
+    "rowRef": { "$ref": "data-access.v1.12.schema.json#/$defs/rowRef" },
+    "changedRow": { "$ref": "data-access.v1.12.schema.json#/$defs/changedRow" },
+    "during": { "$ref": "data-access.v1.12.schema.json#/$defs/during" },
+    "given": { "$ref": "data-access.v1.12.schema.json#/$defs/given" },
+    "transientError": { "$ref": "data-access.v1.12.schema.json#/$defs/transientError" },
+    "notFoundError": { "$ref": "data-access.v1.12.schema.json#/$defs/notFoundError" },
+    "versionChangedError": { "$ref": "data-access.v1.12.schema.json#/$defs/versionChangedError" },
+    "constraintError": { "$ref": "data-access.v1.12.schema.json#/$defs/constraintError" },
+    "turn": { "$ref": "data-access.v1.12.schema.json#/$defs/turn" },
+    "stateWrite": { "$ref": "data-access.v1.12.schema.json#/$defs/stateWrite" },
+    "stateTable": { "$ref": "data-access.v1.12.schema.json#/$defs/stateTable" },
+    "openQuestionNew": { "$ref": "data-access.v1.12.schema.json#/$defs/openQuestionNew" },
+    "openQuestionClose": { "$ref": "data-access.v1.12.schema.json#/$defs/openQuestionClose" },
+    "clockKind": { "$ref": "data-access.v1.12.schema.json#/$defs/clockKind" },
+    "clockNew": { "$ref": "data-access.v1.12.schema.json#/$defs/clockNew" },
+    "clockCancel": { "$ref": "data-access.v1.12.schema.json#/$defs/clockCancel" },
+    "channel": { "$ref": "data-access.v1.12.schema.json#/$defs/channel" },
+    "sendClass": { "$ref": "data-access.v1.12.schema.json#/$defs/sendClass" },
+    "outboxRowNew": { "$ref": "data-access.v1.12.schema.json#/$defs/outboxRowNew" },
+    "reservationConfirm": { "$ref": "data-access.v1.12.schema.json#/$defs/reservationConfirm" },
+    "reservationLetGo": { "$ref": "data-access.v1.12.schema.json#/$defs/reservationLetGo" },
+    "sealedValues": { "$ref": "data-access.v1.12.schema.json#/$defs/sealedValues" },
+    "eventEntry": { "$ref": "data-access.v1.12.schema.json#/$defs/eventEntry" },
+    "writes": { "$ref": "data-access.v1.12.schema.json#/$defs/writes" },
+    "outboxRowWritten": { "$ref": "data-access.v1.12.schema.json#/$defs/outboxRowWritten" },
+    "promotion": { "$ref": "data-access.v1.12.schema.json#/$defs/promotion" },
+    "skippedInLine": { "$ref": "data-access.v1.12.schema.json#/$defs/skippedInLine" },
+    "commitResult": { "$ref": "data-access.v1.12.schema.json#/$defs/commitResult" },
+    "reservationLostError": { "$ref": "data-access.v1.12.schema.json#/$defs/reservationLostError" },
+    "commitTurn.request": { "$ref": "data-access.v1.12.schema.json#/$defs/commitTurn.request" },
+    "commitTurn.response": { "$ref": "data-access.v1.12.schema.json#/$defs/commitTurn.response" },
+    "commitTurn.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/commitTurn.errors" },
+    "commitTurn.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/commitTurn.exchange" },
+    "writePlan.request": { "$ref": "data-access.v1.12.schema.json#/$defs/writePlan.request" },
+    "writePlan.response": { "$ref": "data-access.v1.12.schema.json#/$defs/writePlan.response" },
+    "writePlan.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/writePlan.errors" },
+    "writePlan.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/writePlan.exchange" },
+    "unplannedRows.request": { "$ref": "data-access.v1.12.schema.json#/$defs/unplannedRows.request" },
+    "unplannedRows.response": { "$ref": "data-access.v1.12.schema.json#/$defs/unplannedRows.response" },
+    "unplannedRows.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/unplannedRows.errors" },
+    "unplannedRows.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/unplannedRows.exchange" },
+    "claimOutbox.request": { "$ref": "data-access.v1.12.schema.json#/$defs/claimOutbox.request" },
+    "claimedPart": { "$ref": "data-access.v1.12.schema.json#/$defs/claimedPart" },
+    "claimedRow": {
+      "title": "ClaimedRow",
+      "description": "A claimed outbox row: what the dispatcher needs to run limit 8 and send it (arch 06 line 313; arch 02 line 125). v1.1 added claim and claimedFrom; v1.2 (T-072) port. v1.13 (T-1277; README item 64) adds emailPurpose and notAfter, K-04 v1.1's outbox_rows.email_purpose and not_after as stored, always written by a v1.13 call (null where the column is null), so limit 8 withdraws a row at or after its notAfter at every try and the email port tells a code row from any other (ADR-016 sections 3 and 5; cards E1 and F). A claimedRow with neither is a v1 to v1.12 answer. As K-04 v1.1's CHECKs hold them: a purpose only on an email row, and a code row always with its notAfter (refuse-claimed-code-row-no-not-after). The claimed row carries no turn id and no job id (ADR-016 section 1's reader table: the claim reads none).",
+      "type": "object",
+      "properties": {
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "version": {
+          "description": "The row's version after the claim; marks compare it.",
+          "$ref": "#/$defs/version"
+        },
+        "commitSeq": { "type": "integer", "minimum": 1 },
+        "recipientHandleId": { "$ref": "#/$defs/id" },
+        "recipientPersonId": { "$ref": "#/$defs/nullableId" },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "openQuestionId": { "$ref": "#/$defs/nullableId" },
+        "channel": { "$ref": "#/$defs/channel" },
+        "sendClass": { "$ref": "#/$defs/sendClass" },
+        "versionsRead": {
+          "description": "Limit 8 checks them unchanged at send (arch 06 line 313).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "finalParts": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts" },
+        "parts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/claimedPart" },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "traceId": { "$ref": "#/$defs/id" },
+        "claim": {
+          "description": "The claim taken (K-07 outboxClaim; outbox_claims): claimer and claimedAt this call's, lapsesAt claimedAt + 60 s (K-07 default 2), claimNo raised from the row's last claim, and firstTryAt and nextTryNotBefore kept from it (null at a first claim). New in v1.1.",
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/outboxClaim"
+        },
+        "claimedFrom": {
+          "description": "checked, held or sending (a claim that lapsed, taken again): K-07's moves to sending by claimOutbox. New in v1.1.",
+          "enum": ["checked", "held", "sending"]
+        },
+        "port": {
+          "description": "The port the row goes by (K-07 v1 outboxRow.port, 'in K-05's names'): linq for the imessage, rcs and sms channels, email for the email channel. There is no SMS port (DL-012). New in v1.2; a v1.2 call always writes it.",
+          "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/port"
+        },
+        "emailPurpose": {
+          "description": "K-04 v1.1 outbox_rows.email_purpose as stored: K-12 v1's purpose of an email row (confirmation, copy, emailWay, nextWay, code or notice: K-04 v1.1 default 11, K-12's own spelling), from which the email port takes the row's K-12 purpose and staging's router sends only a code row to a listed inbox (ADR-016 section 5; card F); null for a row that names none, which a text row always is (outbox_rows_email_purpose_is_email). New in v1.13; a v1.13 call always writes it.",
+          "anyOf": [{ "$ref": "../port-email/port-email.v1.schema.json#/$defs/purpose" }, { "type": "null" }]
+        },
+        "notAfter": {
+          "description": "K-04 v1.1 outbox_rows.not_after as stored: no part of the row is sent at or after it. Limit 8 marks the row withdrawn, unsent, at any try at or after it (ADR-016 section 3; card E1). A code row's is its code's expires_at, and a code row always has one (outbox_rows_code_has_not_after); null for a row with no end. New in v1.13; a v1.13 call always writes it.",
+          "$ref": "#/$defs/nullableUtc"
+        }
+      },
+      "required": [
+        "outboxRowId",
+        "version",
+        "commitSeq",
+        "recipientHandleId",
+        "recipientPersonId",
+        "businessId",
+        "bookingId",
+        "openQuestionId",
+        "channel",
+        "sendClass",
+        "versionsRead",
+        "finalParts",
+        "parts",
+        "traceId"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "channel": { "const": "email" } } },
+      "then": { "properties": { "port": { "const": "email" } } },
+      "else": { "properties": { "port": { "const": "linq" } } },
+      "allOf": [
+        {
+          "description": "A purpose only on an email row (K-04 v1.1 outbox_rows_email_purpose_is_email).",
+          "if": {
+            "properties": { "channel": { "enum": ["imessage", "rcs", "sms"] } },
+            "required": ["channel"]
+          },
+          "then": { "properties": { "emailPurpose": { "type": "null" } } }
+        },
+        {
+          "description": "A code row always with its end (K-04 v1.1 outbox_rows_code_has_not_after; ADR-016 section 3: no try sends a dead code).",
+          "if": { "properties": { "emailPurpose": { "const": "code" } }, "required": ["emailPurpose"] },
+          "then": { "properties": { "notAfter": { "$ref": "#/$defs/utc" } }, "required": ["notAfter"] }
+        }
+      ]
+    },
+    "claimOutbox.response": {
+      "title": "ClaimOutboxResponse",
+      "description": "Claimed rows, per recipient in commit order, and the held rows later rows passed. v1.2: each claimed row also names its port; v1.13: its emailPurpose and notAfter (claimedRow). Restated in v1.13 only to refer to v1.13's claimedRow.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "claimed" },
+        "claimed": {
+          "description": "Per recipient in commit order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/claimedRow" }
+        },
+        "passedHeld": {
+          "description": "Rows held for text hours that later rows passed (arch 02 line 125).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "outboxRowId": { "$ref": "#/$defs/id" },
+              "heldUntil": { "$ref": "#/$defs/utc" }
+            },
+            "required": ["outboxRowId", "heldUntil"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "claimed", "passedHeld"],
+      "additionalProperties": false
+    },
+    "claimOutbox.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/claimOutbox.errors" },
+    "claimOutbox.exchange": {
+      "title": "ClaimOutboxExchange",
+      "description": "One claimOutbox request with its outcome. Restated in v1.13 only to refer to v1.13's claimOutbox.response.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "claimOutbox" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/claimOutbox.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/claimOutbox.response" }, { "$ref": "#/$defs/claimOutbox.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "markPart.request": { "$ref": "data-access.v1.12.schema.json#/$defs/markPart.request" },
+    "repeatedDelivery": { "$ref": "data-access.v1.12.schema.json#/$defs/repeatedDelivery" },
+    "markPart.response": { "$ref": "data-access.v1.12.schema.json#/$defs/markPart.response" },
+    "markPart.v1dot9Response": { "$ref": "data-access.v1.12.schema.json#/$defs/markPart.v1dot9Response" },
+    "markPart.errors": {
+      "title": "MarkPartErrors",
+      "description": "v1.1's errors (notFound, transient, wrongState, constraint), and from v1.13 noTurn: a failed mark that carries followUps (a safety line's other ways, README item 15) on a row with no turn, whose follow-ups would be written under a turn it has none of (README item 66; ADR-016 section 3: a code row has no follow-up). Nothing, the failure included, was written. Changed in v1.13.",
+      "oneOf": [
+        { "$ref": "data-access.v1.12.schema.json#/$defs/markPart.errors" },
+        { "$ref": "#/$defs/noTurnError" }
+      ]
+    },
+    "markPart.exchange": {
+      "title": "MarkPartExchange",
+      "description": "One markPart request with its outcome, as v1.9 states it (an answer, markPart.v1dot9Response first, or one of markPart's errors; a delivered mark answered repeated states the delivery it repeats, and a mark that is not a delivery states none), restated in v1.13 only to refer to v1.13's markPart.errors, which adds noTurn. Changed in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "markPart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/markPart.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/markPart.v1dot9Response" },
+            { "$ref": "#/$defs/markPart.response" },
+            { "$ref": "#/$defs/markPart.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": { "outcome": { "const": "delivered" } },
+            "required": ["outcome"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "if": {
+              "type": "object",
+              "properties": { "repeated": { "const": true } },
+              "required": ["repeated"]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "repeatedDelivery": {
+                  "description": "A delivery receipt answered repeated states the delivery it repeats, never null (README item 48).",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "repeatedDelivery": {
+                "description": "An attempt, sent or failed mark repeats no delivery, so it states none (README default 87).",
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    "markRow.request": { "$ref": "data-access.v1.12.schema.json#/$defs/markRow.request" },
+    "markRow.response": { "$ref": "data-access.v1.12.schema.json#/$defs/markRow.response" },
+    "markRow.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/markRow.errors" },
+    "markRow.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/markRow.exchange" },
+    "armClock.request": { "$ref": "data-access.v1.12.schema.json#/$defs/armClock.request" },
+    "armedClock": { "$ref": "data-access.v1.12.schema.json#/$defs/armedClock" },
+    "armClock.response": { "$ref": "data-access.v1.12.schema.json#/$defs/armClock.response" },
+    "armClock.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/armClock.errors" },
+    "armClock.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/armClock.exchange" },
+    "cancelClock.request": { "$ref": "data-access.v1.12.schema.json#/$defs/cancelClock.request" },
+    "cancelClock.response": { "$ref": "data-access.v1.12.schema.json#/$defs/cancelClock.response" },
+    "cancelClock.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/cancelClock.errors" },
+    "cancelClock.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/cancelClock.exchange" },
+    "dueClocks.request": { "$ref": "data-access.v1.12.schema.json#/$defs/dueClocks.request" },
+    "dueClock": { "$ref": "data-access.v1.12.schema.json#/$defs/dueClock" },
+    "dueClocks.response": { "$ref": "data-access.v1.12.schema.json#/$defs/dueClocks.response" },
+    "dueClocks.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/dueClocks.errors" },
+    "dueClocks.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/dueClocks.exchange" },
+    "fireClock.request": { "$ref": "data-access.v1.12.schema.json#/$defs/fireClock.request" },
+    "fireClock.response": { "$ref": "data-access.v1.12.schema.json#/$defs/fireClock.response" },
+    "fireClock.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/fireClock.errors" },
+    "fireClock.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/fireClock.exchange" },
+    "door": { "$ref": "data-access.v1.12.schema.json#/$defs/door" },
+    "savedFor": { "$ref": "data-access.v1.12.schema.json#/$defs/savedFor" },
+    "reserve.request": { "$ref": "data-access.v1.12.schema.json#/$defs/reserve.request" },
+    "reserve.response": { "$ref": "data-access.v1.12.schema.json#/$defs/reserve.response" },
+    "reserve.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/reserve.errors" },
+    "reserve.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/reserve.exchange" },
+    "release.request": { "$ref": "data-access.v1.12.schema.json#/$defs/release.request" },
+    "release.response": { "$ref": "data-access.v1.12.schema.json#/$defs/release.response" },
+    "release.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/release.errors" },
+    "release.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/release.exchange" },
+    "extend.request": { "$ref": "data-access.v1.12.schema.json#/$defs/extend.request" },
+    "extend.response": { "$ref": "data-access.v1.12.schema.json#/$defs/extend.response" },
+    "extend.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/extend.errors" },
+    "extend.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/extend.exchange" },
+    "readActiveBundle.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readActiveBundle.request" },
+    "readActiveBundle.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readActiveBundle.response" },
+    "readActiveBundle.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readActiveBundle.errors" },
+    "readActiveBundle.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readActiveBundle.exchange" },
+    "storedText": { "$ref": "data-access.v1.12.schema.json#/$defs/storedText" },
+    "readBundleValue.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readBundleValue.request" },
+    "readBundleValue.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readBundleValue.response" },
+    "readBundleValue.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readBundleValue.errors" },
+    "readBundleValue.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readBundleValue.exchange" },
+    "publishBundleCopy.request": { "$ref": "data-access.v1.12.schema.json#/$defs/publishBundleCopy.request" },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/publishBundleCopy.errors" },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": { "$ref": "data-access.v1.12.schema.json#/$defs/setActiveBundle.request" },
+    "setActiveBundle.response": { "$ref": "data-access.v1.12.schema.json#/$defs/setActiveBundle.response" },
+    "setActiveBundle.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/setActiveBundle.errors" },
+    "setActiveBundle.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/setActiveBundle.exchange" },
+    "parkTurn.request": { "$ref": "data-access.v1.12.schema.json#/$defs/parkTurn.request" },
+    "parkTurn.response": { "$ref": "data-access.v1.12.schema.json#/$defs/parkTurn.response" },
+    "parkTurn.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/parkTurn.errors" },
+    "parkTurn.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/parkTurn.exchange" },
+    "wrongStateError": { "$ref": "data-access.v1.12.schema.json#/$defs/wrongStateError" },
+    "claimLostError": { "$ref": "data-access.v1.12.schema.json#/$defs/claimLostError" },
+    "effectNew": { "$ref": "data-access.v1.12.schema.json#/$defs/effectNew" },
+    "effectLetGo": { "$ref": "data-access.v1.12.schema.json#/$defs/effectLetGo" },
+    "effectWrites": { "$ref": "data-access.v1.12.schema.json#/$defs/effectWrites" },
+    "waitingChatWrites": { "$ref": "data-access.v1.12.schema.json#/$defs/waitingChatWrites" },
+    "followUpRow": { "$ref": "data-access.v1.12.schema.json#/$defs/followUpRow" },
+    "renewClaim.request": { "$ref": "data-access.v1.12.schema.json#/$defs/renewClaim.request" },
+    "renewClaim.response": { "$ref": "data-access.v1.12.schema.json#/$defs/renewClaim.response" },
+    "renewClaim.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/renewClaim.errors" },
+    "renewClaim.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/renewClaim.exchange" },
+    "dispatcherGivesUp.request": { "$ref": "data-access.v1.12.schema.json#/$defs/dispatcherGivesUp.request" },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "title": "DispatcherGivesUpErrors",
+      "description": "v1.1's errors (tooSoon, claimLost, wrongState, versionChanged, constraint, notFound, transient), and from v1.13 noTurn: the row has no turn (K-04 v1.1's job row, such as a sign-in's code row), whose move to failed, follow-up rows and entries are all written under the failed row's turn, which it has none of; checked as soon as the row is found, before its claim, version or time. Nothing was written: neither the move to failed nor any follow-up row nor any entry (README item 66; ADR-016 section 3: a code row is never given up and has no follow-up; refuse-give-up-no-turn-wrote). Changed in v1.13.",
+      "oneOf": [
+        { "$ref": "data-access.v1.12.schema.json#/$defs/dispatcherGivesUp.errors" },
+        { "$ref": "#/$defs/noTurnError" }
+      ]
+    },
+    "dispatcherGivesUp.exchange": {
+      "title": "DispatcherGivesUpExchange",
+      "description": "One dispatcherGivesUp request with its outcome, restated in v1.13 only to refer to v1.13's dispatcherGivesUp.errors, which adds noTurn. Changed in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "dispatcherGivesUp" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/dispatcherGivesUp.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/dispatcherGivesUp.response" },
+            { "$ref": "#/$defs/dispatcherGivesUp.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "claimEvent": { "$ref": "data-access.v1.12.schema.json#/$defs/claimEvent" },
+    "claimedEffect": { "$ref": "data-access.v1.12.schema.json#/$defs/claimedEffect" },
+    "claimEffects.request": { "$ref": "data-access.v1.12.schema.json#/$defs/claimEffects.request" },
+    "claimEffects.response": { "$ref": "data-access.v1.12.schema.json#/$defs/claimEffects.response" },
+    "claimEffects.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/claimEffects.errors" },
+    "claimEffects.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/claimEffects.exchange" },
+    "serviceBack.request": { "$ref": "data-access.v1.12.schema.json#/$defs/serviceBack.request" },
+    "serviceBack.response": { "$ref": "data-access.v1.12.schema.json#/$defs/serviceBack.response" },
+    "serviceBack.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/serviceBack.errors" },
+    "serviceBack.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/serviceBack.exchange" },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/recordEffectResult.errors" },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": { "$ref": "data-access.v1.12.schema.json#/$defs/writeAllSet.request" },
+    "writeAllSet.response": { "$ref": "data-access.v1.12.schema.json#/$defs/writeAllSet.response" },
+    "writeAllSet.errors": {
+      "title": "WriteAllSetErrors",
+      "description": "v1.1's errors (wrongState, notFound, constraint, transient), and from v1.13 noTurn: a listed row has no turn (a job row), while the 'all set' row and its entry are written under the first failed row's turn, which such a row has none of; checked as each listed row is locked, before its state. Nothing was written (README item 66; ADR-016 section 3: a job row never becomes failed). Changed in v1.13.",
+      "oneOf": [
+        { "$ref": "data-access.v1.12.schema.json#/$defs/writeAllSet.errors" },
+        { "$ref": "#/$defs/noTurnError" }
+      ]
+    },
+    "writeAllSet.exchange": {
+      "title": "WriteAllSetExchange",
+      "description": "One writeAllSet request with its outcome, restated in v1.13 only to refer to v1.13's writeAllSet.errors, which adds noTurn. Changed in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "writeAllSet" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/writeAllSet.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/writeAllSet.response" }, { "$ref": "#/$defs/writeAllSet.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "columnName": { "$ref": "data-access.v1.12.schema.json#/$defs/columnName" },
+    "factTable": { "$ref": "data-access.v1.12.schema.json#/$defs/factTable" },
+    "secretColumn": { "$ref": "data-access.v1.12.schema.json#/$defs/secretColumn" },
+    "role": { "$ref": "data-access.v1.12.schema.json#/$defs/role" },
+    "phoneFlags": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneFlags" },
+    "phoneRead": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneRead" },
+    "openQuestionRead": { "$ref": "data-access.v1.12.schema.json#/$defs/openQuestionRead" },
+    "bookingHead": { "$ref": "data-access.v1.12.schema.json#/$defs/bookingHead" },
+    "factRef": { "$ref": "data-access.v1.12.schema.json#/$defs/factRef" },
+    "factValue": { "$ref": "data-access.v1.12.schema.json#/$defs/factValue" },
+    "pauseRead": { "$ref": "data-access.v1.12.schema.json#/$defs/pauseRead" },
+    "consentRead": { "$ref": "data-access.v1.12.schema.json#/$defs/consentRead" },
+    "unknownFactError": { "$ref": "data-access.v1.12.schema.json#/$defs/unknownFactError" },
+    "readTurnState.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnState.request" },
+    "readTurnState.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnState.response" },
+    "readTurnState.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnState.errors" },
+    "readTurnState.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnState.exchange" },
+    "handleTargets.request": { "$ref": "data-access.v1.12.schema.json#/$defs/handleTargets.request" },
+    "handleTargets.response": { "$ref": "data-access.v1.12.schema.json#/$defs/handleTargets.response" },
+    "handleTargets.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/handleTargets.errors" },
+    "handleTargets.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/handleTargets.exchange" },
+    "textsConsentRead": { "$ref": "data-access.v1.12.schema.json#/$defs/textsConsentRead" },
+    "textsConsentV1dot8": { "$ref": "data-access.v1.12.schema.json#/$defs/textsConsentV1dot8" },
+    "sendState.request": { "$ref": "data-access.v1.12.schema.json#/$defs/sendState.request" },
+    "sendState.response": { "$ref": "data-access.v1.12.schema.json#/$defs/sendState.response" },
+    "sendState.v1dot8Response": { "$ref": "data-access.v1.12.schema.json#/$defs/sendState.v1dot8Response" },
+    "sendState.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/sendState.errors" },
+    "sendState.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/sendState.exchange" },
+    "handleSealingKey.request": { "$ref": "data-access.v1.12.schema.json#/$defs/handleSealingKey.request" },
+    "handleSealingKey.response": { "$ref": "data-access.v1.12.schema.json#/$defs/handleSealingKey.response" },
+    "handleSealingKey.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/handleSealingKey.errors" },
+    "handleSealingKey.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/handleSealingKey.exchange" },
+    "releaseRule": { "$ref": "data-access.v1.12.schema.json#/$defs/releaseRule" },
+    "openHold": { "$ref": "data-access.v1.12.schema.json#/$defs/openHold" },
+    "readOpenHolds.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readOpenHolds.request" },
+    "readOpenHolds.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readOpenHolds.response" },
+    "readOpenHolds.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readOpenHolds.errors" },
+    "readOpenHolds.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readOpenHolds.exchange" },
+    "rowLine": { "$ref": "data-access.v1.12.schema.json#/$defs/rowLine" },
+    "answeredText": { "$ref": "data-access.v1.12.schema.json#/$defs/answeredText" },
+    "rowRecipient": { "$ref": "data-access.v1.12.schema.json#/$defs/rowRecipient" },
+    "businessHeadRead": { "$ref": "data-access.v1.12.schema.json#/$defs/businessHeadRead" },
+    "rowQuestion": { "$ref": "data-access.v1.12.schema.json#/$defs/rowQuestion" },
+    "questionAsSent": { "$ref": "data-access.v1.12.schema.json#/$defs/questionAsSent" },
+    "fixedLineRowError": { "$ref": "data-access.v1.12.schema.json#/$defs/fixedLineRowError" },
+    "businessSensitive": { "$ref": "data-access.v1.12.schema.json#/$defs/businessSensitive" },
+    "readOutboxRow.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRow.request" },
+    "readOutboxRow.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRow.response" },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRow.errors" },
+    "readOutboxRow.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRow.exchange" },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readFixedLineFacts.errors" },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": { "$ref": "data-access.v1.12.schema.json#/$defs/nullableTurnId" },
+    "storedOutcome": { "$ref": "data-access.v1.12.schema.json#/$defs/storedOutcome" },
+    "storedHold": { "$ref": "data-access.v1.12.schema.json#/$defs/storedHold" },
+    "ownerContact": { "$ref": "data-access.v1.12.schema.json#/$defs/ownerContact" },
+    "moreThanOneOwnerError": { "$ref": "data-access.v1.12.schema.json#/$defs/moreThanOneOwnerError" },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcome.request" },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcome.errors" },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHold.request" },
+    "readSafetyHold.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHold.response" },
+    "readSafetyHold.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHold.errors" },
+    "readSafetyHold.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHold.exchange" },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessOwner.request" },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessOwner.errors" },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessZone.request" },
+    "readBusinessZone.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessZone.response" },
+    "readBusinessZone.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessZone.errors" },
+    "readBusinessZone.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readBusinessZone.exchange" },
+    "rowReader.request": { "$ref": "data-access.v1.12.schema.json#/$defs/rowReader.request" },
+    "rowReader.response": { "$ref": "data-access.v1.12.schema.json#/$defs/rowReader.response" },
+    "noReaderError": { "$ref": "data-access.v1.12.schema.json#/$defs/noReaderError" },
+    "rowReader.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/rowReader.errors" },
+    "rowReader.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/rowReader.exchange" },
+    "textService": { "$ref": "data-access.v1.12.schema.json#/$defs/textService" },
+    "chatPhoneOpen": { "$ref": "data-access.v1.12.schema.json#/$defs/chatPhoneOpen" },
+    "chatPhoneStopped": { "$ref": "data-access.v1.12.schema.json#/$defs/chatPhoneStopped" },
+    "chatOpenValues": { "$ref": "data-access.v1.12.schema.json#/$defs/chatOpenValues" },
+    "chatClosedValues": { "$ref": "data-access.v1.12.schema.json#/$defs/chatClosedValues" },
+    "chatOpenedEvent": { "$ref": "data-access.v1.12.schema.json#/$defs/chatOpenedEvent" },
+    "notAPhoneError": { "$ref": "data-access.v1.12.schema.json#/$defs/notAPhoneError" },
+    "openChatOnText.request": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.request" },
+    "openChatOnText.inserted": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.inserted" },
+    "openChatOnText.opened": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.opened" },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.stopped" },
+    "openChatOnText.repeated": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.repeated" },
+    "openChatOnText.response": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.response" },
+    "openChatOnText.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.errors" },
+    "openChatOnText.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/openChatOnText.exchange" },
+    "questionVisit": { "$ref": "data-access.v1.12.schema.json#/$defs/questionVisit" },
+    "neverDeliveredRow": { "$ref": "data-access.v1.12.schema.json#/$defs/neverDeliveredRow" },
+    "readQuestionFacts.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readQuestionFacts.request" },
+    "readQuestionFacts.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readQuestionFacts.response"
+    },
+    "readQuestionFacts.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readQuestionFacts.errors" },
+    "readQuestionFacts.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readQuestionFacts.exchange"
+    },
+    "readHandle.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readHandle.request" },
+    "readHandle.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readHandle.response" },
+    "readHandle.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readHandle.errors" },
+    "readHandle.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readHandle.exchange" },
+    "chatPhoneHandle": { "$ref": "data-access.v1.12.schema.json#/$defs/chatPhoneHandle" },
+    "readChatHandle.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.request" },
+    "readChatHandle.found": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.found" },
+    "readChatHandle.unknown": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.unknown" },
+    "readChatHandle.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.response" },
+    "readChatHandle.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.errors" },
+    "readChatHandle.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readChatHandle.exchange" },
+    "readTurnParty.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.request" },
+    "readTurnParty.atBusiness": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.atBusiness" },
+    "readTurnParty.noBusiness": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.noBusiness" },
+    "readTurnParty.unknown": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.unknown" },
+    "readTurnParty.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.response" },
+    "businessUndecidedError": { "$ref": "data-access.v1.12.schema.json#/$defs/businessUndecidedError" },
+    "readTurnParty.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.errors" },
+    "readTurnParty.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readTurnParty.exchange" },
+    "tokenSha256": { "$ref": "data-access.v1.12.schema.json#/$defs/tokenSha256" },
+    "readTesterStanding.request": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readTesterStanding.request"
+    },
+    "readTesterStanding.response": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readTesterStanding.response"
+    },
+    "readTesterStanding.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readTesterStanding.errors" },
+    "readTesterStanding.exchange": {
+      "$ref": "data-access.v1.12.schema.json#/$defs/readTesterStanding.exchange"
+    },
+    "emailOnFile": { "$ref": "data-access.v1.12.schema.json#/$defs/emailOnFile" },
+    "rosterPhone": { "$ref": "data-access.v1.12.schema.json#/$defs/rosterPhone" },
+    "readRosterPhone.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readRosterPhone.request" },
+    "readRosterPhone.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readRosterPhone.response" },
+    "readRosterPhone.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readRosterPhone.errors" },
+    "readRosterPhone.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readRosterPhone.exchange" },
+    "phoneStateOpen": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneStateOpen" },
+    "phoneStateStopped": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneStateStopped" },
+    "chatLinkRead": { "$ref": "data-access.v1.12.schema.json#/$defs/chatLinkRead" },
+    "readPhoneState.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.request" },
+    "readPhoneState.noRow": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.noRow" },
+    "readPhoneState.row": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.row" },
+    "readPhoneState.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.response" },
+    "readPhoneState.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.errors" },
+    "readPhoneState.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readPhoneState.exchange" },
+    "sealedBytes": { "$ref": "data-access.v1.12.schema.json#/$defs/sealedBytes" },
+    "liveTimer": { "$ref": "data-access.v1.12.schema.json#/$defs/liveTimer" },
+    "readLiveTimers.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readLiveTimers.request" },
+    "readLiveTimers.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readLiveTimers.response" },
+    "readLiveTimers.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readLiveTimers.errors" },
+    "readLiveTimers.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readLiveTimers.exchange" },
+    "readStoppedFlag.request": { "$ref": "data-access.v1.12.schema.json#/$defs/readStoppedFlag.request" },
+    "readStoppedFlag.response": { "$ref": "data-access.v1.12.schema.json#/$defs/readStoppedFlag.response" },
+    "phoneNotFoundError": { "$ref": "data-access.v1.12.schema.json#/$defs/phoneNotFoundError" },
+    "readStoppedFlag.errors": { "$ref": "data-access.v1.12.schema.json#/$defs/readStoppedFlag.errors" },
+    "readStoppedFlag.exchange": { "$ref": "data-access.v1.12.schema.json#/$defs/readStoppedFlag.exchange" },
+
+    "noTurnError": {
+      "title": "NoTurnError",
+      "description": "The outbox row has no turn: K-04 v1.1's job row (turn_id null, job_id set, outbox_rows_turn_or_job), such as a sign-in's code row. dispatcherGivesUp, writeAllSet and markPart's follow-ups write their rows and entries under the failed row's turn (README items 15, 17 and 25), which such a row has none of, so each refuses it with this error and writes nothing at all (README item 66; ADR-016 section 3: a code row is never given up, never failed and has no follow-up; it ends sent, delivered, droppedStopped, or withdrawn at its not_after). It carries the row and nothing else: nothing was written. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "noTurn" },
+        "table": { "const": "outbox_rows" },
+        "rowId": {
+          "description": "The outbox row with no turn.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["error", "table", "rowId"],
+      "additionalProperties": false
+    },
+    "sha256Hex": {
+      "title": "Sha256Hex",
+      "description": "A sha256 digest, or a keyed HMAC-SHA-256, in lower-case hex: the form every hash K-22 v1.2 keeps takes (sign_in_attempts_device_hash_form, _contact_hash_form, _request_hash_form; proof_codes_hash_form; sessions_token_hash_form). A sign-in call carries a hash, never what it hashes: no device cookie, session token or typed code reaches the database (K-22 rule 9; BP rule 7). New in v1.13.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "hashKeyName": {
+      "title": "HashKeyName",
+      "description": "The name of the Workers secret a keyed hash was made under (K-22 hash_key_name; PROOF_CODE_HASH_KEY by default, which the release engineer may rename): its name, never its value, which never reaches the database (K-22 rule 6). New in v1.13.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "signInContact": {
+      "title": "SignInContact",
+      "description": "The contact a sign-in was started for, as the start's account read needs it (README item 58, rule 4): an email in lower case (K-04 handles_address_form), or a mobile in E.164 (K-04 phones_number_form), as the page call normalized what was typed (ADR-016 section 4, 'The key'); or link, a start from a secure page's own link, which names no contact here: its contact hash is kind link over the page's linkCode (K-22 default 15), and no account is read for it. Read for the account and never kept: the attempt keeps only its keyed hash (K-22 sign_in_attempts.contact_hash). Never logged or put in a span. New in v1.13.",
+      "oneOf": [
+        {
+          "title": "SignInEmailContact",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "email" },
+            "address": { "$ref": "#/$defs/emailOnFile" }
+          },
+          "required": ["kind", "address"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInMobileContact",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "mobile" },
+            "number": { "$ref": "#/$defs/phoneNumber" }
+          },
+          "required": ["kind", "number"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SignInLinkContact",
+          "type": "object",
+          "properties": { "kind": { "const": "link" } },
+          "required": ["kind"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "startSignIn.request": {
+      "title": "StartSignInRequest",
+      "description": "A sign-in's start, before the page answers (README item 58; ADR-016 section 4, rules 0 to 5; K-22 v1.2 rule 9; K-21 v1 signInStart, served by the page call's server side, card B1). The page call sends hashes it made through the root's hashing port (the contact's keyed hash; the device's and the start's sha256), the two ids it made, and the contact as typed and normalized for the account read; never the device cookie, never a time: every time is the database's clock (README default 112). Role and scope: rosie_job on the runtime side, rosie.business_id set empty for the transaction, rosie.person_id unset (the call acts for no one: K-22 rule 4). Reads the primary, uncached. Repeat: safe, keyed by requestSha256: a repeat answers the first attempt and writes nothing (rule 1). Time budget: none in the sources; it runs before the page answers. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "K-22 sign_in_attempts.id for a new attempt: made by the page call from at least 128 bits of a cryptographically secure generator, as attempt_id is (DL-546; T-1274's security note a), never from the attempt id, the contact, the device or the time. Also the job id of the attempt's code row and of every entry of its sign-in (README items 59 and 63). Never reaches the page. Dropped on a repeat or a pause.",
+          "$ref": "#/$defs/id"
+        },
+        "attemptId": {
+          "description": "K-22 sign_in_attempts.attempt_id for a new attempt: K-21 v1 signInStart.response.attemptId, made from at least 128 bits of a cryptographically secure generator (K-21 default 18), the one id the page holds. Dropped on a repeat or a pause.",
+          "$ref": "#/$defs/id"
+        },
+        "requestSha256": {
+          "description": "The start's repeat key, K-22 sign_in_attempts.request_sha256: sha256 of the device's sha256, a line feed and K-21 page.requestId (K-22 rule 9, 'The hashes').",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "deviceSha256": {
+          "description": "sha256 of K-21's deviceToken as sent (K-22 sign_in_attempts.device_sha256), to which the attempt is bound: only a check with the same hash finds it (README item 60).",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "contact": { "$ref": "#/$defs/signInContact" },
+        "contactHash": {
+          "description": "K-22 sign_in_attempts.contact_hash: HMAC-SHA-256 under hashKeyName's secret of 'rosie-sign-in-contact', a line feed, the kind (email, mobile or link) and the contact as normalized (K-22 rule 9, 'The hashes'). Every count and the contact's lock read it alone, so a pause and a cap answer alike for any typed contact (K-21 v1 schema line 780).",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "hashKeyName": { "$ref": "#/$defs/hashKeyName" },
+        "way": {
+          "description": "email alone in this version: way text is not served in ADR-016's lane (section 5; CQ-244), and the page call answers it 503 before this call, writing nothing (refuse-start-sign-in-text-way).",
+          "const": "email"
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "requestSha256",
+        "deviceSha256",
+        "contact",
+        "contactHash",
+        "hashKeyName",
+        "way"
+      ],
+      "additionalProperties": false
+    },
+    "startSignIn.started": {
+      "title": "StartSignInStarted",
+      "description": "Started: the attempt this call wrote (rule 5), or, repeated, the one an earlier start of the same request wrote (rule 1), which this call left as it was. The page gets attemptId and expiresAt alone, the same with or without an account (K-21 v1 signInStart.response). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "started" },
+        "id": {
+          "description": "The attempt's K-22 id, the job id of its code row and entries; for the server only, never the page.",
+          "$ref": "#/$defs/id"
+        },
+        "attemptId": { "$ref": "#/$defs/id" },
+        "expiresAt": {
+          "description": "K-22 sign_in_attempts.expires_at: started_at plus 10 minutes, both by the database's clock (sign_in_attempts_ten_minutes; RULES 6.2).",
+          "$ref": "#/$defs/utc"
+        },
+        "repeated": {
+          "description": "true: an earlier start of this request (rule 1); nothing was written and no code follows (K-21 v1 schema line 688: a repeat sends no second code).",
+          "type": "boolean"
+        },
+        "personId": {
+          "description": "For the server only, never the page or a span: the one account's person the code is for (rule 4: exactly one account whose proven email, or whose mobile, is the contact), which the attempt keeps; with it, and only on a start that is not repeated, the page call runs sendSignInCode after its answer (README item 59). null with no account, two or more (open point 14), a link start, and on every repeat.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["result", "id", "attemptId", "expiresAt", "repeated", "personId"],
+      "additionalProperties": false,
+      "if": { "properties": { "repeated": { "const": true } }, "required": ["repeated"] },
+      "then": { "properties": { "personId": { "type": "null" } } }
+    },
+    "startSignIn.paused": {
+      "title": "StartSignInPaused",
+      "description": "Paused: one of rules 0, 2 and 3 held, and nothing was written: no attempt, so a start past a bound never counts toward it (ADR-016 section 4; K-22 rule 9; refuse-start-sign-in-past-cap-wrote). It names no attempt, since none was written. The page gets the time alone (K-21 v1 signInStart.errors paused). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "paused" },
+        "until": {
+          "description": "When a start of this contact can next pass the rule that held, as K-22 rule 9 states each: hourBound, the (n − 100 + 1)-th start of the hour's window plus 1 hour; contactPause, the contact's latest paused_until; dayCap, the (n − 5 + 1)-th start of the contact's 24-hour window plus 24 hours (K-22 default 23).",
+          "$ref": "#/$defs/utc"
+        },
+        "by": {
+          "description": "The rule that held, for the server's own span (a rule's name, never a contact): hourBound (rule 0, SIGN_IN_STARTS_PER_HOUR, 100, across every contact: open point 13), contactPause (rule 2, a fifth wrong code's pause on any attempt of the contact) or dayCap (rule 3, SIGN_IN_STARTS_PER_DAY, 5 a rolling 24 hours: open point 1). None reads an account, so none tells whether one exists.",
+          "enum": ["hourBound", "contactPause", "dayCap"]
+        }
+      },
+      "required": ["result", "until", "by"],
+      "additionalProperties": false
+    },
+    "startSignIn.response": {
+      "title": "StartSignInResponse",
+      "description": "Started or paused (README item 58). New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/startSignIn.started" }, { "$ref": "#/$defs/startSignIn.paused" }]
+    },
+    "startSignIn.errors": {
+      "title": "StartSignInErrors",
+      "description": "constraint: an id the page call made is taken (sign_in_attempts' primary key, sign_in_attempts_attempt_id_key or sign_in_attempts_request_sha256_key, 23505, or a CHECK on a hash's form, 23514), so the page call makes new ids; transient: the same request may be sent again. Nothing was written. New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/constraintError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "startSignIn.exchange": {
+      "title": "StartSignInExchange",
+      "description": "One startSignIn request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "startSignIn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/startSignIn.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/startSignIn.response" }, { "$ref": "#/$defs/startSignIn.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "codeRowPlan": {
+      "title": "CodeRowPlan",
+      "description": "The plan a sign-in code's email row holds: K-03 v1 rowPlan, code-built as a fixed-line row's is (CQ-177 item 128; write-plan-alex-safety.json), with no lines of its own, since the line is code's and K-03 v1 has no slot for a code (K-09 open gap 25): channel email, no text row it copies, formats text alone, no question, no page type and no thread (ADR-016 section 1; T-322's actions/src/domain/proof-codes/words.ts codeRowPlan). So K-03 needs no minor version (README default 116). New in v1.13.",
+      "allOf": [
+        { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/rowPlan" },
+        {
+          "type": "object",
+          "properties": {
+            "channel": { "const": "email" },
+            "copyOf": { "type": "null" },
+            "plan": {
+              "type": "object",
+              "properties": {
+                "formats": { "const": ["text"] },
+                "lines": { "type": "array", "maxItems": 0 },
+                "question": { "type": "null" },
+                "pageType": { "type": "null" },
+                "threadReplyTo": { "type": "null" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "codeFinalParts": {
+      "title": "CodeFinalParts",
+      "description": "The final parts of a sign-in code's email row: K-03 v1 finalParts of one words send holding the code's own line, 'Code NNNNNN: type it on the sign-in page. It works for 10 minutes.' (K-12 send-code.json's form; ADR-016 section 1, 'The words', the stand-ins for Jay's words: open point 5), with no calendar file, option, link, fixed line or slot (T-322's words.ts codeFinalParts). The email port adds the subject, the automated-assistant line and the sender, as for every email row (K-12 README line 29). They hold the code, so they are written only here and in the row, never in an entry, a span or a log (README item 59). New in v1.13.",
+      "allOf": [
+        { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts" },
+        {
+          "type": "object",
+          "properties": {
+            "channel": { "const": "email" },
+            "sends": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "kind": { "const": "words" },
+                  "text": { "type": "string", "minLength": 1 },
+                  "calendarFile": { "const": "none" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "null" }
+                }
+              }
+            },
+            "fixedLines": { "type": "array", "maxItems": 0 },
+            "slotValues": { "type": "array", "maxItems": 0 },
+            "threadReplyTo": { "type": "null" }
+          }
+        }
+      ]
+    },
+    "sendSignInCode.request": {
+      "title": "SendSignInCodeRequest",
+      "description": "A sign-in's code and its email row, after the page has answered (README item 59; ADR-016 section 1; K-22 v1.2 rule 9's 'Given its code'; card R1). The page call sends the attempt's id, the code's keyed hash (the code itself lives only in the final parts' words: tool-api schema line 4065), the ids it made, the active bundle and the page call's trace, and the row's plan and final parts. Never a person, a handle or an address, which the call reads from the attempt and the account itself (K-22 rule 4: kept on the server, never taken from the caller), and never a time (README default 112). Role and scope: rosie_job on the runtime side, rosie.business_id set empty for the transaction, rosie.person_id unset; the runtime side's policies on proof_codes, outbox_rows and event_log admit its writes (K-22 rule 5's binding is the Tool API's). Reads the primary, uncached. Repeat: safe, keyed by the attempt: an attempt that names a code answers the first send and writes nothing. Time budget: none in the sources; it runs after the answer, so the answer waits on no write the two paths do not share (ADR-016 section 4). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "signInAttemptId": {
+          "description": "K-22 sign_in_attempts.id, startSignIn's id: the attempt the code is for, and the job id of the row and its entries (ADR-016 section 4's table).",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The page call's trace id (K-08 v1): the row's trace_id and every entry's.",
+          "$ref": "#/$defs/id"
+        },
+        "bundle": {
+          "description": "The bundle active at the call (K-05 item 11 readActiveBundle; K-08 default 1 for a hop outside a turn): the row's bundle_hash and bundle_build (K-04 v1.1's description of a row with no turn).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "code": {
+          "description": "The K-22 proof_codes row's own values the page call made (rule 5's send columns): its id, the code's keyed hash and the secret's name. Purpose sign_in, person, business (none), handle, channel email, sent_at and expires_at are the call's (README item 59).",
+          "type": "object",
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "codeHash": {
+              "description": "K-22 proof_codes.code_hash: HMAC-SHA-256 under hashKeyName's secret of the code with its own fixed prefix, distinct from a contact's (ADR-016 section 4; open point 4); never the code (refuse-send-sign-in-code-plain-code).",
+              "$ref": "#/$defs/sha256Hex"
+            },
+            "hashKeyName": { "$ref": "#/$defs/hashKeyName" }
+          },
+          "required": ["id", "codeHash", "hashKeyName"],
+          "additionalProperties": false
+        },
+        "emailRowId": {
+          "description": "K-04 outbox_rows.id of the code's email row, made by the page call (CQ-09); the plan's and the final parts' row (a code check).",
+          "$ref": "#/$defs/id"
+        },
+        "plan": { "$ref": "#/$defs/codeRowPlan" },
+        "finalParts": { "$ref": "#/$defs/codeFinalParts" }
+      },
+      "required": ["signInAttemptId", "traceId", "bundle", "code", "emailRowId", "plan", "finalParts"],
+      "additionalProperties": false
+    },
+    "sendSignInCode.sent": {
+      "title": "SendSignInCodeSent",
+      "description": "Sent to the outbox: the code row, the email row with its plan and final parts at state checked, its three entries and the attempt's code id, all in one transaction (README item 59; ADR-016 section 1). The dispatcher then claims and sends the row (ADR-016 section 2). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "sent" },
+        "proofCodeId": { "$ref": "#/$defs/id" },
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "commitSeq": {
+          "description": "The row's place in commit order (K-04's identity column).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "version": {
+          "description": "The row's version after its two moves in this transaction: inserted planned at 1, then its plan and final parts written and moved to checked at 2, as writePlan moves a row (K-07 README lines 40 to 41).",
+          "const": 2
+        },
+        "expiresAt": {
+          "description": "The code's expires_at, sent_at plus 10 minutes by the database's clock (proof_codes_ten_minutes), which is also the row's not_after.",
+          "$ref": "#/$defs/utc"
+        },
+        "entryIds": {
+          "description": "The three entries written, in this order: log-<row id>-created, log-<row id>-planned and log-<code id>-sent (ADR-016 section 1, 'The entries').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "repeated": { "const": false }
+      },
+      "required": [
+        "result",
+        "proofCodeId",
+        "outboxRowId",
+        "commitSeq",
+        "version",
+        "expiresAt",
+        "entryIds",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "sendSignInCode.repeated": {
+      "title": "SendSignInCodeRepeated",
+      "description": "The attempt already names a code: the first send's code, row and end, as stored; nothing was written, no second code was made (ADR-016 section 1: 'A repeat for the same attempt writes nothing and answers the first send'). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "sent" },
+        "proofCodeId": { "$ref": "#/$defs/id" },
+        "outboxRowId": {
+          "description": "The first send's email row, found by its job id (K-04 v1.1 outbox_rows_job_idx).",
+          "$ref": "#/$defs/id"
+        },
+        "expiresAt": { "$ref": "#/$defs/utc" },
+        "repeated": { "const": true }
+      },
+      "required": ["result", "proofCodeId", "outboxRowId", "expiresAt", "repeated"],
+      "additionalProperties": false
+    },
+    "sendSignInCode.notSent": {
+      "title": "SendSignInCodeNotSent",
+      "description": "Nothing was written or sent; the page already answered started, as for any contact with none on file (K-21 README line 114; ADR-016 section 4). why: noPerson, the attempt names no person (no account, two or more, a link start); attemptExpired, the attempt's 10 minutes passed before the send ran (its expires_at before now); noProvenEmail, the person's account holds no proven email with its email handle; dayCap, the codes to that handle since 24 hours before now, every person and purpose, reached 5 (K-22 proof_code_limits; ADR-016 open point 1); codePaused, a sign-in code of that handle is paused (proof_code_limits' paused_until after now). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "notSent" },
+        "why": { "enum": ["noPerson", "attemptExpired", "noProvenEmail", "dayCap", "codePaused"] }
+      },
+      "required": ["result", "why"],
+      "additionalProperties": false
+    },
+    "sendSignInCode.response": {
+      "title": "SendSignInCodeResponse",
+      "description": "Sent, repeated or not sent (README item 59). New in v1.13.",
+      "oneOf": [
+        { "$ref": "#/$defs/sendSignInCode.sent" },
+        { "$ref": "#/$defs/sendSignInCode.repeated" },
+        { "$ref": "#/$defs/sendSignInCode.notSent" }
+      ]
+    },
+    "sendSignInCode.errors": {
+      "title": "SendSignInCodeErrors",
+      "description": "notFound (table sign_in_attempts): no attempt with that id; constraint: an id the page call made is taken (proof_codes or outbox_rows, 23505), a bundle not in the registry (23503) or a CHECK (23514); transient: the same request may be sent again. Nothing was written. New in v1.13.",
+      "oneOf": [
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "sendSignInCode.exchange": {
+      "title": "SendSignInCodeExchange",
+      "description": "One sendSignInCode request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendSignInCode" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendSignInCode.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/sendSignInCode.response" },
+            { "$ref": "#/$defs/sendSignInCode.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "proveSignIn.request": {
+      "title": "ProveSignInRequest",
+      "description": "A sign-in's check (README item 60; ADR-016 section 4, 'The check'; K-22 v1.2 rule 9's check; K-21 v1 signInCheck, served by the page call's server side, card B2). The page call sends the attempt id the page holds, the device's sha256, the check's request id, the typed code's keyed hash and the session it would start; never the device cookie, the code, the session token or a time (README default 112). Role and scope: rosie_app (the Tool API's role), rosie.business_id set empty, rosie.person_id unset until check_proof_code answers right, then the attempt's person, set in this transaction (K-22 rule 4). Reads the primary, uncached. Repeat: keyed by the attempt, the device and requestId: a repeat answers its first result and counts nothing; a signedIn one as alreadySignedIn (K-21 README line 115). Time budget: none in the sources; 10 minutes and 5 tries (RULES 6.2). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "attemptId": {
+          "description": "K-21 signInCheck.request.attemptId: the id the page holds, K-22 sign_in_attempts.attempt_id.",
+          "$ref": "#/$defs/id"
+        },
+        "deviceSha256": {
+          "description": "sha256 of K-21's deviceToken as sent: the attempt answers only the device that started it (K-22 sign_in_attempt; K-21 README line 117).",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "requestId": {
+          "description": "K-21 page.requestId of this check: the call keys the check by sha256 of the attempt's id, the device's sha256 and this id, a line feed between (K-22 rule 9, last_check_sha256), never by a typed code.",
+          "$ref": "#/$defs/id"
+        },
+        "typedHash": {
+          "description": "The code as typed, keyed-hashed with the code's own prefix through the root's hashing port (K-22 rule 5: the caller hashes the typed code first), made for every check, with or without an account, so both paths take the same steps. Never the code.",
+          "$ref": "#/$defs/sha256Hex"
+        },
+        "session": {
+          "description": "The session a right code starts (K-22 sessions): its id and its token's sha256, made by the page call, the token 32 bytes from a cryptographically secure generator (ADR-016 section 6; card A). Only the hash is written; the token leaves the page call once, in the first signedIn (K-21 README line 115). Unused, and nothing of it kept, on every other outcome.",
+          "type": "object",
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "tokenSha256": { "$ref": "#/$defs/tokenSha256" }
+          },
+          "required": ["id", "tokenSha256"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["attemptId", "deviceSha256", "requestId", "typedHash", "session"],
+      "additionalProperties": false
+    },
+    "proveSignIn.signedIn": {
+      "title": "ProveSignInSignedIn",
+      "description": "The code was right and the session started (K-22 rule 4's steps: rosie.person_id set to the attempt's person, device_known, the session insert under rule 5's policy, the attempt marked signed in), for the attempt's person alone (refuse-prove-sign-in-session-no-person). For the server: the person for personStanding, and the ids signInEntries logs (README items 62 and 63). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "signedIn" },
+        "signInAttemptId": {
+          "description": "The attempt's K-22 id: the job id of the check's entries (README default 117; CQ-258).",
+          "$ref": "#/$defs/id"
+        },
+        "personId": {
+          "description": "The attempt's person, the session's: never null, since a session starts only for the call's own person (K-22 rule 5's insert policy; refuse-sign-in-session-start).",
+          "$ref": "#/$defs/id"
+        },
+        "sessionId": { "$ref": "#/$defs/id" },
+        "sessionExpiresAt": {
+          "description": "K-22 sessions.expires_at: started_at plus 30 days by the database's clock (ADR-016 open point 2).",
+          "$ref": "#/$defs/utc"
+        },
+        "proofCodeId": {
+          "description": "The sign-in code the session names (sessions.proof_code_id), used by this check.",
+          "$ref": "#/$defs/id"
+        },
+        "repeated": { "const": false }
+      },
+      "required": [
+        "outcome",
+        "signInAttemptId",
+        "personId",
+        "sessionId",
+        "sessionExpiresAt",
+        "proofCodeId",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "proveSignIn.secondProofNeeded": {
+      "title": "ProveSignInSecondProofNeeded",
+      "description": "The code was right (or used before by this attempt), but the attempt's person held a live owner or admin role at its start (owner_or_admin), has had a session, and device_known does not know this device: no session starts, and the attempt keeps the used code and its person (K-21 README line 110; K-22 rule 4). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "secondProofNeeded" },
+        "signInAttemptId": { "$ref": "#/$defs/id" },
+        "personId": { "$ref": "#/$defs/id" },
+        "proofCodeId": { "$ref": "#/$defs/id" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["outcome", "signInAttemptId", "personId", "proofCodeId", "repeated"],
+      "additionalProperties": false
+    },
+    "proveSignIn.alreadySignedIn": {
+      "title": "ProveSignInAlreadySignedIn",
+      "description": "A repeat of a signedIn check, or a check of an attempt that already started its session: no token, no second session, nothing counted or written (K-21 README line 115; sessions_proof_code_key). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "alreadySignedIn" },
+        "signInAttemptId": { "$ref": "#/$defs/id" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["outcome", "signInAttemptId", "repeated"],
+      "additionalProperties": false
+    },
+    "proveSignIn.wrong": {
+      "title": "ProveSignInWrong",
+      "description": "A code that is not right, counted as one wrong try of the attempt, the answer read from the attempt after it (K-22 rule 9's check, step 5): the same with or without an account and a code. proofCodeId names the code the check reached, null with none, for signInEntries alone. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "wrong" },
+        "signInAttemptId": { "$ref": "#/$defs/id" },
+        "triesLeft": {
+          "description": "5 less the attempt's wrong_tries: 4 to 1 (the fifth answers paused).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "proofCodeId": { "$ref": "#/$defs/nullableId" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["outcome", "signInAttemptId", "triesLeft", "proofCodeId", "repeated"],
+      "additionalProperties": false
+    },
+    "proveSignIn.paused": {
+      "title": "ProveSignInPaused",
+      "description": "The attempt is paused: its fifth wrong try set its paused_until 15 minutes on, at this check or an earlier one; a check during the pause counts nothing, so a sixth check answers paused from the server, cookie or none (STATE note 74). The same with or without an account. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "paused" },
+        "signInAttemptId": { "$ref": "#/$defs/id" },
+        "until": {
+          "description": "K-22 sign_in_attempts.paused_until.",
+          "$ref": "#/$defs/utc"
+        },
+        "proofCodeId": { "$ref": "#/$defs/nullableId" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["outcome", "signInAttemptId", "until", "proofCodeId", "repeated"],
+      "additionalProperties": false
+    },
+    "proveSignIn.expired": {
+      "title": "ProveSignInExpired",
+      "description": "The attempt's 10 minutes are over (now after its expires_at): nothing counted (K-22 rule 9's check, step 3). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "outcome": { "const": "expired" },
+        "signInAttemptId": { "$ref": "#/$defs/id" },
+        "proofCodeId": { "$ref": "#/$defs/nullableId" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["outcome", "signInAttemptId", "proofCodeId", "repeated"],
+      "additionalProperties": false
+    },
+    "proveSignIn.response": {
+      "title": "ProveSignInResponse",
+      "description": "Where the check stands, in K-21 v1's labels (README item 60): the page call answers K-21's signInCheck from it, adding the token on signedIn and the standing personStanding reads. waitingForText is not served in this version (way text: CQ-244). New in v1.13.",
+      "oneOf": [
+        { "$ref": "#/$defs/proveSignIn.signedIn" },
+        { "$ref": "#/$defs/proveSignIn.secondProofNeeded" },
+        { "$ref": "#/$defs/proveSignIn.alreadySignedIn" },
+        { "$ref": "#/$defs/proveSignIn.wrong" },
+        { "$ref": "#/$defs/proveSignIn.paused" },
+        { "$ref": "#/$defs/proveSignIn.expired" }
+      ]
+    },
+    "attemptNotFoundError": {
+      "title": "AttemptNotFoundError",
+      "description": "No attempt with this id was started by this device (K-22 sign_in_attempt answers no row: an unknown id, another device, a null): one answer for all, carrying nothing of any attempt, so another browser learns nothing, not even that an attempt exists (K-21 v1 signInCheck.errors attemptNotFound; refuse-prove-sign-in-other-device-told). Nothing was counted or written. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "attemptNotFound" }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "proveSignIn.errors": {
+      "title": "ProveSignInErrors",
+      "description": "attemptNotFound; constraint: the session the page call made is refused (an id or a token hash taken, sessions_proof_code_key, 23505), so nothing, the code's use included, was written; transient: the same request may be sent again, nothing written. New in v1.13.",
+      "oneOf": [
+        { "$ref": "#/$defs/attemptNotFoundError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "proveSignIn.exchange": {
+      "title": "ProveSignInExchange",
+      "description": "One proveSignIn request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "proveSignIn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/proveSignIn.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/proveSignIn.response" }, { "$ref": "#/$defs/proveSignIn.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "endSession.request": {
+      "title": "EndSessionRequest",
+      "description": "A sign-out (README item 61; K-21 v1 signOut; ADR-016 section 6). The page call sends the session token's sha256, never the token (refuse-end-session-token-not-hash), and no time (README default 112). Role and scope: rosie_app, rosie.business_id set empty, rosie.person_id set to the person session_for_token answers, so rule 5's update policy lets the call end only that person's own live session (K-22 rule 5). Reads the primary, uncached. Repeat: safe: an ended, expired or unknown session answers repeated and ends nothing. Time budget: none. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "tokenSha256": {
+          "description": "The sha256 of K-21 signedInPage.sessionToken.",
+          "$ref": "#/$defs/tokenSha256"
+        }
+      },
+      "required": ["tokenSha256"],
+      "additionalProperties": false
+    },
+    "endSession.ended": {
+      "title": "EndSessionEnded",
+      "description": "The session ended now, ended_why signed_out (K-22 sessions_ended_has_why). For the server: the ids signInEntries logs session.ended by (README item 63). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signedOut" },
+        "repeated": { "const": false },
+        "sessionId": { "$ref": "#/$defs/id" },
+        "personId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["result", "repeated", "sessionId", "personId"],
+      "additionalProperties": false
+    },
+    "endSession.repeated": {
+      "title": "EndSessionRepeated",
+      "description": "No live session has the hash (session_for_token answers no row: unknown, ended or expired): nothing ended, and nothing of any session is named (K-21 v1 signOut: 'an ended, expired or unknown session answers signedOut with repeated true'). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signedOut" },
+        "repeated": { "const": true }
+      },
+      "required": ["result", "repeated"],
+      "additionalProperties": false
+    },
+    "endSession.response": {
+      "title": "EndSessionResponse",
+      "description": "Signed out (README item 61). New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/endSession.ended" }, { "$ref": "#/$defs/endSession.repeated" }]
+    },
+    "endSession.errors": {
+      "title": "EndSessionErrors",
+      "description": "transient alone: the same request may be sent again; nothing changed. New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "endSession.exchange": {
+      "title": "EndSessionExchange",
+      "description": "One endSession request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "endSession" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/endSession.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/endSession.response" }, { "$ref": "#/$defs/endSession.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "personStanding.request": {
+      "title": "PersonStandingRequest",
+      "description": "The standing a signedIn answer gives (README item 62; ADR-016 section 6; K-21 v1 signedIn.person), read after proveSignIn commits, by the person that commit set: proveSignIn.signedIn.personId, never a value from the page. Role and scope: rosie_job on the runtime side, no business scope (person_roles across every business; K-36 team_page_recipients grants rosie_app nothing). Reads the primary, uncached, in one read-only transaction that writes nothing. Repeat: safe, a read. Time budget: none in the sources; once per signedIn. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "personId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["personId"],
+      "additionalProperties": false
+    },
+    "signedInRole": {
+      "title": "SignedInRoleRead",
+      "description": "One live role of the person, in K-21 v1 SignedInRole's names (owner, admin, staff, ownBusiness for K-04's own_business), with its business. A customer role is never a standing: customers have no sign-in (FS line 701; K-21's enum has none; refuse-person-standing-customer-role). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "role": { "enum": ["owner", "admin", "staff", "ownBusiness"] },
+        "businessId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["role", "businessId"],
+      "additionalProperties": false
+    },
+    "personStanding.response": {
+      "title": "PersonStandingResponse",
+      "description": "The person's standing (README item 62): their live roles, whether they are on Rosie's team and whether they are a tester, as the rows say; the page call gives tester false outside staging (K-21 v1 schema line 853), and on a read that fails answers roles empty and both flags false, failing closed (ADR-016 section 6). Never a session, a hash, a contact or a name. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "personId": { "$ref": "#/$defs/id" },
+        "roles": {
+          "description": "K-04 person_roles of the person with ended_at null, but customer, at every business, in role id order (as db/repo/people.ts reads live roles).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/signedInRole" }
+        },
+        "team": {
+          "description": "true when the person holds a live K-36 v1 team_page_recipients row (removed_at null): Rosie's team (K-21 v1 signedIn.person.team; Q-18).",
+          "type": "boolean"
+        },
+        "tester": {
+          "description": "The tester's standing by the rows v1.12's readTesterStanding reads (item 53, default 103), read by person: a live team row, until T-1295's K-05 version widens both reads with staging's human testers' list (open gap 62; ADR-016 section 5).",
+          "type": "boolean"
+        }
+      },
+      "required": ["personId", "roles", "team", "tester"],
+      "additionalProperties": false
+    },
+    "personStanding.errors": {
+      "title": "PersonStandingErrors",
+      "description": "transient alone: the page call answers signedIn with roles empty and both flags false (ADR-016 section 6), and each console's own call checks standing again. A read writes nothing. New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "personStanding.exchange": {
+      "title": "PersonStandingExchange",
+      "description": "One personStanding request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "personStanding" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/personStanding.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/personStanding.response" },
+            { "$ref": "#/$defs/personStanding.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "signInEntryAsk": {
+      "title": "SignInEntryAsk",
+      "description": "One kind of entry to write and the row it is about; the call reads every value from that row (README item 63), so no value, hash or code comes from the caller (refuse-sign-in-entries-caller-values). New in v1.13.",
+      "oneOf": [
+        {
+          "title": "ProofCodeCheckedAsk",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "proof_code.checked" },
+            "proofCodeId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["kind", "proofCodeId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SessionMoveAsk",
+          "type": "object",
+          "properties": {
+            "kind": { "enum": ["session.started", "session.ended"] },
+            "sessionId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["kind", "sessionId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "signInEntries.request": {
+      "title": "SignInEntriesRequest",
+      "description": "The entries of a sign-in's check or of a sign-out, after proveSignIn or endSession commits (README item 63; ADR-016 section 6; K-08 v1.1 proof_code.checked; K-08 v1.2 session.started and session.ended). Role and scope: rosie_job on the runtime side, rosie.business_id set empty: the entries are team-only, with no business, which the Tool API's grants on event_log cannot write (ADR-016, 'One role for the whole sign-in'). Reads the primary, uncached. Repeat: safe: each entry's id is fixed by rule, so a repeat writes nothing. Time budget: none; it runs after the page's answer (README item 63). New in v1.13.",
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "description": "The entries' job id: the attempt's K-22 id for a check's (proveSignIn's signInAttemptId: README default 117; CQ-258), the sign-out's K-21 page.requestId for its session.ended.",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The page call's trace id (K-08 v1).",
+          "$ref": "#/$defs/id"
+        },
+        "entries": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/signInEntryAsk" },
+          "minItems": 1,
+          "maxItems": 2
+        }
+      },
+      "required": ["jobId", "traceId", "entries"],
+      "additionalProperties": false
+    },
+    "signInEntries.response": {
+      "title": "SignInEntriesResponse",
+      "description": "Each entry the rows called for, by its id, and whether this call wrote it or found it written (README item 63). An asked row with no change to log gives no entry. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "logged" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "kind": { "enum": ["proof_code.checked", "session.started", "session.ended"] },
+              "written": {
+                "description": "true: written by this call; false: an entry of that id was already in the log (a repeat).",
+                "type": "boolean"
+              }
+            },
+            "required": ["id", "kind", "written"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "entries"],
+      "additionalProperties": false
+    },
+    "signInEntries.errors": {
+      "title": "SignInEntriesErrors",
+      "description": "notFound: an asked code (proof_codes) or session (sessions) does not exist; transient: the same request may be sent again. Nothing was written. New in v1.13.",
+      "oneOf": [{ "$ref": "#/$defs/notFoundError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "signInEntries.exchange": {
+      "title": "SignInEntriesExchange",
+      "description": "One signInEntries request with its outcome. New in v1.13.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "signInEntries" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/signInEntries.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/signInEntries.response" }, { "$ref": "#/$defs/signInEntries.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

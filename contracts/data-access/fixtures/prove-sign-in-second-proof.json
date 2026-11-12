@@ -1,0 +1,27 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam-new-device.json", "send-sign-in-code-sam-new-device.json"],
+    "now": "2026-11-02T13:21:00Z",
+    "note": "Sam types the right code on his phone's browser. check_proof_code answers right and uses the code; rosie.person_id is set to Sam; the attempt says he held an owner role at its start, he has had sessions, and device_known answers false for this device, so no session starts and the check is recorded secondProofNeeded: the attempt keeps the used code and its person for the second proof (S13-45 row 8; K-21 README line 110; K-22 rule 4). The session the page call made for it is never written."
+  },
+  "request": {
+    "attemptId": "attempt-sam-signin-nov02-phone",
+    "deviceSha256": "d4e5f60718293a4b5c6d7e8f9a0b1c2dd4e5f60718293a4b5c6d7e8f9a0b1c2d",
+    "requestId": "req-portal-sam-nov02-phone-check-1",
+    "typedHash": "f4e5d6c7b8a9aa9b8c7d6e5f40312213f4e5d6c7b8a9aa9b8c7d6e5f40312213",
+    "session": {
+      "id": "session-sam-nov02-phone",
+      "tokenSha256": "b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2"
+    }
+  },
+  "outcome": {
+    "outcome": "secondProofNeeded",
+    "signInAttemptId": "sign-in-sam-nov02-1320",
+    "personId": "person-sam",
+    "proofCodeId": "code-sam-sign-in-nov02-phone",
+    "repeated": false
+  }
+}

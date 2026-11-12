@@ -1,0 +1,27 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-10-28T15:08:00Z",
+    "note": "prove-sign-in-sixth-check's twin for a contact no account holds (K-22 seed-sign-in-attempt.json: sign-in-no-account-oct28-1505, no person and no code, five wrong checks, paused until 15:22:10Z). The sixth check answers paused until the same time, counting nothing, as with an account: every answer to a code that is not right comes from the attempt (ADR-016 section 4). proofCodeId null is for the server's entries alone; the page's answer is the same."
+  },
+  "request": {
+    "attemptId": "attempt-no-account-signin-1",
+    "deviceSha256": "d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2",
+    "requestId": "req-portal-no-account-try6",
+    "typedHash": "0b1c2d3e4f5061728394a5b6c7d8e9f00b1c2d3e4f5061728394a5b6c7d8e9f0",
+    "session": {
+      "id": "session-unknown-no-account-try6",
+      "tokenSha256": "b8c9daebfc0d1e2f30415263748596a7b8c9daebfc0d1e2f30415263748596a7"
+    }
+  },
+  "outcome": {
+    "outcome": "paused",
+    "signInAttemptId": "sign-in-no-account-oct28-1505",
+    "until": "2026-10-28T15:22:10Z",
+    "proofCodeId": null,
+    "repeated": false
+  }
+}

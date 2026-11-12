@@ -1,0 +1,47 @@
+{
+  "call": "sendSignInCode",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-no-account.json"],
+    "now": "2026-11-02T13:05:01Z",
+    "note": "A send for an attempt that names no person (start-sign-in-no-account): the page call never asks for one, since the start's personId was null; asked anyway, the call writes and sends nothing and answers notSent, noPerson. No code, row or entry exists for a contact with no account (ADR-016 section 4; card R1: 'none with no account')."
+  },
+  "request": {
+    "signInAttemptId": "sign-in-someone-nov02-1305",
+    "traceId": "trace-page-someone-nov02-1305",
+    "bundle": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "code": {
+      "id": "code-someone-sign-in-nov02",
+      "codeHash": "f6e7d8c9bab0cc1dae9f807162534435f6e7d8c9bab0cc1dae9f807162534435",
+      "hashKeyName": "PROOF_CODE_HASH_KEY"
+    },
+    "emailRowId": "out-someone-sign-in-nov02-code",
+    "plan": {
+      "row": "out-someone-sign-in-nov02-code",
+      "channel": "email",
+      "copyOf": null,
+      "plan": { "formats": ["text"], "lines": [], "question": null, "pageType": null, "threadReplyTo": null }
+    },
+    "finalParts": {
+      "row": "out-someone-sign-in-nov02-code",
+      "channel": "email",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Code 615048: type it on the sign-in page. It works for 10 minutes.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "notSent",
+    "why": "noPerson"
+  }
+}

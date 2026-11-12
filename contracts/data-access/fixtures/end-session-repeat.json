@@ -1,0 +1,17 @@
+{
+  "call": "endSession",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json", "end-session-sam.json"],
+    "now": "2026-11-02T14:00:05Z",
+    "note": "The sign-out sent again: session_for_token answers no row for an ended session, so the call ends nothing, sets no person and answers signedOut, repeated, naming no session (K-21 v1 signOut). An unknown or expired token answers the same."
+  },
+  "request": {
+    "tokenSha256": "b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1"
+  },
+  "outcome": {
+    "result": "signedOut",
+    "repeated": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-10-28T15:10:00Z",
+    "note": "Three minutes after the fifth wrong code paused someone's attempt at Sam's email (K-22 seed-sign-in-attempt.json: sign-in-sam-oct28-1505, paused until 15:22:10Z; K-21 sign-in-wrong-five.json), a new start for the same contact from another browser. Rule 2 finds the contact's latest paused_until after now, so the start answers paused until then and writes nothing (ADR-016 section 4: a new start for that contact answers paused and sends nothing). Rules 0 to 3 read no account: start-sign-in-no-account-paused answers its twin with no account the same."
+  },
+  "request": {
+    "id": "sign-in-sam-oct28-1510",
+    "attemptId": "attempt-sam-signin-oct28-1510",
+    "requestSha256": "a8b9cadbecf0a1b2c3d4e5f607182933a8b9cadbecf0a1b2c3d4e5f607182933",
+    "deviceSha256": "d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "paused",
+    "until": "2026-10-28T15:22:10Z",
+    "by": "contactPause"
+  }
+}
