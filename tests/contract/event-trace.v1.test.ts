@@ -374,6 +374,12 @@ const ADDED_KINDS_TABLE = tableAfter("### The added kinds").map((cells) => ({
   readBy: must(cells[3]),
 }));
 
+/** README v1.2 "The session kinds": each kind v1.2 adds and its table. */
+const V12_KINDS_TABLE = tableAfter("### The session kinds").map((cells) => ({
+  kind: must(/`([a-z_]+\.[a-z_]+)`/.exec(must(cells[0]))?.[1], `a session kind in ${String(cells[0])}`),
+  table: must(/`([a-z_]+)`/.exec(must(cells[1]))?.[1], `a table in ${String(cells[1])}`),
+}));
+
 /** Each kind's subject (its part before the dot) and the table the README's kinds tables give it. */
 const TABLE_OF = new Map<string, string>();
 for (const [subject, table] of [
@@ -381,6 +387,7 @@ for (const [subject, table] of [
     row.table === null ? [] : [[must(row.subjects[0]), row.table] as const],
   ),
   ...ADDED_KINDS_TABLE.map((row) => [must(row.kind.split(".")[0]), row.table] as const),
+  ...V12_KINDS_TABLE.map((row) => [must(row.kind.split(".")[0]), row.table] as const),
 ]) {
   const known = TABLE_OF.get(subject);
   if (known !== undefined && known !== table)

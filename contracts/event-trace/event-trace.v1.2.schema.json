@@ -1,0 +1,699 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/event-trace/event-trace.v1.2.schema.json",
+  "title": "Event trace v1.2",
+  "description": "K-08 v1.2, a minor version of the event log and trace format (T-1275; ADR-016 card V4; contracts/event-trace/README.md section 'v1.2'). It only adds to v1.1 (event-trace.v1.1.schema.json, frozen and unchanged, referred to here): every v1.1 definition is here under its own name, the unchanged ones by reference; eventKind, addedEventKind, teamOnlyEventKind, eventLogRow, eventLogBatch and exportRow are restated so the closed list of kinds gains a sign-in session's start and end on K-22 v1's sessions table (ADR-016 section 6: signInEntries writes session.started after a sign-in's check commits and session.ended after a sign-out; v1.1's open gap: 'a session kind waits for a call that writes one'). Both are added kinds that only Rosie's team reads (README default 16), so their rows carry no business and no column neverLoggedColumn names (README 'Never in an added kind'); a session's own rule (eventLogRow dependentSchemas.kind) adds that its row holds no sealed value, no column named for a K-21 token and no value that reads as a hash, so neither the session's token nor its sha256 nor the device's sha256 can appear, plain or sealed. A v1 or v1.1 kind is checked as in v1.1, so every v1 and v1.1 document is a v1.2 document. Spans, traces, the measures and the export's sealing are v1's. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/eventLogRow"
+    },
+    {
+      "$ref": "#/$defs/eventLogBatch"
+    },
+    {
+      "$ref": "#/$defs/exportRow"
+    },
+    {
+      "$ref": "#/$defs/span"
+    },
+    {
+      "$ref": "#/$defs/trace"
+    },
+    {
+      "$ref": "#/$defs/traceSet"
+    },
+    {
+      "$ref": "#/$defs/replyTime"
+    },
+    {
+      "$ref": "#/$defs/invariantRun"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/id"
+    },
+    "traceId": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/traceId"
+    },
+    "turnId": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/turnId"
+    },
+    "utc": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/utc"
+    },
+    "zone": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/zone"
+    },
+    "sha256": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/sha256"
+    },
+    "stepId": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/stepId"
+    },
+    "bundleId": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/bundleId"
+    },
+    "tableName": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/tableName"
+    },
+    "role": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/role"
+    },
+    "rowRef": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/rowRef"
+    },
+    "safeId": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/safeId"
+    },
+    "handleRef": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/handleRef"
+    },
+    "eventKind": {
+      "title": "EventKind",
+      "description": "What happened: the closed list of event kinds, <subject>.<move> (02-contracts K-08 'what (a closed list of kinds, and the row it touched)'; arch 09 line 457). v1.2 (T-1275) is v1's list and addedEventKind, which is now v1.1's added kinds and a session's start and end: a minor version only adds a kind, so every v1 and v1.1 kind keeps its meaning (README 'Event kinds', 'v1.1' and 'v1.2').",
+      "anyOf": [
+        {
+          "description": "v1's kinds, unchanged (K-08 v1 eventKind).",
+          "$ref": "event-trace.v1.schema.json#/$defs/eventKind"
+        },
+        {
+          "$ref": "#/$defs/addedEventKind"
+        }
+      ]
+    },
+    "addedEventKind": {
+      "title": "AddedEventKind",
+      "description": "The kinds added after v1, each kept to the added kinds' rules (eventLogRow dependentSchemas.kind): v1.1's, unchanged (README 'v1.1', the added kinds table), and v1.2's session kinds (sessionEventKind; README 'v1.2', the session kinds table).",
+      "anyOf": [
+        {
+          "description": "v1.1's added kinds, unchanged (K-08 v1.1 addedEventKind).",
+          "$ref": "event-trace.v1.1.schema.json#/$defs/addedEventKind"
+        },
+        {
+          "$ref": "#/$defs/sessionEventKind"
+        }
+      ]
+    },
+    "sessionEventKind": {
+      "title": "SessionEventKind",
+      "description": "The kinds v1.2 adds (README 'v1.2'): a sign-in session's start and end, on K-22 v1's sessions table (S11-52; S13-45 row 8; RULES 8.7, 9.1; S11-100). ADR-016 section 6: signInEntries writes session.started after proveSignIn commits a right code's session, and session.ended after endSession, a sign-out; a commit that ends a person's sessions for them (contact_changed, left, handed_over: K-22 README rule 5) writes session.ended too. The session's token, its sha256 and the device's sha256 never appear in either, plain or sealed (BP rule 7; README 'Never in an added kind').",
+      "type": "string",
+      "enum": ["session.started", "session.ended"]
+    },
+    "teamOnlyEventKind": {
+      "title": "TeamOnlyEventKind",
+      "description": "The added kinds only Rosie's team reads, so their rows carry no business (business_id null) and no business scope reads them, its owner included (K-04 v1 rule 4: a row whose business is null is seen by no business scope): v1.1's, unchanged (README default 16), and a session's start and end (README default 22): a session has no business, since it covers every business of its person (K-22 v1 sessions, scope none; S11-52), and K-22 rule 5 keeps a session to its own person's calls. The person a session's row is about goes in its new_values as a plain person_id (README 'v1.2').",
+      "anyOf": [
+        {
+          "description": "v1.1's team-only kinds, unchanged (K-08 v1.1 teamOnlyEventKind).",
+          "$ref": "event-trace.v1.1.schema.json#/$defs/teamOnlyEventKind"
+        },
+        {
+          "$ref": "#/$defs/sessionEventKind"
+        }
+      ]
+    },
+    "proofCodeEventKind": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/proofCodeEventKind"
+    },
+    "neverLoggedColumn": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/neverLoggedColumn"
+    },
+    "codeLike": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/codeLike"
+    },
+    "addedKindValues": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/addedKindValues"
+    },
+    "proofCodeValues": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/proofCodeValues"
+    },
+    "sessionTokenColumn": {
+      "title": "SessionTokenColumn",
+      "description": "Column names no session's row carries in its old or new values, beside those neverLoggedColumn names (token, token_sha256 and device_sha256 among them): K-21 v1's two cookies, the session token and the device token, as a column would spell them (K-21 v1 opaqueToken: 'never logged, put in a span, an event-log row or a message'; K-21's own camelCase names, sessionToken and deviceToken, are no column name at all under v1's fieldValues). A key or token is named, never shown (BP rule 7; README 'v1.2').",
+      "type": "string",
+      "enum": ["session_token", "device_token"]
+    },
+    "hashLike": {
+      "title": "HashLike",
+      "description": "A string that reads as a sha256 in hex, 64 hex digits: the form of a session's token_sha256 and device_sha256 (K-22 v1 sessions_token_hash_form, sessions_device_hash_form). A session's row carries no such value, under any column name (README 'v1.2').",
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "sessionValues": {
+      "title": "SessionValues",
+      "description": "Old or new values of a session's row: no column sessionTokenColumn names and no value that reads as a hash (hashLike), beside addedKindValues' rule, so neither the session's token nor its sha256 nor the device's sha256 appears there under any name (BP rule 7; README 'v1.2').",
+      "anyOf": [
+        {
+          "description": "None (arch 09 line 457).",
+          "type": "null"
+        },
+        {
+          "description": "Values keyed by column, with no token's column and no hash (README 'v1.2').",
+          "type": "object",
+          "propertyNames": {
+            "description": "Never a K-21 token's column (BP rule 7).",
+            "not": {
+              "$ref": "#/$defs/sessionTokenColumn"
+            }
+          },
+          "additionalProperties": {
+            "description": "Never a hash, under any column name (K-22 v1 sessions_token_hash_form, sessions_device_hash_form; BP rule 7).",
+            "not": {
+              "$ref": "#/$defs/hashLike"
+            }
+          }
+        }
+      ]
+    },
+    "fieldValues": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/fieldValues"
+    },
+    "plainValue": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/plainValue"
+    },
+    "plainList": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/plainList"
+    },
+    "plainObject": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/plainObject"
+    },
+    "plainItem": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/plainItem"
+    },
+    "plainString": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/plainString"
+    },
+    "why": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/why"
+    },
+    "provider": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/provider"
+    },
+    "limitResult": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/limitResult"
+    },
+    "approval": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/approval"
+    },
+    "approvalAnswer": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/approvalAnswer"
+    },
+    "approvalConsentRow": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/approvalConsentRow"
+    },
+    "approvalOwnerYes": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/approvalOwnerYes"
+    },
+    "proof": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/proof"
+    },
+    "sealedBytes": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/sealedBytes"
+    },
+    "eventLogRow": {
+      "title": "EventLogRow",
+      "description": "One event-log row, as it lands in K-04 v1's event_log table, column for column. Every write appends one; none is ever edited, so the log never records a change to itself (arch 09 lines 457, 492; K-04 v1 README rule 5). The columns the table holds as not null are required; the rest may be left out, meaning null. v1.2 (T-1275): kind takes v1.2's list; v1.1's three rules hold for v1.2's added kinds and team-only kinds, and a fourth holds for a session's rows (dependentSchemas.kind); K-04's event_log.kind is text with no CHECK, so no migration is needed.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The event id (K-04 event_log.id; CQ-09).",
+          "$ref": "#/$defs/safeId"
+        },
+        "at": {
+          "description": "When, in UTC (arch 09 line 457 'when'; K-04 event_log.at).",
+          "$ref": "#/$defs/utc"
+        },
+        "zone": {
+          "description": "The IANA zone the event is read in; null means UTC (S13-03; K-04 event_log.zone).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/zone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turn_id": {
+          "description": "The turn that wrote it, or null for a job (02-contracts K-08; K-04 event_log.turn_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "job_id": {
+          "description": "For a clock firing, a webhook, a page or Agent API request, a sweep or reconciliation: the job's id (02-contracts K-08; K-04 event_log.job_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trace_id": {
+          "description": "The trace id it was written under (arch 10 line 548; K-04 event_log.trace_id).",
+          "$ref": "#/$defs/traceId"
+        },
+        "bundle_hash": {
+          "description": "The bundle in force, as K-01's bundleId hash; null for a write outside a turn (arch 10 line 548; K-04 event_log.bundle_hash).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bundle_build": {
+          "description": "The bundle's build number; null with bundle_hash (K-01 v1 bundleId; K-04 event_log.bundle_build).",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "business_id": {
+          "description": "The business the write belongs to, or null (arch 10 line 546; K-04 event_log.business_id). Null for an added kind only Rosie's team reads (teamOnlyEventKind: v1.1's and a session's), so no business scope sees it (K-04 v1 rule 4; README 'v1.1' and 'v1.2').",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actor_kind": {
+          "description": "Who: a person, Rosie, a job or a provider (arch 09 line 457 'who'; 02-contracts K-08; K-04 event_log_actor_kind_known).",
+          "type": "string",
+          "enum": ["person", "rosie", "job", "provider"]
+        },
+        "actor_person_id": {
+          "description": "For a person, who (K-04 event_log.actor_person_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actor_role": {
+          "description": "The person's role at the business (02-contracts K-08 'a person and role'; K-04 event_log.actor_role).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/role"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "description": "What happened, from v1.2's closed list (arch 09 line 457 'what'; K-04 event_log.kind).",
+          "$ref": "#/$defs/eventKind"
+        },
+        "table_name": {
+          "description": "The table of the row it touched; never event_log, since the log is never edited (arch 09 lines 457, 492; K-04 event_log.table_name).",
+          "anyOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/tableName"
+                },
+                {
+                  "not": {
+                    "description": "The event log never records an edit of itself: none happens (arch 09 line 457 'never edited').",
+                    "const": "event_log"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "row_id": {
+          "description": "The row it touched; for a phone row, its handle id (02-contracts K-08; K-04 event_log.row_id; README default 3).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "old_values": {
+          "description": "Old values field by field, private ones left out (arch 09 line 457; K-04 event_log.old_values).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/fieldValues"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "new_values": {
+          "description": "New values field by field, private ones left out (arch 09 line 457; K-04 event_log.new_values).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/fieldValues"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sealed_values": {
+          "description": "The private old and new values, sealed under the key of sealed_for_person_id; unreadable once that key is deleted (arch 09 line 492; arch 01 line 93; K-04 event_log.sealed_values). Never on a proof code's row (README 'v1.1') or a session's row (README 'v1.2').",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedBytes"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sealed_for_person_id": {
+          "description": "The person whose key seals sealed_values; one person per row (arch 09 line 492; K-04 event_log.sealed_for_person_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "why": {
+          "description": "Why (arch 09 line 457; K-04 event_log.why).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/why"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approved_by": {
+          "description": "Approved by (arch 09 line 457; K-04 event_log.approved_by).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/approval"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofs": {
+          "description": "Consent proofs that survive a deleted key (arch 09 line 492; arch 10 line 516; K-04 event_log.proofs).",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/proof"
+              },
+              "minItems": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "at", "trace_id", "actor_kind", "kind"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "actor_kind": {
+          "description": "A person actor names the person (arch 09 line 457 'who'; K-04 event_log_person_actor).",
+          "if": {
+            "properties": {
+              "actor_kind": {
+                "description": "arch 09 line 457.",
+                "const": "person"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "actor_person_id": {
+                "description": "K-04 event_log_person_actor.",
+                "type": "string"
+              }
+            },
+            "required": ["actor_person_id"]
+          }
+        },
+        "sealed_values": {
+          "description": "Sealed values name the person whose key seals them (arch 09 line 492; K-04 event_log_sealed_has_person).",
+          "if": {
+            "properties": {
+              "sealed_values": {
+                "description": "arch 09 line 492.",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealed_for_person_id": {
+                "description": "K-04 event_log_sealed_has_person.",
+                "type": "string"
+              }
+            },
+            "required": ["sealed_for_person_id"]
+          }
+        },
+        "trace_id": {
+          "description": "Every row names its turn or its job (02-contracts K-08 'the turn id, or a job id'; K-04 event_log_turn_or_job).",
+          "anyOf": [
+            {
+              "properties": {
+                "turn_id": {
+                  "description": "K-04 event_log_turn_or_job.",
+                  "type": "string"
+                }
+              },
+              "required": ["turn_id"]
+            },
+            {
+              "properties": {
+                "job_id": {
+                  "description": "K-04 event_log_turn_or_job.",
+                  "type": "string"
+                }
+              },
+              "required": ["job_id"]
+            }
+          ]
+        },
+        "kind": {
+          "description": "The rules for the added kinds only, so a row of a v1 kind is checked as v1 checks it and a row of a v1.1 kind as v1.1 does (README 'v1.1' and 'v1.2'): no added kind names a secret's column; a row only Rosie's team reads carries no business; a proof code's row holds no sealed value and no code-like value; and, v1.2, a session's row holds no sealed value, no token's column and no hash.",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "An added kind: v1.1's or v1.2's (README 'v1.1' and 'v1.2').",
+                    "$ref": "#/$defs/addedEventKind"
+                  }
+                },
+                "required": ["kind"]
+              },
+              "then": {
+                "description": "A key or token is named, never shown (BP rule 7).",
+                "properties": {
+                  "old_values": {
+                    "$ref": "#/$defs/addedKindValues"
+                  },
+                  "new_values": {
+                    "$ref": "#/$defs/addedKindValues"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "Read by Rosie's team only (README 'v1.1' and 'v1.2').",
+                    "$ref": "#/$defs/teamOnlyEventKind"
+                  }
+                },
+                "required": ["kind"]
+              },
+              "then": {
+                "description": "No business scope reads the row, its owner included (K-04 v1 rule 4; K-34 README rule 4; K-36 README rule 2; K-37 README rule 2; K-22 v1 sessions, scope none).",
+                "properties": {
+                  "business_id": {
+                    "description": "Null, or left out (K-04 v1 rule 4).",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "A proof code's row (K-09 draft sendProofCode, proveCode).",
+                    "$ref": "#/$defs/proofCodeEventKind"
+                  }
+                },
+                "required": ["kind"]
+              },
+              "then": {
+                "description": "The code, its hash, the code as typed and the ready text never appear, sealed or plain (RULES 6.2; BP rule 7): nothing is sealed, so nothing can hide in sealed bytes.",
+                "properties": {
+                  "old_values": {
+                    "$ref": "#/$defs/proofCodeValues"
+                  },
+                  "new_values": {
+                    "$ref": "#/$defs/proofCodeValues"
+                  },
+                  "sealed_values": {
+                    "description": "None (README 'v1.1').",
+                    "type": "null"
+                  },
+                  "sealed_for_person_id": {
+                    "description": "None, with no sealed values (README 'v1.1').",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "A session's start or end (README 'v1.2').",
+                    "$ref": "#/$defs/sessionEventKind"
+                  }
+                },
+                "required": ["kind"]
+              },
+              "then": {
+                "description": "The session's token, its sha256 and the device's sha256 never appear, sealed or plain (BP rule 7; README 'Never in an added kind' and 'v1.2'): nothing is sealed, since K-22 seals no column of sessions (K-22 README rule 6), so nothing can hide in sealed bytes.",
+                "properties": {
+                  "old_values": {
+                    "$ref": "#/$defs/sessionValues"
+                  },
+                  "new_values": {
+                    "$ref": "#/$defs/sessionValues"
+                  },
+                  "sealed_values": {
+                    "description": "None (README 'v1.2').",
+                    "type": "null"
+                  },
+                  "sealed_for_person_id": {
+                    "description": "None, with no sealed values (README 'v1.2').",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "eventLogBatch": {
+      "title": "EventLogBatch",
+      "description": "The rows one commit appends, in order, under one turn id and one trace id (arch 02 line 121: 'One transaction writes state, one outbox row per message, clock rows and the event log, under the turn id'; K-05 v1 item 1, event-log entries). v1.2: each row is a v1.2 eventLogRow.",
+      "type": "object",
+      "properties": {
+        "rows": {
+          "description": "The rows, in the order the commit writes them (arch 02 line 121).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventLogRow"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["rows"],
+      "additionalProperties": false
+    },
+    "exportRow": {
+      "title": "ExportRow",
+      "description": "One row of the event-log export to R2 Parquet, which reports and evals read instead of the primary (arch 10 line 544). It carries the row as stored, sealed values still sealed, and whether the sealing key was still held when it was read, so a reader knows erased values are gone for good while the proofs' hashes and words stay (arch 09 line 492; arch 10 line 516). v1.2: the row is a v1.2 eventLogRow.",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The event-log row as stored (K-04 event_log; never edited).",
+          "$ref": "#/$defs/eventLogRow"
+        },
+        "sealed_key": {
+          "description": "For a row with sealed values: held, or erased once the person's key is deleted, so they can never be read again; null for a row with none (arch 09 line 492; K-04 sealing_keys.erased_at).",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["held", "erased"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exported_at": {
+          "description": "When the export read the row (arch 10 line 544; CQ-09).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["row", "sealed_key", "exported_at"],
+      "additionalProperties": false
+    },
+    "hop": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/hop"
+    },
+    "label": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/label"
+    },
+    "spanValue": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/spanValue"
+    },
+    "spanFacts": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/spanFacts"
+    },
+    "modelCall": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/modelCall"
+    },
+    "span": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/span"
+    },
+    "trace": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/trace"
+    },
+    "traceSet": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/traceSet"
+    },
+    "replyTime": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/replyTime"
+    },
+    "invariantRun": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/invariantRun"
+    },
+    "invariantCheck": {
+      "$ref": "event-trace.v1.1.schema.json#/$defs/invariantCheck"
+    }
+  }
+}
