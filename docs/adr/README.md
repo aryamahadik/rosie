@@ -32,6 +32,7 @@ A record that work is built on is never rewritten to say something else; it is s
 | [ADR-013](0013-walking-skeleton-turn-one.md)         | The walking skeleton's turn        | Turn 1, Sam's first text (S1-01) to S1-02's question, through decide's two reads and one commit; each hop's fixture named (K-02 v1.1, K-09 v1.5) | proposed, default in use (T-1142) |
 | [ADR-014](0014-worker-database-roles.md)             | The Worker's database roles        | Two logins, one inheriting rosie_job and one rosie_app, each behind its own Hyperdrive configuration and binding; a guard in every call          | proposed, default in use (T-1239) |
 | [ADR-015](0015-safety-result-until-commit.md)        | The safety result until its commit | Each text's K-02 safety result is kept sealed in its handle actor's storage until its turn ends; the turn reads it there; no contract changes    | proposed, default in use (T-1241) |
+| [ADR-016](0016-sign-in-by-code-on-staging.md)        | Sign-in by code on staging         | Codes reach only the named testers by real email; a job id lets a call write an outbox row (K-04 v1.1); a pause per typed contact (K-22 v1.2)    | proposed, default in use (T-1250) |
 
 ## Short names used in the records
 
