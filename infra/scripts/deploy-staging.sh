@@ -5,7 +5,8 @@
 # ops/releases/D-xxx.md:
 #  1. migrate: the expanding migrations on the staging database, when STAGING_DATABASE_URL is set
 #     (guard:migrations has checked before the merge that they only expand);
-#  2. code: wrangler deploy --env staging --var GIT_SHA:<sha>, flags off;
+#  2. code: wrangler deploy --env staging --var GIT_SHA:<sha>, with --var ROSIE_NUMBER:<number> when that is set
+#     in E.164 form (below), flags off;
 #  3. bundle: publish-bundle.sh publishes the bundle folder --bundle names (default bundles/v0, D-017's bundle v0):
 #     PostgreSQL's copy, the KV bulk file into the BUNDLES namespace, then the active bundle id (T-569);
 #  4. flags: flags.sh applies the staging flag set, infra/flags/staging.json, which turns the skeleton flag on
@@ -23,6 +24,21 @@
 # Base URL of the check: STAGING_BASE_URL when set, else this deploy's workers.dev URL plus /test (BASE_PATH
 # of env.staging in wrangler.jsonc).
 # Staging only: it takes no --env, and production deploys and flags run only from the protected release job.
+# Rosie's own number, staging's Linq line (T-1304; CQ-253 as DL-542 refines it): ROSIE_NUMBER is read
+# by name, from the environment, else from the git-ignored .dev.vars (load_dev_var), and taken out of the
+# environment before any command runs, so only step 2's wrangler deploy gets it, as
+# --var ROSIE_NUMBER:<number>. It is never written in wrangler.jsonc or any tracked file: the repository is
+# public (DL-436). Why a var given at deploy:
+#  - it is no key: people text it, and every chat link carries it (K-09 issueChatLink's sms: form);
+#  - wrangler 4.158 prints a --var's value as "(hidden)" (D-000 check 5's log: env.GIT_SHA ("(hidden)")),
+#    and wrangler.jsonc's vars as they are, so the number stays out of the deploy's log;
+#  - a deploy keeps no var of the version before (wrangler.jsonc sets no keep_vars), so a deploy without it
+#    leaves the Worker without it, and each version, a rollback's target too, keeps the number it was
+#    deployed with; a secret, once put, would stay on every later version, and putting one at each deploy
+#    would make every deploy a secret write.
+# Only a value in E.164 form is given (a + and 7 to 15 digits, nothing else: K-04's handles_address_form,
+# K-11's phone). A missing or malformed value deploys without it, and one line says chat links stay off
+# (K-05 default 109). The value itself is never printed.
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -51,6 +67,13 @@ if [[ "$bundle_dir" != /* ]]; then
   bundle_dir="$PWD/$bundle_dir"
 fi
 cd "$ROOT"
+
+# Rosie's own number (above): read by name, then taken out of the environment before any command runs.
+# E164 is the form K-04's handles_address_form and K-11's phone write a number in.
+E164='^[+][1-9][0-9]{6,14}$'
+load_dev_var ROSIE_NUMBER
+rosie_number="${ROSIE_NUMBER:-}"
+unset ROSIE_NUMBER
 
 sha="$(git_sha)"
 log "deploy-staging: start, commit $sha"
@@ -193,10 +216,25 @@ else
     "after step 2 finishes, it goes back to the previous deployment"
 fi
 
+# Step 2's var for Rosie's own number (above): given only in E.164 form, and its value never printed.
+rosie_number_var=()
+if [[ -z "$rosie_number" ]]; then
+  log "step 2/4 code: NOTICE: ROSIE_NUMBER is not set, so the Worker gets no number and chat links" \
+    "stay off (K-05 default 109)"
+elif [[ "$rosie_number" =~ $E164 ]]; then
+  rosie_number_var=(--var "ROSIE_NUMBER:$rosie_number")
+  log "step 2/4 code: ROSIE_NUMBER goes to the Worker by name, as a var (wrangler prints its value as" \
+    "(hidden))"
+else
+  log "step 2/4 code: NOTICE: ROSIE_NUMBER is not in E.164 form (a + and 7 to 15 digits), so the Worker" \
+    "gets no number and chat links stay off (K-05 default 109); the value is not printed"
+fi
+
 started=1
 output="$work/deploy.ndjson"
 log "step 2/4 code: wrangler deploy --env staging (flags stay off)"
-WRANGLER_OUTPUT_FILE_PATH="$output" "$CF" deploy --env staging --var "GIT_SHA:$sha"
+WRANGLER_OUTPUT_FILE_PATH="$output" "$CF" deploy --env staging --var "GIT_SHA:$sha" \
+  ${rosie_number_var[@]+"${rosie_number_var[@]}"}
 deployed=1
 version_id="$(wrangler_output "$output" deploy version_id)"
 log "step 2/4 code: done, version ${version_id:-unknown} is live"
