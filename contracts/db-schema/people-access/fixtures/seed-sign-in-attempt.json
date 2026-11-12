@@ -1,0 +1,132 @@
+{
+  "after": ["seed-session.json"],
+  "rows": [
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-sign-in-oct26-email",
+        "purpose": "sign_in",
+        "person_id": "person-sam",
+        "business_id": null,
+        "sent_to_handle_id": "handle-sam-email",
+        "channel": "email",
+        "code_hash": "f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f00",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-26T13:00:01Z",
+        "expires_at": "2026-10-26T13:10:01Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-26T13:01:30Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "sessions",
+      "values": {
+        "id": "session-sam-oct26-email",
+        "person_id": "person-sam",
+        "token_sha256": "b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0",
+        "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+        "proven_via": "code",
+        "proof_code_id": "code-sam-sign-in-oct26-email",
+        "started_at": "2026-10-26T13:01:30Z",
+        "last_seen_at": "2026-10-26T13:01:30Z",
+        "expires_at": "2026-11-25T13:01:30Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "sign_in_attempts",
+      "values": {
+        "id": "sign-in-sam-oct26-1300",
+        "attempt_id": "attempt-sam-signin-1",
+        "request_sha256": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+        "device_sha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+        "contact_hash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "way": "email",
+        "person_id": "person-sam",
+        "owner_or_admin": true,
+        "proof_code_id": "code-sam-sign-in-oct26-email",
+        "started_at": "2026-10-26T13:00:00Z",
+        "expires_at": "2026-10-26T13:10:00Z",
+        "wrong_tries": 0,
+        "last_wrong_at": null,
+        "paused_until": null,
+        "last_check_sha256": "e1f2031425364758697a8b9cadbecfd0e1f2031425364758697a8b9cadbecfd0",
+        "last_outcome": "signedIn",
+        "session_id": "session-sam-oct26-email",
+        "version": 4
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-sign-in-oct28-email",
+        "purpose": "sign_in",
+        "person_id": "person-sam",
+        "business_id": null,
+        "sent_to_handle_id": "handle-sam-email",
+        "channel": "email",
+        "code_hash": "f2e3d4c5b6a798897a6b5c4d3e2f1001f2e3d4c5b6a798897a6b5c4d3e2f1001",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-28T15:05:01Z",
+        "expires_at": "2026-10-28T15:15:01Z",
+        "wrong_tries": 5,
+        "last_wrong_at": "2026-10-28T15:07:10Z",
+        "paused_until": "2026-10-28T15:22:10Z",
+        "used_at": null,
+        "version": 6
+      }
+    },
+    {
+      "table": "sign_in_attempts",
+      "values": {
+        "id": "sign-in-sam-oct28-1505",
+        "attempt_id": "attempt-sam-signin-3",
+        "request_sha256": "a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091",
+        "device_sha256": "d2e3f405162738495a6b7c8d9eaf0b1cd2e3f405162738495a6b7c8d9eaf0b1c",
+        "contact_hash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "way": "email",
+        "person_id": "person-sam",
+        "owner_or_admin": true,
+        "proof_code_id": "code-sam-sign-in-oct28-email",
+        "started_at": "2026-10-28T15:05:00Z",
+        "expires_at": "2026-10-28T15:15:00Z",
+        "wrong_tries": 5,
+        "last_wrong_at": "2026-10-28T15:07:10Z",
+        "paused_until": "2026-10-28T15:22:10Z",
+        "last_check_sha256": "e2f30415263748596a7b8c9daebfc0d1e2f30415263748596a7b8c9daebfc0d1",
+        "last_outcome": "paused",
+        "session_id": null,
+        "version": 7
+      }
+    },
+    {
+      "table": "sign_in_attempts",
+      "values": {
+        "id": "sign-in-no-account-oct28-1505",
+        "attempt_id": "attempt-no-account-signin-1",
+        "request_sha256": "a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192",
+        "device_sha256": "d3e4f5061728394a5b6c7d8e9fa0b1c2d3e4f5061728394a5b6c7d8e9fa0b1c2",
+        "contact_hash": "c2a3b4c5d6e7f8091a2b3c4d5e6f7081c2a3b4c5d6e7f8091a2b3c4d5e6f7081",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "way": "email",
+        "person_id": null,
+        "owner_or_admin": false,
+        "proof_code_id": null,
+        "started_at": "2026-10-28T15:05:00Z",
+        "expires_at": "2026-10-28T15:15:00Z",
+        "wrong_tries": 5,
+        "last_wrong_at": "2026-10-28T15:07:10Z",
+        "paused_until": "2026-10-28T15:22:10Z",
+        "last_check_sha256": "e3f405162738495a6b7c8d9eafb0c1d2e3f405162738495a6b7c8d9eafb0c1d2",
+        "last_outcome": "paused",
+        "session_id": null,
+        "version": 6
+      }
+    }
+  ]
+}
