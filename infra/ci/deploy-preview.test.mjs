@@ -3,7 +3,9 @@
 // folder, never the real one) with a main branch and task branches, clone it as the lead's checkout, and run
 // the checkout's deploy-preview.sh with fake npm and wrangler commands that only record their calls
 // (script-harness.mjs), and a fake validators' build in main's infra/build/ that records its run the same way
-// (FAKE_BUILD). No STAGING_DATABASE_URL is set, so no migration runs.
+// (FAKE_BUILD). No STAGING_DATABASE_URL is set, so no migration runs. The checkout's fake wrangler also keeps a
+// copy of the config cf.sh hands it, so a test reads exactly what an upload received (T-1256: a preview never
+// gets a Hyperdrive binding).
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -137,6 +139,119 @@ const BRANCHES = {
   "task/T-27-delete-character": { "runtime/src/del\u007f.ts": "export {};\n" },
 };
 
+// T-1256 (ADR-014 new task a): a preview's upload never carries a Hyperdrive binding.
+
+/** A wrangler.jsonc's value, read as wrangler reads it: comments and trailing commas outside strings dropped. */
+function parseJsonc(text) {
+  let json = "";
+  let inString = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inString) {
+      json += c;
+      if (c === "\\") json += text[++i];
+      else if (c === '"') inString = false;
+    } else if (c === '"') {
+      inString = true;
+      json += c;
+    } else if (text.startsWith("//", i)) {
+      while (i + 1 < text.length && text[i + 1] !== "\n") i++;
+    } else if (text.startsWith("/*", i)) {
+      const end = text.indexOf("*/", i + 2);
+      assert.ok(end > 0, "a /* comment is not closed");
+      i = end + 1;
+    } else if (c === "}" || c === "]") {
+      json = json.replace(/,\s*$/, "") + c;
+    } else {
+      json += c;
+    }
+  }
+  return JSON.parse(json);
+}
+
+// Made-up bindings in the shape T-567 gives env.staging (ADR-014 sections 3 and 4): made-up ids, and local strings
+// with a made-up login and password, so no real id, login, password or host is here.
+const ID_JOB = "0123456789abcdef0123456789abcdef";
+const ID_APP = "fedcba9876543210fedcba9876543210";
+const ID_OTHER = "00112233445566778899aabbccddeeff";
+const MADE_UP_PASSWORD = "t1256-made-up-password";
+const madeUpBinding = (binding, id) => ({
+  binding,
+  id,
+  localConnectionString: `postgres://t1256_login:${MADE_UP_PASSWORD}@127.0.0.1:54329/t1256_made_up`,
+});
+
+/** The repository's wrangler.jsonc after change(config), as JSONC: a comment first and a trailing comma last. */
+function wranglerJsonc(change) {
+  const config = parseJsonc(WRANGLER_JSONC);
+  change(config);
+  const json = JSON.stringify(config, null, 2).replace(/\n}$/, ",\n}");
+  return `// deploy-preview.test.mjs (T-1256): the repository's wrangler.jsonc, changed.\n${json}\n`;
+}
+
+/** main's wrangler.jsonc once env.staging binds HYPERDRIVE_JOB and HYPERDRIVE_APP (as T-567 will), then change. */
+const withBindings = (change) =>
+  wranglerJsonc((config) => {
+    config.env.staging.hyperdrive = [
+      madeUpBinding("HYPERDRIVE_JOB", ID_JOB),
+      madeUpBinding("HYPERDRIVE_APP", ID_APP),
+    ];
+    change?.(config);
+  });
+const WITH_BINDINGS = withBindings();
+
+// Configs that still name a Hyperdrive binding once env.staging's list is left out, each with the paths the
+// refusal names: an unsafe binding and unsafe metadata (wrangler 4.158.0 sends both as they are), a required
+// secret named as a binding left out (wrangler sends it as an inherit binding, which would take the deployed
+// version's binding of that name), and a list at the top level (wrangler does not hand it down to env.staging,
+// and it stops the preview all the same).
+const STILL_NAMED = [
+  [
+    "task/T-30-unsafe-binding",
+    (config) => {
+      config.env.staging.unsafe = { bindings: [{ name: "EXTRA", type: "hyperdrive", id: ID_OTHER }] };
+    },
+    ["env.staging.unsafe.bindings[0].type"],
+  ],
+  [
+    "task/T-31-unsafe-metadata",
+    (config) => {
+      config.env.staging.unsafe = { metadata: { keep_bindings: ["hyperdrive"] } };
+    },
+    ["env.staging.unsafe.metadata.keep_bindings[0]"],
+  ],
+  [
+    "task/T-32-required-secret",
+    (config) => {
+      config.env.staging.hyperdrive.push(madeUpBinding("REPORTS", ID_OTHER));
+      config.env.staging.secrets = { required: ["REPORTS"] };
+    },
+    ["env.staging.secrets.required[0]"],
+  ],
+  [
+    "task/T-33-top-level",
+    (config) => {
+      config.hyperdrive = [{ binding: "PRODUCTION_DB", id: ID_OTHER }];
+    },
+    ["hyperdrive"],
+  ],
+];
+
+// The branches that leave main once it binds the two (each wrangler.jsonc in them is a change from main's, so
+// those are previewed only with PREVIEW_ALLOW_INFRA=1).
+const AFTER_BINDINGS = {
+  "task/T-28-code": { "runtime/src/index.ts": "export default { fetch: () => new Response('T-28') };\n" },
+  // A third binding, whose name does not hold "hyperdrive": whatever the list holds is left out.
+  "task/T-29-third-binding": {
+    "wrangler.jsonc": withBindings((config) => {
+      config.env.staging.hyperdrive.push(madeUpBinding("REPORTS", ID_OTHER));
+    }),
+  },
+  ...Object.fromEntries(
+    STILL_NAMED.map(([branch, change]) => [branch, { "wrangler.jsonc": withBindings(change) }]),
+  ),
+};
+
 describe("deploy-preview.sh", () => {
   let fixture;
 
@@ -220,12 +335,40 @@ describe("deploy-preview.sh", () => {
     git(seed, "add", "-A");
     git(seed, "commit", "-q", "-m", "main removes it again");
     git(seed, "push", "-q", "origin", "main");
+    // T-1256: main binds HYPERDRIVE_JOB and HYPERDRIVE_APP in env.staging, as T-567 will, and the branches of
+    // AFTER_BINDINGS leave it there.
+    write(path.join(seed, "wrangler.jsonc"), WITH_BINDINGS);
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main binds two Hyperdrive configurations in env.staging");
+    git(seed, "push", "-q", "origin", "main");
+    for (const [branch, changes] of Object.entries(AFTER_BINDINGS)) {
+      git(seed, "switch", "-q", "-c", branch, "main");
+      for (const [file, content] of Object.entries(changes)) write(path.join(seed, file), content);
+      git(seed, "add", "-A");
+      git(seed, "commit", "-q", "-m", branch);
+      git(seed, "push", "-q", "origin", branch);
+      shas[branch] = git(seed, "rev-parse", "HEAD");
+      git(seed, "switch", "-q", "main");
+    }
 
-    // The lead's checkout, with its own (fake) wrangler; fake npm and wrangler first on PATH.
+    // The lead's checkout, with its own (fake) wrangler; fake npm and wrangler first on PATH. The checkout's
+    // wrangler records its call as the others do, after it keeps a copy of the config it is given (cf.sh's
+    // --config <file>, its first two arguments) beside the run's call log (T-1256).
     const main = path.join(dir, "rosie");
     git(dir, "clone", "-q", origin, main);
     const fake = fakeTools(dir);
-    fake(path.join(main, "node_modules", ".bin", "wrangler"), "main-wrangler");
+    const recordUpload = path.join(dir, "fake", "main-wrangler");
+    fake(recordUpload, "main-wrangler");
+    write(
+      path.join(main, "node_modules", ".bin", "wrangler"),
+      [
+        "#!/usr/bin/env bash",
+        'if [[ "${1:-}" == "--config" && -f "${2:-}" ]]; then cp "$2" "$FAKE_LOG.config"; fi',
+        `exec "${recordUpload}" "$@"`,
+        "",
+      ].join("\n"),
+      0o755,
+    );
     fake(path.join(dir, "bin", "npm"), "npm");
     fake(path.join(dir, "bin", "wrangler"), "wrangler-on-path");
 
@@ -244,7 +387,14 @@ describe("deploy-preview.sh", () => {
           ...extra,
         }),
       });
-      return { ...result, calls: readLog(log), branchCfRan: existsSync(marker) };
+      const upload = `${log}.config`;
+      return {
+        ...result,
+        calls: readLog(log),
+        branchCfRan: existsSync(marker),
+        // The config the checkout's wrangler was given, as it was then (the worktree is gone by now), or null.
+        upload: existsSync(upload) ? readFileSync(upload, "utf8") : null,
+      };
     };
     fixture = { dir, home, main, git, shas, run, cleanup: () => cleanups.forEach((fn) => fn()) };
   });
@@ -583,4 +733,125 @@ describe("deploy-preview.sh", () => {
     );
     assert.deepEqual(result.calls, [], "nothing is installed, built or uploaded");
   });
+
+  // T-1256 (ADR-014 new task a): the branch's code runs unreviewed on the preview, so the upload's config is the
+  // worktree's wrangler.jsonc without env.staging's hyperdrive list, and a config that still names a Hyperdrive
+  // binding stops the preview before anything is migrated or uploaded.
+
+  /** The config an upload received, with what it should be: original less env.staging's hyperdrive list. */
+  function uploadedConfig(result, original) {
+    assert.ok(result.upload, "the checkout's wrangler kept the config it was given");
+    const received = parseJsonc(result.upload);
+    const expected = structuredClone(original);
+    delete expected.env.staging.hyperdrive;
+    return { received, expected };
+  }
+
+  /** Neither a binding's id nor its local string's password reaches the output. */
+  function assertNoValuePrinted(result) {
+    for (const value of [ID_JOB, ID_APP, ID_OTHER, MADE_UP_PASSWORD]) {
+      assert.equal((result.stdout + result.stderr).includes(value), false, `the output holds ${value}`);
+    }
+  }
+
+  it("uploads the repository's own wrangler.jsonc without env.staging's hyperdrive list, the rest unchanged", () => {
+    // T-1's commit holds the repository's wrangler.jsonc, comments and trailing commas included. Today its
+    // env.staging lists no hyperdrive binding; once T-567 binds two there, they are left out as in the next test.
+    const result = fixture.run("task/T-1-code");
+    assertPreviewed(result, "task/T-1-code", "task-t-1-code");
+    const { received, expected } = uploadedConfig(result, parseJsonc(WRANGLER_JSONC));
+    assert.equal(
+      Object.hasOwn(received.env.staging, "hyperdrive"),
+      false,
+      "env.staging holds no hyperdrive entry",
+    );
+    assert.deepEqual(
+      received.env.staging,
+      expected.env.staging,
+      "env.staging, compared whole, less that key",
+    );
+    assert.deepEqual(received, expected, "and the rest of the file as it was");
+  });
+
+  it("with main's env.staging binding HYPERDRIVE_JOB and HYPERDRIVE_APP, a branch that changes only code is uploaded with neither, the rest unchanged", () => {
+    const branch = "task/T-28-code";
+    assert.equal(
+      fixture.git(fixture.main, "show", `${fixture.shas[branch]}:wrangler.jsonc`),
+      WITH_BINDINGS.trim(),
+      "the branch's commit holds main's wrangler.jsonc",
+    );
+    const original = parseJsonc(WITH_BINDINGS);
+    assert.deepEqual(
+      original.env.staging.hyperdrive.map(({ binding }) => binding),
+      ["HYPERDRIVE_JOB", "HYPERDRIVE_APP"],
+      "main's env.staging binds the two",
+    );
+    const result = fixture.run(branch);
+    assertPreviewed(result, branch, "task-t-28-code");
+    const { received, expected } = uploadedConfig(result, original);
+    assert.deepEqual(
+      received.env.staging,
+      expected.env.staging,
+      "env.staging, compared whole, less that key",
+    );
+    assert.deepEqual(received, expected, "and the rest of the file as it was");
+    const { env, ...top } = received;
+    assert.doesNotMatch(
+      JSON.stringify([top, env.staging]),
+      /hyperdrive/i,
+      "no hyperdrive entry is left at the top level or in env.staging",
+    );
+    assert.match(
+      result.stdout,
+      /\] preview: the upload leaves out the hyperdrive list of env\.staging \("HYPERDRIVE_JOB", "HYPERDRIVE_APP"\)\n/,
+    );
+    assertNoValuePrinted(result);
+  });
+
+  it("with PREVIEW_ALLOW_INFRA=1, a reviewed wrangler.jsonc that lists a third binding is uploaded with none of the three", () => {
+    const branch = "task/T-29-third-binding";
+    const result = fixture.run(branch, { PREVIEW_ALLOW_INFRA: "1" });
+    assertPreviewed(result, branch, "task-t-29-third-binding");
+    const original = parseJsonc(AFTER_BINDINGS[branch]["wrangler.jsonc"]);
+    assert.equal(original.env.staging.hyperdrive.length, 3);
+    const { received, expected } = uploadedConfig(result, original);
+    assert.deepEqual(received, expected, "the file less env.staging's hyperdrive list");
+    assert.match(
+      result.stdout,
+      /\] preview: the upload leaves out the hyperdrive list of env\.staging \("HYPERDRIVE_JOB", "HYPERDRIVE_APP", "REPORTS"\)\n/,
+    );
+    assertNoValuePrinted(result);
+  });
+
+  for (const [branch, , paths] of STILL_NAMED) {
+    it(`stops ${branch} before anything is migrated or uploaded: its wrangler.jsonc still names a Hyperdrive binding at ${paths.join(", ")}`, () => {
+      const result = fixture.run(branch, { PREVIEW_ALLOW_INFRA: "1" });
+      assert.equal(result.status, 1, `stdout=${result.stdout}\nstderr=${result.stderr}`);
+      assert.ok(
+        result.stderr.includes(
+          `deploy-preview.sh: refusing to upload ${branch} (${fixture.shas[branch]}): its wrangler.jsonc still` +
+            " names a Hyperdrive binding once the hyperdrive list of env.staging is left out, at" +
+            ` ${paths.join(", ")}. A preview never gets a Hyperdrive binding (ADR-014): nothing was migrated or` +
+            " uploaded\n",
+        ),
+        `the refusal names ${paths.join(", ")} and nothing else: ${result.stderr}`,
+      );
+      assert.deepEqual(
+        result.calls.map(({ tool }) => tool),
+        ["npm", "tool-api-validators"],
+        "it stops after the build: wrangler never starts",
+      );
+      assert.equal(result.upload, null, "no config reached wrangler");
+      assert.doesNotMatch(
+        result.stdout,
+        /no preview schema was migrated/,
+        "it stops before the migration step",
+      );
+      assert.doesNotMatch(result.stdout, /Preview URL/);
+      assert.equal(existsSync(result.calls[0].cwd), false, "the temporary worktree is removed");
+      const worktrees = fixture.git(fixture.main, "worktree", "list", "--porcelain").match(/^worktree /gm);
+      assert.equal(worktrees?.length, 1, "only the lead's checkout is left as a worktree");
+      assertNoValuePrinted(result);
+    });
+  }
 });
