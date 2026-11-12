@@ -1,6 +1,10 @@
 // T-196: K-05 v1 items 2 to 4, write a plan, list the rows a crash left unplanned, claim outbox rows in commit order
 // and move a row's parts, against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/outbox`). The
-// schema comes from migrating a fresh test schema (db/repo/test-db.ts); the public schema is never touched.
+// schema comes from migrating a fresh test schema (db/repo/test-db.ts); the public schema is never touched. T-1251: the
+// schema is in a database of this file's own, because the claim's recipient lock is an advisory lock, which PostgreSQL
+// keeps per database: a run sharing the database claimed the same fixture recipient at the same moment, and the claim
+// here skipped it. Its last test shows that a recipient's lock held in the shared database is not seen here, and held
+// in this file's database is.
 //
 // Every call runs as K-05 states it (README "Scope": runtime; T-191's roles): through a client whose connections run as
 // rosie_job with no business scope. The tables' owner (the migrations' role) loads K-04's seeds and the rows a test adds
@@ -171,8 +175,8 @@ let runtime: Sql;
 let typedColumns: Map<string, string>;
 
 beforeAll(async () => {
-  db = await createTestDatabase({ name: "outbox" });
-  runtime = postgres(resolvePrimaryUrl(), {
+  db = await createTestDatabase({ name: "outbox", database: "own" });
+  runtime = db.connect({
     max: 20,
     onnotice: () => undefined,
     connection: {
@@ -3084,20 +3088,23 @@ describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227;
       expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
       expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toMatchObject({ firstDelivery: true });
       expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toMatchObject({ row: { state: "delivered" } });
-      // No K-05 call leaves a delivered part without its time, and K-04 v1 has no CHECK against it: the tables' owner
-      // takes the poll's away here.
-      await db.sql`
-        update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
-      `;
       const before = await everythingNow();
-      // The repeated part try itself holds no time to answer with.
-      await expect(markPartV12(runtime, receipt(POLL_MESSAGE, pollAt))).rejects.toThrow(
-        "a delivered part holds no delivered_at",
-      );
-      // Nor can the words' repeat say whether theirs was the row's first: another delivered part try holds no time.
-      await expect(markPartV12(runtime, receipt(WORDS_MESSAGE, wordsAt))).rejects.toThrow(
-        "a delivered part holds no delivered_at",
-      );
+      // Restated by T-1278 (CQ-211; DL-545; the architect rules it in review, build prompt 6.6): no K-05 call leaves a
+      // delivered part without its time, and K-04 v1.1's validated CHECK outbox_parts_delivered_has_time now refuses
+      // one, so the tables' owner taking the poll's time away fails loudly (23514) and writes nothing. markPartV12's own
+      // throw for such a part ("a delivered part holds no delivered_at") stays in outbox.ts as the second guard, which
+      // no row can reach once the CHECK holds.
+      await expect(
+        db.sql`
+          update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
+        `,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_parts_delivered_has_time" });
+      expect(await everythingNow()).toEqual(before);
+      // So every delivered part try holds its time, and each repeat answers by those times, never by a guess: the
+      // poll's is the row's second delivery, the words' its first.
+      const row = { state: "delivered", version: 7 };
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
       expect(await everythingNow()).toEqual(before);
       // A mark that is no delivery receipt reads none of it, and v1's markPart answers its repeat as it always did.
       expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: true, repeatedDelivery: null });
@@ -3113,6 +3120,86 @@ describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227;
         nextKey: null,
       });
       expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+// ---- the claim's recipient lock, in this file's own database (T-1251) -------------------------------------------------
+
+describe("claimOutbox's recipient lock is this file's database's own, never another run's (T-1251, CQ-221)", () => {
+  it(
+    "a recipient's lock held in the shared database stops no claim here; held in this file's database, it does",
+    SLOW,
+    async () => {
+      // A recipient named after this run's schema, so its lock held in the shared database is no other run's; its one
+      // row checked, as the parallel claim's rows are written.
+      const recipient = `handle-${db.schema}`;
+      const rowId = `out-${db.schema}`;
+      const rowPlan = { row: rowId, channel: "imessage", copyOf: null, plan: PLAN_BODY };
+      const finalParts = {
+        row: rowId,
+        channel: "imessage",
+        sends: [WORDS],
+        fixedLines: [],
+        slotValues: [],
+        threadReplyTo: null,
+      };
+      await reset();
+      await loadSeeds(["seed-bundle-registry.json"]);
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "handles", { id: recipient, kind: "phone", address: "+15555550198" });
+        await tx`
+          insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+          values ('turn-t1251', ${recipient}, ${["evt-t1251-1"]}, 'committed', ${BUNDLE_HASH}, 1, 'trace-t1251',
+                  '2026-11-09T14:59:00Z')
+        `;
+        await tx`
+          insert into outbox_rows (
+            id, turn_id, recipient_handle_id, channel, send_class, versions_read, plan, final_parts, state,
+            bundle_hash, bundle_build, trace_id
+          )
+          values (
+            ${rowId}, 'turn-t1251', ${recipient}, 'imessage', 'routine', '[]'::jsonb, ${tx.json(rowPlan)}::jsonb,
+            ${tx.json(finalParts)}::jsonb, 'checked', ${BUNDLE_HASH}, 1, 'trace-t1251'
+          )
+        `;
+      });
+      const request: ClaimOutboxRequest = {
+        claimer: "dispatcher-1",
+        recipientHandleId: recipient,
+        now: "2026-11-09T15:00:00Z",
+        limit: 10,
+      };
+      // A session in the database DATABASE_URL names, where another run's claims take their locks, and one in this
+      // file's own.
+      const shared = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+      const here = db.connect({ max: 1, onnotice: () => undefined });
+      /** The claim, run while `holder` holds the recipient's lock as the claim takes it (outbox.ts default 10). */
+      const claimWhileHeld = (holder: Sql): Promise<ClaimOutboxResponse> =>
+        holder.begin(async (tx) => {
+          const [lock] = await tx<{ taken: boolean }[]>`
+            select pg_try_advisory_xact_lock(hashtextextended(${`outbox-recipient:${recipient}`}, 0)) as taken
+          `;
+          expect(lock?.taken, "the holder takes the recipient's lock").toBe(true);
+          return claim(request);
+        });
+      try {
+        const [sharedDatabase] = await shared<{ name: string }[]>`select current_database() as name`;
+        const [ownDatabase] = await here<{ name: string }[]>`select current_database() as name`;
+        expect(db.database).not.toBeNull();
+        expect(ownDatabase?.name).toBe(db.database);
+        expect(sharedDatabase?.name).not.toBe(db.database);
+        // Held in this file's database, it is the claim's own lock: the recipient is skipped, nothing is written.
+        expect(await claimWhileHeld(here)).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+        expect(await rowNow(rowId)).toMatchObject({ state: "checked", version: 1 });
+        // Held in the shared database, as another run's claim of a recipient of the same id holds it: not seen here.
+        const taken = await claimWhileHeld(shared);
+        expect(taken.claimed.map((row) => [row.outboxRowId, row.version])).toEqual([[rowId, 2]]);
+        expect(await rowNow(rowId)).toMatchObject({ state: "sending", version: 2 });
+      } finally {
+        await shared.end({ timeout: 5 });
+        await here.end({ timeout: 5 });
+      }
     },
   );
 });

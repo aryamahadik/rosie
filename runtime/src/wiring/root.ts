@@ -115,7 +115,7 @@ import { setSafetyDeps } from "../safety";
 import type { HandleDirectory, SafetyDeps } from "../safety/types";
 import { isLabel, logSink, openTrace, type BundleId, type LogContext, type TraceContext } from "../trace";
 import { setTurnDeps, turnHooks } from "../turn/turn";
-import type { TurnDeps, TurnDirectory, TurnDispatcher, TurnSafety } from "../turn/types";
+import type { TurnDeps, TurnDirectory, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
 import { LinqDoor } from "./linq-door";
@@ -262,12 +262,6 @@ export interface RootOptions {
    * anything is opened, read or written.
    */
   readonly turnDirectory?: TurnDirectory | null;
-  /**
-   * Each text's safety result as the arrival read gave it (T-1242; ../turn/types.ts TurnSafety.resultsOf), which the turn's
-   * commit records (K-09 README default 5), from where T-1241 rules it is kept. Null or left out (the Worker until the part
-   * of T-1154 that binds it), every read fails closed (NoStateReadError), so the turn takes no result and records none.
-   */
-  readonly turnSafety?: TurnSafety | null;
   /**
    * @rosie/ai's decide for each bundle (T-558; ./real.ts Deciders): the turn's two reads and its one Sonnet re-read, one
    * decider per bundle for both. In a test, over a fake Messages API answered by the recorded-model double; null or left
@@ -437,7 +431,6 @@ export function composeRoot(options: RootOptions): Root {
         handleDirectory: options.handleDirectory ?? null,
         stoppedFlags: options.stoppedFlags ?? null,
         turnDirectory: options.turnDirectory ?? null,
-        turnSafety: options.turnSafety ?? null,
       },
       deciders: options.deciders,
       // The gate's reads, its one commit through the bound turn-row port (the turn id checked there), and the run's bundle.
@@ -537,10 +530,11 @@ export function composeRoot(options: RootOptions): Root {
     ledger: new JobMemory(),
   };
 
+  // Each text's safety result is not among the turn's deps: each run reads it through its leased turn, from the handle's
+  // own actor (ADR-015 section 3; T-1264).
   const turn: TurnDeps = {
     directory: ports.stateReads.turn.directory,
     keys: ports.sealing,
-    safety: ports.stateReads.turn.safety,
     toolApi: {
       // CQ-159: the real frontier port's Tool API base records the call's one frontier span, so the turn records none.
       recordsFrontierSpan: bindsReal(bindings, "frontier"),
@@ -740,7 +734,6 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     handleDirectory: null,
     stoppedFlags: null,
     turnDirectory: null,
-    turnSafety: null,
     // No decide until a part of T-1154 builds one from the bundle's manifest and flows (the bundle reads; staging's
     // BUNDLES) and the model key (J-02; smoke-size calls only, DL-027): every decide and re-read fails closed before any
     // model call (./real.ts NoDeciderError), so no decided part reaches the gate.

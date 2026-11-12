@@ -50,7 +50,6 @@ export function closedPorts(): Ports {
       },
       turn: {
         directory: { partyOf: () => fail("stateReads") },
-        safety: { resultsOf: () => fail("stateReads") },
       },
     },
     turnFace: {

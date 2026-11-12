@@ -2,9 +2,332 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 451, [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), 2026-11-12 09:00:57 UTC.
+- **Through:** commit 466, [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), 2026-11-12 13:22:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 466. docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474) (\#476)
+
+- **Commit:** [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), by Arya Mahadik, 2026-11-12 13:22:39 UTC
+- **Pull request:** [#476](https://github.com/aryamahadik/rosie/pull/476) from `task/commit-history-48`, merged 2026-11-12 13:22:39 UTC. It squashed 1 branch commit:
+  - `93c586a` docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474)
+- **Files changed:** 1 (+81 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +81 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 465. T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else the git-ignored local vars file, as load\_dev\_var reads it) and given at deploy as --var ROSIE\_NUMBER:\<number\> only in E.164 form; a missing or malformed value deploys without it with one line that chat links stay off (K-05 default 109), never the value; the Worker's Env gains ROSIE\_NUMBER?; tests: the deploy's var, the vars file and precedence, missing and malformed values, no stand-in environment holds it, and no wrangler.jsonc section names it nor any tracked config or script holds a phone number outside the fiction range (\#475)
+
+- **Commit:** [`bbd1a98`](https://github.com/aryamahadik/rosie/commit/bbd1a98), by Arya Mahadik, 2026-11-12 13:22:33 UTC
+- **Pull request:** [#475](https://github.com/aryamahadik/rosie/pull/475) from `task/T-1304`, merged 2026-11-12 13:22:33 UTC. It squashed 1 branch commit:
+  - `0c6ec26` T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else t…
+- **Files changed:** 4 (+327 −6), by folder:
+  - `infra/ci/` deploy-staging.test.mjs +178 −1, wrangler-env.test.mjs +101 −3
+  - `infra/scripts/` deploy-staging.sh +40 −2
+  - `runtime/src/` index.ts +8 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 464. docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471) (\#474)
+
+- **Commit:** [`1c76e9b`](https://github.com/aryamahadik/rosie/commit/1c76e9b), by Arya Mahadik, 2026-11-12 12:27:15 UTC
+- **Pull request:** [#474](https://github.com/aryamahadik/rosie/pull/474) from `task/commit-history-47`, merged 2026-11-12 12:27:15 UTC. It squashed 1 branch commit:
+  - `bee5f6b` docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 463. T-1264: the turn reads each kept safety result from its leased turn, and the lease removes it when the turn ends for good (ADR-015 card B) (\#473)
+
+- **Commit:** [`17c6b88`](https://github.com/aryamahadik/rosie/commit/17c6b88), by Arya Mahadik, 2026-11-12 12:27:08 UTC
+- **Pull request:** [#473](https://github.com/aryamahadik/rosie/pull/473) from `task/T-1264`, merged 2026-11-12 12:27:08 UTC. It squashed 4 branch commits:
+  - `2902d1b` T-1264: the turn reads each text's kept safety result from its leased…
+  - `e8cc740` T-1264: the hop rig's known() says plainly that it sets nothing since…
+  - `5abd2c2` Merge branch 'main' into task/T-1264
+  - `6f78222` T-1264: card A's 'a STOP batched behind an owed danger whose re-reads…
+- **Files changed:** 18 (+1742 −160), by folder:
+  - `runtime/src/actor/` handle-actor.ts +22 −2, lease-results.worker.test.ts +415 −0, lease.ts +71 −6
+  - `runtime/src/safety/` store.worker.test.ts +57 −18
+  - `runtime/src/turn/` lease-turn.worker.test.ts +28 −10, test-support.ts +32 −16, turn.ts +7 −4, turn.worker.test.ts +10 −15, types.ts +7 −11
+  - `runtime/src/wiring/` closed.ts +0 −1, hop3.worker.test.ts +5 −3, kept-results.worker.test.ts +1026 −0, ports.ts +9 −6, real.ts +14 −21, root.test.ts +4 −1, root.ts +3 −10, state-reads.worker.test.ts +22 −19, test-support.ts +10 −17
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1264: the turn reads each text's kept safety result from its leased turn (LeasedTurn.resultsOf, from the actor's own store, its own texts alone), and the lease removes a turn's results, closing its texts, inside each transaction that ends the turn for good (its reply ended, finish, its reply given up) and at no other step; the PostgreSQL-down hand-off closes the STOP and START texts it took alone; TurnDeps.safety, Ports.stateReads.turn.safety, RootOptions.turnSafety, StateReadInputs.turnSafety and realStateReads' resultsOf removed; hop-rig and lease tests (ADR-015 card B)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1264: the hop rig's known() says plainly that it sets nothing since card B, and why it is kept
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1264: card A's 'a STOP batched behind an owed danger whose re-reads answer No' restated for card B's turn end (DL-571 grant, store.worker.test.ts that describe only): the 31 s re-read, owed row, unreadTexts and routineHeld checked before the danger's turn commits, the STOP's kept result before the commit that ends its turn; after it, rows gone, texts closed, resultsOf empty, unreadTexts empty, the hold still open and binding the STOP's next-batch commit (unread now empty); at 61 s a danger whose line went is read again no more (DL-508) and one cut off mid-seal is still read again, keeping no row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 462. T-1267: ADR-018, a STOP batch restarts a restarted turn once more, and the direct danger line never waits for its hold (CQ-230, CQ-231) (\#472)
+
+- **Commit:** [`beeb376`](https://github.com/aryamahadik/rosie/commit/beeb376), by Arya Mahadik, 2026-11-12 12:27:00 UTC
+- **Pull request:** [#472](https://github.com/aryamahadik/rosie/pull/472) from `task/T-1267`, merged 2026-11-12 12:27:00 UTC. It squashed 3 branch commits:
+  - `505807c` T-1267: design record ADR-018 rules CQ-230 and CQ-231: a STOP batch r…
+  - `98f8a39` Merge branch 'main' into task/T-1267
+  - `829dc40` T-1267: round 2 (DL-570): ADR-018 ruling 1's host answers true while …
+- **Files changed:** 2 (+168 −19), by folder:
+  - `docs/adr/` 0018-stop-and-danger-line-at-once.md +148 −0, README.md +20 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1267: design record ADR-018 rules CQ-230 and CQ-231: a STOP batch restarts a restarted turn once more and commits on that run (card S); the direct danger line's hold write is guarded, and a danger stays pending, its routine parts held, until its hold is written (card H); README row for ADR-018, and ADR-017's row says poll option words are plain and unscrubbed until CQ-58 (DL-540)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1267: round 2 (DL-570): ADR-018 ruling 1's host answers true while the PostgreSQL-down path is unwired (RULES 7.2: an unread batch may hold a STOP), at the cost of one bounded restart; a readable text with no reading counts as unknown; Card S's Gives, Depends on (not on D-017's wiring), proofs and May touch, the consequences, a new alternative and open point 1 (the bounded case of a batch with no stop word taking the second restart) match; README row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 461. docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469) (\#471)
+
+- **Commit:** [`d43a295`](https://github.com/aryamahadik/rosie/commit/d43a295), by Arya Mahadik, 2026-11-12 12:04:32 UTC
+- **Pull request:** [#471](https://github.com/aryamahadik/rosie/pull/471) from `task/commit-history-46`, merged 2026-11-12 12:04:32 UTC. It squashed 1 branch commit:
+  - `938c5d1` docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 460. T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport and keyword off first; the put script never puts a made name (\#470)
+
+- **Commit:** [`b0b4f6a`](https://github.com/aryamahadik/rosie/commit/b0b4f6a), by Arya Mahadik, 2026-11-12 12:04:22 UTC
+- **Pull request:** [#470](https://github.com/aryamahadik/rosie/pull/470) from `task/T-1261`, merged 2026-11-12 12:04:22 UTC. It squashed 2 branch commits:
+  - `0958d53` T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport an…
+  - `cb8240a` T-1261: put-staging-secrets.test.mjs's devVars() writes RESEND\_API\_KE…
+- **Files changed:** 5 (+690 −83), by folder:
+  - `infra/ci/` README.md +2 −2, cf.test.mjs +283 −1, put-staging-secrets.test.mjs +334 −61
+  - `infra/scripts/` cf.sh +19 −0, put-staging-secrets.sh +52 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport and keyword off first and drop their working names before lib.sh is sourced; put-staging-secrets.sh never puts or takes a value for a name make-staging-secrets.sh makes (DL-549), printing it as made in place, never put
+
+Tests: T-1236's caller set-ups for both scripts (working names exported, bash -a, SHELLOPTS=allexport, --posix -a, bash -k, SHELLOPTS=keyword, mixes) with recorders in front of wrangler and node; a checkout value for each made name is never put; the made list matches make-staging-secrets.sh's MADE. infra/ci/README.md lines 5 and 7.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1261: put-staging-secrets.test.mjs's devVars() writes RESEND_API_KEY, a name the script puts, as an indented export NAME='value' line, so the byte-for-byte case again proves all three line forms on a value put (DL-568, the architect's 6.6 ruling); LINQ_WEBHOOK_SECRET's line is kept for the DL-549 proof; no script changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 459. docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467) (\#469)
+
+- **Commit:** [`9f1d8da`](https://github.com/aryamahadik/rosie/commit/9f1d8da), by Arya Mahadik, 2026-11-12 10:59:16 UTC
+- **Pull request:** [#469](https://github.com/aryamahadik/rosie/pull/469) from `task/commit-history-45`, merged 2026-11-12 10:59:16 UTC. It squashed 1 branch commit:
+  - `c3af14f` docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 458. T-1296: K-06 v1.2, a poll's option words scrubbed and sealed like the body (\#468)
+
+- **Commit:** [`501d5aa`](https://github.com/aryamahadik/rosie/commit/501d5aa), by Arya Mahadik, 2026-11-12 10:59:12 UTC
+- **Pull request:** [#468](https://github.com/aryamahadik/rosie/pull/468) from `task/T-1296`, merged 2026-11-12 10:59:12 UTC. It squashed 3 branch commits:
+  - `46561e8` T-1296: K-06 v1.2, a poll's option words scrubbed like the body (name…
+  - `3d68a05` Merge branch 'main' into worktree-wf\_a8f14faa-f03-1
+  - `8313b99` T-1296: T-085's K-06 contract test reads the option words v1.2 seals …
+- **Files changed:** 10 (+1090 −5), by folder:
+  - `contracts/inbound-event/` README.md +69 −1, frozen.json +1 −1, inbound-event.rules.mjs +36 −1, inbound-event.v1.2.schema.json +820 −0
+  - `contracts/inbound-event/fixtures/` index.json +32 −0, poll-vote-added-option-with-card.json +32 −0, vote-removed-added-option-with-ssn.json +32 −0
+  - `contracts/inbound-event/fixtures/invalid/` refuse-unscrubbed-card-in-added-option.json +32 −0, refuse-unscrubbed-ssn-in-added-option.json +32 −0
+  - `tests/contract/` inbound-event.v1.test.ts +4 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1296: K-06 v1.2, a poll's option words scrubbed like the body (named rule scrubbedV1dot2) and sealed with it: the sealed hand-off's definitions (sealedEvent, sealedPoll, sealedEmailReply; the form 2 box sealedBox opened to sealedWords; the form 1 box, words and event still read), two refused raw and two tagged vote fixtures (a card and an SSN in an added option), v1.2 frozen, README v1.2 sections
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1296: T-085's K-06 contract test reads the option words v1.2 seals (the lead's grant, DL-554): checkScrubbedCounts counts tags in event.poll?.optionWords beside the body and the subject; the number check reads must(event.body ?? event.poll?.optionWords); no assertion loosened
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 457. docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462) (\#467)
+
+- **Commit:** [`c549f4b`](https://github.com/aryamahadik/rosie/commit/c549f4b), by Arya Mahadik, 2026-11-12 10:38:21 UTC
+- **Pull request:** [#467](https://github.com/aryamahadik/rosie/pull/467) from `task/commit-history-44`, merged 2026-11-12 10:38:21 UTC. It squashed 1 branch commit:
+  - `576fa73` docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 456. T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), from which staging-core and skeleton take their roster ids, handle ids and numbers; staging's check tester set (db/seeds/check-tester.ts): a person, its example.com email handle, a live team row, a used sign-in code and a 30-day session holding the token's sha256 handed in by STAGING\_CHECK\_TESTER\_TOKEN\_SHA256, refused before any write off staging's public schema or for an absent or malformed hash; unit and integration tests (\#464)
+
+- **Commit:** [`97be452`](https://github.com/aryamahadik/rosie/commit/97be452), by Arya Mahadik, 2026-11-12 10:38:17 UTC
+- **Pull request:** [#464](https://github.com/aryamahadik/rosie/pull/464) from `task/T-1302`, merged 2026-11-12 10:38:17 UTC. It squashed 1 branch commit:
+  - `53a1c5c` T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), fr…
+- **Files changed:** 9 (+1724 −19), by folder:
+  - `db/seeds/` check-tester.int.test.ts +648 −0, check-tester.test.ts +330 −0, check-tester.ts +399 −0, skeleton.ts +7 −3, staging-core.int.test.ts +16 −4, staging-core.ts +22 −12
+  - `db/seeds/lib/` roster.int.test.ts +90 −0, roster.test.ts +159 −0, roster.ts +53 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 455. T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the actor's copy sources (K-05 v1.12 items 56 and 57), each in one read-only transaction as rosie\_job with the business scope set empty: a handle's running and missed timers at every business in due order, the sealed address as stored in PostgreSQL's hex text form, never opened; the phone row's stopped flag and version by handle id, notFound for no row; transient on a lost connection, scrubbed; and their integration tests (\#465)
+
+- **Commit:** [`f10551c`](https://github.com/aryamahadik/rosie/commit/f10551c), by Arya Mahadik, 2026-11-12 10:38:13 UTC
+- **Pull request:** [#465](https://github.com/aryamahadik/rosie/pull/465) from `task/T-1301`, merged 2026-11-12 10:38:13 UTC. It squashed 1 branch commit:
+  - `cf0bf86` T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the a…
+- **Files changed:** 2 (+1937 −0), by folder:
+  - `db/repo/` copy-reads.int.test.ts +1677 −0, copy-reads.ts +260 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 454. T-1251: the claim tests stop colliding with other integration runs on the shared local database (\#466)
+
+- **Commit:** [`4297762`](https://github.com/aryamahadik/rosie/commit/4297762), by Arya Mahadik, 2026-11-12 10:38:09 UTC
+- **Pull request:** [#466](https://github.com/aryamahadik/rosie/pull/466) from `task/T-1251`, merged 2026-11-12 10:38:10 UTC. It squashed 3 branch commits:
+  - `fb197bd` T-1251: the tests that take the claim's advisory lock make their sche…
+  - `0513972` T-1251: the three files in a database of their own give afterAll 120 …
+  - `72dfe82` T-1251: a database of a file's own is a pool database held through a …
+- **Files changed:** 4 (+255 −22), by folder:
+  - `db/repo/` chat-open.int.test.ts +11 −7, outbox.int.test.ts +87 −3, test-db.ts +151 −6
+  - `tests/contract/` data-access.v1.db-side.test.ts +6 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1251: the tests that take the claim's advisory lock make their schema in a database of their own, so another run's lock on the same recipient is never seen
+
+db/repo/test-db.ts gains database: "own" (a database per test file, made from template_postgis, else template1, and dropped with the file) and connect() for the connections a test opens itself. outbox.int.test.ts, chat-open.int.test.ts and the contract test's database side use it; chat-open's lock-waiter lookup keeps to its own database's sessions. A new outbox test shows a recipient's lock held in the shared database is not seen by the claim, and held in the file's own database is. db/repo/outbox.ts is unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1251: the three files in a database of their own give afterAll 120 s, a resource guard: dropping the database forces a checkpoint, which ran past the 30 s hook limit under load
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1251: a database of a file's own is a pool database held through a lock in the maintenance database and kept, so no DROP DATABASE checkpoint runs per file; the 120 s afterAll limits go again
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 453. docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461) (\#462)
+
+- **Commit:** [`69b3c85`](https://github.com/aryamahadik/rosie/commit/69b3c85), by Arya Mahadik, 2026-11-12 10:16:50 UTC
+- **Pull request:** [#462](https://github.com/aryamahadik/rosie/pull/462) from `task/commit-history-43`, merged 2026-11-12 10:16:50 UTC. It squashed 1 branch commit:
+  - `359fb04` docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 452. T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 v1.12 items 53 to 55) in db/repo/test-phone-reads.ts, each one read-only transaction as rosie\_job with no business scope, with their integration tests (every v1.12 fixture, the cases beyond them, the statements sent, read-only, lost connection) (\#463)
+
+- **Commit:** [`60ef75e`](https://github.com/aryamahadik/rosie/commit/60ef75e), by Arya Mahadik, 2026-11-12 10:16:46 UTC
+- **Pull request:** [#463](https://github.com/aryamahadik/rosie/pull/463) from `task/T-1300`, merged 2026-11-12 10:16:46 UTC. It squashed 1 branch commit:
+  - `38649c7` T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 …
+- **Files changed:** 2 (+2122 −0), by folder:
+  - `db/repo/` test-phone-reads.int.test.ts +1790 −0, test-phone-reads.ts +332 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 451. docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458) (\#461)
 

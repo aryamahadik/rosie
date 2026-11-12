@@ -1,28 +1,33 @@
 #!/usr/bin/env bash
-# Staging's Worker secrets, set by name from the build Mac (T-568; T-1276, ADR-016 card G; C-022; build prompt rule 7:
-# keys are named, never shown; DL-017, DL-024):
+# Staging's Worker secrets, set by name from the build Mac (T-568; T-1276, ADR-016 card G; T-1261; C-022; build prompt
+# rule 7: keys are named, never shown; DL-017, DL-024):
 #   npm run secrets:staging        (bash infra/scripts/put-staging-secrets.sh [--env staging])
-# For each name in SECRETS below, the value is read by name from this checkout's git-ignored .dev.vars and handed to
-# `wrangler secret put <NAME> --env staging` through cf.sh, on standard input. Standard output is one line per name, in
-# the list's order, and nothing else:
+# For each name in SECRETS below but staging's own (is_made below), the value is read by name from this checkout's
+# git-ignored .dev.vars and handed to `wrangler secret put <NAME> --env staging` through cf.sh, on standard input.
+# Standard output is one line per name, in the list's order, and nothing else:
 #   <NAME> set       wrangler took the value: staging's Worker reads it by that name from now on
 #   <NAME> missing   .dev.vars holds no value for the name (no line, or an empty one): nothing was put for it, never an
 #                    empty secret
+#   <NAME> made in place, never put
+#                    one of staging's own: nothing was read or put for it, whatever .dev.vars holds
 # The names are the ones staging's Worker reads, each beside the code that reads it, or for sign-in by code beside the
 # card that builds that code (ADR-016). The model key is the one scoped to Rosie's workspace (DL-027), so no workspace
 # id is a secret: no code reads one.
 # SEALING_WRAP_KEY, LINQ_WEBHOOK_SECRET and PROOF_CODE_HASH_KEY are staging's own: nobody is given them, so they need no
-# line in .dev.vars. make-staging-secrets.sh (npm run secrets:staging:make, T-1236, T-1276) makes them in place and
-# keeps them nowhere else; they still print as missing here, since this script reads .dev.vars alone.
+# line in .dev.vars. make-staging-secrets.sh (npm run secrets:staging:make, T-1236, T-1276) makes them in place, on
+# staging alone, and keeps them nowhere else. This script never puts one, even when .dev.vars has a value for it, and
+# never takes that value: a put replaces the secret staging holds, and replacing the sealing key would orphan everything
+# sealed under it, the proof-code hash key every live sign-in code (DL-495; CQ-218; DL-549). Rotation is a task of its
+# own, never this script's.
 #
 # A value:
 #   - comes from .dev.vars alone. A variable of the same name in the caller's shell is dropped before the file is read,
 #     so the key of another tool on this Mac is never put on staging.
 #   - is never printed, logged, exported, put on a command line or written to a file: it is held in one shell variable
 #     and goes down one pipe to cf.sh. No here-document or here-string is used (bash 3.2 writes those to a temporary
-#     file), and tracing is switched off first, whatever the caller's shell asked for. So is allexport, and the
-#     script's own variables are dropped before anything is read, so a variable of the same name in the caller's
-#     environment never makes one of them an exported one (the note above `unset -v` below).
+#     file), and tracing is switched off first, whatever the caller's shell asked for. So are allexport and keyword,
+#     and the script's own variables are dropped before anything is read, so a variable of the same name in the
+#     caller's environment never makes one of them an exported one (the note above `unset -v` below).
 #   - is never shown by wrangler either: what wrangler prints is kept off the terminal, dropped after a put that worked
 #     and printed after one that failed with the value taken out; and wrangler's own debug log is told to leave request
 #     bodies out (WRANGLER_LOG_SANITIZE).
@@ -34,8 +39,8 @@
 #   - a .dev.vars that cannot be read;
 #   - a value that holds a space, a quote or a #: no key, base64 or whsec_ value does, nor the inbox list, whose
 #     addresses are joined by commas, so its line is not a plain NAME=value (a comment after the value, a quote left
-#     open: lib.sh's load_dev_var keeps those in the value). Every name is checked before the first put, so staging is
-#     untouched.
+#     open: lib.sh's load_dev_var keeps those in the value). Every name it puts is checked before the first put, so
+#     staging is untouched.
 # A put that fails stops the run (exit 1): the names before it stay set, and the ones after it are not put. cf.sh's own
 # refusals arrive the same way.
 # Each put makes a new version of the staging Worker and deploys it at once (wrangler secret put), so run this when a
@@ -43,21 +48,27 @@
 # latest version is not the deployed one (a version uploaded since the last deploy, as a branch preview's is): deploy
 # staging first (npm run deploy:staging), then run this again.
 # Afterwards, `npm run cf -- secret list --env staging` lists the names staging holds (names only).
-# Exit: 0 every name set; 1 refused, or a put failed; 2 misuse (an argument it does not take), found before anything is
-# read; 3 one or more names missing, the others set.
+# Exit: 0 every name it puts is set (staging's own are never put); 1 refused, or a put failed; 2 misuse (an argument it
+# does not take), found before anything is read; 3 one or more names missing, the others set.
 set +x
 set +a
+set +k
 set -euo pipefail
 # No variable of this script starts out marked for export, or with the caller's text in it, whatever names the caller's
 # environment holds. bash marks every variable it inherits for export, and under allexport (bash -a, or handed down in
 # SHELLOPTS) every variable as it is set; a variable marked so goes to every command started from here, cf.sh and
-# wrangler among them, with whatever it holds then. So allexport is switched off above, and every name this script and
-# lib.sh's load_dev_var keep a variable of their own under is dropped here, before anything is read: value, line and
-# said (a value, a line of .dev.vars, wrangler's words) and the rest (names, counts, a path, the --env argument).
+# wrangler among them, with whatever it holds then. A function's local takes the mark of the variable of the same name
+# outside it. Under keyword (bash -k, or handed down in SHELLOPTS) an assignment anywhere on a command line goes to that
+# command's environment instead: `export WRANGLER_LOG_SANITIZE=true` below would run as a bare export, which prints
+# every exported variable, and lib.sh's `local name=...` would declare nothing. So allexport and keyword are switched
+# off above, and every name this script and lib.sh's load_dev_var keep a variable of their own under is dropped here,
+# before anything is read or sourced: value, line and said (a value, a line of .dev.vars, wrangler's words) and the
+# rest (names, counts, a path, the --env argument), the fixed texts in capitals and lib.sh's ROOT and CF included.
 # BASH_REMATCH, where load_dev_var's match leaves the value, goes with them; bash keeps it as an array from the first
-# match on, and never exports an array. A new variable, here or in load_dev_var, goes on this line too:
+# match on, and never exports an array. A new variable, here or in load_dev_var, goes on these lines too:
 # put-staging-secrets.test.mjs fails until it does.
 unset -v value said line name file bad status missing env_name env_count BASH_REMATCH
+unset -v ROOT CF SECRETS USAGE DEV_VARS NOT_IN_A_VALUE
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # The secrets staging's Worker reads, by name.
@@ -83,6 +94,21 @@ SECRETS=(
   # joined by commas, with no space. Like every value here it is never printed: only its name is.
   STAGING_TEST_INBOXES
 )
+# A variable of one of those names in the caller's shell (another tool's key on this Mac) is dropped here, before cf.sh
+# or wrangler starts: it is never the value put, and never travels on to them. A name this script never reads, one of
+# staging's own, included.
+unset -v "${SECRETS[@]}"
+
+# is_made <NAME>: whether the name is one of staging's own, the ones make-staging-secrets.sh makes in place (its MADE
+# list): never put from here, and its value in .dev.vars never taken (the header above). A name it makes goes here too:
+# put-staging-secrets.test.mjs fails until it does.
+is_made() {
+  case "$1" in
+    SEALING_WRAP_KEY | LINQ_WEBHOOK_SECRET | PROOF_CODE_HASH_KEY) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 USAGE="usage: put-staging-secrets.sh [--env staging]"
 DEV_VARS="$ROOT/.dev.vars"
 # What no value in SECRETS holds: white space, a quote, a #.
@@ -150,9 +176,12 @@ value_of() {
   unset "$name"
 }
 
-# Every name's value is checked before the first put.
+# Every value it puts is checked before the first put. Staging's own are passed over: their values are never taken.
 bad=""
 for name in "${SECRETS[@]}"; do
+  if is_made "$name"; then
+    continue
+  fi
   value_of "$name"
   if [[ "$value" =~ $NOT_IN_A_VALUE ]]; then
     bad="${bad:+$bad, }$name"
@@ -169,6 +198,10 @@ export WRANGLER_LOG_SANITIZE=true
 
 missing=0
 for name in "${SECRETS[@]}"; do
+  if is_made "$name"; then
+    printf '%s made in place, never put\n' "$name"
+    continue
+  fi
   value_of "$name"
   if [[ -z "$value" ]]; then
     printf '%s missing\n' "$name"

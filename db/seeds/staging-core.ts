@@ -10,7 +10,8 @@
 //   person_roles    role-<roster id>-customer: that person's customer role at fixture set v1's barber (biz-demo-barber),
 //                   the shop K-21 v1 test-roster.json seats the roster's customer phones at ("fixture set v1's barber as
 //                   Lee's Barbershop (flow A)")
-//   handles         handle-<roster id>: kind phone, at the test phone's number
+//   handles         the handle id the roster's list gives the test phone (handle-<roster id>): kind phone, at the test
+//                   phone's number
 //   person_handles  the person writes from that handle
 //   phones          the number's one row. Only the number and the handle are written, so every other column keeps the
 //                   table's default: the chat is not open (chat_open false; chat_open_at and chat_way null), since a test
@@ -18,7 +19,9 @@
 //
 // The test phones are K-21 v1 test-roster.json's (Q-53), by roster id (TEST_PHONES), less test owner 1, tp-01, which this
 // set never seeds (DL-341): D-017's seed (skeleton.ts, T-1148) gives tp-01's handle a person with no role and no phone
-// row, so its JOIN is a first text, and refuses to run on top of a role or a phone row for it.
+// row, so its JOIN is a first text, and refuses to run on top of a role or a phone row for it. Each phone's roster id,
+// handle id and fake handle are the roster's list's (lib/roster.ts, T-1302; K-05 v1.12 default 106), the one list the
+// test-phone page's roster reads too, so the page and the seeded rows cannot drift.
 //
 // The numbers are personal data, so none is ever in the repository (NQ-DB-2's default). They are read at run time from
 // the environment variable STAGING_TEST_PHONES on the build Mac: `<roster id>=<number>` entries separated by commas, each
@@ -53,6 +56,7 @@ import {
   SHOPS_DIR,
 } from "./lib/demo-shops";
 import { filesUnder, type FixtureSet, openFixtureSet, verifyFixtureSet } from "./lib/fixture-set";
+import { ROSTER, rosterPhone } from "./lib/roster";
 import { TEST_OWNER_1 } from "./skeleton";
 
 /** The environment variable on the build Mac that gives the test phones' numbers (NQ-DB-2's default). */
@@ -67,16 +71,13 @@ export interface TestPhone {
 }
 
 /**
- * The roster, in K-21 v1 test-roster.json's order: tp-01 test owner 1, tp-02 test staff 1, tp-03 and tp-04 the two test
- * customers, tp-05 the one phone named for STOP tests.
+ * The roster, in K-21 v1 test-roster.json's order, from the roster's list (lib/roster.ts): tp-01 test owner 1, tp-02 test
+ * staff 1, tp-03 and tp-04 the two test customers, tp-05 the one phone named for STOP tests.
  */
-export const TEST_PHONES: readonly TestPhone[] = [
-  { testPhoneId: "tp-01", fakeNumber: "+15555550100" },
-  { testPhoneId: "tp-02", fakeNumber: "+15555550102" },
-  { testPhoneId: "tp-03", fakeNumber: "+15555550101" },
-  { testPhoneId: "tp-04", fakeNumber: "+15555550104" },
-  { testPhoneId: "tp-05", fakeNumber: "+15555550105" },
-];
+export const TEST_PHONES: readonly TestPhone[] = ROSTER.map(({ testPhoneId, fakeNumber }) => ({
+  testPhoneId,
+  fakeNumber,
+}));
 
 /** The roster phones this set never seeds: test owner 1, whose rows are the skeleton seed's alone (DL-341). */
 export const LEFT_OUT: readonly string[] = [TEST_OWNER_1.testPhoneId];
@@ -222,6 +223,15 @@ export function testPhoneNumbers(value: string | undefined): TestPhoneNumbers {
   };
 }
 
+/** The handle id the roster's list gives a test phone; a roster id the list does not hold is a fault of the caller. */
+function handleIdOf(testPhoneId: string): string {
+  const phone = rosterPhone(testPhoneId);
+  if (phone === null) {
+    throw new Error(`${testPhoneId} is not on the roster's list (db/seeds/lib/roster.ts)`);
+  }
+  return phone.handleId;
+}
+
 /** The test businesses' rows and each test phone's, test owner 1 left out (see the top of this file). */
 export function stagingCoreRowsOf(
   shops: readonly DemoShop[],
@@ -241,7 +251,7 @@ export function stagingCoreRowsOf(
         testPhoneId: phone.testPhoneId,
         personId: `person-${phone.testPhoneId}`,
         roleId: `role-${phone.testPhoneId}-${TEST_PHONE_ROLE}`,
-        handleId: `handle-${phone.testPhoneId}`,
+        handleId: handleIdOf(phone.testPhoneId),
         businessId: shop.businessId,
       };
       return { number: phone.number, seeded };

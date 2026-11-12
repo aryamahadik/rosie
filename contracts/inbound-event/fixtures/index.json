@@ -222,6 +222,38 @@
       "expect": "accept",
       "shows": "The bare nine-digit decision: 'My booking code is 123456789' is kept as it is under v1.1 too, since nine bare digits are not read as a Social Security number (README default 1, kept by T-1069; open question in the README).",
       "source": "README default 1 and 'Named rule (v1.1)' (nine bare digits); arch 02 line 109 names no form"
+    },
+    {
+      "file": "poll-vote-added-option-with-card.json",
+      "version": "v1.2",
+      "rule": "scrubbedV1dot2",
+      "expect": "accept",
+      "shows": "v1.2 case 1, tagged: Alex adds an option to A7-03's poll, typing his card number in it, and votes for it. A vote for an option someone added reads as typed words, so the option's words take the body's scrub before anything is kept: the card is the tag, the other words stay, and scrubbed.cards is 1. The scrubbed option of invalid/refuse-unscrubbed-card-in-added-option.json. The actor keeps these words only in the event's box (README 'The sealed hand-off (v1.2)').",
+      "source": "arch 07 line 379 (S13-24 rule 6); arch 02 line 109; RULES 4.5 line 199; QUESTIONS.md CQ-58; T-1265's security review, gap 1; K-04 seed-outbox-row (linq-msg-demo-0002, its options linq-opt-demo-1 to 3)"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-card-in-added-option.json",
+      "version": "v1.2",
+      "rule": "scrubbedV1dot2",
+      "expect": "refuse",
+      "shows": "v1.2 case 1, raw: the same vote with the card number left plain in the option's words, 'Charge my card 4242 4242 4242 4242 instead'. v1's scrubbed and v1.1's scrubbedV1dot1 read only the body and an email's subject, so both pass it (the gap CQ-58 names); scrubbedV1dot2 reads the option's words too and refuses it. Otherwise poll-vote-added-option-with-card.json.",
+      "source": "QUESTIONS.md CQ-58; T-1265's security review, gap 1; arch 02 line 109; RULES 4.5 line 199; public Stripe test number"
+    },
+    {
+      "file": "vote-removed-added-option-with-ssn.json",
+      "version": "v1.2",
+      "rule": "scrubbedV1dot2",
+      "expect": "accept",
+      "shows": "v1.2 case 2, tagged: Alex takes back his vote for an option he added holding a Social Security number. A vote removed carries the option's words too, so they take the same scrub: the number is the tag and scrubbed.ssns is 1. The scrubbed option of invalid/refuse-unscrubbed-ssn-in-added-option.json.",
+      "source": "arch 12 line 610 (poll.vote.removed); arch 07 line 379 (S13-24 rule 6); arch 02 line 109; RULES 4.5 line 199; QUESTIONS.md CQ-58"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-ssn-in-added-option.json",
+      "version": "v1.2",
+      "rule": "scrubbedV1dot2",
+      "expect": "refuse",
+      "shows": "v1.2 case 2, raw: the same vote removed with the Social Security number left plain in the option's words, 'My SSN is 123-45-6789'. v1's and v1.1's rules pass it; scrubbedV1dot2 refuses it. Otherwise vote-removed-added-option-with-ssn.json.",
+      "source": "QUESTIONS.md CQ-58; arch 02 line 109; RULES 4.5 line 199; the printed sample number 123-45-6789"
     }
   ]
 }

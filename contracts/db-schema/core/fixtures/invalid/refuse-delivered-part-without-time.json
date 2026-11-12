@@ -1,0 +1,28 @@
+{
+  "after": [
+    "seed-outbox-row.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "outbox_parts",
+    "set": {
+      "delivered_at": null,
+      "version": 4
+    },
+    "where": {
+      "outbox_row_id": "out-a7-03-alex",
+      "part_no": 1,
+      "try_no": 1,
+      "version": 3
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": [
+        "outbox_parts_delivered_has_time"
+      ]
+    }
+  }
+}
