@@ -35,10 +35,14 @@
 //      resume and the batch window hand the queued batches on, in order. So the danger and stop records of every queued
 //      turn land before any queued turn's commit. Before any commit, too, the queue goes first (`beforeCommit`; QUESTIONS.md
 //      CQ-104 (f)).
+//   6. The lease asks, through the actor, whether a batch waiting behind a turn that has used its one restart may hold a
+//      stop word (`stopAmong`; ADR-018 section 1): from each text's reading above, the stricter reading for a text not
+//      read, so a STOP's batch restarts that turn a second time and commits on its first run.
 //
 // Q-45's default: nothing here backs up Cloudflare itself being down. Not here: "booking is paused" for AIs and the booking
 // page (K-09 shared core, C-110; the platform-status actor, T-607 and T-608). Unwired (no `setDbOutageDeps`), nothing here
-// runs and every batch goes on as before. Never logged or put in a span: a text's words, a number, an address, a key.
+// runs and every batch goes on as before, but `stopAmong` reads every batch as one that may hold a stop word (ADR-018
+// round 2, DL-570). Never logged or put in a span: a text's words, a number, an address, a key.
 
 import { scheduleEntry, unscheduleEntry, type ClosedBatch } from "../../actor/batch";
 import type { ActorCopies } from "../../actor/copies/copies";
@@ -307,6 +311,34 @@ export class DbOutage {
       return this.rows().some(
         (row) => waiting.has(row.event_id) && row.kind === "stop" && row.keyword !== "handled",
       );
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Whether these texts, a batch the lease takes behind a turn that has used its one restart, may hold a stop word (STOP
+   * or another opt-out word; ADR-018 section 1): the lease then restarts that turn a second time, so the STOP commits at
+   * once (RULES 7.2). Of the texts, those whose words are read (`isReadableEvent`: a text, a caption, a vote's words, an
+   * edit) are weighed by the reading stored when each was followed (`outage_texts.kind`, `classify`): true when one reads as
+   * a STOP or `unknown`, or has no reading (not read yet, or no row: its `arrive` write threw), and when a text cannot be
+   * found or the reading throws ("Unsure: treat it as a stop"); false when each reads as a START or another text (HELP
+   * among them), or none of them is read (a tapback holds no stop word). Unlike `stopPending`, true while unwired (no
+   * `setDbOutageDeps`): the path then reads nothing, so no batch is known to hold no stop word (round 2, DL-570).
+   */
+  stopAmong(eventIds: readonly string[]): boolean {
+    if (deps === null) return true;
+    try {
+      const ids = [...new Set(eventIds)];
+      const stored = new Map(this.host.texts(ids).map((entry) => [entry.event.eventId, entry.event]));
+      const kinds = new Map(this.rowsOf(ids).map((row) => [row.event_id, row.kind]));
+      return ids.some((eventId) => {
+        const event = stored.get(eventId);
+        if (event === undefined) return true;
+        if (!isReadableEvent(event)) return false;
+        const kind = kinds.get(eventId) ?? null;
+        return kind !== "start" && kind !== "other";
+      });
     } catch {
       return true;
     }
