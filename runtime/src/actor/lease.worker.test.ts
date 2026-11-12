@@ -6,7 +6,10 @@
 // commit-first.json and commit-repeat-same-turn.json state (a repeat of a committed turn id writes nothing and returns
 // the first result). The alarm is fired with `runDurableObjectAlarm`, so "not yet due" is tested against the fake clock.
 // Each run pins its bundle first (T-249), so K-05's bundle reads and the KV namespace are the doubles of
-// src/bundle/test-support.ts, with bundle v0 active (active-bundle.json). Test method: T-1128's
+// src/bundle/test-support.ts, with bundle v0 active (active-bundle.json). The PostgreSQL-down path is unwired, as the
+// composition root installs it today, unless a test wires it (ADR-018 section 1: the lease's `stopAmong` reads each text
+// through it): its doubles (src/outage/db/test-support.ts), PostgreSQL answering, and the actor's copy of the pinned
+// bundle's keyword list (bundle v0's: STOP, START, HELP), taken at each pin. Test method: T-1128's
 // (runtime/src/spikes/do-test-pool/FINDINGS.md). Test values only (rule 9).
 import { evictDurableObject, reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
@@ -14,6 +17,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import commitFirst from "../../../contracts/data-access/fixtures/commit-first.json";
 import commitRepeat from "../../../contracts/data-access/fixtures/commit-repeat-same-turn.json";
+import reactionFromCustomer from "../../../contracts/inbound-event/fixtures/reaction-from-customer.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
@@ -30,10 +34,14 @@ import {
 } from "../gateway";
 import { fakeKeyStore, present } from "../gateway/test-support";
 import { fakeBundles } from "../bundle/test-support";
-import { harness, type Harness } from "../safety/test-support";
+import { setDbOutageDeps, type OutageView, type TextKind } from "../outage/db";
+import { dbFakes, type DbFakes } from "../outage/db/test-support";
+import { harness, TEST_IDS, type Harness } from "../safety/test-support";
 import type { SafetyResult } from "../safety/types";
+import type { LeaseHost } from "./lease";
 import {
   LEASE_MS,
+  PARK_RETRY_MS,
   setBatchHooks,
   setBundleDeps,
   setLeaseHooks,
@@ -49,6 +57,8 @@ import {
   type HoldEntry,
   type LeasedTurn,
   type OpenHold,
+  type ParkAnswer,
+  type ParkingTurn,
   type TurnEntry,
 } from "./index";
 
@@ -80,6 +90,7 @@ interface LeaseRpc {
   readWaitingBatches(): Promise<number[]>;
   readBatches(): Promise<BatchEntry[]>;
   readHolds(): Promise<HoldEntry[]>;
+  readOutage(): Promise<OutageView>;
   markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
@@ -102,15 +113,24 @@ function leaseIn(instance: unknown): LeaseInside {
   return (instance as { lease: LeaseInside }).lease;
 }
 
+/** The host the actor gave its lease (handle-actor.ts), as the lease asks it. */
+function leaseHostIn(instance: unknown): LeaseHost {
+  return (instance as { lease: { host: LeaseHost } }).lease.host;
+}
+
 async function handoffOf(
   eventId: string,
-  options: { body?: string; trace?: string } = {},
+  options: { body?: string; trace?: string; tapback?: boolean } = {},
 ): Promise<SealedHandoff> {
   const trace = options.trace ?? TRACE;
-  const overrides: Json = { eventId, body: options.body ?? "Can I move my haircut to Friday?" };
+  // A tapback (K-06 reaction-from-customer.json): no words, so nothing of it is read.
+  const event: Json =
+    options.tapback === true
+      ? { ...(reactionFromCustomer as Json), eventId }
+      : { ...(textImessage as Json), eventId, body: options.body ?? "Can I move my haircut to Friday?" };
   const prepared = await prepareHandoff(
     {
-      event: { ...(textImessage as Json), ...overrides, traceId: trace } as InboundEvent,
+      event: { ...event, traceId: trace } as InboundEvent,
       partKey: null,
       traceId: trace,
       bundleId: BUNDLE,
@@ -121,7 +141,10 @@ async function handoffOf(
   return prepared.handoff;
 }
 
-async function arrive(eventId: string, options: { body?: string; trace?: string } = {}): Promise<void> {
+async function arrive(
+  eventId: string,
+  options: { body?: string; trace?: string; tapback?: boolean } = {},
+): Promise<void> {
   expect(await door().accept(await handoffOf(eventId, options))).toBe("written");
 }
 
@@ -189,6 +212,8 @@ function requestFor(turn: LeasedTurn): CommitTurnRequest {
 interface Run {
   h: Harness;
   k05: FakeCommits;
+  /** The PostgreSQL-down path's doubles while a test wires it (PostgreSQL answering until a test says it is down). */
+  db: DbFakes | null;
   /** Every turn the lease handed the turn's work, in order. */
   turns: LeasedTurn[];
   /** The fake clock moves, then the alarm runs, as the platform would at the stored time. */
@@ -212,11 +237,21 @@ async function withLease(
     restarts?: boolean;
     /** What the safety read says for each event id (default: No for every text). */
     answers?: Record<string, SafetyResult>;
+    /**
+     * The PostgreSQL-down path wired (T-270), as D-017 will wire it: its doubles over the test's key store, PostgreSQL
+     * answering. It reads each text it follows against the actor's copy of the pinned bundle's keyword list, which the first
+     * turn's pin takes (a text read before any pin reads `unknown`). Unwired by default, as the root installs it today.
+     */
+    downPath?: boolean;
+    /** K-05 v1 parkTurn after a third lapse with no commit (T-253); none wired unless given. */
+    park?: (turn: ParkingTurn) => Promise<ParkAnswer>;
   } = {},
 ): Promise<void> {
   const h = harness(keys, options.answers ?? ALL_NO);
   const k05 = fakeCommits();
   const turns: LeasedTurn[] = [];
+  const db = options.downPath === true ? dbFakes(keys, {}, { start: 0, ids: TEST_IDS }) : null;
+  const restoreDown = db === null ? (): void => undefined : setDbOutageDeps(db.outageDeps);
   // A fake-clock timer still waiting keeps `evictDurableObject` from finishing: a test that restarts the actor gives the
   // safety read's 4 s deadline a promise with no timer (every read here answers at once, so it never matters).
   const deps = options.restarts
@@ -242,12 +277,14 @@ async function withLease(
             turns.push(turn);
           },
           commit: (request, at) => k05.commitTurn(request, at),
+          ...(options.park === undefined ? {} : { park: options.park }),
         },
   );
   const restoreBundles = setBundleDeps(fakeBundles().deps);
   const run: Run = {
     h,
     k05,
+    db,
     turns,
     async tick(ms) {
       await h.clock.advance(ms);
@@ -268,6 +305,7 @@ async function withLease(
     restoreLease();
     restoreBatch();
     restoreSafety();
+    restoreDown();
   }
 }
 
@@ -290,6 +328,54 @@ function scheduleOf(): Promise<{ kind: string; due_ms: number }[]> {
       .exec<{ kind: string; due_ms: number }>("SELECT kind, due_ms FROM batch_schedule ORDER BY due_ms, kind")
       .toArray(),
   );
+}
+
+/** lease_turns.restart of each turn, in the order they opened: 0, 1 for the one restart, 2 for the second (ADR-018). */
+function restartsWritten(): Promise<number[]> {
+  return runInDurableObject(stub(), (_, state) =>
+    state.storage.sql
+      .exec<{ restart: number }>("SELECT restart FROM lease_turns ORDER BY seq")
+      .toArray()
+      .map((row) => row.restart),
+  );
+}
+
+/** One statement on the actor's own storage (a fault a test puts in its way). */
+function exec(query: string): Promise<void> {
+  return runInDurableObject(stub(), (_, state) => {
+    state.storage.sql.exec(query);
+  });
+}
+
+/** The PostgreSQL-down path's reading of a text it follows (`outage_texts.kind`), or undefined when it has no row. */
+async function readingOf(eventId: string): Promise<TextKind | null | undefined> {
+  return (await actorOf().readOutage()).texts.find((text) => text.eventId === eventId)?.kind;
+}
+
+/** The actor's lease host asked whether these texts may hold a stop word, inside the actor, as the lease asks it. */
+function stopAmong(eventIds: string[]): Promise<boolean | undefined> {
+  return runInDurableObject(stub(), (instance) => leaseHostIn(instance).stopAmong?.(eventIds));
+}
+
+/** A text (or a tapback) arrives, and its batch closes 3 s on, alone: what it starts settles. */
+async function batchOf(
+  run: Run,
+  eventId: string,
+  options: { body?: string; tapback?: boolean } = {},
+): Promise<void> {
+  await arrive(eventId, options);
+  await run.settle();
+  await run.tick(3000);
+  await run.settle();
+}
+
+/** A turn of evt-1 (its batch closes at 3 s), then its one restart by evt-2's batch (at 6 s): the restarted turn's run. */
+async function restartedOnce(run: Run): Promise<LeasedTurn> {
+  await batchOf(run, "evt-1");
+  await batchOf(run, "evt-2");
+  const restarted = present(run.turns[1], "the restarted turn");
+  expect(restarted).toMatchObject({ eventIds: ["evt-1", "evt-2"], restart: true, tries: 1 });
+  return restarted;
 }
 
 afterEach(async () => {
@@ -504,49 +590,55 @@ describe("the restart rule", () => {
     });
   });
 
+  // With the PostgreSQL-down path wired (ADR-018 section 1): the third text reads as another text, so its batch may hold no
+  // stop word and the restarted turn takes no second restart. Unwired, as the root installs it today, the lease cannot
+  // know that, and such a batch restarts the turn once more (the second restart's own tests, below).
   it("a second such text waits for the next turn, which opens with it once the restarted turn commits", async () => {
-    await withLease(async (run) => {
-      await arrive("evt-1");
-      await run.tick(3000);
-      await arrive("evt-2");
-      await run.tick(3000);
-      await run.settle();
-      const restarted = run.turns[1];
-      if (restarted === undefined) throw new Error("no restart");
+    await withLease(
+      async (run) => {
+        await arrive("evt-1");
+        await run.tick(3000);
+        await arrive("evt-2");
+        await run.tick(3000);
+        await run.settle();
+        const restarted = run.turns[1];
+        if (restarted === undefined) throw new Error("no restart");
 
-      await arrive("evt-3");
-      await run.tick(3000);
-      await run.settle();
-      // No third run: the restart happens once.
-      expect(run.turns).toHaveLength(2);
-      expect(await actorOf().readWaitingBatches()).toEqual([3]);
-      expect(await actorOf().readBatches()).toMatchObject([
-        { batchId: 1, handed: true },
-        { batchId: 2, handed: true },
-        { batchId: 3, handed: true },
-      ]);
+        await arrive("evt-3");
+        await run.tick(3000);
+        await run.settle();
+        // No third run: the restart happens once.
+        expect(run.turns).toHaveLength(2);
+        expect(await actorOf().readWaitingBatches()).toEqual([3]);
+        expect(await actorOf().readBatches()).toMatchObject([
+          { batchId: 1, handed: true },
+          { batchId: 2, handed: true },
+          { batchId: 3, handed: true },
+        ]);
 
-      const answer = await run.commit(restarted);
-      expect(answer).toEqual({ ...FIRST, turnId: restarted.turnId });
-      await run.settle();
+        const answer = await run.commit(restarted);
+        expect(answer).toEqual({ ...FIRST, turnId: restarted.turnId });
+        await run.settle();
 
-      expect(run.turns).toHaveLength(3);
-      const next = run.turns[2];
-      expect(next?.turnId).toBe(await turnIdOf(["evt-3"]));
-      expect(next).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
-      expect(await actorOf().readTurns()).toMatchObject([
-        { state: "replaced" },
-        {
-          turnId: restarted.turnId,
-          state: "committed",
-          committedAt: "2026-11-07T15:06:30Z",
-          leaseUntil: null,
-        },
-        { turnId: next?.turnId, state: "leased", restart: false },
-      ]);
-      expect(await actorOf().readWaitingBatches()).toEqual([]);
-      expect(await leaseRows()).toBe(1);
-    });
+        expect(run.turns).toHaveLength(3);
+        const next = run.turns[2];
+        expect(next?.turnId).toBe(await turnIdOf(["evt-3"]));
+        expect(next).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
+        expect(await actorOf().readTurns()).toMatchObject([
+          { state: "replaced" },
+          {
+            turnId: restarted.turnId,
+            state: "committed",
+            committedAt: "2026-11-07T15:06:30Z",
+            leaseUntil: null,
+          },
+          { turnId: next?.turnId, state: "leased", restart: false },
+        ]);
+        expect(await actorOf().readWaitingBatches()).toEqual([]);
+        expect(await leaseRows()).toBe(1);
+      },
+      { downPath: true },
+    );
   });
 
   it("after the commit, a text opens the next turn", async () => {
@@ -883,7 +975,9 @@ describe("safety holds bind commits, not hand-offs", () => {
           holds: [crisisHold("evt-3")],
         });
       },
-      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") } },
+      // The down path wired (ADR-018 section 1): the crisis words read as another text, so evt-3's batch takes no second
+      // restart and waits, as it did before that rule.
+      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") }, downPath: true },
     );
   });
 
@@ -913,7 +1007,8 @@ describe("safety holds bind commits, not hand-offs", () => {
         expect(await run.commit(rerun)).toMatchObject({ result: "committed" });
         expect(run.k05.contexts).toEqual([{ holds: [], unread: [] }]);
       },
-      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") } },
+      // The down path wired (ADR-018 section 1): evt-3's batch reads as no stop word and waits for the next turn.
+      { answers: { ...ALL_NO, "evt-3": crisis("evt-3") }, downPath: true },
     );
   });
 
@@ -975,5 +1070,501 @@ describe("safety holds bind commits, not hand-offs", () => {
       },
       { answers: { "evt-1": safetyNo as unknown as SafetyResult } },
     );
+  });
+});
+
+// ADR-018 section 1 (CQ-230; T-1311): a STOP never waits on a restarted turn. A waiting batch that may hold a stop word
+// restarts a turn that has used its one restart a second time, while that turn is leased and not left for the park, so the
+// STOP's turn commits on its first run (T-1263), never after the running turn's lapses; the turn so opened is never
+// restarted again. The lease asks its host (`stopAmong`); the actor answers from the PostgreSQL-down path's reading of each
+// text, and true while that path is unwired, as the composition root installs it today (round 2, DL-570).
+describe("a STOP batch restarts a restarted turn once more (ADR-018 section 1)", () => {
+  it("with the down path wired and a keyword copy that reads STOP: a turn, its restart by a second batch, then a STOP batch: a third turn opens at once with every text, as a restart; the restarted turn's commit answers replaced, one lease row is held, and the fake clock never reaches the lease's 60 s; a fourth batch, a STOP's or not, then waits for the next turn", async () => {
+    await withLease(
+      async (run) => {
+        const restarted = await restartedOnce(run);
+        await arrive("evt-3", { body: "STOP" });
+        await run.settle();
+        // The actor's copy of bundle v0's keyword list, taken at the first turn's pin, reads it as a STOP.
+        expect(await readingOf("evt-3")).toBe("stop");
+        await run.tick(3000);
+        await run.settle();
+
+        expect(run.turns).toHaveLength(3);
+        const third = present(run.turns[2], "the second restart's run");
+        expect(third.turnId).toBe(await turnIdOf(["evt-1", "evt-2", "evt-3"]));
+        expect(third).toMatchObject({
+          eventIds: ["evt-1", "evt-2", "evt-3"],
+          restart: true,
+          tries: 1,
+          leaseUntil: 9000 + LEASE_MS,
+        });
+        expect(third.entries.map((entry) => entry.event.eventId)).toEqual(["evt-1", "evt-2", "evt-3"]);
+        expect(restarted.signal.aborted).toBe(true);
+        expect(third.signal.aborted).toBe(false);
+        expect(await actorOf().readTurns()).toMatchObject([
+          { eventIds: ["evt-1"], state: "replaced", restart: false, leaseUntil: null },
+          { turnId: restarted.turnId, state: "replaced", restart: true, leaseUntil: null },
+          { turnId: third.turnId, state: "leased", restart: true, tries: 1, leaseUntil: 9000 + LEASE_MS },
+        ]);
+        expect(await restartsWritten()).toEqual([0, 1, 2]);
+        expect(await run.commit(restarted)).toEqual({ error: "replaced" });
+        expect(run.k05.calls).toEqual([]);
+        expect(await leaseRows()).toBe(1);
+        expect(await actorOf().readWaitingBatches()).toEqual([]);
+        // At once: 3 s after the STOP, never at the restarted turn's lapse.
+        expect(run.h.clock.now()).toBe(9000);
+        expect(run.h.clock.now()).toBeLessThan(LEASE_MS);
+
+        // A fourth batch, a STOP's, and a fifth, another text's, wait: the second restart's turn is never restarted.
+        await batchOf(run, "evt-4", { body: "STOP" });
+        await batchOf(run, "evt-5");
+        expect(await readingOf("evt-4")).toBe("stop");
+        expect(run.turns).toHaveLength(3);
+        expect(await actorOf().readWaitingBatches()).toEqual([4, 5]);
+
+        // Once that turn commits, the waiting batches open the next turn together.
+        expect(await run.commit(third)).toMatchObject({ result: "committed", repeated: false });
+        await run.settle();
+        expect(run.turns).toHaveLength(4);
+        expect(run.turns[3]).toMatchObject({ eventIds: ["evt-4", "evt-5"], restart: false, tries: 1 });
+        expect(await actorOf().readTurns()).toMatchObject([
+          { state: "replaced" },
+          { state: "replaced" },
+          { turnId: third.turnId, state: "committed" },
+          { eventIds: ["evt-4", "evt-5"], state: "leased", restart: false },
+        ]);
+        expect(await actorOf().readWaitingBatches()).toEqual([]);
+        // PostgreSQL answered throughout: the actor took no STOP itself.
+        expect(present(run.db, "the down path").direct.sent).toEqual([]);
+      },
+      { downPath: true },
+    );
+  });
+
+  it.each([
+    ["a START", { body: "START" }, "start"],
+    ["HELP", { body: "HELP" }, "other"],
+    ["another text", {}, "other"],
+    ["a tapback, which has no words to read", { tapback: true }, undefined],
+  ] as const)(
+    "with the down path wired, after the one restart, a batch read as %s holds no stop word: it waits for the next turn",
+    async (_what, text, reading) => {
+      await withLease(
+        async (run) => {
+          const restarted = await restartedOnce(run);
+          await batchOf(run, "evt-3", text);
+          expect(await readingOf("evt-3")).toBe(reading);
+          expect(run.turns).toHaveLength(2);
+          expect(await actorOf().readWaitingBatches()).toEqual([3]);
+          expect(await restartsWritten()).toEqual([0, 1]);
+
+          expect(await run.commit(restarted)).toMatchObject({ result: "committed" });
+          await run.settle();
+          expect(run.turns).toHaveLength(3);
+          expect(run.turns[2]).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
+        },
+        { downPath: true },
+      );
+    },
+  );
+
+  it.each([
+    ["a text read as unknown (its words could not be opened: the key store failed)", "unknown"],
+    ["a readable text with no reading (its arrive write threw: the path has no row for it)", "noRow"],
+    ["a text whose reading throws", "throws"],
+  ] as const)(
+    "with the down path wired, after the one restart, a batch with %s may hold a stop word: it restarts the turn a second time",
+    async (_what, fault) => {
+      await withLease(
+        async (run) => {
+          const db = present(run.db, "the down path");
+          const restarted = await restartedOnce(run);
+          if (fault === "unknown") db.keyReads.push(false);
+          if (fault === "noRow") {
+            await exec(
+              "CREATE TRIGGER refuse_outage_text BEFORE INSERT ON outage_texts BEGIN SELECT RAISE(ABORT, 'the storage refused'); END",
+            );
+          }
+          await arrive("evt-3");
+          await run.settle();
+          if (fault === "throws") {
+            expect(await readingOf("evt-3")).toBe("other");
+            // The stored reading can no longer be read.
+            await exec("ALTER TABLE outage_texts RENAME TO outage_texts_moved");
+          } else {
+            expect(await readingOf("evt-3")).toBe(fault === "unknown" ? "unknown" : undefined);
+          }
+          await run.tick(3000);
+          await run.settle();
+
+          expect(run.turns).toHaveLength(3);
+          expect(run.turns[2]).toMatchObject({
+            eventIds: ["evt-1", "evt-2", "evt-3"],
+            restart: true,
+            tries: 1,
+          });
+          expect(restarted.signal.aborted).toBe(true);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "replaced" },
+            { eventIds: ["evt-1", "evt-2", "evt-3"], state: "leased", restart: true },
+          ]);
+          expect(await restartsWritten()).toEqual([0, 1, 2]);
+        },
+        { downPath: true },
+      );
+    },
+  );
+
+  it("the actor's lease host answers from the down path's reading of each text whose words are read: true for a STOP, unknown, a text with no reading or one it cannot find; false for a START, HELP, another text or a tapback alone; and true for any batch while the path is unwired", async () => {
+    await withLease(
+      async (run) => {
+        const db = present(run.db, "the down path");
+        // Read before any pin, evt-1 reads unknown (no keyword list copied yet); its turn's pin copies bundle v0's list.
+        await batchOf(run, "evt-1");
+        await arrive("evt-2", { body: "STOP" });
+        await arrive("evt-3", { body: "START" });
+        await arrive("evt-4", { body: "HELP" });
+        await arrive("evt-5");
+        await arrive("evt-6", { tapback: true });
+        await run.settle();
+        db.keyReads.push(false);
+        await arrive("evt-7");
+        await run.settle();
+        await exec(
+          "CREATE TRIGGER refuse_outage_text BEFORE INSERT ON outage_texts BEGIN SELECT RAISE(ABORT, 'the storage refused'); END",
+        );
+        await arrive("evt-8");
+        await run.settle();
+        expect((await actorOf().readOutage()).texts.map((text) => [text.eventId, text.kind])).toEqual([
+          ["evt-1", "unknown"],
+          ["evt-2", "stop"],
+          ["evt-3", "start"],
+          ["evt-4", "other"],
+          ["evt-5", "other"],
+          ["evt-7", "unknown"],
+        ]);
+
+        expect(await stopAmong(["evt-2"])).toBe(true);
+        expect(await stopAmong(["evt-1"])).toBe(true);
+        expect(await stopAmong(["evt-7"])).toBe(true);
+        expect(await stopAmong(["evt-8"])).toBe(true);
+        expect(await stopAmong(["evt-nowhere"])).toBe(true);
+        expect(await stopAmong(["evt-3", "evt-4", "evt-5", "evt-6", "evt-2"])).toBe(true);
+        expect(await stopAmong(["evt-3"])).toBe(false);
+        expect(await stopAmong(["evt-4"])).toBe(false);
+        expect(await stopAmong(["evt-5"])).toBe(false);
+        expect(await stopAmong(["evt-6"])).toBe(false);
+        expect(await stopAmong(["evt-3", "evt-4", "evt-5", "evt-6"])).toBe(false);
+
+        // Unwired, the path reads nothing: any batch may hold a stop word.
+        const restore = setDbOutageDeps(null);
+        try {
+          expect(await stopAmong(["evt-5"])).toBe(true);
+          expect(await stopAmong(["evt-6"])).toBe(true);
+          expect(await stopAmong(["evt-3", "evt-4"])).toBe(true);
+        } finally {
+          restore();
+        }
+      },
+      { downPath: true },
+    );
+  });
+
+  it("the lease reads a host without stopAmong as no stop word, so a host built before this rule keeps the one restart: after it, a STOP batch waits", async () => {
+    await withLease(
+      async (run) => {
+        await restartedOnce(run);
+        await runInDurableObject(stub(), (instance) => {
+          delete leaseHostIn(instance).stopAmong;
+        });
+        await batchOf(run, "evt-3", { body: "STOP" });
+        expect(await readingOf("evt-3")).toBe("stop");
+        expect(run.turns).toHaveLength(2);
+        expect(await actorOf().readWaitingBatches()).toEqual([3]);
+        expect(await restartsWritten()).toEqual([0, 1]);
+      },
+      { downPath: true },
+    );
+  });
+
+  it("the lease reads a host whose stopAmong throws as a stop word: after the one restart, a batch read as another text restarts the turn a second time", async () => {
+    await withLease(
+      async (run) => {
+        await restartedOnce(run);
+        await runInDurableObject(stub(), (instance) => {
+          leaseHostIn(instance).stopAmong = () => {
+            throw new Error("the storage failed");
+          };
+        });
+        await batchOf(run, "evt-3");
+        expect(await readingOf("evt-3")).toBe("other");
+        expect(run.turns).toHaveLength(3);
+        expect(run.turns[2]).toMatchObject({
+          eventIds: ["evt-1", "evt-2", "evt-3"],
+          restart: true,
+          tries: 1,
+        });
+        expect(await restartsWritten()).toEqual([0, 1, 2]);
+      },
+      { downPath: true },
+    );
+  });
+
+  it("with the down path not wired, as the root installs it today: a turn, its restart by a second batch, then a third batch holding no stop word: a third turn opens at once with every text, as a restart; a fourth batch, a STOP's or not, waits for the next turn, which opens once that third turn commits", async () => {
+    await withLease(async (run) => {
+      const restarted = await restartedOnce(run);
+      await batchOf(run, "evt-3");
+
+      expect(run.turns).toHaveLength(3);
+      const third = present(run.turns[2], "the second restart's run");
+      expect(third.turnId).toBe(await turnIdOf(["evt-1", "evt-2", "evt-3"]));
+      expect(third).toMatchObject({
+        eventIds: ["evt-1", "evt-2", "evt-3"],
+        restart: true,
+        tries: 1,
+        leaseUntil: 9000 + LEASE_MS,
+      });
+      expect(restarted.signal.aborted).toBe(true);
+      expect(await actorOf().readTurns()).toMatchObject([
+        { eventIds: ["evt-1"], state: "replaced" },
+        { turnId: restarted.turnId, state: "replaced", restart: true },
+        { turnId: third.turnId, state: "leased", restart: true, tries: 1 },
+      ]);
+      expect(await restartsWritten()).toEqual([0, 1, 2]);
+      expect(await run.commit(restarted)).toEqual({ error: "replaced" });
+      expect(await leaseRows()).toBe(1);
+
+      await batchOf(run, "evt-4", { body: "STOP" });
+      await batchOf(run, "evt-5");
+      expect(run.turns).toHaveLength(3);
+      expect(await actorOf().readWaitingBatches()).toEqual([4, 5]);
+
+      expect(await run.commit(third)).toMatchObject({ result: "committed", repeated: false });
+      await run.settle();
+      expect(run.turns).toHaveLength(4);
+      expect(run.turns[3]).toMatchObject({ eventIds: ["evt-4", "evt-5"], restart: false, tries: 1 });
+      expect(await actorOf().readTurns()).toMatchObject([
+        { state: "replaced" },
+        { state: "replaced" },
+        { turnId: third.turnId, state: "committed" },
+        { eventIds: ["evt-4", "evt-5"], state: "leased", restart: false },
+      ]);
+      expect(await actorOf().readWaitingBatches()).toEqual([]);
+    });
+  });
+
+  it("with the down path not wired: when the turn the second restart opened never commits, the batches waiting behind it, a STOP's among them, open the next turn once it parks at its third lapse", async () => {
+    const parked: string[] = [];
+    await withLease(
+      async (run) => {
+        await restartedOnce(run);
+        await batchOf(run, "evt-3");
+        const third = present(run.turns[2], "the second restart's run");
+        expect(third).toMatchObject({ eventIds: ["evt-1", "evt-2", "evt-3"], restart: true, tries: 1 });
+        await batchOf(run, "evt-4", { body: "STOP" });
+        expect(await actorOf().readWaitingBatches()).toEqual([4]);
+
+        // Its runs never commit: two lapses rerun it under its own id, and the STOP's batch still waits.
+        await run.tick(LEASE_MS);
+        await run.settle();
+        await run.tick(LEASE_MS);
+        await run.settle();
+        expect(run.turns.slice(2).map((turn) => [turn.turnId, turn.tries])).toEqual([
+          [third.turnId, 1],
+          [third.turnId, 2],
+          [third.turnId, 3],
+        ]);
+        expect(await actorOf().readWaitingBatches()).toEqual([4]);
+
+        // Its third lapse parks it; the waiting batch then opens the next turn.
+        await run.tick(LEASE_MS);
+        await run.settle();
+        expect(parked).toEqual([third.turnId]);
+        expect(run.turns).toHaveLength(6);
+        expect(run.turns[5]).toMatchObject({ eventIds: ["evt-4"], restart: false, tries: 1 });
+        expect(await actorOf().readTurns()).toMatchObject([
+          { state: "replaced" },
+          { state: "replaced" },
+          { turnId: third.turnId, state: "parked", tries: 3, leaseUntil: null },
+          { eventIds: ["evt-4"], state: "leased", restart: false },
+        ]);
+        expect(await actorOf().readWaitingBatches()).toEqual([]);
+      },
+      {
+        park: (turn) => {
+          parked.push(turn.turnId);
+          return Promise.resolve<ParkAnswer>({
+            result: "parked",
+            parkedAt: "2026-11-07T15:16:00Z",
+            repeated: false,
+          });
+        },
+      },
+    );
+  });
+
+  describe("a STOP batch waits as today behind a turn it cannot restart (the down path wired, its copy reading STOP)", () => {
+    it("behind a restarted turn that has begun its commit, which may have gone through", async () => {
+      await withLease(
+        async (run) => {
+          const restarted = await restartedOnce(run);
+          run.k05.loseNextAnswer = true;
+          expect(await run.commit(restarted)).toEqual({ error: "noAnswer" });
+
+          await batchOf(run, "evt-3", { body: "STOP" });
+          expect(await readingOf("evt-3")).toBe("stop");
+          expect(run.turns).toHaveLength(2);
+          expect(await actorOf().readWaitingBatches()).toEqual([3]);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "committing" },
+          ]);
+
+          // Sent again, the commit answers repeated, and the STOP's batch opens the next turn.
+          expect(await run.commit(restarted)).toMatchObject({ result: "committed", repeated: true });
+          await run.settle();
+          expect(run.turns[2]).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
+        },
+        { downPath: true },
+      );
+    });
+
+    it("behind a restarted turn that holds its lease for its reply", async () => {
+      await withLease(
+        async (run) => {
+          const restarted = await restartedOnce(run);
+          expect(
+            await runInDurableObject(stub(), () => restarted.commit(requestFor(restarted), { reply: true })),
+          ).toMatchObject({ result: "committed" });
+
+          await batchOf(run, "evt-3", { body: "STOP" });
+          expect(run.turns).toHaveLength(2);
+          expect(await actorOf().readWaitingBatches()).toEqual([3]);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "committed", leaseUntil: 6000 + LEASE_MS },
+          ]);
+
+          // Its reply ends: the STOP's batch opens the next turn.
+          await runInDurableObject(stub(), () => restarted.replied());
+          await run.settle();
+          expect(run.turns[2]).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
+        },
+        { downPath: true },
+      );
+    });
+
+    it("behind a restarted turn that is being parked", async () => {
+      const parks: string[] = [];
+      await withLease(
+        async (run) => {
+          const restarted = await restartedOnce(run);
+          // Three lapses with no commit: the third begins the park, which K-05 cannot take at first (transient).
+          for (let lapse = 0; lapse < 3; lapse += 1) {
+            await run.tick(LEASE_MS);
+            await run.settle();
+          }
+          expect(parks).toEqual([restarted.turnId]);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "parking", tries: 3 },
+          ]);
+
+          await batchOf(run, "evt-3", { body: "STOP" });
+          expect(run.turns).toHaveLength(4);
+          expect(await actorOf().readWaitingBatches()).toEqual([3]);
+
+          // The park, tried again 30 s after its first try, goes through: the STOP's batch opens the next turn.
+          await run.tick(PARK_RETRY_MS - 3000);
+          await run.settle();
+          expect(parks).toEqual([restarted.turnId, restarted.turnId]);
+          expect(run.turns).toHaveLength(5);
+          expect(run.turns[4]).toMatchObject({ eventIds: ["evt-3"], restart: false, tries: 1 });
+        },
+        {
+          downPath: true,
+          park: (turn) => {
+            parks.push(turn.turnId);
+            return Promise.resolve<ParkAnswer>(
+              parks.length === 1
+                ? { error: "transient" }
+                : { result: "parked", parkedAt: "2026-11-07T15:16:00Z", repeated: false },
+            );
+          },
+        },
+      );
+    });
+
+    it("behind a restarted turn past its third lapse, left for the park (none wired)", async () => {
+      await withLease(
+        async (run) => {
+          const restarted = await restartedOnce(run);
+          for (let lapse = 0; lapse < 3; lapse += 1) {
+            await run.tick(LEASE_MS);
+            await run.settle();
+          }
+          expect(run.turns.map((turn) => turn.tries)).toEqual([1, 1, 2, 3]);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "leased", tries: 3 },
+          ]);
+
+          await batchOf(run, "evt-3", { body: "STOP" });
+          expect(await readingOf("evt-3")).toBe("stop");
+          expect(run.turns).toHaveLength(4);
+          expect(await actorOf().readWaitingBatches()).toEqual([3]);
+          expect(await restartsWritten()).toEqual([0, 1]);
+        },
+        { downPath: true },
+      );
+    });
+
+    it("while PostgreSQL is known down: no batch restarts the turn; the actor takes the STOP itself at once, and its batch stays with the batch window", async () => {
+      await withLease(
+        async (run) => {
+          const db = present(run.db, "the down path");
+          // A first turn pins bundle v0 (the actor copies its keyword list) and commits, so every later text is read.
+          await batchOf(run, "evt-1");
+          expect(await run.commit(present(run.turns[0], "the first turn"))).toMatchObject({
+            result: "committed",
+          });
+          // A turn, and its one restart.
+          await batchOf(run, "evt-2");
+          await batchOf(run, "evt-3");
+          const restarted = present(run.turns[2], "the restarted turn");
+          expect(restarted).toMatchObject({ eventIds: ["evt-2", "evt-3"], restart: true, tries: 1 });
+          db.down = true;
+
+          await batchOf(run, "evt-4", { body: "STOP" });
+          // Asked for the STOP, PostgreSQL does not answer: the actor took it (its reply straight through Linq, past the
+          // opt-out; its record queued for the return), and no turn opened or restarted.
+          expect((await actorOf().readOutage()).down).not.toBeNull();
+          expect((await actorOf().readOutage()).texts.find((text) => text.eventId === "evt-4")).toMatchObject(
+            {
+              kind: "stop",
+              keyword: "handled",
+            },
+          );
+          expect(db.direct.sent.map((sent) => sent.idempotencyKey)).toEqual(["keyword:evt-4:stopReply"]);
+          expect(run.turns).toHaveLength(3);
+          expect(await actorOf().readTurns()).toMatchObject([
+            { state: "committed" },
+            { state: "replaced" },
+            { turnId: restarted.turnId, state: "leased", restart: true },
+          ]);
+          expect(await restartsWritten()).toEqual([0, 0, 1]);
+          expect(await actorOf().readWaitingBatches()).toEqual([]);
+          expect(await actorOf().readBatches()).toMatchObject([
+            { batchId: 1, handed: true },
+            { batchId: 2, handed: true },
+            { batchId: 3, handed: true },
+            { batchId: 4, handed: false },
+          ]);
+        },
+        { downPath: true },
+      );
+    });
   });
 });
