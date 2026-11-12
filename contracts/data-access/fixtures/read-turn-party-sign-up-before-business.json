@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T18:20:03Z",
+    "note": "Sam's sign-up after S1-04 and before S1-09, the order K-09's journey 1 table writes them in (S1-04 the companies, S1-09 the business): the database side writes persons person-sam (name 'Sam Lee', language null, version 1), handles handle-sam (phone, +15555550100) and their person_handles row, as T-1148's seed writes them, and the two companies of Sam's S1-04 answer with no business yet: companies company-lee-home-services (owner_person_id person-sam, name 'Lee Home Services LLC', business_id null, version 1) and company-lees-barbershop (owner_person_id person-sam, name \"Lee's Barbershop LLC\", business_id null, version 1). No live role and no company names a business: a company with no business is seen by no business scope, and sign-up's turns read and write it on the runtime side (K-23 README rule 5). So the turn runs with no business and no zone, which the consumer reads as UTC (item 52, defaults 98 and 101)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" }
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "businessId": null,
+    "personId": "person-sam",
+    "zone": null
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:03Z",
+    "note": "The walking skeleton's turn 1 (ADR-013): test owner 1's first text, read by the turn's first run as its batch closes. The state is T-1148's db/seeds/skeleton.ts, which no K-04 seed holds (K-04's seed-person-roles.json gives Sam three owner roles), so this exchange's database side writes its rows itself after K-04's seed-business-head.json, as that seed writes them (its SKELETON_ROWS): persons person-sam (name 'Sam Lee', language null, version 1); handles handle-sam (phone, +15555550100); person_handles (person-sam, handle-sam); companies company-lees-barbershop (owner_person_id person-sam, name \"Lee's Barbershop LLC\", business_id biz-lees-barbershop, version 2); and company_kinds (company-lees-barbershop, barber), which this read does not read. Sam holds no role (ADR-013 new task 4: JOIN is a first text, so the guard finds no target and the frontier offers the sign-up door), so no live role names a business. His one company names biz-lees-barbershop, where no one holds the live owner role and where Sam never held a role, so the turn runs under it (item 52, defaults 98 and 99), as K-09 v1.5 default 130 and its turn 1 fixtures (build-frontier-s1-01.json, commit-s1-01.json) have it: Sam the person, the barbershop's America/New_York the zone (K-02 v1.1 context-s1-01.json's sentAt)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" }
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-sam",
+    "zone": "America/New_York"
+  }
+}

@@ -1871,6 +1871,110 @@
       "expect": "refuse",
       "shows": "Alex's chat answered with his email handle: a Linq chat's handle is a phone, the number the receipt's event carries, so the answer names a phone handle or none (put right, it is read-chat-handle-alex's outcome)",
       "source": "K-06 v1 ('A Linq event comes from a phone'); arch 01 line 55; adapters/src/linq/webhook/parse.ts receiptHandle; K-05 v1.10 item 51, default 94"
+    },
+    {
+      "file": "read-turn-party-test-owner-1.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: test owner 1, who holds no role, owns the one company that names Lee's Barbershop, where no one holds the live owner role, so the turn runs under the barbershop with Sam as the person and its zone, as ADR-013 default 130 and K-09 v1.5's turn 1 fixtures have it",
+      "source": "ADR-013 sections 1 and 4; K-09 v1.5 default 130; T-1148 db/seeds/skeleton.ts; K-23 v1 companies.owner_person_id, README rule 5; K-04 v1 handles, person_handles, person_roles, businesses.time_zone; K-05 v1.11 item 52, defaults 96 to 99"
+    },
+    {
+      "file": "read-turn-party-one-role.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A person with one live role: Riley, a barber at Lee's Barbershop, texts from Riley's own phone, so the turn runs under the barbershop with Riley as the person and the barbershop's zone",
+      "source": "K-04 v1 seed-person-roles.json (role-riley-barber); arch 02 line 115; K-09 v1 caller.businessId, caller.personId; K-05 v1.11 item 52, defaults 97 and 98"
+    },
+    {
+      "file": "read-turn-party-several-businesses.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam with three live owner roles at three businesses: no row says which his texts are about, so none is picked or dropped: businessUndecided, severalBusinesses, with his handle and person, and no turn runs on a business picked for him",
+      "source": "K-04 v1 seed-person-roles.json; S13-27 rule 29; arch 02 line 115; arch 03 line 159; S11-15; QUESTIONS.md CQ-220; K-05 v1.11 item 52, defaults 98, 100 and 102"
+    },
+    {
+      "file": "read-turn-party-several-companies.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam with no role and two companies, each a business of its own on the same login: no source orders an owner's businesses, so businessUndecided, severalBusinesses",
+      "source": "K-23 v1 companies ('a second company a second business on the same login'), seed-company-two-kinds.json; S1-04; S11-15 ('Pause which business?'); K-05 v1.11 item 52, defaults 98 and 100"
+    },
+    {
+      "file": "read-turn-party-sign-up-before-business.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam's sign-up between S1-04 and S1-09: his two companies have no business yet, so no row names one and the turn runs with no business and no zone, on the runtime side, as sign-up's turns run",
+      "source": "K-09 journey 1 table (S1-04 companies, S1-09 business); K-23 v1 README rule 5; K-09 v1 caller.businessId; K-05 v1.2 default 25; K-05 v1.11 item 52, defaults 98 and 101"
+    },
+    {
+      "file": "read-turn-party-first-text.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A number's first text, after the gateway wrote its handle and person: no role and no company, so the turn runs with no business and no zone, and nothing on file is used",
+      "source": "K-05 v1.2 item 29 (handle-key-first-sight.json); RULES 6.3, 6.5; K-09 v1 caller.businessId ('Null only where no business exists yet'); K-05 v1.11 item 52, defaults 96 to 98 and 101"
+    },
+    {
+      "file": "read-turn-party-handed-over.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "An ex-owner after S11-100's hand-over to Hugo P., whose company row still names him: the barbershop's live owner role is another person's, so the company is not his to act on: businessUndecided, anotherOwner, and no turn runs under it",
+      "source": "S11-100 ('Sam's access ends at the handover time'); S2-02 ('One account owner'); RULES 6.8, 6.9; K-05 v1.4 default 58; K-05 v1.11 item 52, default 99"
+    },
+    {
+      "file": "read-turn-party-owner-role-ended.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "An ex-owner whose owner role ended at a hand-over Rosie's team made on papers, before the new owner confirmed, whose company row still names him: businessUndecided, roleEnded",
+      "source": "S11-100 ('Rosie's team hands it over only on papers'); RULES 8.7, 6.9; K-04 v1 person_roles.ended_at; K-05 v1.11 item 52, default 99"
+    },
+    {
+      "file": "read-turn-party-unknown.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A handle K-04 does not hold: every field null, which the directory reads as not known, so no turn or park runs",
+      "source": "runtime/src/turn/types.ts TurnDirectory ('Null: not known, so no turn runs'); K-05 v1.2 item 29; K-04 v1 handles_address_key; K-05 v1.11 item 52, default 96"
+    },
+    {
+      "file": "invalid/refuse-turn-party-caller-business.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "refuse",
+      "shows": "A party request naming the business it wants beside the handle: the business, the person and the zone are read from the rows, never handed in (put right, with the handle named alone, it is read-turn-party-test-owner-1)",
+      "source": "arch 10 line 546; K-04 v1 rule 4; QUESTIONS.md CQ-220; K-05 v1.11 item 52"
+    },
+    {
+      "file": "invalid/refuse-turn-party-undecided-names-businesses.json",
+      "version": "v1.11",
+      "def": "readTurnParty.errors",
+      "expect": "refuse",
+      "shows": "Sam's undecided party answered with the businesses it found: the error names its reason, the handle and the person, never a business, a role or a company (put right, it is read-turn-party-several-businesses's outcome)",
+      "source": "RULES 4.10 ('never joined across businesses'); K-05 v1.4 default 60's rule (each answer what its port reads); K-05 v1.11 item 52, default 102"
+    },
+    {
+      "file": "invalid/refuse-turn-party-business-zone-null.json",
+      "version": "v1.11",
+      "def": "readTurnParty.response",
+      "expect": "refuse",
+      "shows": "Test owner 1's party at the barbershop answered with no zone: a party at a business always carries that business's zone, which K-04 stores not null (put right, it is read-turn-party-test-owner-1's outcome)",
+      "source": "K-04 v1 businesses.time_zone (not null); S13-03; K-05 v1.11 item 52, default 101"
+    },
+    {
+      "file": "invalid/refuse-turn-party-no-business-zone-utc.json",
+      "version": "v1.11",
+      "def": "readTurnParty.response",
+      "expect": "refuse",
+      "shows": "A first text's party with no business answered with the zone UTC: no row stores a zone for a party with no business, so the answer gives none and UTC stays the consumer's reading (put right, it is read-turn-party-first-text's outcome)",
+      "source": "K-05 v1.3 default 52 (what K-04 stores is returned as stored); K-08 v1 eventLogRow.zone ('null means UTC'); K-05 v1.11 item 52, default 101"
     }
   ]
 }

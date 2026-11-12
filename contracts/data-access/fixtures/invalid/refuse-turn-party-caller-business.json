@@ -1,0 +1,19 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:03Z",
+    "note": "Test owner 1's first text, as read-turn-party-test-owner-1 reads it, with its rows written as that fixture's note lists them; the caller names the business it wants the turn to run under beside the handle."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" },
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "handleId": "handle-sam",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-sam",
+    "zone": "America/New_York"
+  }
+}
