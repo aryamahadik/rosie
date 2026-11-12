@@ -15,6 +15,11 @@
 // transient answer, nor the thrown error's message, stack or other own properties. Then K-05 calls of both helpers'
 // kinds run on a client that never connects, each with its own fixture's request.
 //
+// Round 2 (DL-579): transientOrThrow throws a session's failure that is not transient scrubbed, under the call's name
+// (EACCES, a TLS or certificate error, SASL_SIGNATURE_MISMATCH, class 28, 53300), as transientOrScrubbed does; through
+// direct callers too, with a socket that fails as Node's would (postgres.js's own socket option) and a local server
+// that refuses each session at its start with PostgreSQL's own ErrorResponse.
+//
 // Rule 9: the probe's user, password, database and hosts are made up here (.invalid names and documentation
 // addresses), and its one number is a 555-01xx number. A check names what leaked, never its value, so a failing run
 // prints no secret.
@@ -74,6 +79,8 @@ const STATEMENT = "select kind, address from t1268_probe_handles where id = $1";
 const BAD_PASSWORD = `password authentication failed for user "${PROBE_USER}"`;
 const NO_HBA_ENTRY = `no pg_hba.conf entry for host "${ADDRESS}", user "${PROBE_USER}"`;
 const SASL_MISMATCH = "The server did not return the correct signature";
+const TOO_MANY_FOR_ROLE = `too many connections for role "${PROBE_USER}"`;
+const BAD_UUID = `invalid input syntax for type uuid: "${NUMBER}"`;
 
 // ---- what an outcome must never hold --------------------------------------------------------------------------------
 
@@ -214,6 +221,58 @@ async function silentServer(): Promise<{ port: number; close: () => Promise<void
   };
 }
 
+/** PostgreSQL's ErrorResponse message ('E', its length, then each field's type byte and text, then a zero). */
+function errorResponse(fields: Readonly<Record<string, string>>): Uint8Array {
+  const texts = Object.entries(fields).map(([type, text]) => `${type}${text}\u0000`);
+  const body = new TextEncoder().encode(`${texts.join("")}\u0000`);
+  const message = new Uint8Array(body.length + 5);
+  const view = new DataView(message.buffer);
+  view.setUint8(0, "E".charCodeAt(0));
+  view.setUint32(1, body.length + 4);
+  message.set(body, 5);
+  return message;
+}
+
+/**
+ * A local server that refuses each session at its start, as PostgreSQL does: it reads the startup message and answers
+ * with a FATAL ErrorResponse of `code` and `message`, then closes.
+ */
+async function refusingServer(
+  code: string,
+  message: string,
+): Promise<{ port: number; close: () => Promise<void> }> {
+  const sockets = new Set<Socket>();
+  const server = createServer((socket) => {
+    sockets.add(socket);
+    socket.on("error", () => undefined);
+    socket.once("data", () => {
+      socket.end(errorResponse({ S: "FATAL", V: "FATAL", C: code, M: message }));
+    });
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const { port } = server.address() as AddressInfo;
+  return {
+    port,
+    close: async () => {
+      for (const socket of sockets) {
+        socket.destroy();
+      }
+      server.close();
+      await once(server, "close");
+    },
+  };
+}
+
+/**
+ * A postgres.js client on the made-up connection whose socket fails with `raw` before it opens, as Node's socket or TLS
+ * would fail it: postgres.js passes `raw` up as it does a socket's error, on the statement it rejects.
+ */
+function failingSocketClient(raw: Error): Sql {
+  const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+  return postgres(probeUrl(HOST, PORT), options);
+}
+
 /** Waits, about 5 s at most, until the backend `pid` runs a statement. */
 async function waitUntilActive(admin: Sql, pid: number): Promise<void> {
   for (let tries = 0; tries < 100; tries += 1) {
@@ -299,6 +358,11 @@ function genericError(code: string, text: string): Error {
   return Object.assign(new Error(`${code}: ${text}`), { code });
 }
 
+/** Node's certificate check: OpenSSL's verify code alone on it. */
+function certError(code: string, text: string): Error {
+  return Object.assign(new Error(text), { code });
+}
+
 /** A socket's error whose code is a number, not a name (as a DOMException's is). */
 function numberCodedError(): Error {
   return Object.assign(new Error(`connect to ${ADDRESS} failed`), { name: "NetworkError", code: 19 });
@@ -318,10 +382,14 @@ function tlsNameError(): Error {
   return Object.assign(error, { code: "ERR_TLS_CERT_ALTNAME_INVALID", reason, host: HOST, cert });
 }
 
+/**
+ * `session`: a failure to open or keep a session (T-1268 round 2), which transientOrThrow throws scrubbed too; any other
+ * is thrown as it is by transientOrThrow and scrubbed by transientOrScrubbed.
+ */
 type Expected =
   | { answer: TransientError }
-  | { thrown: "client"; code: string | null }
-  | { thrown: "database"; code: string }
+  | { thrown: "client"; code: string | null; session: boolean }
+  | { thrown: "database"; code: string; session: boolean }
   | { thrown: "own" };
 
 interface Shape {
@@ -467,67 +535,98 @@ const SHAPES: Shape[] = [
     holds: ["number", "statement"],
     expected: { answer: { error: "transient", sqlstate: "57P01" } },
   },
-  // Thrown: transientOrThrow throws the error itself; transientOrScrubbed a new Error with the call and the code alone.
+  // Thrown scrubbed, a new Error with the call and the code alone: by both helpers for a failure to open or keep a
+  // session (T-1268 round 2); by transientOrScrubbed alone for any other, which transientOrThrow throws as it is.
   {
-    name: "Node's TLS name check (its host and certificate on it) is thrown scrubbed",
+    name: "Node's TLS name check (its host and certificate on it) is thrown scrubbed by both",
     make: () => rejecting(tlsNameError()),
     holds: ["host", "number", "statement"],
-    expected: { thrown: "client", code: "ERR_TLS_CERT_ALTNAME_INVALID" },
+    expected: { thrown: "client", code: "ERR_TLS_CERT_ALTNAME_INVALID", session: true },
   },
   {
-    name: "Node's TLS name check on no statement is thrown scrubbed",
+    name: "Node's TLS name check on no statement is thrown scrubbed by both",
     make: () => tlsNameError(),
     holds: ["host"],
-    expected: { thrown: "client", code: "ERR_TLS_CERT_ALTNAME_INVALID" },
+    expected: { thrown: "client", code: "ERR_TLS_CERT_ALTNAME_INVALID", session: true },
   },
   {
-    name: "Node's EACCES (a connect the system did not permit) on no statement is thrown scrubbed",
+    name: "Node's certificate check (a self-signed certificate), its code alone on it, is thrown scrubbed by both",
+    make: () => rejecting(certError("DEPTH_ZERO_SELF_SIGNED_CERT", "self-signed certificate")),
+    holds: ["number", "statement"],
+    expected: { thrown: "client", code: "DEPTH_ZERO_SELF_SIGNED_CERT", session: true },
+  },
+  {
+    name: "Node's EACCES (a connect the system did not permit) on no statement is thrown scrubbed by both",
     make: () => connectError("EACCES", -13),
     holds: ["address", "port"],
-    expected: { thrown: "client", code: "EACCES" },
+    expected: { thrown: "client", code: "EACCES", session: true },
   },
   {
-    name: "postgres.js's UNDEFINED_VALUE, its parameters on it, is thrown scrubbed",
+    name: "Node's EPERM on a statement is thrown scrubbed by both",
+    make: () => rejecting(connectError("EPERM", -1)),
+    holds: ["address", "port", "number", "statement"],
+    expected: { thrown: "client", code: "EPERM", session: true },
+  },
+  {
+    name: "postgres.js's UNDEFINED_VALUE, its parameters on it, is thrown scrubbed by transientOrScrubbed",
     make: () => rejecting(genericError("UNDEFINED_VALUE", "Undefined values are not allowed")),
     holds: ["number", "statement"],
-    expected: { thrown: "client", code: "UNDEFINED_VALUE" },
+    expected: { thrown: "client", code: "UNDEFINED_VALUE", session: false },
   },
   {
-    name: "postgres.js's SASL_SIGNATURE_MISMATCH is thrown scrubbed",
+    name: "postgres.js's SASL_SIGNATURE_MISMATCH is thrown scrubbed by both",
     make: () => rejecting(genericError("SASL_SIGNATURE_MISMATCH", SASL_MISMATCH)),
     holds: ["number", "statement"],
-    expected: { thrown: "client", code: "SASL_SIGNATURE_MISMATCH" },
+    expected: { thrown: "client", code: "SASL_SIGNATURE_MISMATCH", session: true },
   },
   {
-    name: "a TypeError postgres.js rejects a statement with (a value it cannot send) is thrown scrubbed",
+    name: "postgres.js's SASL_SIGNATURE_MISMATCH on no statement (a reserve) is thrown scrubbed by both",
+    make: () => genericError("SASL_SIGNATURE_MISMATCH", SASL_MISMATCH),
+    holds: [],
+    expected: { thrown: "client", code: "SASL_SIGNATURE_MISMATCH", session: true },
+  },
+  {
+    name: "a TypeError postgres.js rejects a statement with (a value it cannot send) is thrown scrubbed by transientOrScrubbed",
     make: () => rejecting(new TypeError("Do not know how to serialize a BigInt")),
     holds: ["number", "statement"],
-    expected: { thrown: "client", code: null },
+    expected: { thrown: "client", code: null, session: false },
   },
   {
-    name: "the same under postgres.js's debug is thrown scrubbed",
+    name: "the same under postgres.js's debug is thrown scrubbed by transientOrScrubbed",
     make: () => rejecting(new TypeError("Do not know how to serialize a BigInt"), true),
     holds: ["number", "statement"],
-    expected: { thrown: "client", code: null },
+    expected: { thrown: "client", code: null, session: false },
   },
   {
-    name: "a PostgresError with no SQLSTATE, naming the user, is thrown scrubbed",
+    name: "a PostgresError with no SQLSTATE, naming the user, is thrown scrubbed by both",
     make: () => refusal({ message: BAD_PASSWORD }),
     holds: ["user", "number", "statement"],
-    expected: { thrown: "client", code: null },
+    expected: { thrown: "client", code: null, session: true },
   },
-  // Thrown as DataAccessDatabaseError: PostgreSQL's refusal, its SQLSTATE alone.
+  // Thrown as DataAccessDatabaseError: PostgreSQL's refusal, its SQLSTATE alone; a session's by both helpers.
   {
-    name: "PostgreSQL's 28P01, naming the user, is thrown as DataAccessDatabaseError",
+    name: "PostgreSQL's 28P01, naming the user, is thrown as DataAccessDatabaseError by both",
     make: () => refusal({ code: "28P01", message: BAD_PASSWORD }),
     holds: ["user", "number", "statement"],
-    expected: { thrown: "database", code: "28P01" },
+    expected: { thrown: "database", code: "28P01", session: true },
   },
   {
-    name: "PostgreSQL's 28000, naming the address and the user, is thrown as DataAccessDatabaseError",
+    name: "PostgreSQL's 28000, naming the address and the user, is thrown as DataAccessDatabaseError by both",
     make: () => refusal({ code: "28000", message: NO_HBA_ENTRY }),
     holds: ["address", "user"],
-    expected: { thrown: "database", code: "28000" },
+    expected: { thrown: "database", code: "28000", session: true },
+  },
+  {
+    name: "PostgreSQL's 53300, naming the role, is thrown as DataAccessDatabaseError by both",
+    make: () => refusal({ code: "53300", message: TOO_MANY_FOR_ROLE }),
+    holds: ["user", "number", "statement"],
+    expected: { thrown: "database", code: "53300", session: true },
+  },
+  {
+    name: "a statement's own refusal of another SQLSTATE (22P02, its value in it) is thrown as DataAccessDatabaseError by transientOrScrubbed",
+    make: () => refusal({ severity: "ERROR", code: "22P02", message: BAD_UUID }),
+    holds: ["number", "statement"],
+    expected: { thrown: "database", code: "22P02", session: false },
   },
   // db/repo's own errors: thrown as they are, by both helpers.
   {
@@ -670,12 +769,26 @@ describe("a connection that never opens, as postgres.js raises it (T-1268)", () 
     const code = ownValue(raw, "code");
     expect(["28P01", "28000"]).toContain(code);
     expect(leaksOf(raw, secrets)).toEqual(expect.arrayContaining(["user", "number"]));
-    // Not transient: a retry cannot mend a refused login. transientOrThrow throws it as it is (its callers' rule).
-    expect(thrownBy(() => transientOrThrow(raw))).toBe(raw);
-    const thrown = thrownBy(() => transientOrScrubbed(CALL, raw));
-    expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
-    expect(thrown).toMatchObject({ call: CALL, code, table: null, constraint: null });
-    expect(leaksOf(thrown, secrets)).toEqual([]);
+    // Not transient: a retry cannot mend a refused login. Both helpers throw it scrubbed to its SQLSTATE (T-1268 round 2).
+    for (const thrown of [
+      thrownBy(() => transientOrThrow(raw, CALL)),
+      thrownBy(() => transientOrScrubbed(CALL, raw)),
+    ]) {
+      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+      expect(thrown).toMatchObject({ call: CALL, code, table: null, constraint: null });
+      expect(leaksOf(thrown, secrets)).toEqual([]);
+    }
+
+    // The same through a direct caller of transientOrThrow: handleTargets throws it scrubbed, under its own name.
+    const direct = createClient({ primaryUrl: url.toString(), max: 1, env: {} });
+    try {
+      const rejected = await rejectionOf(fixtureCall(handleTargets, "targets-alex.json")(direct.primary));
+      expect(rejected).toBeInstanceOf(DataAccessDatabaseError);
+      expect(rejected).toMatchObject({ call: "handleTargets", code });
+      expect(leaksOf(rejected, secrets)).toEqual([]);
+    } finally {
+      await direct.close();
+    }
 
     // The same through a K-05 read: readHandle throws it scrubbed, under its own name.
     const client = createClient({ primaryUrl: url.toString(), max: 1, env: {} });
@@ -727,26 +840,109 @@ describe("errors in the shapes postgres.js and Node give them (T-1268)", () => {
       expect(leaksOf(answer, SHAPE_SECRETS)).toEqual([]);
       return;
     }
-    expect(thrownBy(() => transientOrThrow(raw))).toBe(raw);
-    const thrown = thrownBy(() => transientOrScrubbed(CALL, raw));
     if (expected.thrown === "own") {
-      expect(thrown).toBe(raw);
+      expect(thrownBy(() => transientOrThrow(raw))).toBe(raw);
+      expect(thrownBy(() => transientOrScrubbed(CALL, raw))).toBe(raw);
       expect(scrubbed(CALL, raw)).toBe(raw);
       return;
     }
-    expect(thrown).not.toBe(raw);
-    expect(leaksOf(thrown, SHAPE_SECRETS)).toEqual([]);
-    if (expected.thrown === "database") {
-      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
-      expect(thrown).toMatchObject({ call: CALL, code: expected.code, table: null, constraint: null });
-      return;
+    // transientOrThrow: scrubbed, under the call it is given, for a session's failure; else the error as it is.
+    const direct = thrownBy(() => transientOrThrow(raw, CALL));
+    const thrown = thrownBy(() => transientOrScrubbed(CALL, raw));
+    const outcomes = expected.session ? [direct, thrown] : [thrown];
+    expect(direct === raw).toBe(!expected.session);
+    for (const outcome of outcomes) {
+      expect(outcome).not.toBe(raw);
+      expect(leaksOf(outcome, SHAPE_SECRETS)).toEqual([]);
+      if (expected.thrown === "database") {
+        expect(outcome).toBeInstanceOf(DataAccessDatabaseError);
+        expect(outcome).toMatchObject({ call: CALL, code: expected.code, table: null, constraint: null });
+        continue;
+      }
+      // The call's name and the code alone: no message, stack, statement, cause or other property of the original's.
+      expect(Object.getOwnPropertyNames(outcome).sort()).toEqual(["call", "code", "message", "stack"]);
+      const shown = expected.code === null ? "no code" : `code ${expected.code}`;
+      expect(outcome).toMatchObject({ call: CALL, code: expected.code });
+      expect((outcome as Error).message).toBe(`${CALL}: the database call failed (${shown})`);
     }
-    // The call's name and the code alone: no message, stack, statement, cause or other property of the original's.
-    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
-    const shown = expected.code === null ? "no code" : `code ${expected.code}`;
-    expect(thrown).toMatchObject({ call: CALL, code: expected.code });
-    expect((thrown as Error).message).toBe(`${CALL}: the database call failed (${shown})`);
     expect(scrubbed(CALL, raw)).toMatchObject({ call: CALL, code: expected.code });
+  });
+
+  it("transientOrThrow names its scrubbed error even when its caller names no call", () => {
+    const thrown = thrownBy(() => transientOrThrow(connectError("EACCES", -13)));
+    expect(thrown).toMatchObject({ call: "a db/repo call", code: "EACCES" });
+    expect(leaksOf(thrown, SHAPE_SECRETS)).toEqual([]);
+  });
+});
+
+describe("a session's failure through a direct caller of transientOrThrow, scrubbed (T-1268 round 2)", () => {
+  /** The thrown error is clocks.ts's scrubbed client error: the call's name and the code alone. */
+  function expectScrubbedClientError(thrown: unknown, call: string, code: string, secrets: Secrets): void {
+    expect(thrown).toBeInstanceOf(Error);
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({ call, code, message: `${call}: the database call failed (code ${code})` });
+    expect(leaksOf(thrown, secrets)).toEqual([]);
+  }
+
+  const socketCases: { call: string; run: Run; make: () => Error; code: string }[] = [
+    {
+      call: "handleTargets",
+      run: fixtureCall(handleTargets, "targets-alex.json"),
+      make: () => connectError("EACCES", -13),
+      code: "EACCES",
+    },
+    {
+      call: "sendState",
+      run: fixtureCall(sendState, "send-state-no-chat.json"),
+      make: tlsNameError,
+      code: "ERR_TLS_CERT_ALTNAME_INVALID",
+    },
+  ];
+
+  it.each(socketCases)("$call: $code on its socket, scrubbed", async ({ call, run, make, code }) => {
+    const raw = make();
+    expect(leaksOf(raw, SHAPE_SECRETS).length).toBeGreaterThan(0);
+    const sql = failingSocketClient(raw);
+    try {
+      const rejected = await rejectionOf(run(sql));
+      // postgres.js rejected the transaction's first statement with the socket's own error, the statement put on it.
+      expect(Object.hasOwn(raw, "query")).toBe(true);
+      expectScrubbedClientError(rejected, call, code, SHAPE_SECRETS);
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  });
+
+  const refusedCases: { call: string; run: Run; code: string; text: string }[] = [
+    {
+      call: "readTurnState",
+      run: fixtureCall(readTurnState, "read-turn-state-alex.json"),
+      code: "28P01",
+      text: BAD_PASSWORD,
+    },
+    { call: "handleSealingKey", run: sealingKeyCall, code: "53300", text: TOO_MANY_FOR_ROLE },
+  ];
+
+  it.each(refusedCases)("$call: $code at its start, scrubbed", async ({ call, run, code, text }) => {
+    const server = await refusingServer(code, text);
+    const secrets = probeSecrets("127.0.0.1", server.port);
+    try {
+      const url = probeUrl("127.0.0.1", server.port);
+      const raw = await failureOf(url);
+      expect(raw).toMatchObject({ name: "PostgresError", code });
+      expect(leaksOf(raw, secrets)).toEqual(expect.arrayContaining(["user", "number"]));
+      const client = createClient({ primaryUrl: url, max: 1, env: {} });
+      try {
+        const rejected = await rejectionOf(run(client.primary));
+        expect(rejected).toBeInstanceOf(DataAccessDatabaseError);
+        expect(rejected).toMatchObject({ call, code, table: null, constraint: null });
+        expect(leaksOf(rejected, secrets)).toEqual([]);
+      } finally {
+        await client.close();
+      }
+    } finally {
+      await server.close();
+    }
   });
 });
 

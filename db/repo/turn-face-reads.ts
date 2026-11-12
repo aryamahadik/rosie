@@ -359,7 +359,7 @@ export async function readOpenHolds(
       readOpenHoldsIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readOpenHolds");
   }
 }
 
@@ -774,7 +774,7 @@ export async function readOutboxRow(
       readOutboxRowIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readOutboxRow");
   }
 }
 
@@ -861,6 +861,6 @@ export async function readFixedLineFacts(
       readFixedLineFactsIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readFixedLineFacts");
   }
 }

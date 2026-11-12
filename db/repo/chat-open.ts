@@ -460,7 +460,7 @@ export async function openChatOnText(
     );
   } catch (error) {
     try {
-      return transientOrThrow(error);
+      return transientOrThrow(error, CALL);
     } catch {
       throw scrubbed(error);
     }

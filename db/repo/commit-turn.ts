@@ -1485,7 +1485,7 @@ export async function commitTurn(
       return refused;
     }
     try {
-      return transientOrThrow(error);
+      return transientOrThrow(error, "commitTurn");
     } catch {
       throw scrubbed(error);
     }

@@ -78,7 +78,7 @@ import { NOT_STATE_TABLES } from "./commit-turn";
 import { appendEvent, type EventContext, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
-import { assertRequestShape, inRuntimeTransaction, transientOrThrow, utc } from "./targets";
+import { assertRequestShape, inRuntimeTransaction, isSessionFailure, transientOrThrow, utc } from "./targets";
 
 type Json = Parameters<Sql["json"]>[0];
 type Row = Record<string, unknown>;
@@ -324,7 +324,9 @@ function nameOrNull(value: unknown): string | null {
  * name failed), and postgres.js puts the statement on every error it rejects a statement with (query, parameters, args,
  * types, and the statement's origin on its stack; args holds the statement's values even when the connection never
  * opened). It is known by those properties, which db/repo's own errors never carry, or by syscall and errno, Node's mark
- * of a system error.
+ * of a system error, or as a failure to open or keep a session (targets.ts isSessionFailure: a TLS or certificate error,
+ * postgres.js's SASL_SIGNATURE_MISMATCH, with no such property), which transientOrThrow throws through here (T-1268
+ * round 2).
  */
 export function scrubbed(call: string, error: unknown): unknown {
   if (!(error instanceof Error)) {
@@ -353,7 +355,11 @@ export function scrubbed(call: string, error: unknown): unknown {
     "syscall",
     "errno",
   ];
-  if (error.name !== "PostgresError" && !clientFields.some((field) => Object.hasOwn(error, field))) {
+  if (
+    error.name !== "PostgresError" &&
+    !clientFields.some((field) => Object.hasOwn(error, field)) &&
+    !isSessionFailure(error)
+  ) {
     return error;
   }
   const code =
@@ -367,7 +373,7 @@ export function scrubbed(call: string, error: unknown): unknown {
 /** The transient answer, or the error thrown on, scrubbed of any value (K-05 README: every call may answer transient). */
 export function transientOrScrubbed(call: string, error: unknown): K05.TransientError {
   try {
-    return transientOrThrow(error);
+    return transientOrThrow(error, call);
   } catch {
     throw scrubbed(call, error);
   }
