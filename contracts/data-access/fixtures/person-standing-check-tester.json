@@ -1,0 +1,18 @@
+{
+  "call": "personStanding",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-11-12T04:05:00Z",
+    "note": "Staging's check tester (v1.12 default 105), whose six rows no frozen seed holds, so the database side writes them as read-tester-standing-check-tester's note lists them (persons person-check-tester; its email handle and link; its live team_page_recipients row team-check-tester; its used sign-in code; its live session). No role; a live K-36 team row, so team true, and by v1.12's rule (default 103) tester true."
+  },
+  "request": {
+    "personId": "person-check-tester"
+  },
+  "outcome": {
+    "personId": "person-check-tester",
+    "roles": [],
+    "team": true,
+    "tester": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [],
+    "now": "2026-10-28T15:10:00Z",
+    "note": "start-sign-in-contact-paused's twin for a contact no account holds: K-22 seed-sign-in-attempt.json's attempt sign-in-no-account-oct28-1505, five wrong checks with no code, paused until 15:22:10Z as Sam's was. A new start for that contact answers paused until the same time, by the same rule, writing nothing: a pause answers alike for any typed contact (K-21 v1 schema line 780; ADR-016 section 4)."
+  },
+  "request": {
+    "id": "sign-in-someone-oct28-1510",
+    "attemptId": "attempt-someone-signin-oct28-1510",
+    "requestSha256": "aab9cadbecf0a1b2c3d4e5f607182936aab9cadbecf0a1b2c3d4e5f607182936",
+    "deviceSha256": "d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+    "contact": { "kind": "email", "address": "someone@example.com" },
+    "contactHash": "c2a3b4c5d6e7f8091a2b3c4d5e6f7081c2a3b4c5d6e7f8091a2b3c4d5e6f7081",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "paused",
+    "until": "2026-10-28T15:22:10Z",
+    "by": "contactPause"
+  }
+}

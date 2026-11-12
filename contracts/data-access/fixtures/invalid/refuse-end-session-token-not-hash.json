@@ -1,0 +1,19 @@
+{
+  "call": "endSession",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T14:00:00Z",
+    "note": "end-session-sam with the session token itself (a placeholder) where its sha256 goes: the token is a key, so only its sha256 leaves the page call (K-22 sessions_token_hash_form; K-21 'Never in a span or a log')."
+  },
+  "request": {
+    "tokenSha256": "placeholder-session-token-sam-nov02"
+  },
+  "outcome": {
+    "result": "signedOut",
+    "repeated": false,
+    "sessionId": "session-sam-nov02",
+    "personId": "person-sam"
+  }
+}

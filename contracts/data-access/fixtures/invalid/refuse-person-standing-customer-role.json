@@ -1,0 +1,6 @@
+{
+  "personId": "person-alex",
+  "roles": [{ "role": "customer", "businessId": "biz-lees-barbershop" }],
+  "team": false,
+  "tester": false
+}

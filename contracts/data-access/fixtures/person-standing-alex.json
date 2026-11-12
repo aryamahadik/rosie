@@ -1,0 +1,18 @@
+{
+  "call": "personStanding",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-02T13:01:30Z",
+    "note": "Alex holds only customer roles (K-04 seed-person-roles.json: at Lee's Barbershop and the yoga studio). A customer role is no standing, since customers have no sign-in (FS line 701; K-21's SignedInRole has none), so his roles are empty, and he is on no team row."
+  },
+  "request": {
+    "personId": "person-alex"
+  },
+  "outcome": {
+    "personId": "person-alex",
+    "roles": [],
+    "team": false,
+    "tester": false
+  }
+}

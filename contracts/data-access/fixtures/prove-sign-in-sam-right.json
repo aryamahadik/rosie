@@ -1,0 +1,29 @@
+{
+  "call": "proveSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json"],
+    "now": "2026-11-02T13:01:30Z",
+    "note": "Sam types the right code on his laptop 89 seconds after it went. As the Tool API: sign_in_attempt binds his attempt to this device; the look finds no earlier check of this request; the attempt is not signed in, paused or past its 10 minutes; check_proof_code answers right and sets the code's used_at. rosie.person_id is set to the attempt's person, Sam, in this transaction; device_known answers true (his sessions of Oct 20 and Oct 26 came from this device), so the session starts under K-22 rule 5's insert policy, naming the code, its token's sha256 alone written, expiring 30 days on; the check is recorded signedIn and the attempt names the session. The token leaves the page call in this one answer (K-21 README line 115). The token hash is a stand-in."
+  },
+  "request": {
+    "attemptId": "attempt-sam-signin-nov02",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "requestId": "req-portal-sam-nov02-check-1",
+    "typedHash": "f3e4d5c6b7a8998a7b6c5d4e3f201102f3e4d5c6b7a8998a7b6c5d4e3f201102",
+    "session": {
+      "id": "session-sam-nov02",
+      "tokenSha256": "b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1"
+    }
+  },
+  "outcome": {
+    "outcome": "signedIn",
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "personId": "person-sam",
+    "sessionId": "session-sam-nov02",
+    "sessionExpiresAt": "2026-12-02T13:01:30Z",
+    "proofCodeId": "code-sam-sign-in-nov02",
+    "repeated": false
+  }
+}
