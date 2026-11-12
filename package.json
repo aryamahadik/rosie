@@ -65,6 +65,7 @@
     "seed:staging": "bash infra/scripts/seed-staging.sh",
     "secrets:staging": "bash infra/scripts/put-staging-secrets.sh",
     "secrets:staging:make": "bash infra/scripts/make-staging-secrets.sh",
+    "check-tester:token:make": "node infra/scripts/make-check-tester-token.mjs",
     "hyperdrive:staging:create": "bash infra/scripts/create-staging-hyperdrive.sh"
   },
   "devDependencies": {
