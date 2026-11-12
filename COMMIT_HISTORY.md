@@ -2,9 +2,71 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 444, [`69d322c`](https://github.com/aryamahadik/rosie/commit/69d322c), 2026-11-12 07:30:01 UTC.
+- **Through:** commit 447, [`17c4bfa`](https://github.com/aryamahadik/rosie/commit/17c4bfa), 2026-11-12 07:52:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 447. docs: COMMIT\_HISTORY.md through commit 444 (69d322c, \#449) (\#457)
+
+- **Commit:** [`17c4bfa`](https://github.com/aryamahadik/rosie/commit/17c4bfa), by Arya Mahadik, 2026-11-12 07:52:03 UTC
+- **Pull request:** [#457](https://github.com/aryamahadik/rosie/pull/457) from `task/commit-history-40`, merged 2026-11-12 07:52:04 UTC. It squashed 1 branch commit:
+  - `9c07e1b` docs: COMMIT\_HISTORY.md through commit 444 (69d322c, \#449)
+- **Files changed:** 1 (+165 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +165 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 446. T-322: proof codes: sendProofCode and proveCode made alone (a sign-in code as one email row with its words, or a ready text from that mobile, never a first text), the code drawn from Web Crypto with the top range rejected, its keyed hash through the root's port, a 10-minute life and a 15-minute pause after 5 wrong tries in code before any try, a 32-byte session token, and their unit tests against K-09's fixtures and a K-22 double (\#456)
+
+- **Commit:** [`aa35c54`](https://github.com/aryamahadik/rosie/commit/aa35c54), by Arya Mahadik, 2026-11-12 07:52:00 UTC
+- **Pull request:** [#456](https://github.com/aryamahadik/rosie/pull/456) from `task/T-322`, merged 2026-11-12 07:52:00 UTC. It squashed 1 branch commit:
+  - `ba0892a` T-322: proof codes: sendProofCode and proveCode made alone (a sign-in…
+- **Files changed:** 12 (+2246 −0), by folder:
+  - `actions/src/domain/proof-codes/` check.ts +168 −0, draw.test.ts +104 −0, draw.ts +94 −0, handlers.ts +59 −0, hashing.ts +84 −0, index.ts +89 −0, ports.ts +197 −0, proof-codes.test.ts +591 −0, rules.ts +147 −0, send.ts +309 −0, test-support.ts +311 −0, words.ts +93 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 445. T-1275: K-08 v1.2, the session.started and session.ended entries (ADR-016 card V4) (\#454)
+
+- **Commit:** [`fd224c1`](https://github.com/aryamahadik/rosie/commit/fd224c1), by Arya Mahadik, 2026-11-12 07:51:56 UTC
+- **Pull request:** [#454](https://github.com/aryamahadik/rosie/pull/454) from `task/T-1275`, merged 2026-11-12 07:51:57 UTC. It squashed 2 branch commits:
+  - `623913d` T-1275: freeze K-08 v1.2, a sign-in session's start and end (ADR-016 …
+  - `f35bf50` T-1275: K-08 v1.2 wording: a token under a column name the schema doe…
+- **Files changed:** 9 (+907 −4), by folder:
+  - `contracts/event-trace/` README.md +69 −3, event-trace.v1.2.schema.json +699 −0, frozen.json +1 −1
+  - `contracts/event-trace/fixtures/` event-session-ended.json +20 −0, event-session-started.json +27 −0, index.json +32 −0
+  - `contracts/event-trace/fixtures/invalid/` refuse-session-device-hash-in-clear.json +24 −0, refuse-session-token-in-clear.json +28 −0
+  - `tests/contract/` event-trace.v1.test.ts +7 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1275: freeze K-08 v1.2, a sign-in session's start and end (ADR-016 card V4): v1.2 schema (session.started and session.ended as added, team-only kinds; a session's row holds no sealed value, no K-21 token column and no value that reads as a hash; every v1 and v1.1 kind checked as before), 2 accepted and 2 refused fixtures (a token, a device hash) with their index entries, v1.2 in frozen.json, README v1.2 sections; the K-08 contract test reads v1.2's kinds table beside v1's and v1.1's (DL-455's grant)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1275: K-08 v1.2 wording: a token under a column name the schema does not list has no form a schema can tell (K-21 opaqueToken), so it stays the writers' and the contract test's check; the schema refuses the token and both hashes under their own names, any 64-hex value and any sealed bytes (README default 26, freeze record, 'What the schema checks'; schema description and sessionValues). No rule changed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 444. docs: COMMIT\_HISTORY.md through commit 438 (a363a26, \#446) (\#449)
 
