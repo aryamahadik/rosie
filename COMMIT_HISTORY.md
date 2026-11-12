@@ -2,9 +2,79 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 422, [`44dab4d`](https://github.com/aryamahadik/rosie/commit/44dab4d), 2026-11-11 23:59:30 UTC.
+- **Through:** commit 425, [`14d7e61`](https://github.com/aryamahadik/rosie/commit/14d7e61), 2026-11-12 00:54:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 425. docs: COMMIT\_HISTORY.md through commit 422 (44dab4d, \#429) (\#430)
+
+- **Commit:** [`14d7e61`](https://github.com/aryamahadik/rosie/commit/14d7e61), by Arya Mahadik, 2026-11-12 00:54:03 UTC
+- **Pull request:** [#430](https://github.com/aryamahadik/rosie/pull/430) from `task/commit-history-32`, merged 2026-11-12 00:54:04 UTC. It squashed 1 branch commit:
+  - `934f682` docs: COMMIT\_HISTORY.md through commit 422 (44dab4d, \#429)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 424. T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (rounds 1 to 3, squashed onto main 44dab4d so the merge check's rebase replays it; DL-417) (\#433)
+
+- **Commit:** [`5b71e3c`](https://github.com/aryamahadik/rosie/commit/5b71e3c), by Arya Mahadik, 2026-11-12 00:53:59 UTC
+- **Pull request:** [#433](https://github.com/aryamahadik/rosie/pull/433) from `task/T-1241-r3`, merged 2026-11-12 00:54:00 UTC. It squashed 1 branch commit:
+  - `4490a09` T-1241: design record ADR-015, where the arrival safety read's result…
+- **Files changed:** 2 (+229 −0), by folder:
+  - `docs/adr/` 0015-safety-result-until-commit.md +228 −0, README.md +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 423. T-1238: staging's test-phone line keeps a bounded record, the oldest dropped first (P6a) (\#431)
+
+- **Commit:** [`e2ef567`](https://github.com/aryamahadik/rosie/commit/e2ef567), by Arya Mahadik, 2026-11-12 00:53:54 UTC
+- **Pull request:** [#431](https://github.com/aryamahadik/rosie/pull/431) from `task/T-1238`, merged 2026-11-12 00:53:55 UTC. It squashed 5 branch commits:
+  - `0f40b88` T-1238: staging's test-phone line keeps a bounded record: at most 200…
+  - `947bc83` T-1238: line.ts header says the doubles' own memory still lasts until…
+  - `69e13c5` Merge branch 'main' into task/T-1238
+  - `69c3f0d` T-1238: the line keeps an email only when the email double newly reco…
+  - `444417a` T-1238: tests: a repeat of a key the cap dropped (its recipient dropp…
+- **Files changed:** 2 (+677 −25), by folder:
+  - `runtime/src/wiring/test-phone/` line.cap.worker.test.ts +551 −0, line.ts +126 −25
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1238: staging's test-phone line keeps a bounded record: at most 200 parts and 100 emails per recipient and 20 recipients of each in all; the record that would pass a cap drops the recipient's oldest, or the recipient sent to least recently whole, in the same transaction; a repeated key stores and drops nothing; T-565's recorder lives for one send
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1238: line.ts header says the doubles' own memory still lasts until eviction (comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1238: the line keeps an email only when the email double newly recorded it in this call, as T-565's recorder keeps a part; a repeat of a key the cap dropped stores and drops nothing; line.ts's header says the line's record mirrors what the doubles sent and remembers no dropped key (DL-504)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1238: tests: a repeat of a key the cap dropped (its recipient dropped whole, or past its recipient's cap) stores nothing and drops nothing, for emails and parts; after an eviction such a repeat is the new double's send, kept once as any new send
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 422. docs: COMMIT\_HISTORY.md through commit 420 (2f113ee, \#427) (\#429)
 
@@ -9829,3 +9899,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#332](https://github.com/aryamahadik/rosie/pull/332) T-1186: the Worker answers the test-phone page's two calls on staging (`task/T-1186`, 14 branch commits, closed 2026-11-11 00:15:54 UTC)
 - [#343](https://github.com/aryamahadik/rosie/pull/343) T-1179: the compiler's publish keeps a database URL that does not parse out of every error (`task/T-1179`, 1 branch commit, closed 2026-11-11 05:01:21 UTC)
 - [#345](https://github.com/aryamahadik/rosie/pull/345) T-560: join hop 9, compose input from the Tool API and the composer's message plan (`task/T-560`, 3 branch commits, closed 2026-11-11 01:25:04 UTC)
+- [#432](https://github.com/aryamahadik/rosie/pull/432) T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (`task/T-1241`, 4 branch commits, closed 2026-11-12 00:35:31 UTC)
