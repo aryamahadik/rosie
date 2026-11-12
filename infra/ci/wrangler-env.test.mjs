@@ -1,14 +1,15 @@
 // Tests for wrangler.jsonc's env.production (T-1003): its own Worker and resource names (none shared with staging),
 // the pinned account, the same binding names as the top level, no route (it stays a comment until the user says yes),
 // and no key or secret value in the file. Also (T-1235) the link host, LINK_HOST, in each environment, and
-// env.staging's own FILES bucket. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
+// env.staging's own FILES bucket; and (T-1304) Rosie's own number, which no section names and no tracked config or
+// script holds. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
-import { REPO } from "./script-harness.mjs";
+import { REPO, SCRIPTS } from "./script-harness.mjs";
 
 const ROSFIELD_ACCOUNT_ID = "ecb06e7bc9129fa81104d331e9652362";
 // The host every link starts with (T-1235), set as the var LINK_HOST in each environment: a bare host, no scheme.
@@ -285,5 +286,102 @@ describe("env.production checks catch a broken copy", () => {
       broken((c) => delete c.env.production.r2_buckets),
       [],
     );
+  });
+});
+
+// Rosie's own number (T-1304; CQ-253 as DL-542 refines it): staging's Worker gets it only at deploy, by name
+// (infra/scripts/deploy-staging.sh's --var ROSIE_NUMBER, from the environment or the git-ignored .dev.vars), since
+// the repository is public (DL-436) and no real phone number goes in it. So no section of wrangler.jsonc names
+// ROSIE_NUMBER, and no line of wrangler.jsonc, package.json or any infra/scripts file holds a phone number outside
+// the fiction range: +1, an area code, then 555-0100 to 555-0199, as adapters/src/shared/samples.ts and the Linq
+// double read it.
+const FICTIONAL_PHONE = /^\+1[2-9][0-9]{2}55501[0-9]{2}$/;
+// The ways a number is written: a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a
+// North American number without the +: an area code (bracketed or not), an exchange and a line, with a 1 or none.
+const PLUS_FORM = /(?<![0-9A-Za-z])\+[1-9](?:[ ().-]{0,2}[0-9]){6,14}(?![0-9])/g;
+const NANP_FORM =
+  /(?<![0-9A-Za-z+])(?:1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-]?[0-9]{4}(?![0-9A-Za-z])/g;
+
+/** Every phone number a line holds, each once, in E.164 form. */
+function phoneNumbersIn(line) {
+  const numbers = new Set();
+  for (const [match] of line.matchAll(PLUS_FORM)) numbers.add(`+${match.replace(/[^0-9]/g, "")}`);
+  for (const [match] of line.matchAll(NANP_FORM)) numbers.add(`+1${match.replace(/[^0-9]/g, "").slice(-10)}`);
+  return [...numbers];
+}
+
+/** "<file>:<line>" for each line of the files (name to text) that holds a number outside the fiction range. */
+function outsideFiction(files) {
+  const found = [];
+  for (const [name, text] of Object.entries(files)) {
+    text.split("\n").forEach((line, index) => {
+      if (phoneNumbersIn(line).some((number) => !FICTIONAL_PHONE.test(number)))
+        found.push(`${name}:${index + 1}`);
+    });
+  }
+  return found;
+}
+
+describe("Rosie's own number in no tracked config (T-1304)", () => {
+  it("is named in no section of wrangler.jsonc: no var and no secret, at the top level or in either environment", () => {
+    for (const [where, section] of [
+      ["the top level", config],
+      ["env.staging", config.env.staging],
+      ["env.production", config.env.production],
+    ]) {
+      assert.ok(!Object.hasOwn(section.vars ?? {}, "ROSIE_NUMBER"), `${where}'s vars name ROSIE_NUMBER`);
+      assert.ok(
+        !(section.secrets?.required ?? []).includes("ROSIE_NUMBER"),
+        `${where} requires ROSIE_NUMBER`,
+      );
+    }
+  });
+
+  it("finds no phone number outside the fiction range in wrangler.jsonc, package.json or any infra/scripts file", () => {
+    const files = {
+      "wrangler.jsonc": raw,
+      "package.json": readFileSync(path.join(REPO, "package.json"), "utf8"),
+    };
+    for (const entry of readdirSync(SCRIPTS, { withFileTypes: true })) {
+      if (entry.isFile())
+        files[`infra/scripts/${entry.name}`] = readFileSync(path.join(SCRIPTS, entry.name), "utf8");
+    }
+    assert.ok("infra/scripts/deploy-staging.sh" in files);
+    assert.deepEqual(outsideFiction(files), []);
+  });
+
+  it("reads a number however it is written, as E.164, and no id as a number", () => {
+    for (const written of [
+      "+15555550142",
+      "+1 555 555 0142",
+      "+1-555-555-0142",
+      "+1 (555) 555-0142",
+      "(555) 555-0142",
+      "555-555-0142",
+      "555.555.0142",
+      "5555550142",
+      "1-555-555-0142",
+      "15555550142",
+    ]) {
+      assert.deepEqual(phoneNumbersIn(`ROSIE_NUMBER=${written} # Rosie's line`), ["+15555550142"], written);
+    }
+    assert.deepEqual(phoneNumbersIn('"+15555550199", "(555) 555-0100"'), ["+15555550199", "+15555550100"]);
+    assert.deepEqual(phoneNumbersIn(`"${ROSFIELD_ACCOUNT_ID}", "${"0".repeat(31)}1", "2026-11-01"`), []);
+  });
+
+  it("lets the fiction range pass, and names the file and line of any other number, never the number", () => {
+    assert.deepEqual(outsideFiction({ "a.sh": 'ROSIE_NUMBER="+15555550142"\necho "(555) 555-0199"\n' }), []);
+    // Outside the range, yet no one's number: no North American area code starts with 0 or 1, so each number below
+    // is a fiction-range line under an area code that cannot exist.
+    const copy = structuredClone(config);
+    copy.env.staging.vars.ROSIE_NUMBER = "+10555550142";
+    const text = JSON.stringify(copy, null, 2);
+    const at = text.split("\n").findIndex((line) => line.includes("ROSIE_NUMBER")) + 1;
+    const found = outsideFiction({
+      "wrangler.jsonc": text,
+      "deploy.sh": 'set -e\n--var "ROSIE_NUMBER:+1 155 555 0142"\n',
+    });
+    assert.deepEqual(found, [`wrangler.jsonc:${at}`, "deploy.sh:2"]);
+    assert.ok(found.every((place) => !place.includes("0142")));
   });
 });
