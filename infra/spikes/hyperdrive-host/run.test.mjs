@@ -142,7 +142,8 @@ function checkout(t, plan, { exists = false } = {}) {
   for (const file of ["run.sh", "helpers.mjs", "redact.mjs", "probe.mjs"]) {
     cpSync(join(HERE, file), join(spike, file));
   }
-  for (const file of ["lib.sh", "cf.sh"]) {
+  // helpers.mjs imports the `hyperdrive list` parser from infra/scripts/hyperdrive-list.mjs (T-1252).
+  for (const file of ["lib.sh", "cf.sh", "hyperdrive-list.mjs"]) {
     cpSync(join(SCRIPTS, file), at("infra", "scripts", file));
   }
   // cf.sh refuses a config that does not name its account and staging's Worker.
