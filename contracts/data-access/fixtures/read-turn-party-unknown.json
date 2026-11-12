@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-08T14:00:03Z",
+    "note": "A number no K-04 handle holds (+15555550199, an example in the 555-01xx range). The gateway's handleSealingKey writes a handle at its first sight, before its text reaches the actor (item 29), so a turn asks for a handle K-04 does not hold only when the record lost it. Every field null: the directory answers null, and no turn or park runs (runtime/src/turn/turn.ts and park.ts: unknownHandle; item 52, default 96)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550199" }
+  },
+  "outcome": {
+    "handleId": null,
+    "businessId": null,
+    "personId": null,
+    "zone": null
+  }
+}
