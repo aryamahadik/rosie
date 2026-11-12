@@ -1910,7 +1910,7 @@
       "def": "readTurnParty.exchange",
       "expect": "accept",
       "shows": "Sam's sign-up between S1-04 and S1-09: his two companies have no business yet, so no row names one and the turn runs with no business and no zone, on the runtime side, as sign-up's turns run",
-      "source": "K-09 journey 1 table (S1-04 companies, S1-09 business); K-23 v1 README rule 5; K-09 v1 caller.businessId; K-05 v1.2 default 25; K-05 v1.11 item 52, defaults 98 and 101"
+      "source": "K-09 README, the table of journeys 1 and 2 (S1-04 companies, S1-09 business); K-23 v1 README rule 5; K-09 v1 caller.businessId; K-05 v1.2 default 25; K-05 v1.11 item 52, defaults 98 and 101"
     },
     {
       "file": "read-turn-party-first-text.json",
