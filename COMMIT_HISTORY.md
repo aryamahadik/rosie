@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 459, [`9f1d8da`](https://github.com/aryamahadik/rosie/commit/9f1d8da), 2026-11-12 10:59:16 UTC.
+- **Through:** commit 461, [`d43a295`](https://github.com/aryamahadik/rosie/commit/d43a295), 2026-11-12 12:04:32 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 461. docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469) (\#471)
+
+- **Commit:** [`d43a295`](https://github.com/aryamahadik/rosie/commit/d43a295), by Arya Mahadik, 2026-11-12 12:04:32 UTC
+- **Pull request:** [#471](https://github.com/aryamahadik/rosie/pull/471) from `task/commit-history-46`, merged 2026-11-12 12:04:32 UTC. It squashed 1 branch commit:
+  - `938c5d1` docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 460. T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport and keyword off first; the put script never puts a made name (\#470)
+
+- **Commit:** [`b0b4f6a`](https://github.com/aryamahadik/rosie/commit/b0b4f6a), by Arya Mahadik, 2026-11-12 12:04:22 UTC
+- **Pull request:** [#470](https://github.com/aryamahadik/rosie/pull/470) from `task/T-1261`, merged 2026-11-12 12:04:22 UTC. It squashed 2 branch commits:
+  - `0958d53` T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport an…
+  - `cb8240a` T-1261: put-staging-secrets.test.mjs's devVars() writes RESEND\_API\_KE…
+- **Files changed:** 5 (+690 −83), by folder:
+  - `infra/ci/` README.md +2 −2, cf.test.mjs +283 −1, put-staging-secrets.test.mjs +334 −61
+  - `infra/scripts/` cf.sh +19 −0, put-staging-secrets.sh +52 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport and keyword off first and drop their working names before lib.sh is sourced; put-staging-secrets.sh never puts or takes a value for a name make-staging-secrets.sh makes (DL-549), printing it as made in place, never put
+
+Tests: T-1236's caller set-ups for both scripts (working names exported, bash -a, SHELLOPTS=allexport, --posix -a, bash -k, SHELLOPTS=keyword, mixes) with recorders in front of wrangler and node; a checkout value for each made name is never put; the made list matches make-staging-secrets.sh's MADE. infra/ci/README.md lines 5 and 7.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1261: put-staging-secrets.test.mjs's devVars() writes RESEND_API_KEY, a name the script puts, as an indented export NAME='value' line, so the byte-for-byte case again proves all three line forms on a value put (DL-568, the architect's 6.6 ruling); LINQ_WEBHOOK_SECRET's line is kept for the DL-549 proof; no script changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 459. docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467) (\#469)
 
