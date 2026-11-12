@@ -11,55 +11,9 @@
 import { randomBytes } from "node:crypto";
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 
-/** A terminal's colour codes (escape, "[", digits and ";", "m"), which wrangler puts around a table on a terminal. */
-const COLOUR_CODES = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, "g");
-
-/**
- * The row of `wrangler hyperdrive list` for the configuration named `name`: { id, caching }, or null when the list
- * has none. Wrangler 4.158.0 prints the account's configurations as a table (cells between "│") with the columns
- * id, name, user, host, port, scheme, database, caching, mtls and origin_connection_limit, and no table when there
- * are none. Only the id and the caching cell leave this function. Throws with exitCode 2 when the text cannot be
- * read, and 3 when two configurations have the name.
- */
-export function hyperdriveRow(listing, name) {
-  const fail = (exitCode, message) => Object.assign(new Error(message), { exitCode });
-  const text = String(listing).replace(COLOUR_CODES, "");
-  const rows = text
-    .split("\n")
-    .filter((line) => line.startsWith("│"))
-    .map((line) =>
-      line
-        .split("│")
-        .slice(1, -1)
-        .map((cell) => cell.trim()),
-    );
-  if (rows.length === 0) {
-    if (text.includes(name)) {
-      throw fail(2, "the list names the configuration, but not in a table");
-    }
-    return null;
-  }
-  const [head, ...data] = rows;
-  const idAt = head.indexOf("id");
-  const nameAt = head.indexOf("name");
-  const cachingAt = head.indexOf("caching");
-  if (idAt < 0 || nameAt < 0) {
-    throw fail(2, "the list's table has no id or name column");
-  }
-  const found = data.filter((row) => row[nameAt] === name);
-  if (found.length > 1) {
-    throw fail(3, "more than one configuration has the name");
-  }
-  if (found.length === 0) {
-    return null;
-  }
-  const id = found[0][idAt] ?? "";
-  if (!/^[0-9a-f]{32}$/.test(id)) {
-    throw fail(2, "the configuration's id is not 32 hex characters");
-  }
-  const caching = cachingAt < 0 ? "?" : (found[0][cachingAt] ?? "").replace(/[^A-Za-z0-9_:,. -]/g, "");
-  return { id, caching: caching === "" ? "?" : caching };
-}
+// The `hyperdrive list` parser moved to infra/scripts/hyperdrive-list.mjs (ADR-014; T-1252): one parser for the spike,
+// the create script and T-1093's check. `row` below still prints only the id and the caching cell.
+import { hyperdriveRow } from "../../scripts/hyperdrive-list.mjs";
 
 /** "pooled" when the URL's host is a pooled one (Neon marks it "-pooler"), else "direct". Throws on any other text. */
 export function hostKind(url) {
