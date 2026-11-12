@@ -1,0 +1,820 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/inbound-event/inbound-event.v1.2.schema.json",
+  "title": "InboundEventV1dot2",
+  "description": "K-06, the inbound event, v1.2 (T-1296), a minor version. The root is v1's event exactly: it is inbound-event.v1.schema.json (frozen and unchanged; v1.1 is v1's shape too), through allOf, with v1's required list repeated. So every v1 and v1.1 event is a v1.2 event. (v1.1 refers to v1 by a root $ref; v1.2 goes through allOf so that the type generator, which follows a root $ref before it reads this file's own $defs, finds them.) v1.2 adds two things. (1) The named rule scrubbedV1dot2 (inbound-event.rules.mjs): a poll's option words follow the body's scrub, v1.1's reading, before anything is kept, because a vote for an option someone added reads as typed words (arch 07 line 379; S13-24 rule 6), and scrubbed counts what was swapped in them too (arch 02 line 109; arch 10 line 516; RULES 4.5 line 199: 'Never kept at all: full card numbers outside the card box, full Social Security numbers'; CQ-58). (2) Under $defs, the sealed hand-off: the event as the gateway hands it to the handle's actor and as the actor keeps it (sealedEvent), with its words (the body, an email's subject and a poll's option words) taken out and sealed in a box of form version 2 (sealedBox, opened to sealedWords), never kept as a plain field; and the form version 1 box and event the gateway made before v1.2 (sealedBoxV1, sealedWordsV1, sealedEventV1), which are never made again and still open and read as they are (T-243; CQ-58; T-1265's security review). Owner: the architect.",
+  "type": "object",
+  "allOf": [
+    {
+      "description": "v1's event, frozen and unchanged: its fields, its required list, additionalProperties false and both dependentSchemas. Under v1.2 the body, an email's subject and a poll's option words take the scrub (scrubbedV1dot2), scrubbed counts what was swapped in all three, and the gateway seals all three in one box (sealedEvent).",
+      "$ref": "inbound-event.v1.schema.json"
+    }
+  ],
+  "required": [
+    "eventId",
+    "provider",
+    "handle",
+    "service",
+    "kind",
+    "messageId",
+    "chatId",
+    "sentAt",
+    "receivedAt",
+    "body",
+    "scrubbed",
+    "attachments",
+    "threadedReplyTo",
+    "poll",
+    "reaction",
+    "edit",
+    "status",
+    "fromRosie",
+    "email",
+    "traceId"
+  ],
+  "$defs": {
+    "sealedEvent": {
+      "title": "SealedEvent",
+      "description": "The sealed hand-off of v1.2: the event as the gateway hands it to the handle's actor and as the actor keeps it (the inbox stores it whole; T-243, T-244). It is the v1.2 event after the scrub with every word a person typed taken out and sealed in one box under the handle's key: no body, an email reply's email without its subject, a vote's poll without its option words. Every other field is the event's, in the clear, so the actor orders, dedupes and routes on it (arch 02 line 109: 'Before any write it swaps card numbers ... and Social Security numbers for a tag. It writes the sealed event to the handle's actor'; arch 10 line 516: 'private data sealed under a per-person key'; CQ-58). Only the six kinds that go to the handle's actor take this form (README 'Routing'); a delivery receipt has no words and goes to the dispatcher as the event is.",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "The event's eventId, unchanged: the dedupe key (arch 02 line 109), and with the actor name the box's additional data (sealedBox).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "provider": {
+          "description": "The event's provider, unchanged (02-contracts K-06).",
+          "$ref": "inbound-event.v1.schema.json#/$defs/provider"
+        },
+        "handle": {
+          "description": "The event's handle, unchanged. It names the handle's actor, '<kind>:<address>' (arch 10 line 502: one actor per handle), and the key the box is sealed under (NQ-RT-1's default: the handle's key, made on first sight; T-243).",
+          "$ref": "inbound-event.v1.schema.json#/$defs/handle"
+        },
+        "service": {
+          "description": "The event's service, unchanged (arch 07 line 365).",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/service"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "description": "One of the six kinds that go to the handle's actor, in order (README 'Routing'; arch 02 line 113). The receipts (delivered, sent, failed) go to the dispatcher and clock arming, never to the actor, so they never take this form.",
+          "type": "string",
+          "enum": ["text", "photo", "reaction", "pollVote", "voteRemoved", "edit"]
+        },
+        "messageId": {
+          "description": "The event's messageId, unchanged (arch 07 lines 389, 391).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "chatId": {
+          "description": "The event's chatId, unchanged (K-04 threads.linq_chat_id).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sentAt": {
+          "description": "The event's sentAt, unchanged (arch 06 line 309).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receivedAt": {
+          "description": "The event's receivedAt, unchanged: the actor's order (README default 2; arch 02 line 113).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "scrubbed": {
+          "description": "The event's counts, unchanged: under v1.2 they take in what the scrub swapped in the option's words too (README 'Named rule (v1.2)'; arch 02 line 109). Counts only, never a word.",
+          "$ref": "inbound-event.v1.schema.json#/$defs/scrubbed"
+        },
+        "attachments": {
+          "description": "The event's attachments, unchanged: ids and media types, never a file's content (02-contracts K-06 and K-02).",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/attachment"
+          }
+        },
+        "threadedReplyTo": {
+          "description": "The event's threadedReplyTo, unchanged (arch 07 line 389).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "poll": {
+          "description": "For a vote or a vote removed, the poll and the option by their ids only, which the actor matches on (K-04 outbox_parts.linq_message_id and linq_option_ids; S13-24 rule 6). The option's words are in the box (sealedWords.optionWords), never here (CQ-58; RULES 4.5 line 199). Null for every other kind.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedPoll"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reaction": {
+          "description": "The event's reaction, unchanged: a tapback's name as the Linq port reports it, such as like, and the id of the message it is on (arch 07 line 391). A name from the port's list (README open gaps), not words a person typed.",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/reaction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "edit": {
+          "description": "The event's edit, unchanged: the id of the message edited; the new words are in the box (sealedWords.body) (arch 11 line 584).",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/edit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "description": "Always null: a delivery receipt never reaches the actor (README 'Routing'; arch 02 line 127).",
+          "type": "null"
+        },
+        "fromRosie": {
+          "description": "The event's fromRosie, unchanged: Rosie's own reaction starts no turn (arch 07 line 391).",
+          "type": "boolean"
+        },
+        "email": {
+          "description": "For an email reply, its reply address and sender check; its subject is in the box (sealedWords.subject), never here (arch 02 line 109). Null for Linq.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedEmailReply"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traceId": {
+          "description": "The event's traceId, unchanged (arch 10 line 548).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "sealed": {
+          "description": "The event's words after the scrub, sealed under the handle's key: a box of form version 2 for every kind with words (a text, a photo, an edit, an email reply, a vote and a vote removed), null for a reaction, which has none (T-243; CQ-58). The gateway seals only after the scrub, so what the box holds passes scrubbedV1dot2's reading.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedBox"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "eventId",
+        "provider",
+        "handle",
+        "service",
+        "kind",
+        "messageId",
+        "chatId",
+        "sentAt",
+        "receivedAt",
+        "scrubbed",
+        "attachments",
+        "threadedReplyTo",
+        "poll",
+        "reaction",
+        "edit",
+        "status",
+        "fromRosie",
+        "email",
+        "traceId",
+        "sealed"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "provider": {
+          "description": "An email reaches the actor only as a reply (kind text), so it carries its email, subject sealed; a Linq event carries none (RULES 4.1, 6.1; 02-contracts K-12; README 'Routing').",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "provider": {
+                    "description": "02-contracts K-11.",
+                    "const": "linq"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "email": {
+                    "description": "RULES 4.1.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "provider": {
+                    "description": "02-contracts K-12.",
+                    "const": "email"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "kind": {
+                    "description": "An email reply is kind text (README default 5); the email provider's receipts go to the dispatcher.",
+                    "const": "text"
+                  },
+                  "email": {
+                    "description": "RULES 4.1, 6.1: the reply address and the sender check; the subject is sealed.",
+                    "$ref": "#/$defs/sealedEmailReply"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "kind": {
+          "description": "Where each kind's words are: in the box for every kind that has words, nowhere for a reaction (CQ-58; T-243). A vote names its poll by ids only.",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06: the kinds with words.",
+                    "enum": ["text", "photo", "edit", "pollVote", "voteRemoved"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "sealed": {
+                    "description": "A text's, a caption's, an edit's or an email reply's words, or a vote's option words: sealed, never plain (arch 02 line 109; CQ-58).",
+                    "$ref": "#/$defs/sealedBox"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "const": "reaction"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "sealed": {
+                    "description": "A tapback has no words to seal (arch 07 line 391).",
+                    "type": "null"
+                  },
+                  "poll": {
+                    "description": "02-contracts K-06.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "enum": ["pollVote", "voteRemoved"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "arch 07 line 379; arch 03 line 187: the poll and the option by id; the words are sealed.",
+                    "$ref": "#/$defs/sealedPoll"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "enum": ["text", "photo", "edit"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "02-contracts K-06.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sealedPoll": {
+      "title": "SealedPoll",
+      "description": "A vote's poll and option as the actor keeps them: their ids in the clear, which the actor matches against the poll part K-04 holds (outbox_parts.linq_message_id and linq_option_ids; an option id that is none of Rosie's is an option someone added: S13-24 rule 6). It has no optionWords: the option's words are only in the box (sealedWords.optionWords; CQ-58).",
+      "type": "object",
+      "properties": {
+        "pollId": {
+          "description": "The event's poll.pollId, unchanged (K-02 text.poll.pollId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "optionId": {
+          "description": "The event's poll.optionId, unchanged (K-02 text.poll.optionId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["pollId", "optionId"],
+      "additionalProperties": false
+    },
+    "sealedEmailReply": {
+      "title": "SealedEmailReply",
+      "description": "An email reply's own fields as the actor keeps them: the reply address, which picks the booking and its thread (RULES 4.1), and the sender check (RULES 6.1), in the clear. It has no subject: the subject is only in the box (sealedWords.subject; arch 02 line 109; T-243).",
+      "type": "object",
+      "properties": {
+        "replyAddress": {
+          "description": "The event's email.replyAddress, unchanged (RULES 4.1).",
+          "$ref": "inbound-event.v1.schema.json#/$defs/emailReply/properties/replyAddress"
+        },
+        "senderCheck": {
+          "description": "The event's email.senderCheck, unchanged (RULES 6.1).",
+          "$ref": "inbound-event.v1.schema.json#/$defs/emailReply/properties/senderCheck"
+        }
+      },
+      "required": ["replyAddress", "senderCheck"],
+      "additionalProperties": false
+    },
+    "sealedBox": {
+      "title": "SealedBox",
+      "description": "The box v1.2's gateway seals an event's words in, form version 2. The seal is form version 1's, unchanged (T-243; runtime/src/gateway/seal.ts): AES-256-GCM through WebCrypto under the handle's data key (AES-256; K-05 v1.2 handleSealingKey), a fresh random 96-bit IV for each seal and a 128-bit tag; the additional data is the UTF-8 text '<actor name>|<event id>' (actor name '<handle.kind>:<handle.address>'), so a box copied onto another event or handle does not open. What it seals is the UTF-8 of one JSON text, sealedWords: the body, the subject and the option's words. Version 2 differs from version 1 only in that third member (CQ-58). Never logged, put in a span or answered: a key, an opened box.",
+      "type": "object",
+      "properties": {
+        "v": {
+          "description": "The box's form: 2, which opens to sealedWords (body, subject and optionWords). A reader takes a box's words by its form and refuses a form it does not know (README 'The sealed hand-off (v1.2)').",
+          "const": 2
+        },
+        "alg": {
+          "description": "AES-256-GCM, by its JOSE name (T-243).",
+          "const": "A256GCM"
+        },
+        "iv": {
+          "description": "The 12-byte IV, in standard base64: 16 characters, no padding (T-243).",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]{16}$"
+        },
+        "ct": {
+          "description": "The cipher text with its 16-byte tag after it, as one standard base64 string, padded (T-243).",
+          "type": "string",
+          "pattern": "^(?:[A-Za-z0-9+/]{4})+(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+        }
+      },
+      "required": ["v", "alg", "iv", "ct"],
+      "additionalProperties": false
+    },
+    "sealedWords": {
+      "title": "SealedWords",
+      "description": "What a box of form version 2 holds once opened: one JSON text with exactly these three members, the event's words after the scrub, each null where the event has none. An opened box with a member missing, another member, or a member of another type is refused, and nothing in it is read (README 'The sealed hand-off (v1.2)'). Each member passes scrubbedV1dot2's reading.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "The event's body after the scrub: a text's words, a photo's caption or an empty string, an edit's new words, an email reply's text (arch 02 line 109). Null for a vote and a vote removed.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject": {
+          "description": "An email reply's subject after the scrub (arch 02 line 109). Null for Linq.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "optionWords": {
+          "description": "A vote's or a vote removed's option words after the scrub: Rosie's option word for word, or the words of an option someone added, read as typed words (arch 07 line 379; S13-24 rule 6; K-02's poll-vote text carries them as its words). Null for every other kind.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["body", "subject", "optionWords"],
+      "additionalProperties": false
+    },
+    "sealedBoxV1": {
+      "title": "SealedBoxV1",
+      "description": "The box the gateway made before v1.2, form version 1 (T-243): the same seal as version 2 (cipher, key, IV, tag and additional data), opened to sealedWordsV1. Never made after v1.2; every one already kept still opens as it is, under the same key and additional data (the card: 'old boxes still opened as they are').",
+      "type": "object",
+      "properties": {
+        "v": {
+          "description": "The box's form: 1, which opens to sealedWordsV1 (body and subject).",
+          "const": 1
+        },
+        "alg": {
+          "description": "AES-256-GCM, by its JOSE name (T-243).",
+          "const": "A256GCM"
+        },
+        "iv": {
+          "description": "The 12-byte IV, in standard base64, as in version 2.",
+          "$ref": "#/$defs/sealedBox/properties/iv"
+        },
+        "ct": {
+          "description": "The cipher text with its tag, in standard base64, as in version 2.",
+          "$ref": "#/$defs/sealedBox/properties/ct"
+        }
+      },
+      "required": ["v", "alg", "iv", "ct"],
+      "additionalProperties": false
+    },
+    "sealedWordsV1": {
+      "title": "SealedWordsV1",
+      "description": "What a box of form version 1 holds once opened: one JSON text with exactly the body and the subject after the scrub (T-243). It has no option words: an event kept with a version 1 box, or with none, is sealedEventV1, whose vote keeps its option words plain.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "description": "As sealedWords.body.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject": {
+          "description": "As sealedWords.subject.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["body", "subject"],
+      "additionalProperties": false
+    },
+    "sealedEventV1": {
+      "title": "SealedEventV1",
+      "description": "The event as the gateway handed it to the actor before v1.2 (T-243), which an actor may still hold: sealedEvent's fields, but a text's, a photo's, an edit's or an email reply's words in a version 1 box, and a vote's or a vote removed's option words plain in poll.optionWords with no box. Never made after v1.2: the gateway hands over sealedEvent. A reader still reads one as it is: the body and the subject from its version 1 box, a vote's words from its poll.optionWords. Those plain words passed no scrub, so they may hold a card number or a Social Security number (CQ-58); they go with the text's rows and at a person's delete, not with the key (ADR-017 open point 8).",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "As sealedEvent.eventId.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "provider": {
+          "description": "As sealedEvent.provider.",
+          "$ref": "inbound-event.v1.schema.json#/$defs/provider"
+        },
+        "handle": {
+          "description": "As sealedEvent.handle.",
+          "$ref": "inbound-event.v1.schema.json#/$defs/handle"
+        },
+        "service": {
+          "description": "As sealedEvent.service.",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/service"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "description": "As sealedEvent.kind (README 'Routing').",
+          "type": "string",
+          "enum": ["text", "photo", "reaction", "pollVote", "voteRemoved", "edit"]
+        },
+        "messageId": {
+          "description": "As sealedEvent.messageId.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "chatId": {
+          "description": "As sealedEvent.chatId.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sentAt": {
+          "description": "As sealedEvent.sentAt.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receivedAt": {
+          "description": "As sealedEvent.receivedAt.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "scrubbed": {
+          "description": "The event's counts as v1.1's scrub made them: the body and the subject only (README 'Named rule (v1.1)').",
+          "$ref": "inbound-event.v1.schema.json#/$defs/scrubbed"
+        },
+        "attachments": {
+          "description": "As sealedEvent.attachments.",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/attachment"
+          }
+        },
+        "threadedReplyTo": {
+          "description": "As sealedEvent.threadedReplyTo.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "poll": {
+          "description": "For a vote or a vote removed, v1's poll, its option's words plain (T-243 sealed only the body and the subject: CQ-58). Null for every other kind.",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/pollVote"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reaction": {
+          "description": "As sealedEvent.reaction.",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/reaction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "edit": {
+          "description": "As sealedEvent.edit.",
+          "anyOf": [
+            {
+              "$ref": "inbound-event.v1.schema.json#/$defs/edit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "description": "As sealedEvent.status: always null.",
+          "type": "null"
+        },
+        "fromRosie": {
+          "description": "As sealedEvent.fromRosie.",
+          "type": "boolean"
+        },
+        "email": {
+          "description": "As sealedEvent.email: the subject was in the version 1 box.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedEmailReply"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traceId": {
+          "description": "As sealedEvent.traceId.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "sealed": {
+          "description": "A version 1 box for a text, a photo, an edit or an email reply; null for a reaction, a vote and a vote removed, which T-243 did not seal (T-243: only the body and the subject were sealed).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedBoxV1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "eventId",
+        "provider",
+        "handle",
+        "service",
+        "kind",
+        "messageId",
+        "chatId",
+        "sentAt",
+        "receivedAt",
+        "scrubbed",
+        "attachments",
+        "threadedReplyTo",
+        "poll",
+        "reaction",
+        "edit",
+        "status",
+        "fromRosie",
+        "email",
+        "traceId",
+        "sealed"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "provider": {
+          "description": "As sealedEvent's (RULES 4.1, 6.1; 02-contracts K-12).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "provider": {
+                    "description": "02-contracts K-11.",
+                    "const": "linq"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "email": {
+                    "description": "RULES 4.1.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "provider": {
+                    "description": "02-contracts K-12.",
+                    "const": "email"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "kind": {
+                    "description": "README default 5.",
+                    "const": "text"
+                  },
+                  "email": {
+                    "description": "RULES 4.1, 6.1.",
+                    "$ref": "#/$defs/sealedEmailReply"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "kind": {
+          "description": "Where each kind's words were before v1.2 (T-243): a text's, a caption's, an edit's or an email reply's in a version 1 box; a vote's plain in its poll, with no box.",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "enum": ["text", "photo", "edit"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "sealed": {
+                    "description": "T-243: the body and an email's subject, sealed.",
+                    "$ref": "#/$defs/sealedBoxV1"
+                  },
+                  "poll": {
+                    "description": "02-contracts K-06.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "enum": ["reaction", "pollVote", "voteRemoved"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "sealed": {
+                    "description": "T-243 sealed nothing for these kinds.",
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "enum": ["pollVote", "voteRemoved"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "arch 07 line 379: v1's poll, the option's words plain.",
+                    "$ref": "inbound-event.v1.schema.json#/$defs/pollVote"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "02-contracts K-06.",
+                    "const": "reaction"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "poll": {
+                    "description": "02-contracts K-06.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
