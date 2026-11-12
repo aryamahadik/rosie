@@ -796,12 +796,29 @@ describe("a STOP batched behind an owed danger whose re-reads answer No", () => 
             expect(await rowsOf()).toContainEqual({ event_id: "evt-1", box: null });
             const firstTurn = present(run.lease.turns[0], "the first turn");
             expect(firstTurn.holds).toEqual([hold]);
+
+            // 31 s, before its turn commits: the owed text is read again (No), 30 s on, and its next re-read is set 30 s
+            // after that; it stays owed and among the texts not read, and its turn is still on the run that took it.
+            const before = readsOf("evt-1");
+            await run.h.clock.advance(31_000 - run.h.clock.now());
+            await run.wake();
+            await vi.waitFor(async () => {
+              expect(readsOf("evt-1")).toBe(before + 1);
+              expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 61_000 });
+            }, WAIT);
+            expect(await rowsOf()).toContainEqual({ event_id: "evt-1", box: null });
+            expect(await unreadTexts()).toEqual(["evt-1"]);
+            expect(await actorOf().routineHeld()).toBe(true);
+            expect(run.lease.turns.map((turn) => turn.eventIds)).toEqual([first]);
+            // The STOP's result is kept for its turn until that turn ends.
+            if (where === "its batch") expect(await resultsOf(["evt-2"])).toEqual([no("evt-2")]);
             expect(await commitOf(firstTurn)).toMatchObject({ result: "committed" });
             expect(run.lease.contexts).toEqual([owedContext]);
 
             if (where === "the next batch") {
-              // 2 s: the STOP arrives, read as No at 3 s; its batch closes at 5 s and reaches its own turn.
-              await run.h.clock.advance(2000 - run.h.clock.now());
+              // 32 s, once the danger's turn has ended: the STOP arrives, read as No at 33 s; its batch closes at 35 s and
+              // reaches its own turn.
+              await run.h.clock.advance(32_000 - run.h.clock.now());
               await arrive("evt-2", STOP_TEXT);
               await run.h.clock.advance(1000);
               await run.settle();
@@ -812,28 +829,50 @@ describe("a STOP batched behind an owed danger whose re-reads answer No", () => 
               }, WAIT);
               const stopTurn = present(run.lease.turns[1], "the STOP's turn");
               expect(stopTurn.holds).toEqual([hold]);
+              expect(await resultsOf(["evt-2"])).toEqual([no("evt-2")]);
               expect(await commitOf(stopTurn)).toMatchObject({ result: "committed" });
-              expect(run.lease.contexts).toEqual([owedContext, owedContext]);
-              expect(readsOf("evt-1")).toBe(fault === "fail" ? 1 : 2);
+              // The danger's turn ended at its commit, so its text is owed no more: the STOP's commit is handed its hold.
+              expect(run.lease.contexts).toEqual([owedContext, { holds: [hold], unread: [] }]);
+              // No read of the danger since 31 s: the STOP's turn waited on none.
+              expect(readsOf("evt-1")).toBe(before + 1);
             }
-            expect(await resultsOf(["evt-2"])).toEqual([no("evt-2")]);
 
-            // 31 s and 61 s: the owed text is read again (No), each time 30 s on; it stays owed and among the texts not read.
-            const before = readsOf("evt-1");
-            for (const [at, reread] of [
-              [31_000, 1],
-              [61_000, 2],
-            ] as const) {
-              await run.h.clock.advance(at - run.h.clock.now());
-              await run.wake();
-              await vi.waitFor(async () => {
-                expect(readsOf("evt-1")).toBe(before + reread);
-                expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: at + 30_000 });
-              }, WAIT);
-            }
-            expect(await rowsOf()).toContainEqual({ event_id: "evt-1", box: null });
-            expect(await unreadTexts()).toEqual(["evt-1"]);
+            // Each turn ended for good at its commit (ADR-015 section 2: `finish`, a commit with no reply): the rows are
+            // gone, the STOP's result with them, and the texts closed; the danger's hold still binds every later commit.
+            expect(await rowsOf()).toEqual([]);
+            expect(await resultsOf(["evt-2"])).toEqual([]);
+            expect(await idsIn("safety_closed")).toEqual(["evt-1", "evt-2"]);
+            expect(await unreadTexts()).toEqual([]);
+            expect(await actorOf().readHolds()).toEqual([
+              {
+                eventId: "evt-1",
+                holdId: hold.holdId,
+                rule: "after_safe",
+                blocksBooking: true,
+                released: false,
+              },
+            ]);
             expect(await actorOf().routineHeld()).toBe(true);
+
+            // 61 s: a danger whose line went and whose record is kept is settled once its turn ends (DL-508): its pending
+            // note is cleared and it is read again no more. One cut off during its seal has sent no line: it stays pending
+            // and is read again every 30 s until its line goes, keeping no row (ADR-015 section 2, after its turn ended).
+            await run.h.clock.advance(61_000 - run.h.clock.now());
+            await run.wake();
+            if (fault === "fail") {
+              await vi.waitFor(async () => {
+                expect((await scheduleOf()).map((entry) => entry.kind)).not.toContain("safetyRead");
+              }, WAIT);
+              expect(readsOf("evt-1")).toBe(before + 1);
+              expect(await idsIn("safety_pending")).toEqual([]);
+            } else {
+              await vi.waitFor(async () => {
+                expect(readsOf("evt-1")).toBe(before + 2);
+                expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 91_000 });
+              }, WAIT);
+              expect(await idsIn("safety_pending")).toEqual(["evt-1"]);
+            }
+            expect(await rowsOf()).toEqual([]);
           },
         );
       },
