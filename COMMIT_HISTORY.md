@@ -2,9 +2,56 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 457, [`c549f4b`](https://github.com/aryamahadik/rosie/commit/c549f4b), 2026-11-12 10:38:21 UTC.
+- **Through:** commit 459, [`9f1d8da`](https://github.com/aryamahadik/rosie/commit/9f1d8da), 2026-11-12 10:59:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 459. docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467) (\#469)
+
+- **Commit:** [`9f1d8da`](https://github.com/aryamahadik/rosie/commit/9f1d8da), by Arya Mahadik, 2026-11-12 10:59:16 UTC
+- **Pull request:** [#469](https://github.com/aryamahadik/rosie/pull/469) from `task/commit-history-45`, merged 2026-11-12 10:59:16 UTC. It squashed 1 branch commit:
+  - `c3af14f` docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 458. T-1296: K-06 v1.2, a poll's option words scrubbed and sealed like the body (\#468)
+
+- **Commit:** [`501d5aa`](https://github.com/aryamahadik/rosie/commit/501d5aa), by Arya Mahadik, 2026-11-12 10:59:12 UTC
+- **Pull request:** [#468](https://github.com/aryamahadik/rosie/pull/468) from `task/T-1296`, merged 2026-11-12 10:59:12 UTC. It squashed 3 branch commits:
+  - `46561e8` T-1296: K-06 v1.2, a poll's option words scrubbed like the body (name…
+  - `3d68a05` Merge branch 'main' into worktree-wf\_a8f14faa-f03-1
+  - `8313b99` T-1296: T-085's K-06 contract test reads the option words v1.2 seals …
+- **Files changed:** 10 (+1090 −5), by folder:
+  - `contracts/inbound-event/` README.md +69 −1, frozen.json +1 −1, inbound-event.rules.mjs +36 −1, inbound-event.v1.2.schema.json +820 −0
+  - `contracts/inbound-event/fixtures/` index.json +32 −0, poll-vote-added-option-with-card.json +32 −0, vote-removed-added-option-with-ssn.json +32 −0
+  - `contracts/inbound-event/fixtures/invalid/` refuse-unscrubbed-card-in-added-option.json +32 −0, refuse-unscrubbed-ssn-in-added-option.json +32 −0
+  - `tests/contract/` inbound-event.v1.test.ts +4 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1296: K-06 v1.2, a poll's option words scrubbed like the body (named rule scrubbedV1dot2) and sealed with it: the sealed hand-off's definitions (sealedEvent, sealedPoll, sealedEmailReply; the form 2 box sealedBox opened to sealedWords; the form 1 box, words and event still read), two refused raw and two tagged vote fixtures (a card and an SSN in an added option), v1.2 frozen, README v1.2 sections
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1296: T-085's K-06 contract test reads the option words v1.2 seals (the lead's grant, DL-554): checkScrubbedCounts counts tags in event.poll?.optionWords beside the body and the subject; the number check reads must(event.body ?? event.poll?.optionWords); no assertion loosened
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 457. docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462) (\#467)
 
