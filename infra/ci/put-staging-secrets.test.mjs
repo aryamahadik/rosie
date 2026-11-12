@@ -71,7 +71,12 @@ const EVERY_VALUE = [...Object.values(VALUES), ...Object.values(SHELL_VALUES), .
 // The made-up texts a caller's variables hold in the cases of T-568 and T-1261 (each with its name after a comma).
 const CALLER_TEXTS = ["t568 made-up caller text", "t1261 made-up caller text"];
 
-/** A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single quotes, among other lines. */
+/**
+ * A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single quotes, among other lines.
+ * Each form holds a name the script puts, so the byte-for-byte case proves each on a value put: ANTHROPIC_API_KEY
+ * plain, STAGING_TEST_INBOXES double-quoted, RESEND_API_KEY exported. LINQ_WEBHOOK_SECRET's exported line is one of
+ * staging's own, never read (DL-549).
+ */
 const devVars = (values = VALUES) =>
   [
     "# made-up values for T-568's and T-1276's tests",
@@ -82,7 +87,7 @@ const devVars = (values = VALUES) =>
       ? [`  export LINQ_WEBHOOK_SECRET='${values.LINQ_WEBHOOK_SECRET}'`]
       : []),
     ...("PROOF_CODE_HASH_KEY" in values ? [`PROOF_CODE_HASH_KEY=${values.PROOF_CODE_HASH_KEY}`] : []),
-    ...("RESEND_API_KEY" in values ? [`RESEND_API_KEY=${values.RESEND_API_KEY}`] : []),
+    ...("RESEND_API_KEY" in values ? [`  export RESEND_API_KEY='${values.RESEND_API_KEY}'`] : []),
     ...("STAGING_TEST_INBOXES" in values ? [`STAGING_TEST_INBOXES="${values.STAGING_TEST_INBOXES}"`] : []),
     `OTHER_NAME="${OTHER_VALUES[1]}"`,
     "",
