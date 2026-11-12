@@ -321,9 +321,11 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
         ]);
         expect(run.fakes.direct.sent).toEqual([]);
 
-        // Each read tried Haiku, then Sonnet, and each try was cut off at 2 s: the read's own spans say so.
+        // Each read tried Haiku, then Sonnet, and each try was cut off at 2 s: the read's own spans say so. (Since T-1264
+        // the danger text's turn reads the stand-in its read kept, ADR-015, and goes on to decide, whose model calls share
+        // the trace: only the read's own are counted here.)
         await until(
-          () => [dangerTrace, plainTrace].every((id) => run.traceOf(id).filter(modelCall).length === 2),
+          () => [dangerTrace, plainTrace].every((id) => run.traceOf(id).filter(safetyCall).length === 2),
           "both tries of each read",
           15_000,
         );
@@ -331,7 +333,7 @@ describe("hop 3 joined: each raw text is read for danger through @rosie/ai's saf
           expect(
             run
               .traceOf(id)
-              .filter(modelCall)
+              .filter(safetyCall)
               .map((span) => [span.attempt, span.outcome, span.model_calls?.[0]?.model]),
           ).toEqual([
             [1, "timedOut", HAIKU_MODEL],

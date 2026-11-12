@@ -59,11 +59,12 @@
 //                code (`npm run build:validators`), never a no-op; under Node, Ajv over the frozen schemas.
 //   stateReads   T-1242 (T-1154's part P1b): the safety read's bundle lines (BundleSafety: fixedLine, outcomeLine and
 //                dangerWords) with the pin's check of each bundle a turn would pin (DL-341, DL-351), the handle's ids
-//                (idsOf) and stopped flag (isStopped), the turn's directory (partyOf) and each text's safety result
-//                (resultsOf), each read over its own input, handed in by the root (RootOptions.bundleSafety,
-//                handleDirectory, stoppedFlags, turnDirectory, turnSafety; the seams' table below says how): on
-//                staging none is handed in until the part of T-1154 that binds it, so every read there fails closed
-//                (NoStateReadError) and no bundle is pinned. The test environment binds the fake set's state reads.
+//                (idsOf) and stopped flag (isStopped) and the turn's directory (partyOf), each read over its own input,
+//                handed in by the root (RootOptions.bundleSafety, handleDirectory, stoppedFlags, turnDirectory; the
+//                seams' table below says how): on staging none is handed in until the part of T-1154 that binds it, so
+//                every read there fails closed (NoStateReadError) and no bundle is pinned. The test environment binds the
+//                fake set's state reads. Each text's safety result is no state read: the turn reads it from its leased
+//                turn, which the handle's own actor answers from the result its read on arrival kept (ADR-015, T-1264).
 //   decide       T-558: @rosie/ai's decide (T-369 createDecider: two reads routed by stakes and compared part by part;
 //                C-115) and its one Sonnet re-read (T-370; C-116), one decider per bundle for both, handed in by the
 //                root (RootOptions.deciders): in a test, over a fake Messages API answered by the recorded-model double
@@ -318,7 +319,6 @@ import type {
   TurnDecide,
   TurnDirectory,
   TurnParty,
-  TurnSafety,
   WriteRowPlanAnswer,
 } from "../turn/types";
 import type {
@@ -1097,16 +1097,15 @@ class FrontierBundleReads implements FrontierBundles {
 //   stoppedFlags       StoppedFlagRead    SafetyDeps.isStopped. Null: NoStateReadError("isStopped").
 //   turnDirectory      TurnDirectory      TurnDeps.directory.partyOf. Null: NoStateReadError("partyOf"), so the run ends
 //                                         noDirectory before anything is opened, read or written.
-//   turnSafety         TurnSafety         TurnDeps.safety.resultsOf. Null: NoStateReadError("resultsOf"), so the turn
-//                                         takes no text's result (../turn/turn.ts) and its commit records none.
 //   planCalls          PlanCalls          TurnDeps.rows.unplannedRows and writePlan: db/repo/outbox.ts's K-05 v1 calls,
 //                                         `(request) => unplannedRows(sql, request)` and `(request) => writePlan(sql,
 //                                         request)` over a rosie_job client. Null: NoDatabaseError("unplannedRows" or
 //                                         "writePlan"), so no row of the turn is listed, composed or planned.
 //
 // The state reads are typed as the ports they feed (../safety/types.ts, ../turn/types.ts), since no K-05 call names them
-// yet (T-1240 freezes the party read; T-1241 rules where each text's result is kept); the plan calls as db/repo's K-05
-// calls, as every K-05 call the root is handed. The test environment binds the fake set's state reads and rows
+// yet (T-1240 freezes the party read); the plan calls as db/repo's K-05 calls, as every K-05 call the root is handed.
+// Each text's safety result is none of them: T-1241's record (ADR-015) keeps it in the handle's own actor, and the turn
+// reads it from its leased turn (T-1264). The test environment binds the fake set's state reads and rows
 // (./test-support.ts), so it never asks the pin's check.
 
 /**
@@ -1156,7 +1155,6 @@ export interface StateReadInputs {
   readonly handleDirectory: HandleDirectory | null;
   readonly stoppedFlags: StoppedFlagRead | null;
   readonly turnDirectory: TurnDirectory | null;
-  readonly turnSafety: TurnSafety | null;
 }
 
 /** Every state read with none bound: each fails closed. */
@@ -1165,7 +1163,6 @@ const NO_STATE_READ_INPUTS: StateReadInputs = {
   handleDirectory: null,
   stoppedFlags: null,
   turnDirectory: null,
-  turnSafety: null,
 };
 
 /** The handle's party as the turn reads it, field for field: its K-04 id, business, person and zone, nothing more. */
@@ -1190,14 +1187,13 @@ function handleIdsOf(ids: HandleIds): HandleIds {
 
 /**
  * The state-reads port (T-1242): each read through the input the root is handed for it (StateReadInputs; the table above).
- * The bundle's lines and the stopped flag go back as their input gives them, and each text's safety result as its input
- * gives it (the turn takes only its own texts' results); the party and the handle's ids go back field for field, so a
- * reader that answers a row with more in it hands the turn and the safety read nothing more. With an input null, its reads
- * fail closed at once (NoStateReadError naming the read): a bundle line's read throws, being synchronous, and every other
- * read rejects. Nothing here logs: a request names a handle's number.
+ * The bundle's lines and the stopped flag go back as their input gives them; the party and the handle's ids go back field
+ * for field, so a reader that answers a row with more in it hands the turn and the safety read nothing more. With an input
+ * null, its reads fail closed at once (NoStateReadError naming the read): a bundle line's read throws, being synchronous,
+ * and every other read rejects. Nothing here logs: a request names a handle's number.
  */
 export function realStateReads(inputs: StateReadInputs): StateReads {
-  const { bundleSafety, handleDirectory, stoppedFlags, turnDirectory, turnSafety } = inputs;
+  const { bundleSafety, handleDirectory, stoppedFlags, turnDirectory } = inputs;
   const none = (read: string): Promise<never> => Promise.reject(new NoStateReadError(read));
   const noneNow = (read: string): never => {
     throw new NoStateReadError(read);
@@ -1226,9 +1222,6 @@ export function realStateReads(inputs: StateReadInputs): StateReads {
           const party = await turnDirectory.partyOf(request);
           return party === null ? null : turnPartyOf(party);
         },
-      },
-      safety: {
-        resultsOf: (eventIds) => (turnSafety === null ? none("resultsOf") : turnSafety.resultsOf(eventIds)),
       },
     },
   };

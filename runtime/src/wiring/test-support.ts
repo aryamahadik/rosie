@@ -202,7 +202,7 @@ import { actorNameOf } from "../gateway";
 import type { LinqAccepted, LinqFailed, LinqSendRequest } from "../dispatch/types";
 import type { RetryMessage, RetryQueue, RetrySendOptions } from "../queues";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
-import type { HandleIds, SafetyResult } from "../safety/types";
+import type { HandleIds } from "../safety/types";
 import type { BundleId, TraceContext } from "../trace";
 import { setTurnDeps } from "../turn/turn";
 import {
@@ -210,7 +210,6 @@ import {
   fakeRows,
   fakeTurnFace,
   rowsOf,
-  safetyNoFor,
   SAM,
   turnFaceOf,
   unplannedRow,
@@ -4219,8 +4218,11 @@ export interface SkeletonFakes {
    */
   readonly arming: FakeArmingCalls;
   /**
-   * Sets a text's safety result before it is sent: safety-no.json under its event id, what the turn's commit records
-   * (K-09 README default 5). The read on arrival is the joined one (T-554): `models`, over the recorded-model double.
+   * Once set a text's safety result for the turn's commit to record, through the state reads' `resultsOf`. That double is
+   * gone (ADR-015 card B, T-1264): the turn reads each text's result through its leased turn, from what the joined read on
+   * arrival (T-554: `models`, over the recorded-model double) kept in the real actor's storage, so this sets nothing. Kept
+   * so its callers (the e2e skeleton, unchanged; the hop tests) read as they did; for a recorded text the read gives
+   * safety-no.json's result under its event id, what the commit records (K-09 README default 5).
    */
   known(eventId: string): void;
 }
@@ -4238,8 +4240,6 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const gate = fakeGateReads(turnRows);
   const core = fakeCore(clock);
   const direct = fakeDirect(clock);
-  // Read when each call is made: the turn's commit records what `known` set by then.
-  const answers: Record<string, SafetyResult> = {};
 
   const face = fakeTurnFace();
   const decide = fakeDecideModels(face.log);
@@ -4302,17 +4302,10 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
         bundle: fixtureBundle(),
         isStopped: () => false,
       },
+      // Who the handle is. Each text's safety result is no state read (ADR-015; T-1264): each run reads its texts' results
+      // through its leased turn, from what the real read on arrival (`models`) kept in the real actor's storage.
       turn: {
         directory: { partyOf: () => Promise.resolve(SAM.party) },
-        safety: {
-          resultsOf: (eventIds) =>
-            Promise.resolve(
-              eventIds.flatMap((eventId) => {
-                const result = answers[eventId];
-                return result === undefined ? [] : [structuredClone(result)];
-              }),
-            ),
-        },
       },
     },
     turnFace: {
@@ -4352,8 +4345,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     linq,
     retryQueue,
     arming,
-    known(eventId) {
-      answers[eventId] = safetyNoFor(eventId);
+    known() {
+      // Nothing to set: the turn's commit records the result the real read on arrival kept for the text (ADR-015).
     },
   };
 }
