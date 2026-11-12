@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 484, [`09341bc`](https://github.com/aryamahadik/rosie/commit/09341bc), 2026-11-12 20:22:12 UTC.
+- **Through:** commit 486, [`91c8bf2`](https://github.com/aryamahadik/rosie/commit/91c8bf2), 2026-11-12 20:54:12 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 486. docs: COMMIT\_HISTORY.md through commit 484 (09341bc, \#494) (\#495)
+
+- **Commit:** [`91c8bf2`](https://github.com/aryamahadik/rosie/commit/91c8bf2), by Arya Mahadik, 2026-11-12 20:54:12 UTC
+- **Pull request:** [#495](https://github.com/aryamahadik/rosie/pull/495) from `task/commit-history-56`, merged 2026-11-12 20:54:13 UTC. It squashed 1 branch commit:
+  - `9cc9fec` docs: COMMIT\_HISTORY.md through commit 484 (09341bc, \#494)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 485. T-1303: seed:staging hands the check-tester set its token's sha256 by name; the token's maker (\#478)
+
+- **Commit:** [`236cf8e`](https://github.com/aryamahadik/rosie/commit/236cf8e), by Arya Mahadik, 2026-11-12 20:54:07 UTC
+- **Pull request:** [#478](https://github.com/aryamahadik/rosie/pull/478) from `task/T-1303`, merged 2026-11-12 20:54:08 UTC. It squashed 3 branch commits:
+  - `decbcbc` T-1303: seed:staging runs the check-tester set and hands it only the …
+  - `a84222f` Merge branch 'main' into task/T-1303
+  - `ca2378e` T-1303: parity-inputs.test.mjs's T-1303 and T-1310 shapes stay true o…
+- **Files changed:** 6 (+1561 −51), by folder:
+  - `infra/ci/` make-check-tester-token.test.mjs +417 −0, parity-inputs.test.mjs +25 −8, seed-staging.test.mjs +666 −31
+  - `infra/scripts/` make-check-tester-token.mjs +226 −0, seed-staging.sh +226 −12
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1303: seed:staging runs the check-tester set and hands it only the check tester's token's sha256, by name (STAGING_CHECK_TESTER_TOKEN_SHA256), made from STAGING_CHECK_TESTER_TOKEN (read by name as lib.sh reads a key) on node's standard input alone; the token is in no argument, child environment or output, a missing or malformed token is refused before any set runs, and the session's end is read back and printed, never the hash; npm run check-tester:token:make makes the token (32 random bytes as 43 base64url characters) and keeps it by name in the build Mac's git-ignored key file, never printed, replaced only with --rotate; tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1303: parity-inputs.test.mjs's T-1303 and T-1310 shapes stay true once their script line is in package.json (DL-612): each case that adds check-tester:token:make or pretest:ci-scripts builds origin/main from the real manifest without that line (withoutScript; T1303_BASE, T1310_BASE), so the branch still adds it and its commit is never empty; the T-1303 and T-1310 script-line cases, the mixed case, the three second-describe cases and the rule's test:ci-scripts pattern check use that base; every assertion unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 484. docs: COMMIT\_HISTORY.md through commit 482 (9a0c7fa, \#492) (\#494)
 
