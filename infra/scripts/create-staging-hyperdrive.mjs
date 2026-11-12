@@ -1,5 +1,6 @@
 // Staging's two Hyperdrive configurations, each storing one of the Worker's own logins (ADR-014 section 4's piece 2 and
-// "The script's rules (piece 2)"; T-1252; T-1239's round 2 security review, notes b, c and d). The one Node process of
+// "The script's rules (piece 2)"; T-1252; T-1239's round 2 security review, notes b, c and d; hardened by T-1271, from
+// T-1252's security review, notes a to e, and its database review, note a). The one Node process of
 // create-staging-hyperdrive.sh (npm run hyperdrive:staging:create): run it through that file, never on its own.
 // Its live run is the user's, while no agent runs (ADR-014 section 4, "Live steps"; DL-482, DL-486, DL-497): it sets
 // each login's password in PostgreSQL and stores it in Cloudflare.
@@ -18,8 +19,8 @@
 //     call, and of the database connection's TLS too.
 //  2. STAGING_DATABASE_URL, by name: taken out of this process's environment at once, so nothing it starts finds it
 //     there, and never shown. It is checked as infra/scripts/db-url.mjs checks the release scripts' URLs, and a pooled
-//     host (Neon marks it "-pooler") is refused: the password's settings live in one session, and Cloudflare's Neon page
-//     gives Hyperdrive the direct host.
+//     host (Neon marks it "-pooler", read here in any letter case: Node keeps a postgres:// host's case) is refused: the
+//     password's settings live in one session, and Cloudflare's Neon page gives Hyperdrive the direct host.
 //  3. It lists first (cf.sh hyperdrive list, read by infra/scripts/hyperdrive-list.mjs) and makes only what is
 //     missing. A configuration of either name that exists is left exactly as it is: "<name> already exists: id <id>,
 //     caching <caching>", and its stored user must be that name's login; another user (never shown) stops the run.
@@ -31,10 +32,12 @@
 //     session only, log_statement to none and log_min_error_statement to panic (each needs a superuser or the SET
 //     privilege on it, so a refusal there changes nothing), and debug_print_parse and debug_print_rewritten off. Then
 //     it reads the session's values and refuses to make a password when any would write the ALTER ROLE's text to the
-//     server log or keep it: log_statement other than none; log_min_error_statement error or lower; log_min_duration_
-//     statement 0 or more; log_min_duration_sample 0 or more with log_statement_sample_rate above 0;
-//     log_transaction_sample_rate above 0; debug_print_parse or debug_print_rewritten on; pg_stat_statements loaded
-//     and tracking utility statements (its pg_stat_statements.track not none and track_utility on).
+//     server log or keep it: log_statement other than none; log_min_error_statement other than fatal or panic (log
+//     too: QUIET_ERROR_LEVELS below); log_min_duration_statement 0 or more; log_min_duration_sample 0 or more with
+//     log_statement_sample_rate above 0; log_transaction_sample_rate above 0; debug_print_parse or
+//     debug_print_rewritten on; pg_stat_statements loaded and tracking utility statements (its
+//     pg_stat_statements.track not none and track_utility on); pgaudit loaded with a pgaudit.log that names role, ddl
+//     or all (AUDIT_CLASSES below).
 //  5. The API token: the Rosfield sign-in's, from `cf.sh auth token --json` (wrangler 4.158.0's auth token command),
 //     read from that child's standard output, a pipe, and held in memory only. Only the type oauth is taken: wrangler
 //     hands back CLOUDFLARE_API_TOKEN, or a key and an email, before the sign-in, so every child's environment goes
@@ -46,7 +49,8 @@
 //     own (pg_stat_activity shows a session's most recent query until the next one); then the API's create with the
 //     host, port and database of STAGING_DATABASE_URL, the login as user, caching disabled; then
 //     "<name> created: id <id>, caching disabled". A failure there stops the run, with Cloudflare's words printed with
-//     the password, the token and the database URL's parts (its host among them) taken out. It is safe to repeat: the
+//     the password, the token and the database URL's parts (its host among them) taken out of the whole text before it
+//     is cut to its length (ERROR_TEXT_CUT), so a cut never leaves part of one standing. It is safe to repeat: the
 //     login then holds a password nobody has, and the next run, finding no configuration, sets a fresh one; a create
 //     that reached Cloudflare but did not answer is found by the next run's list, and no new password is set for it.
 //  8. It ends the connection, lists again through cf.sh, and prints each name's id, caching and whether its stored
@@ -87,8 +91,36 @@ const DROPPED_NAMES = [
   "CF_API_KEY",
   "CF_EMAIL",
 ];
-// log_min_error_statement's levels above ERROR: a failing statement's text is logged at any other.
-const QUIET_ERROR_LEVELS = new Set(["log", "fatal", "panic"]);
+// log_min_error_statement's levels that are taken: fatal and panic only. PostgreSQL 17 logs the current statement "for
+// any message of the specified severity or higher" and ranks the levels "... ERROR, LOG, FATAL, and PANIC" ("Error
+// Reporting and Logging"; the server's own pg_settings.enumvals, which a test reads), so at log any LOG message during
+// the ALTER ROLE (a lock wait with log_lock_waits on, a log_*_stats report) would log its text, password included.
+// This is stricter than ADR-014 line 146's list, which names only error and the levels below it: T-1252's security
+// review asked it (note a; T-1271). At fatal only a statement that ends its session is logged, at panic only a panic.
+const QUIET_ERROR_LEVELS = new Set(["fatal", "panic"]);
+// pgaudit's pgaudit.log, read as pg_stat_statements' settings are: null when the extension is not loaded. Its classes,
+// as pgaudit 17.1's README.md and pgaudit.c give them (read on sources.debian.org, package pgaudit-17): a list split at
+// commas, each class in any letter case, a "-" before one taking it out again. ROLE holds ALTER ROLE ("Statements
+// related to roles and privileges: GRANT, REVOKE, CREATE/ALTER/DROP ROLE") and ALL holds every class. DDL ("All DDL
+// that is not included in the ROLE class") does not, by pgaudit's own words, but is refused with them, as T-1252's
+// security review asked (note b; T-1271): stricter. So is a list that names one, even when a later "-role" takes it
+// out again, and a class not known here (pgaudit itself refuses an unknown one, so only a placeholder can hold it).
+// pgaudit 17.1 writes "<REDACTED>" after the word password of a CREATE or ALTER ROLE it logs, and pgaudit.log_statement
+// off leaves the text out; neither is read here, since which pgaudit the server runs is not known: refused all the same.
+const AUDIT_CLASSES = new Set([
+  "none",
+  "read",
+  "write",
+  "function",
+  "role",
+  "ddl",
+  "misc",
+  "misc_set",
+  "all",
+]);
+const AUDIT_REFUSED = new Set(["role", "ddl", "all"]);
+// How much of a text answer from Cloudflare's API a refusal shows, cut only after it is scrubbed (createConfiguration).
+const ERROR_TEXT_CUT = 1000;
 // The session's settings that decide whether a statement's text reaches the server log, and its backend.
 const SESSION_QUERY = `select
   pg_catalog.current_setting('log_statement') as log_statement,
@@ -101,6 +133,7 @@ const SESSION_QUERY = `select
   pg_catalog.current_setting('debug_print_rewritten') as debug_print_rewritten,
   pg_catalog.current_setting('pg_stat_statements.track', true) as pg_stat_statements_track,
   pg_catalog.current_setting('pg_stat_statements.track_utility', true) as pg_stat_statements_track_utility,
+  pg_catalog.current_setting('pgaudit.log', true) as pgaudit_log,
   pg_catalog.pg_backend_pid()::pg_catalog.text as pid`;
 
 /** A run stopped on purpose: its message says why and holds no value (outside text in it was scrubbed as put in). */
@@ -132,7 +165,10 @@ function childEnvironment() {
     if (secrets.copies.some((part) => value.includes(part))) continue;
     env[name] = value;
   }
-  // wrangler's debug log leaves request bodies out and is not written to a file; no usage event is sent.
+  // wrangler 4.158.0 writes no log file: a line it logs goes to its log file only when its shouldLogToDisk() holds,
+  // which reads WRANGLER_WRITE_LOGS and is false for "false" or "0" (its cli.js, pinned by a test; T-1271, T-1252's
+  // security review, note e), so the list's table, with each origin's host and user, is kept nowhere. Its debug output
+  // leaves request bodies out (WRANGLER_LOG_SANITIZE), and no usage event is sent (WRANGLER_SEND_METRICS).
   env.WRANGLER_LOG_SANITIZE = "true";
   env.WRANGLER_WRITE_LOGS = "false";
   env.WRANGLER_SEND_METRICS = "false";
@@ -197,7 +233,7 @@ function loggingFaults(settings) {
   }
   if (!QUIET_ERROR_LEVELS.has(settings.log_min_error_statement)) {
     faults.push(
-      `log_min_error_statement is ${settings.log_min_error_statement} (a failing statement's text is logged at error and lower)`,
+      `log_min_error_statement is ${settings.log_min_error_statement} (the statement's text is logged with any message at that level or above, and log ranks above error: only fatal and panic are taken)`,
     );
   }
   if (settings.log_min_duration_statement !== "-1") {
@@ -223,8 +259,28 @@ function loggingFaults(settings) {
       `pg_stat_statements is loaded and keeps utility statements' text (pg_stat_statements.track ${track ?? "(not shown)"}, track_utility ${utility ?? "(not shown)"})`,
     );
   }
+  if (typeof settings.pgaudit_log === "string" && auditNamesAlterRole(settings.pgaudit_log)) {
+    faults.push(
+      `pgaudit is loaded and pgaudit.log is ${settings.pgaudit_log} (it names role, ddl or all, or a class not known here: its audit log could keep the ALTER ROLE's text)`,
+    );
+  }
   return faults;
 }
+
+/** Whether a pgaudit.log value names role, ddl or all, or a class not known here (AUDIT_CLASSES above). */
+function auditNamesAlterRole(value) {
+  if (value.trim() === "") return false;
+  return value.split(",").some((entry) => {
+    const token = entry.trim();
+    const taken = token.startsWith("-");
+    const name = (taken ? token.slice(1) : token).toLowerCase();
+    return !AUDIT_CLASSES.has(name) || (!taken && AUDIT_REFUSED.has(name));
+  });
+}
+
+/** pgaudit's part of a session's logging, as it is read. */
+const describeAudit = (settings) =>
+  typeof settings.pgaudit_log === "string" ? `pgaudit.log ${settings.pgaudit_log}` : "pgaudit not loaded";
 
 const describeSettings = (settings) =>
   [
@@ -382,11 +438,17 @@ async function createConfiguration(pair, password, token, origin) {
   }
   const id = answer?.result?.id;
   if (!response.ok || answer?.success !== true || typeof id !== "string" || !/^[0-9a-f]{32}$/.test(id)) {
+    // Scrubbed whole, and only then cut: a cut first could leave part of the password, the token or the host standing
+    // where scrub looks for the whole of each (T-1271; T-1252's security review, note c).
+    const parts = [password, ...allSecrets()];
     const errors = Array.isArray(answer?.errors)
-      ? answer.errors.map((error) => `${String(error?.code)}: ${String(error?.message)}`).join("; ")
-      : text.slice(0, 1000);
+      ? scrub(
+          answer.errors.map((error) => `${String(error?.code)}: ${String(error?.message)}`).join("; "),
+          parts,
+        )
+      : scrub(text, parts).slice(0, ERROR_TEXT_CUT);
     throw new Refusal(
-      `Cloudflare's API did not create ${pair.name} (HTTP ${String(response.status)}: ${scrub(errors, [password, ...allSecrets()])}). ${pair.login} now holds a password nobody has, so this is safe to repeat: the next run, finding no configuration, sets a fresh one`,
+      `Cloudflare's API did not create ${pair.name} (HTTP ${String(response.status)}: ${errors}). ${pair.login} now holds a password nobody has, so this is safe to repeat: the next run, finding no configuration, sets a fresh one`,
     );
   }
   const caching = answer.result?.caching?.disabled === true ? "disabled" : "not disabled (check it)";
@@ -422,7 +484,8 @@ async function main(args) {
   secrets.copies = [raw, url.href, url.password, decodeURIComponent(url.password)].filter(
     (part) => part.length >= 6,
   );
-  if (url.hostname.includes("-pooler.")) {
+  // In lower case first: Node keeps a postgres:// host's letter case, and a host name is read in any case (T-1271).
+  if (url.hostname.toLowerCase().includes("-pooler.")) {
     throw new Refusal(
       "STAGING_DATABASE_URL names a pooled host (-pooler): the password's log settings hold for one session only, and Cloudflare's Neon page gives Hyperdrive the direct host. Give the direct connection string; nothing was listed, read or made",
     );
@@ -509,6 +572,7 @@ async function main(args) {
     }
     const [settings] = await sql.unsafe(SESSION_QUERY);
     note(`this session's logging: ${describeSettings(settings)}`);
+    note(`this session's audit logging: ${describeAudit(settings)}`);
     const faults = loggingFaults(settings);
     if (faults.length > 0) {
       throw new Refusal(
