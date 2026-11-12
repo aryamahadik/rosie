@@ -6,7 +6,10 @@
 //   - past the recipients in all (PART_RECIPIENTS, EMAIL_RECIPIENTS), the recipient sent to least recently goes, whole;
 //   - one recipient's flood drops only that recipient's own records, even with the line at its recipients in all;
 //   - a repeated idempotency key adds nothing and drops nothing, and is answered as the first send was;
-//   - after the object is rebuilt from storage (an eviction), the same records answer, and the caps still hold.
+//   - after the object is rebuilt from storage (an eviction), the same records answer, and the caps still hold;
+//   - a repeat of a key whose record the cap has dropped (its recipient dropped whole, or the key past its recipient's
+//     cap) stores nothing and drops nothing, for parts and for emails: the double answers it from its memory (DL-504);
+//   - after an eviction, a repeat of a dropped key is the new double's new send: kept once, as any new send.
 //
 // Each flood runs inside the object (runInDurableObject), so hundreds of sends take no network hop; every read is the
 // line's own RPC answer, as the page reads it. Test values only (rule 9): the fictional 555-01xx numbers, example.com
@@ -370,6 +373,179 @@ describe("after the object is rebuilt from storage", () => {
       expect(partKeys(await line.partsTo(SAM))).toEqual(expectedPartKeys(SAM, 4, PARTS_PER_RECIPIENT + 3));
       expect(partKeys(await line.partsTo(TP_04))).toEqual(expectedPartKeys(TP_04, 1, 2));
       expect(await emailKeys(line, to)).toEqual(expectedEmailKeys(to, 4, EMAILS_PER_RECIPIENT + 3));
+    },
+  );
+});
+
+describe("a repeat of a key whose record the cap has dropped: the double sends nothing, so the line keeps nothing (DL-504)", () => {
+  it(
+    "emails: with its address dropped whole, the repeat is answered as the first send, stores nothing and drops nothing; every other address keeps its email",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      const dropped = addressOf(0);
+      const first = await line.sendEmail(email(dropped, 1));
+      expect(first).toMatchObject({ result: "accepted" });
+      // EMAIL_RECIPIENTS other addresses, one email each: the first address, sent to least recently, goes whole.
+      const others = Array.from({ length: EMAIL_RECIPIENTS }, (_unused, i) => addressOf(i + 1));
+      for (const other of others) await sendEmails(line, other, 1, 1);
+      expect(await emailKeys(line, dropped)).toEqual([]);
+      const before = await line.sentEmails({ to: null });
+      const rows = await tableRows(line, "test_phone_emails");
+
+      // The same email again under its key: the double answers it from its memory and sends nothing again.
+      expect(await line.sendEmail(email(dropped, 1))).toEqual(first);
+
+      expect(await line.sentEmails({ to: null })).toEqual(before);
+      expect(await tableRows(line, "test_phone_emails")).toEqual(rows);
+      expect(await emailKeys(line, dropped)).toEqual([]);
+      for (const other of others) {
+        expect(await emailKeys(line, other), other).toEqual(expectedEmailKeys(other, 1, 1));
+      }
+    },
+  );
+
+  it(
+    "emails: with the key past its address's cap, the repeat is answered as the first send, stores nothing and drops nothing; the address keeps its newest in order, and another address all of its own",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      const to = addressOf(1);
+      const other = addressOf(2);
+      await sendEmails(line, other, 1, 2);
+      const first = await line.sendEmail(email(to, 1));
+      expect(first).toMatchObject({ result: "accepted" });
+      await sendEmails(line, to, 2, EMAILS_PER_RECIPIENT + 1);
+      expect(await emailKeys(line, to)).toEqual(expectedEmailKeys(to, 2, EMAILS_PER_RECIPIENT + 1));
+      const before = await line.sentEmails({ to: null });
+      const rows = await tableRows(line, "test_phone_emails");
+
+      expect(await line.sendEmail(email(to, 1))).toEqual(first);
+
+      expect(await line.sentEmails({ to: null })).toEqual(before);
+      expect(await tableRows(line, "test_phone_emails")).toEqual(rows);
+      expect(await emailKeys(line, to)).toEqual(expectedEmailKeys(to, 2, EMAILS_PER_RECIPIENT + 1));
+      expect(await emailKeys(line, other)).toEqual(expectedEmailKeys(other, 1, 2));
+    },
+  );
+
+  it(
+    "parts: with its number dropped whole, the repeat is answered as the first send, stores nothing and drops nothing; every other number keeps its part",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      const dropped = numberOf(0);
+      const first = await line.sendPart(part(dropped, 1));
+      expect(first).toMatchObject({ result: "accepted" });
+      // PART_RECIPIENTS other numbers, one part each: the first number, sent to least recently, goes whole.
+      const others = Array.from({ length: PART_RECIPIENTS }, (_unused, i) => numberOf(i + 1));
+      for (const other of others) await sendParts(line, other, 1, 1);
+      expect(await line.partsTo(dropped)).toEqual([]);
+      const rows = await tableRows(line, "test_phone_parts");
+
+      // The same part again under its key: Linq's dedupe answers it from the double's memory, which records nothing.
+      expect(await line.sendPart(part(dropped, 1))).toEqual(first);
+
+      expect(await tableRows(line, "test_phone_parts")).toEqual(rows);
+      expect(await line.partsTo(dropped)).toEqual([]);
+      for (const other of others) {
+        expect(partKeys(await line.partsTo(other)), other).toEqual(expectedPartKeys(other, 1, 1));
+      }
+    },
+  );
+
+  it(
+    "parts: with the key past its number's cap, the repeat is answered as the first send, stores nothing and drops nothing; the number keeps its newest in order, and another number all of its own",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      await sendParts(line, TP_04, 1, 2);
+      const first = await line.sendPart(part(SAM, 1));
+      expect(first).toMatchObject({ result: "accepted" });
+      await sendParts(line, SAM, 2, PARTS_PER_RECIPIENT + 1);
+      const before = await line.partsTo(SAM);
+      expect(partKeys(before)).toEqual(expectedPartKeys(SAM, 2, PARTS_PER_RECIPIENT + 1));
+      const tp04 = await line.partsTo(TP_04);
+      const rows = await tableRows(line, "test_phone_parts");
+
+      expect(await line.sendPart(part(SAM, 1))).toEqual(first);
+
+      expect(await line.partsTo(SAM)).toEqual(before);
+      expect(await line.partsTo(TP_04)).toEqual(tp04);
+      expect(await tableRows(line, "test_phone_parts")).toEqual(rows);
+    },
+  );
+});
+
+describe("after an eviction, a repeat of a key the cap has dropped is the new double's new send", () => {
+  it(
+    "emails: the new double sends it again as a new email, and the line keeps that send once, as the address's newest, dropping its oldest as for any new email",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      const to = addressOf(1);
+      const other = addressOf(2);
+      await sendEmails(line, other, 1, 2);
+      await sendEmails(line, to, 1, EMAILS_PER_RECIPIENT + 1);
+      expect(await emailKeys(line, to)).toEqual(expectedEmailKeys(to, 2, EMAILS_PER_RECIPIENT + 1));
+
+      // An eviction: a new instance, whose new email double knows no key.
+      await evictDurableObject(line.stub);
+
+      const resent = await line.sendEmail(email(to, 1));
+      if (resent.result !== "accepted") throw new Error("the new double did not accept the email");
+      const kept = await line.sentEmails({ to });
+      expect(kept.emails.map((recorded) => recorded.request.idempotencyKey)).toEqual([
+        ...expectedEmailKeys(to, 3, EMAILS_PER_RECIPIENT + 1),
+        email(to, 1).idempotencyKey,
+      ]);
+      // The kept record is the new double's send, as it answered it.
+      expect(kept.emails[kept.emails.length - 1]).toEqual({
+        recordedAt: resent.acceptedAt,
+        providerMessageId: resent.providerMessageId,
+        request: email(to, 1),
+      });
+
+      // Sent once more, it is the new double's repeat: answered as that send, and nothing more is kept or dropped.
+      const rows = await tableRows(line, "test_phone_emails");
+      expect(await line.sendEmail(email(to, 1))).toEqual(resent);
+      expect(await line.sentEmails({ to })).toEqual(kept);
+      expect(await tableRows(line, "test_phone_emails")).toEqual(rows);
+      expect(await emailKeys(line, other)).toEqual(expectedEmailKeys(other, 1, 2));
+    },
+  );
+
+  it(
+    "parts: the new double sends it again as a new part, and the line keeps that send once, its number back, dropping the number sent to least recently as for any new number",
+    { timeout: TEST_MS },
+    async () => {
+      const line = freshLine();
+      const dropped = numberOf(0);
+      await sendParts(line, dropped, 1, 1);
+      const others = Array.from({ length: PART_RECIPIENTS }, (_unused, i) => numberOf(i + 1));
+      for (const other of others) await sendParts(line, other, 1, 1);
+      expect(await line.partsTo(dropped)).toEqual([]);
+
+      // An eviction: a new instance, whose new Linq double knows no key.
+      await evictDurableObject(line.stub);
+
+      const resent = await line.sendPart(part(dropped, 1));
+      expect(resent).toMatchObject({ result: "accepted" });
+      // The kept record is the new double's send, as it answered it.
+      const kept = await line.partsTo(dropped);
+      expect(kept).toEqual([{ at: expect.any(String) as string, sent: part(dropped, 1), outcome: resent }]);
+      // As for any new number past PART_RECIPIENTS, the one sent to least recently goes whole; the rest keep their part.
+      const [leastRecent, ...rest] = others as [string, ...string[]];
+      expect(await line.partsTo(leastRecent)).toEqual([]);
+      for (const number of rest) {
+        expect(partKeys(await line.partsTo(number)), number).toEqual(expectedPartKeys(number, 1, 1));
+      }
+
+      // Sent once more, it is the new double's repeat: answered as that send, and nothing more is kept or dropped.
+      const rows = await tableRows(line, "test_phone_parts");
+      expect(await line.sendPart(part(dropped, 1))).toEqual(resent);
+      expect(await line.partsTo(dropped)).toEqual(kept);
+      expect(await tableRows(line, "test_phone_parts")).toEqual(rows);
     },
   );
 });
