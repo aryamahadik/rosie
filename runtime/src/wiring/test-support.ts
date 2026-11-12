@@ -4218,11 +4218,11 @@ export interface SkeletonFakes {
    */
   readonly arming: FakeArmingCalls;
   /**
-   * Once set a text's safety result for the turn's commit to record, through the state reads' `resultsOf`. That double is
-   * gone (ADR-015 card B, T-1264): the turn reads each text's result through its leased turn, from what the joined read on
-   * arrival (T-554: `models`, over the recorded-model double) kept in the real actor's storage, so this sets nothing. Kept
-   * so its callers (the e2e skeleton, unchanged; the hop tests) read as they did; for a recorded text the read gives
-   * safety-no.json's result under its event id, what the commit records (K-09 README default 5).
+   * Sets nothing since ADR-015 card B (T-1264). It fed the state reads' `resultsOf` double, which is gone: the turn
+   * reads each text's result through its leased turn, from what the joined read on arrival (T-554: `models`, over the
+   * recorded-model double) kept in the real actor's storage. Kept so its callers (the e2e skeleton, unchanged; the hop
+   * tests) read as they did: for a recorded text the read gives safety-no.json's result under its event id, which is
+   * what the commit records (K-09 README default 5).
    */
   known(eventId: string): void;
 }
