@@ -2,9 +2,65 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 486, [`91c8bf2`](https://github.com/aryamahadik/rosie/commit/91c8bf2), 2026-11-12 20:54:12 UTC.
+- **Through:** commit 488, [`7c3fc58`](https://github.com/aryamahadik/rosie/commit/7c3fc58), 2026-11-12 21:19:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 488. docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495) (\#496)
+
+- **Commit:** [`7c3fc58`](https://github.com/aryamahadik/rosie/commit/7c3fc58), by Arya Mahadik, 2026-11-12 21:19:34 UTC
+- **Pull request:** [#496](https://github.com/aryamahadik/rosie/pull/496) from `task/commit-history-57`, merged 2026-11-12 21:19:34 UTC. It squashed 1 branch commit:
+  - `786b3e0` docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 487. T-1268: db/repo's error helpers scrub a connection that never opened; no host, port, user or password in any error or answer (\#491)
+
+- **Commit:** [`ddab8c9`](https://github.com/aryamahadik/rosie/commit/ddab8c9), by Arya Mahadik, 2026-11-12 21:19:30 UTC
+- **Pull request:** [#491](https://github.com/aryamahadik/rosie/pull/491) from `task/T-1268`, merged 2026-11-12 21:19:30 UTC. It squashed 7 branch commits:
+  - `6c69dbb` T-1268: db/repo's error helpers scrub a connection that never opened:…
+  - `ae5a9a9` Merge branch 'main' into task/T-1268
+  - `fd90fd0` T-1268: round 2 (DL-579): transientOrThrow throws a session's failure…
+  - `6f8b3a2` Merge branch 'main' into task/T-1268
+  - `f177fa5` T-1268: round 3 (DL-602), work in progress: commitTurn's and openChat…
+  - `5f209eb` Merge branch 'main' into task/T-1268
+  - `1f0cdfc` T-1268: round 4 (DL-612): every class in targets.ts's import chain th…
+- **Files changed:** 13 (+1339 −49), by folder:
+  - `db/repo/` chat-open.ts +5 −3, clocks.ts +71 −18, commit-turn.ts +21 −10, connect-failures.int.test.ts +1068 −0, copy-reads.int.test.ts +8 −5, handle-keys.ts +1 −1, reservation-rules.ts +1 −1, reservations.ts +4 −1, safety-reads.ts +1 −1, send-state.ts +1 −1, targets.ts +154 −4, turn-face-reads.ts +3 −3, turn-state.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1268: db/repo's error helpers scrub a connection that never opened: transientOrThrow answers 08001 for CONNECT_TIMEOUT, ECONNREFUSED, EHOSTUNREACH, ENETUNREACH, EHOSTDOWN, ENETDOWN, EADDRNOTAVAIL, ENOTFOUND and every EAI_ code, and 08006 for a socket error with no code; scrubbed throws any other client or connection error as a new Error with the call's name and its code alone; connect-failures.int.test.ts raises each for real or in postgres.js's and Node's shapes and runs 17 K-05 calls on a client that never connects
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1268: round 2 (DL-579): transientOrThrow throws a session's failure that is not transient scrubbed through clocks.ts's scrubbed, under an optional call name (EACCES, EPERM, ECONNABORTED, TLS and certificate codes, SASL_SIGNATURE_MISMATCH, MESSAGE_NOT_SUPPORTED, an error with a connection's marks, PostgreSQL's class 28 and 53300); each direct caller passes its K-05 call's name; copy-reads.int.test.ts's labels fixed; connect-failures.int.test.ts proves the scrubbed error by both helpers and through direct callers (EACCES, TLS name check, 28P01 and 53300 at a session's start)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1268: round 3 (DL-602), work in progress: commitTurn's and openChatOnText's catch blocks rethrow what transientOrThrow throws, their own scrubbed() kept for what it lets through unchanged; OUT_OF_MEM and UNSPECIFIED in SESSION_FAILED_CODES; connect-failures.int.test.ts adds both codes' constructed shapes and the two callers' direct cases (EACCES, the TLS name check, SASL_SIGNATURE_MISMATCH)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1268: round 4 (DL-612): every class in targets.ts's import chain that Node's type stripping cannot run takes plain fields set in its constructor instead of parameter properties, behavior unchanged: clocks.ts's DataAccessDatabaseError, Refused and Scope; commit-turn.ts's Refused, Scope and CommitTurnDatabaseError; reservations.ts's Refused. db/seeds/skeleton.ts, and so the seed runner and seed-staging.test.mjs, load db/repo/targets.ts again
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 486. docs: COMMIT\_HISTORY.md through commit 484 (09341bc, \#494) (\#495)
 
