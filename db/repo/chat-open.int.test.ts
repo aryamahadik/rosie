@@ -1,6 +1,8 @@
 // T-1212: K-05 v1.7's openChatOnText, a number's text opening its chat at receipt, against local PostgreSQL
 // (`npm run db:up`; `npm run test:integration -- db/repo/chat-open`). The schema comes from migrating a fresh test
-// schema (db/repo/test-db.ts); the public schema is never touched.
+// schema (db/repo/test-db.ts); the public schema is never touched. T-1251: the schema is in a database of this file's
+// own, so the claim in a fixture's chain never meets another run's lock on the same recipient (an advisory lock is per
+// database), and the failure tests find the session they cut among this database's sessions only.
 //
 // Every call runs as K-05 v1.7 states it (README item 46): through a client whose connections run as rosie_job, the
 // runtime side's role (0012: the only one that reads handles and phones), with no business scope. The tables' owner
@@ -13,7 +15,6 @@
 // the call appends, read back in K-04's column names, against K-08 v1's eventLogRow. Numbers are 555-01xx (rule 9).
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
-import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   type ChatOpenedEvent,
@@ -25,7 +26,6 @@ import {
   type OpenChatOnTextRequest,
   type TextService,
 } from "./chat-open";
-import { resolvePrimaryUrl } from "./client";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
 import {
   claimOutboxV12,
@@ -189,7 +189,7 @@ let job: Sql;
 let typedColumns: Map<string, string>;
 
 function runtimeClient(name: string, max: number, isolation?: "repeatable read"): Sql {
-  return postgres(resolvePrimaryUrl(), {
+  return db.connect({
     max,
     onnotice: () => undefined,
     connection: {
@@ -202,7 +202,7 @@ function runtimeClient(name: string, max: number, isolation?: "repeatable read")
 }
 
 beforeAll(async () => {
-  db = await createTestDatabase({ name: "chat_open" });
+  db = await createTestDatabase({ name: "chat_open", database: "own" });
   job = runtimeClient("rosie-t1212-chat-open", 10);
   const typed = await db.sql<{ key: string; type: string }[]>`
     select table_name || '.' || column_name as key, data_type as type from information_schema.columns
@@ -502,11 +502,15 @@ function text(handleId: string, label: string, n: number): OpenChatOnTextRequest
   };
 }
 
-/** The pid of the one session of `applicationName` waiting on a lock, polling every 20 ms for at most 20 s. */
+/**
+ * The pid of the one session of `applicationName` waiting on a lock, polling every 20 ms for at most 20 s: one of this
+ * file's database's sessions, never another run's (pg_stat_activity spans the server; T-1251).
+ */
 async function lockWaiter(applicationName: string): Promise<number> {
   for (let tries = 0; tries < 1000; tries += 1) {
     const [row] = await db.sql<{ pid: number }[]>`
-      select pid from pg_stat_activity where application_name = ${applicationName} and wait_event_type = 'Lock'
+      select pid from pg_stat_activity
+      where application_name = ${applicationName} and wait_event_type = 'Lock' and datname = current_database()
     `;
     if (row !== undefined) {
       return row.pid;

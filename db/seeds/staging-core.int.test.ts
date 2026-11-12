@@ -1008,10 +1008,16 @@ describe("node db/seeds/run.mjs --set staging-core", () => {
 });
 
 describe("no real number is in the repository: the numbers come from the environment at run time", () => {
-  it("every phone-like string in the seed sets (db/seeds, this set and its test included) and in the K-21 and K-06 fixtures the test phones mirror is in the fiction range, and this set's own are the roster's five fake handles", () => {
+  it("every phone-like string in the seed sets (db/seeds, this set and its test included) and in the K-21 and K-06 fixtures the test phones mirror is in the fiction range; the roster's list holds the roster's five fake handles, and this set and the skeleton seed none of their own", () => {
     const files = [...filesIn(path.join(REPO, "db/seeds")), ROSTER_FILE, SEND_FILE, PAGE_EVENT_FILE];
-    const self = path.join(REPO, "db/seeds/staging-core.ts");
-    expect(files).toContain(self);
+    // The fake handles' one home since T-1302 (K-05 v1.12 default 106): this set and the skeleton seed take them from it.
+    const list = path.join(REPO, "db/seeds/lib/roster.ts");
+    const seedFiles = ["db/seeds/staging-core.ts", "db/seeds/skeleton.ts"].map((file) =>
+      path.join(REPO, file),
+    );
+    for (const file of [list, ...seedFiles]) {
+      expect(files).toContain(file);
+    }
     expect(files).toContain(path.join(REPO, "db/seeds/staging-core.int.test.ts"));
     const notFictional: string[] = [];
     for (const file of files) {
@@ -1022,8 +1028,14 @@ describe("no real number is in the repository: the numbers come from the environ
       }
     }
     expect(notFictional).toEqual([]);
-    const own = [...readFileSync(self, "utf8").matchAll(PHONE_LIKE)].map((match) => match[0]);
+    const own = [...readFileSync(list, "utf8").matchAll(PHONE_LIKE)].map((match) => match[0]);
     expect(sorted(own)).toEqual(sorted(ROSTER.outcome.phones.map(fakeNumberOf)));
+    for (const file of seedFiles) {
+      expect(
+        [...readFileSync(file, "utf8").matchAll(PHONE_LIKE)].map((match) => match[0]),
+        file,
+      ).toEqual([]);
+    }
 
     // The grep catches a number written any common way. The samples are built here from parts, so this file holds no
     // phone-like string outside the fiction range: one in area code 555, which serves no one, and a fictional one.

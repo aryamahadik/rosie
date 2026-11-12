@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-alex-0022",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550101"
+  },
+  "service": "imessage",
+  "kind": "voteRemoved",
+  "messageId": null,
+  "chatId": "linq-chat-demo-alex",
+  "sentAt": "2026-10-23T14:22:00Z",
+  "receivedAt": "2026-10-23T14:22:01Z",
+  "body": null,
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 1
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": {
+    "pollId": "linq-msg-demo-0002",
+    "optionId": "linq-opt-demo-added-2",
+    "optionWords": "My SSN is [SSN]"
+  },
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-alex-0022"
+}

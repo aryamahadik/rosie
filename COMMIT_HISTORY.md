@@ -2,9 +2,157 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 449, [`1a7f415`](https://github.com/aryamahadik/rosie/commit/1a7f415), 2026-11-12 08:36:47 UTC.
+- **Through:** commit 457, [`c549f4b`](https://github.com/aryamahadik/rosie/commit/c549f4b), 2026-11-12 10:38:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 457. docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462) (\#467)
+
+- **Commit:** [`c549f4b`](https://github.com/aryamahadik/rosie/commit/c549f4b), by Arya Mahadik, 2026-11-12 10:38:21 UTC
+- **Pull request:** [#467](https://github.com/aryamahadik/rosie/pull/467) from `task/commit-history-44`, merged 2026-11-12 10:38:21 UTC. It squashed 1 branch commit:
+  - `576fa73` docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 456. T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), from which staging-core and skeleton take their roster ids, handle ids and numbers; staging's check tester set (db/seeds/check-tester.ts): a person, its example.com email handle, a live team row, a used sign-in code and a 30-day session holding the token's sha256 handed in by STAGING\_CHECK\_TESTER\_TOKEN\_SHA256, refused before any write off staging's public schema or for an absent or malformed hash; unit and integration tests (\#464)
+
+- **Commit:** [`97be452`](https://github.com/aryamahadik/rosie/commit/97be452), by Arya Mahadik, 2026-11-12 10:38:17 UTC
+- **Pull request:** [#464](https://github.com/aryamahadik/rosie/pull/464) from `task/T-1302`, merged 2026-11-12 10:38:17 UTC. It squashed 1 branch commit:
+  - `53a1c5c` T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), fr…
+- **Files changed:** 9 (+1724 −19), by folder:
+  - `db/seeds/` check-tester.int.test.ts +648 −0, check-tester.test.ts +330 −0, check-tester.ts +399 −0, skeleton.ts +7 −3, staging-core.int.test.ts +16 −4, staging-core.ts +22 −12
+  - `db/seeds/lib/` roster.int.test.ts +90 −0, roster.test.ts +159 −0, roster.ts +53 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 455. T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the actor's copy sources (K-05 v1.12 items 56 and 57), each in one read-only transaction as rosie\_job with the business scope set empty: a handle's running and missed timers at every business in due order, the sealed address as stored in PostgreSQL's hex text form, never opened; the phone row's stopped flag and version by handle id, notFound for no row; transient on a lost connection, scrubbed; and their integration tests (\#465)
+
+- **Commit:** [`f10551c`](https://github.com/aryamahadik/rosie/commit/f10551c), by Arya Mahadik, 2026-11-12 10:38:13 UTC
+- **Pull request:** [#465](https://github.com/aryamahadik/rosie/pull/465) from `task/T-1301`, merged 2026-11-12 10:38:13 UTC. It squashed 1 branch commit:
+  - `cf0bf86` T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the a…
+- **Files changed:** 2 (+1937 −0), by folder:
+  - `db/repo/` copy-reads.int.test.ts +1677 −0, copy-reads.ts +260 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 454. T-1251: the claim tests stop colliding with other integration runs on the shared local database (\#466)
+
+- **Commit:** [`4297762`](https://github.com/aryamahadik/rosie/commit/4297762), by Arya Mahadik, 2026-11-12 10:38:09 UTC
+- **Pull request:** [#466](https://github.com/aryamahadik/rosie/pull/466) from `task/T-1251`, merged 2026-11-12 10:38:10 UTC. It squashed 3 branch commits:
+  - `fb197bd` T-1251: the tests that take the claim's advisory lock make their sche…
+  - `0513972` T-1251: the three files in a database of their own give afterAll 120 …
+  - `72dfe82` T-1251: a database of a file's own is a pool database held through a …
+- **Files changed:** 4 (+255 −22), by folder:
+  - `db/repo/` chat-open.int.test.ts +11 −7, outbox.int.test.ts +87 −3, test-db.ts +151 −6
+  - `tests/contract/` data-access.v1.db-side.test.ts +6 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1251: the tests that take the claim's advisory lock make their schema in a database of their own, so another run's lock on the same recipient is never seen
+
+db/repo/test-db.ts gains database: "own" (a database per test file, made from template_postgis, else template1, and dropped with the file) and connect() for the connections a test opens itself. outbox.int.test.ts, chat-open.int.test.ts and the contract test's database side use it; chat-open's lock-waiter lookup keeps to its own database's sessions. A new outbox test shows a recipient's lock held in the shared database is not seen by the claim, and held in the file's own database is. db/repo/outbox.ts is unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1251: the three files in a database of their own give afterAll 120 s, a resource guard: dropping the database forces a checkpoint, which ran past the 30 s hook limit under load
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1251: a database of a file's own is a pool database held through a lock in the maintenance database and kept, so no DROP DATABASE checkpoint runs per file; the 120 s afterAll limits go again
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 453. docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461) (\#462)
+
+- **Commit:** [`69b3c85`](https://github.com/aryamahadik/rosie/commit/69b3c85), by Arya Mahadik, 2026-11-12 10:16:50 UTC
+- **Pull request:** [#462](https://github.com/aryamahadik/rosie/pull/462) from `task/commit-history-43`, merged 2026-11-12 10:16:50 UTC. It squashed 1 branch commit:
+  - `359fb04` docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 452. T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 v1.12 items 53 to 55) in db/repo/test-phone-reads.ts, each one read-only transaction as rosie\_job with no business scope, with their integration tests (every v1.12 fixture, the cases beyond them, the statements sent, read-only, lost connection) (\#463)
+
+- **Commit:** [`60ef75e`](https://github.com/aryamahadik/rosie/commit/60ef75e), by Arya Mahadik, 2026-11-12 10:16:46 UTC
+- **Pull request:** [#463](https://github.com/aryamahadik/rosie/pull/463) from `task/T-1300`, merged 2026-11-12 10:16:46 UTC. It squashed 1 branch commit:
+  - `38649c7` T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 …
+- **Files changed:** 2 (+2122 −0), by folder:
+  - `db/repo/` test-phone-reads.int.test.ts +1790 −0, test-phone-reads.ts +332 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 451. docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458) (\#461)
+
+- **Commit:** [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), by Arya Mahadik, 2026-11-12 09:00:57 UTC
+- **Pull request:** [#461](https://github.com/aryamahadik/rosie/pull/461) from `task/commit-history-42`, merged 2026-11-12 09:00:58 UTC. It squashed 1 branch commit:
+  - `52db5ab` docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 450. T-419: the real Resend send adapter: one email row from mail.rosfield.com with its reply address, thread headers and (for a confirmation) the chat link's QR, under the part's Idempotency-Key and a User-Agent; RESEND\_API\_KEY and the STAGING\_TEST\_INBOXES allow-list read by name, refused before any request when missing or off the list; live-check.mjs for T-1032 (the key read by name, never printed) (\#460)
+
+- **Commit:** [`7e82e92`](https://github.com/aryamahadik/rosie/commit/7e82e92), by Arya Mahadik, 2026-11-12 09:00:53 UTC
+- **Pull request:** [#460](https://github.com/aryamahadik/rosie/pull/460) from `task/T-419`, merged 2026-11-12 09:00:53 UTC. It squashed 1 branch commit:
+  - `b7ae610` T-419: the real Resend send adapter: one email row from mail.rosfield…
+- **Files changed:** 10 (+2059 −0), by folder:
+  - `adapters/src/email/resend-send/` index.ts +25 −0, live-check.d.mts +23 −0, live-check.mjs +218 −0, live-check.test.ts +311 −0, qr-png.ts +137 −0, send.test.ts +761 −0, send.ts +177 −0, types.ts +61 −0, validate.ts +170 −0, wire.ts +176 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 449. docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457) (\#458)
 
