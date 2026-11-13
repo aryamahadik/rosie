@@ -28,7 +28,8 @@
 //      holding exactly K-21 v1's signInCheck labels, in the table list and as PostgreSQL holds it.
 //   6. The three calls of rule 9 as the Tool API calls them, and DL-526's race: an attempt with a code and its twin
 //      with none count the same tries (line 222; see the note above that describe block on last_wrong_at).
-//   7. Every v1 and v1.1 fixture still holds, and every K-22 seed of every version loads together.
+//   7. Every v1 and v1.1 fixture still holds, and every K-22 seed of v1, v1.1 and v1.2 loads together. No later version's
+//      entry is loaded and no later table counted (DL-125): its migration may not have run on the branch that freezes it.
 //
 // It needs PostgreSQL: `npm run db:up` locally (DATABASE_URL, else the local Docker database when CI is unset), and the
 // merge check's service database in CI. Its schema is made in a pool database of its own (createTestDatabase with
@@ -180,10 +181,26 @@ const attemptsTable = must(
   `${TABLE} in v1.2's table list`,
 );
 const listedChecks = attemptsTable.checks ?? [];
-/** Every table of the part at v1.2: the lists of every version in the index, together (README line 176). */
-const partTables = [...new Set(entries.map((entry) => entry.version))]
-  .flatMap((version) => listOf(version).tables)
-  .map((table) => table.name);
+/**
+ * An index's entries of the part at v1.2 (README line 176): v1's, v1.1's and v1.2's, each selected by its version, and
+ * never a later version's (DL-125; DL-124, DL-181). K-22's next minor version is frozen before its migration, as v1.1
+ * and v1.2 were, so on that branch its entries name a table not yet migrated, and this file keeps working there
+ * (contracts/README.md line 76).
+ */
+const partEntriesOf = (index: readonly FixtureEntry[]): FixtureEntry[] =>
+  index.filter((entry) => {
+    const [major, minor] = placeOf(entry.version);
+    return major === MAJOR && minor <= MINOR;
+  });
+/** Every table of the part at v1.2: the lists of its versions in an index, together (README line 176). */
+const partTablesOf = (index: readonly FixtureEntry[]): string[] =>
+  [...new Set(partEntriesOf(index).map((entry) => entry.version))]
+    .flatMap((version) => listOf(version).tables)
+    .map((table) => table.name);
+/** The seeds of the part at v1.2 in an index: its accepted v1, v1.1 and v1.2 entries, in the index's order. */
+const partSeedsOf = (index: readonly FixtureEntry[]): FixtureEntry[] =>
+  partEntriesOf(index).filter((entry) => entry.expect === "accept");
+const partTables = partTablesOf(entries);
 
 /** A fixture of this part's index, as an absolute path. */
 const fixturePath = (file: string): string => path.join(FIXTURES_DIR, ...file.split("/"));
@@ -2298,14 +2315,54 @@ describe("K-22 v1.2 on PostgreSQL with every migration applied (T-1278's 0034 am
       }
     }
 
+    it("selects the part at v1.2 by version: in a copy of the index with v1.3, v1.10 and v2 entries added, the seeds loaded and the tables counted skip every later entry and still take every v1, v1.1 and v1.2 entry (DL-125)", () => {
+      // The index as a later version's freeze leaves it before that version's migration: entries naming tables and
+      // files no branch holds yet. The copy is built here; contracts/ is never changed.
+      const laterEntry = (version: string, kind: FixtureEntry["expect"]): FixtureEntry => ({
+        file: `${kind === "accept" ? "seed" : "invalid/refuse"}-t1291-later-${version}.json`,
+        version,
+        table: `t1291_later_${version.replace(/\W/g, "_")}`,
+        expect: kind,
+        shows: `a ${version} entry this test makes up`,
+        source: "T-1291 round 2 (DL-692)",
+      });
+      const later = ["v1.3", "v1.10", "v2"].flatMap((version) => [
+        laterEntry(version, "accept"),
+        laterEntry(version, "refuse"),
+      ]);
+      const withLater = [...entries, ...later];
+      const ownVersions = ["v1", "v1.1", "v1.2"];
+      const own = withLater.filter((entry) => ownVersions.includes(entry.version));
+
+      // Every v1, v1.1 and v1.2 entry, in the index's order, and no later one.
+      expect(partEntriesOf(withLater)).toEqual(own);
+      // The seeds the case below loads: every accepted v1, v1.1 and v1.2 entry, the same as from the index alone.
+      const seeds = partSeedsOf(withLater);
+      expect(seeds).toEqual(own.filter((entry) => entry.expect === "accept"));
+      expect(seeds).toEqual(partSeedsOf(entries));
+      for (const version of ownVersions)
+        expect(
+          seeds.some((entry) => entry.version === version),
+          version,
+        ).toBe(true);
+      // The tables it counts: the lists of v1, v1.1 and v1.2, together. No later version's list is read, so no table a
+      // later migration adds is named.
+      const tables = partTablesOf(withLater);
+      expect(tables).toEqual(
+        ownVersions.flatMap((version) => listOf(version).tables.map((table) => table.name)),
+      );
+      expect(tables).toEqual(partTables);
+      for (const entry of later) expect(tables).not.toContain(entry.table);
+    });
+
     it(
-      "loads every K-22 seed of every version together, each file once, and every table of the part gets rows",
+      "loads every K-22 seed of v1, v1.1 and v1.2 together, each file once, and every table of the part at v1.2 gets rows",
       SLOW,
       async () => {
         const counts = await rolledBack(async (tx) => {
           await load(
             tx,
-            entries.filter((entry) => entry.expect === "accept").map((entry) => fixturePath(entry.file)),
+            partSeedsOf(entries).map((entry) => fixturePath(entry.file)),
           );
           const found: Record<string, number> = {};
           for (const table of partTables) {
