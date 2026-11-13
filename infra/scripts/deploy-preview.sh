@@ -55,7 +55,7 @@ set -euo pipefail
 # the caller's environment would make it an exported one.
 unset -v database_url
 database_url="${STAGING_DATABASE_URL-}"
-unset -v STAGING_DATABASE_URL DATABASE_URL
+unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 cd "$ROOT"
 

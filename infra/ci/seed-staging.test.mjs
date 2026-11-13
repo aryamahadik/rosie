@@ -1400,6 +1400,59 @@ describe("seed-staging.sh hands the test phones' numbers to staging-core's run a
     assert.deepEqual(whereHeld(children, numbers, kindOf), ["date: env STAGING_TEST_PHONES, args 1"]);
     assert.deepEqual(namedIn(children, ["STAGING_TEST_PHONES"], kindOf), ["date: STAGING_TEST_PHONES"]);
   });
+
+  // T-1349 (T-1343's security review, new task b): a DATABASE_REPLICA_URL in the caller's environment (db/repo/client.ts
+  // reads it) leaves the script's environment before anything is started, as STAGING_DATABASE_URL and DATABASE_URL do:
+  // no run of the seed runner, no read of the session's end and no other command gets it. Made up: a .invalid host never
+  // resolves (RFC 6761).
+  const REPLICA_URL =
+    "postgres://t1349_replica_login:t1349-made-up-replica-password@db-t1349-replica.example.invalid:5432/t1349_replica";
+  const REPLICA_PARTS = [
+    "t1349_replica_login",
+    "t1349-made-up-replica-password",
+    "db-t1349-replica.example.invalid",
+    "t1349_replica",
+  ];
+
+  it("a DATABASE_REPLICA_URL of the caller's reaches no command, in its environment or its arguments, under allexport, bash -a -k or bash -x (T-1349)", async () => {
+    for (const [source, root, extra] of sources()) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["no option", {}, [], ""],
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = root.seed({
+          extra: { ...extra, DATABASE_REPLICA_URL: REPLICA_URL, ...variables },
+          bash,
+        });
+        await assertPhonesToStagingCoreAlone(result, what, REPLICA_PARTS);
+        assert.deepEqual(
+          namedIn(result.children, ["DATABASE_REPLICA_URL"], kindOf),
+          [],
+          `${what}: DATABASE_REPLICA_URL's name`,
+        );
+        for (const part of REPLICA_PARTS) {
+          assert.equal(result.output.includes(part), false, `${what}: the output holds a part of the URL`);
+        }
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+      }
+    }
+  });
+
+  it("a recorder keeps a DATABASE_REPLICA_URL in a command's environment or arguments, and the checks find it (the control for T-1349's checks)", (t) => {
+    const dir = tempDir(t, "seed-replica-control");
+    const spy = spies(dir, ["date"]);
+    spawnSync(path.join(spy.bin, "date"), ["-u", `/made-up/${REPLICA_URL}`], {
+      env: { PATH: spy.bin, DATABASE_REPLICA_URL: REPLICA_URL },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    assert.deepEqual(whereHeld(children, REPLICA_PARTS, kindOf), ["date: env DATABASE_REPLICA_URL, args 1"]);
+    assert.deepEqual(namedIn(children, ["DATABASE_REPLICA_URL"], kindOf), ["date: DATABASE_REPLICA_URL"]);
+  });
 });
 
 describe("seed-staging.sh keeps the token and its hash in variables of its own", () => {
@@ -1445,8 +1498,8 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
       "the first commands",
     );
     // After the four set lines: the unset lines, the token taken from the environment, its names dropped, the database
-    // URLs taken from the environment and their names dropped (T-1310), the test phones' numbers taken and their name
-    // dropped (T-1343), then lib.sh.
+    // URLs taken from the environment and their names dropped (T-1310) with a caller's DATABASE_REPLICA_URL (T-1349),
+    // the test phones' numbers taken and their name dropped (T-1343), then lib.sh.
     const unsets = [];
     let at = 4;
     for (; /^unset -v [A-Za-z_][A-Za-z0-9_ ]*$/.test(lines[at]); at += 1) {
@@ -1465,7 +1518,7 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
         `unset -v ${TOKEN_NAME} ${HASH_NAME}`,
         'db_url="${STAGING_DATABASE_URL:-}"',
         'caller_url="${DATABASE_URL:-}"',
-        "unset -v STAGING_DATABASE_URL DATABASE_URL",
+        "unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL",
         'test_phones="${STAGING_TEST_PHONES:-}"',
         "unset -v STAGING_TEST_PHONES",
         'source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"',

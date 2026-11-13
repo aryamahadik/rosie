@@ -102,7 +102,7 @@ unset -v STAGING_CHECK_TESTER_TOKEN STAGING_CHECK_TESTER_TOKEN_SHA256
 # (below), then dropped.
 db_url="${STAGING_DATABASE_URL:-}"
 caller_url="${DATABASE_URL:-}"
-unset -v STAGING_DATABASE_URL DATABASE_URL
+unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 # The test phones' numbers go the same way (T-1343): test_phones is handed on by name to staging-core's run alone.
 test_phones="${STAGING_TEST_PHONES:-}"
 unset -v STAGING_TEST_PHONES

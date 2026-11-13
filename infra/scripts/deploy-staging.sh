@@ -62,7 +62,7 @@ set -euo pipefail
 unset -v rosie_number rosie_number_var database_url
 rosie_number="${ROSIE_NUMBER:-}"
 database_url="${STAGING_DATABASE_URL:-}"
-unset -v ROSIE_NUMBER STAGING_DATABASE_URL DATABASE_URL
+unset -v ROSIE_NUMBER STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 bundle_dir="$ROOT/bundles/v0" # D-017's bundle v0 (T-163); --bundle names another bundle folder

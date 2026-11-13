@@ -797,4 +797,55 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
       "date: STAGING_DATABASE_URL",
     ]);
   });
+
+  // T-1349 (T-1343's security review, new task b): a DATABASE_REPLICA_URL in the caller's environment (db/repo/client.ts
+  // reads it) leaves the deploy's environment before anything is started, as STAGING_DATABASE_URL and DATABASE_URL do, so
+  // no command the deploy starts gets it, the scripts and programs that use the database included. Made up, as the
+  // caller's other URL.
+  const REPLICA_URL =
+    "postgres://t1349_replica_login:t1349-made-up-replica-password@db-t1349-replica.example.invalid:5432/t1349_replica";
+  const REPLICA_PARTS = [
+    "t1349_replica_login",
+    "t1349-made-up-replica-password",
+    "db-t1349-replica.example.invalid",
+    "t1349_replica",
+  ];
+
+  it("a DATABASE_REPLICA_URL of the caller's reaches no command, in its environment or its arguments, under allexport, bash -a -k or bash -x (T-1349)", () => {
+    for (const [source, rig, extra] of sources()) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["no option", {}, [], ""],
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = rig.deploy({
+          extra: { ...extra, DATABASE_REPLICA_URL: REPLICA_URL, ...variables },
+          bash,
+        });
+        assert.equal(result.status, 0, `${what}: exit ${String(result.status)}`);
+        assertHandedOnAlone(result, what, { others: REPLICA_PARTS });
+        assert.deepEqual(
+          namedIn(result.children, ["DATABASE_REPLICA_URL"], kindOf),
+          [],
+          `${what}: DATABASE_REPLICA_URL's name`,
+        );
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+      }
+    }
+  });
+
+  it("a recorder keeps a DATABASE_REPLICA_URL in a command's environment or arguments, and the checks find it (the control for T-1349's checks)", (t) => {
+    const dir = tempDir(t, "deploy-replica-control");
+    const spy = spies(dir, ["date"]);
+    spawnSync(path.join(spy.bin, "date"), ["-u", `/made-up/${REPLICA_URL}`], {
+      env: { PATH: spy.bin, DATABASE_REPLICA_URL: REPLICA_URL },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    assert.deepEqual(whereHeld(children, REPLICA_PARTS, kindOf), ["date: env DATABASE_REPLICA_URL, args 1"]);
+    assert.deepEqual(namedIn(children, ["DATABASE_REPLICA_URL"], kindOf), ["date: DATABASE_REPLICA_URL"]);
+  });
 });
