@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 570, [`a218f36`](https://github.com/aryamahadik/rosie/commit/a218f36), 2026-11-13 18:02:17 UTC.
+- **Through:** commit 572, [`d601db5`](https://github.com/aryamahadik/rosie/commit/d601db5), 2026-11-13 20:05:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 572. docs: COMMIT\_HISTORY.md through commit 570 (a218f36, \#578) (\#580)
+
+- **Commit:** [`d601db5`](https://github.com/aryamahadik/rosie/commit/d601db5), by Arya Mahadik, 2026-11-13 20:05:27 UTC
+- **Pull request:** [#580](https://github.com/aryamahadik/rosie/pull/580) from `task/commit-history-91`, merged 2026-11-13 20:05:28 UTC. It squashed 1 branch commit:
+  - `aae62b4` docs: COMMIT\_HISTORY.md through commit 570 (a218f36, \#578)
+- **Files changed:** 1 (+62 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +62 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 571. T-728: the journey-states seed set: for each money combo SCENARIOS.md lists (56, every one of each flow's 28 paths), four demo-shop bookings, one per stage journeys 4 to 6 start from: request (who\_for, reach\_by, customer), time\_saved (the line, a held reservation of the pro's time in open hours, the secure link, flow B's place, a photos quote), money\_before (nothing, a saved card, or the deposit or full price taken, with effect, payment, item and ledger line) and booked (visit, free-cancel time, terms snapshot). Never in staging's default run. Tests: the runner loads it on a seeded test schema, every state checked against the fixture files, reserve() refuses each saved time to anyone else, a second run writes nothing, the staging sets and --set staging-signed-up leave no state, and it refuses before the sets it builds on (\#579)
+
+- **Commit:** [`cc4b04b`](https://github.com/aryamahadik/rosie/commit/cc4b04b), by Arya Mahadik, 2026-11-13 20:05:22 UTC
+- **Pull request:** [#579](https://github.com/aryamahadik/rosie/pull/579) from `task/T-728`, merged 2026-11-13 20:05:23 UTC. It squashed 1 branch commit:
+  - `b15e215` T-728: the journey-states seed set: for each money combo SCENARIOS.md…
+- **Files changed:** 2 (+2800 −0), by folder:
+  - `db/seeds/` journey-states.int.test.ts +1031 −0, journey-states.ts +1769 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 570. docs: COMMIT\_HISTORY.md through commit 567 (1a97661, \#575) (\#578)
 
