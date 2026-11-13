@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-held-for-text-hours.json"],
+    "now": "2026-11-08T01:31:02Z",
+    "note": "8:31pm in New York: Sam's routine row of Alex's passed-on question, out-sam-passon-evening, is held to 8am (mark-held-for-text-hours: held_until 13:00Z). Sam's text then reads as danger, and the safety core writes his danger line, which goes at any hour (RULES 4.12: 'Safety beats text hours'), so this exchange's database side writes it itself before the claim, as commit-alex-safety's and write-plan-alex-safety's requests write Alex's, with Sam's ids: the turn turn-sam-safety-0063 (handle-sam, event evt-sam-0063, trace trace-sam-0063, committed at 01:31:00Z) and its one row out-sam-safety-0063 (send class safety, imessage, to handle-sam and person-sam at biz-lees-barbershop, no booking, question or copy, no versions read; after the held row in commit order), checked at version 2 with the fixed line safetyEmergency as its plan and final parts, its own row id in both. The safety claim takes it, and reads, passes and lists no row of another class: passedHeld is empty, where an ordinary claim lists the held row its later rows passed (claim-held-lets-later-pass; README item 67)."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-08T01:31:02Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-safety-0063",
+        "version": 3,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-safety-0063",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-safety-0063/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0063",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-08T01:31:02Z",
+          "lapsesAt": "2026-11-08T01:32:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}

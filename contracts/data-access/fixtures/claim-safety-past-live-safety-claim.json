@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["claim-alex-safety.json"],
+    "now": "2026-11-07T16:00:03Z",
+    "note": "T-1352's case in K-05's terms (DL-687): dispatcher-1's run holds Alex's first danger line, out-alex-safety-emergency, claimed at 16:00:00Z by claim-alex-safety (its claim lapses at 16:01:00Z), its part in flight to Linq (up to 15 s) or waiting 10 s to try again after a failure (K-07 rule 3). Alex's next text reads as danger too, and the safety core writes his second danger line, which no K-05 exchange writes after that claim, so this exchange's database side writes it itself before the claim, as commit-alex-safety's and write-plan-alex-safety's requests write the first, with these ids and times: the turn turn-alex-safety-0051 (handle-alex, event evt-alex-0051, trace trace-alex-0051, committed at 16:00:02Z) and its one row out-alex-safety-0051 (send class safety, imessage, to handle-alex and person-alex at biz-lees-barbershop, no booking, question or copy, no versions read; after the first line in commit order), checked at version 2 with the fixed line safetyEmergency as its plan and final parts, its own row id in both. The second line's danger wake, dispatcher-2, claims with sendClass safety: it waits for Alex's lock rather than skipping him, reads only his safety rows, passes the first line, sending under dispatcher-1's live claim (its claimer sends it, once), and takes the second, so an earlier line that is stuck or failing never holds a later one past its 5 s (README item 67; default 130). An ordinary claim of Alex's rows would stop at the first line and take nothing."
+  },
+  "request": {
+    "claimer": "dispatcher-2",
+    "recipientHandleId": "handle-alex",
+    "now": "2026-11-07T16:00:03Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-safety-0051",
+        "version": 3,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-alex-safety-0051",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-alex-safety-0051/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0051",
+        "claim": {
+          "claimer": "dispatcher-2",
+          "claimedAt": "2026-11-07T16:00:03Z",
+          "lapsesAt": "2026-11-07T16:01:03Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}

@@ -2583,6 +2583,78 @@
       "expect": "refuse",
       "shows": "A give-up of a row with no turn answered noTurn that lists a follow-up row it wrote: noTurn writes nothing (put right, it is give-up-sign-in-code-no-turn's outcome)",
       "source": "ADR-016 section 3; card V3's refused twins; K-05 v1.13 item 66"
+    },
+    {
+      "file": "claim-safety-past-live-safety-claim.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Alex's second danger line claimed by its own wake with sendClass safety, past his first line, sending under another run's live claim: the safety walk passes a safety row it cannot claim and takes the next, so an earlier line that is stuck or failing never holds a later one past its 5 s",
+      "source": "T-1352's rulings and DL-687 (the walk passes a live-claimed safety row); RULES 4.12; arch 04 lines 201 and 211; NQ-RT-9; K-07 v1 outboxClaim (one claim per row); K-05 v1.14 item 67 and default 130"
+    },
+    {
+      "file": "claim-safety-past-routine-live-claim.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed by its wake past his routine notice, sending under the sweep's live claim, which the safety walk never reads; an ordinary claim of his rows stops there",
+      "source": "T-1352's rulings (the security reviewer's 'THE RUN'); RULES 4.12; arch 02 line 111; arch 04 line 201; K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-planned-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Alex's danger line claimed past his booking's confirmation, still planned while it is composed, at which an ordinary walk stops",
+      "source": "T-1352's rulings (a danger row behind a turn's planned rows); arch 04 lines 211 and 225; K-05 v1 item 3; K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-held-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed at 8:31pm past his routine row held to 8am, with passedHeld empty: a safety claim reads, passes and lists no row of another class",
+      "source": "RULES 4.12 ('Safety beats text hours'); arch 02 lines 111 and 125; T-1352's rulings ('passedHeld is empty'); K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-ten-checked-rows.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed with limit 10 past ten checked routine notices, none of which a safety claim reads or counts toward its limit",
+      "source": "T-1352's rulings (the 10-row limit, runtime/src/dispatch/dispatcher.ts DEFAULT_LIMIT); arch 04 line 211; K-05 v1.14 item 67"
+    },
+    {
+      "file": "invalid/refuse-claim-safety-no-recipient.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim made with no recipient: sendClass is allowed only with a named recipient (put right, with handle-alex, it is claim-safety-past-live-safety-claim's request)",
+      "source": "T-1353's card; T-1352's rulings ('That claim is made only with a named recipient'); K-05 v1.14 item 67 and default 134"
+    },
+    {
+      "file": "invalid/refuse-claim-safety-other-class.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A claim asking for send class routine: sendClass takes safety alone (put right, safety, it is claim-safety-past-routine-live-claim's request)",
+      "source": "T-1353's card ('whose only value is safety'); arch 02 line 125; K-05 v1.14 item 67 and default 133"
+    },
+    {
+      "file": "invalid/refuse-safety-claim-takes-routine-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim answered with a routine notice claimed ahead of the danger line: a safety claim never takes a row of another class (put right, the notice left out, it is claim-safety-past-ten-checked-rows's outcome)",
+      "source": "RULES 7.2; T-1352's rulings (a safety claim never takes a routine row); K-05 v1.14 item 67"
+    },
+    {
+      "file": "invalid/refuse-safety-claim-lists-held-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim answered with Sam's held routine row in passedHeld: a safety claim lists no row it passed (put right, passedHeld empty, it is claim-safety-past-held-row's outcome)",
+      "source": "T-1352's rulings ('passedHeld is empty'); K-05 v1.14 item 67 and default 131"
     }
   ]
 }
