@@ -1,0 +1,22 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-10-21T23:22:30Z",
+    "environment": "staging",
+    "after": ["money-step-card.json", "money-card-form.json"],
+    "note": "After Stripe's form saved Alex's card (K-14 v1 cardSaved set saved_at on card-agent-alex-haircut, the runtime side), the page reads the card stage again: no second stage is made (one per step and purpose), and K-14 v1 pageIntent answers succeeded, as page-intent-card-saved.json, so no client secret goes out any more and the page shows the card as A5-07's form does, 'Card •••• 4242', with nothing taken (README default 69). The brand and last four are Stripe's published test card's (BP 9.4)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0003",
+      "traceId": "trace-page-alex-money-0001",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1",
+    "buyOptionId": null
+  },
+  "outcome": {
+    "result": "saved",
+    "card": { "brand": "visa", "last4": "4242" }
+  }
+}

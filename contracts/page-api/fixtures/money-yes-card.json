@@ -1,0 +1,27 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:22:40Z",
+    "environment": "staging",
+    "after": ["money-step-card.json", "money-card-form.json", "money-card-saved.json"],
+    "note": "A5-07's yes (FS section 7 screen 13: 'The exact words ticked are stored'): Alex ticks the words the step showed and taps Book it. Only the step's id goes up, so nothing the step showed can change between the two calls (README default 67). The page entry makes the yes's event and calls K-09 v1.3 takeMoneyBefore alone, stage yes, step A5-07, branch card, payBy cardOnPage, with the yes kind page carrying the step's words as it kept them and this event, exactly as tool-api/fixtures/j5-card-saved-yes-page.json: code builds the words again from the versions read and they match; in one commit booking_details.taken 'asked', set once, and the words he ticked as a K-29 ticked_terms consent with their sha256, which the booking write's terms snapshot will name (K-09 v1.3 README default 92). The consent's id comes back so the page shows the yes kept to the words it showed; the keys given (money_before, card_saved), the money words' rows and written never do (README default 68). Nothing is charged. The approval is ownerok, so the request goes to Sam next and nothing is charged for this visit until his OK (A6-01, A6-02; K-09 v1.4)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0004",
+      "traceId": "trace-page-alex-money-0001",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "moneyStepId": "ms-page-alex-haircut-1",
+    "yesEventId": "evt-page-alex-0014",
+    "branch": "card",
+    "took": "asked",
+    "consentId": "consent-agent-alex-haircut-terms",
+    "textsOffLine": null,
+    "next": "ownerOk"
+  }
+}

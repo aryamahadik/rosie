@@ -1,0 +1,23 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-10-03T13:04:00Z",
+    "environment": "staging",
+    "after": ["money-plan-read-back.json"],
+    "note": "Owen's own yes to the plan's terms on his page: the page entry makes the yes's event and calls K-09 v1.3 settleOffer alone, caller.kind page for the link's person, offer plan, step A5-21, answer agree, the plan from the offer it kept and the yes kind page with the read-back's exact words and this event, making the rows tool-api/fixtures/j5-plan-agree-turn.json makes from his own chat: the K-29 plan_terms consent bound to those words and their sha256, and the K-32 memberships row, kind plan, $35 a visit every 28 days, billed per_visit, naming that consent (K-09 v1.3 README default 96). The consent's id comes back; the plan's row stays on the server. A copy of the terms goes back on this page. The visit's own money step follows (A5-04)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-owen-plan-0002",
+      "traceId": "trace-page-owen-plan-0001",
+      "linkCode": "placeholder-secure-owen-haircut-0038"
+    },
+    "readBackId": "rb-page-owen-plan-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-owen-plan-1",
+    "yesEventId": "evt-page-owen-plan-0001",
+    "served": { "change": "plan", "answer": "agree", "consentId": "consent-owen-plan-terms" }
+  }
+}

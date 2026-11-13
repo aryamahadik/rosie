@@ -1,0 +1,19 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-10-21T23:24:10Z",
+    "environment": "staging",
+    "after": [],
+    "note": "Alex's skin fade at Lee's Barbershop (way list|card|counter: a card saved for the $20 fee), on the secure page the web app opened from its booking page (README default 66). The card stage was made on this step's first moneyCard (K-09 v1.3 takeMoneyBefore card, A5-07, keep true); Stripe's form then refused the card he typed (K-14 v1 cardSaveFailed: the bank declined it). The page reads the card stage again: K-14 v1 pageIntent says it still needs a card after a failed try, and the page entry answers 'Try another card', with no decline code, no bank's words and nothing about the card (RULES 3.11; A5-31: 'A card that's declined: \"Try another card\". Never the bank's reason'; S12-25; README default 69). The next call gives the form again. The link's code and the step's id are placeholders; the visit's time is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-fade-0007",
+      "traceId": "trace-page-alex-fade-0001",
+      "linkCode": "placeholder-secure-alex-fade-0032"
+    },
+    "moneyStepId": "ms-page-alex-fade-1",
+    "buyOptionId": null
+  },
+  "outcome": { "result": "tryAnotherCard" }
+}

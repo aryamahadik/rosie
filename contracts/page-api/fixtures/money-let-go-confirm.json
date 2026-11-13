@@ -1,0 +1,23 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-10-22T18:05:00Z",
+    "environment": "staging",
+    "after": ["money-let-go-read-back.json"],
+    "note": "Alex's yes to his no: the page entry makes the yes's event and calls K-09 v1.3 takeMoneyBefore alone, stage letGo, step A5-05, its no kind page with the read-back's exact words and this event, as tool-api/fixtures/j5-let-go-page.json makes it: in one commit his saved time released (K-05 v1 release, why let_go) and the request ended dropped (K-30 request_ended_why). No key; nothing was taken. The reservation and booking stay on the server."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-consult-0005",
+      "traceId": "trace-page-alex-consult-0001",
+      "linkCode": "placeholder-secure-alex-consult-0035"
+    },
+    "readBackId": "rb-page-alex-consult-no-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-consult-no-1",
+    "yesEventId": "evt-page-alex-consult-0005",
+    "served": { "change": "letGo", "requestEnded": true }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:42:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "Refused by the schema: money-yes-time-taken.json's late yes answered timeTaken with a times card, here one that finds nobody free. The secure page takes no pick (v1.2 bookingTimes and bookingPick take the booking page or a quote link's page only), so on the money calls and Needs you timeTaken's card is always null and the page offers another time as A5-06's words do (README default 77). With card null the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0031",
+      "traceId": "trace-page-alex-money-0004",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-2"
+  },
+  "outcome": {
+    "error": "timeTaken",
+    "card": {
+      "result": "card",
+      "cardId": "card-page-alex-0009",
+      "timesKind": "setstart",
+      "times": [],
+      "nobodyFree": true,
+      "sentNowOffered": false,
+      "takenNow": "A card is saved for the $20 fee; nothing is charged now",
+      "howPaid": "Paid at the counter after the visit",
+      "filter": { "with": null, "fromDay": null, "needBy": null },
+      "expiresAt": "2026-10-21T23:52:00Z"
+    }
+  }
+}

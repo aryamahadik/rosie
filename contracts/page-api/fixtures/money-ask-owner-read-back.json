@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-10-21T23:24:50Z",
+    "environment": "staging",
+    "after": ["money-card-try-another.json"],
+    "note": "A5-31's 'Ask Sam first' on Alex's secure page for the skin fade: no card he tried could be saved, so the step offered the owner's ask (moneyStepShown.askOwner true). He taps it. Nothing is written: the read-back says what the yes does, in A5-08's own terms (Sam is asked once, with the deadline and what silence does; the customer hears when they'll know), and the page entry keeps it with the link under its id, with the change and the K-09 v1.3 call that will make it, takeMoneyBefore askOwner, its why noCardWorks taken from stored facts, never the browser (README default 72). The deadline is K-09's (30 minutes of Sam's text hours: tool-api/fixtures/j5-ask-owner-page.json); the visit's time and the read-back's id are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-fade-0008",
+      "traceId": "trace-page-alex-fade-0001",
+      "linkCode": "placeholder-secure-alex-fade-0032"
+    },
+    "moneyStepId": "ms-page-alex-fade-1",
+    "change": { "kind": "askOwner" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-fade-ask-1",
+    "stepId": "A5-08",
+    "questionId": null,
+    "words": "Ask Lee's Barbershop to book your skin fade on Sat Oct 24 at 1:00pm with no card, so no fee can be charged? You'll hear by 7:55pm. If Lee's Barbershop doesn't answer by then, the time is let go, nothing is booked and nothing is charged.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:34:50Z"
+  }
+}

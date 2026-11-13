@@ -1,0 +1,26 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-11-03T16:03:40Z",
+    "environment": "staging",
+    "after": ["pay-page-step.json", "pay-page-yes.json"],
+    "note": "C3's pay page after the yes: the page entry reads the pay link's payment by K-14 v1 pageIntent, by the paymentId of its stripe_pay_link effect's providerObjectId on Lee's Barbershop's own account, from Rosie's own record and never from the link (as K-14 v1 page-intent-pay-link.json reads one): it still needs a card, so the answer carries the client secret and the shop's account for Stripe's form only, and the $55 it takes (README default 69). Before the yes the same call answers stepFirst (A5-04). Dee types her card into Stripe's form, which confirms the payment; paymentSucceeded then makes it paid (K-32 rule 5), and the page reads it again, paid. The client secret and the account id are placeholders, never logged."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-paypage-dee-sig-0003",
+      "traceId": "trace-paypage-dee-sig-0001",
+      "payCode": "placeholder-pay-dee-signature-0040"
+    },
+    "moneyStepId": "ms-paypage-dee-sig-1",
+    "buyOptionId": null
+  },
+  "outcome": {
+    "result": "form",
+    "purpose": "payment",
+    "state": "needsCard",
+    "clientSecret": "demo-client-secret-payment-dee-sig-1",
+    "accountId": "stripe-acct-demo-lees-barbershop",
+    "amount": { "cents": 5500, "currency": "USD" }
+  }
+}

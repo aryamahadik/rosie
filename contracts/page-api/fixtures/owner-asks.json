@@ -1,0 +1,42 @@
+{
+  "call": "readOwnerAsks",
+  "given": {
+    "now": "2026-10-21T23:30:40Z",
+    "environment": "staging",
+    "after": ["money-ask-owner-confirm.json"],
+    "note": "Needs you for Sam, signed in on the owner console (FS section 6.2 Needs you: 'Each says what is decided, the money, the deadline, and what silence does. Silence never books or charges'): the one journey 5 ask waiting at Lee's Barbershop, A5-08's 'Book it with nothing taken?' for Alex's skin fade (the K-30 owner_oks row tool-api/fixtures/j5-ask-owner-page.json wrote, version 1), with A5-08's question as its clock turn wrote it and its two options as the bundle labels them (K-09 v1.3 README default 93's table: '1 Book it', '2 Let it go, or no reply'), what the booking asks (K-03 pay.asks from the line's path), the deadline, and what silence does: it lets the time go (README default 75). A page-only read under the business's scope, for a person who may answer it (Sam, the owner); no card detail, contact or row of the booking shows. The visit's time is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0001",
+      "traceId": "trace-portal-sam-fade-0001",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "ownerAsks",
+    "asks": [
+      {
+        "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+        "version": 1,
+        "businessName": "Lee's Barbershop",
+        "customerName": "Alex M.",
+        "service": "Skin fade",
+        "with": "Riley",
+        "start": "2026-10-24T17:00:00Z",
+        "zone": "America/New_York",
+        "asks": "A card saved for the $20 fee",
+        "why": "noCardWorks",
+        "question": "Alex M. can't pay what this booking asks now: no card that works, or a phone booking before keypad payment. Book it anyway? Then no fee can be charged. No answer by 7:55pm: the time is let go. / Alex M. · Skin fade · Sat Oct 24 · 1:00pm · Riley / What it asks: A card saved for the $20 fee / Reply 1 Book it, 2 Let it go.",
+        "options": [
+          { "answer": "book", "label": "1 Book it" },
+          { "answer": "letGo", "label": "2 Let it go, or no reply" }
+        ],
+        "askedAt": "2026-10-21T23:25:00Z",
+        "answerBy": "2026-10-21T23:55:00Z",
+        "silence": "letGo"
+      }
+    ]
+  }
+}

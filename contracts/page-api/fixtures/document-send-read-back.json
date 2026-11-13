@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-11-03T19:19:50Z",
+    "environment": "staging",
+    "after": ["money-step-document.json"],
+    "note": "B5-34's 'Yes: a signed contract first' on Alex's secure page: he taps to get the contract. The plug-in names no other signer (rolesToName empty), so he names nobody. Nothing is written: the read-back says what the yes does (Rosie builds the contract and sends it to its signers; he signs it on this page; nothing is taken before everyone has signed; A5-20), and the page entry keeps it with K-09 v1.3 signDocument send, via page, coSigners none (README default 73). The words and the read-back's id are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0021",
+      "traceId": "trace-page-alex-heater-0020",
+      "linkCode": "placeholder-secure-alex-heater-0039"
+    },
+    "moneyStepId": "ms-page-alex-heater-1",
+    "change": { "kind": "sendDocument", "coSigners": [] }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-heater-send-1",
+    "stepId": "B5-34",
+    "questionId": null,
+    "words": "Lee Home Services sends you its contract for the water heater replacement, to read and sign on this page. You are its only signer. Nothing is taken before it is signed.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-03T19:29:50Z"
+  }
+}

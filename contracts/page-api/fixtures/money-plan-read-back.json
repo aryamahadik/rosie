@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-10-03T13:03:50Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A5-21 on Owen H.'s own secure page at Lee's Barbershop: the step offered the haircut plan from before the times (planOffer, billed per visit: K-09 v1.3 README default 106), its terms shown with their own yes, before any card. Owen picks '1 I agree'. Nothing is written: the read-back's words are the plan's terms with the answer picked, A5-21's own lines with the plan's values (MASTER-FLOW-A A5-21's san → cust), and they become the exact words of the K-29 plan_terms consent the confirm writes (K-09 v1.3 README default 96). The page entry keeps the plan from the step, never from the browser. The link's code, the step's and option's ids and the read-back's id are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-owen-plan-0001",
+      "traceId": "trace-page-owen-plan-0001",
+      "linkCode": "placeholder-secure-owen-haircut-0038"
+    },
+    "moneyStepId": "ms-page-owen-haircut-1",
+    "change": { "kind": "plan", "optionId": "opt-lees-plan-owen", "answer": "agree" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-owen-plan-1",
+    "stepId": "A5-21",
+    "questionId": null,
+    "words": "The plan's terms, before any card: / Haircut plan · every 4 weeks / Saturdays · 11:00am · Riley / Each visit: $35 / Each visit is booked and paid like this one / Skip, pause or end any time, by text / 1 I agree",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-03T13:13:50Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-11-03T16:03:20Z",
+    "environment": "staging",
+    "after": ["pay-page-step.json"],
+    "note": "C3's pay page, the yes: Dee ticks the words the step showed and taps Pay and book; only the step's id goes up. The yes comes before Stripe's form takes the payment ('Never: take money before the price and the yes to it': A5-04), so the page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, step A5-16, branch full, the $55 and payBy payLink from the step it kept, naming the booking's live pay link the server found by its code's hash, never the browser's (payLinkId), with the yes kind page carrying the step's words and this event, exactly as tool-api/fixtures/j5-pay-page-yes-page.json: booking_details.taken 'asked' and her ticked words as a K-29 ticked_terms consent, in one commit. Next, Stripe's form on this page takes her card for that payment (moneyCard); only paymentSucceeded makes it paid, within the link's deadline, and the booking write follows (K-09 v1.4). The pay link, its payment and the keys stay on the server."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-paypage-dee-sig-0002",
+      "traceId": "trace-paypage-dee-sig-0001",
+      "payCode": "placeholder-pay-dee-signature-0040"
+    },
+    "moneyStepId": "ms-paypage-dee-sig-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "moneyStepId": "ms-paypage-dee-sig-1",
+    "yesEventId": "evt-paypage-dee-sig-0002",
+    "branch": "full",
+    "took": "asked",
+    "consentId": "consent-dee-signature-cut-terms",
+    "textsOffLine": null,
+    "next": "payOnPage"
+  }
+}

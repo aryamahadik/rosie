@@ -1,0 +1,27 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:22:40Z",
+    "environment": "staging",
+    "after": ["money-step-card.json", "money-card-form.json", "money-card-saved.json"],
+    "note": "Refused by the schema: money-yes-card.json's yes to a card answered with no consent. A yes to a card, a deposit or the full price always writes the exact words ticked as its K-29 ticked_terms consent and answers it (FS section 7 screen 13: 'The exact words ticked are stored'; A5-07; K-09 v1.3 README 'Round 3', cheap note a). With its consentId the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0004",
+      "traceId": "trace-page-alex-money-0001",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "moneyStepId": "ms-page-alex-haircut-1",
+    "yesEventId": "evt-page-alex-0014",
+    "branch": "card",
+    "took": "asked",
+    "consentId": null,
+    "textsOffLine": null,
+    "next": "ownerOk"
+  }
+}

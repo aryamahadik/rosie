@@ -1,0 +1,26 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-11-05T14:59:00Z",
+    "environment": "staging",
+    "after": ["money-step-offers.json"],
+    "note": "A5-22's card for the pack Alex wants to buy ('The card is typed on the page'): the page entry calls K-09 v1.3 takeMoneyBefore alone, stage card, step A5-22, keep false (a card typed for a pack keeps no saved card row from this stage: K-32 default 15), whose stripe_save_card effect is eff-alex-hot-flow-card (tool-api/fixtures/j5-buy-pack-page.json's cardEffectId), and keeps it with the step's option. It reads the card save by K-14 v1 pageIntent on the studio's own account: it needs a card, so the answer carries the client secret and the account for Stripe's form only (README default 69). Nothing is charged here: the pack is charged at the buy, on its own yes. The client secret and the account id are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0002",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    },
+    "moneyStepId": "ms-page-alex-yoga-1",
+    "buyOptionId": "opt-yoga-buy-pack-5"
+  },
+  "outcome": {
+    "result": "form",
+    "purpose": "saveCard",
+    "state": "needsCard",
+    "clientSecret": "demo-client-secret-setup-alex-yoga-1",
+    "accountId": "stripe-acct-demo-yoga-studio",
+    "amount": null
+  }
+}
