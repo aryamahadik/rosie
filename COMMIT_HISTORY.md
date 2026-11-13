@@ -2,9 +2,93 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 572, [`d601db5`](https://github.com/aryamahadik/rosie/commit/d601db5), 2026-11-13 20:05:27 UTC.
+- **Through:** commit 575, [`fb1dc53`](https://github.com/aryamahadik/rosie/commit/fb1dc53), 2026-11-13 20:28:55 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 575. docs: COMMIT\_HISTORY.md through commit 572 (d601db5, \#580) (\#583)
+
+- **Commit:** [`fb1dc53`](https://github.com/aryamahadik/rosie/commit/fb1dc53), by Arya Mahadik, 2026-11-13 20:28:55 UTC
+- **Pull request:** [#583](https://github.com/aryamahadik/rosie/pull/583) from `task/commit-history-92`, merged 2026-11-13 20:28:56 UTC. It squashed 1 branch commit:
+  - `a0ff170` docs: COMMIT\_HISTORY.md through commit 572 (d601db5, \#580)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 574. T-1369: the Hyperdrive script sends PostgreSQL only a SCRAM-SHA-256 verifier and checks each login before Cloudflare stores its password (CQ-225) (\#582)
+
+- **Commit:** [`b16c142`](https://github.com/aryamahadik/rosie/commit/b16c142), by Arya Mahadik, 2026-11-13 20:28:50 UTC
+- **Pull request:** [#582](https://github.com/aryamahadik/rosie/pull/582) from `task/T-1369`, merged 2026-11-13 20:28:50 UTC. It squashed 4 branch commits:
+  - `85bdb60` T-1369: the Hyperdrive script sends PostgreSQL each login's SCRAM-SHA…
+  - `f69a8e6` T-1369: the first suite's and first test's titles say what holds now …
+  - `9f1542e` T-1369: the verifier test writes its no-break space in code, not as a…
+  - `cff51f1` T-1369: ADR-014 piece 2 names which card added each later stop rule (…
+- **Files changed:** 4 (+650 −82), by folder:
+  - `docs/adr/` 0014-worker-database-roles.md +4 −4
+  - `infra/ci/` create-staging-hyperdrive.test.mjs +465 −19
+  - `infra/scripts/` create-staging-hyperdrive.mjs +178 −57, create-staging-hyperdrive.sh +3 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1369: the Hyperdrive script sends PostgreSQL each login's SCRAM-SHA-256 verifier, made in-process with node:crypto (fresh 16-byte salt, 4096 iterations), never the password; it checks each login with select current_user over checked TLS before Cloudflare's create, and a refusal stops the run there; pg_stat_statements keeping utility text no longer stops it, every other stop rule stays; ALTER ROLE failures stop with nothing set and no plain-password fallback. Tests: the verifier equals PostgreSQL's for its salt (throwaway login, 28P01 for a wrong password, dropped after), a recording proxy and API show only verifiers reach the server and the password only its create's body, a refused login check and a refused ALTER ROLE stop before the create; ADR-014 piece 2's rules restated with CQ-225's answer and Neon's page
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1369: the first suite's and first test's titles say what holds now (the password only in the API's body, ALTER ROLE its verifier; one connection as the migrations' role and one check as each login)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1369: the verifier test writes its no-break space in code, not as an invisible character
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1369: ADR-014 piece 2 names which card added each later stop rule (debug_print by T-1252; log and pgaudit by T-1271)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 573. T-1352: the danger line's row is woken by its writer at once on a safety run (K-05 v1.14 item 67), never gated and never awaited; a run's safety rows go first (\#581)
+
+- **Commit:** [`d5cbbf7`](https://github.com/aryamahadik/rosie/commit/d5cbbf7), by Arya Mahadik, 2026-11-13 20:28:46 UTC
+- **Pull request:** [#581](https://github.com/aryamahadik/rosie/pull/581) from `task/T-1352`, merged 2026-11-13 20:28:46 UTC. It squashed 1 branch commit:
+  - `8a4c5e2` T-1352: the danger line's row is woken by its writer at once on a saf…
+- **Files changed:** 13 (+2063 −36), by folder:
+  - `runtime/src/dispatch/` actor-reading.worker.test.ts +8 −1, dispatcher.ts +96 −13, safety-run.worker.test.ts +515 −0, test-support.ts +147 −9, types.ts +7 −0
+  - `runtime/src/dispatch/limit8/` limit8.worker.test.ts +5 −0
+  - `runtime/src/dispatch/retry/` retry.worker.test.ts +5 −3
+  - `runtime/src/outage/ai/` lease.worker.test.ts +655 −5
+  - `runtime/src/safety/` arrival.ts +28 −0, danger-wake.test.ts +373 −0, types.ts +15 −0
+  - `runtime/src/wiring/` root.test.ts +185 −4, root.ts +24 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+- sendDanger starts SafetyDeps.wakeSafety for the row the core names (first or repeated), right after the hand-off time and before writeHold, dangerSent and releaseAtOnce; no reading is asked; a throw or rejection is caught; the run joins pending.
+- SafetyDeps gains wakeSafety, apart from wake (row S's gated wake).
+- root.ts joins the danger wake: runDispatch for the named recipient with sendClass safety, on dispatchDeps, the outage wake's trace rule.
+- DispatchOptions and ClaimOutboxRequest take v1.14's sendClass; a safety run repeats a transient claim and never sends a claimed row of another class (storeError, its claim left to lapse); a run asked for it with no recipient or another value throws before claiming.
+- sendRecipient sends a recipient's safety rows first, then the rest, each in commit order; LETS_LATER_PASS along that order.
+- The outbox double answers v1.14's safety walk (lock waited for, safety rows alone, passes what it cannot claim, limit among safety rows, passedHeld empty), with planned rows, claim records and a held lock for tests.
+- Tests: the lease rig's cases 1 to 8 through the real actor, safety-run.worker.test.ts, danger-wake.test.ts, root.test.ts; four tests that pinned a safety row behind an earlier row in one run restated to the new order (DL-687).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 572. docs: COMMIT\_HISTORY.md through commit 570 (a218f36, \#578) (\#580)
 
