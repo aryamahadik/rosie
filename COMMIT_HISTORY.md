@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 548, [`f0b7af2`](https://github.com/aryamahadik/rosie/commit/f0b7af2), 2026-11-13 12:11:14 UTC.
+- **Through:** commit 550, [`6b9227c`](https://github.com/aryamahadik/rosie/commit/6b9227c), 2026-11-13 12:40:25 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 550. docs: COMMIT\_HISTORY.md through commit 548 (f0b7af2, \#556) (\#557)
+
+- **Commit:** [`6b9227c`](https://github.com/aryamahadik/rosie/commit/6b9227c), by Arya Mahadik, 2026-11-13 12:40:25 UTC
+- **Pull request:** [#557](https://github.com/aryamahadik/rosie/pull/557) from `task/commit-history-81`, merged 2026-11-13 12:40:26 UTC. It squashed 1 branch commit:
+  - `93ac36d` docs: COMMIT\_HISTORY.md through commit 548 (f0b7af2, \#556)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 549. T-1350: inTransaction, inScopedTransaction and inBusinessTransaction decide rollback and release by targets.ts's foundGone (exported; bundles.ts imports it as its transaction starts), with 8-way socket cuts at fn's first statement and while idle after it, and fn's own error rolled back and released, in each file's integration tests (\#558)
+
+- **Commit:** [`dae9ff0`](https://github.com/aryamahadik/rosie/commit/dae9ff0), by Arya Mahadik, 2026-11-13 12:40:21 UTC
+- **Pull request:** [#558](https://github.com/aryamahadik/rosie/pull/558) from `task/T-1350`, merged 2026-11-13 12:40:22 UTC. It squashed 1 branch commit:
+  - `8df59cb` T-1350: inTransaction, inScopedTransaction and inBusinessTransaction …
+- **Files changed:** 7 (+1526 −27), by folder:
+  - `db/repo/` bundles.int.test.ts +496 −0, bundles.ts +15 −8, reservation-rules.int.test.ts +487 −1, reservation-rules.ts +14 −9, reservations.int.test.ts +499 −0, reservations.ts +12 −7, targets.ts +3 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 548. docs: COMMIT\_HISTORY.md through commit 546 (520d4bd, \#554) (\#556)
 
