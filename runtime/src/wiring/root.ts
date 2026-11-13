@@ -92,8 +92,9 @@ import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
 import { setBundleDeps } from "../bundle/pin";
 import type { BundleDeps, BundleRegistry } from "../bundle/types";
+import { actorOf } from "../clocks/actors";
 import { ArmingMemory, clockArming } from "../clocks/arming";
-import type { ClockActorRpc } from "../clocks/types";
+import type { ClockActorRpc, ClockActors, ClockDirectory } from "../clocks/types";
 import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatch/dispatcher";
 import { dispatchSendDoor, queueRetries, retryBodyOf } from "../dispatch/retry";
 import type { ClaimedRow } from "../dispatch/types";
@@ -478,6 +479,9 @@ export function composeRoot(options: RootOptions): Root {
   const dispatchLinq = door.door(ports.linqSend.parts);
   // Where a row left waiting for its next try is put (T-258; DL-315): the retry queue, through T-256's producer.
   const retries = queueRetries(options.retryQueue ?? null, now);
+  // The recipient actor's one reading, asked right before an outage line's row goes (T-1337): every run's, the wake's and
+  // the retry door's alike, through the arming port's directory and the HandleActor namespace.
+  const mayHaveStopped = actorReadingPort(ports.arming.directory, options.actors);
   /** The dispatcher's ports for one run, each claimed row sent on the trace `traceFor` gives it. */
   const dispatchDeps = (traceFor: DispatchDeps["traceFor"]): DispatchDeps => ({
     store: dispatchStore,
@@ -489,6 +493,7 @@ export function composeRoot(options: RootOptions): Root {
     now: utc,
     claimer: claimerOf(),
     retries,
+    mayHaveStopped,
   });
 
   const dispatcher: TurnDispatcher = {
@@ -672,6 +677,27 @@ export function composeRoot(options: RootOptions): Root {
 /** True when the port took its real implementation (./real.ts) in the root's environment. */
 function bindsReal(bindings: readonly Binding[], port: PortName): boolean {
   return bindings.some((binding) => binding.port === port && binding.implementation === "real");
+}
+
+/**
+ * The dispatcher's port to the recipient actor's one reading (T-1337; DL-656; DispatchDeps.mayHaveStopped): the handle
+ * actor of the row's recipient K-04 id, named by `directory` and reached through the HandleActor namespace (the route the
+ * clocks take: ../clocks/actors.ts actorOf), answering through HandleActor.mayHaveStoppedNow, the same function the safety
+ * read's outage line and the AI-down path ask. An actor that cannot be named (no namespace bound, a directory that cannot
+ * say) or that has no such call rejects; the dispatcher counts that, a throw and any answer that is not exactly false as a
+ * stop. Nothing is read here: no outage_texts, inbox, lease or stopped flag (DL-596).
+ */
+export function actorReadingPort(
+  directory: ClockDirectory,
+  actors: ClockActors | null,
+): NonNullable<DispatchDeps["mayHaveStopped"]> {
+  return async (recipientHandleId) => {
+    const actor = await actorOf({ directory }, actors, recipientHandleId);
+    if (actor?.mayHaveStoppedNow === undefined) {
+      throw new WiringError("no handle actor can be named for the row's recipient");
+    }
+    return actor.mayHaveStoppedNow();
+  };
 }
 
 const workerRoots = new WeakMap<Cloudflare.Env, Root>();
