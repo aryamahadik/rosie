@@ -1,0 +1,5 @@
+{
+  "call": "search",
+  "request": { "by": "nameAndTown", "name": "Lee's Barbershop", "town": "Springfield" },
+  "outcome": { "error": "unavailable", "retryAfterSeconds": null }
+}

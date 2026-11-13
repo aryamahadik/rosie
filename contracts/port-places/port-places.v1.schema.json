@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-places/port-places.v1.schema.json",
+  "title": "PortPlacesV1",
+  "description": "K-15 v1, the Google Places port: two calls. search finds a business's public listing by its name and town, or by the text read from a photo of its card, sign or listing, and gives up to five candidates with the fields the owner's read-back shows (name, address, phone, website), or says nothing matched; details gives one listing's fields, offered as prefill the owner confirms: name, address, phone, website, opening hours, categories and photos (02-contracts K-15; S1-09; S1-76; FS section 10). Google's ratings and reviews are never used (FS section 10), and a listing carries no email, since Google's Place has no email field (README, the spike), so S1-75 takes Q-02's default. In Rosie's own terms: the vendor's wire format stays inside the adapter (02-contracts section 5). Each call's request, response and errors are <call>.request, <call>.response and <call>.errors under $defs, and <call>.exchange pairs one request with its outcome, which is what every exchange fixture is (02-contracts section 2 item 2). search.span and details.span are the K-08 v1 portCall spans the calls write, with no name, address, phone or words in them. The root is any one of these, so the type generator writes a type for each (ADR-005). Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/search.exchange" },
+    { "$ref": "#/$defs/details.exchange" },
+    { "$ref": "#/$defs/search.span" },
+    { "$ref": "#/$defs/details.span" }
+  ],
+  "$defs": {
+    "listingRef": {
+      "title": "ListingRef",
+      "description": "A listing's reference: the provider's own id for the place (Google's place id, its Place's id), which every caller keeps and compares whole and never parses (K-09 v1 lookupListing listingRef and SetupS1_09 listingRef). It may be stored: Google exempts place ids from its caching limits [P5], recommends refreshing one older than 12 months, and answers an obsolete one with NOT_FOUND, which details gives as notFound. It has the form of a K-08 v1 label, so a span may name the listing (K-08 v1 span-places-call.json); Google's documents give place ids only by example, letters, digits, - and _ (README, the spike).",
+      "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+    },
+    "listingName": {
+      "title": "ListingName",
+      "description": "The business's name as its listing shows it (FS row B01 'Business name'; S1-09's read-back 'Lee's Barbershop LLC'); Google's displayName text [P1]. The listing's words as they are: the caller hides any word a profession bans before anything is shown (S1-09 'Such a word is never shown'; S13-11; FS section 10). A business's name, never a person's words: it still stays out of a span (search.span).",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "listingAddress": {
+      "title": "ListingAddress",
+      "description": "The listing's address on one line, as the provider formats it (FS row B03; S1-09's read-back '88 Elm St, Springfield'); Google's formattedAddress [P1]. Free text with no promised format, which the owner confirms or fixes in any words (S1-09). Its map pin is the geo port's, which geocodes the confirmed address (K-17; FS row B03), never this port's. An address: it never enters a span or a log line (K-08 v1 'never the raw number or words').",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "phone": {
+      "title": "ListingPhone",
+      "description": "The business's own phone as its listing shows it, in E.164 form, such as +15555550177 (FS row B04 'The business's own phone (from the listing)'; S1-09's read-back; K-23 v1 business_setup_listing_phone_form; K-09 v1 lookupListing listingPhone). The adapter writes Google's internationalPhoneNumber [P1] in E.164 form; a national form such as (555) 010-0177 never crosses the port. It stays the business's: customers book through Rosie's one number (D102), and it is never suggested as the owner's sign-in (S1-10; FS section 10). A phone number: it never enters a span or a log line (K-08 v1).",
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{6,14}$"
+    },
+    "website": {
+      "title": "ListingWebsite",
+      "description": "The website or listing link, read to draft About us and the photos and not shown (FS row B05; S1-09; S1-84), an http or https URL as K-09 v1 lookupListing's website and K-23 v1 business_setup.website take it; Google's websiteUri, 'The authoritative website for this place' [P1].",
+      "type": "string",
+      "pattern": "^https?://\\S+$"
+    },
+    "candidate": {
+      "title": "ListingCandidate",
+      "description": "One listing a search found, with the fields S1-09's read-back shows and registration screen 1 reads back (S1-09 'Here's what I read, and your Google listing matches. / Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177'; FS section 6.1 screen 1: B01, B03, B04, B05 [G]). The owner confirms each field (FS section 10). These are the fields K-09 v1 lookupListing's candidate takes from the port; its alreadyOnRosie is the Tool API's own (S1-76).",
+      "type": "object",
+      "properties": {
+        "listingRef": {
+          "description": "The listing's reference, for details and for the setup row (K-09 v1 SetupS1_09 listingRef).",
+          "$ref": "#/$defs/listingRef"
+        },
+        "name": { "$ref": "#/$defs/listingName" },
+        "address": { "$ref": "#/$defs/listingAddress" },
+        "phone": {
+          "description": "The listing's phone, or null when the listing shows none (FS row B04).",
+          "anyOf": [{ "$ref": "#/$defs/phone" }, { "type": "null" }]
+        },
+        "website": {
+          "description": "The listing's website, or null when the listing shows none (FS row B05).",
+          "anyOf": [{ "$ref": "#/$defs/website" }, { "type": "null" }]
+        }
+      },
+      "required": ["listingRef", "name", "address", "phone", "website"],
+      "additionalProperties": false
+    },
+    "hoursSpan": {
+      "title": "OpeningHoursSpan",
+      "description": "One span the listing shows the business open on one day of the week, in the listing's own local time of day (FS row H01 'Opening hours', weekly hours, [G] offered as prefill, the owner confirms each one; FS section 10). The shape of K-27 v1 weekly_hours: an ISO day, 1 Monday to 7 Sunday; a local time of day it opens, and one it closes, later on the same day, 24:00 for midnight; a span past midnight is two spans. The adapter maps Google's regularOpeningHours periods [P1] to it (README, 'Opening hours'); Google's own period shape and day numbers (0 Sunday to 6 Saturday) never cross the port.",
+      "type": "object",
+      "properties": {
+        "weekday": {
+          "description": "The day of the week, ISO 1 (Monday) to 7 (Sunday), as K-27 v1 weekly_hours.weekday.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7
+        },
+        "opensAt": {
+          "description": "When the span opens, a local time of day HH:MM, 00:00 to 23:59 (K-27 v1 weekly_hours.opens_at).",
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "closesAt": {
+          "description": "When the span closes, a local time of day HH:MM later than opensAt on the same day; 24:00 closes at midnight (K-27 v1 weekly_hours.closes_at).",
+          "type": "string",
+          "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$"
+        }
+      },
+      "required": ["weekday", "opensAt", "closesAt"],
+      "additionalProperties": false
+    },
+    "photoAuthor": {
+      "title": "PhotoAuthor",
+      "description": "Who a listing photo is credited to, as the provider gives it. Google's policies require the credit wherever the photo is shown ('You must always credit the author when displaying photos or reviews' [P6]; 'you must include the additional attribution in your application wherever you display the image' [P7]). A name, possibly a person's: it never enters a span or a log line.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The author's name as shown (Google's AuthorAttribution displayName [P1]).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "uri": {
+          "description": "The author's link (Google's AuthorAttribution uri [P1]), or null when none is given.",
+          "anyOf": [{ "type": "string", "pattern": "^https?://\\S+$" }, { "type": "null" }]
+        }
+      },
+      "required": ["name", "uri"],
+      "additionalProperties": false
+    },
+    "photo": {
+      "title": "ListingPhoto",
+      "description": "One photo on the listing, from which S1-84 picks a few for the owner to confirm (FS section 10 'Photos: picked from the listing or website'; FS row B07; S1-84 'picks a few photos from the website or listing it read at S1-09'). A reference and its credits only: v1 has no call that fetches a photo's image (README, open gaps). The reference is short-lived: it is used within the setup that read it and never stored, since Google's photo names cannot be cached and can expire [P7].",
+      "type": "object",
+      "properties": {
+        "photoRef": {
+          "description": "The photo's reference, opaque to every caller (Google's photo name, places/<place id>/photos/<photo> [P7], read in the adapter).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S+$"
+        },
+        "authors": {
+          "description": "The photo's credits, in the provider's order; empty when the provider gives none (Google's authorAttributions [P1]).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/photoAuthor" }
+        }
+      },
+      "required": ["photoRef", "authors"],
+      "additionalProperties": false
+    },
+    "listing": {
+      "title": "Listing",
+      "description": "One listing's fields, offered as prefill the owner confirms (02-contracts K-15 'Details'; FS section 10): its name, address, phone and website (S1-09), its opening hours and categories (FS section 10, decided Oct 27; FS row H01), and its photos (S1-84). Never Google's ratings or reviews (FS section 10 'Ratings and reviews from Google are not used'), never an email (Google's Place has no email field: the spike), never a map point (the geo port's, K-17).",
+      "type": "object",
+      "properties": {
+        "listingRef": {
+          "description": "The listing's reference (in the double, the one the request named).",
+          "$ref": "#/$defs/listingRef"
+        },
+        "name": { "$ref": "#/$defs/listingName" },
+        "address": { "$ref": "#/$defs/listingAddress" },
+        "phone": {
+          "description": "The listing's phone, or null when the listing shows none (FS row B04).",
+          "anyOf": [{ "$ref": "#/$defs/phone" }, { "type": "null" }]
+        },
+        "website": {
+          "description": "The listing's website, or null when the listing shows none (FS row B05).",
+          "anyOf": [{ "$ref": "#/$defs/website" }, { "type": "null" }]
+        },
+        "openingHours": {
+          "description": "The listing's regular opening hours, one span per open stretch of a day, in day and time order, or null when the listing shows none (FS row H01; S1-21's hours, prefilled from the listing). Prefill: the owner confirms each one before K-27 keeps it (FS section 10).",
+          "anyOf": [
+            { "type": "array", "items": { "$ref": "#/$defs/hoursSpan" }, "minItems": 1 },
+            { "type": "null" }
+          ]
+        },
+        "categories": {
+          "description": "The listing's categories as words, the primary first (FS section 10 'Categories: yes (offered as prefill)'; fixture set v1 test-kit shops' '[G] Barber'). Google gives the primary category's name as words, primaryTypeDisplayName [P1]; its other types are tags from Google's own type tables (such as barber_shop) [P8], the vendor's own values, which never cross the port, so from Google the list holds at most one name. Empty when the listing gives none. Prefill the owner confirms, each one (FS section 10).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "pattern": "\\S" }
+        },
+        "photos": {
+          "description": "The listing's photos, at most ten (Google: 'Each API can return up to 10 photos for a place location' [P7]); empty when it has none, and S1-84 asks for the owner's own ('Nothing to read? Send a few photos from your phone').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/photo" },
+          "maxItems": 10
+        }
+      },
+      "required": [
+        "listingRef",
+        "name",
+        "address",
+        "phone",
+        "website",
+        "openingHours",
+        "categories",
+        "photos"
+      ],
+      "additionalProperties": false
+    },
+    "searchText": {
+      "title": "SearchText",
+      "description": "Words a search is asked with, as given (S1-09; FS section 6.1 screen 1). The request's own: never in a span or a log line (K-08 v1).",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "search.request": {
+      "title": "SearchRequest",
+      "description": "Find a business's public listing (02-contracts K-15 'Search'; S1-09 'It reads the photo and checks the public listing'; FS section 6.1 screen 1 'search the Google listing, or send a photo of a card or sign'): by its name and town (as K-09 v1 lookupListing's nameAndTown query asks), or by the text read from a photo of its card, sign or listing (S1-09; K-02's photo reading, its card or listing kind, forms that text from the name, address and phone it read: 02-contracts K-02). A read with no side effect: repeating it is safe.",
+      "oneOf": [
+        {
+          "title": "SearchByNameAndTown",
+          "description": "The business's name and its town, as the owner gives them (S1-09 'A photo that can't be read: Rosie asks for the business name'; FS section 6.1 screen 1).",
+          "type": "object",
+          "properties": {
+            "by": { "const": "nameAndTown" },
+            "name": { "$ref": "#/$defs/searchText" },
+            "town": { "$ref": "#/$defs/searchText" }
+          },
+          "required": ["by", "name", "town"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SearchByPhotoText",
+          "description": "The text read from a photo of the business's card, sign or listing (S1-09 'Send a photo of your business card, sign, website or Google listing'; 02-contracts K-02 'which also form the text for K-15's search by photo text').",
+          "type": "object",
+          "properties": {
+            "by": { "const": "photoText" },
+            "text": { "$ref": "#/$defs/searchText" }
+          },
+          "required": ["by", "text"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "search.found": {
+      "title": "SearchFound",
+      "description": "One or more listings match, best first, in the provider's order; at most five, as K-09 v1 lookupListing's candidates (maxItems 5). The owner says which is theirs, or none (S1-09).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "found" },
+        "candidates": {
+          "description": "The listings found, best first (02-contracts K-15 'giving candidates').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/candidate" },
+          "minItems": 1,
+          "maxItems": 5
+        }
+      },
+      "required": ["result", "candidates"],
+      "additionalProperties": false
+    },
+    "search.noMatch": {
+      "title": "SearchNoMatch",
+      "description": "No listing matched: the port's answer to an empty result. Not an error. S1-09's 'No match, or already listed' follows: S1-76, Rosie's team checks within 1 business day, setup goes on saved and nothing goes live meanwhile (S1-76; FS section 10). Whether a listing found is already on Rosie is the Tool API's to tell (K-09 v1 alreadyOnRosie), never the port's.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "noMatch" }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "search.response": {
+      "title": "SearchResponse",
+      "description": "Found, with its candidates, or no match (02-contracts K-15).",
+      "anyOf": [{ "$ref": "#/$defs/search.found" }, { "$ref": "#/$defs/search.noMatch" }]
+    },
+    "placesError": {
+      "title": "PlacesError",
+      "description": "The call failed, so nothing is known about the listing: unavailable (the provider failed, timed out or refused the key), rateLimited (the provider said to slow down, with any Retry-After: arch 10 line 540) or badRequest (the provider refused the request itself). An error never means no match or not found: those are answers. The caller's safe default meanwhile: the owner types the details instead, or says them on a call (S1-09 'No photo? Type the details, or say them on a call'; K-09 v1 lookupListing placesUnavailable).",
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "What failed (arch 10 line 540; K-08 v1 span outcome failed or timedOut).",
+          "type": "string",
+          "enum": ["unavailable", "rateLimited", "badRequest"]
+        },
+        "retryAfterSeconds": {
+          "description": "The provider's Retry-After, in whole seconds, when it gave one; otherwise null (arch 10 line 540: 'a rate limit with any Retry-After').",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        }
+      },
+      "required": ["error", "retryAfterSeconds"],
+      "additionalProperties": false
+    },
+    "search.errors": {
+      "title": "SearchError",
+      "description": "search's errors: placesError.",
+      "$ref": "#/$defs/placesError"
+    },
+    "search.exchange": {
+      "title": "SearchExchange",
+      "description": "One search and its outcome: an answer or an error (02-contracts section 2 item 2). The exchange fixtures are the Places double's fixed answers for the demo shops (02-contracts K-15 'The double: a few fixed listings for the demo shops').",
+      "type": "object",
+      "properties": {
+        "call": { "const": "search" },
+        "request": { "$ref": "#/$defs/search.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/search.response" }, { "$ref": "#/$defs/search.errors" }]
+        }
+      },
+      "required": ["call", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "details.request": {
+      "title": "DetailsRequest",
+      "description": "Read one listing's fields, by the reference a search gave (02-contracts K-15 'Details of one candidate'). Called when a step offers the listing's prefill: S1-09's read-back, S1-21's hours, S1-84's photos, the categories (FS section 10). A read with no side effect: repeating it is safe.",
+      "type": "object",
+      "properties": {
+        "listingRef": { "$ref": "#/$defs/listingRef" }
+      },
+      "required": ["listingRef"],
+      "additionalProperties": false
+    },
+    "details.found": {
+      "title": "DetailsFound",
+      "description": "The listing's fields (02-contracts K-15; FS section 10).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "found" },
+        "listing": { "$ref": "#/$defs/listing" }
+      },
+      "required": ["result", "listing"],
+      "additionalProperties": false
+    },
+    "details.notFound": {
+      "title": "DetailsNotFound",
+      "description": "The provider knows no such listing: an unknown reference, or an obsolete one (Google: 'The NOT_FOUND status code indicates that the specified place ID is obsolete' [P5]). An answer, not an error: the caller searches again by name and town, or the owner types the details (S1-09).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "notFound" }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "details.response": {
+      "title": "DetailsResponse",
+      "description": "Found, with the listing, or not found (02-contracts K-15).",
+      "anyOf": [{ "$ref": "#/$defs/details.found" }, { "$ref": "#/$defs/details.notFound" }]
+    },
+    "details.errors": {
+      "title": "DetailsError",
+      "description": "details' errors: placesError.",
+      "$ref": "#/$defs/placesError"
+    },
+    "details.exchange": {
+      "title": "DetailsExchange",
+      "description": "One details call and its outcome: an answer or an error (02-contracts section 2 item 2), as the Places double gives it for its fixed listings.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "details" },
+        "request": { "$ref": "#/$defs/details.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/details.response" }, { "$ref": "#/$defs/details.errors" }]
+        }
+      },
+      "required": ["call", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "search.span": {
+      "title": "SearchSpan",
+      "description": "The span a search writes: a K-08 v1 span on the portCall hop, provider google_places, call search, with its attempt (K-08 v1 README 'portCall covers ... a Google Places search or details (K-15, C-218; S1-09)'; K-08 v1 span-places-call.json is one). What it got and decided is a closed list here, so no name, town, address, phone or photo text ever enters it: got names the step and how it searched; decided names how many candidates came back and the best one's reference (K-08 v1 'never the raw number or words'; arch 02 diagram line 105: full detail only in sealed traces).",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "const": "portCall" },
+            "provider": { "const": "google_places" },
+            "call": { "const": "search" },
+            "got": {
+              "description": "The step that asked and how it searched, never the words (K-08 v1).",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step that asked, such as S1-09 (K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "searchBy": {
+                  "description": "nameAndTown or photoText (search.request).",
+                  "type": "string",
+                  "enum": ["nameAndTown", "photoText"]
+                }
+              },
+              "required": ["searchBy"],
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "The answer in a count and a reference, never a name or an address (K-08 v1). Left out on an error, whose code is the span's error_code.",
+              "type": "object",
+              "properties": {
+                "candidates": {
+                  "description": "How many candidates came back, 0 for no match (search.found, search.noMatch).",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5
+                },
+                "listing": {
+                  "description": "The best candidate's reference, when any came back (a business's public listing id, never words).",
+                  "$ref": "#/$defs/listingRef"
+                }
+              },
+              "required": ["candidates"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call", "attempt", "got"]
+        }
+      ]
+    },
+    "details.span": {
+      "title": "DetailsSpan",
+      "description": "The span a details call writes: a K-08 v1 span on the portCall hop, provider google_places, call details, with its attempt (K-08 v1 README 'portCall'). A closed list of what it got (the step and the listing's reference) and decided (found or not, and how many photos), so no name, address, phone, hours or photo credit ever enters it (K-08 v1 'never the raw number or words').",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "const": "portCall" },
+            "provider": { "const": "google_places" },
+            "call": { "const": "details" },
+            "got": {
+              "description": "The step that asked and the listing's reference (K-08 v1).",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step that asked, such as S1-09, S1-21 or S1-84 (K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "listing": {
+                  "description": "The reference asked for.",
+                  "$ref": "#/$defs/listingRef"
+                }
+              },
+              "required": ["listing"],
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "The answer as a label and a count (K-08 v1). Left out on an error, whose code is the span's error_code.",
+              "type": "object",
+              "properties": {
+                "result": {
+                  "description": "found or notFound (details.response).",
+                  "type": "string",
+                  "enum": ["found", "notFound"]
+                },
+                "photos": {
+                  "description": "How many photos the listing gave, when found.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                }
+              },
+              "required": ["result"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call", "attempt", "got"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "call": "details",
+  "request": { "listingRef": "places-demo-lee-home-services" },
+  "outcome": {
+    "result": "found",
+    "listing": {
+      "listingRef": "places-demo-lee-home-services",
+      "name": "Lee Home Services LLC",
+      "address": "1200 Main St, Springfield",
+      "phone": "+15555550142",
+      "website": "https://example.com",
+      "openingHours": [
+        { "open": { "day": 1, "hour": 9, "minute": 0 }, "close": { "day": 1, "hour": 17, "minute": 0 } },
+        { "open": { "day": 2, "hour": 9, "minute": 0 }, "close": { "day": 2, "hour": 17, "minute": 0 } },
+        { "open": { "day": 3, "hour": 9, "minute": 0 }, "close": { "day": 3, "hour": 17, "minute": 0 } },
+        { "open": { "day": 4, "hour": 9, "minute": 0 }, "close": { "day": 4, "hour": 17, "minute": 0 } },
+        { "open": { "day": 5, "hour": 9, "minute": 0 }, "close": { "day": 5, "hour": 17, "minute": 0 } },
+        { "open": { "day": 6, "hour": 10, "minute": 0 }, "close": { "day": 6, "hour": 14, "minute": 0 } }
+      ],
+      "categories": ["Plumber"],
+      "photos": []
+    }
+  }
+}

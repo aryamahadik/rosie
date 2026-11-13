@@ -1,0 +1,5 @@
+{
+  "call": "details",
+  "request": { "listingRef": "places-demo-test-mixed-shop-a" },
+  "outcome": { "result": "notFound" }
+}
