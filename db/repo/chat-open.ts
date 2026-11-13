@@ -107,16 +107,21 @@ export interface OpenChatOptions {
  * can hold a row's values, the number among them): its SQLSTATE and the table and constraint it names, nothing else.
  */
 export class OpenChatOnTextDatabaseError extends Error {
-  constructor(
-    readonly code: string,
-    readonly table: string | null,
-    readonly constraint: string | null,
-  ) {
+  // Plain fields set in the constructor, never parameter properties: Node's type stripping cannot run those, and
+  // `npm run typecheck` refuses them in db/ (db/tsconfig.erasable.json, T-1329; as T-1268's round 4 did in clocks.ts).
+  readonly code: string;
+  readonly table: string | null;
+  readonly constraint: string | null;
+
+  constructor(code: string, table: string | null, constraint: string | null) {
     const names = [
       table === null ? "" : `, table ${table}`,
       constraint === null ? "" : `, constraint ${constraint}`,
     ];
     super(`openChatOnText: the database refused the call (SQLSTATE ${code}${names.join("")})`);
+    this.code = code;
+    this.table = table;
+    this.constraint = constraint;
     this.name = "OpenChatOnTextDatabaseError";
   }
 }
