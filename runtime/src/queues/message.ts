@@ -61,14 +61,30 @@ export function isErrorLabel(value: unknown): value is string {
 }
 
 /**
+ * The errors that carry a refused PostgreSQL write, by name, with the field each keeps its constraint's name in (each
+ * keeps the SQLSTATE in `code`): postgres.js's PostgresError, and the two db/repo throws in its place, scrubbed of
+ * every value (T-1322): clocks.ts's DataAccessDatabaseError and commit-turn.ts's CommitTurnDatabaseError. Read by name
+ * and field alone: the runtime is handed db/repo's calls and imports none of its code.
+ */
+const REFUSAL_CONSTRAINT_FIELD: ReadonlyMap<string, string> = new Map([
+  ["PostgresError", "constraint_name"],
+  ["DataAccessDatabaseError", "constraint"],
+  ["CommitTurnDatabaseError", "constraint"],
+]);
+
+/**
  * The label a thrown value leaves: the error's name, then `threw`; for a refused PostgreSQL write, its SQLSTATE and
- * constraint (STATE note 3). Never the error's message, detail or any other field.
+ * constraint (STATE note 3), `<Name>:<SQLSTATE>[:<constraint>]`, whether postgres.js's PostgresError carries it or
+ * db/repo's DataAccessDatabaseError or CommitTurnDatabaseError carries it scrubbed (T-1340). A code that is no SQLSTATE
+ * gives `<Name>:threw`, as any other error does, and a constraint that is no constraint's name is left out. Never the
+ * error's message, detail, call, table or any other field.
  */
 export function errorLabelOf(thrown: unknown): string {
   if (!isRecord(thrown)) return "Thrown:threw";
   const name = typeof thrown.name === "string" && ERROR_NAME.test(thrown.name) ? thrown.name : "Error";
-  if (name === "PostgresError" && typeof thrown.code === "string" && SQLSTATE.test(thrown.code)) {
-    const constraint = thrown.constraint_name;
+  const constraintField = REFUSAL_CONSTRAINT_FIELD.get(name);
+  if (constraintField !== undefined && typeof thrown.code === "string" && SQLSTATE.test(thrown.code)) {
+    const constraint = thrown[constraintField];
     return typeof constraint === "string" && CONSTRAINT.test(constraint)
       ? `${name}:${thrown.code}:${constraint}`
       : `${name}:${thrown.code}`;
