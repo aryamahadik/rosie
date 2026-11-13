@@ -403,8 +403,8 @@ function checkSend(request: unknown): SendChecked {
 // ---- shared by both calls -----------------------------------------------------------------------------------------
 
 /**
- * The transaction's level, checked as its first statement (DL-610): read committed, so every statement after a lock
- * wait reads what the lock's holder committed. Any other level throws before anything is read or written.
+ * The transaction's level, checked before the call reads anything (DL-610): read committed, so every statement after a
+ * lock wait reads what the lock's holder committed. Any other level throws before anything is read or written.
  */
 async function assertReadCommitted(tx: Sql, call: string): Promise<void> {
   const [row] = await tx<{ level: string }[]>`select current_setting('transaction_isolation') as level`;
