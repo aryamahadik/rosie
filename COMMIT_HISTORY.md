@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 579, [`335d87c`](https://github.com/aryamahadik/rosie/commit/335d87c), 2026-11-13 22:07:49 UTC.
+- **Through:** commit 582, [`58c3677`](https://github.com/aryamahadik/rosie/commit/58c3677), 2026-11-13 22:35:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 582. docs: COMMIT\_HISTORY.md through commit 579 (335d87c, \#587) (\#590)
+
+- **Commit:** [`58c3677`](https://github.com/aryamahadik/rosie/commit/58c3677), by Arya Mahadik, 2026-11-13 22:35:16 UTC
+- **Pull request:** [#590](https://github.com/aryamahadik/rosie/pull/590) from `task/commit-history-95`, merged 2026-11-13 22:35:16 UTC. It squashed 1 branch commit:
+  - `4fcd180` docs: COMMIT\_HISTORY.md through commit 579 (335d87c, \#587)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 581. T-739: search query plan spike: SPIKE.md names the one query's shape (trade and place, owner rules materialized, free time per worker from hours minus reservations, busy blocks and time off, soonest then nearest, top 5 with exact prices) and the index list for the search-index migration (a GiST on (kind\_id, map\_point) over a trade-and-place table, resources by business for workers, a covering price index), with EXPLAIN (ANALYZE, BUFFERS) on the seeded demo shops and on a 300,000-business synthetic metro (3,465 ms with the migrated indexes, 126 ms with the set; 376 ms when no owner rule cuts the candidates). Scripts under spike/ only; both spike schemas dropped. (\#588)
+
+- **Commit:** [`0568029`](https://github.com/aryamahadik/rosie/commit/0568029), by Arya Mahadik, 2026-11-13 22:35:12 UTC
+- **Pull request:** [#588](https://github.com/aryamahadik/rosie/pull/588) from `task/T-739`, merged 2026-11-13 22:35:12 UTC. It squashed 1 branch commit:
+  - `50eb268` T-739: search query plan spike: SPIKE.md names the one query's shape …
+- **Files changed:** 6 (+988 −0), by folder:
+  - `actions/src/search/` SPIKE.md +337 −0
+  - `actions/src/search/spike/` candidate-indexes.sql +36 −0, search-a-places.sql +169 −0, search-a.sql +186 −0, seed-demo-shops.mjs +102 −0, synthetic.sql +158 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 580. T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (the contracts/tool-api content of 4766cff, judged in round 2, as one commit on main 335d87c so a rebase onto main applies; DL-739) (\#591)
+
+- **Commit:** [`6b71b23`](https://github.com/aryamahadik/rosie/commit/6b71b23), by Arya Mahadik, 2026-11-13 22:35:08 UTC
+- **Pull request:** [#591](https://github.com/aryamahadik/rosie/pull/591) from `task/T-054-r3`, merged 2026-11-13 22:35:08 UTC. It squashed 1 branch commit:
+  - `f0a94d8` T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fe…
+- **Files changed:** 55 (+7661 −3), by folder:
+  - `contracts/tool-api/` README.md +265 −2, frozen.json +1 −1, tool-api.rules.mjs +242 −0, tool-api.v1.9.schema.json +3480 −0
+  - `contracts/tool-api/fixtures/` index.json +50 −0, j7-business-call-off-turn.json +96 −0, j7-cancel-ask-turn.json +58 −0, j7-cancel-confirm-turn.json +88 −0, j7-class-count-job.json +55 −0, j7-death-report-turn.json +37 −0, j7-fee-charge-declined-job.json +86 −0, j7-fee-charge-paid-job.json +67 −0, j7-fee-never-job.json +66 −0, j7-fee-no-fee-page.json +73 −0, j7-fee-nothing-taken-job.json +79 −0, j7-fee-owner-charge-turn.json +64 −0, j7-final-count-turn.json +60 −0, j7-final-count-yes-turn.json +78 −0, j7-first-steps-check-job.json +83 −0, j7-late-cancel-confirm-turn.json +108 −0, j7-late-move-pick-turn.json +76 −0, j7-move-offer-turn.json +73 −0, j7-move-pick-turn.json +90 −0, j7-note-send-turn.json +63 −0, j7-owner-move-yes-turn.json +66 −0, j7-plan-price-keep-turn.json +64 −0, j7-pro-late-turn.json +60 −0, j7-pro-out-turn.json +58 −0, j7-relay-question-turn.json +58 −0, j7-reminder-job.json +58 −0, j7-running-late-turn.json +69 −0, j7-someone-else-asks-turn.json +37 −0, j7-stand-in-take-turn.json +87 −0, j7-updates-switch-turn.json +86 −0, j7-whats-booked-yes-turn.json +87 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-j7-answers-other-stage.json +90 −0, refuse-j7-cancel-no-consent.json +88 −0, refuse-j7-cancel-without-yes.json +83 −0, refuse-j7-change-not-bound.json +88 −0, refuse-j7-death-other-business-booking.json +37 −0, refuse-j7-fee-answer-from-agent.json +64 −0, refuse-j7-fee-charge-unbound.json +63 −0, refuse-j7-fee-on-silence.json +64 −0, refuse-j7-fee-paid-from-page.json +67 −0, refuse-j7-fee-pay-link-url.json +87 −0, refuse-j7-final-count-not-integer.json +60 −0, refuse-j7-final-count-yes-no-consent.json +78 −0, refuse-j7-late-cancel-charged.json +115 −0, refuse-j7-move-pick-from-job.json +90 −0, refuse-j7-plan-price-no-consent.json +64 −0, refuse-j7-reminder-with-code.json +59 −0, refuse-j7-someone-else-shown-booking.json +38 −0, refuse-j7-stand-in-without-yes.json +82 −0, refuse-j7-stated-key.json +90 −0, refuse-j7-updates-switch-from-page.json +86 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 579. docs: COMMIT\_HISTORY.md through commit 577 (0ef3a02, \#585) (\#587)
 
@@ -13120,3 +13171,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#343](https://github.com/aryamahadik/rosie/pull/343) T-1179: the compiler's publish keeps a database URL that does not parse out of every error (`task/T-1179`, 1 branch commit, closed 2026-11-11 05:01:21 UTC)
 - [#345](https://github.com/aryamahadik/rosie/pull/345) T-560: join hop 9, compose input from the Tool API and the composer's message plan (`task/T-560`, 3 branch commits, closed 2026-11-11 01:25:04 UTC)
 - [#432](https://github.com/aryamahadik/rosie/pull/432) T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (`task/T-1241`, 4 branch commits, closed 2026-11-12 00:35:31 UTC)
+- [#589](https://github.com/aryamahadik/rosie/pull/589) T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (`task/T-054`, 2 branch commits, closed 2026-11-13 22:10:38 UTC)
