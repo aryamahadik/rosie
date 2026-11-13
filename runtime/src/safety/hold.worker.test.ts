@@ -2,12 +2,14 @@
 // until the hold is written. Run inside the Workers runtime: the actor is the real Durable Object reached through the
 // gateway's door; the safety read, the shared core, the Linq send and the clock are the doubles of ./test-support, and a
 // turn's commit goes through the actor's own lease to K-05's double, as in ./store.worker.test.ts. Each test proves a line
-// of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives; the last two blocks
-// prove T-1318's card (T-1312's security notes b and a). Where a test makes a write (or a read) throw, the actor's own
-// storage call throws for it, picked by its table and its order (a SQLite trigger that refuses a write cannot also count
-// it: its abort undoes the count); where it makes a seal fail, it does so at the platform's WebCrypto encrypt, for one
-// text's result only. `closeResults` is reached on the actor's own safety read, inside a storage transaction, as the
-// lease's end of a turn calls it. Test values only (rule 9).
+// of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives; the two blocks
+// after them prove T-1318's card (T-1312's security notes b and a), and the last two T-1348's (T-1318's new tasks 1 and 2:
+// a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never
+// clears a danger flag the first read set). Where a test makes a write (or a read) throw, the actor's own storage call
+// throws for it, picked by its table and its order (a SQLite trigger that refuses a write cannot also count it: its abort
+// undoes the count); where it makes a seal fail, it does so at the platform's WebCrypto encrypt, for one text's result
+// only. `closeResults` is reached on the actor's own safety read, inside a storage transaction, as the lease's end of a
+// turn calls it. Test values only (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -44,6 +46,7 @@ import type { SafetyOnArrival } from "./arrival";
 import { harness, type Harness } from "./test-support";
 import type {
   RecordSafetyOutcomeRequest,
+  RecordSafetyOutcomeResponse,
   ReleaseSafetyHoldRequest,
   SafetyDeps,
   SafetyReadAnswer,
@@ -204,6 +207,41 @@ function countingCore(h: Harness, calls: RecordSafetyOutcomeRequest[]): SafetyDe
   };
 }
 
+/** The shared core's double that takes each record and never answers (a cut comes during its call); each request is kept. */
+function hangingCore(h: Harness, attempts: RecordSafetyOutcomeRequest[]): SafetyDeps["core"] {
+  return {
+    recordSafetyOutcome(request) {
+      attempts.push(request);
+      return new Promise(() => undefined);
+    },
+    sendFixedLine: (request) => h.core.sendFixedLine(request),
+    releaseSafetyHold: (request) => h.core.releaseSafetyHold(request),
+  };
+}
+
+/**
+ * The shared core's double answering a text's record again as K-09 v1 does ("one outcome row per text, and a repeat
+ * returns the first"): its first answer, marked repeated, so a danger applied again gets no second line. `rows` keeps the
+ * outbox row of each line the core wrote.
+ */
+function repeatingCore(h: Harness, rows: string[]): SafetyDeps["core"] {
+  const first = new Map<string, RecordSafetyOutcomeResponse>();
+  return {
+    async recordSafetyOutcome(request) {
+      const answer = await h.core.recordSafetyOutcome(request);
+      if ("error" in answer) return answer;
+      const earlier = first.get(request.safety.eventId);
+      if (earlier !== undefined) return { ...earlier, repeated: true };
+      first.set(request.safety.eventId, answer);
+      const row = answer.safetyLine?.outboxRowId ?? null;
+      if (row !== null) rows.push(row);
+      return answer;
+    },
+    sendFixedLine: (request) => h.core.sendFixedLine(request),
+    releaseSafetyHold: (request) => h.core.releaseSafetyHold(request),
+  };
+}
+
 /** evt-1's hold as the labels kept for it build it (`holdFromKept`): An emergency's rule, no id, no booking block. */
 const KEPT_HOLD: HoldEntry = {
   eventId: "evt-1",
@@ -251,6 +289,11 @@ function labelsOf(eventId: string): Promise<string[]> {
       .toArray()[0];
     return row === undefined ? [] : (JSON.parse(row.outcomes) as string[]);
   });
+}
+
+/** A text's kept K-02 result, as the actor's own safety read answers it for a turn (none kept: empty). */
+function keptResults(eventId: string): Promise<readonly SafetyResult[]> {
+  return runInDurableObject(stub(), (instance) => safetyOf(instance).resultsOf([eventId]));
 }
 
 /** The K-01 id of the danger line noted for a text on the direct path (none: null). */
@@ -1056,5 +1099,307 @@ describe("the replay's check for a hold and its write are one guarded step (T-13
       expect(refused()).toBe(1);
       expect(await actorOf().readHolds()).toEqual([released]);
     });
+  });
+});
+
+// ---- T-1348: T-1318's new tasks 1 and 2 --------------------------------------------------------------------------------
+
+describe("a danger whose hold is not written is read again on the read's own schedule until it is, its pending note written or not (T-1348, task 1)", () => {
+  it.each([
+    {
+      then: "the storage recovering before the record's replay: the replay then lands the core's id on that hold, and once the core releases it the routine parts go",
+      replayFirst: false,
+    },
+    {
+      then: "the record's replay coming first, its write of the core's hold throwing too, so the replay leaves no hold: the re-read writes it all the same",
+      replayFirst: true,
+    },
+  ])(
+    "on the direct path, with markDangerPending and every hold write throwing, the line goes once and the text is read again 30 s on; once the storage recovers, that re-read writes the hold from the kept labels, with no read sent, no second send and no core call; $then",
+    async ({ replayFirst }) => {
+      const calls: RecordSafetyOutcomeRequest[] = [];
+      await withActor(
+        { "evt-1": emergency("evt-1") },
+        { deps: (h) => ({ ...h.deps, core: countingCore(h, calls) }) },
+        async (run) => {
+          run.h.core.down = true;
+          const faults = await faultWrites({ safety_holds: () => true, safety_pending: () => true });
+          await arrive("evt-1", SMOKE_TEXT);
+          await run.settle();
+
+          // The note and the three writes of the hold threw; the line went once, at once, under its noted key, and its
+          // record waits. No note and no hold: the text names itself among the texts not read, routine work held.
+          expect(faults.refused("safety_pending")).toBe(1);
+          expect(faults.refused("safety_holds")).toBe(3);
+          expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+          expect(await idsIn("safety_pending")).toEqual([]);
+          expect(await idsIn("safety_line_done")).toEqual(["evt-1"]);
+          expect(await actorOf().readHolds()).toEqual([]);
+          expect(await unreadTexts()).toEqual(["evt-1"]);
+          expect(await actorOf().routineHeld()).toBe(true);
+          // It waits for its hold: it is read again on the read's own schedule, 30 s on, as a noted danger is.
+          await vi.waitFor(async () => {
+            expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+          }, WAIT);
+
+          if (replayFirst) {
+            // The core answers again: the record replays while the hold's write still throws (guarded), and it leaves
+            // the queue with no hold written.
+            run.h.core.down = false;
+            expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+            expect(faults.refused("safety_holds")).toBe(4);
+            expect(await actorOf().writeSafetyOnReturn()).toBe(0);
+            expect(await actorOf().readHolds()).toEqual([]);
+            expect(await unreadTexts()).toEqual(["evt-1"]);
+          }
+
+          // The storage takes every write again. 15 s: nothing is due yet, so nothing is read or written for it.
+          faults.lift();
+          await run.h.clock.advance(15_000);
+          await run.wake();
+          await run.settle();
+          expect(await actorOf().readHolds()).toEqual([]);
+          expect(await unreadTexts()).toEqual(["evt-1"]);
+
+          // 30 s: its re-read is due. Its line and record done and its result kept, it lacks only its hold: written from
+          // the kept labels, the danger is complete, with no read sent (ADR-018 section 2, point 2).
+          await run.h.clock.advance(15_000);
+          await run.wake();
+          await vi.waitFor(async () => {
+            expect(await actorOf().readHolds()).toEqual([KEPT_HOLD]);
+          }, WAIT);
+          expect(await unreadTexts()).toEqual([]);
+          expect(await idsIn("safety_pending")).toEqual([]);
+          expect(await idsIn("safety_line_done")).toEqual([]);
+          await vi.waitFor(noSafetyEntry, WAIT);
+          await run.settle();
+          expect(run.h.read.requests).toHaveLength(1);
+
+          if (!replayFirst) {
+            // The core answers again: the record replays, and the core's id lands on that hold. The core releases it
+            // (the turn's gate or the console names it by its id), and the routine parts go.
+            run.h.core.down = false;
+            expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+            expect(await actorOf().readHolds()).toEqual([{ ...KEPT_HOLD, holdId: "hold-evt-1" }]);
+            expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+            expect(await actorOf().routineHeld()).toBe(false);
+          }
+          // The line went once and nothing sent it again: one send, and the core had the danger's first try (refused)
+          // and the record's replay only.
+          expect(run.h.direct.sent).toHaveLength(1);
+          expect(calls.map((call) => call.caller.kind)).toEqual(["job", "actorOnReturn"]);
+        },
+      );
+    },
+  );
+
+  it("on the outbox path, with markDangerPending, step 1's hold and the core's hold write throwing, the core holds the line and the text, with no hold and no at-once release, is read again 30 s on; the storage recovers while that read is out, and its No is not used, but its step writes the note and the hold from the kept labels; the danger stays pending until the read that finds it again: applied again, the core answers the repeat, its hold takes the core's id and is released at once, and the routine parts go; the line went once", async () => {
+    const rows: string[] = [];
+    const requests: SafetyReadRequest[] = [];
+    const rereads = rereadSpans();
+    await withActor(
+      {},
+      {
+        deps: (h) => ({
+          ...h.deps,
+          core: repeatingCore(h, rows),
+          // The read on arrival finds the harm at once; each re-read answers 1 s after it is sent: No, then the harm.
+          read: {
+            async read(request) {
+              requests.push(request);
+              if (requests.length === 1) return verdict(harm(request.eventId));
+              await h.clock.after(1000);
+              return verdict(requests.length === 2 ? no(request.eventId) : harm(request.eventId));
+            },
+          },
+        }),
+      },
+      async (run) => {
+        const faults = await faultWrites({ safety_holds: () => true, safety_pending: () => true });
+        await arrive("evt-1", HARM_TEXT);
+        await run.settle();
+
+        // The core took the record and holds the line's outbox row. The note, step 1's hold and the core's hold each
+        // threw: no note, no hold, and no at-once release. The text names itself among the texts not read.
+        expect(faults.refused("safety_pending")).toBe(1);
+        expect(faults.refused("safety_holds")).toBe(2);
+        expect(run.h.core.recorded.map((call) => call.request.caller.requestId)).toEqual(["safety:evt-1"]);
+        expect(rows).toEqual(["out-evt-1"]);
+        expect(run.h.core.released).toEqual([]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await unreadTexts()).toEqual(["evt-1"]);
+        expect(await actorOf().routineHeld()).toBe(true);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+        }, WAIT);
+
+        // 30 s: read again on the read's own schedule; the storage takes every write again while the read is out.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(requests).toHaveLength(2);
+        }, WAIT);
+        faults.lift();
+
+        // 31 s: its No is not used (the first verdict stands). Its step writes the note, then the hold from the kept
+        // labels: the danger stays pending (its hold has no core id and was never released at once), read again 30 s on.
+        await run.h.clock.advance(1000);
+        await vi.waitFor(() => {
+          expect(rereads()).toBe(1);
+        }, WAIT);
+        const kept: HoldEntry = {
+          eventId: "evt-1",
+          holdId: null,
+          rule: "at_once",
+          blocksBooking: false,
+          released: false,
+        };
+        expect(await actorOf().readHolds()).toEqual([kept]);
+        expect(await idsIn("safety_pending")).toEqual(["evt-1"]);
+        expect(await labelsOf("evt-1")).toEqual(["Harm to a child or older adult"]);
+        expect(await unreadTexts()).toEqual([]);
+        expect(await actorOf().routineHeld()).toBe(true);
+        expect(run.h.core.recorded).toHaveLength(1);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 61_000 });
+        }, WAIT);
+
+        // 61 s: read again; 62 s: the harm again. Applied again, it reaches the core as a repeat of its record, answered
+        // repeated with its hold: the hold takes the core's id and is released at once after the line, so the routine
+        // parts go, and the danger is complete.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(requests).toHaveLength(3);
+        }, WAIT);
+        await run.h.clock.advance(1000);
+        await vi.waitFor(async () => {
+          expect(await idsIn("safety_pending")).toEqual([]);
+        }, WAIT);
+        await run.settle();
+        expect(await actorOf().readHolds()).toEqual([{ ...kept, holdId: "hold-evt-1", released: true }]);
+        expect(run.h.core.released.map((request) => request.holdId)).toEqual(["hold-evt-1"]);
+        expect(await actorOf().routineHeld()).toBe(false);
+        await vi.waitFor(noSafetyEntry, WAIT);
+        // The line went once: the core wrote one outbox row for it and answered the repeat as repeated, and nothing went
+        // straight through Linq.
+        expect(run.h.core.recorded.map((call) => call.request.caller.requestId)).toEqual([
+          "safety:evt-1",
+          "safety:evt-1",
+        ]);
+        expect(rows).toEqual(["out-evt-1"]);
+        expect(run.h.direct.sent).toEqual([]);
+      },
+    );
+  });
+});
+
+describe("a cut-off danger whose pending note was never written resumes as a danger in application, never as a fresh read (T-1348, task 2)", () => {
+  it("cut off during the core's call with its note's and its hold's writes refused, then resumed with the models answering No: its danger flag, labels and kept result stay, its hold is written from the kept labels before its batch reaches the lease, so no routine part goes before it, and it stays pending; the read that finds the danger again sends its line once", async () => {
+    const attempts: RecordSafetyOutcomeRequest[] = [];
+    const rereads = rereadSpans();
+    // After the cut, the first read says No and the second finds the emergency again.
+    const after = readsBy((eventId, nth) => (nth === 2 ? emergency(eventId) : no(eventId)));
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { lease: true, deps: (h) => ({ ...h.deps, core: hangingCore(h, attempts) }) },
+      async (run) => {
+        const faults = await faultWrites({ safety_holds: () => true, safety_pending: () => true });
+        await arrive("evt-1", SMOKE_TEXT);
+
+        // 0 s: the read finds An emergency. The note's and the hold's writes throw; the flag, the labels and the result
+        // are written; the core is called and never answers. Until its hold is written the text is among the texts not
+        // read.
+        await vi.waitFor(() => {
+          expect(attempts.map((request) => request.caller.requestId)).toEqual(["safety:evt-1"]);
+        }, WAIT);
+        expect(faults.refused("safety_pending")).toBe(1);
+        expect(faults.refused("safety_holds")).toBe(1);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "reading", danger: true },
+        ]);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await labelsOf("evt-1")).toEqual(["An emergency"]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(await unreadTexts()).toEqual(["evt-1"]);
+        expect(run.lease.turns).toEqual([]);
+
+        // 1 s: the cut, during the core's call; the storage takes every write again. 3 s: a new instance resumes it.
+        faults.lift();
+        await run.h.clock.advance(1000);
+        await run.evict({ ...run.h.deps, read: after });
+        await run.h.clock.advance(2000);
+        await run.wake();
+
+        // Resumed as a danger in application: its note is written, its hold is written from the kept labels, and it is
+        // read again at once. The read's No is not used: the flag, the labels and the kept result stay.
+        await vi.waitFor(async () => {
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "lineFailed", danger: true },
+          ]);
+          expect(rereads()).toBe(1);
+        }, WAIT);
+        expect(after.requests).toHaveLength(1);
+        expect(await labelsOf("evt-1")).toEqual(["An emergency"]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(await actorOf().readHolds()).toEqual([KEPT_HOLD]);
+        expect(await idsIn("safety_pending")).toEqual(["evt-1"]);
+        expect(await unreadTexts()).toEqual([]);
+        expect(await actorOf().routineHeld()).toBe(true);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 33_000 });
+        }, WAIT);
+
+        // Its batch reaches the lease with the hold written, and its commit is handed that hold: no routine part goes
+        // before it.
+        await vi.waitFor(() => {
+          expect(run.lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+        }, WAIT);
+        const turn = present(run.lease.turns[0], "the turn");
+        const hold = {
+          eventId: "evt-1",
+          holdId: null,
+          rule: "after_safe",
+          outcomes: ["An emergency"],
+          blocksBooking: false,
+        };
+        expect(turn.holds).toEqual([hold]);
+        expect(await commitOf(turn)).toMatchObject({ result: "committed" });
+        expect(run.lease.contexts).toEqual([{ holds: [hold], unread: [] }]);
+
+        // 33 s: read again, An emergency: applied again, its line goes once, through the core, which answers now; its
+        // hold takes the core's, and the danger is complete.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(async () => {
+          expect(await idsIn("safety_pending")).toEqual([]);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.core.recorded.map((call) => [call.at, call.request.caller.requestId])).toEqual([
+          [33_000, "safety:evt-1"],
+        ]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", danger: true, path: "outbox", lineId: "safetyEmergency" },
+        ]);
+        expect(await actorOf().readHolds()).toEqual([
+          {
+            eventId: "evt-1",
+            holdId: "hold-evt-1",
+            rule: "after_safe",
+            blocksBooking: true,
+            released: false,
+          },
+        ]);
+        expect(after.requests).toHaveLength(2);
+        expect(attempts).toHaveLength(1);
+        expect(run.h.direct.sent).toEqual([]);
+        await vi.waitFor(noSafetyEntry, WAIT);
+      },
+    );
   });
 });
