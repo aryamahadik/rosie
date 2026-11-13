@@ -258,7 +258,15 @@ async function rolledBack<T>(work: (sql: Sql) => Promise<T>): Promise<T> {
 }
 
 beforeAll(async () => {
+  // The clients and the folder first, before any statement, so afterAll can always end and remove them.
   admin = postgres(ADMIN_URL, { max: 3, onnotice: () => undefined, connect_timeout: 15 });
+  maker = postgres(MAKER_URL, {
+    max: 1,
+    onnotice: () => undefined,
+    connect_timeout: 15,
+    connection: { application_name: "rosie-t1333", search_path: `${SCHEMA}, public` },
+  });
+  staged = mkdtempSync(path.join(tmpdir(), "rosie-t1333-migrations-"));
   const [server] = await admin<{ version: number; superuser: boolean; bootstrap: string }[]>`
     select current_setting('server_version_num')::int as version,
            (select rolsuper from pg_roles where rolname = current_user) as superuser,
@@ -293,13 +301,6 @@ beforeAll(async () => {
   await admin.unsafe(
     `grant rosie_app, rosie_job to ${quote(MAKER)} with admin true, inherit false, set false`,
   );
-  maker = postgres(MAKER_URL, {
-    max: 1,
-    onnotice: () => undefined,
-    connect_timeout: 15,
-    connection: { application_name: "rosie-t1333", search_path: `${SCHEMA}, public` },
-  });
-  staged = mkdtempSync(path.join(tmpdir(), "rosie-t1333-migrations-"));
 }, 180_000);
 
 afterAll(async () => {

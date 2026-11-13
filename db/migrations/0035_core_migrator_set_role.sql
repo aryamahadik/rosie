@@ -28,10 +28,11 @@
 -- it grants that role to itself WITH SET TRUE, INHERIT FALSE, which the same page says a maker may do: "the CREATEROLE
 -- user can gain access to the created role by simply granting that role back to themselves with the INHERIT and/or SET
 -- options". PostgreSQL records it with the role itself as grantor, on a row of its own beside the maker's row, which
--- stays as it is. SET TRUE lets it become the role, as the seeds do inside their transaction; INHERIT FALSE gives it
--- none of the role's privileges and none of its policies while it is itself (a policy binds the roles whose privileges
--- a user has). Where 4 does not hold, nothing changes and the seed runner still refuses: this file never fails a deploy
--- for it.
+-- stays as it is ("because this automatic grant is granted by the bootstrap superuser, it cannot be removed or changed
+-- by the CREATEROLE user": the same page). SET TRUE lets it become the role, as the seeds do inside their transaction;
+-- INHERIT FALSE gives it none of the role's privileges and none of its policies while it is itself (a policy binds the
+-- roles whose privileges a user has). Where 4 does not hold, nothing changes and the seed runner still refuses: this
+-- file never fails a deploy for it.
 --
 -- What does not change: no other role is granted anything, so no login gains a membership it did not have. 0012's rule
 -- holds: the deploy names the login role that is granted one of the two, never both (ADR-014: rosie_worker_job inherits
