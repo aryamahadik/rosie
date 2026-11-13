@@ -749,7 +749,11 @@ describe("the frontier's transaction end, once work has its repo (T-1330; local 
   }
 
   /** The raw error the cut raises holds what it names, so the checks on the outcome mean something. */
-  async function expectRawHolds(raw: Error | null, holds: readonly string[], secrets: Secrets): Promise<void> {
+  async function expectRawHolds(
+    raw: Error | null,
+    holds: readonly string[],
+    secrets: Secrets,
+  ): Promise<void> {
     const rejected = await rejectionAtCut(raw);
     if (raw !== null) expect(rejected).toBe(raw);
     else expect(rejected).toMatchObject({ code: "CONNECTION_CLOSED" });
