@@ -59,7 +59,8 @@
 // Beside them, the PostgreSQL-down path's two ports (T-1363; C-175; arch 11 'PostgreSQL down', line 566), kept apart from
 // the twenty-one (`DOWN_PATH_PORTS`) so that D-017's list and its turn order stay as they are. Each carries a field of
 // ../outage/db's DbOutageDeps that no port of the twenty-one carries; T-1326 joins them into `setDbOutageDeps` with the
-// four it takes from the twenty-one (the probe, the sealing key store, the direct line and the safety read's directory):
+// four fields it takes from the twenty-one (the probe over the bundles port's readActiveBundle, the sealing key store,
+// the direct line and the safety read's directory):
 //
 //   port         what it carries                                                   joined by
 //   stopOrStart  K-09 v1 recordStopOrStart for the actorOnReturn caller: each      no D-017 hop
