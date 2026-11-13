@@ -153,7 +153,10 @@ function depsOf(linq: LinqPort, d: Doors, overrides: Partial<GatewayDeps> = {}):
   };
 }
 
-/** The K-06 event the actor will rebuild: the sealed words put back where they came from. */
+/**
+ * The K-06 event the actor will rebuild: the sealed words put back where they came from (the body, an email's subject and,
+ * since K-06 v1.2, a vote's option words: T-1297, as DL-554 says of hand-off.test.ts's rebuild).
+ */
 async function unsealed(handoff: SealedHandoff, keys: FakeKeyStore): Promise<Json> {
   const { sealed, ...rest } = handoff.event;
   const event: Json = { ...rest };
@@ -170,6 +173,9 @@ async function unsealed(handoff: SealedHandoff, keys: FakeKeyStore): Promise<Jso
   event.body = words.body;
   if (typeof event.email === "object" && event.email !== null) {
     event.email = { ...(event.email as Json), subject: words.subject };
+  }
+  if (typeof event.poll === "object" && event.poll !== null) {
+    event.poll = { ...(event.poll as Json), optionWords: words.optionWords };
   }
   return event;
 }
@@ -269,7 +275,8 @@ describe("the sealed body", () => {
     expect(stored).not.toContain("Re: Your haircut");
     const first = present(d.actor.written[0], "the first hand-off");
     const box = present(first.event.sealed, "the sealed box");
-    expect(box).toMatchObject({ v: 1, alg: "A256GCM" });
+    // Form 2 since K-06 v1.2: the gateway never makes a form 1 box after it (README "The sealed hand-off", items 3, 6).
+    expect(box).toMatchObject({ v: 2, alg: "A256GCM" });
     expect(fromBase64(box.iv)).toHaveLength(12);
     // The cipher text is the words and a 16-byte tag, so it cannot be shorter than the JSON of the words.
     expect(fromBase64(box.ct).length).toBeGreaterThan(cardNumber.body.length);

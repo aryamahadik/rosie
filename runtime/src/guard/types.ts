@@ -32,7 +32,10 @@ export interface GuardText {
   readonly eventId: string;
   /** Its K-06 kind: text, photo, reaction, pollVote, voteRemoved or edit. */
   readonly kind: string;
-  /** Its words, opened from the sealed box (K-06 `body`, and an email's subject); null when it has none. Never logged. */
+  /**
+   * Its words, opened from the sealed box (K-06 `body`, an email's subject, and since K-06 v1.2 a vote's option words);
+   * null when it has none. Never logged.
+   */
   readonly words: SealedWords | null;
 }
 

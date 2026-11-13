@@ -94,12 +94,19 @@ export {
 export {
   actorNameOf,
   openWords,
+  optionWordsOf,
+  sealEventWords,
   sealWords,
+  wordsOfEvent,
+  type EventBox,
+  type EventWords,
   type HandleKey,
   type HandleRef,
   type SealedBox,
+  type SealedBoxV2,
   type SealedWords,
   type SealingKeyStore,
+  type StoredWords,
 } from "./seal";
 export type {
   ActorHandoff,

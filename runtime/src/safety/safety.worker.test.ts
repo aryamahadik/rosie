@@ -8,6 +8,7 @@ import { reset, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import pollVote from "../../../contracts/inbound-event/fixtures/poll-vote.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
@@ -927,5 +928,97 @@ describe("the rules", () => {
     const matches = matchDangerWords(["Riley's cut won't stop bleeding"], FIXTURE_DANGER_WORDS);
     expect(timeoutResult("evt-alex-0210", matches)).toEqual(safetyTimeoutDangerWord);
     expect(timeoutResult("evt-x", []).outcomes).toEqual([]);
+  });
+});
+
+/**
+ * A vote of Alex's arrives through the gateway's door: K-06's poll-vote.json with this event id and option words, its
+ * words scrubbed and sealed in its form 2 box by the gateway's own hand-off (K-06 v1.2; T-1297), none in the clear.
+ */
+async function arriveVote(eventId: string, optionWords: string): Promise<SealedHandoff> {
+  const overrides: Json = { eventId, poll: { ...pollVote.poll, optionWords }, traceId: TRACE };
+  const prepared = await prepareHandoff(
+    {
+      event: { ...(pollVote as Json), ...overrides } as InboundEvent,
+      partKey: null,
+      traceId: TRACE,
+      bundleId: BUNDLE,
+    },
+    keys,
+  );
+  if (prepared.door !== "actor") throw new Error("not an actor event");
+  expect(prepared.handoff.event.poll).toEqual({
+    pollId: pollVote.poll.pollId,
+    optionId: pollVote.poll.optionId,
+  });
+  expect(prepared.handoff.event.sealed?.v).toBe(2);
+  expect(await door().accept(prepared.handoff)).toBe("written");
+  return prepared.handoff;
+}
+
+const noFor = (eventId: string): SafetyResult => ({ ...asResult(safetyNo), eventId });
+
+describe("a vote's words, once in its box, are read on arrival (DL-540; T-1297)", () => {
+  it("the safety read reads a vote's option words as its text, and the down path's keyword read reads them too: Rosie's option is another text, an option that reads STOP a stop", async () => {
+    const plain = "evt-alex-vote-0001";
+    const stop = "evt-alex-vote-0002";
+    await withWiredSafety({ [plain]: noFor(plain), [stop]: noFor(stop) }, {}, async (h) => {
+      await arriveVote(plain, "Sat 2:00pm");
+      await arriveVote(stop, "STOP");
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => [request.eventId, request.words])).toEqual([
+        [plain, { body: "Sat 2:00pm", subject: null }],
+        [stop, { body: "STOP", subject: null }],
+      ]);
+      expect(
+        (await actorOf().readSafety()).map((entry) => [entry.eventId, entry.state, entry.danger]),
+      ).toEqual([
+        [plain, "done", false],
+        [stop, "done", false],
+      ]);
+      await actorOf().outageIdle();
+      expect((await actorOf().readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: plain, kind: "other" }),
+        expect.objectContaining({ eventId: stop, kind: "stop" }),
+      ]);
+    });
+  });
+
+  it("a vote whose option holds a danger word, with no verdict in 4 s, gets the safety line (911) by the timeout rule, as a text does", async () => {
+    const eventId = safetyTimeoutDangerWord.eventId;
+    await withSafety({}, {}, async (h) => {
+      await arriveVote(eventId, "Riley's cut won't stop bleeding, please help");
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => request.words)).toEqual([
+        { body: "Riley's cut won't stop bleeding, please help", subject: null },
+      ]);
+      expect(h.core.recorded).toHaveLength(1);
+      expect(h.core.recorded[0]?.request.safety).toEqual(asResult(safetyTimeoutDangerWord));
+      expect(h.core.recorded[0]?.response).toMatchObject({ safetyLine: { fixedLineId: "safetyEmergency" } });
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("a vote kept before K-06 v1.2 (no box) has no words to read on arrival, as it was kept", async () => {
+    await withSafety({ "evt-alex-vote-0003": noFor("evt-alex-vote-0003") }, {}, async (h) => {
+      const { event } = await arriveVote("evt-alex-vote-0003", "Sat 2:00pm");
+      const kept = { ...event, eventId: "evt-alex-vote-0004", sealed: null, poll: { ...pollVote.poll } };
+      expect(
+        await door().accept({
+          event: kept,
+          partKey: null,
+          traceId: TRACE,
+          bundleId: BUNDLE,
+          actorName: ALEX,
+        }),
+      ).toBe("written");
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => request.eventId)).toEqual(["evt-alex-vote-0003"]);
+      expect((await actorOf().readSafety()).map((entry) => entry.eventId)).toEqual(["evt-alex-vote-0003"]);
+    });
   });
 });

@@ -10,6 +10,7 @@ import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
 
 import fixedLines from "../../../../contracts/bundle/fixtures/fixed-lines.json";
+import pollVote from "../../../../contracts/inbound-event/fixtures/poll-vote.json";
 import safetyEmergencyNow from "../../../../contracts/model/fixtures/safety-emergency-now.json";
 import {
   setBatchHooks,
@@ -29,7 +30,13 @@ import {
 import type { ActorCopies } from "../../actor/copies/copies";
 import type { LeaseHost } from "../../actor/lease";
 import { SAM_TIMER } from "../../actor/copies/test-support";
-import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../../gateway";
+import {
+  actorNameOf,
+  durableObjectActor,
+  prepareHandoff,
+  type ActorNamespace,
+  type HandleActorRpc,
+} from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
 import { Q01_DRAFTED } from "../../guard/replies/words";
 import type { SafetyResult } from "../../safety/types";
@@ -1271,5 +1278,58 @@ describe("a STOP stored but not committed stops the safety read's outage line to
     await noOutageLine(rig);
     await dangerStillGoes(rig);
     await noOutageLine(rig);
+  });
+});
+
+describe("a vote's words, once in its box, are read for a STOP (DL-540; T-1297)", () => {
+  it("a vote for an option that reads STOP, while PostgreSQL is down, is taken as a STOP: the flag copied, the stop reply straight through Linq, its record written on return with the option's words", async () => {
+    const VOTE = "evt-sam-0407";
+    const rig = rigFor({ [PRIME]: safetyNoFor(PRIME), [VOTE]: safetyNoFor(VOTE) });
+    await prime(rig);
+    rig.f.down = true;
+    // Sam's vote, through the gateway's own hand-off: K-06 v1.2 seals the option's words in its form 2 box.
+    const prepared = await prepareHandoff(
+      {
+        event: {
+          ...pollVote,
+          eventId: VOTE,
+          handle: SAM.handle,
+          sentAt: new Date(rig.f.clock.now()).toISOString(),
+          traceId: TRACE,
+          poll: { ...pollVote.poll, optionWords: "Stop" },
+        },
+        partKey: null,
+        traceId: TRACE,
+        bundleId: BUNDLE,
+      },
+      keys,
+    );
+    if (prepared.door !== "actor") throw new Error("not an actor event");
+    expect(prepared.handoff.event.poll).toEqual({
+      pollId: pollVote.poll.pollId,
+      optionId: pollVote.poll.optionId,
+    });
+
+    expect(await door().accept(prepared.handoff)).toBe("written");
+    await rig.settle();
+
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: VOTE, kind: "stop", keyword: "handled" }),
+    ]);
+    expect((await rig.actor.readCopies()).stopped).toMatchObject({ stopped: true });
+    expect(rig.f.direct.sent.map((send) => [send.idempotencyKey, send.overrideOptout])).toEqual([
+      [`keyword:${VOTE}:stopReply`, true],
+    ]);
+    expect((await rig.actor.readCopies()).returns.map((entry) => [entry.rank, entry.key])).toEqual([
+      ["stop", `recordStopOrStart:${VOTE}`],
+    ]);
+
+    // Back: the STOP is written as the vote's, with the words the person chose; it joins no turn.
+    rig.f.down = false;
+    await rig.tick(PROBE_MS);
+    expect(rig.f.stops.map((stop) => [stop.kind, stop.inboundEventId, stop.words])).toEqual([
+      ["stop", VOTE, "Stop"],
+    ]);
+    expect(rig.f.log.filter((call) => call.startsWith("commit:"))).toEqual([]);
   });
 });
