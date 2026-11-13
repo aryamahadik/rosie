@@ -5,7 +5,8 @@
 // joins (`SafetyDeps.wake`) is a double that keeps what it is asked. The host's one reading (`SafetyHost.stopped`, the
 // actor's) answers as each test sets it, ask by ask: before the stopped flag is read, right before the core's send, and
 // right before the wake. The real actor and the real dispatcher are ../outage/ai/lease.worker.test.ts's (T-1337's rig).
-// Test values only (rule 9).
+// The wake is started and never awaited (DL-679): a held wake's run is still out when the text's work ends. Test values
+// only (rule 9).
 
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 
@@ -60,13 +61,18 @@ interface Run {
   calls: string[];
   /** The text's safety entry once its work has ended. */
   entry: SafetyEntry | undefined;
+  /** Ends a held wake's run (`wake: "held"`). */
+  release(): void;
 }
 
 interface Spec {
   /** The reading's answers, ask by ask (before the flag read, before the core's send, before the wake); null: no reading. */
   readings: readonly Reading[] | null;
-  /** The wake joined, how it ends; null: none joined. */
-  wake: "resolves" | "throws" | "rejects" | null;
+  /**
+   * The wake joined, how it ends; null: none joined. "held": its run stays out until the test releases it, and the text's
+   * work is not waited past its own end (no `idle`).
+   */
+  wake: "resolves" | "throws" | "rejects" | "held" | null;
   /** What the core answers the line with, from its written answer. */
   answer?: (written: SendFixedLineResponse) => SendFixedLineResponse | CoreError;
 }
@@ -87,6 +93,10 @@ async function run(spec: Spec): Promise<Run> {
   const wakes: Run["wakes"] = [];
   const calls: string[] = [];
   const readings = spec.readings === null ? null : [...spec.readings];
+  let release = (): void => undefined;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
   const safety: SafetyOnArrival = new SafetyOnArrival({
     storage: sqlStorage(),
     spanSink: () => () => undefined,
@@ -136,8 +146,9 @@ async function run(spec: Spec): Promise<Run> {
             });
             // The run takes a while: the line's hand-off time was taken before it.
             now += 1_000;
-            // A throw at the call itself, or a run that rejects.
+            // A throw at the call itself, a run that rejects, or a run held until the test releases it.
             if (spec.wake === "throws") throw new Error("the dispatcher's run failed");
+            if (spec.wake === "held") return held;
             return spec.wake === "rejects"
               ? Promise.reject(new Error("the claim failed"))
               : Promise.resolve();
@@ -156,7 +167,7 @@ async function run(spec: Spec): Promise<Run> {
   );
   if (prepared.door !== "actor") throw new Error("not an actor event");
   await safety.arrive(prepared.handoff);
-  await safety.idle();
+  if (spec.wake !== "held") await safety.idle();
   return {
     safety,
     core,
@@ -164,6 +175,7 @@ async function run(spec: Spec): Promise<Run> {
     wakes,
     calls,
     entry: safety.readSafety().find((entry) => entry.eventId === EVENT),
+    release,
   };
 }
 
@@ -195,6 +207,34 @@ describe("the safety read's outage line wakes the recipient's dispatcher once th
       },
     ]);
     expect(done.calls).toEqual(["reading", "reading", "core", "reading", "wake"]);
+  });
+
+  it("the wake is started, never awaited (DL-679; RULES 4.12): while its run is still out, the text's work (the promise the actor lends to waitUntil) has ended with the line's result kept, and the run is kept with the in-flight safety work: idle waits for it until it ends", async () => {
+    // `run` returns once the text's work has ended: with the wake awaited, it would wait for the held run.
+    const done = await run({ readings: [false, false, false], wake: "held" });
+
+    lineStands(done);
+    expect(done.wakes).toEqual([
+      {
+        request: { handleId: TEST_IDS.handleId, outboxRowIds: [ROW] },
+        state: "reading",
+        at: ARRIVED + CORE_MS,
+      },
+    ]);
+    expect(done.calls).toEqual(["reading", "reading", "core", "reading", "wake"]);
+
+    // The run is still out, so the safety work is not idle until it ends; then it is.
+    let idle = false;
+    const idling = done.safety.idle().then(() => {
+      idle = true;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(idle).toBe(false);
+    done.release();
+    await idling;
+    expect(idle).toBe(true);
+    expect(done.wakes).toHaveLength(1);
   });
 
   it("a repeated answer names a row an earlier ask wrote (a rerun, or the resume of a cut-off read): it is woken all the same", async () => {

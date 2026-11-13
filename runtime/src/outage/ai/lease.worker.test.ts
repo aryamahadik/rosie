@@ -40,6 +40,7 @@ import {
   turnIdOf,
   type BatchEntry,
   type HandleActor,
+  type HoldEntry,
   type SafetyEntry,
   type TurnEntry,
 } from "../../actor";
@@ -136,6 +137,7 @@ interface Party {
 interface ActorRpc {
   readTurns(): Promise<TurnEntry[]>;
   readSafety(): Promise<SafetyEntry[]>;
+  readHolds(): Promise<HoldEntry[]>;
   readBatches(): Promise<BatchEntry[]>;
   readWaitingBatches(): Promise<number[]>;
   safetyIdle(): Promise<void>;
@@ -941,6 +943,11 @@ describe("an outage line's row written before a STOP that has not committed is n
     /** True once a run reached the await it was held at. */
     reached: boolean;
     /**
+     * How many writers' wakes' runs have ended. The safety read's writer starts its wake and never awaits it (DL-679), so
+     * its line can be decided while the run is still out.
+     */
+    ended: number;
+    /**
      * The outage lines' writers' wake as the root builds it (../../wiring/root.ts `outageWake`, T-1341): one run of the real
      * dispatcher for the recipient the wake names, on these ports, the root's port to the real actor among them.
      */
@@ -1028,6 +1035,7 @@ describe("an outage line's row written before a STOP that has not committed is n
       heldAt: null,
       runGate: hold(true),
       reached: false,
+      ended: 0,
       async wake(request) {
         to.woken.push(structuredClone(request));
         if (to.wakeFails > 0) {
@@ -1036,6 +1044,7 @@ describe("an outage line's row written before a STOP that has not committed is n
         }
         // As the root's run: its report, a claim error included, is not read (the rows wait for the next run).
         await runDispatch(deps(), { recipientHandleId: request.handleId });
+        to.ended += 1;
       },
     };
     return to;
@@ -1618,6 +1627,8 @@ describe("an outage line's row written before a STOP that has not committed is n
 
         to.runGate.closed = false;
         await lineDecided(rig, S);
+        // The line was decided when the wake started (DL-679: never awaited); the run ends once it goes on.
+        await until(() => to.ended === 1, "the writer's run's end");
 
         expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowSOf(S)] }]);
         expect(to.claims).toEqual([SAM_HANDLE_ID]);
@@ -1625,6 +1636,114 @@ describe("an outage line's row written before a STOP that has not committed is n
         expect(await safetyOf(rig, S)).toMatchObject({ state: "done", path: "outbox", lineId: "outage" });
       },
     );
+
+    /**
+     * A text's safety read held while `gate` is closed: no verdict in 4 s; once the gate opens, a verdict with danger
+     * (safety-emergency-now.json, under the text's own event id) as its late answer.
+     */
+    function lateDangerFor(rig: DownRig, eventId: string, gate: Hold): void {
+      const late = fakeRead(rig.f.clock, {
+        [eventId]: { ...(safetyEmergencyNow as unknown as SafetyResult), eventId },
+      });
+      const read = rig.h.read.read.bind(rig.h.read);
+      rig.h.read.read = async (request) => {
+        if (request.eventId !== eventId) return read(request);
+        await gate.wait();
+        return late.read(request);
+      };
+    }
+
+    it("row S's wake is started, never awaited (DL-679; RULES 4.12): a text read as another text gets no verdict in 4 s, and its outage line's row is written and its writer's wake started while that run is held; its verdict then comes late, with danger, and the danger line's handling (sendDanger's record and safety row, the danger's hold in place of the unread one, the open batch closed for danger and handed on) completes while the run is still held; then the run sends row S once", async () => {
+      const to = sends();
+      // B is read as No at once; S's read gives no verdict in 4 s, and answers with danger once `verdict` opens.
+      const rig = await downRigFor(SAM, [B], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      const verdict = hold(true);
+      lateDangerFor(rig, S, verdict);
+      // The writer's run waits at its chat lookup, after its claim; the turn the danger's batch opens waits in decide.
+      to.heldAt = "the chat lookup";
+      rig.ai.decideHold.closed = true;
+      await text(rig, S, false);
+      // B comes 2 s on, so the batch window (3 s after the latest text) is still open at S's 4 s deadline.
+      await rig.tick(2000);
+      await text(rig, B, false);
+      await lineDecided(rig, B);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: S, kind: "other" }),
+        expect.objectContaining({ eventId: B, kind: "other" }),
+      ]);
+      expect(await stubSays()).toBe(false);
+
+      // 4 s from S's arrival, the timeout rule writes row S through the core and its writer starts the wake, whose run
+      // claims the row and waits at the chat lookup. The line's result is kept meanwhile: nothing waited for the run.
+      await rig.tick(2000);
+      await until(() => to.reached, "the writer's run at the chat lookup");
+      await lineDecided(rig, S);
+      const rowS = rowSOf(S);
+      expect(to.written).toEqual([rowS]);
+      expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowS] }]);
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: false,
+        path: "outbox",
+        lineId: "outage",
+        handedAfterMs: 4000,
+      });
+      expect(await rig.actor.readHolds()).toEqual([
+        { eventId: S, holdId: null, rule: "unread", blocksBooking: false, released: false },
+      ]);
+      expect((await rig.actor.readBatches()).at(-1)).toMatchObject({ reason: null, eventIds: [S, B] });
+
+      // S's verdict comes now, late, with danger, while the writer's run is still held.
+      verdict.closed = false;
+      await until(() => rig.ai.decideCalls.length === 1, "the turn the danger's batch opens");
+
+      // sendDanger: the core recorded the danger at once, and its safety line's row (send class safety) is written.
+      expect(
+        rig.f.core.recorded.map((call) => [
+          call.at,
+          call.request.safety.eventId,
+          "error" in call.response ? null : (call.response.safetyLine?.fixedLineId ?? null),
+        ]),
+      ).toEqual([[4000, S, "safetyEmergency"]]);
+      expect(to.written).toEqual([rowS, `out-${S}`]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: true,
+        path: "outbox",
+        lineId: "safetyEmergency",
+        handedAfterMs: 4000,
+      });
+      // The unread hold is lifted: the danger's own hold is in its place.
+      expect(await rig.actor.readHolds()).toMatchObject([
+        { eventId: S, holdId: `hold-${S}`, rule: "after_safe", released: false },
+      ]);
+      // The batch close for danger: the open window closed at once and went to the lease, whose turn waits in decide.
+      expect(await rig.actor.readBatches()).toMatchObject([
+        { reason: "danger", handed: true, eventIds: [S, B] },
+      ]);
+      expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [S, B], state: "leased" }]);
+      // All of it while the writer's run is still held: nothing has gone to Linq, and row S is still claimed by it.
+      expect(to.ended).toBe(0);
+      expect(to.linq.requests).toEqual([]);
+      expect(to.store.row(rowS).state).toBe("sending");
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+
+      // The run goes on: the actor's reading still says false (both texts read as other), so row S goes once.
+      to.runGate.closed = false;
+      await until(() => to.ended === 1, "the writer's run's end");
+      expect(
+        to.linq.requests.map((request) => [request.idempotencyKey, request.text, request.overrideOptout]),
+      ).toEqual([[`${rowS}/1/1`, OUTAGE_TEXT, false]]);
+      expect(to.store.row(rowS).state).toBe("sent");
+      expect(to.answers).toEqual([false]);
+
+      // The turn's held decide answers (the models down), so nothing is left waiting when the test ends; what that run
+      // asks for and sends is not this test's claim.
+      rig.ai.decideHold.closed = false;
+      await until(() => rig.o.waits.length === 1, "the turn's run's wait");
+    });
 
     it.each([
       ["the writer's wake throws", true],
