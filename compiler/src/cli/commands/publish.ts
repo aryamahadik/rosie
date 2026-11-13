@@ -151,7 +151,11 @@ function fromCaller(path: string): string {
   return isAbsolute(path) ? path : resolve(process.env.INIT_CWD ?? process.cwd(), path);
 }
 
-/** The lines of a publish K-05 refused or that failed its read back (exit 1). */
+/**
+ * The lines of a publish K-05 refused or that failed its read back (exit 1). A transient answer is named by its kind as
+ * a failure's line is (T-1202), the kind being its SQLSTATE (T-1314): since T-1314, db/repo answers a database that
+ * cannot be reached (ECONNREFUSED, ENOTFOUND, CONNECT_TIMEOUT) as transient, SQLSTATE 08001, which carries no OS code.
+ */
 function refusal(outcome: Exclude<Publish.PublishOutcome, { result: "published" }>, id: string): string[] {
   if (outcome.error === "valueMismatch")
     return [
@@ -160,7 +164,7 @@ function refusal(outcome: Exclude<Publish.PublishOutcome, { result: "published" 
     ];
   if (outcome.error === "transient")
     return [
-      `PostgreSQL could not answer now (K-05: transient, SQLSTATE ${outcome.sqlstate}): nothing was written; run the publish again`,
+      `the publish failed (${outcome.sqlstate}): PostgreSQL could not answer now (K-05: transient, SQLSTATE ${outcome.sqlstate}): nothing was written; run the publish again`,
     ];
   return [
     `PostgreSQL's copy read back by bundle id is not the bundle's: ${outcome.problems.slice(0, 5).join("; ")}`,

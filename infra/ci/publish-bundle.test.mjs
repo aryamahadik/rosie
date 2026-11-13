@@ -281,7 +281,13 @@ describe("publish-bundle.sh", () => {
       const what = args.join(" ");
       const result = rig.run("publish-bundle.sh", ["--env", "local", ...args], { DATABASE_URL: refused.url });
       assert.equal(result.status, 1, `${what}: ${result.output}`);
-      assert.match(result.stderr, /^publish-bundle\.sh: the database call failed \(ECONNREFUSED\): /m, what);
+      // The fault is named by K-05's answer (T-1314): readActiveBundle, the first call of each command, answers a
+      // connection that never opened (ECONNREFUSED) as transient, SQLSTATE 08001, which carries no OS code.
+      assert.match(
+        result.stderr,
+        /^publish-bundle\.sh: refused: PostgreSQL could not answer now \(K-05 readActiveBundle: transient, SQLSTATE 08001\); nothing changed; run it again$/m,
+        what,
+      );
       assertNoUrlPart(result, refused, what);
     }
     assert.equal(await readActive(db.sql), active);

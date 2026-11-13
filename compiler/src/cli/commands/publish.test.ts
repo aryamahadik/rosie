@@ -208,6 +208,13 @@ const T1202 = {
 const failureLine = (kind: string): string =>
   `the publish failed (${kind}): its message is not printed, since it can name the database's host, port, user or database name`;
 
+/**
+ * The one line a publish prints when K-05 answers transient (T-1314): the answer's SQLSTATE as its kind, then a fixed
+ * text. A database that cannot be reached is that answer since T-1314 (SQLSTATE 08001), which carries no OS code.
+ */
+const transientLine = (kind: string): string =>
+  `the publish failed (${kind}): PostgreSQL could not answer now (K-05: transient, SQLSTATE ${kind}): nothing was written; run the publish again`;
+
 /** The kind the lines name, read back from the first one. */
 const kindIn = (lines: readonly string[]): string =>
   /^the publish failed \(([^)]*)\): /.exec(lines[0] ?? "")?.[1] ?? "";
@@ -303,6 +310,8 @@ async function refusingDatabase(): Promise<RefusingDatabase> {
   };
 }
 
+// Since T-1314, db/repo answers each of these (a connection that never opened) as K-05's transient answer, SQLSTATE
+// 08001, which carries no OS code: the line names that kind, where it named ENOTFOUND, EAI_AGAIN or ECONNREFUSED.
 describe("publish.run with a built client whose database cannot be reached (T-1202)", () => {
   const notFound = `postgres://${T1202.user}:${T1202.password}@${T1202.host}:6543/${T1202.database}`;
   const refused = `postgres://${T1202.user}:${T1202.password}@127.0.0.1:1/${T1202.database}`;
@@ -311,13 +320,13 @@ describe("publish.run with a built client whose database cannot be reached (T-12
       "a .invalid host, not found (ENOTFOUND, or EAI_AGAIN where no name server answers)",
       notFound,
       [notFound, T1202.user, T1202.password, T1202.host, "6543", T1202.database],
-      /^(ENOTFOUND|EAI_AGAIN)$/,
+      /^08001$/,
     ],
     [
       "port 1 of 127.0.0.1, which refuses the connection (ECONNREFUSED)",
       refused,
       [refused, T1202.user, T1202.password, "127.0.0.1", "1", T1202.database],
-      /^ECONNREFUSED$/,
+      /^08001$/,
     ],
   ];
 
@@ -331,7 +340,7 @@ describe("publish.run with a built client whose database cannot be reached (T-12
       expect(await publish.run([dir, "--kv", kv], run.io)).toBe(1);
       expect(partsHeld(run.err, parts)).toEqual([]);
       expect(kindIn(run.err)).toMatch(kind);
-      expect(run.err).toEqual([failureLine(kindIn(run.err))]);
+      expect(run.err).toEqual([transientLine(kindIn(run.err))]);
       expect(run.out).toEqual([]);
       expect(existsSync(kv)).toBe(false);
     },
@@ -346,8 +355,8 @@ describe("publish.run with a built client whose database cannot be reached (T-12
     expect(
       partsHeld(run.err, [notFound, T1202.user, T1202.password, T1202.host, "6543", T1202.database]),
     ).toEqual([]);
-    expect(kindIn(run.err)).toMatch(/^(ENOTFOUND|EAI_AGAIN)$/);
-    expect(run.err).toEqual([failureLine(kindIn(run.err))]);
+    expect(kindIn(run.err)).toMatch(/^08001$/);
+    expect(run.err).toEqual([transientLine(kindIn(run.err))]);
     expect(run.out).toEqual([]);
     expect(existsSync(kv)).toBe(false);
   });
