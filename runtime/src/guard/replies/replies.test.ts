@@ -121,6 +121,41 @@ describe("the core actions are K-09 v1's", () => {
     expect(actionFor(found, turn, CALLER)?.request).toMatchObject({ words: "STOP" });
   });
 
+  it("a vote's STOP or START is K-09 v1's recordStopOrStart with its option's words; words with no letter or digit take the list's word", () => {
+    const stop: Keyword = { kind: "stop", word: "STOP", flagsVisit: false };
+    const vote = (eventId: string, optionWords: string | null, keyword: Keyword): KeywordText => ({
+      text: { eventId, kind: "pollVote", words: { body: null, subject: null, optionWords } },
+      keyword,
+    });
+    const actions = [
+      actionFor(vote("evt-alex-0270", "Stop!", stop), turn, CALLER),
+      actionFor(
+        vote("evt-alex-0271", "start", { kind: "start", word: KEYWORDS.start, flagsVisit: false }),
+        turn,
+        CALLER,
+      ),
+    ];
+
+    expect(actions.map((action) => action?.request)).toMatchObject([
+      { kind: "stop", inboundEventId: "evt-alex-0270", words: "Stop!" },
+      { kind: "start", inboundEventId: "evt-alex-0271", words: "start" },
+    ]);
+    for (const action of actions) {
+      expect(contractProblems(K09_V1, "recordStopOrStart.request", action?.request)).toEqual([]);
+    }
+    // Never a keyword the guard finds, but K-09 still gets words (minLength 1): the list's.
+    for (const blank of [null, "", " ", "!!"]) {
+      expect(actionFor(vote("evt-alex-0272", blank, stop), turn, CALLER)?.request).toMatchObject({
+        words: "STOP",
+      });
+    }
+    const unworded: KeywordText = {
+      text: { eventId: "evt-alex-0273", kind: "text", words: null },
+      keyword: stop,
+    };
+    expect(actionFor(unworded, turn, CALLER)?.request).toMatchObject({ words: "STOP" });
+  });
+
   it("with no number (an email handle) a STOP or START makes no action; HELP still does", () => {
     const email = { handleId: "handle-alex-email", phoneNumber: null };
     const stop = keywordText("evt-alex-0260", "STOP", { kind: "stop", word: "STOP", flagsVisit: false });
