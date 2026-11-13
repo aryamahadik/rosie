@@ -1,14 +1,17 @@
 // T-1331 (T-1315's handoff b; DL-630, DL-694): db/repo/scope.ts withBusiness starts its transaction through T-1268's
 // transientOrThrow, under the name of the call it is opened for, so a connect failure at the start never leaves as
-// postgres.js raises it. `npm run db:up`, then `npm run test:integration -- db/repo/scope`.
+// postgres.js raises it; since round 3 (DL-708, DL-710) through clocks.ts's transientOrScrubbed, so no failure of the
+// start leaves raw. `npm run db:up`, then `npm run test:integration -- db/repo/scope`.
 //
 // Each failure is raised by postgres.js as installed (3.4.9) at the transaction's first statement, sql.begin's begin: a
 // port nothing listens on (Node's ECONNREFUSED, for real); a socket that fails before it opens with an error built in the
 // shape postgres.js or Node gives it (postgres.js's own `socket` option, so postgres.js passes the error up as it does a
 // socket's and puts the statement on it: node_modules/postgres/src/errors.js and connection.js); a local server that
-// refuses each session at its start with PostgreSQL's own ErrorResponse (class 28, 53300). Each is seen through
-// withBusiness itself, for a call whose contract has K-05's transient answer and for one whose has none, and through the
-// turn face's three calls after the frontier, whose business scope is pgCallScope over withBusiness
+// refuses each session at its start with PostgreSQL's own ErrorResponse (class 28, 53300; 3D000, 42501 and 55000, which
+// name the database). One is raised at the start's second statement, the scope's set_config: a local server that
+// accepts the session and its begin, then refuses set_config with 57014, the business id on its statement. Each is seen
+// through withBusiness itself, for a call whose contract has K-05's transient answer and for one whose has none, and
+// through the turn face's three calls after the frontier, whose business scope is pgCallScope over withBusiness
 // (actions/src/tool-api/turn-face/pg/calls.ts): gateAndCommit, composeInput and finalizeMessage on the Tool API base, as
 // pgTurnFace and pgTurnCalls bind them. Each raw error is checked to hold what it names (so the check means something),
 // and each outcome to hold none of the connection: neither the answer nor the thrown error's message, stack or other own
@@ -39,7 +42,14 @@ import { pgCallScope, pgTurnCalls, pgTurnFace } from "../../actions/src/tool-api
 import type { TurnFace } from "../../actions/src/tool-api/turn-face/turn-face";
 import { createClient, resolvePrimaryUrl } from "./client";
 import { DataAccessDatabaseError } from "./clocks";
-import { BusinessScopeError, readBusinessScope, SCOPE_SETTING, type Sql, withBusiness } from "./scope";
+import {
+  BusinessScopeError,
+  readBusinessScope,
+  SCOPE_SETTING,
+  setBusinessScope,
+  type Sql,
+  withBusiness,
+} from "./scope";
 import type { WrappingKeys } from "./sealing";
 import type { TransientError } from "./targets";
 
@@ -167,6 +177,137 @@ async function refusingServer(
     socket.on("error", () => undefined);
     socket.once("data", () => {
       socket.end(errorResponse({ S: "FATAL", V: "FATAL", C: code, M: message }));
+    });
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const { port } = server.address() as AddressInfo;
+  return {
+    port,
+    close: async () => {
+      for (const socket of sockets) socket.destroy();
+      server.close();
+      await once(server, "close");
+    },
+  };
+}
+
+/** A backend message: its type byte, its length (itself and the body), then the body. */
+function backendMessage(type: string, body: Uint8Array = new Uint8Array(0)): Uint8Array {
+  const message = new Uint8Array(body.length + 5);
+  const view = new DataView(message.buffer);
+  view.setUint8(0, type.charCodeAt(0));
+  view.setUint32(1, body.length + 4);
+  message.set(body, 5);
+  return message;
+}
+
+/** The bytes of each part, one after another. */
+function joined(...parts: readonly Uint8Array[]): Uint8Array {
+  const all = new Uint8Array(parts.reduce((length, part) => length + part.length, 0));
+  let at = 0;
+  for (const part of parts) {
+    all.set(part, at);
+    at += part.length;
+  }
+  return all;
+}
+
+/** The bytes as a DataView, to read a frontend message's type byte and length. */
+const viewOf = (bytes: Uint8Array): DataView =>
+  new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+
+/** The zero-ended text at `start` of a frontend message's body, and where the field after it starts. */
+function textAt(body: Uint8Array, start: number): { text: string; next: number } {
+  const end = body.indexOf(0, start);
+  return { text: new TextDecoder().decode(body.subarray(start, end)), next: end + 1 };
+}
+
+/** A statement's command tag, as PostgreSQL's CommandComplete gives it (a select here returns no row). */
+function tagOf(statement: string): string {
+  const word = (statement.trim().split(/\s+/)[0] ?? "").toUpperCase();
+  return word === "SELECT" ? "SELECT 0" : word;
+}
+
+/**
+ * A local server that accepts each session and its begin, then refuses the scope's set_config with 57014 (a statement
+ * timeout or a cancel), as PostgreSQL would, following postgres.js 3.4.9's side (connection.js 156-244, 535-588 and
+ * 812-819; index.js 241-273): AuthenticationOk and ReadyForQuery after the startup message; the type fetch's extended
+ * query (Parse, Describe, Bind, Execute, Sync) answered with no row; the begin, a simple query, answered BEGIN in a
+ * transaction. set_config's Parse (sent with Describe and Flush, since it has values) gets the ErrorResponse; every
+ * message is then dropped until the Sync postgres.js sends on it, answered ReadyForQuery in a failed transaction; the
+ * rollback is answered ROLLBACK, idle.
+ */
+async function scopeRefusingServer(): Promise<{ port: number; close: () => Promise<void> }> {
+  const sockets = new Set<Socket>();
+  const server = createServer((socket) => {
+    sockets.add(socket);
+    socket.on("error", () => undefined);
+    const statements = new Map<string, string>();
+    let pending: Uint8Array = new Uint8Array(0);
+    let started = false;
+    let bound = "";
+    let status = "I";
+    let failed = false;
+    const ready = (): Uint8Array => backendMessage("Z", new TextEncoder().encode(status));
+    const complete = (tag: string): Uint8Array => {
+      status = tag === "BEGIN" ? "T" : tag === "COMMIT" || tag === "ROLLBACK" ? "I" : status;
+      return backendMessage("C", new TextEncoder().encode(`${tag}\u0000`));
+    };
+    const answer = (type: string, body: Uint8Array): void => {
+      if (type === "X") {
+        socket.end();
+      } else if (type === "S") {
+        failed = false;
+        socket.write(ready());
+      } else if (failed) {
+        // After an error PostgreSQL reads every message up to the next Sync and answers none.
+      } else if (type === "Q") {
+        socket.write(joined(complete(tagOf(textAt(body, 0).text)), ready()));
+      } else if (type === "P") {
+        const name = textAt(body, 0);
+        const statement = textAt(body, name.next).text;
+        if (statement.includes("set_config")) {
+          failed = true;
+          status = status === "T" ? "E" : status;
+          const timedOut = {
+            S: "ERROR",
+            V: "ERROR",
+            C: "57014",
+            M: "canceling statement due to statement timeout",
+          };
+          socket.write(errorResponse(timedOut));
+          return;
+        }
+        statements.set(name.text, statement);
+        socket.write(backendMessage("1"));
+      } else if (type === "D") {
+        socket.write(joined(backendMessage("t", new Uint8Array(2)), backendMessage("n")));
+      } else if (type === "B") {
+        const portal = textAt(body, 0);
+        bound = statements.get(textAt(body, portal.next).text) ?? "";
+        socket.write(backendMessage("2"));
+      } else if (type === "E") {
+        socket.write(complete(tagOf(bound)));
+      }
+      // A Flush (H) needs no answer: every answer is written as it is made.
+    };
+    socket.on("data", (chunk: Uint8Array) => {
+      pending = joined(pending, chunk);
+      for (;;) {
+        if (!started) {
+          // The startup message: its length, then the protocol and the parameters, with no type byte.
+          if (pending.length < 4 || pending.length < viewOf(pending).getUint32(0)) return;
+          pending = pending.subarray(viewOf(pending).getUint32(0));
+          started = true;
+          socket.write(joined(backendMessage("R", new Uint8Array(4)), ready()));
+          continue;
+        }
+        if (pending.length < 5 || pending.length < viewOf(pending).getUint32(1) + 1) return;
+        const end = viewOf(pending).getUint32(1) + 1;
+        answer(String.fromCharCode(viewOf(pending).getUint8(0)), pending.subarray(5, end));
+        pending = pending.subarray(end);
+      }
     });
   });
   server.listen(0, "127.0.0.1");
@@ -466,21 +607,61 @@ const shapes: { name: string; make: () => Error; holds: readonly string[]; expec
   },
 ];
 
-const refusals: { code: string; text: string; holds: readonly string[]; secrets: Secrets }[] = [
+/** PostgreSQL's refusals of a session at its start: `names`, what its test's title says the refusal names. */
+const refusals: {
+  code: string;
+  names: string;
+  text: string;
+  holds: readonly string[];
+  secrets: Secrets;
+}[] = [
   {
     code: "28P01",
+    names: "user",
     text: `password authentication failed for user "${PROBE_USER}"`,
     holds: ["user"],
     secrets: {},
   },
   {
     code: "28000",
+    names: "user",
     text: `no pg_hba.conf entry for host "${ADDRESS}", user "${PROBE_USER}", database "${PROBE_DATABASE}"`,
     holds: ["address", "user", "database"],
     secrets: secretsOf({ address: ADDRESS }),
   },
-  { code: "53300", text: `too many connections for role "${PROBE_USER}"`, holds: ["user"], secrets: {} },
+  {
+    code: "53300",
+    names: "user",
+    text: `too many connections for role "${PROBE_USER}"`,
+    holds: ["user"],
+    secrets: {},
+  },
+  // Round 3 (DL-708): the refusals that name the database (PostgreSQL's postinit.c, InitPostgres and CheckMyDatabase).
+  {
+    code: "3D000",
+    names: "database",
+    text: `database "${PROBE_DATABASE}" does not exist`,
+    holds: ["database"],
+    secrets: {},
+  },
+  {
+    code: "42501",
+    names: "database",
+    text: `permission denied for database "${PROBE_DATABASE}"`,
+    holds: ["database"],
+    secrets: {},
+  },
+  {
+    code: "55000",
+    names: "database",
+    text: `database "${PROBE_DATABASE}" is not currently accepting connections`,
+    holds: ["database"],
+    secrets: {},
+  },
 ];
+
+/** The scope's set_config refused with 57014 (a statement timeout or a cancel): no lost connection, so never transient. */
+const TIMED_OUT: Expected = { thrown: "database", code: "57014" };
 
 /**
  * A shape's raw error holds what it names, and postgres.js rejects the transaction's first statement (sql.begin's begin)
@@ -548,13 +729,13 @@ describe("withBusiness's start on a connection that never opens, is lost or is r
   });
 
   it.each(refusals)(
-    "a session PostgreSQL refuses at its start ($code, naming the user) is thrown scrubbed to its SQLSTATE, transient answer or none",
+    "a session PostgreSQL refuses at its start ($code, naming the $names) is thrown scrubbed to its SQLSTATE, transient answer or none",
     async ({ code, text, holds, secrets: more }) => {
       const server = await refusingServer(code, text);
       const secrets = { ...probeSecrets("127.0.0.1", server.port), ...more };
       try {
         const url = probeUrl("127.0.0.1", server.port);
-        // What postgres.js rejects the transaction's first statement with: PostgreSQL's refusal, the user in it.
+        // What postgres.js rejects the transaction's first statement with: PostgreSQL's refusal, what it names in it.
         const raw = await onFreshClient(
           () => clientOn(url),
           (sql) => rejectionOf(sql`select 1`),
@@ -569,6 +750,40 @@ describe("withBusiness's start on a connection that never opens, is lost or is r
       }
     },
   );
+
+  it("a set_config refused with 57014, the business id on its statement, is thrown scrubbed to its SQLSTATE, transient answer or none, read only too; fn never runs", async () => {
+    const server = await scopeRefusingServer();
+    const secrets = { ...probeSecrets("127.0.0.1", server.port), ...secretsOf({ business: BUSINESS }) };
+    try {
+      const url = probeUrl("127.0.0.1", server.port);
+      // What postgres.js rejects the start's set_config with, after the begin: its statement on it, the business id
+      // among its values.
+      const raw = await onFreshClient(
+        () => clientOn(url),
+        (sql) => rejectionOf(sql.begin((tx) => setBusinessScope(tx, BUSINESS))),
+      );
+      expect(raw).toMatchObject({ name: "PostgresError", code: "57014" });
+      const statement = raw as { query?: unknown; parameters?: unknown; args?: unknown };
+      expect(statement.query).toMatch(/set_config/);
+      expect(statement.parameters).toContain(BUSINESS);
+      expect(statement.args).toContain(BUSINESS);
+      expect(leaksOf(raw, secrets)).toEqual(expect.arrayContaining(["business"]));
+
+      // Not transient (57014 is no lost connection): thrown scrubbed, the caller's answer or not.
+      await expectStart(() => clientOn(url), TIMED_OUT, secrets);
+      // Read only (the replica's transaction), the same.
+      for (const answers of [false, true]) {
+        const readOnly = await onFreshClient(
+          () => clientOn(url),
+          (sql) => throughStart(sql, answers, true),
+        );
+        expectOutcome(readOnly.settled, TIMED_OUT, answers, CALL, secrets);
+        expect(readOnly.runs).toBe(0);
+      }
+    } finally {
+      await server.close();
+    }
+  });
 });
 
 describe("the turn face's three calls over pgCallScope, at the start of the Tool API's transaction (T-1331)", () => {
@@ -595,6 +810,28 @@ describe("the turn face's three calls over pgCallScope, at the start of the Tool
       }
     },
   );
+
+  it("a set_config refused with 57014: each of the three calls throws it scrubbed to its SQLSTATE, naming no business", async () => {
+    const server = await scopeRefusingServer();
+    try {
+      const url = probeUrl("127.0.0.1", server.port);
+      // The business each call's request names, which its scope's set_config is sent with, and BUSINESS, pgCallScope's.
+      const businessOf = (request: unknown): string =>
+        (request as { caller: { businessId: string } }).caller.businessId;
+      const businesses = secretsOf({
+        business: BUSINESS,
+        gateAndCommitBusiness: businessOf(commitRequestAfter(undefined)),
+        composeInputBusiness: businessOf(
+          (fixture("compose-input-s1-02.json") as { request: unknown }).request,
+        ),
+        finalizeMessageBusiness: businessOf((fixture("finalize-pass.json") as { request: unknown }).request),
+      });
+      const secrets = { ...probeSecrets("127.0.0.1", server.port), ...businesses };
+      await expectCallScope(() => clientOn(url), TIMED_OUT, secrets);
+    } finally {
+      await server.close();
+    }
+  });
 });
 
 describe("withBusiness once fn has begun, on local PostgreSQL: as before (T-1331)", () => {
