@@ -63,6 +63,7 @@ import {
   type OutageReport,
   type WaitingTurn,
 } from "./index";
+import { setOutageHost } from "./outage";
 import { outageHarness, type OutageHarness } from "./test-support";
 
 const keys = fakeKeyStore();
@@ -382,6 +383,91 @@ describe("never to a stopped phone", () => {
     expect(s.o.lines.rows.size).toBe(0);
     expect(report.lines).toEqual([]);
     expect(s.o.wakes).toEqual([]);
+  });
+
+  it("the handle actor that runs the turn says the number may have asked to stop, by a word no commit has recorded yet (T-1323; setOutageHost): no line goes to any waiting text, the stopped flag is not even read, and the turn still runs again every 30 s", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: number[] = [];
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(s.o.clock.now());
+        return true;
+      },
+    });
+    downThenBack(s, 2);
+
+    const report = await runWithRetries(s, 2);
+
+    expect(s.o.lines.requests).toEqual([]);
+    expect(report.lines).toEqual([]);
+    expect(s.o.wakes).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([]);
+    // Asked before the run's first line; the texts are then done for the run, so the next try has none to ask for.
+    expect(asked).toEqual([0]);
+    expect(s.decidedAt).toEqual([0, RETRY_MS, 2 * RETRY_MS]);
+    expect(report.end).toBe("committed");
+  });
+
+  it('an actor that cannot say (its reading throws) is read as a stop (RULES 7.2: "Unsure: treat it as a stop"): no line goes, and the stopped flag is not read', async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        throw new Error("the actor's storage failed");
+      },
+    });
+    downThenBack(s, 1);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(s.o.lines.requests).toEqual([]);
+    expect(report.lines).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([]);
+    expect(report.end).toBe("committed");
+  });
+
+  it("an actor that says no word waits uncommitted leaves the line to the other checks: each waiting text gets it once, the stopped flag read before it goes", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: number[] = [];
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(s.o.clock.now());
+        return false;
+      },
+    });
+    downThenBack(s, 2);
+
+    const report = await runWithRetries(s, 2);
+
+    expect(s.o.lines.requests.map((sent) => sent.request)).toEqual([
+      samLine("evt-sam-0001"),
+      samLine("evt-sam-0002"),
+    ]);
+    expect(report.lines.map((line) => line.repeated)).toEqual([false, false]);
+    expect(asked).toEqual([0]);
+    expect(s.o.stoppedReads).toEqual([actorNameOf(SAM.handle)]);
+  });
+
+  it("a line the core left unanswered is asked for again at the next try only while the actor still says no word waits: a STOP stored behind the turn meanwhile holds it back (T-1323, DL-621)", async () => {
+    const s = await samTurn([S1_02_TEXT]);
+    s.o.lines.transient = 1;
+    let stopStored = false;
+    setOutageHost(s.turn.signal, { stopped: () => stopStored });
+    downThenBack(s, 2);
+
+    const running = runTurnThroughOutage(s.turn);
+    await until(() => s.o.waits.length === 1, "the first wait");
+    // The core answered transient, so the line is still to ask for; then a STOP is stored behind the turn.
+    expect(s.o.lines.requests.map((sent) => sent.at)).toEqual([0]);
+    stopStored = true;
+    await s.o.clock.advance(RETRY_MS);
+    await until(() => s.o.waits.length === 2, "the second wait");
+    await s.o.clock.advance(RETRY_MS);
+    const report = await running;
+
+    expect(s.o.lines.requests.map((sent) => sent.at)).toEqual([0]);
+    expect(s.o.lines.rows.size).toBe(0);
+    expect(report.lines).toEqual([]);
+    expect(report.end).toBe("committed");
   });
 
   it("T-259's stopped check: limit 8 drops the outage line's row (quick_reply, the outage line) for a stopped phone at send", () => {
