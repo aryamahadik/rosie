@@ -56,11 +56,27 @@
 //   linqDirect   the checked safety line sent straight through Linq while          no D-017 hop
 //                PostgreSQL is down (arch 11 line 566), split from linqSend by T-563
 //
+// Beside them, the PostgreSQL-down path's two ports (T-1363; C-175; arch 11 'PostgreSQL down', line 566), kept apart from
+// the twenty-one (`DOWN_PATH_PORTS`) so that D-017's list and its turn order stay as they are. Each carries a field of
+// ../outage/db's DbOutageDeps that no port of the twenty-one carries; T-1326 joins them into `setDbOutageDeps` with the
+// four fields it takes from the twenty-one (the probe over the bundles port's readActiveBundle, the sealing key store,
+// the direct line and the safety read's directory):
+//
+//   port         what it carries                                                   joined by
+//   stopOrStart  K-09 v1 recordStopOrStart for the actorOnReturn caller: each      no D-017 hop
+//                STOP or START the handle actor took while PostgreSQL was down,
+//                written on return (DbOutageDeps.core)
+//   timerFire    the alerts of a safety timer due while PostgreSQL is down, fired  no D-017 hop
+//                from the actor's copy with its address still sealed
+//                (DbOutageDeps.timers); the address is opened only where the CTO
+//                and the security reviewer rule (QUESTIONS.md CQ-101 (c))
+//
 // Not ports: the HandleActor namespace (the gateway's door to each handle's actor and the clock arming's way to it, a
 // binding the root is handed), the clock, and the wiring between the parts the root builds (the lease runs the turn loop;
 // the turn wakes the dispatcher; the receipt door marks the part delivered and arms its clock). Not bound here: the
-// guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`) and the
-// Stripe and calendar doors, none of which a D-017 hop runs.
+// guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`), the
+// PostgreSQL-down path's deps (`setDbOutageDeps`, until T-1326 joins them from the ports) and the Stripe and calendar
+// doors, none of which a D-017 hop runs.
 
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 
@@ -75,6 +91,7 @@ import type {
 import type { SealingKeyStore } from "../gateway/seal";
 import type { ChatOpenPort, LinqPort as LinqVerifyCall } from "../gateway/types";
 import type { HandleTargetsPort } from "../guard/types";
+import type { StopOrStartCore, TimerFirePort } from "../outage/db/types";
 import type { DirectLineSender, SafetyCore, SafetyDeps, SafetyReadPort } from "../safety/types";
 import type {
   ParkTurnAnswer,
@@ -111,7 +128,15 @@ export const PORTS = [
   "linqDirect",
 ] as const;
 
-export type PortName = (typeof PORTS)[number];
+/**
+ * The PostgreSQL-down path's two ports (T-1363; C-175), which no D-017 hop runs: K-09 recordStopOrStart on return and a
+ * safety timer fired from the actor's copy. Kept apart from the twenty-one, each is picked in its own table
+ * (./picks.ts DOWN_PATH_PICKS) and bound once beside them (./bind.ts).
+ */
+export const DOWN_PATH_PORTS = ["stopOrStart", "timerFire"] as const;
+
+/** A port's name: one of D-017's twenty-one, or one of the PostgreSQL-down path's two. */
+export type PortName = (typeof PORTS)[number] | (typeof DOWN_PATH_PORTS)[number];
 
 /**
  * K-05's two calls that write a turn's one row in PostgreSQL (K-04 turns), each once per turn id (QUESTIONS.md NQ-RT-3's
@@ -277,4 +302,18 @@ export interface Ports {
   readonly arming: ArmingPort;
   /** A checked safety line straight through Linq while PostgreSQL is down (arch 11 line 566): no D-017 hop. */
   readonly linqDirect: DirectLineSender;
+  /**
+   * K-09 v1 recordStopOrStart for the actorOnReturn caller (T-1363; ../outage/db/types.ts StopOrStartCore): each STOP or
+   * START the handle actor took while PostgreSQL was down, written once it answers again (the PostgreSQL-down path's
+   * `core`, which T-1326 joins). No D-017 hop. A call it does not take (a throw, or K-09's transient) leaves the record
+   * with the actor for its next try.
+   */
+  readonly stopOrStart: StopOrStartCore;
+  /**
+   * The alerts of a safety timer due while PostgreSQL is down, fired from the actor's copy (T-1363; ../outage/db/types.ts
+   * TimerFirePort; the PostgreSQL-down path's `timers`, which T-1326 joins). No D-017 hop. The copy comes with the job's
+   * address still sealed under its person's key: opening it is the CTO's call with the security reviewer (QUESTIONS.md
+   * CQ-101 (c)). A throw: not fired, tried again 5 s on.
+   */
+  readonly timerFire: TimerFirePort;
 }

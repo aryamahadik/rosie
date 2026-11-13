@@ -2,6 +2,11 @@
 // (./picks.ts). Each call fails at once with `NotJoinedError`, naming the port and never a value, so a webhook route
 // answers 503 with nothing stored, as `unconfiguredGateway` did, and nothing waits on a port that cannot answer. Worker
 // code: no double, no fixture, no network call, no key.
+//
+// The PostgreSQL-down path's two (T-1363) fail closed the same way, before anything is read or sent: a closed
+// recordStopOrStart refuses the STOP or START written on return with nothing recorded (no answer, so the actor keeps the
+// record for its next try), and a closed fireFromCopy fires nothing: no alert goes, and the timer copy's sealed address is
+// never opened (QUESTIONS.md CQ-101 (c)); the down path tries the timer again 5 s on.
 
 import type { PortName, Ports } from "./ports";
 
@@ -88,5 +93,7 @@ export function closedPorts(): Ports {
       directory: { actorNameOf: () => fail("arming") },
     },
     linqDirect: { send: () => fail("linqDirect") },
+    stopOrStart: { recordStopOrStart: () => fail("stopOrStart") },
+    timerFire: { fireFromCopy: () => fail("timerFire") },
   };
 }

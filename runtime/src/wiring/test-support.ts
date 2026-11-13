@@ -95,6 +95,12 @@
 //                answering as db/repo/clocks.ts answers on them; the question's facts from those rows and test owner 1's
 //                seeded business (its zone); and the actor name of each handle the key double knows
 //   linqDirect   safety/test-support fakeDirect (no D-017 hop)
+//   stopOrStart  `fakeStopOrStart` (the PostgreSQL-down path's, no D-017 hop; T-1363): each K-09 recordStopOrStart the
+//                actor writes on return, kept, then handed to the action layer's recordStopOrStart where the test root
+//                holds one, as kept-results.worker.test.ts hands the down path its own (../outage/db/test-support.ts
+//                dbFakes); refused, with nothing written, while it holds none
+//   timerFire    `fakeTimerFire` (the PostgreSQL-down path's, no D-017 hop; T-1363): each safety timer fired from the
+//                actor's copy, kept as the actor handed it, its address still sealed and never opened here
 //
 // One test clock stands behind every fake that keeps time and behind the root itself. The contract fixtures and the Linq
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
@@ -200,6 +206,12 @@ import type { NotFoundError as ClockNotFoundError, QuestionFacts } from "../cloc
 import { yieldToOthers } from "../dispatch/test-support";
 import { actorNameOf } from "../gateway";
 import type { LinqAccepted, LinqFailed, LinqSendRequest } from "../dispatch/types";
+import type {
+  StopOrStartCore,
+  StopOrStartOnReturn,
+  TimerFirePort,
+  TimerFireRequest,
+} from "../outage/db/types";
 import type { RetryMessage, RetryQueue, RetrySendOptions } from "../queues";
 import { fakeCore, fakeDirect, fixtureBundle, type FakeCore, type FakeDirect } from "../safety/test-support";
 import type { HandleIds } from "../safety/types";
@@ -4066,6 +4078,74 @@ export function fakeArmingCalls(
   return fake;
 }
 
+// ---- the PostgreSQL-down path's two ports, as fakes (T-1363) ------------------------------------------------------
+
+/**
+ * K-09 v1 recordStopOrStart for the actorOnReturn caller, as the test root's stopOrStart port takes it (T-1363): each
+ * request kept as the actor sent it, then handed to the action layer's recordStopOrStart where the test root holds one
+ * (`core`), whose answer or throw comes back as it is; as kept-results.worker.test.ts hands the PostgreSQL-down path its
+ * own today (../outage/db/test-support.ts dbFakes' core, answering as start-recorded.json and
+ * j3-stop-on-return-tells-businesses.json do). While the test root holds none, or while `down`, each call is refused (a
+ * throw: no answer) before anything is written, so the actor keeps the record for its next try.
+ */
+export interface FakeStopOrStart extends StopOrStartCore {
+  /** Every request, in order, as the actor sent it (a copy), whether or not it was taken. */
+  readonly requests: StopOrStartOnReturn[];
+  /** The action layer's recordStopOrStart each request is handed to, where the test root holds one; else null. */
+  core: StopOrStartCore | null;
+  /** While true, every call fails as PostgreSQL unreachable, before the action layer's call is asked. */
+  down: boolean;
+}
+
+/** The stopOrStart port's fake, handing each request to `core` (none until a test hands one). */
+export function fakeStopOrStart(core: StopOrStartCore | null = null): FakeStopOrStart {
+  const fake: FakeStopOrStart = {
+    requests: [],
+    core,
+    down: false,
+    recordStopOrStart(request) {
+      fake.requests.push(structuredClone(request));
+      if (fake.down) return Promise.reject(new Error("PostgreSQL is unreachable"));
+      const held = fake.core;
+      if (held === null) {
+        return Promise.reject(new Error("this test root holds no recordStopOrStart: nothing is written"));
+      }
+      return held.recordStopOrStart(request);
+    },
+  };
+  return fake;
+}
+
+/**
+ * The alerts of a safety timer due while PostgreSQL is down, fired from the actor's copy, as the test root's timerFire
+ * port takes them (T-1363), as ../outage/db/test-support.ts dbFakes' timers do: each fire kept with the clock's time and
+ * the request as the actor handed it, the copy's address still sealed under its person's key (never opened here:
+ * QUESTIONS.md CQ-101 (c)).
+ */
+export interface FakeTimerFire extends TimerFirePort {
+  /** Each timer fired from the copy, with the clock time it was fired at, in order. */
+  readonly fired: { at: number; request: TimerFireRequest }[];
+  /** How many of the next fires throw (not fired: the down path tries again 5 s on). */
+  fail: number;
+}
+
+/** The timerFire port's fake, on the given clock. */
+export function fakeTimerFire(now: () => number = Date.now): FakeTimerFire {
+  const fake: FakeTimerFire = {
+    fired: [],
+    fail: 0,
+    fireFromCopy(request) {
+      if (fake.fail > 0) {
+        fake.fail -= 1;
+        return Promise.reject(new Error("the alerts did not go"));
+      }
+      fake.fired.push({ at: now(), request: structuredClone(request) });
+      return Promise.resolve();
+    },
+  };
+  return fake;
+}
+
 // ---- the walking skeleton's turn -----------------------------------------------------------------------------------
 
 /** The row commit-s1-02.json writes (S1-04's question to Sam): the one the turn composes and the dispatcher sends. */
@@ -4198,6 +4278,17 @@ export interface SkeletonFakes {
   readonly core: FakeCore;
   /** The direct send through Linq the safety read uses only while the core is down (the linqDirect port). */
   readonly direct: FakeDirect;
+  /**
+   * K-09 v1 recordStopOrStart on return, as the stopOrStart port's fake (T-1363; the PostgreSQL-down path's `core`): every
+   * request the actor sent, each handed to the action layer's recordStopOrStart where the test holds one
+   * (`stopOrStart.core`), and refused, with nothing written, while it holds none.
+   */
+  readonly stopOrStart: FakeStopOrStart;
+  /**
+   * A safety timer's alerts fired from the actor's copy, as the timerFire port's fake (T-1363; the PostgreSQL-down path's
+   * `timers`): each fire, as the actor handed it, on the test clock.
+   */
+  readonly timerFire: FakeTimerFire;
   readonly face: FakeTurnFace;
   /**
    * The Linq line the root's real Linq send port sends each part through (K-11 sendPart, joined by T-563;
@@ -4240,6 +4331,10 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const gate = fakeGateReads(turnRows);
   const core = fakeCore(clock);
   const direct = fakeDirect(clock);
+  // The PostgreSQL-down path's two ports (T-1363), which no D-017 hop runs: no recordStopOrStart is held until a test
+  // hands one, and each timer fired is kept on the test clock.
+  const stopOrStart = fakeStopOrStart();
+  const timerFire = fakeTimerFire(() => clock.now());
 
   const face = fakeTurnFace();
   const decide = fakeDecideModels(face.log);
@@ -4314,6 +4409,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     },
     dataAccess: { rows: rowsOf(rows) },
     linqDirect: direct,
+    stopOrStart,
+    timerFire,
   };
 
   return {
@@ -4341,6 +4438,8 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
     dispatch,
     core,
     direct,
+    stopOrStart,
+    timerFire,
     face,
     linq,
     retryQueue,
