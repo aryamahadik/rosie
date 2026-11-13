@@ -11,6 +11,13 @@
 //      reads the send state afresh, and each part goes under the key the store holds for it: the same key after no
 //      answer, the new one after a reported failure, and not before the claim's Retry-After (renewClaim notYet). A run
 //      that leaves a row waiting again starts that wait's own job, so the door answers `done`.
+// A safety line's job (its body names send class `safety`: ./plan.ts) runs a safety run (T-1357; T-1352's rulings, the
+// architect's new task 1; DL-687): K-05 v1.14's safety-only claim for its recipient (item 67), which waits for the
+// recipient's lock, passes every row of another class and every safety row it cannot claim, and takes the line once its
+// own claim has lapsed. So no earlier row's live claim, plan or hold stops the line's retry (RULES 4.12: "the safety
+// message first"), and, like the danger line's own wake, the retry takes and sends no row of another class, so it never
+// sends a row a STOP binds while a STOP may wait (RULES 7.2). Every other job, and one enqueued before T-1357 with no
+// class in its body, runs the claim of every class, as before.
 // It answers `again` (the consumer puts the next try of this job on the queue) only when the store gave no answer it
 // can use, and never once 15 minutes of tries have passed (K-07 rule 5: the next way is C-126's).
 
@@ -79,7 +86,12 @@ export function dispatchSendDoor(deps: DispatchDeps, options: SendDoorOptions = 
         if (next.nextKey === null) return again("noNextKey");
       }
 
-      const report = await runDispatch(deps, { recipientHandleId: body.recipientHandleId });
+      // A safety line's job: the safety run, whose claim is repeated while it answers transient (T-1352); any other job:
+      // the run of every class.
+      const report = await runDispatch(deps, {
+        recipientHandleId: body.recipientHandleId,
+        ...(body.sendClass === "safety" ? { sendClass: "safety" as const } : {}),
+      });
       if (report.claimError !== null) return again("claimTransient");
       return told(send, "ran", { result: "done" });
     },

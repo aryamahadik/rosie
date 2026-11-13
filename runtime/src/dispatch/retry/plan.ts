@@ -4,8 +4,9 @@
 // A run that leaves a row waiting for its next try starts one retry job for it, keyed by the try it leaves and the claim
 // that handed that try out (`retry-<part key>#<attempts>`), so each wait starts its own job and the queue's ledger never
 // takes a later wait for one it already ran (T-256: "each failure of a row starts its own retry"). The job carries ids and
-// labels only (K-37 rule 4): the row, its recipient, the part's key, the chain and the failure's code. When it comes due,
-// the dispatcher's send door (./door.ts) runs the recipient's rows again.
+// labels only (K-37 rule 4): the row, its recipient, the part's key, the chain and the failure's code, and for a safety
+// line its send class (T-1357). When it comes due, the dispatcher's send door (./door.ts) runs the recipient's rows again:
+// a safety line's job by K-05 v1.14's safety-only claim, every other job by the claim of every class.
 
 import {
   codeLabelOf,
@@ -15,6 +16,7 @@ import {
   type RetryJob,
   type RetryQueue,
 } from "../../queues";
+import { isSafety } from "../limit8";
 import type { ClaimedPart, ClaimedRow, Utc } from "../types";
 
 /**
@@ -48,6 +50,14 @@ export interface RetryBody {
   chain: RetryChain;
   /** The failure's code (Linq's code, else its kind) or the wait's label, as recorded. */
   code: string;
+  /**
+   * K-05 v1.14's one send class (item 67; T-1357: T-1352's rulings, the architect's new task 1): set only when the row
+   * waiting is a safety line (send class `safety`), so the door's run for it makes the safety-only claim for its
+   * recipient. That claim passes an earlier row's live claim, plan or hold, and takes no row of another class, so the
+   * safety line's retry is never stopped behind another row and never sends a row a STOP binds (RULES 4.12, 7.2). Left
+   * out for every other row, and by a job enqueued before it: the door's run is then the claim of every class, as before.
+   */
+  sendClass?: "safety";
 }
 
 /** One wait, ready for the retry queue. */
@@ -75,7 +85,7 @@ export interface RetryPlanInput {
 export const retryJobKey = (part: ClaimedPart): string =>
   `retry-${part.idempotencyKey}#${String(part.attempts)}`;
 
-/** The retry job for a wait, due `waitSeconds` after `at`. */
+/** The retry job for a wait, due `waitSeconds` after `at`; a safety line's names its class. */
 export function retryPlanOf(input: RetryPlanInput): RetryPlan {
   const body: RetryBody = {
     outboxRowId: input.row.outboxRowId,
@@ -83,6 +93,7 @@ export function retryPlanOf(input: RetryPlanInput): RetryPlan {
     failedKey: input.part.idempotencyKey,
     chain: input.chain,
     code: input.code,
+    ...(isSafety(input.row) ? { sendClass: "safety" as const } : {}),
   };
   return {
     job: {
@@ -106,10 +117,14 @@ export function retryPlanOf(input: RetryPlanInput): RetryPlan {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** A retry job's body as the door reads it back, or null when it is not one of the dispatcher's. */
+/**
+ * A retry job's body as the door reads it back, or null when it is not one of the dispatcher's. Its send class is kept
+ * only when it is exactly `safety`; any other value, or none (a job enqueued before T-1357), reads as a job of no class,
+ * whose run is the claim of every class, as before.
+ */
 export function retryBodyOf(body: unknown): RetryBody | null {
   if (!isRecord(body)) return null;
-  const { outboxRowId, recipientHandleId, failedKey, chain, code } = body;
+  const { outboxRowId, recipientHandleId, failedKey, chain, code, sendClass } = body;
   if (
     typeof outboxRowId !== "string" ||
     typeof recipientHandleId !== "string" ||
@@ -119,7 +134,14 @@ export function retryBodyOf(body: unknown): RetryBody | null {
   ) {
     return null;
   }
-  return { outboxRowId, recipientHandleId, failedKey, chain, code };
+  return {
+    outboxRowId,
+    recipientHandleId,
+    failedKey,
+    chain,
+    code,
+    ...(sendClass === "safety" ? { sendClass: "safety" as const } : {}),
+  };
 }
 
 /** Where a run puts each wait: "queued", or why not (a label). */

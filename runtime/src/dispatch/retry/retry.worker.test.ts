@@ -28,9 +28,9 @@ import {
   words,
   type SeedRow,
 } from "../test-support";
-import type { ChatTarget, LinqAccepted, LinqFailed } from "../types";
+import type { ChatTarget, LinqAccepted, LinqFailed, OutboxStore } from "../types";
 import { dispatchSendDoor, type DoorOutcome } from "./door";
-import { queueRetries } from "./plan";
+import { queueRetries, retryBodyOf } from "./plan";
 import { mayOverrideOptout, retryRuleFor } from "./rules";
 
 const CHATS: Readonly<Record<string, ChatTarget>> = {
@@ -772,5 +772,289 @@ describe("error-rate-limit.json waits its Retry-After", () => {
     const [, retried] = t.sendTimes;
     expect(Date.parse(retried?.[1] ?? "")).toBeGreaterThanOrEqual(Date.parse("2026-11-07T19:01:10.000Z"));
     expect(t.store.row(ROW).state).toBe("sent");
+  });
+});
+
+/** Holds a run at its renewal of one row, before any part of that row goes, so the row's claim stays live until `open`. */
+function holdRenewalOf(
+  t: Rig,
+  rowId: string,
+): { store: OutboxStore; entered: Promise<void>; open: () => void } {
+  let markEntered = (): void => undefined;
+  let open = (): void => undefined;
+  const entered = new Promise<void>((resolve) => {
+    markEntered = resolve;
+  });
+  const released = new Promise<void>((resolve) => {
+    open = resolve;
+  });
+  return {
+    store: {
+      claimOutbox: (request) => t.store.claimOutbox(request),
+      renewClaim: async (request) => {
+        if (request.outboxRowId === rowId) {
+          markEntered();
+          await released;
+        }
+        return t.store.renewClaim(request);
+      },
+      markPart: (request) => t.store.markPart(request),
+      markRow: (request) => t.store.markRow(request),
+    },
+    entered,
+    open,
+  };
+}
+
+/** Each claim the outbox double answered: its class (null: the claim of every class), its claimer and the rows it took. */
+const claimsOf = (t: Rig): [string | null, string, readonly string[] | "transient"][] =>
+  t.store.claims.map((claim) => [claim.request.sendClass ?? null, claim.request.claimer, claim.took]);
+
+const keysSent = (t: Rig): string[] => t.linq.requests.map((request) => request.idempotencyKey);
+
+describe("T-1357: a failed safety line's retry takes the safety-only claim (K-05 v1.14 item 67; T-1352's rulings, the architect's new task 1)", () => {
+  // K-07 outbox-safety-retry.json's line (Alex's emergency line, send class safety, refused with a 503), and an earlier
+  // routine row of his, the booking line.
+  const SAFETY = outboxSafetyRetry.row.id;
+  const BOOKED = "out-alex-booked-riley";
+  const START = outboxSafetyRetry.claim.claimedAt;
+  const seeds: SeedRow[] = [
+    {
+      id: BOOKED,
+      recipient: "handle-alex",
+      commitSeq: 1,
+      sends: [words("You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am")],
+      bookingId: "booking-alex-riley-nov14",
+    },
+    {
+      id: SAFETY,
+      recipient: "handle-alex",
+      commitSeq: outboxSafetyRetry.row.commitSeq,
+      sends: [words(outboxSafetyRetry.row.finalParts.sends[0]?.text ?? "")],
+      sendClass: "safety",
+      fixedLines: ["safetyEmergency"],
+      bookingId: outboxSafetyRetry.row.bookingId,
+    },
+  ];
+
+  it("a safety line whose try fails is tried again when its job comes due, through the safety-only claim, past an earlier routine row's live claim; that row then goes once, after it", async () => {
+    // The line's own wake (T-1352's safety run) at 16:00:00, as in the fixture; Linq's 503 comes a second later.
+    const t = rig(seeds, START, 1_000);
+    t.linq.failures.set(`${SAFETY}/1/1`, SERVICE_DOWN);
+
+    const own = await runDispatch(t.deps, { recipientHandleId: "handle-alex", sendClass: "safety" });
+
+    expect(own.rows).toEqual([
+      {
+        outboxRowId: SAFETY,
+        recipientHandleId: "handle-alex",
+        outcome: "failed",
+        partsSent: 0,
+        retry: expect.objectContaining({
+          why: "newKey",
+          jobKey: `retry-${SAFETY}/1/1#1`,
+          scheduled: "queued",
+        }),
+      },
+    ]);
+    // The job names the line's class beside its ids and labels.
+    const job = only(t.queue.sent);
+    expect(job.message.job.body).toEqual({
+      outboxRowId: SAFETY,
+      recipientHandleId: "handle-alex",
+      failedKey: `${SAFETY}/1/1`,
+      chain: "rerun",
+      code: "503",
+      sendClass: "safety",
+    });
+
+    // 16:00:30: a turn's commit wakes Alex's rows. Its run of every class takes the booking line, the earlier row, stops
+    // at the line's live claim (items 3, 13), and is held at the booking line's renewal: nothing of it has gone, and its
+    // claim lives to 16:01:30.
+    t.clock.advance(29_000);
+    const held = holdRenewalOf(t, BOOKED);
+    const commitWake = runDispatch({ ...t.deps, store: held.store }, { recipientHandleId: "handle-alex" });
+    await held.entered;
+
+    // The job comes due once the claim the line's try went under has lapsed; the booking line's claim is still live.
+    t.clock.advance(Date.parse(job.message.notBefore) - Date.parse(t.clock.now()));
+    expect(Date.parse(t.store.row(BOOKED).claim?.lapsesAt ?? "")).toBeGreaterThan(Date.parse(t.clock.now()));
+    expect(await t.deliver(job)).toEqual(["done"]);
+
+    // The door's run is a safety run: its claim passed the booking line's live claim and took the line alone, which went
+    // under try 2's key.
+    expect(t.doorTries).toEqual([{ key: `retry-${SAFETY}/1/1#1`, outcome: "ran" }]);
+    expect(claimsOf(t)).toEqual([
+      ["safety", "dispatcher-1", [SAFETY]],
+      [null, "dispatcher-1", [BOOKED]],
+      ["safety", "dispatcher-2", [SAFETY]],
+    ]);
+    expect(t.store.claims[2]?.request.recipientHandleId).toBe("handle-alex");
+    expect(t.sendTimes).toEqual([
+      [`${SAFETY}/1/1`, "2026-11-07T16:00:00.000Z"],
+      [`${SAFETY}/1/2`, "2026-11-07T16:01:00.000Z"],
+    ]);
+    expect(t.store.row(SAFETY)).toMatchObject({
+      state: "sent",
+      claim: { claimer: "dispatcher-2", claimNo: 2 },
+    });
+    expect(t.store.row(BOOKED)).toMatchObject({
+      state: "sending",
+      claim: { claimer: "dispatcher-1", claimNo: 1 },
+    });
+    expect(tryRows(t, BOOKED)).toEqual([[`${BOOKED}/1/1`, "pending"]]);
+
+    // The commit's run goes on: the booking line goes once, after the line.
+    held.open();
+    expect((await commitWake).rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([[BOOKED, "sent"]]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${SAFETY}/1/2`, `${BOOKED}/1/1`]);
+    expect(t.queue.sent).toHaveLength(1);
+    expectOverrideOnlyWhereAllowed(t, seeds);
+  });
+
+  it("a safety line's 4006: once the minute passes with no receipt, the door writes the new key and its safety claim takes the line past an earlier routine row's live claim", async () => {
+    const t = rig(seeds, START, 1_000);
+    t.linq.failures.set(`${SAFETY}/1/1`, FAILED_4006);
+    await runDispatch(t.deps, { recipientHandleId: "handle-alex", sendClass: "safety" });
+    const job = only(t.queue.sent);
+    expect(job.message.job.body).toEqual({
+      outboxRowId: SAFETY,
+      recipientHandleId: "handle-alex",
+      failedKey: `${SAFETY}/1/1`,
+      chain: "awaitReceipt",
+      code: "4006",
+      sendClass: "safety",
+    });
+
+    t.clock.advance(30_000); // 16:00:31: the commit's run holds the booking line's live claim, to 16:01:31
+    const held = holdRenewalOf(t, BOOKED);
+    const commitWake = runDispatch({ ...t.deps, store: held.store }, { recipientHandleId: "handle-alex" });
+    await held.entered;
+
+    t.clock.advance(Date.parse(job.message.notBefore) - Date.parse(t.clock.now()));
+    expect(Date.parse(t.store.row(BOOKED).claim?.lapsesAt ?? "")).toBeGreaterThan(Date.parse(t.clock.now()));
+    expect(await t.deliver(job)).toEqual(["done"]);
+
+    expect(t.doorTries).toEqual([{ key: `retry-${SAFETY}/1/1#1`, outcome: "ran" }]);
+    expect(t.store.marks).toContainEqual({
+      outcome: "failed",
+      idempotencyKey: `${SAFETY}/1/1`,
+      errorCode: "4006",
+      retry: true,
+      at: job.message.notBefore,
+    });
+    expect(claimsOf(t)).toEqual([
+      ["safety", "dispatcher-1", [SAFETY]],
+      [null, "dispatcher-1", [BOOKED]],
+      ["safety", "dispatcher-2", [SAFETY]],
+    ]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${SAFETY}/1/2`]);
+    expect(t.store.row(SAFETY).state).toBe("sent");
+
+    held.open();
+    expect((await commitWake).rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([[BOOKED, "sent"]]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${SAFETY}/1/2`, `${BOOKED}/1/1`]);
+  });
+
+  it("takes no row of another class, not even one a run of every class held back behind the line's failed try: that row waits for the recipient's next run of every class (RULES 7.2: the line's retry never sends a row a STOP binds)", async () => {
+    const t = rig(seeds, START);
+    t.linq.failures.set(`${SAFETY}/1/1`, SERVICE_DOWN);
+
+    // A turn's commit wakes Alex's rows: its run of every class takes both and sends the line first (T-1352), and the
+    // line's failure holds the booking line back (LETS_LATER_PASS).
+    const commitWake = await runDispatch(t.deps, { recipientHandleId: "handle-alex" });
+    expect(commitWake.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
+      [SAFETY, "failed"],
+      [BOOKED, "notReached"],
+    ]);
+    const job = only(t.queue.sent);
+    expect(job.message.job.body).toMatchObject({ outboxRowId: SAFETY, sendClass: "safety" });
+
+    t.clock.advance(Date.parse(job.message.notBefore) - Date.parse(t.clock.now()));
+    expect(await t.deliver(job)).toEqual(["done"]);
+
+    // The door's safety claim took the line alone, and it went. The booking line, whose claim has lapsed too, is another
+    // class's: not read, taken or sent, and no job waits for it.
+    expect(claimsOf(t)).toEqual([
+      [null, "dispatcher-1", [BOOKED, SAFETY]],
+      ["safety", "dispatcher-2", [SAFETY]],
+    ]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${SAFETY}/1/2`]);
+    expect(t.store.row(SAFETY).state).toBe("sent");
+    expect(t.store.row(BOOKED)).toMatchObject({
+      state: "sending",
+      claim: { claimer: "dispatcher-1", claimNo: 1 },
+    });
+    expect(t.sendState.reads).toEqual([SAFETY, SAFETY, SAFETY, SAFETY]);
+    expect(t.queue.sent).toHaveLength(1);
+
+    // The recipient's next run of every class (his next text's commit) takes the booking line again and sends it, once.
+    const next = await runDispatch(t.deps, { recipientHandleId: "handle-alex" });
+    expect(next.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([[BOOKED, "sent"]]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${SAFETY}/1/2`, `${BOOKED}/1/1`]);
+  });
+
+  it("unchanged for a routine row: its job names no class, and the door's run is the claim of every class", async () => {
+    const t = rig(seeds, START);
+    t.linq.failures.set(`${BOOKED}/1/1`, SERVICE_DOWN);
+
+    const first = await runDispatch(t.deps, { recipientHandleId: "handle-alex" });
+
+    expect(first.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
+      [SAFETY, "sent"],
+      [BOOKED, "failed"],
+    ]);
+    const job = only(t.queue.sent);
+    expect(job.message.job.body).toEqual({
+      outboxRowId: BOOKED,
+      recipientHandleId: "handle-alex",
+      failedKey: `${BOOKED}/1/1`,
+      chain: "rerun",
+      code: "503",
+    });
+
+    t.clock.advance(Date.parse(job.message.notBefore) - Date.parse(t.clock.now()));
+    expect(await t.deliver(job)).toEqual(["done"]);
+
+    expect(t.doorTries).toEqual([{ key: `retry-${BOOKED}/1/1#1`, outcome: "ran" }]);
+    expect(claimsOf(t)).toEqual([
+      [null, "dispatcher-1", [BOOKED, SAFETY]],
+      [null, "dispatcher-2", [BOOKED]],
+    ]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${BOOKED}/1/1`, `${BOOKED}/1/2`]);
+    expect(t.store.row(BOOKED).state).toBe("sent");
+    expect(t.queue.sent).toHaveLength(1);
+  });
+
+  it("reads the class back only as safety: a body with none, as a job enqueued before T-1357 has, or with any other value is a job of no class, whose run is the claim of every class", async () => {
+    const body = {
+      outboxRowId: SAFETY,
+      recipientHandleId: "handle-alex",
+      failedKey: `${SAFETY}/1/1`,
+      chain: "rerun",
+      code: "503",
+    };
+    expect(retryBodyOf({ ...body, sendClass: "safety" })).toEqual({ ...body, sendClass: "safety" });
+    for (const sendClass of [undefined, null, "routine", "Safety", ["safety"]]) {
+      const read = retryBodyOf({ ...body, sendClass });
+      expect(read).toEqual(body);
+      expect(read !== null && "sendClass" in read).toBe(false);
+    }
+
+    // A safety line's job enqueued before T-1357, with no class in its body, runs as it did: the claim of every class.
+    const t = rig(seeds, START);
+    const door = dispatchSendDoor({ ...t.deps, claimer: "dispatcher-2" });
+    const answer = await door.retrySend({
+      key: `retry-${SAFETY}/1/1#1`,
+      kind: "send",
+      businessId: null,
+      traceId: outboxSafetyRetry.row.traceId,
+      body,
+      try: 2,
+      firstTriedAt: "2026-11-07T16:00:00.000Z",
+    });
+    expect(answer).toEqual({ result: "done" });
+    expect(claimsOf(t)).toEqual([[null, "dispatcher-2", [BOOKED, SAFETY]]]);
+    expect(keysSent(t)).toEqual([`${SAFETY}/1/1`, `${BOOKED}/1/1`]);
   });
 });
