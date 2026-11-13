@@ -1073,8 +1073,8 @@ after(async () => {
   }
 });
 
-describe("create-staging-hyperdrive.sh makes what is missing, and each password goes only to ALTER ROLE and the API's body", () => {
-  it("with neither configuration: one connection, both logins in their shape, each with a password only the API got, both created with caching disabled and each id printed; then a second run connects to nothing", async (t) => {
+describe("create-staging-hyperdrive.sh makes what is missing, and each password goes only to the API's body (ALTER ROLE gets its verifier: T-1369)", () => {
+  it("with neither configuration: one connection as the migrations' role and one check as each login, both logins in their shape, each with a password only the API got, both created with caching disabled and each id printed; then a second run connects to nothing", async (t) => {
     const rig = checkout(t, "a");
     // debug_print_parse and debug_print_rewritten on for the maker: the script sets them off for its session.
     const db = await database(rig.names, {
